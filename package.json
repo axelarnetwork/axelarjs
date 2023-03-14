@@ -1,12 +1,34 @@
 {
   "name": "axelarjs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "Axelar Network foundations for javascript/Typescript based applications",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "husky install",
+    "build": "turbo run build",
+    "build:pkgs": "turbo run build --filter=\"./packages/*\"",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "compile": "turbo run compile",
+    "format": "prettier --write .",
+    "storybook": "pnpm -C ./packages/ui run storybook ",
+    "build-storybook": "turbo run build-storybook",
+    "docs:dev": "pnpm -C ./apps/docs dev",
+    "e2e": "pnpm -C ./apps/e2e run test",
+    "changeset": "changeset version"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@changesets/cli": "^2.26.0",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
+    "eslint": "^8.36.0",
+    "husky": "^8.0.0",
+    "prettier": "^2.8.4",
+    "pretty-quick": "^3.1.3",
+    "turbo": "^1.8.3",
+    "typescript": "^4.9.3"
+  }
 }
