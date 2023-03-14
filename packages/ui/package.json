@@ -12,7 +12,6 @@
     "codegen:component": "node scripts/codegen.mjs component --",
     "test": "vitest --run src",
     "test:watch": "vitest src",
-    "prepare": "husky install",
     "rome:apply": "npx rome check src/ --apply"
   },
   "dependencies": {
@@ -27,8 +26,6 @@
     "tailwind-styled-components": "^2.2.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.4.4",
-    "@commitlint/config-conventional": "^17.4.4",
     "@ianvs/prettier-plugin-sort-imports": "^3.7.1",
     "@storybook/addon-essentials": "^7.0.0-beta.55",
     "@storybook/addon-interactions": "^7.0.0-beta.55",
