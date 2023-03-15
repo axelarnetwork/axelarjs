@@ -1,4 +1,4 @@
-# Axelar UI
+# @axelarjs/ui
 
 The interchain design system
 
