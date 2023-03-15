@@ -1,0 +1,11 @@
+build/
+/proto/
+
+# Top level folders for node <10.7 support
+/cosmos
+/cosmos_proto
+/tendermint
+/gogoproto
+/google
+/axelar
+/node_modules
