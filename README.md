@@ -6,6 +6,6 @@ under :building_construction:
 
 ```
 ├── packages
-│   └── ui
-│   └── [more coming soon]
+│   └── ui - shared UI component library (react + tailwindcss)
+│   └── cosmos-types - Generated types from axelar-core protobuf files
 ```
