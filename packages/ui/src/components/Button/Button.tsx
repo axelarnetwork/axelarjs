@@ -1,5 +1,6 @@
-import { cva, VariantProps } from "class-variance-authority";
 import { FC } from "react";
+
+import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
 export const buttonVariance = cva("btn", {
