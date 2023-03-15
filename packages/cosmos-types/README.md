@@ -1,4 +1,4 @@
-# @axelarnetwork/axelarjs-types
+# @axelarjs/cosmos-types
 
 JS and TS types relating to Protocol Buffers used by [axelar-core](https://github.com/axelarnetwork/axelar-core) and other related projects
 
