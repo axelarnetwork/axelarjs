@@ -1,0 +1,4 @@
+{
+  "extends": "@tsconfig/node16-strictest-esm/tsconfig.json",
+  "compilerOptions": { "lib": ["ES2021", "DOM"] }
+}

@@ -6,10 +6,13 @@
   "main": "./src/index.ts",
   "files": [
     "src",
-    "assets",
-    "typings",
     "tailwind.config.preset.cjs"
   ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./base.css": "./src/base.css",
+    "./preset": "./tailwind.config.preset.cjs"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
