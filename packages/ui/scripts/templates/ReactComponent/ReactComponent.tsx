@@ -1,4 +1,5 @@
 import type { FC } from "react";
+
 import tw from "tailwind-styled-components";
 
 const StyledReactComponent = tw.div``;

@@ -1,7 +1,7 @@
-import { expect } from "vitest";
 import matchers, {
   TestingLibraryMatchers,
 } from "@testing-library/jest-dom/matchers";
+import { expect } from "vitest";
 
 declare global {
   namespace Vi {

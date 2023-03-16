@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-
 import { exec } from "child_process";
-import { writeFile, readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
+
 import { rainbow } from "./lib.mjs";
 
 const scriptName = rainbow("postexport");

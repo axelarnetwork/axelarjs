@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { createInterface } from "readline/promises";
 import R from "rambda/immutable";
+import { createInterface } from "readline/promises";
 
 /**
  * Prompt user for input

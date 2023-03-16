@@ -1,7 +1,8 @@
 #!/usr/bin/env zx
-
 import { Command } from "commander";
+
 import "zx/globals";
+
 import path from "path";
 
 import { prompt } from "./lib.mjs";
