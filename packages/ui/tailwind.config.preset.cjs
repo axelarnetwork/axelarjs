@@ -6,7 +6,6 @@ module.exports = {
   },
   daisyui: {
     themes: ["light", "dark"],
-    defaultTheme: "light",
   },
   plugins: [
     require("tailwindcss-radix"),
