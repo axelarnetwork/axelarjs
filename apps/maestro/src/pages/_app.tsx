@@ -1,15 +1,15 @@
 import "~/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Cabin } from "@next/font/google";
-import { AxelarIcon, Navbar } from "@axelarjs/ui";
-import { MoonIcon, SunIcon } from "lucide-react";
-import { useState } from "react";
+import { AxelarIcon, Navbar, useThemeSwitcher } from "@axelarjs/ui";
+import { Moon, Sun } from "lucide-react";
 import clsx from "clsx";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, toggleTheme] = useThemeSwitcher();
+
   return (
     <>
       <style jsx global>
@@ -29,18 +29,18 @@ export default function App({ Component, pageProps }: AppProps) {
           </Navbar.Start>
           <Navbar.End>
             <button
+              data-toggle-theme="dark,light"
+              data-act-class="ACTIVECLASS"
               className={clsx("swap swap-rotate", {
                 "swap-active": theme === "light",
               })}
-              onClick={() =>
-                setTheme((theme) => (theme === "light" ? "dark" : "light"))
-              }
+              onClick={toggleTheme}
             >
               <span className="swap-on">
-                <SunIcon className="h-6 w-6" />
+                <Sun className="h-6 w-6" />
               </span>
               <span className="swap-off">
-                <MoonIcon className="h-6 w-6" />
+                <Moon className="h-6 w-6" />
               </span>
             </button>
           </Navbar.End>
