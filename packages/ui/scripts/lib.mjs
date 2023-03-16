@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import R from "rambda/immutable";
+import R from "rambda";
 import { createInterface } from "readline/promises";
 
 /**

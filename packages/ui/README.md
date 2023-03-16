@@ -32,3 +32,58 @@ pnpm storybook
 - storybook v7 for interactive docs
 - prettier on precommit
 - commitlint / conventional commits check on precommit
+
+### Use Nextjs 13+ fonts
+
+1. Install `@next/font`
+
+```bash
+pnpm add -D @next/font
+```
+
+2. Import it on `_app.tsx`
+
+```tsx
+import { Cabin } from "@next/font/google";
+
+const fontSans = Cabin({
+  subsets: ["latin"],
+});
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <style jsx global>
+        {`
+          :root {
+            --font-sans: ${fontSans.style.fontFamily};
+          }
+        `}
+      </style>
+      <Component {...pageProps} />;
+    </>
+  );
+}
+
+export default MyApp;
+```
+
+3. Configure tailwind.config.js
+
+```ts
+const { fontFamily } = require("tailwindcss/defaultTheme");
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  presets: [require("@axelarjs/ui/preset")],
+  // ...
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", ...fontFamily.sans],
+      },
+    },
+  },
+  // ...
+};
+```

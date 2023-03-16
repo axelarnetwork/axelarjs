@@ -22,7 +22,8 @@
     "codegen:component": "node scripts/codegen.mjs component --",
     "test": "vitest --run src",
     "test:watch": "vitest src",
-    "rome:apply": "npx rome check src/ --apply"
+    "rome:apply": "npx rome check src/ --apply",
+    "svgr": "svgr ./assets/icons"
   },
   "dependencies": {
     "@radix-ui/react-switch": "^1.0.2",
@@ -50,6 +51,7 @@
     "@storybook/testing-react": "2.0.0-next.0",
     "@storybook/theming": "7.0.0-rc.3",
     "@storybook/types": "7.0.0-rc.3",
+    "@svgr/cli": "^6.5.1",
     "@tailwindcss/typography": "^0.5.9",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
