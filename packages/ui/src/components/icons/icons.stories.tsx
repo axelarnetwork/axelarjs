@@ -6,8 +6,8 @@ import * as icons from "./svgr";
 
 export default {
   title: "components/Icons",
-  component: icons.Axelar,
-} as Meta<typeof icons.Axelar>;
+  component: icons.AxelarIcon,
+} as Meta<typeof icons.AxelarIcon>;
 
 const Template: StoryFn<IconType> = () => {
   const iconComponents = Object.keys(icons).map(

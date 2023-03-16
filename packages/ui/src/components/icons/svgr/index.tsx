@@ -1,3 +1,3 @@
-export { default as AxelarBlue } from "./AxelarBlue";
-export { default as AxelarWhite } from "./AxelarWhite";
-export { default as Axelar } from "./Axelar";
+export { default as AxelarBlueIcon } from "./AxelarBlueIcon";
+export { default as AxelarIcon } from "./AxelarIcon";
+export { default as AxelarWhiteIcon } from "./AxelarWhiteIcon";

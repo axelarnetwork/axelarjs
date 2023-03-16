@@ -32,9 +32,11 @@ importers:
       "@types/react": ^18.0.27
       "@types/react-dom": ^18.0.10
       autoprefixer: ^10.4.13
+      clsx: ^1.2.1
       daisyui: ^2.51.2
       eslint: ^8.36.0
       eslint-config-next: 13.2.4
+      lucide-react: ^0.125.0
       next: 13.2.4
       next-transpile-modules: ^10.0.0
       postcss: ^8.4.21
@@ -49,8 +51,10 @@ importers:
       "@types/node": 18.15.3
       "@types/react": 18.0.28
       "@types/react-dom": 18.0.11
+      clsx: 1.2.1
       eslint: 8.36.0
       eslint-config-next: 13.2.4_vgl77cfdswitgr47lm5swmv43m
+      lucide-react: 0.125.0_react@18.2.0
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0

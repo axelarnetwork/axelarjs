@@ -2,9 +2,7 @@ import { Button } from "@axelarjs/ui";
 import Head from "next/head";
 import tw from "tailwind-styled-components";
 
-const Shell = tw.div`
-  h-screen grid place-items-center
-`;
+const Shell = tw.div``;
 
 export default function Home() {
   return (
