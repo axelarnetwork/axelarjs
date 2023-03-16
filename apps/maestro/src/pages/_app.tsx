@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
         `}
       </style>
       <div className="min-h-screen flex flex-col flex-1 gap-4">
-        <Navbar className="bg-base-200 p-4">
+        <Navbar className="bg-base-200">
           <Navbar.Start>
             <div className="flex items-center gap-2 text-lg font-bold uppercase">
               <AxelarIcon className="h-6 w-6 dark:invert" />
