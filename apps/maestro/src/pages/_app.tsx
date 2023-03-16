@@ -30,10 +30,8 @@ export default function App({ Component, pageProps }: AppProps) {
           <Navbar.End>
             <button
               data-toggle-theme="dark,light"
-              data-act-class="ACTIVECLASS"
-              className={clsx("swap swap-rotate", {
-                "swap-active": theme === "light",
-              })}
+              data-act-class="swap-active"
+              className={clsx("swap swap-rotate")}
               onClick={toggleTheme}
             >
               <span className="swap-on">
