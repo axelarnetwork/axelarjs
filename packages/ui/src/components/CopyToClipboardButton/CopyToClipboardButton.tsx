@@ -53,7 +53,7 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
       {children}
 
       <div
-        className={clsx("swap swap-rotate", {
+        className={clsx("swap swap-flip", {
           "swap-active": isCopied,
         })}
       >
