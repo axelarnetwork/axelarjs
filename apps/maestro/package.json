@@ -16,6 +16,7 @@
     "clsx": "^1.2.1",
     "eslint": "^8.36.0",
     "eslint-config-next": "13.2.4",
+    "ethers": "^5",
     "lucide-react": "^0.125.0",
     "next": "13.2.4",
     "nextjs-progressbar": "^0.0.16",
@@ -24,7 +25,8 @@
     "react-dom": "^18.2.0",
     "tailwind-styled-components": "^2.2.0",
     "typescript": "5.0.2",
-    "unstated-next": "^1.1.0"
+    "unstated-next": "^1.1.0",
+    "wagmi": "^0.12.2"
   },
   "devDependencies": {
     "@next/font": "^13.2.4",
