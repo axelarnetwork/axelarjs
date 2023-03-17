@@ -6,6 +6,7 @@ import { Moon, Sun } from "lucide-react";
 export const VALID_THEMES = ["light", "dark"] as const;
 
 export type ThemeKind = (typeof VALID_THEMES)[number];
+export const THEME_KEY = "@axelarui/theme";
 
 export function isValidTheme(theme: string): theme is ThemeKind {
   // rome-ignore lint/suspicious/noExplicitAny: avoid union type mismatch
@@ -14,7 +15,7 @@ export function isValidTheme(theme: string): theme is ThemeKind {
 
 function persistTheme(theme: ThemeKind) {
   document.documentElement.dataset.theme = theme;
-  localStorage.setItem("theme", theme);
+  localStorage.setItem(THEME_KEY, theme);
 }
 
 export type ThemeSwitcherProps = {};
@@ -28,7 +29,7 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
       return;
     }
 
-    const persistedTheme = localStorage.getItem("theme");
+    const persistedTheme = localStorage.getItem(THEME_KEY);
 
     const defaultTheme =
       persistedTheme && isValidTheme(persistedTheme) ? persistedTheme : "light";

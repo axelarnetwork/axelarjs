@@ -8,6 +8,8 @@ const BASE_THEME = { ...darkTheme, ...base };
  */
 const theme = {
   ...BASE_THEME,
+
+  /// Add your custom theme overrides here
 };
 
 module.exports = theme;

@@ -12,6 +12,7 @@ const BASE_THEME = {
  */
 const theme = {
   ...BASE_THEME,
+  /// Add your custom theme overrides here
 };
 
 module.exports = theme;
