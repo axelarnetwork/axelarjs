@@ -39,6 +39,7 @@ importers:
       eslint: ^8.36.0
       eslint-config-next: 13.2.4
       ethers: ^5
+      ky: ^0.33.3
       lucide-react: ^0.125.0
       next: 13.2.4
       next-transpile-modules: ^10.0.0
@@ -63,6 +64,7 @@ importers:
       eslint: 8.36.0
       eslint-config-next: 13.2.4_j4766f7ecgqbon3u7zlxn5zszu
       ethers: 5.7.2
+      ky: 0.33.3
       lucide-react: 0.125.0_react@18.2.0
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
       nextjs-progressbar: 0.0.16_next@13.2.4+react@18.2.0
@@ -12932,6 +12934,14 @@ packages:
       }
     engines: { node: ">=6" }
     dev: true
+
+  /ky/0.33.3:
+    resolution:
+      {
+        integrity: sha512-CasD9OCEQSFIam2U8efFK81Yeg8vNMTBUqtMOHlrcWQHqUX3HeCl9Dr31u4toV7emlH8Mymk5+9p0lL6mKb/Xw==,
+      }
+    engines: { node: ">=14.16" }
+    dev: false
 
   /language-subtag-registry/0.3.22:
     resolution:

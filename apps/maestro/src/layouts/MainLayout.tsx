@@ -10,16 +10,17 @@ import {
   ThemeSwitcher,
   useTheme,
 } from "@axelarjs/ui";
-import { useWeb3Modal, Web3Button, Web3Modal } from "@web3modal/react";
+import { useWeb3Modal, Web3Modal } from "@web3modal/react";
 
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useNetwork, useDisconnect } from "wagmi";
 
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { APP_NAME } from "~/config/app";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { isConnected, address } = useAccount();
-  const { open, isOpen } = useWeb3Modal();
+  const { chain } = useNetwork();
+  const { open } = useWeb3Modal();
   const { disconnect } = useDisconnect();
   const theme = useTheme();
 
@@ -36,6 +37,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           <Navbar.End className="flex items-center gap-2">
             {isConnected && address ? (
               <>
+                <div>{chain?.network}</div>
                 <CopyToClipboardButton size="sm" copyText={address} outline>
                   {address.slice(0, 6)}...{address.slice(-4)}
                 </CopyToClipboardButton>
