@@ -1,7 +1,8 @@
 import "~/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Cabin } from "@next/font/google";
-import { AxelarIcon, Navbar, ThemeSwitcher } from "@axelarjs/ui";
+import { AxelarIcon, Clamp, Footer, Navbar, ThemeSwitcher } from "@axelarjs/ui";
+import NextNProgress from "nextjs-progressbar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 
@@ -15,6 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }
         `}
       </style>
+      <NextNProgress />
       <div className="min-h-screen flex flex-col flex-1 gap-4">
         <Navbar className="bg-base-200">
           <Navbar.Start>
@@ -27,14 +29,14 @@ export default function App({ Component, pageProps }: AppProps) {
             <ThemeSwitcher />
           </Navbar.End>
         </Navbar>
-        <main className="flex-1">
+        <Clamp $as="main" className="flex-1">
           <Component {...pageProps} />
-        </main>
-        <footer className="bg-base-200 p-4 grid place-items-center">
-          <span>
+        </Clamp>
+        <Footer className="p-8 bg-neutral text-neutral-content" center>
+          <Footer.Title>
             &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
-          </span>
-        </footer>
+          </Footer.Title>
+        </Footer>
       </div>
     </>
   );

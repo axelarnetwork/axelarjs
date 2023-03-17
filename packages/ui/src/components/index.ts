@@ -1,5 +1,7 @@
 export * from "./Button";
 export * from "./Card";
+export * from "./core";
+export * from "./Footer";
 export * from "./icons";
 export * from "./Navbar";
 export * from "./Switch";
