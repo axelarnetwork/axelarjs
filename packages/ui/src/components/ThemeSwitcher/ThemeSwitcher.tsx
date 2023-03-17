@@ -64,16 +64,10 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
     <button
       data-toggle-theme={VALID_THEMES.join(",")}
       onClick={handleToggleTheme}
-      className={clsx("swap swap-rotate", {
-        "swap-active": theme === "dark",
-      })}
+      className={clsx("swap swap-rotate", { "swap-active": theme === "dark" })}
     >
-      <span className="swap-on pointer-events-none">
-        <Sun className="h-6 w-6" />
-      </span>
-      <span className="swap-off pointer-events-none">
-        <Moon className="h-6 w-6" />
-      </span>
+      <Sun className="swap-on pointer-events-none h-6 w-6" />
+      <Moon className="swap-off pointer-events-none h-6 w-6" />
     </button>
   );
 };
