@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
 import clsx from "clsx";
-import { Check, CheckCircle, Copy } from "lucide-react";
+import { CheckCircle, ClipboardCopy } from "lucide-react";
 
 import { useCopyToClipboard } from "../../hooks";
 import { Button, ButtonProps } from "../Button";
@@ -29,7 +29,7 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
   const handleCopy = (text = "") => {
     if (!text) {
       throw new Error(
-        "CopyToClipboardButton: missing props 'copyText' or string children"
+        "[CopyToClipboardButton]: missing props 'copyText' or string children"
       );
     }
     copy(text ?? "");
@@ -42,11 +42,7 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
     "h-4 w-4": props.size === "md",
     "h-3.5 w-3.5": props.size === "sm",
     "h-3 w-3": props.size === "xs",
-    "text-success": isCopied,
-    "opacity-75": !isCopied,
   });
-
-  const Icon = isCopied ? CheckCircle : Copy;
 
   return (
     <Button
@@ -54,8 +50,16 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
       onClick={handleCopy.bind(null, textToCopy)}
       {...props}
     >
-      {children}{" "}
-      <Icon className={iconClassNames} color="currentColor" aria-hidden />
+      {children}
+
+      <div
+        className={clsx("swap swap-rotate", {
+          "swap-active": isCopied,
+        })}
+      >
+        <ClipboardCopy className={clsx("swap-off", iconClassNames)} />
+        <CheckCircle className={clsx("swap-on text-success", iconClassNames)} />
+      </div>
     </Button>
   );
 };

@@ -13,6 +13,7 @@ const BASE_THEME = {
 const theme = {
   ...BASE_THEME,
   /// Add your custom theme overrides here
+  "base-200": "#EBF6FC",
 };
 
 module.exports = theme;

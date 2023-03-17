@@ -66,19 +66,24 @@ function useThemeState(initialState: ThemeKind | null = null) {
 export const { Provider: ThemeProvider, useContainer: useThemeSwitcher } =
   createContainer(useThemeState);
 
-export type ThemeSwitcherProps = {};
+export type ThemeSwitcherProps = JSX.IntrinsicElements["button"];
 
-export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
+export const ThemeSwitcher: FC<ThemeSwitcherProps> = (props) => {
   const [theme, actions] = useThemeSwitcher();
 
   return (
     <button
       data-toggle-theme={VALID_THEMES.join(",")}
       onClick={actions.toggleTheme}
-      className={clsx("swap swap-rotate", { "swap-active": theme === "dark" })}
+      className={clsx("swap-rotate swap", { "swap-active": theme === "dark" })}
+      {...props}
     >
       <Sun className="swap-on pointer-events-none h-6 w-6" />
       <Moon className="swap-off pointer-events-none h-6 w-6" />
     </button>
   );
+};
+
+ThemeSwitcher.defaultProps = {
+  "aria-label": "Toggle theme",
 };

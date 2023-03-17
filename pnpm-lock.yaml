@@ -149,6 +149,7 @@ importers:
       tailwind-merge: ^1.10.0
       tailwind-styled-components: ^2.2.0
       tailwindcss: ^3.2.7
+      tailwindcss-animate: ^1.0.5
       tailwindcss-radix: ^2.8.0
       typescript: 5.0.2
       unstated-next: ^1.1.0
@@ -204,6 +205,7 @@ importers:
       prop-types: 15.8.1
       storybook: 7.0.0-rc.3
       tailwindcss: 3.2.7_postcss@8.4.21
+      tailwindcss-animate: 1.0.5_tailwindcss@3.2.7
       tailwindcss-radix: 2.8.0
       typescript: 5.0.2
       vite: 4.1.4
@@ -16694,6 +16696,17 @@ packages:
       react-dom: 18.2.0_react@18.2.0
       tailwind-merge: 1.10.0
     dev: false
+
+  /tailwindcss-animate/1.0.5_tailwindcss@3.2.7:
+    resolution:
+      {
+        integrity: sha512-UU3qrOJ4lFQABY+MVADmBm+0KW3xZyhMdRvejwtXqYOL7YjHYxmuREFAZdmVG5LPe5E9CAst846SLC4j5I3dcw==,
+      }
+    peerDependencies:
+      tailwindcss: ">=3.0.0 || insiders"
+    dependencies:
+      tailwindcss: 3.2.7_postcss@8.4.21
+    dev: true
 
   /tailwindcss-radix/2.8.0:
     resolution:
