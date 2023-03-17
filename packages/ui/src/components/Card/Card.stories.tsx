@@ -53,5 +53,5 @@ export const CardWithCustomTag = Template.bind({});
 CardWithCustomTag.args = {
   children: "Card with Custom Tag",
   className: "bg-base-300",
-  as: "section",
+  $as: "section",
 };
