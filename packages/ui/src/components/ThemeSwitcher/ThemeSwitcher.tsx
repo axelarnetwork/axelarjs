@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useState } from "react";
 
 import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
+import { createContainer } from "unstated-next";
 
 export const VALID_THEMES = ["light", "dark"] as const;
 
@@ -18,10 +19,8 @@ function persistTheme(theme: ThemeKind) {
   localStorage.setItem(THEME_KEY, theme);
 }
 
-export type ThemeSwitcherProps = {};
-
-export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
-  const [theme, setTheme] = useState<ThemeKind | null>(null);
+function useThemeState(initialState: ThemeKind | null = null) {
+  const [theme, setTheme] = useState<ThemeKind | null>(initialState);
 
   useEffect(() => {
     if (theme) {
@@ -61,10 +60,21 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
     []
   );
 
+  return [theme, { toggleTheme: handleToggleTheme }] as const;
+}
+
+export const { Provider: ThemeProvider, useContainer: useThemeSwitcher } =
+  createContainer(useThemeState);
+
+export type ThemeSwitcherProps = {};
+
+export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
+  const [theme, actions] = useThemeSwitcher();
+
   return (
     <button
       data-toggle-theme={VALID_THEMES.join(",")}
-      onClick={handleToggleTheme}
+      onClick={actions.toggleTheme}
       className={clsx("swap swap-rotate", { "swap-active": theme === "dark" })}
     >
       <Sun className="swap-on pointer-events-none h-6 w-6" />

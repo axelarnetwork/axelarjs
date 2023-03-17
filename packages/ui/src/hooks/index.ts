@@ -5,3 +5,4 @@ export * from "./useIsomorphicLayoutEffect";
 export * from "./useSortedArray";
 export * from "./useSyncedRef";
 export * from "./useWindowSize";
+export * from "./useTheme";
