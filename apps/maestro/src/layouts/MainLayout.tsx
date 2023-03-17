@@ -15,7 +15,6 @@ import { useAccount, useDisconnect } from "wagmi";
 
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { APP_NAME } from "~/config/app";
-import "~/styles/globals.css";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { isConnected, address } = useAccount();
