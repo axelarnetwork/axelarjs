@@ -1,0 +1,33 @@
+{
+  // tailwindcss intelisense settings
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript", // if you are using typescript
+    "typescriptreact": "javascript" // if you are using typescript with react
+  },
+  "tailwindCSS.experimental.classRegex": [
+    "tw`([^`]*)", // tw`...`
+    "tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
+    "tw\\(.*?\\).*?`([^`]*)", // tw(Component)<xxx>`...`
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "editor.quickSuggestions": {
+    "strings": true // forces VS Code to trigger completions when editing "string" content
+  },
+  // prettier settings
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
