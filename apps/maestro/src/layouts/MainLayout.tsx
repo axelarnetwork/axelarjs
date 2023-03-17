@@ -4,6 +4,7 @@ import {
   AxelarIcon,
   Button,
   Clamp,
+  CopyToClipboardButton,
   Footer,
   Navbar,
   ThemeSwitcher,
@@ -34,9 +35,9 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           <Navbar.End className="flex items-center gap-2">
             {isConnected && address ? (
               <>
-                <Button size="sm">
+                <CopyToClipboardButton size="sm" copyText={address}>
                   {address.slice(0, 6)}...{address.slice(-4)}
-                </Button>
+                </CopyToClipboardButton>
                 <Button size="sm" onClick={() => disconnect()}>
                   Disconnect
                 </Button>
