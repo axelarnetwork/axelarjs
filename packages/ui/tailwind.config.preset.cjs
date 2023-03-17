@@ -9,7 +9,10 @@ module.exports = {
     extend: {},
   },
   daisyui: {
-    themes: ["light", "dark"],
+    themes: [
+      { light: require("./themes/light.cjs") },
+      { dark: require("./themes/dark.cjs") },
+    ],
   },
   darkMode: ["class", '[data-theme="dark"]'],
 };
