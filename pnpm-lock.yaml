@@ -31,7 +31,7 @@ importers:
       "@types/node": 18.15.3
       "@types/react": ^18.0.27
       "@types/react-dom": ^18.0.10
-      "@web3modal/ethereum": ^2.2.0
+      "@web3modal/ethereum": ^2.2.1
       "@web3modal/react": ^2.2.1
       autoprefixer: ^10.4.13
       clsx: ^1.2.1
@@ -58,7 +58,7 @@ importers:
       "@types/node": 18.15.3
       "@types/react": 18.0.28
       "@types/react-dom": 18.0.11
-      "@web3modal/ethereum": 2.2.0_ethers@5.7.2
+      "@web3modal/ethereum": 2.2.1_ethers@5.7.2
       "@web3modal/react": 2.2.1_biqbaboplfbrettd7655fr4n2y
       clsx: 1.2.1
       eslint: 8.36.0
@@ -7190,10 +7190,10 @@ packages:
       - react
     dev: false
 
-  /@web3modal/ethereum/2.2.0_ethers@5.7.2:
+  /@web3modal/ethereum/2.2.1_ethers@5.7.2:
     resolution:
       {
-        integrity: sha512-/xARXiIyKz9O9plCwNUAoE70gT8r5x6dnJ3cslAC3PW+mUwI3wKVIBuT1garO7BfKK/rnDwDyAeJ+OIbxTT3mw==,
+        integrity: sha512-lSz13EaWxhJQyuAluC0FJ+hH8cx5pQyEr2f3brn5KVLIN6vgVz9rjSMLLmI1w2ukrQRKpRz0XCzDSgrerYhtQw==,
       }
     peerDependencies:
       "@wagmi/core": ">=0.10"
