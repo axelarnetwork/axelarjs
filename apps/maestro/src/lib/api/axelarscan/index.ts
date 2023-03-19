@@ -17,10 +17,8 @@ export const COLLECTIONS = {
   chains: "chains",
 };
 
-const BASE_URL = String(process.env.NEXT_PUBLIC_EXPLORER_API_URL);
-
 const client = ky.extend({
-  prefixUrl: BASE_URL,
+  prefixUrl: String(process.env.NEXT_PUBLIC_EXPLORER_API_URL),
 });
 
 export type AxelarApiParams<T extends Record<string, unknown>> = T & {
@@ -34,8 +32,6 @@ async function getAssets(params?: { denoms: string[] }) {
   const json = { module: MODULES.data, path: null, ...params };
 
   const result = await client.post("", { json }).json<GetAssetsResponse>();
-
-  console.log("getAssets", { result });
 
   return result;
 }
