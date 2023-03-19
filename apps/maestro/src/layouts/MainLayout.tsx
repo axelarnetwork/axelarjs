@@ -14,14 +14,12 @@ import { useWeb3Modal, Web3Modal } from "@web3modal/react";
 
 import { useAccount, useNetwork, useDisconnect, useSwitchNetwork } from "wagmi";
 
-import {
-  CHAIN_CONFIGS,
-  ethereumClient,
-  WALLECTCONNECT_PROJECT_ID,
-} from "~/config/wagmi";
+import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { APP_NAME } from "~/config/app";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 import Image from "next/image";
+
+const ChainsDropdown = () => {};
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
