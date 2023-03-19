@@ -30,17 +30,19 @@ export type AxelarApiParams<T extends Record<string, unknown>> = T & {
 
 export type GetAssetsResponse = AxelarScanAsset[];
 
-export const getAssets = async (params: { denoms: string[] }) => {
+async function getAssets(params?: { denoms: string[] }) {
   const json = { module: MODULES.data, path: null, ...params };
 
   const result = await client.post("", { json }).json<GetAssetsResponse>();
 
+  console.log("getAssets", { result });
+
   return result;
-};
+}
 
 export type GetAssetsPriceResponse = AxelarAssetPrice[];
 
-export const getAssetPrices = async (params: { denoms: string[] }) => {
+async function getAssetPrices(params: { denoms: string[] }) {
   const json = {
     module: MODULES.assets,
     path: null,
@@ -50,14 +52,14 @@ export const getAssetPrices = async (params: { denoms: string[] }) => {
   const result = await client.post("", { json }).json<GetAssetsPriceResponse>();
 
   return result;
-};
+}
 
 export type GetChainConfigsResponse = {
   evm: EVMChainConfig[];
   cosmos: CosmosChainConfig[];
 };
 
-export const getChainConfigs = async () => {
+async function getChainConfigs() {
   const isStaging = process.env.NEXT_PUBLIC_SITE_URL?.includes("staging");
 
   const json = {
@@ -81,4 +83,6 @@ export const getChainConfigs = async () => {
       (a) => (!a?.is_staging || isStaging) && !disabledChains?.includes(a.id)
     ),
   };
-};
+}
+
+export { getAssets, getAssetPrices, getChainConfigs };
