@@ -68,6 +68,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         themeMode={theme ?? "light"}
         themeVariables={{
           "--w3m-font-family": "var(--font-sans)",
+          "--w3m-logo-image-url": "/icons/favicon-32x32.png",
         }}
       />
     </>
