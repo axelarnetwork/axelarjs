@@ -1,12 +1,9 @@
 import { ComponentProps, FC } from "react";
 
-import { StoryFn } from "@storybook/react";
+import type { CapitalizeKeys } from "@axelarjs/utils";
+import type { StoryFn } from "@storybook/react";
 
 import { Card } from "../Card";
-
-type CapitalizeKeys<T> = {
-  [TKey in keyof T as `${Capitalize<string & TKey>}s`]: T[TKey];
-};
 
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));
@@ -16,6 +13,8 @@ type VariantConfig<
   TKey extends keyof ComponentProps<TComponent>
 > = {
   values: ComponentProps<TComponent>[TKey][];
+  description?: string;
+  title?: string;
   getChildren?: (props: ComponentProps<TComponent>[TKey]) => React.ReactNode;
 };
 
@@ -44,7 +43,7 @@ const Variants = <
   <Card className="bg-base-200 m-8 inline-grid">
     <Card.Body className="grid gap-4">
       <Card.Title>
-        {capitalize(props.propKey)}{" "}
+        {props.variant.title ?? capitalize(props.propKey)}{" "}
         <span className="text-base-content/75">/</span>{" "}
         {props.variant.values.map((x) => (
           <small className="badge badge-info badge-sm">{x}</small>
@@ -86,7 +85,7 @@ export const configurePlayground = <
 
     return {
       ...acc,
-      [`${capitalize(propKey)}s`]: componentStory,
+      [capitalize(propKey)]: componentStory,
     };
   }, {} as CapitalizeKeys<Record<keyof typeof variants, StoryFn<typeof Variants>>>);
 };
