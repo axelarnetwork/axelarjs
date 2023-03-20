@@ -5,14 +5,19 @@ import { DISABLED_CHAINS } from "~/config/chains";
 import { getAssetPrices, getAssets, getChainConfigs } from ".";
 
 export function useChainConfigsQuery() {
-  return useQuery(["axelarscan-chain-configs"], getChainConfigs);
+  return useQuery(["axelarscan-chain-configs"], getChainConfigs, {
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnWindowFocus: false,
+  });
 }
 
 export function useEVMChainConfigsQuery() {
   const { data, ...query } = useChainConfigsQuery();
 
   return {
-    data: data?.evm?.filter((a) => !DISABLED_CHAINS.has(a?.chain_id)),
+    data: data?.evm?.filter(
+      (chain) => !(DISABLED_CHAINS.has(chain?.chain_id) || chain?.deprecated)
+    ),
     ...query,
   };
 }
