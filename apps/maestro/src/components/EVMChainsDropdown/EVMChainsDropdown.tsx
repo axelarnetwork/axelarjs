@@ -1,4 +1,4 @@
-import { Button, Dropdown } from "@axelarjs/ui";
+import { Dropdown, LinkButton } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
 import React, { FC } from "react";
@@ -76,8 +76,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
                 chain.chain_id === props.selectedChain?.chain_id,
             })}
           >
-            <Button
-              $as="a"
+            <LinkButton
               href="#"
               onClick={(e) => {
                 e.preventDefault();
@@ -87,7 +86,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
             >
               <ChainIcon src={chain.image} alt={chain.chain_name} size="md" />
               <div>{chain.chain_name}</div>
-            </Button>
+            </LinkButton>
           </Dropdown.Item>
         ))}
       </Dropdown.Content>
