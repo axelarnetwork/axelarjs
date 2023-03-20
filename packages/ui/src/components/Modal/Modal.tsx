@@ -33,7 +33,7 @@ const StyledActionButtons = tw.div`
 `;
 
 export type ModalProps = JSX.IntrinsicElements["div"] & {
-  onCancel: () => void;
+  onCancel?: () => void;
   onCancelText?: string;
   onConfirm?: () => void;
   onConfirmText?: string;
