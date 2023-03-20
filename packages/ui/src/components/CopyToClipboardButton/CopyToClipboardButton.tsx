@@ -40,29 +40,31 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
   };
   const isCopied = copied === textToCopy;
 
-  const iconClassNames = clsx({
-    "h-5 w-5": props.size === "lg",
-    "h-4 w-4": props.size === "md",
-    "h-3.5 w-3.5": props.size === "sm",
-    "h-3 w-3": props.size === "xs",
-  });
-
   return (
     <Button
       className={clsx("flex items-center gap-2", className)}
       onClick={handleCopy.bind(null, textToCopy)}
       {...props}
     >
-      {children}
+      {children ?? textToCopy}
 
       <div
         className={clsx("swap swap-rotate", {
           "swap-active": isCopied,
         })}
       >
-        <CheckCircle className={clsx("swap-on text-success", iconClassNames)} />
-        <ClipboardCopy className={clsx("swap-off", iconClassNames)} />
+        <CheckCircle
+          className={clsx(
+            "swap-on h-[1em] w-[1em]",
+            props.color === "success" ? "text-success-content" : "text-success"
+          )}
+        />
+        <ClipboardCopy className={clsx("swap-off", "h-[1em] w-[1em]")} />
       </div>
     </Button>
   );
+};
+
+CopyToClipboardButton.defaultProps = {
+  size: "md",
 };

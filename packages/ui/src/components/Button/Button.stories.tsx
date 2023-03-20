@@ -20,7 +20,7 @@ const Template: StoryFn<typeof Button> = (args) => {
 
 export const Default = Template.bind({});
 
-const colors = [
+export const buttonColors = [
   "primary",
   "secondary",
   "accent",
@@ -30,13 +30,13 @@ const colors = [
   "info",
 ] as ButtonProps["color"][];
 
-const sizes = ["xs", "sm", "md", "lg"] as ButtonProps["size"][];
+export const buttonSizes = ["xs", "sm", "md", "lg"] as ButtonProps["size"][];
 
 // creates stories for variansts (color, size, shape)
 const { Colors, Sizes, Shapes } = pluralizeKeys(
   configurePlayground(Button, {
-    color: { values: colors },
-    size: { values: sizes },
+    color: { values: buttonColors },
+    size: { values: buttonSizes },
     shape: {
       values: ["circle", "square"],
       getChildren: (value) => (value === "circle" ? "🔵" : "🟢"),
