@@ -1,6 +1,10 @@
 import ky from "ky";
 
-import type { SearchGMPParams } from "./types";
+import type {
+  GetGMPContractsResponse,
+  SearchGMPParams,
+  SearchGMPResponse,
+} from "./types";
 
 export const client = ky.extend({
   prefixUrl: String(process.env.NEXT_PUBLIC_GMP_API_URL),
@@ -14,17 +18,15 @@ async function searchGMP(params: SearchGMPParams) {
         method: "searchGMP",
       },
     })
-    .json();
+    .json<SearchGMPResponse>();
 }
 
-async function getContracts(params = {}) {
-  // await request({
-  //   ...params,
-  //   method: "getContracts",
-  // });
-  return new Promise((resolve) => {
-    resolve([]);
-  });
+async function getContracts() {
+  return await client
+    .post("", {
+      json: { method: "getContracts" },
+    })
+    .json<GetGMPContractsResponse>();
 }
 
 export { getContracts, searchGMP };

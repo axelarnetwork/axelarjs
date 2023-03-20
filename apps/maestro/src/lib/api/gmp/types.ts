@@ -61,3 +61,13 @@ export type SearchGMPResponseData = {
 export type SearchGMPResponse = {
   data: SearchGMPResponseData[];
 };
+
+export type GetGMPContractsResponse = {
+  constant_address_deployer: `0x${string}`;
+  express_contract: {
+    address: `0x${string}`;
+  };
+  gateway_contracts: Record<string, { address: `0x${string}` }>;
+  gas_service_contracts: Record<string, { address: `0x${string}` }>;
+  time_spent: number;
+};
