@@ -36,4 +36,8 @@ export const Default = Template.bind({});
 Default.args = {
   children: "Default Modal",
   className: "bg-base-300",
+  onCancelText: "Back",
+  onCancel: () => {},
+  onConfirmText: "Confirm",
+  onConfirm: () => alert("Confirmed!"),
 };

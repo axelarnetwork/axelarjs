@@ -26,9 +26,27 @@ const StyledDialogContent = tw(Dialog.Content)`
   bg-base-100
 `;
 
-export type ModalProps = JSX.IntrinsicElements["div"] & {};
+const StyledActionButtons = tw.div`
+  flex
+  flex-row
+  justify-between
+`;
 
-export const Modal: FC<ModalProps> = ({ children, ...props }) => (
+export type ModalProps = JSX.IntrinsicElements["div"] & {
+  onCancel: () => void;
+  onCancelText?: string;
+  onConfirm?: () => void;
+  onConfirmText: string;
+};
+
+export const Modal: FC<ModalProps> = ({
+  children,
+  onCancel,
+  onConfirm,
+  onCancelText = "Back",
+  onConfirmText = "Close",
+  ...props
+}) => (
   <Dialog.Root>
     <Dialog.Trigger asChild>
       <Button>Open</Button>
@@ -37,9 +55,16 @@ export const Modal: FC<ModalProps> = ({ children, ...props }) => (
       <StyledDialogOverlay />
       <StyledDialogContent>
         {children}
-        <Dialog.Close asChild>
-          <Button>Close</Button>
-        </Dialog.Close>
+        <StyledActionButtons>
+          {onCancel && (
+            <Dialog.Close asChild>
+              <Button onClick={onCancel}>{onCancelText}</Button>
+            </Dialog.Close>
+          )}
+          <Dialog.Close asChild>
+            <Button onClick={onConfirm}>{onConfirmText}</Button>
+          </Dialog.Close>
+        </StyledActionButtons>
       </StyledDialogContent>
     </Dialog.Portal>
   </Dialog.Root>
