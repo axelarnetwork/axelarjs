@@ -2,32 +2,69 @@ import { ComponentProps, FC } from "react";
 
 import { StoryFn } from "@storybook/react";
 
+import { Card } from "../Card";
+
+type CapitalizeKeys<T> = {
+  [TKey in keyof T as `${Capitalize<string & TKey>}s`]: T[TKey];
+};
+
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));
 
-const Variants: FC<{
+type VariantConfig<
+  TComponent extends FC,
+  TKey extends keyof ComponentProps<TComponent>
+> = {
+  values: ComponentProps<TComponent>[TKey][];
+  getChildren?: (props: ComponentProps<TComponent>[TKey]) => React.ReactNode;
+};
+
+type VariantConfigLike<TComponent extends FC> = VariantConfig<
+  TComponent,
+  // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+  any
+>;
+
+type VariantsProps<
+  TComponent extends FC,
+  TComponentProps extends ComponentProps<TComponent>
+> = {
   propKey: string;
-  values: (string | number | boolean)[];
-  component: FC;
-  defaultProps?: Record<string, unknown>;
-}> = (props) => (
-  <section className="grid gap-2">
-    <h1 className="text-lg">
-      {capitalize(props.propKey)} / <small>{props.values.join(", ")}</small>
-    </h1>
-    <ul className="flex items-center gap-2">
-      {props.values.map((value) => (
-        // @ts-ignore
-        <props.component
-          key={String(value)}
-          {...{ [props.propKey]: value }}
-          {...props.defaultProps}
-        >
-          {String(value)}
-        </props.component>
-      ))}
-    </ul>
-  </section>
+  variant: VariantConfigLike<TComponent>;
+  component: TComponent;
+  defaultProps?: Partial<TComponentProps>;
+};
+
+const Variants = <
+  TComponent extends FC,
+  TComponentProps extends ComponentProps<TComponent>
+>(
+  props: VariantsProps<TComponent, TComponentProps>
+) => (
+  <Card className="bg-base-200 m-8 inline-grid">
+    <Card.Body className="grid gap-4">
+      <Card.Title>
+        {capitalize(props.propKey)}{" "}
+        <span className="text-base-content/75">/</span>{" "}
+        {props.variant.values.map((x) => (
+          <small className="badge badge-info badge-sm">{x}</small>
+        ))}
+      </Card.Title>
+      <ul className="flex items-center gap-2">
+        {props.variant.values.map((value) => (
+          <li key={String(value)}>
+            {/** @ts-ignore */}
+            <props.component
+              {...{ [props.propKey]: value }}
+              {...props.defaultProps}
+            >
+              {props.variant?.getChildren?.(value) ?? String(capitalize(value))}
+            </props.component>
+          </li>
+        ))}
+      </ul>
+    </Card.Body>
+  </Card>
 );
 
 const Template: StoryFn<typeof Variants> = (args) => <Variants {...args} />;
@@ -38,18 +75,18 @@ export const configurePlayground = <
 >(
   component: React.FC<TComponentProps>,
   variants: {
-    [TKey in keyof TComponentProps]: TComponentProps[TKey][];
+    [TKey in keyof TComponentProps]: VariantConfigLike<TComponent>;
   },
   defaultProps?: Partial<TComponentProps>
 ) => {
-  return Object.entries(variants).reduce((acc, [propKey, values]) => {
+  return Object.entries(variants).reduce((acc, [propKey, variant]) => {
     const componentStory = Template.bind({});
     // @ts-ignore
-    componentStory.args = { propKey, values, component, defaultProps };
+    componentStory.args = { propKey, variant, component, defaultProps };
 
     return {
       ...acc,
-      [capitalize(propKey)]: componentStory,
+      [`${capitalize(propKey)}s`]: componentStory,
     };
-  }, {} as Record<string, StoryFn<typeof Variants>>);
+  }, {} as CapitalizeKeys<Record<keyof typeof variants, StoryFn<typeof Variants>>>);
 };

@@ -31,10 +31,14 @@ const colors = [
 
 const sizes = ["xs", "sm", "md", "lg"] as ButtonProps["size"][];
 
-const { Color, Size, Shape } = configurePlayground(Button, {
-  color: colors,
-  size: sizes,
-  shape: ["circle", "square"],
+// creates stories for variansts (color, size, shape)
+const { Colors, Sizes, Shapes } = configurePlayground(Button, {
+  color: { values: colors },
+  size: { values: sizes },
+  shape: {
+    values: ["circle", "square"],
+    getChildren: (value) => (value === "circle" ? "🔵" : "🔴"),
+  },
 });
 
-export { Color, Size, Shape };
+export { Colors, Sizes, Shapes };
