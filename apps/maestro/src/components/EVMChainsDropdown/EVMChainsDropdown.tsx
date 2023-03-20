@@ -76,17 +76,18 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
                 chain.chain_id === props.selectedChain?.chain_id,
             })}
           >
-            <LinkButton
+            {/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
+            <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
                 handleChainChange(chain.chain_id);
               }}
-              className="group flex items-center gap-2"
+              className="group"
             >
               <ChainIcon src={chain.image} alt={chain.chain_name} size="md" />
               <div>{chain.chain_name}</div>
-            </LinkButton>
+            </a>
           </Dropdown.Item>
         ))}
       </Dropdown.Content>
