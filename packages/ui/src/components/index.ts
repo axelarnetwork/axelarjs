@@ -6,6 +6,7 @@ export * from "./Dropdown";
 export * from "./Footer";
 export * from "./icons";
 export * from "./Navbar";
+export * from "./StoryPlayground";
 export * from "./TextInput";
 export * from "./ThemeSwitcher";
 export * from "./Toggle";
