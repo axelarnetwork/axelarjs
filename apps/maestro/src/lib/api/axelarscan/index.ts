@@ -17,7 +17,7 @@ export const COLLECTIONS = {
   chains: "chains",
 };
 
-const client = ky.extend({
+export const client = ky.extend({
   prefixUrl: String(process.env.NEXT_PUBLIC_EXPLORER_API_URL),
 });
 

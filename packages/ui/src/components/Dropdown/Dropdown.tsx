@@ -59,7 +59,7 @@ const _Dropdown: FC<DropdownProps> = ({
 
 export const Dropdown = Object.assign(_Dropdown, {
   Trigger: tw(Button)``,
-  Content: tw.ul`dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52`,
+  Content: tw.ul`dropdown-content menu p-2 shadow bg-base-100 rounded-box whitespace-nowrap`,
   Item: tw.li``,
   CardContent: tw(Card)`dropdown-content`,
 });
