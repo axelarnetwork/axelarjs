@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { Params } from "./params";
 
 export const protobufPackage = "axelar.tss.v1beta1";

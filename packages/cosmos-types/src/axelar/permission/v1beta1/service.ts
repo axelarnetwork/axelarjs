@@ -1,5 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
+
 import { QueryGovernanceKeyRequest, QueryGovernanceKeyResponse } from "./query";
 import {
   DeregisterControllerRequest,

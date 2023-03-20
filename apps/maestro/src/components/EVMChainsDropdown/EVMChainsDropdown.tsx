@@ -1,7 +1,9 @@
+import React, { FC } from "react";
+
 import { Dropdown, LinkButton } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
-import React, { FC } from "react";
+
 import { EVMChainConfig } from "~/lib/api/axelarscan/types";
 
 type Props = {
@@ -24,9 +26,9 @@ const ChainIcon: FC<{
   const iconSize = iconSizes[props.size];
 
   return (
-    <div className="rounded-full shadow-black group-hover:ring-2 relative p-0.5">
+    <div className="relative rounded-full p-0.5 shadow-black group-hover:ring-2">
       <Image
-        className="rounded-full bg-base-300 overflow-hidden"
+        className="bg-base-300 overflow-hidden rounded-full"
         src={props.src}
         alt={props.alt}
         width={iconSize}
@@ -56,7 +58,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
   return (
     <Dropdown align="end">
       <Dropdown.Trigger
-        className="flex items-center gap-2 group"
+        className="group flex items-center gap-2"
         ghost
         size="sm"
       >

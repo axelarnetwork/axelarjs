@@ -1,5 +1,6 @@
 import { useQuery } from "wagmi";
-import { searchGMP, getContracts } from "./index";
+
+import { getContracts, searchGMP } from "./index";
 import { SearchGMPParams } from "./types";
 
 export function useSearchGMPQuery(params: SearchGMPParams) {

@@ -1,5 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
+
 import { VoteRequest, VoteResponse } from "./tx";
 
 export const protobufPackage = "axelar.vote.v1beta1";

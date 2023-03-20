@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { Threshold } from "../../utils/v1beta1/threshold";
 
 export const protobufPackage = "axelar.multisig.v1beta1";

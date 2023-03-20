@@ -1,28 +1,27 @@
 import { EthereumClient, w3mConnectors } from "@web3modal/ethereum";
 import { configureChains, createClient } from "wagmi";
 import {
-  mainnet,
-  goerli,
-  moonbeam,
-  avalanche,
-  avalancheFuji,
-  polygon,
-  polygonMumbai,
-  bsc,
-  bscTestnet,
   arbitrum,
   arbitrumGoerli,
-  celo,
-  celoAlfajores,
   aurora,
   auroraTestnet,
-  optimism,
-  optimismGoerli,
-  moonbaseAlpha,
+  avalanche,
+  avalancheFuji,
+  bsc,
+  bscTestnet,
+  celo,
+  celoAlfajores,
   fantom,
   fantomTestnet,
+  goerli,
+  mainnet,
+  moonbaseAlpha,
+  moonbeam,
+  optimism,
+  optimismGoerli,
+  polygon,
+  polygonMumbai,
 } from "wagmi/chains";
-
 import { publicProvider } from "wagmi/providers/public";
 
 export const WALLECTCONNECT_PROJECT_ID = String(

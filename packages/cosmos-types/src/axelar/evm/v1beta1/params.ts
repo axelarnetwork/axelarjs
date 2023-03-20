@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { Chain } from "../../nexus/exported/v1beta1/types";
 import { Threshold } from "../../utils/v1beta1/threshold";
 import { NetworkInfo } from "./types";

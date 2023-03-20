@@ -1,5 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
+
 import { HeartBeatRequest, HeartBeatResponse } from "./tx";
 
 export const protobufPackage = "axelar.tss.v1beta1";

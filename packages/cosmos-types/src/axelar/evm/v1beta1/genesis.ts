@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { QueueState } from "../../utils/v1beta1/queuer";
 import { Params } from "./params";
 import {
