@@ -18,8 +18,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "Cards are used to display content in a consistent and organized way. They can be used to display text, images, and other types of content.",
+        component: "Modals are used for popup windows with one-off content.",
       },
     },
   },
