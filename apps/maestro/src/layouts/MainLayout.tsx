@@ -5,21 +5,18 @@ import {
   Button,
   Clamp,
   CopyToClipboardButton,
-  Dropdown,
   Footer,
   Navbar,
   ThemeSwitcher,
   useTheme,
 } from "@axelarjs/ui";
 import { useWeb3Modal, Web3Modal } from "@web3modal/react";
-import Image from "next/image";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
 import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
 import { APP_NAME } from "~/config/app";
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
-import { EVMChainConfig } from "~/lib/api/axelarscan/types";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();

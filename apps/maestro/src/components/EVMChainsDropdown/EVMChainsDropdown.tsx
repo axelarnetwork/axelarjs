@@ -57,11 +57,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
 
   return (
     <Dropdown align="end">
-      <Dropdown.Trigger
-        className="group flex items-center gap-2"
-        ghost
-        size="sm"
-      >
+      <Dropdown.Trigger className="btn btn-sm btn-ghost group flex items-center gap-2">
         <ChainIcon
           src={props.selectedChain.image}
           alt={props.selectedChain.chain_name}
