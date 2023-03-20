@@ -1,6 +1,5 @@
 import { FC } from "react";
 
-// @ts-ignore
 import * as Dialog from "@radix-ui/react-dialog";
 import tw from "tailwind-styled-components";
 
