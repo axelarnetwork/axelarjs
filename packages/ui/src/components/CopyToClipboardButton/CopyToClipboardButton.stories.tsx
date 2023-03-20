@@ -1,7 +1,7 @@
 import { pluralizeKeys } from "@axelarjs/utils";
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { buttonColors, buttonSizes } from "../Button/Button.stories";
+import { buttonColors, buttonSizes } from "../Button/Button";
 import { configurePlayground } from "../StoryPlayground";
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
 

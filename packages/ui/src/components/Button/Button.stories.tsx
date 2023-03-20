@@ -2,7 +2,7 @@ import { pluralizeKeys } from "@axelarjs/utils";
 import { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../StoryPlayground";
-import { Button, ButtonProps } from "./Button";
+import { Button, buttonColors, buttonSizes } from "./Button";
 
 export default {
   title: "components/Button",
@@ -19,18 +19,6 @@ const Template: StoryFn<typeof Button> = (args) => {
 };
 
 export const Default = Template.bind({});
-
-export const buttonColors = [
-  "primary",
-  "secondary",
-  "accent",
-  "success",
-  "error",
-  "warning",
-  "info",
-] as ButtonProps["color"][];
-
-export const buttonSizes = ["xs", "sm", "md", "lg"] as ButtonProps["size"][];
 
 // creates stories for variansts (color, size, shape)
 const { Colors, Sizes, Shapes } = pluralizeKeys(
