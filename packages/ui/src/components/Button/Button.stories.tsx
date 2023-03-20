@@ -24,12 +24,19 @@ const Row = tw.div`
   flex items-center flex-wrap gap-2
 `;
 
-const Template: StoryFn<StoryArgs> = (args) => {
-  if (args.colors) {
+const Template: StoryFn<StoryArgs> = ({
+  colors,
+  sizes,
+  shapes,
+  ref,
+  onCopy,
+  ...args
+}: StoryArgs) => {
+  if (colors) {
     return (
       <Row>
-        {args.colors.map((color) => (
-          <Button key={color} {...args} color={color}>
+        {colors.map((color) => (
+          <Button key={color} color={color} {...args}>
             {color}
           </Button>
         ))}
@@ -37,10 +44,10 @@ const Template: StoryFn<StoryArgs> = (args) => {
     );
   }
 
-  if (args.sizes) {
+  if (sizes) {
     return (
       <Row>
-        {args.sizes.map((size) => (
+        {sizes.map((size) => (
           <Button key={size} {...args} size={size}>
             {size}
           </Button>
@@ -49,10 +56,10 @@ const Template: StoryFn<StoryArgs> = (args) => {
     );
   }
 
-  if (args.shapes) {
+  if (shapes) {
     return (
       <div className="flex items-center gap-2">
-        {args.shapes.map((shape) => (
+        {shapes.map((shape) => (
           <Button key={shape} {...args} shape={shape}>
             <XIcon />
           </Button>

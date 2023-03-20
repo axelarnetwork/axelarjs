@@ -2,7 +2,6 @@ import { FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
-import tw from "tailwind-styled-components";
 
 export const buttonVariance = cva("btn", {
   variants: {
@@ -48,53 +47,65 @@ export const buttonVariance = cva("btn", {
 
 type VProps = VariantProps<typeof buttonVariance>;
 
-type PolymorphicProps =
-  | {
-      $as: "a";
-      href: string;
-    }
-  | {
-      $as?: never;
-    };
+export type ButtonProps = JSX.IntrinsicElements["button"] & VProps & {};
+export type LinkButtonProps = JSX.IntrinsicElements["a"] & VProps & {};
 
-export type ButtonProps = JSX.IntrinsicElements["button"] &
-  VProps &
-  PolymorphicProps;
+const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
+  props: T
+) => {
+  const {
+    className,
+    size,
+    color,
+    disabled,
+    shape,
+    ghost,
+    glass,
+    outline,
+    link,
+    loading,
+    children,
+    ...componentProps
+  } = props;
 
-/**
- * Button - A button component
- */
-const _Button: FC<ButtonProps> = ({
-  className,
-  size,
-  color,
-  disabled,
-  shape,
-  ghost,
-  glass,
-  outline,
-  link,
-  loading,
-  ...props
-}) => {
-  const classes = twMerge(
-    buttonVariance({
-      size,
-      color,
-      disabled,
-      shape,
-      ghost,
-      outline,
-      link,
-      glass,
-      loading,
-    }),
-    className
-  );
-  return <button disabled={disabled} className={classes} {...props} />;
+  return [
+    twMerge(
+      buttonVariance({
+        size,
+        color,
+        disabled,
+        shape,
+        ghost,
+        outline,
+        link,
+        glass,
+        loading,
+      }),
+      className
+    ),
+    componentProps,
+  ] as const;
 };
 
-export const Button = tw(_Button)``;
+export const Button: FC<ButtonProps> = (props) => {
+  const [className, componentProps] = getSegmentedProps(props);
+
+  return (
+    <button disabled={props.disabled} className={className} {...componentProps}>
+      {props.children}
+    </button>
+  );
+};
+
+export const LinkButton: FC<LinkButtonProps> = (props) => {
+  const [classes, componentProps] = getSegmentedProps(props);
+
+  return (
+    <a className={classes} {...componentProps}>
+      {props.children}
+    </a>
+  );
+};
 
 Button.defaultProps = {
   type: "button",
