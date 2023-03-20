@@ -40,4 +40,5 @@ Default.args = {
   onCancel: () => {},
   onConfirmText: "Confirm",
   onConfirm: () => alert("Confirmed!"),
+  triggerText: "Open Modal",
 };

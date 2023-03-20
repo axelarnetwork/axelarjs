@@ -36,7 +36,8 @@ export type ModalProps = JSX.IntrinsicElements["div"] & {
   onCancel: () => void;
   onCancelText?: string;
   onConfirm?: () => void;
-  onConfirmText: string;
+  onConfirmText?: string;
+  triggerText?: string;
 };
 
 export const Modal: FC<ModalProps> = ({
@@ -45,11 +46,12 @@ export const Modal: FC<ModalProps> = ({
   onConfirm,
   onCancelText = "Back",
   onConfirmText = "Close",
+  triggerText = "Open",
   ...props
 }) => (
   <Dialog.Root>
     <Dialog.Trigger asChild>
-      <Button>Open</Button>
+      <Button>{triggerText}</Button>
     </Dialog.Trigger>
     <Dialog.Portal>
       <StyledDialogOverlay />
