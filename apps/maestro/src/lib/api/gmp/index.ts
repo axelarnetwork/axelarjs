@@ -1,19 +1,30 @@
-// const request = async (params) => {
-//   const response = await fetch(process.env.NEXT_PUBLIC_GMP_API_URL, {
-//     method: "POST",
-//     body: JSON.stringify(params),
-//   }).catch(() => {
-//     return null;
-//   });
+import ky from "ky";
 
-//   return response && (await response.json());
-// };
+import type { SearchGMPParams } from "./types";
 
-export const searchGMP = async (params = {}) =>
+export const client = ky.extend({
+  prefixUrl: String(process.env.NEXT_PUBLIC_GMP_API_URL),
+});
+
+async function searchGMP(params: SearchGMPParams) {
+  return await client
+    .post("", {
+      json: {
+        ...params,
+        method: "searchGMP",
+      },
+    })
+    .json();
+}
+
+async function getContracts(params = {}) {
   // await request({
   //   ...params,
-  //   method: "searchGMP",
+  //   method: "getContracts",
   // });
-  new Promise((resolve) => {
+  return new Promise((resolve) => {
     resolve([]);
   });
+}
+
+export { getContracts, searchGMP };

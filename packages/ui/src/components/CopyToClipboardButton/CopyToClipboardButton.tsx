@@ -6,7 +6,10 @@ import { CheckCircle, ClipboardCopy } from "lucide-react";
 import { useCopyToClipboard } from "../../hooks";
 import { Button, ButtonProps } from "../Button";
 
-export type CopyToClipboardButtonProps = Omit<ButtonProps, "onClick"> & {
+export type CopyToClipboardButtonProps = Omit<
+  ButtonProps,
+  "onClick" | "$as"
+> & {
   copyText?: string;
   copyTimeout?: number;
   onCopied?: () => void;
@@ -53,12 +56,12 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
       {children}
 
       <div
-        className={clsx("swap swap-flip", {
+        className={clsx("swap swap-rotate", {
           "swap-active": isCopied,
         })}
       >
-        <ClipboardCopy className={clsx("swap-off", iconClassNames)} />
         <CheckCircle className={clsx("swap-on text-success", iconClassNames)} />
+        <ClipboardCopy className={clsx("swap-off", iconClassNames)} />
       </div>
     </Button>
   );

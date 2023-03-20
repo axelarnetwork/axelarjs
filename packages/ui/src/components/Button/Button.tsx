@@ -2,6 +2,7 @@ import { FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
+import tw from "tailwind-styled-components";
 
 export const buttonVariance = cva("btn", {
   variants: {
@@ -47,14 +48,23 @@ export const buttonVariance = cva("btn", {
 
 type VProps = VariantProps<typeof buttonVariance>;
 
-export type ButtonProps = JSX.IntrinsicElements["button"] & VProps & {};
+type PolymorphicProps =
+  | {
+      $as: "a";
+      href: string;
+    }
+  | {
+      $as?: never;
+    };
+
+export type ButtonProps = JSX.IntrinsicElements["button"] &
+  VProps &
+  PolymorphicProps;
 
 /**
  * Button - A button component
- * @param param0
- * @returns
  */
-export const Button: FC<ButtonProps> = ({
+const _Button: FC<ButtonProps> = ({
   className,
   size,
   color,
@@ -83,6 +93,8 @@ export const Button: FC<ButtonProps> = ({
   );
   return <button disabled={disabled} className={classes} {...props} />;
 };
+
+export const Button = tw(_Button)``;
 
 Button.defaultProps = {
   type: "button",

@@ -1,10 +1,12 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useMemo } from "react";
+import Image from "next/image";
 
 import {
   AxelarIcon,
   Button,
   Clamp,
   CopyToClipboardButton,
+  Dropdown,
   Footer,
   Navbar,
   ThemeSwitcher,
@@ -17,9 +19,8 @@ import { useAccount, useNetwork, useDisconnect, useSwitchNetwork } from "wagmi";
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { APP_NAME } from "~/config/app";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
-import Image from "next/image";
-
-const ChainsDropdown = () => {};
+import { EVMChainConfig } from "~/lib/api/axelarscan/types";
+import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
@@ -31,7 +32,10 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   const { data: evmChains } = useEVMChainConfigsQuery();
 
-  const currentChain = evmChains?.find((c) => c.chain_id === chain?.id);
+  const selectedChain = useMemo(
+    () => evmChains?.find((c) => c.chain_id === chain?.id),
+    [chain, evmChains]
+  );
 
   return (
     <>
@@ -46,56 +50,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           <Navbar.End className="flex items-center gap-2">
             {isConnected && address ? (
               <>
-                {currentChain && (
-                  <div className="dropdown">
-                    <Button
-                      tabIndex={0}
-                      className="flex items-center gap-2"
-                      ghost
-                      size="sm"
-                    >
-                      <Image
-                        className="rounded-full"
-                        src={currentChain.image}
-                        alt={currentChain.chain_name}
-                        width={18}
-                        height={18}
-                      />
-                      <div>{currentChain.chain_name}</div>
-                    </Button>
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 -translate-x-1"
-                    >
-                      {evmChains?.map((chain) => (
-                        <li key={chain.chain_id}>
-                          {/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
-                          <a
-                            href="#"
-                            role="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              try {
-                                switchNetworkAsync?.(chain.chain_id);
-                              } catch (error) {}
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <Image
-                                className="rounded-full"
-                                src={chain.image}
-                                alt={chain.chain_name}
-                                width={18}
-                                height={18}
-                              />
-                              <div>{chain.chain_name}</div>
-                            </div>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <EVMChainsDropdown
+                  onSwitchNetwork={switchNetworkAsync}
+                  selectedChain={selectedChain}
+                  chains={evmChains}
+                />
                 <CopyToClipboardButton size="sm" copyText={address} outline>
                   {address.slice(0, 6)}...{address.slice(-4)}
                 </CopyToClipboardButton>
