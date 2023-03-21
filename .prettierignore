@@ -4,6 +4,8 @@ build/
 
 .next/
 
+.turbo/
+
 storybook-static/
 
 pnpm-lock.yaml
