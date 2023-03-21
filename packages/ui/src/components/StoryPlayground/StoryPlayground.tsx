@@ -1,9 +1,12 @@
-import { ComponentProps, FC } from "react";
+import { ComponentProps, FC, useState } from "react";
 
 import type { CapitalizeKeys } from "@axelarjs/utils";
 import type { StoryFn } from "@storybook/react";
+import clsx from "clsx";
 
+import { Button } from "../Button";
 import { Card } from "../Card";
+import { ThemeProvider, ThemeSwitcher } from "../ThemeSwitcher";
 
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));
@@ -47,54 +50,92 @@ type VariantsProps<
   defaultProps?: Partial<TComponentProps>;
 };
 
+const VIEWPORTS = {
+  mobile: {
+    name: "Mobile",
+    className: "w-full max-w-sm",
+  },
+  desktop: {
+    name: "Desktop",
+    className: "w-full max-w-6xl",
+  },
+};
+
+type Viewport = keyof typeof VIEWPORTS;
+
+const VIEW_OPTIONS = Object.keys(VIEWPORTS) as Viewport[];
+
 const Variants = <
   TComponent extends FC,
   TComponentProps extends ComponentProps<TComponent>
 >(
   props: VariantsProps<TComponent, TComponentProps>
-) => (
-  <Card className="bg-base-200 m-8 inline-grid">
-    <Card.Body className="grid gap-4">
-      <Card.Title>
-        {props.variant.title ?? capitalize(props.propKey)}{" "}
-        <span className="text-base-content/75">/</span>{" "}
-        {props.variant.values.map((x) => (
-          <small className="badge badge-info badge-sm">{x}</small>
-        ))}
-      </Card.Title>
-      <ul className="flex flex-wrap items-center gap-4">
-        {props.variant.values.map((value) => {
-          const itemProps = {
-            [props.propKey]: value,
-            ...props.defaultProps,
-            ...("noChildren" in props.variant
-              ? {}
-              : {
-                  children: props.variant.getChildren?.(value) ?? String(value),
-                }),
-          };
+) => {
+  const [view, setView] = useState<"mobile" | "desktop">("desktop");
 
-          return (
-            <li key={String(value)}>
-              {"noChildren" in props.variant ? (
-                <div>
-                  <span className="label">{value}</span>
-                  {/* @ts-ignore\ */}
-                  <props.component {...itemProps} />
-                </div>
-              ) : (
-                <>
-                  {/* @ts-ignore\ */}
-                  <props.component {...itemProps} />
-                </>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </Card.Body>
-  </Card>
-);
+  return (
+    <Card
+      className={clsx("bg-base-200 m-8 inline-grid", {
+        [VIEWPORTS.mobile.className]: view === "mobile",
+        [VIEWPORTS.desktop.className]: view === "desktop",
+      })}
+    >
+      <Card.Body className="grid gap-4">
+        <Card.Title>
+          {props.variant.title ?? capitalize(props.propKey)}{" "}
+          <span className="text-base-content/75">/</span>{" "}
+          {props.variant.values.map((x) => (
+            <small className="badge badge-info badge-sm">{x}</small>
+          ))}
+        </Card.Title>
+        <div className="absolute top-0 right-0 flex items-center gap-2 p-2.5">
+          {VIEW_OPTIONS.map((device) => (
+            <Button
+              size="xs"
+              className="rounded-full"
+              outline
+              onClick={() => setView(device)}
+            >
+              {device}
+            </Button>
+          ))}
+          <ThemeSwitcher />
+        </div>
+        <ul className="flex flex-wrap items-center gap-4">
+          {props.variant.values.map((value) => {
+            const itemProps = {
+              [props.propKey]: value,
+              ...props.defaultProps,
+              ...("noChildren" in props.variant
+                ? {}
+                : {
+                    children:
+                      props.variant.getChildren?.(value) ?? String(value),
+                  }),
+            };
+
+            return (
+              <li key={String(value)}>
+                {"noChildren" in props.variant ? (
+                  <div>
+                    <span className="label">{value}</span>
+                    {/* @ts-ignore\ */}
+                    <props.component {...itemProps} />
+                  </div>
+                ) : (
+                  <>
+                    {/* @ts-ignore\ */}
+                    <props.component {...itemProps} />
+                  </>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </Card.Body>
+    </Card>
+  );
+};
 
 const Template: StoryFn<typeof Variants> = (args) => <Variants {...args} />;
 
