@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 import { Button } from "../Button";
 import { Card } from "../Card";
-import { ThemeProvider, ThemeSwitcher } from "../ThemeSwitcher";
+import { ThemeSwitcher } from "../ThemeSwitcher";
 
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));
@@ -51,13 +51,20 @@ type VariantsProps<
 };
 
 const VIEWPORTS = {
-  mobile: {
-    name: "Mobile",
-    className: "w-full max-w-sm",
+  mobile1: {
+    className: "phone-1",
+  },
+  mobile2: {
+    className: "phone-2",
+  },
+  mobile3: {
+    className: "phone-3",
+  },
+  mobile4: {
+    className: "phone-4",
   },
   desktop: {
-    name: "Desktop",
-    className: "w-full max-w-6xl",
+    className: "desktop",
   },
 };
 
@@ -65,75 +72,101 @@ type Viewport = keyof typeof VIEWPORTS;
 
 const VIEW_OPTIONS = Object.keys(VIEWPORTS) as Viewport[];
 
+const ARTBOARD_OPTIONS = [
+  "phone-1",
+  "phone-2",
+  "phone-3",
+  "phone-4",
+  "phone-5",
+  "phone-6",
+  "desktop",
+] as const;
+
+type Artboard = (typeof ARTBOARD_OPTIONS)[number];
+
 const Variants = <
   TComponent extends FC,
   TComponentProps extends ComponentProps<TComponent>
 >(
   props: VariantsProps<TComponent, TComponentProps>
 ) => {
-  const [view, setView] = useState<"mobile" | "desktop">("desktop");
+  const [view, setView] = useState<Viewport>("mobile4");
 
   return (
-    <Card
-      className={clsx("bg-base-200 m-8 inline-grid", {
-        [VIEWPORTS.mobile.className]: view === "mobile",
-        [VIEWPORTS.desktop.className]: view === "desktop",
-      })}
-    >
-      <Card.Body className="grid gap-4">
-        <Card.Title>
-          {props.variant.title ?? capitalize(props.propKey)}{" "}
-          <span className="text-base-content/75">/</span>{" "}
-          {props.variant.values.map((x) => (
-            <small className="badge badge-info badge-sm">{x}</small>
-          ))}
-        </Card.Title>
-        <div className="absolute top-0 right-0 flex items-center gap-2 p-2.5">
-          {VIEW_OPTIONS.map((device) => (
-            <Button
-              size="xs"
-              className="rounded-full"
-              outline
-              onClick={() => setView(device)}
-            >
-              {device}
-            </Button>
-          ))}
-          <ThemeSwitcher />
-        </div>
-        <ul className="flex flex-wrap items-center gap-4">
-          {props.variant.values.map((value) => {
-            const itemProps = {
-              [props.propKey]: value,
-              ...props.defaultProps,
-              ...("noChildren" in props.variant
-                ? {}
-                : {
-                    children:
-                      props.variant.getChildren?.(value) ?? String(value),
-                  }),
-            };
+    <div className="relative inline-block p-14">
+      <section className="absolute top-2 right-2 flex items-center gap-2 p-2.5">
+        {VIEW_OPTIONS.map((device) => (
+          <Button
+            size="xs"
+            className="rounded-full"
+            outline
+            onClick={() => setView(device)}
+          >
+            {device}
+          </Button>
+        ))}
+        <ThemeSwitcher />
+      </section>
+      <Card
+        className={clsx(
+          "bg-base-200 inline-grid overflow-x-scroll p-4 transition-all duration-300"
+        )}
+      >
+        <Card.Body className="grid gap-8">
+          <Card.Title>
+            {props.variant.title ?? capitalize(props.propKey)}{" "}
+            <span className="text-base-content/75">/</span>{" "}
+            {props.variant.values.map((x) => (
+              <small className="badge badge-info badge-sm">{x}</small>
+            ))}
+          </Card.Title>
 
-            return (
-              <li key={String(value)}>
-                {"noChildren" in props.variant ? (
-                  <div>
-                    <span className="label">{value}</span>
-                    {/* @ts-ignore\ */}
-                    <props.component {...itemProps} />
-                  </div>
-                ) : (
-                  <>
-                    {/* @ts-ignore\ */}
-                    <props.component {...itemProps} />
-                  </>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </Card.Body>
-    </Card>
+          <div
+            className={clsx(
+              "artboard artboard-demo mx-auto transition-all duration-300",
+              {
+                ...ARTBOARD_OPTIONS.reduce((acc, artboard) => {
+                  acc[artboard] = artboard === VIEWPORTS[view].className;
+                  return acc;
+                }, {} as Record<Artboard, boolean>),
+              }
+            )}
+          >
+            <ul className="flex flex-wrap items-center gap-4">
+              {props.variant.values.map((value) => {
+                const itemProps = {
+                  [props.propKey]: value,
+                  ...props.defaultProps,
+                  ...("noChildren" in props.variant
+                    ? {}
+                    : {
+                        children:
+                          props.variant.getChildren?.(value) ?? String(value),
+                      }),
+                };
+
+                return (
+                  <li key={String(value)}>
+                    {"noChildren" in props.variant ? (
+                      <div>
+                        <span className="label">{value}</span>
+                        {/* @ts-ignore\ */}
+                        <props.component {...itemProps} />
+                      </div>
+                    ) : (
+                      <>
+                        {/* @ts-ignore\ */}
+                        <props.component {...itemProps} />
+                      </>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </Card.Body>
+      </Card>
+    </div>
   );
 };
 
