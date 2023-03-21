@@ -7,6 +7,7 @@ export * from "./Footer";
 export * from "./icons";
 export * from "./Modal";
 export * from "./Navbar";
+export * from "./Steps";
 export * from "./StoryPlayground";
 export * from "./TextInput";
 export * from "./ThemeSwitcher";
