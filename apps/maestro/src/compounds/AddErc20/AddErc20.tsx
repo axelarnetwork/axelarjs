@@ -6,17 +6,19 @@ import { useAddErc20State } from "./AddErc20.state";
 import { Step1, Step2, Step3, Step4, StepsSummary } from "./Steps";
 import { TokenRegistration } from "./TokenRegistration";
 
-const stepMap = [Step1, Step2, Step3, Step4];
+const stepMap = [Step1, Step2, Step3];
 
 export const AddErc20: FC<{}> = () => {
   const { state, actions } = useAddErc20State();
-  const { step, newTokenType, tokenName, tokenSymbol, decimals } = state;
+  const { step, newTokenType, tokenName, tokenSymbol, decimals, amountToMint } =
+    state;
   const {
     setStep,
     setNewTokenType,
     setTokenName,
     setTokenSymbol,
     setDecimals,
+    setAmountToMint,
   } = actions;
 
   const CurrentStep = useMemo(() => {
@@ -48,9 +50,11 @@ export const AddErc20: FC<{}> = () => {
           decimals={decimals}
           tokenName={tokenName}
           tokenSymbol={tokenSymbol}
+          amountToMint={amountToMint}
           setDecimals={setDecimals}
           setTokenName={setTokenName}
           setTokenSymbol={setTokenSymbol}
+          setAmountToMint={setAmountToMint}
         />
       </Modal.Body>
       <Modal.Actions>

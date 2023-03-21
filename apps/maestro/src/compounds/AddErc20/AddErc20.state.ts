@@ -8,15 +8,24 @@ export const useAddErc20State = () => {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [decimals, setDecimals] = useState(0);
+  const [amountToMint, setAmountToMint] = useState(0);
 
   return {
-    state: { step, newTokenType, tokenName, tokenSymbol, decimals },
+    state: {
+      step,
+      newTokenType,
+      tokenName,
+      tokenSymbol,
+      decimals,
+      amountToMint,
+    },
     actions: {
       setStep,
       setNewTokenType,
       setTokenName,
       setTokenSymbol,
       setDecimals,
+      setAmountToMint,
     },
   };
 };

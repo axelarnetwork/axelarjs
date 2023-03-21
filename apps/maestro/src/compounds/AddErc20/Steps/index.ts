@@ -7,6 +7,8 @@ export type StepProps = {
   setTokenSymbol: (tokenSymbol: string) => void;
   decimals: number;
   setDecimals: (decimals: number) => void;
+  amountToMint: number;
+  setAmountToMint: (amountToMint: number) => void;
 };
 
 export * from "./Step1";
