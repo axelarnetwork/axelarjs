@@ -5,10 +5,6 @@ import { useAccount, useMutation, useSigner } from "wagmi";
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
-export type TransactionState =
-  | { type: "idle" }
-  | { type: "deploying"; txHash: string };
-
 export type UseDeployAndRegisterInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
@@ -21,7 +17,7 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   decimals: number;
   destinationChainIds: string[];
   onFinished?: () => void;
-  onStatusUpdate?: (message: TransactionState) => void;
+  onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
 
 export function useDeployAndRegisterInterchainTokenMutation(

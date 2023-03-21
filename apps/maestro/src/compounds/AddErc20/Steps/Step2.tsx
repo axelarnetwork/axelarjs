@@ -32,6 +32,15 @@ export const Step2: FC<StepProps> = (props: StepProps) => {
         onChange={(e) => props.setDecimals(parseInt(e.target.value))}
         placeholder="Input your token decimals"
       />
+      <label className="text-sm">Amount to mint (leave zero for none)</label>
+      <TextInput
+        inputSize={"md"}
+        type={"number"}
+        color={"primary"}
+        value={props.amountToMint}
+        onChange={(e) => props.setAmountToMint(parseInt(e.target.value))}
+        placeholder="Input your amount to mint"
+      />
     </div>
   );
 };

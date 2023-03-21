@@ -14,14 +14,12 @@ export const StepsSummary: FC<StepsSummaryProps> = (
       <Steps.Step active={props.currentStep === 0}>Select Flow</Steps.Step>
       <Steps.Step active={props.currentStep === 1}>
         {props.newTokenType === "new"
-          ? "Deploy and register new ERC-20 token"
+          ? "New ERC-20 token details"
           : "Validate your ERC-20"}
       </Steps.Step>
-      {props.newTokenType === "new" && (
-        <Steps.Step active={props.currentStep === 2}>
-          (Optional) Mint?
-        </Steps.Step>
-      )}
+      <Steps.Step active={props.currentStep === 2}>
+        Deploy and register your token
+      </Steps.Step>
     </Steps>
   );
 };
