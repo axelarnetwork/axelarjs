@@ -29,19 +29,11 @@ async function estimateGasFee(
 async function estimateGasFeeMultipleChains(
   params: EstimateGasFeeMultipleChainsParams
 ): Promise<BigNumber[]> {
-  let promises: Promise<BigNumber>[] = [];
-  params.destinationChainIds.forEach((destinationChainId) => {
-    promises.push(
-      Promise.resolve(estimateGasFee({ ...params, destinationChainId }))
-    );
-  });
-  return Promise.all(promises);
-
-  //   return await Promise.all(
-  //     params.destinationChainIds.map(async (destinationChainId) => {
-  //       Promise.resolve(await estimateGasFee({ ...params, destinationChainId }));
-  //     })
-  //   );
+  return await Promise.all(
+    params.destinationChainIds.map((destinationChainId) =>
+      estimateGasFee({ ...params, destinationChainId })
+    )
+  );
 }
 
 export { estimateGasFee, estimateGasFeeMultipleChains };

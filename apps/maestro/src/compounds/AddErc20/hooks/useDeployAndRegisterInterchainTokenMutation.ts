@@ -1,8 +1,6 @@
-import { GasToken } from "@axelar-network/axelarjs-sdk";
-import { constants } from "ethers";
+import { BigNumber, constants } from "ethers";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
-import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -18,6 +16,7 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   tokenSymbol: string;
   decimals: number;
   destinationChainIds: string[];
+  gasFees: BigNumber[];
   onFinished?: () => void;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
@@ -39,23 +38,14 @@ export function useDeployAndRegisterInterchainTokenMutation(
       if (!signer || !tokenLinker || !address) return;
 
       const {
-        sourceChainId,
         tokenName,
         tokenSymbol,
         decimals,
         destinationChainIds,
+        gasFees,
         onFinished,
         onStatusUpdate,
       } = input;
-
-      const gasFees = useEstimateGasFeeMultipleChains({
-        sourceChainId,
-        destinationChainIds,
-        sourceChainTokenSymbol: GasToken.ETH,
-        gasMultipler: 1.5,
-      });
-      if (!gasFees?.data) return;
-      console.log("gas fees", gasFees);
 
       try {
         //deploy and register tokens
@@ -67,7 +57,7 @@ export function useDeployAndRegisterInterchainTokenMutation(
             address,
             constants.AddressZero,
             destinationChainIds,
-            gasFees.data
+            gasFees
           );
 
         if (onStatusUpdate)

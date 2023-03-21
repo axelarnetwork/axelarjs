@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 
+import { GasToken } from "@axelar-network/axelarjs-sdk";
 import { Tooltip } from "@axelarjs/ui";
 
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
@@ -10,16 +11,13 @@ import { StepProps } from ".";
 const useStep3ChainSelectionState = () => {
   const [selectedChains, setSelectedChains] = useState(new Set());
 
-  const addSelectedChain = (item: any) => {
+  const addSelectedChain = (item: any) =>
     setSelectedChains((prev) => new Set(prev).add(item));
-  };
 
   const removeSelectedChain = (item: any) => {
     setSelectedChains((prev) => {
       const next = new Set(prev);
-
       next.delete(item);
-
       return next;
     });
   };
@@ -34,7 +32,16 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
 
   const { state, actions } = useStep3ChainSelectionState();
 
-  // const gasPrice = useEstimateGasFeeMultipleChains({})
+  const {
+    data: gasPrices,
+    isLoading,
+    isError,
+  } = useEstimateGasFeeMultipleChains({
+    sourceChainId: "Avalanche",
+    sourceChainTokenSymbol: GasToken.AVAX,
+    destinationChainIds: ["Polygon", "Fantom"],
+  });
+  console.log("gasPrices", gasPrices);
   return (
     <div>
       <label>Chains to deploy remote tokens</label>
