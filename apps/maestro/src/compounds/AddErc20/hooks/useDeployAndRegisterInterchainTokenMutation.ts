@@ -1,6 +1,8 @@
+import { GasToken } from "@axelar-network/axelarjs-sdk";
 import { constants } from "ethers";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
+import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
 export type TransactionState =
@@ -13,10 +15,11 @@ export type UseDeployAndRegisterInterchainTokenConfig = {
 };
 
 export type UseDeployAndRegisterInterchainTokenInput = {
+  sourceChainId: string;
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
-  destinationChains: string[];
+  destinationChainIds: string[];
   onFinished?: () => void;
   onStatusUpdate?: (message: TransactionState) => void;
 };
@@ -36,15 +39,26 @@ export function useDeployAndRegisterInterchainTokenMutation(
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
       if (!signer || !tokenLinker || !address) return;
-      const gasValues: any[] = [];
+
       const {
+        sourceChainId,
         tokenName,
         tokenSymbol,
         decimals,
-        destinationChains,
+        destinationChainIds,
         onFinished,
         onStatusUpdate,
       } = input;
+
+      const gasFees = useEstimateGasFeeMultipleChains({
+        sourceChainId,
+        destinationChainIds,
+        sourceChainTokenSymbol: GasToken.ETH,
+        gasMultipler: 1.5,
+      });
+      if (!gasFees?.data) return;
+      console.log("gas fees", gasFees);
+
       try {
         //deploy and register tokens
         const deployAndRegisterTokensTx =
@@ -54,8 +68,8 @@ export function useDeployAndRegisterInterchainTokenMutation(
             decimals,
             address,
             constants.AddressZero,
-            destinationChains,
-            gasValues
+            destinationChainIds,
+            gasFees.data
           );
 
         if (onStatusUpdate)
