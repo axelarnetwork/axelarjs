@@ -13,6 +13,7 @@ const inputVariance = cva("input", {
       success: "input-success",
       warning: "input-warning",
       error: "input-error",
+      info: "input-info",
     },
     inputSize: {
       xs: "input-xs",

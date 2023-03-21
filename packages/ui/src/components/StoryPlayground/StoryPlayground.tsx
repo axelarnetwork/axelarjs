@@ -8,6 +8,20 @@ import { Card } from "../Card";
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));
 
+type PolymorphicVariantConfig<
+  TComponent extends FC,
+  TKey extends keyof ComponentProps<TComponent>
+> =
+  | {
+      noChildren: true;
+      getChildren?: never;
+    }
+  | {
+      getChildren?: (
+        props: ComponentProps<TComponent>[TKey]
+      ) => React.ReactNode;
+    };
+
 type VariantConfig<
   TComponent extends FC,
   TKey extends keyof ComponentProps<TComponent>
@@ -15,8 +29,7 @@ type VariantConfig<
   values: ComponentProps<TComponent>[TKey][];
   description?: string;
   title?: string;
-  getChildren?: (props: ComponentProps<TComponent>[TKey]) => React.ReactNode;
-};
+} & PolymorphicVariantConfig<TComponent, TKey>;
 
 type VariantConfigLike<TComponent extends FC> = VariantConfig<
   TComponent,
@@ -49,18 +62,35 @@ const Variants = <
           <small className="badge badge-info badge-sm">{x}</small>
         ))}
       </Card.Title>
-      <ul className="flex items-center gap-2">
-        {props.variant.values.map((value) => (
-          <li key={String(value)}>
-            {/** @ts-ignore */}
-            <props.component
-              {...{ [props.propKey]: value }}
-              {...props.defaultProps}
-            >
-              {props.variant?.getChildren?.(value) ?? String(capitalize(value))}
-            </props.component>
-          </li>
-        ))}
+      <ul className="flex flex-wrap items-center gap-4">
+        {props.variant.values.map((value) => {
+          const itemProps = {
+            [props.propKey]: value,
+            ...props.defaultProps,
+            ...("noChildren" in props.variant
+              ? {}
+              : {
+                  children: props.variant.getChildren?.(value) ?? String(value),
+                }),
+          };
+
+          return (
+            <li key={String(value)}>
+              {"noChildren" in props.variant ? (
+                <div>
+                  <span className="label">{value}</span>
+                  {/* @ts-ignore\ */}
+                  <props.component {...itemProps} />
+                </div>
+              ) : (
+                <>
+                  {/* @ts-ignore\ */}
+                  <props.component {...itemProps} />
+                </>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </Card.Body>
   </Card>
