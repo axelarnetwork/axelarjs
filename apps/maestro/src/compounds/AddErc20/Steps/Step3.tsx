@@ -92,27 +92,29 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           const isSelected = state.selectedChains.has(chain.chain_name);
           return (
             <Tooltip tip={chain.name} key={chain.chain_name}>
-              <button
-                className={clsx("h-[30] w-[30] rounded-full", {
-                  "ring-primary ring-offset-base-200 rounded-3xl ring-4 ring-offset-2":
-                    isSelected,
-                })}
+              <Button
+                ghost
+                shape="circle"
+                className="h-[30] w-[30] rounded-full"
+                size="sm"
+                color="primary"
+                outline={isSelected}
                 onClick={() => {
-                  if (isSelected) {
-                    actions.removeSelectedChain(chain.chain_name);
-                  } else {
-                    actions.addSelectedChain(chain.chain_name);
-                  }
+                  const action = isSelected
+                    ? actions.removeSelectedChain
+                    : actions.addSelectedChain;
+
+                  action(chain.chain_name);
                 }}
               >
                 <Image
                   className="pointer-events-none rounded-full"
                   src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
-                  width={30}
-                  height={30}
+                  width={24}
+                  height={24}
                   alt="chain logo"
                 />
-              </button>
+              </Button>
             </Tooltip>
           );
         })}
