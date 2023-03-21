@@ -2,6 +2,8 @@ import { FC, useCallback, useState } from "react";
 
 import { GasToken } from "@axelar-network/axelarjs-sdk";
 import { Button, Tooltip } from "@axelarjs/ui";
+import clsx from "clsx";
+import Image from "next/image";
 import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
@@ -10,14 +12,15 @@ import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 import { StepProps } from ".";
 import { useDeployAndRegisterInterchainTokenMutation } from "../hooks/useDeployAndRegisterInterchainTokenMutation";
 
-const useStep3ChainSelectionState = () => {
+function useStep3ChainSelectionState() {
   const [selectedChains, setSelectedChains] = useState(new Set<string>());
 
-  const addSelectedChain = (item: any) =>
+  const addSelectedChain = (item: string) =>
     setSelectedChains((prev) => new Set(prev).add(item));
 
-  const removeSelectedChain = (item: any) => {
+  const removeSelectedChain = (item: string) => {
     setSelectedChains((prev) => {
+      if (!prev.has(item)) return prev;
       const next = new Set(prev);
       next.delete(item);
       return next;
@@ -28,7 +31,7 @@ const useStep3ChainSelectionState = () => {
     state: { selectedChains },
     actions: { addSelectedChain, removeSelectedChain },
   };
-};
+}
 
 export const Step3: FC<StepProps> = (props: StepProps) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
@@ -69,11 +72,16 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       )?.chain_name as string,
     });
   }, [
+    isGasPriceQueryLoading,
+    isGasPriceQueryError,
+    gasFees,
+    deployAndRegisterToken,
     props.tokenName,
     props.tokenSymbol,
     props.decimals,
     state.selectedChains,
-    gasFees,
+    evmChains,
+    network.chain?.id,
   ]);
 
   return (
@@ -83,12 +91,12 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         {evmChains?.map((chain) => {
           const isSelected = state.selectedChains.has(chain.chain_name);
           return (
-            <Tooltip tip={chain.name}>
-              <img
-                className={
-                  "cursor-pointer" +
-                  (isSelected ? " rounded-3xl border-4 border-sky-500" : "")
-                }
+            <Tooltip tip={chain.name} key={chain.chain_name}>
+              <button
+                className={clsx("h-[30] w-[30] rounded-full", {
+                  "ring-primary ring-offset-base-200 rounded-3xl ring-4 ring-offset-2":
+                    isSelected,
+                })}
                 onClick={() => {
                   if (isSelected) {
                     actions.removeSelectedChain(chain.chain_name);
@@ -96,10 +104,15 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
                     actions.addSelectedChain(chain.chain_name);
                   }
                 }}
-                src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
-                width={`30px`}
-                height={`30px`}
-              />
+              >
+                <Image
+                  className="pointer-events-none rounded-full"
+                  src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
+                  width={30}
+                  height={30}
+                  alt="chain logo"
+                />
+              </button>
             </Tooltip>
           );
         })}
