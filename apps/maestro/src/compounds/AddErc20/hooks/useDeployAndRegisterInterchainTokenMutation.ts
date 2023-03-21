@@ -5,6 +5,8 @@ import { useAccount, useMutation, useSigner } from "wagmi";
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
+import { DeployAndRegisterTransactionState } from "../AddErc20.state";
+
 export type UseDeployAndRegisterInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;

@@ -1,4 +1,3 @@
-// prettier-ignore
 export default {
   _format: "hh-sol-artifact-1",
   contractName: "ERC20",
