@@ -3,7 +3,7 @@ import { FC, useMemo } from "react";
 import { Button, Modal } from "@axelarjs/ui";
 
 import { useAddErc20State } from "./AddErc20.state";
-import { Step1, Step2, Step3, Step4 } from "./Steps";
+import { Step1, Step2, Step3, Step4, StepsSummary } from "./Steps";
 import { TokenRegistration } from "./TokenRegistration";
 
 const stepMap = [Step1, Step2, Step3, Step4];
@@ -35,6 +35,7 @@ export const AddErc20: FC<{}> = () => {
     <Modal triggerLabel="Deploy a new ERC-20 token">
       <Modal.Body>
         <TokenRegistration />
+        <StepsSummary currentStep={step} newTokenType={newTokenType} />
         <CurrentStep
           newTokenType={newTokenType}
           setNewTokenType={setNewTokenType}
