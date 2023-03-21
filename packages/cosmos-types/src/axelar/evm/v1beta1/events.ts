@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { Coin } from "../../../cosmos/base/v1beta1/coin";
 import { PollParticipants } from "../../vote/exported/v1beta1/types";
 import { TokenDetails } from "./types";

@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { Role, roleFromJSON, roleToJSON } from "../exported/v1beta1/types";
 
 export const protobufPackage = "axelar.permission.v1beta1";

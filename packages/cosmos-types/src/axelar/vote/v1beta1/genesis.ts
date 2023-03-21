@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { PollMetadata } from "../exported/v1beta1/types";
 import { Params } from "./params";
 

@@ -10,12 +10,12 @@ import {
 export const MODULES = {
   assets: "assets",
   data: "data",
-};
+} as const;
 
 export const COLLECTIONS = {
   assets: "assets",
   chains: "chains",
-};
+} as const;
 
 export const client = ky.extend({
   prefixUrl: String(process.env.NEXT_PUBLIC_EXPLORER_API_URL),

@@ -1,4 +1,6 @@
 import Head from "next/head";
+
+import { AddErc20 } from "~/features";
 import {
   useAssetsQuery,
   useChainConfigsQuery,
@@ -19,6 +21,7 @@ export default function Home() {
       {assets?.map((asset) => (
         <div key={asset.id}>{asset.id}</div>
       ))}
+      <AddErc20 />
 
       {chainConfigs?.evm.map((chainConfig) => (
         <div key={chainConfig.id}>{chainConfig.id}</div>

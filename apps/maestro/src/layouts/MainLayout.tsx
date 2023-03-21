@@ -1,26 +1,22 @@
 import { FC, PropsWithChildren, useMemo } from "react";
-import Image from "next/image";
 
 import {
   AxelarIcon,
   Button,
   Clamp,
   CopyToClipboardButton,
-  Dropdown,
   Footer,
   Navbar,
   ThemeSwitcher,
   useTheme,
 } from "@axelarjs/ui";
 import { useWeb3Modal, Web3Modal } from "@web3modal/react";
+import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
-import { useAccount, useNetwork, useDisconnect, useSwitchNetwork } from "wagmi";
-
-import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
-import { APP_NAME } from "~/config/app";
-import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
-import { EVMChainConfig } from "~/lib/api/axelarscan/types";
 import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
+import { APP_NAME } from "~/config/app";
+import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
+import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
@@ -39,7 +35,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col flex-1 gap-4">
+      <div className="flex min-h-screen flex-1 flex-col gap-4">
         <Navbar className="bg-base-200">
           <Navbar.Start>
             <div className="flex items-center gap-2 text-lg font-bold uppercase">
@@ -73,7 +69,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <Clamp $as="main" className="flex-1">
           {children}
         </Clamp>
-        <Footer className="p-8 bg-neutral text-neutral-content" center>
+        <Footer className="bg-neutral text-neutral-content p-8" center>
           <Footer.Title>
             &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
           </Footer.Title>

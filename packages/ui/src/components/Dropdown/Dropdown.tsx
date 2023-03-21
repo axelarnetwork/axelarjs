@@ -58,8 +58,12 @@ const _Dropdown: FC<DropdownProps> = ({
 };
 
 export const Dropdown = Object.assign(_Dropdown, {
-  Trigger: tw(Button)``,
+  Trigger: tw.label`cursor-pointer`,
   Content: tw.ul`dropdown-content menu p-2 shadow bg-base-100 rounded-box whitespace-nowrap`,
   Item: tw.li``,
-  CardContent: tw(Card)`dropdown-content`,
 });
+
+Dropdown.Trigger.defaultProps = {
+  tabIndex: 0,
+  role: "button",
+};

@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+
 import { Duration } from "../../../google/protobuf/duration";
 import { Asset, Chain } from "../../nexus/exported/v1beta1/types";
 

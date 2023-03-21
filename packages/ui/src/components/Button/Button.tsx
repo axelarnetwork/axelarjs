@@ -5,12 +5,18 @@ import { twMerge } from "tailwind-merge";
 
 export const buttonVariance = cva("btn", {
   variants: {
+    /**
+     * The size of the button
+     **/
     size: {
       xs: "btn-xs",
       sm: "btn-sm",
       md: "btn-md",
       lg: "btn-lg",
     },
+    /**
+     * The color of the button, configurable in the theme
+     **/
     color: {
       primary: "btn-primary",
       secondary: "btn-secondary",
@@ -20,25 +26,46 @@ export const buttonVariance = cva("btn", {
       warning: "btn-warning",
       error: "btn-error",
     },
+    /**
+     * The shape of the button (circle or square)
+     **/
     shape: {
       square: "btn-square",
       circle: "btn-circle",
     },
+    /**
+     * Renders a wireframe button
+     **/
     outline: {
       true: "btn-outline",
     },
+    /**
+     * Renders a disabled button
+     **/
     disabled: {
       true: "btn-disabled",
     },
+    /**
+     * Renders a ghost button, which is a transparent button with no border
+     **/
     ghost: {
       true: "btn-ghost",
     },
+    /**
+     * Renders a glass button, which is a semi transparent with a glass effect
+     **/
     glass: {
       true: "glass",
     },
+    /**
+     * Renders a link button, which looks like a link
+     **/
     link: {
       true: "btn-link",
     },
+    /**
+     * Renders a loading button, which is disabled and has a loading indicator
+     */
     loading: {
       true: "loading",
     },
@@ -49,6 +76,18 @@ type VProps = VariantProps<typeof buttonVariance>;
 
 export type ButtonProps = JSX.IntrinsicElements["button"] & VProps & {};
 export type LinkButtonProps = JSX.IntrinsicElements["a"] & VProps & {};
+
+export const buttonColors = [
+  "primary",
+  "secondary",
+  "accent",
+  "success",
+  "error",
+  "warning",
+  "info",
+] as ButtonProps["color"][];
+
+export const buttonSizes = ["xs", "sm", "md", "lg"] as ButtonProps["size"][];
 
 const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   props: T

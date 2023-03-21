@@ -1,3 +1,5 @@
+import type { AnyRecord, PluralizeKeys } from "./types";
+
 export const caseInsensitiveRecord = <T>(record: Record<string, T>) =>
   new Proxy(record, {
     get(target, p) {
@@ -8,6 +10,7 @@ export const caseInsensitiveRecord = <T>(record: Record<string, T>) =>
       }
 
       const exactMatch = target[p];
+
       if (exactMatch !== undefined) {
         return exactMatch;
       }
@@ -18,3 +21,12 @@ export const caseInsensitiveRecord = <T>(record: Record<string, T>) =>
       )?.[1];
     },
   });
+
+export function pluralizeKeys<T extends AnyRecord>(obj: T) {
+  const nextEntries = Object.entries(obj).map(([key, value]) => [
+    `${key}s`,
+    value,
+  ]);
+
+  return Object.fromEntries(nextEntries) as PluralizeKeys<T>;
+}

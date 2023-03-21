@@ -1,5 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
+
 import { RefundMsgRequest, RefundMsgResponse } from "./tx";
 
 export const protobufPackage = "axelar.reward.v1beta1";
