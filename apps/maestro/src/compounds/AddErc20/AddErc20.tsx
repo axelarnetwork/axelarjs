@@ -10,8 +10,14 @@ const stepMap = [Step1, Step2, Step3, Step4];
 
 export const AddErc20: FC<{}> = () => {
   const { state, actions } = useAddErc20State();
-  const { step, newTokenType } = state;
-  const { setStep, setNewTokenType } = actions;
+  const { step, newTokenType, tokenName, tokenSymbol, decimals } = state;
+  const {
+    setStep,
+    setNewTokenType,
+    setTokenName,
+    setTokenSymbol,
+    setDecimals,
+  } = actions;
 
   const CurrentStep = useMemo(() => {
     return stepMap[step];
@@ -39,6 +45,12 @@ export const AddErc20: FC<{}> = () => {
         <CurrentStep
           newTokenType={newTokenType}
           setNewTokenType={setNewTokenType}
+          decimals={decimals}
+          tokenName={tokenName}
+          tokenSymbol={tokenSymbol}
+          setDecimals={setDecimals}
+          setTokenName={setTokenName}
+          setTokenSymbol={setTokenSymbol}
         />
       </Modal.Body>
       <Modal.Actions>
