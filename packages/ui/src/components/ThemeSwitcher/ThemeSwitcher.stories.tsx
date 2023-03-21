@@ -1,6 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { ThemeSwitcher } from "./ThemeSwitcher";
+import { ThemeProvider, ThemeSwitcher } from "./ThemeSwitcher";
 
 export default {
   title: "components/ThemeSwitcher",
@@ -14,7 +14,11 @@ export default {
 } as Meta<typeof ThemeSwitcher>;
 
 const Template: StoryFn<typeof ThemeSwitcher> = (args) => {
-  return <ThemeSwitcher {...args} />;
+  return (
+    <ThemeProvider initialState="dark">
+      <ThemeSwitcher {...args} />
+    </ThemeProvider>
+  );
 };
 
 export const Default = Template.bind({});

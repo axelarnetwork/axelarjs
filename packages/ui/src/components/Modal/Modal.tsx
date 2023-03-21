@@ -2,18 +2,16 @@ import { ComponentProps, FC, Fragment, ReactNode, useState } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
-import clsx from "clsx";
 import tw from "tailwind-styled-components";
 import { createContainer } from "unstated-next";
 
 import { Button } from "../Button";
 
 const StyledDialogContent = tw(Dialog.Content)`
-  modal
-`;
-
-const StyledModalBody = tw.div`
-  modal-box grid gap-2 
+  modal-box modal-open
+  fixed z-50
+  grid gap-2
+  top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]
 `;
 
 function useModalState(initialOpen = false) {
@@ -50,8 +48,21 @@ const ModalRoot: FC<ModalProps> = ({
 }) => {
   const [isOpen, actions] = useModalStateContiner();
 
+  const handleOpenChange = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    }
+    if (open) {
+      actions.open();
+    } else {
+      actions.close();
+    }
+  };
+
   return (
-    <Dialog.Root {...{ modal, open, onOpenChange, defaultOpen }}>
+    <Dialog.Root
+      {...{ modal, open: isOpen, onOpenChange: handleOpenChange, defaultOpen }}
+    >
       {"trigger" in props ? (
         <Dialog.Trigger asChild onClick={actions.open}>
           {props.trigger}
@@ -74,32 +85,31 @@ const ModalRoot: FC<ModalProps> = ({
           >
             <Dialog.Overlay
               forceMount
-              className="fixed inset-0 z-20 bg-black/10"
+              className="fixed inset-0 z-20 bg-black/25"
             />
           </Transition.Child>
           <Transition.Child
-            as={Fragment}
+            as={StyledDialogContent}
+            forceMount
             enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
+            enterFrom="opacity-0 scale-75"
             enterTo="opacity-100 scale-100"
             leave="ease-in duration-200"
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <StyledDialogContent
-              className={clsx({
-                "modal-open": isOpen,
-              })}
-            >
-              <StyledModalBody>
-                {!hideCloseButton && (
-                  <Dialog.Close className="btn btn-sm btn-circle absolute right-2 top-2">
-                    ✕
-                  </Dialog.Close>
-                )}
-                {props.children}
-              </StyledModalBody>
-            </StyledDialogContent>
+            {!hideCloseButton && (
+              <Dialog.Close asChild>
+                <Button
+                  size="sm"
+                  shape="circle"
+                  className="absolute right-2 top-2"
+                >
+                  ✕
+                </Button>
+              </Dialog.Close>
+            )}
+            {props.children}
           </Transition.Child>
         </Transition.Root>
       </Dialog.Portal>
@@ -112,7 +122,7 @@ ModalRoot.defaultProps = {
 };
 
 const ModalRootWithProvider = (props: ModalProps) => (
-  <ModalStateProvider initialState={props.open ?? props.defaultOpen ?? false}>
+  <ModalStateProvider initialState={props.open || props.defaultOpen}>
     <ModalRoot {...props} />
   </ModalStateProvider>
 );
