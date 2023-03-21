@@ -51,18 +51,24 @@ type VariantsProps<
 };
 
 const VIEWPORTS = {
-  mobile1: {
+  phone1: {
     className: "phone-1",
   },
-  mobile2: {
-    className: "phone-2",
-  },
-  mobile3: {
-    className: "phone-3",
-  },
-  mobile4: {
+  // phone2: {
+  //   className: "phone-2",
+  // },
+  // phone3: {
+  //   className: "phone-3",
+  // },
+  phone4: {
     className: "phone-4",
   },
+  phone5: {
+    className: "phone-5",
+  },
+  // phone6: {
+  //   className: "phone-6",
+  // },
   desktop: {
     className: "desktop",
   },
@@ -90,21 +96,22 @@ const Variants = <
 >(
   props: VariantsProps<TComponent, TComponentProps>
 ) => {
-  const [view, setView] = useState<Viewport>("mobile4");
+  const [view, setView] = useState<Viewport>("desktop");
 
   return (
     <div className="relative inline-block p-14">
       <section className="absolute top-2 right-2 flex items-center gap-2 p-2.5">
-        {VIEW_OPTIONS.map((device) => (
-          <Button
-            size="xs"
-            className="rounded-full"
-            outline
-            onClick={() => setView(device)}
-          >
-            {device}
-          </Button>
-        ))}
+        <div className="btn-group">
+          {VIEW_OPTIONS.map((device) => (
+            <input
+              type="radio"
+              name="viewports"
+              data-title={device}
+              className="btn btn-sm"
+              onClick={setView.bind(null, device)}
+            />
+          ))}
+        </div>
         <ThemeSwitcher />
       </section>
       <Card
@@ -123,11 +130,13 @@ const Variants = <
 
           <div
             className={clsx(
-              "artboard artboard-demo mx-auto transition-all duration-300",
+              "artboard artboard-demo mx-auto p-4 transition-all duration-300",
               {
                 ...ARTBOARD_OPTIONS.reduce((acc, artboard) => {
-                  acc[artboard] = artboard === VIEWPORTS[view].className;
-                  return acc;
+                  return {
+                    ...acc,
+                    [artboard]: artboard === VIEWPORTS[view].className,
+                  };
                 }, {} as Record<Artboard, boolean>),
               }
             )}
