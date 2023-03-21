@@ -1,15 +1,17 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 
 import { GasToken } from "@axelar-network/axelarjs-sdk";
-import { Tooltip } from "@axelarjs/ui";
+import { Button, Tooltip } from "@axelarjs/ui";
+import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 
 import { StepProps } from ".";
+import { useDeployAndRegisterInterchainTokenMutation } from "../hooks/useDeployAndRegisterInterchainTokenMutation";
 
 const useStep3ChainSelectionState = () => {
-  const [selectedChains, setSelectedChains] = useState(new Set());
+  const [selectedChains, setSelectedChains] = useState(new Set<string>());
 
   const addSelectedChain = (item: any) =>
     setSelectedChains((prev) => new Set(prev).add(item));
@@ -27,21 +29,53 @@ const useStep3ChainSelectionState = () => {
     actions: { addSelectedChain, removeSelectedChain },
   };
 };
+
 export const Step3: FC<StepProps> = (props: StepProps) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
+
+  const network = useNetwork();
 
   const { state, actions } = useStep3ChainSelectionState();
 
   const {
-    data: gasPrices,
-    isLoading,
-    isError,
+    data: gasFees,
+    isLoading: isGasPriceQueryLoading,
+    isError: isGasPriceQueryError,
   } = useEstimateGasFeeMultipleChains({
-    sourceChainId: "Avalanche",
+    sourceChainId: evmChains?.find(
+      (evmChain) => evmChain.chain_id === network.chain?.id
+    )?.chain_name as string,
     sourceChainTokenSymbol: GasToken.AVAX,
-    destinationChainIds: ["Polygon", "Fantom"],
+    destinationChainIds: Array.from(state.selectedChains),
   });
-  console.log("gasPrices", gasPrices);
+  console.log("gasFees", gasFees);
+
+  const { mutateAsync: deployAndRegisterToken } =
+    useDeployAndRegisterInterchainTokenMutation();
+
+  const handleDeploy = useCallback(async () => {
+    if (isGasPriceQueryLoading || isGasPriceQueryError || !gasFees) {
+      console.warn("gas prices not loaded");
+      return;
+    }
+    await deployAndRegisterToken({
+      tokenName: props.tokenName,
+      tokenSymbol: props.tokenSymbol,
+      decimals: props.decimals,
+      destinationChainIds: Array.from(state.selectedChains),
+      gasFees,
+      sourceChainId: evmChains?.find(
+        (evmChain) => evmChain.chain_id === network.chain?.id
+      )?.chain_name as string,
+    });
+  }, [
+    props.tokenName,
+    props.tokenSymbol,
+    props.decimals,
+    state.selectedChains,
+    gasFees,
+  ]);
+
   return (
     <div>
       <label>Chains to deploy remote tokens</label>
@@ -70,6 +104,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           );
         })}
       </div>
+      <Button onClick={handleDeploy}>Deploy</Button>
     </div>
   );
 };

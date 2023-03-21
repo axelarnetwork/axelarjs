@@ -1,14 +1,9 @@
-import { BigNumber, constants } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
-
-export type UseDeployAndRegisterInterchainTokenConfig = {
-  tokenAddress: `0x${string}`;
-  tokenId: `0x${string}`;
-};
 
 export type UseDeployAndRegisterInterchainTokenInput = {
   sourceChainId: string;
@@ -21,9 +16,8 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
 
-export function useDeployAndRegisterInterchainTokenMutation(
-  config: UseDeployAndRegisterInterchainTokenConfig
-) {
+export function useDeployAndRegisterInterchainTokenMutation() {
+  // mutationInput: UseDeployAndRegisterInterchainTokenInput
   const signer = useSigner();
 
   const { address } = useAccount();
@@ -32,6 +26,25 @@ export function useDeployAndRegisterInterchainTokenMutation(
     address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
     signerOrProvider: signer.data,
   });
+
+  // const { config, error } = usePrepareContractWrite({
+  //   address: String(
+  //     process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+  //   ) as `0x${string}`,
+  //   abi: InterchainTokenLinker.abi,
+  //   functionName: "deployInterchainToken",
+  //   args: [
+  //     mutationInput.tokenName,
+  //     mutationInput.tokenSymbol,
+  //     mutationInput.decimals,
+  //     address as `0x${string}`,
+  //     ethers.utils.hexZeroPad(ethers.utils.hexlify(0), 32) as `0x${string}`,
+  //     mutationInput.destinationChainIds,
+  //     mutationInput.gasFees,
+  //   ],
+  // });
+
+  // const { writeAsync } = useContractWrite(config);
 
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
@@ -49,15 +62,32 @@ export function useDeployAndRegisterInterchainTokenMutation(
 
       try {
         //deploy and register tokens
+        const salt = ethers.utils.hexZeroPad(
+          ethers.utils.hexlify(0),
+          32
+        ) as `0x${string}`;
+        console.log("deploying contract", signer, tokenLinker);
+        console.log(
+          "params",
+          tokenName,
+          tokenSymbol,
+          decimals,
+          address,
+          salt,
+          destinationChainIds,
+          gasFees
+        );
+        // const deployAndRegisterTokensTx = await writeAsync();
         const deployAndRegisterTokensTx =
           await tokenLinker.deployInterchainToken(
             tokenName,
             tokenSymbol,
             decimals,
             address,
-            constants.AddressZero,
+            salt,
             destinationChainIds,
-            gasFees
+            gasFees,
+            { value: BigNumber.from("1000000000000000000") }
           );
 
         if (onStatusUpdate)
@@ -70,6 +100,7 @@ export function useDeployAndRegisterInterchainTokenMutation(
 
         if (onFinished) onFinished();
       } catch (e) {
+        console.log("something went wrong", e);
         if (onStatusUpdate) onStatusUpdate({ type: "idle" });
         return;
       }
