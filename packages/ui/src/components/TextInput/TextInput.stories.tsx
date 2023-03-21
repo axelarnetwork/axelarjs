@@ -1,6 +1,9 @@
+import { pluralizeKeys } from "@axelarjs/utils";
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { TextInput, TextInputProps } from "./TextInput";
+import { buttonColors, buttonSizes } from "../Button";
+import { configurePlayground } from "../StoryPlayground";
+import { TextInput } from "./TextInput";
 
 export default {
   title: "components/TextInput",
@@ -21,28 +24,17 @@ export const Default = Template.bind({});
 Default.args = {
   placeholder: "Placeholder",
 };
+const { Sizes, Colors } = pluralizeKeys(
+  configurePlayground(TextInput, {
+    size: {
+      values: buttonSizes,
+      noChildren: true,
+    },
+    color: {
+      values: buttonColors,
+      noChildren: true,
+    },
+  })
+);
 
-const SizesTemplate: StoryFn<
-  TextInputProps & {
-    sizes: TextInputProps["inputSize"][];
-  }
-> = (args) => {
-  return (
-    <div className="card bg-base-200 w-full max-w-md">
-      <ul className="card-body">
-        {args.sizes.map((size) => (
-          <li key={size} className="form-control">
-            <TextInput inputSize={size} {...args} />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-export const Sizes = SizesTemplate.bind({});
-
-Sizes.args = {
-  placeholder: "Placeholder",
-  sizes: ["xs", "sm", "md", "lg"],
-};
+export { Sizes, Colors };
