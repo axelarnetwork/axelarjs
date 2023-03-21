@@ -26,6 +26,7 @@
     "svgr": "svgr ./assets/icons"
   },
   "dependencies": {
+    "@axelarjs/utils": "workspace:*",
     "@headlessui/react": "^1.7.13",
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-dropdown-menu": "^2.0.4",

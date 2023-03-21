@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import { AddErc20 } from "~/features";
+import { AddErc20 } from "~/compounds";
 import {
   useAssetsQuery,
   useChainConfigsQuery,

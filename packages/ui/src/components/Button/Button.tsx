@@ -77,6 +77,18 @@ type VProps = VariantProps<typeof buttonVariance>;
 export type ButtonProps = JSX.IntrinsicElements["button"] & VProps & {};
 export type LinkButtonProps = JSX.IntrinsicElements["a"] & VProps & {};
 
+export const buttonColors = [
+  "primary",
+  "secondary",
+  "accent",
+  "success",
+  "error",
+  "warning",
+  "info",
+] as ButtonProps["color"][];
+
+export const buttonSizes = ["xs", "sm", "md", "lg"] as ButtonProps["size"][];
+
 const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   props: T
 ) => {
