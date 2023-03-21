@@ -1,80 +1,73 @@
-import { FC } from "react";
+import { ComponentProps, FC, ReactNode } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import tw from "tailwind-styled-components";
 
 import { Button } from "../Button";
 
-const StyledDialogOverlay = tw(Dialog.Overlay)`
-  fixed
-  inset-0
-  animationOverlayShow
-  bg-slate-500/25
-`;
-
 const StyledDialogContent = tw(Dialog.Content)`
-  fixed
-  top-2/4
-  left-2/4
-  -translate-y-2/4
-  -translate-x-2/4
-  p-5
-  w-9/12
-  rounded-xl
-  animationContentShow
-  bg-base-100
+  modal modal-open
 `;
 
-const StyledActionButtons = tw.div`
-  flex
-  flex-row
-  justify-between
+const StyledModalBody = tw.div`
+  modal-box grid gap-2 animate-in slide-in-from-top-0
 `;
+
+type PolymorphicProps =
+  | {
+      trigger: ReactNode;
+    }
+  | {
+      triggerLabel: ReactNode;
+    };
 
 export type ModalProps = JSX.IntrinsicElements["div"] & {
-  onCancel?: () => void;
-  onCancelText?: string;
-  onConfirm?: () => void;
-  onConfirmText?: string;
-  cb?: () => void;
-  cbText?: string;
-  triggerText?: string;
-};
+  hideCloseButton?: boolean;
+} & PolymorphicProps;
 
-export const Modal: FC<ModalProps> = ({
-  children,
-  onCancel,
-  onConfirm,
-  cb,
-  cbText = "Next",
-  onCancelText = "Back",
-  onConfirmText = "Close",
-  triggerText = "Open",
-  ...props
-}) => (
+const ModalRoot: FC<ModalProps> = ({ ...props }) => (
   <Dialog.Root>
-    <Dialog.Trigger asChild>
-      <Button>{triggerText}</Button>
-    </Dialog.Trigger>
+    {"trigger" in props ? (
+      <Dialog.Trigger asChild>{props.trigger}</Dialog.Trigger>
+    ) : (
+      <Dialog.Trigger asChild>
+        <Button>{props.triggerLabel}</Button>
+      </Dialog.Trigger>
+    )}
     <Dialog.Portal>
-      <StyledDialogOverlay />
+      <Dialog.Overlay />
       <StyledDialogContent>
-        {children}
-        <StyledActionButtons>
-          {onCancel && (
-            <Dialog.Close asChild>
-              <Button onClick={onCancel}>{onCancelText}</Button>
+        <StyledModalBody>
+          {!props.hideCloseButton && (
+            <Dialog.Close className="btn btn-sm btn-circle absolute right-2 top-2">
+              ✕
             </Dialog.Close>
           )}
-          {cb ? (
-            <Button onClick={cb}>{cbText}</Button>
-          ) : (
-            <Dialog.Close asChild>
-              <Button onClick={onConfirm}>{onConfirmText}</Button>
-            </Dialog.Close>
-          )}
-        </StyledActionButtons>
+          {props.children}
+        </StyledModalBody>
       </StyledDialogContent>
     </Dialog.Portal>
   </Dialog.Root>
 );
+
+export const Modal = Object.assign(ModalRoot, {
+  Body: tw.div``,
+  Actions: tw.div`
+    modal-action justify-between
+  `,
+  Title: tw(Dialog.Title)`
+    font-bold
+  `,
+  Description: tw(Dialog.Description)`
+    font-medium opacity-75 -mt-2
+  `,
+  CloseAction: (props: ComponentProps<typeof Button>) => (
+    <Dialog.Close asChild>
+      <Button {...props} />
+    </Dialog.Close>
+  ),
+});
+
+Modal.defaultProps = {
+  triggerLabel: "Open Modal",
+};
