@@ -8,13 +8,12 @@ import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 export const TokenRegistration: FC<{}> = () => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain: currentChain } = useNetwork();
-  const [chain, setChain] = useState<any>({
-    ...currentChain,
-    chain_id: currentChain?.id,
-  });
+
+  const [chainId, setChainId] = useState(currentChain?.id);
+
   const selectedChain = useMemo(
-    () => evmChains?.find((c) => c.chain_id === chain?.chain_id),
-    [chain, evmChains]
+    () => evmChains?.find((c) => c.chain_id === chainId),
+    [chainId, evmChains]
   );
   return (
     <div>
@@ -22,9 +21,12 @@ export const TokenRegistration: FC<{}> = () => {
       <EVMChainsDropdown
         selectedChain={selectedChain}
         chains={evmChains}
-        onSwitchNetwork={(chain_id) =>
-          setChain(evmChains?.find((c) => c.chain_id === chain_id))
-        }
+        onSwitchNetwork={(chain_id) => {
+          const target = evmChains?.find((c) => c.chain_id === chain_id);
+          if (target) {
+            setChainId(target?.chain_id);
+          }
+        }}
       />
     </div>
   );
