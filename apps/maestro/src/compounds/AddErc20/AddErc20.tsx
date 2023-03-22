@@ -3,10 +3,10 @@ import { FC, useMemo } from "react";
 import { Button, Modal } from "@axelarjs/ui";
 
 import { useAddErc20State } from "./AddErc20.state";
-import { Step1, Step2, Step3, StepsSummary } from "./Steps";
+import { Step1, Step2, Step3, Step4, StepsSummary } from "./Steps";
 import { TokenRegistration } from "./TokenRegistration";
 
-const STEP_MAP = [Step1, Step2, Step3];
+const STEP_MAP = [Step1, Step2, Step3, Step4];
 
 type Props = {
   trigger?: JSX.Element;
@@ -63,11 +63,19 @@ export const AddErc20: FC<Props> = (props) => {
           tokenName={state.tokenName}
           tokenSymbol={state.tokenSymbol}
           amountToMint={state.amountToMint}
+          deployedTokenAddress={state.deployedTokenAddress}
+          txHash={state.txHash}
           setNewTokenType={actions.setNewTokenType}
           setDecimals={actions.setDecimals}
           setTokenName={actions.setTokenName}
           setTokenSymbol={actions.setTokenSymbol}
           setAmountToMint={actions.setAmountToMint}
+          incrementStep={actions.setStep.bind(null, state.step + 1)}
+          setDeployedTokenAddress={actions.setDeployedTokenAddress}
+          setTxhash={actions.setTxHash}
+          addSelectedChain={actions.addSelectedChain}
+          removeSelectedChain={actions.removeSelectedChain}
+          selectedChains={state.selectedChains}
         />
       </Modal.Body>
       <Modal.Actions>
