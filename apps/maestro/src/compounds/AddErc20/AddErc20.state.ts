@@ -15,7 +15,7 @@ export const useAddErc20State = () => {
   const [decimals, setDecimals] = useState(0);
   const [amountToMint, setAmountToMint] = useState(0);
   const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
-  const [txHash, setTxHash] = useState("");
+  const [txHash, setTxHash] = useState<`0x${string}`>();
   const [txState, setTxState] = useState<DeployAndRegisterTransactionState>({
     type: "idle",
   });

@@ -12,7 +12,7 @@ export type StepProps = {
   deployedTokenAddress: string;
   setDeployedTokenAddress: (deployedTokenAddress: string) => void;
   incrementStep: () => void;
-  txHash: string;
+  txHash?: `0x${string}`;
   setTxhash: (txHash: `0x${string}`) => void;
   selectedChains: Set<string>;
   addSelectedChain: (item: string) => void;
