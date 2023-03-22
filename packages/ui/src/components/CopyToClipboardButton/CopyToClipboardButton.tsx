@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { FC, forwardRef } from "react";
 
 import clsx from "clsx";
 import { CheckCircle, ClipboardCopy } from "lucide-react";
@@ -15,13 +15,10 @@ export type CopyToClipboardButtonProps = Omit<
   onCopied?: () => void;
 };
 
-export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
-  copyText,
-  onCopied,
-  children,
-  className,
-  ...props
-}) => {
+export const CopyToClipboardButton = forwardRef<
+  HTMLButtonElement,
+  CopyToClipboardButtonProps
+>(({ copyText, onCopied, children, className, ...props }, ref) => {
   const [copied, copy] = useCopyToClipboard({
     timeout: 2000,
   });
@@ -45,6 +42,7 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
       className={clsx("flex items-center gap-2", className)}
       onClick={handleCopy.bind(null, textToCopy)}
       {...props}
+      ref={ref}
     >
       {children ?? textToCopy}
 
@@ -63,7 +61,7 @@ export const CopyToClipboardButton: FC<CopyToClipboardButtonProps> = ({
       </div>
     </Button>
   );
-};
+});
 
 CopyToClipboardButton.defaultProps = {
   size: "md",
