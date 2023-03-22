@@ -113,11 +113,7 @@ const Variants = <
         </div>
         <ThemeSwitcher />
       </section>
-      <Card
-        className={clsx(
-          "bg-base-200 inline-grid overflow-x-scroll p-4 transition-all duration-300"
-        )}
-      >
+      <Card className="bg-base-200 inline-grid overflow-x-scroll p-4 transition-all duration-300">
         <Card.Body className="grid gap-8">
           <Card.Title>
             {props.variant.title ?? capitalize(props.propKey)}{" "}
