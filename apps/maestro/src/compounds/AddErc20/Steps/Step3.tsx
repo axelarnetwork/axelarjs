@@ -50,6 +50,8 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     )?.chain_name as string,
     sourceChainTokenSymbol: GasToken.AVAX,
     destinationChainIds: Array.from(state.selectedChains),
+    gasLimit: 1_000_000,
+    gasMultipler: 2,
   });
   console.log("gasFees", gasFees);
 

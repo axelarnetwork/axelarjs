@@ -524,6 +524,11 @@ export default {
           type: "uint8",
         },
         {
+          internalType: "uint256",
+          name: "cap",
+          type: "uint256",
+        },
+        {
           internalType: "address",
           name: "owner",
           type: "address",

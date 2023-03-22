@@ -78,16 +78,21 @@ export function useDeployAndRegisterInterchainTokenMutation() {
           gasFees
         );
         // const deployAndRegisterTokensTx = await writeAsync();
+        const value = gasFees.reduce(
+          (a, b) => a.add(BigNumber.from(b)),
+          BigNumber.from(0)
+        );
         const deployAndRegisterTokensTx =
           await tokenLinker.deployInterchainToken(
             tokenName,
             tokenSymbol,
             decimals,
+            BigNumber.from("1000000000000000000000000"),
             address,
             salt,
             destinationChainIds,
             gasFees,
-            { value: BigNumber.from("1000000000000000000") }
+            { value }
           );
 
         if (onStatusUpdate)
@@ -96,7 +101,12 @@ export function useDeployAndRegisterInterchainTokenMutation() {
             txHash: deployAndRegisterTokensTx.hash,
           });
 
-        await deployAndRegisterTokensTx.wait(1);
+        const deployAndRegisterTokensTxDone =
+          await deployAndRegisterTokensTx.wait(1);
+        console.log(
+          "deployAndRegisterTokensTxDone",
+          deployAndRegisterTokensTxDone
+        );
 
         if (onFinished) onFinished();
       } catch (e) {
