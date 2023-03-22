@@ -45,6 +45,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     data: gasFees,
     isLoading: isGasPriceQueryLoading,
     isError: isGasPriceQueryError,
+    error,
   } = useEstimateGasFeeMultipleChains({
     sourceChainId: evmChains?.find(
       (evmChain) => evmChain.chain_id === network.chain?.id
@@ -53,7 +54,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     gasLimit: 1_000_000,
     gasMultipler: 2,
   });
-  console.log("gasFees", gasFees);
+  console.log("gasFees", error, gasFees);
 
   const { mutateAsync: deployAndRegisterToken } =
     useDeployAndRegisterInterchainTokenMutation();
