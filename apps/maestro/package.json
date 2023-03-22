@@ -12,6 +12,10 @@
     "@axelar-network/axelarjs-sdk": "^0.12.5",
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
+    "@trpc/client": "^10.17.0",
+    "@trpc/next": "^10.17.0",
+    "@trpc/react-query": "^10.17.0",
+    "@trpc/server": "^10.17.0",
     "@types/node": "18.15.3",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
@@ -28,10 +32,12 @@
     "rambda": "^7.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "superjson": "^1.12.2",
     "tailwind-styled-components": "^2.2.0",
     "typescript": "5.0.2",
     "unstated-next": "^1.1.0",
-    "wagmi": "^0.12.2"
+    "wagmi": "^0.12.2",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@next/font": "^13.2.4",

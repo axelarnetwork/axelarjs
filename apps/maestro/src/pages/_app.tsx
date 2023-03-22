@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FC, useLayoutEffect, useState } from "react";
 
 import { ThemeProvider } from "@axelarjs/ui";
 import { Cabin } from "@next/font/google";
@@ -10,15 +10,16 @@ import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 import "~/styles/globals.css";
 
 import MainLayout from "~/layouts/MainLayout";
+import { trpc } from "~/lib/trpc";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 
-export default function App({ Component, pageProps }: AppProps) {
-  const [ready, setReady] = useState(false);
+const App: FC<AppProps> = ({ Component, pageProps }) => {
+  // indicate whether the app is rendered on the server
+  const [isSSR, setIsSSR] = useState(true);
 
-  useEffect(() => {
-    setReady(true);
-  }, []);
+  // set isSSR to false on the first client-side render
+  useLayoutEffect(() => setIsSSR(false), []);
 
   return (
     <>
@@ -30,7 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
         `}
       </style>
       <NextNProgress />
-      {ready && (
+      {!isSSR && (
         <>
           <ThemeProvider>
             <WagmiConfigPropvider>
@@ -43,4 +44,6 @@ export default function App({ Component, pageProps }: AppProps) {
       )}
     </>
   );
-}
+};
+
+export default trpc.withTRPC(App);
