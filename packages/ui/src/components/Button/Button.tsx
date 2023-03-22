@@ -69,6 +69,11 @@ export const buttonVariance = cva("btn", {
     loading: {
       true: "loading",
     },
+
+    length: {
+      wide: "btn-wide",
+      block: "btn-block",
+    },
   },
 });
 
