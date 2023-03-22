@@ -20,6 +20,15 @@ const inputVariance = cva("input", {
       md: "input-md",
       lg: "input-lg",
     },
+    ghost: {
+      true: "input-ghost",
+    },
+    bordered: {
+      true: "input-bordered",
+    },
+    disabled: {
+      true: "input-disabled",
+    },
   },
 });
 
@@ -32,13 +41,19 @@ export type TextInputProps = NativeElementProps &
     type?: "text" | "password" | "email" | "number" | "tel" | "url";
   };
 
+/**
+ * A text input component
+ */
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ color, inputSize, className, ...props }, ref) => (
+  ({ color, inputSize, ghost, bordered, className, ...props }, ref) => (
     <input
       className={twMerge(
         inputVariance({
+          bordered,
           color,
           inputSize,
+          ghost,
+          disabled: props.disabled,
         }),
         className
       )}

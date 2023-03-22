@@ -106,6 +106,7 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
     ghost,
     glass,
     outline,
+    length,
     link,
     loading,
     children,
@@ -123,6 +124,7 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
         outline,
         link,
         glass,
+        length,
         loading,
       }),
       className

@@ -6,68 +6,68 @@ import { useAddErc20State } from "./AddErc20.state";
 import { Step1, Step2, Step3, StepsSummary } from "./Steps";
 import { TokenRegistration } from "./TokenRegistration";
 
-const stepMap = [Step1, Step2, Step3];
+const STEP_MAP = [Step1, Step2, Step3];
 
-export const AddErc20: FC<{}> = () => {
+type Props = {
+  trigger?: JSX.Element;
+};
+
+export const AddErc20: FC<Props> = (props) => {
   const { state, actions } = useAddErc20State();
-  const {
-    step,
-    newTokenType,
-    tokenName,
-    tokenSymbol,
-    decimals,
-    amountToMint,
-    txState,
-  } = state;
-  const {
-    setStep,
-    setNewTokenType,
-    setTokenName,
-    setTokenSymbol,
-    setDecimals,
-    setAmountToMint,
-    setTxState,
-    resetAddErc20StateInputs,
-  } = actions;
 
-  const CurrentStep = useMemo(() => {
-    return stepMap[step];
-  }, [step]);
+  const CurrentStep = useMemo(() => STEP_MAP[state.step], [state.step]);
 
   const back = () =>
-    step === 0 ? (
-      <Modal.CloseAction onClick={resetAddErc20StateInputs} color="secondary">
+    state.step === 0 ? (
+      <Modal.CloseAction
+        onClick={actions.resetAddErc20StateInputs}
+        color="secondary"
+      >
         Close
       </Modal.CloseAction>
     ) : (
-      <Button onClick={() => setStep(step - 1)}>Back</Button>
+      <Button onClick={() => actions.setStep(state.step - 1)}>Back</Button>
     );
 
   const forward = () =>
-    step === stepMap.length - 1 ? (
-      <Modal.CloseAction onClick={resetAddErc20StateInputs} color="primary">
+    state.step === STEP_MAP.length - 1 ? (
+      <Modal.CloseAction
+        onClick={actions.resetAddErc20StateInputs}
+        color="primary"
+      >
         Close
       </Modal.CloseAction>
     ) : (
-      <Button onClick={() => setStep(step + 1)}>Next</Button>
+      <Button onClick={actions.setStep.bind(null, state.step + 1)}>Next</Button>
     );
 
+  const conditionalProps = props.trigger
+    ? {
+        trigger: props.trigger,
+      }
+    : {
+        triggerLabel: "Deploy a new ERC-20 token",
+      };
+
   return (
-    <Modal triggerLabel="Deploy a new ERC-20 token">
+    <Modal {...conditionalProps}>
       <Modal.Body>
         <TokenRegistration />
-        <StepsSummary currentStep={step} newTokenType={newTokenType} />
+        <StepsSummary
+          currentStep={state.step}
+          newTokenType={state.newTokenType}
+        />
         <CurrentStep
-          newTokenType={newTokenType}
-          setNewTokenType={setNewTokenType}
-          decimals={decimals}
-          tokenName={tokenName}
-          tokenSymbol={tokenSymbol}
-          amountToMint={amountToMint}
-          setDecimals={setDecimals}
-          setTokenName={setTokenName}
-          setTokenSymbol={setTokenSymbol}
-          setAmountToMint={setAmountToMint}
+          newTokenType={state.newTokenType}
+          decimals={state.decimals}
+          tokenName={state.tokenName}
+          tokenSymbol={state.tokenSymbol}
+          amountToMint={state.amountToMint}
+          setNewTokenType={actions.setNewTokenType}
+          setDecimals={actions.setDecimals}
+          setTokenName={actions.setTokenName}
+          setTokenSymbol={actions.setTokenSymbol}
+          setAmountToMint={actions.setAmountToMint}
         />
       </Modal.Body>
       <Modal.Actions>
