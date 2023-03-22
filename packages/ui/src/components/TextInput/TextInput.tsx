@@ -25,7 +25,12 @@ const inputVariance = cva("input", {
 
 type VProps = VariantProps<typeof inputVariance>;
 
-export type TextInputProps = JSX.IntrinsicElements["input"] & VProps;
+type NativeElementProps = Omit<JSX.IntrinsicElements["input"], "type">;
+
+export type TextInputProps = NativeElementProps &
+  VProps & {
+    type?: "text" | "password" | "email" | "number" | "tel" | "url";
+  };
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   ({ color, inputSize, className, ...props }, ref) => (
