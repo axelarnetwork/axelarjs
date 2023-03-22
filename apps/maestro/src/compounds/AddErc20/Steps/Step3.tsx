@@ -1,20 +1,25 @@
 import { FC, useCallback, useState } from "react";
 
-import { GasToken } from "@axelar-network/axelarjs-sdk";
-import { Button, Tooltip } from "@axelarjs/ui";
-import clsx from "clsx";
+import { Button, LinkButton, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
 import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
-import { getNativeToken } from "~/utils/getNativeToken";
 
 import { StepProps } from ".";
 import { useDeployAndRegisterInterchainTokenMutation } from "../hooks/useDeployAndRegisterInterchainTokenMutation";
 
 function useStep3ChainSelectionState() {
   const [selectedChains, setSelectedChains] = useState(new Set<string>());
+  const network = useNetwork();
+  const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const resetState = () => {
+    setSelectedChains(new Set<string>());
+    setDeployedTokenAddress("");
+    setIsDeploying(false);
+  };
 
   const addSelectedChain = (item: string) =>
     setSelectedChains((prev) => new Set(prev).add(item));
@@ -29,18 +34,22 @@ function useStep3ChainSelectionState() {
   };
 
   return {
-    state: { selectedChains },
-    actions: { addSelectedChain, removeSelectedChain },
+    state: { selectedChains, deployedTokenAddress, network, isDeploying },
+    actions: {
+      addSelectedChain,
+      removeSelectedChain,
+      setDeployedTokenAddress,
+      resetState,
+      setIsDeploying,
+    },
   };
 }
 
 export const Step3: FC<StepProps> = (props: StepProps) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
-
-  const network = useNetwork();
-
   const { state, actions } = useStep3ChainSelectionState();
-
+  const { isDeploying, network } = state;
+  const { setIsDeploying } = actions;
   const {
     data: gasFees,
     isLoading: isGasPriceQueryLoading,
@@ -64,6 +73,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       console.warn("gas prices not loaded");
       return;
     }
+    setIsDeploying(true);
     await deployAndRegisterToken({
       tokenName: props.tokenName,
       tokenSymbol: props.tokenSymbol,
@@ -73,7 +83,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       sourceChainId: evmChains?.find(
         (evmChain) => evmChain.chain_id === network.chain?.id
       )?.chain_name as string,
+      onStatusUpdate: (data) =>
+        actions.setDeployedTokenAddress(data.tokenAddress as string),
     });
+    setIsDeploying(false);
   }, [
     isGasPriceQueryLoading,
     isGasPriceQueryError,
@@ -87,8 +100,16 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     network.chain?.id,
   ]);
 
+  if (state.deployedTokenAddress)
+    return (
+      <div>
+        <div>Deploy Token Successful</div>
+        <LinkButton>{state.deployedTokenAddress}</LinkButton>
+      </div>
+    );
+
   return (
-    <div>
+    <div className="flex flex-col">
       <label>Chains to deploy remote tokens</label>
       <div className="my-5 flex flex-wrap gap-5">
         {evmChains?.map((chain) => {
@@ -122,7 +143,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           );
         })}
       </div>
-      <Button onClick={handleDeploy}>Deploy</Button>
+      <Button loading={isDeploying} onClick={handleDeploy}>
+        Deploy
+      </Button>
     </div>
   );
 };

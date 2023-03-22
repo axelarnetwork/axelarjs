@@ -96,12 +96,6 @@ export function useDeployAndRegisterInterchainTokenMutation() {
             { value }
           );
 
-        if (onStatusUpdate)
-          onStatusUpdate({
-            type: "deploying",
-            txHash: deployAndRegisterTokensTx.hash,
-          });
-
         const deployAndRegisterTokensTxDone =
           await deployAndRegisterTokensTx.wait(1);
         console.log(
@@ -109,10 +103,15 @@ export function useDeployAndRegisterInterchainTokenMutation() {
           deployAndRegisterTokensTxDone
         );
 
-        const deployedTokenAddress = getTokenDeployedEventFromTxReceipt(
-          deployAndRegisterTokensTxDone
-        );
-        console.log("deployedTokenAddress", deployedTokenAddress);
+        if (onStatusUpdate)
+          onStatusUpdate({
+            type: "deployed",
+            txHash:
+              deployAndRegisterTokensTxDone.transactionHash as `0x${string}`,
+            tokenAddress: getTokenDeployedEventFromTxReceipt(
+              deployAndRegisterTokensTxDone
+            ) as `0x${string}`,
+          });
 
         if (onFinished) onFinished();
       } catch (e) {
