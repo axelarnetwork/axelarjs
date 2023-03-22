@@ -12,6 +12,11 @@ export type StepProps = {
   deployedTokenAddress: string;
   setDeployedTokenAddress: (deployedTokenAddress: string) => void;
   incrementStep: () => void;
+  txHash: string;
+  setTxhash: (txHash: `0x${string}`) => void;
+  selectedChains: Set<string>;
+  addSelectedChain: (item: string) => void;
+  removeSelectedChain: (item: string) => void;
 };
 
 export * from "./Step1";

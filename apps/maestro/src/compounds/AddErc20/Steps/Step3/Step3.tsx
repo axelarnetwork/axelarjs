@@ -10,7 +10,9 @@ import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDepl
 import { useStep3ChainSelectionState } from "./Step3.state";
 
 export const Step3: FC<StepProps> = (props: StepProps) => {
-  const { state, actions } = useStep3ChainSelectionState();
+  const { state, actions } = useStep3ChainSelectionState({
+    selectedChains: props.selectedChains,
+  });
 
   const {
     isDeploying,
@@ -21,9 +23,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     gasFees,
     isGasPriceQueryError,
     isGasPriceQueryLoading,
-    selectedChains,
   } = state;
-  const { setIsDeploying, addSelectedChain, removeSelectedChain } = actions;
+  const { setIsDeploying } = actions;
+  const { selectedChains, addSelectedChain, removeSelectedChain } = props;
 
   const { mutateAsync: deployAndRegisterToken } =
     useDeployAndRegisterInterchainTokenMutation();
@@ -41,13 +43,15 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         tokenName: props.tokenName,
         tokenSymbol: props.tokenSymbol,
         decimals: props.decimals,
-        destinationChainIds: Array.from(state.selectedChains),
+        destinationChainIds: Array.from(selectedChains),
         gasFees,
         sourceChainId: evmChains?.find(
           (evmChain) => evmChain.chain_id === network.chain?.id
         )?.chain_name as string,
-        onStatusUpdate: (data) =>
-          props.setDeployedTokenAddress(data.tokenAddress as string),
+        onStatusUpdate: (data) => {
+          props.setDeployedTokenAddress(data.tokenAddress as string);
+          data.txHash && props.setTxhash(data.txHash);
+        },
       });
       setIsDeploying(false);
       props.incrementStep();
@@ -61,7 +65,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       props.tokenName,
       props.tokenSymbol,
       props.decimals,
-      state.selectedChains,
+      selectedChains,
       evmChains,
       network.chain?.id,
       actions,

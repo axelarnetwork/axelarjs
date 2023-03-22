@@ -64,6 +64,7 @@ export const AddErc20: FC<Props> = (props) => {
           tokenSymbol={state.tokenSymbol}
           amountToMint={state.amountToMint}
           deployedTokenAddress={state.deployedTokenAddress}
+          txHash={state.txHash}
           setNewTokenType={actions.setNewTokenType}
           setDecimals={actions.setDecimals}
           setTokenName={actions.setTokenName}
@@ -71,6 +72,10 @@ export const AddErc20: FC<Props> = (props) => {
           setAmountToMint={actions.setAmountToMint}
           incrementStep={actions.setStep.bind(null, state.step + 1)}
           setDeployedTokenAddress={actions.setDeployedTokenAddress}
+          setTxhash={actions.setTxHash}
+          addSelectedChain={actions.addSelectedChain}
+          removeSelectedChain={actions.removeSelectedChain}
+          selectedChains={state.selectedChains}
         />
       </Modal.Body>
       <Modal.Actions>

@@ -7,11 +7,14 @@ import { useNetwork } from "wagmi";
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 
-export function useStep3ChainSelectionState() {
+export type UseStep3ChainSelectionStateProps = {
+  selectedChains: Set<string>;
+};
+export function useStep3ChainSelectionState({
+  selectedChains,
+}: UseStep3ChainSelectionStateProps) {
   const { data: evmChains } = useEVMChainConfigsQuery();
-  const [selectedChains, setSelectedChains] = useState(new Set<string>());
   const network = useNetwork();
-  const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, _setTotalGasFee] = useState(
     formatEther(BigNumber.from(0))
@@ -34,8 +37,6 @@ export function useStep3ChainSelectionState() {
   useEffect(() => gasFees && setTotalGasFee(gasFees), [gasFees]);
 
   const resetState = () => {
-    setSelectedChains(new Set<string>());
-    setDeployedTokenAddress("");
     setIsDeploying(false);
     _setTotalGasFee(formatEther(BigNumber.from(0)));
   };
@@ -56,22 +57,8 @@ export function useStep3ChainSelectionState() {
     [evmChains, network]
   );
 
-  const addSelectedChain = (item: string) =>
-    setSelectedChains((prev) => new Set(prev).add(item));
-
-  const removeSelectedChain = (item: string) => {
-    setSelectedChains((prev) => {
-      if (!prev.has(item)) return prev;
-      const next = new Set(prev);
-      next.delete(item);
-      return next;
-    });
-  };
-
   return {
     state: {
-      selectedChains,
-      deployedTokenAddress,
       network,
       isDeploying,
       totalGasFee,
@@ -82,9 +69,6 @@ export function useStep3ChainSelectionState() {
       gasFees,
     },
     actions: {
-      addSelectedChain,
-      removeSelectedChain,
-      setDeployedTokenAddress,
       resetState,
       setIsDeploying,
       setTotalGasFee,

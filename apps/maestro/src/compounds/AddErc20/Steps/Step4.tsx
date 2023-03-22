@@ -2,24 +2,28 @@ import { FC, useCallback, useState } from "react";
 
 import { LinkButton, useIntervalAsync } from "@axelarjs/ui";
 
+import { queryTransactionStatus } from "~/lib/api/axelarscan";
+
 import { StepProps } from ".";
 
 export const Step4: FC<StepProps> = (props: StepProps) => {
   const [count, setCount] = useState(0);
-  const [delay, setDelay] = useState<number | null>(5000);
+  const [delay, setDelay] = useState<number | null>(10000);
 
   const updateState = useCallback(async () => {
-    const response = await fetch("https://httpbin.org/get");
-    const data = await response.json();
+    console.log("txHashhhh", count, props.txHash, props.selectedChains);
+    const response = await queryTransactionStatus(props.txHash);
+
     if (count < 3) {
       setCount((count) => count + 1);
     } else {
       setDelay(null);
     }
-    console.log("data", data);
-    return data;
-  }, [count]);
-  const interval = useIntervalAsync(updateState.bind(this), delay);
+    console.log("response", response);
+    return response;
+  }, [props.txHash, count]);
+
+  useIntervalAsync(updateState, delay);
 
   return (
     <div>
