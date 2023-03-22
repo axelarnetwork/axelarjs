@@ -143,6 +143,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 
+Button.displayName = "Button";
+
 export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
   (props, ref) => {
     const [classes, componentProps] = getSegmentedProps(props);
@@ -154,6 +156,8 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     );
   }
 );
+
+LinkButton.displayName = "LinkButton";
 
 Button.defaultProps = {
   type: "button",
