@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { ThemeProvider } from "@axelarjs/ui";
 import { Cabin } from "@next/font/google";
@@ -19,7 +19,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   const [isSSR, setIsSSR] = useState(true);
 
   // set isSSR to false on the first client-side render
-  useLayoutEffect(() => setIsSSR(false), []);
+  useEffect(() => setIsSSR(false), []);
 
   return (
     <>
