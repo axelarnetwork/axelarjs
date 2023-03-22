@@ -10,7 +10,7 @@ import {
   ThemeSwitcher,
   useTheme,
 } from "@axelarjs/ui";
-import { useWeb3Modal, Web3Modal } from "@web3modal/react";
+import { Web3Modal } from "@web3modal/react";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
 import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
@@ -18,7 +18,6 @@ import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
-import { trpc } from "~/lib/trpc";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
