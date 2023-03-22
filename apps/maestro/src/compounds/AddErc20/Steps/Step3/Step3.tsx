@@ -1,12 +1,6 @@
-import React, {
-  FC,
-  FormEventHandler,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { FC, FormEventHandler, useCallback } from "react";
 
-import { Button, LinkButton, Tooltip, useIntervalAsync } from "@axelarjs/ui";
+import { Button, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
 
 import { getNativeToken } from "~/utils/getNativeToken";
@@ -17,21 +11,6 @@ import { useStep3ChainSelectionState } from "./Step3.state";
 
 export const Step3: FC<StepProps> = (props: StepProps) => {
   const { state, actions } = useStep3ChainSelectionState();
-  const [count, setCount] = useState(0);
-  const [delay, setDelay] = useState<number | null>(5000);
-
-  const updateState = useCallback(async () => {
-    const response = await fetch("https://httpbin.org/get");
-    const data = await response.json();
-    if (count < 3) {
-      setCount((count) => count + 1);
-    } else {
-      setDelay(null);
-    }
-    console.log("data", data);
-    return data;
-  }, [count]);
-  const interval = useIntervalAsync(updateState.bind(this), delay);
 
   const {
     isDeploying,
@@ -88,14 +67,6 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       actions,
     ]
   );
-
-  // if (state.deployedTokenAddress)
-  //   return (
-  //     <div>
-  //       <div>Deploy Token Successful</div>
-  //       <LinkButton>{state.deployedTokenAddress}</LinkButton>
-  //     </div>
-  //   );
 
   return (
     <form className="flex flex-col" onSubmit={handleDeploy}>

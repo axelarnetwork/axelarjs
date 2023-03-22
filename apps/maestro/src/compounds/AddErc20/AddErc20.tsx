@@ -63,13 +63,13 @@ export const AddErc20: FC<Props> = (props) => {
           tokenName={state.tokenName}
           tokenSymbol={state.tokenSymbol}
           amountToMint={state.amountToMint}
+          deployedTokenAddress={state.deployedTokenAddress}
           setNewTokenType={actions.setNewTokenType}
           setDecimals={actions.setDecimals}
           setTokenName={actions.setTokenName}
           setTokenSymbol={actions.setTokenSymbol}
           setAmountToMint={actions.setAmountToMint}
           incrementStep={actions.setStep.bind(null, state.step + 1)}
-          deployedTokenAddress={state.deployedTokenAddress}
           setDeployedTokenAddress={actions.setDeployedTokenAddress}
         />
       </Modal.Body>
