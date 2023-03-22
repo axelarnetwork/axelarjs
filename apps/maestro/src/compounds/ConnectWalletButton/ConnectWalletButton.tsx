@@ -18,6 +18,7 @@ ConnectWalletButton.displayName = "ConnectWalletButton";
 ConnectWalletButton.defaultProps = {
   size: "sm",
   color: "primary",
+  children: "Connect Wallet",
 };
 
 export default ConnectWalletButton;
