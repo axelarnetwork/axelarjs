@@ -28,9 +28,6 @@ type StepsVProps = VariantProps<typeof stepsVariance>;
 
 const stepVariance = cva("step", {
   variants: {
-    active: {
-      false: "!step-neutral",
-    },
     color: {
       primary: "step-primary",
       secondary: "step-secondary",
@@ -40,9 +37,6 @@ const stepVariance = cva("step", {
       success: "step-success",
       error: "step-error",
     },
-  },
-  defaultVariants: {
-    active: false,
   },
 });
 
@@ -150,6 +144,10 @@ type StapProps = JSX.IntrinsicElements["li"] &
      * The content of the step, defaults to the index of the step
      */
     content?: string;
+    /**
+     * Whether the step is active
+     */
+    active?: boolean;
   };
 
 const Step: FC<StapProps> = ({
@@ -165,10 +163,7 @@ const Step: FC<StapProps> = ({
     <li
       data-content={content}
       className={twMerge(
-        stepVariance({
-          active,
-          color: color ?? state.color,
-        }),
+        stepVariance(active ? { color: state.color } : {}),
         className
       )}
       {...props}

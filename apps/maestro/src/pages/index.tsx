@@ -1,14 +1,12 @@
+import { Button, TextInput } from "@axelarjs/ui";
 import Head from "next/head";
+import { useAccount } from "wagmi";
 
-import { AddErc20 } from "~/features";
-import {
-  useAssetsQuery,
-  useChainConfigsQuery,
-} from "~/lib/api/axelarscan/hooks";
+import { AddErc20 } from "~/compounds";
+import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 
 export default function Home() {
-  const { data: assets, error } = useAssetsQuery();
-  const { data: chainConfigs } = useChainConfigsQuery();
+  const account = useAccount();
 
   return (
     <>
@@ -18,16 +16,30 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {assets?.map((asset) => (
-        <div key={asset.id}>{asset.id}</div>
-      ))}
-      <AddErc20 />
 
-      {chainConfigs?.evm.map((chainConfig) => (
-        <div key={chainConfig.id}>{chainConfig.id}</div>
-      ))}
-
-      {error && <div>{(error as Error)?.message}</div>}
+      <div className="grid flex-1 place-items-center">
+        {account.address ? (
+          <>
+            <div className="flex w-full max-w-md flex-col items-center justify-center">
+              <TextInput
+                bordered
+                className="bprder-red block w-full max-w-sm"
+                placeholder="Search for and existing ERC-20 token address on Etherscan"
+              />
+              <div className="divider">OR</div>
+              <AddErc20
+                trigger={
+                  <Button size="md" className="w-full max-w-sm" color="primary">
+                    Deploy a new ERC-20 token
+                  </Button>
+                }
+              />
+            </div>
+          </>
+        ) : (
+          <ConnectWalletButton size="md" className="w-full max-w-sm" />
+        )}
+      </div>
     </>
   );
 }

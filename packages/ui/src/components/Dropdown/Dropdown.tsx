@@ -3,9 +3,6 @@ import type { FC } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import tw from "tailwind-styled-components";
 
-import { Button } from "../Button";
-import { Card } from "../Card";
-
 const dropdownVariance = cva("dropdown", {
   variants: {
     placement: {
@@ -26,11 +23,11 @@ const dropdownVariance = cva("dropdown", {
 type VProps = VariantProps<typeof dropdownVariance>;
 
 type VariableProps =
+  | { $as: never }
   | {
       $as?: "a";
       href?: string;
-    }
-  | { $as: never };
+    };
 
 export type DropdownProps = JSX.IntrinsicElements["div"] &
   VProps &

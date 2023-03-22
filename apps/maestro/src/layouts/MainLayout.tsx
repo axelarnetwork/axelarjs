@@ -14,13 +14,13 @@ import { useWeb3Modal, Web3Modal } from "@web3modal/react";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
 import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
+import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
-  const { open } = useWeb3Modal();
   const { disconnect } = useDisconnect();
   const { chain } = useNetwork();
   const { isConnected, address } = useAccount();
@@ -59,14 +59,12 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 </Button>
               </>
             ) : (
-              <Button size="sm" onClick={() => open()} color="primary">
-                Connect Wallet
-              </Button>
+              <ConnectWalletButton />
             )}
             <ThemeSwitcher />
           </Navbar.End>
         </Navbar>
-        <Clamp $as="main" className="flex-1">
+        <Clamp $as="main" className="flex flex-1">
           {children}
         </Clamp>
         <Footer className="bg-neutral text-neutral-content p-8" center>
