@@ -62,13 +62,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       gasFees,
       setIsDeploying,
       deployAndRegisterToken,
-      props.tokenName,
-      props.tokenSymbol,
-      props.decimals,
+      props,
       selectedChains,
       evmChains,
       network.chain?.id,
-      actions,
     ]
   );
 
