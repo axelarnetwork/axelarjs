@@ -68,9 +68,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           (evmChain) => evmChain.chain_id === network.chain?.id
         )?.chain_name as string,
         onStatusUpdate: (data) =>
-          actions.setDeployedTokenAddress(data.tokenAddress as string),
+          props.setDeployedTokenAddress(data.tokenAddress as string),
       });
       setIsDeploying(false);
+      props.incrementStep();
     },
     [
       isGasPriceQueryLoading,
@@ -88,13 +89,13 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     ]
   );
 
-  if (state.deployedTokenAddress)
-    return (
-      <div>
-        <div>Deploy Token Successful</div>
-        <LinkButton>{state.deployedTokenAddress}</LinkButton>
-      </div>
-    );
+  // if (state.deployedTokenAddress)
+  //   return (
+  //     <div>
+  //       <div>Deploy Token Successful</div>
+  //       <LinkButton>{state.deployedTokenAddress}</LinkButton>
+  //     </div>
+  //   );
 
   return (
     <form className="flex flex-col" onSubmit={handleDeploy}>

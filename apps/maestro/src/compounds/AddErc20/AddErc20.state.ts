@@ -14,6 +14,7 @@ export const useAddErc20State = () => {
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [decimals, setDecimals] = useState(0);
   const [amountToMint, setAmountToMint] = useState(0);
+  const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
   const [txState, setTxState] = useState<DeployAndRegisterTransactionState>({
     type: "idle",
   });
@@ -26,6 +27,10 @@ export const useAddErc20State = () => {
     setAmountToMint(0);
     setTxState({ type: "idle" });
   };
+  const resetAllState = () => {
+    resetAddErc20StateInputs();
+    setDeployedTokenAddress("");
+  };
 
   return {
     state: {
@@ -36,6 +41,7 @@ export const useAddErc20State = () => {
       decimals,
       amountToMint,
       txState,
+      deployedTokenAddress,
     },
     actions: {
       setStep,
@@ -44,8 +50,10 @@ export const useAddErc20State = () => {
       setTokenSymbol,
       setDecimals,
       setAmountToMint,
+      setDeployedTokenAddress,
       setTxState,
       resetAddErc20StateInputs,
+      resetAllState,
     },
   };
 };
