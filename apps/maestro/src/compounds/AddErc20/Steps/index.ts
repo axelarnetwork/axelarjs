@@ -9,9 +9,18 @@ export type StepProps = {
   setDecimals: (decimals: number) => void;
   amountToMint: number;
   setAmountToMint: (amountToMint: number) => void;
+  deployedTokenAddress: string;
+  setDeployedTokenAddress: (deployedTokenAddress: string) => void;
+  incrementStep: () => void;
+  txHash: string;
+  setTxhash: (txHash: `0x${string}`) => void;
+  selectedChains: Set<string>;
+  addSelectedChain: (item: string) => void;
+  removeSelectedChain: (item: string) => void;
 };
 
 export * from "./Step1";
 export * from "./Step2";
 export * from "./Step3";
+export * from "./Step4";
 export * from "./StepsSummary";

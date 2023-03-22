@@ -2,7 +2,12 @@ import { useQuery } from "wagmi";
 
 import { DISABLED_CHAINS } from "~/config/chains";
 
-import { getAssetPrices, getAssets, getChainConfigs } from ".";
+import {
+  getAssetPrices,
+  getAssets,
+  getChainConfigs,
+  queryTransactionStatus,
+} from ".";
 
 export function useChainConfigsQuery() {
   return useQuery(["axelarscan-chain-configs"], getChainConfigs, {
