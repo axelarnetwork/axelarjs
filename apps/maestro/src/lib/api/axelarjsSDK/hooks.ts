@@ -1,5 +1,7 @@
 import { useQuery } from "wagmi";
 
+import { getNativeToken } from "~/utils/getNativeToken";
+
 import { estimateGasFee, estimateGasFeeMultipleChains } from "./index";
 import {
   EstimateGasFeeMultipleChainsParams,
@@ -9,6 +11,7 @@ import {
 const staleTime = 1000 * 60 * 3; // 3 minutes
 
 export function useEstimateGasFee(params: EstimateGasFeeParams) {
+  params.sourceChainTokenSymbol = getNativeToken(params.sourceChainId);
   return useQuery(
     ["estimate-gas-fee", params],
     estimateGasFee.bind(null, params),

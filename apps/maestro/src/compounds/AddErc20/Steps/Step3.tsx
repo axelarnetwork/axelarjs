@@ -8,6 +8,7 @@ import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
+import { getNativeToken } from "~/utils/getNativeToken";
 
 import { StepProps } from ".";
 import { useDeployAndRegisterInterchainTokenMutation } from "../hooks/useDeployAndRegisterInterchainTokenMutation";
@@ -48,7 +49,6 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     sourceChainId: evmChains?.find(
       (evmChain) => evmChain.chain_id === network.chain?.id
     )?.chain_name as string,
-    sourceChainTokenSymbol: GasToken.AVAX,
     destinationChainIds: Array.from(state.selectedChains),
     gasLimit: 1_000_000,
     gasMultipler: 2,
