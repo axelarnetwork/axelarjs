@@ -45,7 +45,9 @@ export const AddErc20: FC<{}> = () => {
 
   const forward = () =>
     step === stepMap.length - 1 ? (
-      <Modal.CloseAction color="primary">Close</Modal.CloseAction>
+      <Modal.CloseAction onClick={resetAddErc20StateInputs} color="primary">
+        Close
+      </Modal.CloseAction>
     ) : (
       <Button onClick={() => setStep(step + 1)}>Next</Button>
     );

@@ -2,6 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import { getTokenDeployedEventFromTxReceipt } from "~/utils/findContractEvent";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -95,18 +96,22 @@ export function useDeployAndRegisterInterchainTokenMutation() {
             { value }
           );
 
-        if (onStatusUpdate)
-          onStatusUpdate({
-            type: "deploying",
-            txHash: deployAndRegisterTokensTx.hash,
-          });
-
         const deployAndRegisterTokensTxDone =
           await deployAndRegisterTokensTx.wait(1);
         console.log(
           "deployAndRegisterTokensTxDone",
           deployAndRegisterTokensTxDone
         );
+
+        if (onStatusUpdate)
+          onStatusUpdate({
+            type: "deployed",
+            txHash:
+              deployAndRegisterTokensTxDone.transactionHash as `0x${string}`,
+            tokenAddress: getTokenDeployedEventFromTxReceipt(
+              deployAndRegisterTokensTxDone
+            ) as `0x${string}`,
+          });
 
         if (onFinished) onFinished();
       } catch (e) {

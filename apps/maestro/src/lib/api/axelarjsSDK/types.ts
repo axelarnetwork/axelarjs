@@ -13,7 +13,6 @@ export type EstimateGasFeeParams = {
 export type EstimateGasFeeMultipleChainsParams = {
   sourceChainId: string;
   destinationChainIds: string[];
-  sourceChainTokenSymbol?: GasToken;
   gasLimit?: number;
   gasMultipler?: number;
   minGasPrice?: string;

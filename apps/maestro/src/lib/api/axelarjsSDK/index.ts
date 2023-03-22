@@ -1,5 +1,8 @@
 import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
 import { BigNumber } from "ethers";
+import { formatEther } from "ethers/lib/utils.js";
+
+import { getNativeToken } from "~/utils/getNativeToken";
 
 import type {
   EstimateGasFeeMultipleChainsParams,
@@ -13,7 +16,7 @@ export const client = new AxelarQueryAPI({
 async function estimateGasFee(
   params: EstimateGasFeeParams
 ): Promise<BigNumber> {
-  return BigNumber.from(
+  const fee = BigNumber.from(
     await client.estimateGasFee(
       params.sourceChainId,
       params.destinationChainId,
@@ -24,6 +27,8 @@ async function estimateGasFee(
       params.isGMPExpressTransaction
     )
   );
+  console.log("estimateGasFee", formatEther(fee), params);
+  return fee;
 }
 
 async function estimateGasFeeMultipleChains(
@@ -31,7 +36,11 @@ async function estimateGasFeeMultipleChains(
 ): Promise<BigNumber[]> {
   return await Promise.all(
     params.destinationChainIds.map((destinationChainId) =>
-      estimateGasFee({ ...params, destinationChainId })
+      estimateGasFee({
+        ...params,
+        destinationChainId,
+        sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
+      })
     )
   );
 }
