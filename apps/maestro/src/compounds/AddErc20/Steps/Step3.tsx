@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import React, { FC, FormEventHandler, useCallback, useState } from "react";
 
 import { Button, LinkButton, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
@@ -63,42 +63,48 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     gasLimit: 1_000_000,
     gasMultipler: 2,
   });
-  console.log("gasFees", error, gasFees);
 
   const { mutateAsync: deployAndRegisterToken } =
     useDeployAndRegisterInterchainTokenMutation();
 
-  const handleDeploy = useCallback(async () => {
-    if (isGasPriceQueryLoading || isGasPriceQueryError || !gasFees) {
-      console.warn("gas prices not loaded");
-      return;
-    }
-    setIsDeploying(true);
-    await deployAndRegisterToken({
-      tokenName: props.tokenName,
-      tokenSymbol: props.tokenSymbol,
-      decimals: props.decimals,
-      destinationChainIds: Array.from(state.selectedChains),
+  const handleDeploy = useCallback<FormEventHandler<HTMLFormElement>>(
+    async (e) => {
+      e.preventDefault();
+
+      if (isGasPriceQueryLoading || isGasPriceQueryError || !gasFees) {
+        console.warn("gas prices not loaded");
+        return;
+      }
+      setIsDeploying(true);
+      await deployAndRegisterToken({
+        tokenName: props.tokenName,
+        tokenSymbol: props.tokenSymbol,
+        decimals: props.decimals,
+        destinationChainIds: Array.from(state.selectedChains),
+        gasFees,
+        sourceChainId: evmChains?.find(
+          (evmChain) => evmChain.chain_id === network.chain?.id
+        )?.chain_name as string,
+        onStatusUpdate: (data) =>
+          actions.setDeployedTokenAddress(data.tokenAddress as string),
+      });
+      setIsDeploying(false);
+    },
+    [
+      isGasPriceQueryLoading,
+      isGasPriceQueryError,
       gasFees,
-      sourceChainId: evmChains?.find(
-        (evmChain) => evmChain.chain_id === network.chain?.id
-      )?.chain_name as string,
-      onStatusUpdate: (data) =>
-        actions.setDeployedTokenAddress(data.tokenAddress as string),
-    });
-    setIsDeploying(false);
-  }, [
-    isGasPriceQueryLoading,
-    isGasPriceQueryError,
-    gasFees,
-    deployAndRegisterToken,
-    props.tokenName,
-    props.tokenSymbol,
-    props.decimals,
-    state.selectedChains,
-    evmChains,
-    network.chain?.id,
-  ]);
+      setIsDeploying,
+      deployAndRegisterToken,
+      props.tokenName,
+      props.tokenSymbol,
+      props.decimals,
+      state.selectedChains,
+      evmChains,
+      network.chain?.id,
+      actions,
+    ]
+  );
 
   if (state.deployedTokenAddress)
     return (
@@ -109,7 +115,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     );
 
   return (
-    <div className="flex flex-col">
+    <form className="flex flex-col" onSubmit={handleDeploy}>
       <label>Chains to deploy remote tokens</label>
       <div className="my-5 flex flex-wrap gap-5">
         {evmChains?.map((chain) => {
@@ -130,6 +136,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
 
                   action(chain.chain_name);
                 }}
+                type="submit"
               >
                 <Image
                   className="pointer-events-none rounded-full"
@@ -143,9 +150,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           );
         })}
       </div>
-      <Button loading={isDeploying} onClick={handleDeploy}>
-        Deploy
-      </Button>
-    </div>
+      <Button loading={isDeploying}>Deploy</Button>
+    </form>
   );
 };

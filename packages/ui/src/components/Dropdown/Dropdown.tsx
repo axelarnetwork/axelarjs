@@ -23,11 +23,11 @@ const dropdownVariance = cva("dropdown", {
 type VProps = VariantProps<typeof dropdownVariance>;
 
 type VariableProps =
+  | { $as: never }
   | {
       $as?: "a";
       href?: string;
-    }
-  | { $as: never };
+    };
 
 export type DropdownProps = JSX.IntrinsicElements["div"] &
   VProps &
