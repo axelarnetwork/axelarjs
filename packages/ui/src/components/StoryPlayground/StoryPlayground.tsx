@@ -4,7 +4,6 @@ import type { CapitalizeKeys } from "@axelarjs/utils";
 import type { StoryFn } from "@storybook/react";
 import clsx from "clsx";
 
-import { Button } from "../Button";
 import { Card } from "../Card";
 import { ThemeSwitcher } from "../ThemeSwitcher";
 
@@ -106,7 +105,7 @@ const Variants = <
             <input
               type="radio"
               name="viewports"
-              data-title={device}
+              data-title={device.split("-").join(" ")}
               className="btn btn-sm"
               onClick={setView.bind(null, device)}
             />
