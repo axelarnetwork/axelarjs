@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { forwardRef } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
@@ -126,25 +126,34 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   ] as const;
 };
 
-export const Button: FC<ButtonProps> = (props) => {
-  const [className, componentProps] = getSegmentedProps(props);
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (props, ref) => {
+    const [className, componentProps] = getSegmentedProps(props);
 
-  return (
-    <button disabled={props.disabled} className={className} {...componentProps}>
-      {props.children}
-    </button>
-  );
-};
+    return (
+      <button
+        disabled={props.disabled}
+        className={className}
+        {...componentProps}
+        ref={ref}
+      >
+        {props.children}
+      </button>
+    );
+  }
+);
 
-export const LinkButton: FC<LinkButtonProps> = (props) => {
-  const [classes, componentProps] = getSegmentedProps(props);
+export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
+  (props, ref) => {
+    const [classes, componentProps] = getSegmentedProps(props);
 
-  return (
-    <a className={classes} {...componentProps}>
-      {props.children}
-    </a>
-  );
-};
+    return (
+      <a className={classes} {...componentProps} ref={ref}>
+        {props.children}
+      </a>
+    );
+  }
+);
 
 Button.defaultProps = {
   type: "button",
