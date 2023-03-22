@@ -45,4 +45,12 @@ async function estimateGasFeeMultipleChains(
   );
 }
 
+const extendedClient = {
+  ...client,
+  estimateGasFee,
+  estimateGasFeeMultipleChains,
+};
+
+export default extendedClient;
+
 export { estimateGasFee, estimateGasFeeMultipleChains };
