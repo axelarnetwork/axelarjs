@@ -31,7 +31,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
 
   const selectedChain = useMemo(
-    () => evmChains?.find((c) => c.chain_id === chain?.id),
+    () => evmChains?.find?.((x) => x.chain_id === chain?.id),
     [chain, evmChains]
   );
 
