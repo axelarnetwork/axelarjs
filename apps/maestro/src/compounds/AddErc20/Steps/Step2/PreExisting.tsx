@@ -4,11 +4,8 @@ import { TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
 import { useSigner } from "wagmi";
 
-import { useERC20 } from "~/lib/contract/hooks/useERC20";
-import {
-  useCheckTokenExistsInTokenLinker,
-  useInterchainTokenLinker,
-} from "~/lib/contract/hooks/useInterchainTokenLinker";
+import { useGetERC20TokenDetails } from "~/lib/contract/hooks/useERC20";
+import { useCheckTokenExistsInTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
 import { StepProps } from "..";
 
@@ -46,14 +43,12 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenDecimals, setTokenDecimals] = useState(0);
   const signer = useSigner();
-  const erc20 = useERC20({
+  const { data: tokenInfo } = useGetERC20TokenDetails({
     address: props.address,
     signerOrProvider: signer.data,
+    tokenAddress: props.address as `0x${string}`,
   });
-  const tl = useInterchainTokenLinker({
-    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
-    signerOrProvider: signer.data,
-  });
+
   const { data: doesTlExist } = useCheckTokenExistsInTokenLinker({
     address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
     signerOrProvider: signer.data,
@@ -61,16 +56,17 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   });
 
   useEffect(() => {
-    // erc20?.decimals().then((decimals) => setTokenDecimals(decimals));
-    // erc20?.name().then((name) => setTokenName(name));
-    // erc20?.symbol().then((symbol) => setTokenSymbol(symbol));
-    // tl?.getTokenId(props.address as `0x${string}`).then((data) => alert(data));
-  }, [props.address]);
+    tokenInfo && tokenInfo.decimals && setTokenDecimals(tokenInfo.decimals);
+    tokenInfo && tokenInfo.tokenName && setTokenName(tokenInfo.tokenName);
+    tokenInfo && tokenInfo.tokenSymbol && setTokenSymbol(tokenInfo.tokenSymbol);
+  }, [props.address, tokenInfo, doesTlExist]);
 
   return (
     <div>
       <div>{props.address}</div>
-      {/* <div>{doesTlExist}</div> */}
+      <div>
+        Does token exist: {doesTlExist ? "Token Exists" : "Token Doesnt Exist"}
+      </div>
       <div>Decimals: {tokenDecimals}</div>
       <div>Token Name: {tokenName}</div>
       <div>Token Symbol: {tokenSymbol}</div>
