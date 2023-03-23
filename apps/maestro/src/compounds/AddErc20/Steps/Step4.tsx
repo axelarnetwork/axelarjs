@@ -38,7 +38,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
   useIntervalAsync(updateState, delay);
 
   const getStatuses = () => {
-    const divs = [...statusMap.entries()].map(([status, chainId]) => {
+    const divs = [...statusMap.entries()].map(([chainId, status]) => {
       return (
         <div key={`chain-status-${chainId}`}>
           Chain: {chainId}, Status: {status}
