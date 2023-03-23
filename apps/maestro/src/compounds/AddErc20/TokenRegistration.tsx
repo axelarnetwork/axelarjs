@@ -16,9 +16,11 @@ export const TokenRegistration: FC<{}> = () => {
     [chainId, evmChains]
   );
   return (
-    <div>
+    <>
       <label>Register Origin Token On: </label>
+
       <EVMChainsDropdown
+        compact
         selectedChain={selectedChain}
         chains={evmChains}
         onSwitchNetwork={(chain_id) => {
@@ -28,6 +30,6 @@ export const TokenRegistration: FC<{}> = () => {
           }
         }}
       />
-    </div>
+    </>
   );
 };

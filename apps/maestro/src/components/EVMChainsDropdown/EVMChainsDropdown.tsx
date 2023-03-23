@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 
-import { Dropdown, LinkButton } from "@axelarjs/ui";
+import { Dropdown } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
 
@@ -10,6 +10,7 @@ type Props = {
   onSwitchNetwork?: (chainId: number) => void;
   selectedChain?: EVMChainConfig;
   chains?: EVMChainConfig[];
+  compact?: boolean;
 };
 
 const iconSizes = {
@@ -65,7 +66,12 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
         />
         <span>{props.selectedChain.chain_name}</span>
       </Dropdown.Trigger>
-      <Dropdown.Content className="dark:bg-base-200 w-48">
+      <Dropdown.Content
+        className={clsx("dark:bg-base-200 absolute w-48", {
+          "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2":
+            props.compact,
+        })}
+      >
         {props.chains?.map((chain) => (
           <Dropdown.Item
             key={chain.chain_id}

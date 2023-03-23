@@ -52,7 +52,9 @@ export const AddErc20: FC<Props> = (props) => {
   return (
     <Modal {...conditionalProps}>
       <Modal.Body>
-        <TokenRegistration />
+        <Modal.Title className="flex items-center gap-2">
+          <TokenRegistration />
+        </Modal.Title>
         <StepsSummary
           currentStep={state.step}
           newTokenType={state.newTokenType}
