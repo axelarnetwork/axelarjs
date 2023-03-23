@@ -68,7 +68,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
       </Dropdown.Trigger>
       <Dropdown.Content
         className={clsx("dark:bg-base-200 absolute w-48", {
-          "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2":
+          "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2 overflow-x-scroll":
             props.compact,
         })}
       >
