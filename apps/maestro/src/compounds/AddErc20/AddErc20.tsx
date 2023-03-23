@@ -67,6 +67,9 @@ export const AddErc20: FC<Props> = (props) => {
           amountToMint={state.amountToMint}
           deployedTokenAddress={state.deployedTokenAddress}
           txHash={state.txHash}
+          selectedChains={state.selectedChains}
+          tokenAlreadyRegistered={state.tokenAlreadyRegistered}
+          isPreexistingToken={state.isPreExistingToken}
           setNewTokenType={actions.setNewTokenType}
           setDecimals={actions.setDecimals}
           setTokenName={actions.setTokenName}
@@ -77,7 +80,8 @@ export const AddErc20: FC<Props> = (props) => {
           setTxhash={actions.setTxHash}
           addSelectedChain={actions.addSelectedChain}
           removeSelectedChain={actions.removeSelectedChain}
-          selectedChains={state.selectedChains}
+          setTokenAlreadyRegistered={actions.setTokenAlreadyRegistered}
+          setIsPreexistingToken={actions.setIsPreExistingToken}
         />
       </Modal.Body>
       <Modal.Actions>

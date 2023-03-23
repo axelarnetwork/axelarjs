@@ -1,6 +1,10 @@
 import { FC, useCallback, useState } from "react";
 
-import { LinkButton, useIntervalAsync } from "@axelarjs/ui";
+import {
+  CopyToClipboardButton,
+  LinkButton,
+  useIntervalAsync,
+} from "@axelarjs/ui";
 
 import { searchGMP } from "~/services/gmp";
 
@@ -25,6 +29,10 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
     const { data } = await searchGMP({
       txHash: props.txHash,
     });
+    if (data?.length === 0) {
+      setDelay(null);
+      console.warn("no gmp cutting off poll");
+    }
     data.forEach((tx) => {
       const { destinationChain } = tx.call.returnValues;
       if (statusMap.get(destinationChain.toLowerCase()) !== tx.status) {
@@ -38,7 +46,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
   useIntervalAsync(updateState, delay);
 
   const getStatuses = () => {
-    const divs = [...statusMap.entries()].map(([status, chainId]) => {
+    const divs = [...statusMap.entries()].map(([chainId, status]) => {
       return (
         <div key={`chain-status-${chainId}`}>
           Chain: {chainId}, Status: {status}
@@ -51,7 +59,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
   return (
     <div>
       <div>Deploy Token Successful</div>
-      <LinkButton>{props.deployedTokenAddress}</LinkButton>
+      <CopyToClipboardButton copyText={props.deployedTokenAddress} />
       <div>{getStatuses()}</div>
     </div>
   );

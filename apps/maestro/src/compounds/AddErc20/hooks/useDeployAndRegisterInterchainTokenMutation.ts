@@ -1,4 +1,5 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber } from "ethers";
+import { hexlify, hexZeroPad } from "ethers/lib/utils";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
@@ -18,7 +19,6 @@ export type UseDeployAndRegisterInterchainTokenInput = {
 };
 
 export function useDeployAndRegisterInterchainTokenMutation() {
-  // mutationInput: UseDeployAndRegisterInterchainTokenInput
   const signer = useSigner();
 
   const { address } = useAccount();
@@ -28,95 +28,46 @@ export function useDeployAndRegisterInterchainTokenMutation() {
     signerOrProvider: signer.data,
   });
 
-  // const { config, error } = usePrepareContractWrite({
-  //   address: String(
-  //     process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-  //   ) as `0x${string}`,
-  //   abi: InterchainTokenLinker.abi,
-  //   functionName: "deployInterchainToken",
-  //   args: [
-  //     mutationInput.tokenName,
-  //     mutationInput.tokenSymbol,
-  //     mutationInput.decimals,
-  //     address as `0x${string}`,
-  //     ethers.utils.hexZeroPad(ethers.utils.hexlify(0), 32) as `0x${string}`,
-  //     mutationInput.destinationChainIds,
-  //     mutationInput.gasFees,
-  //   ],
-  // });
-
-  // const { writeAsync } = useContractWrite(config);
-
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
       if (!(signer && tokenLinker && address)) return;
 
-      const {
-        tokenName,
-        tokenSymbol,
-        decimals,
-        destinationChainIds,
-        gasFees,
-        onFinished,
-        onStatusUpdate,
-      } = input;
-
       try {
         //deploy and register tokens
-        const salt = ethers.utils.hexZeroPad(
-          ethers.utils.hexlify(0),
-          32
-        ) as `0x${string}`;
-        console.log("deploying contract", signer, tokenLinker);
-        console.log(
-          "params",
-          tokenName,
-          tokenSymbol,
-          decimals,
-          address,
-          salt,
-          destinationChainIds,
-          gasFees
-        );
-        // const deployAndRegisterTokensTx = await writeAsync();
-        const value = gasFees.reduce(
+        const salt = hexZeroPad(hexlify(0), 32) as `0x${string}`;
+        const value = input.gasFees.reduce(
           (a, b) => a.add(BigNumber.from(b)),
           BigNumber.from(0)
         );
         const deployAndRegisterTokensTx =
           await tokenLinker.deployInterchainToken(
-            tokenName,
-            tokenSymbol,
-            decimals,
+            input.tokenName,
+            input.tokenSymbol,
+            input.decimals,
             BigNumber.from("1000000000000000000000000"),
             address,
             salt,
-            destinationChainIds,
-            gasFees,
+            input.destinationChainIds,
+            input.gasFees,
             { value }
           );
 
-        const deployAndRegisterTokensTxDone =
-          await deployAndRegisterTokensTx.wait(1);
-        console.log(
-          "deployAndRegisterTokensTxDone",
-          deployAndRegisterTokensTxDone
-        );
+        const txDone = await deployAndRegisterTokensTx.wait(1);
+        console.log("deployAndRegisterTokensTxDone", txDone);
 
-        if (onStatusUpdate)
-          onStatusUpdate({
+        if (input.onStatusUpdate)
+          input.onStatusUpdate({
             type: "deployed",
-            txHash:
-              deployAndRegisterTokensTxDone.transactionHash as `0x${string}`,
+            txHash: txDone.transactionHash as `0x${string}`,
             tokenAddress: getTokenDeployedEventFromTxReceipt(
-              deployAndRegisterTokensTxDone
+              txDone
             ) as `0x${string}`,
           });
 
-        if (onFinished) onFinished();
+        if (input.onFinished) input.onFinished();
       } catch (e) {
         console.log("something went wrong", e);
-        if (onStatusUpdate) onStatusUpdate({ type: "idle" });
+        if (input.onStatusUpdate) input.onStatusUpdate({ type: "idle" });
         return;
       }
     }
