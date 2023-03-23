@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 
+import { DISABLED_CHAINS } from "~/config/chains";
 import { publicProcedure, router } from "~/server/trpc";
 
 export const axelarscanRouter = router({
@@ -24,7 +25,7 @@ export const axelarscanRouter = router({
     try {
       const { evm } = await ctx.services.axelarscan.getChainConfigs();
 
-      return evm;
+      return evm.filter((chain) => !DISABLED_CHAINS.has(chain.chain_id));
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
