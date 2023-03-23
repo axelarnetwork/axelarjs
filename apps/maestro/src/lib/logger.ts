@@ -18,9 +18,9 @@ export type LoggerConfig = {
   getLogger?: typeof getLogger;
 };
 
-type LogArgs<T> =
-  | [severity: LogSeverity]
-  | [severity: LogSeverity, message: T, alwaysLog?: boolean];
+type LogArgs<T extends unknown[]> =
+  | [severity: LogSeverity, alwaysLog: boolean | undefined]
+  | [severity: LogSeverity, alwaysLog: boolean | undefined, message: T];
 
 class Logger {
   isDevEnviroment: boolean = false;
@@ -35,20 +35,26 @@ class Logger {
     return logger;
   }
 
-  private logMessage<T>(...args: LogArgs<T>) {
-    const [severity, message, alwaysLog] = args;
-    if (message) {
-      this.logMessage(severity, message, alwaysLog);
+  private logMessage<T extends unknown[]>(...args: LogArgs<T>) {
+    const [severity, alwaysLog, message] = args;
+    if (message && message) {
+      this.logMessage(severity, alwaysLog, message);
     } else {
-      return (message: T, alwaysLog?: boolean) =>
-        this.logMessage(severity, message, alwaysLog);
+      return (message: T) => this.logMessage(severity, alwaysLog, message);
     }
   }
 
-  public log = this.logMessage("log");
-  public info = this.logMessage("info");
-  public warn = this.logMessage("warn");
-  public error = this.logMessage("error");
+  public log = this.logMessage("log", false);
+  public info = this.logMessage("info", false);
+  public warn = this.logMessage("warn", false);
+  public error = this.logMessage("error", false);
+
+  public always = {
+    log: this.logMessage("log", true),
+    info: this.logMessage("info", true),
+    warn: this.logMessage("warn", true),
+    error: this.logMessage("error", true),
+  };
 }
 
 export const logger = new Logger();

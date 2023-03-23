@@ -1,5 +1,6 @@
 const nextTranspileModules = require("next-transpile-modules");
-const withTM = nextTranspileModules(["@axelarjs/ui"]);
+const withUI = nextTranspileModules(["@axelarjs/ui"]);
+const withUTILS = nextTranspileModules(["@axelarjs/utils"]);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -9,4 +10,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withTM(nextConfig);
+module.exports = withUTILS(withUI(nextConfig));

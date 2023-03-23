@@ -10,6 +10,9 @@ import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "~/styles/globals.css";
 
+import { QueryClientProvider } from "@tanstack/react-query";
+
+import { queryClient } from "~/config/wagmi";
 import MainLayout from "~/layouts/MainLayout";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -43,14 +46,16 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       <NextNProgress />
       {!isSSR && (
         <>
-          <ThemeProvider>
-            <WagmiConfigPropvider>
-              <MainLayout>
-                <Component {...pageProps} />
-              </MainLayout>
-            </WagmiConfigPropvider>
-            <ReactQueryDevtools />
-          </ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider>
+              <WagmiConfigPropvider>
+                <MainLayout>
+                  <Component {...pageProps} />
+                </MainLayout>
+              </WagmiConfigPropvider>
+              <ReactQueryDevtools />
+            </ThemeProvider>
+          </QueryClientProvider>
         </>
       )}
     </>
