@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 
-import { Dropdown, LinkButton } from "@axelarjs/ui";
+import { Dropdown } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
 
@@ -65,7 +65,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
         />
         <span>{props.selectedChain.chain_name}</span>
       </Dropdown.Trigger>
-      <Dropdown.Content className="dark:bg-base-200 w-48">
+      <Dropdown.Content className="dark:bg-base-200 absolute z-20 w-48 overflow-y-scroll">
         {props.chains?.map((chain) => (
           <Dropdown.Item
             key={chain.chain_id}

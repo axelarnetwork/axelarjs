@@ -16,8 +16,9 @@ export const TokenRegistration: FC<{}> = () => {
     [chainId, evmChains]
   );
   return (
-    <div>
+    <>
       <label>Register Origin Token On: </label>
+
       <EVMChainsDropdown
         selectedChain={selectedChain}
         chains={evmChains}
@@ -28,6 +29,6 @@ export const TokenRegistration: FC<{}> = () => {
           }
         }}
       />
-    </div>
+    </>
   );
 };
