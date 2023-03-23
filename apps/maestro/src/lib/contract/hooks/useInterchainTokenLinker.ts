@@ -34,3 +34,21 @@ export function useCheckTokenExistsInTokenLinker(
     }
   );
 }
+
+export function useGetTokenIdInTokenLinker(
+  config: UseCheckTokenExistsInTokenLinkerConfig
+) {
+  const tl = useInterchainTokenLinker(config);
+  const getTokenId = async (tokenAddress: `0x${string}`) =>
+    tl?.getTokenId(config.tokenAddress as `0x${string}`);
+  return useQuery(
+    ["useGetTokenIdInTokenLinker", config.tokenAddress],
+    () => getTokenId(config.tokenAddress as `0x${string}`),
+    {
+      enabled:
+        Boolean(tl) &&
+        Boolean(config.signerOrProvider) &&
+        Boolean(config.tokenAddress),
+    }
+  );
+}

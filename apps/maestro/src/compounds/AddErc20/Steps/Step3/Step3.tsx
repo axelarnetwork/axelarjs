@@ -2,7 +2,9 @@ import React, { FC, FormEventHandler, useCallback } from "react";
 
 import { Button, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
+import { useSigner } from "wagmi";
 
+import { useGetTokenIdInTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import { StepProps } from "..";
@@ -24,6 +26,14 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   const { mutateAsync: registerOriginToken } = useRegisterOriginTokenMutation();
   const { mutateAsync: deployRemoteTokens } = useDeployRemoteTokensMutation();
 
+  const signer = useSigner();
+
+  const { data: tokenId } = useGetTokenIdInTokenLinker({
+    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
+    signerOrProvider: signer.data,
+    tokenAddress: props.deployedTokenAddress as `0x${string}`,
+  });
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
     // ==> dimension 1: isPreexisting (0 = no, 1 - yes)
@@ -31,7 +41,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     // ==> dimension 3: deployOnOtherChains (0 = no, 1 - yes)
     const decisionMatrix = [
       [
-        [handleRegisterOriginToken, handleDeployAndRegisterToken],
+        [handleDeployAndRegisterToken, handleDeployAndRegisterToken],
         [null, null],
       ],
       [
@@ -61,10 +71,14 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         console.warn("gas prices not loaded");
         return;
       }
-
+      if (!tokenId) {
+        console.log("no token ID for ", props.deployedTokenAddress);
+      }
+      console.log("token ID", tokenId);
       actions.setIsDeploying(true);
       await deployRemoteTokens({
-        tokenId: `0x` as `0x${string}`, //todo
+        tokenId: tokenId as `0x${string}`,
+        tokenAddress: props.deployedTokenAddress as `0x${string}`,
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
@@ -75,7 +89,14 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       actions.setIsDeploying(false);
       props.incrementStep();
     },
-    [actions.setIsDeploying, deployRemoteTokens, props]
+    [
+      actions.setIsDeploying,
+      deployRemoteTokens,
+      props,
+      state.isGasPriceQueryError,
+      state.isGasPriceQueryError,
+      state.gasFees,
+    ]
   );
 
   const handleRegisterOriginToken = useCallback<

@@ -29,6 +29,10 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
     const { data } = await searchGMP({
       txHash: props.txHash,
     });
+    if (data?.length === 0) {
+      setDelay(null);
+      console.warn("no gmp cutting off poll");
+    }
     data.forEach((tx) => {
       const { destinationChain } = tx.call.returnValues;
       if (statusMap.get(destinationChain.toLowerCase()) !== tx.status) {

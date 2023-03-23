@@ -9,6 +9,7 @@ import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployRemoteTokenInput = {
   tokenId: `0x${string}`;
+  tokenAddress: `0x${string}`;
   destinationChainIds: string[];
   gasFees: BigNumber[];
   onFinished?: () => void;
@@ -29,8 +30,7 @@ export function useDeployRemoteTokensMutation() {
     if (!(signer && tokenLinker && address)) return;
 
     try {
-      //deploy and register tokens
-      const salt = hexZeroPad(hexlify(0), 32) as `0x${string}`;
+      //deploy remote tokens
       const value = input.gasFees.reduce(
         (a, b) => a.add(BigNumber.from(b)),
         BigNumber.from(0)
@@ -49,7 +49,7 @@ export function useDeployRemoteTokensMutation() {
         input.onStatusUpdate({
           type: "deployed",
           txHash: txDone.transactionHash as `0x${string}`,
-          tokenAddress: "0x", //todo
+          tokenAddress: input.tokenAddress,
         });
 
       if (input.onFinished) input.onFinished();
