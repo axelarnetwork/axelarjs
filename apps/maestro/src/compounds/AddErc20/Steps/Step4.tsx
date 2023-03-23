@@ -1,6 +1,10 @@
 import { FC, useCallback, useState } from "react";
 
-import { LinkButton, useIntervalAsync } from "@axelarjs/ui";
+import {
+  CopyToClipboardButton,
+  LinkButton,
+  useIntervalAsync,
+} from "@axelarjs/ui";
 
 import { searchGMP } from "~/services/gmp";
 
@@ -51,7 +55,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
   return (
     <div>
       <div>Deploy Token Successful</div>
-      <LinkButton>{props.deployedTokenAddress}</LinkButton>
+      <CopyToClipboardButton copyText={props.deployedTokenAddress} />
       <div>{getStatuses()}</div>
     </div>
   );

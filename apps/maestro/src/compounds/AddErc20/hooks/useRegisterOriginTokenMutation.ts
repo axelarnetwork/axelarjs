@@ -10,7 +10,7 @@ export type UseRegisterInterchainTokenInput = {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
 
-export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
+export function useRegisterOriginTokenMutation() {
   const signer = useSigner();
 
   const { address } = useAccount();

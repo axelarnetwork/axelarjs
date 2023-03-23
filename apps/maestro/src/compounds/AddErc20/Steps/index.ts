@@ -17,6 +17,8 @@ export type StepProps = {
   selectedChains: Set<string>;
   addSelectedChain: (item: string) => void;
   removeSelectedChain: (item: string) => void;
+  setTokenAlreadyExists: (tokenAlreadyExists: boolean) => void;
+  tokenAlreadyExists: boolean;
 };
 
 export * from "./Step1";
