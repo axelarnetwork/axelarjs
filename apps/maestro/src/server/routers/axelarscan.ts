@@ -25,7 +25,9 @@ export const axelarscanRouter = router({
     try {
       const { evm } = await ctx.services.axelarscan.getChainConfigs();
 
-      return evm.filter((chain) => !DISABLED_CHAINS.has(chain.chain_id));
+      return evm.filter(
+        (chain) => !(DISABLED_CHAINS.has(chain.chain_id) || chain.deprecated)
+      );
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
