@@ -17,6 +17,7 @@ export const useAddErc20State = () => {
   const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
   const [txHash, setTxHash] = useState<`0x${string}`>();
   const [tokenAlreadyRegistered, setTokenAlreadyRegistered] = useState(false);
+  const [isPreExistingToken, setIsPreExistingToken] = useState(false);
   const [txState, setTxState] = useState<DeployAndRegisterTransactionState>({
     type: "idle",
   });
@@ -30,6 +31,7 @@ export const useAddErc20State = () => {
     setDecimals(0);
     setAmountToMint(0);
     setTxState({ type: "idle" });
+    setIsPreExistingToken(false);
     setTokenAlreadyRegistered(false);
     setSelectedChains(new Set<string>());
   };
@@ -63,6 +65,7 @@ export const useAddErc20State = () => {
       txHash,
       selectedChains,
       tokenAlreadyRegistered,
+      isPreExistingToken,
     },
     actions: {
       setStep,
@@ -79,6 +82,7 @@ export const useAddErc20State = () => {
       addSelectedChain,
       removeSelectedChain,
       setTokenAlreadyRegistered,
+      setIsPreExistingToken,
     },
   };
 };

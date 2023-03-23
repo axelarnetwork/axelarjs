@@ -7,6 +7,7 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import { StepProps } from "..";
 import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
+import { useDeployRemoteTokensMutation } from "../../hooks/useDeployRemoteTokensMutation";
 import { useRegisterOriginTokenAndDeployRemoteTokensMutation } from "../../hooks/useRegisterOriginTokenAndDeployRemoteTokensMutation";
 import { useRegisterOriginTokenMutation } from "../../hooks/useRegisterOriginTokenMutation";
 import { useStep3ChainSelectionState } from "./Step3.state";
@@ -21,32 +22,68 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   const { mutateAsync: registerOriginTokenAndDeployRemoteTokens } =
     useRegisterOriginTokenAndDeployRemoteTokensMutation();
   const { mutateAsync: registerOriginToken } = useRegisterOriginTokenMutation();
+  const { mutateAsync: deployRemoteTokens } = useDeployRemoteTokensMutation();
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    switch (true) {
-      case props.selectedChains.size > 0 && !props.tokenAlreadyRegistered:
-        handleDeployAndRegisterToken(e);
-        break;
-      case props.selectedChains.size > 0 && props.tokenAlreadyRegistered:
-        handleRegisterOriginTokenAndDeployRemoteTokens(e);
-        break;
-      case props.selectedChains.size === 0 && props.tokenAlreadyRegistered:
-        handleRegisterOriginToken(e);
-        break;
-      case props.selectedChains.size === 0 && !props.tokenAlreadyRegistered:
-        //TODO...what to do?
-        break;
-      default:
-        break;
-    }
+    // ==> dimension 1: isPreexisting (0 = no, 1 - yes)
+    // ==> dimension 2: isTokenAlreadyRegistered (0 = no, 1 - yes)
+    // ==> dimension 3: deployOnOtherChains (0 = no, 1 - yes)
+    const decisionMatrix = [
+      [
+        [handleRegisterOriginToken, handleDeployAndRegisterToken],
+        [null, null],
+      ],
+      [
+        [handleRegisterOriginToken, handleRegisterAndDeployRemoteTokens],
+        [null, handleDeployRemoteTokens],
+      ],
+    ];
+    const pe = +Boolean(props.isPreexistingToken); //preexisting
+    const ar = +Boolean(props.tokenAlreadyRegistered); //already-registered
+    const oc = +Boolean(props.selectedChains.size > 0); //other-chains
+    const decision = decisionMatrix[pe][ar][oc];
+    if (decision) decision(e);
+    else console.warn("no op");
   };
+
+  const handleDeployRemoteTokens = useCallback<
+    FormEventHandler<HTMLFormElement>
+  >(
+    async (e) => {
+      e.preventDefault();
+      console.log("handleDeployRemoteTokens");
+      if (
+        state.isGasPriceQueryLoading ||
+        state.isGasPriceQueryError ||
+        !state.gasFees
+      ) {
+        console.warn("gas prices not loaded");
+        return;
+      }
+
+      actions.setIsDeploying(true);
+      await deployRemoteTokens({
+        tokenId: `0x` as `0x${string}`, //todo
+        destinationChainIds: Array.from(props.selectedChains),
+        gasFees: state.gasFees,
+        onStatusUpdate: (data) => {
+          props.setDeployedTokenAddress(data.tokenAddress as string);
+          data.txHash && props.setTxhash(data.txHash);
+        },
+      });
+      actions.setIsDeploying(false);
+      props.incrementStep();
+    },
+    [actions.setIsDeploying, deployRemoteTokens, props]
+  );
 
   const handleRegisterOriginToken = useCallback<
     FormEventHandler<HTMLFormElement>
   >(
     async (e) => {
       e.preventDefault();
+      console.log("handleRegisterOriginToken");
 
       actions.setIsDeploying(true);
       await registerOriginToken({
@@ -62,11 +99,12 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     [actions.setIsDeploying, registerOriginToken, props]
   );
 
-  const handleRegisterOriginTokenAndDeployRemoteTokens = useCallback<
+  const handleRegisterAndDeployRemoteTokens = useCallback<
     FormEventHandler<HTMLFormElement>
   >(
     async (e) => {
       e.preventDefault();
+      console.log("handleRegisterAndDeployRemoteTokens");
 
       if (
         state.isGasPriceQueryLoading ||
@@ -105,6 +143,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   >(
     async (e) => {
       e.preventDefault();
+      console.log("handleDeployAndRegisterToken");
 
       if (
         state.isGasPriceQueryLoading ||
