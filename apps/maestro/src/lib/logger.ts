@@ -40,7 +40,7 @@ class Logger {
     if (message && message) {
       this.logMessage(severity, alwaysLog, message);
     } else {
-      return (message: T) => this.logMessage(severity, alwaysLog, message);
+      return (...messages: T) => this.logMessage(severity, alwaysLog, messages);
     }
   }
 
@@ -54,6 +54,8 @@ class Logger {
     info: this.logMessage("info", true),
     warn: this.logMessage("warn", true),
     error: this.logMessage("error", true),
+  } as {
+    [key in LogSeverity]: <T extends unknown[]>(...message: T) => void;
   };
 }
 
