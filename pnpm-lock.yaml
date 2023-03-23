@@ -31,6 +31,7 @@ importers:
       '@axelarjs/utils': workspace:*
       '@next/font': ^13.2.4
       '@tanstack/react-query': ^4.26.1
+      '@tanstack/react-query-devtools': ^4.28.0
       '@trpc/client': ^10.17.0
       '@trpc/next': ^10.17.0
       '@trpc/react-query': ^10.17.0
@@ -95,6 +96,7 @@ importers:
     devDependencies:
       '@next/font': 13.2.4
       '@tanstack/react-query': 4.26.1_biqbaboplfbrettd7655fr4n2y
+      '@tanstack/react-query-devtools': 4.28.0_brdhmlf72zuns3lsk66phyptty
       autoprefixer: 10.4.14_postcss@8.4.21
       daisyui: 2.51.3_j7yt3jd32cwenjqavrrga47yr4
       next-transpile-modules: 10.0.0
@@ -5023,6 +5025,13 @@ packages:
       tailwindcss: 3.2.7_postcss@8.4.21
     dev: true
 
+  /@tanstack/match-sorter-utils/8.7.6:
+    resolution: {integrity: sha512-2AMpRiA6QivHOUiBpQAVxjiHAA68Ei23ZUMNaRJrN6omWiSFLoYrxGcT6BXtuzp0Jw4h6HZCmGGIM/gbwebO2A==}
+    engines: {node: '>=12'}
+    dependencies:
+      remove-accents: 0.4.2
+    dev: true
+
   /@tanstack/query-core/4.26.1:
     resolution: {integrity: sha512-Zrx2pVQUP4ndnsu6+K/m8zerXSVY8QM+YSbxA1/jbBY21GeCd5oKfYl92oXPK0hPEUtoNuunIdiq0ZMqLos+Zg==}
 
@@ -5037,6 +5046,21 @@ packages:
     dependencies:
       '@tanstack/query-persist-client-core': 4.26.1
     dev: false
+
+  /@tanstack/react-query-devtools/4.28.0_brdhmlf72zuns3lsk66phyptty:
+    resolution: {integrity: sha512-1SnoMw1CWn8FdPEIHvlAzmMBX3heXJo11fyBtt+FzYAHj5yFC8P67Kpgi0HpLkY7SLnd6QK/7qFkpeH4AQbgZg==}
+    peerDependencies:
+      '@tanstack/react-query': 4.28.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@tanstack/match-sorter-utils': 8.7.6
+      '@tanstack/react-query': 4.26.1_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      superjson: 1.12.2
+      use-sync-external-store: 1.2.0_react@18.2.0
+    dev: true
 
   /@tanstack/react-query-persist-client/4.26.1_vohxj3xpfxn57cw32hqo6tozmq:
     resolution: {integrity: sha512-efS2hPz8z+ySCTIy1DJ4uuT7LSi8F0E4bMXwP/aj2dDuMRFn6AV3z7LItInpp0Em3JKhi90GP2vxDyvQTOhO2A==}
@@ -7340,7 +7364,6 @@ packages:
     engines: {node: '>=12.13'}
     dependencies:
       is-what: 4.1.8
-    dev: false
 
   /copy-to-clipboard/3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
@@ -9818,7 +9841,6 @@ packages:
   /is-what/4.1.8:
     resolution: {integrity: sha512-yq8gMao5upkPoGEU9LsB2P+K3Kt8Q3fQFCGyNCWOAnJAMzEXVV9drYb0TXr42TTliLLhKIBvulgAXgtLLnwzGA==}
     engines: {node: '>=12.13'}
-    dev: false
 
   /is-windows/1.0.2:
     resolution: {integrity: sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA==}
@@ -12242,6 +12264,10 @@ packages:
       unist-util-visit: 2.0.3
     dev: true
 
+  /remove-accents/0.4.2:
+    resolution: {integrity: sha1-CkPTqq4egNuRngeuJUsoXZ4ce7U=}
+    dev: true
+
   /require-directory/2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -12915,7 +12941,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       copy-anything: 3.0.3
-    dev: false
 
   /superstruct/0.14.2:
     resolution: {integrity: sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==}
