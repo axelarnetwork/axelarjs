@@ -1,10 +1,18 @@
 import { FC, useMemo } from "react";
 
 import { Button, Modal } from "@axelarjs/ui";
+import dynamic from "next/dynamic";
 
 import { useAddErc20State } from "./AddErc20.state";
-import { Step1, Step2, Step3, Step4, StepsSummary } from "./Steps";
 import { TokenRegistration } from "./TokenRegistration";
+
+const Step1 = dynamic(() => import("~/compounds/AddErc20/Steps/Step1"));
+const Step2 = dynamic(() => import("~/compounds/AddErc20/Steps/Step2/Step2"));
+const Step3 = dynamic(() => import("~/compounds/AddErc20/Steps/Step3/Step3"));
+const Step4 = dynamic(() => import("~/compounds/AddErc20/Steps/Step4"));
+const StepsSummary = dynamic(
+  () => import("~/compounds/AddErc20/Steps/StepsSummary")
+);
 
 const STEP_MAP = [Step1, Step2, Step3, Step4];
 
@@ -91,3 +99,4 @@ export const AddErc20: FC<Props> = (props) => {
     </Modal>
   );
 };
+export default AddErc20;

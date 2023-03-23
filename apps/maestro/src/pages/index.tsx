@@ -2,12 +2,15 @@ import { useState } from "react";
 
 import { Button, Card, TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils.js";
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useAccount, useNetwork } from "wagmi";
 
-import { AddErc20 } from "~/compounds";
+// import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { trpc } from "~/lib/trpc";
+
+const AddErc20 = dynamic(() => import("../compounds/AddErc20/AddErc20"));
 
 export default function Home() {
   const account = useAccount();

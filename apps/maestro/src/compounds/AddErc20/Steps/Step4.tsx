@@ -64,3 +64,5 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
     </div>
   );
 };
+
+export default Step4;
