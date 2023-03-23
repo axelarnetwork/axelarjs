@@ -20,6 +20,40 @@ export const axelarscanRouter = router({
       });
     }
   }),
+  getEVMChainConfigs: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const { evm } = await ctx.services.axelarscan.getChainConfigs();
+
+      return evm;
+    } catch (error) {
+      // If we get a TRPC error, we throw it
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      // otherwise, we throw an internal server error
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get chain config",
+      });
+    }
+  }),
+  getCosmosChainConfigs: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const { cosmos } = await ctx.services.axelarscan.getChainConfigs();
+
+      return cosmos;
+    } catch (error) {
+      // If we get a TRPC error, we throw it
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      // otherwise, we throw an internal server error
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get chain config",
+      });
+    }
+  }),
 });
 
 export type AxelarscanRouter = typeof axelarscanRouter;
