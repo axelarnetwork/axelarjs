@@ -20,6 +20,7 @@ export const TokenRegistration: FC<{}> = () => {
       <label>Register Origin Token On: </label>
 
       <EVMChainsDropdown
+        compact
         selectedChain={selectedChain}
         chains={evmChains}
         onSwitchNetwork={(chain_id) => {
