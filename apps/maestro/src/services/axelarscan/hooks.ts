@@ -1,3 +1,4 @@
+import { indexBy, prop } from "rambda";
 import { useQuery } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
@@ -12,7 +13,16 @@ export function useChainConfigsQuery() {
 }
 
 export function useEVMChainConfigsQuery() {
-  return trpc.axelarscan.getEVMChainConfigs.useQuery();
+  const { data, ...queryResult } =
+    trpc.axelarscan.getEVMChainConfigs.useQuery();
+
+  return {
+    ...queryResult,
+    data,
+    computed: {
+      indexedByChainId: indexBy(prop("chainId"), data ?? []),
+    },
+  };
 }
 
 export function useCosmosChainConfigsQuery() {
