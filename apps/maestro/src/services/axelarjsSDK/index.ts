@@ -1,8 +1,7 @@
 import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
 import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils.js";
 
-import { getNativeToken } from "~/utils/getNativeToken";
+import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import type {
   EstimateGasFeeMultipleChainsParams,
@@ -27,7 +26,7 @@ async function estimateGasFee(
       params.isGMPExpressTransaction
     )
   );
-  console.log("estimateGasFee", formatEther(fee), params);
+
   return fee;
 }
 

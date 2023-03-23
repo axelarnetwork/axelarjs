@@ -17,7 +17,7 @@ import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
-import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();

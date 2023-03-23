@@ -4,6 +4,9 @@ import { z } from "zod";
 import { publicProcedure, router } from "~/server/trpc";
 
 export const gmpRouter = router({
+  /**
+   * Get the status of a transaction
+   */
   getTransactionStatus: publicProcedure
     // a procedure must have a schema for input validation, we use zod for this: https://zod.dev/
     .input(
@@ -15,7 +18,7 @@ export const gmpRouter = router({
     // a query is a read-only operation, a mutation is a write operation
     .query(async ({ input, ctx }) => {
       try {
-        const gmpResponse = await ctx.clients.gmp.searchGMP({
+        const gmpResponse = await ctx.services.gmp.searchGMP({
           txHash: input.txHash as `0x${string}`,
         });
 

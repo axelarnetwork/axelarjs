@@ -2,7 +2,7 @@ import { FC, useCallback, useState } from "react";
 
 import { LinkButton, useIntervalAsync } from "@axelarjs/ui";
 
-import { searchGMP } from "~/lib/api/gmp";
+import { searchGMP } from "~/services/gmp";
 
 import { StepProps } from ".";
 

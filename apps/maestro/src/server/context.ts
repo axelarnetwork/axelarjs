@@ -1,9 +1,9 @@
 import { inferAsyncReturnType } from "@trpc/server";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import axelarjsSDKClient from "~/lib/api/axelarjsSDK";
-import axelarscanClient from "~/lib/api/axelarscan";
-import gmpClient from "~/lib/api/gmp";
+import axelarjsSDKClient from "~/services/axelarjsSDK";
+import axelarscanClient from "~/services/axelarscan";
+import gmpClient from "~/services/gmp";
 
 type ContextConfig = {
   req: NextApiRequest;
@@ -14,7 +14,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
   return {
     req,
     res,
-    clients: {
+    services: {
       gmp: gmpClient,
       axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,

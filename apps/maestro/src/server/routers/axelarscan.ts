@@ -5,7 +5,7 @@ import { publicProcedure, router } from "~/server/trpc";
 export const axelarscanRouter = router({
   getChainConfigs: publicProcedure.query(async ({ ctx }) => {
     try {
-      const response = await ctx.clients.axelarscan.getChainConfigs();
+      const response = await ctx.services.axelarscan.getChainConfigs();
 
       return response;
     } catch (error) {
