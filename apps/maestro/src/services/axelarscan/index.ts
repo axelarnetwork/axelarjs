@@ -21,10 +21,6 @@ export const client = ky.extend({
   prefixUrl: String(process.env.NEXT_PUBLIC_EXPLORER_API_URL),
 });
 
-export const gmpClient = ky.extend({
-  prefixUrl: String(process.env.NEXT_PUBLIC_GMP_API_URL),
-});
-
 export type AxelarApiParams<T extends Record<string, unknown>> = T & {
   module: string;
   path: string | null;
@@ -85,17 +81,13 @@ async function getChainConfigs() {
   };
 }
 
-async function queryTransactionStatus(txHash: string) {
-  const json = {
-    method: "searchGMP",
-    txHash,
-  };
+const extendedClient = {
+  ...client,
+  getAssets,
+  getAssetPrices,
+  getChainConfigs,
+};
 
-  const result = await gmpClient.post("", { json }).json<any>();
+export default extendedClient;
 
-  console.log("query Transaction Status", result);
-
-  return result;
-}
-
-export { getAssets, getAssetPrices, getChainConfigs, queryTransactionStatus };
+export { getAssets, getAssetPrices, getChainConfigs };

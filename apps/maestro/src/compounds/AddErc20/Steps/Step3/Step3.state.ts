@@ -4,8 +4,8 @@ import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { useNetwork } from "wagmi";
 
-import { useEstimateGasFeeMultipleChains } from "~/lib/api/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
+import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
 export type UseStep3ChainSelectionStateProps = {
   selectedChains: Set<string>;

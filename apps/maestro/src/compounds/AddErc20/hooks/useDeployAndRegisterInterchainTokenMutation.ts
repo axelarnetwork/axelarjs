@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
-import { getTokenDeployedEventFromTxReceipt } from "~/utils/findContractEvent";
+import { getTokenDeployedEventFromTxReceipt } from "~/lib/utils/findContractEvent";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -49,7 +49,7 @@ export function useDeployAndRegisterInterchainTokenMutation() {
 
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
-      if (!signer || !tokenLinker || !address) return;
+      if (!(signer && tokenLinker && address)) return;
 
       const {
         tokenName,

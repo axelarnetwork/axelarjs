@@ -3,7 +3,7 @@ import React, { FC, FormEventHandler, useCallback } from "react";
 import { Button, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
 
-import { getNativeToken } from "~/utils/getNativeToken";
+import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import { StepProps } from "..";
 import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
@@ -62,13 +62,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       gasFees,
       setIsDeploying,
       deployAndRegisterToken,
-      props.tokenName,
-      props.tokenSymbol,
-      props.decimals,
+      props,
       selectedChains,
       evmChains,
       network.chain?.id,
-      actions,
     ]
   );
 

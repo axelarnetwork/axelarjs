@@ -29,4 +29,12 @@ async function getContracts() {
     .json<GetGMPContractsResponse>();
 }
 
+const extendedClient = {
+  ...client,
+  searchGMP,
+  getContracts,
+};
+
+export default extendedClient;
+
 export { getContracts, searchGMP };

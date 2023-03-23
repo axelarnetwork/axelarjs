@@ -4,7 +4,7 @@ import { Dropdown, LinkButton } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
 
-import { EVMChainConfig } from "~/lib/api/axelarscan/types";
+import { EVMChainConfig } from "~/services/axelarscan/types";
 
 type Props = {
   onSwitchNetwork?: (chainId: number) => void;
