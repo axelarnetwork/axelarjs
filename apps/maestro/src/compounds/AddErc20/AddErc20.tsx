@@ -78,8 +78,8 @@ export const AddErc20: FC<Props> = (props) => {
           addSelectedChain={actions.addSelectedChain}
           removeSelectedChain={actions.removeSelectedChain}
           selectedChains={state.selectedChains}
-          setTokenAlreadyExists={actions.setTokenAlreadyExists}
-          tokenAlreadyExists={state.tokenAlreadyExists}
+          setTokenAlreadyRegistered={actions.setTokenAlreadyRegistered}
+          tokenAlreadyRegistered={state.tokenAlreadyRegistered}
         />
       </Modal.Body>
       <Modal.Actions>

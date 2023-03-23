@@ -25,16 +25,16 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     switch (true) {
-      case props.selectedChains.size > 0 && !props.tokenAlreadyExists:
+      case props.selectedChains.size > 0 && !props.tokenAlreadyRegistered:
         handleDeployAndRegisterToken(e);
         break;
-      case props.selectedChains.size > 0 && props.tokenAlreadyExists:
+      case props.selectedChains.size > 0 && props.tokenAlreadyRegistered:
         handleRegisterOriginTokenAndDeployRemoteTokens(e);
         break;
-      case props.selectedChains.size === 0 && props.tokenAlreadyExists:
+      case props.selectedChains.size === 0 && props.tokenAlreadyRegistered:
         handleRegisterOriginToken(e);
         break;
-      case props.selectedChains.size === 0 && !props.tokenAlreadyExists:
+      case props.selectedChains.size === 0 && !props.tokenAlreadyRegistered:
         //TODO...what to do?
         break;
       default:
@@ -181,8 +181,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         })}
       </div>
       <label className="text-md">
-        Does token exist{" "}
-        {props.tokenAlreadyExists ? "Token exists" : "Token doesnt exist"}
+        Is Token registered{" "}
+        {props.tokenAlreadyRegistered
+          ? "Token registered"
+          : "Token isnt registered"}
       </label>
       <label className="text-md">
         Approximate cost: {state.totalGasFee}{" "}

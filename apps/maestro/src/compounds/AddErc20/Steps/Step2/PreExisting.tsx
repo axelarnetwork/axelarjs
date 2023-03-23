@@ -30,7 +30,7 @@ export const PreExistingERC20Token: FC<StepProps> = (props: StepProps) => {
       {validatedAddr && (
         <ERC20Details
           address={validatedAddr}
-          setTokenAlreadyExists={props.setTokenAlreadyExists}
+          setTokenAlreadyRegistered={props.setTokenAlreadyRegistered}
         />
       )}
     </div>
@@ -39,7 +39,7 @@ export const PreExistingERC20Token: FC<StepProps> = (props: StepProps) => {
 
 type ERC20DetailsProps = {
   address: string;
-  setTokenAlreadyExists: (okenAlreadyExists: boolean) => void;
+  setTokenAlreadyRegistered: (tokenAlreadyRegistered: boolean) => void;
 };
 
 export const ERC20Details: FC<ERC20DetailsProps> = (
@@ -65,7 +65,7 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     tokenInfo && tokenInfo.decimals && setTokenDecimals(tokenInfo.decimals);
     tokenInfo && tokenInfo.tokenName && setTokenName(tokenInfo.tokenName);
     tokenInfo && tokenInfo.tokenSymbol && setTokenSymbol(tokenInfo.tokenSymbol);
-    props.setTokenAlreadyExists(Boolean(doesTlExist));
+    props.setTokenAlreadyRegistered(Boolean(doesTlExist));
   }, [props.address, tokenInfo, doesTlExist]);
 
   return (
