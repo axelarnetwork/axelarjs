@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo } from "react";
 
 import { Button, Modal } from "@axelarjs/ui";
 import dynamic from "next/dynamic";
@@ -18,10 +18,19 @@ const STEP_MAP = [Step1, Step2, Step3, Step4];
 
 type Props = {
   trigger?: JSX.Element;
+  tokenAddress?: `0x${string}`;
 };
 
 export const AddErc20: FC<Props> = (props) => {
   const { state, actions } = useAddErc20State();
+
+  useEffect(() => {
+    if (!props.tokenAddress) return;
+    actions.setDeployedTokenAddress(props.tokenAddress);
+    actions.setStep(1);
+    actions.setIsPreExistingToken(true);
+    actions.setNewTokenType("existing");
+  }, [props.tokenAddress]);
 
   const CurrentStep = useMemo(() => STEP_MAP[state.step], [state.step]);
 

@@ -13,7 +13,9 @@ import {
 import { StepProps } from "..";
 
 export const PreExistingERC20Token: FC<StepProps> = (props: StepProps) => {
-  const [tokenAddress, setTokenAddress] = useState("");
+  const [tokenAddress, setTokenAddress] = useState(
+    props.deployedTokenAddress || ""
+  );
   const [validatedAddr, setValidatedAddr] = useState<string>("");
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import { Card, CopyToClipboardButton } from "@axelarjs/ui";
+import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { Maybe, unSluggify } from "@axelarjs/utils";
 import clsx from "clsx";
 import { isAddress } from "ethers/lib/utils.js";
@@ -10,6 +10,7 @@ import { pluck } from "rambda";
 import { useNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
+import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -31,36 +32,48 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress as `0x${string}`,
   });
 
-  return Maybe.of(evmChains).mapOrNull((chains) => (
-    <ul className="grid w-full grid-cols-3 gap-4">
-      {chains.map((chain) => {
-        const matchingToken = interchainToken?.matchingTokens?.find(
-          (t) => t.chainId === chain.chain_id
-        );
-        return (
-          <Card
-            key={chain.chain_id}
-            className={clsx(
-              "bg-base-200 hover:ring-primary/50 transition-all hover:ring",
-              {
-                "ring-primary/50 ring": matchingToken?.isRegistered,
-                "ring-accent/50 ring": matchingToken?.isOriginToken,
-              }
-            )}
-            bordered
-          >
-            <Card.Body>
-              <Card.Title>
-                <ChainIcon src={chain.image} alt={chain.name} size="md" />
-                {chain.name}
-              </Card.Title>
-              <div>{chain.chain_id}</div>
-            </Card.Body>
-          </Card>
-        );
-      })}
-    </ul>
-  ));
+  return (
+    <div>
+      <AddErc20
+        trigger={
+          <Button size="sm" className="mb-5 w-full max-w-sm">
+            Deploy on other chains
+          </Button>
+        }
+        tokenAddress={props.tokenAddress}
+      />
+      {Maybe.of(evmChains).mapOrNull((chains) => (
+        <ul className="grid w-full grid-cols-3 gap-4">
+          {chains.map((chain) => {
+            const matchingToken = interchainToken?.matchingTokens?.find(
+              (t) => t.chainId === chain.chain_id
+            );
+            return (
+              <Card
+                key={chain.chain_id}
+                className={clsx(
+                  "bg-base-200 hover:ring-primary/50 transition-all hover:ring",
+                  {
+                    "ring-primary/50 ring": matchingToken?.isRegistered,
+                    "ring-accent/50 ring": matchingToken?.isOriginToken,
+                  }
+                )}
+                bordered
+              >
+                <Card.Body>
+                  <Card.Title>
+                    <ChainIcon src={chain.image} alt={chain.name} size="md" />
+                    {chain.name}
+                  </Card.Title>
+                  <div>{chain.chain_id}</div>
+                </Card.Body>
+              </Card>
+            );
+          })}
+        </ul>
+      ))}
+    </div>
+  );
 };
 
 const InterchainTokensPage = () => {
