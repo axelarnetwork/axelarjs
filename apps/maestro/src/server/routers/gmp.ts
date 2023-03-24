@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { partition } from "rambda";
 import { z } from "zod";
 
 import { CHAIN_CONFIGS } from "~/config/wagmi";
@@ -56,8 +57,9 @@ export const gmpRouter = router({
     )
     .query(async ({ input }) => {
       try {
-        const chainConfig = CHAIN_CONFIGS.find(
-          (chain) => chain.id === input.chainId
+        const [[chainConfig], remainingChainConfigs] = partition(
+          (chain) => chain.id === input.chainId,
+          CHAIN_CONFIGS
         );
 
         if (!chainConfig) {
@@ -80,6 +82,13 @@ export const gmpRouter = router({
           }),
         ]);
 
+        if (!tokenId) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `Token not found on ${chainConfig.name} (${chainConfig.id}))`,
+          });
+        }
+
         const tokenAddress = await client.readContract({
           method: "getTokenAddress",
           args: [tokenId],
@@ -96,55 +105,63 @@ export const gmpRouter = router({
         }
 
         const matchingTokens = await Promise.all(
-          CHAIN_CONFIGS.filter(
-            (chain) =>
-              chain.id !== chainConfig.id && input.chainIds.includes(chain.id)
-          ).map(async (chain) => {
-            const client = new InterchainTokenLinkerClient(chain);
-
+          remainingChainConfigs.map(async (chain) => {
             try {
-              const [matchingAddress, matchingTokenId, originTokenId] =
+              const client = new InterchainTokenLinkerClient(chain);
+
+              const matchingTokenAddressFromTokenId = await client.readContract(
+                {
+                  method: "getTokenAddress",
+                  args: [tokenId],
+                }
+              );
+
+              const [matchingTokenId, matchingOriginTokenId] =
                 await Promise.all([
                   client.readContract({
-                    method: "getTokenAddress",
-                    args: [tokenId],
-                  }),
-                  client.readContract({
                     method: "getTokenId",
-                    args: [tokenAddress as `0x${string}`],
+                    args: [matchingTokenAddressFromTokenId as `0x${string}`],
                   }),
                   client.readContract({
                     method: "getOriginTokenId",
-                    args: [tokenAddress as `0x${string}`],
+                    args: [matchingTokenAddressFromTokenId as `0x${string}`],
                   }),
                 ]);
 
               return {
+                tokenId,
                 chainId: chain.id,
                 chainName: chain.name,
-                tokenAddress: matchingAddress,
-                tokenId,
-                originTokenId,
-                isOriginToken: originTokenId === matchingTokenId,
-                isRegistered: parseInt(matchingTokenId, 16) > 0,
+                tokenAddress: matchingTokenAddressFromTokenId,
+                originTokenId: matchingOriginTokenId,
+                isOriginToken: matchingOriginTokenId === matchingTokenId,
+                isRegistered: parseInt(matchingTokenAddressFromTokenId, 16) > 0,
               };
             } catch (error) {
-              console.log("error while scanning tokens", { error });
               return {
+                tokenId,
                 originTokenId,
                 chainId: chain.id,
                 tokenAddress,
-                isRegistered: parseInt(tokenAddress, 16) > 0,
+                isOriginToken: false,
+                isRegistered: false,
               };
             }
           })
         );
 
-        return {
-          isOriginToken: originTokenId === tokenId,
+        const lookupToken = {
           tokenId,
+          chainId: input.chainId,
+          originTokenId,
           tokenAddress,
-          matchingTokens,
+          isOriginToken: originTokenId === tokenId,
+          isRegistered: parseInt(tokenAddress, 16) > 0,
+        };
+
+        return {
+          ...lookupToken,
+          matchingTokens: [lookupToken, ...matchingTokens],
         };
       } catch (error) {
         // If we get a TRPC error, we throw it
@@ -154,7 +171,8 @@ export const gmpRouter = router({
         // otherwise, we throw an internal server error
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to get transaction status",
+          message: "Failed to get InterchainTokenLinker details",
+          cause: error,
         });
       }
     }),
