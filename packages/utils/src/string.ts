@@ -13,3 +13,6 @@ export const sluggify = (value: string) =>
 
 export const unSluggify = (value: string) =>
   value.split("-").map(capitalize).join(" ");
+
+export const maskAddress = (address: `0x${string}`) =>
+  `${address.slice(0, 6)}...${address.slice(-4)}`;

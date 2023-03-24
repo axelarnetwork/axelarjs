@@ -1,7 +1,7 @@
 import { FC } from "react";
 
 import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
-import { Maybe, unSluggify } from "@axelarjs/utils";
+import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import clsx from "clsx";
 import { isAddress } from "ethers/lib/utils.js";
 import Head from "next/head";
@@ -45,37 +45,51 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               ),
             ] as const
         )
-        .filter(([, matchingToken]) => Boolean(matchingToken))
-        .map(([chain, matchingToken]) => {
-          invariant(matchingToken, "matchingToken should be defined");
+        .filter(([, token]) => Boolean(token))
+        .map(([chain, token]) => {
+          invariant(token, "token should be defined");
 
           return (
             <Card
-              bordered
+              compact
               key={chain.chain_id}
               className={clsx(
-                "bg-base-200 hover:ring-primary/50 transition-all hover:ring",
+                "bg-base-200 hover:ring-primary/50 transition-all hover:shadow-xl hover:ring",
                 {
-                  "ring-primary/50 ring": matchingToken.isRegistered,
-                  "ring-success/50 ring": matchingToken.isOriginToken,
+                  "ring-primary/50 ring-2": token.isRegistered,
+                  "ring-success/50 ring-2": token.isOriginToken,
                 }
               )}
             >
               <Card.Body>
-                <Card.Title>
-                  <ChainIcon src={chain.image} alt={chain.name} size="md" />
-                  {chain.name}
+                <Card.Title className="justify-between">
+                  <span className="flex items-center gap-2">
+                    <ChainIcon src={chain.image} alt={chain.name} size="md" />
+                    {chain.name}
+                  </span>
+
+                  {token.isOriginToken ? (
+                    <span className="badge badge-success">origin token</span>
+                  ) : (
+                    token.isRegistered && (
+                      <span className="badge badge-secondary">registered</span>
+                    )
+                  )}
                 </Card.Title>
-                <Card.Actions>
-                  {matchingToken.isRegistered ? (
-                    <CopyToClipboardButton size="sm">
-                      {matchingToken.tokenAddress.slice(0, 6)}...
-                      {matchingToken.tokenAddress.slice(-4)}
+                <Card.Actions className="justify-between">
+                  {token.isRegistered ? (
+                    <CopyToClipboardButton
+                      size="sm"
+                      copyText={token.tokenAddress}
+                      ghost
+                    >
+                      {maskAddress(token.tokenAddress)}
                     </CopyToClipboardButton>
                   ) : (
                     <Button
                       size="sm"
-                      onClick={() => switchNetworkAsync?.(chain.chain_id)}
+                      color="primary"
+                      onClick={switchNetworkAsync?.bind(null, chain.chain_id)}
                     >
                       Switch to {chain.name}
                     </Button>

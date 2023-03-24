@@ -11,6 +11,7 @@ import {
   ThemeSwitcher,
   useTheme,
 } from "@axelarjs/ui";
+import { maskAddress } from "@axelarjs/utils";
 import { Web3Modal } from "@web3modal/react";
 import Link from "next/link";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
@@ -59,7 +60,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                   chains={evmChains}
                 />
                 <CopyToClipboardButton size="sm" copyText={address} outline>
-                  {address.slice(0, 6)}...{address.slice(-4)}
+                  {maskAddress(address)}
                 </CopyToClipboardButton>
                 <Button size="sm" onClick={() => disconnect()}>
                   Disconnect
