@@ -45,7 +45,9 @@ export const useAddErc20State = () => {
 
   const removeSelectedChain = (item: string) => {
     setSelectedChains((prev) => {
-      if (!prev.has(item)) return prev;
+      if (!prev.has(item)) {
+        return prev;
+      }
       const next = new Set(prev);
       next.delete(item);
       return next;

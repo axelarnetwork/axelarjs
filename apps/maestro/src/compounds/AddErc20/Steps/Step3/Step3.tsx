@@ -51,8 +51,11 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     const ar = +Boolean(props.tokenAlreadyRegistered); //already-registered
     const oc = +Boolean(props.selectedChains.size > 0); //other-chains
     const decision = decisionMatrix[pe][ar][oc];
-    if (decision) decision(e);
-    else console.warn("no op");
+    if (decision) {
+      decision(e);
+    } else {
+      console.warn("no op");
+    }
   };
 
   const handleDeployRemoteTokens = useCallback<
@@ -212,7 +215,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           return (
             <Tooltip tip={chain.name} key={chain.chain_name}>
               <Button
-                ghost
+                ghost={true}
                 shape="circle"
                 className="h-[40] w-[40] rounded-full"
                 size="sm"

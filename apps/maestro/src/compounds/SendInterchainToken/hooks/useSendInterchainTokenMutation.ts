@@ -88,16 +88,19 @@ export function useSendInterchainTokenMutation(
 
     //approve
     try {
-      if (onStatusUpdate)
+      if (onStatusUpdate) {
         onStatusUpdate({
           type: "approving",
         });
+      }
       const tx = await erc20.approve(tokenLinker.address, bigNumberAmount);
 
       // wait for tx to be mined
       await tx.wait(1);
     } catch (e) {
-      if (onStatusUpdate) onStatusUpdate({ type: "idle" });
+      if (onStatusUpdate) {
+        onStatusUpdate({ type: "idle" });
+      }
       return;
     }
 
@@ -110,14 +113,19 @@ export function useSendInterchainTokenMutation(
         bigNumberAmount,
         { value: BigNumber.from(gas) }
       );
-      if (onStatusUpdate)
+      if (onStatusUpdate) {
         onStatusUpdate({ type: "sending", txHash: sendTokenTx.hash });
+      }
 
       await sendTokenTx.wait(1);
 
-      if (onFinished) onFinished();
+      if (onFinished) {
+        onFinished();
+      }
     } catch (e) {
-      if (onStatusUpdate) onStatusUpdate({ type: "idle" });
+      if (onStatusUpdate) {
+        onStatusUpdate({ type: "idle" });
+      }
       return;
     }
   });

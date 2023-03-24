@@ -27,7 +27,9 @@ export function useDeployRemoteTokensMutation() {
   });
 
   return useMutation(async (input: UseDeployRemoteTokenInput) => {
-    if (!(signer && tokenLinker && address)) return;
+    if (!(signer && tokenLinker && address)) {
+      return;
+    }
 
     try {
       //deploy remote tokens
@@ -45,17 +47,22 @@ export function useDeployRemoteTokensMutation() {
       const txDone = await deployRemoteTokensTx.wait(1);
       console.log("deployRemoteTokensTxDone", txDone);
 
-      if (input.onStatusUpdate)
+      if (input.onStatusUpdate) {
         input.onStatusUpdate({
           type: "deployed",
           txHash: txDone.transactionHash as `0x${string}`,
           tokenAddress: input.tokenAddress,
         });
+      }
 
-      if (input.onFinished) input.onFinished();
+      if (input.onFinished) {
+        input.onFinished();
+      }
     } catch (e) {
       console.log("something went wrong", e);
-      if (input.onStatusUpdate) input.onStatusUpdate({ type: "idle" });
+      if (input.onStatusUpdate) {
+        input.onStatusUpdate({ type: "idle" });
+      }
       return;
     }
   });

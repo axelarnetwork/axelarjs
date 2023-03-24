@@ -30,7 +30,9 @@ export function useDeployAndRegisterInterchainTokenMutation() {
 
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
-      if (!(signer && tokenLinker && address)) return;
+      if (!(signer && tokenLinker && address)) {
+        return;
+      }
 
       try {
         //deploy and register tokens
@@ -55,7 +57,7 @@ export function useDeployAndRegisterInterchainTokenMutation() {
         const txDone = await deployAndRegisterTokensTx.wait(1);
         console.log("deployAndRegisterTokensTxDone", txDone);
 
-        if (input.onStatusUpdate)
+        if (input.onStatusUpdate) {
           input.onStatusUpdate({
             type: "deployed",
             txHash: txDone.transactionHash as `0x${string}`,
@@ -63,11 +65,16 @@ export function useDeployAndRegisterInterchainTokenMutation() {
               txDone
             ) as `0x${string}`,
           });
+        }
 
-        if (input.onFinished) input.onFinished();
+        if (input.onFinished) {
+          input.onFinished();
+        }
       } catch (e) {
         console.log("something went wrong", e);
-        if (input.onStatusUpdate) input.onStatusUpdate({ type: "idle" });
+        if (input.onStatusUpdate) {
+          input.onStatusUpdate({ type: "idle" });
+        }
         return;
       }
     }

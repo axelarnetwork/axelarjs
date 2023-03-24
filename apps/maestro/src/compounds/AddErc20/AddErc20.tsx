@@ -25,7 +25,9 @@ export const AddErc20: FC<Props> = (props) => {
   const { state, actions } = useAddErc20State();
 
   useEffect(() => {
-    if (!props.tokenAddress) return;
+    if (!props.tokenAddress) {
+      return;
+    }
     actions.setDeployedTokenAddress(props.tokenAddress);
     actions.setStep(1);
     actions.setIsPreExistingToken(true);

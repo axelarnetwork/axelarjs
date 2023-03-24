@@ -44,7 +44,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             <Link href="/">
               <LinkButton
                 className="flex items-center gap-2 text-lg font-bold uppercase"
-                ghost
+                ghost={true}
               >
                 <AxelarIcon className="h-6 w-6 dark:invert" />
                 {APP_NAME}
@@ -59,7 +59,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                   selectedChain={selectedChain}
                   chains={evmChains}
                 />
-                <CopyToClipboardButton size="sm" copyText={address} outline>
+                <CopyToClipboardButton
+                  size="sm"
+                  copyText={address}
+                  outline={true}
+                >
                   {maskAddress(address)}
                 </CopyToClipboardButton>
                 <Button size="sm" onClick={() => disconnect()}>
@@ -75,7 +79,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <Clamp $as="main" className="flex flex-1">
           {children}
         </Clamp>
-        <Footer className="bg-neutral text-neutral-content p-8" center>
+        <Footer className="bg-neutral text-neutral-content p-8" center={true}>
           <Footer.Title>
             &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
           </Footer.Title>

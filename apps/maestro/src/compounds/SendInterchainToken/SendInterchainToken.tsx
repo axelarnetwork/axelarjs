@@ -53,7 +53,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
   );
 
   const handleSend = useCallback(async () => {
-    if (!selectedFromChain || !selectedToChain || !amount) return;
+    if (!(selectedFromChain && selectedToChain && amount)) {
+      return;
+    }
 
     await sendToken({
       tokenAddress: props.tokenAddress,
@@ -83,7 +85,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <div className="grid grid-cols-1">
               <label className="text-center">Source Chain</label>
               <EVMChainsDropdown
-                compact
+                compact={true}
                 selectedChain={selectedFromChain}
                 chains={evmChains}
                 onSwitchNetwork={(chain_id) => {
@@ -99,7 +101,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <div className="grid grid-cols-1">
               <label className="text-center">Destination Chain</label>
               <EVMChainsDropdown
-                compact
+                compact={true}
                 selectedChain={selectedToChain}
                 chains={evmChains}
                 onSwitchNetwork={(chain_id) => {

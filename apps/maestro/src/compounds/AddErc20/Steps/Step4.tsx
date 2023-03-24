@@ -39,7 +39,9 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
         updateStatusMap(destinationChain.toLowerCase(), tx.status);
       }
     });
-    if (data.every((tx) => tx.status === "executed")) setDelay(null);
+    if (data.every((tx) => tx.status === "executed")) {
+      setDelay(null);
+    }
     return data;
   }, [props.txHash, updateStatusMap, statusMap]);
 

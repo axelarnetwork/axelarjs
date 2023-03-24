@@ -41,7 +41,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 
   return (
     <>
-      <style jsx global>
+      <style jsx={true} global={true}>
         {`
           :root {
             --font-sans: ${fontSans.style.fontFamily};
