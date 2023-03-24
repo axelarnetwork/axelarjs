@@ -2,6 +2,11 @@ import { FC, useEffect, useState } from "react";
 
 import { ThemeProvider } from "@axelarjs/ui";
 import { Cabin } from "@next/font/google";
+import {
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import NextNProgress from "nextjs-progressbar";
@@ -10,9 +15,7 @@ import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "~/styles/globals.css";
 
-import { QueryClientProvider } from "@tanstack/react-query";
-
-import { queryClient } from "~/config/wagmi";
+import { queryClient as wagmiQueryClient } from "~/config/wagmi";
 import MainLayout from "~/layouts/MainLayout";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -31,6 +34,8 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
   const [isSSR, setIsSSR] = useState(true);
 
+  const [queryClient] = useState(() => wagmiQueryClient);
+
   // set isSSR to false on the first client-side render
   useEffect(() => setIsSSR(false), []);
 
@@ -44,20 +49,22 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         `}
       </style>
       <NextNProgress />
-      {!isSSR && (
-        <>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-              <WagmiConfigPropvider>
-                <MainLayout>
-                  <Component {...pageProps} />
-                </MainLayout>
-              </WagmiConfigPropvider>
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          <ThemeProvider>
+            <WagmiConfigPropvider>
+              {!isSSR && (
+                <>
+                  <MainLayout>
+                    <Component {...pageProps} />
+                  </MainLayout>
+                </>
+              )}
               <ReactQueryDevtools />
-            </ThemeProvider>
-          </QueryClientProvider>
-        </>
-      )}
+            </WagmiConfigPropvider>
+          </ThemeProvider>
+        </Hydrate>
+      </QueryClientProvider>
     </>
   );
 };

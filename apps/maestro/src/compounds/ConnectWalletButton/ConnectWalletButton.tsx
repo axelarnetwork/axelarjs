@@ -9,7 +9,13 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
   (props, ref) => {
     const { open } = useWeb3Modal();
 
-    return <Button {...props} onClick={() => open()} ref={ref} />;
+    return (
+      <Button
+        {...props}
+        onClick={() => open({ route: "ConnectWallet" })}
+        ref={ref}
+      />
+    );
   }
 );
 

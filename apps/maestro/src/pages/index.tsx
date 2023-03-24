@@ -1,29 +1,34 @@
 import { useEffect, useState } from "react";
 
-import { Button, Card, TextInput } from "@axelarjs/ui";
-import { isAddress } from "ethers/lib/utils.js";
+import { Button } from "@axelarjs/ui";
+import { sluggify } from "@axelarjs/utils";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useAccount, useNetwork } from "wagmi";
 
-// import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
-import { SearchInterchainTokens } from "~/compounds/SearchInterchainTokens";
+import SearchInterchainTokens from "~/compounds/SearchInterchainTokens";
 
-const AddErc20 = dynamic(() => import("../compounds/AddErc20/AddErc20"));
+const AddErc20 = dynamic(() => import("~/compounds/AddErc20/AddErc20"));
 
 export default function Home() {
   const router = useRouter();
   const account = useAccount();
   const { chain } = useNetwork();
-  const [tokenId, setTokenId] = useState("");
+
+  const [searchTokenResult, setSearchTokenResult] = useState<{
+    tokenId: string;
+    tokenAddress: string;
+  }>();
 
   useEffect(() => {
-    if (tokenId) {
-      router.push(`/${chain?.id}/${tokenId}`);
+    if (searchTokenResult?.tokenAddress && chain?.name) {
+      router.push(
+        `/${sluggify(chain.name)}/${searchTokenResult?.tokenAddress}`
+      );
     }
-  }, [tokenId, router, chain?.id]);
+  }, [searchTokenResult, router, chain?.name]);
 
   return (
     <>
@@ -38,11 +43,7 @@ export default function Home() {
         {account.address ? (
           <>
             <div className="flex w-full max-w-md flex-col items-center justify-center">
-              <SearchInterchainTokens
-                onTokenFound={(tokenId) => {
-                  setTokenId(tokenId);
-                }}
-              />
+              <SearchInterchainTokens onTokenFound={setSearchTokenResult} />
               <div className="divider">OR</div>
               <AddErc20
                 trigger={

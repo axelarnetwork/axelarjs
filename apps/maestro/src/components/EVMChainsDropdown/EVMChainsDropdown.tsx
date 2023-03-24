@@ -19,15 +19,21 @@ const iconSizes = {
   lg: 32,
 };
 
-const ChainIcon: FC<{
+export const ChainIcon: FC<{
   size: keyof typeof iconSizes;
   src: string;
   alt: string;
+  className?: string;
 }> = (props) => {
   const iconSize = iconSizes[props.size];
 
   return (
-    <div className="relative rounded-full p-0.5 shadow-black group-hover:ring-2">
+    <div
+      className={clsx(
+        "relative rounded-full p-0.5 shadow-black group-hover:ring-2",
+        props.className
+      )}
+    >
       <Image
         className="bg-base-300 overflow-hidden rounded-full"
         src={props.src}

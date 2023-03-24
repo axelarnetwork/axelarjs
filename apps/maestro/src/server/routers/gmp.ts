@@ -109,10 +109,6 @@ export const gmpRouter = router({
                     args: [tokenId],
                   }),
                   client.readContract({
-                    method: "getTokenAddress",
-                    args: [tokenId],
-                  }),
-                  client.readContract({
                     method: "getTokenId",
                     args: [tokenAddress as `0x${string}`],
                   }),
@@ -129,7 +125,7 @@ export const gmpRouter = router({
                 tokenId,
                 originTokenId,
                 isOriginToken: originTokenId === matchingTokenId,
-                isRegistered: parseInt(tokenId, 16) > 0,
+                isRegistered: parseInt(matchingTokenId, 16) > 0,
               };
             } catch (error) {
               console.log("error while scanning tokens", { error });
