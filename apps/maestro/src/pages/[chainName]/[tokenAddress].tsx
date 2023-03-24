@@ -13,8 +13,85 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
+import { SendInterchainToken } from "~/compounds/SendInterchainToken";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+
+type InterchainTokenProps = {
+  isRegistered: boolean;
+  isOriginToken: boolean;
+  tokenAddress: `0x${string}`;
+  chain: {
+    chain_id: number;
+    name: string;
+    image: string;
+  };
+  onSwitchNetwork?: (chainId: number) => void;
+};
+
+const InterchainToken: FC<InterchainTokenProps> = (props) => {
+  return (
+    <Card
+      compact
+      key={props.chain.chain_id}
+      bordered={!props.isRegistered}
+      className={clsx(
+        "bg-base- transition-all",
+        "100 hover:ring-primary/50 hover:shadow-xl hover:ring",
+        {
+          "ring-primary/50 ring-2": props.isRegistered,
+          "ring-success/50 ring-2": props.isOriginToken,
+          "shadow-sm": !props.isRegistered,
+        }
+      )}
+    >
+      <Card.Body>
+        <Card.Title className="justify-between">
+          <span className="flex items-center gap-2">
+            <ChainIcon
+              src={props.chain.image}
+              alt={props.chain.name}
+              size="md"
+            />
+            {props.chain.name}
+          </span>
+
+          {props.isOriginToken ? (
+            <span className="badge badge-success badge-outline">origin</span>
+          ) : (
+            props.isRegistered && (
+              <span className="badge badge-info badge-outline">registered</span>
+            )
+          )}
+        </Card.Title>
+
+        {!props.isRegistered && (
+          <div className="mx-auto px-2">Remote token not registered</div>
+        )}
+        <Card.Actions className="justify-between">
+          {props.isRegistered ? (
+            <CopyToClipboardButton
+              copyText={props.tokenAddress}
+              ghost
+              length="block"
+            >
+              {maskAddress(props.tokenAddress)}
+            </CopyToClipboardButton>
+          ) : (
+            <Button
+              size="sm"
+              color="primary"
+              length="block"
+              onClick={props.onSwitchNetwork?.bind(null, props.chain.chain_id)}
+            >
+              Switch to {props.chain.name}
+            </Button>
+          )}
+        </Card.Actions>
+      </Card.Body>
+    </Card>
+  );
+};
 
 type ConnectedInterchainTokensPageProps = {
   chainName: string;
@@ -50,53 +127,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           invariant(token, "token should be defined");
 
           return (
-            <Card
-              compact
+            <InterchainToken
               key={chain.chain_id}
-              className={clsx(
-                "bg-base-200 hover:ring-primary/50 transition-all hover:shadow-xl hover:ring",
-                {
-                  "ring-primary/50 ring-2": token.isRegistered,
-                  "ring-success/50 ring-2": token.isOriginToken,
-                }
-              )}
-            >
-              <Card.Body>
-                <Card.Title className="justify-between">
-                  <span className="flex items-center gap-2">
-                    <ChainIcon src={chain.image} alt={chain.name} size="md" />
-                    {chain.name}
-                  </span>
-
-                  {token.isOriginToken ? (
-                    <span className="badge badge-success">origin token</span>
-                  ) : (
-                    token.isRegistered && (
-                      <span className="badge badge-secondary">registered</span>
-                    )
-                  )}
-                </Card.Title>
-                <Card.Actions className="justify-between">
-                  {token.isRegistered ? (
-                    <CopyToClipboardButton
-                      size="sm"
-                      copyText={token.tokenAddress}
-                      ghost
-                    >
-                      {maskAddress(token.tokenAddress)}
-                    </CopyToClipboardButton>
-                  ) : (
-                    <Button
-                      size="sm"
-                      color="primary"
-                      onClick={switchNetworkAsync?.bind(null, chain.chain_id)}
-                    >
-                      Switch to {chain.name}
-                    </Button>
-                  )}
-                </Card.Actions>
-              </Card.Body>
-            </Card>
+              isRegistered={token.isRegistered}
+              isOriginToken={token.isOriginToken}
+              tokenAddress={token.tokenAddress}
+              chain={chain}
+              onSwitchNetwork={switchNetworkAsync}
+            />
           );
         })}
     </ul>
@@ -112,6 +150,10 @@ const InterchainTokensPage = () => {
     chainName: string;
     tokenAddress: string;
   };
+  const { data, isFetching, error, isFetched } = useInterchainTokensQuery({
+    chainId: chain?.id,
+    tokenAddress: tokenAddress as `0x${string}`,
+  });
 
   const routeChain = chains.find((c) => c.name === unSluggify(chainName));
 
@@ -144,14 +186,25 @@ const InterchainTokensPage = () => {
           {tokenAddress}
         </CopyToClipboardButton>{" "}
       </div>
-      <AddErc20
-        trigger={
-          <Button size="sm" className="mb-5 w-full max-w-sm">
-            Deploy on other chains
-          </Button>
-        }
-        tokenAddress={tokenAddress}
-      />
+      <div className="flex w-full justify-end">
+        <AddErc20
+          trigger={
+            <Button size="sm" className="max-w-sm">
+              Deploy on other chains
+            </Button>
+          }
+          tokenAddress={tokenAddress}
+        />
+        <SendInterchainToken
+          trigger={
+            <Button size="sm" className="ml-2 max-w-sm">
+              Send token interchain [WIP]
+            </Button>
+          }
+          tokenAddress={tokenAddress}
+          tokenId={data.tokenId as `0x${string}`}
+        />
+      </div>
       <ConnectedInterchainTokensPage
         chainName={chainName}
         tokenAddress={tokenAddress}
