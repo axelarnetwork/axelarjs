@@ -13,8 +13,8 @@ export const getNativeToken = (chainId: string) => {
     celo: GasToken.CELO,
     kava: GasToken.KAVA,
   };
-  if (!gasTokenMap[chainId.toLowerCase()])
+  if (!gasTokenMap[chainId?.toLowerCase()])
     throw `getNativeToken(): chain ${chainId} does not exist`;
 
-  return gasTokenMap[chainId.toLowerCase()];
+  return gasTokenMap[chainId?.toLowerCase()];
 };

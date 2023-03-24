@@ -22,3 +22,4 @@ export const Step1: FC<StepProps> = (props: StepProps) => {
     </div>
   );
 };
+export default Step1;

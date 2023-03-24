@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 
-import { Button } from "@axelarjs/ui";
+import { Button, Card, TextInput } from "@axelarjs/ui";
+import { isAddress } from "ethers/lib/utils.js";
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useAccount, useNetwork } from "wagmi";
 
-import { AddErc20 } from "~/compounds";
+// import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { SearchInterchainTokens } from "~/compounds/SearchInterchainTokens";
+
+const AddErc20 = dynamic(() => import("../compounds/AddErc20/AddErc20"));
 
 export default function Home() {
   const router = useRouter();

@@ -24,3 +24,5 @@ export const StepsSummary: FC<StepsSummaryProps> = (
     </Steps>
   );
 };
+
+export default StepsSummary;

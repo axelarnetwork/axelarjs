@@ -248,7 +248,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       </label>
       <label className="text-md">
         Approximate cost: {state.totalGasFee}{" "}
-        {getNativeToken(state.sourceChainId)}
+        {state?.sourceChainId && getNativeToken(state.sourceChainId)}
       </label>
       <Button loading={state.isDeploying} type="submit">
         Deploy
@@ -256,3 +256,5 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     </form>
   );
 };
+
+export default Step3;

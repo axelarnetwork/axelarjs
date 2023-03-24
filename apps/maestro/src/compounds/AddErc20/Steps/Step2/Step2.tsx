@@ -11,3 +11,5 @@ export const Step2: FC<StepProps> = (props: StepProps) => {
     <PreExistingERC20Token {...props} />
   );
 };
+
+export default Step2;
