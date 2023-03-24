@@ -63,7 +63,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             >
               <Card.Body>
                 <Card.Title className="justify-between">
-                  <span className="flex items-center">
+                  <span className="flex items-center gap-2">
                     <ChainIcon src={chain.image} alt={chain.name} size="md" />
                     {chain.name}
                   </span>
