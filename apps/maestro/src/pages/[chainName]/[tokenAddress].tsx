@@ -68,7 +68,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                 </Card.Title>
                 <Card.Actions>
                   {matchingToken.isRegistered ? (
-                    <CopyToClipboardButton size="sm">
+                    <CopyToClipboardButton
+                      size="sm"
+                      copyText={matchingToken.tokenAddress}
+                    >
                       {matchingToken.tokenAddress.slice(0, 6)}...
                       {matchingToken.tokenAddress.slice(-4)}
                     </CopyToClipboardButton>
