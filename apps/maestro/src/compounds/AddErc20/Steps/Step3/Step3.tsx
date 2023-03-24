@@ -2,10 +2,10 @@ import React, { FC, FormEventHandler, useCallback } from "react";
 
 import { Button, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
-import { useSigner } from "wagmi";
+import { useNetwork } from "wagmi";
 
-import { useGetTokenIdInTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
 import { StepProps } from "..";
 import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
@@ -26,11 +26,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   const { mutateAsync: registerOriginToken } = useRegisterOriginTokenMutation();
   const { mutateAsync: deployRemoteTokens } = useDeployRemoteTokensMutation();
 
-  const signer = useSigner();
-
-  const { data: tokenId } = useGetTokenIdInTokenLinker({
-    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
-    signerOrProvider: signer.data,
+  const { chain } = useNetwork();
+  const { data: tokenData } = useInterchainTokensQuery({
+    chainId: chain?.id,
     tokenAddress: props.deployedTokenAddress as `0x${string}`,
   });
 
@@ -71,13 +69,13 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         console.warn("gas prices not loaded");
         return;
       }
-      if (!tokenId) {
+      if (!tokenData?.tokenId) {
         console.log("no token ID for ", props.deployedTokenAddress);
       }
-      console.log("token ID", tokenId);
+
       actions.setIsDeploying(true);
       await deployRemoteTokens({
-        tokenId: tokenId as `0x${string}`,
+        tokenId: tokenData.tokenId as `0x${string}`,
         tokenAddress: props.deployedTokenAddress as `0x${string}`,
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,

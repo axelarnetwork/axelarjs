@@ -2,10 +2,11 @@ import { FC, useEffect, useState } from "react";
 
 import { TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
-import { useSigner } from "wagmi";
+import { useNetwork, useSigner } from "wagmi";
 
+import { ADDRESS_ZERO_BYTES32 } from "~/config/constants";
 import { useGetERC20TokenDetails } from "~/lib/contract/hooks/useERC20";
-import { useCheckTokenExistsInTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
 import { StepProps } from "..";
 
@@ -61,9 +62,9 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     tokenAddress: props.address as `0x${string}`,
   });
 
-  const { data: doesTlExist } = useCheckTokenExistsInTokenLinker({
-    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
-    signerOrProvider: signer.data,
+  const { chain } = useNetwork();
+  const { data: tokenData } = useInterchainTokensQuery({
+    chainId: chain?.id,
     tokenAddress: props.address as `0x${string}`,
   });
 
@@ -73,14 +74,19 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     tokenInfo && tokenInfo.tokenSymbol && setTokenSymbol(tokenInfo.tokenSymbol);
     tokenInfo && props.setIsPreexistingToken(Boolean(tokenInfo));
     tokenInfo && props.setDeployedTokenAddress(props.address);
-    props.setTokenAlreadyRegistered(Boolean(doesTlExist));
-  }, [props.address, tokenInfo, doesTlExist]);
+    props.setTokenAlreadyRegistered(
+      Boolean(tokenData?.tokenId !== ADDRESS_ZERO_BYTES32)
+    );
+  }, [props.address, tokenInfo, tokenData]);
 
   return (
     <div>
       <div>{props.address}</div>
       <div>
-        Does token exist: {doesTlExist ? "Token Exists" : "Token Doesnt Exist"}
+        Does token exist:{" "}
+        {tokenData?.tokenId !== ADDRESS_ZERO_BYTES32
+          ? "Token Exists"
+          : "Token Doesnt Exist"}
       </div>
       <div>Decimals: {tokenDecimals}</div>
       <div>Token Name: {tokenName}</div>
