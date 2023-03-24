@@ -13,6 +13,7 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
+import { SendInterchainToken } from "~/compounds/SendInterchainToken";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
@@ -112,6 +113,10 @@ const InterchainTokensPage = () => {
     chainName: string;
     tokenAddress: string;
   };
+  const { data, isFetching, error, isFetched } = useInterchainTokensQuery({
+    chainId: chain?.id,
+    tokenAddress: tokenAddress as `0x${string}`,
+  });
 
   const routeChain = chains.find((c) => c.name === unSluggify(chainName));
 
@@ -144,14 +149,25 @@ const InterchainTokensPage = () => {
           {tokenAddress}
         </CopyToClipboardButton>{" "}
       </div>
-      <AddErc20
-        trigger={
-          <Button size="sm" className="mb-5 w-full max-w-sm">
-            Deploy on other chains
-          </Button>
-        }
-        tokenAddress={tokenAddress}
-      />
+      <div className="flex w-full justify-end">
+        <AddErc20
+          trigger={
+            <Button size="sm" className="max-w-sm">
+              Deploy on other chains
+            </Button>
+          }
+          tokenAddress={tokenAddress}
+        />
+        <SendInterchainToken
+          trigger={
+            <Button size="sm" className="ml-2 max-w-sm">
+              Send token interchain [WIP]
+            </Button>
+          }
+          tokenAddress={tokenAddress}
+          tokenId={data.tokenId as `0x${string}`}
+        />
+      </div>
       <ConnectedInterchainTokensPage
         chainName={chainName}
         tokenAddress={tokenAddress}
