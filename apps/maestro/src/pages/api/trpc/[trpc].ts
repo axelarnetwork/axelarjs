@@ -16,7 +16,7 @@ export default trpcNext.createNextApiHandler({
   onError({ error }) {
     if (error.code === "INTERNAL_SERVER_ERROR") {
       // send to bug reporting
-      logger.always.error("Something went wrong", error);
+      logger.always.error("[tRpcError: Something went wrong]: ", { error });
     }
   },
   /**

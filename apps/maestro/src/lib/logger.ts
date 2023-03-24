@@ -37,8 +37,10 @@ class Logger {
 
   private logMessage<T extends unknown[]>(...args: LogArgs<T>) {
     const [severity, alwaysLog, message] = args;
+
     if (message && message) {
-      this.logMessage(severity, alwaysLog, message);
+      const logger = getLogger(severity);
+      logger(...message);
     } else {
       return (...messages: T) => this.logMessage(severity, alwaysLog, messages);
     }
