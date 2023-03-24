@@ -24,10 +24,20 @@ type CardBaseProps = VariantProps<typeof cardVariance>;
 
 export type CardProps = ComponentProps<typeof StyledCard> & CardBaseProps & {};
 
-const CardContainer = ({ bordered, className, ...props }: CardProps) => {
+const CardContainer = ({
+  bordered,
+  compact,
+  normal,
+  className,
+  ...props
+}: CardProps) => {
   return (
     <StyledCard
-      className={twMerge(cardVariance({ bordered }), className, "card")}
+      className={twMerge(
+        cardVariance({ bordered, compact, normal }),
+        className,
+        "card"
+      )}
       {...props}
     />
   );
