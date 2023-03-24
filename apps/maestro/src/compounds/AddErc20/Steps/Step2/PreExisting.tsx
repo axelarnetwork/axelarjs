@@ -2,11 +2,13 @@ import { FC, useEffect, useState } from "react";
 
 import { TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
-import { useNetwork, useSigner } from "wagmi";
+import { useNetwork } from "wagmi";
 
 import { ADDRESS_ZERO_BYTES32 } from "~/config/constants";
-import { useGetERC20TokenDetails } from "~/lib/contract/hooks/useERC20";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import {
+  useGetERC20TokenDetailsQuery,
+  useInterchainTokensQuery,
+} from "~/services/gmp/hooks";
 
 import { StepProps } from "..";
 
@@ -55,36 +57,34 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenDecimals, setTokenDecimals] = useState(0);
-  const signer = useSigner();
-  const { data: tokenInfo } = useGetERC20TokenDetails({
-    address: props.address,
-    signerOrProvider: signer.data,
-    tokenAddress: props.address as `0x${string}`,
-  });
 
   const { chain } = useNetwork();
-  const { data: tokenData } = useInterchainTokensQuery({
+  const { data: tlData } = useInterchainTokensQuery({
+    chainId: chain?.id,
+    tokenAddress: props.address as `0x${string}`,
+  });
+  const { data: token } = useGetERC20TokenDetailsQuery({
     chainId: chain?.id,
     tokenAddress: props.address as `0x${string}`,
   });
 
   useEffect(() => {
-    tokenInfo && tokenInfo.decimals && setTokenDecimals(tokenInfo.decimals);
-    tokenInfo && tokenInfo.tokenName && setTokenName(tokenInfo.tokenName);
-    tokenInfo && tokenInfo.tokenSymbol && setTokenSymbol(tokenInfo.tokenSymbol);
-    tokenInfo && props.setIsPreexistingToken(Boolean(tokenInfo));
-    tokenInfo && props.setDeployedTokenAddress(props.address);
+    token && token.decimals && setTokenDecimals(token.decimals as number);
+    token && token.tokenName && setTokenName(token.tokenName as string);
+    token && token.tokenSymbol && setTokenSymbol(token.tokenSymbol as string);
+    token && props.setIsPreexistingToken(Boolean(token));
+    token && props.setDeployedTokenAddress(props.address);
     props.setTokenAlreadyRegistered(
-      Boolean(tokenData?.tokenId !== ADDRESS_ZERO_BYTES32)
+      Boolean(tlData?.tokenId && tlData?.tokenId !== ADDRESS_ZERO_BYTES32)
     );
-  }, [props.address, tokenInfo, tokenData]);
+  }, [props.address, token, tlData]);
 
   return (
     <div>
       <div>{props.address}</div>
       <div>
         Does token exist:{" "}
-        {tokenData?.tokenId !== ADDRESS_ZERO_BYTES32
+        {tlData.tokenId && tlData?.tokenId !== ADDRESS_ZERO_BYTES32
           ? "Token Exists"
           : "Token Doesnt Exist"}
       </div>
