@@ -32,7 +32,7 @@ type InterchainTokenProps = {
 const InterchainToken: FC<InterchainTokenProps> = (props) => {
   return (
     <Card
-      compact
+      compact={true}
       key={props.chain.chain_id}
       bordered={!props.isRegistered}
       className={clsx(
@@ -72,7 +72,7 @@ const InterchainToken: FC<InterchainTokenProps> = (props) => {
           {props.isRegistered ? (
             <CopyToClipboardButton
               copyText={props.tokenAddress}
-              ghost
+              ghost={true}
               length="block"
             >
               {maskAddress(props.tokenAddress)}
@@ -150,7 +150,7 @@ const InterchainTokensPage = () => {
     chainName: string;
     tokenAddress: string;
   };
-  const { data, isFetching, error, isFetched } = useInterchainTokensQuery({
+  const { data } = useInterchainTokensQuery({
     chainId: chain?.id,
     tokenAddress: tokenAddress as `0x${string}`,
   });
@@ -182,7 +182,7 @@ const InterchainTokensPage = () => {
       </Head>
       <div className="flex items-center gap-2">
         Interchain Token{" "}
-        <CopyToClipboardButton copyText={tokenAddress} size="sm" ghost>
+        <CopyToClipboardButton copyText={tokenAddress} size="sm" ghost={true}>
           {tokenAddress}
         </CopyToClipboardButton>{" "}
       </div>

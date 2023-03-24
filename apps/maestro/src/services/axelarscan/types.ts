@@ -40,7 +40,7 @@ export type EVMChainConfig = {
   short_name: string;
   chain_id: number;
   is_staging?: boolean;
-  provider_params: Array<{
+  provider_params: {
     chainId: string;
     chainName: string;
     rpcUrls: string[];
@@ -50,7 +50,7 @@ export type EVMChainConfig = {
       decimals: number;
     };
     blockExplorerUrls: string[];
-  }>;
+  }[];
   explorer: {
     name: string;
     url: string;

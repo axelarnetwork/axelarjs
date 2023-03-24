@@ -71,9 +71,9 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   });
 
   useEffect(() => {
-    token && token.decimals && setTokenDecimals(token.decimals as number);
-    token && token.tokenName && setTokenName(token.tokenName as string);
-    token && token.tokenSymbol && setTokenSymbol(token.tokenSymbol as string);
+    token?.decimals && setTokenDecimals(token.decimals as number);
+    token?.tokenName && setTokenName(token.tokenName as string);
+    token?.tokenSymbol && setTokenSymbol(token.tokenSymbol as string);
     token && props.setIsPreexistingToken(Boolean(token));
     token && props.setDeployedTokenAddress(props.address);
     props.setTokenAlreadyRegistered(

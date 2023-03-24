@@ -24,7 +24,9 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
   });
 
   return useMutation(async (input: UseRegisterInterchainTokenInput) => {
-    if (!(signer && tokenLinker && address)) return;
+    if (!(signer && tokenLinker && address)) {
+      return;
+    }
 
     try {
       //register tokens
@@ -44,17 +46,22 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
       const txDone = await registerTokensTx.wait(1);
       console.log("txDone", txDone);
 
-      if (input.onStatusUpdate)
+      if (input.onStatusUpdate) {
         input.onStatusUpdate({
           type: "deployed",
           txHash: txDone.transactionHash as `0x${string}`,
           tokenAddress: input.tokenAddress,
         });
+      }
 
-      if (input.onFinished) input.onFinished();
+      if (input.onFinished) {
+        input.onFinished();
+      }
     } catch (e) {
       console.log("something went wrong", e);
-      if (input.onStatusUpdate) input.onStatusUpdate({ type: "idle" });
+      if (input.onStatusUpdate) {
+        input.onStatusUpdate({ type: "idle" });
+      }
       return;
     }
   });
