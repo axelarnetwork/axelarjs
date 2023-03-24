@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 
 import { Button } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
@@ -17,18 +17,15 @@ export default function Home() {
   const account = useAccount();
   const { chain } = useNetwork();
 
-  const [searchTokenResult, setSearchTokenResult] = useState<{
-    tokenId: string;
-    tokenAddress: string;
-  }>();
-
-  useEffect(() => {
-    if (searchTokenResult?.tokenAddress && chain?.name) {
-      router.push(
-        `/${sluggify(chain.name)}/${searchTokenResult?.tokenAddress}`
-      );
-    }
-  }, [searchTokenResult, router, chain?.name]);
+  const handleTokenFound = useCallback(
+    (result: { tokenAddress: string; tokenId: string }) => {
+      if (!chain) {
+        return;
+      }
+      router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
+    },
+    [chain, router]
+  );
 
   return (
     <>
@@ -38,12 +35,11 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <div className="grid flex-1 place-items-center">
         {account.address ? (
           <>
             <div className="flex w-full max-w-lg flex-col items-center justify-center">
-              <SearchInterchainTokens onTokenFound={setSearchTokenResult} />
+              <SearchInterchainTokens onTokenFound={handleTokenFound} />
               <div className="divider">OR</div>
               <AddErc20
                 trigger={
