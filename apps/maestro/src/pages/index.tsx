@@ -42,12 +42,12 @@ export default function Home() {
       <div className="grid flex-1 place-items-center">
         {account.address ? (
           <>
-            <div className="flex w-full max-w-md flex-col items-center justify-center">
+            <div className="flex w-full max-w-lg flex-col items-center justify-center">
               <SearchInterchainTokens onTokenFound={setSearchTokenResult} />
               <div className="divider">OR</div>
               <AddErc20
                 trigger={
-                  <Button size="md" className="w-full max-w-sm" color="primary">
+                  <Button size="md" className="w-full max-w-md" color="primary">
                     Deploy a new ERC-20 token
                   </Button>
                 }

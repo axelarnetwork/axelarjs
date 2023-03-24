@@ -37,7 +37,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
   }, [data.tokenAddress, data.tokenId, props]);
 
   return (
-    <InputGroup className="max-w-sm">
+    <InputGroup className="max-w-md">
       <TextInput
         bordered
         type="search"
