@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { InputGroup, TextInput, Tooltip } from "@axelarjs/ui";
+import { InputGroup, SpinnerIcon, TextInput, Tooltip } from "@axelarjs/ui";
 import { useNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
@@ -22,7 +22,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
 
   const selectedChain = evmChains?.find((c) => c.chain_id === chain?.id);
 
-  const { data } = useInterchainTokensQuery({
+  const { data, isFetching } = useInterchainTokensQuery({
     chainId: chain?.id,
     tokenAddress: search as `0x${string}`,
   });
@@ -48,13 +48,17 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
       />
 
       <span>
-        <Tooltip tip={chain?.name || ""}>
-          <ChainIcon
-            src={selectedChain?.image || ""}
-            alt={chain?.name || ""}
-            size="md"
-          />
-        </Tooltip>
+        {isFetching ? (
+          <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
+        ) : (
+          <Tooltip tip={chain?.name || ""}>
+            <ChainIcon
+              src={selectedChain?.image || ""}
+              alt={chain?.name || ""}
+              size="md"
+            />
+          </Tooltip>
+        )}
       </span>
     </InputGroup>
   );
