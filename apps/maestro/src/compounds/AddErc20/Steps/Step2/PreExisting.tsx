@@ -5,8 +5,10 @@ import { isAddress } from "ethers/lib/utils";
 import { useNetwork, useSigner } from "wagmi";
 
 import { ADDRESS_ZERO_BYTES32 } from "~/config/constants";
-import { useGetERC20TokenDetails } from "~/lib/contract/hooks/useERC20";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import {
+  useGetERC20TokenDetailsQuery,
+  useInterchainTokensQuery,
+} from "~/services/gmp/hooks";
 
 import { StepProps } from "..";
 
@@ -55,36 +57,40 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenDecimals, setTokenDecimals] = useState(0);
-  const signer = useSigner();
-  const { data: tokenInfo } = useGetERC20TokenDetails({
-    address: props.address,
-    signerOrProvider: signer.data,
-    tokenAddress: props.address as `0x${string}`,
-  });
 
   const { chain } = useNetwork();
-  const { data: tokenData } = useInterchainTokensQuery({
+  const { data: tlData } = useInterchainTokensQuery({
+    chainId: chain?.id,
+    tokenAddress: props.address as `0x${string}`,
+  });
+  const { data: tokenInfo } = useGetERC20TokenDetailsQuery({
     chainId: chain?.id,
     tokenAddress: props.address as `0x${string}`,
   });
 
   useEffect(() => {
-    tokenInfo && tokenInfo.decimals && setTokenDecimals(tokenInfo.decimals);
-    tokenInfo && tokenInfo.tokenName && setTokenName(tokenInfo.tokenName);
-    tokenInfo && tokenInfo.tokenSymbol && setTokenSymbol(tokenInfo.tokenSymbol);
+    tokenInfo &&
+      tokenInfo.decimals &&
+      setTokenDecimals(tokenInfo.decimals as number);
+    tokenInfo &&
+      tokenInfo.tokenName &&
+      setTokenName(tokenInfo.tokenName as string);
+    tokenInfo &&
+      tokenInfo.tokenSymbol &&
+      setTokenSymbol(tokenInfo.tokenSymbol as string);
     tokenInfo && props.setIsPreexistingToken(Boolean(tokenInfo));
     tokenInfo && props.setDeployedTokenAddress(props.address);
     props.setTokenAlreadyRegistered(
-      Boolean(tokenData?.tokenId !== ADDRESS_ZERO_BYTES32)
+      Boolean(tlData?.tokenId !== ADDRESS_ZERO_BYTES32)
     );
-  }, [props.address, tokenInfo, tokenData]);
+  }, [props.address, tokenInfo, tlData]);
 
   return (
     <div>
       <div>{props.address}</div>
       <div>
         Does token exist:{" "}
-        {tokenData?.tokenId !== ADDRESS_ZERO_BYTES32
+        {tlData?.tokenId !== ADDRESS_ZERO_BYTES32
           ? "Token Exists"
           : "Token Doesnt Exist"}
       </div>
