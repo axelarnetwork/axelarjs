@@ -2,9 +2,9 @@ import { FC } from "react";
 
 import { TextInput } from "@axelarjs/ui";
 
-import { StepProps } from ".";
+import { StepProps } from "..";
 
-export const Step2: FC<StepProps> = (props: StepProps) => {
+export const NewERC20Token: FC<StepProps> = (props: StepProps) => {
   return (
     <div className="grid grid-cols-1 gap-y-2">
       <label className="text-sm">Token Name</label>

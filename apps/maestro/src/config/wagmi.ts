@@ -1,3 +1,5 @@
+import { Maybe } from "@axelarjs/utils";
+import { QueryClient } from "@tanstack/react-query";
 import { EthereumClient, w3mConnectors } from "@web3modal/ethereum";
 import { configureChains, createClient } from "wagmi";
 import {
@@ -23,6 +25,8 @@ import {
   polygonMumbai,
 } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+
+import { logger } from "~/lib/logger";
 
 export const WALLECTCONNECT_PROJECT_ID = String(
   process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
@@ -117,6 +121,8 @@ const { webSocketProvider, provider } = configureChains(CHAIN_CONFIGS, [
   publicProvider(),
 ]);
 
+export const queryClient = new QueryClient();
+
 export const wagmiClient = createClient({
   autoConnect: true,
   provider,
@@ -126,6 +132,8 @@ export const wagmiClient = createClient({
     projectId: WALLECTCONNECT_PROJECT_ID,
     version: 1,
   }),
+  logger: Maybe.of(logger.warn).mapOrUndefined((warn) => ({ warn })),
+  queryClient,
 });
 
 export const ethereumClient = new EthereumClient(wagmiClient, CHAIN_CONFIGS);

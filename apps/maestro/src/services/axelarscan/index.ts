@@ -81,4 +81,13 @@ async function getChainConfigs() {
   };
 }
 
+const extendedClient = {
+  ...client,
+  getAssets,
+  getAssetPrices,
+  getChainConfigs,
+};
+
+export default extendedClient;
+
 export { getAssets, getAssetPrices, getChainConfigs };

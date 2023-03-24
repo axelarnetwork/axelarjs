@@ -3,7 +3,7 @@ import { FC, useMemo, useState } from "react";
 import { useNetwork } from "wagmi";
 
 import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
-import { useEVMChainConfigsQuery } from "~/lib/api/axelarscan/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
 export const TokenRegistration: FC<{}> = () => {
   const { data: evmChains } = useEVMChainConfigsQuery();
@@ -16,9 +16,11 @@ export const TokenRegistration: FC<{}> = () => {
     [chainId, evmChains]
   );
   return (
-    <div>
+    <>
       <label>Register Origin Token On: </label>
+
       <EVMChainsDropdown
+        compact
         selectedChain={selectedChain}
         chains={evmChains}
         onSwitchNetwork={(chain_id) => {
@@ -28,6 +30,6 @@ export const TokenRegistration: FC<{}> = () => {
           }
         }}
       />
-    </div>
+    </>
   );
 };

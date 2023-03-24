@@ -5,3 +5,5 @@ export const Clamp = tw.div`
   w-full
   mx-auto
 `;
+
+export const FormControl = tw.div`form-control`;

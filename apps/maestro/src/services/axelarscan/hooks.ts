@@ -1,6 +1,7 @@
+import { indexBy, prop } from "rambda";
 import { useQuery } from "wagmi";
 
-import { DISABLED_CHAINS } from "~/config/chains";
+import { trpc } from "~/lib/trpc";
 
 import { getAssetPrices, getAssets, getChainConfigs } from ".";
 
@@ -12,23 +13,20 @@ export function useChainConfigsQuery() {
 }
 
 export function useEVMChainConfigsQuery() {
-  const { data, ...query } = useChainConfigsQuery();
+  const { data, ...queryResult } =
+    trpc.axelarscan.getEVMChainConfigs.useQuery();
 
   return {
-    data: data?.evm?.filter(
-      (chain) => !(DISABLED_CHAINS.has(chain?.chain_id) || chain?.deprecated)
-    ),
-    ...query,
+    ...queryResult,
+    data,
+    computed: {
+      indexedByChainId: indexBy(prop("chainId"), data ?? []),
+    },
   };
 }
 
 export function useCosmosChainConfigsQuery() {
-  const { data, ...query } = useChainConfigsQuery();
-
-  return {
-    data: data?.cosmos,
-    ...query,
-  };
+  return trpc.axelarscan.getCosmosChainConfigs.useQuery();
 }
 
 export function useAssetsQuery(denoms: string[] = []) {

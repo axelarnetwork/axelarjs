@@ -1,12 +1,34 @@
-import { Button, TextInput } from "@axelarjs/ui";
-import Head from "next/head";
-import { useAccount } from "wagmi";
+import { useEffect, useState } from "react";
 
-import { AddErc20 } from "~/compounds";
+import { Button } from "@axelarjs/ui";
+import { sluggify } from "@axelarjs/utils";
+import dynamic from "next/dynamic";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useAccount, useNetwork } from "wagmi";
+
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
+import SearchInterchainTokens from "~/compounds/SearchInterchainTokens";
+
+const AddErc20 = dynamic(() => import("~/compounds/AddErc20/AddErc20"));
 
 export default function Home() {
+  const router = useRouter();
   const account = useAccount();
+  const { chain } = useNetwork();
+
+  const [searchTokenResult, setSearchTokenResult] = useState<{
+    tokenId: string;
+    tokenAddress: string;
+  }>();
+
+  useEffect(() => {
+    if (searchTokenResult?.tokenAddress && chain?.name) {
+      router.push(
+        `/${sluggify(chain.name)}/${searchTokenResult?.tokenAddress}`
+      );
+    }
+  }, [searchTokenResult, router, chain?.name]);
 
   return (
     <>
@@ -20,16 +42,12 @@ export default function Home() {
       <div className="grid flex-1 place-items-center">
         {account.address ? (
           <>
-            <div className="flex w-full max-w-md flex-col items-center justify-center">
-              <TextInput
-                bordered
-                className="bprder-red block w-full max-w-sm"
-                placeholder="Search for and existing ERC-20 token address on Etherscan"
-              />
+            <div className="flex w-full max-w-lg flex-col items-center justify-center">
+              <SearchInterchainTokens onTokenFound={setSearchTokenResult} />
               <div className="divider">OR</div>
               <AddErc20
                 trigger={
-                  <Button size="md" className="w-full max-w-sm" color="primary">
+                  <Button size="md" className="w-full max-w-md" color="primary">
                     Deploy a new ERC-20 token
                   </Button>
                 }

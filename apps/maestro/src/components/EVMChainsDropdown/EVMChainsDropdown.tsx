@@ -1,15 +1,16 @@
 import React, { FC } from "react";
 
-import { Dropdown, LinkButton } from "@axelarjs/ui";
+import { Dropdown } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
 
-import { EVMChainConfig } from "~/lib/api/axelarscan/types";
+import { EVMChainConfig } from "~/services/axelarscan/types";
 
 type Props = {
   onSwitchNetwork?: (chainId: number) => void;
   selectedChain?: EVMChainConfig;
   chains?: EVMChainConfig[];
+  compact?: boolean;
 };
 
 const iconSizes = {
@@ -18,15 +19,21 @@ const iconSizes = {
   lg: 32,
 };
 
-const ChainIcon: FC<{
+export const ChainIcon: FC<{
   size: keyof typeof iconSizes;
   src: string;
   alt: string;
+  className?: string;
 }> = (props) => {
   const iconSize = iconSizes[props.size];
 
   return (
-    <div className="relative rounded-full p-0.5 shadow-black group-hover:ring-2">
+    <div
+      className={clsx(
+        "relative rounded-full p-0.5 shadow-black group-hover:ring-2",
+        props.className
+      )}
+    >
       <Image
         className="bg-base-300 overflow-hidden rounded-full"
         src={props.src}
@@ -65,7 +72,12 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
         />
         <span>{props.selectedChain.chain_name}</span>
       </Dropdown.Trigger>
-      <Dropdown.Content className="dark:bg-base-200 w-48">
+      <Dropdown.Content
+        className={clsx("dark:bg-base-200 absolute w-48", {
+          "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2 overflow-x-scroll":
+            props.compact,
+        })}
+      >
         {props.chains?.map((chain) => (
           <Dropdown.Item
             key={chain.chain_id}

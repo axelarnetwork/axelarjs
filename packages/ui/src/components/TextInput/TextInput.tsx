@@ -38,7 +38,7 @@ type NativeElementProps = Omit<JSX.IntrinsicElements["input"], "type">;
 
 export type TextInputProps = NativeElementProps &
   VProps & {
-    type?: "text" | "password" | "email" | "number" | "tel" | "url";
+    type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
   };
 
 /**

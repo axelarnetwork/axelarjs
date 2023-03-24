@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { ComponentProps, FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
+import tw from "tailwind-styled-components";
 
 const variance = cva("tooltip", {
   variants: {
@@ -24,10 +25,12 @@ const variance = cva("tooltip", {
   },
 });
 
+const StyledTooltip = tw.div``;
+
+type BaseTooltipProps = ComponentProps<typeof StyledTooltip>;
 type VProps = VariantProps<typeof variance>;
 
-export type TooltipProps = JSX.IntrinsicElements["div"] &
-  VProps & { tip: string };
+export type TooltipProps = BaseTooltipProps & VProps & { tip: string };
 
 export const Tooltip: FC<TooltipProps> = ({
   tip,
@@ -38,11 +41,11 @@ export const Tooltip: FC<TooltipProps> = ({
   open,
   ...props
 }) => (
-  <div
+  <StyledTooltip
     {...props}
     className={variance({ className, position, variant, open })}
     data-tip={tip}
   >
     {children}
-  </div>
+  </StyledTooltip>
 );

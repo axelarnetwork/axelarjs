@@ -18,7 +18,8 @@ async function searchGMP(params: SearchGMPParams) {
         method: "searchGMP",
       },
     })
-    .json<SearchGMPResponse>();
+    .json<SearchGMPResponse>()
+    .catch(() => ({ data: [] }));
 }
 
 async function getContracts() {
@@ -28,5 +29,13 @@ async function getContracts() {
     })
     .json<GetGMPContractsResponse>();
 }
+
+const extendedClient = {
+  ...client,
+  searchGMP,
+  getContracts,
+};
+
+export default extendedClient;
 
 export { getContracts, searchGMP };

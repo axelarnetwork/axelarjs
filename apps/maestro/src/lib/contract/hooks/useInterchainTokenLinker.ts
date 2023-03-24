@@ -1,4 +1,5 @@
-import { useContract, UseContractConfig } from "wagmi";
+import { hexlify, hexZeroPad } from "ethers/lib/utils";
+import { useContract, UseContractConfig, useQuery } from "wagmi";
 
 import contract from "../abis/InterchainTokenLinker";
 
