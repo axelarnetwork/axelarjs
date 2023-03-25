@@ -94,7 +94,7 @@ const InterchainToken: FC<InterchainTokenProps> = (props) => {
 };
 
 type ConnectedInterchainTokensPageProps = {
-  chainName: string;
+  chainId?: number;
   tokenAddress: `0x${string}`;
 };
 
@@ -102,9 +102,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
-  const { chain } = useNetwork();
   const { data: interchainToken } = useInterchainTokensQuery({
-    chainId: chain?.id,
+    chainId: props.chainId,
     tokenAddress: props.tokenAddress as `0x${string}`,
   });
 
@@ -150,12 +149,13 @@ const InterchainTokensPage = () => {
     chainName: string;
     tokenAddress: string;
   };
-  const { data } = useInterchainTokensQuery({
-    chainId: chain?.id,
-    tokenAddress: tokenAddress as `0x${string}`,
-  });
 
   const routeChain = chains.find((c) => c.name === unSluggify(chainName));
+
+  const { data } = useInterchainTokensQuery({
+    chainId: routeChain?.id,
+    tokenAddress: tokenAddress as `0x${string}`,
+  });
 
   const chainIds = Maybe.of(evmChains).mapOr([], pluck("chain_id"));
 
@@ -206,7 +206,7 @@ const InterchainTokensPage = () => {
         />
       </div>
       <ConnectedInterchainTokensPage
-        chainName={chainName}
+        chainId={routeChain?.id}
         tokenAddress={tokenAddress}
       />
     </div>
