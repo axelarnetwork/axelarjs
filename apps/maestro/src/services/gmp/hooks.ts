@@ -65,3 +65,20 @@ export function useGetERC20TokenDetailsQuery(input: {
     }
   );
 }
+
+export function useGetERC20TokenBalanceForOwner(input: {
+  chainId?: number;
+  tokenLinkerTokenId?: `0x${string}`;
+  owner?: `0x${string}`;
+}) {
+  return trpc.gmp.getERC20TokenBalanceForOwner.useQuery(
+    {
+      chainId: Number(input.chainId),
+      tokenLinkerTokenId: String(input.tokenLinkerTokenId),
+      owner: String(input.owner),
+    },
+    {
+      enabled: Boolean(input.chainId) && isAddress(input.owner ?? ""),
+    }
+  );
+}
