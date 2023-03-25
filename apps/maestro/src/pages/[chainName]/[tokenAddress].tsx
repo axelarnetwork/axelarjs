@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
+import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import clsx from "clsx";
 import { isAddress } from "ethers/lib/utils.js";
@@ -180,11 +180,31 @@ const InterchainTokensPage = () => {
       <Head>
         <title>Interchain Tokens - {unSluggify(chainName)}</title>
       </Head>
-      <div className="flex items-center gap-2">
-        Interchain Token{" "}
-        <CopyToClipboardButton copyText={tokenAddress} size="sm" ghost={true}>
-          {tokenAddress}
-        </CopyToClipboardButton>{" "}
+      <div>
+        <div className="flex items-center gap-2">
+          Interchain Token Home Address{" "}
+          <CopyToClipboardButton copyText={tokenAddress} size="sm" ghost={true}>
+            {tokenAddress}
+          </CopyToClipboardButton>{" "}
+        </div>
+        <div className="flex items-center gap-2">
+          Token ID{" "}
+          <Tooltip
+            tip={
+              "The Token ID is an internal identifier used to correlate all instances of an ERC-20 token across all supported chains" ||
+              ""
+            }
+          >
+            {" "}
+            <CopyToClipboardButton
+              copyText={data.tokenId}
+              size="sm"
+              ghost={true}
+            >
+              {data.tokenId}
+            </CopyToClipboardButton>{" "}
+          </Tooltip>
+        </div>
       </div>
       <div className="flex w-full justify-end">
         <AddErc20
