@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { constants } from "ethers";
 import { partition } from "rambda";
 import { z } from "zod";
 
@@ -184,7 +185,6 @@ export const gmpRouter = router({
       })
     )
     .query(async ({ input }) => {
-      console.log("getERC20TokenDetails___");
       try {
         const chainConfig = CHAIN_CONFIGS.find(
           (chain) => chain.id === input.chainId
@@ -235,8 +235,8 @@ export const gmpRouter = router({
     .input(
       z.object({
         chainId: z.number(),
-        tokenLinkerTokenId: z.string(),
-        owner: z.string(),
+        tokenLinkerTokenId: z.string().regex(/^(0x)?[0-9a-f]{64}$/i),
+        owner: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
       })
     )
     .query(async ({ input }) => {
@@ -260,8 +260,7 @@ export const gmpRouter = router({
           args: [input.tokenLinkerTokenId as `0x${string}`],
         });
 
-        if (tokenAddress === "0x0000000000000000000000000000000000000000")
-          return null;
+        if (tokenAddress === constants.AddressZero) return null;
       } catch (error) {
         // If we get a TRPC error, we throw it
         if (error instanceof TRPCError) {
@@ -307,7 +306,7 @@ export const gmpRouter = router({
           }),
         ]);
 
-        return { tokenBalance, decimals };
+        return { tokenBalance: String(tokenBalance), decimals };
       } catch (error) {
         // If we get a TRPC error, we throw it
         if (error instanceof TRPCError) {

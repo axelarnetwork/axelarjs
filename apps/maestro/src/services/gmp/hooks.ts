@@ -78,7 +78,10 @@ export function useGetERC20TokenBalanceForOwner(input: {
       owner: String(input.owner),
     },
     {
-      enabled: Boolean(input.chainId) && isAddress(input.owner ?? ""),
+      enabled:
+        Boolean(input.chainId) &&
+        Boolean(input.tokenLinkerTokenId?.match(/^(0x)?[0-9a-f]{64}/i)) &&
+        isAddress(input.owner ?? ""),
     }
   );
 }
