@@ -241,24 +241,32 @@ export const gmpRouter = router({
     )
     .query(async ({ input }) => {
       let tokenAddress = "";
+
+      const chainConfig = CHAIN_CONFIGS.find(
+        (chain) => chain.id === input.chainId
+      );
+
+      if (!chainConfig) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid chainId",
+        });
+      }
+
       try {
-        const chainConfig = CHAIN_CONFIGS.find(
-          (chain) => chain.id === input.chainId
-        );
-
-        if (!chainConfig) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid chainId",
-          });
-        }
-
         tokenAddress = await new InterchainTokenLinkerClient(
           chainConfig
         ).readContract({
           method: "getTokenAddress",
           args: [input.tokenLinkerTokenId as `0x${string}`],
         });
+
+        if (!tokenAddress) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid tokenAddress",
+          });
+        }
 
         if (tokenAddress === constants.AddressZero) return null;
       } catch (error) {
@@ -274,24 +282,6 @@ export const gmpRouter = router({
       }
 
       try {
-        const chainConfig = CHAIN_CONFIGS.find(
-          (chain) => chain.id === input.chainId
-        );
-
-        if (!chainConfig) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid chainId",
-          });
-        }
-
-        if (!tokenAddress) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid tokenAddress",
-          });
-        }
-
         const erc20Client = new ERC20Client(chainConfig);
 
         const [tokenBalance, decimals] = await Promise.all([
