@@ -72,8 +72,8 @@ const ModalRoot: FC<ModalProps> = ({
           <Button>{props.triggerLabel}</Button>
         </Dialog.Trigger>
       )}
-      <Dialog.Portal>
-        <Transition.Root show={isOpen}>
+      <Transition.Root show={isOpen}>
+        <Dialog.Portal>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -91,7 +91,7 @@ const ModalRoot: FC<ModalProps> = ({
           <Transition.Child
             as={StyledDialogContent}
             forceMount
-            enter="ease-out duration-300"
+            enter="ease-out duration-150"
             enterFrom="opacity-0 scale-75"
             enterTo="opacity-100 scale-100"
             leave="ease-in duration-200"
@@ -111,8 +111,8 @@ const ModalRoot: FC<ModalProps> = ({
             )}
             {props.children}
           </Transition.Child>
-        </Transition.Root>
-      </Dialog.Portal>
+        </Dialog.Portal>
+      </Transition.Root>
     </Dialog.Root>
   );
 };
