@@ -7,6 +7,11 @@ export type ERC20ClientContractReadAction = {
   method: "decimals" | "symbol" | "name";
   address: `0x${string}`;
 };
+export type ERC20ClientContractReadTokenBalanceAction = {
+  method: "balanceOf";
+  address: `0x${string}`;
+  args: [account: `0x${string}`];
+};
 export class ERC20Client {
   private client: ReturnType<typeof createPublicClient>;
 
@@ -22,6 +27,16 @@ export class ERC20Client {
       address: action.address,
       abi: ERC20.abi,
       functionName: action.method,
+    });
+  }
+  public readContractTokenBalance(
+    action: ERC20ClientContractReadTokenBalanceAction
+  ) {
+    return this.client.readContract({
+      address: action.address,
+      abi: ERC20.abi,
+      functionName: action.method,
+      args: action.args,
     });
   }
 }

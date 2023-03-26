@@ -3,24 +3,29 @@ import { FC } from "react";
 import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import clsx from "clsx";
+import { formatUnits } from "ethers/lib/utils";
 import { isAddress } from "ethers/lib/utils.js";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { pluck } from "rambda";
 import invariant from "tiny-invariant";
-import { useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { SendInterchainToken } from "~/compounds/SendInterchainToken";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import {
+  useGetERC20TokenBalanceForOwner,
+  useInterchainTokensQuery,
+} from "~/services/gmp/hooks";
 
 type InterchainTokenProps = {
   isRegistered: boolean;
   isOriginToken: boolean;
   tokenAddress: `0x${string}`;
+  tokenId: `0x${string}`;
   chain: {
     chain_id: number;
     name: string;
@@ -30,6 +35,12 @@ type InterchainTokenProps = {
 };
 
 const InterchainToken: FC<InterchainTokenProps> = (props) => {
+  const { address } = useAccount();
+  const { data: bal } = useGetERC20TokenBalanceForOwner({
+    chainId: props.chain.chain_id,
+    tokenLinkerTokenId: props.tokenId,
+    owner: address,
+  });
   return (
     <Card
       compact={true}
@@ -64,9 +75,11 @@ const InterchainToken: FC<InterchainTokenProps> = (props) => {
             )
           )}
         </Card.Title>
-
         {!props.isRegistered && (
           <div className="mx-auto px-2">Remote token not registered</div>
+        )}
+        {bal && bal.tokenBalance && (
+          <div>Balance: {formatUnits(bal.tokenBalance, bal.decimals)}</div>
         )}
         <Card.Actions className="justify-between">
           {props.isRegistered ? (
@@ -133,6 +146,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               tokenAddress={token.tokenAddress}
               chain={chain}
               onSwitchNetwork={switchNetworkAsync}
+              tokenId={token.tokenId}
             />
           );
         })}
