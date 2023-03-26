@@ -2,11 +2,7 @@ import { FC, useEffect, useState } from "react";
 
 import { ThemeProvider } from "@axelarjs/ui";
 import { Cabin } from "@next/font/google";
-import {
-  Hydrate,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import NextNProgress from "nextjs-progressbar";
