@@ -30,7 +30,7 @@ export const ChainIcon: FC<{
   return (
     <div
       className={clsx(
-        "relative rounded-full p-0.5 shadow-black group-hover:ring-2",
+        "bg-basep-200 relative rounded-full p-0.5 shadow-black group-hover:ring-2",
         props.className
       )}
     >
