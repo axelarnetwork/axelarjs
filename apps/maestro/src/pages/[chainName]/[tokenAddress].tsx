@@ -78,7 +78,7 @@ const InterchainToken: FC<InterchainTokenProps> = (props) => {
         {!props.isRegistered && (
           <div className="mx-auto px-2">Remote token not registered</div>
         )}
-        {bal && bal.tokenBalance && (
+        {bal?.tokenBalance && (
           <div>Balance: {formatUnits(bal.tokenBalance, bal.decimals)}</div>
         )}
         <Card.Actions className="justify-between">

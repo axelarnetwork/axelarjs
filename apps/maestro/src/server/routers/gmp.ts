@@ -268,7 +268,9 @@ export const gmpRouter = router({
           });
         }
 
-        if (tokenAddress === constants.AddressZero) return null;
+        if (tokenAddress === constants.AddressZero) {
+          return null;
+        }
       } catch (error) {
         // If we get a TRPC error, we throw it
         if (error instanceof TRPCError) {
