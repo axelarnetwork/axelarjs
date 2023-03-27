@@ -21,7 +21,11 @@ export function useInterchainTokensQuery(input: {
   tokenAddress?: `0x${string}`;
   chainIds?: number[];
 }) {
-  const { data: evmChains, computed } = useEVMChainConfigsQuery();
+  const {
+    data: evmChains,
+    computed,
+    ...evmChainsQuery
+  } = useEVMChainConfigsQuery();
 
   const uniqueChainsIDs = uniq(evmChains?.map?.((x) => x.chain_id) ?? []);
 
@@ -48,6 +52,10 @@ export function useInterchainTokensQuery(input: {
         chain: computed.indexedByChainId[token.chainId],
       })),
     },
+    isLoading: evmChainsQuery.isLoading || queryResult.isLoading,
+    isFetching: evmChainsQuery.isFetching || queryResult.isFetching,
+    isError: evmChainsQuery.isError || queryResult.isError,
+    error: evmChainsQuery.error || queryResult.error,
   };
 }
 

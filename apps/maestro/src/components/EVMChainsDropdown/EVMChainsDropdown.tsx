@@ -70,7 +70,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           alt={props.selectedChain.chain_name}
           size="sm"
         />
-        <span>{props.selectedChain.chain_name}</span>
+        <span>{props.selectedChain.name}</span>
       </Dropdown.Trigger>
       <Dropdown.Content
         className={clsx("dark:bg-base-200 w-48", {

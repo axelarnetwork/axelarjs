@@ -1,34 +1,12 @@
 import { FC, PropsWithChildren, useMemo } from "react";
 
 import { Clamp, Footer, useTheme } from "@axelarjs/ui";
-import { sluggify } from "@axelarjs/utils";
 import { Web3Modal } from "@web3modal/react";
-import { useRouter } from "next/router";
 
-import {
-  ethereumClient,
-  EVM_CHAIN_CONFIGS,
-  WALLECTCONNECT_PROJECT_ID,
-} from "~/config/wagmi";
+import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
+import { useChainFromRoute } from "~/lib/hooks";
 
 import Appbar from "./Appbar";
-
-function useChainFromRoute() {
-  const { chainName } = useRouter().query;
-
-  // set default chain from url
-  return useMemo(() => {
-    if (typeof chainName === "string") {
-      const targetChain = EVM_CHAIN_CONFIGS.find(
-        (chain) => sluggify(chain.name) === chainName
-      );
-
-      if (targetChain) {
-        return targetChain;
-      }
-    }
-  }, [chainName]);
-}
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
