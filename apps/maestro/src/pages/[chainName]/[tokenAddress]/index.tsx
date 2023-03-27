@@ -15,6 +15,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { SendInterchainToken } from "~/compounds/SendInterchainToken";
+import Page from "~/layouts/Page";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useGetERC20TokenBalanceForOwner,
@@ -199,10 +200,7 @@ const InterchainTokensPage = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-8">
-      <Head>
-        <title>Interchain Tokens - {unSluggify(chainName)}</title>
-      </Head>
+    <Page pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}>
       <div>
         <div className="flex items-center gap-2">
           Interchain Token Home Address{" "}
@@ -213,12 +211,12 @@ const InterchainTokensPage = () => {
         <div className="flex items-center gap-2">
           Token ID{" "}
           <Tooltip
+            className="z-20"
             tip={
               "The Token ID is an internal identifier used to correlate all instances of an ERC-20 token across all supported chains" ||
               ""
             }
           >
-            {" "}
             <CopyToClipboardButton
               copyText={interchainToken.tokenId}
               size="sm"
@@ -252,7 +250,8 @@ const InterchainTokensPage = () => {
         chainId={routeChain?.id}
         tokenAddress={tokenAddress}
       />
-    </div>
+    </Page>
   );
 };
+
 export default InterchainTokensPage;

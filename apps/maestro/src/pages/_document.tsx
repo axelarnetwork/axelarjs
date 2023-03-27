@@ -13,6 +13,7 @@ export default function Document() {
           content="/icons/mstile-150x150.png"
         />
         <meta name="theme-color" content="#050707" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
         <Main />
