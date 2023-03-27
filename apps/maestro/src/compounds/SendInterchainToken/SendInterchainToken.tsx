@@ -3,7 +3,7 @@ import { FC, useCallback, useMemo, useState } from "react";
 import { Button, Modal, TextInput } from "@axelarjs/ui";
 import { useNetwork } from "wagmi";
 
-import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
+import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
 import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";

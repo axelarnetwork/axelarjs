@@ -14,7 +14,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
-import { EVMChainsDropdown } from "~/components/EVMChainsDropdown";
+import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -38,8 +38,8 @@ const Appbar: FC<AppbarProps> = (props) => {
 
   return (
     <Navbar
-      className={clsx("bg-base-100 sticky top-0 transition-all", {
-        "bg-base-100 z-10 shadow-lg": isSticky,
+      className={clsx("bg-base-100 sticky top-0 z-10 transition-all", {
+        "bg-base-100 shadow-lg": isSticky,
       })}
     >
       <Navbar.Start>

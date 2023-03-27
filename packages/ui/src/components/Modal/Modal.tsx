@@ -1,11 +1,11 @@
-import { ComponentProps, FC, Fragment, ReactNode, useState } from "react";
+import { ComponentProps, FC, Fragment, ReactNode } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
 import tw from "tailwind-styled-components";
-import { createContainer } from "unstated-next";
 
 import { Button } from "../Button";
+import { ModalStateProvider, useModalStateContiner } from "./Modal.state";
 
 const StyledDialogContent = tw(Dialog.Content)`
   modal-box modal-open
@@ -13,16 +13,6 @@ const StyledDialogContent = tw(Dialog.Content)`
   grid gap-2
   top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]
 `;
-
-function useModalState(initialOpen = false) {
-  const [isOpen, setIsOpen] = useState(initialOpen);
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
-  return [isOpen, { open, close }] as const;
-}
-
-const { Provider: ModalStateProvider, useContainer: useModalStateContiner } =
-  createContainer(useModalState);
 
 type PolymorphicProps =
   | {
@@ -96,7 +86,7 @@ const ModalRoot: FC<ModalProps> = ({
             enterTo="opacity-100 scale-100"
             leave="ease-in duration-200"
             leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+            leaveTo="opacity-0 scale-75"
           >
             {!hideCloseButton && (
               <Dialog.Close asChild>

@@ -45,7 +45,7 @@ export const ChainIcon: FC<{
   );
 };
 
-export const EVMChainsDropdown: FC<Props> = (props) => {
+const EVMChainsDropdown: FC<Props> = (props) => {
   const handleChainChange = (chainId: number) => {
     try {
       props.onSwitchNetwork?.(chainId);
@@ -73,7 +73,7 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
         <span>{props.selectedChain.chain_name}</span>
       </Dropdown.Trigger>
       <Dropdown.Content
-        className={clsx("dark:bg-base-200 absolute w-48", {
+        className={clsx("dark:bg-base-200 w-48", {
           "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2 overflow-x-scroll":
             props.compact,
         })}
@@ -104,3 +104,5 @@ export const EVMChainsDropdown: FC<Props> = (props) => {
     </Dropdown>
   );
 };
+
+export default EVMChainsDropdown;
