@@ -12,6 +12,7 @@ import {
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -26,6 +27,7 @@ const Appbar: FC<AppbarProps> = (props) => {
   const { chain } = useNetwork();
   const { isConnected, address } = useAccount();
   const { switchNetworkAsync } = useSwitchNetwork();
+  const router = useRouter();
 
   const { data: evmChains } = useEVMChainConfigsQuery();
 
@@ -43,15 +45,14 @@ const Appbar: FC<AppbarProps> = (props) => {
       })}
     >
       <Navbar.Start>
-        <Link href="/">
-          <LinkButton
-            className="flex items-center gap-2 text-lg font-bold uppercase"
-            ghost={true}
-          >
-            <AxelarIcon className="h-6 w-6 dark:invert" />
-            {APP_NAME}
-          </LinkButton>
-        </Link>
+        <LinkButton
+          className="flex items-center gap-2 text-lg font-bold uppercase"
+          ghost={true}
+          onClick={() => router.push("/")}
+        >
+          <AxelarIcon className="h-6 w-6 dark:invert" />
+          {APP_NAME}
+        </LinkButton>
       </Navbar.Start>
       <Navbar.End className="flex items-center gap-2">
         {isConnected && address ? (
