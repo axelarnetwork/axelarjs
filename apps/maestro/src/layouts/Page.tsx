@@ -36,7 +36,7 @@ const Page = ({
         className={clsx(
           "grid flex-1",
           {
-            "place-items-center": !(mustBeConnected || isConnected),
+            "place-items-center": mustBeConnected && !isConnected,
           },
           className
         )}
