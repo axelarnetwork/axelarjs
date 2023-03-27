@@ -34,7 +34,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       key={props.chain.chain_id}
       bordered={!props.isRegistered}
       className={clsx(
-        "bg-base- transition-all",
+        "bg-base-200 dark:bg-base-300 transition-all",
         "100 hover:ring-primary/50 hover:shadow-xl hover:ring",
         {
           "ring-primary/50 ring-2": props.isRegistered,
