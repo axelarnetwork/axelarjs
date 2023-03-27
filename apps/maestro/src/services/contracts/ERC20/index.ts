@@ -1,6 +1,6 @@
 import { createPublicClient, http } from "viem";
 
-import { CHAIN_CONFIGS } from "~/config/wagmi";
+import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { ERC20 } from "~/lib/contract/abis";
 
 export type ERC20ClientContractReadAction = {
@@ -15,7 +15,7 @@ export type ERC20ClientContractReadTokenBalanceAction = {
 export class ERC20Client {
   private client: ReturnType<typeof createPublicClient>;
 
-  constructor(chainConfig: (typeof CHAIN_CONFIGS)[number]) {
+  constructor(chainConfig: (typeof EVM_CHAIN_CONFIGS)[number]) {
     this.client = createPublicClient({
       chain: chainConfig,
       transport: http(),

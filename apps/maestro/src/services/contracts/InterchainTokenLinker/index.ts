@@ -1,6 +1,6 @@
 import { createPublicClient, http } from "viem";
 
-import { CHAIN_CONFIGS } from "~/config/wagmi";
+import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { InterchainTokenLinker } from "~/lib/contract/abis";
 
 export type ContractReadAction =
@@ -16,7 +16,7 @@ export type ContractReadAction =
 export class InterchainTokenLinkerClient {
   private client: ReturnType<typeof createPublicClient>;
 
-  constructor(chainConfig: (typeof CHAIN_CONFIGS)[number]) {
+  constructor(chainConfig: (typeof EVM_CHAIN_CONFIGS)[number]) {
     this.client = createPublicClient({
       chain: chainConfig,
       transport: http(),

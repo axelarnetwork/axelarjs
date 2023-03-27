@@ -29,7 +29,6 @@ logger.configure({
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
   const [isSSR, setIsSSR] = useState(true);
-
   const [queryClient] = useState(() => wagmiQueryClient);
 
   // set isSSR to false on the first client-side render

@@ -1,34 +1,39 @@
-import { FC, PropsWithChildren, useEffect } from "react";
+import { FC, PropsWithChildren, useMemo } from "react";
 
 import { Clamp, Footer, useTheme } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
-import { useWeb3Modal, Web3Modal } from "@web3modal/react";
+import { Web3Modal } from "@web3modal/react";
 import { useRouter } from "next/router";
-import { useNetwork } from "wagmi";
 
-import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
+import {
+  ethereumClient,
+  EVM_CHAIN_CONFIGS,
+  WALLECTCONNECT_PROJECT_ID,
+} from "~/config/wagmi";
 
 import Appbar from "./Appbar";
 
-const MainLayout: FC<PropsWithChildren> = ({ children }) => {
-  const theme = useTheme();
-  const { chain, chains } = useNetwork();
-
+function useChainFromRoute() {
   const { chainName } = useRouter().query;
 
-  const { setDefaultChain } = useWeb3Modal();
-
   // set default chain from url
-  useEffect(() => {
+  return useMemo(() => {
     if (typeof chainName === "string") {
-      const targetChain = chains.find(
+      const targetChain = EVM_CHAIN_CONFIGS.find(
         (chain) => sluggify(chain.name) === chainName
       );
-      if (targetChain?.id && targetChain.id !== chain?.id) {
-        setDefaultChain(targetChain);
+
+      if (targetChain) {
+        return targetChain;
       }
     }
-  }, [chainName, chain, chains, setDefaultChain]);
+  }, [chainName]);
+}
+
+const MainLayout: FC<PropsWithChildren> = ({ children }) => {
+  const theme = useTheme();
+
+  const defaultChain = useChainFromRoute();
 
   return (
     <>
@@ -47,6 +52,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         projectId={WALLECTCONNECT_PROJECT_ID}
         ethereumClient={ethereumClient}
         themeMode={theme ?? "light"}
+        defaultChain={defaultChain}
         themeVariables={{
           "--w3m-font-family": "var(--font-sans)",
           "--w3m-logo-image-url": "/icons/favicon-32x32.png",
