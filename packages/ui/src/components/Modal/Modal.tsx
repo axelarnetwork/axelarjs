@@ -75,7 +75,7 @@ const ModalRoot: FC<ModalProps> = ({
           >
             <Dialog.Overlay
               forceMount
-              className="fixed inset-0 z-20 bg-black/25"
+              className="fixed inset-0 z-20 bg-black/25 backdrop-blur-sm"
             />
           </Transition.Child>
           <Transition.Child
