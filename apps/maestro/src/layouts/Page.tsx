@@ -6,6 +6,7 @@ import Head from "next/head";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
+import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -71,10 +72,16 @@ const Page = ({
           <ConnectWalletButton size="md" length="block" className="max-w-md" />
         );
       case "network-mismatch":
-        return (
-          <div className="grid w-full place-items-center gap-2">
-            <div className="text-2xl font-semibold">
-              You are connected to <span>{evmChain?.name}</span>
+        return !evmChain ? null : (
+          <div className="grid w-full place-items-center gap-4">
+            <div className="flex items-center gap-1 text-xl font-semibold">
+              {`You're currently connected to `}
+              {evmChain.name}{" "}
+              <ChainIcon
+                size="md"
+                src={String(evmChain.image)}
+                alt={evmChain.name}
+              />
             </div>
             <Button
               color="primary"
@@ -91,7 +98,7 @@ const Page = ({
     }
   }, [
     pageState,
-    evmChain?.name,
+    evmChain,
     evmChainFromRoute?.name,
     evmChainFromRoute?.chain_id,
     children,
