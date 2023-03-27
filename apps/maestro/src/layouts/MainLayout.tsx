@@ -13,19 +13,15 @@ import {
 
 import Appbar from "./Appbar";
 
-function useChainFromRoute() {
+export function useChainFromRoute() {
   const { chainName } = useRouter().query;
 
-  // set default chain from url
+  // get default chain from url
   return useMemo(() => {
     if (typeof chainName === "string") {
-      const targetChain = EVM_CHAIN_CONFIGS.find(
+      return EVM_CHAIN_CONFIGS.find(
         (chain) => sluggify(chain.name) === chainName
       );
-
-      if (targetChain) {
-        return targetChain;
-      }
     }
   }, [chainName]);
 }
