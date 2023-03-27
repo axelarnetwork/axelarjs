@@ -4,7 +4,6 @@ import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import clsx from "clsx";
 import { isAddress } from "ethers/lib/utils.js";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { pluck } from "rambda";
 import invariant from "tiny-invariant";
