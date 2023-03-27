@@ -36,7 +36,7 @@ export const NETWORK_ENV = String(process.env.NEXT_PUBLIC_NETWORK_ENV) as
   | "mainnet"
   | "testnet";
 
-export const CHAIN_CONFIGS = [
+export const EVM_CHAIN_CONFIGS = [
   { ...mainnet, networkNameOnAxelar: "ethereum", environment: "mainnet" },
   { ...goerli, networkNameOnAxelar: "ethereum-2", environment: "testnet" },
   { ...moonbeam, networkNameOnAxelar: "moonbeam", environment: "mainnet" },
@@ -117,7 +117,7 @@ export const CHAIN_CONFIGS = [
   },
 ].filter((chain) => chain.environment === NETWORK_ENV);
 
-const { webSocketProvider, provider } = configureChains(CHAIN_CONFIGS, [
+const { webSocketProvider, provider } = configureChains(EVM_CHAIN_CONFIGS, [
   publicProvider(),
 ]);
 
@@ -128,12 +128,17 @@ export const wagmiClient = createClient({
   provider,
   webSocketProvider,
   connectors: w3mConnectors({
-    chains: CHAIN_CONFIGS,
+    chains: EVM_CHAIN_CONFIGS,
     projectId: WALLECTCONNECT_PROJECT_ID,
     version: 1,
   }),
-  logger: Maybe.of(logger.warn).mapOrUndefined((warn) => ({ warn })),
+  logger: {
+    warn: logger.warn,
+  },
   queryClient,
 });
 
-export const ethereumClient = new EthereumClient(wagmiClient, CHAIN_CONFIGS);
+export const ethereumClient = new EthereumClient(
+  wagmiClient,
+  EVM_CHAIN_CONFIGS
+);

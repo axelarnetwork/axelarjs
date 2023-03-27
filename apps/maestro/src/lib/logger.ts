@@ -22,6 +22,8 @@ type LogArgs<T extends unknown[]> =
   | [severity: LogSeverity, alwaysLog: boolean | undefined]
   | [severity: LogSeverity, alwaysLog: boolean | undefined, message: T];
 
+type LoggerFn = <T extends unknown[]>(...message: T) => void;
+
 class Logger {
   isDevEnviroment: boolean = false;
 
@@ -46,19 +48,17 @@ class Logger {
     }
   }
 
-  public log = this.logMessage("log", false);
-  public info = this.logMessage("info", false);
-  public warn = this.logMessage("warn", false);
-  public error = this.logMessage("error", false);
+  public log = this.logMessage("log", false) as LoggerFn;
+  public info = this.logMessage("info", false) as LoggerFn;
+  public warn = this.logMessage("warn", false) as LoggerFn;
+  public error = this.logMessage("error", false) as LoggerFn;
 
   public always = {
     log: this.logMessage("log", true),
     info: this.logMessage("info", true),
     warn: this.logMessage("warn", true),
     error: this.logMessage("error", true),
-  } as {
-    [key in LogSeverity]: <T extends unknown[]>(...message: T) => void;
-  };
+  } as Record<LogSeverity, LoggerFn>;
 }
 
 export const logger = new Logger();

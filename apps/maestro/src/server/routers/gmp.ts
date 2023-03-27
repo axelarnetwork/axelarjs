@@ -3,7 +3,7 @@ import { constants } from "ethers";
 import { partition } from "rambda";
 import { z } from "zod";
 
-import { CHAIN_CONFIGS } from "~/config/wagmi";
+import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { publicProcedure, router } from "~/server/trpc";
 import { ERC20Client } from "~/services/contracts/ERC20";
 import { InterchainTokenLinkerClient } from "~/services/contracts/InterchainTokenLinker";
@@ -60,7 +60,7 @@ export const gmpRouter = router({
       try {
         const [[chainConfig], remainingChainConfigs] = partition(
           (chain) => chain.id === input.chainId,
-          CHAIN_CONFIGS
+          EVM_CHAIN_CONFIGS
         );
 
         if (!chainConfig) {
@@ -186,7 +186,7 @@ export const gmpRouter = router({
     )
     .query(async ({ input }) => {
       try {
-        const chainConfig = CHAIN_CONFIGS.find(
+        const chainConfig = EVM_CHAIN_CONFIGS.find(
           (chain) => chain.id === input.chainId
         );
 
@@ -242,7 +242,7 @@ export const gmpRouter = router({
     .query(async ({ input }) => {
       let tokenAddress = "";
 
-      const chainConfig = CHAIN_CONFIGS.find(
+      const chainConfig = EVM_CHAIN_CONFIGS.find(
         (chain) => chain.id === input.chainId
       );
 

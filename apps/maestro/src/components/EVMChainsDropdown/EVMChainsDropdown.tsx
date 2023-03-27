@@ -95,8 +95,8 @@ const EVMChainsDropdown: FC<Props> = (props) => {
               }}
               className="group"
             >
-              <ChainIcon src={chain.image} alt={chain.chain_name} size="md" />
-              <div>{chain.chain_name}</div>
+              <ChainIcon src={chain.image} alt={chain.name} size="md" />
+              <div>{chain.name}</div>
             </a>
           </Dropdown.Item>
         ))}
