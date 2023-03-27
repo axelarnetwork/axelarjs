@@ -3,7 +3,6 @@ import { FC } from "react";
 import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import clsx from "clsx";
-import { formatUnits } from "ethers/lib/utils";
 import { isAddress } from "ethers/lib/utils.js";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -11,6 +10,7 @@ import { pluck } from "rambda";
 import invariant from "tiny-invariant";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
+import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { AddErc20 } from "~/compounds";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton";
@@ -36,7 +36,7 @@ type InterchainTokenProps = {
 
 const InterchainToken: FC<InterchainTokenProps> = (props) => {
   const { address } = useAccount();
-  const { data: bal } = useGetERC20TokenBalanceForOwner({
+  const { data: balance } = useGetERC20TokenBalanceForOwner({
     chainId: props.chain.chain_id,
     tokenLinkerTokenId: props.tokenId,
     owner: address,
@@ -78,8 +78,16 @@ const InterchainToken: FC<InterchainTokenProps> = (props) => {
         {!props.isRegistered && (
           <div className="mx-auto px-2">Remote token not registered</div>
         )}
-        {bal?.tokenBalance && (
-          <div>Balance: {formatUnits(bal.tokenBalance, bal.decimals)}</div>
+        {balance?.tokenBalance && (
+          <div>
+            Balance:{" "}
+            <BigNumberText
+              decimals={balance.decimals}
+              localeOptions={{ minimumFractionDigits: 0, notation: "compact" }}
+            >
+              {balance.tokenBalance}
+            </BigNumberText>
+          </div>
         )}
         <Card.Actions className="justify-between">
           {props.isRegistered ? (
@@ -87,6 +95,7 @@ const InterchainToken: FC<InterchainTokenProps> = (props) => {
               copyText={props.tokenAddress}
               ghost={true}
               length="block"
+              size="sm"
             >
               {maskAddress(props.tokenAddress)}
             </CopyToClipboardButton>
@@ -166,7 +175,7 @@ const InterchainTokensPage = () => {
 
   const routeChain = chains.find((c) => c.name === unSluggify(chainName));
 
-  const { data } = useInterchainTokensQuery({
+  const { data: interchainToken } = useInterchainTokensQuery({
     chainId: routeChain?.id,
     tokenAddress: tokenAddress as `0x${string}`,
   });
@@ -211,11 +220,11 @@ const InterchainTokensPage = () => {
           >
             {" "}
             <CopyToClipboardButton
-              copyText={data.tokenId}
+              copyText={interchainToken.tokenId}
               size="sm"
               ghost={true}
             >
-              {data.tokenId}
+              {interchainToken.tokenId}
             </CopyToClipboardButton>{" "}
           </Tooltip>
         </div>
@@ -236,7 +245,7 @@ const InterchainTokensPage = () => {
             </Button>
           }
           tokenAddress={tokenAddress}
-          tokenId={data.tokenId as `0x${string}`}
+          tokenId={interchainToken.tokenId as `0x${string}`}
         />
       </div>
       <ConnectedInterchainTokensPage
