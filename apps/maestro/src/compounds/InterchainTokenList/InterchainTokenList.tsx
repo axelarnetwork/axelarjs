@@ -43,8 +43,9 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
         "hover:opacity-75 hover:shadow-xl",
         {
           "shadow-sm": !props.isRegistered,
-          "ring-primary/50 ring-4": props.isSelected,
           "cursor-pointer": props.onToggleSelection,
+          "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 ring-4":
+            props.isSelected,
         }
       )}
       aria-label={
@@ -135,16 +136,39 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
     [props.tokens]
   );
 
+  const selectedTokens = tokens.filter((x) => x.isSelected);
+
   return (
     <section className="relative grid gap-4">
-      <header className="flex items-center gap-2 text-2xl">
-        <span className="font-bold">{props.title}</span>
-        <span className="font-mono text-xl opacity-50">
-          ({props.tokens.length})
-        </span>
+      <header className="flex items-center justify-between gap-2 text-2xl">
+        <div className="flex items-center gap-2">
+          <span className="font-bold">{props.title}</span>
+          <span className="font-mono text-xl opacity-50">
+            ({tokens.length})
+          </span>
+        </div>
+        {tokens.length > 0 && Boolean(props.onToggleSelection) && (
+          <Button
+            size="sm"
+            color="primary"
+            disabled={Boolean(
+              // disable if all tokens are selected or none are selected
+              selectedTokens.length && selectedTokens.length !== tokens.length
+            )}
+            onClick={() => {
+              tokens.forEach((token, i) => {
+                setTimeout(() => {
+                  props.onToggleSelection?.(token.chainId);
+                }, i * 25);
+              });
+            }}
+          >
+            Toggle All
+          </Button>
+        )}
       </header>
       <main>
-        <ul className="grid w-full grid-cols-3 gap-4">
+        <ul className="grid w-full grid-cols-3 gap-4 md:gap-5">
           {tokens.map((token) => (
             <InterchainToken
               key={token.chainId}
