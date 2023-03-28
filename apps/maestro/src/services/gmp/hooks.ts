@@ -49,7 +49,7 @@ export function useInterchainTokensQuery(input: {
       ...data,
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
-        chain: computed.indexedByChainId[token.chainId],
+        chain: computed.indexedByChainId[String(token.chainId)],
       })),
     },
     isLoading: evmChainsQuery.isLoading || queryResult.isLoading,

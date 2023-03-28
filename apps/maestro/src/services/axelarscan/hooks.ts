@@ -20,7 +20,7 @@ export function useEVMChainConfigsQuery() {
     ...queryResult,
     data,
     computed: {
-      indexedByChainId: indexBy(prop("chainId"), data ?? []),
+      indexedByChainId: indexBy(prop("chain_id"), data ?? []),
     },
   };
 }
