@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 
 import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
-import { Maybe, unSluggify } from "@axelarjs/utils";
+import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import { isAddress } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
 import { partition, sortBy, without } from "rambda";
@@ -34,60 +34,40 @@ const InterchainTokensPage = () => {
     <Page
       pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
       mustBeConnected
-      className="flex flex-col gap-4"
+      className="!flex flex-col gap-12"
     >
-      <Card className="bg-base-300">
-        <Card.Body>
-          <Card.Title>Interchain Token</Card.Title>
-          <div className="flex items-center gap-2">
-            Interchain Token Home Address{" "}
-            <CopyToClipboardButton
-              copyText={tokenAddress}
-              size="sm"
-              ghost={true}
-            >
-              {tokenAddress}
-            </CopyToClipboardButton>{" "}
-          </div>
-          <div className="flex items-center gap-2">
-            Token ID{" "}
-            <Tooltip
-              className="z-20"
-              tip={
-                "The Token ID is an internal identifier used to correlate all instances of an ERC-20 token across all supported chains" ||
-                ""
-              }
-            >
+      <section>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-semibold">Interchain Token</h2>
+          <div className="flex items-center">
+            {interchainToken?.tokenAddress && (
               <CopyToClipboardButton
-                copyText={interchainToken.tokenId}
+                copyText={tokenAddress}
                 size="sm"
                 ghost={true}
               >
-                {interchainToken.tokenId}
-              </CopyToClipboardButton>{" "}
-            </Tooltip>
+                Token Address: {maskAddress(tokenAddress)}
+              </CopyToClipboardButton>
+            )}
+            {interchainToken.tokenId && (
+              <Tooltip
+                tip={
+                  "Token ID is an internal identifier used to correlate all instances of an ERC-20 token across all supported chains"
+                }
+                position="bottom"
+              >
+                <CopyToClipboardButton
+                  copyText={interchainToken.tokenId}
+                  size="sm"
+                  ghost={true}
+                >
+                  Token ID: {maskAddress(interchainToken.tokenId)}
+                </CopyToClipboardButton>{" "}
+              </Tooltip>
+            )}
           </div>
-          <Card.Actions>
-            <AddErc20
-              trigger={
-                <Button size="sm" className="max-w-sm">
-                  Deploy on other chains
-                </Button>
-              }
-              tokenAddress={tokenAddress}
-            />
-            <SendInterchainToken
-              trigger={
-                <Button size="sm" className="ml-2 max-w-sm">
-                  Send token interchain [WIP]
-                </Button>
-              }
-              tokenAddress={tokenAddress}
-              tokenId={interchainToken.tokenId as `0x${string}`}
-            />
-          </Card.Actions>
-        </Card.Body>
-      </Card>
+        </div>
+      </section>
       <ConnectedInterchainTokensPage
         chainId={routeChain?.id}
         tokenAddress={tokenAddress}
