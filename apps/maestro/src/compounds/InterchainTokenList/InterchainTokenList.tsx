@@ -4,13 +4,10 @@ import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
 import { BigNumber } from "ethers";
-import { propEq } from "rambda";
-import invariant from "tiny-invariant";
-import { useAccount, useSwitchNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
 import { useGetERC20TokenBalanceForOwner } from "~/services/gmp/hooks";
 
@@ -25,7 +22,6 @@ type TokenInfo = {
 };
 
 export type InterchainTokenProps = TokenInfo & {
-  onSwitchNetwork?: (chainId: number) => void;
   onToggleSelection?: () => void;
 };
 
@@ -128,9 +124,7 @@ export type InterchainTokenListProps = {
 };
 
 export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
-  const { switchNetworkAsync } = useSwitchNetwork();
-
-  const cardPairs = useMemo(
+  const tokens = useMemo(
     () =>
       props.tokens
         .filter((x) => x.chain)
@@ -151,10 +145,9 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
       </header>
       <main>
         <ul className="grid w-full grid-cols-3 gap-4">
-          {cardPairs.map((token) => (
+          {tokens.map((token) => (
             <InterchainToken
               key={token.chainId}
-              onSwitchNetwork={switchNetworkAsync}
               onToggleSelection={props.onToggleSelection?.bind(
                 null,
                 token.chainId
