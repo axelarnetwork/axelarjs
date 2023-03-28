@@ -1,8 +1,10 @@
-import { FC, useEffect, useRef } from "react";
+import { forwardRef, useEffect } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 import tw from "tailwind-styled-components";
+
+import { useSyncedRef } from "../../hooks";
 
 const StyledToggle = tw.input``;
 
@@ -35,28 +37,23 @@ export type ToggleProps = Omit<JSX.IntrinsicElements["input"], "type"> &
     indeterminate?: boolean;
   };
 
-export const Toggle: FC<ToggleProps> = ({
-  color,
-  size,
-  className,
-  indeterminate,
-  ...props
-}) => {
-  const ref = useRef<HTMLInputElement>(null);
+export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
+  ({ color, size, className, indeterminate, ...props }, ref) => {
+    const innerRef = useSyncedRef(ref);
 
-  useEffect(() => {
-    if (ref.current) {
-      // @ts-ignore
-      ref.current.indeterminate = indeterminate;
-    }
-  }, [indeterminate]);
+    useEffect(() => {
+      if (innerRef.current) {
+        innerRef.current.indeterminate = Boolean(indeterminate);
+      }
+    }, [indeterminate]);
 
-  return (
-    <input
-      ref={ref}
-      type="checkbox"
-      className={twMerge(toggleVariance({ color, size }), className)}
-      {...props}
-    />
-  );
-};
+    return (
+      <input
+        ref={innerRef}
+        type="checkbox"
+        className={twMerge(toggleVariance({ color, size }), className)}
+        {...props}
+      />
+    );
+  }
+);

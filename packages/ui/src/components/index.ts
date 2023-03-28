@@ -2,6 +2,7 @@ export * from "./Button";
 export * from "./Card";
 export * from "./CopyToClipboardButton";
 export * from "./core";
+export * from "./Drawer";
 export * from "./Dropdown";
 export * from "./Footer";
 export * from "./icons";

@@ -1,8 +1,10 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useMemo } from "react";
 
 import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
+import { BigNumber } from "ethers";
+import { propEq } from "rambda";
 import invariant from "tiny-invariant";
 import { useAccount, useSwitchNetwork } from "wagmi";
 
@@ -12,47 +14,62 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
 import { useGetERC20TokenBalanceForOwner } from "~/services/gmp/hooks";
 
-export type InterchainTokenProps = {
+type TokenInfo = {
+  chainId: number;
   isRegistered: boolean;
   isOriginToken: boolean;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  chain: EVMChainConfig;
+  isSelected?: boolean;
+  chain?: EVMChainConfig;
+};
+
+export type InterchainTokenProps = TokenInfo & {
   onSwitchNetwork?: (chainId: number) => void;
+  onToggleSelection?: () => void;
 };
 
 export const InterchainToken: FC<InterchainTokenProps> = (props) => {
   const { address } = useAccount();
   const { data: balance } = useGetERC20TokenBalanceForOwner({
-    chainId: props.chain.chain_id,
+    chainId: props.chainId,
     tokenLinkerTokenId: props.tokenId,
     owner: address,
   });
   return (
     <Card
       compact={true}
-      key={props.chain.chain_id}
+      key={props.chainId}
       bordered={!props.isRegistered}
+      onClick={props.onToggleSelection}
       className={clsx(
-        "bg-base-200 dark:bg-base-300 transition-all",
-        "100 hover:ring-primary/50 hover:shadow-xl hover:ring",
+        "bg-base-200 dark:bg-base-300 transition-all ease-in",
+        "hover:opacity-75 hover:shadow-xl",
         {
-          "ring-primary/50 ring-2": props.isRegistered,
-          "ring-success/50 ring-2": props.isOriginToken,
           "shadow-sm": !props.isRegistered,
+          "ring-primary/50 ring-4": props.isSelected,
+          "cursor-pointer": props.onToggleSelection,
         }
       )}
+      aria-label={
+        props.onToggleSelection ? "click to toggle token selection" : undefined
+      }
+      aria-selected={props.isSelected}
+      $as={props.onToggleSelection ? "button" : undefined}
+      role={props.onToggleSelection ? "switch" : undefined}
     >
       <Card.Body>
         <Card.Title className="justify-between">
-          <span className="flex items-center gap-2">
-            <ChainIcon
-              src={props.chain.image}
-              alt={props.chain.name}
-              size="md"
-            />
-            {props.chain.name}
-          </span>
+          {props.chain && (
+            <span className="flex items-center gap-2">
+              <ChainIcon
+                src={props.chain.image}
+                alt={props.chain.name}
+                size="md"
+              />
+              {props.chain.name}
+            </span>
+          )}
 
           {props.isOriginToken ? (
             <span className="badge badge-success badge-outline">origin</span>
@@ -66,18 +83,28 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
           <div className="mx-auto px-2">Remote token not registered</div>
         )}
         {balance?.tokenBalance && (
-          <div>
-            Balance:{" "}
-            <BigNumberText
-              decimals={balance.decimals}
-              localeOptions={{ minimumFractionDigits: 0, notation: "compact" }}
-            >
-              {balance.tokenBalance}
-            </BigNumberText>
+          <div className="flex items-center justify-between">
+            <div>
+              Balance:{" "}
+              <BigNumberText
+                decimals={balance.decimals}
+                localeOptions={{
+                  minimumFractionDigits: 0,
+                  notation: "compact",
+                }}
+              >
+                {balance.tokenBalance}
+              </BigNumberText>
+            </div>
+            {BigNumber.from(balance.tokenBalance).gt(0) && (
+              <Button size="xs" color="primary">
+                Send
+              </Button>
+            )}
           </div>
         )}
         <Card.Actions className="justify-between">
-          {props.isRegistered ? (
+          {props.isRegistered && (
             <CopyToClipboardButton
               copyText={props.tokenAddress}
               ghost={true}
@@ -86,15 +113,6 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
             >
               {maskAddress(props.tokenAddress)}
             </CopyToClipboardButton>
-          ) : (
-            <Button
-              size="sm"
-              color="primary"
-              length="block"
-              onClick={props.onSwitchNetwork?.bind(null, props.chain.chain_id)}
-            >
-              Switch to {props.chain.name}
-            </Button>
           )}
         </Card.Actions>
       </Card.Body>
@@ -104,48 +122,53 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
 
 export type InterchainTokenListProps = {
   title: ReactNode;
-  tokens: {
-    chainId: number;
-    isRegistered: boolean;
-    isOriginToken: boolean;
-    tokenAddress: `0x${string}`;
-    tokenId: `0x${string}`;
-  }[];
+  tokens: TokenInfo[];
+  onToggleSelection?: (chainId: number) => void;
+  footer?: ReactNode;
 };
 
 export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
-  const { data: evmChains } = useEVMChainConfigsQuery();
   const { switchNetworkAsync } = useSwitchNetwork();
 
+  const cardPairs = useMemo(
+    () =>
+      props.tokens
+        .filter((x) => x.chain)
+        .sort((a, b) =>
+          // sort by origin token ascending
+          a?.isOriginToken ? -1 : b?.isOriginToken ? 1 : 0
+        ),
+    [props.tokens]
+  );
+
   return (
-    <section className="grid gap-4">
-      <h2 className="text-2xl font-bold">{props.title}</h2>
-      <ul className="grid w-full grid-cols-3 gap-4">
-        {evmChains
-          ?.map(
-            (chain) =>
-              [
-                chain,
-                props.tokens?.find(({ chainId }) => chainId === chain.chain_id),
-              ] as const
-          )
-          .filter(([, token]) => Boolean(token))
-          .map(([chain, token]) => {
+    <section className="relative grid gap-4">
+      <header className="flex items-center gap-2 text-2xl">
+        <span className="font-bold">{props.title}</span>
+        <span className="font-mono text-xl opacity-50">
+          ({props.tokens.length})
+        </span>
+      </header>
+      <main>
+        <ul className="grid w-full grid-cols-3 gap-4">
+          {cardPairs?.map((token) => {
             invariant(token, "token should be defined");
 
             return (
               <InterchainToken
-                key={chain.chain_id}
-                isRegistered={token.isRegistered}
-                isOriginToken={token.isOriginToken}
-                tokenAddress={token.tokenAddress}
-                chain={chain}
+                key={token.chainId}
                 onSwitchNetwork={switchNetworkAsync}
-                tokenId={token.tokenId}
+                onToggleSelection={props.onToggleSelection?.bind(
+                  null,
+                  token.chainId
+                )}
+                {...token}
               />
             );
           })}
-      </ul>
+        </ul>
+      </main>
+      {props.footer && <footer>{props.footer}</footer>}
     </section>
   );
 };

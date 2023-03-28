@@ -1,10 +1,10 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 
-import { Button, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
+import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
 import { Maybe, unSluggify } from "@axelarjs/utils";
 import { isAddress } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
-import { partition } from "rambda";
+import { partition, sortBy, without } from "rambda";
 
 import { AddErc20 } from "~/compounds";
 import { InterchainTokenList } from "~/compounds/InterchainTokenList";
@@ -34,52 +34,60 @@ const InterchainTokensPage = () => {
     <Page
       pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
       mustBeConnected
+      className="flex flex-col gap-4"
     >
-      <div>
-        <div className="flex items-center gap-2">
-          Interchain Token Home Address{" "}
-          <CopyToClipboardButton copyText={tokenAddress} size="sm" ghost={true}>
-            {tokenAddress}
-          </CopyToClipboardButton>{" "}
-        </div>
-        <div className="flex items-center gap-2">
-          Token ID{" "}
-          <Tooltip
-            className="z-20"
-            tip={
-              "The Token ID is an internal identifier used to correlate all instances of an ERC-20 token across all supported chains" ||
-              ""
-            }
-          >
+      <Card className="bg-base-300">
+        <Card.Body>
+          <Card.Title>Interchain Token</Card.Title>
+          <div className="flex items-center gap-2">
+            Interchain Token Home Address{" "}
             <CopyToClipboardButton
-              copyText={interchainToken.tokenId}
+              copyText={tokenAddress}
               size="sm"
               ghost={true}
             >
-              {interchainToken.tokenId}
+              {tokenAddress}
             </CopyToClipboardButton>{" "}
-          </Tooltip>
-        </div>
-      </div>
-      <div className="flex w-full justify-end">
-        <AddErc20
-          trigger={
-            <Button size="sm" className="max-w-sm">
-              Deploy on other chains
-            </Button>
-          }
-          tokenAddress={tokenAddress}
-        />
-        <SendInterchainToken
-          trigger={
-            <Button size="sm" className="ml-2 max-w-sm">
-              Send token interchain [WIP]
-            </Button>
-          }
-          tokenAddress={tokenAddress}
-          tokenId={interchainToken.tokenId as `0x${string}`}
-        />
-      </div>
+          </div>
+          <div className="flex items-center gap-2">
+            Token ID{" "}
+            <Tooltip
+              className="z-20"
+              tip={
+                "The Token ID is an internal identifier used to correlate all instances of an ERC-20 token across all supported chains" ||
+                ""
+              }
+            >
+              <CopyToClipboardButton
+                copyText={interchainToken.tokenId}
+                size="sm"
+                ghost={true}
+              >
+                {interchainToken.tokenId}
+              </CopyToClipboardButton>{" "}
+            </Tooltip>
+          </div>
+          <Card.Actions>
+            <AddErc20
+              trigger={
+                <Button size="sm" className="max-w-sm">
+                  Deploy on other chains
+                </Button>
+              }
+              tokenAddress={tokenAddress}
+            />
+            <SendInterchainToken
+              trigger={
+                <Button size="sm" className="ml-2 max-w-sm">
+                  Send token interchain [WIP]
+                </Button>
+              }
+              tokenAddress={tokenAddress}
+              tokenId={interchainToken.tokenId as `0x${string}`}
+            />
+          </Card.Actions>
+        </Card.Body>
+      </Card>
       <ConnectedInterchainTokensPage
         chainId={routeChain?.id}
         tokenAddress={tokenAddress}
@@ -103,6 +111,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress as `0x${string}`,
   });
 
+  const [selectedChainIds, setSelectedChainIds] = useState<number[]>([]);
+
   const [registered, unregistered] = Maybe.of(
     interchainToken?.matchingTokens
   ).mapOr(
@@ -111,14 +121,34 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 md:relative">
       <InterchainTokenList
         title="Registered interchain tokens"
         tokens={registered}
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
-        tokens={unregistered}
+        tokens={unregistered.map((x) => ({
+          ...x,
+          isSelected: selectedChainIds.includes(x.chainId),
+        }))}
+        onToggleSelection={(chainId) => {
+          setSelectedChainIds((selected) =>
+            selected.includes(chainId)
+              ? without([chainId], selected)
+              : selected.concat(chainId)
+          );
+        }}
+        footer={
+          <div className="flex h-4 w-full justify-end p-4">
+            {selectedChainIds.length > 0 ? (
+              <Button color="accent">
+                Deploy token on {selectedChainIds.length} additional chain
+                {selectedChainIds.length > 1 ? "s" : ""}
+              </Button>
+            ) : undefined}
+          </div>
+        }
       />
     </div>
   );
