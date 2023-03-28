@@ -151,21 +151,17 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
       </header>
       <main>
         <ul className="grid w-full grid-cols-3 gap-4">
-          {cardPairs?.map((token) => {
-            invariant(token, "token should be defined");
-
-            return (
-              <InterchainToken
-                key={token.chainId}
-                onSwitchNetwork={switchNetworkAsync}
-                onToggleSelection={props.onToggleSelection?.bind(
-                  null,
-                  token.chainId
-                )}
-                {...token}
-              />
-            );
-          })}
+          {cardPairs.map((token) => (
+            <InterchainToken
+              key={token.chainId}
+              onSwitchNetwork={switchNetworkAsync}
+              onToggleSelection={props.onToggleSelection?.bind(
+                null,
+                token.chainId
+              )}
+              {...token}
+            />
+          ))}
         </ul>
       </main>
       {props.footer && <footer>{props.footer}</footer>}
