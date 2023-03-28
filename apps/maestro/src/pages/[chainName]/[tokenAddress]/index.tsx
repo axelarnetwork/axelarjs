@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { partition, sortBy, without } from "rambda";
 
 import { AddErc20 } from "~/compounds";
+import { useDeployRemoteTokensMutation } from "~/compounds/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/compounds/InterchainTokenList";
 import { SendInterchainToken } from "~/compounds/SendInterchainToken";
 import Page from "~/layouts/Page";
@@ -99,6 +100,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [[], []],
     partition((x) => x.isRegistered)
   );
+
+  const { mutateAsync: deployRemoteTokens } = useDeployRemoteTokensMutation();
 
   return (
     <div className="flex flex-col gap-8 md:relative">

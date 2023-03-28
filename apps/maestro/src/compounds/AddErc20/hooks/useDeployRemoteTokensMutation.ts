@@ -1,9 +1,7 @@
 import { BigNumber } from "ethers";
-import { hexlify, hexZeroPad } from "ethers/lib/utils";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
-import { getTokenDeployedEventFromTxReceipt } from "~/lib/utils/findContractEvent";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
