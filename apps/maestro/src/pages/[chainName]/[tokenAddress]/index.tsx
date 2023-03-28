@@ -121,16 +121,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       .filter(Boolean) as string[];
   }, [selectedChainIds, unregistered]);
 
-  const queryClient = useQueryClient();
-
   const { address } = useAccount();
 
   useEffect(() => {
-    if (deployRemoteTokens.length === 0) {
-      return;
-    }
-
-    if (deployedTokens.length === 0) {
+    if (deployRemoteTokens.length === 0 || deployedTokens.length === 0) {
       return;
     }
 
@@ -139,17 +133,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       setDeployedTokens([]);
       console.log("deployedTokens", deployedTokens);
 
-      queryClient.invalidateQueries([
-        ["gmp", "getERC20TokenBalanceForOwner"],
-        {
-          input: {
-            chainId: props.chainId,
-            tokenLinkerTokenId: interchainToken.tokenId,
-            owner: address,
-          },
-          type: "query",
-        },
-      ]);
+      refetch();
     }
   }, [
     address,
@@ -158,7 +142,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     destinationChainIds,
     interchainToken.tokenId,
     props.chainId,
-    queryClient,
+    props.tokenAddress,
+    refetch,
   ]);
 
   const {
