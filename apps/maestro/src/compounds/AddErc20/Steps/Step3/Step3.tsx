@@ -84,10 +84,11 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
-          // @ts-ignore
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          // @ts-ignore
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
@@ -115,8 +116,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       await registerOriginToken({
         tokenAddress: props.deployedTokenAddress as `0x${string}`,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
@@ -146,8 +149,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
@@ -189,8 +194,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           (evmChain) => evmChain.chain_id === state.network.chain?.id
         )?.chain_name as string,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
