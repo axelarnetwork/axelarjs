@@ -84,7 +84,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
+          // @ts-ignore
           props.setDeployedTokenAddress(data.tokenAddress as string);
+          // @ts-ignore
           data.txHash && props.setTxhash(data.txHash);
         },
       });

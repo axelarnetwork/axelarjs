@@ -1,11 +1,19 @@
 import { useState } from "react";
 
 export const INITIAL_STATE = {};
-export type DeployAndRegisterTransactionState = {
-  type: "idle" | "deploying" | "deployed";
-  txHash?: `0x${string}`;
-  tokenAddress?: `0x${string}`;
-};
+export type DeployAndRegisterTransactionState =
+  | {
+      type: "idle";
+    }
+  | {
+      type: "deploying";
+      txHash: `0x${string}`;
+    }
+  | {
+      type: "deployed";
+      txHash: `0x${string}`;
+      tokenAddress: `0x${string}`;
+    };
 
 export const useAddErc20State = () => {
   const [step, setStep] = useState(0);

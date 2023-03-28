@@ -51,6 +51,7 @@ export function useInterchainTokensQuery(input: {
         ...token,
         chain: computed.indexedByChainId[String(token.chainId)],
       })),
+      chain: computed.indexedByChainId[String(input.chainId)],
     },
     isLoading: evmChainsQuery.isLoading || queryResult.isLoading,
     isFetching: evmChainsQuery.isFetching || queryResult.isFetching,
