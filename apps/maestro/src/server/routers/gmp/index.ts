@@ -8,7 +8,7 @@ import { searchInterchainToken } from "./searchInterchainToken";
 
 export const gmpRouter = router({
   getTransactionStatus,
-  getInterchainTokenDeploymentStatus: getTransactionStatusOnDestinationChains,
+  getTransactionStatusOnDestinationChains,
   searchInterchainToken,
   getERC20TokenDetails,
   getERC20TokenBalanceForOwner,

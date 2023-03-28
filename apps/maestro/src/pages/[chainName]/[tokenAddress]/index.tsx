@@ -2,13 +2,11 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { isAddress } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";
 import { useAccount } from "wagmi";
 
-import { DeployAndRegisterTransactionState } from "~/compounds/AddErc20/AddErc20.state";
 import { useDeployRemoteTokensMutation } from "~/compounds/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/compounds/InterchainTokenList";
 import Page from "~/layouts/Page";
@@ -35,9 +33,9 @@ const InterchainTokensPage = () => {
 
   return (
     <Page
-      pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
       mustBeConnected
-      className="!flex flex-col gap-12"
+      pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
+      className="!flex flex-1 flex-col gap-12 md:gap-16"
     >
       <section>
         <div className="flex items-center justify-between">

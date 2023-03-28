@@ -98,7 +98,7 @@ export function useGetERC20TokenBalanceForOwner(input: {
 export function useTrackInterchainDeploymentStatusQuery(input: {
   txHash?: `0x${string}`;
 }) {
-  return trpc.gmp.getInterchainTokenDeploymentStatus.useQuery(
+  return trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
     {
       txHash: String(input.txHash),
     },
