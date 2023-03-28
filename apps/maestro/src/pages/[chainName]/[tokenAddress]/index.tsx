@@ -139,14 +139,17 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               : selected.concat(chainId)
           );
         }}
+        footer={
+          <div className="-bottom-16 flex w-full justify-end p-4 md:absolute">
+            {selectedChainIds.length > 0 ? (
+              <Button color="accent">
+                Deploy token on {selectedChainIds.length} additional chain
+                {selectedChainIds.length > 1 ? "s" : ""}
+              </Button>
+            ) : undefined}
+          </div>
+        }
       />
-      {selectedChainIds.length > 0 && (
-        <div className="bottom-0 flex w-full justify-end p-4 md:absolute">
-          <Button color="accent">
-            Deploy on selected chains ({selectedChainIds.length})
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

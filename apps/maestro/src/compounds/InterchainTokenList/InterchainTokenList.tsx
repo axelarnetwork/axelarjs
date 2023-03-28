@@ -124,6 +124,7 @@ export type InterchainTokenListProps = {
   title: ReactNode;
   tokens: TokenInfo[];
   onToggleSelection?: (chainId: number) => void;
+  footer?: ReactNode;
 };
 
 export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
@@ -141,30 +142,33 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
   );
 
   return (
-    <section className="grid gap-4">
-      <h2 className="flex items-center gap-2 text-2xl">
+    <section className="relative grid gap-4">
+      <header className="flex items-center gap-2 text-2xl">
         <span className="font-bold">{props.title}</span>
         <span className="font-mono text-xl opacity-50">
           ({props.tokens.length})
         </span>
-      </h2>
-      <ul className="grid w-full grid-cols-3 gap-4">
-        {cardPairs?.map((token) => {
-          invariant(token, "token should be defined");
+      </header>
+      <main>
+        <ul className="grid w-full grid-cols-3 gap-4">
+          {cardPairs?.map((token) => {
+            invariant(token, "token should be defined");
 
-          return (
-            <InterchainToken
-              key={token.chainId}
-              onSwitchNetwork={switchNetworkAsync}
-              onToggleSelection={props.onToggleSelection?.bind(
-                null,
-                token.chainId
-              )}
-              {...token}
-            />
-          );
-        })}
-      </ul>
+            return (
+              <InterchainToken
+                key={token.chainId}
+                onSwitchNetwork={switchNetworkAsync}
+                onToggleSelection={props.onToggleSelection?.bind(
+                  null,
+                  token.chainId
+                )}
+                {...token}
+              />
+            );
+          })}
+        </ul>
+      </main>
+      {props.footer && <footer>{props.footer}</footer>}
     </section>
   );
 };
