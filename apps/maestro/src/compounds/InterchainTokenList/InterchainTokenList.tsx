@@ -58,7 +58,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       $as={props.onToggleSelection ? "button" : undefined}
       role={props.onToggleSelection ? "switch" : undefined}
     >
-      <Card.Body>
+      <Card.Body className="w-full">
         <Card.Title className="justify-between">
           {props.chain && (
             <span className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
           )}
         </Card.Title>
         {!props.isRegistered && (
-          <div className="mx-auto px-2">Remote token not registered</div>
+          <div className="mx-auto">Remote token not registered</div>
         )}
         {balance?.tokenBalance && (
           <div className="flex items-center justify-between">
