@@ -140,7 +140,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           );
         }}
         footer={
-          <div className="-bottom-16 flex w-full justify-end p-4 md:absolute">
+          <div className="flex h-4 w-full justify-end p-4">
             {selectedChainIds.length > 0 ? (
               <Button color="accent">
                 Deploy token on {selectedChainIds.length} additional chain
