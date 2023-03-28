@@ -94,3 +94,17 @@ export function useGetERC20TokenBalanceForOwner(input: {
     }
   );
 }
+
+export function useTrackInterchainDeploymentStatusQuery(input: {
+  txHash?: `0x${string}`;
+}) {
+  return trpc.gmp.getInterchainTokenDeploymentStatus.useQuery(
+    {
+      txHash: String(input.txHash),
+    },
+    {
+      enabled: Boolean(input.txHash?.match(/^(0x)?[0-9a-f]{64}/i)),
+      refetchInterval: 1000 * 10, // 10 seconds
+    }
+  );
+}

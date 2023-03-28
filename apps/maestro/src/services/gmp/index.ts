@@ -19,7 +19,7 @@ async function searchGMP(params: SearchGMPParams) {
       },
     })
     .json<SearchGMPResponse>()
-    .catch(() => ({ data: [] }));
+    .catch(() => ({ data: [] as SearchGMPResponse["data"] }));
 }
 
 async function getContracts() {

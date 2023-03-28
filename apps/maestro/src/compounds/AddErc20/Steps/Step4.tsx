@@ -1,24 +1,22 @@
 import { FC, useCallback, useState } from "react";
 
-import {
-  CopyToClipboardButton,
-  LinkButton,
-  useIntervalAsync,
-} from "@axelarjs/ui";
+import { CopyToClipboardButton, useIntervalAsync } from "@axelarjs/ui";
 
 import { searchGMP } from "~/services/gmp";
 
 import { StepProps } from ".";
 
+const setToStatusMap = (set: Set<string>) => {
+  const map = new Map<string, string>();
+  set.forEach((k) => map.set(k.toLowerCase(), "called"));
+  return map;
+};
+
 export const Step4: FC<StepProps> = (props: StepProps) => {
   const [delay, setDelay] = useState<number | null>(10000);
-
-  const setToMap = (set: Set<string>) => {
-    const map = new Map<string, string>();
-    set.forEach((k) => map.set(k.toLowerCase(), "called"));
-    return map;
-  };
-  const [statusMap, setStatusMap] = useState(setToMap(props.selectedChains));
+  const [statusMap, setStatusMap] = useState(
+    setToStatusMap(props.selectedChains)
+  );
   const updateStatusMap = useCallback(
     (chainId: string, status: string) => {
       setStatusMap(new Map(statusMap.set(chainId, status)));

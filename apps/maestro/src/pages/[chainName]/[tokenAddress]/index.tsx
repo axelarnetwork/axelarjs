@@ -124,7 +124,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { address } = useAccount();
 
   useEffect(() => {
-    if (deployRemoteTokens.length === 0 || deployedTokens.length === 0) {
+    if (destinationChainIds.length === 0 || deployedTokens.length === 0) {
       return;
     }
 
