@@ -14,16 +14,18 @@ import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
-import { StepProps } from "..";
+import { useAddErc20StateContainer } from "../../AddErc20.state";
 import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
 import { useDeployRemoteTokensMutation } from "../../hooks/useDeployRemoteTokensMutation";
 import { useRegisterOriginTokenAndDeployRemoteTokensMutation } from "../../hooks/useRegisterOriginTokenAndDeployRemoteTokensMutation";
 import { useRegisterOriginTokenMutation } from "../../hooks/useRegisterOriginTokenMutation";
 import { useStep3ChainSelectionState } from "./Step3.state";
 
-export const Step3: FC<StepProps> = (props: StepProps) => {
+export const Step3: FC = () => {
+  const { state: rootState, actions: rootActions } =
+    useAddErc20StateContainer();
   const { state, actions } = useStep3ChainSelectionState({
-    selectedChains: props.selectedChains,
+    selectedChains: rootState.selectedChains,
   });
 
   const { mutateAsync: deployAndRegisterToken } =
@@ -36,7 +38,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   const { chain } = useNetwork();
   const { data: tokenData } = useInterchainTokensQuery({
     chainId: chain?.id,
-    tokenAddress: props.deployedTokenAddress as `0x${string}`,
+    tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
   });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -54,9 +56,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         [null, handleDeployRemoteTokens],
       ],
     ];
-    const pe = +Boolean(props.isPreexistingToken); //preexisting
-    const ar = +Boolean(props.tokenAlreadyRegistered); //already-registered
-    const oc = +Boolean(props.selectedChains.size > 0); //other-chains
+    const pe = +Boolean(rootState.isPreExistingToken); //preexisting
+    const ar = +Boolean(rootState.tokenAlreadyRegistered); //already-registered
+    const oc = +Boolean(rootState.selectedChains.size > 0); //other-chains
     const decision = decisionMatrix[pe][ar][oc];
 
     if (decision) {
@@ -81,25 +83,25 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         return;
       }
       if (!tokenData?.tokenId) {
-        console.log("no token ID for ", props.deployedTokenAddress);
+        console.log("no token ID for ", rootState.deployedTokenAddress);
       }
 
       actions.setIsDeploying(true);
       await deployRemoteTokens({
         tokenId: tokenData.tokenId as `0x${string}`,
-        tokenAddress: props.deployedTokenAddress as `0x${string}`,
-        destinationChainIds: Array.from(props.selectedChains),
+        tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
+        destinationChainIds: Array.from(rootState.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
           if (data.type === "deployed") {
-            props.setDeployedTokenAddress(data.tokenAddress as string);
+            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
 
-            data.txHash && props.setTxhash(data.txHash);
+            data.txHash && rootActions.setTxHash(data.txHash);
           }
         },
       });
       actions.setIsDeploying(false);
-      props.incrementStep();
+      rootActions.incrementStep();
     },
     [
       state.isGasPriceQueryLoading,
@@ -108,7 +110,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       tokenData.tokenId,
       actions,
       deployRemoteTokens,
-      props,
+      rootState.deployedTokenAddress,
+      rootState.selectedChains,
+      rootActions,
     ]
   );
 
@@ -121,18 +125,18 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
 
       actions.setIsDeploying(true);
       await registerOriginToken({
-        tokenAddress: props.deployedTokenAddress as `0x${string}`,
+        tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
         onStatusUpdate: (data) => {
           if (data.type === "deployed") {
-            props.setDeployedTokenAddress(data.tokenAddress as string);
-            data.txHash && props.setTxhash(data.txHash);
+            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && rootActions.setTxHash(data.txHash);
           }
         },
       });
       actions.setIsDeploying(false);
-      props.incrementStep();
+      rootActions.incrementStep();
     },
-    [actions, registerOriginToken, props]
+    [actions, registerOriginToken, rootState.deployedTokenAddress, rootActions]
   );
 
   const handleRegisterAndDeployRemoteTokens = useCallback<
@@ -154,18 +158,18 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       }
       actions.setIsDeploying(true);
       await registerOriginTokenAndDeployRemoteTokens({
-        tokenAddress: props.deployedTokenAddress as `0x${string}`,
-        destinationChainIds: Array.from(props.selectedChains),
+        tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
+        destinationChainIds: Array.from(rootState.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
           if (data.type === "deployed") {
-            props.setDeployedTokenAddress(data.tokenAddress as string);
-            data.txHash && props.setTxhash(data.txHash);
+            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && rootActions.setTxHash(data.txHash);
           }
         },
       });
       actions.setIsDeploying(false);
-      props.incrementStep();
+      rootActions.incrementStep();
     },
     [
       state.isGasPriceQueryLoading,
@@ -173,7 +177,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       state.gasFees,
       actions,
       registerOriginTokenAndDeployRemoteTokens,
-      props,
+      rootState.deployedTokenAddress,
+      rootState.selectedChains,
+      rootActions,
     ]
   );
 
@@ -194,23 +200,23 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       }
       actions.setIsDeploying(true);
       await deployAndRegisterToken({
-        tokenName: props.tokenName,
-        tokenSymbol: props.tokenSymbol,
-        decimals: props.decimals,
-        destinationChainIds: Array.from(props.selectedChains),
+        tokenName: rootState.tokenName,
+        tokenSymbol: rootState.tokenSymbol,
+        decimals: rootState.decimals,
+        destinationChainIds: Array.from(rootState.selectedChains),
         gasFees: state.gasFees,
         sourceChainId: state.evmChains?.find(
           (evmChain) => evmChain.chain_id === state.network.chain?.id
         )?.chain_name as string,
         onStatusUpdate: (data) => {
           if (data.type === "deployed") {
-            props.setDeployedTokenAddress(data.tokenAddress as string);
-            data.txHash && props.setTxhash(data.txHash);
+            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && rootActions.setTxHash(data.txHash);
           }
         },
       });
       actions.setIsDeploying(false);
-      props.incrementStep();
+      rootActions.incrementStep();
     },
     [
       state.isGasPriceQueryLoading,
@@ -220,18 +226,13 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       state.network.chain?.id,
       actions,
       deployAndRegisterToken,
-      props,
+      rootState.tokenName,
+      rootState.tokenSymbol,
+      rootState.decimals,
+      rootState.selectedChains,
+      rootActions,
     ]
   );
-
-  const tooltipPositionOverrides = useMemo(() => {
-    return {
-      // position the first tooltip to the right
-      0: "right" as const,
-      // position the last tooltip to the left
-      [Number(state.evmChains?.length) - 1]: "left" as const,
-    };
-  }, [state.evmChains?.length]);
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -239,14 +240,14 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         <Label>
           <Label.Text>Chains to deploy remote tokens</Label.Text>
         </Label>
-        <div className="bg-base-300 flex flex-wrap justify-evenly gap-2.5 rounded-lg p-2">
+        <div className="bg-base-300 grid grid-cols-8 justify-evenly gap-4 rounded-lg p-6">
           {state.evmChains?.map((chain, i) => {
-            const isSelected = props.selectedChains.has(chain.chain_name);
+            const isSelected = rootState.selectedChains.has(chain.chain_name);
             return (
               <Tooltip
                 tip={`Deploy on ${chain.name}`}
                 key={chain.chain_name}
-                position={tooltipPositionOverrides[i] ?? "top"}
+                position="top"
               >
                 <Button
                   ghost={true}
@@ -257,8 +258,8 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
                   outline={isSelected}
                   onClick={() => {
                     const action = isSelected
-                      ? props.removeSelectedChain
-                      : props.addSelectedChain;
+                      ? rootActions.removeSelectedChain
+                      : rootActions.addSelectedChain;
 
                     action(chain.chain_name);
                   }}

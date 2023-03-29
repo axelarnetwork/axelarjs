@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-export const INITIAL_STATE = {};
+import { createContainer } from "unstated-next";
+
 export type DeployAndRegisterTransactionState =
   | {
       type: "idle";
@@ -15,21 +16,48 @@ export type DeployAndRegisterTransactionState =
       tokenAddress: `0x${string}`;
     };
 
-export const useAddErc20State = () => {
+export const INITIAL_STATE = {
+  step: 0,
+  newTokenType: "new" as "new" | "existing",
+  tokenName: "",
+  tokenSymbol: "",
+  decimals: 0,
+  amountToMint: 0,
+  deployedTokenAddress: "",
+  txHash: undefined as `0x${string}` | undefined,
+  tokenAlreadyRegistered: false,
+  isPreExistingToken: false,
+  txState: { type: "idle" } as DeployAndRegisterTransactionState,
+  selectedChains: new Set<string>(),
+};
+
+function useAddErc20State(initialState = INITIAL_STATE) {
   const [step, setStep] = useState(0);
-  const [newTokenType, setNewTokenType] = useState<"new" | "existing">("new");
-  const [tokenName, setTokenName] = useState("");
-  const [tokenSymbol, setTokenSymbol] = useState("");
-  const [decimals, setDecimals] = useState(0);
-  const [amountToMint, setAmountToMint] = useState(0);
-  const [deployedTokenAddress, setDeployedTokenAddress] = useState("");
-  const [txHash, setTxHash] = useState<`0x${string}`>();
-  const [tokenAlreadyRegistered, setTokenAlreadyRegistered] = useState(false);
-  const [isPreExistingToken, setIsPreExistingToken] = useState(false);
-  const [txState, setTxState] = useState<DeployAndRegisterTransactionState>({
-    type: "idle",
-  });
-  const [selectedChains, setSelectedChains] = useState(new Set<string>());
+  const [newTokenType, setNewTokenType] = useState<"new" | "existing">(
+    initialState.newTokenType
+  );
+  const [tokenName, setTokenName] = useState(initialState.tokenName);
+  const [tokenSymbol, setTokenSymbol] = useState(initialState.tokenSymbol);
+  const [decimals, setDecimals] = useState(initialState.decimals);
+  const [amountToMint, setAmountToMint] = useState(initialState.amountToMint);
+  const [deployedTokenAddress, setDeployedTokenAddress] = useState(
+    initialState.deployedTokenAddress
+  );
+  const [txHash, setTxHash] = useState<`0x${string}`>(
+    initialState.txHash as `0x${string}`
+  );
+  const [tokenAlreadyRegistered, setTokenAlreadyRegistered] = useState(
+    initialState.tokenAlreadyRegistered
+  );
+  const [isPreExistingToken, setIsPreExistingToken] = useState(
+    initialState.isPreExistingToken
+  );
+  const [txState, setTxState] = useState<DeployAndRegisterTransactionState>(
+    initialState.txState
+  );
+  const [selectedChains, setSelectedChains] = useState(
+    initialState.selectedChains
+  );
 
   const resetAddErc20StateInputs = () => {
     setStep(0);
@@ -93,6 +121,12 @@ export const useAddErc20State = () => {
       removeSelectedChain,
       setTokenAlreadyRegistered,
       setIsPreExistingToken,
+      incrementStep: () => setStep((prev) => prev + 1),
     },
   };
-};
+}
+
+export const {
+  Provider: AddErc20StateProvider,
+  useContainer: useAddErc20StateContainer,
+} = createContainer(useAddErc20State);

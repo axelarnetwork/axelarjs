@@ -10,11 +10,13 @@ import {
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 
-import { StepProps } from "..";
+import { useAddErc20StateContainer } from "../../AddErc20.state";
 
-export const PreExistingERC20Token: FC<StepProps> = (props: StepProps) => {
+export const PreExistingERC20Token: FC = () => {
+  const { state } = useAddErc20StateContainer();
+
   const [tokenAddress, setTokenAddress] = useState(
-    props.deployedTokenAddress || ""
+    state.deployedTokenAddress || ""
   );
   const [validatedAddr, setValidatedAddr] = useState<string>("");
 
@@ -32,25 +34,13 @@ export const PreExistingERC20Token: FC<StepProps> = (props: StepProps) => {
         onChange={(e) => setTokenAddress(e.target.value)}
         placeholder="Input your token address"
       />
-      {validatedAddr && (
-        <ERC20Details
-          address={validatedAddr}
-          setTokenAlreadyRegistered={props.setTokenAlreadyRegistered}
-          setIsPreexistingToken={props.setIsPreexistingToken}
-          deployedTokenAddress={props.deployedTokenAddress}
-          setDeployedTokenAddress={props.setDeployedTokenAddress}
-        />
-      )}
+      {validatedAddr && <ERC20Details address={validatedAddr} />}
     </div>
   );
 };
 
 type ERC20DetailsProps = {
   address: string;
-  setTokenAlreadyRegistered: (tokenAlreadyRegistered: boolean) => void;
-  setIsPreexistingToken: (isPreexistingToken: boolean) => void;
-  deployedTokenAddress: string;
-  setDeployedTokenAddress: (deployedTokenAddress: string) => void;
 };
 
 export const ERC20Details: FC<ERC20DetailsProps> = (
@@ -70,16 +60,19 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     tokenAddress: props.address as `0x${string}`,
   });
 
+  const { actions } = useAddErc20StateContainer();
+
   useEffect(() => {
     token?.decimals && setTokenDecimals(token.decimals as number);
     token?.tokenName && setTokenName(token.tokenName as string);
     token?.tokenSymbol && setTokenSymbol(token.tokenSymbol as string);
-    token && props.setIsPreexistingToken(Boolean(token));
-    token && props.setDeployedTokenAddress(props.address);
-    props.setTokenAlreadyRegistered(
+    token && actions.setIsPreExistingToken(Boolean(token));
+    token && actions.setDeployedTokenAddress(props.address);
+
+    actions.setTokenAlreadyRegistered(
       Boolean(tlData?.tokenId && tlData?.tokenId !== ADDRESS_ZERO_BYTES32)
     );
-  }, [props.address, token, tlData, props]);
+  }, [props.address, token, tlData, props, actions]);
 
   return (
     <Card className="bg-base-300" compact>

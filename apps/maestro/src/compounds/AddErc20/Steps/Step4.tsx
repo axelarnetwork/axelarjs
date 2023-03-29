@@ -4,7 +4,7 @@ import { CopyToClipboardButton, useIntervalAsync } from "@axelarjs/ui";
 
 import { searchGMP } from "~/services/gmp";
 
-import { StepProps } from ".";
+import { useAddErc20StateContainer } from "../AddErc20.state";
 
 const setToStatusMap = (set: Set<string>) => {
   const map = new Map<string, string>();
@@ -12,10 +12,11 @@ const setToStatusMap = (set: Set<string>) => {
   return map;
 };
 
-export const Step4: FC<StepProps> = (props: StepProps) => {
+export const Step4: FC = () => {
+  const { state } = useAddErc20StateContainer();
   const [delay, setDelay] = useState<number | null>(10000);
   const [statusMap, setStatusMap] = useState(
-    setToStatusMap(props.selectedChains)
+    setToStatusMap(state.selectedChains)
   );
   const updateStatusMap = useCallback(
     (chainId: string, status: string) => {
@@ -25,7 +26,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
   );
   const updateState = useCallback(async () => {
     const { data } = await searchGMP({
-      txHash: props.txHash,
+      txHash: state.txHash,
     });
     if (data?.length === 0) {
       setDelay(null);
@@ -41,7 +42,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
       setDelay(null);
     }
     return data;
-  }, [props.txHash, updateStatusMap, statusMap]);
+  }, [state.txHash, statusMap, updateStatusMap]);
 
   useIntervalAsync(updateState, delay);
 
@@ -59,7 +60,7 @@ export const Step4: FC<StepProps> = (props: StepProps) => {
   return (
     <div>
       <div>Deploy Token Successful</div>
-      <CopyToClipboardButton copyText={props.deployedTokenAddress} />
+      <CopyToClipboardButton copyText={state.deployedTokenAddress} />
       <div>{getStatuses()}</div>
     </div>
   );
