@@ -234,29 +234,20 @@ export const Step3: FC = () => {
     ]
   );
 
-  const tooltipPositionOverrides = useMemo(() => {
-    return {
-      // position the first tooltip to the right
-      0: "right" as const,
-      // position the last tooltip to the left
-      [Number(state.evmChains?.length) - 1]: "left" as const,
-    };
-  }, [state.evmChains?.length]);
-
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
       <FormControl>
         <Label>
           <Label.Text>Chains to deploy remote tokens</Label.Text>
         </Label>
-        <div className="bg-base-300 flex flex-wrap justify-evenly gap-2.5 rounded-lg p-2">
+        <div className="bg-base-300 grid grid-cols-8 justify-evenly gap-4 rounded-lg p-6">
           {state.evmChains?.map((chain, i) => {
             const isSelected = rootState.selectedChains.has(chain.chain_name);
             return (
               <Tooltip
                 tip={`Deploy on ${chain.name}`}
                 key={chain.chain_name}
-                position={tooltipPositionOverrides[i] ?? "top"}
+                position="top"
               >
                 <Button
                   ghost={true}
