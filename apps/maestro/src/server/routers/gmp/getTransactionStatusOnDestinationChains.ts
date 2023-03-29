@@ -1,7 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { logger } from "~/lib/logger";
 import { publicProcedure } from "~/server/trpc";
+import { GMPStatus } from "~/services/gmp/types";
 
 /**
  * Get the status of an interchain token deployment
@@ -17,9 +19,11 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
   // a query is a read-only operation, a mutation is a write operation
   .query(async ({ input, ctx }) => {
     try {
+      logger.info(`getTransactionStatusOnDestinationChains: ${input.txHash}`);
       const { data } = await ctx.services.gmp.searchGMP({
         txHash: input.txHash as `0x${string}`,
       });
+      logger.info(`getTransactionStatusOnDestinationChains: ${data}`);
 
       if (data.length) {
         return data.reduce(
@@ -27,7 +31,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             ...acc,
             [call.returnValues.destinationChain.toLowerCase()]: status,
           }),
-          {}
+          {} as { [chainId: string]: GMPStatus }
         );
       }
 

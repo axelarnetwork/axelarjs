@@ -1,6 +1,6 @@
 import { FC, ReactNode, useMemo } from "react";
 
-import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
+import { Badge, Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
 import { BigNumber } from "ethers";
@@ -9,7 +9,8 @@ import { useAccount } from "wagmi";
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { EVMChainConfig } from "~/services/axelarscan/types";
-import { useGetERC20TokenBalanceForOwner } from "~/services/gmp/hooks";
+import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
+import { GMPStatus } from "~/services/gmp/types";
 
 type TokenInfo = {
   chainId: number;
@@ -19,6 +20,7 @@ type TokenInfo = {
   tokenId: `0x${string}`;
   isSelected?: boolean;
   chain?: EVMChainConfig;
+  deploymentStatus?: "pending" | GMPStatus;
 };
 
 export type InterchainTokenProps = TokenInfo & {
@@ -27,7 +29,7 @@ export type InterchainTokenProps = TokenInfo & {
 
 export const InterchainToken: FC<InterchainTokenProps> = (props) => {
   const { address } = useAccount();
-  const { data: balance } = useGetERC20TokenBalanceForOwner({
+  const { data: balance } = useGetERC20TokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenLinkerTokenId: props.tokenId,
     owner: address,
@@ -69,18 +71,27 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
           )}
 
           {props.isOriginToken ? (
-            <span className="badge badge-success badge-outline">origin</span>
+            <Badge outline color="success">
+              origin
+            </Badge>
           ) : (
             props.isRegistered && (
-              <span className="badge badge-info badge-outline">registered</span>
+              <Badge outline color="info">
+                registered
+              </Badge>
             )
+          )}
+          {props.deploymentStatus && (
+            <Badge outline color="warning">
+              {props.deploymentStatus}
+            </Badge>
           )}
         </Card.Title>
         {!props.isRegistered && (
           <div className="mx-auto">Remote token not registered</div>
         )}
         {balance?.tokenBalance && (
-          <div className="flex items-center justify-between">
+          <div className="bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2">
             <div>
               Balance:{" "}
               <BigNumberText
@@ -107,8 +118,12 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
               ghost={true}
               length="block"
               size="sm"
+              className="bg-base-300 dark:bg-base-100"
             >
-              {maskAddress(props.tokenAddress)}
+              {maskAddress(props.tokenAddress, {
+                segmentA: 14,
+                segmentB: -10,
+              })}
             </CopyToClipboardButton>
           )}
         </Card.Actions>

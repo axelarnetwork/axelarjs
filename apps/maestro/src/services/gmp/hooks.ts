@@ -6,7 +6,7 @@ import { trpc } from "~/lib/trpc";
 
 import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
 import { getContracts, searchGMP } from "./index";
-import { SearchGMPParams } from "./types";
+import { GMPStatus, SearchGMPParams } from "./types";
 
 export function useSearchGMPQuery(params: SearchGMPParams) {
   return useQuery(["gmp-search", params], searchGMP.bind(null, params));
@@ -75,7 +75,7 @@ export function useGetERC20TokenDetailsQuery(input: {
   );
 }
 
-export function useGetERC20TokenBalanceForOwner(input: {
+export function useGetERC20TokenBalanceForOwnerQuery(input: {
   chainId?: number;
   tokenLinkerTokenId?: `0x${string}`;
   owner?: `0x${string}`;
@@ -95,16 +95,37 @@ export function useGetERC20TokenBalanceForOwner(input: {
   );
 }
 
-export function useTrackInterchainDeploymentStatusQuery(input: {
-  txHash?: `0x${string}`;
-}) {
-  return trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
-    {
-      txHash: String(input.txHash),
+export function useGetTransactionStatusOnDestinationChainsQuery(
+  input: {
+    txHash?: `0x${string}`;
+  },
+  options?: {
+    enabled?: boolean;
+    refetchInterval?: number;
+  }
+) {
+  return useQuery(
+    ["gmp-get-transaction-status-on-destination-chains", input],
+    async () => {
+      const { data } = await searchGMP({
+        txHash: input.txHash,
+      });
+
+      if (data.length) {
+        return data.reduce(
+          (acc, { call, status }) => ({
+            ...acc,
+            [call.returnValues.destinationChain.toLowerCase()]: status,
+          }),
+          {} as { [chainId: string]: GMPStatus }
+        );
+      }
+      return {};
     },
     {
       enabled: Boolean(input.txHash?.match(/^(0x)?[0-9a-f]{64}/i)),
       refetchInterval: 1000 * 10, // 10 seconds
+      ...options,
     }
   );
 }
