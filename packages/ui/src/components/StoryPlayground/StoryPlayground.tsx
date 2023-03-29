@@ -97,6 +97,14 @@ const Variants = <
 ) => {
   const [view, setView] = useState<Viewport>("desktop");
 
+  const viewports = ARTBOARD_OPTIONS.reduce(
+    (acc, artboard) => ({
+      ...acc,
+      [artboard]: artboard === VIEWPORTS[view].className,
+    }),
+    {} as Record<Artboard, boolean>
+  );
+
   return (
     <div className="relative inline-block p-14">
       <section className="absolute top-2 right-2 flex items-center gap-2 p-2.5">
@@ -125,15 +133,8 @@ const Variants = <
 
           <div
             className={clsx(
-              "artboard artboard-demo mx-auto p-4 transition-all duration-300",
-              {
-                ...ARTBOARD_OPTIONS.reduce((acc, artboard) => {
-                  return {
-                    ...acc,
-                    [artboard]: artboard === VIEWPORTS[view].className,
-                  };
-                }, {} as Record<Artboard, boolean>),
-              }
+              "artboard artboard-demo bg-base-300 mx-auto p-4 transition-all duration-300",
+              { ...viewports }
             )}
           >
             <ul className="flex flex-wrap items-center gap-4">

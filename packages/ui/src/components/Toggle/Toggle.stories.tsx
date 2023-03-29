@@ -1,21 +1,38 @@
-import type { Meta, StoryFn } from "@storybook/react";
+import { pluralizeKeys } from "@axelarjs/utils";
+import { Meta, StoryFn } from "@storybook/react";
 
+import { COLOR_VARIANTS, SIZE_VARIANTS } from "../../theme";
+import { configurePlayground } from "../StoryPlayground";
 import { Toggle } from "./Toggle";
 
 export default {
   title: "components/Toggle",
   component: Toggle,
-  docs: {
-    description: {
-      component: "Toggle, Toggle, does whatever a Toggle do.",
+  argTypes: {
+    onClick: {
+      action: "clicked",
     },
   },
 } as Meta<typeof Toggle>;
 
 const Template: StoryFn<typeof Toggle> = (args) => {
-  return <Toggle {...args} />;
+  return <Toggle {...args}>{args.children ?? "Toggle"}</Toggle>;
 };
 
 export const Default = Template.bind({});
 
-Default.args = {};
+// creates stories for variansts (color, size, shape)
+const { Colors, Sizes } = pluralizeKeys(
+  configurePlayground(Toggle, {
+    color: {
+      values: COLOR_VARIANTS,
+      noChildren: true,
+    },
+    size: {
+      values: SIZE_VARIANTS,
+      noChildren: true,
+    },
+  })
+);
+
+export { Colors, Sizes };

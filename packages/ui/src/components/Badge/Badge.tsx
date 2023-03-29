@@ -11,6 +11,7 @@ const badgeVariance = cva("badge", {
     color: {
       primary: "badge-primary",
       secondary: "badge-secondary",
+      accent: "badge-accent",
       success: "badge-success",
       error: "badge-error",
       warning: "badge-warning",
@@ -38,12 +39,16 @@ export const Badge: FC<BadgeProps> = ({
   color,
   outline,
   ghost,
+  size,
   className,
   ...props
 }) => {
   return (
     <StyledBadge
-      className={twMerge(badgeVariance({ color, outline, ghost }), className)}
+      className={twMerge(
+        badgeVariance({ color, outline, ghost, size }),
+        className
+      )}
       {...props}
     />
   );

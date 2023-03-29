@@ -1,6 +1,6 @@
-import { FC, PropsWithChildren, useMemo } from "react";
+import { FC, PropsWithChildren } from "react";
 
-import { Clamp, Footer, useTheme } from "@axelarjs/ui";
+import { Badge, Clamp, Footer, useTheme } from "@axelarjs/ui";
 import { Web3Modal } from "@web3modal/react";
 
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
@@ -24,6 +24,15 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           <Footer.Title>
             &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
           </Footer.Title>
+          {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+            <Badge
+              className="absolute right-4 lowercase"
+              size="lg"
+              color="accent"
+            >
+              env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
+            </Badge>
+          )}
         </Footer>
       </div>
       <Web3Modal

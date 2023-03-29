@@ -1,7 +1,7 @@
 import { pluralizeKeys } from "@axelarjs/utils";
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { buttonColors, buttonSizes } from "../Button";
+import { COLOR_VARIANTS, SIZE_VARIANTS } from "../../theme";
 import { configurePlayground } from "../StoryPlayground";
 import { TextInput } from "./TextInput";
 
@@ -27,11 +27,11 @@ Default.args = {
 const { Sizes, Colors } = pluralizeKeys(
   configurePlayground(TextInput, {
     size: {
-      values: buttonSizes,
+      values: SIZE_VARIANTS,
       noChildren: true,
     },
     color: {
-      values: buttonColors,
+      values: COLOR_VARIANTS,
       noChildren: true,
     },
   })

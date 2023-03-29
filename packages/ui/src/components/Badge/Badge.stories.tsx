@@ -1,7 +1,7 @@
 import { pluralizeKeys } from "@axelarjs/utils";
 import { Meta, StoryFn } from "@storybook/react";
 
-import { buttonColors, buttonSizes } from "../Button";
+import { COLOR_VARIANTS, SIZE_VARIANTS } from "../../theme";
 import { configurePlayground } from "../StoryPlayground";
 import { Badge } from "./Badge";
 
@@ -24,8 +24,8 @@ export const Default = Template.bind({});
 // creates stories for variansts (color, size, shape)
 const { Colors, Sizes } = pluralizeKeys(
   configurePlayground(Badge, {
-    color: { values: buttonColors },
-    size: { values: buttonSizes },
+    color: { values: COLOR_VARIANTS },
+    size: { values: SIZE_VARIANTS },
   })
 );
 
