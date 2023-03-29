@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 
-import { ThemeProvider } from "@axelarjs/ui";
+import { ThemeProvider, Toaster } from "@axelarjs/ui";
 import { Cabin } from "@next/font/google";
 import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -56,6 +56,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                 </>
               )}
               <ReactQueryDevtools />
+              <Toaster />
             </WagmiConfigPropvider>
           </ThemeProvider>
         </Hydrate>
