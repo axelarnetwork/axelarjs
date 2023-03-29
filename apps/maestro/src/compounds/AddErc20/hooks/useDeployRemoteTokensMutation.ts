@@ -1,3 +1,4 @@
+import { toast } from "@axelarjs/ui";
 import { BigNumber } from "ethers";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
@@ -58,7 +59,8 @@ export function useDeployRemoteTokensMutation() {
         input.onFinished();
       }
     } catch (e) {
-      logger.log("something went wrong", e);
+      toast.error("Failed to deploy remote tokens");
+      logger.warn("Failed to deploy remote tokens", { cause: e });
       if (input.onStatusUpdate) {
         input.onStatusUpdate({ type: "idle" });
       }
