@@ -3,11 +3,9 @@ import { useCallback } from "react";
 import { Button } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
 import dynamic from "next/dynamic";
-import Head from "next/head";
 import { useRouter } from "next/router";
-import { useAccount, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 
-import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import SearchInterchainTokens from "~/compounds/SearchInterchainTokens";
 import Page from "~/layouts/Page";
 
@@ -15,7 +13,6 @@ const AddErc20 = dynamic(() => import("~/compounds/AddErc20/AddErc20"));
 
 export default function Home() {
   const router = useRouter();
-  const account = useAccount();
   const { chain } = useNetwork();
 
   const handleTokenFound = useCallback(

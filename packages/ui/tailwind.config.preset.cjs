@@ -6,9 +6,6 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("daisyui"),
   ],
-  theme: {
-    extend: {},
-  },
   daisyui: {
     themes: [
       { light: require("./themes/light.cjs") },

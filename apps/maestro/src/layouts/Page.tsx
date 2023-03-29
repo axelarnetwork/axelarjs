@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { Button } from "@axelarjs/ui";
 import clsx from "clsx";
 import Head from "next/head";
+import Image from "next/image";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -17,6 +18,7 @@ type Props = JSX.IntrinsicElements["section"] & {
   pageTitle?: string;
   pageDescription?: string;
   mustBeConnected?: boolean;
+  isLoading?: boolean;
 };
 
 const Page = ({
@@ -25,6 +27,7 @@ const Page = ({
   mustBeConnected,
   className,
   children,
+  isLoading,
   ...props
 }: Props) => {
   const { isConnected } = useAccount();
@@ -137,6 +140,17 @@ const Page = ({
       >
         {pageContent}
       </section>
+      {isLoading && (
+        <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
+          <Image
+            src="/icons/conductor-icon-128.png"
+            height={128}
+            width={128}
+            alt="conductor icon"
+            className="animate-ping duration-1000"
+          />
+        </div>
+      )}
     </>
   );
 };

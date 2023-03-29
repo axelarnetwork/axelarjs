@@ -2,6 +2,7 @@ import { httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import superjson from "superjson";
 
+import { queryClient } from "~/config/wagmi";
 import type { AppRouter } from "~/server/routers/_app";
 
 function getBaseUrl() {
@@ -31,6 +32,7 @@ export const trpc = createTRPCNext<AppRouter>({
       };
     }
     return {
+      queryClient, // use shared queryClient
       transformer: superjson, // optional - adds superjson serialization
       links: [
         httpBatchLink({

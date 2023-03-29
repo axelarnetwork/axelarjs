@@ -1,4 +1,3 @@
-import { Maybe } from "@axelarjs/utils";
 import { QueryClient } from "@tanstack/react-query";
 import { EthereumClient, w3mConnectors } from "@web3modal/ethereum";
 import { configureChains, createClient } from "wagmi";
@@ -132,10 +131,8 @@ export const wagmiClient = createClient({
     projectId: WALLECTCONNECT_PROJECT_ID,
     version: 1,
   }),
-  logger: {
-    warn: logger.warn,
-  },
-  queryClient,
+  logger, // custom logger
+  queryClient, // react-query client
 });
 
 export const ethereumClient = new EthereumClient(
