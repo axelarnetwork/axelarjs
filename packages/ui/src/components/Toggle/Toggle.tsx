@@ -18,8 +18,10 @@ const toggleVariance = cva("toggle", {
       primary: "toggle-primary",
       secondary: "toggle-secondary",
       accent: "toggle-accent",
+      info: "toggle-info",
       success: "toggle-success",
       warning: "toggle-warning",
+      error: "toggle-error",
     },
     size: {
       xs: "toggle-xs",
