@@ -31,7 +31,7 @@ export const INITIAL_STATE = {
   selectedChains: new Set<string>(),
 };
 
-export function useAddErc20State(initialState = INITIAL_STATE) {
+function useAddErc20State(initialState = INITIAL_STATE) {
   const [step, setStep] = useState(0);
   const [newTokenType, setNewTokenType] = useState<"new" | "existing">(
     initialState.newTokenType
@@ -121,6 +121,7 @@ export function useAddErc20State(initialState = INITIAL_STATE) {
       removeSelectedChain,
       setTokenAlreadyRegistered,
       setIsPreExistingToken,
+      incrementStep: () => setStep((prev) => prev + 1),
     },
   };
 }

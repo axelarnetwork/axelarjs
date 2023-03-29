@@ -3,7 +3,10 @@ import { FC, useEffect, useMemo } from "react";
 import { Button, Modal } from "@axelarjs/ui";
 import dynamic from "next/dynamic";
 
-import { useAddErc20State } from "./AddErc20.state";
+import {
+  AddErc20StateProvider,
+  useAddErc20StateContainer,
+} from "./AddErc20.state";
 import { TokenRegistration } from "./TokenRegistration";
 
 const Step1 = dynamic(() => import("~/compounds/AddErc20/Steps/Step1"));
@@ -16,13 +19,13 @@ const StepsSummary = dynamic(
 
 const STEP_MAP = [Step1, Step2, Step3, Step4];
 
-type Props = {
+type AddErc20Props = {
   trigger?: JSX.Element;
   tokenAddress?: `0x${string}`;
 };
 
-export const AddErc20: FC<Props> = (props) => {
-  const { state, actions } = useAddErc20State();
+export const AddErc20: FC<AddErc20Props> = (props) => {
+  const { state, actions } = useAddErc20StateContainer();
 
   useEffect(() => {
     if (!props.tokenAddress) {
@@ -80,30 +83,7 @@ export const AddErc20: FC<Props> = (props) => {
           currentStep={state.step}
           newTokenType={state.newTokenType}
         />
-        <CurrentStep
-          newTokenType={state.newTokenType}
-          decimals={state.decimals}
-          tokenName={state.tokenName}
-          tokenSymbol={state.tokenSymbol}
-          amountToMint={state.amountToMint}
-          deployedTokenAddress={state.deployedTokenAddress}
-          txHash={state.txHash}
-          selectedChains={state.selectedChains}
-          tokenAlreadyRegistered={state.tokenAlreadyRegistered}
-          isPreexistingToken={state.isPreExistingToken}
-          setNewTokenType={actions.setNewTokenType}
-          setDecimals={actions.setDecimals}
-          setTokenName={actions.setTokenName}
-          setTokenSymbol={actions.setTokenSymbol}
-          setAmountToMint={actions.setAmountToMint}
-          incrementStep={actions.setStep.bind(null, state.step + 1)}
-          setDeployedTokenAddress={actions.setDeployedTokenAddress}
-          setTxhash={actions.setTxHash}
-          addSelectedChain={actions.addSelectedChain}
-          removeSelectedChain={actions.removeSelectedChain}
-          setTokenAlreadyRegistered={actions.setTokenAlreadyRegistered}
-          setIsPreexistingToken={actions.setIsPreExistingToken}
-        />
+        <CurrentStep />
       </Modal.Body>
       <Modal.Actions>
         {back()}
@@ -112,4 +92,13 @@ export const AddErc20: FC<Props> = (props) => {
     </Modal>
   );
 };
-export default AddErc20;
+
+const AddErc20WithProvider = (props: AddErc20Props) => {
+  return (
+    <AddErc20StateProvider>
+      <AddErc20 {...props} />
+    </AddErc20StateProvider>
+  );
+};
+
+export default AddErc20WithProvider;
