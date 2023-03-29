@@ -48,9 +48,7 @@ export const AddErc20: FC<AddErc20Props> = (props) => {
         Close
       </Modal.CloseAction>
     ) : (
-      <Button length="wide" onClick={() => actions.setStep(state.step - 1)}>
-        Back
-      </Button>
+      <Button onClick={() => actions.setStep(state.step - 1)}>Back</Button>
     );
 
   const forward = () =>
