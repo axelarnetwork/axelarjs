@@ -1,6 +1,12 @@
 import { FC, ReactNode, useMemo } from "react";
 
-import { Badge, Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CopyToClipboardButton,
+  SpinnerIcon,
+} from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
 import { BigNumber } from "ethers";
@@ -86,8 +92,15 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
             )
           )}
           {props.deploymentStatus && (
-            <Badge outline color="warning">
-              {props.deploymentStatus}
+            <Badge
+              outline
+              color="warning"
+              className="flex items-center gap-0.5"
+            >
+              <span className="-translate-x-1">
+                <SpinnerIcon className="text-info h-2.5 w-2.5 animate-spin" />
+              </span>
+              <span className="-translate-y-px">{props.deploymentStatus}</span>
             </Badge>
           )}
         </Card.Title>

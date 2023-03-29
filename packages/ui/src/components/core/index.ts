@@ -7,3 +7,8 @@ export const Clamp = tw.div`
 `;
 
 export const FormControl = tw.div`form-control`;
+
+export const Label = Object.assign(tw.label`label`, {
+  Text: tw.span`label-text`,
+  AltText: tw.span`label-text-alt`,
+});

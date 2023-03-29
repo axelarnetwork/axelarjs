@@ -1,9 +1,16 @@
-import React, { FC, FormEvent, FormEventHandler, useCallback } from "react";
+import React, {
+  FC,
+  FormEvent,
+  FormEventHandler,
+  useCallback,
+  useMemo,
+} from "react";
 
-import { Button, Tooltip } from "@axelarjs/ui";
+import { Button, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
 import { useNetwork } from "wagmi";
 
+import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
@@ -133,14 +140,16 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
   >(
     async (e) => {
       e.preventDefault();
-      console.log("handleRegisterAndDeployRemoteTokens");
 
       if (
         state.isGasPriceQueryLoading ||
         state.isGasPriceQueryError ||
         !state.gasFees
       ) {
-        console.warn("gas prices not loaded");
+        logger.warn(
+          "[handleRegisterAndDeployRemoteTokens]: ",
+          "gas prices not loaded"
+        );
         return;
       }
       actions.setIsDeploying(true);
@@ -215,53 +224,79 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     ]
   );
 
-  return (
-    <form className="flex flex-col" onSubmit={handleSubmit}>
-      <label>Chains to deploy remote tokens</label>
-      <div className="my-5 flex flex-wrap gap-3">
-        {state.evmChains?.map((chain) => {
-          const isSelected = props.selectedChains.has(chain.chain_name);
-          return (
-            <Tooltip tip={chain.name} key={chain.chain_name}>
-              <Button
-                ghost={true}
-                shape="circle"
-                className="h-[40] w-[40] rounded-full"
-                size="sm"
-                color="primary"
-                outline={isSelected}
-                onClick={() => {
-                  const action = isSelected
-                    ? props.removeSelectedChain
-                    : props.addSelectedChain;
+  const tooltipPositionOverrides = useMemo(() => {
+    return {
+      // position the first tooltip to the right
+      0: "right" as const,
+      // position the last tooltip to the left
+      [Number(state.evmChains?.length) - 1]: "left" as const,
+    };
+  }, [state.evmChains?.length]);
 
-                  action(chain.chain_name);
-                }}
+  return (
+    <form className="grid gap-4" onSubmit={handleSubmit}>
+      <FormControl>
+        <Label>
+          <Label.Text>Chains to deploy remote tokens</Label.Text>
+        </Label>
+        <div className="bg-base-300 flex flex-wrap justify-evenly gap-2.5 rounded-lg p-2">
+          {state.evmChains?.map((chain, i) => {
+            const isSelected = props.selectedChains.has(chain.chain_name);
+            return (
+              <Tooltip
+                tip={`Deploy on ${chain.name}`}
+                key={chain.chain_name}
+                position={tooltipPositionOverrides[i] ?? "top"}
               >
-                <Image
-                  className="pointer-events-none rounded-full"
-                  src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
-                  width={24}
-                  height={24}
-                  alt="chain logo"
-                />
-              </Button>
-            </Tooltip>
-          );
-        })}
-      </div>
-      <label className="text-md">
-        Is Token registered{" "}
-        {props.tokenAlreadyRegistered
-          ? "Token registered"
-          : "Token isnt registered"}
-      </label>
-      <label className="text-md">
-        Approximate cost: {state.totalGasFee}{" "}
-        {state?.sourceChainId && getNativeToken(state.sourceChainId)}
-      </label>
-      <Button loading={state.isDeploying} type="submit">
-        Deploy
+                <Button
+                  ghost={true}
+                  shape="circle"
+                  className="h-[40] w-[40] rounded-full"
+                  size="sm"
+                  color="primary"
+                  outline={isSelected}
+                  onClick={() => {
+                    const action = isSelected
+                      ? props.removeSelectedChain
+                      : props.addSelectedChain;
+
+                    action(chain.chain_name);
+                  }}
+                >
+                  <Image
+                    className="pointer-events-none rounded-full"
+                    src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
+                    width={24}
+                    height={24}
+                    alt="chain logo"
+                  />
+                </Button>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </FormControl>
+      <Button
+        loading={state.isDeploying}
+        type="submit"
+        disabled={
+          state.isGasPriceQueryLoading ||
+          state.isGasPriceQueryError ||
+          !state.gasFees?.length
+        }
+      >
+        Deploy{" "}
+        {Boolean(state.gasFees?.length) &&
+          `and register on ${state.gasFees?.length} chain${
+            Number(state.gasFees?.length) > 1 ? "s" : ""
+          }`}
+        <Tooltip tip="Approximate gas cost">
+          <span className="ml-2 text-xs">
+            (≈ {state.totalGasFee}{" "}
+            {state?.sourceChainId && getNativeToken(state.sourceChainId)} in
+            fees)
+          </span>
+        </Tooltip>
       </Button>
     </form>
   );

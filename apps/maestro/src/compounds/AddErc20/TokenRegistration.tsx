@@ -18,7 +18,6 @@ export const TokenRegistration: FC<{}> = () => {
   return (
     <>
       <label>Register Origin Token On: </label>
-
       <EVMChainsDropdown
         compact={true}
         selectedChain={selectedChain}

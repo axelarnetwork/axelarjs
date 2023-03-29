@@ -12,14 +12,8 @@ export const StepsSummary: FC<StepsSummaryProps> = (
   return (
     <Steps className="my-10 h-24 w-full text-sm">
       <Steps.Step active={props.currentStep >= 0}>Select Flow</Steps.Step>
-      <Steps.Step active={props.currentStep >= 1}>
-        {props.newTokenType === "new"
-          ? "New token details"
-          : "Validate your ERC-20"}
-      </Steps.Step>
-      <Steps.Step active={props.currentStep >= 2}>
-        Deploy & Register token
-      </Steps.Step>
+      <Steps.Step active={props.currentStep >= 1}>Token details</Steps.Step>
+      <Steps.Step active={props.currentStep >= 2}>Deploy & Register</Steps.Step>
       <Steps.Step active={props.currentStep >= 3}>Review</Steps.Step>
     </Steps>
   );
