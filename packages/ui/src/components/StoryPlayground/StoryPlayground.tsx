@@ -133,7 +133,7 @@ const Variants = <
 
           <div
             className={clsx(
-              "artboard artboard-demo mx-auto p-4 transition-all duration-300",
+              "artboard artboard-demo bg-base-300 mx-auto p-4 transition-all duration-300",
               { ...viewports }
             )}
           >
