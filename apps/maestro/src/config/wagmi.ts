@@ -14,6 +14,8 @@ import {
   celoAlfajores,
   fantom,
   fantomTestnet,
+  filecoin,
+  filecoinHyperspace,
   goerli,
   mainnet,
   moonbaseAlpha,
@@ -114,7 +116,20 @@ export const EVM_CHAIN_CONFIGS = [
     },
     testnet: true,
   },
+  {
+    ...filecoinHyperspace,
+    networkNameOnAxelar: "filecoin",
+    environment: "testnet",
+  },
+  { ...filecoin, networkNameOnAxelar: "filecoin", environment: "mainnet" },
 ].filter((chain) => chain.environment === NETWORK_ENV);
+
+logger.info({
+  [`chain configs on "${NETWORK_ENV}"`]: EVM_CHAIN_CONFIGS.map((x) => ({
+    id: x.id,
+    name: x.name,
+  })),
+});
 
 const { webSocketProvider, provider } = configureChains(EVM_CHAIN_CONFIGS, [
   publicProvider(),
