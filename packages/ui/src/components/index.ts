@@ -8,6 +8,7 @@ export * from "./Dropdown";
 export * from "./Footer";
 export * from "./icons";
 export * from "./InputGroup";
+export * from "./Kbd";
 export * from "./Modal";
 export * from "./Navbar";
 export * from "./Steps";
