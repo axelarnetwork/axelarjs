@@ -24,6 +24,13 @@ type LogArgs<T extends unknown[]> =
 
 type LoggerFn = <T extends unknown[]>(...message: T) => void;
 
+const PREFIXES: Record<LogSeverity, string> = {
+  log: "⚡ :",
+  info: "💡 :",
+  warn: "💣 :",
+  error: "💥 :",
+};
+
 class Logger {
   isDevEnviroment: boolean = false;
 
@@ -42,7 +49,8 @@ class Logger {
 
     if (message && message) {
       const logger = getLogger(severity);
-      logger(...message);
+      const prefix = PREFIXES[severity];
+      logger(prefix, ...message);
     } else {
       return (...messages: T) => this.logMessage(severity, alwaysLog, messages);
     }
