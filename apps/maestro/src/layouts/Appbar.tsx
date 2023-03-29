@@ -2,6 +2,7 @@ import React, { FC, useMemo } from "react";
 
 import {
   AxelarIcon,
+  Badge,
   Button,
   CopyToClipboardButton,
   LinkButton,
@@ -46,11 +47,21 @@ const Appbar: FC<AppbarProps> = (props) => {
     >
       <Navbar.Start>
         <LinkButton
-          className="flex items-center gap-2 text-lg font-bold uppercase"
+          className="relative flex items-center gap-2 text-lg font-bold uppercase"
           ghost={true}
           onClick={() => router.push("/")}
         >
           <AxelarIcon className="h-6 w-6 dark:invert" />
+          {process.env.NEXT_PUBLIC_NETWORK_ENV === "testnet" && (
+            <Badge
+              className="absolute -right-14 lowercase"
+              size="xs"
+              color="error"
+              outline
+            >
+              testnet
+            </Badge>
+          )}
           {APP_NAME}
         </LinkButton>
       </Navbar.Start>

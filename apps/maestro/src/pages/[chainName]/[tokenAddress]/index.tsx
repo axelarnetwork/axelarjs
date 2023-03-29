@@ -32,7 +32,7 @@ const InterchainTokensPage = () => {
 
   const routeChain = useChainFromRoute();
 
-  const { data: interchainToken } = useInterchainTokensQuery({
+  const { data: interchainToken, isLoading } = useInterchainTokensQuery({
     chainId: routeChain?.id,
     tokenAddress: tokenAddress as `0x${string}`,
   });
@@ -46,6 +46,7 @@ const InterchainTokensPage = () => {
       mustBeConnected
       pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
       className="!flex flex-1 flex-col gap-12 md:gap-16"
+      isLoading={isLoading}
     >
       <section>
         <div className="flex items-center justify-between">
