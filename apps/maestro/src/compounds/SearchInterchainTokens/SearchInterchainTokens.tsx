@@ -31,7 +31,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
 
   const isValidAddress = isAddress(search as `0x${string}`);
 
-  const { data, isFetching, error, isFetched } = useInterchainTokensQuery({
+  const { data, error, isLoading } = useInterchainTokensQuery({
     chainId: chain?.id,
     tokenAddress: search as `0x${string}`,
   });
@@ -58,7 +58,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
           color={error ? "error" : undefined}
         />
         <span>
-          {isFetching ? (
+          {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
             <Tooltip tip={chain?.name || ""}>

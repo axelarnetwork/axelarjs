@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 
-import { TextInput } from "@axelarjs/ui";
+import { Card, TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
@@ -79,20 +79,20 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     props.setTokenAlreadyRegistered(
       Boolean(tlData?.tokenId && tlData?.tokenId !== ADDRESS_ZERO_BYTES32)
     );
-  }, [props.address, token, tlData]);
+  }, [props.address, token, tlData, props]);
 
   return (
-    <div>
-      <div>{props.address}</div>
-      <div>
-        Does token exist:{" "}
-        {tlData.tokenId && tlData?.tokenId !== ADDRESS_ZERO_BYTES32
-          ? "Token Exists"
-          : "Token Doesnt Exist"}
-      </div>
-      <div>Decimals: {tokenDecimals}</div>
-      <div>Token Name: {tokenName}</div>
-      <div>Token Symbol: {tokenSymbol}</div>
-    </div>
+    <Card className="bg-base-300" compact>
+      <Card.Body $as="ul" className="list-inside">
+        <Card.Title>
+          <h3>Token Details</h3>
+        </Card.Title>
+        <ul>
+          <li className="list-item">Decimals: {tokenDecimals}</li>
+          <li className="list-item">Token Name: {tokenName}</li>
+          <li className="list-item">Token Symbol: {tokenSymbol}</li>
+        </ul>
+      </Card.Body>
+    </Card>
   );
 };

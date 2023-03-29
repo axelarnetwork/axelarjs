@@ -32,7 +32,7 @@ export const AddErc20: FC<Props> = (props) => {
     actions.setStep(1);
     actions.setIsPreExistingToken(true);
     actions.setNewTokenType("existing");
-  }, [props.tokenAddress]);
+  }, [actions, props.tokenAddress]);
 
   const CurrentStep = useMemo(() => STEP_MAP[state.step], [state.step]);
 
