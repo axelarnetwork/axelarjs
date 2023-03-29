@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler, useCallback } from "react";
+import React, { FC, FormEvent, FormEventHandler, useCallback } from "react";
 
 import { Button, Tooltip } from "@axelarjs/ui";
 import Image from "next/image";
@@ -32,7 +32,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     tokenAddress: props.deployedTokenAddress as `0x${string}`,
   });
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // ==> dimension 1: isPreexisting (0 = no, 1 - yes)
     // ==> dimension 2: isTokenAlreadyRegistered (0 = no, 1 - yes)
@@ -51,6 +51,7 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
     const ar = +Boolean(props.tokenAlreadyRegistered); //already-registered
     const oc = +Boolean(props.selectedChains.size > 0); //other-chains
     const decision = decisionMatrix[pe][ar][oc];
+
     if (decision) {
       decision(e);
     } else {
@@ -83,20 +84,24 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
       props.incrementStep();
     },
     [
-      actions.setIsDeploying,
-      deployRemoteTokens,
-      props,
-      state.isGasPriceQueryError,
+      state.isGasPriceQueryLoading,
       state.isGasPriceQueryError,
       state.gasFees,
+      tokenData.tokenId,
+      actions,
+      deployRemoteTokens,
+      props,
     ]
   );
 
@@ -111,14 +116,16 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       await registerOriginToken({
         tokenAddress: props.deployedTokenAddress as `0x${string}`,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
       props.incrementStep();
     },
-    [actions.setIsDeploying, registerOriginToken, props]
+    [actions, registerOriginToken, props]
   );
 
   const handleRegisterAndDeployRemoteTokens = useCallback<
@@ -142,8 +149,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
         destinationChainIds: Array.from(props.selectedChains),
         gasFees: state.gasFees,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
@@ -153,10 +162,9 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       state.isGasPriceQueryLoading,
       state.isGasPriceQueryError,
       state.gasFees,
-      actions.setIsDeploying,
+      actions,
       registerOriginTokenAndDeployRemoteTokens,
       props,
-      props.selectedChains,
     ]
   );
 
@@ -186,8 +194,10 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
           (evmChain) => evmChain.chain_id === state.network.chain?.id
         )?.chain_name as string,
         onStatusUpdate: (data) => {
-          props.setDeployedTokenAddress(data.tokenAddress as string);
-          data.txHash && props.setTxhash(data.txHash);
+          if (data.type === "deployed") {
+            props.setDeployedTokenAddress(data.tokenAddress as string);
+            data.txHash && props.setTxhash(data.txHash);
+          }
         },
       });
       actions.setIsDeploying(false);
@@ -197,12 +207,11 @@ export const Step3: FC<StepProps> = (props: StepProps) => {
       state.isGasPriceQueryLoading,
       state.isGasPriceQueryError,
       state.gasFees,
-      actions.setIsDeploying,
-      deployAndRegisterToken,
-      props,
-      props.selectedChains,
       state.evmChains,
       state.network.chain?.id,
+      actions,
+      deployAndRegisterToken,
+      props,
     ]
   );
 

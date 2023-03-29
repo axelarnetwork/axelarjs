@@ -1,18 +1,16 @@
 import { FC, ReactNode, useMemo } from "react";
 
-import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
+import { Badge, Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
 import { BigNumber } from "ethers";
-import { propEq } from "rambda";
-import invariant from "tiny-invariant";
-import { useAccount, useSwitchNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
-import { useGetERC20TokenBalanceForOwner } from "~/services/gmp/hooks";
+import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
+import { GMPStatus } from "~/services/gmp/types";
 
 type TokenInfo = {
   chainId: number;
@@ -22,16 +20,16 @@ type TokenInfo = {
   tokenId: `0x${string}`;
   isSelected?: boolean;
   chain?: EVMChainConfig;
+  deploymentStatus?: "pending" | GMPStatus;
 };
 
 export type InterchainTokenProps = TokenInfo & {
-  onSwitchNetwork?: (chainId: number) => void;
   onToggleSelection?: () => void;
 };
 
 export const InterchainToken: FC<InterchainTokenProps> = (props) => {
   const { address } = useAccount();
-  const { data: balance } = useGetERC20TokenBalanceForOwner({
+  const { data: balance } = useGetERC20TokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenLinkerTokenId: props.tokenId,
     owner: address,
@@ -41,24 +39,29 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       compact={true}
       key={props.chainId}
       bordered={!props.isRegistered}
-      onClick={props.onToggleSelection}
+      onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
       className={clsx(
         "bg-base-200 dark:bg-base-300 transition-all ease-in",
         "hover:opacity-75 hover:shadow-xl",
         {
           "shadow-sm": !props.isRegistered,
-          "ring-primary/50 ring-4": props.isSelected,
           "cursor-pointer": props.onToggleSelection,
+          "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 ring-4":
+            props.isSelected,
         }
       )}
       aria-label={
         props.onToggleSelection ? "click to toggle token selection" : undefined
       }
       aria-selected={props.isSelected}
-      $as={props.onToggleSelection ? "button" : undefined}
+      $as={
+        props.onToggleSelection && !props.deploymentStatus
+          ? "button"
+          : undefined
+      }
       role={props.onToggleSelection ? "switch" : undefined}
     >
-      <Card.Body>
+      <Card.Body className="w-full">
         <Card.Title className="justify-between">
           {props.chain && (
             <span className="flex items-center gap-2">
@@ -72,34 +75,53 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
           )}
 
           {props.isOriginToken ? (
-            <span className="badge badge-success badge-outline">origin</span>
+            <Badge outline color="success">
+              origin
+            </Badge>
           ) : (
             props.isRegistered && (
-              <span className="badge badge-info badge-outline">registered</span>
+              <Badge outline color="info">
+                registered
+              </Badge>
             )
+          )}
+          {props.deploymentStatus && (
+            <Badge outline color="warning">
+              {props.deploymentStatus}
+            </Badge>
           )}
         </Card.Title>
         {!props.isRegistered && (
-          <div className="mx-auto px-2">Remote token not registered</div>
+          <div className="mx-auto">Remote token not registered</div>
         )}
         {balance?.tokenBalance && (
-          <div className="flex items-center justify-between">
-            <div>
-              Balance:{" "}
-              <BigNumberText
-                decimals={balance.decimals}
-                localeOptions={{
-                  minimumFractionDigits: 0,
-                  notation: "compact",
-                }}
-              >
-                {balance.tokenBalance}
-              </BigNumberText>
-            </div>
-            {BigNumber.from(balance.tokenBalance).gt(0) && (
-              <Button size="xs" color="primary">
-                Send
-              </Button>
+          <div
+            className={clsx(
+              "bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4"
+            )}
+          >
+            {balance.tokenBalance === "0" ? (
+              <span className="mx-auto">No balance</span>
+            ) : (
+              <>
+                <div>
+                  Balance:{" "}
+                  <BigNumberText
+                    decimals={balance.decimals}
+                    localeOptions={{
+                      minimumFractionDigits: 0,
+                      notation: "compact",
+                    }}
+                  >
+                    {balance.tokenBalance}
+                  </BigNumberText>
+                </div>
+                {BigNumber.from(balance.tokenBalance).gt(0) && (
+                  <Button size="xs" color="primary">
+                    Send
+                  </Button>
+                )}
+              </>
             )}
           </div>
         )}
@@ -110,8 +132,12 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
               ghost={true}
               length="block"
               size="sm"
+              className="bg-base-300 dark:bg-base-100"
             >
-              {maskAddress(props.tokenAddress)}
+              {maskAddress(props.tokenAddress, {
+                segmentA: 14,
+                segmentB: -10,
+              })}
             </CopyToClipboardButton>
           )}
         </Card.Actions>
@@ -128,9 +154,7 @@ export type InterchainTokenListProps = {
 };
 
 export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
-  const { switchNetworkAsync } = useSwitchNetwork();
-
-  const cardPairs = useMemo(
+  const tokens = useMemo(
     () =>
       props.tokens
         .filter((x) => x.chain)
@@ -141,31 +165,49 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
     [props.tokens]
   );
 
+  const selectedTokens = tokens.filter((x) => x.isSelected);
+
   return (
     <section className="relative grid gap-4">
-      <header className="flex items-center gap-2 text-2xl">
-        <span className="font-bold">{props.title}</span>
-        <span className="font-mono text-xl opacity-50">
-          ({props.tokens.length})
-        </span>
+      <header className="flex items-center justify-between gap-2 text-2xl">
+        <div className="flex items-center gap-2">
+          <span className="font-bold">{props.title}</span>
+          <span className="font-mono text-xl opacity-50">
+            ({tokens.length})
+          </span>
+        </div>
+        {tokens.length > 0 && Boolean(props.onToggleSelection) && (
+          <Button
+            size="sm"
+            color="primary"
+            disabled={Boolean(
+              // disable if all tokens are selected or none are selected
+              selectedTokens.length && selectedTokens.length !== tokens.length
+            )}
+            onClick={() => {
+              tokens.forEach((token, i) => {
+                setTimeout(() => {
+                  props.onToggleSelection?.(token.chainId);
+                }, i * 25);
+              });
+            }}
+          >
+            Toggle All
+          </Button>
+        )}
       </header>
       <main>
-        <ul className="grid w-full grid-cols-3 gap-4">
-          {cardPairs?.map((token) => {
-            invariant(token, "token should be defined");
-
-            return (
-              <InterchainToken
-                key={token.chainId}
-                onSwitchNetwork={switchNetworkAsync}
-                onToggleSelection={props.onToggleSelection?.bind(
-                  null,
-                  token.chainId
-                )}
-                {...token}
-              />
-            );
-          })}
+        <ul className="grid w-full grid-cols-3 gap-4 md:gap-5">
+          {tokens.map((token) => (
+            <InterchainToken
+              key={token.chainId}
+              onToggleSelection={props.onToggleSelection?.bind(
+                null,
+                token.chainId
+              )}
+              {...token}
+            />
+          ))}
         </ul>
       </main>
       {props.footer && <footer>{props.footer}</footer>}

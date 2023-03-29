@@ -1,9 +1,8 @@
 import { BigNumber } from "ethers";
-import { hexlify, hexZeroPad } from "ethers/lib/utils";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
-import { getTokenDeployedEventFromTxReceipt } from "~/lib/utils/findContractEvent";
+import { logger } from "~/lib/logger";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -45,7 +44,7 @@ export function useDeployRemoteTokensMutation() {
       );
 
       const txDone = await deployRemoteTokensTx.wait(1);
-      console.log("deployRemoteTokensTxDone", txDone);
+      logger.log("deployRemoteTokensTxDone", txDone);
 
       if (input.onStatusUpdate) {
         input.onStatusUpdate({
@@ -59,7 +58,7 @@ export function useDeployRemoteTokensMutation() {
         input.onFinished();
       }
     } catch (e) {
-      console.log("something went wrong", e);
+      logger.log("something went wrong", e);
       if (input.onStatusUpdate) {
         input.onStatusUpdate({ type: "idle" });
       }

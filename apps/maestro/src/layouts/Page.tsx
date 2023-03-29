@@ -69,28 +69,37 @@ const Page = ({
         return <div>Loading...</div>;
       case "disconnected":
         return (
-          <ConnectWalletButton size="md" length="block" className="max-w-md" />
+          <div className="grid w-full flex-1 place-items-center">
+            <ConnectWalletButton
+              size="md"
+              length="block"
+              className=" max-w-md"
+            />
+          </div>
         );
       case "network-mismatch":
         return !evmChain ? null : (
-          <div className="grid w-full place-items-center gap-4">
-            <div className="flex items-center gap-1 text-xl font-semibold">
-              {`You're currently connected to `}
-              {evmChain.name}{" "}
-              <ChainIcon
-                size="md"
-                src={String(evmChain.image)}
-                alt={evmChain.name}
-              />
+          <div className="grid w-full flex-1 place-items-center">
+            <div className="grid w-full place-items-center gap-4">
+              <div className="flex items-center gap-1 text-xl font-semibold">
+                {`You're currently connected to ${evmChain.name} `}
+                <ChainIcon
+                  size="md"
+                  src={String(evmChain.image)}
+                  alt={evmChain.name}
+                />
+              </div>
+              <Button
+                color="primary"
+                length="block"
+                className="max-w-md"
+                onClick={() =>
+                  switchNetworkAsync?.(evmChainFromRoute?.chain_id)
+                }
+              >
+                Switch to {evmChainFromRoute?.name}
+              </Button>
             </div>
-            <Button
-              color="primary"
-              length="block"
-              className="max-w-md"
-              onClick={() => switchNetworkAsync?.(evmChainFromRoute?.chain_id)}
-            >
-              Switch to {evmChainFromRoute?.name}
-            </Button>
           </div>
         );
       case "connected":

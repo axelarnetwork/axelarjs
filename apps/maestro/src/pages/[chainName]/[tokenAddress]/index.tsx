@@ -1,17 +1,28 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
-import { Button, Card, CopyToClipboardButton, Tooltip } from "@axelarjs/ui";
+import {
+  Button,
+  CopyToClipboardButton,
+  LinkButton,
+  Tooltip,
+} from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import { isAddress } from "ethers/lib/utils.js";
+import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
-import { partition, sortBy, without } from "rambda";
+import { partition, without } from "rambda";
+import { useAccount } from "wagmi";
 
-import { AddErc20 } from "~/compounds";
+import { useDeployRemoteTokensMutation } from "~/compounds/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/compounds/InterchainTokenList";
-import { SendInterchainToken } from "~/compounds/SendInterchainToken";
 import Page from "~/layouts/Page";
 import { useChainFromRoute } from "~/lib/hooks";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import {
+  useGetTransactionStatusOnDestinationChainsQuery,
+  useInterchainTokensQuery,
+} from "~/services/gmp/hooks";
+import { GMPStatus } from "~/services/gmp/types";
 
 const InterchainTokensPage = () => {
   const { chainName, tokenAddress } = useRouter().query as {
@@ -32,9 +43,9 @@ const InterchainTokensPage = () => {
 
   return (
     <Page
-      pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
       mustBeConnected
-      className="!flex flex-col gap-12"
+      pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
+      className="!flex flex-1 flex-col gap-12 md:gap-16"
     >
       <section>
         <div className="flex items-center justify-between">
@@ -68,10 +79,12 @@ const InterchainTokensPage = () => {
           </div>
         </div>
       </section>
-      <ConnectedInterchainTokensPage
-        chainId={routeChain?.id}
-        tokenAddress={tokenAddress}
-      />
+      {routeChain && (
+        <ConnectedInterchainTokensPage
+          chainId={routeChain?.id}
+          tokenAddress={tokenAddress}
+        />
+      )}
     </Page>
   );
 };
@@ -79,14 +92,15 @@ const InterchainTokensPage = () => {
 export default InterchainTokensPage;
 
 type ConnectedInterchainTokensPageProps = {
-  chainId?: number;
+  chainId: number;
   tokenAddress: `0x${string}`;
 };
 
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
-  const { data: interchainToken } = useInterchainTokensQuery({
+  const { address } = useAccount();
+  const { data: interchainToken, refetch } = useInterchainTokensQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress as `0x${string}`,
   });
@@ -100,6 +114,99 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     partition((x) => x.isRegistered)
   );
 
+  const [deployTokensTxHash, setDeployTokensTxHash] = useState<`0x${string}`>();
+
+  const { mutateAsync: deployRemoteTokens, isLoading: isDeploying } =
+    useDeployRemoteTokensMutation();
+
+  const targetDeploymentChains = useMemo(() => {
+    return selectedChainIds
+      .map((x) => unregistered.find((y) => y.chainId === x)?.chain.id)
+      .filter(Boolean) as string[];
+  }, [selectedChainIds, unregistered]);
+
+  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
+    txHash: deployTokensTxHash,
+  });
+
+  const statusesByChain = useMemo(() => {
+    return (
+      statuses ??
+      targetDeploymentChains.reduce(
+        (acc, chainId) => ({
+          ...acc,
+          [chainId]: "pending" as const,
+        }),
+        {} as Record<string, "pending" | GMPStatus>
+      )
+    );
+  }, [statuses, targetDeploymentChains]);
+
+  const deployedTokens = useMemo(() => {
+    return Object.entries(statusesByChain)
+      .filter(([_, status]) => status === "executed")
+      .map(([chainId, _]) => chainId);
+  }, [statusesByChain]);
+
+  useEffect(() => {
+    if (targetDeploymentChains.length === 0 || deployedTokens.length === 0) {
+      return;
+    }
+
+    if (deployedTokens.length === targetDeploymentChains.length) {
+      setSelectedChainIds([]);
+      setDeployTokensTxHash(undefined);
+
+      console.log("deployedTokens", deployedTokens);
+
+      refetch();
+    }
+  }, [
+    address,
+    deployedTokens,
+    targetDeploymentChains,
+    interchainToken.tokenId,
+    props.chainId,
+    props.tokenAddress,
+    refetch,
+  ]);
+
+  const {
+    data: gasFees,
+    isLoading: isGasPriceQueryLoading,
+    isError: isGasPriceQueryError,
+  } = useEstimateGasFeeMultipleChains({
+    sourceChainId: interchainToken.chain.id,
+    destinationChainIds: targetDeploymentChains,
+    gasLimit: 1_000_000,
+    gasMultipler: 2,
+  });
+
+  const handleDeployRemoteTokens = useCallback(async () => {
+    if (!(props.chainId && interchainToken?.tokenId && gasFees)) {
+      return;
+    }
+
+    await deployRemoteTokens({
+      destinationChainIds: targetDeploymentChains,
+      tokenAddress: props.tokenAddress,
+      tokenId: interchainToken.tokenId,
+      gasFees,
+      onStatusUpdate(status) {
+        if (status.type === "deployed") {
+          setDeployTokensTxHash(status.txHash);
+        }
+      },
+    });
+  }, [
+    props.chainId,
+    props.tokenAddress,
+    interchainToken.tokenId,
+    gasFees,
+    deployRemoteTokens,
+    targetDeploymentChains,
+  ]);
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       <InterchainTokenList
@@ -111,8 +218,15 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         tokens={unregistered.map((x) => ({
           ...x,
           isSelected: selectedChainIds.includes(x.chainId),
+          deploymentStatus:
+            deployTokensTxHash && x.chain?.id
+              ? statusesByChain[x.chain.id]
+              : undefined,
         }))}
         onToggleSelection={(chainId) => {
+          if (deployTokensTxHash) {
+            return;
+          }
           setSelectedChainIds((selected) =>
             selected.includes(chainId)
               ? without([chainId], selected)
@@ -121,12 +235,33 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         }}
         footer={
           <div className="flex h-4 w-full justify-end p-4">
-            {selectedChainIds.length > 0 ? (
-              <Button color="accent">
+            {selectedChainIds.length > 0 && !deployTokensTxHash ? (
+              <Button
+                color="accent"
+                onClick={handleDeployRemoteTokens}
+                disabled={
+                  isGasPriceQueryLoading ||
+                  isGasPriceQueryError ||
+                  Boolean(deployTokensTxHash)
+                }
+                loading={isDeploying}
+              >
                 Deploy token on {selectedChainIds.length} additional chain
                 {selectedChainIds.length > 1 ? "s" : ""}
               </Button>
             ) : undefined}
+            {deployTokensTxHash && (
+              <LinkButton
+                color="accent"
+                outline
+                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${deployTokensTxHash}`}
+                className="flex items-center gap-2"
+                target="_blank"
+              >
+                View on axelarscan {maskAddress(deployTokensTxHash)}{" "}
+                <ExternalLink className="h-4 w-4" />
+              </LinkButton>
+            )}
           </div>
         }
       />

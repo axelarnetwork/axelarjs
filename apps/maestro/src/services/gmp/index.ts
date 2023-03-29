@@ -6,8 +6,10 @@ import type {
   SearchGMPResponse,
 } from "./types";
 
+const PREFIX_URL = String(process.env.NEXT_PUBLIC_GMP_API_URL);
+
 export const client = ky.extend({
-  prefixUrl: String(process.env.NEXT_PUBLIC_GMP_API_URL),
+  prefixUrl: PREFIX_URL,
 });
 
 async function searchGMP(params: SearchGMPParams) {
@@ -19,7 +21,7 @@ async function searchGMP(params: SearchGMPParams) {
       },
     })
     .json<SearchGMPResponse>()
-    .catch(() => ({ data: [] }));
+    .catch(() => ({ data: [] as SearchGMPResponse["data"] }));
 }
 
 async function getContracts() {
