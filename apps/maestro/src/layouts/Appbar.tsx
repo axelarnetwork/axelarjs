@@ -11,7 +11,6 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 

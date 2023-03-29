@@ -45,7 +45,9 @@ export const AddErc20: FC<Props> = (props) => {
         Close
       </Modal.CloseAction>
     ) : (
-      <Button onClick={() => actions.setStep(state.step - 1)}>Back</Button>
+      <Button length="wide" onClick={() => actions.setStep(state.step - 1)}>
+        Back
+      </Button>
     );
 
   const forward = () =>
@@ -69,7 +71,7 @@ export const AddErc20: FC<Props> = (props) => {
       };
 
   return (
-    <Modal {...conditionalProps}>
+    <Modal {...conditionalProps} hideCloseButton>
       <Modal.Body>
         <Modal.Title className="flex items-center gap-2">
           <TokenRegistration />
