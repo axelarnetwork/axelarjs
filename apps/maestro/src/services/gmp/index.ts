@@ -13,7 +13,6 @@ export const client = ky.extend({
 });
 
 async function searchGMP(params: SearchGMPParams) {
-  console.log("searchGMP", { params, url: PREFIX_URL });
   return await client
     .post("", {
       json: {

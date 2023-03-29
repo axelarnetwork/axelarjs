@@ -39,7 +39,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       compact={true}
       key={props.chainId}
       bordered={!props.isRegistered}
-      onClick={props.onToggleSelection}
+      onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
       className={clsx(
         "bg-base-200 dark:bg-base-300 transition-all ease-in",
         "hover:opacity-75 hover:shadow-xl",
@@ -54,7 +54,11 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
         props.onToggleSelection ? "click to toggle token selection" : undefined
       }
       aria-selected={props.isSelected}
-      $as={props.onToggleSelection ? "button" : undefined}
+      $as={
+        props.onToggleSelection && !props.deploymentStatus
+          ? "button"
+          : undefined
+      }
       role={props.onToggleSelection ? "switch" : undefined}
     >
       <Card.Body className="w-full">
@@ -91,23 +95,33 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
           <div className="mx-auto">Remote token not registered</div>
         )}
         {balance?.tokenBalance && (
-          <div className="bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2">
-            <div>
-              Balance:{" "}
-              <BigNumberText
-                decimals={balance.decimals}
-                localeOptions={{
-                  minimumFractionDigits: 0,
-                  notation: "compact",
-                }}
-              >
-                {balance.tokenBalance}
-              </BigNumberText>
-            </div>
-            {BigNumber.from(balance.tokenBalance).gt(0) && (
-              <Button size="xs" color="primary">
-                Send
-              </Button>
+          <div
+            className={clsx(
+              "bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4"
+            )}
+          >
+            {balance.tokenBalance === "0" ? (
+              <span className="mx-auto">No balance</span>
+            ) : (
+              <>
+                <div>
+                  Balance:{" "}
+                  <BigNumberText
+                    decimals={balance.decimals}
+                    localeOptions={{
+                      minimumFractionDigits: 0,
+                      notation: "compact",
+                    }}
+                  >
+                    {balance.tokenBalance}
+                  </BigNumberText>
+                </div>
+                {BigNumber.from(balance.tokenBalance).gt(0) && (
+                  <Button size="xs" color="primary">
+                    Send
+                  </Button>
+                )}
+              </>
             )}
           </div>
         )}
