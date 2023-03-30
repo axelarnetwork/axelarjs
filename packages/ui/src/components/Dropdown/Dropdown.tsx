@@ -61,6 +61,6 @@ export const Dropdown = Object.assign(_Dropdown, {
 });
 
 Dropdown.Trigger.defaultProps = {
-  tabIndex: 0,
+  tabIndex: -1,
   role: "button",
 };
