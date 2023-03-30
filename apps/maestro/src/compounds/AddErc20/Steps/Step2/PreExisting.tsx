@@ -4,13 +4,12 @@ import { Card, TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
+import { useAddErc20StateContainer } from "~/compounds/AddErc20";
 import { ADDRESS_ZERO_BYTES32 } from "~/config/constants";
 import {
   useGetERC20TokenDetailsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
-
-import { useAddErc20StateContainer } from "../../AddErc20.state";
 
 export const PreExistingERC20Token: FC = () => {
   const { state } = useAddErc20StateContainer();
@@ -46,9 +45,11 @@ type ERC20DetailsProps = {
 export const ERC20Details: FC<ERC20DetailsProps> = (
   props: ERC20DetailsProps
 ) => {
-  const [tokenName, setTokenName] = useState("");
-  const [tokenSymbol, setTokenSymbol] = useState("");
-  const [tokenDecimals, setTokenDecimals] = useState(0);
+  const [tokenInfo, setTokenInfo] = useState<{
+    decimals: number;
+    tokenName: string;
+    tokenSymbol: string;
+  }>();
 
   const { chain } = useNetwork();
   const { data: tlData } = useInterchainTokensQuery({
@@ -63,27 +64,27 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   const { actions } = useAddErc20StateContainer();
 
   useEffect(() => {
-    token?.decimals && setTokenDecimals(token.decimals as number);
-    token?.tokenName && setTokenName(token.tokenName as string);
-    token?.tokenSymbol && setTokenSymbol(token.tokenSymbol as string);
-    token && actions.setIsPreExistingToken(Boolean(token));
-    token && actions.setDeployedTokenAddress(props.address);
-
+    if (token) {
+      setTokenInfo(token);
+      actions.setIsPreExistingToken(Boolean(token));
+      actions.setDeployedTokenAddress(props.address);
+    }
     actions.setTokenAlreadyRegistered(
       Boolean(tlData?.tokenId && tlData?.tokenId !== ADDRESS_ZERO_BYTES32)
     );
   }, [props.address, token, tlData, props, actions]);
 
   return (
-    <Card className="bg-base-300" compact>
+    <Card className="bg-base-200 dark:bg-base-300" compact>
       <Card.Body $as="ul" className="list-inside">
         <Card.Title>
           <h3>Token Details</h3>
         </Card.Title>
+
         <ul>
-          <li className="list-item">Decimals: {tokenDecimals}</li>
-          <li className="list-item">Token Name: {tokenName}</li>
-          <li className="list-item">Token Symbol: {tokenSymbol}</li>
+          <li>Decimals: {tokenInfo?.decimals ?? "..."}</li>
+          <li>Token Name: {tokenInfo?.tokenName ?? "..."}</li>
+          <li>Token Symbol: {tokenInfo?.tokenSymbol ?? "..."}</li>
         </ul>
       </Card.Body>
     </Card>

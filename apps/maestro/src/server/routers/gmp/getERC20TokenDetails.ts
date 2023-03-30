@@ -43,9 +43,9 @@ export const getERC20TokenDetails = publicProcedure
       ]);
 
       return {
-        tokenName,
-        tokenSymbol,
-        decimals,
+        tokenName: String(tokenName),
+        tokenSymbol: String(tokenSymbol),
+        decimals: Number(decimals),
       };
     } catch (error) {
       // If we get a TRPC error, we throw it

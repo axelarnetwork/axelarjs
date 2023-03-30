@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { FormControl, Label, TextInput } from "@axelarjs/ui";
+import clsx from "clsx";
 
 import { useAddErc20StateContainer } from "~/compounds/AddErc20";
 
@@ -15,7 +16,7 @@ export const NewERC20Token: FC = () => {
           bordered
           value={state.tokenName}
           onChange={(e) => actions.setTokenName(e.target.value)}
-          placeholder="Input your token name"
+          placeholder="Enter your token name"
         />
       </FormControl>
       <FormControl>
@@ -24,9 +25,11 @@ export const NewERC20Token: FC = () => {
           bordered
           value={state.tokenSymbol}
           onChange={(e) => actions.setTokenSymbol(e.target.value)}
-          placeholder="Input your token symbol"
+          placeholder="Enter your token symbol"
           maxLength={11}
-          className="uppercase"
+          className={clsx({
+            uppercase: state.tokenSymbol.length > 0,
+          })}
         />
       </FormControl>
       <FormControl>
@@ -36,7 +39,7 @@ export const NewERC20Token: FC = () => {
           type="number"
           value={state.decimals}
           onChange={(e) => actions.setDecimals(parseInt(e.target.value))}
-          placeholder="Input your token decimals"
+          placeholder="Enter your token decimals"
           min={0}
         />
       </FormControl>
@@ -47,7 +50,7 @@ export const NewERC20Token: FC = () => {
           type="number"
           value={state.amountToMint}
           onChange={(e) => actions.setAmountToMint(parseInt(e.target.value))}
-          placeholder="Input your amount to mint"
+          placeholder="Enter your amount to mint"
           min={0}
         />
       </FormControl>

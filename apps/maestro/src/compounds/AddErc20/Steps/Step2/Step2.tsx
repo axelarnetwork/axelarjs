@@ -1,6 +1,7 @@
 import { FC } from "react";
 
-import { useAddErc20StateContainer } from "../../AddErc20.state";
+import { useAddErc20StateContainer } from "~/compounds/AddErc20";
+
 import { NewERC20Token } from "./NewERC20Token";
 import { PreExistingERC20Token } from "./PreExisting";
 

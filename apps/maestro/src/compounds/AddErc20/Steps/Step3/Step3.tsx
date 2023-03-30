@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 import { Button, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import { BigNumber } from "ethers";
 import Image from "next/image";
 import { useNetwork } from "wagmi";
 
@@ -199,11 +200,17 @@ export const Step3: FC = () => {
         return;
       }
       actions.setIsDeploying(true);
+
+      const amountToMint = BigNumber.from(rootState.amountToMint).mul(
+        10 ** rootState.decimals
+      );
+
       await deployAndRegisterToken({
         tokenName: rootState.tokenName,
         tokenSymbol: rootState.tokenSymbol,
         decimals: rootState.decimals,
         destinationChainIds: Array.from(rootState.selectedChains),
+        amountToMint,
         gasFees: state.gasFees,
         sourceChainId: state.evmChains?.find(
           (evmChain) => evmChain.chain_id === state.network.chain?.id
@@ -230,6 +237,7 @@ export const Step3: FC = () => {
       rootState.tokenSymbol,
       rootState.decimals,
       rootState.selectedChains,
+      rootState.amountToMint,
       rootActions,
     ]
   );

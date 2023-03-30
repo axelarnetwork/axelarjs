@@ -14,6 +14,7 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   decimals: number;
   destinationChainIds: string[];
   gasFees: BigNumber[];
+  amountToMint?: BigNumber;
   onFinished?: () => void;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
@@ -46,7 +47,7 @@ export function useDeployAndRegisterInterchainTokenMutation() {
             input.tokenName,
             input.tokenSymbol,
             input.decimals,
-            BigNumber.from("1000000000000000000000000"),
+            input.amountToMint || BigNumber.from(0),
             address,
             salt,
             input.destinationChainIds,
