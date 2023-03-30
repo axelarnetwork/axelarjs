@@ -203,13 +203,13 @@ export const Step3: FC = () => {
       actions.setIsDeploying(true);
 
       const amountToMint = BigNumber.from(rootState.amountToMint).mul(
-        10 ** rootState.decimals
+        10 ** rootState.tokenDecimals
       );
 
       await deployAndRegisterToken({
         tokenName: rootState.tokenName,
         tokenSymbol: rootState.tokenSymbol,
-        decimals: rootState.decimals,
+        decimals: rootState.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
         amountToMint,
         gasFees: state.gasFees,
@@ -236,7 +236,7 @@ export const Step3: FC = () => {
       deployAndRegisterToken,
       rootState.tokenName,
       rootState.tokenSymbol,
-      rootState.decimals,
+      rootState.tokenDecimals,
       rootState.selectedChains,
       rootState.amountToMint,
       rootActions,
