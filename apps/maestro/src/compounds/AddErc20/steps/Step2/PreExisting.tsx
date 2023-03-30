@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 
-import { Card, TextInput } from "@axelarjs/ui";
+import { Button, Card, Modal, TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
@@ -10,6 +10,8 @@ import {
   useGetERC20TokenDetailsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
+
+import { NextButton, PrevButton } from "../core";
 
 export const PreExistingERC20Token: FC = () => {
   const { state } = useAddErc20StateContainer();
@@ -61,7 +63,7 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     tokenAddress: props.address as `0x${string}`,
   });
 
-  const { actions } = useAddErc20StateContainer();
+  const { state, actions } = useAddErc20StateContainer();
 
   useEffect(() => {
     if (token) {
@@ -75,18 +77,26 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   }, [props.address, token, tlData, props, actions]);
 
   return (
-    <Card className="bg-base-200 dark:bg-base-300" compact>
-      <Card.Body $as="ul" className="list-inside">
-        <Card.Title>
-          <h3>Token Details</h3>
-        </Card.Title>
+    <>
+      <Card className="bg-base-200 dark:bg-base-300" compact>
+        <Card.Body $as="ul" className="list-inside">
+          <Card.Title>
+            <h3>Token Details</h3>
+          </Card.Title>
 
-        <ul>
-          <li>Decimals: {tokenInfo?.decimals ?? "..."}</li>
-          <li>Token Name: {tokenInfo?.tokenName ?? "..."}</li>
-          <li>Token Symbol: {tokenInfo?.tokenSymbol ?? "..."}</li>
-        </ul>
-      </Card.Body>
-    </Card>
+          <ul>
+            <li>Decimals: {tokenInfo?.decimals ?? "..."}</li>
+            <li>Token Name: {tokenInfo?.tokenName ?? "..."}</li>
+            <li>Token Symbol: {tokenInfo?.tokenSymbol ?? "..."}</li>
+          </ul>
+        </Card.Body>
+      </Card>
+      <Modal.Actions>
+        <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
+        <NextButton onClick={actions.incrementStep}>
+          Deploy & Register
+        </NextButton>
+      </Modal.Actions>
+    </>
   );
 };

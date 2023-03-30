@@ -29,6 +29,7 @@ importers:
       '@axelar-network/axelarjs-sdk': ^0.12.5
       '@axelarjs/ui': workspace:*
       '@axelarjs/utils': workspace:*
+      '@hookform/resolvers': ^3.0.0
       '@next/font': ^13.2.4
       '@tanstack/react-query': ^4.28.0
       '@tanstack/react-query-devtools': ^4.28.0
@@ -56,6 +57,7 @@ importers:
       rambda: ^7.5.0
       react: ^18.2.0
       react-dom: ^18.2.0
+      react-hook-form: ^7.43.8
       superjson: ^1.12.2
       tailwind-styled-components: ^2.2.0
       tailwindcss: ^3.3.0
@@ -69,6 +71,7 @@ importers:
       '@axelar-network/axelarjs-sdk': 0.12.5
       '@axelarjs/ui': link:../../packages/ui
       '@axelarjs/utils': link:../../packages/utils
+      '@hookform/resolvers': 3.0.0_react-hook-form@7.43.8
       '@trpc/client': 10.18.0_@trpc+server@10.18.0
       '@trpc/next': 10.18.0_fk7ybuwqrs7skzzxcj6wjc5c3i
       '@trpc/react-query': 10.18.0_rcvfzig2xktluz4p7kugxqlbwi
@@ -89,6 +92,7 @@ importers:
       rambda: 7.5.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      react-hook-form: 7.43.8_react@18.2.0
       superjson: 1.12.2
       tailwind-styled-components: 2.2.0_biqbaboplfbrettd7655fr4n2y
       typescript: 5.0.2
@@ -2792,6 +2796,14 @@ packages:
       client-only: 0.0.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@hookform/resolvers/3.0.0_react-hook-form@7.43.8:
+    resolution: {integrity: sha512-SQPefakODpyq25b/phHXDKCdRrEfPcCXV7B4nAa139wE1DxufYbbNAjeo0T04ZXBokRxZ+wD8iA1kkVMa3QwjQ==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.43.8_react@18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.8:
@@ -12567,6 +12579,15 @@ packages:
       react-dom: 18.2.0_react@18.2.0
       react-is: 18.1.0
     dev: true
+
+  /react-hook-form/7.43.8_react@18.2.0:
+    resolution: {integrity: sha512-BQm+Ge5KjTk1EchDBRhdP8Pkb7MArO2jFF+UWYr3rtvh6197khi22uloLqlWeuY02ItlCzPunPsFt1/q9wQKnw==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /react-hot-toast/2.4.0_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-qnnVbXropKuwUpriVVosgo8QrB+IaPJCpL8oBI6Ov84uvHZ5QQcTp2qg6ku2wNfgJl6rlQXJIQU5q+5lmPOutA==}
