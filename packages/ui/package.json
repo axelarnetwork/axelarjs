@@ -20,6 +20,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "codegen:component": "node scripts/codegen.mjs component --",
+    "codegen:compound": "node scripts/codegen.mjs compound --",
+    "codegen:hook": "node scripts/codegen.mjs hook --",
     "test": "vitest --run src",
     "test:watch": "vitest src",
     "rome:apply": "npx rome check src/ --apply",
