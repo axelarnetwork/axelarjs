@@ -21,7 +21,7 @@ export const INITIAL_STATE = {
   newTokenType: "new" as "new" | "existing",
   tokenName: "",
   tokenSymbol: "",
-  decimals: 0,
+  tokenDecimals: 0,
   amountToMint: 0,
   deployedTokenAddress: "",
   txHash: undefined as `0x${string}` | undefined,
@@ -38,7 +38,9 @@ function useAddErc20State(initialState = INITIAL_STATE) {
   );
   const [tokenName, setTokenName] = useState(initialState.tokenName);
   const [tokenSymbol, setTokenSymbol] = useState(initialState.tokenSymbol);
-  const [decimals, setDecimals] = useState(initialState.decimals);
+  const [tokenDecimals, setTokenDecimals] = useState(
+    initialState.tokenDecimals
+  );
   const [amountToMint, setAmountToMint] = useState(initialState.amountToMint);
   const [deployedTokenAddress, setDeployedTokenAddress] = useState(
     initialState.deployedTokenAddress
@@ -64,7 +66,7 @@ function useAddErc20State(initialState = INITIAL_STATE) {
     setNewTokenType("new");
     setTokenName("");
     setTokenSymbol("");
-    setDecimals(0);
+    setTokenDecimals(0);
     setAmountToMint(0);
     setTxState({ type: "idle" });
     setIsPreExistingToken(false);
@@ -96,7 +98,7 @@ function useAddErc20State(initialState = INITIAL_STATE) {
       newTokenType,
       tokenName,
       tokenSymbol,
-      decimals,
+      tokenDecimals,
       amountToMint,
       txState,
       deployedTokenAddress,
@@ -110,7 +112,7 @@ function useAddErc20State(initialState = INITIAL_STATE) {
       setNewTokenType,
       setTokenName,
       setTokenSymbol,
-      setDecimals,
+      setTokenDecimals,
       setAmountToMint,
       setDeployedTokenAddress,
       setTxState,
@@ -122,6 +124,7 @@ function useAddErc20State(initialState = INITIAL_STATE) {
       setTokenAlreadyRegistered,
       setIsPreExistingToken,
       incrementStep: () => setStep((prev) => prev + 1),
+      decrementStep: () => setStep((prev) => prev - 1),
     },
   };
 }

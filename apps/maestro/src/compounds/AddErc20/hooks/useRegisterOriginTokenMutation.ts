@@ -1,6 +1,7 @@
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import { logger } from "~/lib/logger";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -26,18 +27,21 @@ export function useRegisterOriginTokenMutation() {
     }
 
     try {
-      //register tokens
-      const registerTokensTx = await tokenLinker.registerOriginToken(
+      //register token
+      const registerTokenTx = await tokenLinker.registerOriginToken(
         input.tokenAddress
       );
 
-      const txDone = await registerTokensTx.wait(1);
-      console.log("txDone", txDone);
+      const txReceipt = await registerTokenTx.wait(1);
+
+      logger.info("tokenLinker.registerOriginToken", {
+        txReceipt,
+      });
 
       if (input.onStatusUpdate) {
         input.onStatusUpdate({
           type: "deployed",
-          txHash: txDone.transactionHash as `0x${string}`,
+          txHash: txReceipt.transactionHash as `0x${string}`,
           tokenAddress: input.tokenAddress,
         });
       }
@@ -46,7 +50,9 @@ export function useRegisterOriginTokenMutation() {
         input.onFinished();
       }
     } catch (e) {
-      console.log("something went wrong", e);
+      logger.error("failed to register origin token", {
+        cause: e,
+      });
       if (input.onStatusUpdate) {
         input.onStatusUpdate({ type: "idle" });
       }

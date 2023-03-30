@@ -7,16 +7,19 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { isAddress } from "ethers/lib/utils.js";
+import { BigNumber } from "ethers";
+import { formatEther, isAddress } from "ethers/lib/utils.js";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";
 import { useAccount } from "wagmi";
 
+import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { useDeployRemoteTokensMutation } from "~/compounds/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/compounds/InterchainTokenList";
 import Page from "~/layouts/Page";
 import { useChainFromRoute } from "~/lib/hooks";
+import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import {
   useGetTransactionStatusOnDestinationChainsQuery,
@@ -235,35 +238,62 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           );
         }}
         footer={
-          <div className="flex h-4 w-full justify-end p-4">
-            {selectedChainIds.length > 0 && !deployTokensTxHash ? (
-              <Button
-                color="accent"
-                onClick={handleDeployRemoteTokens}
-                disabled={
-                  isGasPriceQueryLoading ||
-                  isGasPriceQueryError ||
-                  Boolean(deployTokensTxHash)
-                }
-                loading={isDeploying}
-              >
-                Deploy token on {selectedChainIds.length} additional chain
-                {selectedChainIds.length > 1 ? "s" : ""}
-              </Button>
-            ) : undefined}
-            {deployTokensTxHash && (
-              <LinkButton
-                color="accent"
-                outline
-                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${deployTokensTxHash}`}
-                className="flex items-center gap-2"
-                target="_blank"
-              >
-                View on axelarscan {maskAddress(deployTokensTxHash)}{" "}
-                <ExternalLink className="h-4 w-4" />
-              </LinkButton>
-            )}
-          </div>
+          !selectedChainIds.length ? undefined : (
+            <div className="bg-base-300 flex w-full items-center justify-between rounded-xl p-2 pl-4">
+              {isGasPriceQueryLoading && <span>estimating gas fee... </span>}
+              {gasFees && (
+                <Tooltip
+                  tip={`Estimated gas fee for deploying token on ${
+                    selectedChainIds.length
+                  } additional chain${selectedChainIds.length > 1 ? "s" : ""}`}
+                >
+                  <div className="flex items-center gap-1 text-sm">
+                    ≈{" "}
+                    <BigNumberText
+                      decimals={18}
+                      localeOptions={{
+                        style: "decimal",
+                        maximumFractionDigits: 4,
+                      }}
+                    >
+                      {gasFees.reduce(
+                        (acc, x) => acc.add(x),
+                        BigNumber.from(0)
+                      )}
+                    </BigNumberText>{" "}
+                    {getNativeToken(interchainToken.chain.id)}
+                  </div>
+                </Tooltip>
+              )}
+              {selectedChainIds.length > 0 && !deployTokensTxHash ? (
+                <Button
+                  color="accent"
+                  onClick={handleDeployRemoteTokens}
+                  disabled={
+                    isGasPriceQueryLoading ||
+                    isGasPriceQueryError ||
+                    Boolean(deployTokensTxHash)
+                  }
+                  loading={isDeploying}
+                >
+                  Deploy token on {selectedChainIds.length} additional chain
+                  {selectedChainIds.length > 1 ? "s" : ""}
+                </Button>
+              ) : undefined}
+              {deployTokensTxHash && (
+                <LinkButton
+                  color="accent"
+                  outline
+                  href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${deployTokensTxHash}`}
+                  className="flex items-center gap-2"
+                  target="_blank"
+                >
+                  View on axelarscan {maskAddress(deployTokensTxHash)}{" "}
+                  <ExternalLink className="h-4 w-4" />
+                </LinkButton>
+              )}
+            </div>
+          )
         }
       />
     </div>

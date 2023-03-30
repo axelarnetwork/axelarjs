@@ -6,6 +6,8 @@ import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { publicProcedure } from "~/server/trpc";
 import { InterchainTokenLinkerClient } from "~/services/contracts/InterchainTokenLinker";
 
+const isAddressZero = (address: string) => parseInt(address, 16) === 0;
+
 export const searchInterchainToken = publicProcedure
   .input(
     z.object({
@@ -41,7 +43,7 @@ export const searchInterchainToken = publicProcedure
         }),
       ]);
 
-      if (!tokenId) {
+      if (!tokenId || isAddressZero(tokenId)) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `Token not found on ${chainConfig.name} (${chainConfig.id}))`,

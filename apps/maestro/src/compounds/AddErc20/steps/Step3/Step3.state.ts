@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
@@ -10,6 +10,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 export type UseStep3ChainSelectionStateProps = {
   selectedChains: Set<string>;
 };
+
 export function useStep3ChainSelectionState({
   selectedChains,
 }: UseStep3ChainSelectionStateProps) {

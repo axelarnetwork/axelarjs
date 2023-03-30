@@ -40,7 +40,7 @@ const Appbar: FC<AppbarProps> = (props) => {
   return (
     <Navbar
       className={clsx("bg-base-100 sticky top-0 z-10 transition-all", {
-        "bg-base-200 shadow-lg md:shadow-xl": isSticky,
+        "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
       })}
     >
       <Navbar.Start>
