@@ -125,10 +125,11 @@ export const EVM_CHAIN_CONFIGS = [
 ].filter((chain) => chain.environment === NETWORK_ENV);
 
 logger.info({
-  [`chain configs on "${NETWORK_ENV}"`]: EVM_CHAIN_CONFIGS.map((x) => ({
-    id: x.id,
-    name: x.name,
-  })),
+  [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NETWORK_ENV}"`]:
+    EVM_CHAIN_CONFIGS.map((x) => ({
+      id: x.id,
+      name: x.name,
+    })),
 });
 
 const { webSocketProvider, provider } = configureChains(EVM_CHAIN_CONFIGS, [
