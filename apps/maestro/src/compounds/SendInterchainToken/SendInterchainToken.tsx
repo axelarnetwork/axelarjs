@@ -1,10 +1,13 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
-import { Button, Modal, TextInput } from "@axelarjs/ui";
-import { useNetwork } from "wagmi";
+import { FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { EVMChainConfig } from "~/services/axelarscan/types";
 
 import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
 
@@ -12,40 +15,42 @@ type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
+  sourceChain: EVMChainConfig;
+  balance: {
+    tokenBalance: string;
+    decimals: string | number;
+  };
 };
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
-  const [amount, setAmount] = useState<number | undefined>();
-  const { chain: currentChain } = useNetwork();
   const { mutateAsync: sendToken } = useSendInterchainTokenMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
   });
+  const schema = z.object({
+    amountToSend: z.coerce
+      .number()
+      .min(0)
+      .max(Number(props.balance.tokenBalance)),
+  });
+  type FormState = z.infer<typeof schema>;
+  const { register, handleSubmit, watch } = useForm<FormState>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      amountToSend: undefined,
+    },
+  });
+  const amount = watch("amountToSend");
+  const formSubmitRef = useRef<HTMLButtonElement>(null);
 
-  const [fromChainId, setFromChainId] = useState(currentChain?.id);
   const [toChainId, setToChainId] = useState(5);
   const back = () => (
-    <Modal.CloseAction
-      // onClick={actions.resetAddErc20StateInputs}
-      color="secondary"
-    >
-      Close
-    </Modal.CloseAction>
+    <Modal.CloseAction color="secondary">Close</Modal.CloseAction>
   );
 
   const forward = () => (
-    <Modal.CloseAction
-      // onClick={actions.resetAddErc20StateInputs}
-      color="primary"
-    >
-      Close
-    </Modal.CloseAction>
-  );
-
-  const selectedFromChain = useMemo(
-    () => evmChains?.find((c) => c.chain_id === fromChainId),
-    [fromChainId, evmChains]
+    <Modal.CloseAction color="primary">Close</Modal.CloseAction>
   );
   const selectedToChain = useMemo(
     () => evmChains?.find((c) => c.chain_id === toChainId),
@@ -53,55 +58,38 @@ export const SendInterchainToken: FC<Props> = (props) => {
   );
 
   const handleSend = useCallback(async () => {
-    if (!(selectedFromChain && selectedToChain && amount)) {
-      return;
-    }
-
+    if (!selectedToChain || !amount) return;
     await sendToken({
       tokenAddress: props.tokenAddress,
       tokenId: props.tokenId,
       toNetwork: selectedToChain.chain_name,
-      fromNetwork: selectedFromChain.chain_name,
+      fromNetwork: props.sourceChain.chain_name,
       amount: amount?.toString(),
     });
-  }, [
-    sendToken,
-    props.tokenAddress,
-    props.tokenId,
-    selectedFromChain,
-    selectedToChain,
-    amount,
-  ]);
+  }, [sendToken, props.tokenAddress, props.tokenId, selectedToChain, amount]);
+
+  const submitHandler: SubmitHandler<FormState> = async (data, e) => {
+    e?.preventDefault();
+    console.log("clicked");
+    await handleSend();
+  };
 
   return (
     <Modal trigger={props.trigger}>
       <Modal.Body>
-        <div>
-          <Modal.Title className="flex items-center gap-2">
-            Send Interchain Token
+        <div className="flex h-80 w-full flex-col align-top">
+          <Modal.Title>
+            <div className="text-2xl"> Send Interchain Token</div>
           </Modal.Title>
-
-          <div className="mt-5 grid grid-cols-2">
-            <div className="grid grid-cols-1">
-              <label className="text-center">Source Chain</label>
-              <EVMChainsDropdown
-                compact={true}
-                selectedChain={selectedFromChain}
-                chains={evmChains}
-                onSwitchNetwork={(chain_id) => {
-                  const target = evmChains?.find(
-                    (c) => c.chain_id === chain_id
-                  );
-                  if (target) {
-                    setFromChainId(target?.chain_id);
-                  }
-                }}
-              />
+          <div className="mt-5 flex w-full flex-row justify-between">
+            <div className="w-1/2">
+              <label className="text-md align-top">From:</label>
+              <EVMChainsDropdown compact selectedChain={props.sourceChain} />
             </div>
-            <div className="grid grid-cols-1">
-              <label className="text-center">Destination Chain</label>
+            <div className="w-1/2">
+              <label className="text-md align-top">To:</label>
               <EVMChainsDropdown
-                compact={true}
+                compact
                 selectedChain={selectedToChain}
                 chains={evmChains}
                 onSwitchNetwork={(chain_id) => {
@@ -115,18 +103,33 @@ export const SendInterchainToken: FC<Props> = (props) => {
               />
             </div>
           </div>
+
+          <div>Balance: {props.balance.tokenBalance}</div>
+
+          <form
+            className="grid h-24 grid-cols-1 gap-y-2"
+            onSubmit={handleSubmit(submitHandler)}
+          >
+            <FormControl>
+              <Label>Amount to send</Label>
+              <TextInput
+                bordered
+                type="number"
+                placeholder="Enter your amount to send"
+                min={0}
+                {...register("amountToSend")}
+              />
+            </FormControl>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!amount}
+              ref={formSubmitRef}
+            >
+              Send {amount || 0} tokens to {selectedToChain?.name}
+            </button>
+          </form>
         </div>
-        <TextInput
-          inputSize={"md"}
-          type={"number"}
-          color={"primary"}
-          className={"mt-5 w-full"}
-          value={amount}
-          onChange={(e) => setAmount(parseInt(e.target.value))}
-          placeholder="Amount to send"
-        />
-        <div>TOKEN ID: {props.tokenId}</div>
-        <Button onClick={handleSend}>Send [TODO]</Button>
       </Modal.Body>
       <Modal.Actions>
         {back()}

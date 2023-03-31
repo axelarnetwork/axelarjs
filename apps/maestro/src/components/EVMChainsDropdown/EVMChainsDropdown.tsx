@@ -68,39 +68,41 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         <ChainIcon
           src={props.selectedChain.image}
           alt={props.selectedChain.chain_name}
-          size="sm"
+          size="md"
         />
         <span>{props.selectedChain.name}</span>
       </Dropdown.Trigger>
-      <Dropdown.Content
-        className={clsx("dark:bg-base-200 w-48", {
-          "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2 overflow-x-scroll":
-            props.compact,
-        })}
-      >
-        {props.chains?.map((chain) => (
-          <Dropdown.Item
-            key={chain.chain_id}
-            className={clsx({
-              "pointer-events-none":
-                chain.chain_id === props.selectedChain?.chain_id,
-            })}
-          >
-            {/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handleChainChange(chain.chain_id);
-              }}
-              className="group"
+      {props.chains && (
+        <Dropdown.Content
+          className={clsx("dark:bg-base-200 w-48", {
+            "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2 overflow-x-scroll":
+              props.compact,
+          })}
+        >
+          {props.chains?.map((chain) => (
+            <Dropdown.Item
+              key={chain.chain_id}
+              className={clsx({
+                "pointer-events-none":
+                  chain.chain_id === props.selectedChain?.chain_id,
+              })}
             >
-              <ChainIcon src={chain.image} alt={chain.name} size="md" />
-              <div>{chain.name}</div>
-            </a>
-          </Dropdown.Item>
-        ))}
-      </Dropdown.Content>
+              {/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleChainChange(chain.chain_id);
+                }}
+                className="group"
+              >
+                <ChainIcon src={chain.image} alt={chain.name} size="md" />
+                <div>{chain.name}</div>
+              </a>
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Content>
+      )}
     </Dropdown>
   );
 };
