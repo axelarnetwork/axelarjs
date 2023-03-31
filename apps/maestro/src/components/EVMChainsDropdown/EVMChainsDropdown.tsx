@@ -11,6 +11,7 @@ type Props = {
   selectedChain?: EVMChainConfig;
   chains?: EVMChainConfig[];
   compact?: boolean;
+  disabled?: boolean;
 };
 
 const iconSizes = {
@@ -58,13 +59,24 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     }
   };
 
+  const [isOpen, setIsOpen] = React.useState(false);
+
   if (!props.selectedChain) {
     return null;
   }
 
   return (
-    <Dropdown align="end">
-      <Dropdown.Trigger className="btn btn-sm btn-ghost group flex items-center gap-2">
+    <Dropdown align="end" className="relative">
+      <Dropdown.Trigger
+        $as="button"
+        className={clsx("btn btn-sm btn-ghost group flex items-center gap-2", {
+          "pointer-events-none": props.disabled,
+        })}
+        tabIndex={props.compact ? -1 : 0}
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+      >
         <ChainIcon
           src={props.selectedChain.image}
           alt={props.selectedChain.chain_name}

@@ -5,6 +5,7 @@ export * from "./CopyToClipboardButton";
 export * from "./core";
 export * from "./Drawer";
 export * from "./Dropdown";
+export * from "./DropdownMenu";
 export * from "./Footer";
 export * from "./icons";
 export * from "./InputGroup";

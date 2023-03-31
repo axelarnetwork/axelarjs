@@ -311,12 +311,8 @@ export const Step3: FC = () => {
         </Button>
       </form>
       <Modal.Actions>
-        <PrevButton onClick={() => rootActions.setStep((x) => x - 1)}>
-          Select Flow
-        </PrevButton>
-        <NextButton onClick={rootActions.incrementStep}>
-          Deploy & Register
-        </NextButton>
+        <PrevButton onClick={rootActions.decrementStep}>Select Flow</PrevButton>
+        <NextButton onClick={rootActions.incrementStep}>Review</NextButton>
       </Modal.Actions>
     </>
   );
