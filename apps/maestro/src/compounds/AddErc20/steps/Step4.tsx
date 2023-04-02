@@ -1,6 +1,8 @@
 import { FC } from "react";
 
-import { CopyToClipboardButton, Modal } from "@axelarjs/ui";
+import { CopyToClipboardButton, LinkButton, Modal } from "@axelarjs/ui";
+import { maskAddress } from "@axelarjs/utils";
+import { ExternalLink } from "lucide-react";
 
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
@@ -16,9 +18,20 @@ export const Step4: FC = () => {
 
   return (
     <>
-      <div>
-        <div>Deploy Token Successful</div>
-        txHash: {state.txHash}
+      <div className="grid gap-4">
+        <div className="alert alert-success">
+          Token deployed and registered successfully!
+        </div>
+        <LinkButton
+          color="accent"
+          outline
+          href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${state.txHash}`}
+          className="flex items-center gap-2"
+          target="_blank"
+        >
+          View on axelarscan {maskAddress(state.txHash)}{" "}
+          <ExternalLink className="h-4 w-4" />
+        </LinkButton>
         <CopyToClipboardButton copyText={state.deployedTokenAddress} />
         <ul>
           {[...Object.entries(statuses ?? {})].map(([chainId, status]) => (
