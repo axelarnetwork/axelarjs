@@ -18,6 +18,8 @@ import { EVMChainConfig } from "~/services/axelarscan/types";
 import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
 import { GMPStatus } from "~/services/gmp/types";
 
+import { SendInterchainToken } from "../SendInterchainToken";
+
 type TokenInfo = {
   chainId: number;
   isRegistered: boolean;
@@ -130,9 +132,17 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                   </BigNumberText>
                 </div>
                 {BigNumber.from(balance.tokenBalance).gt(0) && (
-                  <Button size="xs" color="primary">
-                    Send
-                  </Button>
+                  <SendInterchainToken
+                    trigger={
+                      <Button size="xs" color="primary">
+                        Send
+                      </Button>
+                    }
+                    tokenAddress={props.tokenAddress}
+                    tokenId={props.tokenId}
+                    sourceChain={props.chain as EVMChainConfig}
+                    balance={balance}
+                  />
                 )}
               </>
             )}

@@ -202,8 +202,9 @@ export const Step3: FC = () => {
       }
       actions.setIsDeploying(true);
 
+      const decimalAdjustment = BigNumber.from(10).pow(rootState.tokenDecimals);
       const amountToMint = BigNumber.from(rootState.amountToMint).mul(
-        10 ** rootState.tokenDecimals
+        decimalAdjustment
       );
 
       await deployAndRegisterToken({
@@ -311,11 +312,16 @@ export const Step3: FC = () => {
         </Button>
       </form>
       <Modal.Actions>
-        <PrevButton onClick={() => rootActions.setStep((x) => x - 1)}>
-          Select Flow
-        </PrevButton>
-        <NextButton onClick={rootActions.incrementStep}>
-          Deploy & Register
+        <PrevButton onClick={rootActions.decrementStep}>Select Flow</PrevButton>
+        <NextButton
+          disabled={
+            state.isDeploying ||
+            !rootState.deployedTokenAddress ||
+            !rootState.txHash
+          }
+          onClick={rootActions.incrementStep}
+        >
+          Review
         </NextButton>
       </Modal.Actions>
     </>

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 
-import { Button, Card, Modal, TextInput } from "@axelarjs/ui";
+import { Card, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { isAddress } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
@@ -14,7 +14,7 @@ import {
 import { NextButton, PrevButton } from "../core";
 
 export const PreExistingERC20Token: FC = () => {
-  const { state } = useAddErc20StateContainer();
+  const { state, actions } = useAddErc20StateContainer();
 
   const [tokenAddress, setTokenAddress] = useState(
     state.deployedTokenAddress || ""
@@ -27,15 +27,24 @@ export const PreExistingERC20Token: FC = () => {
 
   return (
     <div className="grid grid-cols-1 gap-y-2">
-      <label className="text-sm">Token Address {validatedAddr}</label>
-      <TextInput
-        inputSize={"md"}
-        color={"primary"}
-        value={tokenAddress}
-        onChange={(e) => setTokenAddress(e.target.value)}
-        placeholder="Input your token address"
-      />
-      {validatedAddr && <ERC20Details address={validatedAddr} />}
+      <FormControl>
+        <Label>Token Address</Label>
+        <TextInput
+          inputSize={"md"}
+          color={"primary"}
+          value={tokenAddress}
+          onChange={(e) => setTokenAddress(e.target.value)}
+          placeholder="Input your token address"
+        />
+      </FormControl>
+      {validatedAddr ? (
+        <ERC20Details address={validatedAddr} />
+      ) : (
+        <Modal.Actions>
+          <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
+          <NextButton disabled>Deploy & Register</NextButton>
+        </Modal.Actions>
+      )}
     </div>
   );
 };
@@ -63,7 +72,7 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
     tokenAddress: props.address as `0x${string}`,
   });
 
-  const { state, actions } = useAddErc20StateContainer();
+  const { actions } = useAddErc20StateContainer();
 
   useEffect(() => {
     if (token) {
@@ -79,7 +88,7 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
   return (
     <>
       <Card className="bg-base-200 dark:bg-base-300" compact>
-        <Card.Body $as="ul" className="list-inside">
+        <Card.Body>
           <Card.Title>
             <h3>Token Details</h3>
           </Card.Title>
@@ -93,7 +102,10 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
       </Card>
       <Modal.Actions>
         <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
-        <NextButton onClick={actions.incrementStep}>
+        <NextButton
+          onClick={actions.incrementStep}
+          disabled={!tokenInfo || !tokenInfo.decimals}
+        >
           Deploy & Register
         </NextButton>
       </Modal.Actions>
