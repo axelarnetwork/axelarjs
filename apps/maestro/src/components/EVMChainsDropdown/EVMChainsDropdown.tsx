@@ -80,7 +80,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         <ChainIcon
           src={props.selectedChain.image}
           alt={props.selectedChain.chain_name}
-          size="md"
+          size="sm"
         />
         <span>{props.selectedChain.name}</span>
       </Dropdown.Trigger>
