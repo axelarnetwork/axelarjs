@@ -24,7 +24,7 @@
   "devDependencies": {
     "@tsconfig/node16-strictest-esm": "^1.0.3",
     "@types/ramda": "^0.28.23",
-    "@types/react": "^18.0.28",
+    "@types/react": "^18.0.32",
     "rambda": "^7.5.0",
     "typescript": "5.0.2"
   },
