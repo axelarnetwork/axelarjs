@@ -1,8 +1,10 @@
 import { FC } from "react";
 
 import { CopyToClipboardButton, LinkButton, Modal } from "@axelarjs/ui";
-import { maskAddress } from "@axelarjs/utils";
+import { maskAddress, sluggify } from "@axelarjs/utils";
 import { ExternalLink } from "lucide-react";
+import { useRouter } from "next/router";
+import { useNetwork } from "wagmi";
 
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
@@ -10,7 +12,9 @@ import { useAddErc20StateContainer } from "../AddErc20.state";
 import { NextButton, PrevButton } from "./core";
 
 export const Step4: FC = () => {
+  const router = useRouter();
   const { state, actions } = useAddErc20StateContainer();
+  const { chain } = useNetwork();
 
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash: state.txHash,
@@ -43,7 +47,18 @@ export const Step4: FC = () => {
       </div>
       <Modal.Actions>
         <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
-        <NextButton onClick={() => {}}>Go to Token Page</NextButton>
+        <NextButton
+          disabled={!chain?.name || !state.deployedTokenAddress}
+          onClick={() => {
+            if (chain?.name) {
+              router.push(
+                `/${sluggify(chain?.name)}/${state.deployedTokenAddress}`
+              );
+            }
+          }}
+        >
+          Go to Token Page
+        </NextButton>
       </Modal.Actions>
     </>
   );
