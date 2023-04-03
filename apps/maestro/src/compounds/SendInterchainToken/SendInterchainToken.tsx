@@ -1,9 +1,18 @@
 import { FC, useMemo, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
+import {
+  Button,
+  FormControl,
+  Label,
+  LinkButton,
+  Modal,
+  TextInput,
+} from "@axelarjs/ui";
+import { maskAddress } from "@axelarjs/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatUnits } from "ethers/lib/utils.js";
+import { ExternalLink } from "lucide-react";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
@@ -11,8 +20,12 @@ import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
+import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
-import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
+import {
+  TransactionState,
+  useSendInterchainTokenMutation,
+} from "./hooks/useSendInterchainTokenMutation";
 
 type Props = {
   trigger?: JSX.Element;
@@ -27,7 +40,7 @@ type Props = {
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
-  const { mutateAsync: sendToken, isLoading: isSending } =
+  const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
       tokenAddress: props.tokenAddress,
       tokenId: props.tokenId,
@@ -52,7 +65,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   });
 
   const amount = watch("amountToSend");
-  const formSubmitRef = useRef<HTMLButtonElement>(null);
 
   const [toChainId, setToChainId] = useState(5);
 
@@ -61,19 +73,62 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [toChainId, evmChains]
   );
 
+  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
+
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
     invariant(selectedToChain, "selectedToChain is undefined");
 
-    await sendToken({
+    await sendTokenAsync({
       tokenAddress: props.tokenAddress,
       tokenId: props.tokenId,
       toNetwork: selectedToChain.chain_name,
       fromNetwork: props.sourceChain.chain_name,
       amount: amount?.toString(),
+      onStatusUpdate: setSendTokenStatus,
     });
   };
+
+  const buttonChildren = useMemo(() => {
+    switch (sendTokenStatus?.type) {
+      case "awaiting_approval":
+        return (
+          <>
+            Approve {amount} tokens to be sent to {selectedToChain?.name}
+          </>
+        );
+      case "approving":
+        return (
+          <>
+            Approving {amount} tokens to be sent to {selectedToChain?.name}
+          </>
+        );
+      case "sending":
+        return (
+          <>
+            Sending {amount} tokens to {selectedToChain?.name}
+          </>
+        );
+      case "failed":
+        return (
+          <>
+            Failed to send {amount} tokens to {selectedToChain?.name}
+          </>
+        );
+      default:
+        return (
+          <>
+            Send {amount || 0} tokens to {selectedToChain?.name}
+          </>
+        );
+    }
+  }, [amount, selectedToChain?.name, sendTokenStatus?.type]);
+
+  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
+    txHash:
+      sendTokenStatus?.type === "sending" ? sendTokenStatus.txHash : undefined,
+  });
 
   return (
     <Modal trigger={props.trigger}>
@@ -135,14 +190,41 @@ export const SendInterchainToken: FC<Props> = (props) => {
               {...register("amountToSend")}
             />
           </FormControl>
+
+          {sendTokenStatus?.type === "failed" && (
+            <div className="alert alert-error">
+              {sendTokenStatus?.error?.message}
+            </div>
+          )}
+
+          {sendTokenStatus?.type === "sending" && (
+            <div className="grid gap-4">
+              <LinkButton
+                color="accent"
+                outline
+                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${sendTokenStatus.txHash}`}
+                className="flex items-center gap-2"
+                target="_blank"
+              >
+                View on axelarscan {maskAddress(sendTokenStatus.txHash)}{" "}
+                <ExternalLink className="h-4 w-4" />
+              </LinkButton>
+              <ul>
+                {Object.entries(statuses ?? {}).map(([chainName, status]) => (
+                  <li key={chainName}>
+                    {chainName}: {status}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <Button
             color="primary"
             type="submit"
             disabled={!formState.isValid || !selectedToChain}
             loading={isSending}
-            ref={formSubmitRef}
           >
-            Send {amount || 0} tokens to {selectedToChain?.name}
+            {buttonChildren}
           </Button>
         </form>
       </Modal.Body>
