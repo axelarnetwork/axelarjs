@@ -15,14 +15,16 @@ const Step1: FC = () => {
         <Button
           outline={state.newTokenType !== "new"}
           onClick={actions.setNewTokenType.bind(null, "new")}
+          color="primary"
         >
-          New ERC-20 token
+          Deploy a new ERC-20 token
         </Button>
         <Button
           outline={state.newTokenType !== "existing"}
           onClick={actions.setNewTokenType.bind(null, "existing")}
+          color="primary"
         >
-          Pre-Existing ERC-20 token
+          Deploy a pre-existing ERC-20 token
         </Button>
       </div>
       <Modal.Actions>

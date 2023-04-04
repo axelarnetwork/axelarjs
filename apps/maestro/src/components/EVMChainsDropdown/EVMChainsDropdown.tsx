@@ -65,6 +65,10 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     return null;
   }
 
+  const eligibleChains = (props.chains ?? []).filter(
+    (chain) => chain.chain_id !== props.selectedChain?.chain_id
+  );
+
   return (
     <Dropdown align="end" className="relative">
       <Dropdown.Trigger
@@ -87,11 +91,11 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       {props.chains && (
         <Dropdown.Content
           className={clsx("dark:bg-base-200 w-48", {
-            "bg-base-200 dark:bg-base-300 max-h-80 w-96 translate-x-8 translate-y-2 overflow-x-scroll":
+            "bg-base-200 dark:bg-base-300 max-h-[300px] w-96 translate-x-8 translate-y-2 overflow-x-scroll":
               props.compact,
           })}
         >
-          {props.chains?.map((chain) => (
+          {eligibleChains.map((chain) => (
             <Dropdown.Item
               key={chain.chain_id}
               className={clsx({

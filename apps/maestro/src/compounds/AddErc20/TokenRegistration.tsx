@@ -21,7 +21,7 @@ export const TokenRegistration: FC<{}> = () => {
   );
   return (
     <>
-      <label>Register Origin Token On: </label>
+      <span>Register origin token on: </span>
       <EVMChainsDropdown
         compact={true}
         selectedChain={selectedChain}
@@ -33,7 +33,10 @@ export const TokenRegistration: FC<{}> = () => {
             switchNetwork?.(target.chain_id);
           }
         }}
-        disabled={state.step > 1}
+        disabled={
+          state.newTokenType === "existing" &&
+          Boolean(state.deployedTokenAddress)
+        }
       />
     </>
   );

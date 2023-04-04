@@ -23,30 +23,25 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     <>
       <Drawer>
         <Drawer.Toggle checked={isOpen} />
-        <Drawer.Content>
-          <div className="flex min-h-screen flex-1 flex-col gap-4">
-            <Appbar />
-            <Clamp $as="main" className="flex flex-1">
-              {children}
-            </Clamp>
-            <Footer
-              className="bg-neutral text-neutral-content p-8"
-              center={true}
-            >
-              <Footer.Title>
-                &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
-              </Footer.Title>
-              {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-                <Badge
-                  className="absolute right-4 lowercase"
-                  size="lg"
-                  color="accent"
-                >
-                  env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
-                </Badge>
-              )}
-            </Footer>
-          </div>
+        <Drawer.Content className="flex min-h-screen flex-1 flex-col gap-4">
+          <Appbar />
+          <Clamp $as="main" className="flex flex-1">
+            {children}
+          </Clamp>
+          <Footer className="bg-neutral text-neutral-content p-8" center={true}>
+            <Footer.Title>
+              &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
+            </Footer.Title>
+            {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+              <Badge
+                className="absolute right-4 lowercase"
+                size="lg"
+                color="accent"
+              >
+                env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
+              </Badge>
+            )}
+          </Footer>
         </Drawer.Content>
         <Drawer.Side>
           <Drawer.Overlay onClick={actions.close} />

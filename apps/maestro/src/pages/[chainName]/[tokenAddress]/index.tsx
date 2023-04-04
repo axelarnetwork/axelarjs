@@ -219,12 +219,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
-        tokens={unregistered.map((x) => ({
-          ...x,
-          isSelected: selectedChainIds.includes(x.chainId),
+        tokens={unregistered.map((token) => ({
+          ...token,
+          isSelected: selectedChainIds.includes(token.chainId),
+          isRegistered: false,
           deploymentStatus:
-            deployTokensTxHash && x.chain?.id
-              ? statusesByChain[x.chain.id]
+            deployTokensTxHash && token.chain?.id
+              ? statusesByChain[token.chain.id]
               : undefined,
         }))}
         onToggleSelection={(chainId) => {

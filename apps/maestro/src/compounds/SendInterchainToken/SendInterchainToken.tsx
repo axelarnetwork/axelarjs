@@ -20,7 +20,10 @@ import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
-import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
+import {
+  useGetTransactionStatusOnDestinationChainsQuery,
+  useInterchainTokensQuery,
+} from "~/services/gmp/hooks";
 
 import {
   TransactionState,
@@ -39,7 +42,13 @@ type Props = {
 };
 
 export const SendInterchainToken: FC<Props> = (props) => {
-  const { data: evmChains } = useEVMChainConfigsQuery();
+  const { data: evmChains, computed } = useEVMChainConfigsQuery();
+
+  const { data: interchainToken } = useInterchainTokensQuery({
+    tokenAddress: props.tokenAddress,
+    chainId: props.sourceChain.chain_id,
+  });
+
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
       tokenAddress: props.tokenAddress,
@@ -130,12 +139,20 @@ export const SendInterchainToken: FC<Props> = (props) => {
       sendTokenStatus?.type === "sending" ? sendTokenStatus.txHash : undefined,
   });
 
+  const eligibleTargetChains = useMemo(() => {
+    return (interchainToken?.matchingTokens ?? [])
+      .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
+      .map((x) => computed.indexedByChainId[x.chainId]);
+  }, [
+    interchainToken?.matchingTokens,
+    props.sourceChain.chain_id,
+    computed.indexedByChainId,
+  ]);
+
   return (
     <Modal trigger={props.trigger}>
       <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title>
-          <div className="text-2xl"> Send Interchain Token</div>
-        </Modal.Title>
+        <Modal.Title>Send interchain token</Modal.Title>
         <div className="my-4 grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
@@ -150,9 +167,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <EVMChainsDropdown
               compact
               selectedChain={selectedToChain}
-              chains={evmChains}
+              chains={eligibleTargetChains}
               onSwitchNetwork={(chain_id) => {
-                const target = evmChains?.find((c) => c.chain_id === chain_id);
+                const target = computed.indexedByChainId[chain_id];
                 if (target) {
                   setToChainId(target?.chain_id);
                 }

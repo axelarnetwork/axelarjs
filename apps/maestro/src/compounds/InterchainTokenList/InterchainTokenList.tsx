@@ -39,7 +39,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
   const { chain } = useNetwork();
   const { data: balance } = useGetERC20TokenBalanceForOwnerQuery({
     chainId: props.chainId,
-    tokenLinkerTokenId: props.tokenId,
+    tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
   });
 
