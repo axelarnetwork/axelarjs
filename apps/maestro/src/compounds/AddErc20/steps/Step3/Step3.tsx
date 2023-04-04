@@ -3,7 +3,9 @@ import React, {
   FormEvent,
   FormEventHandler,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
 } from "react";
 
 import { Button, FormControl, Label, Modal, Tooltip } from "@axelarjs/ui";
@@ -63,6 +65,7 @@ export const Step3: FC = () => {
     const oc = +Boolean(rootState.selectedChains.size > 0); //other-chains
     const decision = decisionMatrix[pe][ar][oc];
 
+    console.log({ pe, ar, oc, decision });
     if (decision) {
       decision(e);
     } else {
@@ -221,11 +224,11 @@ export const Step3: FC = () => {
           if (data.type === "deployed") {
             rootActions.setDeployedTokenAddress(data.tokenAddress as string);
             data.txHash && rootActions.setTxHash(data.txHash);
+            rootActions.incrementStep();
+            actions.setIsDeploying(false);
           }
         },
       });
-      actions.setIsDeploying(false);
-      rootActions.incrementStep();
     },
     [
       state.isGasPriceQueryLoading,
@@ -252,12 +255,26 @@ export const Step3: FC = () => {
     [state.evmChains, state.network.chain?.id]
   );
 
+  const formSubmitRef = useRef<HTMLButtonElement>(null);
+
   return (
     <>
       <form className="grid gap-4" onSubmit={handleSubmit}>
         <FormControl>
           <Label>
             <Label.Text>Chains to deploy remote tokens</Label.Text>
+            {Boolean(state.gasFees?.length) && (
+              <Label.AltText>
+                <Tooltip tip="Approximate gas cost">
+                  <span className="ml-2 text-xs">
+                    (≈ {state.totalGasFee}{" "}
+                    {state?.sourceChainId &&
+                      getNativeToken(state.sourceChainId)}{" "}
+                    in fees)
+                  </span>
+                </Tooltip>
+              </Label.AltText>
+            )}
           </Label>
           <div className="bg-base-300 grid grid-cols-8 justify-evenly gap-4 rounded-lg p-6">
             {eligibleChains?.map((chain, i) => {
@@ -297,40 +314,22 @@ export const Step3: FC = () => {
             })}
           </div>
         </FormControl>
-        <Button
-          loading={state.isDeploying}
-          type="submit"
-          disabled={
-            state.isGasPriceQueryLoading ||
-            state.isGasPriceQueryError ||
-            !state.gasFees?.length
-          }
-        >
-          Deploy{" "}
-          {Boolean(state.gasFees?.length) &&
-            `and register on ${state.gasFees?.length} chain${
-              Number(state.gasFees?.length) > 1 ? "s" : ""
-            }`}
-          <Tooltip tip="Approximate gas cost">
-            <span className="ml-2 text-xs">
-              (≈ {state.totalGasFee}{" "}
-              {state?.sourceChainId && getNativeToken(state.sourceChainId)} in
-              fees)
-            </span>
-          </Tooltip>
-        </Button>
+        <button type="submit" ref={formSubmitRef} />
       </form>
       <Modal.Actions>
-        <PrevButton onClick={rootActions.decrementStep}>Select Flow</PrevButton>
+        <PrevButton onClick={rootActions.decrementStep}>
+          Token details
+        </PrevButton>
         <NextButton
-          disabled={
-            state.isDeploying ||
-            !rootState.deployedTokenAddress ||
-            !rootState.txHash
-          }
-          onClick={rootActions.incrementStep}
+          loading={state.isDeploying}
+          disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
+          onClick={() => formSubmitRef.current?.click()}
         >
-          Review
+          Deploy & register token{" "}
+          {Boolean(state.gasFees?.length) &&
+            `on ${state.gasFees?.length} chain${
+              Number(state.gasFees?.length) > 1 ? "s" : ""
+            }`}
         </NextButton>
       </Modal.Actions>
     </>

@@ -6,6 +6,7 @@ import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
+import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor/GMPTxStatusMonitor";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
 import { useAddErc20StateContainer } from "../AddErc20.state";
@@ -15,10 +16,6 @@ export const Step4: FC = () => {
   const router = useRouter();
   const { state, actions } = useAddErc20StateContainer();
   const { chain } = useNetwork();
-
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash: state.txHash,
-  });
 
   return (
     <>
@@ -33,17 +30,12 @@ export const Step4: FC = () => {
           className="flex items-center gap-2"
           target="_blank"
         >
-          View on axelarscan {maskAddress(state.txHash)}{" "}
+          View on axelarscan {maskAddress(state.txHash ?? "")}{" "}
           <ExternalLink className="h-4 w-4" />
         </LinkButton>
         <CopyToClipboardButton copyText={state.deployedTokenAddress} />
-        <ul>
-          {[...Object.entries(statuses ?? {})].map(([chainId, status]) => (
-            <li key={`chain-status-${chainId}`}>
-              Chain: {chainId}, Status: {status}
-            </li>
-          ))}
-        </ul>
+
+        <GMPTxStatusMonitor txHash={state.txHash} />
       </div>
       <Modal.Actions>
         <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>

@@ -124,6 +124,8 @@ export const EVM_CHAIN_CONFIGS = [
   { ...filecoin, networkNameOnAxelar: "filecoin", environment: "mainnet" },
 ].filter((chain) => chain.environment === NETWORK_ENV);
 
+export type EVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
+
 logger.info({
   [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NETWORK_ENV}"`]:
     EVM_CHAIN_CONFIGS.map((x) => ({

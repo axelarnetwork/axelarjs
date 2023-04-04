@@ -1,3 +1,4 @@
+import { constants } from "ethers";
 import { isAddress } from "ethers/lib/utils.js";
 import { uniq } from "rambda";
 import { useQuery } from "wagmi";
@@ -77,20 +78,21 @@ export function useGetERC20TokenDetailsQuery(input: {
 
 export function useGetERC20TokenBalanceForOwnerQuery(input: {
   chainId?: number;
-  tokenLinkerTokenId?: `0x${string}`;
+  tokenAddress?: `0x${string}`;
   owner?: `0x${string}`;
 }) {
   return trpc.gmp.getERC20TokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),
-      tokenLinkerTokenId: String(input.tokenLinkerTokenId),
+      tokenAddress: String(input.tokenAddress),
       owner: String(input.owner),
     },
     {
       enabled:
         Boolean(input.chainId) &&
-        Boolean(input.tokenLinkerTokenId?.match(/^(0x)?[0-9a-f]{64}/i)) &&
-        isAddress(input.owner ?? ""),
+        isAddress(input.tokenAddress ?? "") &&
+        isAddress(input.owner ?? "") &&
+        input.tokenAddress !== constants.AddressZero,
     }
   );
 }

@@ -32,6 +32,7 @@ export const NewERC20Token: FC = () => {
     },
   });
 
+  // this is only required because the form and actions are sibling elements
   const formSubmitRef = useRef<HTMLButtonElement>(null);
 
   const submitHandler: SubmitHandler<FormState> = (data, e) => {
@@ -76,7 +77,8 @@ export const NewERC20Token: FC = () => {
             bordered
             type="number"
             placeholder="Enter your token decimals"
-            min={0}
+            min={1}
+            max={18}
             {...register("tokenDecimals")}
           />
         </FormControl>
