@@ -42,7 +42,7 @@ export const PreExistingERC20Token: FC = () => {
       ) : (
         <Modal.Actions>
           <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
-          <NextButton disabled>Deploy & Register</NextButton>
+          <NextButton disabled={true}>Deploy & Register</NextButton>
         </Modal.Actions>
       )}
     </div>
@@ -87,7 +87,7 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
 
   return (
     <>
-      <Card className="bg-base-200 dark:bg-base-300" compact>
+      <Card className="bg-base-200 dark:bg-base-300" compact={true}>
         <Card.Body>
           <Card.Title>
             <h3>Token Details</h3>
@@ -104,7 +104,7 @@ export const ERC20Details: FC<ERC20DetailsProps> = (
         <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
         <NextButton
           onClick={actions.incrementStep}
-          disabled={!tokenInfo || !tokenInfo.decimals}
+          disabled={!tokenInfo?.decimals}
         >
           Deploy & Register
         </NextButton>
