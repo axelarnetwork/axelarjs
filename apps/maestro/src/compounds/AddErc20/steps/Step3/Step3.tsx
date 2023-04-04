@@ -244,6 +244,14 @@ export const Step3: FC = () => {
     ]
   );
 
+  const eligibleChains = useMemo(
+    () =>
+      state.evmChains?.filter(
+        (chain) => chain.chain_id !== state.network.chain?.id
+      ),
+    [state.evmChains, state.network.chain?.id]
+  );
+
   return (
     <>
       <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -252,8 +260,9 @@ export const Step3: FC = () => {
             <Label.Text>Chains to deploy remote tokens</Label.Text>
           </Label>
           <div className="bg-base-300 grid grid-cols-8 justify-evenly gap-4 rounded-lg p-6">
-            {state.evmChains?.map((chain, i) => {
+            {eligibleChains?.map((chain, i) => {
               const isSelected = rootState.selectedChains.has(chain.chain_name);
+
               return (
                 <Tooltip
                   tip={`Deploy on ${chain.name}`}
