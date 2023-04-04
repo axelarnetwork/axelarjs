@@ -55,7 +55,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       // otherwise, we throw an internal server error
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to get ERC20 token address on ${input.tokenLinkerTokenId} on chain ${input.chainId}`,
+        message: `Failed to get ERC20 token balance for the giver input, ${input}`,
       });
     }
 

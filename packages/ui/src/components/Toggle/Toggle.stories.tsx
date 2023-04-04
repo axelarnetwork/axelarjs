@@ -16,12 +16,6 @@ export default {
   },
 } as Meta<typeof Toggle>;
 
-const Template: StoryFn<typeof Toggle> = (args) => {
-  return <Toggle {...args}>{args.children ?? "Toggle"}</Toggle>;
-};
-
-export const Default = Template.bind({});
-
 // creates stories for variansts (color, size, shape)
 const { Colors, Sizes } = pluralizeKeys(
   configurePlayground(Toggle, {

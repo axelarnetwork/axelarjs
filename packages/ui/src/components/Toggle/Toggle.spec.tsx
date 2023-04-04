@@ -2,13 +2,18 @@ import { composeStories } from "@storybook/testing-react";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { ThemeProvider } from "../ThemeSwitcher";
 import * as stories from "./Toggle.stories";
 
-const { Default } = composeStories(stories);
+const { Colors } = composeStories(stories);
 
 describe("Toggle", () => {
-  it("renders Default component story without breaking", () => {
-    const { container } = render(<Default />);
+  it("renders Colors component story without breaking", () => {
+    const { container } = render(
+      <ThemeProvider>
+        <Colors />
+      </ThemeProvider>
+    );
     expect(container).toBeVisible();
   });
 });

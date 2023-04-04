@@ -25,8 +25,10 @@ export const gasTokenMap: Record<string, GasToken> = {
 
 export type TransactionState =
   | { type: "idle" }
-  | { type: "approving" }
-  | { type: "sending"; txHash: string };
+  | { type: "failed"; error: Error }
+  | { type: "awaiting_approval" }
+  | { type: "approving"; txHash: `0x${string}` }
+  | { type: "sending"; txHash: `0x${string}` };
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
@@ -40,7 +42,6 @@ export type UseSendInterchainTokenInput = {
   fromNetwork: string;
   amount: string;
   onFinished?: () => void;
-  // eslint-disable-next-line
   onStatusUpdate?: (message: TransactionState) => void;
 };
 
@@ -88,19 +89,23 @@ export function useSendInterchainTokenMutation(
 
     //approve
     try {
-      if (onStatusUpdate) {
-        onStatusUpdate({
-          type: "approving",
-        });
-      }
+      onStatusUpdate?.({ type: "awaiting_approval" });
       const tx = await erc20.approve(tokenLinker.address, bigNumberAmount);
+
+      onStatusUpdate?.({ type: "approving", txHash: tx.hash as `0x${string}` });
 
       // wait for tx to be mined
       await tx.wait(1);
     } catch (e) {
-      if (onStatusUpdate) {
-        onStatusUpdate({ type: "idle" });
+      if (e instanceof Error) {
+        onStatusUpdate?.({ type: "failed", error: e });
+      } else {
+        onStatusUpdate?.({
+          type: "failed",
+          error: new Error("failed to approve token spend amount"),
+        });
       }
+
       return;
     }
 
@@ -113,9 +118,11 @@ export function useSendInterchainTokenMutation(
         bigNumberAmount,
         { value: BigNumber.from(gas) }
       );
-      if (onStatusUpdate) {
-        onStatusUpdate({ type: "sending", txHash: sendTokenTx.hash });
-      }
+
+      onStatusUpdate?.({
+        type: "sending",
+        txHash: sendTokenTx.hash as `0x${string}`,
+      });
 
       await sendTokenTx.wait(1);
 
@@ -123,9 +130,15 @@ export function useSendInterchainTokenMutation(
         onFinished();
       }
     } catch (e) {
-      if (onStatusUpdate) {
-        onStatusUpdate({ type: "idle" });
+      if (e instanceof Error) {
+        onStatusUpdate?.({ type: "failed", error: e });
+      } else {
+        onStatusUpdate?.({
+          type: "failed",
+          error: new Error("Failed to send token"),
+        });
       }
+
       return;
     }
   });

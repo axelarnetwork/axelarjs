@@ -9,8 +9,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import clsx from "clsx";
-import { BigNumber } from "ethers";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
@@ -37,11 +36,15 @@ export type InterchainTokenProps = TokenInfo & {
 
 export const InterchainToken: FC<InterchainTokenProps> = (props) => {
   const { address } = useAccount();
+  const { chain } = useNetwork();
   const { data: balance } = useGetERC20TokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenLinkerTokenId: props.tokenId,
     owner: address,
   });
+
+  const isSourceChain = chain?.id === props.chainId;
+
   return (
     <Card
       compact={true}
@@ -131,7 +134,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                     {balance.tokenBalance}
                   </BigNumberText>
                 </div>
-                {BigNumber.from(balance.tokenBalance).gt(0) && (
+                {isSourceChain && (
                   <SendInterchainToken
                     trigger={
                       <Button size="xs" color="primary">

@@ -21,7 +21,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
 export type AppbarProps = {};
 
-const Appbar: FC<AppbarProps> = (props) => {
+const Appbar: FC<AppbarProps> = () => {
   const { disconnect } = useDisconnect();
   const { chain } = useNetwork();
   const { isConnected, address } = useAccount();
@@ -39,7 +39,7 @@ const Appbar: FC<AppbarProps> = (props) => {
 
   return (
     <Navbar
-      className={clsx("bg-base-100 sticky top-0 z-10 transition-all", {
+      className={clsx("bg-base-100 fixed top-0 z-10 transition-all", {
         "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
       })}
     >
