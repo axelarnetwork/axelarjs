@@ -8,7 +8,14 @@ import React, {
   useRef,
 } from "react";
 
-import { Button, FormControl, Label, Modal, Tooltip } from "@axelarjs/ui";
+import {
+  Badge,
+  Button,
+  FormControl,
+  Label,
+  Modal,
+  Tooltip,
+} from "@axelarjs/ui";
 import { BigNumber } from "ethers";
 import Image from "next/image";
 import { useNetwork } from "wagmi";
@@ -276,7 +283,7 @@ export const Step3: FC = () => {
               </Label.AltText>
             )}
           </Label>
-          <div className="bg-base-300 grid grid-cols-8 justify-evenly gap-4 rounded-lg p-6">
+          <div className="bg-base-300 flex flex-wrap gap-2 rounded-3xl p-4">
             {eligibleChains?.map((chain, i) => {
               const isSelected = rootState.selectedChains.has(chain.chain_name);
 
@@ -288,9 +295,9 @@ export const Step3: FC = () => {
                 >
                   <Button
                     ghost={true}
-                    shape="circle"
-                    className="h-[40] w-[40] rounded-full"
+                    className="rounded-2xl hover:ring"
                     size="sm"
+                    role="button"
                     color="primary"
                     outline={isSelected}
                     onClick={() => {
@@ -302,12 +309,13 @@ export const Step3: FC = () => {
                     }}
                   >
                     <Image
-                      className="pointer-events-none rounded-full"
+                      className="pointer-events-none -translate-x-2 rounded-full"
                       src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
                       width={24}
                       height={24}
-                      alt="chain logo"
+                      alt={`${chain.name} logo`}
                     />
+                    <span>{chain.name}</span>
                   </Button>
                 </Tooltip>
               );
