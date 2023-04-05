@@ -1,4 +1,4 @@
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import {
@@ -60,7 +60,16 @@ export const SendInterchainToken: FC<Props> = (props) => {
       formatUnits(props.balance.tokenBalance, props.balance.decimals)
     );
     return z.object({
-      amountToSend: z.coerce.number().min(1).max(tokenBalanceAsNumber),
+      amountToSend: z.coerce
+        .number({
+          invalid_type_error: "Amount must be a number",
+          required_error: "Amount is required",
+        })
+        .refine((v) => v > 0, "Amount must be greater than 0")
+        .refine(
+          (v) => v <= tokenBalanceAsNumber,
+          `Amount must be less than or equal to ${tokenBalanceAsNumber}`
+        ),
     });
   }, [props.balance.decimals, props.balance.tokenBalance]);
 
@@ -77,9 +86,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   const [toChainId, setToChainId] = useState(5);
 
+  const eligibleTargetChains = useMemo(() => {
+    return (interchainToken?.matchingTokens ?? [])
+      .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
+      .map((x) => computed.indexedByChainId[x.chainId]);
+  }, [
+    interchainToken?.matchingTokens,
+    props.sourceChain.chain_id,
+    computed.indexedByChainId,
+  ]);
+
   const selectedToChain = useMemo(
-    () => evmChains?.find((c) => c.chain_id === toChainId),
-    [toChainId, evmChains]
+    () =>
+      eligibleTargetChains.find((c) => c.chain_id === toChainId) ??
+      eligibleTargetChains[0],
+
+    [toChainId, eligibleTargetChains]
   );
 
   const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
@@ -138,16 +160,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     txHash:
       sendTokenStatus?.type === "sending" ? sendTokenStatus.txHash : undefined,
   });
-
-  const eligibleTargetChains = useMemo(() => {
-    return (interchainToken?.matchingTokens ?? [])
-      .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
-      .map((x) => computed.indexedByChainId[x.chainId]);
-  }, [
-    interchainToken?.matchingTokens,
-    props.sourceChain.chain_id,
-    computed.indexedByChainId,
-  ]);
 
   return (
     <Modal trigger={props.trigger}>
