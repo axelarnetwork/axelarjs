@@ -3,19 +3,11 @@ import React, {
   FormEvent,
   FormEventHandler,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
 } from "react";
 
-import {
-  Badge,
-  Button,
-  FormControl,
-  Label,
-  Modal,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Button, FormControl, Label, Modal, Tooltip } from "@axelarjs/ui";
 import { BigNumber } from "ethers";
 import Image from "next/image";
 import { useNetwork } from "wagmi";
