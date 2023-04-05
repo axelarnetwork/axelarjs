@@ -42,7 +42,7 @@ type Props = {
 };
 
 export const SendInterchainToken: FC<Props> = (props) => {
-  const { data: evmChains, computed } = useEVMChainConfigsQuery();
+  const { computed } = useEVMChainConfigsQuery();
 
   const { data: interchainToken } = useInterchainTokensQuery({
     tokenAddress: props.tokenAddress,
@@ -60,14 +60,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
       formatUnits(props.balance.tokenBalance, props.balance.decimals)
     );
     return z.object({
-      amountToSend: z.coerce
-        .number({
-          invalid_type_error: "Amount must be a number",
-          required_error: "Amount is required",
-        })
-        .refine((v) => v > 0, "Amount must be greater than 0")
+      amountToSend: z
+        .string()
+        .refine((v) => Number(v) > 0, "Amount must be greater than 0")
         .refine(
-          (v) => v <= tokenBalanceAsNumber,
+          (v) => Number(v) <= tokenBalanceAsNumber,
           `Amount must be less than or equal to ${tokenBalanceAsNumber}`
         ),
     });
@@ -82,7 +79,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     },
   });
 
-  const amount = watch("amountToSend");
+  const amountToSend = watch("amountToSend");
 
   const [toChainId, setToChainId] = useState(5);
 
@@ -116,7 +113,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       tokenId: props.tokenId,
       toNetwork: selectedToChain.chain_name,
       fromNetwork: props.sourceChain.chain_name,
-      amount: amount?.toString(),
+      amount: amountToSend?.toString(),
       onStatusUpdate: setSendTokenStatus,
     });
   };
@@ -126,35 +123,45 @@ export const SendInterchainToken: FC<Props> = (props) => {
       case "awaiting_approval":
         return (
           <>
-            Approve {amount} tokens to be sent to {selectedToChain?.name}
+            Approve {amountToSend} tokens to be sent to {selectedToChain?.name}
           </>
         );
       case "approving":
         return (
           <>
-            Approving {amount} tokens to be sent to {selectedToChain?.name}
+            Approving {amountToSend} tokens to be sent to{" "}
+            {selectedToChain?.name}
           </>
         );
       case "sending":
         return (
           <>
-            Sending {amount} tokens to {selectedToChain?.name}
+            Sending {amountToSend} tokens to {selectedToChain?.name}
           </>
         );
       case "failed":
         return (
           <>
-            Failed to send {amount} tokens to {selectedToChain?.name}
+            Failed to send {amountToSend} tokens to {selectedToChain?.name}
           </>
         );
       default:
+        if (!formState.isValid) {
+          return !Number(amountToSend) ? "Send tokens" : "Insufficient balance";
+        }
+
         return (
           <>
-            Send {amount || 0} tokens to {selectedToChain?.name}
+            Send {amountToSend || 0} tokens to {selectedToChain?.name}
           </>
         );
     }
-  }, [amount, selectedToChain?.name, sendTokenStatus?.type]);
+  }, [
+    amountToSend,
+    formState.isValid,
+    selectedToChain?.name,
+    sendTokenStatus?.type,
+  ]);
 
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash:
