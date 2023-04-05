@@ -11,11 +11,9 @@ import {
   TextInput,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { formatUnits } from "ethers/lib/utils.js";
 import { ExternalLink } from "lucide-react";
 import invariant from "tiny-invariant";
-import { z } from "zod";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -29,6 +27,10 @@ import {
   TransactionState,
   useSendInterchainTokenMutation,
 } from "./hooks/useSendInterchainTokenMutation";
+
+type FormState = {
+  amountToSend: number;
+};
 
 type Props = {
   trigger?: JSX.Element;
@@ -55,29 +57,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
       tokenId: props.tokenId,
     });
 
-  const formSchema = useMemo(() => {
-    const tokenBalanceAsNumber = Number(
-      formatUnits(props.balance.tokenBalance, props.balance.decimals)
-    );
-    return z.object({
-      amountToSend: z
-        .string()
-        .refine((v) => Number(v) > 0, "Amount must be greater than 0")
-        .refine(
-          (v) => Number(v) <= tokenBalanceAsNumber,
-          `Amount must be less than or equal to ${tokenBalanceAsNumber}`
-        ),
-    });
-  }, [props.balance.decimals, props.balance.tokenBalance]);
-
-  type FormState = z.infer<typeof formSchema>;
-
-  const { register, handleSubmit, watch, formState, reset } =
+  const { register, handleSubmit, watch, formState, reset, setValue } =
     useForm<FormState>({
-      resolver: zodResolver(formSchema),
       defaultValues: {
         amountToSend: undefined,
       },
+      mode: "onChange",
+      reValidateMode: "onChange",
     });
 
   const amountToSend = watch("amountToSend");
@@ -142,9 +128,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
         );
       default:
         if (!formState.isValid) {
-          return !Number(amountToSend) ? "Send tokens" : "Insufficient balance";
+          return formState.errors.amountToSend?.message;
         }
-
         return (
           <>
             Send {amountToSend || 0} tokens to {selectedToChain?.name}
@@ -153,6 +138,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     }
   }, [
     amountToSend,
+    formState.errors.amountToSend?.message,
     formState.isValid,
     selectedToChain?.name,
     sendTokenStatus?.type,
@@ -195,9 +181,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
           onSubmit={handleSubmit(submitHandler)}
         >
           <FormControl>
-            <Label>
+            <Label htmlFor="amountToSend">
               <Label.Text>Amount to send</Label.Text>
-              <Label.AltText>
+              <Label.AltText
+                role="button"
+                onClick={() => {
+                  setValue(
+                    "amountToSend",
+                    Number(formatUnits(props.balance.tokenBalance))
+                  );
+                }}
+              >
                 Balance:{" "}
                 <BigNumberText
                   decimals={props.balance.decimals}
@@ -212,11 +206,29 @@ export const SendInterchainToken: FC<Props> = (props) => {
               </Label.AltText>
             </Label>
             <TextInput
+              id="amountToSend"
               bordered
               type="number"
               placeholder="Enter your amount to send"
               min={0}
-              {...register("amountToSend")}
+              {...register("amountToSend", {
+                valueAsNumber: true,
+                required: {
+                  value: true,
+                  message: "Amount is required",
+                },
+                validate(value) {
+                  if (value <= 0) {
+                    return "Amount must be greater than 0";
+                  }
+
+                  if (value > Number(formatUnits(props.balance.tokenBalance))) {
+                    return "Insufficient balance";
+                  }
+
+                  return true;
+                },
+              })}
             />
           </FormControl>
 
@@ -229,6 +241,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               <LinkButton
                 color="accent"
                 outline
+                size="sm"
                 href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${sendTokenStatus.txHash}`}
                 className="flex items-center gap-2"
                 target="_blank"
@@ -247,6 +260,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               />
             </div>
           )}
+
           <Button
             color="primary"
             type="submit"
@@ -260,4 +274,5 @@ export const SendInterchainToken: FC<Props> = (props) => {
     </Modal>
   );
 };
+
 export default SendInterchainToken;
