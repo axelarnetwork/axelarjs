@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import { Badge, BadgeProps } from "@axelarjs/ui";
 import { indexBy } from "rambda";
@@ -32,11 +32,12 @@ const STATUS_COLORS: Partial<
 
 type Props = {
   txHash: `0x${string}`;
+  onAllChainsExecuted?: () => void;
 };
 
-const GMPTxStatusMonitor = (props: Props) => {
+const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash: props.txHash,
+    txHash: txHash,
   });
 
   const { data: evmChains } = useEVMChainConfigsQuery();
@@ -45,6 +46,16 @@ const GMPTxStatusMonitor = (props: Props) => {
     () => indexBy((c) => c.id, evmChains ?? []),
     [evmChains]
   );
+
+  useEffect(() => {
+    if (
+      statuses &&
+      Object.values(statuses).every((s) => s === "executed") &&
+      onAllChainsExecuted
+    ) {
+      onAllChainsExecuted();
+    }
+  }, [statuses, onAllChainsExecuted]);
 
   if (!statuses || Object.keys(statuses).length === 0) {
     return null;

@@ -2,6 +2,7 @@ import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import {
+  Alert,
   Button,
   FormControl,
   Label,
@@ -18,13 +19,12 @@ import { z } from "zod";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
+import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
-import {
-  useGetTransactionStatusOnDestinationChainsQuery,
-  useInterchainTokensQuery,
-} from "~/services/gmp/hooks";
+import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
+import GMPTxStatusMonitor from "../GMPTxStatusMonitor";
 import {
   TransactionState,
   useSendInterchainTokenMutation,
@@ -72,12 +72,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   type FormState = z.infer<typeof formSchema>;
 
-  const { register, handleSubmit, watch, formState } = useForm<FormState>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      amountToSend: undefined,
-    },
-  });
+  const { register, handleSubmit, watch, formState, reset } =
+    useForm<FormState>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        amountToSend: undefined,
+      },
+    });
 
   const amountToSend = watch("amountToSend");
 
@@ -139,12 +140,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
             Sending {amountToSend} tokens to {selectedToChain?.name}
           </>
         );
-      case "failed":
-        return (
-          <>
-            Failed to send {amountToSend} tokens to {selectedToChain?.name}
-          </>
-        );
       default:
         if (!formState.isValid) {
           return !Number(amountToSend) ? "Send tokens" : "Insufficient balance";
@@ -163,10 +158,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     sendTokenStatus?.type,
   ]);
 
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash:
-      sendTokenStatus?.type === "sending" ? sendTokenStatus.txHash : undefined,
-  });
+  const trpcContext = trpc.useContext();
 
   return (
     <Modal trigger={props.trigger}>
@@ -187,6 +179,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               compact
               selectedChain={selectedToChain}
               chains={eligibleTargetChains}
+              disabled={isSending || eligibleTargetChains.length <= 1}
               onSwitchNetwork={(chain_id) => {
                 const target = computed.indexedByChainId[chain_id];
                 if (target) {
@@ -228,9 +221,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           </FormControl>
 
           {sendTokenStatus?.type === "failed" && (
-            <div className="alert alert-error">
-              {sendTokenStatus?.error?.message}
-            </div>
+            <Alert status="error">{sendTokenStatus?.error?.message}</Alert>
           )}
 
           {sendTokenStatus?.type === "sending" && (
@@ -245,19 +236,21 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 View on axelarscan {maskAddress(sendTokenStatus.txHash)}{" "}
                 <ExternalLink className="h-4 w-4" />
               </LinkButton>
-              <ul>
-                {Object.entries(statuses ?? {}).map(([chainName, status]) => (
-                  <li key={chainName}>
-                    {chainName}: {status}
-                  </li>
-                ))}
-              </ul>
+              <GMPTxStatusMonitor
+                txHash={sendTokenStatus.txHash}
+                onAllChainsExecuted={() => {
+                  trpcContext.gmp.searchInterchainToken.invalidate();
+                  trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate();
+
+                  reset();
+                }}
+              />
             </div>
           )}
           <Button
             color="primary"
             type="submit"
-            disabled={!formState.isValid || !selectedToChain}
+            disabled={!formState.isValid || isSending}
             loading={isSending}
           >
             {buttonChildren}
