@@ -6,13 +6,10 @@ import {
   Button,
   FormControl,
   Label,
-  LinkButton,
   Modal,
   TextInput,
 } from "@axelarjs/ui";
-import { maskAddress } from "@axelarjs/utils";
 import { formatUnits } from "ethers/lib/utils.js";
-import { ExternalLink } from "lucide-react";
 import invariant from "tiny-invariant";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
@@ -90,7 +87,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
 
-  const submitHandler: SubmitHandler<FormState> = async (data, e) => {
+  const submitHandler: SubmitHandler<FormState> = async (_data, e) => {
     e?.preventDefault();
 
     invariant(selectedToChain, "selectedToChain is undefined");
@@ -114,12 +111,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           </>
         );
       case "approving":
-        return (
-          <>
-            Approving {amountToSend} tokens to be sent to{" "}
-            {selectedToChain?.name}
-          </>
-        );
+        return <>Confirm transaction on wallet</>;
       case "sending":
         return (
           <>
@@ -237,30 +229,16 @@ export const SendInterchainToken: FC<Props> = (props) => {
           )}
 
           {sendTokenStatus?.type === "sending" && (
-            <div className="grid gap-4">
-              <LinkButton
-                color="accent"
-                outline
-                size="sm"
-                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${sendTokenStatus.txHash}`}
-                className="flex items-center gap-2"
-                target="_blank"
-              >
-                View on axelarscan {maskAddress(sendTokenStatus.txHash)}{" "}
-                <ExternalLink className="h-4 w-4" />
-              </LinkButton>
-              <GMPTxStatusMonitor
-                txHash={sendTokenStatus.txHash}
-                onAllChainsExecuted={() => {
-                  trpcContext.gmp.searchInterchainToken.invalidate();
-                  trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate();
+            <GMPTxStatusMonitor
+              txHash={sendTokenStatus.txHash}
+              onAllChainsExecuted={() => {
+                trpcContext.gmp.searchInterchainToken.invalidate();
+                trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate();
 
-                  reset();
-                }}
-              />
-            </div>
+                reset();
+              }}
+            />
           )}
-
           <Button
             color="primary"
             type="submit"
