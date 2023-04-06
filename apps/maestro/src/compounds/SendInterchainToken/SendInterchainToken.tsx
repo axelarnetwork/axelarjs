@@ -110,7 +110,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             Approve {amountToSend} tokens to be sent to {selectedToChain?.name}
           </>
         );
-      case "approving":
+      case "awaiting_confirmation":
         return <>Confirm transaction on wallet</>;
       case "sending":
         return (
