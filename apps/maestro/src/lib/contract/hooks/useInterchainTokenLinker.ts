@@ -1,4 +1,4 @@
-import { useContract, UseContractConfig, useQuery } from "wagmi";
+import { useContract, UseContractConfig } from "wagmi";
 
 import contract from "../abis/InterchainTokenLinker";
 

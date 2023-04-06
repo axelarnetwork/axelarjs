@@ -1,34 +1,33 @@
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import {
+  Alert,
   Button,
   FormControl,
   Label,
-  LinkButton,
   Modal,
   TextInput,
 } from "@axelarjs/ui";
-import { maskAddress } from "@axelarjs/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { formatUnits } from "ethers/lib/utils.js";
-import { ExternalLink } from "lucide-react";
 import invariant from "tiny-invariant";
-import { z } from "zod";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
+import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
-import {
-  useGetTransactionStatusOnDestinationChainsQuery,
-  useInterchainTokensQuery,
-} from "~/services/gmp/hooks";
+import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
+import GMPTxStatusMonitor from "../GMPTxStatusMonitor";
 import {
   TransactionState,
   useSendInterchainTokenMutation,
 } from "./hooks/useSendInterchainTokenMutation";
+
+type FormState = {
+  amountToSend: number;
+};
 
 type Props = {
   trigger?: JSX.Element;
@@ -42,7 +41,7 @@ type Props = {
 };
 
 export const SendInterchainToken: FC<Props> = (props) => {
-  const { data: evmChains, computed } = useEVMChainConfigsQuery();
+  const { computed } = useEVMChainConfigsQuery();
 
   const { data: interchainToken } = useInterchainTokensQuery({
     tokenAddress: props.tokenAddress,
@@ -55,89 +54,18 @@ export const SendInterchainToken: FC<Props> = (props) => {
       tokenId: props.tokenId,
     });
 
-  const formSchema = useMemo(() => {
-    const tokenBalanceAsNumber = Number(
-      formatUnits(props.balance.tokenBalance, props.balance.decimals)
-    );
-    return z.object({
-      amountToSend: z.coerce.number().min(1).max(tokenBalanceAsNumber),
+  const { register, handleSubmit, watch, formState, reset, setValue } =
+    useForm<FormState>({
+      defaultValues: {
+        amountToSend: undefined,
+      },
+      mode: "onChange",
+      reValidateMode: "onChange",
     });
-  }, [props.balance.decimals, props.balance.tokenBalance]);
 
-  type FormState = z.infer<typeof formSchema>;
-
-  const { register, handleSubmit, watch, formState } = useForm<FormState>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      amountToSend: undefined,
-    },
-  });
-
-  const amount = watch("amountToSend");
+  const amountToSend = watch("amountToSend");
 
   const [toChainId, setToChainId] = useState(5);
-
-  const selectedToChain = useMemo(
-    () => evmChains?.find((c) => c.chain_id === toChainId),
-    [toChainId, evmChains]
-  );
-
-  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
-
-  const submitHandler: SubmitHandler<FormState> = async (data, e) => {
-    e?.preventDefault();
-
-    invariant(selectedToChain, "selectedToChain is undefined");
-
-    await sendTokenAsync({
-      tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
-      toNetwork: selectedToChain.chain_name,
-      fromNetwork: props.sourceChain.chain_name,
-      amount: amount?.toString(),
-      onStatusUpdate: setSendTokenStatus,
-    });
-  };
-
-  const buttonChildren = useMemo(() => {
-    switch (sendTokenStatus?.type) {
-      case "awaiting_approval":
-        return (
-          <>
-            Approve {amount} tokens to be sent to {selectedToChain?.name}
-          </>
-        );
-      case "approving":
-        return (
-          <>
-            Approving {amount} tokens to be sent to {selectedToChain?.name}
-          </>
-        );
-      case "sending":
-        return (
-          <>
-            Sending {amount} tokens to {selectedToChain?.name}
-          </>
-        );
-      case "failed":
-        return (
-          <>
-            Failed to send {amount} tokens to {selectedToChain?.name}
-          </>
-        );
-      default:
-        return (
-          <>
-            Send {amount || 0} tokens to {selectedToChain?.name}
-          </>
-        );
-    }
-  }, [amount, selectedToChain?.name, sendTokenStatus?.type]);
-
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash:
-      sendTokenStatus?.type === "sending" ? sendTokenStatus.txHash : undefined,
-  });
 
   const eligibleTargetChains = useMemo(() => {
     return (interchainToken?.matchingTokens ?? [])
@@ -148,6 +76,67 @@ export const SendInterchainToken: FC<Props> = (props) => {
     props.sourceChain.chain_id,
     computed.indexedByChainId,
   ]);
+
+  const selectedToChain = useMemo(
+    () =>
+      eligibleTargetChains.find((c) => c.chain_id === toChainId) ??
+      eligibleTargetChains[0],
+
+    [toChainId, eligibleTargetChains]
+  );
+
+  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
+
+  const submitHandler: SubmitHandler<FormState> = async (_data, e) => {
+    e?.preventDefault();
+
+    invariant(selectedToChain, "selectedToChain is undefined");
+
+    await sendTokenAsync({
+      tokenAddress: props.tokenAddress,
+      tokenId: props.tokenId,
+      toNetwork: selectedToChain.chain_name,
+      fromNetwork: props.sourceChain.chain_name,
+      amount: amountToSend?.toString(),
+      onStatusUpdate: setSendTokenStatus,
+    });
+  };
+
+  const buttonChildren = useMemo(() => {
+    switch (sendTokenStatus?.type) {
+      case "awaiting_approval":
+        return (
+          <>
+            Approve {amountToSend} tokens to be sent to {selectedToChain?.name}
+          </>
+        );
+      case "awaiting_confirmation":
+        return <>Confirm transaction on wallet</>;
+      case "sending":
+        return (
+          <>
+            Sending {amountToSend} tokens to {selectedToChain?.name}
+          </>
+        );
+      default:
+        if (!formState.isValid) {
+          return formState.errors.amountToSend?.message;
+        }
+        return (
+          <>
+            Send {amountToSend || 0} tokens to {selectedToChain?.name}
+          </>
+        );
+    }
+  }, [
+    amountToSend,
+    formState.errors.amountToSend?.message,
+    formState.isValid,
+    selectedToChain?.name,
+    sendTokenStatus?.type,
+  ]);
+
+  const trpcContext = trpc.useContext();
 
   return (
     <Modal trigger={props.trigger}>
@@ -168,6 +157,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               compact
               selectedChain={selectedToChain}
               chains={eligibleTargetChains}
+              disabled={isSending || eligibleTargetChains.length <= 1}
               onSwitchNetwork={(chain_id) => {
                 const target = computed.indexedByChainId[chain_id];
                 if (target) {
@@ -183,9 +173,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
           onSubmit={handleSubmit(submitHandler)}
         >
           <FormControl>
-            <Label>
+            <Label htmlFor="amountToSend">
               <Label.Text>Amount to send</Label.Text>
-              <Label.AltText>
+              <Label.AltText
+                role="button"
+                onClick={() => {
+                  setValue(
+                    "amountToSend",
+                    Number(formatUnits(props.balance.tokenBalance))
+                  );
+                }}
+              >
                 Balance:{" "}
                 <BigNumberText
                   decimals={props.balance.decimals}
@@ -200,45 +198,51 @@ export const SendInterchainToken: FC<Props> = (props) => {
               </Label.AltText>
             </Label>
             <TextInput
+              id="amountToSend"
               bordered
               type="number"
               placeholder="Enter your amount to send"
               min={0}
-              {...register("amountToSend")}
+              {...register("amountToSend", {
+                valueAsNumber: true,
+                required: {
+                  value: true,
+                  message: "Amount is required",
+                },
+                validate(value) {
+                  if (value <= 0) {
+                    return "Amount must be greater than 0";
+                  }
+
+                  if (value > Number(formatUnits(props.balance.tokenBalance))) {
+                    return "Insufficient balance";
+                  }
+
+                  return true;
+                },
+              })}
             />
           </FormControl>
 
           {sendTokenStatus?.type === "failed" && (
-            <div className="alert alert-error">
-              {sendTokenStatus?.error?.message}
-            </div>
+            <Alert status="error">{sendTokenStatus?.error?.message}</Alert>
           )}
 
           {sendTokenStatus?.type === "sending" && (
-            <div className="grid gap-4">
-              <LinkButton
-                color="accent"
-                outline
-                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${sendTokenStatus.txHash}`}
-                className="flex items-center gap-2"
-                target="_blank"
-              >
-                View on axelarscan {maskAddress(sendTokenStatus.txHash)}{" "}
-                <ExternalLink className="h-4 w-4" />
-              </LinkButton>
-              <ul>
-                {Object.entries(statuses ?? {}).map(([chainName, status]) => (
-                  <li key={chainName}>
-                    {chainName}: {status}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <GMPTxStatusMonitor
+              txHash={sendTokenStatus.txHash}
+              onAllChainsExecuted={() => {
+                trpcContext.gmp.searchInterchainToken.invalidate();
+                trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate();
+
+                reset();
+              }}
+            />
           )}
           <Button
             color="primary"
             type="submit"
-            disabled={!formState.isValid || !selectedToChain}
+            disabled={!formState.isValid || isSending}
             loading={isSending}
           >
             {buttonChildren}
@@ -248,4 +252,5 @@ export const SendInterchainToken: FC<Props> = (props) => {
     </Modal>
   );
 };
+
 export default SendInterchainToken;

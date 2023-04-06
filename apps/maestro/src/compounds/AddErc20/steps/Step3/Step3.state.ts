@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";

@@ -7,7 +7,6 @@ import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor/GMPTxStatusMonitor";
-import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
 import { useAddErc20StateContainer } from "../AddErc20.state";
 import { NextButton, PrevButton } from "./core";
@@ -25,6 +24,7 @@ export const Step4: FC = () => {
         </div>
         <LinkButton
           color="accent"
+          size="sm"
           outline
           href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${state.txHash}`}
           className="flex items-center gap-2"

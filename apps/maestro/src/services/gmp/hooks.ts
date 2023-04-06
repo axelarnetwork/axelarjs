@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { constants } from "ethers";
 import { isAddress } from "ethers/lib/utils.js";
 import { uniq } from "rambda";
@@ -106,7 +108,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
     refetchInterval?: number;
   }
 ) {
-  return useQuery(
+  const { data, ...query } = useQuery(
     ["gmp-get-transaction-status-on-destination-chains", input],
     async () => {
       const { data } = await searchGMP({
@@ -130,4 +132,17 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
       ...options,
     }
   );
+
+  return {
+    ...query,
+    data: data ?? {},
+    computed: useMemo(() => {
+      const statuses = Object.values(data ?? {});
+
+      return {
+        chains: statuses.length,
+        executed: statuses.filter((x) => x === "executed").length,
+      };
+    }, [data]),
+  };
 }

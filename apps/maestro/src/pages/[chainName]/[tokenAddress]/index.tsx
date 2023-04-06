@@ -8,7 +8,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import { BigNumber } from "ethers";
-import { formatEther, isAddress } from "ethers/lib/utils.js";
+import { isAddress } from "ethers/lib/utils.js";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";

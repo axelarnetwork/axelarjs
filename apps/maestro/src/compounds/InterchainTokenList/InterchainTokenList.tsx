@@ -137,7 +137,12 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                 {isSourceChain && (
                   <SendInterchainToken
                     trigger={
-                      <Button size="xs" color="primary">
+                      <Button
+                        size="xs"
+                        color="primary"
+                        // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                        className="absolute right-6"
+                      >
                         Send
                       </Button>
                     }
@@ -223,7 +228,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
         )}
       </header>
       <main>
-        <ul className="grid w-full grid-cols-3 gap-4 md:gap-5">
+        <ul className="grid w-full gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-5">
           {tokens.map((token) => (
             <InterchainToken
               key={token.chainId}

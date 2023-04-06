@@ -7,7 +7,7 @@ type Props = ButtonProps;
 
 const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
   (props, ref) => {
-    const { open, setDefaultChain } = useWeb3Modal();
+    const { open } = useWeb3Modal();
 
     return <Button {...props} onClick={() => open()} ref={ref} />;
   }

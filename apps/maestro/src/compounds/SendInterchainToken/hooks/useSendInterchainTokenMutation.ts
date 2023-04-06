@@ -27,7 +27,7 @@ export type TransactionState =
   | { type: "idle" }
   | { type: "failed"; error: Error }
   | { type: "awaiting_approval" }
-  | { type: "approving"; txHash: `0x${string}` }
+  | { type: "awaiting_confirmation"; txHash: `0x${string}` }
   | { type: "sending"; txHash: `0x${string}` };
 
 export type UseSendInterchainTokenConfig = {
@@ -92,7 +92,10 @@ export function useSendInterchainTokenMutation(
       onStatusUpdate?.({ type: "awaiting_approval" });
       const tx = await erc20.approve(tokenLinker.address, bigNumberAmount);
 
-      onStatusUpdate?.({ type: "approving", txHash: tx.hash as `0x${string}` });
+      onStatusUpdate?.({
+        type: "awaiting_confirmation",
+        txHash: tx.hash as `0x${string}`,
+      });
 
       // wait for tx to be mined
       await tx.wait(1);

@@ -12,7 +12,7 @@
     "@axelar-network/axelarjs-sdk": "0.12.5",
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@hookform/resolvers": "^3.0.0",
+    "@hookform/resolvers": "^3.0.1",
     "@trpc/client": "^10.18.0",
     "@trpc/next": "^10.18.0",
     "@trpc/react-query": "^10.18.0",

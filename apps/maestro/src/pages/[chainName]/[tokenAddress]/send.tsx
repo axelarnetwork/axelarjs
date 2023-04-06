@@ -6,7 +6,7 @@ import Page from "~/layouts/Page";
 
 type Props = {};
 
-const SendInterchainToken = (props: Props) => {
+const SendInterchainToken = (_props: Props) => {
   return (
     <Page className="place-items-center">
       <Card className="bg-base-200">
