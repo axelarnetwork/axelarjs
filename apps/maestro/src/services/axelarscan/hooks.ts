@@ -1,9 +1,12 @@
 import { indexBy, prop } from "rambda";
 import { useQuery } from "wagmi";
 
+import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
 
 import { getAssetPrices, getAssets, getChainConfigs } from ".";
+
+const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), EVM_CHAIN_CONFIGS);
 
 export function useChainConfigsQuery() {
   return useQuery(["axelarscan-chain-configs"], getChainConfigs, {
@@ -21,6 +24,9 @@ export function useEVMChainConfigsQuery() {
     data,
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), data ?? []),
+      wagmiChains: (data ?? []).map(
+        (x) => EVM_CHAIN_CONFIGS_BY_ID[String(x.chain_id)]
+      ),
     },
   };
 }

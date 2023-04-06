@@ -33,10 +33,7 @@ export function useDeployRemoteTokensMutation() {
 
     try {
       //deploy remote tokens
-      const value = input.gasFees.reduce(
-        (a, b) => a.add(BigNumber.from(b)),
-        BigNumber.from(0)
-      );
+      const value = input.gasFees.reduce((a, b) => a.add(b), BigNumber.from(0));
       const deployRemoteTokensTx = await tokenLinker.deployRemoteTokens(
         input.tokenId,
         input.destinationChainIds,

@@ -51,15 +51,17 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     [evmChains]
   );
 
+  const statusList = Object.values(statuses ?? {});
+
   useEffect(() => {
     if (
-      statuses &&
-      Object.values(statuses).every((s) => s === "executed") &&
+      statusList.length > 0 &&
+      statusList.every((s) => s === "executed") &&
       onAllChainsExecuted
     ) {
       onAllChainsExecuted();
     }
-  }, [statuses, onAllChainsExecuted]);
+  }, [statusList, onAllChainsExecuted]);
 
   if (!statuses || Object.keys(statuses).length === 0) {
     return null;
@@ -87,7 +89,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
               className="flex items-center justify-between"
             >
               <span className="flex items-center gap-2">
-                <ChainIcon src={chain.image} size="sm" alt={chain.chain_name} />{" "}
+                <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
                 {chain.chain_name}
               </span>
               <Badge color={STATUS_COLORS[status]}>
