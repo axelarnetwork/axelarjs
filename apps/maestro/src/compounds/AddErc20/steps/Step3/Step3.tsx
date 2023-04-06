@@ -276,7 +276,7 @@ export const Step3: FC = () => {
             )}
           </Label>
           <div className="bg-base-300 flex flex-wrap gap-2 rounded-3xl p-4">
-            {eligibleChains?.map((chain, i) => {
+            {eligibleChains?.map((chain) => {
               const isSelected = rootState.selectedChains.has(chain.chain_name);
 
               return (
