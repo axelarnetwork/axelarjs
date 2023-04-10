@@ -28,7 +28,8 @@ export type TransactionState =
   | { type: "failed"; error: Error }
   | { type: "awaiting_approval" }
   | { type: "awaiting_confirmation"; txHash: `0x${string}` }
-  | { type: "sending"; txHash: `0x${string}` };
+  | { type: "sending"; txHash: `0x${string}` }
+  | { type: "confirmed"; txHash: `0x${string}` };
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
@@ -89,7 +90,10 @@ export function useSendInterchainTokenMutation(
 
     //approve
     try {
-      onStatusUpdate?.({ type: "awaiting_approval" });
+      onStatusUpdate?.({
+        type: "awaiting_approval",
+      });
+
       const tx = await erc20.approve(tokenLinker.address, bigNumberAmount);
 
       onStatusUpdate?.({
@@ -99,6 +103,11 @@ export function useSendInterchainTokenMutation(
 
       // wait for tx to be mined
       await tx.wait(1);
+
+      onStatusUpdate?.({
+        type: "confirmed",
+        txHash: tx.hash as `0x${string}`,
+      });
     } catch (e) {
       if (e instanceof Error) {
         onStatusUpdate?.({ type: "failed", error: e });
@@ -119,7 +128,7 @@ export function useSendInterchainTokenMutation(
         input.toNetwork,
         address,
         bigNumberAmount,
-        { value: BigNumber.from(gas) }
+        { value: BigNumber.from(gas).mul(2) }
       );
 
       onStatusUpdate?.({

@@ -7,12 +7,14 @@ import {
   CopyToClipboardButton,
   SpinnerIcon,
 } from "@axelarjs/ui";
-import { maskAddress } from "@axelarjs/utils";
+import { maskAddress, sluggify } from "@axelarjs/utils";
 import clsx from "clsx";
-import { useAccount, useNetwork } from "wagmi";
+import { useRouter } from "next/router";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
+import { WagmiEVMChainConfig } from "~/config/wagmi";
 import { EVMChainConfig } from "~/services/axelarscan/types";
 import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
 import { GMPStatus } from "~/services/gmp/types";
@@ -27,6 +29,7 @@ type TokenInfo = {
   tokenId: `0x${string}`;
   isSelected?: boolean;
   chain?: EVMChainConfig;
+  wagmiConfig?: WagmiEVMChainConfig;
   deploymentStatus?: "pending" | GMPStatus;
 };
 
@@ -42,8 +45,21 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
   });
+  const router = useRouter();
+
+  const { switchNetworkAsync } = useSwitchNetwork();
 
   const isSourceChain = chain?.id === props.chainId;
+
+  const handleSwitchChain = async () => {
+    try {
+      await switchNetworkAsync?.(props.chainId);
+
+      router.push(
+        `/${sluggify(props.wagmiConfig?.name ?? "")}/${props.tokenAddress}`
+      );
+    } catch (error) {}
+  };
 
   return (
     <Card
@@ -134,7 +150,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                     {balance.tokenBalance}
                   </BigNumberText>
                 </div>
-                {isSourceChain && (
+                {isSourceChain ? (
                   <SendInterchainToken
                     trigger={
                       <Button
@@ -143,7 +159,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                         // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
                         className="absolute right-6"
                       >
-                        Send
+                        send
                       </Button>
                     }
                     tokenAddress={props.tokenAddress}
@@ -151,6 +167,19 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                     sourceChain={props.chain as EVMChainConfig}
                     balance={balance}
                   />
+                ) : (
+                  <Button
+                    size="xs"
+                    className="flex items-center gap-2"
+                    onClick={handleSwitchChain}
+                  >
+                    switch to{" "}
+                    <ChainIcon
+                      src={props.chain?.image ?? ""}
+                      size="xs"
+                      alt={props.chain?.name ?? ""}
+                    />
+                  </Button>
                 )}
               </>
             )}

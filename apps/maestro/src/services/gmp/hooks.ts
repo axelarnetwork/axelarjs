@@ -53,8 +53,14 @@ export function useInterchainTokensQuery(input: {
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
         chain: computed.indexedByChainId[String(token.chainId)],
+        wagmiConfig: computed.wagmiChains?.find(
+          (x) => x?.id === Number(token.chainId)
+        ),
       })),
       chain: computed.indexedByChainId[String(input.chainId)],
+      wagmiConfig: computed.wagmiChains?.find(
+        (x) => x?.id === Number(input.chainId)
+      ),
     },
     isLoading: evmChainsQuery.isLoading || queryResult.isLoading,
     isFetching: evmChainsQuery.isFetching || queryResult.isFetching,

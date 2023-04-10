@@ -54,14 +54,20 @@ export const SendInterchainToken: FC<Props> = (props) => {
       tokenId: props.tokenId,
     });
 
-  const { register, handleSubmit, watch, formState, reset, setValue } =
-    useForm<FormState>({
-      defaultValues: {
-        amountToSend: undefined,
-      },
-      mode: "onChange",
-      reValidateMode: "onChange",
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState,
+    reset: resetForm,
+    setValue,
+  } = useForm<FormState>({
+    defaultValues: {
+      amountToSend: undefined,
+    },
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
 
   const amountToSend = watch("amountToSend");
 
@@ -232,10 +238,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
               onAllChainsExecuted={() => {
-                trpcContext.gmp.searchInterchainToken.invalidate();
-                trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate();
-
-                reset();
+                Promise.all([
+                  trpcContext.gmp.searchInterchainToken.invalidate(),
+                  trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate(),
+                ]).then(() => {
+                  resetForm();
+                });
               }}
             />
           )}
