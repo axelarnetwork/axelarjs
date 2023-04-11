@@ -10,7 +10,7 @@ import {
   TextInput,
 } from "@axelarjs/ui";
 import { BigNumber } from "ethers";
-import { formatUnits } from "ethers/lib/utils.js";
+import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import invariant from "tiny-invariant";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
@@ -27,7 +27,7 @@ import {
 } from "./hooks/useSendInterchainTokenMutation";
 
 type FormState = {
-  amountToSend: number;
+  amountToSend: string;
 };
 
 type Props = {
@@ -121,7 +121,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       tokenId: props.tokenId,
       toNetwork: selectedToChain.chain_name,
       fromNetwork: props.sourceChain.chain_name,
-      amount: amountToSend?.toString(),
+      amount: amountToSend,
       onStatusUpdate: setSendTokenStatus,
     });
   };
@@ -144,7 +144,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         );
       default:
         if (!formState.isValid) {
-          return formState.errors.amountToSend?.message;
+          return formState.errors.amountToSend?.message ?? "Amount is reauired";
         }
         return (
           <>
@@ -161,6 +161,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
   ]);
 
   const trpcContext = trpc.useContext();
+
+  const isFormDisabled =
+    sendTokenStatus.type !== "idle" && sendTokenStatus.type !== "failed";
 
   return (
     <Modal
@@ -196,7 +199,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               compact
               selectedChain={selectedToChain}
               chains={eligibleTargetChains}
-              disabled={isSending || eligibleTargetChains.length <= 1}
+              disabled={isFormDisabled || eligibleTargetChains.length <= 1}
               onSwitchNetwork={(chain_id) => {
                 const target = computed.indexedByChainId[chain_id];
                 if (target) {
@@ -219,7 +222,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 onClick={() => {
                   setValue(
                     "amountToSend",
-                    Number(formatUnits(props.balance.tokenBalance))
+                    formatUnits(
+                      props.balance.tokenBalance,
+                      props.balance.decimals
+                    ).replace(/,/gi, "")
                   );
                 }}
               >
@@ -254,17 +260,16 @@ export const SendInterchainToken: FC<Props> = (props) => {
               }}
               {...register("amountToSend", {
                 disabled: sendTokenStatus.type !== "idle",
-                required: {
-                  value: true,
-                  message: "Amount is required",
-                },
                 validate(value) {
-                  if (value <= 0) {
+                  if (!value || value === "0") {
                     return "Amount must be greater than 0";
                   }
 
-                  const bnValue = BigNumber.from(String(value));
-                  const bnBalance = BigNumber.from(props.balance.tokenBalance);
+                  const bnValue = BigNumber.from(value);
+                  const bnBalance = parseUnits(
+                    props.balance.tokenBalance,
+                    props.balance.decimals
+                  );
 
                   if (bnValue.gt(bnBalance)) {
                     return "Insufficient balance";
@@ -293,11 +298,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <Button
             color="primary"
             type="submit"
-            disabled={
-              !formState.isValid ||
-              (sendTokenStatus?.type !== "idle" &&
-                sendTokenStatus?.type !== "failed")
-            }
+            disabled={!formState.isValid || isFormDisabled}
             loading={isSending}
           >
             {buttonChildren}
