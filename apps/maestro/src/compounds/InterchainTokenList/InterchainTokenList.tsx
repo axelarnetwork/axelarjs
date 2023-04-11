@@ -70,7 +70,7 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       bordered={!props.isRegistered}
       onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
       className={clsx(
-        "bg-base-200 dark:bg-base-300 transition-all ease-in",
+        "bg-base-200 dark:bg-base-300 relative overflow-hidden transition-all ease-in",
         "hover:opacity-75 hover:shadow-xl",
         {
           "shadow-sm": !props.isRegistered,
@@ -90,6 +90,20 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       }
       role={props.onToggleSelection ? "switch" : undefined}
     >
+      {props.onToggleSelection && (
+        <div
+          style={{
+            backgroundImage: `url(${props.chain?.image})`,
+          }}
+          className={clsx(
+            "absolute inset-0 h-full scale-100 bg-cover opacity-0 blur-3xl transition-all duration-300",
+            "hover:scale-150 hover:opacity-30",
+            {
+              "opacity-50": props.isSelected,
+            }
+          )}
+        />
+      )}
       <Card.Body className="w-full">
         <Card.Title className="justify-between">
           {props.chain && (
