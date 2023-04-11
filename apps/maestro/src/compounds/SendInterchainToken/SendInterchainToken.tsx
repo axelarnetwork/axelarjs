@@ -183,9 +183,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       }}
     >
       <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title>
-          Send interchain token ({sendTokenStatus.type})
-        </Modal.Title>
+        <Modal.Title>Send interchain token</Modal.Title>
         <div className="my-4 grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
