@@ -8,6 +8,7 @@ import {
   Label,
   Modal,
   TextInput,
+  toast,
 } from "@axelarjs/ui";
 import { BigNumber } from "ethers";
 import { formatUnits, parseUnits } from "ethers/lib/utils.js";
@@ -116,14 +117,29 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
     invariant(selectedToChain, "selectedToChain is undefined");
 
-    await sendTokenAsync({
-      tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
-      toNetwork: selectedToChain.chain_name,
-      fromNetwork: props.sourceChain.chain_name,
-      amount: amountToSend,
-      onStatusUpdate: setSendTokenStatus,
-    });
+    await sendTokenAsync(
+      {
+        tokenAddress: props.tokenAddress,
+        tokenId: props.tokenId,
+        toNetwork: selectedToChain.chain_name,
+        fromNetwork: props.sourceChain.chain_name,
+        amount: amountToSend,
+        onStatusUpdate(status) {
+          if (status.type === "failed") {
+            toast.error(status.error.message);
+          }
+          setSendTokenStatus(status);
+        },
+      },
+      {
+        // handles unhandled errors in the mutation
+        onError(error) {
+          if (error instanceof Error) {
+            toast.error(error.message);
+          }
+        },
+      }
+    );
   };
 
   const buttonChildren = useMemo(() => {
@@ -280,10 +296,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
-
-          {sendTokenStatus?.type === "failed" && (
-            <Alert status="error">{sendTokenStatus?.error?.message}</Alert>
-          )}
 
           {sendTokenStatus?.type === "sending" && (
             <GMPTxStatusMonitor
