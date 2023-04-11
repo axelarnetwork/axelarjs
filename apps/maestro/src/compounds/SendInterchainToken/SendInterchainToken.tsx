@@ -287,22 +287,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
               onAllChainsExecuted={async () => {
-                try {
-                  await Promise.all([
-                    trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate({
-                      owner: address,
-                      chainId: props.sourceChain.chain_id,
-                      tokenAddress: props.tokenAddress,
-                    }),
-                    trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate({
-                      owner: address,
-                      chainId: selectedToChain?.chain_id,
-                      tokenAddress: props.tokenAddress,
-                    }),
-                  ]);
-                  resetForm();
-                  setSendTokenStatus({ type: "idle" });
-                } catch (error) {}
+                await trpcContext.gmp.getERC20TokenBalanceForOwner.refetch();
+                resetForm();
+                setSendTokenStatus({ type: "idle" });
               }}
             />
           )}
