@@ -2,7 +2,6 @@ import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import {
-  Alert,
   Button,
   FormControl,
   Label,
@@ -199,7 +198,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
       }}
     >
       <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title>Send interchain token</Modal.Title>
+        <Modal.Title>
+          Send interchain token ({sendTokenStatus.type})
+        </Modal.Title>
         <div className="my-4 grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
@@ -275,7 +276,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 }
               }}
               {...register("amountToSend", {
-                disabled: sendTokenStatus.type !== "idle",
+                disabled: isFormDisabled,
                 validate(value) {
                   if (!value || value === "0") {
                     return "Amount must be greater than 0";
@@ -296,7 +297,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
-
           {sendTokenStatus?.type === "sending" && (
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
