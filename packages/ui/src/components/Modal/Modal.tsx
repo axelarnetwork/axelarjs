@@ -1,4 +1,4 @@
-import { ComponentProps, FC, Fragment, ReactNode, useEffect } from "react";
+import { ComponentProps, FC, Fragment, ReactNode } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
