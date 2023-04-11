@@ -12,7 +12,6 @@ import {
 import { BigNumber } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
 import invariant from "tiny-invariant";
-import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -162,8 +161,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   ]);
 
   const trpcContext = trpc.useContext();
-
-  const { address } = useAccount();
 
   return (
     <Modal
