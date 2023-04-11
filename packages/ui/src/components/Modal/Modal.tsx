@@ -1,4 +1,4 @@
-import { ComponentProps, FC, Fragment, ReactNode } from "react";
+import { ComponentProps, FC, Fragment, ReactNode, useEffect } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -26,6 +26,7 @@ export type ModalProps = JSX.IntrinsicElements["div"] &
   PolymorphicProps &
   Dialog.DialogProps & {
     hideCloseButton?: boolean;
+    disableCloseButton?: boolean;
   };
 
 const ModalRoot: FC<ModalProps> = ({
@@ -34,6 +35,7 @@ const ModalRoot: FC<ModalProps> = ({
   onOpenChange,
   defaultOpen,
   hideCloseButton,
+  disableCloseButton,
   ...props
 }) => {
   const [isOpen, actions] = useModalStateContiner();
@@ -41,6 +43,7 @@ const ModalRoot: FC<ModalProps> = ({
   const handleOpenChange = (open: boolean) => {
     if (onOpenChange) {
       onOpenChange(open);
+      return;
     }
     if (open) {
       actions.open();
@@ -51,7 +54,12 @@ const ModalRoot: FC<ModalProps> = ({
 
   return (
     <Dialog.Root
-      {...{ modal, open: isOpen, onOpenChange: handleOpenChange, defaultOpen }}
+      {...{
+        modal,
+        open: isOpen,
+        onOpenChange: handleOpenChange,
+        defaultOpen,
+      }}
     >
       {"trigger" in props ? (
         <Dialog.Trigger asChild onClick={actions.open}>
@@ -94,6 +102,7 @@ const ModalRoot: FC<ModalProps> = ({
                   size="sm"
                   shape="circle"
                   className="absolute right-2 top-2"
+                  disabled={disableCloseButton}
                 >
                   ✕
                 </Button>
@@ -112,7 +121,7 @@ ModalRoot.defaultProps = {
 };
 
 const ModalRootWithProvider = (props: ModalProps) => (
-  <ModalStateProvider initialState={props.open || props.defaultOpen}>
+  <ModalStateProvider initialState={props.open ?? props.defaultOpen}>
     <ModalRoot {...props} />
   </ModalStateProvider>
 );

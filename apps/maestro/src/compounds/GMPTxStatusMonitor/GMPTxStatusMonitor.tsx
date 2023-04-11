@@ -31,6 +31,13 @@ const STATUS_COLORS: Partial<
   executed: "success",
 };
 
+const STATUS_ICONS: Partial<Record<GMPStatus, React.ReactNode>> = {
+  called: "⚪",
+  confirmed: "🔵",
+  executing: "🟡",
+  executed: "🟢",
+};
+
 type Props = {
   txHash: `0x${string}`;
   onAllChainsExecuted?: () => void;
@@ -94,8 +101,8 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
               </span>
               <Badge color={STATUS_COLORS[status]}>
                 {!["error", "executed"].includes(status) && (
-                  <span className="-translate-x-2 animate-pulse text-xs">
-                    ⚪
+                  <span className="text-warning -translate-x-2 animate-pulse text-xs">
+                    {STATUS_ICONS[status]}
                   </span>
                 )}
 

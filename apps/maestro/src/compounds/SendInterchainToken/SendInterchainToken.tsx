@@ -9,8 +9,10 @@ import {
   Modal,
   TextInput,
 } from "@axelarjs/ui";
+import { BigNumber } from "ethers";
 import { formatUnits } from "ethers/lib/utils.js";
 import invariant from "tiny-invariant";
+import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -34,11 +36,24 @@ type Props = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
+  isOpen?: boolean;
+  onClose?: () => void;
   balance: {
     tokenBalance: string;
     decimals: string | number;
   };
 };
+
+const ALLOWED_NON_NUMERIC_KEYS = [
+  "Backspace",
+  "Delete",
+  "Tab",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Enter",
+];
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { computed } = useEVMChainConfigsQuery();
@@ -47,6 +62,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     tokenAddress: props.tokenAddress,
     chainId: props.sourceChain.chain_id,
   });
+
+  const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
 
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
@@ -91,7 +108,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [toChainId, eligibleTargetChains]
   );
 
-  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
+  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>({
+    type: "idle",
+  });
 
   const submitHandler: SubmitHandler<FormState> = async (_data, e) => {
     e?.preventDefault();
@@ -144,10 +163,29 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   const trpcContext = trpc.useContext();
 
+  const { address } = useAccount();
+
   return (
-    <Modal trigger={props.trigger}>
+    <Modal
+      trigger={props.trigger}
+      disableCloseButton={sendTokenStatus.type !== "idle"}
+      open={isModalOpen}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          if (sendTokenStatus.type !== "idle") {
+            return;
+          }
+          props.onClose?.();
+          resetForm();
+          setSendTokenStatus({ type: "idle" });
+        }
+        setIsModalOpen(isOpen);
+      }}
+    >
       <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title>Send interchain token</Modal.Title>
+        <Modal.Title>
+          Send interchain token ({sendTokenStatus.type})
+        </Modal.Title>
         <div className="my-4 grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
@@ -206,11 +244,21 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <TextInput
               id="amountToSend"
               bordered
-              type="number"
               placeholder="Enter your amount to send"
               min={0}
+              onKeyDown={(e) => {
+                // prevent non-numeric characters
+                if (
+                  // allow backspace, delete, tab, arrow keys, enter
+                  !ALLOWED_NON_NUMERIC_KEYS.includes(e.key) &&
+                  // is not numeric
+                  !/^[0-9.]+$/.test(e.key)
+                ) {
+                  e.preventDefault();
+                }
+              }}
               {...register("amountToSend", {
-                valueAsNumber: true,
+                disabled: sendTokenStatus.type !== "idle",
                 required: {
                   value: true,
                   message: "Amount is required",
@@ -220,7 +268,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Amount must be greater than 0";
                   }
 
-                  if (value > Number(formatUnits(props.balance.tokenBalance))) {
+                  const bnValue = BigNumber.from(String(value));
+                  const bnBalance = BigNumber.from(props.balance.tokenBalance);
+
+                  if (bnValue.gt(bnBalance)) {
                     return "Insufficient balance";
                   }
 
@@ -237,20 +288,34 @@ export const SendInterchainToken: FC<Props> = (props) => {
           {sendTokenStatus?.type === "sending" && (
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
-              onAllChainsExecuted={() => {
-                Promise.all([
-                  trpcContext.gmp.searchInterchainToken.invalidate(),
-                  trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate(),
-                ]).then(() => {
+              onAllChainsExecuted={async () => {
+                try {
+                  await Promise.all([
+                    trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate({
+                      owner: address,
+                      chainId: props.sourceChain.chain_id,
+                      tokenAddress: props.tokenAddress,
+                    }),
+                    trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate({
+                      owner: address,
+                      chainId: selectedToChain?.chain_id,
+                      tokenAddress: props.tokenAddress,
+                    }),
+                  ]);
                   resetForm();
-                });
+                  setSendTokenStatus({ type: "idle" });
+                } catch (error) {}
               }}
             />
           )}
           <Button
             color="primary"
             type="submit"
-            disabled={!formState.isValid || isSending}
+            disabled={
+              !formState.isValid ||
+              (sendTokenStatus?.type !== "idle" &&
+                sendTokenStatus?.type !== "failed")
+            }
             loading={isSending}
           >
             {buttonChildren}

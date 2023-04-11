@@ -1,4 +1,4 @@
-import { FC, ReactNode, useMemo } from "react";
+import { FC, ReactNode, useMemo, useState } from "react";
 
 import {
   Badge,
@@ -60,6 +60,8 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
       );
     } catch (error) {}
   };
+
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
 
   return (
     <Card
@@ -152,6 +154,8 @@ export const InterchainToken: FC<InterchainTokenProps> = (props) => {
                 </div>
                 {isSourceChain ? (
                   <SendInterchainToken
+                    isOpen={isSendModalOpen}
+                    onClose={() => setIsSendModalOpen(false)}
                     trigger={
                       <Button
                         size="xs"
