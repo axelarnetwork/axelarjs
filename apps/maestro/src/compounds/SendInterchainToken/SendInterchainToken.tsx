@@ -183,11 +183,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
   return (
     <Modal
       trigger={props.trigger}
-      disableCloseButton={sendTokenStatus.type !== "idle"}
+      disableCloseButton={isFormDisabled}
       open={isModalOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          if (sendTokenStatus.type !== "idle") {
+          if (isFormDisabled) {
             return;
           }
           props.onClose?.();
