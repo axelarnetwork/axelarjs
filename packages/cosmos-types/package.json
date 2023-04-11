@@ -39,6 +39,6 @@
     "degit": "^2.8.4",
     "rimraf": "^4.4.1",
     "ts-proto": "^1.146.0",
-    "typescript": "5.0.2"
+    "typescript": "5.0.4"
   }
 }

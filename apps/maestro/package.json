@@ -36,7 +36,7 @@
     "react-hook-form": "^7.43.9",
     "superjson": "^1.12.2",
     "tailwind-styled-components": "^2.2.0",
-    "typescript": "5.0.2",
+    "typescript": "5.0.4",
     "unstated-next": "^1.1.0",
     "viem": "^0.1.26",
     "wagmi": "^0.12.10",
