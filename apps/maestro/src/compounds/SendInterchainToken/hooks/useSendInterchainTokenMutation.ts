@@ -46,6 +46,10 @@ export type UseSendInterchainTokenInput = {
   onStatusUpdate?: (message: TransactionState) => void;
 };
 
+const AXELAR_QUERY_API = new AxelarQueryAPI({
+  environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
+});
+
 export function useSendInterchainTokenMutation(
   config: UseSendInterchainTokenConfig
 ) {
@@ -79,10 +83,9 @@ export function useSendInterchainTokenMutation(
     const { toNetwork, fromNetwork, onFinished, onStatusUpdate } = input;
 
     const decimals = await erc20.decimals();
-    const bigNumberAmount = BigNumber.from(parseUnits(input.amount, decimals));
-    const environment = process.env.NEXT_PUBLIC_NETWORK_ENV as Environment;
-    const axelarQueryAPI = new AxelarQueryAPI({ environment });
-    const gas = await axelarQueryAPI.estimateGasFee(
+    const bnAmount = BigNumber.from(parseUnits(input.amount ?? "0", decimals));
+
+    const gas = await AXELAR_QUERY_API.estimateGasFee(
       fromNetwork,
       toNetwork,
       gasTokenMap[fromNetwork.toLowerCase()]
@@ -94,7 +97,7 @@ export function useSendInterchainTokenMutation(
         type: "awaiting_approval",
       });
 
-      const tx = await erc20.approve(tokenLinker.address, bigNumberAmount);
+      const tx = await erc20.approve(tokenLinker.address, bnAmount);
 
       onStatusUpdate?.({
         type: "awaiting_confirmation",
@@ -127,7 +130,7 @@ export function useSendInterchainTokenMutation(
         input.tokenId,
         input.toNetwork,
         address,
-        bigNumberAmount,
+        bnAmount,
         { value: BigNumber.from(gas).mul(2) }
       );
 

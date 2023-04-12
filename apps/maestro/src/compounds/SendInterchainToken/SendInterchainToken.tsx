@@ -2,18 +2,20 @@ import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import {
-  Alert,
   Button,
   FormControl,
   Label,
   Modal,
   TextInput,
+  toast,
 } from "@axelarjs/ui";
-import { formatUnits } from "ethers/lib/utils.js";
+import { BigNumber } from "ethers";
+import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import invariant from "tiny-invariant";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
+import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { EVMChainConfig } from "~/services/axelarscan/types";
@@ -26,7 +28,7 @@ import {
 } from "./hooks/useSendInterchainTokenMutation";
 
 type FormState = {
-  amountToSend: number;
+  amountToSend: string;
 };
 
 type Props = {
@@ -34,11 +36,24 @@ type Props = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
+  isOpen?: boolean;
+  onClose?: () => void;
   balance: {
     tokenBalance: string;
     decimals: string | number;
   };
 };
+
+const ALLOWED_NON_NUMERIC_KEYS = [
+  "Backspace",
+  "Delete",
+  "Tab",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Enter",
+];
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { computed } = useEVMChainConfigsQuery();
@@ -47,6 +62,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     tokenAddress: props.tokenAddress,
     chainId: props.sourceChain.chain_id,
   });
+
+  const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
 
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
@@ -91,21 +108,40 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [toChainId, eligibleTargetChains]
   );
 
-  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>();
+  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>({
+    type: "idle",
+  });
 
   const submitHandler: SubmitHandler<FormState> = async (_data, e) => {
     e?.preventDefault();
 
     invariant(selectedToChain, "selectedToChain is undefined");
 
-    await sendTokenAsync({
-      tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
-      toNetwork: selectedToChain.chain_name,
-      fromNetwork: props.sourceChain.chain_name,
-      amount: amountToSend?.toString(),
-      onStatusUpdate: setSendTokenStatus,
-    });
+    await sendTokenAsync(
+      {
+        tokenAddress: props.tokenAddress,
+        tokenId: props.tokenId,
+        toNetwork: selectedToChain.chain_name,
+        fromNetwork: props.sourceChain.chain_name,
+        amount: amountToSend,
+        onStatusUpdate(status) {
+          if (status.type === "failed") {
+            toast.error("Failed to send token. Please try again.");
+            logger.always.error(status.error);
+          }
+          setSendTokenStatus(status);
+        },
+      },
+      {
+        // handles unhandled errors in the mutation
+        onError(error) {
+          if (error instanceof Error) {
+            toast.error("Failed to send token. Please try again.");
+            logger.always.error(error);
+          }
+        },
+      }
+    );
   };
 
   const buttonChildren = useMemo(() => {
@@ -126,7 +162,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         );
       default:
         if (!formState.isValid) {
-          return formState.errors.amountToSend?.message;
+          return formState.errors.amountToSend?.message ?? "Amount is reauired";
         }
         return (
           <>
@@ -144,8 +180,26 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   const trpcContext = trpc.useContext();
 
+  const isFormDisabled =
+    sendTokenStatus.type !== "idle" && sendTokenStatus.type !== "failed";
+
   return (
-    <Modal trigger={props.trigger}>
+    <Modal
+      trigger={props.trigger}
+      disableCloseButton={isFormDisabled}
+      open={isModalOpen}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          if (isFormDisabled) {
+            return;
+          }
+          props.onClose?.();
+          resetForm();
+          setSendTokenStatus({ type: "idle" });
+        }
+        setIsModalOpen(isOpen);
+      }}
+    >
       <Modal.Body className="flex h-96 flex-col">
         <Modal.Title>Send interchain token</Modal.Title>
         <div className="my-4 grid grid-cols-2 gap-4 p-1">
@@ -163,7 +217,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               compact
               selectedChain={selectedToChain}
               chains={eligibleTargetChains}
-              disabled={isSending || eligibleTargetChains.length <= 1}
+              disabled={isFormDisabled || eligibleTargetChains.length <= 1}
               onSwitchNetwork={(chain_id) => {
                 const target = computed.indexedByChainId[chain_id];
                 if (target) {
@@ -186,7 +240,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 onClick={() => {
                   setValue(
                     "amountToSend",
-                    Number(formatUnits(props.balance.tokenBalance))
+                    formatUnits(
+                      props.balance.tokenBalance,
+                      props.balance.decimals
+                    ).replace(/,/gi, "")
                   );
                 }}
               >
@@ -206,21 +263,33 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <TextInput
               id="amountToSend"
               bordered
-              type="number"
               placeholder="Enter your amount to send"
               min={0}
+              onKeyDown={(e) => {
+                // prevent non-numeric characters
+                if (
+                  // allow backspace, delete, tab, arrow keys, enter
+                  !ALLOWED_NON_NUMERIC_KEYS.includes(e.key) &&
+                  // is not numeric
+                  !/^[0-9.]+$/.test(e.key)
+                ) {
+                  e.preventDefault();
+                }
+              }}
               {...register("amountToSend", {
-                valueAsNumber: true,
-                required: {
-                  value: true,
-                  message: "Amount is required",
-                },
+                disabled: isFormDisabled,
                 validate(value) {
-                  if (value <= 0) {
+                  if (!value || value === "0") {
                     return "Amount must be greater than 0";
                   }
 
-                  if (value > Number(formatUnits(props.balance.tokenBalance))) {
+                  const bnValue = BigNumber.from(value);
+                  const bnBalance = parseUnits(
+                    props.balance.tokenBalance,
+                    props.balance.decimals
+                  );
+
+                  if (bnValue.gt(bnBalance)) {
                     return "Insufficient balance";
                   }
 
@@ -229,28 +298,21 @@ export const SendInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
-
-          {sendTokenStatus?.type === "failed" && (
-            <Alert status="error">{sendTokenStatus?.error?.message}</Alert>
-          )}
-
           {sendTokenStatus?.type === "sending" && (
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
-              onAllChainsExecuted={() => {
-                Promise.all([
-                  trpcContext.gmp.searchInterchainToken.invalidate(),
-                  trpcContext.gmp.getERC20TokenBalanceForOwner.invalidate(),
-                ]).then(() => {
-                  resetForm();
-                });
+              onAllChainsExecuted={async () => {
+                await trpcContext.gmp.getERC20TokenBalanceForOwner.refetch();
+                resetForm();
+                setSendTokenStatus({ type: "idle" });
+                toast.success("Tokens sent successfully!");
               }}
             />
           )}
           <Button
             color="primary"
             type="submit"
-            disabled={!formState.isValid || isSending}
+            disabled={!formState.isValid || isFormDisabled}
             loading={isSending}
           >
             {buttonChildren}

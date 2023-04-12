@@ -33,15 +33,15 @@ async function estimateGasFee(
 async function estimateGasFeeMultipleChains(
   params: EstimateGasFeeMultipleChainsParams
 ): Promise<BigNumber[]> {
-  return await Promise.all(
-    params.destinationChainIds.map((destinationChainId) =>
+  return await Promise.all([
+    ...params.destinationChainIds.map((destinationChainId) =>
       estimateGasFee({
         ...params,
         destinationChainId,
         sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
       })
-    )
-  );
+    ),
+  ]);
 }
 
 const extendedClient = {

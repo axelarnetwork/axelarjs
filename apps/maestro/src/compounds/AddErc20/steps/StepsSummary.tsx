@@ -6,15 +6,19 @@ export type StepsSummaryProps = {
   currentStep: number;
   newTokenType: "new" | "existing";
 };
+
+const STEPS = ["Token details", "Deploy & Register", "Review"];
+
 export const StepsSummary: FC<StepsSummaryProps> = (
   props: StepsSummaryProps
 ) => {
   return (
     <Steps className="my-10 h-24 w-full text-sm">
-      <Steps.Step active={props.currentStep >= 0}>Select Flow</Steps.Step>
-      <Steps.Step active={props.currentStep >= 1}>Token details</Steps.Step>
-      <Steps.Step active={props.currentStep >= 2}>Deploy & Register</Steps.Step>
-      <Steps.Step active={props.currentStep >= 3}>Review</Steps.Step>
+      {STEPS.map((step, index) => (
+        <Steps.Step key={step} active={props.currentStep >= index}>
+          {step}
+        </Steps.Step>
+      ))}
     </Steps>
   );
 };

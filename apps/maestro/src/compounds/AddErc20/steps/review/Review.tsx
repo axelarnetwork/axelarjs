@@ -1,6 +1,12 @@
 import { FC } from "react";
 
-import { CopyToClipboardButton, LinkButton, Modal } from "@axelarjs/ui";
+import {
+  Alert,
+  Button,
+  CopyToClipboardButton,
+  LinkButton,
+  Modal,
+} from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
@@ -8,20 +14,19 @@ import { useNetwork } from "wagmi";
 
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor/GMPTxStatusMonitor";
 
-import { useAddErc20StateContainer } from "../AddErc20.state";
-import { NextButton, PrevButton } from "./core";
+import { useAddErc20StateContainer } from "../../AddErc20.state";
 
 export const Step4: FC = () => {
   const router = useRouter();
-  const { state, actions } = useAddErc20StateContainer();
+  const { state } = useAddErc20StateContainer();
   const { chain } = useNetwork();
 
   return (
     <>
       <div className="grid gap-4">
-        <div className="alert alert-success">
+        <Alert status="success">
           Token deployed and registered successfully!
-        </div>
+        </Alert>
         <LinkButton
           color="accent"
           size="sm"
@@ -38,8 +43,9 @@ export const Step4: FC = () => {
         <GMPTxStatusMonitor txHash={state.txHash} />
       </div>
       <Modal.Actions>
-        <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
-        <NextButton
+        <Button
+          length="block"
+          color="primary"
           disabled={!chain?.name || !state.deployedTokenAddress}
           onClick={() => {
             if (chain?.name) {
@@ -49,8 +55,8 @@ export const Step4: FC = () => {
             }
           }}
         >
-          Go to Token Page
-        </NextButton>
+          Go to token page!
+        </Button>
       </Modal.Actions>
     </>
   );
