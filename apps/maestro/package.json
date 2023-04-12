@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
-    "@next/font": "^13.3.0",
     "@tanstack/react-query-devtools": "4.28.0",
     "@wagmi/core": "^0.10.9",
     "autoprefixer": "^10.4.14",
