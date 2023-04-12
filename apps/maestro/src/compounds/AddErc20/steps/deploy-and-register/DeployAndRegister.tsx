@@ -10,19 +10,13 @@ import React, {
 import { Button, FormControl, Label, Modal, Tooltip } from "@axelarjs/ui";
 import { BigNumber } from "ethers";
 import Image from "next/image";
-import { useNetwork } from "wagmi";
 
-import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
-import { useDeployRemoteTokensMutation } from "../../hooks/useDeployRemoteTokensMutation";
-import { useRegisterOriginTokenAndDeployRemoteTokensMutation } from "../../hooks/useRegisterOriginTokenAndDeployRemoteTokensMutation";
-import { useRegisterOriginTokenMutation } from "../../hooks/useRegisterOriginTokenMutation";
 import { NextButton, PrevButton } from "../core";
-import { useStep3ChainSelectionState } from "./Step3.state";
+import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -33,159 +27,12 @@ export const Step3: FC = () => {
 
   const { mutateAsync: deployAndRegisterToken } =
     useDeployAndRegisterInterchainTokenMutation();
-  const { mutateAsync: registerOriginTokenAndDeployRemoteTokens } =
-    useRegisterOriginTokenAndDeployRemoteTokensMutation();
-  const { mutateAsync: registerOriginToken } = useRegisterOriginTokenMutation();
-  const { mutateAsync: deployRemoteTokens } = useDeployRemoteTokensMutation();
-
-  const { chain } = useNetwork();
-  const { data: tokenData } = useInterchainTokensQuery({
-    chainId: chain?.id,
-    tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
-  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // ==> dimension 1: isPreexisting (0 = no, 1 - yes)
-    // ==> dimension 2: isTokenAlreadyRegistered (0 = no, 1 - yes)
-    // ==> dimension 3: deployOnOtherChains (0 = no, 1 - yes)
-    const decisionMatrix = [
-      [
-        [handleDeployAndRegisterToken, handleDeployAndRegisterToken],
-        [null, null],
-      ],
-      [
-        [handleRegisterOriginToken, handleRegisterAndDeployRemoteTokens],
-        [null, handleDeployRemoteTokens],
-      ],
-    ];
-    const pe = +Boolean(rootState.isPreExistingToken); //preexisting
-    const ar = +Boolean(rootState.tokenAlreadyRegistered); //already-registered
-    const oc = +Boolean(rootState.selectedChains.size > 0); //other-chains
-    const decision = decisionMatrix[pe][ar][oc];
 
-    console.log({ pe, ar, oc, decision });
-    if (decision) {
-      decision(e);
-    } else {
-      console.warn("no op");
-    }
+    handleDeployAndRegisterToken(e);
   };
-
-  const handleDeployRemoteTokens = useCallback<
-    FormEventHandler<HTMLFormElement>
-  >(
-    async (e) => {
-      e.preventDefault();
-      console.log("handleDeployRemoteTokens");
-      if (
-        state.isGasPriceQueryLoading ||
-        state.isGasPriceQueryError ||
-        !state.gasFees
-      ) {
-        console.warn("gas prices not loaded");
-        return;
-      }
-      if (!tokenData?.tokenId) {
-        console.log("no token ID for ", rootState.deployedTokenAddress);
-      }
-
-      actions.setIsDeploying(true);
-      await deployRemoteTokens({
-        tokenId: tokenData.tokenId as `0x${string}`,
-        tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
-        destinationChainIds: Array.from(rootState.selectedChains),
-        gasFees: state.gasFees,
-        onStatusUpdate: (data) => {
-          if (data.type === "deployed") {
-            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
-
-            data.txHash && rootActions.setTxHash(data.txHash);
-          }
-        },
-      });
-      actions.setIsDeploying(false);
-      rootActions.incrementStep();
-    },
-    [
-      state.isGasPriceQueryLoading,
-      state.isGasPriceQueryError,
-      state.gasFees,
-      tokenData.tokenId,
-      actions,
-      deployRemoteTokens,
-      rootState.deployedTokenAddress,
-      rootState.selectedChains,
-      rootActions,
-    ]
-  );
-
-  const handleRegisterOriginToken = useCallback<
-    FormEventHandler<HTMLFormElement>
-  >(
-    async (e) => {
-      e.preventDefault();
-      console.log("handleRegisterOriginToken");
-
-      actions.setIsDeploying(true);
-      await registerOriginToken({
-        tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
-        onStatusUpdate: (data) => {
-          if (data.type === "deployed") {
-            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
-            data.txHash && rootActions.setTxHash(data.txHash);
-          }
-        },
-      });
-      actions.setIsDeploying(false);
-      rootActions.incrementStep();
-    },
-    [actions, registerOriginToken, rootState.deployedTokenAddress, rootActions]
-  );
-
-  const handleRegisterAndDeployRemoteTokens = useCallback<
-    FormEventHandler<HTMLFormElement>
-  >(
-    async (e) => {
-      e.preventDefault();
-
-      if (
-        state.isGasPriceQueryLoading ||
-        state.isGasPriceQueryError ||
-        !state.gasFees
-      ) {
-        logger.warn(
-          "[handleRegisterAndDeployRemoteTokens]: ",
-          "gas prices not loaded"
-        );
-        return;
-      }
-      actions.setIsDeploying(true);
-      await registerOriginTokenAndDeployRemoteTokens({
-        tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
-        destinationChainIds: Array.from(rootState.selectedChains),
-        gasFees: state.gasFees,
-        onStatusUpdate: (data) => {
-          if (data.type === "deployed") {
-            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
-            data.txHash && rootActions.setTxHash(data.txHash);
-          }
-        },
-      });
-      actions.setIsDeploying(false);
-      rootActions.incrementStep();
-    },
-    [
-      state.isGasPriceQueryLoading,
-      state.isGasPriceQueryError,
-      state.gasFees,
-      actions,
-      registerOriginTokenAndDeployRemoteTokens,
-      rootState.deployedTokenAddress,
-      rootState.selectedChains,
-      rootActions,
-    ]
-  );
 
   const handleDeployAndRegisterToken = useCallback<
     FormEventHandler<HTMLFormElement>

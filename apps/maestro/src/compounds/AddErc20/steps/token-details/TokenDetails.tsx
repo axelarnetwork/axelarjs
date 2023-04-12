@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { useAddErc20StateContainer } from "~/compounds/AddErc20";
 
-import { NextButton, PrevButton } from "../core";
+import { NextButton } from "../core";
 
 const schema = z.object({
   tokenName: z.string().min(1).max(32),
@@ -19,7 +19,7 @@ const schema = z.object({
 
 type FormState = z.infer<typeof schema>;
 
-export const NewERC20Token: FC = () => {
+const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
 
   const { register, handleSubmit, formState } = useForm<FormState>({
@@ -103,7 +103,7 @@ export const NewERC20Token: FC = () => {
         </div>
       )}
       <Modal.Actions>
-        <PrevButton onClick={actions.decrementStep}>Select Flow</PrevButton>
+        <Modal.CloseAction>Cancel and exit</Modal.CloseAction>
         <NextButton
           disabled={!formState.isValid}
           onClick={() => formSubmitRef.current?.click()}
@@ -114,3 +114,5 @@ export const NewERC20Token: FC = () => {
     </>
   );
 };
+
+export default TokenDetails;

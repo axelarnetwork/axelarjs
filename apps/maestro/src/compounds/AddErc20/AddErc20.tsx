@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo } from "react";
+import { FC, useMemo } from "react";
 
 import { LinkButton, Modal } from "@axelarjs/ui";
 import dynamic from "next/dynamic";
@@ -17,19 +17,21 @@ const StepLoading = () => (
   </div>
 );
 
-const Step1 = dynamic(() => import("~/compounds/AddErc20/steps/Step1"), {
-  loading: StepLoading,
-});
+const Step1 = dynamic(
+  () => import("~/compounds/AddErc20/steps/token-details"),
+  {
+    loading: StepLoading,
+  }
+);
 
-const Step2 = dynamic(() => import("~/compounds/AddErc20/steps/Step2"), {
-  loading: StepLoading,
-});
+const Step2 = dynamic(
+  () => import("~/compounds/AddErc20/steps/deploy-and-register"),
+  {
+    loading: StepLoading,
+  }
+);
 
-const Step3 = dynamic(() => import("~/compounds/AddErc20/steps/Step3"), {
-  loading: StepLoading,
-});
-
-const Step4 = dynamic(() => import("~/compounds/AddErc20/steps/Step4"), {
+const Step3 = dynamic(() => import("~/compounds/AddErc20/steps/review"), {
   loading: StepLoading,
 });
 
@@ -37,7 +39,7 @@ const StepsSummary = dynamic(
   () => import("~/compounds/AddErc20/steps/StepsSummary")
 );
 
-const STEP_MAP = [Step1, Step2, Step3, Step4];
+const STEPS = [Step1, Step2, Step3];
 
 type AddErc20Props = {
   trigger?: JSX.Element;
@@ -45,19 +47,9 @@ type AddErc20Props = {
 };
 
 export const AddErc20: FC<AddErc20Props> = (props) => {
-  const { state, actions } = useAddErc20StateContainer();
+  const { state } = useAddErc20StateContainer();
 
-  useEffect(() => {
-    if (!props.tokenAddress) {
-      return;
-    }
-    actions.setDeployedTokenAddress(props.tokenAddress);
-    actions.setStep(1);
-    actions.setIsPreExistingToken(true);
-    actions.setNewTokenType("existing");
-  }, [actions, props.tokenAddress]);
-
-  const CurrentStep = useMemo(() => STEP_MAP[state.step], [state.step]);
+  const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
   const conditionalProps = props.trigger
     ? { trigger: props.trigger }
