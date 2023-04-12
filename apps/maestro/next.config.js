@@ -1,13 +1,10 @@
-const nextTranspileModules = require("next-transpile-modules");
-const withUI = nextTranspileModules(["@axelarjs/ui"]);
-const withUTILS = nextTranspileModules(["@axelarjs/utils"]);
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["@axelarjs/ui", "@axelarjs/utils"],
   images: {
     domains: ["testnet.axelarscan.io"],
   },
 };
 
-module.exports = withUTILS(withUI(nextConfig));
+module.exports = nextConfig;

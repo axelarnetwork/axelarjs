@@ -243,6 +243,10 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
     [props.tokens]
   );
 
+  if (!tokens.length) {
+    return null;
+  }
+
   const selectedTokens = tokens.filter((x) => x.isSelected);
 
   return (
