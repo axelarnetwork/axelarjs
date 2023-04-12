@@ -1,10 +1,10 @@
 import { FC, useEffect, useState } from "react";
 
 import { ThemeProvider, Toaster } from "@axelarjs/ui";
-import { Cabin } from "@next/font/google";
 import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
+import { Cabin } from "next/font/google";
 import NextNProgress from "nextjs-progressbar";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";

@@ -35,16 +35,10 @@ pnpm storybook
 
 ### Use Nextjs 13+ fonts
 
-1. Install `@next/font`
-
-```bash
-pnpm add -D @next/font
-```
-
-2. Import it on `_app.tsx`
+1. Import it on `_app.tsx`
 
 ```tsx
-import { Cabin } from "@next/font/google";
+import { Cabin } from "next/font/google";
 
 const fontSans = Cabin({
   subsets: ["latin"],
@@ -68,7 +62,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 export default MyApp;
 ```
 
-3. Configure tailwind.config.js
+2. Configure tailwind.config.js
 
 ```ts
 const { fontFamily } = require("tailwindcss/defaultTheme");

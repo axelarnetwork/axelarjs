@@ -107,10 +107,11 @@ const Variants = <
 
   return (
     <div className="relative inline-block p-14">
-      <section className="absolute top-2 right-2 flex items-center gap-2 p-2.5">
+      <section className="absolute right-2 top-2 flex items-center gap-2 p-2.5">
         <div className="btn-group">
           {VIEW_OPTIONS.map((device) => (
             <input
+              key={device}
               type="radio"
               name="viewports"
               data-title={device.split("-").join(" ")}
@@ -126,8 +127,10 @@ const Variants = <
           <Card.Title>
             {props.variant.title ?? capitalize(props.propKey)}{" "}
             <span className="text-base-content/75">/</span>{" "}
-            {props.variant.values.map((x) => (
-              <small className="badge badge-info badge-sm">{x}</small>
+            {props.variant.values.map((value) => (
+              <small key={value} className="badge badge-info badge-sm">
+                {value}
+              </small>
             ))}
           </Card.Title>
 
@@ -151,7 +154,7 @@ const Variants = <
                 };
 
                 return (
-                  <li key={String(value)}>
+                  <li key={value}>
                     {"noChildren" in props.variant ? (
                       <div>
                         <span className="label">{value}</span>

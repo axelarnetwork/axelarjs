@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
+import { GridLoader } from "react-spinners";
 
 import { Button } from "@axelarjs/ui";
 import clsx from "clsx";
 import Head from "next/head";
-import Image from "next/image";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -142,13 +142,7 @@ const Page = ({
       </section>
       {isLoading && (
         <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
-          <Image
-            src="/icons/conductor-icon-128.png"
-            height={128}
-            width={128}
-            alt="conductor icon"
-            className="animate-ping duration-1000"
-          />
+          <GridLoader color="var(--primary)" className="animate-pulse" />
         </div>
       )}
     </>
