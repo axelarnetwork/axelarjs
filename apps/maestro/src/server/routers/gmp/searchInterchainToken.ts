@@ -46,7 +46,7 @@ export const searchInterchainToken = publicProcedure
       if (!tokenId || isAddressZero(tokenId)) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `Token not found on ${chainConfig.name} (${chainConfig.id}))`,
+          message: `Token not found on ${chainConfig.name} (${chainConfig.id})`,
         });
       }
 

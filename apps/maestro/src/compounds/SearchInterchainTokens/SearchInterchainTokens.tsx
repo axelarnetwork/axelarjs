@@ -12,11 +12,14 @@ import { useNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import {
+  useGetERC20TokenDetailsQuery,
+  useInterchainTokensQuery,
+} from "~/services/gmp/hooks";
 
 export type SearchInterchainTokens = {
   onTokenFound: (result: {
-    tokenId: `0x${string}`;
+    tokenId?: `0x${string}`;
     tokenAddress: `0x${string}`;
   }) => void;
 };
@@ -31,19 +34,24 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
 
   const isValidAddress = isAddress(search as `0x${string}`);
 
+  const { data: tokenDetails } = useGetERC20TokenDetailsQuery({
+    chainId: chain?.id,
+    tokenAddress: search as `0x${string}`,
+  });
+
   const { data, error, isLoading } = useInterchainTokensQuery({
     chainId: chain?.id,
     tokenAddress: search as `0x${string}`,
   });
 
   useEffect(() => {
-    if (data?.tokenId && data.tokenAddress) {
+    if ((data?.tokenId && data.tokenAddress) || tokenDetails) {
       props.onTokenFound({
         tokenId: data.tokenId,
-        tokenAddress: data.tokenAddress,
+        tokenAddress: search as `0x${string}`,
       });
     }
-  }, [data.tokenAddress, data.tokenId, props]);
+  }, [data.tokenAddress, data.tokenId, props, search, tokenDetails]);
 
   return (
     <FormControl className="w-full max-w-md">
@@ -71,7 +79,8 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
           )}
         </span>
       </InputGroup>
-      {(error || (!isValidAddress && search.length >= 10)) && (
+      {((error && !tokenDetails) ||
+        (!isValidAddress && search.length >= 10)) && (
         <div className="p-2 text-sm text-red-500">
           {error?.message ?? "Invalid ERC-20 token address"}
         </div>

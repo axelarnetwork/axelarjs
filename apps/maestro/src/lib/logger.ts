@@ -7,7 +7,7 @@ export const getLogger = (severity: LogSeverity) => {
     case "warn":
       return console.warn;
     case "error":
-      return console.error;
+      return console.warn;
     default:
       return console.log;
   }

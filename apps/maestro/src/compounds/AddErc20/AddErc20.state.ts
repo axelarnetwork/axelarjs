@@ -31,7 +31,15 @@ export const INITIAL_STATE = {
   selectedChains: new Set<string>(),
 };
 
-function useAddErc20State(initialState = INITIAL_STATE) {
+export type AddErc20State = typeof INITIAL_STATE;
+
+function useAddErc20State(
+  partialInitialState: Partial<AddErc20State> = INITIAL_STATE
+) {
+  const initialState = {
+    ...INITIAL_STATE,
+    ...(partialInitialState ?? {}),
+  };
   const [step, setStep] = useState(0);
   const [newTokenType, setNewTokenType] = useState<"new" | "existing">(
     initialState.newTokenType

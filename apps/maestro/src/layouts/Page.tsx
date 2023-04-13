@@ -19,6 +19,7 @@ type Props = JSX.IntrinsicElements["section"] & {
   pageDescription?: string;
   mustBeConnected?: boolean;
   isLoading?: boolean;
+  loadingMessage?: string;
 };
 
 const Page = ({
@@ -130,7 +131,7 @@ const Page = ({
 
       <section
         className={clsx(
-          "grid flex-1",
+          "mt-20 grid flex-1",
           {
             "place-items-center": isExceptionalState,
           },
@@ -142,7 +143,13 @@ const Page = ({
       </section>
       {isLoading && (
         <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
-          <GridLoader color="var(--primary)" className="animate-pulse" />
+          <div className="grid place-items-center gap-12 text-center">
+            <GridLoader
+              color="var(--primary)"
+              className="animate-ping animate-pulse [animation-duration:3s]"
+            />
+            <span>{props.loadingMessage || "loading page data..."}</span>
+          </div>
         </div>
       )}
     </>
