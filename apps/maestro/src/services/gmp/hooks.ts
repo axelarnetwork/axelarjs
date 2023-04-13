@@ -82,6 +82,8 @@ export function useGetERC20TokenDetailsQuery(input: {
     },
     {
       enabled: Boolean(input.chainId) && isAddress(input.tokenAddress ?? ""),
+      staleTime: 1000 * 60 * 60 * 24, // 24 hours
+      refetchOnWindowFocus: false,
     }
   );
 }
