@@ -1,7 +1,9 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  Alert,
   Button,
+  Card,
   CopyToClipboardButton,
   LinkButton,
   Tooltip,
@@ -15,10 +17,12 @@ import { partition, without } from "rambda";
 import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
+import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useDeployRemoteTokensMutation } from "~/compounds/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/compounds/InterchainTokenList";
 import Page from "~/layouts/Page";
 import { useChainFromRoute } from "~/lib/hooks";
+import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import {
@@ -41,7 +45,7 @@ const InterchainTokensPage = () => {
   });
 
   if (!isAddress(tokenAddress)) {
-    return <div>Invalid token address</div>;
+    return <Alert status="error">Invalid token address</Alert>;
   }
 
   return (
@@ -84,10 +88,12 @@ const InterchainTokensPage = () => {
         </div>
       </section>
       {routeChain && (
-        <ConnectedInterchainTokensPage
-          chainId={routeChain?.id}
-          tokenAddress={tokenAddress}
-        />
+        <>
+          <ConnectedInterchainTokensPage
+            chainId={routeChain?.id}
+            tokenAddress={tokenAddress}
+          />
+        </>
       )}
     </Page>
   );
@@ -107,6 +113,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { data: interchainToken, refetch } = useInterchainTokensQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress as `0x${string}`,
+  });
+
+  const { data: tokenDetails } = trpc.gmp.getERC20TokenDetails.useQuery({
+    chainId: props.chainId,
+    tokenAddress: props.tokenAddress,
   });
 
   const [selectedChainIds, setSelectedChainIds] = useState<number[]>([]);
@@ -213,6 +224,60 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   return (
     <div className="flex flex-col gap-8 md:relative">
+      {tokenDetails && (
+        <Card>
+          <Card.Body>
+            <Card.Title className="justify-between">
+              <div className="flex items-center gap-2">
+                Interchain Token{" "}
+                {Boolean(tokenDetails.name && tokenDetails.symbol) && (
+                  <>
+                    <span>&middot;</span>
+                    <span className="text-primary text-base">
+                      {tokenDetails.name}
+                    </span>{" "}
+                    <span className="text-base opacity-50">
+                      ({tokenDetails.symbol})
+                    </span>
+                  </>
+                )}
+              </div>
+              <LinkButton
+                className="flex items-center gap-2 text-base"
+                href={`${interchainToken.chain.explorer.url}/token/${props.tokenAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                ghost
+                size="sm"
+              >
+                View token on {interchainToken.chain.explorer.name}
+                <ChainIcon
+                  src={interchainToken.chain.image}
+                  alt={interchainToken.chain.name}
+                  size="sm"
+                />
+              </LinkButton>
+            </Card.Title>
+            <ul className="grid gap-2">
+              {[
+                ["Name", tokenDetails.name],
+                ["Symbol", tokenDetails.symbol],
+                ["Decimals", tokenDetails.decimals],
+              ]
+                .filter(([, value]) => Boolean(value))
+                .map(([label, value]) => (
+                  <li
+                    key={String(label)}
+                    className="flex items-center gap-2 text-sm"
+                  >
+                    <span className="font-semibold">{label}: </span>
+                    <span className="opacity-60">{value}</span>
+                  </li>
+                ))}
+            </ul>
+          </Card.Body>
+        </Card>
+      )}
       <InterchainTokenList
         title="Registered interchain tokens"
         tokens={registered}

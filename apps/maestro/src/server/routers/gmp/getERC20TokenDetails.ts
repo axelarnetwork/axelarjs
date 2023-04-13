@@ -43,8 +43,8 @@ export const getERC20TokenDetails = publicProcedure
       ]);
 
       return {
-        tokenName: String(tokenName),
-        tokenSymbol: String(tokenSymbol),
+        name: String(tokenName),
+        symbol: String(tokenSymbol),
         decimals: Number(decimals),
       };
     } catch (error) {
