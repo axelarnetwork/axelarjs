@@ -26,6 +26,7 @@ import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import {
+  useGetERC20TokenDetailsQuery,
   useGetTransactionStatusOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
@@ -39,7 +40,16 @@ const InterchainTokensPage = () => {
 
   const routeChain = useChainFromRoute();
 
-  const { isLoading, isError } = useInterchainTokensQuery({
+  const {
+    data: interchainToken,
+    isLoading,
+    isError,
+  } = useInterchainTokensQuery({
+    chainId: routeChain?.id,
+    tokenAddress: tokenAddress as `0x${string}`,
+  });
+
+  const { data: tokenDetails } = useGetERC20TokenDetailsQuery({
     chainId: routeChain?.id,
     tokenAddress: tokenAddress as `0x${string}`,
   });
@@ -56,6 +66,86 @@ const InterchainTokensPage = () => {
       isLoading={isLoading && !isError}
       loadingMessage="loading interchain token..."
     >
+      {tokenDetails && (
+        <section className="grid gap-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-2xl font-bold">
+              Interchain Token{" "}
+              {Boolean(tokenDetails.name && tokenDetails.symbol) && (
+                <>
+                  <span>&middot;</span>
+                  <span className="text-primary text-base">
+                    {tokenDetails.name}
+                  </span>{" "}
+                  <span className="text-base opacity-50">
+                    ({tokenDetails.symbol})
+                  </span>
+                </>
+              )}
+            </div>
+            {interchainToken?.tokenId && (
+              <LinkButton
+                className="flex items-center gap-2 text-base"
+                href={`${interchainToken.chain.explorer.url}/token/${tokenAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="sm"
+              >
+                <ChainIcon
+                  src={interchainToken.chain.image}
+                  alt={interchainToken.chain.name}
+                  size="sm"
+                />
+                View token on {interchainToken.chain.explorer.name}
+                <ExternalLink className="h-5 w-5" />
+              </LinkButton>
+            )}
+          </div>
+          <ul className="grid gap-1.5">
+            {[
+              ["Name", tokenDetails.name],
+              ["Symbol", tokenDetails.symbol],
+              ["Decimals", tokenDetails.decimals],
+              [
+                "Token Address",
+                <CopyToClipboardButton
+                  key="token-address"
+                  size="xs"
+                  ghost
+                  copyText={tokenAddress}
+                >
+                  {maskAddress(tokenAddress)}
+                </CopyToClipboardButton>,
+              ],
+              ...(interchainToken?.tokenId
+                ? [
+                    [
+                      "Token ID",
+                      <CopyToClipboardButton
+                        key="token-id"
+                        size="xs"
+                        ghost
+                        copyText={interchainToken.tokenId}
+                      >
+                        {maskAddress(interchainToken.tokenId)}
+                      </CopyToClipboardButton>,
+                    ],
+                  ]
+                : []),
+            ]
+              .filter(([, value]) => Boolean(value))
+              .map(([label, value]) => (
+                <li
+                  key={String(label)}
+                  className="flex items-center gap-2 text-sm"
+                >
+                  <span className="font-semibold">{label}: </span>
+                  <span className="opacity-60">{value}</span>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
       {routeChain && (
         <>
           <ConnectedInterchainTokensPage
@@ -202,86 +292,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         <Alert status="error">{tokenDetailsError.message}</Alert>
       )}
 
-      {tokenDetails && (
-        <section className="grid gap-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-2xl font-bold">
-              Interchain Token{" "}
-              {Boolean(tokenDetails.name && tokenDetails.symbol) && (
-                <>
-                  <span>&middot;</span>
-                  <span className="text-primary text-base">
-                    {tokenDetails.name}
-                  </span>{" "}
-                  <span className="text-base opacity-50">
-                    ({tokenDetails.symbol})
-                  </span>
-                </>
-              )}
-            </div>
-            {interchainToken?.tokenId && (
-              <LinkButton
-                className="flex items-center gap-2 text-base"
-                href={`${interchainToken.chain.explorer.url}/token/${props.tokenAddress}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                size="sm"
-              >
-                <ChainIcon
-                  src={interchainToken.chain.image}
-                  alt={interchainToken.chain.name}
-                  size="sm"
-                />
-                View token on {interchainToken.chain.explorer.name}
-                <ExternalLink className="h-5 w-5" />
-              </LinkButton>
-            )}
-          </div>
-          <ul className="grid gap-1.5">
-            {[
-              ["Name", tokenDetails.name],
-              ["Symbol", tokenDetails.symbol],
-              ["Decimals", tokenDetails.decimals],
-              [
-                "Token Address",
-                <CopyToClipboardButton
-                  key="token-address"
-                  size="xs"
-                  ghost
-                  copyText={props.tokenAddress as `0x${string}`}
-                >
-                  {maskAddress(props.tokenAddress as `0x${string}`)}
-                </CopyToClipboardButton>,
-              ],
-              ...(interchainToken?.tokenId
-                ? [
-                    [
-                      "Token ID",
-                      <CopyToClipboardButton
-                        key="token-id"
-                        size="xs"
-                        ghost
-                        copyText={interchainToken?.tokenId as `0x${string}`}
-                      >
-                        {maskAddress(interchainToken?.tokenId as `0x${string}`)}
-                      </CopyToClipboardButton>,
-                    ],
-                  ]
-                : []),
-            ]
-              .filter(([, value]) => Boolean(value))
-              .map(([label, value]) => (
-                <li
-                  key={String(label)}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <span className="font-semibold">{label}: </span>
-                  <span className="opacity-60">{value}</span>
-                </li>
-              ))}
-          </ul>
-        </section>
-      )}
       {interchainTokenError && tokenDetails && (
         <AddErc20
           tokenDetails={{
