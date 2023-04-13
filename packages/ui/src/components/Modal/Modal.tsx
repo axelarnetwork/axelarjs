@@ -139,8 +139,13 @@ export const Modal = Object.assign(ModalRootWithProvider, {
   `,
   CloseAction: (props: ComponentProps<typeof Button>) => {
     const [, actions] = useModalStateContiner();
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      props.onClick?.(e);
+      actions.close();
+    };
     return (
-      <Dialog.Close asChild onClick={actions.close}>
+      <Dialog.Close asChild onClick={handleClick}>
         <Button {...props} />
       </Dialog.Close>
     );

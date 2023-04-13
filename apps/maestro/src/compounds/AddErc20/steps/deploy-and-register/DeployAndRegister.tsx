@@ -7,7 +7,14 @@ import React, {
   useRef,
 } from "react";
 
-import { Button, FormControl, Label, Modal, Tooltip } from "@axelarjs/ui";
+import {
+  Button,
+  FormControl,
+  Label,
+  Modal,
+  toast,
+  Tooltip,
+} from "@axelarjs/ui";
 import { BigNumber } from "ethers";
 import Image from "next/image";
 
@@ -15,6 +22,7 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
+import { useRegisterOriginTokenAndDeployRemoteTokensMutation } from "../../hooks/useRegisterOriginTokenAndDeployRemoteTokensMutation";
 import { NextButton, PrevButton } from "../core";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
@@ -25,13 +33,24 @@ export const Step3: FC = () => {
     selectedChains: rootState.selectedChains,
   });
 
-  const { mutateAsync: deployAndRegisterToken } =
-    useDeployAndRegisterInterchainTokenMutation();
+  const {
+    mutateAsync: deployAndRegisterToken,
+    error: deployAndRegisterTokenError,
+  } = useDeployAndRegisterInterchainTokenMutation();
+
+  const {
+    mutateAsync: registerPreExistingToken,
+    error: registerPreExistingTokenError,
+  } = useRegisterOriginTokenAndDeployRemoteTokensMutation();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    handleDeployAndRegisterToken(e);
+    if (rootState.isPreExistingToken) {
+      handleRegisterPreExistingToken(e);
+    } else {
+      handleDeployAndRegisterToken(e);
+    }
   };
 
   const handleDeployAndRegisterToken = useCallback<
@@ -39,7 +58,6 @@ export const Step3: FC = () => {
   >(
     async (e) => {
       e.preventDefault();
-      console.log("handleDeployAndRegisterToken");
 
       if (
         state.isGasPriceQueryLoading ||
@@ -56,25 +74,36 @@ export const Step3: FC = () => {
         decimalAdjustment
       );
 
-      await deployAndRegisterToken({
-        tokenName: rootState.tokenName,
-        tokenSymbol: rootState.tokenSymbol,
-        decimals: rootState.tokenDecimals,
-        destinationChainIds: Array.from(rootState.selectedChains),
-        amountToMint,
-        gasFees: state.gasFees,
-        sourceChainId: state.evmChains?.find(
-          (evmChain) => evmChain.chain_id === state.network.chain?.id
-        )?.chain_name as string,
-        onStatusUpdate: (data) => {
-          if (data.type === "deployed") {
-            rootActions.setDeployedTokenAddress(data.tokenAddress as string);
-            data.txHash && rootActions.setTxHash(data.txHash);
-            rootActions.incrementStep();
-            actions.setIsDeploying(false);
-          }
+      await deployAndRegisterToken(
+        {
+          tokenName: rootState.tokenName,
+          tokenSymbol: rootState.tokenSymbol,
+          decimals: rootState.tokenDecimals,
+          destinationChainIds: Array.from(rootState.selectedChains),
+          amountToMint,
+          gasFees: state.gasFees,
+          sourceChainId: state.evmChains?.find(
+            (evmChain) => evmChain.chain_id === state.network.chain?.id
+          )?.chain_name as string,
+          onStatusUpdate: (data) => {
+            if (data.type === "deployed") {
+              rootActions.setDeployedTokenAddress(data.tokenAddress as string);
+              data.txHash && rootActions.setTxHash(data.txHash);
+              rootActions.incrementStep();
+              actions.setIsDeploying(false);
+            }
+          },
         },
-      });
+        {
+          onError(error) {
+            console.error(error);
+            actions.setIsDeploying(false);
+            toast.error(
+              "There was an error deploying and registering your token. Please try again."
+            );
+          },
+        }
+      );
     },
     [
       state.isGasPriceQueryLoading,
@@ -93,6 +122,59 @@ export const Step3: FC = () => {
     ]
   );
 
+  const handleRegisterPreExistingToken = useCallback<
+    FormEventHandler<HTMLFormElement>
+  >(
+    async (e) => {
+      e.preventDefault();
+
+      if (
+        state.isGasPriceQueryLoading ||
+        state.isGasPriceQueryError ||
+        !state.gasFees
+      ) {
+        console.warn("gas prices not loaded");
+        return;
+      }
+      actions.setIsDeploying(true);
+
+      await registerPreExistingToken(
+        {
+          tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
+          destinationChainIds: Array.from(rootState.selectedChains),
+          gasFees: state.gasFees,
+          onStatusUpdate: (data) => {
+            if (data.type === "deployed") {
+              rootActions.setDeployedTokenAddress(data.tokenAddress as string);
+              data.txHash && rootActions.setTxHash(data.txHash);
+              rootActions.incrementStep();
+              actions.setIsDeploying(false);
+            }
+          },
+        },
+        {
+          onError(error) {
+            console.error(error);
+            actions.setIsDeploying(false);
+            toast.error(
+              "There was an error registering your token. Please try again."
+            );
+          },
+        }
+      );
+    },
+    [
+      state.isGasPriceQueryLoading,
+      state.isGasPriceQueryError,
+      state.gasFees,
+      actions,
+      rootState.deployedTokenAddress,
+      rootState.selectedChains,
+      registerPreExistingToken,
+      rootActions,
+    ]
+  );
+
   const eligibleChains = useMemo(
     () =>
       state.evmChains?.filter(
@@ -103,12 +185,17 @@ export const Step3: FC = () => {
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);
 
+  const hasTxError = Boolean(
+    deployAndRegisterTokenError || registerPreExistingTokenError
+  );
+
   return (
     <>
       <form className="grid gap-4" onSubmit={handleSubmit}>
         <FormControl>
           <Label>
-            <Label.Text>Chains to deploy remote tokens</Label.Text>
+            <Label.Text>Also deploy on this chains (optional):</Label.Text>
+
             {Boolean(state.gasFees?.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
@@ -168,7 +255,7 @@ export const Step3: FC = () => {
           Token details
         </PrevButton>
         <NextButton
-          loading={state.isDeploying}
+          loading={state.isDeploying && !hasTxError}
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
           onClick={() => formSubmitRef.current?.click()}
         >

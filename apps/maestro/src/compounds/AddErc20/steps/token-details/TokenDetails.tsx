@@ -14,7 +14,7 @@ const schema = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
-  amountToMint: z.coerce.number().min(1),
+  amountToMint: z.coerce.number().min(0),
 });
 
 type FormState = z.infer<typeof schema>;
@@ -45,6 +45,8 @@ const TokenDetails: FC = () => {
     actions.incrementStep();
   };
 
+  const isReadonly = state.isPreExistingToken;
+
   return (
     <>
       <form
@@ -56,6 +58,7 @@ const TokenDetails: FC = () => {
           <TextInput
             bordered
             placeholder="Enter your token name"
+            disabled={isReadonly}
             {...register("tokenName")}
           />
         </FormControl>
@@ -68,6 +71,7 @@ const TokenDetails: FC = () => {
             className={clsx({
               uppercase: state.tokenSymbol.length > 0,
             })}
+            disabled={isReadonly}
             {...register("tokenSymbol")}
           />
         </FormControl>
@@ -79,19 +83,23 @@ const TokenDetails: FC = () => {
             placeholder="Enter your token decimals"
             min={1}
             max={18}
+            disabled={isReadonly}
             {...register("tokenDecimals")}
           />
         </FormControl>
-        <FormControl>
-          <Label>Amount to mint (leave zero for none)</Label>
-          <TextInput
-            bordered
-            type="number"
-            placeholder="Enter your amount to mint"
-            min={0}
-            {...register("amountToMint")}
-          />
-        </FormControl>
+        {process.env.NEXT_PUBLIC_NETWORK_ENV === "testnet" && (
+          <FormControl>
+            <Label>Amount to mint (leave zero for none)</Label>
+            <TextInput
+              bordered
+              type="number"
+              placeholder="Enter your amount to mint"
+              min={0}
+              disabled={isReadonly}
+              {...register("amountToMint")}
+            />
+          </FormControl>
+        )}
         <button type="submit" ref={formSubmitRef} />
       </form>
 

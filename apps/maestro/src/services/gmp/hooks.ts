@@ -43,6 +43,8 @@ export function useInterchainTokensQuery(input: {
         Boolean(input.chainId) &&
         isAddress(input.tokenAddress ?? "") &&
         Boolean(input.chainIds?.length || uniqueChainsIDs.length),
+      retry: false,
+      refetchOnWindowFocus: false,
     }
   );
 

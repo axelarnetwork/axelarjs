@@ -43,10 +43,15 @@ const STEPS = [Step1, Step2, Step3];
 
 type AddErc20Props = {
   trigger?: JSX.Element;
-  tokenAddress?: `0x${string}`;
+  tokenDetails?: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    address: `0x${string}`;
+  };
 };
 
-export const AddErc20: FC<AddErc20Props> = (props) => {
+const AddErc20: FC<AddErc20Props> = (props) => {
   const { state } = useAddErc20StateContainer();
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
@@ -73,7 +78,20 @@ export const AddErc20: FC<AddErc20Props> = (props) => {
 
 const AddErc20WithProvider = (props: AddErc20Props) => {
   return (
-    <AddErc20StateProvider>
+    <AddErc20StateProvider
+      initialState={
+        props.tokenDetails
+          ? {
+              newTokenType: "existing",
+              deployedTokenAddress: props.tokenDetails.address,
+              tokenName: props.tokenDetails.name,
+              tokenDecimals: props.tokenDetails.decimals,
+              isPreExistingToken: true,
+              tokenSymbol: props.tokenDetails.symbol,
+            }
+          : undefined
+      }
+    >
       <AddErc20 {...props} />
     </AddErc20StateProvider>
   );

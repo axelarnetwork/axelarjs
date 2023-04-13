@@ -16,7 +16,7 @@ export default function Home() {
   const { chain } = useNetwork();
 
   const handleTokenFound = useCallback(
-    (result: { tokenAddress: string; tokenId: string }) => {
+    (result: { tokenAddress: string; tokenId?: string }) => {
       if (!chain) {
         return;
       }

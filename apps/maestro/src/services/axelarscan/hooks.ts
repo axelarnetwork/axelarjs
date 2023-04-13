@@ -16,8 +16,13 @@ export function useChainConfigsQuery() {
 }
 
 export function useEVMChainConfigsQuery() {
-  const { data, ...queryResult } =
-    trpc.axelarscan.getEVMChainConfigs.useQuery();
+  const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery(
+    undefined,
+    {
+      staleTime: 1000 * 60 * 60, // 1 hour
+      refetchOnWindowFocus: false,
+    }
+  );
 
   return {
     ...queryResult,
