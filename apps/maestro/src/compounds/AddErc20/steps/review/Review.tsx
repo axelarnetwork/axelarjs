@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 
 import {
   Alert,
@@ -24,10 +24,16 @@ const Review: FC = () => {
   const { chain } = useNetwork();
   const routeChain = useChainFromRoute();
 
-  const { refetch } = useInterchainTokensQuery({
-    chainId: routeChain?.id,
-    tokenAddress: state.deployedTokenAddress as `0x${string}`,
-  });
+  const [shouldFetch, setShouldFetch] = useState(false);
+
+  useInterchainTokensQuery(
+    shouldFetch && routeChain?.id && state.deployedTokenAddress
+      ? {
+          chainId: routeChain.id,
+          tokenAddress: state.deployedTokenAddress as `0x${string}`,
+        }
+      : {}
+  );
 
   return (
     <>
@@ -60,11 +66,12 @@ const Review: FC = () => {
       </div>
       <Modal.Actions>
         {routeChain ? (
+          // if the chain is not the same as the route, we need to refresh the page
           <Modal.CloseAction
             length="block"
             color="primary"
-            onClick={async () => {
-              refetch();
+            onClick={() => {
+              setShouldFetch(true);
               // refresh the page to show the new token
               router.replace(router.asPath);
             }}
