@@ -20,7 +20,7 @@ import { useAddErc20StateContainer } from "../../AddErc20.state";
 
 const Review: FC = () => {
   const router = useRouter();
-  const { state } = useAddErc20StateContainer();
+  const { state, actions } = useAddErc20StateContainer();
   const { chain } = useNetwork();
   const routeChain = useChainFromRoute();
 
@@ -94,6 +94,8 @@ const Review: FC = () => {
                 router.push(
                   `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
                 );
+
+                actions.reset();
               }
             }}
           >

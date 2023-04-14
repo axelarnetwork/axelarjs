@@ -105,7 +105,9 @@ const TokenDetails: FC = () => {
         </div>
       )}
       <Modal.Actions>
-        <Modal.CloseAction>Cancel and exit</Modal.CloseAction>
+        <Modal.CloseAction onClick={actions.reset}>
+          Cancel and exit
+        </Modal.CloseAction>
         <NextButton
           disabled={!formState.isValid}
           onClick={() => formSubmitRef.current?.click()}

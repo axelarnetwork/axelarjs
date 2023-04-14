@@ -55,7 +55,7 @@ function useAddErc20State(
       selectedChains: uniq(state.selectedChains),
     },
     actions: {
-      resetAllState: () => {
+      reset: () => {
         setState((draft) => {
           Object.assign(draft, initialState);
         });
