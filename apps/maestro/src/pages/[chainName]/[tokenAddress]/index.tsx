@@ -294,6 +294,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
       {interchainTokenError && tokenDetails && (
         <AddErc20
+          trigger={
+            <div className="mx-auto w-full max-w-md">
+              <Button length="block">
+                Register token on {interchainToken.chain.name}
+              </Button>
+            </div>
+          }
           tokenDetails={{
             tokenAddress: props.tokenAddress,
             tokenDecimals: tokenDetails.decimals,
