@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 
 import {
   AddErc20StateProvider,
+  TokenDetails,
   useAddErc20StateContainer,
 } from "./AddErc20.state";
 import { TokenRegistration } from "./TokenRegistration";
@@ -43,12 +44,7 @@ const STEPS = [Step1, Step2, Step3];
 
 type AddErc20Props = {
   trigger?: JSX.Element;
-  tokenDetails?: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    address: `0x${string}`;
-  };
+  tokenDetails?: TokenDetails;
 };
 
 const AddErc20: FC<AddErc20Props> = (props) => {
@@ -66,10 +62,7 @@ const AddErc20: FC<AddErc20Props> = (props) => {
         <Modal.Title className="flex items-center gap-2">
           <TokenRegistration />
         </Modal.Title>
-        <StepsSummary
-          currentStep={state.step}
-          newTokenType={state.newTokenType}
-        />
+        <StepsSummary currentStep={state.step} />
         <CurrentStep />
       </Modal.Body>
     </Modal>
@@ -82,12 +75,7 @@ const AddErc20WithProvider = (props: AddErc20Props) => {
       initialState={
         props.tokenDetails
           ? {
-              newTokenType: "existing",
-              deployedTokenAddress: props.tokenDetails.address,
-              tokenName: props.tokenDetails.name,
-              tokenDecimals: props.tokenDetails.decimals,
-              isPreExistingToken: true,
-              tokenSymbol: props.tokenDetails.symbol,
+              tokenDetails: props.tokenDetails,
             }
           : undefined
       }

@@ -4,7 +4,6 @@ import { Steps } from "@axelarjs/ui";
 
 export type StepsSummaryProps = {
   currentStep: number;
-  newTokenType: "new" | "existing";
 };
 
 const STEPS = ["Token details", "Deploy & Register", "Review"];
