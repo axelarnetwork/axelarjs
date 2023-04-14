@@ -33,10 +33,7 @@ export const TokenRegistration: FC<{}> = () => {
             switchNetwork?.(target.chain_id);
           }
         }}
-        disabled={
-          state.newTokenType === "existing" &&
-          Boolean(state.deployedTokenAddress)
-        }
+        disabled={state.isPreExistingToken}
       />
     </>
   );
