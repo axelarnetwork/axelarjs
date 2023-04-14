@@ -76,6 +76,7 @@ const AddErc20WithProvider = (props: AddErc20Props) => {
         props.tokenDetails
           ? {
               tokenDetails: props.tokenDetails,
+              step: 0,
             }
           : undefined
       }

@@ -4,6 +4,22 @@ import { usePersistedState } from "@axelarjs/ui";
 import { uniq, without } from "rambda";
 import { createContainer } from "unstated-next";
 
+export type TransactionState =
+  | {
+      type: "idle";
+    }
+  | {
+      type: "awaiting_confirmation";
+    }
+  | {
+      type: "confirmed";
+      txHash: `0x${string}`;
+    }
+  | {
+      type: "failed";
+      errorMessage: string;
+    };
+
 export type DeployAndRegisterTransactionState =
   | {
       type: "idle";
@@ -52,18 +68,23 @@ function useAddErc20State(
   /**
    * Update token details with partial initial state
    */
-  useEffect(() => {
-    // abort if there's no token address
-    if (!partialInitialState.tokenDetails?.tokenAddress) {
-      return;
-    }
-    setState((draft) => {
-      draft.tokenDetails = {
-        ...draft.tokenDetails,
-        ...partialInitialState.tokenDetails,
-      };
-    });
-  }, [partialInitialState.tokenDetails, setState]);
+  useEffect(
+    () => {
+      // abort if there's no token address
+      if (!partialInitialState.tokenDetails?.tokenAddress) {
+        return;
+      }
+      setState((draft) => {
+        draft.step = partialInitialState.step ?? draft.step;
+        draft.tokenDetails = {
+          ...draft.tokenDetails,
+          ...partialInitialState.tokenDetails,
+        };
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [partialInitialState.tokenDetails]
+  );
 
   return {
     state: {
