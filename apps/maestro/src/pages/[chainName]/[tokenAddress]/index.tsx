@@ -295,10 +295,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetails && (
         <AddErc20
           tokenDetails={{
-            address: props.tokenAddress,
-            decimals: tokenDetails.decimals,
-            name: tokenDetails.name,
-            symbol: tokenDetails.symbol,
+            tokenAddress: props.tokenAddress,
+            tokenDecimals: tokenDetails.decimals,
+            tokenName: tokenDetails.name,
+            tokenSymbol: tokenDetails.symbol,
+            amountToMint: 0,
           }}
         />
       )}
