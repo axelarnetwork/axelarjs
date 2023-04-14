@@ -1,7 +1,6 @@
-import { BigNumber, logger } from "ethers";
+import { BigNumber } from "ethers";
 import { Logger } from "ethers/lib/utils.js";
 import {
-  ProviderRpcError,
   useAccount,
   useMutation,
   UserRejectedRequestError,
