@@ -54,6 +54,7 @@ function useAddErc20State(
    */
   useEffect(() => {
     setState((draft) => {
+      if (!partialInitialState.tokenDetails) return;
       draft.tokenDetails = {
         ...draft.tokenDetails,
         ...partialInitialState.tokenDetails,
@@ -92,7 +93,7 @@ function useAddErc20State(
           if (draft.selectedChains.includes(item)) {
             draft.selectedChains = without([item], draft.selectedChains);
           } else {
-            draft.selectedChains.concat(item);
+            draft.selectedChains.push(item);
           }
         });
       },

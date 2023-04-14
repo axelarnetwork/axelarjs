@@ -83,10 +83,10 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
             backgroundImage: `url(${props.chain?.image})`,
           }}
           className={clsx(
-            "absolute inset-0 h-full scale-100 bg-cover opacity-0 blur-3xl transition-all duration-300",
-            "bg-center delay-150 hover:scale-150 hover:opacity-30",
+            "absolute inset-0 scale-100 bg-cover opacity-0 blur-3xl transition-all duration-300",
+            "bg-center delay-150 hover:scale-150 hover:opacity-20",
             {
-              "scale-125 opacity-50 hover:scale-150 hover:blur-sm":
+              "scale-125 opacity-25 hover:scale-150 hover:blur-sm":
                 props.isSelected,
             }
           )}
