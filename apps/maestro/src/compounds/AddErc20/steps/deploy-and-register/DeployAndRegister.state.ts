@@ -7,13 +7,13 @@ import { useNetwork } from "wagmi";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
+import { useAddErc20StateContainer } from "../../AddErc20.state";
+
 export type UseStep3ChainSelectionStateProps = {
   selectedChains: Set<string>;
 };
 
-export function useStep3ChainSelectionState({
-  selectedChains,
-}: UseStep3ChainSelectionStateProps) {
+export function useStep3ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const network = useNetwork();
   const [isDeploying, setIsDeploying] = useState(false);
@@ -24,13 +24,16 @@ export function useStep3ChainSelectionState({
     evmChains?.find((evmChain) => evmChain.chain_id === network.chain?.id)
       ?.chain_name as string
   );
+
+  const { state: rootState } = useAddErc20StateContainer();
+
   const {
     data: gasFees,
     isLoading: isGasPriceQueryLoading,
     isError: isGasPriceQueryError,
   } = useEstimateGasFeeMultipleChains({
     sourceChainId,
-    destinationChainIds: Array.from(selectedChains),
+    destinationChainIds: rootState.selectedChains,
     gasLimit: 1_000_000,
     gasMultipler: 2,
   });

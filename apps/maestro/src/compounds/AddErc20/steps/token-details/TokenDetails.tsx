@@ -3,7 +3,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import { FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
 import { z } from "zod";
 
 import { useAddErc20StateContainer } from "~/compounds/AddErc20";
@@ -24,12 +23,7 @@ const TokenDetails: FC = () => {
 
   const { register, handleSubmit, formState } = useForm<FormState>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      tokenName: state.tokenName,
-      tokenSymbol: state.tokenSymbol,
-      tokenDecimals: state.tokenDecimals,
-      amountToMint: state.amountToMint,
-    },
+    defaultValues: state.tokenDetails,
   });
 
   // this is only required because the form and actions are sibling elements
@@ -38,11 +32,14 @@ const TokenDetails: FC = () => {
   const submitHandler: SubmitHandler<FormState> = (data, e) => {
     e?.preventDefault();
 
-    actions.setTokenName(data.tokenName);
-    actions.setTokenSymbol(data.tokenSymbol);
-    actions.setTokenDecimals(Number(data.tokenDecimals));
-    actions.setAmountToMint(Number(data.amountToMint));
-    actions.incrementStep();
+    actions.setTokenDetails({
+      tokenName: data.tokenName,
+      tokenSymbol: data.tokenSymbol,
+      tokenDecimals: data.tokenDecimals,
+      amountToMint: data.amountToMint,
+    });
+
+    actions.nextStep();
   };
 
   const isReadonly = state.isPreExistingToken;
@@ -68,9 +65,6 @@ const TokenDetails: FC = () => {
             bordered
             placeholder="Enter your token symbol"
             maxLength={11}
-            className={clsx({
-              uppercase: state.tokenSymbol.length > 0,
-            })}
             disabled={isReadonly}
             {...register("tokenSymbol")}
           />
@@ -111,7 +105,9 @@ const TokenDetails: FC = () => {
         </div>
       )}
       <Modal.Actions>
-        <Modal.CloseAction>Cancel and exit</Modal.CloseAction>
+        <Modal.CloseAction onClick={actions.reset}>
+          Cancel and exit
+        </Modal.CloseAction>
         <NextButton
           disabled={!formState.isValid}
           onClick={() => formSubmitRef.current?.click()}

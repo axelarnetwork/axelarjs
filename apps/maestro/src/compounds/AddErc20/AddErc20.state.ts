@@ -1,5 +1,5 @@
-import { useState } from "react";
-
+import { usePersistedState } from "@axelarjs/ui";
+import { uniq, without } from "rambda";
 import { createContainer } from "unstated-next";
 
 export type DeployAndRegisterTransactionState =
@@ -18,20 +18,21 @@ export type DeployAndRegisterTransactionState =
 
 export const INITIAL_STATE = {
   step: 0,
-  newTokenType: "new" as "new" | "existing",
-  tokenName: "",
-  tokenSymbol: "",
-  tokenDecimals: 0,
-  amountToMint: 0,
-  deployedTokenAddress: "",
-  txHash: undefined as `0x${string}` | undefined,
-  tokenAlreadyRegistered: false,
-  isPreExistingToken: false,
+  tokenDetails: {
+    tokenName: "",
+    tokenSymbol: "",
+    tokenDecimals: 0,
+    amountToMint: 0,
+    tokenAddress: undefined as `0x${string}` | undefined,
+  },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
-  selectedChains: new Set<string>(),
+  selectedChains: [] as string[],
+  onDeployTxHash: (_txHash: `0x${string}`) => {},
 };
 
 export type AddErc20State = typeof INITIAL_STATE;
+
+export type TokenDetails = AddErc20State["tokenDetails"];
 
 function useAddErc20State(
   partialInitialState: Partial<AddErc20State> = INITIAL_STATE
@@ -40,99 +41,49 @@ function useAddErc20State(
     ...INITIAL_STATE,
     ...(partialInitialState ?? {}),
   };
-  const [step, setStep] = useState(0);
-  const [newTokenType, setNewTokenType] = useState<"new" | "existing">(
-    initialState.newTokenType
-  );
-  const [tokenName, setTokenName] = useState(initialState.tokenName);
-  const [tokenSymbol, setTokenSymbol] = useState(initialState.tokenSymbol);
-  const [tokenDecimals, setTokenDecimals] = useState(
-    initialState.tokenDecimals
-  );
-  const [amountToMint, setAmountToMint] = useState(initialState.amountToMint);
-  const [deployedTokenAddress, setDeployedTokenAddress] = useState(
-    initialState.deployedTokenAddress
-  );
-  const [txHash, setTxHash] = useState<`0x${string}`>(
-    initialState.txHash as `0x${string}`
-  );
-  const [tokenAlreadyRegistered, setTokenAlreadyRegistered] = useState(
-    initialState.tokenAlreadyRegistered
-  );
-  const [isPreExistingToken, setIsPreExistingToken] = useState(
-    initialState.isPreExistingToken
-  );
-  const [txState, setTxState] = useState<DeployAndRegisterTransactionState>(
-    initialState.txState
-  );
-  const [selectedChains, setSelectedChains] = useState(
-    initialState.selectedChains
-  );
 
-  const resetAddErc20StateInputs = () => {
-    setStep(0);
-    setNewTokenType("new");
-    setTokenName("");
-    setTokenSymbol("");
-    setTokenDecimals(0);
-    setAmountToMint(0);
-    setTxState({ type: "idle" });
-    setIsPreExistingToken(false);
-    setTokenAlreadyRegistered(false);
-    setSelectedChains(new Set<string>());
-  };
-  const resetAllState = () => {
-    resetAddErc20StateInputs();
-    setDeployedTokenAddress("");
-  };
-
-  const addSelectedChain = (item: string) =>
-    setSelectedChains((prev) => new Set(prev).add(item));
-
-  const removeSelectedChain = (item: string) => {
-    setSelectedChains((prev) => {
-      if (!prev.has(item)) {
-        return prev;
-      }
-      const next = new Set(prev);
-      next.delete(item);
-      return next;
-    });
-  };
+  const [state, setState] = usePersistedState(
+    "@maestro/add-erc20",
+    initialState
+  );
 
   return {
     state: {
-      step,
-      newTokenType,
-      tokenName,
-      tokenSymbol,
-      tokenDecimals,
-      amountToMint,
-      txState,
-      deployedTokenAddress,
-      txHash,
-      selectedChains,
-      tokenAlreadyRegistered,
-      isPreExistingToken,
+      ...state,
+      // computed state
+      isPreExistingToken: Boolean(state.tokenDetails.tokenAddress),
+      selectedChains: uniq(state.selectedChains),
     },
     actions: {
-      setStep,
-      setNewTokenType,
-      setTokenName,
-      setTokenSymbol,
-      setTokenDecimals,
-      setAmountToMint,
-      setDeployedTokenAddress,
-      setTxState,
-      resetAddErc20StateInputs,
-      resetAllState,
-      setTxHash,
-      addSelectedChain,
-      removeSelectedChain,
-      setTokenAlreadyRegistered,
-      setIsPreExistingToken,
-      incrementStep: () => setStep((prev) => prev + 1),
-      decrementStep: () => setStep((prev) => prev - 1),
+      reset: () => {
+        setState((draft) => {
+          Object.assign(draft, initialState);
+        });
+      },
+      setTokenDetails: (detatils: Partial<TokenDetails>) => {
+        setState((draft) => {
+          draft.tokenDetails = {
+            ...draft.tokenDetails,
+            ...detatils,
+          };
+        });
+      },
+      setTxState: (txState: DeployAndRegisterTransactionState) => {
+        setState((draft) => {
+          draft.txState = txState;
+        });
+      },
+      toggleAdditionalChain: (item: string) => {
+        setState((draft) => {
+          if (draft.selectedChains.includes(item)) {
+            draft.selectedChains = without([item], draft.selectedChains);
+          } else {
+            draft.selectedChains.concat(item);
+          }
+        });
+      },
+      nextStep: () => setState((draft) => draft.step++),
+      prevStep: () => setState((draft) => draft.step--),
     },
   };
 }

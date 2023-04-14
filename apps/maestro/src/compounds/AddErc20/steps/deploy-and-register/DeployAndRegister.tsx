@@ -29,9 +29,8 @@ import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
     useAddErc20StateContainer();
-  const { state, actions } = useStep3ChainSelectionState({
-    selectedChains: rootState.selectedChains,
-  });
+
+  const { state, actions } = useStep3ChainSelectionState();
 
   const {
     mutateAsync: deployAndRegisterToken,
@@ -69,27 +68,28 @@ export const Step3: FC = () => {
       }
       actions.setIsDeploying(true);
 
-      const decimalAdjustment = BigNumber.from(10).pow(rootState.tokenDecimals);
-      const amountToMint = BigNumber.from(rootState.amountToMint).mul(
-        decimalAdjustment
+      const decimalAdjustment = BigNumber.from(10).pow(
+        rootState.tokenDetails.tokenDecimals
       );
+      const amountToMint = BigNumber.from(
+        rootState.tokenDetails.amountToMint
+      ).mul(decimalAdjustment);
 
       await deployAndRegisterToken(
         {
-          tokenName: rootState.tokenName,
-          tokenSymbol: rootState.tokenSymbol,
-          decimals: rootState.tokenDecimals,
+          tokenName: rootState.tokenDetails.tokenName,
+          tokenSymbol: rootState.tokenDetails.tokenSymbol,
+          decimals: rootState.tokenDetails.tokenDecimals,
           destinationChainIds: Array.from(rootState.selectedChains),
           amountToMint,
           gasFees: state.gasFees,
           sourceChainId: state.evmChains?.find(
             (evmChain) => evmChain.chain_id === state.network.chain?.id
           )?.chain_name as string,
-          onStatusUpdate: (data) => {
-            if (data.type === "deployed") {
-              rootActions.setDeployedTokenAddress(data.tokenAddress as string);
-              data.txHash && rootActions.setTxHash(data.txHash);
-              rootActions.incrementStep();
+          onStatusUpdate: (txState) => {
+            if (txState.type === "deployed") {
+              rootActions.setTxState(txState);
+              rootActions.nextStep();
               actions.setIsDeploying(false);
             }
           },
@@ -98,6 +98,7 @@ export const Step3: FC = () => {
           onError(error) {
             console.error(error);
             actions.setIsDeploying(false);
+
             toast.error(
               "There was an error deploying and registering your token. Please try again."
             );
@@ -112,12 +113,12 @@ export const Step3: FC = () => {
       state.evmChains,
       state.network.chain?.id,
       actions,
-      deployAndRegisterToken,
-      rootState.tokenName,
-      rootState.tokenSymbol,
-      rootState.tokenDecimals,
+      rootState.tokenDetails.tokenDecimals,
+      rootState.tokenDetails.amountToMint,
+      rootState.tokenDetails.tokenName,
+      rootState.tokenDetails.tokenSymbol,
       rootState.selectedChains,
-      rootState.amountToMint,
+      deployAndRegisterToken,
       rootActions,
     ]
   );
@@ -140,14 +141,13 @@ export const Step3: FC = () => {
 
       await registerPreExistingToken(
         {
-          tokenAddress: rootState.deployedTokenAddress as `0x${string}`,
+          tokenAddress: rootState.tokenDetails.tokenAddress as `0x${string}`,
           destinationChainIds: Array.from(rootState.selectedChains),
           gasFees: state.gasFees,
-          onStatusUpdate: (data) => {
-            if (data.type === "deployed") {
-              rootActions.setDeployedTokenAddress(data.tokenAddress as string);
-              data.txHash && rootActions.setTxHash(data.txHash);
-              rootActions.incrementStep();
+          onStatusUpdate: (txState) => {
+            if (txState.type === "deployed") {
+              txState.txHash && rootActions.setTxState(txState);
+              rootActions.nextStep();
               actions.setIsDeploying(false);
             }
           },
@@ -168,9 +168,9 @@ export const Step3: FC = () => {
       state.isGasPriceQueryError,
       state.gasFees,
       actions,
-      rootState.deployedTokenAddress,
-      rootState.selectedChains,
       registerPreExistingToken,
+      rootState.tokenDetails.tokenAddress,
+      rootState.selectedChains,
       rootActions,
     ]
   );
@@ -211,7 +211,9 @@ export const Step3: FC = () => {
           </Label>
           <div className="bg-base-300 flex flex-wrap gap-2 rounded-3xl p-4">
             {eligibleChains?.map((chain) => {
-              const isSelected = rootState.selectedChains.has(chain.chain_name);
+              const isSelected = rootState.selectedChains.includes(
+                chain.chain_name
+              );
 
               return (
                 <Tooltip
@@ -227,11 +229,7 @@ export const Step3: FC = () => {
                     color="primary"
                     outline={isSelected}
                     onClick={() => {
-                      const action = isSelected
-                        ? rootActions.removeSelectedChain
-                        : rootActions.addSelectedChain;
-
-                      action(chain.chain_name);
+                      rootActions.toggleAdditionalChain(chain.chain_name);
                     }}
                   >
                     <Image
@@ -251,9 +249,7 @@ export const Step3: FC = () => {
         <button type="submit" ref={formSubmitRef} />
       </form>
       <Modal.Actions>
-        <PrevButton onClick={rootActions.decrementStep}>
-          Token details
-        </PrevButton>
+        <PrevButton onClick={rootActions.prevStep}>Token details</PrevButton>
         <NextButton
           loading={state.isDeploying && !hasTxError}
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
