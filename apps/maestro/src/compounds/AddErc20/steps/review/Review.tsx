@@ -27,10 +27,10 @@ const Review: FC = () => {
   const [shouldFetch, setShouldFetch] = useState(false);
 
   useInterchainTokensQuery(
-    shouldFetch && routeChain?.id && state.deployedTokenAddress
+    shouldFetch && routeChain?.id && state.txState.type === "deployed"
       ? {
           chainId: routeChain.id,
-          tokenAddress: state.deployedTokenAddress as `0x${string}`,
+          tokenAddress: state.txState.tokenAddress,
         }
       : {}
   );
@@ -38,31 +38,37 @@ const Review: FC = () => {
   return (
     <>
       <div className="grid gap-4">
-        <Alert status="success">
-          <div>Token deployed and registered successfully!</div>
-          <div className="flex items-center">
-            Address:
-            <CopyToClipboardButton
-              copyText={state.deployedTokenAddress}
+        {state.txState.type === "deployed" && (
+          <Alert status="success">
+            <div>Token deployed and registered successfully!</div>
+            <div className="flex items-center">
+              Address:
+              <CopyToClipboardButton
+                copyText={state.txState.tokenAddress}
+                size="sm"
+                ghost
+              >
+                {maskAddress(state.txState.tokenAddress)}
+              </CopyToClipboardButton>
+            </div>
+          </Alert>
+        )}
+        {(state.txState.type === "deployed" ||
+          state.txState.type === "deploying") && (
+          <>
+            <LinkButton
               size="sm"
-              ghost
+              href={`${chain?.blockExplorers?.default.url}/tx/${state.txState.txHash}`}
+              className="flex items-center gap-2"
+              target="_blank"
             >
-              {maskAddress(state.deployedTokenAddress as `0x${string}`)}
-            </CopyToClipboardButton>
-          </div>
-        </Alert>
-        <LinkButton
-          size="sm"
-          href={`${chain?.blockExplorers?.default.url}/tx/${state.txHash}`}
-          className="flex items-center gap-2"
-          target="_blank"
-        >
-          View transaction {maskAddress(state.txHash ?? "")} on{" "}
-          {chain?.blockExplorers?.default.name}{" "}
-          <ExternalLink className="h-4 w-4" />
-        </LinkButton>
-
-        <GMPTxStatusMonitor txHash={state.txHash} />
+              View transaction {maskAddress(state.txState.txHash ?? "")} on{" "}
+              {chain?.blockExplorers?.default.name}{" "}
+              <ExternalLink className="h-4 w-4" />
+            </LinkButton>
+            <GMPTxStatusMonitor txHash={state.txState.txHash} />
+          </>
+        )}
       </div>
       <Modal.Actions>
         {routeChain ? (
@@ -82,11 +88,11 @@ const Review: FC = () => {
           <Button
             length="block"
             color="primary"
-            disabled={!chain?.name || !state.deployedTokenAddress}
+            disabled={!chain?.name || state.txState.type !== "deployed"}
             onClick={() => {
-              if (chain?.name) {
+              if (chain?.name && state.txState.type === "deployed") {
                 router.push(
-                  `/${sluggify(chain?.name)}/${state.deployedTokenAddress}`
+                  `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
                 );
               }
             }}
