@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { usePersistedState } from "@axelarjs/ui";
 import { uniq, without } from "rambda";
 import { createContainer } from "unstated-next";
@@ -46,6 +48,18 @@ function useAddErc20State(
     "@maestro/add-erc20",
     initialState
   );
+
+  /**
+   * Update token details with partial initial state
+   */
+  useEffect(() => {
+    setState((draft) => {
+      draft.tokenDetails = {
+        ...draft.tokenDetails,
+        ...partialInitialState.tokenDetails,
+      };
+    });
+  }, [partialInitialState.tokenDetails, setState]);
 
   return {
     state: {
