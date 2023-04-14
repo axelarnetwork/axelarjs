@@ -53,6 +53,10 @@ function useAddErc20State(
    * Update token details with partial initial state
    */
   useEffect(() => {
+    // abort if there's no token address
+    if (!partialInitialState.tokenDetails?.tokenAddress) {
+      return;
+    }
     setState((draft) => {
       draft.tokenDetails = {
         ...draft.tokenDetails,
