@@ -97,7 +97,7 @@ const InterchainTokensPage = () => {
                   size="sm"
                 />
                 View token on {interchainToken.chain.explorer.name}
-                <ExternalLink className="h-5 w-5" />
+                <ExternalLink className="h-4 w-4 translate-x-1" />
               </LinkButton>
             )}
           </div>
