@@ -53,8 +53,11 @@ function useAddErc20State(
    * Update token details with partial initial state
    */
   useEffect(() => {
+    // abort if there's no token address
+    if (!partialInitialState.tokenDetails?.tokenAddress) {
+      return;
+    }
     setState((draft) => {
-      if (!partialInitialState.tokenDetails) return;
       draft.tokenDetails = {
         ...draft.tokenDetails,
         ...partialInitialState.tokenDetails,
@@ -93,7 +96,7 @@ function useAddErc20State(
           if (draft.selectedChains.includes(item)) {
             draft.selectedChains = without([item], draft.selectedChains);
           } else {
-            draft.selectedChains.push(item);
+            draft.selectedChains.concat(item);
           }
         });
       },
