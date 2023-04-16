@@ -96,12 +96,10 @@ export const Step3: FC = () => {
         },
         {
           onError(error) {
-            console.error(error);
             actions.setIsDeploying(false);
-
-            toast.error(
-              "There was an error deploying and registering your token. Please try again."
-            );
+            if (error instanceof Error) {
+              toast.error(`Failed to register token: ${error?.message}`);
+            }
           },
         }
       );
@@ -146,7 +144,7 @@ export const Step3: FC = () => {
           gasFees: state.gasFees,
           onStatusUpdate: (txState) => {
             if (txState.type === "deployed") {
-              txState.txHash && rootActions.setTxState(txState);
+              rootActions.setTxState(txState);
               rootActions.nextStep();
               actions.setIsDeploying(false);
             }
@@ -154,11 +152,10 @@ export const Step3: FC = () => {
         },
         {
           onError(error) {
-            console.error(error);
             actions.setIsDeploying(false);
-            toast.error(
-              "There was an error registering your token. Please try again."
-            );
+            if (error instanceof Error) {
+              toast.error(`Failed to register token: ${error?.message}`);
+            }
           },
         }
       );

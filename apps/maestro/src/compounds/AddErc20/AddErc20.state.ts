@@ -1,8 +1,23 @@
 import { useEffect } from "react";
 
-import { usePersistedState } from "@axelarjs/ui";
+import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { uniq, without } from "rambda";
-import { createContainer } from "unstated-next";
+
+export type TransactionState =
+  | {
+      type: "idle";
+    }
+  | {
+      type: "awaiting_confirmation";
+    }
+  | {
+      type: "confirmed";
+      txHash: `0x${string}`;
+    }
+  | {
+      type: "failed";
+      errorMessage: string;
+    };
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -44,7 +59,7 @@ function useAddErc20State(
     ...(partialInitialState ?? {}),
   };
 
-  const [state, setState] = usePersistedState(
+  const [state, setState] = useSessionStorageState(
     "@maestro/add-erc20",
     initialState
   );
@@ -52,18 +67,23 @@ function useAddErc20State(
   /**
    * Update token details with partial initial state
    */
-  useEffect(() => {
-    // abort if there's no token address
-    if (!partialInitialState.tokenDetails?.tokenAddress) {
-      return;
-    }
-    setState((draft) => {
-      draft.tokenDetails = {
-        ...draft.tokenDetails,
-        ...partialInitialState.tokenDetails,
-      };
-    });
-  }, [partialInitialState.tokenDetails, setState]);
+  useEffect(
+    () => {
+      // abort if there's no token address
+      if (!partialInitialState.tokenDetails?.tokenAddress) {
+        return;
+      }
+      setState((draft) => {
+        draft.step = partialInitialState.step ?? draft.step;
+        draft.tokenDetails = {
+          ...draft.tokenDetails,
+          ...partialInitialState.tokenDetails,
+        };
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [partialInitialState.tokenDetails]
+  );
 
   return {
     state: {
@@ -96,7 +116,7 @@ function useAddErc20State(
           if (draft.selectedChains.includes(item)) {
             draft.selectedChains = without([item], draft.selectedChains);
           } else {
-            draft.selectedChains.concat(item);
+            draft.selectedChains.push(item);
           }
         });
       },

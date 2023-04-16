@@ -29,6 +29,7 @@ const Page = ({
   className,
   children,
   isLoading,
+  loadingMessage,
   ...props
 }: Props) => {
   const { isConnected } = useAccount();
@@ -148,7 +149,7 @@ const Page = ({
               color="var(--primary)"
               className="animate-ping animate-pulse [animation-duration:3s]"
             />
-            <span>{props.loadingMessage || "loading page data..."}</span>
+            <span>{loadingMessage || "loading page data..."}</span>
           </div>
         </div>
       )}
