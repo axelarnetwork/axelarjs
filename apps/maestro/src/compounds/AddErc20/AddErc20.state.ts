@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 
-import { usePersistedState } from "@axelarjs/ui";
+import { createContainer, usePersistedState } from "@axelarjs/ui";
 import { uniq, without } from "rambda";
-import { createContainer } from "unstated-next";
 
 export type TransactionState =
   | {

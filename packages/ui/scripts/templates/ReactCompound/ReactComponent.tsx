@@ -1,7 +1,8 @@
 import { ComponentProps, FC, useState } from "react";
 
 import tw from "tailwind-styled-components";
-import { createContainer } from "unstated-next";
+
+import { createContainer } from "../../lib/unstated";
 
 const StyledReactComponent = tw.div``;
 

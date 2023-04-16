@@ -2,7 +2,8 @@ import { FC, useCallback, useEffect, useState } from "react";
 
 import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
-import { createContainer } from "unstated-next";
+
+import { createContainer } from "../../lib/unstated";
 
 export const VALID_THEMES = ["light", "dark"] as const;
 
