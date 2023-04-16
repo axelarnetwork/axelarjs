@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { createContainer } from "unstated-next";
+import { createContainer } from "@axelarjs/utils/react";
 
 function useModalState(initialOpen = false) {
   const [isOpen, setIsOpen] = useState(initialOpen);
