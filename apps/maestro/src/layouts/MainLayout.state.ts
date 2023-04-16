@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import { createContainer } from "@axelarjs/ui";
+import { createContainer } from "@axelarjs/utils/react";
 
 function useLayoutState() {
   const [DrawerSideContent, setDrawerSideContent] = useState<FC>(

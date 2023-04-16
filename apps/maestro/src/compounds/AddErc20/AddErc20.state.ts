@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { createContainer, useSessionStorageState } from "@axelarjs/ui";
+import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { uniq, without } from "rambda";
 
 export type TransactionState =

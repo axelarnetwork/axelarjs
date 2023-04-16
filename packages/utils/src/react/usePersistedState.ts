@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { Maybe } from "@axelarjs/utils";
 import produce, { Draft } from "immer";
+
+import { Maybe } from "../monads";
 
 export function usePersistedState<T>(
   storage: Storage,
