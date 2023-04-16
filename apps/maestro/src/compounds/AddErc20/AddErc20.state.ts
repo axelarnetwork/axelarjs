@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { createContainer, usePersistedState } from "@axelarjs/ui";
+import { createContainer, useSessionStorageState } from "@axelarjs/ui";
 import { uniq, without } from "rambda";
 
 export type TransactionState =
@@ -59,7 +59,7 @@ function useAddErc20State(
     ...(partialInitialState ?? {}),
   };
 
-  const [state, setState] = usePersistedState(
+  const [state, setState] = useSessionStorageState(
     "@maestro/add-erc20",
     initialState
   );
@@ -116,7 +116,7 @@ function useAddErc20State(
           if (draft.selectedChains.includes(item)) {
             draft.selectedChains = without([item], draft.selectedChains);
           } else {
-            draft.selectedChains.concat(item);
+            draft.selectedChains.push(item);
           }
         });
       },

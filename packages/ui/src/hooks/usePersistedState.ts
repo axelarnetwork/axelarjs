@@ -3,13 +3,17 @@ import { useEffect, useState } from "react";
 import { Maybe } from "@axelarjs/utils";
 import produce, { Draft } from "immer";
 
-export function usePersistedState<T>(key: string, defaultValue: T) {
+export function usePersistedState<T>(
+  storage: Storage,
+  key: string,
+  defaultValue: T
+) {
   const [state, _setState] = useState<T>(() =>
-    Maybe.of(localStorage.getItem(key)).mapOr(defaultValue, JSON.parse)
+    Maybe.of(storage.getItem(key)).mapOr(defaultValue, JSON.parse)
   );
 
   useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(state));
+    storage.setItem(key, JSON.stringify(state));
   }, [key, state]);
 
   /**
@@ -32,4 +36,12 @@ export function usePersistedState<T>(key: string, defaultValue: T) {
   };
 
   return [state, setState] as const;
+}
+
+export function useLocalStorageState<T>(key: string, defaultValue: T) {
+  return usePersistedState(window.localStorage, key, defaultValue);
+}
+
+export function useSessionStorageState<T>(key: string, defaultValue: T) {
+  return usePersistedState(window.sessionStorage, key, defaultValue);
 }
