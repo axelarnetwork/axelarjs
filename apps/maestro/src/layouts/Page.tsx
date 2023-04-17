@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { GridLoader } from "react-spinners";
 
-import { Button } from "@axelarjs/ui";
+import { Badge, Button } from "@axelarjs/ui";
 import clsx from "clsx";
 import Head from "next/head";
 import tw from "tailwind-styled-components";
@@ -12,7 +12,12 @@ import ConnectWalletButton from "~/compounds/ConnectWalletButton";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
-type PageState = "loading" | "connected" | "disconnected" | "network-mismatch";
+type PageState =
+  | "loading"
+  | "connected"
+  | "disconnected"
+  | "network-mismatch"
+  | "unsupported-network";
 
 type Props = JSX.IntrinsicElements["section"] & {
   pageTitle?: string;
@@ -57,6 +62,10 @@ const Page = ({
       return "disconnected";
     }
 
+    if (chain && !evmChain) {
+      return "unsupported-network";
+    }
+
     if (!evmChain) {
       return "loading";
     }
@@ -66,7 +75,7 @@ const Page = ({
     }
 
     return "connected";
-  }, [evmChain, mustBeConnected, isConnected, chainFromRoute]);
+  }, [evmChain, mustBeConnected, isConnected, chainFromRoute, chain]);
 
   const pageContent = useMemo(() => {
     switch (pageState) {
@@ -80,6 +89,25 @@ const Page = ({
               length="block"
               className=" max-w-md"
             />
+          </div>
+        );
+      case "unsupported-network":
+        return (
+          <div className="grid w-full flex-1 place-items-center">
+            <div className="grid w-full place-items-center gap-4">
+              <div className="grid gap-1 text-center text-xl font-semibold">
+                <div>
+                  You&apos;re connected to chain <Badge>{chain?.id}</Badge>{" "}
+                  which is not a supported{" "}
+                  <Badge>{process.env.NEXT_PUBLIC_NETWORK_ENV}</Badge> network.
+                </div>
+                <div>
+                  Select a valid{" "}
+                  <Badge>{process.env.NEXT_PUBLIC_NETWORK_ENV}</Badge> network
+                  in your wallet.
+                </div>
+              </div>
+            </div>
           </div>
         );
       case "network-mismatch":
@@ -112,9 +140,10 @@ const Page = ({
     }
   }, [
     pageState,
-    evmChain,
+    chain?.name,
     evmChainFromRoute?.name,
     evmChainFromRoute?.chain_id,
+    evmChain,
     children,
     switchNetworkAsync,
   ]);
