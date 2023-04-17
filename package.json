@@ -8,6 +8,7 @@
     "build": "turbo run build",
     "build:pkgs": "turbo run build --filter=\"./packages/*\"",
     "test": "turbo run test",
+    "test:ci": "CI=true turbo run test",
     "lint": "turbo run lint",
     "compile": "turbo run compile",
     "format": "prettier --write .",
