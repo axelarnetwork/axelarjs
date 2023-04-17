@@ -1,6 +1,11 @@
 import { BigNumber } from "ethers";
-import { hexlify, hexZeroPad } from "ethers/lib/utils";
-import { useAccount, useMutation, useSigner } from "wagmi";
+import { hexlify, hexZeroPad, Logger } from "ethers/lib/utils";
+import {
+  useAccount,
+  useMutation,
+  UserRejectedRequestError,
+  useSigner,
+} from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 import { getTokenDeployedEventFromTxReceipt } from "~/lib/utils/findContractEvent";
@@ -56,7 +61,6 @@ export function useDeployAndRegisterInterchainTokenMutation() {
           );
 
         const txDone = await deployAndRegisterTokensTx.wait(1);
-        console.log("deployAndRegisterTokensTxDone", txDone);
 
         if (input.onStatusUpdate) {
           input.onStatusUpdate({
@@ -72,10 +76,20 @@ export function useDeployAndRegisterInterchainTokenMutation() {
           input.onFinished();
         }
       } catch (e) {
-        console.log("something went wrong", e);
         if (input.onStatusUpdate) {
           input.onStatusUpdate({ type: "idle" });
         }
+        if (e instanceof Error && "code" in e) {
+          switch (e.code) {
+            case Logger.errors.ACTION_REJECTED:
+              throw new UserRejectedRequestError(
+                "User rejected the transaction"
+              );
+            default:
+              throw new Error("Transaction reverted by EVM");
+          }
+        }
+
         return;
       }
     }
