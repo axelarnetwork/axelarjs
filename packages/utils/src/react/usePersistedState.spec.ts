@@ -85,11 +85,11 @@ describe("usePersistedState", () => {
 
     const [state] = result.current;
 
+    // considering the previous test, the state should be 88 * 2 = 176
     const expected = {
       count: 176,
     };
 
-    // considering the previous test, the state should be 88 * 2 = 176
     expect(state).toEqual(expected);
     expect(storage.getItem(key)).toBe(JSON.stringify(expected));
   });
