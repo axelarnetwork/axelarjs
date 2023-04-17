@@ -140,10 +140,10 @@ const Page = ({
     }
   }, [
     pageState,
-    chain?.name,
+    chain?.id,
+    evmChain,
     evmChainFromRoute?.name,
     evmChainFromRoute?.chain_id,
-    evmChain,
     children,
     switchNetworkAsync,
   ]);
