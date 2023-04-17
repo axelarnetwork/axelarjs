@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { act, renderHook } from "@testing-library/react";
 import fc from "fast-check";
-import { describe, expect, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { ContainerProviderProps, createContainer } from "./unstated";
 
@@ -14,7 +14,7 @@ function useCounter(initialState = 0) {
 }
 
 describe("useCounter", () => {
-  test("increments the count with random initial states", async () => {
+  it("increments the count with random initial states", async () => {
     await fc.assert(
       fc.asyncProperty(fc.integer(), async (initialState: number) => {
         const { result } = renderHook(() => useCounter(initialState));
@@ -31,14 +31,14 @@ describe("useCounter", () => {
 });
 
 describe("createContainer", () => {
-  test("returns a container with Provider and useContainer", () => {
+  it("returns a container with Provider and useContainer", () => {
     const container = createContainer(useCounter);
 
     expect(container.Provider).toBeDefined();
     expect(container.useContainer).toBeDefined();
   });
 
-  test("works correctly with children and initialState", () => {
+  it("works correctly with children and initialState", () => {
     const container = createContainer(useCounter);
     const Wrapper = ({ children }: ContainerProviderProps) => (
       <container.Provider initialState={10}>{children}</container.Provider>
