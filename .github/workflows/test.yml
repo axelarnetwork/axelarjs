@@ -3,7 +3,7 @@ on:
   - pull_request
 
 jobs:
-  cache-and-install:
+  setup-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,9 +39,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-  test:
-    needs: cache-and-install
-    runs-on: ubuntu-latest
-    steps:
       - name: Run tests
         run: pnpm test
