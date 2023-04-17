@@ -1,4 +1,10 @@
-import { useAccount, useMutation, useSigner } from "wagmi";
+import { Logger } from "ethers/lib/utils.js";
+import {
+  useAccount,
+  useMutation,
+  UserRejectedRequestError,
+  useSigner,
+} from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 import { logger } from "~/lib/logger";
@@ -50,12 +56,18 @@ export function useRegisterOriginTokenMutation() {
         input.onFinished();
       }
     } catch (e) {
-      logger.error("failed to register origin token", {
-        cause: e,
-      });
       if (input.onStatusUpdate) {
         input.onStatusUpdate({ type: "idle" });
       }
+      if (e instanceof Error && "code" in e) {
+        switch (e.code) {
+          case Logger.errors.ACTION_REJECTED:
+            throw new UserRejectedRequestError("User rejected the transaction");
+          default:
+            throw new Error("Transaction reverted by EVM");
+        }
+      }
+
       return;
     }
   });

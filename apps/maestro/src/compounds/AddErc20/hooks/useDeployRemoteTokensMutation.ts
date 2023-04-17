@@ -1,9 +1,13 @@
-import { toast } from "@axelarjs/ui";
 import { BigNumber } from "ethers";
-import { useAccount, useMutation, useSigner } from "wagmi";
+import { Logger } from "ethers/lib/utils.js";
+import {
+  useAccount,
+  useMutation,
+  UserRejectedRequestError,
+  useSigner,
+} from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
-import { logger } from "~/lib/logger";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -42,7 +46,6 @@ export function useDeployRemoteTokensMutation() {
       );
 
       const txDone = await deployRemoteTokensTx.wait(1);
-      logger.log("deployRemoteTokensTxDone", txDone);
 
       if (input.onStatusUpdate) {
         input.onStatusUpdate({
@@ -56,11 +59,18 @@ export function useDeployRemoteTokensMutation() {
         input.onFinished();
       }
     } catch (e) {
-      toast.error("Failed to deploy remote tokens");
-      logger.warn("Failed to deploy remote tokens", { cause: e });
       if (input.onStatusUpdate) {
         input.onStatusUpdate({ type: "idle" });
       }
+      if (e instanceof Error && "code" in e) {
+        switch (e.code) {
+          case Logger.errors.ACTION_REJECTED:
+            throw new UserRejectedRequestError("User rejected the transaction");
+          default:
+            throw new Error("Transaction reverted by EVM");
+        }
+      }
+
       return;
     }
   });
