@@ -144,13 +144,13 @@ export const wagmiClient = createClient({
   autoConnect: true,
   provider,
   webSocketProvider,
+  logger, // custom logger
+  queryClient, // react-query client
   connectors: w3mConnectors({
     chains: EVM_CHAIN_CONFIGS,
     projectId: WALLECTCONNECT_PROJECT_ID,
-    version: 1,
+    version: 2,
   }),
-  logger, // custom logger
-  queryClient, // react-query client
 });
 
 export const ethereumClient = new EthereumClient(
