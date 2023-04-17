@@ -1,5 +1,9 @@
 import { QueryClient } from "@tanstack/react-query";
-import { EthereumClient, w3mConnectors } from "@web3modal/ethereum";
+import {
+  EthereumClient,
+  w3mConnectors,
+  w3mProvider,
+} from "@web3modal/ethereum";
 import { configureChains, createClient } from "wagmi";
 import {
   arbitrum,
@@ -25,7 +29,6 @@ import {
   polygon,
   polygonMumbai,
 } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
 
 import { logger } from "~/lib/logger";
 
@@ -135,7 +138,9 @@ logger.info({
 });
 
 const { webSocketProvider, provider } = configureChains(EVM_CHAIN_CONFIGS, [
-  publicProvider(),
+  w3mProvider({
+    projectId: WALLECTCONNECT_PROJECT_ID,
+  }),
 ]);
 
 export const queryClient = new QueryClient();
