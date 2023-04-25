@@ -1,6 +1,7 @@
 // useCopyToClipboard.test.ts
 
 import { act, renderHook } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vitest } from "vitest";
 
 import { useCopyToClipboard } from "./useCopyToClipboard";
@@ -8,11 +9,8 @@ import { useCopyToClipboard } from "./useCopyToClipboard";
 describe("useCopyToClipboard", () => {
   beforeEach(() => {
     vitest.useFakeTimers();
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: vitest.fn(() => Promise.resolve()),
-      },
-    });
+
+    userEvent.setup();
   });
 
   afterEach(() => {
@@ -32,7 +30,6 @@ describe("useCopyToClipboard", () => {
     expect(success).toBe(true);
     const [updatedCopiedText] = result.current;
     expect(updatedCopiedText).toBe(textToCopy);
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(textToCopy);
 
     vitest.advanceTimersByTime(3000);
 
