@@ -1,4 +1,9 @@
 {
+  "eslint.packageManager": "pnpm",
+  "eslint.workingDirectories": [
+    { "pattern": "apps/*/" },
+    { "pattern": "packages/*/" }
+  ],
   // tailwindcss intelisense settings
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
