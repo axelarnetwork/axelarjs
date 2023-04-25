@@ -1,4 +1,7 @@
 {
   "extends": "next/core-web-vitals",
+  "babelOptions": {
+    "presets": ["next/babel"]
+  },
   "rules": {}
 }
