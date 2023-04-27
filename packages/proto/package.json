@@ -1,5 +1,5 @@
 {
-  "name": "@axelarjs/cosmos-types",
+  "name": "@axelarjs/proto",
   "version": "0.32.3",
   "description": "Axelarcore supporting protobuf types",
   "files": [
