@@ -129,13 +129,15 @@ export const EVM_CHAIN_CONFIGS = [
 
 export type WagmiEVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
 
-logger.info({
-  [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NETWORK_ENV}"`]:
-    EVM_CHAIN_CONFIGS.map((x) => ({
-      id: x.id,
-      name: x.name,
-    })),
-});
+if (typeof window !== "undefined") {
+  logger.info({
+    [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NETWORK_ENV}"`]:
+      EVM_CHAIN_CONFIGS.map((x) => ({
+        id: x.id,
+        name: x.name,
+      })),
+  });
+}
 
 const { webSocketProvider, provider } = configureChains(EVM_CHAIN_CONFIGS, [
   w3mProvider({
