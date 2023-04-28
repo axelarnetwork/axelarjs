@@ -30,8 +30,11 @@ import {
   polygon,
   polygonMumbai,
 } from "wagmi/chains";
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 
 import { logger } from "~/lib/logger";
+
+import { APP_NAME } from "./app";
 
 export const WALLECTCONNECT_PROJECT_ID = String(
   process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
@@ -159,11 +162,19 @@ export const wagmiClient = createClient({
   webSocketProvider,
   logger, // custom logger
   queryClient, // react-query client
-  connectors: w3mConnectors({
-    chains: EVM_CHAIN_CONFIGS,
-    projectId: WALLECTCONNECT_PROJECT_ID,
-    version: 2,
-  }),
+  connectors: [
+    new CoinbaseWalletConnector({
+      chains: EVM_CHAIN_CONFIGS,
+      options: {
+        appName: APP_NAME,
+      },
+    }),
+    ...w3mConnectors({
+      chains: EVM_CHAIN_CONFIGS,
+      projectId: WALLECTCONNECT_PROJECT_ID,
+      version: 2,
+    }),
+  ],
 });
 
 export const ethereumClient = new EthereumClient(
