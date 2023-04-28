@@ -12,6 +12,7 @@ import {
   auroraTestnet,
   avalanche,
   avalancheFuji,
+  baseGoerli,
   bsc,
   bscTestnet,
   celo,
@@ -125,6 +126,11 @@ export const EVM_CHAIN_CONFIGS = [
     environment: "testnet",
   },
   { ...filecoin, networkNameOnAxelar: "filecoin", environment: "mainnet" },
+  {
+    ...baseGoerli,
+    networkNameOnAxelar: "base",
+    environment: "testnet",
+  },
 ].filter((chain) => chain.environment === NETWORK_ENV);
 
 export type WagmiEVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
