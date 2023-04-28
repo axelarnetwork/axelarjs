@@ -1,6 +1,7 @@
 import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import { EVMChainConfig } from "@axelarjs/axelarscan";
 import {
   Button,
   FormControl,
@@ -18,7 +19,6 @@ import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { EVMChainConfig } from "~/services/axelarscan/types";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
 import GMPTxStatusMonitor from "../GMPTxStatusMonitor";
