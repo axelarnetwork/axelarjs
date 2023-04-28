@@ -1,10 +1,9 @@
 import React, { FC } from "react";
 
+import { EVMChainConfig } from "@axelarjs/axelarscan";
 import { Dropdown } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";
-
-import { EVMChainConfig } from "~/services/axelarscan/types";
 
 type Props = {
   onSwitchNetwork?: (chainId: number) => void;

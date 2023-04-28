@@ -1,10 +1,14 @@
 import { TRPCError } from "@trpc/server";
 
+import { DISABLED_CHAINS, IS_STAGING } from "~/config/app";
 import { publicProcedure } from "~/server/trpc";
 
 export const getCosmosChainConfigs = publicProcedure.query(async ({ ctx }) => {
   try {
-    const { cosmos } = await ctx.services.axelarscan.getChainConfigs();
+    const { cosmos } = await ctx.services.axelarscan.getChainConfigs({
+      disabledChains: DISABLED_CHAINS,
+      isStaging: IS_STAGING,
+    });
 
     return cosmos;
   } catch (error) {
