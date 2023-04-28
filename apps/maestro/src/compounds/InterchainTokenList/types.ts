@@ -1,5 +1,6 @@
+import { EVMChainConfig } from "@axelarjs/axelarscan";
+
 import { WagmiEVMChainConfig } from "~/config/wagmi";
-import { EVMChainConfig } from "~/services/axelarscan/types";
 import { GMPStatus } from "~/services/gmp/types";
 
 export type TokenInfo = {

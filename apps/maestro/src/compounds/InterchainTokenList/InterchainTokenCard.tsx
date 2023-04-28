@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 
+import { EVMChainConfig } from "@axelarjs/axelarscan";
 import {
   Badge,
   Button,
@@ -14,7 +15,6 @@ import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import { EVMChainConfig } from "~/services/axelarscan/types";
 import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
 
 import { SendInterchainToken } from "../SendInterchainToken";
