@@ -55,6 +55,10 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         ethereumClient={ethereumClient}
         themeMode={theme ?? "light"}
         defaultChain={defaultChain}
+        walletImages={{
+          coinbaseWallet:
+            "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
+        }}
         themeVariables={{
           "--w3m-font-family": "var(--font-sans)",
           "--w3m-logo-image-url": "/icons/favicon-32x32.png",
