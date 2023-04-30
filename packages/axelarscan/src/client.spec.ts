@@ -34,6 +34,7 @@ describe("AxelarscanClient", () => {
               json: vi.fn().mockImplementation(() => []),
             };
           case "data":
+            console.log("data", body.json.collection);
             if (body.json.collection === "chains") {
               return {
                 json: vi.fn().mockImplementation(() => ({
@@ -95,10 +96,6 @@ describe("AxelarscanClient", () => {
         // Add sample CosmosChainConfig data
       ],
     };
-
-    (ky.post as Mock).mockResolvedValueOnce({
-      json: async () => expectedResult,
-    });
 
     const result = await mockAxelarClient.getChainConfigs({
       isStaging,
