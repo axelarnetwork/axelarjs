@@ -6,7 +6,7 @@ import {
   GetAssetsPriceResponse,
   GetAssetsResponse,
   GetChainConfigsResponse,
-} from "./client";
+} from ".";
 import { CosmosChainConfig, EVMChainConfig } from "./types";
 
 const mockOptions: Options = {

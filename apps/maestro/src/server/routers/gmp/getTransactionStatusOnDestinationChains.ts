@@ -1,9 +1,9 @@
+import { GMPStatus } from "@axelarjs/api";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { logger } from "~/lib/logger";
 import { publicProcedure } from "~/server/trpc";
-import { GMPStatus } from "~/services/gmp/types";
 
 /**
  * Get the status of an interchain token deployment

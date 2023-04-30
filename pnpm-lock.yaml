@@ -37,9 +37,9 @@ importers:
       '@axelar-network/axelarjs-sdk':
         specifier: 0.12.5
         version: 0.12.5
-      '@axelarjs/axelarscan':
+      '@axelarjs/api':
         specifier: workspace:*
-        version: link:../../packages/axelarscan
+        version: link:../../packages/api
       '@axelarjs/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -165,7 +165,7 @@ importers:
         specifier: ^1.3.1
         version: 1.3.1
 
-  packages/axelarscan:
+  packages/api:
     dependencies:
       immer:
         specifier: ^9.0.21
@@ -574,11 +574,6 @@ packages:
     dependencies:
       '@babel/highlight': 7.18.6
 
-  /@babel/compat-data@7.21.0:
-    resolution: {integrity: sha512-gMuZsmsgxk/ENC3O/fRw5QY8A9/uxQbbCEypnLIiYYc/qVJtEV7ouxC3EllIIwNzMqAQee5tanFabWsUOutS7g==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
   /@babel/compat-data@7.21.4:
     resolution: {integrity: sha512-/DYyDpeCfaVinT40FPGdkkb+lYSKvsVuMjDAG7jPOWWiM1ibOaB9CXJAlc4d1QpP/U2q2P9jbrSlClKSErd55g==}
     engines: {node: '>=6.9.0'}
@@ -668,7 +663,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
     dependencies:
-      '@babel/compat-data': 7.21.0
+      '@babel/compat-data': 7.21.4
       '@babel/core': 7.21.3
       '@babel/helper-validator-option': 7.21.0
       browserslist: 4.21.5
@@ -5193,7 +5188,7 @@ packages:
     resolution: {integrity: sha512-42Ej9sDDEmsJKjrfQ1PHmiDiHagh/u9AHO9QWbeNx4KmD9yS5d1XHmXUNINfUcykAU+4431Cn+k6Vn5mWBYimQ==}
     engines: {node: '>=14'}
     dependencies:
-      '@babel/types': 7.21.3
+      '@babel/types': 7.21.4
       entities: 4.4.0
     dev: true
 

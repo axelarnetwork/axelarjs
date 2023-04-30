@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "0.12.5",
-    "@axelarjs/axelarscan": "workspace:*",
+    "@axelarjs/api": "workspace:*",
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "@hookform/resolvers": "^3.1.0",

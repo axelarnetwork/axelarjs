@@ -1,5 +1,6 @@
 import { FC, useMemo, useState } from "react";
 
+import { EVMChainConfig } from "@axelarjs/api";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -16,7 +17,7 @@ export const TokenRegistration: FC<{}> = () => {
   const { state } = useAddErc20StateContainer();
 
   const selectedChain = useMemo(
-    () => evmChains?.find((c) => c.chain_id === chainId),
+    () => evmChains?.find((c: EVMChainConfig) => c.chain_id === chainId),
     [chainId, evmChains]
   );
   return (

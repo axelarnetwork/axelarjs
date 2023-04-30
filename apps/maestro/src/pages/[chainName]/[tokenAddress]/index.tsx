@@ -1,5 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
+import { GMPStatus } from "@axelarjs/api";
 import {
   Alert,
   Button,
@@ -30,7 +31,6 @@ import {
   useGetTransactionStatusOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
-import { GMPStatus } from "~/services/gmp/types";
 
 const InterchainTokensPage = () => {
   const { chainName, tokenAddress } = useRouter().query as {
