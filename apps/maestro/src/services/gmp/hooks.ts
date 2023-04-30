@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { GMPStatus, SearchGMPParams } from "@axelarjs/api";
+import { GMPStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { constants } from "ethers";
 import { isAddress } from "ethers/lib/utils.js";
 import { uniq } from "rambda";
