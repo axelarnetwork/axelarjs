@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { EVMChainConfig } from "@axelarjs/api";
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { useNetwork } from "wagmi";
@@ -21,8 +22,9 @@ export function useStep3ChainSelectionState() {
     formatEther(BigNumber.from(0))
   );
   const [sourceChainId, setSourceChainId] = useState(
-    evmChains?.find((evmChain) => evmChain.chain_id === network.chain?.id)
-      ?.chain_name as string
+    evmChains?.find(
+      (evmChain: EVMChainConfig) => evmChain.chain_id === network.chain?.id
+    )?.chain_name as string
   );
 
   const { state: rootState } = useAddErc20StateContainer();
