@@ -10,8 +10,6 @@ export const getEVMChainConfigs = publicProcedure.query(async ({ ctx }) => {
       isStaging: IS_STAGING,
     });
 
-    console.log({ evm });
-
     return evm.filter((chain) => !chain.deprecated);
   } catch (error) {
     // If we get a TRPC error, we throw it

@@ -18,9 +18,9 @@ import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import AddErc20 from "~/compounds/AddErc20";
-import { useDeployRemoteTokensMutation } from "~/compounds/AddErc20/hooks/useDeployRemoteTokensMutation";
-import { InterchainTokenList } from "~/compounds/InterchainTokenList";
+import AddErc20 from "~/features/AddErc20";
+import { useDeployRemoteTokensMutation } from "~/features/AddErc20/hooks/useDeployRemoteTokensMutation";
+import { InterchainTokenList } from "~/features/InterchainTokenList";
 import Page from "~/layouts/Page";
 import { useChainFromRoute } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";

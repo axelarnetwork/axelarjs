@@ -59,6 +59,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
         <TextInput
           bordered={true}
           type="search"
+          name="tokenAddress"
           className="bprder-red mx-auto block w-full"
           placeholder={`Search for ERC-20 token address on ${chain?.name}`}
           value={search}
