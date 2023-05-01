@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { GMPStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { constants } from "ethers";
 import { isAddress } from "ethers/lib/utils.js";
 import { uniq } from "rambda";
@@ -8,15 +9,17 @@ import { useQuery } from "wagmi";
 import { trpc } from "~/lib/trpc";
 
 import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
-import { getContracts, searchGMP } from "./index";
-import { GMPStatus, SearchGMPParams } from "./types";
+import gmpClient from "./index";
 
 export function useSearchGMPQuery(params: SearchGMPParams) {
-  return useQuery(["gmp-search", params], searchGMP.bind(null, params));
+  return useQuery(
+    ["gmp-search", params],
+    gmpClient.searchGMP.bind(null, params)
+  );
 }
 
 export function useContractsQuery() {
-  return useQuery(["gmp-contracts"], getContracts);
+  return useQuery(["gmp-contracts"], gmpClient.getContracts);
 }
 
 export function useInterchainTokensQuery(input: {
@@ -121,7 +124,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   const { data, ...query } = useQuery(
     ["gmp-get-transaction-status-on-destination-chains", input],
     async () => {
-      const { data } = await searchGMP({
+      const { data } = await gmpClient.searchGMP({
         txHash: input.txHash,
       });
 

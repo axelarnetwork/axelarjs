@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 
+import { GMPStatus } from "@axelarjs/api";
 import { Badge, BadgeProps } from "@axelarjs/ui";
 import { indexBy } from "rambda";
 
@@ -7,7 +8,6 @@ import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import { GMPStatus } from "~/services/gmp/types";
 
 const STATUS_LABELS: Partial<Record<GMPStatus, string>> = {
   called: "Called",

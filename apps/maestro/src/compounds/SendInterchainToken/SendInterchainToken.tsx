@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { EVMChainConfig } from "@axelarjs/axelarscan";
+import { EVMChainConfig } from "@axelarjs/api";
 import {
   Button,
   FormControl,

@@ -1,12 +1,24 @@
 {
-  "name": "@axelarjs/axelarscan",
+  "name": "@axelarjs/api",
   "private": true,
   "version": "0.1.0",
   "description": "",
   "type": "module",
   "main": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./axelarscan": "./src/axelarscan/index.ts",
+    "./gmp": "./src/gmp/index.ts"
+  },
+  "typesVersions": {
+    "*": {
+      "axelarscan": [
+        "./src/axelarscan/index.ts"
+      ],
+      "gmp": [
+        "./src/gmp/index.ts"
+      ]
+    }
   },
   "scripts": {
     "test": "vitest --run src"
