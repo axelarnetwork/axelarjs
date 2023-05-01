@@ -5,7 +5,7 @@ import { FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { useAddErc20StateContainer } from "~/compounds/AddErc20";
+import { useAddErc20StateContainer } from "~/features/AddErc20";
 
 import { NextButton } from "../core";
 

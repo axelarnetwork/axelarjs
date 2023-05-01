@@ -6,10 +6,10 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
-import SearchInterchainTokens from "~/compounds/SearchInterchainTokens";
+import SearchInterchainTokens from "~/features/SearchInterchainTokens";
 import Page from "~/layouts/Page";
 
-const AddErc20 = dynamic(() => import("~/compounds/AddErc20/AddErc20"));
+const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
 
 export default function Home() {
   const router = useRouter();
