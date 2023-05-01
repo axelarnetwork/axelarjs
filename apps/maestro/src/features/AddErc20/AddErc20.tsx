@@ -18,26 +18,23 @@ const StepLoading = () => (
   </div>
 );
 
-const Step1 = dynamic(
-  () => import("~/compounds/AddErc20/steps/token-details"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step1 = dynamic(() => import("~/features/AddErc20/steps/token-details"), {
+  loading: StepLoading,
+});
 
 const Step2 = dynamic(
-  () => import("~/compounds/AddErc20/steps/deploy-and-register"),
+  () => import("~/features/AddErc20/steps/deploy-and-register"),
   {
     loading: StepLoading,
   }
 );
 
-const Step3 = dynamic(() => import("~/compounds/AddErc20/steps/review"), {
+const Step3 = dynamic(() => import("~/features/AddErc20/steps/review"), {
   loading: StepLoading,
 });
 
 const StepsSummary = dynamic(
-  () => import("~/compounds/AddErc20/steps/StepsSummary")
+  () => import("~/features/AddErc20/steps/StepsSummary")
 );
 
 const STEPS = [Step1, Step2, Step3];

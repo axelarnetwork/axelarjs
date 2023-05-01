@@ -16,12 +16,12 @@ import invariant from "tiny-invariant";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
+import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
-import GMPTxStatusMonitor from "../GMPTxStatusMonitor";
 import {
   TransactionState,
   useSendInterchainTokenMutation,
