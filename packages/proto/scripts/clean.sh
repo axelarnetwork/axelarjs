@@ -1,0 +1,1 @@
+npx rimraf axelar build cosmos cosmos_proto gogoproto google proto src/*
