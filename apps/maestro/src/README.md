@@ -36,6 +36,6 @@ XState is a state management library that provides a way to model state machines
 
 ### Useful references:
 
-- [Feature-Driven Development](https://en.wikipedia.org/wiki/Feature-driven_development)
-- [Model-View-ViewModel (MVVM)](https://en.wikipedia.org/wiki/docs/advanced/patterns/)
-- [React Compound Pattern](https://www.patterns.dev/posts/compound-pattern)
+- [`Feature-Driven Development` 🔗](https://en.wikipedia.org/wiki/Feature-driven_development)
+- [`Model-View-ViewModel (MVVM)` 🔗](https://en.wikipedia.org/wiki/docs/advanced/patterns/)
+- [`React Compound Pattern` 🔗](https://www.patterns.dev/posts/compound-pattern)
