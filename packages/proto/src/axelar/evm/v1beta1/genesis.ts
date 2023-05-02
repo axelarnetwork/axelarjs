@@ -51,21 +51,27 @@ export const GenesisState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.chains.push(
             GenesisState_Chain.decode(reader, reader.uint32())
           );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -174,67 +180,117 @@ export const GenesisState_Chain = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState_Chain {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState_Chain();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.burnerInfos.push(BurnerInfo.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.commandQueue = QueueState.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.confirmedDeposits.push(
             ERC20Deposit.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.burnedDeposits.push(
             ERC20Deposit.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 8:
+          if (tag != 66) {
+            break;
+          }
+
           message.commandBatches.push(
             CommandBatchMetadata.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 9:
+          if (tag != 74) {
+            break;
+          }
+
           message.gateway = Gateway.decode(reader, reader.uint32());
-          break;
+          continue;
         case 10:
+          if (tag != 82) {
+            break;
+          }
+
           message.tokens.push(
             ERC20TokenMetadata.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 11:
+          if (tag != 90) {
+            break;
+          }
+
           message.events.push(Event.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 12:
+          if (tag != 98) {
+            break;
+          }
+
           message.confirmedEventQueue = QueueState.decode(
             reader,
             reader.uint32()
           );
-          break;
+          continue;
         case 13:
+          if (tag != 106) {
+            break;
+          }
+
           message.legacyConfirmedDeposits.push(
             ERC20Deposit.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 14:
+          if (tag != 114) {
+            break;
+          }
+
           message.legacyBurnedDeposits.push(
             ERC20Deposit.decode(reader, reader.uint32())
           );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

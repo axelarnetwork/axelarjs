@@ -22,7 +22,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RefundMsgRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RefundMsg", data);
     return promise.then((data) =>
-      RefundMsgResponse.decode(new _m0.Reader(data))
+      RefundMsgResponse.decode(_m0.Reader.create(data))
     );
   }
 }

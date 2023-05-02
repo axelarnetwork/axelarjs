@@ -31,16 +31,18 @@ export const PendingIBCTransferCountRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): PendingIBCTransferCountRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePendingIBCTransferCountRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -90,13 +92,18 @@ export const PendingIBCTransferCountResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): PendingIBCTransferCountResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePendingIBCTransferCountResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           const entry1 =
             PendingIBCTransferCountResponse_TransfersByChainEntry.decode(
               reader,
@@ -105,11 +112,12 @@ export const PendingIBCTransferCountResponse = {
           if (entry1.value !== undefined) {
             message.transfersByChain[entry1.key] = entry1.value;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -182,7 +190,8 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): PendingIBCTransferCountResponse_TransfersByChainEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message =
       createBasePendingIBCTransferCountResponse_TransfersByChainEntry();
@@ -190,15 +199,24 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.key = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.value = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

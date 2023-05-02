@@ -57,7 +57,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = StartKeygenRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "StartKeygen", data);
     return promise.then((data) =>
-      StartKeygenResponse.decode(new _m0.Reader(data))
+      StartKeygenResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -65,7 +65,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = SubmitPubKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "SubmitPubKey", data);
     return promise.then((data) =>
-      SubmitPubKeyResponse.decode(new _m0.Reader(data))
+      SubmitPubKeyResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -75,7 +75,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = SubmitSignatureRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "SubmitSignature", data);
     return promise.then((data) =>
-      SubmitSignatureResponse.decode(new _m0.Reader(data))
+      SubmitSignatureResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -83,7 +83,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RotateKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RotateKey", data);
     return promise.then((data) =>
-      RotateKeyResponse.decode(new _m0.Reader(data))
+      RotateKeyResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -91,7 +91,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = KeygenOptOutRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "KeygenOptOut", data);
     return promise.then((data) =>
-      KeygenOptOutResponse.decode(new _m0.Reader(data))
+      KeygenOptOutResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -99,7 +99,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = KeygenOptInRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "KeygenOptIn", data);
     return promise.then((data) =>
-      KeygenOptInResponse.decode(new _m0.Reader(data))
+      KeygenOptInResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -143,28 +143,30 @@ export class QueryServiceClientImpl implements QueryService {
   KeyID(request: KeyIDRequest): Promise<KeyIDResponse> {
     const data = KeyIDRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "KeyID", data);
-    return promise.then((data) => KeyIDResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      KeyIDResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   NextKeyID(request: NextKeyIDRequest): Promise<NextKeyIDResponse> {
     const data = NextKeyIDRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "NextKeyID", data);
     return promise.then((data) =>
-      NextKeyIDResponse.decode(new _m0.Reader(data))
+      NextKeyIDResponse.decode(_m0.Reader.create(data))
     );
   }
 
   Key(request: KeyRequest): Promise<KeyResponse> {
     const data = KeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Key", data);
-    return promise.then((data) => KeyResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => KeyResponse.decode(_m0.Reader.create(data)));
   }
 
   KeygenSession(request: KeygenSessionRequest): Promise<KeygenSessionResponse> {
     const data = KeygenSessionRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "KeygenSession", data);
     return promise.then((data) =>
-      KeygenSessionResponse.decode(new _m0.Reader(data))
+      KeygenSessionResponse.decode(_m0.Reader.create(data))
     );
   }
 }

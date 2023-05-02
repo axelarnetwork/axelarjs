@@ -4,6 +4,7 @@ import _m0 from "protobufjs/minimal";
 
 import { Duration } from "../../../google/protobuf/duration";
 import { Asset, Chain } from "../../nexus/exported/v1beta1/types";
+import { Fee } from "./types";
 
 export const protobufPackage = "axelar.axelarnet.v1beta1";
 
@@ -124,19 +125,20 @@ export interface RetryIBCTransferRequest {
 
 export interface RetryIBCTransferResponse {}
 
-export interface ExecuteMessageRequest {
+export interface RouteMessageRequest {
   sender: Uint8Array;
   id: string;
   payload: Uint8Array;
 }
 
-export interface ExecuteMessageResponse {}
+export interface RouteMessageResponse {}
 
 export interface CallContractRequest {
   sender: Uint8Array;
   chain: string;
   contractAddress: string;
   payload: Uint8Array;
+  fee?: Fee;
 }
 
 export interface CallContractResponse {}
@@ -171,28 +173,46 @@ export const LinkRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): LinkRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLinkRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.recipientAddr = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.recipientChain = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.asset = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -258,19 +278,25 @@ export const LinkResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): LinkResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLinkResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.depositAddr = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -332,25 +358,39 @@ export const ConfirmDepositRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): ConfirmDepositRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConfirmDepositRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.depositAddress = reader.bytes();
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.denom = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -416,16 +456,18 @@ export const ConfirmDepositResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): ConfirmDepositResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConfirmDepositResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -472,19 +514,25 @@ export const ExecutePendingTransfersRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): ExecutePendingTransfersRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseExecutePendingTransfersRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -537,16 +585,18 @@ export const ExecutePendingTransfersResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): ExecutePendingTransfersResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseExecutePendingTransfersResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -599,25 +649,39 @@ export const RegisterIBCPathRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RegisterIBCPathRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRegisterIBCPathRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.path = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -676,16 +740,18 @@ export const RegisterIBCPathResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RegisterIBCPathResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRegisterIBCPathResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -754,34 +820,60 @@ export const AddCosmosBasedChainRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): AddCosmosBasedChainRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAddCosmosBasedChainRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.chain = Chain.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.addrPrefix = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.nativeAssets.push(Asset.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 6:
+          if (tag != 50) {
+            break;
+          }
+
           message.cosmosChain = reader.string();
-          break;
+          continue;
         case 7:
+          if (tag != 58) {
+            break;
+          }
+
           message.ibcPath = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -863,16 +955,18 @@ export const AddCosmosBasedChainResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): AddCosmosBasedChainResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAddCosmosBasedChainResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -937,31 +1031,53 @@ export const RegisterAssetRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RegisterAssetRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRegisterAssetRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.asset = Asset.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.limit = reader.bytes();
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.window = Duration.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1043,16 +1159,18 @@ export const RegisterAssetResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RegisterAssetResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRegisterAssetResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1099,19 +1217,25 @@ export const RouteIBCTransfersRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RouteIBCTransfersRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRouteIBCTransfersRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1164,16 +1288,18 @@ export const RouteIBCTransfersResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RouteIBCTransfersResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRouteIBCTransfersResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1223,22 +1349,32 @@ export const RegisterFeeCollectorRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RegisterFeeCollectorRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRegisterFeeCollectorRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.feeCollector = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1301,16 +1437,18 @@ export const RegisterFeeCollectorResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RegisterFeeCollectorResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRegisterFeeCollectorResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1363,25 +1501,39 @@ export const RetryIBCTransferRequest = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RetryIBCTransferRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRetryIBCTransferRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.id = reader.uint64() as Long;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1444,16 +1596,18 @@ export const RetryIBCTransferResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): RetryIBCTransferResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRetryIBCTransferResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1481,13 +1635,13 @@ export const RetryIBCTransferResponse = {
   },
 };
 
-function createBaseExecuteMessageRequest(): ExecuteMessageRequest {
+function createBaseRouteMessageRequest(): RouteMessageRequest {
   return { sender: new Uint8Array(), id: "", payload: new Uint8Array() };
 }
 
-export const ExecuteMessageRequest = {
+export const RouteMessageRequest = {
   encode(
-    message: ExecuteMessageRequest,
+    message: RouteMessageRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
@@ -1502,34 +1656,45 @@ export const ExecuteMessageRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ExecuteMessageRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): RouteMessageRequest {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseExecuteMessageRequest();
+    const message = createBaseRouteMessageRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.id = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.payload = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
-  fromJSON(object: any): ExecuteMessageRequest {
+  fromJSON(object: any): RouteMessageRequest {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
@@ -1541,7 +1706,7 @@ export const ExecuteMessageRequest = {
     };
   },
 
-  toJSON(message: ExecuteMessageRequest): unknown {
+  toJSON(message: RouteMessageRequest): unknown {
     const obj: any = {};
     message.sender !== undefined &&
       (obj.sender = base64FromBytes(
@@ -1555,16 +1720,16 @@ export const ExecuteMessageRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ExecuteMessageRequest>, I>>(
+  create<I extends Exact<DeepPartial<RouteMessageRequest>, I>>(
     base?: I
-  ): ExecuteMessageRequest {
-    return ExecuteMessageRequest.fromPartial(base ?? {});
+  ): RouteMessageRequest {
+    return RouteMessageRequest.fromPartial(base ?? {});
   },
 
-  fromPartial<I extends Exact<DeepPartial<ExecuteMessageRequest>, I>>(
+  fromPartial<I extends Exact<DeepPartial<RouteMessageRequest>, I>>(
     object: I
-  ): ExecuteMessageRequest {
-    const message = createBaseExecuteMessageRequest();
+  ): RouteMessageRequest {
+    const message = createBaseRouteMessageRequest();
     message.sender = object.sender ?? new Uint8Array();
     message.id = object.id ?? "";
     message.payload = object.payload ?? new Uint8Array();
@@ -1572,13 +1737,13 @@ export const ExecuteMessageRequest = {
   },
 };
 
-function createBaseExecuteMessageResponse(): ExecuteMessageResponse {
+function createBaseRouteMessageResponse(): RouteMessageResponse {
   return {};
 }
 
-export const ExecuteMessageResponse = {
+export const RouteMessageResponse = {
   encode(
-    _: ExecuteMessageResponse,
+    _: RouteMessageResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
@@ -1587,40 +1752,42 @@ export const ExecuteMessageResponse = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ExecuteMessageResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+  ): RouteMessageResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseExecuteMessageResponse();
+    const message = createBaseRouteMessageResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
 
-  fromJSON(_: any): ExecuteMessageResponse {
+  fromJSON(_: any): RouteMessageResponse {
     return {};
   },
 
-  toJSON(_: ExecuteMessageResponse): unknown {
+  toJSON(_: RouteMessageResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ExecuteMessageResponse>, I>>(
+  create<I extends Exact<DeepPartial<RouteMessageResponse>, I>>(
     base?: I
-  ): ExecuteMessageResponse {
-    return ExecuteMessageResponse.fromPartial(base ?? {});
+  ): RouteMessageResponse {
+    return RouteMessageResponse.fromPartial(base ?? {});
   },
 
-  fromPartial<I extends Exact<DeepPartial<ExecuteMessageResponse>, I>>(
+  fromPartial<I extends Exact<DeepPartial<RouteMessageResponse>, I>>(
     _: I
-  ): ExecuteMessageResponse {
-    const message = createBaseExecuteMessageResponse();
+  ): RouteMessageResponse {
+    const message = createBaseRouteMessageResponse();
     return message;
   },
 };
@@ -1631,6 +1798,7 @@ function createBaseCallContractRequest(): CallContractRequest {
     chain: "",
     contractAddress: "",
     payload: new Uint8Array(),
+    fee: undefined,
   };
 }
 
@@ -1651,32 +1819,60 @@ export const CallContractRequest = {
     if (message.payload.length !== 0) {
       writer.uint32(34).bytes(message.payload);
     }
+    if (message.fee !== undefined) {
+      Fee.encode(message.fee, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CallContractRequest {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCallContractRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.sender = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.contractAddress = reader.string();
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.payload = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
+        case 5:
+          if (tag != 42) {
+            break;
+          }
+
+          message.fee = Fee.decode(reader, reader.uint32());
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -1693,6 +1889,7 @@ export const CallContractRequest = {
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
         : new Uint8Array(),
+      fee: isSet(object.fee) ? Fee.fromJSON(object.fee) : undefined,
     };
   },
 
@@ -1709,6 +1906,8 @@ export const CallContractRequest = {
       (obj.payload = base64FromBytes(
         message.payload !== undefined ? message.payload : new Uint8Array()
       ));
+    message.fee !== undefined &&
+      (obj.fee = message.fee ? Fee.toJSON(message.fee) : undefined);
     return obj;
   },
 
@@ -1726,6 +1925,10 @@ export const CallContractRequest = {
     message.chain = object.chain ?? "";
     message.contractAddress = object.contractAddress ?? "";
     message.payload = object.payload ?? new Uint8Array();
+    message.fee =
+      object.fee !== undefined && object.fee !== null
+        ? Fee.fromPartial(object.fee)
+        : undefined;
     return message;
   },
 };
@@ -1746,16 +1949,18 @@ export const CallContractResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): CallContractResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCallContractResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
