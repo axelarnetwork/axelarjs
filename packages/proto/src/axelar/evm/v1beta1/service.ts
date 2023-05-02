@@ -118,7 +118,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = SetGatewayRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "SetGateway", data);
     return promise.then((data) =>
-      SetGatewayResponse.decode(new _m0.Reader(data))
+      SetGatewayResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -128,21 +128,21 @@ export class MsgServiceClientImpl implements MsgService {
     const data = ConfirmGatewayTxRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmGatewayTx", data);
     return promise.then((data) =>
-      ConfirmGatewayTxResponse.decode(new _m0.Reader(data))
+      ConfirmGatewayTxResponse.decode(_m0.Reader.create(data))
     );
   }
 
   Link(request: LinkRequest): Promise<LinkResponse> {
     const data = LinkRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Link", data);
-    return promise.then((data) => LinkResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => LinkResponse.decode(_m0.Reader.create(data)));
   }
 
   ConfirmToken(request: ConfirmTokenRequest): Promise<ConfirmTokenResponse> {
     const data = ConfirmTokenRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmToken", data);
     return promise.then((data) =>
-      ConfirmTokenResponse.decode(new _m0.Reader(data))
+      ConfirmTokenResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -152,7 +152,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = ConfirmDepositRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmDeposit", data);
     return promise.then((data) =>
-      ConfirmDepositResponse.decode(new _m0.Reader(data))
+      ConfirmDepositResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -162,7 +162,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = ConfirmTransferKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmTransferKey", data);
     return promise.then((data) =>
-      ConfirmTransferKeyResponse.decode(new _m0.Reader(data))
+      ConfirmTransferKeyResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -172,7 +172,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = CreateDeployTokenRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreateDeployToken", data);
     return promise.then((data) =>
-      CreateDeployTokenResponse.decode(new _m0.Reader(data))
+      CreateDeployTokenResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -182,7 +182,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = CreateBurnTokensRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "CreateBurnTokens", data);
     return promise.then((data) =>
-      CreateBurnTokensResponse.decode(new _m0.Reader(data))
+      CreateBurnTokensResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -196,7 +196,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      CreatePendingTransfersResponse.decode(new _m0.Reader(data))
+      CreatePendingTransfersResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -210,7 +210,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      CreateTransferOperatorshipResponse.decode(new _m0.Reader(data))
+      CreateTransferOperatorshipResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -218,7 +218,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = SignCommandsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "SignCommands", data);
     return promise.then((data) =>
-      SignCommandsResponse.decode(new _m0.Reader(data))
+      SignCommandsResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -226,7 +226,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = AddChainRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AddChain", data);
     return promise.then((data) =>
-      AddChainResponse.decode(new _m0.Reader(data))
+      AddChainResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -236,7 +236,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RetryFailedEventRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RetryFailedEvent", data);
     return promise.then((data) =>
-      RetryFailedEventResponse.decode(new _m0.Reader(data))
+      RetryFailedEventResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -319,7 +319,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = BatchedCommandsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "BatchedCommands", data);
     return promise.then((data) =>
-      BatchedCommandsResponse.decode(new _m0.Reader(data))
+      BatchedCommandsResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -327,7 +327,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = BurnerInfoRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "BurnerInfo", data);
     return promise.then((data) =>
-      BurnerInfoResponse.decode(new _m0.Reader(data))
+      BurnerInfoResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -337,7 +337,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = ConfirmationHeightRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmationHeight", data);
     return promise.then((data) =>
-      ConfirmationHeightResponse.decode(new _m0.Reader(data))
+      ConfirmationHeightResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -345,7 +345,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = DepositStateRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "DepositState", data);
     return promise.then((data) =>
-      DepositStateResponse.decode(new _m0.Reader(data))
+      DepositStateResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -355,27 +355,31 @@ export class QueryServiceClientImpl implements QueryService {
     const data = PendingCommandsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "PendingCommands", data);
     return promise.then((data) =>
-      PendingCommandsResponse.decode(new _m0.Reader(data))
+      PendingCommandsResponse.decode(_m0.Reader.create(data))
     );
   }
 
   Chains(request: ChainsRequest): Promise<ChainsResponse> {
     const data = ChainsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Chains", data);
-    return promise.then((data) => ChainsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      ChainsResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   Command(request: CommandRequest): Promise<CommandResponse> {
     const data = CommandRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Command", data);
-    return promise.then((data) => CommandResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      CommandResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   KeyAddress(request: KeyAddressRequest): Promise<KeyAddressResponse> {
     const data = KeyAddressRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "KeyAddress", data);
     return promise.then((data) =>
-      KeyAddressResponse.decode(new _m0.Reader(data))
+      KeyAddressResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -385,7 +389,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = GatewayAddressRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GatewayAddress", data);
     return promise.then((data) =>
-      GatewayAddressResponse.decode(new _m0.Reader(data))
+      GatewayAddressResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -393,21 +397,23 @@ export class QueryServiceClientImpl implements QueryService {
     const data = BytecodeRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Bytecode", data);
     return promise.then((data) =>
-      BytecodeResponse.decode(new _m0.Reader(data))
+      BytecodeResponse.decode(_m0.Reader.create(data))
     );
   }
 
   Event(request: EventRequest): Promise<EventResponse> {
     const data = EventRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Event", data);
-    return promise.then((data) => EventResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      EventResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   ERC20Tokens(request: ERC20TokensRequest): Promise<ERC20TokensResponse> {
     const data = ERC20TokensRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ERC20Tokens", data);
     return promise.then((data) =>
-      ERC20TokensResponse.decode(new _m0.Reader(data))
+      ERC20TokensResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -415,7 +421,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = TokenInfoRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TokenInfo", data);
     return promise.then((data) =>
-      TokenInfoResponse.decode(new _m0.Reader(data))
+      TokenInfoResponse.decode(_m0.Reader.create(data))
     );
   }
 }

@@ -66,30 +66,55 @@ export const GenesisState = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.collectorAddress = reader.bytes();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.chains.push(CosmosChain.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.transferQueue = QueueState.decode(reader, reader.uint32());
-          break;
+          continue;
         case 7:
+          if (tag != 58) {
+            break;
+          }
+
           message.ibcTransfers.push(
             IBCTransfer.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 8:
+          if (tag != 66) {
+            break;
+          }
+
           const entry8 = GenesisState_SeqIdMappingEntry.decode(
             reader,
             reader.uint32()
@@ -97,11 +122,12 @@ export const GenesisState = {
           if (entry8.value !== undefined) {
             message.seqIdMapping[entry8.key] = entry8.value;
           }
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -227,22 +253,32 @@ export const GenesisState_SeqIdMappingEntry = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): GenesisState_SeqIdMappingEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState_SeqIdMappingEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.key = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.value = reader.uint64() as Long;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

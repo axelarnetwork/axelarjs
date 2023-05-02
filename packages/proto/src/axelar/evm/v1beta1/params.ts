@@ -99,55 +99,109 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.confirmationHeight = reader.uint64() as Long;
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.network = reader.string();
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.tokenCode = reader.bytes();
-          break;
+          continue;
         case 6:
+          if (tag != 50) {
+            break;
+          }
+
           message.burnable = reader.bytes();
-          break;
+          continue;
         case 7:
+          if (tag != 56) {
+            break;
+          }
+
           message.revoteLockingPeriod = reader.int64() as Long;
-          break;
+          continue;
         case 8:
+          if (tag != 66) {
+            break;
+          }
+
           message.networks.push(NetworkInfo.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 9:
+          if (tag != 74) {
+            break;
+          }
+
           message.votingThreshold = Threshold.decode(reader, reader.uint32());
-          break;
+          continue;
         case 10:
+          if (tag != 80) {
+            break;
+          }
+
           message.minVoterCount = reader.int64() as Long;
-          break;
+          continue;
         case 11:
+          if (tag != 88) {
+            break;
+          }
+
           message.commandsGasLimit = reader.uint32();
-          break;
+          continue;
         case 13:
+          if (tag != 104) {
+            break;
+          }
+
           message.votingGracePeriod = reader.int64() as Long;
-          break;
+          continue;
         case 14:
+          if (tag != 112) {
+            break;
+          }
+
           message.endBlockerLimit = reader.int64() as Long;
-          break;
+          continue;
         case 15:
+          if (tag != 120) {
+            break;
+          }
+
           message.transferLimit = reader.uint64() as Long;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -305,22 +359,32 @@ export const PendingChain = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PendingChain {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePendingChain();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.chain = Chain.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

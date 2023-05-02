@@ -21,7 +21,7 @@ export class MsgServiceClientImpl implements MsgService {
   Vote(request: VoteRequest): Promise<VoteResponse> {
     const data = VoteRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Vote", data);
-    return promise.then((data) => VoteResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => VoteResponse.decode(_m0.Reader.create(data)));
   }
 }
 

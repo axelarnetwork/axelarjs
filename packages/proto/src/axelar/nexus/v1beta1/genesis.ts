@@ -6,6 +6,7 @@ import {
   Chain,
   CrossChainTransfer,
   FeeInfo,
+  GeneralMessage,
   TransferFee,
 } from "../exported/v1beta1/types";
 import { Params } from "./params";
@@ -25,6 +26,8 @@ export interface GenesisState {
   feeInfos: FeeInfo[];
   rateLimits: RateLimit[];
   transferEpochs: TransferEpoch[];
+  messages: GeneralMessage[];
+  messageNonce: Long;
 }
 
 function createBaseGenesisState(): GenesisState {
@@ -39,6 +42,8 @@ function createBaseGenesisState(): GenesisState {
     feeInfos: [],
     rateLimits: [],
     transferEpochs: [],
+    messages: [],
+    messageNonce: Long.UZERO,
   };
 }
 
@@ -77,56 +82,118 @@ export const GenesisState = {
     for (const v of message.transferEpochs) {
       TransferEpoch.encode(v!, writer.uint32(82).fork()).ldelim();
     }
+    for (const v of message.messages) {
+      GeneralMessage.encode(v!, writer.uint32(90).fork()).ldelim();
+    }
+    if (!message.messageNonce.isZero()) {
+      writer.uint32(96).uint64(message.messageNonce);
+    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGenesisState();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.nonce = reader.uint64() as Long;
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.chains.push(Chain.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.chainStates.push(ChainState.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.linkedAddresses.push(
             LinkedAddresses.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 6:
+          if (tag != 50) {
+            break;
+          }
+
           message.transfers.push(
             CrossChainTransfer.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 7:
+          if (tag != 58) {
+            break;
+          }
+
           message.fee = TransferFee.decode(reader, reader.uint32());
-          break;
+          continue;
         case 8:
+          if (tag != 66) {
+            break;
+          }
+
           message.feeInfos.push(FeeInfo.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 9:
+          if (tag != 74) {
+            break;
+          }
+
           message.rateLimits.push(RateLimit.decode(reader, reader.uint32()));
-          break;
+          continue;
         case 10:
+          if (tag != 82) {
+            break;
+          }
+
           message.transferEpochs.push(
             TransferEpoch.decode(reader, reader.uint32())
           );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
+        case 11:
+          if (tag != 90) {
+            break;
+          }
+
+          message.messages.push(GeneralMessage.decode(reader, reader.uint32()));
+          continue;
+        case 12:
+          if (tag != 96) {
+            break;
+          }
+
+          message.messageNonce = reader.uint64() as Long;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -157,6 +224,12 @@ export const GenesisState = {
       transferEpochs: Array.isArray(object?.transferEpochs)
         ? object.transferEpochs.map((e: any) => TransferEpoch.fromJSON(e))
         : [],
+      messages: Array.isArray(object?.messages)
+        ? object.messages.map((e: any) => GeneralMessage.fromJSON(e))
+        : [],
+      messageNonce: isSet(object.messageNonce)
+        ? Long.fromValue(object.messageNonce)
+        : Long.UZERO,
     };
   },
 
@@ -215,6 +288,15 @@ export const GenesisState = {
     } else {
       obj.transferEpochs = [];
     }
+    if (message.messages) {
+      obj.messages = message.messages.map((e) =>
+        e ? GeneralMessage.toJSON(e) : undefined
+      );
+    } else {
+      obj.messages = [];
+    }
+    message.messageNonce !== undefined &&
+      (obj.messageNonce = (message.messageNonce || Long.UZERO).toString());
     return obj;
   },
 
@@ -253,6 +335,12 @@ export const GenesisState = {
       object.rateLimits?.map((e) => RateLimit.fromPartial(e)) || [];
     message.transferEpochs =
       object.transferEpochs?.map((e) => TransferEpoch.fromPartial(e)) || [];
+    message.messages =
+      object.messages?.map((e) => GeneralMessage.fromPartial(e)) || [];
+    message.messageNonce =
+      object.messageNonce !== undefined && object.messageNonce !== null
+        ? Long.fromValue(object.messageNonce)
+        : Long.UZERO;
     return message;
   },
 };

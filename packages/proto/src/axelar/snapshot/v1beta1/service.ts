@@ -36,7 +36,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RegisterProxyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RegisterProxy", data);
     return promise.then((data) =>
-      RegisterProxyResponse.decode(new _m0.Reader(data))
+      RegisterProxyResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -46,7 +46,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = DeactivateProxyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "DeactivateProxy", data);
     return promise.then((data) =>
-      DeactivateProxyResponse.decode(new _m0.Reader(data))
+      DeactivateProxyResponse.decode(_m0.Reader.create(data))
     );
   }
 }

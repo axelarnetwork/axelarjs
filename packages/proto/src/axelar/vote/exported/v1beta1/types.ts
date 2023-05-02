@@ -153,52 +153,102 @@ export const PollMetadata = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PollMetadata {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePollMetadata();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.expiresAt = reader.int64() as Long;
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.result = Any.decode(reader, reader.uint32());
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.votingThreshold = Threshold.decode(reader, reader.uint32());
-          break;
+          continue;
         case 6:
+          if (tag != 48) {
+            break;
+          }
+
           message.state = reader.int32() as any;
-          break;
+          continue;
         case 7:
+          if (tag != 56) {
+            break;
+          }
+
           message.minVoterCount = reader.int64() as Long;
-          break;
+          continue;
         case 10:
+          if (tag != 82) {
+            break;
+          }
+
           message.rewardPoolName = reader.string();
-          break;
+          continue;
         case 11:
+          if (tag != 88) {
+            break;
+          }
+
           message.gracePeriod = reader.int64() as Long;
-          break;
+          continue;
         case 12:
+          if (tag != 96) {
+            break;
+          }
+
           message.completedAt = reader.int64() as Long;
-          break;
+          continue;
         case 13:
+          if (tag != 104) {
+            break;
+          }
+
           message.id = reader.uint64() as Long;
-          break;
+          continue;
         case 15:
+          if (tag != 122) {
+            break;
+          }
+
           message.snapshot = Snapshot.decode(reader, reader.uint32());
-          break;
+          continue;
         case 16:
+          if (tag != 130) {
+            break;
+          }
+
           message.module = reader.string();
-          break;
+          continue;
         case 17:
+          if (tag != 138) {
+            break;
+          }
+
           message.moduleMetadata = Any.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -341,22 +391,32 @@ export const PollKey = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PollKey {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePollKey();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.module = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.id = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -406,22 +466,32 @@ export const PollParticipants = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PollParticipants {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePollParticipants();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 8) {
+            break;
+          }
+
           message.pollId = reader.uint64() as Long;
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.participants.push(reader.bytes());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

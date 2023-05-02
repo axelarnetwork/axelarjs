@@ -616,11 +616,6 @@ packages:
     dependencies:
       '@babel/highlight': 7.18.6
 
-  /@babel/compat-data@7.21.4:
-    resolution: {integrity: sha512-/DYyDpeCfaVinT40FPGdkkb+lYSKvsVuMjDAG7jPOWWiM1ibOaB9CXJAlc4d1QpP/U2q2P9jbrSlClKSErd55g==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
   /@babel/compat-data@7.21.7:
     resolution: {integrity: sha512-KYMqFYTaenzMK4yUtf4EW9wc4N9ef80FsbMtkwool5zpwl4YrT1SdWYSTRcT94KO4hannogdS+LxY7L+arP3gA==}
     engines: {node: '>=6.9.0'}
@@ -661,7 +656,7 @@ packages:
     resolution: {integrity: sha512-NieM3pVIYW2SwGzKoqfPrQsf4xGs9M9AIG3ThppsSRmO+m7eQhmI6amajKMUeIO37wFfsvnvcxQFx6x6iqxDnA==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.21.4
+      '@babel/types': 7.21.5
       '@jridgewell/gen-mapping': 0.3.2
       '@jridgewell/trace-mapping': 0.3.17
       jsesc: 2.5.2
@@ -689,20 +684,6 @@ packages:
     dependencies:
       '@babel/helper-explode-assignable-expression': 7.18.6
       '@babel/types': 7.21.5
-    dev: true
-
-  /@babel/helper-compilation-targets@7.21.4(@babel/core@7.21.5):
-    resolution: {integrity: sha512-Fa0tTuOXZ1iL8IeDFUWCzjZcn+sJGd9RZdH9esYVjEejGmzf+FFYQpMi/kZUk2kPy/q1H3/GPw7np8qar/stfg==}
-    engines: {node: '>=6.9.0'}
-    peerDependencies:
-      '@babel/core': ^7.0.0
-    dependencies:
-      '@babel/compat-data': 7.21.7
-      '@babel/core': 7.21.5
-      '@babel/helper-validator-option': 7.21.0
-      browserslist: 4.21.5
-      lru-cache: 5.1.1
-      semver: 6.3.0
     dev: true
 
   /@babel/helper-compilation-targets@7.21.5(@babel/core@7.21.5):
@@ -889,6 +870,7 @@ packages:
   /@babel/helper-string-parser@7.19.4:
     resolution: {integrity: sha512-nHtDoQcuqFmwYNYPz3Rah5ph2p8PFeFCsZk9A/48dPc/rGocJ5J3hAAZ7pb76VWX3fZKu+uEr/FhH5jLx7umrw==}
     engines: {node: '>=6.9.0'}
+    dev: true
 
   /@babel/helper-string-parser@7.21.5:
     resolution: {integrity: sha512-5pTUx3hAJaZIdW99sJ6ZUUgWq/Y+Hja7TowEnLNMm1VivRgZQL3vpBY3qUACVsvw+yQU6+YgfBVmcbLaZtrA1w==}
@@ -1773,9 +1755,9 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
-      '@babel/compat-data': 7.21.4
+      '@babel/compat-data': 7.21.7
       '@babel/core': 7.21.5
-      '@babel/helper-compilation-targets': 7.21.4(@babel/core@7.21.5)
+      '@babel/helper-compilation-targets': 7.21.5(@babel/core@7.21.5)
       '@babel/helper-plugin-utils': 7.20.2
       '@babel/helper-validator-option': 7.21.0
       '@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression': 7.18.6(@babel/core@7.21.5)
@@ -1843,7 +1825,7 @@ packages:
       '@babel/plugin-transform-unicode-escapes': 7.18.10(@babel/core@7.21.5)
       '@babel/plugin-transform-unicode-regex': 7.18.6(@babel/core@7.21.5)
       '@babel/preset-modules': 0.1.5(@babel/core@7.21.5)
-      '@babel/types': 7.21.4
+      '@babel/types': 7.21.5
       babel-plugin-polyfill-corejs2: 0.3.3(@babel/core@7.21.5)
       babel-plugin-polyfill-corejs3: 0.6.0(@babel/core@7.21.5)
       babel-plugin-polyfill-regenerator: 0.4.1(@babel/core@7.21.5)
@@ -1990,7 +1972,7 @@ packages:
     resolution: {integrity: sha512-rU2oY501qDxE8Pyo7i/Orqma4ziCOrby0/9mvbDUGEfvZjb279Nk9k19e2fiCxHbRRpY2ZyrgW1eq22mvmOIzA==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/helper-string-parser': 7.19.4
+      '@babel/helper-string-parser': 7.21.5
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
 

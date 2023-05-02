@@ -46,21 +46,27 @@ export const QueryValidatorsResponse = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): QueryValidatorsResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryValidatorsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.validators.push(
             QueryValidatorsResponse_Validator.decode(reader, reader.uint32())
           );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -150,37 +156,67 @@ export const QueryValidatorsResponse_TssIllegibilityInfo = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): QueryValidatorsResponse_TssIllegibilityInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryValidatorsResponse_TssIllegibilityInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 8) {
+            break;
+          }
+
           message.tombstoned = reader.bool();
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.jailed = reader.bool();
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.missedTooManyBlocks = reader.bool();
-          break;
+          continue;
         case 4:
+          if (tag != 32) {
+            break;
+          }
+
           message.noProxyRegistered = reader.bool();
-          break;
+          continue;
         case 5:
+          if (tag != 40) {
+            break;
+          }
+
           message.tssSuspended = reader.bool();
-          break;
+          continue;
         case 6:
+          if (tag != 48) {
+            break;
+          }
+
           message.proxyInsuficientFunds = reader.bool();
-          break;
+          continue;
         case 7:
+          if (tag != 56) {
+            break;
+          }
+
           message.staleTssHeartbeat = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -273,29 +309,43 @@ export const QueryValidatorsResponse_Validator = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): QueryValidatorsResponse_Validator {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryValidatorsResponse_Validator();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.operatorAddress = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.moniker = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.tssIllegibilityInfo =
             QueryValidatorsResponse_TssIllegibilityInfo.decode(
               reader,
               reader.uint32()
             );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

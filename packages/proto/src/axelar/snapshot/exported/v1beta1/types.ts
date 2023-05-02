@@ -42,22 +42,32 @@ export const Participant = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Participant {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParticipant();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.address = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.weight = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -136,21 +146,34 @@ export const Snapshot = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Snapshot {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSnapshot();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.timestamp = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.height = reader.int64() as Long;
-          break;
+          continue;
         case 8:
+          if (tag != 66) {
+            break;
+          }
+
           const entry8 = Snapshot_ParticipantsEntry.decode(
             reader,
             reader.uint32()
@@ -158,14 +181,19 @@ export const Snapshot = {
           if (entry8.value !== undefined) {
             message.participants[entry8.key] = entry8.value;
           }
-          break;
+          continue;
         case 9:
+          if (tag != 74) {
+            break;
+          }
+
           message.bondedWeight = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -257,22 +285,32 @@ export const Snapshot_ParticipantsEntry = {
     input: _m0.Reader | Uint8Array,
     length?: number
   ): Snapshot_ParticipantsEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSnapshot_ParticipantsEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.key = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.value = Participant.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
