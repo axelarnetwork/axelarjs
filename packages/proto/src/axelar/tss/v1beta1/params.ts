@@ -86,51 +86,89 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.keyRequirements.push(
             KeyRequirement.decode(reader, reader.uint32())
           );
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.suspendDurationInBlocks = reader.int64() as Long;
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.heartbeatPeriodInBlocks = reader.int64() as Long;
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.maxMissedBlocksPerWindow = Threshold.decode(
             reader,
             reader.uint32()
           );
-          break;
+          continue;
         case 5:
+          if (tag != 40) {
+            break;
+          }
+
           message.unbondingLockingKeyRotationCount = reader.int64() as Long;
-          break;
+          continue;
         case 6:
+          if (tag != 50) {
+            break;
+          }
+
           message.externalMultisigThreshold = Threshold.decode(
             reader,
             reader.uint32()
           );
-          break;
+          continue;
         case 7:
+          if (tag != 56) {
+            break;
+          }
+
           message.maxSignQueueSize = reader.int64() as Long;
-          break;
+          continue;
         case 8:
+          if (tag != 64) {
+            break;
+          }
+
           message.maxSimultaneousSignShares = reader.int64() as Long;
-          break;
+          continue;
         case 9:
+          if (tag != 72) {
+            break;
+          }
+
           message.tssSignedBlocksWindow = reader.int64() as Long;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

@@ -145,12 +145,14 @@ export interface GeneralMessage {
   payloadHash: Uint8Array;
   status: GeneralMessage_Status;
   asset?: Coin;
+  sourceTxId: Uint8Array;
+  sourceTxIndex: Long;
 }
 
 export enum GeneralMessage_Status {
   STATUS_UNSPECIFIED = 0,
   STATUS_APPROVED = 1,
-  STATUS_SENT = 2,
+  STATUS_PROCESSING = 2,
   STATUS_EXECUTED = 3,
   STATUS_FAILED = 4,
   UNRECOGNIZED = -1,
@@ -167,8 +169,8 @@ export function generalMessage_StatusFromJSON(
     case "STATUS_APPROVED":
       return GeneralMessage_Status.STATUS_APPROVED;
     case 2:
-    case "STATUS_SENT":
-      return GeneralMessage_Status.STATUS_SENT;
+    case "STATUS_PROCESSING":
+      return GeneralMessage_Status.STATUS_PROCESSING;
     case 3:
     case "STATUS_EXECUTED":
       return GeneralMessage_Status.STATUS_EXECUTED;
@@ -190,8 +192,8 @@ export function generalMessage_StatusToJSON(
       return "STATUS_UNSPECIFIED";
     case GeneralMessage_Status.STATUS_APPROVED:
       return "STATUS_APPROVED";
-    case GeneralMessage_Status.STATUS_SENT:
-      return "STATUS_SENT";
+    case GeneralMessage_Status.STATUS_PROCESSING:
+      return "STATUS_PROCESSING";
     case GeneralMessage_Status.STATUS_EXECUTED:
       return "STATUS_EXECUTED";
     case GeneralMessage_Status.STATUS_FAILED:
@@ -224,28 +226,46 @@ export const Chain = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Chain {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseChain();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.name = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.supportsForeignAssets = reader.bool();
-          break;
+          continue;
         case 4:
+          if (tag != 32) {
+            break;
+          }
+
           message.keyType = reader.int32() as any;
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.module = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -305,22 +325,32 @@ export const CrossChainAddress = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CrossChainAddress {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCrossChainAddress();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.chain = Chain.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -387,28 +417,46 @@ export const CrossChainTransfer = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CrossChainTransfer {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCrossChainTransfer();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.recipient = CrossChainAddress.decode(reader, reader.uint32());
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.asset = Coin.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.id = reader.uint64() as Long;
-          break;
+          continue;
         case 4:
+          if (tag != 32) {
+            break;
+          }
+
           message.state = reader.int32() as any;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -482,19 +530,25 @@ export const TransferFee = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): TransferFee {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTransferFee();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.coins.push(Coin.decode(reader, reader.uint32()));
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -564,31 +618,53 @@ export const FeeInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FeeInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFeeInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.chain = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.asset = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.feeRate = reader.bytes();
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.minFee = reader.bytes();
-          break;
+          continue;
         case 5:
+          if (tag != 42) {
+            break;
+          }
+
           message.maxFee = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -659,22 +735,32 @@ export const Asset = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Asset {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAsset();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.denom = reader.string();
-          break;
+          continue;
         case 3:
+          if (tag != 24) {
+            break;
+          }
+
           message.isNativeAsset = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -716,6 +802,8 @@ function createBaseGeneralMessage(): GeneralMessage {
     payloadHash: new Uint8Array(),
     status: 0,
     asset: undefined,
+    sourceTxId: new Uint8Array(),
+    sourceTxIndex: Long.UZERO,
   };
 }
 
@@ -748,38 +836,84 @@ export const GeneralMessage = {
     if (message.asset !== undefined) {
       Coin.encode(message.asset, writer.uint32(50).fork()).ldelim();
     }
+    if (message.sourceTxId.length !== 0) {
+      writer.uint32(58).bytes(message.sourceTxId);
+    }
+    if (!message.sourceTxIndex.isZero()) {
+      writer.uint32(64).uint64(message.sourceTxIndex);
+    }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GeneralMessage {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGeneralMessage();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.id = reader.string();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.sender = CrossChainAddress.decode(reader, reader.uint32());
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.recipient = CrossChainAddress.decode(reader, reader.uint32());
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.payloadHash = reader.bytes();
-          break;
+          continue;
         case 5:
+          if (tag != 40) {
+            break;
+          }
+
           message.status = reader.int32() as any;
-          break;
+          continue;
         case 6:
+          if (tag != 50) {
+            break;
+          }
+
           message.asset = Coin.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
+        case 7:
+          if (tag != 58) {
+            break;
+          }
+
+          message.sourceTxId = reader.bytes();
+          continue;
+        case 8:
+          if (tag != 64) {
+            break;
+          }
+
+          message.sourceTxIndex = reader.uint64() as Long;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -800,6 +934,12 @@ export const GeneralMessage = {
         ? generalMessage_StatusFromJSON(object.status)
         : 0,
       asset: isSet(object.asset) ? Coin.fromJSON(object.asset) : undefined,
+      sourceTxId: isSet(object.sourceTxId)
+        ? bytesFromBase64(object.sourceTxId)
+        : new Uint8Array(),
+      sourceTxIndex: isSet(object.sourceTxIndex)
+        ? Long.fromValue(object.sourceTxIndex)
+        : Long.UZERO,
     };
   },
 
@@ -824,6 +964,12 @@ export const GeneralMessage = {
       (obj.status = generalMessage_StatusToJSON(message.status));
     message.asset !== undefined &&
       (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
+    message.sourceTxId !== undefined &&
+      (obj.sourceTxId = base64FromBytes(
+        message.sourceTxId !== undefined ? message.sourceTxId : new Uint8Array()
+      ));
+    message.sourceTxIndex !== undefined &&
+      (obj.sourceTxIndex = (message.sourceTxIndex || Long.UZERO).toString());
     return obj;
   },
 
@@ -852,6 +998,11 @@ export const GeneralMessage = {
       object.asset !== undefined && object.asset !== null
         ? Coin.fromPartial(object.asset)
         : undefined;
+    message.sourceTxId = object.sourceTxId ?? new Uint8Array();
+    message.sourceTxIndex =
+      object.sourceTxIndex !== undefined && object.sourceTxIndex !== null
+        ? Long.fromValue(object.sourceTxIndex)
+        : Long.UZERO;
     return message;
   },
 };

@@ -22,7 +22,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = HeartBeatRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "HeartBeat", data);
     return promise.then((data) =>
-      HeartBeatResponse.decode(new _m0.Reader(data))
+      HeartBeatResponse.decode(_m0.Reader.create(data))
     );
   }
 }

@@ -230,58 +230,104 @@ export const KeyRequirement = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): KeyRequirement {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseKeyRequirement();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 8) {
+            break;
+          }
+
           message.keyRole = reader.int32() as any;
-          break;
+          continue;
         case 2:
+          if (tag != 16) {
+            break;
+          }
+
           message.keyType = reader.int32() as any;
-          break;
+          continue;
         case 3:
+          if (tag != 26) {
+            break;
+          }
+
           message.minKeygenThreshold = Threshold.decode(
             reader,
             reader.uint32()
           );
-          break;
+          continue;
         case 4:
+          if (tag != 34) {
+            break;
+          }
+
           message.safetyThreshold = Threshold.decode(reader, reader.uint32());
-          break;
+          continue;
         case 5:
+          if (tag != 40) {
+            break;
+          }
+
           message.keyShareDistributionPolicy = reader.int32() as any;
-          break;
+          continue;
         case 6:
+          if (tag != 48) {
+            break;
+          }
+
           message.maxTotalShareCount = reader.int64() as Long;
-          break;
+          continue;
         case 7:
+          if (tag != 56) {
+            break;
+          }
+
           message.minTotalShareCount = reader.int64() as Long;
-          break;
+          continue;
         case 8:
+          if (tag != 66) {
+            break;
+          }
+
           message.keygenVotingThreshold = Threshold.decode(
             reader,
             reader.uint32()
           );
-          break;
+          continue;
         case 9:
+          if (tag != 74) {
+            break;
+          }
+
           message.signVotingThreshold = Threshold.decode(
             reader,
             reader.uint32()
           );
-          break;
+          continue;
         case 10:
+          if (tag != 80) {
+            break;
+          }
+
           message.keygenTimeout = reader.int64() as Long;
-          break;
+          continue;
         case 11:
+          if (tag != 88) {
+            break;
+          }
+
           message.signTimeout = reader.int64() as Long;
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },
@@ -434,22 +480,32 @@ export const SigKeyPair = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SigKeyPair {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSigKeyPair();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
+          if (tag != 10) {
+            break;
+          }
+
           message.pubKey = reader.bytes();
-          break;
+          continue;
         case 2:
+          if (tag != 18) {
+            break;
+          }
+
           message.signature = reader.bytes();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+          continue;
       }
+      if ((tag & 7) == 4 || tag == 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
     }
     return message;
   },

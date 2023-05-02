@@ -12,8 +12,6 @@ import {
   CallContractResponse,
   ConfirmDepositRequest,
   ConfirmDepositResponse,
-  ExecuteMessageRequest,
-  ExecuteMessageResponse,
   ExecutePendingTransfersRequest,
   ExecutePendingTransfersResponse,
   LinkRequest,
@@ -26,6 +24,8 @@ import {
   RetryIBCTransferResponse,
   RouteIBCTransfersRequest,
   RouteIBCTransfersResponse,
+  RouteMessageRequest,
+  RouteMessageResponse,
 } from "./tx";
 
 export const protobufPackage = "axelar.axelarnet.v1beta1";
@@ -52,9 +52,7 @@ export interface MsgService {
   RetryIBCTransfer(
     request: RetryIBCTransferRequest
   ): Promise<RetryIBCTransferResponse>;
-  ExecuteMessage(
-    request: ExecuteMessageRequest
-  ): Promise<ExecuteMessageResponse>;
+  RouteMessage(request: RouteMessageRequest): Promise<RouteMessageResponse>;
   CallContract(request: CallContractRequest): Promise<CallContractResponse>;
 }
 
@@ -72,13 +70,13 @@ export class MsgServiceClientImpl implements MsgService {
     this.RouteIBCTransfers = this.RouteIBCTransfers.bind(this);
     this.RegisterFeeCollector = this.RegisterFeeCollector.bind(this);
     this.RetryIBCTransfer = this.RetryIBCTransfer.bind(this);
-    this.ExecuteMessage = this.ExecuteMessage.bind(this);
+    this.RouteMessage = this.RouteMessage.bind(this);
     this.CallContract = this.CallContract.bind(this);
   }
   Link(request: LinkRequest): Promise<LinkResponse> {
     const data = LinkRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Link", data);
-    return promise.then((data) => LinkResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) => LinkResponse.decode(_m0.Reader.create(data)));
   }
 
   ConfirmDeposit(
@@ -87,7 +85,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = ConfirmDepositRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmDeposit", data);
     return promise.then((data) =>
-      ConfirmDepositResponse.decode(new _m0.Reader(data))
+      ConfirmDepositResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -101,7 +99,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      ExecutePendingTransfersResponse.decode(new _m0.Reader(data))
+      ExecutePendingTransfersResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -111,7 +109,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = AddCosmosBasedChainRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AddCosmosBasedChain", data);
     return promise.then((data) =>
-      AddCosmosBasedChainResponse.decode(new _m0.Reader(data))
+      AddCosmosBasedChainResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -119,7 +117,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RegisterAssetRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RegisterAsset", data);
     return promise.then((data) =>
-      RegisterAssetResponse.decode(new _m0.Reader(data))
+      RegisterAssetResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -129,7 +127,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RouteIBCTransfersRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RouteIBCTransfers", data);
     return promise.then((data) =>
-      RouteIBCTransfersResponse.decode(new _m0.Reader(data))
+      RouteIBCTransfersResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -143,7 +141,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      RegisterFeeCollectorResponse.decode(new _m0.Reader(data))
+      RegisterFeeCollectorResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -153,17 +151,15 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RetryIBCTransferRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RetryIBCTransfer", data);
     return promise.then((data) =>
-      RetryIBCTransferResponse.decode(new _m0.Reader(data))
+      RetryIBCTransferResponse.decode(_m0.Reader.create(data))
     );
   }
 
-  ExecuteMessage(
-    request: ExecuteMessageRequest
-  ): Promise<ExecuteMessageResponse> {
-    const data = ExecuteMessageRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ExecuteMessage", data);
+  RouteMessage(request: RouteMessageRequest): Promise<RouteMessageResponse> {
+    const data = RouteMessageRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "RouteMessage", data);
     return promise.then((data) =>
-      ExecuteMessageResponse.decode(new _m0.Reader(data))
+      RouteMessageResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -171,7 +167,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = CallContractRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "CallContract", data);
     return promise.then((data) =>
-      CallContractResponse.decode(new _m0.Reader(data))
+      CallContractResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -202,7 +198,7 @@ export class QueryServiceClientImpl implements QueryService {
       data
     );
     return promise.then((data) =>
-      PendingIBCTransferCountResponse.decode(new _m0.Reader(data))
+      PendingIBCTransferCountResponse.decode(_m0.Reader.create(data))
     );
   }
 }

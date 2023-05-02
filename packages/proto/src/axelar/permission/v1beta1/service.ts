@@ -42,7 +42,7 @@ export class MsgClientImpl implements Msg {
     const data = RegisterControllerRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RegisterController", data);
     return promise.then((data) =>
-      RegisterControllerResponse.decode(new _m0.Reader(data))
+      RegisterControllerResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -56,7 +56,7 @@ export class MsgClientImpl implements Msg {
       data
     );
     return promise.then((data) =>
-      DeregisterControllerResponse.decode(new _m0.Reader(data))
+      DeregisterControllerResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -66,7 +66,7 @@ export class MsgClientImpl implements Msg {
     const data = UpdateGovernanceKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGovernanceKey", data);
     return promise.then((data) =>
-      UpdateGovernanceKeyResponse.decode(new _m0.Reader(data))
+      UpdateGovernanceKeyResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -93,7 +93,7 @@ export class QueryClientImpl implements Query {
     const data = QueryGovernanceKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GovernanceKey", data);
     return promise.then((data) =>
-      QueryGovernanceKeyResponse.decode(new _m0.Reader(data))
+      QueryGovernanceKeyResponse.decode(_m0.Reader.create(data))
     );
   }
 }

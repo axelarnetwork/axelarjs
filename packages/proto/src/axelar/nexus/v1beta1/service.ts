@@ -87,7 +87,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      RegisterChainMaintainerResponse.decode(new _m0.Reader(data))
+      RegisterChainMaintainerResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -101,7 +101,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      DeregisterChainMaintainerResponse.decode(new _m0.Reader(data))
+      DeregisterChainMaintainerResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -109,7 +109,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = ActivateChainRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ActivateChain", data);
     return promise.then((data) =>
-      ActivateChainResponse.decode(new _m0.Reader(data))
+      ActivateChainResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -119,7 +119,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = DeactivateChainRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "DeactivateChain", data);
     return promise.then((data) =>
-      DeactivateChainResponse.decode(new _m0.Reader(data))
+      DeactivateChainResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -129,7 +129,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RegisterAssetFeeRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RegisterAssetFee", data);
     return promise.then((data) =>
-      RegisterAssetFeeResponse.decode(new _m0.Reader(data))
+      RegisterAssetFeeResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -143,7 +143,7 @@ export class MsgServiceClientImpl implements MsgService {
       data
     );
     return promise.then((data) =>
-      SetTransferRateLimitResponse.decode(new _m0.Reader(data))
+      SetTransferRateLimitResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -220,7 +220,7 @@ export class QueryServiceClientImpl implements QueryService {
       data
     );
     return promise.then((data) =>
-      LatestDepositAddressResponse.decode(new _m0.Reader(data))
+      LatestDepositAddressResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -230,41 +230,47 @@ export class QueryServiceClientImpl implements QueryService {
     const data = TransfersForChainRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TransfersForChain", data);
     return promise.then((data) =>
-      TransfersForChainResponse.decode(new _m0.Reader(data))
+      TransfersForChainResponse.decode(_m0.Reader.create(data))
     );
   }
 
   FeeInfo(request: FeeInfoRequest): Promise<FeeInfoResponse> {
     const data = FeeInfoRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "FeeInfo", data);
-    return promise.then((data) => FeeInfoResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      FeeInfoResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   TransferFee(request: TransferFeeRequest): Promise<TransferFeeResponse> {
     const data = TransferFeeRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TransferFee", data);
     return promise.then((data) =>
-      TransferFeeResponse.decode(new _m0.Reader(data))
+      TransferFeeResponse.decode(_m0.Reader.create(data))
     );
   }
 
   Chains(request: ChainsRequest): Promise<ChainsResponse> {
     const data = ChainsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Chains", data);
-    return promise.then((data) => ChainsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      ChainsResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   Assets(request: AssetsRequest): Promise<AssetsResponse> {
     const data = AssetsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Assets", data);
-    return promise.then((data) => AssetsResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      AssetsResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   ChainState(request: ChainStateRequest): Promise<ChainStateResponse> {
     const data = ChainStateRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ChainState", data);
     return promise.then((data) =>
-      ChainStateResponse.decode(new _m0.Reader(data))
+      ChainStateResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -272,7 +278,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = ChainsByAssetRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ChainsByAsset", data);
     return promise.then((data) =>
-      ChainsByAssetResponse.decode(new _m0.Reader(data))
+      ChainsByAssetResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -282,7 +288,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = RecipientAddressRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RecipientAddress", data);
     return promise.then((data) =>
-      RecipientAddressResponse.decode(new _m0.Reader(data))
+      RecipientAddressResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -292,7 +298,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = ChainMaintainersRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ChainMaintainers", data);
     return promise.then((data) =>
-      ChainMaintainersResponse.decode(new _m0.Reader(data))
+      ChainMaintainersResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -302,14 +308,16 @@ export class QueryServiceClientImpl implements QueryService {
     const data = TransferRateLimitRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "TransferRateLimit", data);
     return promise.then((data) =>
-      TransferRateLimitResponse.decode(new _m0.Reader(data))
+      TransferRateLimitResponse.decode(_m0.Reader.create(data))
     );
   }
 
   Message(request: MessageRequest): Promise<MessageResponse> {
     const data = MessageRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Message", data);
-    return promise.then((data) => MessageResponse.decode(new _m0.Reader(data)));
+    return promise.then((data) =>
+      MessageResponse.decode(_m0.Reader.create(data))
+    );
   }
 }
 
