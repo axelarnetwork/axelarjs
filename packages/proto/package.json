@@ -26,7 +26,7 @@
     "clean": "./scripts/clean.sh",
     "sync": "./scripts/sync.sh",
     "codegen": "./scripts/codegen.sh",
-    "build": "rimraf build && pnpm tsc -m commonjs --outDir build/commonjs && pnpm tsc -m esnext --outDir build/module && cp -Rf build/commonjs/* .",
+    "build": "./scripts/build.sh",
     "compile": "pnpm tsc --noEmit",
     "prepublish": "pnpm run build",
     "format": "prettier --write \"src/**/*.ts\""
