@@ -13,9 +13,3 @@ Here's an example folder structure for a feature called `RegisterToken`:
 │   ├── SubComponent1.tsx        # Contains a smaller component used by the main feature component
 │   └── SubComponent2.tsx        # Contains another smaller component used by the main feature component
 ```
-
-Here are some references that you may find useful:
-
-- [Feature-Driven Development](https://en.wikipedia.org/wiki/Feature-driven_development)
-- [Model-View-ViewModel (MVVM)](https://en.wikipedia.org/wiki/docs/advanced/patterns/)
-- [React Compound Pattern](https://www.patterns.dev/posts/compound-pattern)
