@@ -1,10 +1,7 @@
 {
-  "extends": "@tsconfig/node16-strictest-esm/tsconfig.json",
+  "extends": "@axelarjs/config/tsconfig.strictest",
   "compilerOptions": {
-    "moduleResolution": "node",
     "exactOptionalPropertyTypes": false,
-    "declaration": true,
-    "ignoreDeprecations": "5.0",
     "noUnusedLocals": false
   },
   "include": ["src"]
