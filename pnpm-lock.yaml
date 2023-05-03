@@ -274,9 +274,18 @@ importers:
         specifier: ^1.13.0
         version: 1.13.0
     devDependencies:
+      '@cosmjs/proto-signing':
+        specifier: ^0.30.1
+        version: 0.30.1
       '@tsconfig/strictest':
         specifier: ^2.0.1
         version: 2.0.1
+      cosmjs-types:
+        specifier: ^0.7.2
+        version: 0.7.2
+      rambda:
+        specifier: ^7.5.0
+        version: 7.5.0
       typescript:
         specifier: ^5.0.4
         version: 5.0.4
@@ -2435,7 +2444,6 @@ packages:
       '@cosmjs/encoding': 0.30.1
       '@cosmjs/math': 0.30.1
       '@cosmjs/utils': 0.30.1
-    dev: false
 
   /@cosmjs/crypto@0.28.13:
     resolution: {integrity: sha512-ynKfM0q/tMBQMHJby6ad8lR3gkgBKaelQhIsCZTjClsnuC7oYT9y3ThSZCUWr7Pa9h0J8ahU2YV2oFWFVWJQzQ==}
@@ -2459,7 +2467,6 @@ packages:
       bn.js: 5.2.1
       elliptic: 6.5.4
       libsodium-wrappers: 0.7.11
-    dev: false
 
   /@cosmjs/encoding@0.28.13:
     resolution: {integrity: sha512-jtXbAYtV77rLHxoIrjGFsvgGjeTKttuHRv6cvuy3toCZzY7JzTclKH5O2g36IIE4lXwD9xwuhGJ2aa6A3dhNkA==}
@@ -2475,7 +2482,6 @@ packages:
       base64-js: 1.5.1
       bech32: 1.1.4
       readonly-date: 1.0.0
-    dev: false
 
   /@cosmjs/json-rpc@0.28.13:
     resolution: {integrity: sha512-fInSvg7x9P6p+GWqet+TMhrMTM3OWWdLJOGS5w2ryubMjgpR1rLiAx77MdTNkArW+/6sUwku0sN4veM4ENQu6A==}
@@ -2513,7 +2519,6 @@ packages:
     resolution: {integrity: sha512-yaoeI23pin9ZiPHIisa6qqLngfnBR/25tSaWpkTm8Cy10MX70UF5oN4+/t1heLaM6SSmRrhk3psRkV4+7mH51Q==}
     dependencies:
       bn.js: 5.2.1
-    dev: false
 
   /@cosmjs/proto-signing@0.28.13:
     resolution: {integrity: sha512-nSl/2ZLsUJYz3Ad0RY3ihZUgRHIow2OnYqKsESMu+3RA/jTi9bDYhiBu8mNMHI0xrEJry918B2CyI56pOUHdPQ==}
@@ -2537,7 +2542,6 @@ packages:
       '@cosmjs/utils': 0.30.1
       cosmjs-types: 0.7.2
       long: 4.0.0
-    dev: false
 
   /@cosmjs/socket@0.28.13:
     resolution: {integrity: sha512-lavwGxQ5VdeltyhpFtwCRVfxeWjH5D5mmN7jgx9nuCf3XSFbTcOYxrk2pQ4usenu1Q1KZdL4Yl5RCNrJuHD9Ug==}
@@ -2661,7 +2665,6 @@ packages:
 
   /@cosmjs/utils@0.30.1:
     resolution: {integrity: sha512-KvvX58MGMWh7xA+N+deCfunkA/ZNDvFLw4YbOmX3f/XBIkqrVY7qlotfy2aNb1kgp6h4B6Yc8YawJPDTfvWX7g==}
-    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -7835,7 +7838,6 @@ packages:
     dependencies:
       long: 4.0.0
       protobufjs: 6.11.3
-    dev: false
 
   /create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
@@ -10609,11 +10611,9 @@ packages:
     resolution: {integrity: sha512-SrcLtXj7BM19vUKtQuyQKiQCRJPgbpauzl3s0rSwD+60wtHqSUuqcoawlMDheCJga85nKOQwxNYQxf/CKAvs6Q==}
     dependencies:
       libsodium: 0.7.11
-    dev: false
 
   /libsodium@0.7.11:
     resolution: {integrity: sha512-WPfJ7sS53I2s4iM58QxY3Inb83/6mjlYgcmZs7DJsvDlnmVUwNinBCi5vBT43P6bHRy01O4zsMU2CoVR6xJ40A==}
-    dev: false
 
   /lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
@@ -12475,7 +12475,6 @@ packages:
 
   /readonly-date@1.0.0:
     resolution: {integrity: sha512-tMKIV7hlk0h4mO3JTmmVuIlJVXjKk3Sep9Bf5OH0O+758ruuVkUy2J9SttDLm91IEX/WHlXPSpxMGjPj4beMIQ==}
-    dev: false
 
   /real-require@0.1.0:
     resolution: {integrity: sha512-r/H9MzAWtrv8aSVjPCMFpDMl5q66GqtmmRkRjpHTsp4zBAa+snZyiQNlMONiUmEJcsnaw0wCauJ2GWODr/aFkg==}

@@ -2,7 +2,8 @@
   "extends": "@axelarjs/config/tsconfig.strictest",
   "compilerOptions": {
     "exactOptionalPropertyTypes": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "declaration": true
   },
   "include": ["src"]
 }
