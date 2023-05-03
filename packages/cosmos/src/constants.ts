@@ -1,4 +1,5 @@
 import { Environment } from "./types";
+import { memoize } from "./utils";
 
 export type EnvironmentConfigs = {
   resourceUrl: string;
@@ -71,16 +72,6 @@ const configsMap: Record<Environment, EnvironmentConfigs> = {
   mainnet: mainnetConfigs,
 };
 
-let configToUse: EnvironmentConfigs;
-
-export const getConfigs = (environment: Environment): EnvironmentConfigs => {
-  if (!configToUse) {
-    if (environment in configsMap) {
-      configToUse = configsMap[environment];
-      return configToUse;
-    }
-    throw new Error("config environment does not exist");
-  }
-
-  return configToUse;
-};
+export const getConfigs = memoize(
+  (environment: Environment): EnvironmentConfigs => configsMap[environment]
+);

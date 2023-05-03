@@ -11,7 +11,7 @@ export type AxelarQueryClientType = QueryClient & AxelarQueryService;
 let instance: AxelarQueryClientType;
 
 export class AxelarQueryClient extends QueryClient {
-  static async initOrGetAxelarQueryClient(config: AxelarQueryClientConfig) {
+  static async init(config: AxelarQueryClientConfig) {
     if (!instance) {
       const { axelarRpcUrl, environment } = config;
       const links: EnvironmentConfigs = getConfigs(environment);
@@ -25,8 +25,4 @@ export class AxelarQueryClient extends QueryClient {
   }
 }
 
-export const createAxelarQueryClient = async (
-  config: AxelarQueryClientConfig
-): Promise<AxelarQueryClientType> => {
-  return await AxelarQueryClient.initOrGetAxelarQueryClient(config);
-};
+export const createAxelarQueryClient = AxelarQueryClient.init;
