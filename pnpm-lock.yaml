@@ -177,6 +177,9 @@ importers:
         specifier: ^0.28.0
         version: 0.28.0
     devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
       '@testing-library/jest-dom':
         specifier: ^5.16.5
         version: 5.16.5
@@ -198,6 +201,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.0.11
         version: 18.2.1
+      '@types/testing-library__jest-dom':
+        specifier: ^5.14.5
+        version: 5.14.5
       '@vitejs/plugin-react':
         specifier: ^3.1.0
         version: 3.1.0(vite@4.3.3)
@@ -229,8 +235,17 @@ importers:
         specifier: ^0.30.1
         version: 0.30.1(happy-dom@9.10.1)
 
+  packages/config:
+    devDependencies:
+      '@tsconfig/strictest':
+        specifier: ^2.0.1
+        version: 2.0.1
+
   packages/cosmos:
     dependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
       '@axelarjs/proto':
         specifier: workspace:*
         version: link:../proto
@@ -299,6 +314,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
       '@axelarjs/utils':
         specifier: workspace:*
         version: link:../utils
@@ -496,6 +514,9 @@ importers:
         specifier: ^0.28.0
         version: 0.28.0
     devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
       '@testing-library/jest-dom':
         specifier: ^5.16.5
         version: 5.16.5
@@ -517,6 +538,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.0.11
         version: 18.0.11
+      '@types/testing-library__jest-dom':
+        specifier: ^5.14.5
+        version: 5.14.5
       '@vitejs/plugin-react':
         specifier: ^3.1.0
         version: 3.1.0(vite@4.3.3)

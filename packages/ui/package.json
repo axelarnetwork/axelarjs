@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "compile": "tsc --noEmit",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -30,6 +31,7 @@
     "upgrage-storybook": "npx storybook@next upgrade --prerelease"
   },
   "dependencies": {
+    "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "@headlessui/react": "^1.7.13",
     "@radix-ui/react-dialog": "^1.0.3",

@@ -1,5 +1,5 @@
-import ky, { Options } from "ky";
-import { beforeEach, describe, Mock, test, vi } from "vitest";
+import { Options } from "ky";
+import { beforeEach, describe, test, vi } from "vitest";
 
 import {
   AxelarscanClient,
