@@ -1,0 +1,17 @@
+{
+  "name": "@axelarjs/config",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "./tsconfig.strictest.json"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.1"
+  }
+}
