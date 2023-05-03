@@ -293,6 +293,19 @@ importers:
         specifier: ^0.30.1
         version: 0.30.1(happy-dom@9.7.1)
 
+  packages/evm:
+    dependencies:
+      viem:
+        specifier: ^0.3.16
+        version: 0.3.16(typescript@5.0.4)(zod@3.21.4)
+    devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^5.0.4
+        version: 5.0.4
+
   packages/proto:
     dependencies:
       long:
