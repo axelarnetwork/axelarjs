@@ -293,9 +293,9 @@ importers:
         specifier: ^7.2.3
         version: 7.2.3
     devDependencies:
-      '@tsconfig/node16-strictest-esm':
-        specifier: ^1.0.3
-        version: 1.0.3
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
       degit:
         specifier: ^2.8.4
         version: 2.8.4
@@ -5690,10 +5690,6 @@ packages:
 
   /@tsconfig/node14@1.0.3:
     resolution: {integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==}
-    dev: true
-
-  /@tsconfig/node16-strictest-esm@1.0.3:
-    resolution: {integrity: sha512-0/QTPDkKmE2dy0dMRstPCv4VJ+gUGgvMKzaWd5P3hgdlmPqYqe1pJxDGUlNYbSgUBlncIvvX+mIeZarokysNgg==}
     dev: true
 
   /@tsconfig/node16@1.0.3:

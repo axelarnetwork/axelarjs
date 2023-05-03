@@ -37,7 +37,7 @@
     "protobufjs": "^7.2.3"
   },
   "devDependencies": {
-    "@tsconfig/node16-strictest-esm": "^1.0.3",
+    "@axelarjs/config": "workspace:*",
     "degit": "^2.8.4",
     "prettier": "^2.8.8",
     "rimraf": "^4.4.1",
