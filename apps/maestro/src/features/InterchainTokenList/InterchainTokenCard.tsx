@@ -7,6 +7,7 @@ import {
   Card,
   CopyToClipboardButton,
   SpinnerIcon,
+  Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
 import clsx from "clsx";
@@ -19,6 +20,22 @@ import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
 
 import { SendInterchainToken } from "../SendInterchainToken";
 import { TokenInfo } from "./types";
+
+const StatusIndicator = (
+  props: Pick<TokenInfo, "isOriginToken" | "isRegistered">
+) => {
+  if (!props.isRegistered && !props.isOriginToken) {
+    return null;
+  }
+
+  const tip = props.isOriginToken ? "orign token" : "registered";
+
+  return (
+    <Tooltip tip={tip} aria-label={tip} position="left">
+      <Badge size="sm" color={props.isOriginToken ? "success" : "info"} />
+    </Tooltip>
+  );
+};
 
 export type InterchainTokenCardProps = TokenInfo & {
   onToggleSelection?: () => void;
@@ -104,18 +121,10 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
               {props.chain.name}
             </span>
           )}
-
-          {props.isOriginToken ? (
-            <Badge outline color="success">
-              origin
-            </Badge>
-          ) : (
-            props.isRegistered && (
-              <Badge outline color="info">
-                registered
-              </Badge>
-            )
-          )}
+          <StatusIndicator
+            isOriginToken={props.isOriginToken}
+            isRegistered={props.isRegistered}
+          />
           {props.deploymentStatus && (
             <Badge
               outline
