@@ -8,7 +8,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "LicenseRef-LICENSE",
   "dependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
