@@ -33,7 +33,6 @@
     "@testing-library/react": "^14.0.0",
     "@tsconfig/strictest": "^2.0.1",
     "@types/node": "18.15.3",
-    "@types/ramda": "^0.28.23",
     "@types/react": "^18.0.34",
     "@types/react-dom": "^18.0.11",
     "@types/testing-library__jest-dom": "^5.14.5",
@@ -41,7 +40,6 @@
     "fast-check": "^3.8.1",
     "happy-dom": "^9.10.1",
     "matchers": "link:@testing-library/jest-dom/matchers",
-    "rambda": "^7.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "5.0.4",
@@ -51,6 +49,6 @@
   "dependencies": {
     "immer": "^9.0.21",
     "ky": "^0.33.3",
-    "ramda": "^0.28.0"
+    "rambda": "^7.5.0"
   }
 }

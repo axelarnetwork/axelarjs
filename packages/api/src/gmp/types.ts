@@ -1,3 +1,7 @@
+type BaseGMPResponse<T> = T & {
+  time_spent: number;
+};
+
 export type GMPStatus =
   | "called"
   | "confirming"
@@ -116,13 +120,12 @@ export type SearchGMPResponseData = {
   is_invalid_call: boolean;
 };
 
-export type SearchGMPResponse = {
+export type SearchGMPResponse = BaseGMPResponse<{
   data: SearchGMPResponseData[];
   total: number;
-  time_spent: number;
-};
+}>;
 
-export type GetGMPContractsResponse = {
+export type GetContractsResponse = BaseGMPResponse<{
   constant_address_deployer: `0x${string}`;
   express_contract: {
     address: `0x${string}`;
@@ -130,4 +133,50 @@ export type GetGMPContractsResponse = {
   gateway_contracts: Record<string, { address: `0x${string}` }>;
   gas_service_contracts: Record<string, { address: `0x${string}` }>;
   time_spent: number;
+}>;
+
+export type GetGasPriceParams = {
+  sourceChain: string;
+  destinationChain: string;
+  sourceTokenSymbol?: string;
+  sourceTokenAddress?: `0x${string}`;
+};
+
+export type GetGasPriceResponse = BaseGMPResponse<{
+  method: "getGasPrice";
+  params: GetGasPriceParams & {
+    method: "getGasPrice";
+  };
+  result: {
+    source_token: GMPTokenInfo;
+    destination_native_token: GMPTokenInfo;
+  };
+  time_spent: number;
+}>;
+
+export type GetGMPStatisticsResponse = {
+  messages: {
+    key: string;
+    num_txs: number;
+    source_chains: {
+      key: string;
+      num_txs: number;
+      destination_chains: {
+        key: string;
+        num_txs: number;
+        contracts: {
+          key: string;
+          num_txs: number;
+        }[];
+      }[];
+    }[];
+  }[];
+  time_spent: number;
+};
+
+export type GetGMPChartResponse = {
+  data: {
+    timestamp: number;
+    num_txs: number;
+  }[];
 };

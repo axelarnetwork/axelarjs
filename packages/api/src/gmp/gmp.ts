@@ -1,7 +1,11 @@
 import ky, { Options } from "ky";
+import { always } from "rambda";
 
 import {
-  GetGMPContractsResponse,
+  GetContractsResponse,
+  GetGasPriceParams,
+  GetGasPriceResponse,
+  GetGMPChartResponse,
   SearchGMPParams,
   SearchGMPResponse,
 } from "./types";
@@ -16,21 +20,33 @@ export class GMPClient {
   async searchGMP(params: SearchGMPParams) {
     return await this.client
       .post("", {
-        json: {
-          ...params,
-          method: "searchGMP",
-        },
+        json: { ...params, method: "searchGMP" },
       })
       .json<SearchGMPResponse>()
-      .catch(() => ({ data: [] as SearchGMPResponse["data"] }));
+      .catch(always({ data: [] as SearchGMPResponse["data"] }))
+      .then((res) => res.data);
   }
 
   async getContracts() {
     return await this.client
+      .post("", { json: { method: "getContracts" } })
+      .json<GetContractsResponse>();
+  }
+
+  async getGasPrice(params: GetGasPriceParams) {
+    return await this.client
       .post("", {
-        json: { method: "getContracts" },
+        json: { ...params, method: "getGasPrice" },
       })
-      .json<GetGMPContractsResponse>();
+      .json<GetGasPriceResponse>()
+      .then((res) => res.result);
+  }
+
+  async getGMPChart() {
+    return await this.client
+      .post("", { json: { method: "GMPChart" } })
+      .json<GetGMPChartResponse>()
+      .then((res) => res.data);
   }
 }
 

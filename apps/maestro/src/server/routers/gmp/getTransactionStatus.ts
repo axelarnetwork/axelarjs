@@ -16,12 +16,12 @@ export const getTransactionStatus = publicProcedure
   // a query is a read-only operation, a mutation is a write operation
   .query(async ({ input, ctx }) => {
     try {
-      const gmpResponse = await ctx.services.gmp.searchGMP({
+      const response = await ctx.services.gmp.searchGMP({
         txHash: input.txHash as `0x${string}`,
       });
 
-      if (gmpResponse.data.length) {
-        return gmpResponse.data[0].status;
+      if (response.length) {
+        return response[0].status;
       }
 
       // If we don't find the transaction, we throw a 404 error
