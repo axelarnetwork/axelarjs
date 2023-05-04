@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 
-import { GMPStatus } from "@axelarjs/api";
+import { GMPTxStatus } from "@axelarjs/api";
 import { Badge, BadgeProps } from "@axelarjs/ui";
 import { indexBy } from "rambda";
 
@@ -9,7 +9,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
-const STATUS_LABELS: Partial<Record<GMPStatus, string>> = {
+const STATUS_LABELS: Partial<Record<GMPTxStatus, string>> = {
   called: "Called",
   approvable: "Approvable",
   approving: "Approving",
@@ -21,17 +21,16 @@ const STATUS_LABELS: Partial<Record<GMPStatus, string>> = {
   confirming: "Confirming",
   error: "Error",
   insufficient_fee: "Insufficient Fee",
-  not_executed: "Not Executed",
 };
 
 const STATUS_COLORS: Partial<
-  Record<GMPStatus, NonNullable<BadgeProps["color"]>>
+  Record<GMPTxStatus, NonNullable<BadgeProps["color"]>>
 > = {
   error: "error",
   executed: "success",
 };
 
-const STATUS_ICONS: Partial<Record<GMPStatus, React.ReactNode>> = {
+const STATUS_ICONS: Partial<Record<GMPTxStatus, React.ReactNode>> = {
   called: "⚪",
   confirmed: "🔵",
   executing: "🟡",

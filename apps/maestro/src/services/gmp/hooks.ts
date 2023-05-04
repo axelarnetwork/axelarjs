@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { GMPStatus, SearchGMPParams } from "@axelarjs/api/gmp";
+import { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { constants } from "ethers";
 import { isAddress } from "ethers/lib/utils.js";
 import { uniq } from "rambda";
@@ -134,7 +134,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
             ...acc,
             [call.returnValues.destinationChain.toLowerCase()]: status,
           }),
-          {} as { [chainId: string]: GMPStatus }
+          {} as { [chainId: string]: GMPTxStatus }
         );
       }
       return {};

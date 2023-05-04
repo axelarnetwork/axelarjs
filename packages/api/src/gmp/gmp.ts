@@ -3,9 +3,18 @@ import { always } from "rambda";
 
 import {
   GetContractsResponse,
+  GetFeesParams,
+  GetFeesResponse,
   GetGasPriceParams,
   GetGasPriceResponse,
+  GetGMPChartParams,
   GetGMPChartResponse,
+  GetGMPCumulativeVolumeParams,
+  GetGMPCumulativeVolumeResponse,
+  GetGMPStatisticsParams,
+  GetGMPStatisticsResponse,
+  GetGMPTotalVolumeParams,
+  GetGMPTotalVolumeResponse,
   SearchGMPParams,
   SearchGMPResponse,
 } from "./types";
@@ -27,10 +36,60 @@ export class GMPClient {
       .then((res) => res.data);
   }
 
-  async getContracts() {
+  async getGMPStatistics(params: GetGMPStatisticsParams) {
     return await this.client
-      .post("", { json: { method: "getContracts" } })
-      .json<GetContractsResponse>();
+      .post("", {
+        json: {
+          ...params,
+          method: "GMPStats",
+        },
+      })
+      .json<GetGMPStatisticsResponse>();
+  }
+
+  async getGMPChart(params: GetGMPChartParams) {
+    return await this.client
+      .post("", {
+        json: {
+          ...params,
+          method: "GMPChart",
+        },
+      })
+      .json<GetGMPChartResponse>()
+      .then((res) => res.data);
+  }
+
+  async getGMPCumulativeVolume(params: GetGMPCumulativeVolumeParams) {
+    return await this.client
+      .post("", {
+        json: {
+          ...params,
+          method: "GMPCumulativeVolume",
+        },
+      })
+      .json<GetGMPCumulativeVolumeResponse>();
+  }
+
+  async getGMPTotalVolume(params: GetGMPTotalVolumeParams) {
+    return await this.client
+      .post("", {
+        json: {
+          ...params,
+          method: "GMPTotalVolume",
+        },
+      })
+      .json<GetGMPTotalVolumeResponse>();
+  }
+
+  async estimateTimeSpent(params: GetGasPriceParams) {
+    return await this.client
+      .post("", {
+        json: {
+          ...params,
+          method: "estimateTimeSpent",
+        },
+      })
+      .json<{ time_spent: number }>();
   }
 
   async getGasPrice(params: GetGasPriceParams) {
@@ -42,11 +101,25 @@ export class GMPClient {
       .then((res) => res.result);
   }
 
-  async getGMPChart() {
+  async getGasSymbols() {
     return await this.client
-      .post("", { json: { method: "GMPChart" } })
-      .json<GetGMPChartResponse>()
-      .then((res) => res.data);
+      .post("", { json: { method: "getGasSupportSymbols" } })
+      .json<string[]>();
+  }
+
+  async getFees(params: GetFeesParams) {
+    return await this.client
+      .post("", {
+        json: { ...params, method: "getFees" },
+      })
+      .json<GetFeesResponse>()
+      .then((res) => res.result);
+  }
+
+  async getContracts() {
+    return await this.client
+      .post("", { json: { method: "getContracts" } })
+      .json<GetContractsResponse>();
   }
 }
 

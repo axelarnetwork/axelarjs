@@ -1,4 +1,4 @@
-import { GMPStatus } from "@axelarjs/api";
+import { GMPTxStatus } from "@axelarjs/api";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -31,7 +31,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             ...acc,
             [call.returnValues.destinationChain.toLowerCase()]: status,
           }),
-          {} as { [chainId: string]: GMPStatus }
+          {} as { [chainId: string]: GMPTxStatus }
         );
       }
 
