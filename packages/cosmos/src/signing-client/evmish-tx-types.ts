@@ -34,46 +34,34 @@ const TxTypeUrlMap = {
   EvmRetryFailedEventRequest: `/${protobufPackage}.RetryFailedEventRequest`,
 };
 
-export function registerEvmTxTypes(registry: Registry) {
-  registry.register(TxTypeUrlMap.EvmLinkRequest, LinkRequest);
-  registry.register(TxTypeUrlMap.EvmSetGatewayRequest, SetGatewayRequest);
-  registry.register(
-    TxTypeUrlMap.EvmConfirmGatewayTxRequest,
-    ConfirmGatewayTxRequest
-  );
-  registry.register(
-    TxTypeUrlMap.EvmConfirmDepositRequest,
-    ConfirmDepositRequest
-  );
-  registry.register(TxTypeUrlMap.EvmConfirmTokenRequest, ConfirmTokenRequest);
-  registry.register(
-    TxTypeUrlMap.EvmConfirmTransferKeyRequest,
-    ConfirmTransferKeyRequest
-  );
-  registry.register(
-    TxTypeUrlMap.EvmCreateBurnTokensRequest,
-    CreateBurnTokensRequest
-  );
-  registry.register(
-    TxTypeUrlMap.EvmCreateDeployTokenRequest,
-    CreateDeployTokenRequest
-  );
-  registry.register(
+const EVM_TYPE_PAIRS = [
+  [TxTypeUrlMap.EvmLinkRequest, LinkRequest],
+  [TxTypeUrlMap.EvmSetGatewayRequest, SetGatewayRequest],
+  [TxTypeUrlMap.EvmConfirmGatewayTxRequest, ConfirmGatewayTxRequest],
+  [TxTypeUrlMap.EvmConfirmDepositRequest, ConfirmDepositRequest],
+  [TxTypeUrlMap.EvmConfirmTokenRequest, ConfirmTokenRequest],
+  [TxTypeUrlMap.EvmConfirmTransferKeyRequest, ConfirmTransferKeyRequest],
+  [TxTypeUrlMap.EvmCreateBurnTokensRequest, CreateBurnTokensRequest],
+  [TxTypeUrlMap.EvmCreateDeployTokenRequest, CreateDeployTokenRequest],
+  [
     TxTypeUrlMap.EvmCreatePendingTransfersRequest,
-    CreatePendingTransfersRequest
-  );
-  registry.register(
+    CreatePendingTransfersRequest,
+  ],
+  [
     TxTypeUrlMap.EvmCreateTransferOperatorshipRequest,
-    CreateTransferOperatorshipRequest
-  );
-  registry.register(
+    CreateTransferOperatorshipRequest,
+  ],
+  [
     TxTypeUrlMap.EvmCreateTransferOwnershipRequest,
-    CreateTransferOwnershipRequest
-  );
-  registry.register(TxTypeUrlMap.EvmSignCommandsRequest, SignCommandsRequest);
-  registry.register(TxTypeUrlMap.EvmAddChainRequest, AddChainRequest);
-  registry.register(
-    TxTypeUrlMap.EvmRetryFailedEventRequest,
-    RetryFailedEventRequest
-  );
+    CreateTransferOwnershipRequest,
+  ],
+  [TxTypeUrlMap.EvmSignCommandsRequest, SignCommandsRequest],
+  [TxTypeUrlMap.EvmAddChainRequest, AddChainRequest],
+  [TxTypeUrlMap.EvmRetryFailedEventRequest, RetryFailedEventRequest],
+] as const;
+
+export function registerEvmTxTypes(registry: Registry) {
+  for (const [typeUrl, codec] of EVM_TYPE_PAIRS) {
+    registry.register(typeUrl, codec);
+  }
 }

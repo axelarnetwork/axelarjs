@@ -56,7 +56,7 @@ export class AxelarSigningClient
     this.signerAddress = signerAddress;
   }
 
-  static async initOrGetAxelarSigningClient(config: AxelarSigningClientConfig) {
+  static async init(config: AxelarSigningClientConfig) {
     if (!instance) {
       const {
         axelarRpcUrl,
@@ -70,7 +70,8 @@ export class AxelarSigningClient
       const tmClient = await Tendermint34Client.connect(rpc);
       const prefix = "axelar";
 
-      let wallet;
+      let wallet: OfflineSigner | undefined;
+
       if (walletDetails.mnemonic)
         wallet = await Wallet.fromMnemonic(walletDetails.mnemonic, { prefix });
       else if (walletDetails.offlineSigner)
@@ -124,8 +125,4 @@ export class AxelarSigningClient
   }
 }
 
-export const createAxelarSigningClient = async (
-  config: AxelarSigningClientConfig
-): Promise<AxelarSigningClient> => {
-  return await AxelarSigningClient.initOrGetAxelarSigningClient(config);
-};
+export const createAxelarSigningClient = AxelarSigningClient.init;

@@ -20,36 +20,30 @@ const TxTypeUrlMap = {
   AxelarnetRegisterAssetRequest: `/${protobufPackage}.RegisterAssetRequest`,
   AxelarnetRouteIBCTransfersRequest: `/${protobufPackage}.RouteIBCTransfersRequest`,
   AxelarnetRegisterFeeCollectorRequest: `/${protobufPackage}.RegisterFeeCollectorRequest`,
-};
+} as const;
+
+const AXELARNET_TYPE_PAIRS = [
+  [TxTypeUrlMap.AxelarnetLinkRequest, LinkRequest],
+  [TxTypeUrlMap.AxelarnetConfirmDepositRequest, ConfirmDepositRequest],
+  [
+    TxTypeUrlMap.AxelarnetExecutePendingTransfersRequest,
+    ExecutePendingTransfersRequest,
+  ],
+  [TxTypeUrlMap.AxelarnetRegisterIBCPathRequest, RegisterIBCPathRequest],
+  [
+    TxTypeUrlMap.AxelarnetAddCosmosBasedChainRequest,
+    AddCosmosBasedChainRequest,
+  ],
+  [TxTypeUrlMap.AxelarnetRegisterAssetRequest, RegisterAssetRequest],
+  [TxTypeUrlMap.AxelarnetRouteIBCTransfersRequest, RouteIBCTransfersRequest],
+  [
+    TxTypeUrlMap.AxelarnetRegisterFeeCollectorRequest,
+    RegisterFeeCollectorRequest,
+  ],
+] as const;
 
 export function registerAxelarnetTxTypes(registry: Registry) {
-  registry.register(TxTypeUrlMap.AxelarnetLinkRequest, LinkRequest);
-  registry.register(
-    TxTypeUrlMap.AxelarnetConfirmDepositRequest,
-    ConfirmDepositRequest
-  );
-  registry.register(
-    TxTypeUrlMap.AxelarnetExecutePendingTransfersRequest,
-    ExecutePendingTransfersRequest
-  );
-  registry.register(
-    TxTypeUrlMap.AxelarnetRegisterIBCPathRequest,
-    RegisterIBCPathRequest
-  );
-  registry.register(
-    TxTypeUrlMap.AxelarnetAddCosmosBasedChainRequest,
-    AddCosmosBasedChainRequest
-  );
-  registry.register(
-    TxTypeUrlMap.AxelarnetRegisterAssetRequest,
-    RegisterAssetRequest
-  );
-  registry.register(
-    TxTypeUrlMap.AxelarnetRouteIBCTransfersRequest,
-    RouteIBCTransfersRequest
-  );
-  registry.register(
-    TxTypeUrlMap.AxelarnetRegisterFeeCollectorRequest,
-    RegisterFeeCollectorRequest
-  );
+  for (const [typeUrl, codec] of AXELARNET_TYPE_PAIRS) {
+    registry.register(typeUrl, codec);
+  }
 }
