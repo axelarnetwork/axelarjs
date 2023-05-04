@@ -128,8 +128,8 @@ importers:
         specifier: 5.0.4
         version: 5.0.4
       viem:
-        specifier: ^0.3.16
-        version: 0.3.16(typescript@5.0.4)(zod@3.21.4)
+        specifier: ^0.3.17
+        version: 0.3.17(typescript@5.0.4)(zod@3.21.4)
       wagmi:
         specifier: ^0.12.12
         version: 0.12.12(@babel/core@7.21.5)(ethers@5.7.2)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(zod@3.21.4)
@@ -302,8 +302,8 @@ importers:
   packages/evm:
     dependencies:
       viem:
-        specifier: ^0.3.16
-        version: 0.3.16(typescript@5.0.4)(zod@3.21.4)
+        specifier: ^0.3.17
+        version: 0.3.17(typescript@5.0.4)(zod@3.21.4)
     devDependencies:
       '@axelarjs/config':
         specifier: workspace:*
@@ -14082,8 +14082,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /viem@0.3.16(typescript@5.0.4)(zod@3.21.4):
-    resolution: {integrity: sha512-Btfd6AfUbddM4hxl1LPtiaGcIJA8rG2WM1Q4VYf4AETvF8fTogDOJ08roRaOy+ep32+pKctyVOmeyE14Uhfylg==}
+  /viem@0.3.17(typescript@5.0.4)(zod@3.21.4):
+    resolution: {integrity: sha512-WGJQ3rV2gMiHgwxLqeAZQ3HetSfsrkF//WezdJPnwUNXuic/c2jjB3MBk4XfYvuRUMccPfc37ORi03AmQxjscg==}
     dependencies:
       '@adraffy/ens-normalize': 1.9.0
       '@noble/curves': 0.9.0
