@@ -241,6 +241,12 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
 
+  packages/core:
+    devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
+
   packages/cosmos:
     dependencies:
       '@axelarjs/config':
@@ -292,6 +298,19 @@ importers:
       vitest:
         specifier: ^0.30.1
         version: 0.30.1(happy-dom@9.7.1)
+
+  packages/evm:
+    dependencies:
+      viem:
+        specifier: ^0.3.16
+        version: 0.3.16(typescript@5.0.4)(zod@3.21.4)
+    devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^5.0.4
+        version: 5.0.4
 
   packages/proto:
     dependencies:
@@ -351,8 +370,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       immer:
-        specifier: ^9.0.21
-        version: 9.0.21
+        specifier: ^10.0.1
+        version: 10.0.1
       lucide-react:
         specifier: ^0.139.0
         version: 0.139.0(react@18.2.0)
@@ -9875,6 +9894,10 @@ packages:
   /ignore@5.2.4:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
+
+  /immer@10.0.1:
+    resolution: {integrity: sha512-zg++jJLsKKTwXGeSYIw0HgChSYQGtu0UDTnbKx5aGLYgte4CwTmH9eJDYyQ6FheyUtBe+lQW9FrGxya1G+Dtmg==}
+    dev: false
 
   /immer@9.0.21:
     resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}

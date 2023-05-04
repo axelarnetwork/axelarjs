@@ -4,12 +4,11 @@
   "description": "Cosmos SDK for Axelar Network",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "LicenseRef-LICENSE",
   "dependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",

@@ -1,0 +1,13 @@
+{
+  "name": "@axelarjs/core",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "LicenseRef-LICENSE",
+  "devDependencies": {
+    "@axelarjs/config": "workspace:*"
+  }
+}
