@@ -26,6 +26,10 @@ export class GMPClient {
     this.client = ky.extend(options);
   }
 
+  static init(options: Options) {
+    return new GMPClient(options);
+  }
+
   async searchGMP(params: SearchGMPParams) {
     return await this.client
       .post("", {
@@ -123,4 +127,4 @@ export class GMPClient {
   }
 }
 
-export const createGMPClient = (options: Options) => new GMPClient(options);
+export const createGMPClient = GMPClient.init;

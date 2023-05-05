@@ -38,6 +38,10 @@ export class AxelarscanClient {
     this.client = ky.extend(options);
   }
 
+  static init(options: Options) {
+    return new AxelarscanClient(options);
+  }
+
   async getAssets(params?: { denoms: string[] }) {
     const json = {
       module: MODULES.data,
@@ -94,5 +98,4 @@ export class AxelarscanClient {
   }
 }
 
-export const createAxelarscanClient = (options: Options) =>
-  new AxelarscanClient(options);
+export const createAxelarscanClient = AxelarscanClient.init;
