@@ -1,6 +1,6 @@
-import ky, { Options } from "ky";
 import { always } from "rambda";
 
+import { HTTPClient, Options } from "../HTTPClient";
 import {
   GetContractsResponse,
   GetFeesParams,
@@ -19,15 +19,12 @@ import {
   SearchGMPResponse,
 } from "./types";
 
-export class GMPClient {
-  private client: typeof ky;
-
-  constructor(options: Options) {
-    this.client = ky.extend(options);
-  }
-
+export class GMPClient extends HTTPClient {
   static init(options: Options) {
-    return new GMPClient(options);
+    return new GMPClient(options, {
+      name: "GMPClient",
+      version: "0.0.1",
+    });
   }
 
   async searchGMP(params: SearchGMPParams) {
