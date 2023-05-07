@@ -1,4 +1,4 @@
-import { EVMChainConfig, GMPStatus } from "@axelarjs/api";
+import { EVMChainConfig, GMPTxStatus } from "@axelarjs/api";
 
 import { WagmiEVMChainConfig } from "~/config/wagmi";
 
@@ -11,5 +11,5 @@ export type TokenInfo = {
   isSelected?: boolean;
   chain?: EVMChainConfig;
   wagmiConfig?: WagmiEVMChainConfig;
-  deploymentStatus?: "pending" | GMPStatus;
+  deploymentStatus?: "pending" | GMPTxStatus;
 };

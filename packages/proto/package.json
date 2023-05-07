@@ -31,7 +31,7 @@
     "prepublish": "pnpm run build",
     "format": "prettier --write \"src/**/*.ts\""
   },
-  "license": "Apache-2.0",
+  "license": "LicenseRef-LICENSE",
   "dependencies": {
     "long": "^5.2.1",
     "protobufjs": "^7.2.3"

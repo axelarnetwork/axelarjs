@@ -1,5 +1,4 @@
-import ky, { Options } from "ky";
-
+import { HTTPClient, Options } from "../HTTPClient";
 import {
   AxelarAssetPrice,
   AxelarScanAsset,
@@ -31,11 +30,12 @@ export type GetChainConfigsResponse = {
   cosmos: CosmosChainConfig[];
 };
 
-export class AxelarscanClient {
-  private client: typeof ky;
-
-  constructor(options: Options) {
-    this.client = ky.extend(options);
+export class AxelarscanClient extends HTTPClient {
+  static init(options: Options) {
+    return new AxelarscanClient(options, {
+      name: "AxelarscanClient",
+      version: "0.0.1",
+    });
   }
 
   async getAssets(params?: { denoms: string[] }) {
@@ -94,5 +94,4 @@ export class AxelarscanClient {
   }
 }
 
-export const createAxelarscanClient = (options: Options) =>
-  new AxelarscanClient(options);
+export const createAxelarscanClient = AxelarscanClient.init;
