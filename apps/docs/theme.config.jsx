@@ -14,7 +14,7 @@ const THEME_CONFIG = {
     </div>
   ),
   project: {
-    link: "https://github.com/shuding/nextra",
+    link: "https://github.com/axelar-nextwork/axelarjs",
   },
   // ...
 };
