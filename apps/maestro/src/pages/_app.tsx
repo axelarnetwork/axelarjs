@@ -43,7 +43,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
           }
         `}
       </style>
-      <NextNProgress />
+      <NextNProgress options={{ showSpinner: false }} />
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <ThemeProvider>

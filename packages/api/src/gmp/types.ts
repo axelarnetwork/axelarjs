@@ -1,4 +1,8 @@
-export type GMPStatus =
+type BaseGMPResponse<T> = T & {
+  time_spent: number;
+};
+
+export type GMPTxStatus =
   | "called"
   | "confirming"
   | "confirmable"
@@ -12,26 +16,39 @@ export type GMPStatus =
   | "error"
   | "express_executable"
   | "express_executable_without_gas_paid"
-  | "not_executed"
-  | "not_executed_without_gas_paid"
+  | "executable"
+  | "executable_without_gas_paid"
   | "insufficient_fee";
 
 export type ChainType = "evm" | "cosmos";
 
 export type SortOrder = "asc" | "desc";
 
-export type SearchGMPParams = {
-  contractMethod?: "callContrct" | "callContrctWithToken";
-  txHash?: `0x${string}`;
-  txLogIndex?: number;
+type BaseGMPParams = {
+  contractMethod?: string;
   sourceChain?: string;
   destinationChain?: string;
+  sourceAddress?: `0x${string}`;
   contractAddress?: `0x${string}`;
   senderAddress?: `0x${string}`;
   relayerAddress?: `0x${string}`;
-  status?: GMPStatus;
+  /**
+   * Unix timestamp in seconds
+   */
   fromTime?: number;
+  /**
+   * Unix timestamp in seconds
+   */
   toTime?: number;
+};
+
+// SearchGMP
+
+export type SearchGMPParams = BaseGMPParams & {
+  contractMethod?: "callContrct" | "callContrctWithToken";
+  txHash?: `0x${string}`;
+  txLogIndex?: number;
+  status?: GMPTxStatus;
   from?: number;
   size?: number;
   sort?: Record<string, SortOrder>;
@@ -110,19 +127,18 @@ type SearchGMPFees = {
 export type SearchGMPResponseData = {
   call: SearchGMPCall;
   fees: SearchGMPFees;
-  status: GMPStatus;
+  status: GMPTxStatus;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;
 };
 
-export type SearchGMPResponse = {
+export type SearchGMPResponse = BaseGMPResponse<{
   data: SearchGMPResponseData[];
   total: number;
-  time_spent: number;
-};
+}>;
 
-export type GetGMPContractsResponse = {
+export type GetContractsResponse = BaseGMPResponse<{
   constant_address_deployer: `0x${string}`;
   express_contract: {
     address: `0x${string}`;
@@ -130,4 +146,162 @@ export type GetGMPContractsResponse = {
   gateway_contracts: Record<string, { address: `0x${string}` }>;
   gas_service_contracts: Record<string, { address: `0x${string}` }>;
   time_spent: number;
+}>;
+
+export type GetGasPriceParams = {
+  sourceChain: string;
+  destinationChain: string;
+  sourceTokenSymbol?: string;
+  sourceTokenAddress?: `0x${string}`;
 };
+
+export type GetGasPriceResponse = BaseGMPResponse<{
+  method: "getGasPrice";
+  params: GetGasPriceParams & {
+    method: "getGasPrice";
+  };
+  result: {
+    source_token: GMPTokenInfo;
+    destination_native_token: GMPTokenInfo;
+  };
+  time_spent: number;
+}>;
+
+// GetGMPStatistics
+
+type BaseStats<T = {}> = T & {
+  key: string;
+  num_txs: number;
+};
+
+export type GetGMPStatisticsParams = BaseGMPParams;
+
+export type GetGMPStatisticsResponse = {
+  messages: BaseStats<{
+    source_chains: BaseStats<{
+      destination_chains: BaseStats<{ contracts: BaseStats[] }>[];
+    }>[];
+  }>[];
+  time_spent: number;
+};
+
+// GetGMPChart
+
+export type GetGMPChartParams = BaseGMPParams;
+
+export type GetGMPChartResponse = {
+  data: {
+    timestamp: number;
+    num_txs: number;
+  }[];
+};
+
+// GetGMPCumulativeVolume
+
+export type GetGMPCumulativeVolumeParams = BaseGMPParams;
+
+export type GetGMPCumulativeVolumeResponse = {
+  data: {
+    timestamp: number;
+    volume: number;
+    cumulative_volume: number;
+    num_txs: number;
+  }[];
+};
+
+// GetGMPTotalVolume
+
+export type GetGMPTotalVolumeParams = BaseGMPParams;
+
+export type GetGMPTotalVolumeResponse = number;
+
+// EstimateTimeSpent
+
+export type EstimateTimeSpentParams = Pick<
+  BaseGMPParams,
+  | "contractMethod"
+  | "sourceChain"
+  | "destinationChain"
+  | "sourceAddress"
+  | "contractAddress"
+  | "fromTime"
+  | "toTime"
+>;
+
+export type EstimateTimeSpentResponse = BaseStats<{
+  express_execute: number | null;
+  confirm: number | null;
+  approve: number | null;
+  execute: number | null;
+  total: number;
+}>[];
+
+// GetFees
+
+export type GetFeesParams = {
+  sourceChain: string;
+  destinationChain: string;
+  sourceTokenSymbol?: string;
+  sourceTokenAddress?: `0x${string}`;
+  sourceContractAddress?: `0x${string}`;
+  destinationContractAddress?: `0x${string}`;
+};
+
+type ExpressFee = {
+  relayer_fee: number;
+  relayer_fee_usd: number;
+  express_gas_overhead_fee: number;
+  express_gas_overhead_fee_usd: number;
+  total: number;
+  total_usd: number;
+};
+
+type TokenPrice = {
+  usd: number;
+};
+
+type Token = {
+  contract_address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  token_price: TokenPrice;
+  gas_price: string;
+  gas_price_gwei: string;
+};
+
+type GetBaseFeesResult = {
+  base_fee: number;
+  base_fee_usd: number;
+  source_base_fee: number;
+  source_base_fee_string: string;
+  source_base_fee_usd: number;
+  destination_base_fee: number;
+  destination_base_fee_string: string;
+  destination_base_fee_usd: number;
+  express_supported: boolean;
+  express_fee: number;
+  express_fee_string: string;
+  express_fee_usd: number;
+  express_execute_gas_limit_adjustment: number;
+  express_execute_gas_limit_adjustment_with_multiplier: number;
+  source_express_fee: ExpressFee;
+  destination_express_fee: ExpressFee;
+  source_token: Token;
+  destination_native_token: Token & {
+    name: string;
+    symbol: string;
+  };
+  axelar_token: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    token_price: TokenPrice;
+  };
+};
+
+export type GetFeesResponse = BaseGMPResponse<{
+  method: "getBaseFees";
+  params: GetFeesParams & { method: "getFees" };
+  result: GetBaseFeesResult;
+}>;

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { GMPStatus, SearchGMPParams } from "@axelarjs/api/gmp";
+import { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { constants } from "ethers";
 import { isAddress } from "ethers/lib/utils.js";
 import { uniq } from "rambda";
@@ -124,17 +124,17 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   const { data, ...query } = useQuery(
     ["gmp-get-transaction-status-on-destination-chains", input],
     async () => {
-      const { data } = await gmpClient.searchGMP({
+      const responseData = await gmpClient.searchGMP({
         txHash: input.txHash,
       });
 
-      if (data.length) {
-        return data.reduce(
+      if (responseData.length) {
+        return responseData.reduce(
           (acc, { call, status }) => ({
             ...acc,
             [call.returnValues.destinationChain.toLowerCase()]: status,
           }),
-          {} as { [chainId: string]: GMPStatus }
+          {} as { [chainId: string]: GMPTxStatus }
         );
       }
       return {};

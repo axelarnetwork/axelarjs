@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
-import { GMPStatus } from "@axelarjs/api";
+import { GMPTxStatus } from "@axelarjs/api";
 import {
   Alert,
   Button,
@@ -216,7 +216,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           ...acc,
           [chainId]: "pending" as const,
         }),
-        {} as Record<string, "pending" | GMPStatus>
+        {} as Record<string, "pending" | GMPTxStatus>
       )
     );
   }, [statuses, targetDeploymentChains]);
