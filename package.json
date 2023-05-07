@@ -24,9 +24,9 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
-    "@commitlint/cli": "^17.6.1",
-    "@commitlint/config-conventional": "^17.6.1",
-    "eslint": "^8.39.0",
+    "@commitlint/cli": "^17.6.3",
+    "@commitlint/config-conventional": "^17.6.3",
+    "eslint": "^8.40.0",
     "husky": "^8.0.3",
     "prettier": "^2.8.8",
     "pretty-quick": "^3.1.3",
