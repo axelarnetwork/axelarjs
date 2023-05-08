@@ -1,5 +1,5 @@
 {
-  "name": "maestro",
+  "name": "@axelarjs/maestro",
   "version": "0.1.0",
   "private": true,
   "scripts": {
