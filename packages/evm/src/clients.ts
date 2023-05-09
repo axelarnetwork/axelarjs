@@ -9,7 +9,6 @@ import {
   baseGoerli,
   celo,
   celoAlfajores,
-  Chain,
   fantom,
   fantomTestnet,
   filecoin,
