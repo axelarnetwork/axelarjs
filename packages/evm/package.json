@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
+    "compile": "tsc --noEmit"
+  },
   "keywords": [],
   "author": "",
   "license": "LicenseRef-LICENSE",
@@ -12,6 +16,7 @@
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
+    "rimraf": "^5.0.0",
     "typescript": "^5.0.4"
   }
 }
