@@ -1,2 +1,5 @@
+# build artifacts
 build/
 contracts/
+clients.js
+index.js
