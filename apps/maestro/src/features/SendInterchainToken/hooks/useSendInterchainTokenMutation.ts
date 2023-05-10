@@ -3,8 +3,8 @@ import {
   Environment,
   GasToken,
 } from "@axelar-network/axelarjs-sdk";
-import { BigNumber } from "ethers";
-import { parseUnits } from "ethers/lib/utils.js";
+import { BigNumber } from "@ethersproject/bignumber";
+import { parseUnits } from "ethers/lib/utils";
 import { useAccount, useMutation, useSigner } from "wagmi";
 
 import { useERC20 } from "~/lib/contract/hooks/useERC20";

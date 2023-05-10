@@ -1,4 +1,4 @@
-import { Logger } from "ethers/lib/utils.js";
+import { Logger } from "ethers/lib/utils";
 import {
   useAccount,
   useMutation,

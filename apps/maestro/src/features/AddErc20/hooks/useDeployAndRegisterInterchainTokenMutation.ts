@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
 import { hexlify, hexZeroPad, Logger } from "ethers/lib/utils";
 import {
   useAccount,

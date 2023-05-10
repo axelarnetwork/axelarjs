@@ -14,6 +14,9 @@
     "@axelarjs/api": "workspace:*",
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/constants": "^5.7.0",
     "@hookform/resolvers": "^3.1.0",
     "@tanstack/react-query": "4.28.0",
     "@trpc/client": "^10.25.0",
@@ -41,7 +44,7 @@
     "superjson": "^1.12.3",
     "tailwind-styled-components": "^2.2.0",
     "typescript": "5.0.4",
-    "viem": "^0.3.17",
+    "viem": "^0.3.19",
     "wagmi": "^0.12.13",
     "zod": "^3.21.4"
   },

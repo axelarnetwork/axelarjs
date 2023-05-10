@@ -1,7 +1,7 @@
 import React from "react";
 
-import { BigNumberish } from "ethers";
-import { formatUnits } from "ethers/lib/utils.js";
+import type { BigNumberish } from "@ethersproject/bignumber";
+import { formatUnits } from "ethers/lib/utils";
 
 export type BigNumberTextProps = {
   children: BigNumberish;
