@@ -366,6 +366,9 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.0
       typescript:
         specifier: ^5.0.4
         version: 5.0.4
