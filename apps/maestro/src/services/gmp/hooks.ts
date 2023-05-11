@@ -78,7 +78,7 @@ export function useGetERC20TokenDetailsQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
 }) {
-  return trpc.gmp.getERC20TokenDetails.useQuery(
+  return trpc.erc20.getERC20TokenDetails.useQuery(
     {
       chainId: Number(input.chainId),
       tokenAddress: String(input.tokenAddress),
@@ -96,7 +96,7 @@ export function useGetERC20TokenBalanceForOwnerQuery(input: {
   tokenAddress?: `0x${string}`;
   owner?: `0x${string}`;
 }) {
-  return trpc.gmp.getERC20TokenBalanceForOwner.useQuery(
+  return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),
       tokenAddress: String(input.tokenAddress),

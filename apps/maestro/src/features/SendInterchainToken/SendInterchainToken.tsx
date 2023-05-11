@@ -302,7 +302,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
               onAllChainsExecuted={async () => {
-                await trpcContext.gmp.getERC20TokenBalanceForOwner.refetch();
+                await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
                 resetForm();
                 setSendTokenStatus({ type: "idle" });
                 toast.success("Tokens sent successfully!");

@@ -179,7 +179,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   });
 
   const { data: tokenDetails, error: tokenDetailsError } =
-    trpc.gmp.getERC20TokenDetails.useQuery({
+    trpc.erc20.getERC20TokenDetails.useQuery({
       chainId: props.chainId,
       tokenAddress: props.tokenAddress,
     });
