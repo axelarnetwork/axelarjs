@@ -1,4 +1,3 @@
-import { ERC20Client } from "@axelarjs/evm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -12,7 +11,7 @@ export const getERC20TokenDetails = publicProcedure
       tokenAddress: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
     })
   )
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx }) => {
     try {
       const chainConfig = EVM_CHAIN_CONFIGS.find(
         (chain) => chain.id === input.chainId
@@ -25,10 +24,10 @@ export const getERC20TokenDetails = publicProcedure
         });
       }
 
-      const client = new ERC20Client({
-        chain: chainConfig,
-        address: input.tokenAddress as `0x${string}`,
-      });
+      const client = ctx.contracts.createERC20Client(
+        chainConfig,
+        input.tokenAddress as `0x${string}`
+      );
 
       const [tokenName, tokenSymbol, decimals] = await Promise.all([
         client.readContract("name"),
