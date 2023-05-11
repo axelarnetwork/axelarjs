@@ -15,7 +15,7 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
-import { BigNumber } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
 import Image from "next/image";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";

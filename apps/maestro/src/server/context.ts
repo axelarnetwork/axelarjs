@@ -1,5 +1,7 @@
+import { ERC20Client, InterchainTokenServiceClient } from "@axelarjs/evm";
 import { inferAsyncReturnType } from "@trpc/server";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Chain } from "wagmi";
 
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
@@ -10,6 +12,10 @@ type ContextConfig = {
   res: NextApiResponse<unknown>;
 };
 
+const DEFAULT_INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
+  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+) as `0x${string}`;
+
 const createContextInner = async ({ req, res }: ContextConfig) => {
   return {
     req,
@@ -18,6 +24,20 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       gmp: gmpClient,
       axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
+    },
+    contracts: {
+      createERC20Client(chain: Chain, address: `0x${string}`) {
+        return new ERC20Client({ chain, address });
+      },
+      createInterchainTokenServiceClient(
+        chain: Chain,
+        address?: `0x${string}`
+      ) {
+        return new InterchainTokenServiceClient({
+          chain,
+          address: address ?? DEFAULT_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+        });
+      },
     },
   };
 };

@@ -9,8 +9,8 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { BigNumber } from "ethers";
-import { isAddress } from "ethers/lib/utils.js";
+import { BigNumber } from "@ethersproject/bignumber";
+import { isAddress } from "ethers/lib/utils";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";

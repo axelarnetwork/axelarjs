@@ -7,7 +7,7 @@ import {
   TextInput,
   Tooltip,
 } from "@axelarjs/ui";
-import { isAddress } from "ethers/lib/utils.js";
+import { isAddress } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";

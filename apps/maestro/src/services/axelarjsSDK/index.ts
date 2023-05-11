@@ -1,5 +1,5 @@
 import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
-import { BigNumber } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 

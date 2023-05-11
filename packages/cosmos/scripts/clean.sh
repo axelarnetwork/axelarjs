@@ -1,0 +1,1 @@
+npx rimraf build contracts clients.js index.js

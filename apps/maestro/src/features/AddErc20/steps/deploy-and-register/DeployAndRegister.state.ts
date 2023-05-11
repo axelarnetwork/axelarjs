@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { EVMChainConfig } from "@axelarjs/api";
-import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils.js";
+import { BigNumber } from "@ethersproject/bignumber";
+import { formatEther } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";

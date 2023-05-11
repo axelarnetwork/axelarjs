@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { publicProcedure } from "~/server/trpc";
-import { ERC20Client } from "~/services/contracts/ERC20";
 
 export const getERC20TokenBalanceForOwner = publicProcedure
   .input(
@@ -13,7 +12,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       owner: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
     })
   )
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx }) => {
     const chainConfig = EVM_CHAIN_CONFIGS.find(
       (chain) => chain.id === input.chainId
     );
@@ -26,18 +25,16 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     }
 
     try {
-      const erc20Client = new ERC20Client(chainConfig);
+      const client = ctx.contracts.createERC20Client(
+        chainConfig,
+        input.tokenAddress as `0x${string}`
+      );
 
       const [tokenBalance, decimals] = await Promise.all([
-        erc20Client.readContractTokenBalance({
-          method: "balanceOf",
-          address: input.tokenAddress as `0x$${string}`,
+        client.readContract("balanceOf", {
           args: [input.owner as `0x$${string}`],
         }),
-        erc20Client.readContract({
-          method: "decimals",
-          address: input.tokenAddress as `0x${string}`,
-        }),
+        client.readContract("decimals"),
       ]);
 
       return {

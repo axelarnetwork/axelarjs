@@ -1,3 +1,4 @@
 {
-  "extends": "@axelarjs/config/tsconfig.strictest"
+  "extends": "@axelarjs/config/tsconfig.strictest",
+  "include": ["src"]
 }

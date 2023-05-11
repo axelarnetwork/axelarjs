@@ -2,8 +2,27 @@
   "name": "@axelarjs/cosmos",
   "version": "0.1.0",
   "description": "Cosmos SDK for Axelar Network",
-  "main": "index.js",
+  "files": [
+    "build",
+    "query-client",
+    "signing-client"
+  ],
+  "exports": {
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
+    }
+  },
   "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit"
   },
   "keywords": [],
@@ -26,6 +45,7 @@
     "@tsconfig/strictest": "^2.0.1",
     "cosmjs-types": "^0.7.2",
     "rambda": "^7.5.0",
+    "rimraf": "^5.0.0",
     "typescript": "^5.0.4",
     "vitest": "^0.31.0"
   }
