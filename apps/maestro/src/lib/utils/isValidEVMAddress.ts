@@ -1,4 +1,4 @@
-import { getAddress } from "ethers/lib/utils.js";
+import { getAddress } from "ethers/lib/utils";
 
 /**
  * type guard for EVM addresses

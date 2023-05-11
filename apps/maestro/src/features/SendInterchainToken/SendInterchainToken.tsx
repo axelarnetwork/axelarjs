@@ -10,8 +10,8 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
-import { BigNumber } from "ethers";
-import { formatUnits, parseUnits } from "ethers/lib/utils.js";
+import { BigNumber } from "@ethersproject/bignumber";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import invariant from "tiny-invariant";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";

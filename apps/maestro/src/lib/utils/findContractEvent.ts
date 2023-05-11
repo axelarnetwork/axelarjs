@@ -1,8 +1,8 @@
-import { ethers } from "ethers";
-import { Interface } from "ethers/lib/utils.js";
+import { TransactionReceipt } from "@ethersproject/abstract-provider";
+import { Interface } from "ethers/lib/utils";
 
 export function getTokenDeployedEventFromTxReceipt(
-  receipt: ethers.providers.TransactionReceipt
+  receipt: TransactionReceipt
 ): `0x${string}` | null {
   const abiInterface = new Interface([
     "event TokenDeployed(address indexed tokenAddress, string name, string symbol, uint8 decimals, uint256 cap, address indexed owner)",

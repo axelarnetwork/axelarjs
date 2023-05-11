@@ -7,7 +7,8 @@
     "cosmos",
     "gogoproto",
     "google",
-    "sifnode"
+    "axelar",
+    "tendermint"
   ],
   "exports": {
     "./*": {
@@ -33,15 +34,15 @@
   },
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "long": "^5.2.1",
+    "long": "^5.2.3",
     "protobufjs": "^7.2.3"
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "degit": "^2.8.4",
     "prettier": "^2.8.8",
-    "rimraf": "^4.4.1",
-    "ts-proto": "^1.146.0",
+    "rimraf": "^5.0.0",
+    "ts-proto": "^1.147.2",
     "typescript": "5.0.4"
   }
 }

@@ -17,7 +17,8 @@
     "docs:dev": "pnpm -C ./apps/docs dev",
     "e2e": "pnpm -C ./apps/e2e run test",
     "changeset": "changeset version",
-    "dev:maestro": "pnpm -C ./apps/maestro run dev"
+    "dev:maestro": "pnpm -C ./apps/maestro run dev",
+    "dev:docs": "pnpm -C ./apps/docs run dev"
   },
   "keywords": [],
   "author": "",

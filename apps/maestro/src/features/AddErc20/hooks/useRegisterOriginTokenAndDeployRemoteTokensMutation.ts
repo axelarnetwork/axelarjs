@@ -1,5 +1,5 @@
-import { BigNumber } from "ethers";
-import { Logger } from "ethers/lib/utils.js";
+import { BigNumber } from "@ethersproject/bignumber";
+import { Logger } from "ethers/lib/utils";
 import {
   useAccount,
   useMutation,

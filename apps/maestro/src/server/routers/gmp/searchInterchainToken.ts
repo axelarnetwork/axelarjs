@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { publicProcedure } from "~/server/trpc";
-import { InterchainTokenLinkerClient } from "~/services/contracts/InterchainTokenLinker";
 
 const isAddressZero = (address: string) => parseInt(address, 16) === 0;
 
@@ -16,7 +15,7 @@ export const searchInterchainToken = publicProcedure
       chainIds: z.array(z.number().or(z.string())),
     })
   )
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx }) => {
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
         (chain) => chain.id === input.chainId,
@@ -30,15 +29,14 @@ export const searchInterchainToken = publicProcedure
         });
       }
 
-      const client = new InterchainTokenLinkerClient(chainConfig);
+      const client =
+        ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
       const [tokenId, originTokenId] = await Promise.all([
-        client.readContract({
-          method: "getTokenId",
+        client.readContract("getTokenId", {
           args: [input.tokenAddress as `0x${string}`],
         }),
-        client.readContract({
-          method: "getOriginTokenId",
+        client.readContract("getOriginTokenId", {
           args: [input.tokenAddress as `0x${string}`],
         }),
       ]);
@@ -50,8 +48,7 @@ export const searchInterchainToken = publicProcedure
         });
       }
 
-      const tokenAddress = await client.readContract({
-        method: "getTokenAddress",
+      const tokenAddress = await client.readContract("getTokenAddress", {
         args: [tokenId],
       });
 
@@ -68,20 +65,21 @@ export const searchInterchainToken = publicProcedure
       const matchingTokens = await Promise.all(
         remainingChainConfigs.map(async (chain) => {
           try {
-            const client = new InterchainTokenLinkerClient(chain);
+            const client =
+              ctx.contracts.createInterchainTokenServiceClient(chain);
 
-            const matchingTokenAddressFromTokenId = await client.readContract({
-              method: "getTokenAddress",
-              args: [tokenId],
-            });
+            const matchingTokenAddressFromTokenId = await client.readContract(
+              "getTokenAddress",
+              {
+                args: [tokenId],
+              }
+            );
 
             const [matchingTokenId, matchingOriginTokenId] = await Promise.all([
-              client.readContract({
-                method: "getTokenId",
+              client.readContract("getTokenId", {
                 args: [matchingTokenAddressFromTokenId as `0x${string}`],
               }),
-              client.readContract({
-                method: "getOriginTokenId",
+              client.readContract("getOriginTokenId", {
                 args: [matchingTokenAddressFromTokenId as `0x${string}`],
               }),
             ]);
