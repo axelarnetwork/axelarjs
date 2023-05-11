@@ -95,6 +95,9 @@ importers:
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@axelarjs/evm':
+        specifier: workspace:*
+        version: link:../../packages/evm
       '@axelarjs/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -350,6 +353,9 @@ importers:
       rambda:
         specifier: ^7.5.0
         version: 7.5.0
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.0
       typescript:
         specifier: ^5.0.4
         version: 5.0.4

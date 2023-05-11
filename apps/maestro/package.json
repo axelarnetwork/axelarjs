@@ -12,6 +12,7 @@
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "0.12.5",
     "@axelarjs/api": "workspace:*",
+    "@axelarjs/evm": "workspace:*",
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "@ethersproject/abstract-provider": "^5.7.0",

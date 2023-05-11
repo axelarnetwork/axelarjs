@@ -1,9 +1,9 @@
+import { ERC20Client } from "@axelarjs/evm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { publicProcedure } from "~/server/trpc";
-import { ERC20Client } from "~/services/contracts/ERC20";
 
 export const getERC20TokenDetails = publicProcedure
   .input(
@@ -25,21 +25,15 @@ export const getERC20TokenDetails = publicProcedure
         });
       }
 
-      const client = new ERC20Client(chainConfig);
+      const client = new ERC20Client({
+        chain: chainConfig,
+        address: input.tokenAddress as `0x${string}`,
+      });
 
       const [tokenName, tokenSymbol, decimals] = await Promise.all([
-        client.readContract({
-          method: "name",
-          address: input.tokenAddress as `0x${string}`,
-        }),
-        client.readContract({
-          method: "symbol",
-          address: input.tokenAddress as `0x${string}`,
-        }),
-        client.readContract({
-          method: "decimals",
-          address: input.tokenAddress as `0x${string}`,
-        }),
+        client.readContract("name"),
+        client.readContract("symbol"),
+        client.readContract("decimals"),
       ]);
 
       return {
