@@ -1,4 +1,8 @@
-import { createPublicClient as _createPublicClient, http } from "viem";
+import {
+  createPublicClient as _createPublicClient,
+  http,
+  PublicClient,
+} from "viem";
 import {
   arbitrum,
   arbitrumGoerli,
@@ -42,20 +46,26 @@ const TESTNET_CHAINS = {
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
 
-export function createPublicClient(chainName: SupportedMainnetChain) {
+export function createPublicClient(
+  chainName: SupportedMainnetChain
+): PublicClient {
   const chain = MAINNET_CHAINS[chainName];
 
-  return _createPublicClient({
+  const client = _createPublicClient({
     chain,
     transport: http(`${chain.rpcUrls.default.http[0]}`),
   });
+  return client;
 }
 
-export function createPublicTestnetClient(chainName: SupportedTestnetChain) {
+export function createPublicTestnetClient(
+  chainName: SupportedTestnetChain
+): PublicClient {
   const chain = TESTNET_CHAINS[chainName];
 
-  return _createPublicClient({
+  const client = _createPublicClient({
     chain,
     transport: http(`${chain.rpcUrls.default.http[0]}`),
   });
+  return client;
 }

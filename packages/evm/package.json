@@ -1,8 +1,30 @@
 {
   "name": "@axelarjs/evm",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
+  "description": "EVM clients & utils",
+  "files": [
+    "./build",
+    "./contracts",
+    "./index.js",
+    "./clients.js"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
+    }
+  },
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",

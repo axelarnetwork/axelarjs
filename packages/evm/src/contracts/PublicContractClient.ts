@@ -1,4 +1,10 @@
-import { Chain, createPublicClient, http, ReadContractParameters } from "viem";
+import {
+  Chain,
+  ContractFunctionResult,
+  createPublicClient,
+  http,
+  ReadContractParameters,
+} from "viem";
 import { mainnet } from "viem/chains";
 
 type PublicClientType = ReturnType<typeof createPublicClient>;
@@ -28,24 +34,32 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     TMethod extends ReadContractParameters<TAbi>["functionName"]
   >(
     method: TMethod,
-    action: Omit<
+    params?: Omit<
       ReadContractParameters<TAbi, TMethod>,
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
     }
-  ) {
-    const address = action.address ?? this.address;
+  ): Promise<ContractFunctionResult<TAbi, TMethod>> {
+    const address = params?.address ?? this.address;
 
     if (!address) {
       throw new Error("No address provided");
     }
 
-    return this.client.readContract({
+    const contractParams = {
       address,
       abi: this.abi,
       functionName: method,
-      ...action,
-    } as ReadContractParameters<TAbi, TMethod>);
+    };
+
+    if (params?.args) {
+      // @ts-ignore
+      contractParams["args"] = params.args;
+    }
+
+    return this.client.readContract(
+      contractParams as ReadContractParameters<TAbi, TMethod>
+    );
   }
 }
