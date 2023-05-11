@@ -1,11 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { Logger } from "ethers/lib/utils";
-import {
-  useAccount,
-  useMutation,
-  UserRejectedRequestError,
-  useSigner,
-} from "wagmi";
+import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
 
@@ -21,7 +16,7 @@ export type UseDeployRemoteTokenInput = {
 };
 
 export function useDeployRemoteTokensMutation() {
-  const signer = useSigner();
+  const signer = useWalletClient();
 
   const { address } = useAccount();
 
@@ -65,7 +60,7 @@ export function useDeployRemoteTokensMutation() {
       if (e instanceof Error && "code" in e) {
         switch (e.code) {
           case Logger.errors.ACTION_REJECTED:
-            throw new UserRejectedRequestError("User rejected the transaction");
+            throw new Error("User rejected the transaction");
           default:
             throw new Error("Transaction reverted by EVM");
         }

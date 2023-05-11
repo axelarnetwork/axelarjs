@@ -5,7 +5,7 @@ import {
 } from "@axelar-network/axelarjs-sdk";
 import { BigNumber } from "@ethersproject/bignumber";
 import { parseUnits } from "ethers/lib/utils";
-import { useAccount, useMutation, useSigner } from "wagmi";
+import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useERC20 } from "~/lib/contract/hooks/useERC20";
 import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
@@ -53,7 +53,7 @@ const AXELAR_QUERY_API = new AxelarQueryAPI({
 export function useSendInterchainTokenMutation(
   config: UseSendInterchainTokenConfig
 ) {
-  const signer = useSigner();
+  const signer = useWalletClient();
   const erc20 = useERC20({
     address: config.tokenAddress,
     signerOrProvider: signer.data,
