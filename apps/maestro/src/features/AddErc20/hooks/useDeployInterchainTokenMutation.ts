@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import { InterchainTokenServiceClient } from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { hexlify, hexZeroPad, Logger } from "ethers/lib/utils";
 import {
@@ -14,6 +14,10 @@ import { watchContractEvent } from "wagmi/actions";
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
+
+const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
+  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+) as `0x${string}`;
 
 export type UseDeployAndRegisterInterchainTokenInput = {
   sourceChainId: string;
@@ -37,9 +41,7 @@ export function useDeployInterchainTokenMutation(config: {
     writeAsync: deployInterchainTokenAsync,
     data: deployInterchainTokenResult,
   } = useInterchainTokenServiceDeployInterchainToken({
-    address: String(
-      process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-    ) as `0x${string}`,
+    address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
     gas: config.gas,
   });
 
@@ -52,15 +54,14 @@ export function useDeployInterchainTokenMutation(config: {
     gasFees: [],
   });
 
+  // to prevent duplicate events
   const deployedRef = useRef(false);
 
   const unwatch = watchContractEvent(
     {
-      address: String(
-        process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-      ) as `0x${string}`,
+      address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
       eventName: "TokenDeployed",
-      abi: InterchainTokenServiceClient.ABI,
+      abi: INTERCHAIN_TOKEN_SERVICE_ABI,
     },
     (logs) => {
       const log = logs.find(
