@@ -3,12 +3,15 @@ import {
   Environment,
   GasToken,
 } from "@axelar-network/axelarjs-sdk";
-import { BigNumber } from "@ethersproject/bignumber";
 import { parseUnits } from "ethers/lib/utils";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import { useERC20 } from "~/lib/contract/hooks/useERC20";
-import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import {
+  useERC20Approve,
+  useERC20Reads,
+  useERC20Writes,
+} from "~/lib/contract/hooks/useERC20";
+import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
 
 export const gasTokenMap: Record<string, GasToken> = {
   avalanche: GasToken.AVAX,
@@ -50,40 +53,38 @@ const AXELAR_QUERY_API = new AxelarQueryAPI({
   environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
 });
 
+const TOKEN_LINKER_ADDRESS = String(
+  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+) as `0x${string}`;
+
 export function useSendInterchainTokenMutation(
   config: UseSendInterchainTokenConfig
 ) {
-  const signer = useWalletClient();
-  const erc20 = useERC20({
+  const { data: walletClient } = useWalletClient();
+  const erc20Reads = useERC20Reads({
     address: config.tokenAddress,
-    signerOrProvider: signer.data,
+  });
+
+  const { writeAsync: approveERC20Spend } = useERC20Approve({
+    address: config.tokenAddress,
   });
 
   const { address } = useAccount();
 
-  const tokenLinker = useInterchainTokenLinker({
-    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
-    signerOrProvider: signer.data,
+  const tokenLinker = useInterchainTokenServiceWrites({
+    address: TOKEN_LINKER_ADDRESS,
+    walletClient,
   });
 
   return useMutation(async (input: UseSendInterchainTokenInput) => {
-    if (!(erc20 && address && tokenLinker)) {
-      console.log("useMutation SendInterchainTokenModal: return erc20", erc20);
-      console.log(
-        "useMutation SendInterchainTokenModal: return address",
-        address
-      );
-      console.log(
-        "useMutation SendInterchainTokenModal: return tokenLInker",
-        tokenLinker
-      );
+    if (!(erc20Reads && address && tokenLinker)) {
       return;
     }
 
     const { toNetwork, fromNetwork, onFinished, onStatusUpdate } = input;
 
-    const decimals = await erc20.decimals();
-    const bnAmount = BigNumber.from(parseUnits(input.amount ?? "0", decimals));
+    const decimals = await erc20Reads.decimals();
+    const bnAmount = parseUnits(input.amount ?? "0", decimals).toBigInt();
 
     const gas = await AXELAR_QUERY_API.estimateGasFee(
       fromNetwork,
@@ -97,19 +98,13 @@ export function useSendInterchainTokenMutation(
         type: "awaiting_approval",
       });
 
-      const tx = await erc20.approve(tokenLinker.address, bnAmount);
-
-      onStatusUpdate?.({
-        type: "awaiting_confirmation",
-        txHash: tx.hash as `0x${string}`,
+      const tx = await approveERC20Spend({
+        args: [TOKEN_LINKER_ADDRESS, bnAmount],
       });
-
-      // wait for tx to be mined
-      await tx.wait(1);
 
       onStatusUpdate?.({
         type: "confirmed",
-        txHash: tx.hash as `0x${string}`,
+        txHash: tx.hash,
       });
     } catch (e) {
       if (e instanceof Error) {
@@ -126,20 +121,15 @@ export function useSendInterchainTokenMutation(
 
     try {
       //send token
-      const sendTokenTx = await tokenLinker.sendToken(
-        input.tokenId,
-        input.toNetwork,
-        address,
-        bnAmount,
-        { value: BigNumber.from(gas).mul(2) }
+      const sendTokenTxHash = await tokenLinker.sendToken(
+        [input.tokenId, input.toNetwork, address, bnAmount],
+        { value: BigInt(gas) * BigInt(2) }
       );
 
       onStatusUpdate?.({
         type: "sending",
-        txHash: sendTokenTx.hash as `0x${string}`,
+        txHash: sendTokenTxHash,
       });
-
-      await sendTokenTx.wait(1);
 
       if (onFinished) {
         onFinished();

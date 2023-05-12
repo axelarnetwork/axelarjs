@@ -15,14 +15,12 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
-import { BigNumber } from "@ethersproject/bignumber";
 import Image from "next/image";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import { useAddErc20StateContainer } from "../../AddErc20.state";
-import { useDeployAndRegisterInterchainTokenMutation } from "../../hooks/useDeployAndRegisterInterchainTokenMutation";
-import { useRegisterOriginTokenAndDeployRemoteTokensMutation } from "../../hooks/useRegisterOriginTokenAndDeployRemoteTokensMutation";
+import { useDeployInterchainTokenMutation } from "../../hooks/useDeployInterchainTokenMutation";
 import { NextButton, PrevButton } from "../core";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
@@ -32,29 +30,23 @@ export const Step3: FC = () => {
 
   const { state, actions } = useStep3ChainSelectionState();
 
-  const {
-    mutateAsync: deployAndRegisterToken,
-    error: deployAndRegisterTokenError,
-  } = useDeployAndRegisterInterchainTokenMutation();
+  const gas = state.gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(1);
 
   const {
-    mutateAsync: registerPreExistingToken,
-    error: registerPreExistingTokenError,
-  } = useRegisterOriginTokenAndDeployRemoteTokensMutation();
+    mutateAsync: deployInterchainToken,
+    error: deployInterchainTokenError,
+  } = useDeployInterchainTokenMutation({
+    gas,
+    onStatusUpdate: (txState) => {
+      if (txState.type === "deployed") {
+        rootActions.setTxState(txState);
+        rootActions.nextStep();
+        actions.setIsDeploying(false);
+      }
+    },
+  });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (rootState.isPreExistingToken) {
-      handleRegisterPreExistingToken(e);
-    } else {
-      handleDeployAndRegisterToken(e);
-    }
-  };
-
-  const handleDeployAndRegisterToken = useCallback<
-    FormEventHandler<HTMLFormElement>
-  >(
+  const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (e) => {
       e.preventDefault();
 
@@ -68,31 +60,16 @@ export const Step3: FC = () => {
       }
       actions.setIsDeploying(true);
 
-      const decimalAdjustment = BigNumber.from(10).pow(
-        rootState.tokenDetails.tokenDecimals
-      );
-      const amountToMint = BigNumber.from(
-        rootState.tokenDetails.amountToMint
-      ).mul(decimalAdjustment);
-
-      await deployAndRegisterToken(
+      await deployInterchainToken(
         {
           tokenName: rootState.tokenDetails.tokenName,
           tokenSymbol: rootState.tokenDetails.tokenSymbol,
           decimals: rootState.tokenDetails.tokenDecimals,
           destinationChainIds: Array.from(rootState.selectedChains),
-          amountToMint,
           gasFees: state.gasFees,
           sourceChainId: state.evmChains?.find(
             (evmChain) => evmChain.chain_id === state.network.chain?.id
           )?.chain_name as string,
-          onStatusUpdate: (txState) => {
-            if (txState.type === "deployed") {
-              rootActions.setTxState(txState);
-              rootActions.nextStep();
-              actions.setIsDeploying(false);
-            }
-          },
         },
         {
           onError(error) {
@@ -112,63 +89,10 @@ export const Step3: FC = () => {
       state.network.chain?.id,
       actions,
       rootState.tokenDetails.tokenDecimals,
-      rootState.tokenDetails.amountToMint,
       rootState.tokenDetails.tokenName,
       rootState.tokenDetails.tokenSymbol,
       rootState.selectedChains,
-      deployAndRegisterToken,
-      rootActions,
-    ]
-  );
-
-  const handleRegisterPreExistingToken = useCallback<
-    FormEventHandler<HTMLFormElement>
-  >(
-    async (e) => {
-      e.preventDefault();
-
-      if (
-        state.isGasPriceQueryLoading ||
-        state.isGasPriceQueryError ||
-        !state.gasFees
-      ) {
-        console.warn("gas prices not loaded");
-        return;
-      }
-      actions.setIsDeploying(true);
-
-      await registerPreExistingToken(
-        {
-          tokenAddress: rootState.tokenDetails.tokenAddress as `0x${string}`,
-          destinationChainIds: Array.from(rootState.selectedChains),
-          gasFees: state.gasFees,
-          onStatusUpdate: (txState) => {
-            if (txState.type === "deployed") {
-              rootActions.setTxState(txState);
-              rootActions.nextStep();
-              actions.setIsDeploying(false);
-            }
-          },
-        },
-        {
-          onError(error) {
-            actions.setIsDeploying(false);
-            if (error instanceof Error) {
-              toast.error(`Failed to register token: ${error?.message}`);
-            }
-          },
-        }
-      );
-    },
-    [
-      state.isGasPriceQueryLoading,
-      state.isGasPriceQueryError,
-      state.gasFees,
-      actions,
-      registerPreExistingToken,
-      rootState.tokenDetails.tokenAddress,
-      rootState.selectedChains,
-      rootActions,
+      deployInterchainToken,
     ]
   );
 
@@ -182,9 +106,7 @@ export const Step3: FC = () => {
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);
 
-  const hasTxError = Boolean(
-    deployAndRegisterTokenError || registerPreExistingTokenError
-  );
+  const hasTxError = Boolean(deployInterchainTokenError);
 
   return (
     <>

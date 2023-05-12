@@ -1,5 +1,5 @@
-import { TransactionReceipt } from "@ethersproject/abstract-provider";
 import { Interface } from "ethers/lib/utils";
+import { TransactionReceipt } from "viem";
 
 export function getTokenDeployedEventFromTxReceipt(
   receipt: TransactionReceipt

@@ -1,15 +1,14 @@
-import { BigNumber } from "@ethersproject/bignumber";
 import { Logger } from "ethers/lib/utils";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseRegisterInterchainTokenInput = {
   tokenAddress: `0x${string}`;
   destinationChainIds: string[];
-  gasFees: BigNumber[];
+  gasFees: bigint[];
   onFinished?: () => void;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
@@ -19,9 +18,10 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
 
   const { address } = useAccount();
 
-  const tokenLinker = useInterchainTokenLinker({
-    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
-    signerOrProvider: signer.data,
+  const tokenLinker = useInterchainTokenServiceWrites({
+    address: String(
+      process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+    ) as `0x${string}`,
   });
 
   return useMutation(async (input: UseRegisterInterchainTokenInput) => {
@@ -32,24 +32,16 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
     try {
       //register tokens
 
-      const value = input.gasFees.reduce(
-        (a, b) => a.add(BigNumber.from(b)),
-        BigNumber.from(0)
+      const value = input.gasFees.reduce((a, b) => a + b, BigInt(0));
+      const txHash = await tokenLinker.registerOriginTokenAndDeployRemoteTokens(
+        [input.tokenAddress, input.destinationChainIds, input.gasFees],
+        { value }
       );
-      const registerTokensTx =
-        await tokenLinker.registerOriginTokenAndDeployRemoteTokens(
-          input.tokenAddress,
-          input.destinationChainIds,
-          input.gasFees,
-          { value }
-        );
-
-      const txDone = await registerTokensTx.wait(1);
 
       if (input.onStatusUpdate) {
         input.onStatusUpdate({
           type: "deployed",
-          txHash: txDone.transactionHash as `0x${string}`,
+          txHash: txHash,
           tokenAddress: input.tokenAddress,
         });
       }

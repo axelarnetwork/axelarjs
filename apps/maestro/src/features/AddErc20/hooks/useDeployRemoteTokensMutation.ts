@@ -1,8 +1,11 @@
-import { BigNumber } from "@ethersproject/bignumber";
 import { Logger } from "ethers/lib/utils";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import {
+  useInterchainTokenServiceDeployInterchainToken,
+  useInterchainTokenServiceDeployRemoteTokens,
+  useInterchainTokenServiceWrites,
+} from "~/lib/contract/hooks/useInterchainTokenService";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -10,42 +13,38 @@ export type UseDeployRemoteTokenInput = {
   tokenId: `0x${string}`;
   tokenAddress: `0x${string}`;
   destinationChainIds: string[];
-  gasFees: BigNumber[];
+  gasFees: bigint[];
   onFinished?: () => void;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
 };
 
-export function useDeployRemoteTokensMutation() {
+export function useDeployRemoteTokensMutation(gas: bigint) {
   const signer = useWalletClient();
 
   const { address } = useAccount();
 
-  const tokenLinker = useInterchainTokenLinker({
-    address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
-    signerOrProvider: signer.data,
+  const { writeAsync } = useInterchainTokenServiceDeployRemoteTokens({
+    address: String(
+      process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+    ) as `0x${string}`,
+    gas,
   });
 
   return useMutation(async (input: UseDeployRemoteTokenInput) => {
-    if (!(signer && tokenLinker && address)) {
+    if (!(signer && address)) {
       return;
     }
 
     try {
       //deploy remote tokens
-      const value = input.gasFees.reduce((a, b) => a.add(b), BigNumber.from(0));
-      const deployRemoteTokensTx = await tokenLinker.deployRemoteTokens(
-        input.tokenId,
-        input.destinationChainIds,
-        input.gasFees,
-        { value }
-      );
-
-      const txDone = await deployRemoteTokensTx.wait(1);
+      const deployRemoteTokensTx = await writeAsync({
+        args: [input.tokenId, input.destinationChainIds, input.gasFees],
+      });
 
       if (input.onStatusUpdate) {
         input.onStatusUpdate({
           type: "deployed",
-          txHash: txDone.transactionHash as `0x${string}`,
+          txHash: deployRemoteTokensTx.hash,
           tokenAddress: input.tokenAddress,
         });
       }

@@ -1,5 +1,4 @@
 import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
-import { BigNumber } from "@ethersproject/bignumber";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 
@@ -12,10 +11,8 @@ export const client = new AxelarQueryAPI({
   environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
 });
 
-async function estimateGasFee(
-  params: EstimateGasFeeParams
-): Promise<BigNumber> {
-  const fee = BigNumber.from(
+async function estimateGasFee(params: EstimateGasFeeParams): Promise<bigint> {
+  const fee = BigInt(
     await client.estimateGasFee(
       params.sourceChainId,
       params.destinationChainId,
@@ -32,7 +29,7 @@ async function estimateGasFee(
 
 async function estimateGasFeeMultipleChains(
   params: EstimateGasFeeMultipleChainsParams
-): Promise<BigNumber[]> {
+): Promise<bigint[]> {
   return await Promise.all([
     ...params.destinationChainIds.map((destinationChainId) =>
       estimateGasFee({

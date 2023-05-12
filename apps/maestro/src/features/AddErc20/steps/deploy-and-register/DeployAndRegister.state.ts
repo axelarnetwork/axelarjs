@@ -47,7 +47,7 @@ export function useStep3ChainSelectionState() {
     _setTotalGasFee(formatEther(BigNumber.from(0)));
   };
 
-  const setTotalGasFee = (gasFees: BigNumber[]) => {
+  const setTotalGasFee = (gasFees: bigint[]) => {
     const num = +formatEther(
       gasFees.reduce((a, b) => a.add(BigNumber.from(b)), BigNumber.from(0))
     );

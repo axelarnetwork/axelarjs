@@ -1,7 +1,7 @@
 import { Logger } from "ethers/lib/utils";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import { useInterchainTokenLinker } from "~/lib/contract/hooks/useInterchainTokenLinker";
+import { useInterchainTokenServiceReads } from "~/lib/contract/hooks/useInterchainTokenService";
 import { logger } from "~/lib/logger";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -17,7 +17,7 @@ export function useRegisterOriginTokenMutation() {
 
   const { address } = useAccount();
 
-  const tokenLinker = useInterchainTokenLinker({
+  const tokenLinker = useInterchainTokenServiceReads({
     address: String(process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS),
     signerOrProvider: signer.data,
   });
