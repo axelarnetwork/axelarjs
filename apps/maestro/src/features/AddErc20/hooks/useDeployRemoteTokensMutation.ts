@@ -1,11 +1,7 @@
 import { Logger } from "ethers/lib/utils";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import {
-  useInterchainTokenServiceDeployInterchainToken,
-  useInterchainTokenServiceDeployRemoteTokens,
-  useInterchainTokenServiceWrites,
-} from "~/lib/contract/hooks/useInterchainTokenService";
+import { useInterchainTokenServiceDeployRemoteTokens } from "~/lib/contract/hooks/useInterchainTokenService";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 

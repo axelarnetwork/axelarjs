@@ -10,7 +10,11 @@ export function getTokenDeployedEventFromTxReceipt(
 
   for (const log of receipt.logs) {
     try {
-      const parsed = abiInterface.parseLog(log);
+      const parsed = abiInterface.parseLog({
+        topics: log.topics,
+        data: log.data,
+      });
+      console.log({ parsed });
       if (parsed?.args?.tokenAddress) {
         return parsed.args.tokenAddress;
       }

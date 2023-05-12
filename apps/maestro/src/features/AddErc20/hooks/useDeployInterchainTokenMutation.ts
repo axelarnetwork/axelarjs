@@ -1,3 +1,7 @@
+import { useRef, useState } from "react";
+
+import { InterchainTokenServiceClient } from "@axelarjs/evm";
+import { toast } from "@axelarjs/ui";
 import { hexlify, hexZeroPad, Logger } from "ethers/lib/utils";
 import {
   useAccount,
@@ -5,9 +9,9 @@ import {
   useWaitForTransaction,
   useWalletClient,
 } from "wagmi";
+import { watchContractEvent } from "wagmi/actions";
 
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
-import { getTokenDeployedEventFromTxReceipt } from "~/lib/utils/findContractEvent";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -39,6 +43,57 @@ export function useDeployInterchainTokenMutation(config: {
     gas: config.gas,
   });
 
+  const [input, setInput] = useState<UseDeployAndRegisterInterchainTokenInput>({
+    sourceChainId: "",
+    tokenName: "",
+    tokenSymbol: "",
+    decimals: 0,
+    destinationChainIds: [],
+    gasFees: [],
+  });
+
+  const deployedRef = useRef(false);
+
+  const unwatch = watchContractEvent(
+    {
+      address: String(
+        process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+      ) as `0x${string}`,
+      eventName: "TokenDeployed",
+      abi: InterchainTokenServiceClient.ABI,
+    },
+    (logs) => {
+      const log = logs.find(
+        (log) =>
+          Boolean(log.args?.tokenAddress) &&
+          log?.args.decimals === input.decimals &&
+          log?.args.name === input.tokenName &&
+          log?.args.symbol === input.tokenSymbol &&
+          log?.args.owner === address
+      );
+
+      if (!log || deployedRef.current) {
+        return;
+      }
+
+      unwatch();
+
+      deployedRef.current = true;
+
+      console.log("onStatusUpdate", {
+        type: "deployed",
+        tokenAddress: log.args?.tokenAddress as `0x${string}`,
+        txHash: deployInterchainTokenResult?.hash as `0x${string}`,
+      });
+
+      config.onStatusUpdate?.({
+        type: "deployed",
+        tokenAddress: log.args?.tokenAddress as `0x${string}`,
+        txHash: deployInterchainTokenResult?.hash as `0x${string}`,
+      });
+    }
+  );
+
   useWaitForTransaction({
     hash: deployInterchainTokenResult?.hash,
     onSuccess(receipt) {
@@ -46,15 +101,9 @@ export function useDeployInterchainTokenMutation(config: {
         return;
       }
 
-      if (config.onStatusUpdate) {
-        config.onStatusUpdate({
-          type: "deployed",
-          txHash: deployInterchainTokenResult.hash,
-          tokenAddress: getTokenDeployedEventFromTxReceipt(
-            receipt
-          ) as `0x${string}`,
-        });
-      }
+      console.log("onSuccess", { receipt });
+
+      toast.success("Token deployed");
     },
   });
 
@@ -64,9 +113,14 @@ export function useDeployInterchainTokenMutation(config: {
         return;
       }
 
+      setInput(input);
+
       try {
         //deploy and register tokens
-        const salt = hexZeroPad(hexlify(0), 32) as `0x${string}`;
+        const salt = hexZeroPad(
+          hexlify(Math.floor(Math.random() * 1_000_000_000)),
+          32
+        ) as `0x${string}`;
 
         await deployInterchainTokenAsync({
           args: [

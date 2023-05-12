@@ -50,9 +50,9 @@ export function useInterchainTokenServiceDeployInterchainToken(
   }
 ) {
   return useContractWrite({
-    address: config.address,
     abi: ABI,
     functionName: "deployInterchainToken",
+    address: config.address,
     value: config.gas,
   });
 }

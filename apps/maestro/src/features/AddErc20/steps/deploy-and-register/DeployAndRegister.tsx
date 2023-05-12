@@ -1,6 +1,5 @@
 import React, {
   FC,
-  FormEvent,
   FormEventHandler,
   useCallback,
   useMemo,
@@ -30,13 +29,11 @@ export const Step3: FC = () => {
 
   const { state, actions } = useStep3ChainSelectionState();
 
-  const gas = state.gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(1);
-
   const {
     mutateAsync: deployInterchainToken,
     error: deployInterchainTokenError,
   } = useDeployInterchainTokenMutation({
-    gas,
+    gas: BigInt(0),
     onStatusUpdate: (txState) => {
       if (txState.type === "deployed") {
         rootActions.setTxState(txState);
@@ -74,6 +71,7 @@ export const Step3: FC = () => {
         {
           onError(error) {
             actions.setIsDeploying(false);
+
             if (error instanceof Error) {
               toast.error(`Failed to register token: ${error?.message}`);
             }

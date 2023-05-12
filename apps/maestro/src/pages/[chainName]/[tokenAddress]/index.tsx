@@ -35,7 +35,7 @@ import {
 const InterchainTokensPage = () => {
   const { chainName, tokenAddress } = useRouter().query as {
     chainName: string;
-    tokenAddress: string;
+    tokenAddress: `0x${string}`;
   };
 
   const routeChain = useChainFromRoute();
@@ -195,9 +195,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const [deployTokensTxHash, setDeployTokensTxHash] = useState<`0x${string}`>();
 
-  const { mutateAsync: deployRemoteTokens, isLoading: isDeploying } =
-    useDeployRemoteTokensMutation();
-
   const targetDeploymentChains = useMemo(() => {
     return selectedChainIds
       .map((x) => unregistered.find((y) => y.chainId === x)?.chain.id)
@@ -260,6 +257,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     gasLimit: 1_000_000,
     gasMultipler: 2,
   });
+
+  const { mutateAsync: deployRemoteTokens, isLoading: isDeploying } =
+    useDeployRemoteTokensMutation(
+      gasFees?.reduce((acc, x) => acc + x, BigInt(0)) ?? BigInt(0)
+    );
 
   const handleDeployRemoteTokens = useCallback(async () => {
     if (!(props.chainId && interchainToken?.tokenId && gasFees)) {

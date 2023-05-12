@@ -6,11 +6,7 @@ import {
 import { parseUnits } from "ethers/lib/utils";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import {
-  useERC20Approve,
-  useERC20Reads,
-  useERC20Writes,
-} from "~/lib/contract/hooks/useERC20";
+import { useERC20Approve, useERC20Reads } from "~/lib/contract/hooks/useERC20";
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
 
 export const gasTokenMap: Record<string, GasToken> = {
