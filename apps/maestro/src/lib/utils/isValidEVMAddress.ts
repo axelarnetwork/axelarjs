@@ -1,4 +1,4 @@
-import { getAddress } from "ethers/lib/utils";
+import { getAddress } from "viem";
 
 /**
  * type guard for EVM addresses

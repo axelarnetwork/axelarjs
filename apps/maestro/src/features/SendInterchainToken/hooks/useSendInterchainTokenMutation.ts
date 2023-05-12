@@ -3,7 +3,7 @@ import {
   Environment,
   GasToken,
 } from "@axelar-network/axelarjs-sdk";
-import { parseUnits } from "ethers/lib/utils";
+import { parseUnits } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useERC20Approve, useERC20Reads } from "~/lib/contract/hooks/useERC20";
@@ -80,7 +80,7 @@ export function useSendInterchainTokenMutation(
     const { toNetwork, fromNetwork, onFinished, onStatusUpdate } = input;
 
     const decimals = await erc20Reads.decimals();
-    const bnAmount = parseUnits(input.amount ?? "0", decimals).toBigInt();
+    const bnAmount = parseUnits(`${Number(input.amount)}`, decimals);
 
     const gas = await AXELAR_QUERY_API.estimateGasFee(
       fromNetwork,

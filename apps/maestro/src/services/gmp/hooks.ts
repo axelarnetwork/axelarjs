@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 
 import { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
-import { AddressZero } from "@ethersproject/constants";
-import { isAddress } from "ethers/lib/utils";
 import { uniq } from "rambda";
+import { isAddress } from "viem";
 import { useQuery } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
@@ -107,7 +106,7 @@ export function useGetERC20TokenBalanceForOwnerQuery(input: {
         Boolean(input.chainId) &&
         isAddress(input.tokenAddress ?? "") &&
         isAddress(input.owner ?? "") &&
-        input.tokenAddress !== AddressZero,
+        parseInt(String(input.tokenAddress), 16) !== 0,
     }
   );
 }

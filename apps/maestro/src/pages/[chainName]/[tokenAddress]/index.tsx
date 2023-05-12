@@ -9,11 +9,10 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { BigNumber } from "@ethersproject/bignumber";
-import { isAddress } from "ethers/lib/utils";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";
+import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
@@ -356,10 +355,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                         maximumFractionDigits: 4,
                       }}
                     >
-                      {gasFees.reduce(
-                        (acc, x) => acc.add(x),
-                        BigNumber.from(0)
-                      )}
+                      {gasFees.reduce((a, b) => a + b)}
                     </BigNumberText>{" "}
                     {getNativeToken(interchainToken.chain.id)}
                   </div>

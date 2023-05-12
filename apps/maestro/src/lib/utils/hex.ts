@@ -137,9 +137,8 @@ export function hexlify(value: HexIsh, options?: DataOptions): string {
 }
 
 export function hexZeroPad(value: BytesLike, length: number): string {
-  let result = value as string;
   if (typeof value !== "string") {
-    result = hexlify(value);
+    value = hexlify(value);
   } else if (!isHexString(value)) {
     // logger.throwArgumentError("invalid hex string", "value", value);
     throw new Error("invalid hex string");
@@ -151,8 +150,8 @@ export function hexZeroPad(value: BytesLike, length: number): string {
   }
 
   while (value.length < 2 * length + 2) {
-    result = `0x0${result.substring(2)}`;
+    value = `0x0${value.substring(2)}`;
   }
 
-  return result;
+  return value;
 }

@@ -1,11 +1,10 @@
 import React from "react";
 
-import type { BigNumberish } from "@ethersproject/bignumber";
-import { formatUnits } from "ethers/lib/utils";
+import { formatUnits } from "viem";
 
 export type BigNumberTextProps = {
-  children: BigNumberish;
-  decimals?: number | string;
+  children: bigint;
+  decimals?: number;
   locales?: Intl.LocalesArgument;
   localeOptions?: Intl.NumberFormatOptions;
 };
@@ -13,7 +12,7 @@ export type BigNumberTextProps = {
 const BigNumberText = (props: BigNumberTextProps) => {
   return (
     <>
-      {Number(formatUnits(props.children, props.decimals)).toLocaleString(
+      {Number(formatUnits(props.children, props.decimals ?? 0)).toLocaleString(
         props.locales,
         props.localeOptions
       )}

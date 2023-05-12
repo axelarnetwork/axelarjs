@@ -10,9 +10,8 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
-import { BigNumber } from "@ethersproject/bignumber";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
 import invariant from "tiny-invariant";
+import { formatUnits, parseUnits } from "viem";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -241,22 +240,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   setValue(
                     "amountToSend",
                     formatUnits(
-                      props.balance.tokenBalance,
-                      props.balance.decimals
+                      BigInt(props.balance.tokenBalance),
+                      Number(props.balance.decimals)
                     ).replace(/,/gi, "")
                   );
                 }}
               >
                 Balance:{" "}
                 <BigNumberText
-                  decimals={props.balance.decimals}
+                  decimals={Number(props.balance.decimals)}
                   localeOptions={{
                     style: "decimal",
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 4,
                   }}
                 >
-                  {props.balance.tokenBalance}
+                  {BigInt(props.balance.tokenBalance)}
                 </BigNumberText>
               </Label.AltText>
             </Label>
@@ -283,13 +282,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Amount must be greater than 0";
                   }
 
-                  const bnValue = BigNumber.from(value);
                   const bnBalance = parseUnits(
-                    props.balance.tokenBalance,
-                    props.balance.decimals
+                    `${Number(props.balance.tokenBalance)}`,
+                    Number(props.balance.decimals)
                   );
 
-                  if (bnValue.gt(bnBalance)) {
+                  if (BigInt(value) > bnBalance) {
                     return "Insufficient balance";
                   }
 

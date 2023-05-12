@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
-
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
-import { toast } from "@axelarjs/ui";
-import { hexlify, hexZeroPad, Logger } from "ethers/lib/utils";
+import {
+  ContractFunctionRevertedError,
+  TransactionExecutionError,
+  UserRejectedRequestError,
+} from "viem";
 import {
   useAccount,
   useMutation,
@@ -12,6 +13,7 @@ import {
 import { watchContractEvent } from "wagmi/actions";
 
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
+import { hexlify, hexZeroPad } from "~/lib/utils/hex";
 
 import { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -45,17 +47,17 @@ export function useDeployInterchainTokenMutation(config: {
     gas: config.gas,
   });
 
-  const [input, setInput] = useState<UseDeployAndRegisterInterchainTokenInput>({
+  let currentInput: UseDeployAndRegisterInterchainTokenInput = {
     sourceChainId: "",
     tokenName: "",
     tokenSymbol: "",
     decimals: 0,
     destinationChainIds: [],
     gasFees: [],
-  });
-
+  };
   // to prevent duplicate events
-  const deployedRef = useRef(false);
+
+  let deployed = false;
 
   const unwatch = watchContractEvent(
     {
@@ -67,19 +69,19 @@ export function useDeployInterchainTokenMutation(config: {
       const log = logs.find(
         (log) =>
           Boolean(log.args?.tokenAddress) &&
-          log?.args.decimals === input.decimals &&
-          log?.args.name === input.tokenName &&
-          log?.args.symbol === input.tokenSymbol &&
+          log?.args.decimals === currentInput.decimals &&
+          log?.args.name === currentInput.tokenName &&
+          log?.args.symbol === currentInput.tokenSymbol &&
           log?.args.owner === address
       );
 
-      if (!log || deployedRef.current) {
+      if (!log || deployed) {
         return;
       }
 
       unwatch();
 
-      deployedRef.current = true;
+      deployed = true;
 
       console.log("onStatusUpdate", {
         type: "deployed",
@@ -103,8 +105,6 @@ export function useDeployInterchainTokenMutation(config: {
       }
 
       console.log("onSuccess", { receipt });
-
-      toast.success("Token deployed");
     },
   });
 
@@ -114,7 +114,7 @@ export function useDeployInterchainTokenMutation(config: {
         return;
       }
 
-      setInput(input);
+      currentInput = input;
 
       try {
         //deploy and register tokens
@@ -142,13 +142,15 @@ export function useDeployInterchainTokenMutation(config: {
         if (config.onStatusUpdate) {
           config.onStatusUpdate({ type: "idle" });
         }
-        if (e instanceof Error && "code" in e) {
-          switch (e.code) {
-            case Logger.errors.ACTION_REJECTED:
-              throw new Error("User rejected the transaction");
-            default:
-              throw new Error("Transaction reverted by EVM");
-          }
+        if (e instanceof TransactionExecutionError) {
+          throw e;
+        }
+        if (e instanceof UserRejectedRequestError) {
+          throw new Error("User rejected the transaction");
+        }
+
+        if (e instanceof ContractFunctionRevertedError) {
+          throw new Error("Transaction reverted by EVM");
         }
 
         return;
