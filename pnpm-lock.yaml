@@ -349,7 +349,7 @@ importers:
         version: 5.0.4
       vitest:
         specifier: ^0.31.0
-        version: 0.31.0(happy-dom@9.7.1)
+        version: 0.31.0(happy-dom@9.10.1)
 
   packages/evm:
     dependencies:
@@ -596,6 +596,9 @@ importers:
       immer:
         specifier: ^9.0.21
         version: 9.0.21
+      lodash.throttle:
+        specifier: ^4.1.1
+        version: 4.1.1
       ramda:
         specifier: ^0.29.0
         version: 0.29.0
@@ -612,6 +615,12 @@ importers:
       '@tsconfig/strictest':
         specifier: ^2.0.1
         version: 2.0.1
+      '@types/lodash.debounce':
+        specifier: ^4.0.7
+        version: 4.0.7
+      '@types/lodash.throttle':
+        specifier: ^4.1.7
+        version: 4.1.7
       '@types/node':
         specifier: 18.15.3
         version: 18.15.3
@@ -6174,6 +6183,18 @@ packages:
     resolution: {integrity: sha512-hz+S3nV6Mym5xPbT9fnO8dDhBFQguMYpY0Ipxv06JMi1ORgnEM4M1ymWDUhUNer3ElLmT583opRo4RzxKmh9jw==}
     dev: false
 
+  /@types/lodash.debounce@4.0.7:
+    resolution: {integrity: sha512-X1T4wMZ+gT000M2/91SYj0d/7JfeNZ9PeeOldSNoE/lunLeQXKvkmIumI29IaKMotU/ln/McOIvgzZcQ/3TrSA==}
+    dependencies:
+      '@types/lodash': 4.14.191
+    dev: true
+
+  /@types/lodash.throttle@4.1.7:
+    resolution: {integrity: sha512-znwGDpjCHQ4FpLLx19w4OXDqq8+OvREa05H89obtSyXyOFKL3dDjCslsmfBz0T2FU8dmf5Wx1QvogbINiGIu9g==}
+    dependencies:
+      '@types/lodash': 4.14.191
+    dev: true
+
   /@types/lodash@4.14.191:
     resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
     dev: true
@@ -11457,6 +11478,10 @@ packages:
   /lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
     dev: true
+
+  /lodash.throttle@4.1.1:
+    resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
+    dev: false
 
   /lodash.uniq@4.5.0:
     resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}

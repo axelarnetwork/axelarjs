@@ -31,10 +31,10 @@ const STATUS_COLORS: Partial<
 };
 
 const STATUS_ICONS: Partial<Record<GMPTxStatus, React.ReactNode>> = {
-  called: "⚪",
-  confirmed: "🔵",
-  executing: "🟡",
-  executed: "🟢",
+  called: <Badge color="accent" size="xs" />,
+  confirmed: <Badge color="info" size="xs" />,
+  executing: <Badge color="warning" size="xs" />,
+  executed: <Badge color="success" size="xs" />,
 };
 
 type Props = {

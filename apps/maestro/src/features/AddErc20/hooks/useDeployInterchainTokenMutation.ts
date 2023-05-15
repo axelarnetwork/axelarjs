@@ -1,4 +1,5 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import { throttle } from "@axelarjs/utils";
 import {
   ContractFunctionRevertedError,
   TransactionExecutionError,
@@ -55,9 +56,8 @@ export function useDeployInterchainTokenMutation(config: {
     destinationChainIds: [],
     gasFees: [],
   };
-  // to prevent duplicate events
 
-  let deployed = false;
+  const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const unwatch = watchContractEvent(
     {
@@ -75,15 +75,13 @@ export function useDeployInterchainTokenMutation(config: {
           log?.args.owner === address
       );
 
-      if (!log || deployed) {
+      if (!log) {
         return;
       }
 
       unwatch();
 
-      deployed = true;
-
-      config.onStatusUpdate?.({
+      onStatusUpdate({
         type: "deployed",
         tokenAddress: log.args?.tokenAddress as `0x${string}`,
         txHash: deployInterchainTokenResult?.hash as `0x${string}`,
@@ -129,7 +127,7 @@ export function useDeployInterchainTokenMutation(config: {
           ],
         });
 
-        config.onStatusUpdate?.({
+        onStatusUpdate({
           type: "deploying",
           txHash: tx.hash,
         });
@@ -138,9 +136,8 @@ export function useDeployInterchainTokenMutation(config: {
           config.onFinished();
         }
       } catch (e) {
-        if (config.onStatusUpdate) {
-          config.onStatusUpdate({ type: "idle" });
-        }
+        onStatusUpdate({ type: "idle" });
+
         if (e instanceof TransactionExecutionError) {
           throw e;
         }
