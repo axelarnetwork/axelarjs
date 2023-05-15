@@ -17,7 +17,7 @@ export function useStep3ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const network = useNetwork();
   const [isDeploying, setIsDeploying] = useState(false);
-  const [totalGasFee, _setTotalGasFee] = useState(formatEther(BigInt(0)));
+  const [totalGasFee, $setTotalGasFee] = useState(formatEther(BigInt(0)));
   const [sourceChainId, setSourceChainId] = useState(
     evmChains?.find(
       (evmChain: EVMChainConfig) => evmChain.chain_id === network.chain?.id
@@ -41,12 +41,12 @@ export function useStep3ChainSelectionState() {
 
   const resetState = () => {
     setIsDeploying(false);
-    _setTotalGasFee(formatEther(BigInt(0)));
+    $setTotalGasFee(formatEther(BigInt(0)));
   };
 
   const setTotalGasFee = (gasFees: bigint[]) => {
-    const num = +formatEther(gasFees.reduce((a, b) => a + b, BigInt(0)));
-    _setTotalGasFee(num.toFixed(4));
+    const num = Number(formatEther(gasFees.reduce((a, b) => a + b, BigInt(0))));
+    $setTotalGasFee(num.toFixed(4));
   };
 
   useEffect(

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Maybe } from "./monads";
+import { Maybe } from "./monad";
 
 describe("Maybe", () => {
   describe("of", () => {
