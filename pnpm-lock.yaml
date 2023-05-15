@@ -596,6 +596,9 @@ importers:
       immer:
         specifier: ^9.0.21
         version: 9.0.21
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
       lodash.throttle:
         specifier: ^4.1.1
         version: 4.1.1
@@ -11477,7 +11480,6 @@ packages:
 
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
-    dev: true
 
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
