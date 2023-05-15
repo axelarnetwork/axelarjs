@@ -95,6 +95,9 @@ importers:
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@axelarjs/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@axelarjs/evm':
         specifier: workspace:*
         version: link:../../packages/evm
@@ -292,6 +295,9 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
+      typescript:
+        specifier: ^5.0.4
+        version: 5.0.4
 
   packages/cosmos:
     dependencies:
