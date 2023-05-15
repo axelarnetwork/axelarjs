@@ -1,16 +1,63 @@
-import { useContract, UseContractConfig } from "wagmi";
+import { ERC20Client } from "@axelarjs/evm";
+import { getContract, GetContractParameters } from "viem";
+import {
+  useContractWrite,
+  usePublicClient,
+  useWalletClient,
+  WalletClient,
+} from "wagmi";
 
-import contract from "../abis/ERC20";
+const { ABI } = ERC20Client;
 
-type Config = Omit<UseContractConfig<typeof contract.abi>, "abi">;
+type Config = Omit<
+  GetContractParameters,
+  "abi" | "publicClient" | "walletClient"
+>;
 
-export function useERC20(config: Config) {
+export function useERC20Reads(config: Config) {
   if (!config.address) {
     throw new Error("address is required");
   }
 
-  return useContract({
-    abi: contract.abi,
-    ...config,
+  const publicClient = usePublicClient();
+
+  const { read } = getContract({
+    abi: ABI,
+    address: config.address,
+    publicClient,
+  });
+
+  return read;
+}
+
+export function useERC20Writes(
+  config: Config & {
+    walletClient?: WalletClient | null;
+  }
+) {
+  if (!config.address) {
+    throw new Error("address is required");
+  }
+
+  const { data: walletClient } = useWalletClient();
+
+  if (!walletClient) {
+    return null;
+  }
+
+  const { write } = getContract({
+    abi: ABI,
+    address: config.address,
+    walletClient,
+  });
+
+  return write;
+}
+
+export function useERC20Approve(config: Config) {
+  return useContractWrite({
+    address: config.address,
+    abi: ABI,
+    functionName: "approve",
   });
 }

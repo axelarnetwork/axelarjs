@@ -4,7 +4,7 @@ import {
   w3mConnectors,
   w3mProvider,
 } from "@web3modal/ethereum";
-import { configureChains, createClient } from "wagmi";
+import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
   arbitrumGoerli,
@@ -148,20 +148,23 @@ if (typeof window !== "undefined") {
   });
 }
 
-const { webSocketProvider, provider } = configureChains(EVM_CHAIN_CONFIGS, [
-  w3mProvider({
-    projectId: WALLECTCONNECT_PROJECT_ID,
-  }),
-]);
+const { webSocketPublicClient, publicClient } = configureChains(
+  EVM_CHAIN_CONFIGS,
+  [
+    w3mProvider({
+      projectId: WALLECTCONNECT_PROJECT_ID,
+    }),
+  ]
+);
 
 export const queryClient = new QueryClient();
 
-export const wagmiClient = createClient({
+export const wagmiConfig = createConfig({
   autoConnect: true,
-  provider,
-  webSocketProvider,
+  publicClient,
+  webSocketPublicClient,
+  queryClient,
   logger, // custom logger
-  queryClient, // react-query client
   connectors: [
     new CoinbaseWalletConnector({
       chains: EVM_CHAIN_CONFIGS,
@@ -178,6 +181,6 @@ export const wagmiClient = createClient({
 });
 
 export const ethereumClient = new EthereumClient(
-  wagmiClient,
+  wagmiConfig,
   EVM_CHAIN_CONFIGS
 );
