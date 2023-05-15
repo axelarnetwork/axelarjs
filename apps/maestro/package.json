@@ -42,14 +42,13 @@
     "tailwind-styled-components": "^2.2.0",
     "typescript": "5.0.4",
     "viem": "^0.3.24",
-    "wagmi": "1.0.2",
+    "wagmi": "1.0.4",
     "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",
     "@next/bundle-analyzer": "^13.4.2",
     "@tanstack/react-query-devtools": "4.29.7",
-    "@wagmi/core": "^1.0.2",
     "autoprefixer": "^10.4.14",
     "daisyui": "^2.51.6",
     "postcss": "^8.4.23",

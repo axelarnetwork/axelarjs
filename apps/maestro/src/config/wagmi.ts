@@ -31,6 +31,7 @@ import {
   polygonMumbai,
 } from "wagmi/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
+import { LedgerConnector } from "wagmi/connectors/ledger";
 
 import { logger } from "~/lib/logger";
 
@@ -159,6 +160,12 @@ const { webSocketPublicClient, publicClient } = configureChains(
 
 export const queryClient = new QueryClient();
 
+const W3M_CONNECTORS = w3mConnectors({
+  chains: EVM_CHAIN_CONFIGS,
+  projectId: WALLECTCONNECT_PROJECT_ID,
+  version: 2,
+});
+
 export const wagmiConfig = createConfig({
   autoConnect: true,
   publicClient,
@@ -172,11 +179,10 @@ export const wagmiConfig = createConfig({
         appName: APP_NAME,
       },
     }),
-    ...w3mConnectors({
+    new LedgerConnector({
       chains: EVM_CHAIN_CONFIGS,
-      projectId: WALLECTCONNECT_PROJECT_ID,
-      version: 2,
     }),
+    ...W3M_CONNECTORS,
   ],
 });
 
