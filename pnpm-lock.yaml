@@ -150,8 +150,8 @@ importers:
         specifier: ^0.33.3
         version: 0.33.3
       lucide-react:
-        specifier: ^0.190.0
-        version: 0.190.0(react@18.2.0)
+        specifier: ^0.216.0
+        version: 0.216.0(react@18.2.0)
       next:
         specifier: ^13.4.2
         version: 13.4.2(@babel/core@7.21.8)(react-dom@18.2.0)(react@18.2.0)
@@ -11567,14 +11567,6 @@ packages:
     resolution: {integrity: sha512-65/Jky17UwSb0BuB9V+MyDpsOtXKmYwzhyl+cOa9XUiI4uV2Ouy/2voFP3+al0BjZbJgMBD8FojMpAf+Z+qn4A==}
     engines: {node: 14 || >=16.14}
     dev: true
-
-  /lucide-react@0.190.0(react@18.2.0):
-    resolution: {integrity: sha512-a3usWP+PuTBOL2Py8jduu1CnHm6eF2FJWt4gLqsu3/tDgJKnQ/Q/3iaNveqPXUYVg9Akn8Gp14ydPf23QaOqhw==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.2.0
-    dev: false
 
   /lucide-react@0.216.0(react@18.2.0):
     resolution: {integrity: sha512-PGWXs6JXI/08rhfkmj/joji0MAKDCcms44j0LYILO4J36AWqKhgjjaZ6WECRSyZ9TQe5gOrAR0g38O8cKrQngw==}
