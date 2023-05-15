@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 
 import { GMPTxStatus } from "@axelarjs/api";
 import { Badge, BadgeProps } from "@axelarjs/ui";
+import clsx from "clsx";
 import { indexBy } from "rambda";
 
 import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";
@@ -28,13 +29,9 @@ const STATUS_COLORS: Partial<
 > = {
   error: "error",
   executed: "success",
-};
-
-const STATUS_ICONS: Partial<Record<GMPTxStatus, React.ReactNode>> = {
-  called: "⚪",
-  confirmed: "🔵",
-  executing: "🟡",
-  executed: "🟢",
+  called: "accent",
+  confirmed: "info",
+  executing: "warning",
 };
 
 type Props = {
@@ -46,6 +43,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const {
     data: statuses,
     computed: { chains: total, executed },
+    isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash: txHash,
   });
@@ -70,6 +68,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   }, [statusList, onAllChainsExecuted]);
 
   if (!statuses || Object.keys(statuses).length === 0) {
+    if (isLoading) {
+      return (
+        <div className="grid place-items-center gap-4">
+          <div className="flex">Loading chain deployment status...</div>
+        </div>
+      );
+    }
     return null;
   }
 
@@ -98,12 +103,14 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
                 <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
                 {chain.chain_name}
               </span>
-              <Badge color={STATUS_COLORS[status]}>
-                {!["error", "executed"].includes(status) && (
-                  <span className="text-warning -translate-x-2 animate-pulse text-xs">
-                    {STATUS_ICONS[status]}
-                  </span>
-                )}
+              <Badge className="flex items-center">
+                <Badge
+                  className={clsx("-translate-x-1.5 text-xs", {
+                    "animate-pulse": !["error", "executed"].includes(status),
+                  })}
+                  color={STATUS_COLORS[status]}
+                  size="xs"
+                />
 
                 {STATUS_LABELS[status]}
               </Badge>

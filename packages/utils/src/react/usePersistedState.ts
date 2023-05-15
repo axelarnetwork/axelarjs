@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import produce, { Draft } from "immer";
 
-import { Maybe } from "../monads";
+import { Maybe } from "../monad";
 
 export function usePersistedState<T>(
   storage: Storage,
