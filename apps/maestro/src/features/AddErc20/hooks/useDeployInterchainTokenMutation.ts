@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import {
   ContractFunctionRevertedError,
@@ -83,12 +85,6 @@ export function useDeployInterchainTokenMutation(config: {
 
       deployed = true;
 
-      console.log("onStatusUpdate", {
-        type: "deployed",
-        tokenAddress: log.args?.tokenAddress as `0x${string}`,
-        txHash: deployInterchainTokenResult?.hash as `0x${string}`,
-      });
-
       config.onStatusUpdate?.({
         type: "deployed",
         tokenAddress: log.args?.tokenAddress as `0x${string}`,
@@ -123,7 +119,7 @@ export function useDeployInterchainTokenMutation(config: {
           32
         ) as `0x${string}`;
 
-        await deployInterchainTokenAsync({
+        const tx = await deployInterchainTokenAsync({
           args: [
             input.tokenName,
             input.tokenSymbol,
@@ -133,6 +129,11 @@ export function useDeployInterchainTokenMutation(config: {
             input.destinationChainIds,
             input.gasFees,
           ],
+        });
+
+        config.onStatusUpdate?.({
+          type: "deploying",
+          txHash: tx.hash,
         });
 
         if (config.onFinished) {

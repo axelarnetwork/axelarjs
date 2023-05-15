@@ -108,6 +108,14 @@ function useAddErc20State(
       },
       setTxState: (txState: DeployAndRegisterTransactionState) => {
         setState((draft) => {
+          if (
+            draft.txState.type === "deploying" &&
+            txState.type === "deployed"
+          ) {
+            // retain txHash from deploying state
+            txState.txHash = draft.txState.txHash;
+          }
+
           draft.txState = txState;
         });
       },

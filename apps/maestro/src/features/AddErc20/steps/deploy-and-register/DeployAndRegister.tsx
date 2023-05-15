@@ -34,7 +34,10 @@ export const Step3: FC = () => {
     error: deployInterchainTokenError,
   } = useDeployInterchainTokenMutation({
     gas: BigInt(0),
-    onStatusUpdate: (txState) => {
+    onStatusUpdate(txState) {
+      if (txState.type === "deploying") {
+        rootActions.setTxState(txState);
+      }
       if (txState.type === "deployed") {
         rootActions.setTxState(txState);
         rootActions.nextStep();

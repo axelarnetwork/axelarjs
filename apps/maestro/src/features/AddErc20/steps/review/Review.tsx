@@ -35,6 +35,10 @@ const Review: FC = () => {
       : {}
   );
 
+  console.log({
+    txState: state.txState,
+  });
+
   return (
     <>
       <div className="grid gap-4">
