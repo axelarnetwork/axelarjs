@@ -43,6 +43,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const {
     data: statuses,
     computed: { chains: total, executed },
+    isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash: txHash,
   });
@@ -67,6 +68,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   }, [statusList, onAllChainsExecuted]);
 
   if (!statuses || Object.keys(statuses).length === 0) {
+    if (isLoading) {
+      return (
+        <div className="grid place-items-center gap-4">
+          <div className="flex">Loading chain deployment status...</div>
+        </div>
+      );
+    }
     return null;
   }
 
