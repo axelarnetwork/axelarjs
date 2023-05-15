@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 
 import { GMPTxStatus } from "@axelarjs/api";
 import { Badge, BadgeProps } from "@axelarjs/ui";
+import clsx from "clsx";
 import { indexBy } from "rambda";
 
 import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";
@@ -28,13 +29,9 @@ const STATUS_COLORS: Partial<
 > = {
   error: "error",
   executed: "success",
-};
-
-const STATUS_ICONS: Partial<Record<GMPTxStatus, React.ReactNode>> = {
-  called: <Badge color="accent" size="xs" />,
-  confirmed: <Badge color="info" size="xs" />,
-  executing: <Badge color="warning" size="xs" />,
-  executed: <Badge color="success" size="xs" />,
+  called: "accent",
+  confirmed: "info",
+  executing: "warning",
 };
 
 type Props = {
@@ -98,12 +95,14 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
                 <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
                 {chain.chain_name}
               </span>
-              <Badge color={STATUS_COLORS[status]}>
-                {!["error", "executed"].includes(status) && (
-                  <span className="text-warning -translate-x-2 animate-pulse text-xs">
-                    {STATUS_ICONS[status]}
-                  </span>
-                )}
+              <Badge className="flex items-center">
+                <Badge
+                  className={clsx("-translate-x-1.5 text-xs", {
+                    "animate-pulse": !["error", "executed"].includes(status),
+                  })}
+                  color={STATUS_COLORS[status]}
+                  size="xs"
+                />
 
                 {STATUS_LABELS[status]}
               </Badge>
