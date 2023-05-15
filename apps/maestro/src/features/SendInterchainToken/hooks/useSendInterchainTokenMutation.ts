@@ -1,26 +1,10 @@
-import {
-  AxelarQueryAPI,
-  Environment,
-  GasToken,
-} from "@axelar-network/axelarjs-sdk";
+import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
 import { parseUnits } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useERC20Approve, useERC20Reads } from "~/lib/contract/hooks/useERC20";
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
-
-export const gasTokenMap: Record<string, GasToken> = {
-  avalanche: GasToken.AVAX,
-  "ethereum-2": GasToken.ETH,
-  ethereum: GasToken.ETH,
-  moonbeam: GasToken.GLMR,
-  fantom: GasToken.FTM,
-  polygon: GasToken.MATIC,
-  aurora: GasToken.AURORA,
-  binance: GasToken.BINANCE,
-  celo: GasToken.CELO,
-  kava: GasToken.KAVA,
-};
+import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 export type TransactionState =
   | { type: "idle" }
@@ -85,7 +69,7 @@ export function useSendInterchainTokenMutation(
     const gas = await AXELAR_QUERY_API.estimateGasFee(
       fromNetwork,
       toNetwork,
-      gasTokenMap[fromNetwork.toLowerCase()]
+      getNativeToken(fromNetwork.toLowerCase())
     );
 
     //approve

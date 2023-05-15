@@ -1,21 +1,22 @@
-import { GasToken } from "@axelar-network/axelarjs-sdk";
+import { GAS_TOKENS, GasTokenKind } from "@axelarjs/evm";
 
-export const getNativeToken = (chainId: string) => {
-  const gasTokenMap: Record<string, GasToken> = {
-    avalanche: GasToken.AVAX,
-    "ethereum-2": GasToken.ETH,
-    ethereum: GasToken.ETH,
-    moonbeam: GasToken.GLMR,
-    fantom: GasToken.FTM,
-    polygon: GasToken.MATIC,
-    aurora: GasToken.AURORA,
-    binance: GasToken.BINANCE,
-    celo: GasToken.CELO,
-    kava: GasToken.KAVA,
-  };
-  if (!gasTokenMap[chainId?.toLowerCase()]) {
+const GAS_TOKEN_MAP: Record<string, GasTokenKind> = {
+  avalanche: GAS_TOKENS.AVAX,
+  "ethereum-2": GAS_TOKENS.ETH,
+  ethereum: GAS_TOKENS.ETH,
+  moonbeam: GAS_TOKENS.GLMR,
+  fantom: GAS_TOKENS.FTM,
+  polygon: GAS_TOKENS.MATIC,
+  aurora: GAS_TOKENS.AURORA,
+  binance: GAS_TOKENS.BINANCE,
+  celo: GAS_TOKENS.CELO,
+  kava: GAS_TOKENS.KAVA,
+};
+
+export function getNativeToken(chainId: string) {
+  if (!GAS_TOKEN_MAP[chainId?.toLowerCase()]) {
     throw `getNativeToken(): chain ${chainId} does not exist`;
   }
 
-  return gasTokenMap[chainId?.toLowerCase()];
-};
+  return GAS_TOKEN_MAP[chainId?.toLowerCase()];
+}
