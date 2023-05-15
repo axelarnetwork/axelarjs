@@ -9,11 +9,10 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { BigNumber } from "@ethersproject/bignumber";
-import { isAddress } from "ethers/lib/utils";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";
+import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
@@ -35,7 +34,7 @@ import {
 const InterchainTokensPage = () => {
   const { chainName, tokenAddress } = useRouter().query as {
     chainName: string;
-    tokenAddress: string;
+    tokenAddress: `0x${string}`;
   };
 
   const routeChain = useChainFromRoute();
@@ -179,7 +178,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   });
 
   const { data: tokenDetails, error: tokenDetailsError } =
-    trpc.gmp.getERC20TokenDetails.useQuery({
+    trpc.erc20.getERC20TokenDetails.useQuery({
       chainId: props.chainId,
       tokenAddress: props.tokenAddress,
     });
@@ -194,9 +193,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 
   const [deployTokensTxHash, setDeployTokensTxHash] = useState<`0x${string}`>();
-
-  const { mutateAsync: deployRemoteTokens, isLoading: isDeploying } =
-    useDeployRemoteTokensMutation();
 
   const targetDeploymentChains = useMemo(() => {
     return selectedChainIds
@@ -260,6 +256,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     gasLimit: 1_000_000,
     gasMultipler: 2,
   });
+
+  const { mutateAsync: deployRemoteTokens, isLoading: isDeploying } =
+    useDeployRemoteTokensMutation(
+      gasFees?.reduce((acc, x) => acc + x, BigInt(0)) ?? BigInt(0)
+    );
 
   const handleDeployRemoteTokens = useCallback(async () => {
     if (!(props.chainId && interchainToken?.tokenId && gasFees)) {
@@ -354,10 +355,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                         maximumFractionDigits: 4,
                       }}
                     >
-                      {gasFees.reduce(
-                        (acc, x) => acc.add(x),
-                        BigNumber.from(0)
-                      )}
+                      {gasFees.reduce((a, b) => a + b)}
                     </BigNumberText>{" "}
                     {getNativeToken(interchainToken.chain.id)}
                   </div>

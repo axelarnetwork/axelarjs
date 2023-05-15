@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { EVMChainConfig } from "@axelarjs/api";
-import { BigNumber } from "@ethersproject/bignumber";
-import { formatEther } from "ethers/lib/utils";
+import { formatEther } from "viem";
 import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
@@ -18,9 +17,7 @@ export function useStep3ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const network = useNetwork();
   const [isDeploying, setIsDeploying] = useState(false);
-  const [totalGasFee, _setTotalGasFee] = useState(
-    formatEther(BigNumber.from(0))
-  );
+  const [totalGasFee, _setTotalGasFee] = useState(formatEther(BigInt(0)));
   const [sourceChainId, setSourceChainId] = useState(
     evmChains?.find(
       (evmChain: EVMChainConfig) => evmChain.chain_id === network.chain?.id
@@ -44,13 +41,11 @@ export function useStep3ChainSelectionState() {
 
   const resetState = () => {
     setIsDeploying(false);
-    _setTotalGasFee(formatEther(BigNumber.from(0)));
+    _setTotalGasFee(formatEther(BigInt(0)));
   };
 
-  const setTotalGasFee = (gasFees: BigNumber[]) => {
-    const num = +formatEther(
-      gasFees.reduce((a, b) => a.add(BigNumber.from(b)), BigNumber.from(0))
-    );
+  const setTotalGasFee = (gasFees: bigint[]) => {
+    const num = +formatEther(gasFees.reduce((a, b) => a + b, BigInt(0)));
     _setTotalGasFee(num.toFixed(4));
   };
 

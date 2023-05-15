@@ -160,7 +160,7 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
                       notation: "compact",
                     }}
                   >
-                    {balance.tokenBalance}
+                    {BigInt(balance.tokenBalance)}
                   </BigNumberText>
                 </div>
                 {isSourceChain ? (
