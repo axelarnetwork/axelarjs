@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import {
   ContractFunctionRevertedError,
