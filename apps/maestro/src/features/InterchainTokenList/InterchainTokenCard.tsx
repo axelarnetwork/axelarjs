@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
+import { useState, type FC } from "react";
 
-import { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import {
   Badge,
   Button,
@@ -19,7 +19,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
 
 import { SendInterchainToken } from "../SendInterchainToken";
-import { TokenInfo } from "./types";
+import type { TokenInfo } from "./types";
 
 const StatusIndicator = (
   props: Pick<TokenInfo, "isOriginToken" | "isRegistered">

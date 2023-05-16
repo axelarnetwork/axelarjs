@@ -1,10 +1,10 @@
 import { ERC20Client } from "@axelarjs/evm";
-import { getContract, GetContractParameters } from "viem";
+import { getContract, type GetContractParameters } from "viem";
 import {
   useContractWrite,
   usePublicClient,
   useWalletClient,
-  WalletClient,
+  type WalletClient,
 } from "wagmi";
 
 const { ABI } = ERC20Client;

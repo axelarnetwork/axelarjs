@@ -1,4 +1,4 @@
-import { ComponentProps, FC, useState } from "react";
+import { ComponentProps, FC, ReactNode, useState } from "react";
 
 import type { CapitalizeKeys } from "@axelarjs/utils";
 import type { StoryFn } from "@storybook/react";
@@ -19,9 +19,7 @@ type PolymorphicVariantConfig<
       getChildren?: never;
     }
   | {
-      getChildren?: (
-        props: ComponentProps<TComponent>[TKey]
-      ) => React.ReactNode;
+      getChildren?: (props: ComponentProps<TComponent>[TKey]) => ReactNode;
     };
 
 type VariantConfig<
@@ -184,7 +182,7 @@ export const configurePlayground = <
   TComponent extends FC,
   TComponentProps extends ComponentProps<TComponent>
 >(
-  component: React.FC<TComponentProps>,
+  component: FC<TComponentProps>,
   variants: {
     [TKey in keyof TComponentProps]: VariantConfigLike<TComponent>;
   },

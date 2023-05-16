@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { Button, ButtonProps } from "@axelarjs/ui";
+import { Button, type ButtonProps } from "@axelarjs/ui";
 import { useWeb3Modal } from "@web3modal/react";
 
 type Props = ButtonProps;

@@ -2,6 +2,7 @@ import { always } from "rambda";
 
 import { HTTPClient, Options } from "../HTTPClient";
 import {
+  EstimateTimeSpentParams,
   GetContractsResponse,
   GetFeesParams,
   GetFeesResponse,
@@ -27,7 +28,13 @@ export class GMPClient extends HTTPClient {
     });
   }
 
-  async searchGMP(params: SearchGMPParams) {
+  /**
+   * Provides query-based access to GMP transfers and related transactions and statuses.
+   *
+   * @param params {SearchGMPParams} - The search parameters.
+   * @returns {Promise<SearchGMPResponse['data']>}
+   */
+  async searchGMP(params: SearchGMPParams): Promise<SearchGMPResponse["data"]> {
     return await this.client
       .post("", {
         json: { ...params, method: "searchGMP" },
@@ -37,6 +44,13 @@ export class GMPClient extends HTTPClient {
       .then((res) => res.data);
   }
 
+  /**
+   * Returns the statistics of the General Message Passing (GMP) calls
+   * by each combination of source chain, destination chain, and assets.
+   *
+   * @param params
+   * @returns
+   */
   async getGMPStatistics(params: GetGMPStatisticsParams) {
     return await this.client
       .post("", {
@@ -82,7 +96,7 @@ export class GMPClient extends HTTPClient {
       .json<GetGMPTotalVolumeResponse>();
   }
 
-  async estimateTimeSpent(params: GetGasPriceParams) {
+  async estimateTimeSpent(params: EstimateTimeSpentParams) {
     return await this.client
       .post("", {
         json: {

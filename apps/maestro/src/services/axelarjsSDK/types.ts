@@ -1,4 +1,4 @@
-import { GasToken } from "@axelar-network/axelarjs-sdk";
+import type { GasToken } from "@axelar-network/axelarjs-sdk";
 
 export type EstimateGasFeeParams = {
   sourceChainId: string;

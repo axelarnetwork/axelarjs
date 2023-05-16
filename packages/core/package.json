@@ -3,11 +3,16 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
+    "compile": "tsc --noEmit"
+  },
   "keywords": [],
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "@axelarjs/config": "workspace:*"
+    "@axelarjs/config": "workspace:*",
+    "typescript": "^5.0.4"
   }
 }

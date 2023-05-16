@@ -1,6 +1,6 @@
 import { InterchainTokenServiceClient } from "@axelarjs/evm";
-import { useContractWrite, usePublicClient, WalletClient } from "wagmi";
-import { getContract, GetContractArgs } from "wagmi/actions";
+import { useContractWrite, usePublicClient, type WalletClient } from "wagmi";
+import { getContract, type GetContractArgs } from "wagmi/actions";
 
 type Config = Omit<GetContractArgs, "abi" | "walletClient" | "publicClient">;
 

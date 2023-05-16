@@ -1,6 +1,6 @@
-import { EVMChainConfig, GMPTxStatus } from "@axelarjs/api";
+import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api";
 
-import { WagmiEVMChainConfig } from "~/config/wagmi";
+import type { WagmiEVMChainConfig } from "~/config/wagmi";
 
 export type TokenInfo = {
   chainId: number;

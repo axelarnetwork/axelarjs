@@ -44,7 +44,7 @@ type StepVProps = VariantProps<typeof stepVariance>;
 
 type PolymorphicProps =
   | {
-      children: React.ReactNode;
+      children: ReactNode;
     }
   | {
       children: never;
