@@ -1,5 +1,5 @@
-import { FC, useRef } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useRef, type FC } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { zodResolver } from "@hookform/resolvers/zod";

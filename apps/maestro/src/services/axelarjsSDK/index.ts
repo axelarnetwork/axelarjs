@@ -1,7 +1,7 @@
 import {
   AxelarQueryAPI,
-  Environment,
-  GasToken,
+  type Environment,
+  type GasToken,
 } from "@axelar-network/axelarjs-sdk";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";

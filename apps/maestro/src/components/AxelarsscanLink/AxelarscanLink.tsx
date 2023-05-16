@@ -1,6 +1,10 @@
-import React, { FC } from "react";
+import React, { type FC } from "react";
 
-import { AxelarWhiteIcon, LinkButton, LinkButtonProps } from "@axelarjs/ui";
+import {
+  AxelarWhiteIcon,
+  LinkButton,
+  type LinkButtonProps,
+} from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 
 type Props = Omit<LinkButtonProps, "ref"> & {

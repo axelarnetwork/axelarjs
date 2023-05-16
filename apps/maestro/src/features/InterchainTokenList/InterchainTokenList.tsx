@@ -1,9 +1,9 @@
-import { FC, ReactNode, useMemo } from "react";
+import { useMemo, type FC, type ReactNode } from "react";
 
 import { Button } from "@axelarjs/ui";
 
 import { InterchainTokenCard } from "./InterchainTokenCard";
-import { TokenInfo } from "./types";
+import type { TokenInfo } from "./types";
 
 export type InterchainTokenListProps = {
   title: ReactNode;

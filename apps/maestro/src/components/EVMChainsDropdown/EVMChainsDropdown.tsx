@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import { useState, type FC } from "react";
 
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { Dropdown } from "@axelarjs/ui";
@@ -59,7 +59,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     }
   };
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!props.selectedChain) {
     return null;

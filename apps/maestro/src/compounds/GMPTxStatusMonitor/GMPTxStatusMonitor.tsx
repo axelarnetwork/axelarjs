@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
-import { Badge, BadgeProps } from "@axelarjs/ui";
+import { Badge, type BadgeProps } from "@axelarjs/ui";
 import clsx from "clsx";
 import { indexBy } from "rambda";
 

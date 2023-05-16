@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import {

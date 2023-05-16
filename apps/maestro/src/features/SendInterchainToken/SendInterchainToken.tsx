@@ -1,5 +1,5 @@
-import { FC, useMemo, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useMemo, useState, type FC } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { EVMChainConfig } from "@axelarjs/api";
 import {
@@ -22,8 +22,8 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
 import {
-  TransactionState,
   useSendInterchainTokenMutation,
+  type TransactionState,
 } from "./hooks/useSendInterchainTokenMutation";
 
 type FormState = {

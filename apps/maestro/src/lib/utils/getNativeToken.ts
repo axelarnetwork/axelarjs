@@ -1,4 +1,4 @@
-import { GAS_TOKENS, GasTokenKind } from "@axelarjs/evm";
+import { GAS_TOKENS, type GasTokenKind } from "@axelarjs/evm";
 
 const GAS_TOKEN_MAP: Record<string, GasTokenKind> = {
   avalanche: GAS_TOKENS.AVAX,

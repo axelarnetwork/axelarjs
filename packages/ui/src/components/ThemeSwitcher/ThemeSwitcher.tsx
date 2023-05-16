@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, MouseEvent, useCallback, useEffect, useState } from "react";
 
 import { createContainer } from "@axelarjs/utils/react";
 import clsx from "clsx";
@@ -37,7 +37,7 @@ function useThemeState(initialState: ThemeKind | null = null) {
   }, [theme]);
 
   const handleToggleTheme = useCallback(
-    (evt: React.MouseEvent<HTMLButtonElement>) => {
+    (evt: MouseEvent<HTMLButtonElement>) => {
       const target = evt.target as HTMLElement;
 
       const [primaryTheme, secondaryTheme] =

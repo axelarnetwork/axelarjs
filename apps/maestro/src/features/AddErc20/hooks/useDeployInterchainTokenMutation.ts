@@ -16,7 +16,7 @@ import { watchContractEvent } from "wagmi/actions";
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
 
-import { DeployAndRegisterTransactionState } from "../AddErc20.state";
+import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
   process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS

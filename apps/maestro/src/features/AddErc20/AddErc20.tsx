@@ -1,12 +1,12 @@
-import { FC, useMemo } from "react";
+import { useMemo, type FC } from "react";
 
 import { LinkButton, Modal } from "@axelarjs/ui";
 import dynamic from "next/dynamic";
 
 import {
   AddErc20StateProvider,
-  TokenDetails,
   useAddErc20StateContainer,
+  type TokenDetails,
 } from "./AddErc20.state";
 import { TokenRegistration } from "./TokenRegistration";
 

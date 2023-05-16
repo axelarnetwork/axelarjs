@@ -1,7 +1,7 @@
 import { useQuery } from "wagmi";
 
 import { estimateGasFee, estimateGasFeeMultipleChains } from "./index";
-import {
+import type {
   EstimateGasFeeMultipleChainsParams,
   EstimateGasFeeParams,
 } from "./types";

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState, type FC } from "react";
 
 import { ThemeProvider, Toaster } from "@axelarjs/ui";
 import { Hydrate, QueryClientProvider } from "@tanstack/react-query";

@@ -1,7 +1,7 @@
 import { ERC20Client, InterchainTokenServiceClient } from "@axelarjs/evm";
-import { inferAsyncReturnType } from "@trpc/server";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Chain } from "wagmi";
+import type { inferAsyncReturnType } from "@trpc/server";
+import type { NextApiRequest, NextApiResponse } from "next";
+import type { Chain } from "wagmi";
 
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";

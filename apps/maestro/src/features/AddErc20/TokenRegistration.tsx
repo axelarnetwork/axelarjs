@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { useMemo, useState, type FC } from "react";
 
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { useNetwork, useSwitchNetwork } from "wagmi";

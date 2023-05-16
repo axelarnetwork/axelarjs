@@ -1,9 +1,9 @@
 import React, {
-  FC,
-  FormEventHandler,
   useCallback,
   useMemo,
   useRef,
+  type FC,
+  type FormEventHandler,
 } from "react";
 
 import {

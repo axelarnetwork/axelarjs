@@ -1,4 +1,4 @@
-import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
+import { AxelarQueryAPI, type Environment } from "@axelar-network/axelarjs-sdk";
 import { parseUnits } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 

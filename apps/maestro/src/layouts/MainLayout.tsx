@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from "react";
 
 import { Badge, Clamp, Drawer, Footer, useTheme } from "@axelarjs/ui";
 import { Web3Modal } from "@web3modal/react";
