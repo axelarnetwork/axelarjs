@@ -1,5 +1,6 @@
 import { publicProcedure, router } from "~/server/trpc";
 
+import { axelarjsSDKRouter } from "./axelarjsSDK";
 import { axelarscanRouter } from "./axelarscan";
 import { erc20Router } from "./erc20";
 import { gmpRouter } from "./gmp";
@@ -11,6 +12,7 @@ export const appRouter = router({
   gmp: gmpRouter,
   axelarscan: axelarscanRouter,
   erc20: erc20Router,
+  axelarjsSDK: axelarjsSDKRouter,
 });
 
 export type AppRouter = typeof appRouter;

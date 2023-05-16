@@ -1,6 +1,5 @@
-import { useQuery } from "wagmi";
+import { trpc } from "~/lib/trpc";
 
-import { estimateGasFee, estimateGasFeeMultipleChains } from "./index";
 import type {
   EstimateGasFeeMultipleChainsParams,
   EstimateGasFeeParams,
@@ -9,19 +8,15 @@ import type {
 const staleTime = 1000 * 60 * 2; // 2 minutes
 
 export function useEstimateGasFee(params: EstimateGasFeeParams) {
-  return useQuery(
-    ["estimate-gas-fee", params],
-    estimateGasFee.bind(null, params),
-    { staleTime }
-  );
+  return trpc.axelarjsSDK.estimateGasFee.useQuery(params, {
+    staleTime,
+  });
 }
 
 export function useEstimateGasFeeMultipleChains(
   params: EstimateGasFeeMultipleChainsParams
 ) {
-  return useQuery(
-    ["estimate-gas-fee-multiple-chains", params],
-    estimateGasFeeMultipleChains.bind(null, params),
-    { staleTime }
-  );
+  return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(params, {
+    staleTime,
+  });
 }
