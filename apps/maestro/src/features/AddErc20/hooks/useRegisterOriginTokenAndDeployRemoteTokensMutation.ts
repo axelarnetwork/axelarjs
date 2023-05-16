@@ -3,7 +3,7 @@ import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
 
-import { DeployAndRegisterTransactionState } from "../AddErc20.state";
+import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseRegisterInterchainTokenInput = {
   tokenAddress: `0x${string}`;

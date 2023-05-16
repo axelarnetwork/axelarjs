@@ -1,6 +1,6 @@
 # build artifacts
-build
+build/
 *.js
 *.d.ts
 
-./contracts/
+contracts/

@@ -1,26 +1,10 @@
-import {
-  AxelarQueryAPI,
-  Environment,
-  GasToken,
-} from "@axelar-network/axelarjs-sdk";
 import { parseUnits } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useERC20Approve, useERC20Reads } from "~/lib/contract/hooks/useERC20";
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
-
-export const gasTokenMap: Record<string, GasToken> = {
-  avalanche: GasToken.AVAX,
-  "ethereum-2": GasToken.ETH,
-  ethereum: GasToken.ETH,
-  moonbeam: GasToken.GLMR,
-  fantom: GasToken.FTM,
-  polygon: GasToken.MATIC,
-  aurora: GasToken.AURORA,
-  binance: GasToken.BINANCE,
-  celo: GasToken.CELO,
-  kava: GasToken.KAVA,
-};
+import { trpc } from "~/lib/trpc";
+import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 export type TransactionState =
   | { type: "idle" }
@@ -33,21 +17,17 @@ export type TransactionState =
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
+  sourceChainId: string;
+  destinationChainId: string;
 };
 
 export type UseSendInterchainTokenInput = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  toNetwork: string;
-  fromNetwork: string;
   amount: string;
   onFinished?: () => void;
   onStatusUpdate?: (message: TransactionState) => void;
 };
-
-const AXELAR_QUERY_API = new AxelarQueryAPI({
-  environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
-});
 
 const TOKEN_LINKER_ADDRESS = String(
   process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
@@ -72,21 +52,21 @@ export function useSendInterchainTokenMutation(
     walletClient,
   });
 
+  const { data: gas } = trpc.axelarjsSDK.estimateGasFee.useQuery({
+    sourceChainId: config.sourceChainId,
+    destinationChainId: config.destinationChainId,
+    sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
+  });
+
   return useMutation(async (input: UseSendInterchainTokenInput) => {
-    if (!(erc20Reads && address && tokenLinker)) {
+    if (!(erc20Reads && address && tokenLinker && gas)) {
       return;
     }
 
-    const { toNetwork, fromNetwork, onFinished, onStatusUpdate } = input;
+    const { onFinished, onStatusUpdate } = input;
 
     const decimals = await erc20Reads.decimals();
     const bnAmount = parseUnits(`${Number(input.amount)}`, decimals);
-
-    const gas = await AXELAR_QUERY_API.estimateGasFee(
-      fromNetwork,
-      toNetwork,
-      gasTokenMap[fromNetwork.toLowerCase()]
-    );
 
     //approve
     try {
@@ -118,7 +98,7 @@ export function useSendInterchainTokenMutation(
     try {
       //send token
       const sendTokenTxHash = await tokenLinker.sendToken(
-        [input.tokenId, input.toNetwork, address, bnAmount],
+        [input.tokenId, config.destinationChainId, address, bnAmount],
         { value: BigInt(gas) * BigInt(2) }
       );
 

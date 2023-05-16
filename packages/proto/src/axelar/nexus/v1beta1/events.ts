@@ -37,6 +37,18 @@ export interface MessageReceived {
   recipient?: CrossChainAddress;
 }
 
+export interface MessageProcessing {
+  id: string;
+}
+
+export interface MessageExecuted {
+  id: string;
+}
+
+export interface MessageFailed {
+  id: string;
+}
+
 function createBaseFeeDeducted(): FeeDeducted {
   return {
     transferId: Long.UZERO,
@@ -562,6 +574,198 @@ export const MessageReceived = {
       object.recipient !== undefined && object.recipient !== null
         ? CrossChainAddress.fromPartial(object.recipient)
         : undefined;
+    return message;
+  },
+};
+
+function createBaseMessageProcessing(): MessageProcessing {
+  return { id: "" };
+}
+
+export const MessageProcessing = {
+  encode(
+    message: MessageProcessing,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MessageProcessing {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMessageProcessing();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MessageProcessing {
+    return { id: isSet(object.id) ? String(object.id) : "" };
+  },
+
+  toJSON(message: MessageProcessing): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MessageProcessing>, I>>(
+    base?: I
+  ): MessageProcessing {
+    return MessageProcessing.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MessageProcessing>, I>>(
+    object: I
+  ): MessageProcessing {
+    const message = createBaseMessageProcessing();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseMessageExecuted(): MessageExecuted {
+  return { id: "" };
+}
+
+export const MessageExecuted = {
+  encode(
+    message: MessageExecuted,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MessageExecuted {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMessageExecuted();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MessageExecuted {
+    return { id: isSet(object.id) ? String(object.id) : "" };
+  },
+
+  toJSON(message: MessageExecuted): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MessageExecuted>, I>>(
+    base?: I
+  ): MessageExecuted {
+    return MessageExecuted.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MessageExecuted>, I>>(
+    object: I
+  ): MessageExecuted {
+    const message = createBaseMessageExecuted();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseMessageFailed(): MessageFailed {
+  return { id: "" };
+}
+
+export const MessageFailed = {
+  encode(
+    message: MessageFailed,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MessageFailed {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMessageFailed();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MessageFailed {
+    return { id: isSet(object.id) ? String(object.id) : "" };
+  },
+
+  toJSON(message: MessageFailed): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MessageFailed>, I>>(
+    base?: I
+  ): MessageFailed {
+    return MessageFailed.fromPartial(base ?? {});
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MessageFailed>, I>>(
+    object: I
+  ): MessageFailed {
+    const message = createBaseMessageFailed();
+    message.id = object.id ?? "";
     return message;
   },
 };

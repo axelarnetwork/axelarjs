@@ -1,4 +1,4 @@
-import { GMPTxStatus } from "@axelarjs/api";
+import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 

@@ -1,6 +1,6 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
-import { GMPTxStatus } from "@axelarjs/api";
+import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import {
   Alert,
   Button,

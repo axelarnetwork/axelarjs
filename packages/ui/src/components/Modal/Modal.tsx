@@ -1,4 +1,4 @@
-import { ComponentProps, FC, Fragment, ReactNode } from "react";
+import { ComponentProps, FC, Fragment, MouseEvent, ReactNode } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -140,7 +140,7 @@ export const Modal = Object.assign(ModalRootWithProvider, {
   CloseAction: (props: ComponentProps<typeof Button>) => {
     const [, actions] = useModalStateContiner();
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
       props.onClick?.(e);
       actions.close();
     };

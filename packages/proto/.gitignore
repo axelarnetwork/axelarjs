@@ -9,3 +9,6 @@ build/
 /google
 /axelar
 /node_modules
+
+*.js
+*.d.ts

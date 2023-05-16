@@ -12,6 +12,7 @@
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "0.12.5",
     "@axelarjs/api": "workspace:*",
+    "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
@@ -49,6 +50,8 @@
     "@babel/core": "^7.21.8",
     "@next/bundle-analyzer": "^13.4.2",
     "@tanstack/react-query-devtools": "4.29.7",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
     "autoprefixer": "^10.4.14",
     "daisyui": "^2.51.6",
     "postcss": "^8.4.23",
