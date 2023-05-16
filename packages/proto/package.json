@@ -42,7 +42,7 @@
     "degit": "^2.8.4",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.0",
-    "ts-proto": "^1.147.2",
+    "ts-proto": "^1.147.3",
     "typescript": "5.0.4"
   }
 }
