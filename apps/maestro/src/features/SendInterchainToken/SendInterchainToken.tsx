@@ -63,30 +63,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
-
-  const { mutateAsync: sendTokenAsync, isLoading: isSending } =
-    useSendInterchainTokenMutation({
-      tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
-    });
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState,
-    reset: resetForm,
-    setValue,
-  } = useForm<FormState>({
-    defaultValues: {
-      amountToSend: undefined,
-    },
-    mode: "onChange",
-    reValidateMode: "onChange",
-  });
-
-  const amountToSend = watch("amountToSend");
-
   const [toChainId, setToChainId] = useState(5);
 
   const eligibleTargetChains = useMemo(() => {
@@ -107,6 +83,31 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [toChainId, eligibleTargetChains]
   );
 
+  const { mutateAsync: sendTokenAsync, isLoading: isSending } =
+    useSendInterchainTokenMutation({
+      tokenAddress: props.tokenAddress,
+      tokenId: props.tokenId,
+      destinationChainId: selectedToChain.chain_name,
+      sourceChainId: props.sourceChain.chain_name,
+    });
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState,
+    reset: resetForm,
+    setValue,
+  } = useForm<FormState>({
+    defaultValues: {
+      amountToSend: undefined,
+    },
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
+  const amountToSend = watch("amountToSend");
+
   const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>({
     type: "idle",
   });
@@ -120,8 +121,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
       {
         tokenAddress: props.tokenAddress,
         tokenId: props.tokenId,
-        toNetwork: selectedToChain.chain_name,
-        fromNetwork: props.sourceChain.chain_name,
         amount: amountToSend,
         onStatusUpdate(status) {
           if (status.type === "failed") {
