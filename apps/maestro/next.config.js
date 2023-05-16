@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@axelarjs/ui", "@axelarjs/utils", "@axelarjs/api"],
+  transpilePackages: ["@axelarjs/ui", "@axelarjs/utils"],
   images: {
     domains: ["testnet.axelarscan.io"],
   },
