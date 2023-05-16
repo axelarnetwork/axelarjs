@@ -2,6 +2,7 @@ import { always } from "rambda";
 
 import { HTTPClient, Options } from "../HTTPClient";
 import {
+  EstimateTimeSpentParams,
   GetContractsResponse,
   GetFeesParams,
   GetFeesResponse,
@@ -82,7 +83,7 @@ export class GMPClient extends HTTPClient {
       .json<GetGMPTotalVolumeResponse>();
   }
 
-  async estimateTimeSpent(params: GetGasPriceParams) {
+  async estimateTimeSpent(params: EstimateTimeSpentParams) {
     return await this.client
       .post("", {
         json: {
