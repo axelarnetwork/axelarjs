@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 
-import { GMPTxStatus } from "@axelarjs/api";
+import type { GMPTxStatus } from "@axelarjs/api";
 import { Badge, BadgeProps } from "@axelarjs/ui";
 import clsx from "clsx";
 import { indexBy } from "rambda";

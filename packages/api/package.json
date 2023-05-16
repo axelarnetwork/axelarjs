@@ -2,27 +2,44 @@
   "name": "@axelarjs/api",
   "private": true,
   "version": "0.1.0",
-  "description": "",
-  "type": "module",
-  "main": "src/index.ts",
+  "description": "Axelar typesafe api clients",
+  "files": [
+    "./build",
+    "./axelarscan",
+    "./axelar-query",
+    "./gmp",
+    "./index.js"
+  ],
   "exports": {
-    ".": "./src/index.ts",
-    "./axelarscan": "./src/axelarscan/index.ts",
-    "./gmp": "./src/gmp/index.ts"
+    "./gmp": {
+      "import": "./build/module/gmp/index.js",
+      "require": "./build/commonjs//gmp/index.js"
+    },
+    "./axelarscan": {
+      "import": "./build/module/axelarscan/index.js",
+      "require": "./build/commonjs/axelarscan/index.js"
+    },
+    "./axelar-query": {
+      "import": "./build/module/axelar-query/index.js",
+      "require": "./build/commonjs/axelar-query/index.js"
+    },
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    }
   },
   "typesVersions": {
     "*": {
-      "axelarscan": [
-        "./src/axelarscan/index.ts"
-      ],
-      "gmp": [
-        "./src/gmp/index.ts"
+      "*": [
+        "./build/module/*"
       ]
     }
   },
   "scripts": {
     "test": "vitest --run src",
-    "compile": "tsc --noEmit"
+    "compile": "tsc --noEmit",
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh"
   },
   "keywords": [],
   "author": "",

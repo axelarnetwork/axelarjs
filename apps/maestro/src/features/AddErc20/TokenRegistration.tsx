@@ -1,6 +1,6 @@
 import { FC, useMemo, useState } from "react";
 
-import { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig } from "@axelarjs/api";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
+import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api";
 import { uniq } from "rambda";
 import { isAddress } from "viem";
 import { useQuery } from "wagmi";
