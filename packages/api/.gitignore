@@ -1,7 +1,8 @@
-./node_modules/
-./build/
-./axelarscan/
-./gmp/
-./axelar-query/
+node_modules/
+build/
+axelarscan/
+gmp/
+axelar-query/
 *.d.ts
 *.js
+.turbo/
