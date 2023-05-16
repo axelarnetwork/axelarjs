@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import {
   Badge,
   Button,

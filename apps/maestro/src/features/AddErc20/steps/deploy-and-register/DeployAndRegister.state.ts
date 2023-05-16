@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { formatEther } from "viem";
 import { useNetwork } from "wagmi";
 

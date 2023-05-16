@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { Dropdown } from "@axelarjs/ui";
 import clsx from "clsx";
 import Image from "next/image";

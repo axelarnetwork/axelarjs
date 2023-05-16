@@ -1,4 +1,4 @@
-import { EVMChainConfig, GMPTxStatus } from "@axelarjs/api";
+import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api";
 
 import { WagmiEVMChainConfig } from "~/config/wagmi";
 
