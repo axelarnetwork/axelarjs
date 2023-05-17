@@ -51,7 +51,7 @@
     "vitest": "^0.31.0"
   },
   "dependencies": {
-    "immer": "^9.0.21",
+    "immer": "^10.0.2",
     "lodash.throttle": "^4.1.1",
     "lodash.debounce": "^4.0.8",
     "ramda": "^0.29.0"

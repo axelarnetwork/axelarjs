@@ -606,8 +606,8 @@ importers:
   packages/utils:
     dependencies:
       immer:
-        specifier: ^9.0.21
-        version: 9.0.21
+        specifier: ^10.0.2
+        version: 10.0.2
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
