@@ -1,0 +1,19 @@
+#nprogress {
+  @apply pointer-events-none;
+}
+
+#nprogress .bar {
+  @apply bg-primary;
+  @apply fixed left-0 top-0 z-50;
+  @apply h-[3px] w-full;
+}
+
+#nprogress .peg {
+  @apply absolute block;
+  @apply right-0;
+  @apply w-[100px];
+  @apply h-full;
+  @apply shadow-primary;
+  @apply opacity-100;
+  @apply translate-y-4 rotate-3;
+}
