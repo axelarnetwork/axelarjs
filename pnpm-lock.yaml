@@ -164,6 +164,9 @@ importers:
       nextjs-progressbar:
         specifier: ^0.0.16
         version: 0.0.16(next@13.4.2)(react@18.2.0)
+      nprogress:
+        specifier: ^0.2.0
+        version: 0.2.0
       rambda:
         specifier: ^7.5.0
         version: 7.5.0
@@ -207,6 +210,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: 4.29.7
         version: 4.29.7(@tanstack/react-query@4.29.7)(react-dom@18.2.0)(react@18.2.0)
+      '@types/nprogress':
+        specifier: ^0.2.0
+        version: 0.2.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.59.6
         version: 5.59.6(@typescript-eslint/parser@5.59.6)(eslint@8.40.0)(typescript@5.0.4)
@@ -6323,7 +6329,6 @@ packages:
 
   /@types/nprogress@0.2.0:
     resolution: {integrity: sha512-1cYJrqq9GezNFPsWTZpFut/d4CjpZqA0vhqDUPFWYKF1oIyBz5qnoYMzR+0C/T96t3ebLAC1SSnwrVOm5/j74A==}
-    dev: false
 
   /@types/object-hash@1.3.4:
     resolution: {integrity: sha512-xFdpkAkikBgqBdG9vIlsqffDV8GpvnPEzs0IUtr1v3BEB97ijsFQ4RXVbUZwjFThhB4MDSTUfvmxUD5PGx0wXA==}
