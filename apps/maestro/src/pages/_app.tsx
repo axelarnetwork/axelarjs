@@ -5,7 +5,6 @@ import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
-import NextNProgress from "nextjs-progressbar";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
@@ -13,6 +12,7 @@ import "~/styles/globals.css";
 
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
 import MainLayout from "~/layouts/MainLayout";
+import NProgressBar from "~/layouts/NProgressBar";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 
@@ -43,7 +43,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
           }
         `}
       </style>
-      <NextNProgress options={{ showSpinner: false }} />
+      <NProgressBar />
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <ThemeProvider>
