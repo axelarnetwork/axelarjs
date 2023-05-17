@@ -2,7 +2,11 @@
   "name": "@axelarjs/utils",
   "private": true,
   "version": "0.1.0",
-  "description": "",
+  "description": "General purpose utils for axelarjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
   "type": "module",
   "main": "src/index.ts",
   "exports": {

@@ -219,9 +219,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.23)
-      daisyui:
-        specifier: ^2.51.6
-        version: 2.51.6(autoprefixer@10.4.14)(postcss@8.4.23)(ts-node@10.9.1)
       postcss:
         specifier: ^8.4.23
         version: 8.4.23

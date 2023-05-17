@@ -2,6 +2,10 @@
   "name": "@axelarjs/proto",
   "version": "0.32.3",
   "description": "Axelarcore supporting protobuf types",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
   "files": [
     "build",
     "cosmos",

@@ -1,8 +1,12 @@
 {
   "name": "axelarjs",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Axelar Network foundations for javascript/Typescript based applications",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
   "scripts": {
     "prepare": "husky install",
     "build": "turbo run build",
