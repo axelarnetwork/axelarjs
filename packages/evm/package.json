@@ -38,11 +38,11 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "^0.3.22"
+    "viem": "^0.3.29"
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "rimraf": "^5.0.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   }
 }
