@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import produce, { Draft } from "immer";
+import { Draft, produce } from "immer";
 
 import { Maybe } from "../monad";
 

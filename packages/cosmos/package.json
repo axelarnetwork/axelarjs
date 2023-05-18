@@ -2,6 +2,10 @@
   "name": "@axelarjs/cosmos",
   "version": "0.1.0",
   "description": "Cosmos SDK for Axelar Network",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
   "files": [
     "build",
     "query-client",
@@ -45,8 +49,8 @@
     "@tsconfig/strictest": "^2.0.1",
     "cosmjs-types": "^0.7.2",
     "rambda": "^7.5.0",
-    "rimraf": "^5.0.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4",
-    "vitest": "^0.31.0"
+    "vitest": "^0.31.1"
   }
 }

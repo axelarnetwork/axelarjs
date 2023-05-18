@@ -1,7 +1,11 @@
 {
   "name": "@axelarjs/config",
   "version": "0.1.0",
-  "description": "",
+  "description": "AxelarJS shared configuration",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
   "files": [
     "./tsconfig.strictest.json"
   ],

@@ -1,7 +1,11 @@
 {
   "name": "@axelarjs/core",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Axelarjs Core",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
   "main": "index.js",
   "scripts": {
     "build": "./scripts/build.sh",
