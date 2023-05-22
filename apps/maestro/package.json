@@ -46,7 +46,7 @@
     "superjson": "^1.12.3",
     "tailwind-styled-components": "^2.2.0",
     "typescript": "5.0.4",
-    "viem": "^0.3.31",
+    "viem": "^0.3.34",
     "wagmi": "^1.0.5",
     "zod": "^3.21.4"
   },

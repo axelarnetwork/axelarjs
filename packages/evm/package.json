@@ -38,7 +38,7 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "^0.3.31"
+    "viem": "^0.3.34"
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
