@@ -1,4 +1,8 @@
-import { ERC20Client, InterchainTokenServiceClient } from "@axelarjs/evm";
+import {
+  ERC20Client,
+  InterchainTokenClient,
+  InterchainTokenServiceClient,
+} from "@axelarjs/evm";
 import type { inferAsyncReturnType } from "@trpc/server";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Chain } from "wagmi";
@@ -28,6 +32,9 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     contracts: {
       createERC20Client(chain: Chain, address: `0x${string}`) {
         return new ERC20Client({ chain, address });
+      },
+      createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
+        return new InterchainTokenClient({ chain, address });
       },
       createInterchainTokenServiceClient(
         chain: Chain,

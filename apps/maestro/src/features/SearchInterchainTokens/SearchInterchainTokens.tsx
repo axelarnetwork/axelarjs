@@ -12,10 +12,8 @@ import { useNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import {
-  useGetERC20TokenDetailsQuery,
-  useInterchainTokensQuery,
-} from "~/services/gmp/hooks";
+import { useGetERC20TokenDetailsQuery } from "~/services/erc20/hooks";
+import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
 export type SearchInterchainTokens = {
   onTokenFound: (result: {

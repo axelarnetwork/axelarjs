@@ -26,6 +26,11 @@ export default {
           type: "address",
         },
         {
+          internalType: "address",
+          name: "expressCallHandlerAddress_",
+          type: "address",
+        },
+        {
           internalType: "string",
           name: "chainName_",
           type: "string",
@@ -33,6 +38,11 @@ export default {
       ],
       stateMutability: "nonpayable",
       type: "constructor",
+    },
+    {
+      inputs: [],
+      name: "AlreadyExpressExecuted",
+      type: "error",
     },
     {
       inputs: [],
@@ -53,6 +63,11 @@ export default {
         },
       ],
       name: "ExceedMintLimit",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "ExecutionFailed",
       type: "error",
     },
     {
@@ -78,6 +93,11 @@ export default {
     {
       inputs: [],
       name: "InvalidOwner",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "InvalidSelector",
       type: "error",
     },
     {
@@ -122,12 +142,22 @@ export default {
     },
     {
       inputs: [],
+      name: "NotRegistered",
+      type: "error",
+    },
+    {
+      inputs: [],
       name: "NotSelf",
       type: "error",
     },
     {
       inputs: [],
       name: "SetupFailed",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "SymbolTooLong",
       type: "error",
     },
     {
@@ -180,10 +210,10 @@ export default {
       anonymous: false,
       inputs: [
         {
-          indexed: false,
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
+          indexed: true,
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
         },
         {
           indexed: true,
@@ -192,10 +222,16 @@ export default {
           type: "address",
         },
         {
-          indexed: true,
+          indexed: false,
           internalType: "uint256",
           name: "amount",
           type: "uint256",
+        },
+        {
+          indexed: false,
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
         },
       ],
       name: "Receiving",
@@ -205,6 +241,12 @@ export default {
       anonymous: false,
       inputs: [
         {
+          indexed: true,
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
           indexed: false,
           internalType: "string",
           name: "sourceChain",
@@ -217,22 +259,34 @@ export default {
           type: "address",
         },
         {
-          indexed: true,
+          indexed: false,
           internalType: "uint256",
           name: "amount",
           type: "uint256",
         },
         {
-          indexed: true,
-          internalType: "address",
+          indexed: false,
+          internalType: "bytes",
           name: "from",
-          type: "address",
+          type: "bytes",
         },
         {
           indexed: false,
           internalType: "bytes",
           name: "data",
           type: "bytes",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+        {
+          indexed: false,
+          internalType: "bool",
+          name: "executionSuccessful",
+          type: "bool",
         },
       ],
       name: "ReceivingWithData",
@@ -284,6 +338,12 @@ export default {
           name: "amount",
           type: "uint256",
         },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
       ],
       name: "Sending",
       type: "event",
@@ -291,6 +351,12 @@ export default {
     {
       anonymous: false,
       inputs: [
+        {
+          indexed: false,
+          internalType: "address",
+          name: "sourceAddress",
+          type: "address",
+        },
         {
           indexed: false,
           internalType: "string",
@@ -310,16 +376,16 @@ export default {
           type: "uint256",
         },
         {
-          indexed: true,
-          internalType: "address",
-          name: "from",
-          type: "address",
-        },
-        {
           indexed: false,
           internalType: "bytes",
           name: "data",
           type: "bytes",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
         },
       ],
       name: "SendingWithData",
@@ -447,7 +513,7 @@ export default {
           type: "bytes",
         },
       ],
-      name: "callContractWithInterToken",
+      name: "callContractWithInterchainToken",
       outputs: [],
       stateMutability: "payable",
       type: "function",
@@ -553,12 +619,12 @@ export default {
         },
         {
           internalType: "string[]",
-          name: "",
+          name: "destinationChains",
           type: "string[]",
         },
         {
           internalType: "uint256[]",
-          name: "",
+          name: "gasValues",
           type: "uint256[]",
         },
       ],
@@ -664,6 +730,90 @@ export default {
     },
     {
       inputs: [],
+      name: "expressCallHandler",
+      outputs: [
+        {
+          internalType: "contract IExpressCallHandler",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "address",
+          name: "destinationAddress",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+      ],
+      name: "expressExecute",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "sourceChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "sourceAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "address",
+          name: "destinationAddress",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+        {
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+      ],
+      name: "expressExecuteWithToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
       name: "gasService",
       outputs: [
         {
@@ -749,6 +899,25 @@ export default {
       inputs: [
         {
           internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+      ],
+      name: "getCustomInterchainTokenId",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "pure",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
           name: "sender",
           type: "address",
         },
@@ -773,6 +942,25 @@ export default {
       inputs: [
         {
           internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "getGatewayTokenSymbol",
+      outputs: [
+        {
+          internalType: "string",
+          name: "symbol",
+          type: "string",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
           name: "key",
           type: "bytes32",
         },
@@ -783,6 +971,30 @@ export default {
           internalType: "int256",
           name: "",
           type: "int256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "sender",
+          type: "address",
+        },
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+      ],
+      name: "getInterchainTokenId",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "",
+          type: "bytes32",
         },
       ],
       stateMutability: "view",
@@ -954,6 +1166,82 @@ export default {
       type: "function",
     },
     {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "isCustomInterchainToken",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "isGatewayToken",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "isOriginToken",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "isRemoteGatewayToken",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       inputs: [],
       name: "linkerRouter",
       outputs: [
@@ -1083,6 +1371,209 @@ export default {
       type: "function",
     },
     {
+      inputs: [],
+      name: "registerSelfAsInterchainToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "origin",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "tokenName",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "tokenSymbol",
+          type: "string",
+        },
+        {
+          internalType: "uint8",
+          name: "decimals",
+          type: "uint8",
+        },
+        {
+          internalType: "bool",
+          name: "isGateway",
+          type: "bool",
+        },
+      ],
+      name: "selfDeployToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+      ],
+      name: "selfSendToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "sourceChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "sourceAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+        {
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+      ],
+      name: "selfSendTokenWithData",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+      ],
+      name: "selfTransferOrMint",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "sourceChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "sourceAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+        {
+          internalType: "bytes32",
+          name: "sendHash",
+          type: "bytes32",
+        },
+      ],
+      name: "selfTransferOrMintWithData",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
       inputs: [
         {
           internalType: "address",
@@ -1136,6 +1627,37 @@ export default {
       name: "sendToken",
       outputs: [],
       stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "mintLimit",
+          type: "uint256",
+        },
+      ],
+      name: "setSelfMintLimit",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "uint256",
+          name: "mintLimit",
+          type: "uint256",
+        },
+      ],
+      name: "setTokenMintLimit",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
