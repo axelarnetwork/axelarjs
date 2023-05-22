@@ -25,8 +25,8 @@ import { useChainFromRoute } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useGetERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
-  useGetERC20TokenDetailsQuery,
   useGetTransactionStatusOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
