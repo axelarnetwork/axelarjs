@@ -49,6 +49,7 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
   });
+
   const router = useRouter();
 
   const { switchNetworkAsync } = useSwitchNetwork();
