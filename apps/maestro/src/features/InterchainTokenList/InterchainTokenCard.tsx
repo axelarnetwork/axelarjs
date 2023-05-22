@@ -16,7 +16,7 @@ import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/gmp/hooks";
+import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/erc20/hooks";
 
 import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";
