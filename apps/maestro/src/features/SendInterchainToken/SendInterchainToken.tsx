@@ -33,7 +33,6 @@ type FormState = {
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
-  tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
@@ -86,7 +85,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
       tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
       destinationChainId: selectedToChain.chain_name,
       sourceChainId: props.sourceChain.chain_name,
     });
@@ -120,7 +118,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     await sendTokenAsync(
       {
         tokenAddress: props.tokenAddress,
-        tokenId: props.tokenId,
         amount: amountToSend,
         onStatusUpdate(status) {
           if (status.type === "failed") {
@@ -282,7 +279,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   }
 
                   const bnBalance = parseUnits(
-                    `${Number(props.balance.tokenBalance)}`,
+                    `${props.balance.tokenBalance}` as `${number}`,
                     Number(props.balance.decimals)
                   );
 

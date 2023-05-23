@@ -25,7 +25,7 @@ import { useChainFromRoute } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
-import { useGetERC20TokenDetailsQuery } from "~/services/erc20/hooks";
+import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
   useGetTransactionStatusOnDestinationChainsQuery,
   useInterchainTokensQuery,
@@ -48,7 +48,7 @@ const InterchainTokensPage = () => {
     tokenAddress: tokenAddress as `0x${string}`,
   });
 
-  const { data: tokenDetails } = useGetERC20TokenDetailsQuery({
+  const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: routeChain?.id,
     tokenAddress: tokenAddress as `0x${string}`,
   });
@@ -186,7 +186,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const [selectedChainIds, setSelectedChainIds] = useState<number[]>([]);
 
   const [registered, unregistered] = Maybe.of(
-    interchainToken?.matchingTokens
+    interchainToken?.matchingTokens?.map((x) => ({
+      ...x,
+      decimals: Number(tokenDetails?.decimals),
+    }))
   ).mapOr(
     [[], []],
     partition((x) => x.isRegistered)
