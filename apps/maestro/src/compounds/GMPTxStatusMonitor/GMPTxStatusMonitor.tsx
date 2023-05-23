@@ -71,7 +71,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     if (isLoading) {
       return (
         <div className="grid place-items-center gap-4">
-          <div className="flex">Loading chain deployment status...</div>
+          <div className="flex">Loading transaction status...</div>
         </div>
       );
     }

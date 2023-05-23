@@ -24,7 +24,11 @@
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
     "dev:docs": "pnpm -C ./apps/docs run dev"
   },
-  "keywords": [],
+  "keywords": [
+    "Axelar Network",
+    "Cross-chain",
+    "Interoperability"
+  ],
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {

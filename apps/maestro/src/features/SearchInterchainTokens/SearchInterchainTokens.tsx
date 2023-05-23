@@ -12,8 +12,8 @@ import { useNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useGetERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
 export type SearchInterchainTokens = {
   onTokenFound: (result: {
@@ -32,7 +32,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
 
   const isValidAddress = isAddress(search as `0x${string}`);
 
-  const { data: tokenDetails } = useGetERC20TokenDetailsQuery({
+  const { data: tokenDetails } = useInterchainTokenDetailsQuery({
     chainId: chain?.id,
     tokenAddress: search as `0x${string}`,
   });

@@ -1,4 +1,4 @@
-import { useMemo, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { EVMChainConfig } from "@axelarjs/api";
@@ -10,37 +10,25 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
-import invariant from "tiny-invariant";
-import { formatUnits, parseUnits } from "viem";
+import { useWaitForTransaction } from "wagmi";
 
-import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
-import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
-import { logger } from "~/lib/logger";
+import { useMintInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-
-import {
-  useSendInterchainTokenMutation,
-  type TransactionState,
-} from "./hooks/useSendInterchainTokenMutation";
 
 type FormState = {
-  amountToSend: string;
+  amountToMint: string;
 };
 
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
+  tokenDecimals: number;
   tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
+  accountAddress: `0x${string}`;
   onClose?: () => void;
-  balance: {
-    tokenBalance: string;
-    decimals: string | number;
-  };
 };
 
 const ALLOWED_NON_NUMERIC_KEYS = [
@@ -54,42 +42,43 @@ const ALLOWED_NON_NUMERIC_KEYS = [
   "Enter",
 ];
 
+type TransactionState =
+  | "idle"
+  | "pending_approval"
+  | "pending_confirmation"
+  | "confirmed"
+  | "error";
+
 export const MintInterchainToken: FC<Props> = (props) => {
-  const { computed } = useEVMChainConfigsQuery();
-
-  const { data: interchainToken } = useInterchainTokensQuery({
-    tokenAddress: props.tokenAddress,
-    chainId: props.sourceChain.chain_id,
-  });
-
   const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
-  const [toChainId, setToChainId] = useState(5);
 
-  const eligibleTargetChains = useMemo(() => {
-    return (interchainToken?.matchingTokens ?? [])
-      .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
-      .map((x) => computed.indexedByChainId[x.chainId]);
-  }, [
-    interchainToken?.matchingTokens,
-    props.sourceChain.chain_id,
-    computed.indexedByChainId,
-  ]);
+  const [txState, setTxState] = useState<TransactionState>("idle");
 
-  const selectedToChain = useMemo(
-    () =>
-      eligibleTargetChains.find((c) => c.chain_id === toChainId) ??
-      eligibleTargetChains[0],
+  const {
+    writeAsync: mintTokenAsync,
+    isLoading: isMinting,
+    data: mintResult,
+  } = useMintInterchainToken({
+    address: props.tokenAddress,
+  });
+  const trpcContext = trpc.useContext();
 
-    [toChainId, eligibleTargetChains]
-  );
+  useWaitForTransaction({
+    hash: mintResult?.hash,
+    async onSuccess(receipt) {
+      if (!mintResult) {
+        return;
+      }
 
-  const { mutateAsync: sendTokenAsync, isLoading: isSending } =
-    useSendInterchainTokenMutation({
-      tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
-      destinationChainId: selectedToChain.chain_name,
-      sourceChainId: props.sourceChain.chain_name,
-    });
+      setTxState("confirmed");
+
+      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+
+      toast.success("Successfully minted interchain tokens");
+
+      console.log("receipt", receipt);
+    },
+  });
 
   const {
     register,
@@ -97,171 +86,66 @@ export const MintInterchainToken: FC<Props> = (props) => {
     watch,
     formState,
     reset: resetForm,
-    setValue,
   } = useForm<FormState>({
     defaultValues: {
-      amountToSend: undefined,
+      amountToMint: undefined,
     },
     mode: "onChange",
     reValidateMode: "onChange",
   });
 
-  const amountToSend = watch("amountToSend");
-
-  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>({
-    type: "idle",
-  });
+  const amountToMint = watch("amountToMint");
 
   const submitHandler: SubmitHandler<FormState> = async (_data, e) => {
     e?.preventDefault();
 
-    invariant(selectedToChain, "selectedToChain is undefined");
+    const decimalAdjustment = BigInt(10 ** props.tokenDecimals);
+    const adjustedAmount = BigInt(amountToMint) * decimalAdjustment;
 
-    await sendTokenAsync(
-      {
-        tokenAddress: props.tokenAddress,
-        tokenId: props.tokenId,
-        amount: amountToSend,
-        onStatusUpdate(status) {
-          if (status.type === "failed") {
-            toast.error("Failed to send token. Please try again.");
-            logger.always.error(status.error);
-          }
-          setSendTokenStatus(status);
-        },
-      },
-      {
-        // handles unhandled errors in the mutation
-        onError(error) {
-          if (error instanceof Error) {
-            toast.error("Failed to send token. Please try again.");
-            logger.always.error(error);
-          }
-        },
-      }
-    );
+    setTxState("pending_approval");
+    await mintTokenAsync({
+      args: [props.accountAddress, adjustedAmount],
+    });
+    setTxState("pending_confirmation");
   };
-
-  const buttonChildren = useMemo(() => {
-    switch (sendTokenStatus?.type) {
-      case "awaiting_approval":
-        return (
-          <>
-            Approve {amountToSend} tokens to be sent to {selectedToChain?.name}
-          </>
-        );
-      case "awaiting_confirmation":
-        return <>Confirm transaction on wallet</>;
-      case "sending":
-        return (
-          <>
-            Sending {amountToSend} tokens to {selectedToChain?.name}
-          </>
-        );
-      default:
-        if (!formState.isValid) {
-          return formState.errors.amountToSend?.message ?? "Amount is reauired";
-        }
-        return (
-          <>
-            Send {amountToSend || 0} tokens to {selectedToChain?.name}
-          </>
-        );
-    }
-  }, [
-    amountToSend,
-    formState.errors.amountToSend?.message,
-    formState.isValid,
-    selectedToChain?.name,
-    sendTokenStatus?.type,
-  ]);
-
-  const trpcContext = trpc.useContext();
-
-  const isFormDisabled =
-    sendTokenStatus.type !== "idle" && sendTokenStatus.type !== "failed";
 
   return (
     <Modal
       trigger={props.trigger}
-      disableCloseButton={isFormDisabled}
+      disableCloseButton={isMinting}
       open={isModalOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          if (isFormDisabled) {
+          if (isMinting) {
             return;
           }
           props.onClose?.();
           resetForm();
-          setSendTokenStatus({ type: "idle" });
         }
         setIsModalOpen(isOpen);
       }}
     >
       <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title>Send interchain token</Modal.Title>
-        <div className="my-4 grid grid-cols-2 gap-4 p-1">
-          <div className="flex items-center gap-2">
-            <label className="text-md align-top">From:</label>
-            <EVMChainsDropdown
-              disabled
-              compact
-              selectedChain={props.sourceChain}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-md align-top">To:</label>
-            <EVMChainsDropdown
-              compact
-              selectedChain={selectedToChain}
-              chains={eligibleTargetChains}
-              disabled={isFormDisabled || eligibleTargetChains.length <= 1}
-              onSwitchNetwork={(chain_id) => {
-                const target = computed.indexedByChainId[chain_id];
-                if (target) {
-                  setToChainId(target?.chain_id);
-                }
-              }}
-            />
-          </div>
-        </div>
-
+        <Modal.Title className="flex">
+          <span>Mint interchain tokens on</span>
+          <EVMChainsDropdown
+            disabled
+            compact
+            selectedChain={props.sourceChain}
+          />
+        </Modal.Title>
         <form
           className="flex flex-1 flex-col justify-between"
           onSubmit={handleSubmit(submitHandler)}
         >
           <FormControl>
-            <Label htmlFor="amountToSend">
-              <Label.Text>Amount to send</Label.Text>
-              <Label.AltText
-                role="button"
-                onClick={() => {
-                  setValue(
-                    "amountToSend",
-                    formatUnits(
-                      BigInt(props.balance.tokenBalance),
-                      Number(props.balance.decimals)
-                    ).replace(/,/gi, "")
-                  );
-                }}
-              >
-                Balance:{" "}
-                <BigNumberText
-                  decimals={Number(props.balance.decimals)}
-                  localeOptions={{
-                    style: "decimal",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 4,
-                  }}
-                >
-                  {BigInt(props.balance.tokenBalance)}
-                </BigNumberText>
-              </Label.AltText>
+            <Label htmlFor="amountToMint">
+              <Label.Text>Amount to mint</Label.Text>
             </Label>
             <TextInput
-              id="amountToSend"
+              id="amountToMint"
               bordered
-              placeholder="Enter your amount to send"
+              placeholder="Enter your amount to mint"
               min={0}
               onKeyDown={(e) => {
                 // prevent non-numeric characters
@@ -274,20 +158,11 @@ export const MintInterchainToken: FC<Props> = (props) => {
                   e.preventDefault();
                 }
               }}
-              {...register("amountToSend", {
-                disabled: isFormDisabled,
+              {...register("amountToMint", {
+                disabled: isMinting,
                 validate(value) {
                   if (!value || value === "0") {
                     return "Amount must be greater than 0";
-                  }
-
-                  const bnBalance = parseUnits(
-                    `${Number(props.balance.tokenBalance)}`,
-                    Number(props.balance.decimals)
-                  );
-
-                  if (BigInt(value) > bnBalance) {
-                    return "Insufficient balance";
                   }
 
                   return true;
@@ -295,24 +170,17 @@ export const MintInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
-          {sendTokenStatus?.type === "sending" && (
-            <GMPTxStatusMonitor
-              txHash={sendTokenStatus.txHash}
-              onAllChainsExecuted={async () => {
-                await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
-                resetForm();
-                setSendTokenStatus({ type: "idle" });
-                toast.success("Tokens sent successfully!");
-              }}
-            />
-          )}
+
           <Button
             color="primary"
             type="submit"
-            disabled={!formState.isValid || isFormDisabled}
-            loading={isSending}
+            disabled={!formState.isValid || isMinting}
+            loading={
+              txState === "pending_approval" ||
+              txState === "pending_confirmation"
+            }
           >
-            {buttonChildren}
+            Mint tokens
           </Button>
         </form>
       </Modal.Body>

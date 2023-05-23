@@ -2,11 +2,11 @@ import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
 
-export function useERC20TokenDetailsQuery(input: {
+export function useInterchainTokenDetailsQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
 }) {
-  return trpc.erc20.getERC20TokenDetails.useQuery(
+  return trpc.interchainToken.getInterchainTokenDetails.useQuery(
     {
       chainId: Number(input.chainId),
       tokenAddress: String(input.tokenAddress),
@@ -19,12 +19,12 @@ export function useERC20TokenDetailsQuery(input: {
   );
 }
 
-export function useERC20TokenBalanceForOwnerQuery(input: {
+export function useInterchainTokenBalanceForOwnerQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
   owner?: `0x${string}`;
 }) {
-  return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
+  return trpc.interchainToken.getInterchainTokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),
       tokenAddress: String(input.tokenAddress),

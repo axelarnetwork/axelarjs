@@ -46,26 +46,26 @@ export function useInterchainTokenServiceWrites(
 
 export function useInterchainTokenServiceDeployInterchainToken(
   config: Config & {
-    gas: bigint;
+    value: bigint;
   }
 ) {
   return useContractWrite({
     abi: ABI,
     functionName: "deployInterchainToken",
     address: config.address,
-    value: config.gas,
+    value: config.value,
   });
 }
 
 export function useInterchainTokenServiceDeployRemoteTokens(
   config: Config & {
-    gas: bigint;
+    value: bigint;
   }
 ) {
   return useContractWrite({
-    address: config.address,
     abi: ABI,
+    address: config.address,
     functionName: "deployRemoteTokens",
-    value: config.gas,
+    value: config.value,
   });
 }

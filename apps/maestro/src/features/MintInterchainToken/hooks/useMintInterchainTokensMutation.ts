@@ -11,17 +11,17 @@ export type TransactionState =
   | { type: "failed"; error: Error }
   | { type: "awaiting_approval" }
   | { type: "awaiting_confirmation"; txHash: `0x${string}` }
-  | { type: "sending"; txHash: `0x${string}` }
+  | { type: "minting"; txHash: `0x${string}` }
   | { type: "confirmed"; txHash: `0x${string}` };
 
-export type UseSendInterchainTokenConfig = {
+export type UseMintInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   sourceChainId: string;
   destinationChainId: string;
 };
 
-export type UseSendInterchainTokenInput = {
+export type UseMintInterchainTokenInput = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   amount: string;
@@ -33,8 +33,8 @@ const TOKEN_LINKER_ADDRESS = String(
   process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
 ) as `0x${string}`;
 
-export function useSendInterchainTokenMutation(
-  config: UseSendInterchainTokenConfig
+export function useMintInterchainTokensMutation(
+  config: UseMintInterchainTokenConfig
 ) {
   const { data: walletClient } = useWalletClient();
   const erc20Reads = useERC20Reads({
@@ -47,7 +47,7 @@ export function useSendInterchainTokenMutation(
 
   const { address } = useAccount();
 
-  const tokenLinker = useInterchainTokenServiceWrites({
+  const tokenService = useInterchainTokenServiceWrites({
     address: TOKEN_LINKER_ADDRESS,
     walletClient,
   });
@@ -58,8 +58,8 @@ export function useSendInterchainTokenMutation(
     sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
   });
 
-  return useMutation(async (input: UseSendInterchainTokenInput) => {
-    if (!(erc20Reads && address && tokenLinker && gas)) {
+  return useMutation(async (input: UseMintInterchainTokenInput) => {
+    if (!(erc20Reads && address && tokenService && gas)) {
       return;
     }
 
@@ -97,13 +97,13 @@ export function useSendInterchainTokenMutation(
 
     try {
       //send token
-      const sendTokenTxHash = await tokenLinker.sendToken(
+      const sendTokenTxHash = await tokenService.sendToken(
         [input.tokenId, config.destinationChainId, address, bnAmount],
         { value: BigInt(gas) * BigInt(2) }
       );
 
       onStatusUpdate?.({
-        type: "sending",
+        type: "minting",
         txHash: sendTokenTxHash,
       });
 

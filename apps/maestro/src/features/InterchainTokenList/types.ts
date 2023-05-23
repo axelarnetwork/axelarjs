@@ -8,6 +8,7 @@ export type TokenInfo = {
   isOriginToken: boolean;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
+  decimals: number;
   isSelected?: boolean;
   chain?: EVMChainConfig;
   wagmiConfig?: WagmiEVMChainConfig;
