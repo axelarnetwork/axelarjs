@@ -58,12 +58,8 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const statusList = Object.values(statuses ?? {});
 
   useEffect(() => {
-    if (
-      statusList.length > 0 &&
-      statusList.every((s) => s === "executed") &&
-      onAllChainsExecuted
-    ) {
-      onAllChainsExecuted();
+    if (statusList?.every((s) => s === "executed")) {
+      onAllChainsExecuted?.();
     }
   }, [statusList, onAllChainsExecuted]);
 
