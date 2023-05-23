@@ -282,7 +282,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   }
 
                   const bnBalance = parseUnits(
-                    `${Number(props.balance.tokenBalance)}`,
+                    `${props.balance.tokenBalance}` as `${number}`,
                     Number(props.balance.decimals)
                   );
 

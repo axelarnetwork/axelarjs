@@ -2,7 +2,7 @@ import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
 
-export function useGetERC20TokenDetailsQuery(input: {
+export function useERC20TokenDetailsQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
 }) {
@@ -19,7 +19,7 @@ export function useGetERC20TokenDetailsQuery(input: {
   );
 }
 
-export function useGetERC20TokenBalanceForOwnerQuery(input: {
+export function useERC20TokenBalanceForOwnerQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
   owner?: `0x${string}`;

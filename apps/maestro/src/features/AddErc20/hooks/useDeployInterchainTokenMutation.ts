@@ -32,7 +32,7 @@ export type UseDeployAndRegisterInterchainTokenInput = {
 };
 
 export function useDeployInterchainTokenMutation(config: {
-  gas: bigint;
+  value: bigint;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }) {
@@ -45,7 +45,7 @@ export function useDeployInterchainTokenMutation(config: {
     data: deployInterchainTokenResult,
   } = useInterchainTokenServiceDeployInterchainToken({
     address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-    gas: config.gas,
+    value: config.value,
   });
 
   let currentInput: UseDeployAndRegisterInterchainTokenInput = {

@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { useCallback, useState, type FC } from "react";
 
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import {
@@ -16,8 +16,9 @@ import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import { useGetERC20TokenBalanceForOwnerQuery } from "~/services/erc20/hooks";
+import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 
+import { MintInterchainToken } from "../MintInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";
 
@@ -37,14 +38,14 @@ const StatusIndicator = (
   );
 };
 
-export type InterchainTokenCardProps = TokenInfo & {
-  onToggleSelection?: () => void;
-};
+export type RegisteredInterchainTokenCardProps = TokenInfo;
 
-export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
+export const RegisteredInterchainTokenCard: FC<
+  RegisteredInterchainTokenCardProps
+> = (props) => {
   const { address } = useAccount();
   const { chain } = useNetwork();
-  const { data: balance } = useGetERC20TokenBalanceForOwnerQuery({
+  const { data: balance } = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
@@ -54,9 +55,7 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
 
   const { switchNetworkAsync } = useSwitchNetwork();
 
-  const isSourceChain = chain?.id === props.chainId;
-
-  const handleSwitchChain = async () => {
+  const handleSwitchChain = useCallback(async () => {
     try {
       await switchNetworkAsync?.(props.chainId);
 
@@ -64,52 +63,41 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
         `/${sluggify(props.wagmiConfig?.name ?? "")}/${props.tokenAddress}`
       );
     } catch (error) {}
-  };
+  }, [
+    props.chainId,
+    props.tokenAddress,
+    props.wagmiConfig?.name,
+    router,
+    switchNetworkAsync,
+  ]);
 
-  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<"send" | "mint" | null>(null);
+
+  const isSourceChain = chain?.id === props.chainId;
+
+  const switchChainButton = (
+    <Button
+      size="xs"
+      className="flex items-center gap-2"
+      onClick={handleSwitchChain}
+    >
+      switch to{" "}
+      <ChainIcon
+        src={props.chain?.image ?? ""}
+        size="xs"
+        alt={props.chain?.name ?? ""}
+      />
+    </Button>
+  );
 
   return (
     <Card
-      compact={true}
-      key={props.chainId}
-      bordered={!props.isRegistered}
-      onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
+      compact
       className={clsx(
         "bg-base-200 dark:bg-base-300 relative overflow-hidden transition-all ease-in",
-        "hover:opacity-75 hover:shadow-xl",
-        {
-          "shadow-sm": !props.isRegistered,
-          "cursor-pointer": props.onToggleSelection,
-          "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 ring-4":
-            props.isSelected,
-        }
+        "hover:opacity-75 hover:shadow-xl"
       )}
-      aria-label={
-        props.onToggleSelection ? "click to toggle token selection" : undefined
-      }
-      aria-selected={props.isSelected}
-      $as={
-        props.onToggleSelection && !props.deploymentStatus
-          ? "button"
-          : undefined
-      }
-      role={props.onToggleSelection ? "switch" : undefined}
     >
-      {props.onToggleSelection && (
-        <div
-          style={{
-            backgroundImage: `url(${props.chain?.image})`,
-          }}
-          className={clsx(
-            "absolute inset-0 scale-100 bg-cover opacity-0 blur-3xl transition-all duration-300",
-            "bg-center delay-150 hover:scale-150 hover:opacity-20",
-            {
-              "scale-125 opacity-25 hover:scale-150 hover:blur-sm":
-                props.isSelected,
-            }
-          )}
-        />
-      )}
       <Card.Body className="w-full">
         <Card.Title className="justify-between">
           {props.chain && (
@@ -139,9 +127,7 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
             </Badge>
           )}
         </Card.Title>
-        {!props.isRegistered && (
-          <div className="mx-auto">Remote token not registered</div>
-        )}
+
         {balance?.tokenBalance && (
           <div
             className={clsx(
@@ -149,7 +135,44 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
             )}
           >
             {balance.tokenBalance === "0" ? (
-              <span className="mx-auto">No balance</span>
+              <div className="flex w-full items-center justify-between">
+                <span className="mx-auto">No balance</span>
+                {balance.isTokenOwner &&
+                  (isSourceChain ? (
+                    <>
+                      <Button
+                        size="xs"
+                        color="primary"
+                        onClick={setActiveModal.bind(null, "mint")}
+                      >
+                        mint
+                      </Button>
+                      {address && (
+                        <MintInterchainToken
+                          isOpen={activeModal === "mint"}
+                          onClose={setActiveModal.bind(null, null)}
+                          accountAddress={address}
+                          trigger={
+                            <Button
+                              size="xs"
+                              color="primary"
+                              // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                              className="absolute right-6"
+                            >
+                              mint
+                            </Button>
+                          }
+                          tokenAddress={props.tokenAddress}
+                          tokenDecimals={props.decimals}
+                          tokenId={props.tokenId}
+                          sourceChain={props.chain as EVMChainConfig}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    switchChainButton
+                  ))}
+              </div>
             ) : (
               <>
                 <div>
@@ -165,59 +188,132 @@ export const InterchainTokenCard: FC<InterchainTokenCardProps> = (props) => {
                   </BigNumberText>
                 </div>
                 {isSourceChain ? (
-                  <SendInterchainToken
-                    isOpen={isSendModalOpen}
-                    onClose={() => setIsSendModalOpen(false)}
-                    trigger={
-                      <Button
-                        size="xs"
-                        color="primary"
-                        // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                        className="absolute right-6"
-                      >
-                        send
-                      </Button>
-                    }
-                    tokenAddress={props.tokenAddress}
-                    tokenId={props.tokenId}
-                    sourceChain={props.chain as EVMChainConfig}
-                    balance={balance}
-                  />
-                ) : (
-                  <Button
-                    size="xs"
-                    className="flex items-center gap-2"
-                    onClick={handleSwitchChain}
-                  >
-                    switch to{" "}
-                    <ChainIcon
-                      src={props.chain?.image ?? ""}
-                      size="xs"
-                      alt={props.chain?.name ?? ""}
+                  <>
+                    <SendInterchainToken
+                      isOpen={activeModal === "send"}
+                      onClose={setActiveModal.bind(null, null)}
+                      trigger={
+                        <Button
+                          size="xs"
+                          color="primary"
+                          // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                          className="absolute right-6"
+                        >
+                          send
+                        </Button>
+                      }
+                      tokenAddress={props.tokenAddress}
+                      tokenId={props.tokenId}
+                      sourceChain={props.chain as EVMChainConfig}
+                      balance={balance}
                     />
-                  </Button>
+                  </>
+                ) : (
+                  switchChainButton
                 )}
               </>
             )}
           </div>
         )}
         <Card.Actions className="justify-between">
-          {props.isRegistered && (
-            <CopyToClipboardButton
-              copyText={props.tokenAddress}
-              ghost={true}
-              length="block"
-              size="sm"
-              className="bg-base-300 dark:bg-base-100"
-            >
-              {maskAddress(props.tokenAddress, {
-                segmentA: 14,
-                segmentB: -10,
-              })}
-            </CopyToClipboardButton>
-          )}
+          <CopyToClipboardButton
+            copyText={props.tokenAddress}
+            ghost={true}
+            length="block"
+            size="sm"
+            className="bg-base-300 dark:bg-base-100"
+          >
+            {maskAddress(props.tokenAddress, {
+              segmentA: 14,
+              segmentB: -10,
+            })}
+          </CopyToClipboardButton>
         </Card.Actions>
       </Card.Body>
     </Card>
+  );
+};
+
+type UnregisteredInterchainTokenCardProps = TokenInfo & {
+  onToggleSelection?: () => void;
+};
+
+export const UnregisteredInterchainTokenCard: FC<
+  UnregisteredInterchainTokenCardProps
+> = (props) => {
+  return (
+    <>
+      <Card
+        compact
+        bordered
+        onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
+        className={clsx(
+          "bg-base-200 dark:bg-base-300 relative overflow-hidden transition-all ease-in",
+          "hover:opacity-75 hover:shadow-xl",
+          {
+            "cursor-pointer": props.onToggleSelection,
+            "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 ring-4":
+              props.isSelected,
+          }
+        )}
+        aria-label={
+          props.onToggleSelection
+            ? "click to toggle token selection"
+            : undefined
+        }
+        aria-selected={props.isSelected}
+        $as={
+          props.onToggleSelection && !props.deploymentStatus
+            ? "button"
+            : undefined
+        }
+        role={props.onToggleSelection ? "switch" : undefined}
+      >
+        {props.onToggleSelection && (
+          <div
+            style={{
+              backgroundImage: `url(${props.chain?.image})`,
+            }}
+            className={clsx(
+              "absolute inset-0 scale-100 bg-cover opacity-0 blur-3xl transition-all duration-300",
+              "bg-center delay-150 hover:scale-150 hover:opacity-20",
+              {
+                "scale-125 opacity-25 hover:scale-150 hover:blur-sm":
+                  props.isSelected,
+              }
+            )}
+          />
+        )}
+        <Card.Body className="w-full">
+          <Card.Title className="justify-between">
+            {props.chain && (
+              <span className="flex items-center gap-2">
+                <ChainIcon
+                  src={props.chain.image}
+                  alt={props.chain.name}
+                  size="md"
+                />
+                {props.chain.name}
+              </span>
+            )}
+            {props.deploymentStatus && (
+              <Badge
+                outline
+                color="warning"
+                className="flex items-center gap-0.5"
+              >
+                <span className="-translate-x-1">
+                  <SpinnerIcon className="text-info h-2.5 w-2.5 animate-spin" />
+                </span>
+                <span className="-translate-y-px">
+                  {props.deploymentStatus}
+                </span>
+              </Badge>
+            )}
+          </Card.Title>
+          <div className="mx-auto">Remote token not registered</div>
+        </Card.Body>
+      </Card>
+    </>
   );
 };

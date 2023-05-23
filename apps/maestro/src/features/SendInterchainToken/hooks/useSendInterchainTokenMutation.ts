@@ -1,7 +1,8 @@
 import { parseUnits } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
-import { useERC20Approve, useERC20Reads } from "~/lib/contract/hooks/useERC20";
+import { useERC20Reads } from "~/lib/contract/hooks/useERC20";
+import { useTransferInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -41,10 +42,6 @@ export function useSendInterchainTokenMutation(
     address: config.tokenAddress,
   });
 
-  const { writeAsync: approveERC20Spend } = useERC20Approve({
-    address: config.tokenAddress,
-  });
-
   const { address } = useAccount();
 
   const tokenLinker = useInterchainTokenServiceWrites({
@@ -58,69 +55,45 @@ export function useSendInterchainTokenMutation(
     sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
   });
 
-  return useMutation(async (input: UseSendInterchainTokenInput) => {
-    if (!(erc20Reads && address && tokenLinker && gas)) {
-      return;
-    }
-
-    const { onFinished, onStatusUpdate } = input;
-
-    const decimals = await erc20Reads.decimals();
-    const bnAmount = parseUnits(`${Number(input.amount)}`, decimals);
-
-    //approve
-    try {
-      onStatusUpdate?.({
-        type: "awaiting_approval",
-      });
-
-      const tx = await approveERC20Spend({
-        args: [TOKEN_LINKER_ADDRESS, bnAmount],
-      });
-
-      onStatusUpdate?.({
-        type: "confirmed",
-        txHash: tx.hash,
-      });
-    } catch (e) {
-      if (e instanceof Error) {
-        onStatusUpdate?.({ type: "failed", error: e });
-      } else {
-        onStatusUpdate?.({
-          type: "failed",
-          error: new Error("failed to approve token spend amount"),
-        });
-      }
-
-      return;
-    }
-
-    try {
-      //send token
-      const sendTokenTxHash = await tokenLinker.sendToken(
-        [input.tokenId, config.destinationChainId, address, bnAmount],
-        { value: BigInt(gas) * BigInt(2) }
-      );
-
-      onStatusUpdate?.({
-        type: "sending",
-        txHash: sendTokenTxHash,
-      });
-
-      if (onFinished) {
-        onFinished();
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        onStatusUpdate?.({ type: "failed", error: e });
-      } else {
-        onStatusUpdate?.({
-          type: "failed",
-          error: new Error("Failed to send token"),
-        });
-      }
-
-      return;
-    }
+  const { writeAsync: transferAsync } = useTransferInterchainToken({
+    address: config.tokenAddress,
+    value: BigInt(gas ?? 0) * BigInt(2),
   });
+
+  return useMutation<void, unknown, UseSendInterchainTokenInput>(
+    async ({ amount, tokenId, onStatusUpdate }) => {
+      if (!(erc20Reads && address && tokenLinker && gas)) {
+        return;
+      }
+
+      const decimals = await erc20Reads.decimals();
+      const bnAmount = parseUnits(`${Number(amount)}`, decimals);
+
+      try {
+        onStatusUpdate?.({
+          type: "awaiting_approval",
+        });
+
+        const tx = await transferAsync({
+          args: [config.destinationChainId, address, bnAmount, tokenId],
+        });
+
+        onStatusUpdate?.({
+          type: "sending",
+          txHash: tx.hash,
+        });
+      } catch (e) {
+        if (e instanceof Error) {
+          onStatusUpdate?.({ type: "failed", error: e });
+        } else {
+          onStatusUpdate?.({
+            type: "failed",
+            error: new Error("failed to transfer token"),
+          });
+        }
+
+        return;
+      }
+    }
+  );
 }

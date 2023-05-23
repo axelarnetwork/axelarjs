@@ -23,7 +23,7 @@ export function useDeployRemoteTokensMutation(gas: bigint) {
     address: String(
       process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
     ) as `0x${string}`,
-    gas,
+    value: gas,
   });
 
   return useMutation(async (input: UseDeployRemoteTokenInput) => {
