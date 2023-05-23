@@ -17,14 +17,12 @@ export type TransactionState =
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
-  tokenId: `0x${string}`;
   sourceChainId: string;
   destinationChainId: string;
 };
 
 export type UseSendInterchainTokenInput = {
   tokenAddress: `0x${string}`;
-  tokenId: `0x${string}`;
   amount: string;
   onFinished?: () => void;
   onStatusUpdate?: (message: TransactionState) => void;
@@ -61,7 +59,7 @@ export function useSendInterchainTokenMutation(
   });
 
   return useMutation<void, unknown, UseSendInterchainTokenInput>(
-    async ({ amount, tokenId, onStatusUpdate }) => {
+    async ({ amount, onStatusUpdate }) => {
       if (!(erc20Reads && address && tokenLinker && gas)) {
         return;
       }
@@ -74,13 +72,13 @@ export function useSendInterchainTokenMutation(
           type: "awaiting_approval",
         });
 
-        const tx = await transferAsync({
-          args: [config.destinationChainId, address, bnAmount, tokenId],
+        const txResult = await transferAsync({
+          args: [config.destinationChainId, address, bnAmount, `0x`],
         });
 
         onStatusUpdate?.({
           type: "sending",
-          txHash: tx.hash,
+          txHash: txResult.hash,
         });
       } catch (e) {
         if (e instanceof Error) {

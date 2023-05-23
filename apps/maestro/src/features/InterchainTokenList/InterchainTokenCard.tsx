@@ -136,39 +136,30 @@ export const RegisteredInterchainTokenCard: FC<
           >
             {balance.tokenBalance === "0" ? (
               <div className="flex w-full items-center justify-between">
-                <span className="mx-auto">No balance</span>
+                <span className={clsx({ "mx-auto": !isSourceChain })}>
+                  No balance
+                </span>
                 {balance.isTokenOwner &&
                   (isSourceChain ? (
-                    <>
-                      <Button
-                        size="xs"
-                        color="primary"
-                        onClick={setActiveModal.bind(null, "mint")}
-                      >
-                        mint
-                      </Button>
-                      {address && (
-                        <MintInterchainToken
-                          isOpen={activeModal === "mint"}
-                          onClose={setActiveModal.bind(null, null)}
-                          accountAddress={address}
-                          trigger={
-                            <Button
-                              size="xs"
-                              color="primary"
-                              // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                              className="absolute right-6"
-                            >
-                              mint
-                            </Button>
-                          }
-                          tokenAddress={props.tokenAddress}
-                          tokenDecimals={props.decimals}
-                          tokenId={props.tokenId}
-                          sourceChain={props.chain as EVMChainConfig}
-                        />
-                      )}
-                    </>
+                    <MintInterchainToken
+                      isOpen={activeModal === "mint"}
+                      onClose={setActiveModal.bind(null, null)}
+                      accountAddress={address as `0x${string}`}
+                      trigger={
+                        <Button
+                          size="xs"
+                          color="primary"
+                          // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                          className="absolute right-6"
+                        >
+                          mint
+                        </Button>
+                      }
+                      tokenAddress={props.tokenAddress}
+                      tokenDecimals={props.decimals}
+                      tokenId={props.tokenId}
+                      sourceChain={props.chain as EVMChainConfig}
+                    />
                   ) : (
                     switchChainButton
                   ))}
@@ -188,26 +179,23 @@ export const RegisteredInterchainTokenCard: FC<
                   </BigNumberText>
                 </div>
                 {isSourceChain ? (
-                  <>
-                    <SendInterchainToken
-                      isOpen={activeModal === "send"}
-                      onClose={setActiveModal.bind(null, null)}
-                      trigger={
-                        <Button
-                          size="xs"
-                          color="primary"
-                          // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                          className="absolute right-6"
-                        >
-                          send
-                        </Button>
-                      }
-                      tokenAddress={props.tokenAddress}
-                      tokenId={props.tokenId}
-                      sourceChain={props.chain as EVMChainConfig}
-                      balance={balance}
-                    />
-                  </>
+                  <SendInterchainToken
+                    isOpen={activeModal === "send"}
+                    onClose={setActiveModal.bind(null, null)}
+                    trigger={
+                      <Button
+                        size="xs"
+                        color="primary"
+                        // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                        className="absolute right-6"
+                      >
+                        send
+                      </Button>
+                    }
+                    tokenAddress={props.tokenAddress}
+                    sourceChain={props.chain as EVMChainConfig}
+                    balance={balance}
+                  />
                 ) : (
                   switchChainButton
                 )}
