@@ -36,7 +36,6 @@ const TokenDetails: FC = () => {
       tokenName: data.tokenName,
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
-      amountToMint: data.amountToMint,
     });
 
     actions.nextStep();
@@ -81,19 +80,6 @@ const TokenDetails: FC = () => {
             {...register("tokenDecimals")}
           />
         </FormControl>
-        {process.env.NEXT_PUBLIC_NETWORK_ENV === "testnet" && (
-          <FormControl>
-            <Label>Amount to mint (leave zero for none)</Label>
-            <TextInput
-              bordered
-              type="number"
-              placeholder="Enter your amount to mint"
-              min={0}
-              disabled={isReadonly}
-              {...register("amountToMint")}
-            />
-          </FormControl>
-        )}
         <button type="submit" ref={formSubmitRef} />
       </form>
 
