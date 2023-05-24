@@ -23,8 +23,11 @@
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
     "dev:docs": "pnpm -C ./apps/docs run dev",
     "changeset": "changeset",
-    "version": "changeset version",
-    "publish": "changeset publish"
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "cs": "pnpm changeset",
+    "cs:version": "pnpm: changeset:version",
+    "cs:publish": "pnpmp changeset:publish"
   },
   "keywords": [
     "Axelar Network",
