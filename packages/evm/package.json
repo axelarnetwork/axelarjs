@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/evm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "EVM clients & utils",
   "repository": {
     "type": "git",

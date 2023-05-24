@@ -1,6 +1,6 @@
-# @axelarjs/proto
+# @axelarjs/evm
 
-## 0.32.4
+## 0.1.1
 
 ### Patch Changes
 
