@@ -20,9 +20,11 @@
     "build-storybook": "turbo run build-storybook",
     "docs:dev": "pnpm -C ./apps/docs dev",
     "e2e": "pnpm -C ./apps/e2e run test",
-    "changeset": "changeset version",
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
-    "dev:docs": "pnpm -C ./apps/docs run dev"
+    "dev:docs": "pnpm -C ./apps/docs run dev",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "publish": "changeset publish"
   },
   "keywords": [
     "Axelar Network",
