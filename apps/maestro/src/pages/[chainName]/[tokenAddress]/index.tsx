@@ -310,7 +310,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             tokenDecimals: tokenDetails.decimals,
             tokenName: tokenDetails.name,
             tokenSymbol: tokenDetails.symbol,
-            amountToMint: 0,
           }}
         />
       )}
