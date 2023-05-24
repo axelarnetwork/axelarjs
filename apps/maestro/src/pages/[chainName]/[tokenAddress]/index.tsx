@@ -222,7 +222,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const deployedTokens = useMemo(() => {
     return Object.entries(statusesByChain)
-      .filter(([_, status]) => status === "executed")
+      .filter(([_, { status }]) => status === "executed")
       .map(([chainId, _]) => chainId);
   }, [statusesByChain]);
 
@@ -236,7 +236,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       setDeployTokensTxHash(undefined);
 
       console.log("deployedTokens", deployedTokens);
-
       refetch();
     }
   }, [
@@ -319,15 +318,21 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
-        tokens={unregistered.map((token) => ({
-          ...token,
-          isSelected: selectedChainIds.includes(token.chainId),
-          isRegistered: false,
-          deploymentStatus:
-            deployTokensTxHash && token.chain?.id
-              ? statusesByChain[token.chain.id]
-              : undefined,
-        }))}
+        tokens={unregistered.map((token) => {
+          const gmpInfo = token.chain?.id
+            ? statusesByChain[token.chain.id]
+            : undefined;
+
+          return {
+            ...token,
+            isSelected: selectedChainIds.includes(token.chainId),
+            isRegistered: false,
+            deploymentStatus: gmpInfo?.status,
+            deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
+              ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
+            ),
+          };
+        })}
         onToggleSelection={(chainId) => {
           if (deployTokensTxHash) {
             return;
