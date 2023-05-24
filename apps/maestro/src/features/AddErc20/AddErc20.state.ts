@@ -39,7 +39,6 @@ export const INITIAL_STATE = {
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 0,
-    amountToMint: 0,
     tokenAddress: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
