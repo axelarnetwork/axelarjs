@@ -124,6 +124,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             toast.error("Failed to send token. Please try again.");
             logger.always.error(status.error);
           }
+
           setSendTokenStatus(status);
         },
       },
@@ -292,7 +293,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
-          {sendTokenStatus?.type === "sending" && (
+          {sendTokenStatus.type === "sending" && (
             <GMPTxStatusMonitor
               txHash={sendTokenStatus.txHash}
               onAllChainsExecuted={async () => {

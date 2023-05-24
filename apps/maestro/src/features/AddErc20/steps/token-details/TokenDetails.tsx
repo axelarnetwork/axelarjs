@@ -13,7 +13,6 @@ const schema = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
-  amountToMint: z.coerce.number().min(0),
 });
 
 type FormState = z.infer<typeof schema>;

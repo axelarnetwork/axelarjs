@@ -91,12 +91,11 @@ export function useDeployInterchainTokenMutation(config: {
 
   useWaitForTransaction({
     hash: deployInterchainTokenResult?.hash,
-    onSuccess(receipt) {
+    onSuccess() {
       if (!deployInterchainTokenResult) {
         return;
       }
-
-      console.log("onSuccess", { receipt });
+      config.onFinished?.();
     },
   });
 
@@ -131,10 +130,6 @@ export function useDeployInterchainTokenMutation(config: {
           type: "deploying",
           txHash: tx.hash,
         });
-
-        if (config.onFinished) {
-          config.onFinished();
-        }
       } catch (e) {
         onStatusUpdate({ type: "idle" });
 
