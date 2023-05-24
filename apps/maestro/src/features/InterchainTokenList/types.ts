@@ -13,4 +13,5 @@ export type TokenInfo = {
   chain?: EVMChainConfig;
   wagmiConfig?: WagmiEVMChainConfig;
   deploymentStatus?: "pending" | GMPTxStatus;
+  deploymentTxHash?: `0x${string}:${number}` | `0x${string}`;
 };

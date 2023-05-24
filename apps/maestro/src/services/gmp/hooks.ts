@@ -93,9 +93,21 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
         return responseData.reduce(
           (acc, { call, status }) => ({
             ...acc,
-            [call.returnValues.destinationChain.toLowerCase()]: status,
+            [call.returnValues.destinationChain.toLowerCase()]: {
+              status,
+              txHash: call.transactionHash,
+              logIndex: call.logIndex,
+              txId: call.id,
+            },
           }),
-          {} as { [chainId: string]: GMPTxStatus }
+          {} as {
+            [chainId: string]: {
+              status: GMPTxStatus;
+              txHash: `0x${string}`;
+              logIndex: number;
+              txId?: string;
+            };
+          }
         );
       }
       return {};
@@ -115,7 +127,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
 
       return {
         chains: statuses.length,
-        executed: statuses.filter((x) => x === "executed").length,
+        executed: statuses.filter((x) => x.status === "executed").length,
       };
     }, [data]),
   };

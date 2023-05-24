@@ -58,7 +58,10 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const statusList = Object.values(statuses ?? {});
 
   useEffect(() => {
-    if (statusList?.every((s) => s === "executed")) {
+    if (
+      statusList.length &&
+      statusList?.every((s) => s.status === "executed")
+    ) {
       onAllChainsExecuted?.();
     }
   }, [statusList, onAllChainsExecuted]);
@@ -87,32 +90,38 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
         <AxelarscanLink txHash={txHash} />
       </div>
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
-        {[...Object.entries(statuses ?? {})].map(([axelarChainId, status]) => {
-          const chain = chainsByAxelarChainId[axelarChainId];
+        {[...Object.entries(statuses ?? {})].map(
+          ([axelarChainId, { status }]) => {
+            const chain = chainsByAxelarChainId[axelarChainId];
 
-          return (
-            <li
-              key={`chain-status-${axelarChainId}`}
-              className="flex items-center justify-between"
-            >
-              <span className="flex items-center gap-2">
-                <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
-                {chain.chain_name}
-              </span>
-              <Badge className="flex items-center">
-                <Badge
-                  className={clsx("-translate-x-1.5 text-xs", {
-                    "animate-pulse": !["error", "executed"].includes(status),
-                  })}
-                  color={STATUS_COLORS[status]}
-                  size="xs"
-                />
+            return (
+              <li
+                key={`chain-status-${axelarChainId}`}
+                className="flex items-center justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <ChainIcon
+                    src={chain.image}
+                    size="md"
+                    alt={chain.chain_name}
+                  />{" "}
+                  {chain.chain_name}
+                </span>
+                <Badge className="flex items-center">
+                  <Badge
+                    className={clsx("-translate-x-1.5 text-xs", {
+                      "animate-pulse": !["error", "executed"].includes(status),
+                    })}
+                    color={STATUS_COLORS[status]}
+                    size="xs"
+                  />
 
-                {STATUS_LABELS[status]}
-              </Badge>
-            </li>
-          );
-        })}
+                  {STATUS_LABELS[status]}
+                </Badge>
+              </li>
+            );
+          }
+        )}
       </ul>
     </div>
   );
