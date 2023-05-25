@@ -3,22 +3,6 @@ import { useEffect } from "react";
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { uniq, without } from "rambda";
 
-export type TransactionState =
-  | {
-      type: "idle";
-    }
-  | {
-      type: "awaiting_confirmation";
-    }
-  | {
-      type: "confirmed";
-      txHash: `0x${string}`;
-    }
-  | {
-      type: "failed";
-      errorMessage: string;
-    };
-
 export type DeployAndRegisterTransactionState =
   | {
       type: "idle";

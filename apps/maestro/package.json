@@ -27,8 +27,8 @@
     "@trpc/react-query": "^10.27.1",
     "@trpc/server": "^10.27.1",
     "@types/node": "18.16.1",
-    "@types/react": "18.2.5",
-    "@types/react-dom": "18.2.3",
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4",
     "@web3modal/ethereum": "^2.4.1",
     "@web3modal/react": "^2.4.1",
     "clsx": "^1.2.1",
@@ -46,8 +46,8 @@
     "superjson": "^1.12.3",
     "tailwind-styled-components": "^2.2.0",
     "typescript": "5.0.4",
-    "viem": "^0.3.34",
-    "wagmi": "^1.0.5",
+    "viem": "^0.3.36",
+    "wagmi": "^1.0.6",
     "zod": "^3.21.4"
   },
   "devDependencies": {
