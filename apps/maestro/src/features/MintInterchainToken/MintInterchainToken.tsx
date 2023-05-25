@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { useMemo, useState, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { EVMChainConfig } from "@axelarjs/api";
@@ -109,6 +109,20 @@ export const MintInterchainToken: FC<Props> = (props) => {
     setTxState("pending_confirmation");
   };
 
+  const buttonChildren = useMemo(() => {
+    switch (txState) {
+      case "idle":
+      case "confirmed":
+        return "Mint tokens";
+      case "pending_approval":
+        return "Waiting for approval";
+      case "pending_confirmation":
+        return "Waiting for confirmation";
+      case "error":
+        return "Failed to mint tokens";
+    }
+  }, [txState]);
+
   return (
     <Modal
       trigger={props.trigger}
@@ -180,7 +194,7 @@ export const MintInterchainToken: FC<Props> = (props) => {
               txState === "pending_confirmation"
             }
           >
-            Mint tokens
+            {buttonChildren}
           </Button>
         </form>
       </Modal.Body>

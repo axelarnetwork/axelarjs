@@ -85,7 +85,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
       tokenAddress: props.tokenAddress,
-      destinationChainId: selectedToChain.chain_name,
+      destinationChainId: selectedToChain?.chain_name,
       sourceChainId: props.sourceChain.chain_name,
     });
 
@@ -143,11 +143,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const buttonChildren = useMemo(() => {
     switch (sendTokenStatus?.type) {
       case "awaiting_approval":
-        return (
-          <>
-            Approve {amountToSend} tokens to be sent to {selectedToChain?.name}
-          </>
-        );
       case "awaiting_confirmation":
         return <>Confirm transaction on wallet</>;
       case "sending":
