@@ -4,16 +4,9 @@ import { useAccount, useMutation, useWalletClient } from "wagmi";
 import { useERC20Reads } from "~/lib/contract/hooks/useERC20";
 import { useTransferInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
+import type { TransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-
-export type TransactionState =
-  | { type: "idle" }
-  | { type: "failed"; error: Error }
-  | { type: "awaiting_approval" }
-  | { type: "awaiting_confirmation"; txHash: `0x${string}` }
-  | { type: "sending"; txHash: `0x${string}` }
-  | { type: "confirmed"; txHash: `0x${string}` };
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
@@ -69,7 +62,7 @@ export function useSendInterchainTokenMutation(
 
       try {
         onStatusUpdate?.({
-          type: "awaiting_approval",
+          status: "awaiting_approval",
         });
 
         const txResult = await transferAsync({
@@ -77,15 +70,19 @@ export function useSendInterchainTokenMutation(
         });
 
         onStatusUpdate?.({
-          type: "sending",
-          txHash: txResult.hash,
+          status: "submitted",
+          hash: txResult.hash,
         });
       } catch (e) {
         if (e instanceof Error) {
-          onStatusUpdate?.({ type: "failed", error: e });
+          onStatusUpdate?.({
+            status: "reverted",
+
+            error: e,
+          });
         } else {
           onStatusUpdate?.({
-            type: "failed",
+            status: "reverted",
             error: new Error("failed to transfer token"),
           });
         }

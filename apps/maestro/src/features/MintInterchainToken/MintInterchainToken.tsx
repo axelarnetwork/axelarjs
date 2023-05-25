@@ -14,6 +14,7 @@ import { useWaitForTransaction } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useMintInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
+import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 
 type FormState = {
@@ -42,17 +43,10 @@ const ALLOWED_NON_NUMERIC_KEYS = [
   "Enter",
 ];
 
-type TransactionState =
-  | "idle"
-  | "pending_approval"
-  | "pending_confirmation"
-  | "confirmed"
-  | "error";
-
 export const MintInterchainToken: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
 
-  const [txState, setTxState] = useState<TransactionState>("idle");
+  const [txState, setTxState] = useTransactionState();
 
   const {
     writeAsync: mintTokenAsync,
@@ -61,6 +55,7 @@ export const MintInterchainToken: FC<Props> = (props) => {
   } = useMintInterchainToken({
     address: props.tokenAddress,
   });
+
   const trpcContext = trpc.useContext();
 
   useWaitForTransaction({
@@ -70,7 +65,10 @@ export const MintInterchainToken: FC<Props> = (props) => {
         return;
       }
 
-      setTxState("confirmed");
+      setTxState({
+        status: "confirmed",
+        receipt,
+      });
 
       await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
 
@@ -102,23 +100,28 @@ export const MintInterchainToken: FC<Props> = (props) => {
     const decimalAdjustment = BigInt(10 ** props.tokenDecimals);
     const adjustedAmount = BigInt(amountToMint) * decimalAdjustment;
 
-    setTxState("pending_approval");
-    await mintTokenAsync({
+    setTxState({
+      status: "awaiting_approval",
+    });
+
+    const txResult = await mintTokenAsync({
       args: [props.accountAddress, adjustedAmount],
     });
-    setTxState("pending_confirmation");
+
+    setTxState({
+      status: "submitted",
+      hash: txResult?.hash,
+    });
   };
 
   const buttonChildren = useMemo(() => {
-    switch (txState) {
+    switch (txState.status) {
       case "idle":
       case "confirmed":
         return "Mint tokens";
-      case "pending_approval":
+      case "awaiting_approval":
         return "Waiting for approval";
-      case "pending_confirmation":
-        return "Waiting for confirmation";
-      case "error":
+      case "reverted":
         return "Failed to mint tokens";
     }
   }, [txState]);
@@ -190,8 +193,8 @@ export const MintInterchainToken: FC<Props> = (props) => {
             type="submit"
             disabled={!formState.isValid || isMinting}
             loading={
-              txState === "pending_approval" ||
-              txState === "pending_confirmation"
+              txState.status === "awaiting_approval" ||
+              txState.status === "submitted"
             }
           >
             {buttonChildren}

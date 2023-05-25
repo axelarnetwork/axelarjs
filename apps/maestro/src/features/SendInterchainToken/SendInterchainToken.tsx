@@ -16,15 +16,13 @@ import { formatUnits, parseUnits } from "viem";
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
+import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
-import {
-  useSendInterchainTokenMutation,
-  type TransactionState,
-} from "./hooks/useSendInterchainTokenMutation";
+import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
 
 type FormState = {
   amountToSend: string;
@@ -106,9 +104,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   const amountToSend = watch("amountToSend");
 
-  const [sendTokenStatus, setSendTokenStatus] = useState<TransactionState>({
-    type: "idle",
-  });
+  const [txState, setTxState] = useTransactionState();
 
   const submitHandler: SubmitHandler<FormState> = async (_data, e) => {
     e?.preventDefault();
@@ -119,13 +115,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
       {
         tokenAddress: props.tokenAddress,
         amount: amountToSend,
-        onStatusUpdate(status) {
-          if (status.type === "failed") {
+        onStatusUpdate(state) {
+          if (state.status === "reverted") {
             toast.error("Failed to send token. Please try again.");
-            logger.always.error(status.error);
+            logger.always.error(state.error);
           }
 
-          setSendTokenStatus(status);
+          setTxState(state);
         },
       },
       {
@@ -141,11 +137,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
   };
 
   const buttonChildren = useMemo(() => {
-    switch (sendTokenStatus?.type) {
+    switch (txState?.status) {
       case "awaiting_approval":
-      case "awaiting_confirmation":
         return <>Confirm transaction on wallet</>;
-      case "sending":
+      case "submitted":
         return (
           <>
             Sending {amountToSend} tokens to {selectedToChain?.name}
@@ -166,13 +161,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
     formState.errors.amountToSend?.message,
     formState.isValid,
     selectedToChain?.name,
-    sendTokenStatus?.type,
+    txState?.status,
   ]);
 
   const trpcContext = trpc.useContext();
 
   const isFormDisabled =
-    sendTokenStatus.type !== "idle" && sendTokenStatus.type !== "failed";
+    txState.status !== "idle" && txState.status !== "reverted";
 
   return (
     <Modal
@@ -186,7 +181,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           }
           props.onClose?.();
           resetForm();
-          setSendTokenStatus({ type: "idle" });
+          setTxState({ status: "idle" });
         }
         setIsModalOpen(isOpen);
       }}
@@ -288,13 +283,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
-          {sendTokenStatus.type === "sending" && (
+          {txState.status === "submitted" && (
             <GMPTxStatusMonitor
-              txHash={sendTokenStatus.txHash}
+              txHash={txState.hash}
               onAllChainsExecuted={async () => {
                 await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
                 resetForm();
-                setSendTokenStatus({ type: "idle" });
+                setTxState({ status: "idle" });
                 toast.success("Tokens sent successfully!");
               }}
             />
