@@ -14,7 +14,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "0.12.5",
+    "@axelar-network/axelarjs-sdk": "0.12.7",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
