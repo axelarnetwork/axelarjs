@@ -6,6 +6,7 @@ import {
   Button,
   CopyToClipboardButton,
   LinkButton,
+  toast,
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
@@ -13,15 +14,16 @@ import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { partition, without } from "rambda";
 import { isAddress } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import AddErc20 from "~/features/AddErc20";
 import { useDeployRemoteTokensMutation } from "~/features/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import Page from "~/layouts/Page";
+import { useInterchainTokenServiceRegisterOriginToken } from "~/lib/contract/hooks/useInterchainTokenService";
 import { useChainFromRoute } from "~/lib/hooks";
+import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
@@ -159,9 +161,84 @@ const InterchainTokensPage = () => {
 
 export default InterchainTokensPage;
 
+const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
+  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+) as `0x${string}`;
+
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
   tokenAddress: `0x${string}`;
+};
+
+const RegisterOriginTokenButton = ({
+  address = "0x0" as `0x${string}`,
+  chainName = "Axelar",
+  onSuccess = () => {},
+}) => {
+  const [txState, setTxState] = useTransactionState();
+
+  const { writeAsync, data } = useInterchainTokenServiceRegisterOriginToken({
+    address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+  });
+
+  useWaitForTransaction({
+    hash: data?.hash,
+    async onSuccess(receipt) {
+      onSuccess();
+
+      setTxState({
+        status: "confirmed",
+        receipt,
+      });
+
+      toast.success("Token registered successfully");
+    },
+  });
+
+  const handleSubmitTransaction = useCallback(async () => {
+    setTxState({
+      status: "awaiting_approval",
+    });
+
+    try {
+      const result = await writeAsync({ args: [address] });
+
+      setTxState({
+        status: "submitted",
+        hash: result.hash,
+      });
+    } catch (error) {
+      setTxState({
+        status: "reverted",
+        error: error as Error,
+      });
+    }
+  }, [address, setTxState, writeAsync]);
+
+  const buttonChildren = useMemo(() => {
+    switch (txState.status) {
+      case "awaiting_approval":
+        return "Approve transaction";
+      case "submitted":
+        return "Waiting for confirmation...";
+      case "reverted":
+        return "Transaction failed";
+      default:
+        return `Register origin token on ${chainName}`;
+    }
+  }, [txState, chainName]);
+
+  return (
+    <Button
+      length="block"
+      onClick={handleSubmitTransaction}
+      loading={
+        txState.status === "awaiting_approval" || txState.status === "submitted"
+      }
+    >
+      {buttonChildren}
+    </Button>
+  );
 };
 
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
@@ -296,21 +373,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )}
 
       {interchainTokenError && tokenDetails && (
-        <AddErc20
-          trigger={
-            <div className="mx-auto w-full max-w-md">
-              <Button length="block">
-                Register token on {interchainToken.chain.name}
-              </Button>
-            </div>
-          }
-          tokenDetails={{
-            tokenAddress: props.tokenAddress,
-            tokenDecimals: tokenDetails.decimals,
-            tokenName: tokenDetails.name,
-            tokenSymbol: tokenDetails.symbol,
-          }}
-        />
+        <div className="mx-auto w-full max-w-md">
+          <RegisterOriginTokenButton
+            address={props.tokenAddress}
+            chainName={interchainToken.chain.name}
+            onSuccess={refetch}
+          />
+        </div>
       )}
       <InterchainTokenList
         title="Registered interchain tokens"

@@ -20,7 +20,7 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 import { useDeployInterchainTokenMutation } from "../../hooks/useDeployInterchainTokenMutation";
-import { NextButton, PrevButton } from "../core";
+import { NextButton, PrevButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
@@ -175,9 +175,9 @@ export const Step3: FC = () => {
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
           onClick={() => formSubmitRef.current?.click()}
         >
-          Deploy & register token{" "}
+          Deploy{" "}
           {Boolean(state.gasFees?.length) &&
-            `on ${state.gasFees?.length} chain${
+            `& register token on ${state.gasFees?.length} chain${
               Number(state.gasFees?.length) > 1 ? "s" : ""
             }`}
         </NextButton>

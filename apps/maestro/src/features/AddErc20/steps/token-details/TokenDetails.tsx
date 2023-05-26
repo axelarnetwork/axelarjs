@@ -7,7 +7,7 @@ import { z } from "zod";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20";
 
-import { NextButton } from "../core";
+import { NextButton } from "../shared";
 
 const schema = z.object({
   tokenName: z.string().min(1).max(32),

@@ -48,9 +48,14 @@ export const searchInterchainToken = publicProcedure
         });
       }
 
-      const tokenAddress = await client.readContract("getTokenAddress", {
-        args: [tokenId],
-      });
+      const [tokenAddress, isOriginToken] = await Promise.all([
+        client.readContract("getTokenAddress", {
+          args: [tokenId],
+        }),
+        client.readContract("isOriginToken", {
+          args: [tokenId],
+        }),
+      ]);
 
       if (tokenAddress.toLowerCase() !== input.tokenAddress.toLowerCase()) {
         throw new TRPCError({
@@ -75,22 +80,22 @@ export const searchInterchainToken = publicProcedure
               }
             );
 
-            const [matchingTokenId, matchingOriginTokenId] = await Promise.all([
-              client.readContract("getTokenId", {
-                args: [matchingTokenAddressFromTokenId as `0x${string}`],
-              }),
+            const [matchingOriginTokenId, isOriginToken] = await Promise.all([
               client.readContract("getOriginTokenId", {
                 args: [matchingTokenAddressFromTokenId as `0x${string}`],
+              }),
+              client.readContract("isOriginToken", {
+                args: [tokenId],
               }),
             ]);
 
             return {
               tokenId,
+              isOriginToken,
               chainId: chain.id,
               chainName: chain.name,
               tokenAddress: matchingTokenAddressFromTokenId,
               originTokenId: matchingOriginTokenId,
-              isOriginToken: matchingOriginTokenId === matchingTokenId,
               isRegistered: parseInt(matchingTokenAddressFromTokenId, 16) > 0,
             };
           } catch (error) {
@@ -108,11 +113,11 @@ export const searchInterchainToken = publicProcedure
 
       const lookupToken = {
         tokenId,
-        chainId: input.chainId,
         originTokenId,
         tokenAddress,
-        isOriginToken: originTokenId === tokenId,
+        isOriginToken,
         isRegistered: parseInt(tokenAddress, 16) > 0,
+        chainId: input.chainId,
       };
 
       return {
