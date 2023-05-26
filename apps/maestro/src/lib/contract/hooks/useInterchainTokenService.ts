@@ -57,6 +57,14 @@ export function useInterchainTokenServiceDeployInterchainToken(
   });
 }
 
+export function useInterchainTokenServiceRegisterOriginToken(config: Config) {
+  return useContractWrite({
+    abi: ABI,
+    functionName: "registerOriginToken",
+    address: config.address,
+  });
+}
+
 export function useInterchainTokenServiceDeployRemoteTokens(
   config: Config & {
     value: bigint;
