@@ -1,5 +1,7 @@
 # @axelarjs
 
+![build & test workflow](https://github.com/axelarnetwork/axelarjs/actions/workflows/test.yml/badge.svg)
+
 Axelar Network foundations for Javascript/Typescript application development
 
 :building_construction: under construction :building_construction:
