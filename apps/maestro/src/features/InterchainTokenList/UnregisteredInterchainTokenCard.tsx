@@ -24,7 +24,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
           "hover:opacity-75 hover:shadow-xl",
           {
             "cursor-pointer": props.onToggleSelection,
-            "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 ring-4":
+            "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 -translate-y-1.5 ring-4":
               props.isSelected,
           }
         )}

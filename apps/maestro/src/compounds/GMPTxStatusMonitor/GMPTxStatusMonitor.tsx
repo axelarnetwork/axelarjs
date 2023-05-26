@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo } from "react";
 
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
-import { Badge, type BadgeProps } from "@axelarjs/ui";
+import { Badge, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import clsx from "clsx";
+import Link from "next/link";
 import { indexBy } from "rambda";
 
 import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";
@@ -81,7 +82,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
         <span>
-          {total > 0 && (
+          {total > 1 && (
             <>
               Executed in {executed} of {total} chains
             </>
@@ -91,7 +92,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       </div>
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
-          ([axelarChainId, { status }]) => {
+          ([axelarChainId, { status, logIndex }]) => {
             const chain = chainsByAxelarChainId[axelarChainId];
 
             return (
@@ -107,17 +108,28 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
                   />{" "}
                   {chain.chain_name}
                 </span>
-                <Badge className="flex items-center">
-                  <Badge
-                    className={clsx("-translate-x-1.5 text-xs", {
-                      "animate-pulse": !["error", "executed"].includes(status),
-                    })}
-                    color={STATUS_COLORS[status]}
-                    size="xs"
-                  />
+                <Tooltip tip="View on Axelarscan" position="left">
+                  <Link
+                    href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}:${logIndex}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Badge className="flex items-center">
+                      <Badge
+                        className={clsx("-translate-x-1.5 text-xs", {
+                          "animate-pulse": !["error", "executed"].includes(
+                            status
+                          ),
+                        })}
+                        color={STATUS_COLORS[status]}
+                        size="xs"
+                        aria-label={`status: ${STATUS_LABELS[status]}`}
+                      />
 
-                  {STATUS_LABELS[status]}
-                </Badge>
+                      {STATUS_LABELS[status]}
+                    </Badge>
+                  </Link>
+                </Tooltip>
               </li>
             );
           }

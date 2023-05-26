@@ -12,7 +12,7 @@ import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
-import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor/GMPTxStatusMonitor";
+import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
@@ -66,7 +66,9 @@ const Review: FC = () => {
               {chain?.blockExplorers?.default.name}{" "}
               <ExternalLink className="h-4 w-4" />
             </LinkButton>
-            <GMPTxStatusMonitor txHash={state.txState.txHash} />
+            {Boolean(state.selectedChains.length) && (
+              <GMPTxStatusMonitor txHash={state.txState.txHash} />
+            )}
           </>
         )}
       </div>
