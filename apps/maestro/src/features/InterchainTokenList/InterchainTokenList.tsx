@@ -64,7 +64,11 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
         <ul className="grid w-full gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-5">
           {tokens.map((token) =>
             token.isRegistered ? (
-              <RegisteredInterchainTokenCard key={token.chainId} {...token} />
+              <RegisteredInterchainTokenCard
+                key={token.chainId}
+                {...token}
+                hasRemoteTokens={tokens.length > 1}
+              />
             ) : (
               <UnregisteredInterchainTokenCard
                 key={token.chainId}
