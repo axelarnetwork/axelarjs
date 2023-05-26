@@ -38,7 +38,9 @@ const StatusIndicator = (
   );
 };
 
-export type Props = TokenInfo;
+export type Props = TokenInfo & {
+  hasRemoteTokens: boolean;
+};
 
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
@@ -134,7 +136,11 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           >
             {balance.tokenBalance === "0" ? (
               <div className="flex w-full items-center justify-between">
-                <span className={clsx({ "mx-auto": !isSourceChain })}>
+                <span
+                  className={clsx({
+                    "mx-auto": !isSourceChain || !balance.isTokenOwner,
+                  })}
+                >
                   No balance
                 </span>
                 {balance.isTokenOwner &&
@@ -184,8 +190,8 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                       <Button
                         size="xs"
                         color="primary"
-                        // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
                         className="absolute right-6"
+                        disabled={!props.hasRemoteTokens}
                       >
                         send
                       </Button>
