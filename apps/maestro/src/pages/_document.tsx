@@ -15,7 +15,7 @@ export default function Document() {
         <meta name="theme-color" content="#050707" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <body>
+      <body className="antialiased">
         <Main />
         <NextScript />
       </body>
