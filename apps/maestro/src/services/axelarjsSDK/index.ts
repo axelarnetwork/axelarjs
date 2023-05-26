@@ -16,19 +16,18 @@ export const client = new AxelarQueryAPI({
 });
 
 async function estimateGasFee(params: EstimateGasFeeParams): Promise<bigint> {
-  const fee = BigInt(
-    await client.estimateGasFee(
-      params.sourceChainId,
-      params.destinationChainId,
-      params.sourceChainTokenSymbol,
-      params.gasLimit,
-      params.gasMultipler,
-      params.minGasPrice,
-      params.isGMPExpressTransaction
-    )
+  const response = await client.estimateGasFee(
+    params.sourceChainId,
+    params.destinationChainId,
+    params.sourceChainTokenSymbol,
+    params.gasLimit,
+    params.gasMultipler,
+    params.minGasPrice
   );
 
-  return fee;
+  const rawFee = typeof response === "string" ? response : response.baseFee;
+
+  return BigInt(rawFee);
 }
 
 async function estimateGasFeeMultipleChains(
