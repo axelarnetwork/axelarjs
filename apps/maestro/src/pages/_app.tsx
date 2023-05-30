@@ -26,6 +26,21 @@ logger.configure({
       : "production",
 });
 
+async function initLogRocketAsync() {
+  if (process.env.NODE_ENV !== "development") {
+    const { initLogRocket } = await import("~/config/telemetry");
+    initLogRocket();
+    return true;
+  }
+  return false;
+}
+
+initLogRocketAsync().then((initialized) => {
+  if (initialized) {
+    logger.info("LogRocket initialized");
+  }
+});
+
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
   const [isSSR, setIsSSR] = useState(true);
