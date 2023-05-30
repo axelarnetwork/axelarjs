@@ -18,26 +18,9 @@ import { trpc } from "~/lib/trpc";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 
-logger.configure({
-  env:
-    process.env.NODE_ENV === "development" ||
-    ["preview", "development"].includes(String(process.env.VERCEL_ENV))
-      ? "development"
-      : "production",
-});
-
-async function initLogRocketAsync() {
-  if (process.env.NODE_ENV !== "development") {
-    const { initLogRocket } = await import("~/config/telemetry");
-    initLogRocket();
-    return true;
-  }
-  return false;
-}
-
-initLogRocketAsync().then((initialized) => {
+initTelemetryAsync().then((initialized) => {
   if (initialized) {
-    logger.info("LogRocket initialized");
+    logger.info("Telemetry initialized");
   }
 });
 
@@ -81,3 +64,22 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 };
 
 export default trpc.withTRPC(App);
+
+logger.configure({
+  env:
+    process.env.NODE_ENV === "development" ||
+    ["preview", "development"].includes(String(process.env.VERCEL_ENV))
+      ? "development"
+      : "production",
+});
+
+async function initTelemetryAsync() {
+  if (process.env.NODE_ENV !== "development") {
+    const { initLogRocket } = await import("~/config/telemetry");
+    const { initSentry } = await import("~/config/telemetry");
+    initLogRocket();
+    initSentry();
+    return true;
+  }
+  return false;
+}
