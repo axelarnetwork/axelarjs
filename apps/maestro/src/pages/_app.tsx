@@ -76,9 +76,9 @@ logger.configure({
 async function initTelemetryAsync() {
   if (process.env.NODE_ENV !== "development") {
     const { initLogRocket } = await import("~/config/telemetry");
-    const { initSentry } = await import("~/config/telemetry");
+
     initLogRocket();
-    initSentry();
+
     return true;
   }
   return false;
