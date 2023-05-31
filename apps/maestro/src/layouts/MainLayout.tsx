@@ -44,7 +44,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           </Footer>
         </Drawer.Content>
         <Drawer.Side>
-          <Drawer.Overlay onClick={actions.close} />
+          <Drawer.Overlay onClick={actions.closeDrawer} />
           <aside className="bg-base-100 text-base-content w-full max-w-xs p-4">
             <DrawerSideContent />
           </aside>

@@ -103,7 +103,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                   chain.chain_id === props.selectedChain?.chain_id,
               })}
             >
-              {/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
+              {/* rome-ignore lint/a11y/useValidAnchor: needed by daisyui */}
               <a
                 href="#"
                 onClick={(e) => {
