@@ -51,6 +51,6 @@
     "rambda": "^7.5.0",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4",
-    "vitest": "^0.31.1"
+    "vitest": "^0.31.2"
   }
 }
