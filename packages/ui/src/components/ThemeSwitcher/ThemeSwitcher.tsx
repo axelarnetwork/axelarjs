@@ -1,6 +1,6 @@
+import { createContainer } from "@axelarjs/utils/react";
 import { FC, MouseEvent, useCallback, useEffect, useState } from "react";
 
-import { createContainer } from "@axelarjs/utils/react";
 import clsx from "clsx";
 import { Moon, Sun } from "lucide-react";
 

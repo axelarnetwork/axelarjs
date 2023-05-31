@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo } from "react";
-
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, Tooltip, type BadgeProps } from "@axelarjs/ui";
-import clsx from "clsx";
+import React, { useEffect, useMemo } from "react";
 import Link from "next/link";
+
+import clsx from "clsx";
 import { indexBy } from "rambda";
 
 import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";

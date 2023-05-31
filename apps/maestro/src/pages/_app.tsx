@@ -1,10 +1,10 @@
-import { useEffect, useState, type FC } from "react";
-
 import { ThemeProvider, Toaster } from "@axelarjs/ui";
-import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useEffect, useState, type FC } from "react";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
+
+import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 

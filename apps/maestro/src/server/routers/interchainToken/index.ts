@@ -1,5 +1,4 @@
 import { router } from "~/server/trpc";
-
 import { getInterchainTokenBalanceForOwner } from "./getInterchainTokenBalanceForOwner";
 import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
 

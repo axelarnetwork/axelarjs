@@ -1,5 +1,4 @@
 import { router } from "~/server/trpc";
-
 import { getERC20TokenBalanceForOwner } from "./getERC20TokenBalanceForOwner";
 import { getERC20TokenDetails } from "./getERC20TokenDetails";
 

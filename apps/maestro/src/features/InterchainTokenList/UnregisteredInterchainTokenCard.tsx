@@ -1,11 +1,10 @@
-import { type FC } from "react";
-
 import { Badge, Card, SpinnerIcon, Tooltip } from "@axelarjs/ui";
-import clsx from "clsx";
+import { type FC } from "react";
 import Link from "next/link";
 
-import { ChainIcon } from "~/components/EVMChainsDropdown";
+import clsx from "clsx";
 
+import { ChainIcon } from "~/components/EVMChainsDropdown";
 import type { TokenInfo } from "./types";
 
 export type Props = TokenInfo & {

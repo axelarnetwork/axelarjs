@@ -1,6 +1,3 @@
-import { useMemo, useState, type FC } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-
 import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Button,
@@ -10,6 +7,9 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
+import { useMemo, useState, type FC } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+
 import { useWaitForTransaction } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";

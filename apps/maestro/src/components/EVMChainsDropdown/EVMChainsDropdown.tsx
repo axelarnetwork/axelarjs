@@ -1,9 +1,9 @@
-import { useState, type FC } from "react";
-
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { Dropdown } from "@axelarjs/ui";
-import clsx from "clsx";
+import { useState, type FC } from "react";
 import Image from "next/image";
+
+import clsx from "clsx";
 
 type Props = {
   onSwitchNetwork?: (chainId: number) => void;

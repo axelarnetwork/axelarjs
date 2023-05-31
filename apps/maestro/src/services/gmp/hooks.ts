@@ -1,12 +1,11 @@
+import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { useMemo } from "react";
 
-import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { uniq } from "rambda";
 import { isAddress } from "viem";
 import { useQuery } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
-
 import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
 import gmpClient from "./index";
 

@@ -1,5 +1,3 @@
-import { useState, type FC } from "react";
-
 import {
   Alert,
   Button,
@@ -8,14 +6,15 @@ import {
   Modal,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
-import { ExternalLink } from "lucide-react";
+import { useState, type FC } from "react";
 import { useRouter } from "next/router";
+
+import { ExternalLink } from "lucide-react";
 import { useNetwork } from "wagmi";
 
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 
 const Review: FC = () => {

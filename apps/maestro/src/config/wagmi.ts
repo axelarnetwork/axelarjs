@@ -34,7 +34,6 @@ import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { LedgerConnector } from "wagmi/connectors/ledger";
 
 import { logger } from "~/lib/logger";
-
 import { APP_NAME } from "./app";
 
 export const WALLECTCONNECT_PROJECT_ID = String(

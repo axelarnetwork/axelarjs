@@ -1,6 +1,6 @@
 import { useEffect, type FC } from "react";
-
 import { Router } from "next/router";
+
 import NProgress, { type NProgressOptions } from "nprogress";
 
 Router.events.on("routeChangeStart", NProgress.start);

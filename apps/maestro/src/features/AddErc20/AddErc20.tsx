@@ -1,6 +1,5 @@
-import { useMemo, type FC } from "react";
-
 import { LinkButton, Modal } from "@axelarjs/ui";
+import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
 import {

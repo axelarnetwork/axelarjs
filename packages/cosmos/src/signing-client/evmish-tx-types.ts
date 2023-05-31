@@ -15,6 +15,7 @@ import {
   SetGatewayRequest,
   SignCommandsRequest,
 } from "@axelarjs/proto/axelar/evm/v1beta1/tx";
+
 import { Registry } from "@cosmjs/proto-signing";
 
 const TxTypeUrlMap = {

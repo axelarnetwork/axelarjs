@@ -1,11 +1,10 @@
+import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { useMemo, useState, type FC } from "react";
 
-import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-
 import { useAddErc20StateContainer } from "./AddErc20.state";
 
 export const TokenRegistration: FC<{}> = () => {
