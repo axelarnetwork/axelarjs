@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import {
   FormControl,
   InputGroup,
@@ -7,6 +5,8 @@ import {
   TextInput,
   Tooltip,
 } from "@axelarjs/ui";
+import { useEffect, useState } from "react";
+
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 

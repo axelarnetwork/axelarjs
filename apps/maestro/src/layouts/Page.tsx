@@ -1,9 +1,9 @@
+import { Badge, Button } from "@axelarjs/ui";
 import React, { useMemo } from "react";
 import { GridLoader } from "react-spinners";
-
-import { Badge, Button } from "@axelarjs/ui";
-import clsx from "clsx";
 import Head from "next/head";
+
+import clsx from "clsx";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 

@@ -3,7 +3,6 @@ import { useQuery } from "wagmi";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
-
 import axelarscanClient from ".";
 
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), EVM_CHAIN_CONFIGS);

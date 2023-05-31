@@ -1,6 +1,5 @@
-import { useMemo, type FC, type ReactNode } from "react";
-
 import { Button } from "@axelarjs/ui";
+import { useMemo, type FC, type ReactNode } from "react";
 
 import RegisteredInterchainTokenCard from "./RegisteredInterchainTokenCard";
 import type { TokenInfo } from "./types";
@@ -49,7 +48,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
               selectedTokens.length && selectedTokens.length !== tokens.length
             )}
             onClick={() => {
-              tokens.forEach((token, i) => {
+              tokens?.forEach((token, i) => {
                 setTimeout(() => {
                   props.onToggleSelection?.(token.chainId);
                 }, i * 25);

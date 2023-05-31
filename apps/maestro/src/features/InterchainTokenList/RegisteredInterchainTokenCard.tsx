@@ -1,5 +1,3 @@
-import { useCallback, useState, type FC } from "react";
-
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import {
   Badge,
@@ -10,14 +8,15 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
-import clsx from "clsx";
+import { useCallback, useState, type FC } from "react";
 import { useRouter } from "next/router";
+
+import clsx from "clsx";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
-
 import { MintInterchainToken } from "../MintInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";

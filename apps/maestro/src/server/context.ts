@@ -3,8 +3,9 @@ import {
   InterchainTokenClient,
   InterchainTokenServiceClient,
 } from "@axelarjs/evm";
-import type { inferAsyncReturnType } from "@trpc/server";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+import type { inferAsyncReturnType } from "@trpc/server";
 import type { Chain } from "wagmi";
 
 import axelarjsSDKClient from "~/services/axelarjsSDK";

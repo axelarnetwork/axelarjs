@@ -14,6 +14,7 @@ import {
   QueryService as TSSQS,
   QueryServiceClientImpl as TSSQSCI,
 } from "@axelarjs/proto/axelar/tss/v1beta1/service";
+
 import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
 
 export interface AxelarQueryService {

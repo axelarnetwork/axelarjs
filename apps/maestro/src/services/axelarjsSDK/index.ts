@@ -5,7 +5,6 @@ import {
 } from "@axelar-network/axelarjs-sdk";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-
 import type {
   EstimateGasFeeMultipleChainsParams,
   EstimateGasFeeParams,

@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useMemo, useState, type FC } from "react";
-
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import {
   Alert,
@@ -10,8 +8,10 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { ExternalLink } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
+
+import { ExternalLink } from "lucide-react";
 import { partition, without } from "rambda";
 import { isAddress } from "viem";
 import { useAccount, useWaitForTransaction } from "wagmi";

@@ -40,7 +40,7 @@
     "@changesets/cli": "^2.26.1",
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.5",
-    "@ianvs/prettier-plugin-sort-imports": "^3.7.2",
+    "@ianvs/prettier-plugin-sort-imports": "^4.0.1",
     "eslint": "^8.41.0",
     "husky": "^8.0.3",
     "prettier": "^2.8.8",

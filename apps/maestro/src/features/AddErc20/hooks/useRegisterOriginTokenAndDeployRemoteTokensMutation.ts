@@ -2,7 +2,6 @@ import { ContractFunctionRevertedError, UserRejectedRequestError } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
-
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseRegisterInterchainTokenInput = {

@@ -1,11 +1,10 @@
+import { Badge, Clamp, Drawer, Footer, useTheme } from "@axelarjs/ui";
 import type { FC, PropsWithChildren } from "react";
 
-import { Badge, Clamp, Drawer, Footer, useTheme } from "@axelarjs/ui";
 import { Web3Modal } from "@web3modal/react";
 
 import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
-
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,

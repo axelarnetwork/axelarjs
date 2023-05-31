@@ -1,6 +1,6 @@
+import { Button } from "@axelarjs/ui";
 import type { ComponentProps, FC } from "react";
 
-import { Button } from "@axelarjs/ui";
 import { ChevronLeft } from "lucide-react";
 import tw from "tailwind-styled-components";
 

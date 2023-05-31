@@ -1,5 +1,3 @@
-import React from "react";
-
 import { formatUnits } from "viem";
 
 export type BigNumberTextProps = {

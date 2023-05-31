@@ -1,11 +1,3 @@
-import React, {
-  useCallback,
-  useMemo,
-  useRef,
-  type FC,
-  type FormEventHandler,
-} from "react";
-
 import {
   Button,
   FormControl,
@@ -14,10 +6,16 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  type FC,
+  type FormEventHandler,
+} from "react";
 import Image from "next/image";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 import { useDeployInterchainTokenMutation } from "../../hooks/useDeployInterchainTokenMutation";
 import { NextButton, PrevButton } from "../shared";

@@ -1,6 +1,3 @@
-import { useMemo, useState, type FC } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-
 import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Button,
@@ -10,6 +7,9 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
+import { useMemo, useState, type FC } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+
 import invariant from "tiny-invariant";
 import { formatUnits, parseUnits } from "viem";
 
@@ -21,7 +21,6 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-
 import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
 
 type FormState = {
