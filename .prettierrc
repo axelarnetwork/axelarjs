@@ -1,6 +1,9 @@
 {
   "importOrder": [
+    "^@axelarjs/",
     "^react",
+    "^next",
+    "",
     "<THIRD_PARTY_MODULES>",
     "",
     "^[~/]",
@@ -8,13 +11,8 @@
     "",
     ".css$"
   ],
-  "importOrderBuiltinModulesToTop": true,
-  "importOrderCaseInsensitive": true,
   "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
-  "importOrderMergeDuplicateImports": true,
-  "importOrderCombineTypeAndValueImports": true,
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true,
+  "importOrderTypeScriptVersion": "5.0",
   "plugins": [
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"

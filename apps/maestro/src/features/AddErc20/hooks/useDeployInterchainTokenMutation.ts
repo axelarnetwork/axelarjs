@@ -1,5 +1,6 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { throttle } from "@axelarjs/utils";
+
 import {
   ContractFunctionRevertedError,
   TransactionExecutionError,
@@ -15,7 +16,6 @@ import { watchContractEvent } from "wagmi/actions";
 
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
-
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(

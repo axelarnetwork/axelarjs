@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Card } from "@axelarjs/ui";
 
 import Page from "~/layouts/Page";

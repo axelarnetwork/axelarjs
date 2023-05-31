@@ -1,5 +1,3 @@
-import React, { useEffect, useMemo, type FC } from "react";
-
 import {
   AxelarIcon,
   Button,
@@ -10,16 +8,17 @@ import {
   useIsSticky,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
+import React, { useEffect, useMemo, type FC } from "react";
+import { useRouter } from "next/router";
+
 import clsx from "clsx";
 import { MenuIcon } from "lucide-react";
-import { useRouter } from "next/router";
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-
 import { useLayoutStateContainer } from "./MainLayout.state";
 
 export type AppbarProps = {};

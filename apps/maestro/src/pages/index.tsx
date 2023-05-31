@@ -1,9 +1,9 @@
-import { useCallback } from "react";
-
 import { Button } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
+import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
+
 import { useNetwork } from "wagmi";
 
 import SearchInterchainTokens from "~/features/SearchInterchainTokens";

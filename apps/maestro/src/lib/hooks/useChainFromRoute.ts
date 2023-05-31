@@ -1,6 +1,5 @@
-import { useMemo } from "react";
-
 import { sluggify } from "@axelarjs/utils";
+import { useMemo } from "react";
 import { useRouter } from "next/router";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";

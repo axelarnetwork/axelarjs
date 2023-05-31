@@ -1,12 +1,11 @@
+import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { useEffect, useState } from "react";
 
-import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { formatEther } from "viem";
 import { useNetwork } from "wagmi";
 
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 
 export type UseStep3ChainSelectionStateProps = {

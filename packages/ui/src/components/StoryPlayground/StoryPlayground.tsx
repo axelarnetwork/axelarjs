@@ -1,6 +1,6 @@
+import type { CapitalizeKeys } from "@axelarjs/utils";
 import { ComponentProps, FC, ReactNode, useState } from "react";
 
-import type { CapitalizeKeys } from "@axelarjs/utils";
 import type { StoryFn } from "@storybook/react";
 import clsx from "clsx";
 

@@ -9,6 +9,7 @@ import {
   RegisterIBCPathRequest,
   RouteIBCTransfersRequest,
 } from "@axelarjs/proto/axelar/axelarnet/v1beta1/tx";
+
 import { Registry } from "@cosmjs/proto-signing";
 
 const TxTypeUrlMap = {

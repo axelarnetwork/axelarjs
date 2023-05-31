@@ -16,7 +16,6 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 import { EnvironmentConfigs, getConfigs } from "~/constants";
 import { AxelarSigningClientConfig } from "~/types";
-
 import { registerAxelarnetTxTypes } from "./axelarnet-tx-types";
 import { registerEvmTxTypes } from "./evmish-tx-types";
 

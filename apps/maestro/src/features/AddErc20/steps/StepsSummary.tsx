@@ -1,6 +1,5 @@
-import type { FC } from "react";
-
 import { Steps } from "@axelarjs/ui";
+import type { FC } from "react";
 
 export type StepsSummaryProps = {
   currentStep: number;
