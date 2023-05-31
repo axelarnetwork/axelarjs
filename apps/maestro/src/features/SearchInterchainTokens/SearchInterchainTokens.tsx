@@ -52,17 +52,17 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
   }, [data.tokenAddress, data.tokenId, props, search, tokenDetails]);
 
   return (
-    <FormControl className="w-full max-w-md">
+    <FormControl className="max-w-md md:w-full">
       <InputGroup>
         <TextInput
           bordered={true}
           type="search"
           name="tokenAddress"
-          className="bprder-red mx-auto block w-full"
           placeholder={`Search for ERC-20 token address on ${chain?.name}`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           color={error ? "error" : undefined}
+          className="md:w-full"
         />
         <span>
           {isLoading && isAddress(search) ? (
