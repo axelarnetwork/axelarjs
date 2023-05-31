@@ -24,10 +24,10 @@ function useLayoutState() {
     },
     {
       setDrawerSideContent: _setDrawerSideContent,
-      open: () => setIsOpen(true),
-      close: () => setIsOpen(false),
-      toggle: () => setIsOpen((isOpen) => !isOpen),
-      openWithSideContent: (value: FC) => {
+      openDrawer: () => setIsOpen(true),
+      closeDrawer: () => setIsOpen(false),
+      toggleDrawer: () => setIsOpen((isOpen) => !isOpen),
+      openDrawerWithContent: (value: FC) => {
         _setDrawerSideContent(value);
         setIsOpen(true);
       },
