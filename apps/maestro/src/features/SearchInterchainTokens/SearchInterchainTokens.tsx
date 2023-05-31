@@ -52,7 +52,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
   }, [data.tokenAddress, data.tokenId, props, search, tokenDetails]);
 
   return (
-    <FormControl className="max-w-md md:w-full">
+    <FormControl className="w-full max-w-xs md:max-w-md">
       <InputGroup>
         <TextInput
           bordered={true}
@@ -62,7 +62,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           color={error ? "error" : undefined}
-          className="md:w-full"
+          className="flex-1"
         />
         <span>
           {isLoading && isAddress(search) ? (

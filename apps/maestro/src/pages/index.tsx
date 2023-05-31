@@ -37,7 +37,11 @@ export default function Home() {
         <div className="divider">OR</div>
         <AddErc20
           trigger={
-            <Button size="md" className="w-full max-w-md" color="primary">
+            <Button
+              size="md"
+              className="w-full max-w-xs md:max-w-md"
+              color="primary"
+            >
               Deploy a new ERC-20 token
             </Button>
           }
