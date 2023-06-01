@@ -2,6 +2,8 @@ import {
   AxelarIcon,
   Button,
   CopyToClipboardButton,
+  Dropdown,
+  Identicon,
   LinkButton,
   Navbar,
   ThemeSwitcher,
@@ -44,12 +46,6 @@ const Appbar: FC<AppbarProps> = () => {
       <>
         {isConnected && address ? (
           <>
-            <EVMChainsDropdown
-              onSwitchNetwork={switchNetworkAsync}
-              selectedChain={selectedChain}
-              chains={evmChains}
-              triggerClassName="w-full md:w-auto"
-            />
             <CopyToClipboardButton size="sm" copyText={address} outline={true}>
               {maskAddress(address)}
             </CopyToClipboardButton>
@@ -60,20 +56,10 @@ const Appbar: FC<AppbarProps> = () => {
         ) : (
           <ConnectWalletButton />
         )}
-        <div className="absolute right-4 top-6 flex md:static">
-          <ThemeSwitcher />
-        </div>
       </>
     );
     return Content;
-  }, [
-    address,
-    disconnect,
-    evmChains,
-    isConnected,
-    selectedChain,
-    switchNetworkAsync,
-  ]);
+  }, [address, disconnect, isConnected]);
 
   const [, actions] = useLayoutStateContainer();
 
@@ -81,11 +67,14 @@ const Appbar: FC<AppbarProps> = () => {
     () => {
       actions.setDrawerSideContent(() => (
         <div className="flex h-full flex-col gap-4">
-          <div className="flex gap-2 px-3 py-2">
+          <div className="flex gap-2 px-0 py-2">
             <AxelarIcon className="h-6 w-6 dark:invert" />
             <span>{APP_NAME}</span>
           </div>
           <AppbarEndContent />
+          <div className="absolute right-4 top-6">
+            <ThemeSwitcher />
+          </div>
         </div>
       ));
     },
@@ -95,9 +84,12 @@ const Appbar: FC<AppbarProps> = () => {
 
   return (
     <Navbar
-      className={clsx("bg-base-100 fixed top-0 z-10 transition-all", {
-        "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
-      })}
+      className={clsx(
+        "bg-base-100 fixed top-0 z-10 px-2 transition-all md:px-6",
+        {
+          "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
+        }
+      )}
     >
       <Navbar.Start>
         <LinkButton
@@ -111,16 +103,46 @@ const Appbar: FC<AppbarProps> = () => {
       </Navbar.Start>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">
-          <AppbarEndContent />
+          <EVMChainsDropdown
+            onSwitchNetwork={switchNetworkAsync}
+            selectedChain={selectedChain}
+            chains={evmChains}
+            triggerClassName="w-full md:w-auto"
+          />
+
+          {isConnected && address ? (
+            <Dropdown align="end">
+              <Dropdown.Trigger>
+                <button className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring">
+                  <Identicon address={address ?? ""} diameter={18} />
+                </button>
+              </Dropdown.Trigger>
+              <Dropdown.Content className="dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-4 p-4 md:w-48">
+                <>
+                  <CopyToClipboardButton
+                    size="sm"
+                    copyText={address}
+                    outline={true}
+                  >
+                    {maskAddress(address)}
+                  </CopyToClipboardButton>
+                  <Button size="sm" color="error" onClick={() => disconnect()}>
+                    Disconnect
+                  </Button>
+                </>
+              </Dropdown.Content>
+            </Dropdown>
+          ) : (
+            <ConnectWalletButton />
+          )}
         </div>
-        <Button
+        <button
           onClick={actions.toggleDrawer}
           aria-label="Toggle Drawer"
-          className="!bg-opacity-5 md:hidden"
-          ghost
+          className="!bg-opacity-5 px-2 md:hidden"
         >
           <MenuIcon className="h-6 w-6" />
-        </Button>
+        </button>
       </Navbar.End>
     </Navbar>
   );
