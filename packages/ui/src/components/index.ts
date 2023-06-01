@@ -9,6 +9,7 @@ export * from "./Dropdown";
 export * from "./DropdownMenu";
 export * from "./Footer";
 export * from "./icons";
+export * from "./Identicon";
 export * from "./InputGroup";
 export * from "./Kbd";
 export * from "./Menu";
