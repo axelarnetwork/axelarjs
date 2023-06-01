@@ -123,17 +123,17 @@ importers:
         specifier: 4.29.7
         version: 4.29.7(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client':
-        specifier: ^10.28.0
-        version: 10.28.0(@trpc/server@10.28.0)
+        specifier: ^10.28.2
+        version: 10.28.2(@trpc/server@10.28.2)
       '@trpc/next':
-        specifier: ^10.28.0
-        version: 10.28.0(@tanstack/react-query@4.29.7)(@trpc/client@10.28.0)(@trpc/react-query@10.28.0)(@trpc/server@10.28.0)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^10.28.2
+        version: 10.28.2(@tanstack/react-query@4.29.7)(@trpc/client@10.28.2)(@trpc/react-query@10.28.2)(@trpc/server@10.28.2)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/react-query':
-        specifier: ^10.28.0
-        version: 10.28.0(@tanstack/react-query@4.29.7)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^10.28.2
+        version: 10.28.2(@tanstack/react-query@4.29.7)(@trpc/client@10.28.2)(@trpc/server@10.28.2)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server':
-        specifier: ^10.28.0
-        version: 10.28.0
+        specifier: ^10.28.2
+        version: 10.28.2
       '@types/node':
         specifier: 18.16.1
         version: 18.16.1
@@ -469,6 +469,9 @@ importers:
       react-hot-toast:
         specifier: ^2.4.1
         version: 2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
+      react-jazzicon:
+        specifier: ^1.0.4
+        version: 1.0.4(react-dom@18.2.0)(react@18.2.0)
       tailwind-merge:
         specifier: ^1.12.0
         version: 1.12.0
@@ -7291,53 +7294,53 @@ packages:
       '@testing-library/dom': 9.3.0
     dev: true
 
-  /@trpc/client@10.28.0(@trpc/server@10.28.0):
-    resolution: {integrity: sha512-Xhl2xdGI4PkI/a8xaTbsdpIXOy7PeOZaBBdvBgs2kpKiznNAI10qPrK+GLIDkSxvekLqDSnVYIhS0kU0FkhEXw==}
+  /@trpc/client@10.28.2(@trpc/server@10.28.2):
+    resolution: {integrity: sha512-J8fyV5GuIekcjR70At/93jwjVpzPPI7ij7xeBnoKyv73I8lTcYsaxh1V60pH5dx0yYn6oHEEntJHs6BvQbneOw==}
     peerDependencies:
-      '@trpc/server': 10.28.0
+      '@trpc/server': 10.28.2
     dependencies:
-      '@trpc/server': 10.28.0
+      '@trpc/server': 10.28.2
     dev: false
 
-  /@trpc/next@10.28.0(@tanstack/react-query@4.29.7)(@trpc/client@10.28.0)(@trpc/react-query@10.28.0)(@trpc/server@10.28.0)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-sD98gQu/vZhXhC4hEPqyQStWhUIgZCWQuE4N//eZodAtb8Lyosg/UUs/Mo6IFAcdjcXKuyMYlu27ZIRjaG3txw==}
+  /@trpc/next@10.28.2(@tanstack/react-query@4.29.7)(@trpc/client@10.28.2)(@trpc/react-query@10.28.2)(@trpc/server@10.28.2)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ElQM9LW4zFsmhUJYIOBJiWGBv7ZQzFK3stMudy1+LH8Dxlz4l0YZ8QQoW/YAjIzuGA/3SDkHsYDo7uqYK13Vpg==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.28.0
-      '@trpc/react-query': 10.28.0
-      '@trpc/server': 10.28.0
+      '@trpc/client': 10.28.2
+      '@trpc/react-query': 10.28.2
+      '@trpc/server': 10.28.2
       next: '*'
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
       '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.28.0(@trpc/server@10.28.0)
-      '@trpc/react-query': 10.28.0(@tanstack/react-query@4.29.7)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/server': 10.28.0
+      '@trpc/client': 10.28.2(@trpc/server@10.28.2)
+      '@trpc/react-query': 10.28.2(@tanstack/react-query@4.29.7)(@trpc/client@10.28.2)(@trpc/server@10.28.2)(react-dom@18.2.0)(react@18.2.0)
+      '@trpc/server': 10.28.2
       next: 13.4.4(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-ssr-prepass: 1.5.0(react@18.2.0)
     dev: false
 
-  /@trpc/react-query@10.28.0(@tanstack/react-query@4.29.7)(@trpc/client@10.28.0)(@trpc/server@10.28.0)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ssXaZbtNHrgvUW/bmwpiEttF1t1TMZAp/FQ98puXE7MqpodEi2aIum1Ou9Cb1w0lEc4mPwOwztzwuUSGsdCD6Q==}
+  /@trpc/react-query@10.28.2(@tanstack/react-query@4.29.7)(@trpc/client@10.28.2)(@trpc/server@10.28.2)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-hDIk1MKkH5Kz1WXqbPGYJCB5jnjnIQgl0Zg4bScq6/PETBK38fZRn9MHmyjf8HLbvkXbdzWSfnhBGf/nkCCGrQ==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.28.0
-      '@trpc/server': 10.28.0
+      '@trpc/client': 10.28.2
+      '@trpc/server': 10.28.2
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
       '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.28.0(@trpc/server@10.28.0)
-      '@trpc/server': 10.28.0
+      '@trpc/client': 10.28.2(@trpc/server@10.28.2)
+      '@trpc/server': 10.28.2
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@trpc/server@10.28.0:
-    resolution: {integrity: sha512-PrJ/VgRuujMCtNkgrldCPbqv3+yk1LKweKEfvQHTN2L0WIaKJPXzSsOTJS9PqNpFOTqzaK5mgDbypIFvq7SYow==}
+  /@trpc/server@10.28.2:
+    resolution: {integrity: sha512-mCdMzef1NnchYyV11Dg02vu8HDyXl0elvrs2Noi261eLRIU5TwQjiSRxbw/YrDupOKKjaG4iz2i8mHR7jhlvWQ==}
     dev: false
 
   /@trysound/sax@0.2.0:
@@ -13815,6 +13818,10 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
+  /mersenne-twister@1.1.0:
+    resolution: {integrity: sha512-mUYWsMKNrm4lfygPkL3OfGzOPTR2DBlTkBNHM//F6hGp8cLThY897crAlk3/Jo17LEOOjQUrNAx6DvgO77QJkA==}
+    dev: false
+
   /methods@1.1.2:
     resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
     engines: {node: '>= 0.6'}
@@ -15705,6 +15712,17 @@ packages:
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: true
+
+  /react-jazzicon@1.0.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-/3kWv5vtAhI18GBFoqjpxRTtL+EImuB73PAC02r/zJQ6E+PAUmoBx8edYvTCIYHwS01uFf6N3elTDqSrVPwg4w==}
+    peerDependencies:
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
+    dependencies:
+      mersenne-twister: 1.1.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /react-refresh@0.14.0:
     resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
