@@ -41,26 +41,6 @@ const Appbar: FC<AppbarProps> = () => {
 
   const isSticky = useIsSticky(100);
 
-  const AppbarEndContent = useMemo(() => {
-    const Content = () => (
-      <>
-        {isConnected && address ? (
-          <>
-            <CopyToClipboardButton size="sm" copyText={address} outline={true}>
-              {maskAddress(address)}
-            </CopyToClipboardButton>
-            <Button size="sm" onClick={() => disconnect()}>
-              Disconnect
-            </Button>
-          </>
-        ) : (
-          <ConnectWalletButton />
-        )}
-      </>
-    );
-    return Content;
-  }, [address, disconnect, isConnected]);
-
   const [, actions] = useLayoutStateContainer();
 
   useEffect(
@@ -71,7 +51,24 @@ const Appbar: FC<AppbarProps> = () => {
             <AxelarIcon className="h-6 w-6 dark:invert" />
             <span>{APP_NAME}</span>
           </div>
-          <AppbarEndContent />
+          <>
+            {isConnected && address ? (
+              <>
+                <CopyToClipboardButton
+                  size="sm"
+                  copyText={address}
+                  outline={true}
+                >
+                  {maskAddress(address)}
+                </CopyToClipboardButton>
+                <Button size="sm" onClick={() => disconnect()}>
+                  Disconnect
+                </Button>
+              </>
+            ) : (
+              <ConnectWalletButton />
+            )}
+          </>
           <div className="absolute right-4 top-6">
             <ThemeSwitcher />
           </div>
@@ -79,7 +76,7 @@ const Appbar: FC<AppbarProps> = () => {
       ));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [isConnected]
   );
 
   return (
@@ -139,7 +136,7 @@ const Appbar: FC<AppbarProps> = () => {
         <button
           onClick={actions.toggleDrawer}
           aria-label="Toggle Drawer"
-          className="!bg-opacity-5 px-2 md:hidden"
+          className="hover:bg-base-300/50 active:bg-base-300 rounded-lg p-2 px-3 transition-all md:hidden"
         >
           <MenuIcon className="h-6 w-6" />
         </button>
