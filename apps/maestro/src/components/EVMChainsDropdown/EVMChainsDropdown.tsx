@@ -11,6 +11,7 @@ type Props = {
   chains?: EVMChainConfig[];
   compact?: boolean;
   disabled?: boolean;
+  triggerClassName?: string;
 };
 
 const iconSizes = {
@@ -69,13 +70,22 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     (chain) => chain.chain_id !== props.selectedChain?.chain_id
   );
 
+  const windowWidth = window.innerWidth;
+
   return (
-    <Dropdown align="end" className="relative">
+    <Dropdown
+      align={windowWidth > 768 ? "end" : undefined}
+      className="relative"
+    >
       <Dropdown.Trigger
         $as="button"
-        className={clsx("btn btn-sm btn-ghost group flex items-center gap-2", {
-          "pointer-events-none": props.disabled,
-        })}
+        className={clsx(
+          "btn btn-sm btn-ghost group flex items-center gap-2",
+          {
+            "pointer-events-none": props.disabled,
+          },
+          props.triggerClassName
+        )}
         tabIndex={props.compact ? -1 : 0}
         onClick={() => {
           setIsOpen(!isOpen);
@@ -90,8 +100,8 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       </Dropdown.Trigger>
       {eligibleChains.length > 0 && (
         <Dropdown.Content
-          className={clsx("dark:bg-base-200 w-48", {
-            "bg-base-200 dark:bg-base-300 max-h-[300px] w-96 translate-x-8 translate-y-2 overflow-x-scroll":
+          className={clsx("dark:bg-base-200 mt-2 max-h-[80vh] w-full md:w-48", {
+            "bg-base-200 dark:bg-base-300 max-h-[300px] w-96 translate-x-8 overflow-x-scroll":
               props.compact,
           })}
         >

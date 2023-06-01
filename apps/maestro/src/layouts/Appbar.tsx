@@ -48,6 +48,7 @@ const Appbar: FC<AppbarProps> = () => {
               onSwitchNetwork={switchNetworkAsync}
               selectedChain={selectedChain}
               chains={evmChains}
+              triggerClassName="w-full md:w-auto"
             />
             <CopyToClipboardButton size="sm" copyText={address} outline={true}>
               {maskAddress(address)}
@@ -59,7 +60,9 @@ const Appbar: FC<AppbarProps> = () => {
         ) : (
           <ConnectWalletButton />
         )}
-        <ThemeSwitcher />
+        <div className="absolute right-4 top-6 flex md:static">
+          <ThemeSwitcher />
+        </div>
       </>
     );
     return Content;
@@ -77,7 +80,11 @@ const Appbar: FC<AppbarProps> = () => {
   useEffect(
     () => {
       actions.setDrawerSideContent(() => (
-        <div className="flex flex-col gap-4">
+        <div className="flex h-full flex-col gap-4">
+          <div className="flex gap-2 px-3 py-2">
+            <AxelarIcon className="h-6 w-6 dark:invert" />
+            <span>{APP_NAME}</span>
+          </div>
           <AppbarEndContent />
         </div>
       ));
