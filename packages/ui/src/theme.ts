@@ -2,6 +2,7 @@ export type ColorVariant =
   | "primary"
   | "secondary"
   | "accent"
+  | "neutral"
   | "info"
   | "success"
   | "warning"
@@ -13,6 +14,7 @@ export const COLOR_VARIANTS: ColorVariant[] = [
   "primary",
   "secondary",
   "accent",
+  "neutral",
   "info",
   "success",
   "warning",

@@ -42,12 +42,10 @@ export const Alert: FC<AlertProps> = ({
       className={twMerge(alertVariance({ status }), className)}
       {...props}
     >
-      <div>
-        <span className={!status ? "text-info" : ""}>
-          {icon ?? ICON_MAP[status ?? "info"]}
-        </span>
-        <span>{children}</span>
-      </div>
+      <span className={!status ? "text-info" : ""}>
+        {icon ?? ICON_MAP[status ?? "info"]}
+      </span>
+      <span>{children}</span>
     </StyledAlert>
   );
 };

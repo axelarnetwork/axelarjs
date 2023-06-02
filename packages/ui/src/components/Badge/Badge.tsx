@@ -8,10 +8,25 @@ const StyledBadge = tw.span``;
 
 const badgeVariance = cva("badge", {
   variants: {
+    /**
+     * @deprecated Use `variant` instead
+     */
     color: {
       primary: "badge-primary",
       secondary: "badge-secondary",
       accent: "badge-accent",
+      neutral: "badge-neutral",
+      success: "badge-success",
+      error: "badge-error",
+      warning: "badge-warning",
+      info: "badge-info",
+      ghost: "badge-ghost",
+    },
+    variant: {
+      primary: "badge-primary",
+      secondary: "badge-secondary",
+      accent: "badge-accent",
+      neutral: "badge-neutral",
       success: "badge-success",
       error: "badge-error",
       warning: "badge-warning",
@@ -26,6 +41,9 @@ const badgeVariance = cva("badge", {
     outline: {
       true: "badge-outline",
     },
+    /**
+     * @deprecated Use `variant='ghost'` instead
+     */
     ghost: {
       true: "badge-ghost",
     },
