@@ -16,15 +16,32 @@ export const buttonVariance = cva("btn", {
     },
     /**
      * The color of the button, configurable in the theme
+     *
+     * @deprecated Use `variant` instead
      **/
     color: {
       primary: "btn-primary",
       secondary: "btn-secondary",
+      neutral: "btn-neutral",
       accent: "btn-accent",
       info: "btn-info",
       success: "btn-success",
       warning: "btn-warning",
       error: "btn-error",
+      ghost: "btn-ghost",
+      link: "btn-link",
+    },
+    variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+      neutral: "btn-neutral",
+      accent: "btn-accent",
+      info: "btn-info",
+      success: "btn-success",
+      warning: "btn-warning",
+      error: "btn-error",
+      ghost: "btn-ghost",
+      link: "btn-link",
     },
     /**
      * The shape of the button (circle or square)
@@ -47,6 +64,8 @@ export const buttonVariance = cva("btn", {
     },
     /**
      * Renders a ghost button, which is a transparent button with no border
+     *
+     * @deprecated Use `color="ghost"` instead
      **/
     ghost: {
       true: "btn-ghost",
@@ -59,6 +78,8 @@ export const buttonVariance = cva("btn", {
     },
     /**
      * Renders a link button, which looks like a link
+     *
+     * @deprecated Use `color="link"` instead
      **/
     link: {
       true: "btn-link",

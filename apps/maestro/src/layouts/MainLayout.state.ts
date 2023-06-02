@@ -5,7 +5,7 @@ function useLayoutState() {
   const [DrawerSideContent, setDrawerSideContent] = useState<FC>(
     () => () => null
   );
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   /**
    * Set the component to render in the drawer
@@ -19,16 +19,16 @@ function useLayoutState() {
   return [
     {
       DrawerSideContent,
-      isOpen,
+      isDrawerOpen: isDrawerOpen,
     },
     {
       setDrawerSideContent: _setDrawerSideContent,
-      openDrawer: () => setIsOpen(true),
-      closeDrawer: () => setIsOpen(false),
-      toggleDrawer: () => setIsOpen((isOpen) => !isOpen),
+      openDrawer: () => setDrawerOpen(true),
+      closeDrawer: () => setDrawerOpen(false),
+      toggleDrawer: () => setDrawerOpen((isOpen) => !isOpen),
       openDrawerWithContent: (value: FC) => {
         _setDrawerSideContent(value);
-        setIsOpen(true);
+        setDrawerOpen(true);
       },
     },
   ] as const;

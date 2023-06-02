@@ -1,4 +1,4 @@
-const lightTheme = require("daisyui/src/colors/themes")["[data-theme=light]"];
+const lightTheme = require("daisyui/src/theming/themes")["[data-theme=light]"];
 
 const base = require("./base.cjs");
 
