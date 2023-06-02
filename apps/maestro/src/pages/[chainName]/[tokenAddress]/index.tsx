@@ -70,11 +70,11 @@ const InterchainTokensPage = () => {
       {tokenDetails && (
         <section className="grid gap-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-2xl font-bold">
-              Interchain Token{" "}
+            <div className="flex flex-wrap items-center gap-2 text-2xl font-bold">
+              <span className="hidden sm:inline">Interchain Token </span>
               {Boolean(tokenDetails.name && tokenDetails.symbol) && (
                 <>
-                  <span>&middot;</span>
+                  <span className="hidden sm:inline">&middot;</span>
                   <span className="text-primary text-base">
                     {tokenDetails.name}
                   </span>{" "}
@@ -97,7 +97,11 @@ const InterchainTokensPage = () => {
                   alt={interchainToken.chain.name}
                   size="sm"
                 />
-                View token on {interchainToken.chain.explorer.name}
+                View token
+                <span className="hidden sm:inline">
+                  {" "}
+                  on {interchainToken.chain.explorer.name}
+                </span>
                 <ExternalLink className="h-4 w-4 translate-x-1" />
               </LinkButton>
             )}
