@@ -9,6 +9,9 @@ const drawerVariance = cva("drawer", {
     end: {
       true: "drawer-end",
     },
+    open: {
+      true: "drawer-open",
+    },
     mobile: {
       true: "drawer-mobile",
     },

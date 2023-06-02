@@ -161,7 +161,7 @@ const Page = ({
 
       <section
         className={clsx(
-          "mt-20 grid flex-1",
+          "mt-20 grid flex-1 px-4 xl:px-2 2xl:px-0",
           {
             "place-items-center": isExceptionalState,
           },

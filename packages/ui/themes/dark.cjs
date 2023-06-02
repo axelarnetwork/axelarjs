@@ -1,4 +1,4 @@
-const darkTheme = require("daisyui/src/colors/themes")["[data-theme=dark]"];
+const darkTheme = require("daisyui/src/theming/themes")["[data-theme=dark]"];
 const base = require("./base.cjs");
 
 const BASE_THEME = { ...darkTheme, ...base };

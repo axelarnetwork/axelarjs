@@ -14,7 +14,8 @@ import {
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
 
-  const [{ isOpen, DrawerSideContent }, actions] = useLayoutStateContainer();
+  const [{ isDrawerOpen: isOpen, DrawerSideContent }, actions] =
+    useLayoutStateContainer();
 
   const defaultChain = useChainFromRoute();
 
@@ -44,7 +45,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         </Drawer.Content>
         <Drawer.Side>
           <Drawer.Overlay onClick={actions.closeDrawer} />
-          <aside className="bg-base-100 text-base-content w-full max-w-xs p-4">
+          <aside className="bg-base-100 text-base-content h-full w-full max-w-xs p-4">
             <DrawerSideContent />
           </aside>
         </Drawer.Side>
