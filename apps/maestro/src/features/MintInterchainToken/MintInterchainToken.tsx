@@ -66,12 +66,13 @@ export const MintInterchainToken: FC<Props> = (props) => {
         return;
       }
 
+      await trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate();
+      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+
       setTxState({
         status: "confirmed",
         receipt,
       });
-
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
 
       toast.success("Successfully minted interchain tokens");
 
