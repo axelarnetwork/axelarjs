@@ -187,6 +187,7 @@ const RegisterOriginTokenButton = ({
 
   useWaitForTransaction({
     hash: data?.hash,
+    confirmations: 5,
     async onSuccess(receipt) {
       onSuccess();
 
