@@ -12,6 +12,7 @@ type Props = {
   compact?: boolean;
   disabled?: boolean;
   triggerClassName?: string;
+  chainIconClassName?: string;
 };
 
 const iconSizes = {
@@ -95,6 +96,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           src={props.selectedChain.image}
           alt={props.selectedChain.chain_name}
           size="sm"
+          className={props.chainIconClassName}
         />
         <span>{props.selectedChain.name}</span>
       </Dropdown.Trigger>
