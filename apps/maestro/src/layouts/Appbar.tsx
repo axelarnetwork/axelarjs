@@ -58,7 +58,9 @@ const Appbar: FC<AppbarProps> = () => {
                   size="sm"
                   copyText={address}
                   outline={true}
+                  className="flex items-center gap-2"
                 >
+                  <Identicon address={address ?? ""} diameter={18} />{" "}
                   {maskAddress(address)}
                 </CopyToClipboardButton>
                 <Button size="sm" onClick={() => disconnect()}>
@@ -102,9 +104,9 @@ const Appbar: FC<AppbarProps> = () => {
             onSwitchNetwork={switchNetworkAsync}
             selectedChain={selectedChain}
             chains={evmChains}
-            triggerClassName="w-full md:w-auto"
+            triggerClassName="w-full md:w-auto rounded-full"
+            chainIconClassName="-translate-x-1.5"
           />
-
           {isConnected && address ? (
             <Dropdown align="end">
               <Dropdown.Trigger>
@@ -118,7 +120,9 @@ const Appbar: FC<AppbarProps> = () => {
                     size="sm"
                     copyText={address}
                     outline={true}
+                    className="flex items-center gap-1"
                   >
+                    <Identicon address={address ?? ""} diameter={18} />{" "}
                     {maskAddress(address)}
                   </CopyToClipboardButton>
                   <Button size="sm" color="error" onClick={() => disconnect()}>
