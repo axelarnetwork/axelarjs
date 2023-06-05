@@ -12,3 +12,8 @@ export const Identicon: FC<IdenticonProps> = (props) => (
     seed={jsNumberForAddress(props.address)}
   />
 );
+
+Identicon.defaultProps = {
+  diameter: 32,
+  address: "0x",
+};
