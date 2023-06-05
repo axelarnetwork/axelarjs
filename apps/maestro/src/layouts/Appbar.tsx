@@ -105,7 +105,6 @@ const Appbar: FC<AppbarProps> = () => {
             triggerClassName="w-full md:w-auto"
           />
 
-          {address}
           {isConnected && address ? (
             <Dropdown align="end">
               <Dropdown.Trigger>
