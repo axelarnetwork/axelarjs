@@ -84,13 +84,6 @@ export const buttonVariance = cva("btn", {
     link: {
       true: "btn-link",
     },
-    /**
-     * Renders a loading button, which is disabled and has a loading indicator
-     */
-    loading: {
-      true: "loading",
-    },
-
     length: {
       wide: "btn-wide",
       block: "btn-block",
@@ -100,8 +93,15 @@ export const buttonVariance = cva("btn", {
 
 type VProps = VariantProps<typeof buttonVariance>;
 
-export type ButtonProps = JSX.IntrinsicElements["button"] & VProps & {};
-export type LinkButtonProps = JSX.IntrinsicElements["a"] & VProps & {};
+export type ButtonProps = JSX.IntrinsicElements["button"] &
+  VProps & {
+    loading?: boolean;
+  };
+
+export type LinkButtonProps = JSX.IntrinsicElements["a"] &
+  VProps & {
+    loading?: boolean;
+  };
 
 const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   props: T
@@ -134,7 +134,6 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
         link,
         glass,
         length,
-        loading,
       }),
       className
     ),
@@ -153,6 +152,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...componentProps}
         ref={ref}
       >
+        {props.loading && <span className="loading loading-spinner" />}
         {props.children}
       </button>
     );
