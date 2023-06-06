@@ -1,10 +1,11 @@
-import { ComponentProps, FC, Fragment, MouseEvent, ReactNode } from "react";
+import { ComponentProps, FC, Fragment, MouseEvent, useMemo } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
 import tw from "tailwind-styled-components";
 
 import { Button } from "../Button";
+import { DialogTriggerProps } from "../Dialog";
 import {
   DialogStateProvider,
   useDialogStateContiner,
@@ -17,16 +18,8 @@ const StyledDialogContent = tw(Dialog.Content)`
   top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]
 `;
 
-type PolymorphicProps =
-  | {
-      trigger: ReactNode;
-    }
-  | {
-      triggerLabel: ReactNode;
-    };
-
 export type ModalProps = JSX.IntrinsicElements["div"] &
-  PolymorphicProps &
+  DialogTriggerProps &
   Dialog.DialogProps & {
     hideCloseButton?: boolean;
     disableCloseButton?: boolean;
@@ -55,6 +48,24 @@ const ModalRoot: FC<ModalProps> = ({
     }
   };
 
+  const trigger = useMemo(
+    () =>
+      "trigger" in props ? (
+        <Dialog.Trigger asChild onClick={actions.open}>
+          {props.trigger}
+        </Dialog.Trigger>
+      ) : "triggerLabel" in props ? (
+        <Dialog.Trigger asChild onClick={actions.open}>
+          <Button>{props.triggerLabel}</Button>
+        </Dialog.Trigger>
+      ) : "renderTrigger" in props ? (
+        props.renderTrigger?.({
+          onClick: actions.open,
+        })
+      ) : null,
+    [props]
+  );
+
   return (
     <Dialog.Root
       {...{
@@ -64,15 +75,7 @@ const ModalRoot: FC<ModalProps> = ({
         defaultOpen,
       }}
     >
-      {"trigger" in props ? (
-        <Dialog.Trigger asChild onClick={actions.open}>
-          {props.trigger}
-        </Dialog.Trigger>
-      ) : (
-        <Dialog.Trigger asChild onClick={actions.open}>
-          <Button>{props.triggerLabel}</Button>
-        </Dialog.Trigger>
-      )}
+      {trigger}
       <Transition.Root show={state.isOpen}>
         <Dialog.Portal>
           <Transition.Child
