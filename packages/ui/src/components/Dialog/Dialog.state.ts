@@ -1,7 +1,9 @@
 import { createContainer } from "@axelarjs/utils/react";
 import { useEffect, useState } from "react";
 
-function useModalState(initialOpen = false) {
+import { not } from "rambda";
+
+function useDialogState(initialOpen = false) {
   const [isOpen, setIsOpen] = useState(initialOpen);
 
   useEffect(() => {
@@ -13,10 +15,12 @@ function useModalState(initialOpen = false) {
 
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
-  return [isOpen, { open, close }] as const;
+  const toggle = () => setIsOpen(not);
+
+  return [{ isOpen }, { open, close, toggle }] as const;
 }
 
 export const {
-  Provider: ModalStateProvider,
-  useContainer: useModalStateContiner,
-} = createContainer(useModalState);
+  Provider: DialogStateProvider,
+  useContainer: useDialogStateContiner,
+} = createContainer(useDialogState);
