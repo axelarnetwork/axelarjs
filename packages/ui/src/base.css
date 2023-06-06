@@ -30,7 +30,7 @@
 
 @layer base {
   ::-webkit-scrollbar {
-    width: 9px;
+    @apply h-1.5 w-1.5 md:h-2 md:w-2;
   }
 
   ::-webkit-scrollbar-thumb {

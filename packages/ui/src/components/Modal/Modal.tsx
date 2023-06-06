@@ -5,7 +5,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import tw from "tailwind-styled-components";
 
 import { Button } from "../Button";
-import { ModalStateProvider, useModalStateContiner } from "./Modal.state";
+import {
+  DialogStateProvider,
+  useDialogStateContiner,
+} from "../Dialog/Dialog.state";
 
 const StyledDialogContent = tw(Dialog.Content)`
   modal-box modal-open
@@ -38,7 +41,7 @@ const ModalRoot: FC<ModalProps> = ({
   disableCloseButton,
   ...props
 }) => {
-  const [isOpen, actions] = useModalStateContiner();
+  const [state, actions] = useDialogStateContiner();
 
   const handleOpenChange = (open: boolean) => {
     if (onOpenChange) {
@@ -56,7 +59,7 @@ const ModalRoot: FC<ModalProps> = ({
     <Dialog.Root
       {...{
         modal,
-        open: isOpen,
+        open: state.isOpen,
         onOpenChange: handleOpenChange,
         defaultOpen,
       }}
@@ -70,7 +73,7 @@ const ModalRoot: FC<ModalProps> = ({
           <Button>{props.triggerLabel}</Button>
         </Dialog.Trigger>
       )}
-      <Transition.Root show={isOpen}>
+      <Transition.Root show={state.isOpen}>
         <Dialog.Portal>
           <Transition.Child
             as={Fragment}
@@ -121,9 +124,9 @@ ModalRoot.defaultProps = {
 };
 
 const ModalRootWithProvider = (props: ModalProps) => (
-  <ModalStateProvider initialState={props.open ?? props.defaultOpen}>
+  <DialogStateProvider initialState={props.open ?? props.defaultOpen}>
     <ModalRoot {...props} />
-  </ModalStateProvider>
+  </DialogStateProvider>
 );
 
 export const Modal = Object.assign(ModalRootWithProvider, {
@@ -138,12 +141,13 @@ export const Modal = Object.assign(ModalRootWithProvider, {
     font-medium opacity-75 -mt-2
   `,
   CloseAction: (props: ComponentProps<typeof Button>) => {
-    const [, actions] = useModalStateContiner();
+    const [, actions] = useDialogStateContiner();
 
     const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
       props.onClick?.(e);
       actions.close();
     };
+
     return (
       <Dialog.Close asChild onClick={handleClick}>
         <Button {...props} />

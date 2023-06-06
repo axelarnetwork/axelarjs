@@ -1,4 +1,4 @@
-import { FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
+import { Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
 import { useRef, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
@@ -88,17 +88,17 @@ const TokenDetails: FC = () => {
           ))}
         </div>
       )}
-      <Modal.Actions>
-        <Modal.CloseAction onClick={actions.reset}>
-          Cancel and exit
-        </Modal.CloseAction>
+      <Dialog.Actions>
+        <Dialog.CloseAction onClick={actions.reset}>
+          Cancel & exit
+        </Dialog.CloseAction>
         <NextButton
           disabled={!formState.isValid}
           onClick={() => formSubmitRef.current?.click()}
         >
-          Deploy & Register
+          Register token
         </NextButton>
-      </Modal.Actions>
+      </Dialog.Actions>
     </>
   );
 };

@@ -1,8 +1,8 @@
 import {
   Button,
+  Dialog,
   FormControl,
   Label,
-  Modal,
   toast,
   Tooltip,
 } from "@axelarjs/ui";
@@ -166,7 +166,7 @@ export const Step3: FC = () => {
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
       </form>
-      <Modal.Actions>
+      <Dialog.Actions>
         <PrevButton onClick={rootActions.prevStep}>Token details</PrevButton>
         <NextButton
           loading={state.isDeploying && !hasTxError}
@@ -179,7 +179,7 @@ export const Step3: FC = () => {
               Number(state.gasFees?.length) > 1 ? "s" : ""
             }`}
         </NextButton>
-      </Modal.Actions>
+      </Dialog.Actions>
     </>
   );
 };

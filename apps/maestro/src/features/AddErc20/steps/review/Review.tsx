@@ -2,8 +2,8 @@ import {
   Alert,
   Button,
   CopyToClipboardButton,
+  Dialog,
   LinkButton,
-  Modal,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
 import { useState, type FC } from "react";
@@ -71,10 +71,10 @@ const Review: FC = () => {
           </>
         )}
       </div>
-      <Modal.Actions>
+      <Dialog.Actions>
         {routeChain ? (
           // if the chain is not the same as the route, we need to refresh the page
-          <Modal.CloseAction
+          <Dialog.CloseAction
             length="block"
             color="primary"
             onClick={() => {
@@ -84,7 +84,7 @@ const Review: FC = () => {
             }}
           >
             View token page!
-          </Modal.CloseAction>
+          </Dialog.CloseAction>
         ) : (
           <Button
             length="block"
@@ -103,7 +103,7 @@ const Review: FC = () => {
             Go to token page!
           </Button>
         )}
-      </Modal.Actions>
+      </Dialog.Actions>
     </>
   );
 };

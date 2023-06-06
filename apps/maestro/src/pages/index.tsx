@@ -1,4 +1,3 @@
-import { Button } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
@@ -35,17 +34,7 @@ export default function Home() {
       <div className="flex w-full max-w-lg flex-col items-center justify-center">
         <SearchInterchainTokens onTokenFound={handleTokenFound} />
         <div className="divider">OR</div>
-        <AddErc20
-          trigger={
-            <Button
-              size="md"
-              className="w-full max-w-xs md:max-w-md"
-              color="primary"
-            >
-              Deploy a new ERC-20 token
-            </Button>
-          }
-        />
+        <AddErc20 />
       </div>
     </Page>
   );

@@ -1,4 +1,4 @@
-import { LinkButton, Modal } from "@axelarjs/ui";
+import { Button, Dialog, LinkButton } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
@@ -39,29 +39,36 @@ const StepsSummary = dynamic(
 const STEPS = [Step1, Step2, Step3];
 
 type AddErc20Props = {
-  trigger?: JSX.Element;
   tokenDetails?: TokenDetails;
 };
 
-const AddErc20: FC<AddErc20Props> = (props) => {
+const AddErc20: FC<AddErc20Props> = () => {
   const { state } = useAddErc20StateContainer();
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
-  const conditionalProps = props.trigger
-    ? { trigger: props.trigger }
-    : { triggerLabel: "Deploy a new ERC-20 token" };
-
   return (
-    <Modal {...conditionalProps} hideCloseButton>
-      <Modal.Body>
-        <Modal.Title className="flex items-center gap-2">
+    <Dialog
+      renderTrigger={(props) => (
+        <Button
+          {...props}
+          size="md"
+          className="w-full max-w-xs md:max-w-md"
+          color="primary"
+        >
+          Deploy a new ERC-20 token
+        </Button>
+      )}
+    >
+      <Dialog.Body $as="section">
+        <Dialog.CornerCloseAction />
+        <Dialog.Title className="flex items-center gap-2">
           <TokenRegistration />
-        </Modal.Title>
+        </Dialog.Title>
         <StepsSummary currentStep={state.step} />
         <CurrentStep />
-      </Modal.Body>
-    </Modal>
+      </Dialog.Body>
+    </Dialog>
   );
 };
 
