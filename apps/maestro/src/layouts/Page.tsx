@@ -1,14 +1,16 @@
 import { Badge, Button } from "@axelarjs/ui";
-import React, { useMemo } from "react";
+import { sluggify } from "@axelarjs/utils";
+import React, { useCallback, useMemo } from "react";
 import { GridLoader } from "react-spinners";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 import clsx from "clsx";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import ConnectWalletButton from "~/compounds/ConnectWalletButton";
+import SearchInterchainTokens from "~/features/SearchInterchainTokens";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
@@ -77,19 +79,33 @@ const Page = ({
     return "connected";
   }, [evmChain, mustBeConnected, isConnected, chainFromRoute, chain]);
 
+  const router = useRouter();
+
+  const handleTokenFound = useCallback(
+    (result: {
+      tokenAddress: string;
+      tokenId?: string;
+      chainName?: string;
+    }) => {
+      if (!result?.chainName) {
+        return;
+      }
+      router.push(`/${sluggify(result.chainName)}/${result?.tokenAddress}`);
+    },
+    [router]
+  );
+
   const pageContent = useMemo(() => {
     switch (pageState) {
       case "loading":
         return <div>Loading...</div>;
       case "disconnected":
-        return (
+        return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
-            <ConnectWalletButton
-              size="md"
-              length="block"
-              className=" max-w-md"
-            />
+            <SearchInterchainTokens onTokenFound={handleTokenFound} />
           </div>
+        ) : (
+          children
         );
       case "unsupported-network":
         return (
@@ -140,11 +156,13 @@ const Page = ({
     }
   }, [
     pageState,
+    mustBeConnected,
+    handleTokenFound,
+    children,
     chain?.id,
     evmChain,
     evmChainFromRoute?.name,
     evmChainFromRoute?.chain_id,
-    children,
     switchNetworkAsync,
   ]);
 
