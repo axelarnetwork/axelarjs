@@ -1,4 +1,4 @@
-import { createContainer } from "@axelarjs/utils/react";
+import { createContainer, useLocalStorageState } from "@axelarjs/utils/react";
 import { useState, type FC } from "react";
 
 function useLayoutState() {
@@ -6,6 +6,12 @@ function useLayoutState() {
     () => () => null
   );
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [persistedState, setPersistedState] = useLocalStorageState(
+    "@axelar/maestro/banners",
+    {
+      isTestnetBannerDismissed: false,
+    }
+  );
 
   /**
    * Set the component to render in the drawer
@@ -20,6 +26,7 @@ function useLayoutState() {
     {
       DrawerSideContent,
       isDrawerOpen: isDrawerOpen,
+      isTestnetBannerDismissed: persistedState.isTestnetBannerDismissed,
     },
     {
       setDrawerSideContent: _setDrawerSideContent,
@@ -29,6 +36,11 @@ function useLayoutState() {
       openDrawerWithContent: (value: FC) => {
         _setDrawerSideContent(value);
         setDrawerOpen(true);
+      },
+      dismissTestnetBanner: () => {
+        setPersistedState((stateDraft) => {
+          stateDraft.isTestnetBannerDismissed = true;
+        });
       },
     },
   ] as const;

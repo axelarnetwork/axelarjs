@@ -45,7 +45,6 @@ const ALLOWED_NON_NUMERIC_KEYS = [
 
 export const MintInterchainToken: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
-
   const [txState, setTxState] = useTransactionState();
 
   const {
