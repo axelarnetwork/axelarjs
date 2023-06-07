@@ -1,3 +1,5 @@
+import type { InterchainTokenClient } from "@axelarjs/evm";
+
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -7,7 +9,7 @@ import { publicProcedure } from "~/server/trpc";
 export const getInterchainTokenDetails = publicProcedure
   .input(
     z.object({
-      chainId: z.number(),
+      chainId: z.number().optional(),
       tokenAddress: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
     })
   )
@@ -18,6 +20,27 @@ export const getInterchainTokenDetails = publicProcedure
       );
 
       if (!chainConfig) {
+        // scan all chains
+        for (const chainConfig of EVM_CHAIN_CONFIGS) {
+          const client = ctx.contracts.createInterchainTokenClient(
+            chainConfig,
+            input.tokenAddress as `0x${string}`
+          );
+
+          try {
+            const details = await getTokenDetails(client);
+
+            if (details) {
+              return details;
+            }
+            // continue scanning
+          } catch (error) {
+            console.log(
+              `Token ${input.tokenAddress} not deployed on ${chainConfig.name}`
+            );
+          }
+        }
+
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Invalid chainId",
@@ -29,19 +52,7 @@ export const getInterchainTokenDetails = publicProcedure
         input.tokenAddress as `0x${string}`
       );
 
-      const [tokenName, tokenSymbol, decimals, owner] = await Promise.all([
-        client.readContract("name"),
-        client.readContract("symbol"),
-        client.readContract("decimals"),
-        client.readContract("owner"),
-      ]);
-
-      return {
-        name: String(tokenName),
-        symbol: String(tokenSymbol),
-        decimals: Number(decimals),
-        owner: String(owner) as `0x${string}`,
-      };
+      return getTokenDetails(client);
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -54,3 +65,21 @@ export const getInterchainTokenDetails = publicProcedure
       });
     }
   });
+
+async function getTokenDetails(client: InterchainTokenClient) {
+  const [tokenName, tokenSymbol, decimals, owner] = await Promise.all([
+    client.readContract("name"),
+    client.readContract("symbol"),
+    client.readContract("decimals"),
+    client.readContract("owner"),
+  ]);
+
+  return {
+    name: String(tokenName),
+    symbol: String(tokenSymbol),
+    decimals: Number(decimals),
+    owner: String(owner) as `0x${string}`,
+    chainId: client.chain?.id,
+    chainName: client.chain?.name,
+  };
+}

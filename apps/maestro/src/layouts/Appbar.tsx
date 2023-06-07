@@ -134,6 +134,7 @@ const Appbar: FC<AppbarProps> = () => {
           ) : (
             <ConnectWalletButton />
           )}
+          <ThemeSwitcher />
         </div>
         <button
           onClick={actions.toggleDrawer}

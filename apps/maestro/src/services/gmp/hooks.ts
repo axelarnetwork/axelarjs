@@ -1,4 +1,5 @@
 import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
+import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { uniq } from "rambda";
@@ -33,21 +34,21 @@ export function useInterchainTokensQuery(input: {
 
   const uniqueChainsIDs = uniq(evmChains?.map?.((x) => x.chain_id) ?? []);
 
-  const { data, ...queryResult } = trpc.gmp.searchInterchainToken.useQuery(
-    {
-      chainId: Number(input.chainId),
-      tokenAddress: String(input.tokenAddress),
-      chainIds: input.chainIds ?? uniqueChainsIDs,
-    },
-    {
-      enabled:
-        Boolean(input.chainId) &&
-        isAddress(input.tokenAddress ?? "") &&
-        Boolean(input.chainIds?.length || uniqueChainsIDs.length),
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { data, ...queryResult } =
+    trpc.interchainToken.searchInterchainToken.useQuery(
+      {
+        chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
+        tokenAddress: String(input.tokenAddress),
+        chainIds: input.chainIds ?? uniqueChainsIDs,
+      },
+      {
+        enabled:
+          isAddress(input.tokenAddress ?? "") &&
+          Boolean(input.chainIds?.length || uniqueChainsIDs.length),
+        retry: false,
+        refetchOnWindowFocus: false,
+      }
+    );
 
   return {
     ...queryResult,
