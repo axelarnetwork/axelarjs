@@ -1,4 +1,11 @@
-import { ComponentProps, FC, useEffect, useRef } from "react";
+import {
+  ComponentProps,
+  FC,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import tw from "tailwind-styled-components";
 
@@ -9,20 +16,20 @@ const StyledDialog = tw.dialog`
   modal modal-bottom sm:modal-middle
 `;
 
-type PolymorphicProps =
+export type DialogTriggerProps =
   | {
-      trigger: JSX.Element;
+      trigger?: JSX.Element;
     }
   | {
-      triggerLabel: JSX.Element;
+      triggerLabel?: ReactNode;
     }
   | {
-      renderTrigger: (props: { onClick: () => void }) => JSX.Element;
+      renderTrigger?: (props: { onClick: () => void }) => JSX.Element;
     };
 
 export type DialogProps = ComponentProps<typeof StyledDialog> & {
   defaultOpen?: boolean;
-} & PolymorphicProps;
+} & DialogTriggerProps;
 
 const DialogRoot: FC<DialogProps> = (props) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -45,15 +52,21 @@ const DialogRoot: FC<DialogProps> = (props) => {
     };
   }, [state.isOpen]);
 
-  return (
-    <>
-      {"renderTrigger" in props ? (
-        props.renderTrigger({ onClick: actions.open })
+  const trigger = useMemo(
+    () =>
+      "renderTrigger" in props ? (
+        props.renderTrigger?.({ onClick: actions.open })
+      ) : "triggerLabel" in props ? (
+        <Button onClick={actions.open}>{props.triggerLabel}</Button>
       ) : "trigger" in props ? (
         props.trigger
-      ) : (
-        <Button onClick={actions.open}>{props.triggerLabel}</Button>
-      )}
+      ) : null,
+    [props]
+  );
+
+  return (
+    <>
+      {trigger}
       <StyledDialog ref={dialogRef} open={state.isOpen} onClose={actions.close}>
         {props.children}
       </StyledDialog>
