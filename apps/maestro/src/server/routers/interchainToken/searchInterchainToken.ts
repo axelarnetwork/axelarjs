@@ -4,8 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { partition } from "rambda";
 import { z } from "zod";
 
-import type { WagmiEVMChainConfig } from "~/config/wagmi";
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
