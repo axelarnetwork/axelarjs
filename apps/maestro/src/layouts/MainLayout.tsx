@@ -118,7 +118,11 @@ const TestnetBanner = ({ onClose = () => {} }) => (
         with small amounts first.
       </p>
       <Card.Actions className="justify-end">
-        <LinkButton variant="accent" size="xs">
+        <LinkButton
+          variant="accent"
+          size="xs"
+          href={process.env.NEXT_PUBLIC_TESTNET_URL}
+        >
           Go to testnet
         </LinkButton>
       </Card.Actions>
