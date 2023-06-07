@@ -119,6 +119,7 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
     link,
     loading,
     children,
+    variant,
     ...componentProps
   } = props;
 
@@ -134,6 +135,7 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
         link,
         glass,
         length,
+        variant,
       }),
       className
     ),

@@ -1,4 +1,13 @@
-import { Badge, Clamp, Drawer, Footer, useTheme } from "@axelarjs/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  Clamp,
+  Drawer,
+  Footer,
+  LinkButton,
+  useTheme,
+} from "@axelarjs/ui";
 import type { FC, PropsWithChildren } from "react";
 
 import { Web3Modal } from "@web3modal/react";
@@ -14,15 +23,21 @@ import {
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
 
-  const [{ isDrawerOpen: isOpen, DrawerSideContent }, actions] =
-    useLayoutStateContainer();
+  const [
+    { isDrawerOpen, DrawerSideContent, isTestnetBannerDismissed },
+    actions,
+  ] = useLayoutStateContainer();
 
   const defaultChain = useChainFromRoute();
+
+  const shouldRenderTestnetBanner =
+    process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet" &&
+    !isTestnetBannerDismissed;
 
   return (
     <>
       <Drawer>
-        <Drawer.Toggle checked={isOpen} />
+        <Drawer.Toggle checked={isDrawerOpen} />
         <Drawer.Content className="flex min-h-screen flex-1 flex-col gap-4">
           <Appbar />
           <Clamp $as="main" className="flex flex-1">
@@ -36,12 +51,15 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               <Badge
                 className="absolute right-4 lowercase"
                 size="lg"
-                color="accent"
+                variant="accent"
               >
                 env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
               </Badge>
             )}
           </Footer>
+          {shouldRenderTestnetBanner && (
+            <TestnetBanner onClose={actions.dismissTestnetBanner} />
+          )}
         </Drawer.Content>
         <Drawer.Side>
           <Drawer.Overlay onClick={actions.closeDrawer} />
@@ -79,3 +97,31 @@ const WithProvider: FC<PropsWithChildren> = (props) => (
 WithProvider.displayName = "MainLayout";
 
 export default WithProvider;
+
+const TestnetBanner = ({ onClose = () => {} }) => (
+  <Card
+    className="bg-base-200 absolute bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
+    compact
+  >
+    <Card.Body>
+      <Button
+        size="sm"
+        shape="circle"
+        className="absolute right-2 top-2"
+        onClick={onClose}
+      >
+        ✕
+      </Button>
+      <Card.Title>New to Maestro?</Card.Title>
+      <p>
+        Run a few flows in our testnet (with test tokens) and experiment here
+        with small amounts first.
+      </p>
+      <Card.Actions className="justify-end">
+        <LinkButton variant="accent" size="xs">
+          Go to testnet
+        </LinkButton>
+      </Card.Actions>
+    </Card.Body>
+  </Card>
+);
