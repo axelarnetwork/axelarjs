@@ -18,6 +18,7 @@ import { useAccount, useWaitForTransaction } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
+import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { useDeployRemoteTokensMutation } from "~/features/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import Page from "~/layouts/Page";
@@ -61,7 +62,6 @@ const InterchainTokensPage = () => {
 
   return (
     <Page
-      mustBeConnected
       pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
       className="!flex flex-1 flex-col gap-12 md:gap-16"
       isLoading={isLoading && !isError}
@@ -379,11 +379,17 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
-          <RegisterOriginTokenButton
-            address={props.tokenAddress}
-            chainName={interchainToken.chain.name}
-            onSuccess={refetch}
-          />
+          {address ? (
+            <RegisterOriginTokenButton
+              address={props.tokenAddress}
+              chainName={interchainToken.chain.name}
+              onSuccess={refetch}
+            />
+          ) : (
+            <ConnectWalletButton className="w-full" size="md">
+              Connect wallet to register this token
+            </ConnectWalletButton>
+          )}
         </div>
       )}
       <InterchainTokenList

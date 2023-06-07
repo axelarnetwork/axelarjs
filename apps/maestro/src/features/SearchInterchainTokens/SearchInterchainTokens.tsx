@@ -1,4 +1,5 @@
 import {
+  AxelarIcon,
   FormControl,
   InputGroup,
   SpinnerIcon,
@@ -19,6 +20,7 @@ export type SearchInterchainTokens = {
   onTokenFound: (result: {
     tokenId?: `0x${string}`;
     tokenAddress: `0x${string}`;
+    chainName?: string;
   }) => void;
 };
 
@@ -44,9 +46,11 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
 
   useEffect(() => {
     if ((data?.tokenId && data.tokenAddress) || tokenDetails) {
+      console.log("tokenFound", { tokenDetails });
       props.onTokenFound({
         tokenId: data.tokenId,
         tokenAddress: search as `0x${string}`,
+        chainName: tokenDetails?.chainName,
       });
     }
   }, [data.tokenAddress, data.tokenId, props, search, tokenDetails]);
@@ -58,7 +62,11 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
           bordered={true}
           type="search"
           name="tokenAddress"
-          placeholder={`Search for ERC-20 token address on ${chain?.name}`}
+          placeholder={
+            chain?.name
+              ? `Search for ERC-20 token address on ${chain?.name}`
+              : "Search for ERC-20 token address"
+          }
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           color={error ? "error" : undefined}
@@ -68,12 +76,16 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
-            <Tooltip tip={chain?.name || ""}>
-              <ChainIcon
-                src={selectedChain?.image || ""}
-                alt={chain?.name || ""}
-                size="md"
-              />
+            <Tooltip tip={chain?.name || "You're not connected to any chain"}>
+              {selectedChain ? (
+                <ChainIcon
+                  src={selectedChain?.image || ""}
+                  alt={chain?.name || ""}
+                  size="md"
+                />
+              ) : (
+                <AxelarIcon className="dark:invert" />
+              )}
             </Tooltip>
           )}
         </span>
