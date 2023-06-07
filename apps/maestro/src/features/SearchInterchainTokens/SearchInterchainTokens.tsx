@@ -1,13 +1,13 @@
 import {
-  AxelarIcon,
   FormControl,
   InputGroup,
   SpinnerIcon,
   TextInput,
   Tooltip,
 } from "@axelarjs/ui";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FC } from "react";
 
+import { HelpCircleIcon } from "lucide-react";
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 
@@ -24,7 +24,7 @@ export type SearchInterchainTokens = {
   }) => void;
 };
 
-const SearchInterchainTokens = (props: SearchInterchainTokens) => {
+const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
   const [search, setSearch] = useState<string>("");
 
   const { chain } = useNetwork();
@@ -84,7 +84,7 @@ const SearchInterchainTokens = (props: SearchInterchainTokens) => {
                   size="md"
                 />
               ) : (
-                <AxelarIcon className="dark:invert" />
+                <HelpCircleIcon />
               )}
             </Tooltip>
           )}

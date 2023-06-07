@@ -59,12 +59,13 @@ export const Badge: FC<BadgeProps> = ({
   ghost,
   size,
   className,
+  variant,
   ...props
 }) => {
   return (
     <StyledBadge
       className={twMerge(
-        badgeVariance({ color, outline, ghost, size }),
+        badgeVariance({ color, outline, ghost, size, variant }),
         className
       )}
       {...props}
