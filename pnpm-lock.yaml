@@ -21,10 +21,10 @@ importers:
         specifier: ^17.6.5
         version: 17.6.5
       '@ianvs/prettier-plugin-sort-imports':
-        specifier: ^4.0.1
-        version: 4.0.1(prettier@2.8.8)
+        specifier: ^4.0.2
+        version: 4.0.2(prettier@2.8.8)
       eslint:
-        specifier: ^8.41.0
+        specifier: ^8.42.0
         version: 8.42.0
       husky:
         specifier: ^8.0.3
@@ -36,8 +36,8 @@ importers:
         specifier: ^3.1.3
         version: 3.1.3(prettier@2.8.8)
       turbo:
-        specifier: ^1.10.1
-        version: 1.10.1
+        specifier: ^1.10.2
+        version: 1.10.2
       typescript:
         specifier: ^5.1.3
         version: 5.1.3
@@ -69,17 +69,17 @@ importers:
         specifier: ^7.54.0
         version: 7.54.0(next@13.4.4)(react@18.2.0)
       '@tanstack/react-query':
-        specifier: 4.29.7
-        version: 4.29.7(react-dom@18.2.0)(react@18.2.0)
+        specifier: 4.29.12
+        version: 4.29.12(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client':
         specifier: ^10.29.1
         version: 10.29.1(@trpc/server@10.29.1)
       '@trpc/next':
         specifier: ^10.29.1
-        version: 10.29.1(@tanstack/react-query@4.29.7)(@trpc/client@10.29.1)(@trpc/react-query@10.29.1)(@trpc/server@10.29.1)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
+        version: 10.29.1(@tanstack/react-query@4.29.12)(@trpc/client@10.29.1)(@trpc/react-query@10.29.1)(@trpc/server@10.29.1)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/react-query':
         specifier: ^10.29.1
-        version: 10.29.1(@tanstack/react-query@4.29.7)(@trpc/client@10.29.1)(@trpc/server@10.29.1)(react-dom@18.2.0)(react@18.2.0)
+        version: 10.29.1(@tanstack/react-query@4.29.12)(@trpc/client@10.29.1)(@trpc/server@10.29.1)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server':
         specifier: ^10.29.1
         version: 10.29.1
@@ -166,8 +166,8 @@ importers:
         specifier: ^13.4.4
         version: 13.4.4
       '@tanstack/react-query-devtools':
-        specifier: 4.29.7
-        version: 4.29.7(@tanstack/react-query@4.29.7)(react-dom@18.2.0)(react@18.2.0)
+        specifier: 4.29.12
+        version: 4.29.12(@tanstack/react-query@4.29.12)(react-dom@18.2.0)(react@18.2.0)
       '@types/logrocket-react':
         specifier: ^3.0.0
         version: 3.0.0
@@ -532,7 +532,7 @@ importers:
         version: 2.8.8
       prettier-plugin-tailwindcss:
         specifier: ^0.3.0
-        version: 0.3.0(@ianvs/prettier-plugin-sort-imports@4.0.1)(prettier@2.8.8)
+        version: 0.3.0(@ianvs/prettier-plugin-sort-imports@4.0.2)(prettier@2.8.8)
       pretty-quick:
         specifier: ^3.1.3
         version: 3.1.3(prettier@2.8.8)
@@ -735,7 +735,7 @@ packages:
       '@babel/parser': 7.22.4
       '@babel/template': 7.21.9
       '@babel/traverse': 7.22.4
-      '@babel/types': 7.21.5
+      '@babel/types': 7.22.4
       convert-source-map: 1.9.0
       debug: 4.3.4
       gensync: 1.0.0-beta.2
@@ -771,7 +771,7 @@ packages:
     resolution: {integrity: sha512-F3fZga2uv09wFdEjEQIJxXALXfz0+JaOb7SabvVMmjHxeVTuGW8wgE8Vp1Hd7O+zMTYtcfEISGRzPkeiaPPsvg==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.21.5
+      '@babel/types': 7.22.4
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.18
       jsesc: 2.5.2
@@ -1090,7 +1090,7 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
     dependencies:
-      '@babel/types': 7.21.5
+      '@babel/types': 7.22.4
     dev: true
 
   /@babel/parser@7.22.4:
@@ -2803,7 +2803,7 @@ packages:
       '@babel/plugin-transform-unicode-escapes': 7.21.5(@babel/core@7.21.8)
       '@babel/plugin-transform-unicode-regex': 7.18.6(@babel/core@7.21.8)
       '@babel/preset-modules': 0.1.5(@babel/core@7.21.8)
-      '@babel/types': 7.21.5
+      '@babel/types': 7.22.4
       babel-plugin-polyfill-corejs2: 0.3.3(@babel/core@7.21.8)
       babel-plugin-polyfill-corejs3: 0.6.0(@babel/core@7.21.8)
       babel-plugin-polyfill-regenerator: 0.4.1(@babel/core@7.21.8)
@@ -2995,13 +2995,13 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/code-frame': 7.21.4
-      '@babel/generator': 7.21.9
+      '@babel/generator': 7.22.3
       '@babel/helper-environment-visitor': 7.22.1
       '@babel/helper-function-name': 7.21.0
       '@babel/helper-hoist-variables': 7.18.6
       '@babel/helper-split-export-declaration': 7.18.6
-      '@babel/parser': 7.21.9
-      '@babel/types': 7.21.5
+      '@babel/parser': 7.22.4
+      '@babel/types': 7.22.4
       debug: 4.3.4
       globals: 11.12.0
     transitivePeerDependencies:
@@ -4316,8 +4316,8 @@ packages:
   /@humanwhocodes/object-schema@1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
 
-  /@ianvs/prettier-plugin-sort-imports@4.0.1(prettier@2.8.8):
-    resolution: {integrity: sha512-xFpOSzroyJRSxgJSNc3beLIrRgrCzh8TjtFL7iPFyX7VMR57jsnPieKIctAehbWST4Z3uHKAd1iLrSWBf9rILQ==}
+  /@ianvs/prettier-plugin-sort-imports@4.0.2(prettier@2.8.8):
+    resolution: {integrity: sha512-VnsTzyb9aSWpc3v6HvZKD6eolZRvofIYjhda+6IbW1GYwr2byWqK0KhLPbYNkit9MAgShad5bhZ1hgBn867A1A==}
     peerDependencies:
       '@vue/compiler-sfc': '>=3.0.0'
       prettier: 2.x
@@ -6911,10 +6911,6 @@ packages:
 
   /@tanstack/query-core@4.29.11:
     resolution: {integrity: sha512-8C+hF6SFAb/TlFZyS9FItgNwrw4PMa7YeX+KQYe2ZAiEz6uzg6yIr+QBzPkUwZ/L0bXvGd1sufTm3wotoz+GwQ==}
-    dev: false
-
-  /@tanstack/query-core@4.29.7:
-    resolution: {integrity: sha512-GXG4b5hV2Loir+h2G+RXhJdoZhJLnrBWsuLB2r0qBRyhWuXq9w/dWxzvpP89H0UARlH6Mr9DiVj4SMtpkF/aUA==}
 
   /@tanstack/query-persist-client-core@4.29.11:
     resolution: {integrity: sha512-CSmMZchr+446r79NJ/pjD2yfjqNqFV7k8BnqOq4yTZvXsaQLEIn3tsaU45IsPgs4N7g9OBfPUPDdapSQvck2WQ==}
@@ -6928,32 +6924,32 @@ packages:
       '@tanstack/query-persist-client-core': 4.29.11
     dev: false
 
-  /@tanstack/react-query-devtools@4.29.7(@tanstack/react-query@4.29.7)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-fckNnBV6Kfbtq6EJqQen8oBjPqGFcOPS9SJmNKLbFLQgd7OpNIlA4M0r37iJYUY9m14/ESKc1wzKd36VfeiPjg==}
+  /@tanstack/react-query-devtools@4.29.12(@tanstack/react-query@4.29.12)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-ug4YGQhMhh6QI8/sWJhjXxuvdeehxf1cyxpTifGMH5qreQ5ECHT6vzqG/aKvADQDzqLBGrF0q4wTDnRRYvvtrA==}
     peerDependencies:
-      '@tanstack/react-query': 4.29.7
+      '@tanstack/react-query': 4.29.12
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       '@tanstack/match-sorter-utils': 8.8.4
-      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       superjson: 1.12.3
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: true
 
-  /@tanstack/react-query-persist-client@4.29.12(@tanstack/react-query@4.29.7):
+  /@tanstack/react-query-persist-client@4.29.12(@tanstack/react-query@4.29.12):
     resolution: {integrity: sha512-rh6zZJB+3j8lr+YsEkVadnqmUELmqNFZQzGGsHS5col/YOjYsMe9ppqaUjIMJ2aXnFXye50sbe4KxHhSGoaNVw==}
     peerDependencies:
       '@tanstack/react-query': 4.29.12
     dependencies:
       '@tanstack/query-persist-client-core': 4.29.11
-      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
-  /@tanstack/react-query@4.29.7(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ijBWEzAIo09fB1yd22slRZzprrZ5zMdWYzBnCg5qiXuFbH78uGN1qtGz8+Ed4MuhaPaYSD+hykn+QEKtQviEtg==}
+  /@tanstack/react-query@4.29.12(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-zhcN6+zF6cxprxhTHQajHGlvxgK8npnp9uLe9yaWhGc6sYcPWXzyO4raL4HomUzQOPzu3jLvkriJQ7BOrDM8vA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -6964,7 +6960,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@tanstack/query-core': 4.29.7
+      '@tanstack/query-core': 4.29.11
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       use-sync-external-store: 1.2.0(react@18.2.0)
@@ -7053,7 +7049,7 @@ packages:
       '@trpc/server': 10.29.1
     dev: false
 
-  /@trpc/next@10.29.1(@tanstack/react-query@4.29.7)(@trpc/client@10.29.1)(@trpc/react-query@10.29.1)(@trpc/server@10.29.1)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0):
+  /@trpc/next@10.29.1(@tanstack/react-query@4.29.12)(@trpc/client@10.29.1)(@trpc/react-query@10.29.1)(@trpc/server@10.29.1)(next@13.4.4)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-2RNnct2T+k5yExSy748Lv5IDPAKEvx/QKoAJIBo8FqRem3ypW6ZpRTxillyE+vyD8QVRtMaD4v0dnPaFeRhJ3g==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
@@ -7064,9 +7060,9 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
-      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client': 10.29.1(@trpc/server@10.29.1)
-      '@trpc/react-query': 10.29.1(@tanstack/react-query@4.29.7)(@trpc/client@10.29.1)(@trpc/server@10.29.1)(react-dom@18.2.0)(react@18.2.0)
+      '@trpc/react-query': 10.29.1(@tanstack/react-query@4.29.12)(@trpc/client@10.29.1)(@trpc/server@10.29.1)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.29.1
       next: 13.4.4(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
@@ -7074,7 +7070,7 @@ packages:
       react-ssr-prepass: 1.5.0(react@18.2.0)
     dev: false
 
-  /@trpc/react-query@10.29.1(@tanstack/react-query@4.29.7)(@trpc/client@10.29.1)(@trpc/server@10.29.1)(react-dom@18.2.0)(react@18.2.0):
+  /@trpc/react-query@10.29.1(@tanstack/react-query@4.29.12)(@trpc/client@10.29.1)(@trpc/server@10.29.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-yWsce8euPSVtn3SeBKXxLmq607/sqyIez7pgMOhMBKehRNdZzrGp3MhjmRwim+IUKLrw71kUgsw7w6uT5FPB0g==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
@@ -7083,7 +7079,7 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
-      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client': 10.29.1(@trpc/server@10.29.1)
       '@trpc/server': 10.29.1
       react: 18.2.0
@@ -13630,7 +13626,7 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  /prettier-plugin-tailwindcss@0.3.0(@ianvs/prettier-plugin-sort-imports@4.0.1)(prettier@2.8.8):
+  /prettier-plugin-tailwindcss@0.3.0(@ianvs/prettier-plugin-sort-imports@4.0.2)(prettier@2.8.8):
     resolution: {integrity: sha512-009/Xqdy7UmkcTBpwlq7jsViDqXAYSOMLDrHAdTMlVZOrKfM2o9Ci7EMWTMZ7SkKBFTG04UM9F9iM2+4i6boDA==}
     engines: {node: '>=12.17.0'}
     peerDependencies:
@@ -13682,7 +13678,7 @@ packages:
       prettier-plugin-twig-melody:
         optional: true
     dependencies:
-      '@ianvs/prettier-plugin-sort-imports': 4.0.1(prettier@2.8.8)
+      '@ianvs/prettier-plugin-sort-imports': 4.0.2(prettier@2.8.8)
       prettier: 2.8.8
     dev: true
 
@@ -15482,65 +15478,65 @@ packages:
       yargs: 17.7.2
     dev: true
 
-  /turbo-darwin-64@1.10.1:
-    resolution: {integrity: sha512-isLLoPuAOMNsYovOq9BhuQOZWQuU13zYsW988KkkaA4OJqOn7qwa9V/KBYCJL8uVQqtG+/Y42J37lO8RJjyXuA==}
+  /turbo-darwin-64@1.10.2:
+    resolution: {integrity: sha512-sVLpVVANByfMgqf7OYPcZM4KiDnjGu7ITvAzBSa9Iwe14yoWLn8utrNsWCRaQEB6kEqBGLPmvL7AKwkl8M2Gqg==}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-darwin-arm64@1.10.1:
-    resolution: {integrity: sha512-x1nloPR10fLElNCv17BKr0kCx/O5gse/UXAcVscMZH2tvRUtXrdBmut62uw2YU3J9hli2fszYjUWXkulVpQvFA==}
+  /turbo-darwin-arm64@1.10.2:
+    resolution: {integrity: sha512-TKG91DSoYQjsCft4XBx4lYycVT5n3UQB/nOKgv/WJCSfwshLWulya3yhP8JT5erv9rPF8gwgnx87lrCmT4EAVA==}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-linux-64@1.10.1:
-    resolution: {integrity: sha512-abV+ODCeOlz0503OZlHhPWdy3VwJZc1jObf1VQj7uQM+JqJ/kXbMyqJIMQVz+m7QJUFdferYPRxGhYT/NbYK7Q==}
+  /turbo-linux-64@1.10.2:
+    resolution: {integrity: sha512-ZIzAkfrzjJFkSM/uEfxU6JjseCsT5PHRu0s0lmYce37ApQbv/HC7tI0cFhuosI30+O8109/mkyZykKE7AQfgqA==}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-linux-arm64@1.10.1:
-    resolution: {integrity: sha512-zRC3nZbHQ63tofOmbuySzEn1ROISWTkemYYr1L98rpmT5aVa0kERlGiYcfDwZh3cBso/Ylg/wxexRAaPzcCJYQ==}
+  /turbo-linux-arm64@1.10.2:
+    resolution: {integrity: sha512-G4uZA+RBQ5S1X/oUxO5KoLL2NDMkrrBZF52+00jQv6UEb9lWDgwzqSwoAGjdXxeDCrqMW5rBVwb/IBIF2/yhwA==}
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-windows-64@1.10.1:
-    resolution: {integrity: sha512-Irqz8IU+o7Q/5V44qatZBTunk+FQAOII1hZTsEU54ah62f9Y297K6/LSp+yncmVQOZlFVccXb6MDqcETExIQtA==}
+  /turbo-windows-64@1.10.2:
+    resolution: {integrity: sha512-ObfQO37kGu1jBzFs/L+hybrCXBwdnimotJwzg7pCoSyGijKITlugrpJoPDKlg0eMr3/1Y6KUeHy26vZaDXrbuQ==}
     cpu: [x64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-windows-arm64@1.10.1:
-    resolution: {integrity: sha512-124IT15d2gyjC+NEn11pHOaVFvZDRHpxfF+LDUzV7YxfNIfV0mGkR3R/IyVXtQHOgqOdtQTbC4y411sm31+SEw==}
+  /turbo-windows-arm64@1.10.2:
+    resolution: {integrity: sha512-7S6dx4738R/FIT2cxbsunqgHN5LelXzuzkcaZgdkU33oswRf/6KOfOABzQLdTX7Uos59cBSdwayf6KQJxuOXUg==}
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo@1.10.1:
-    resolution: {integrity: sha512-wq0YeSv6P/eEDXOL42jkMUr+T4z34dM8mdHu5u6C6OOAq8JuLJ72F/v4EVR1JmY8icyTkFz10ICLV0haUUYhbQ==}
+  /turbo@1.10.2:
+    resolution: {integrity: sha512-m9sR5XHhuzxUQACf0vI2qCG5OqDYAZiPTaAsTwECnwUF4/cXwEmcYddbLJnO+K9orNvcnjjent5oBNBVQ/o0ow==}
     hasBin: true
     requiresBuild: true
     optionalDependencies:
-      turbo-darwin-64: 1.10.1
-      turbo-darwin-arm64: 1.10.1
-      turbo-linux-64: 1.10.1
-      turbo-linux-arm64: 1.10.1
-      turbo-windows-64: 1.10.1
-      turbo-windows-arm64: 1.10.1
+      turbo-darwin-64: 1.10.2
+      turbo-darwin-arm64: 1.10.2
+      turbo-linux-64: 1.10.2
+      turbo-linux-arm64: 1.10.2
+      turbo-windows-64: 1.10.2
+      turbo-windows-arm64: 1.10.2
     dev: true
 
   /type-check@0.3.2:
@@ -16063,8 +16059,8 @@ packages:
         optional: true
     dependencies:
       '@tanstack/query-sync-storage-persister': 4.29.11
-      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
-      '@tanstack/react-query-persist-client': 4.29.12(@tanstack/react-query@4.29.7)
+      '@tanstack/react-query': 4.29.12(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query-persist-client': 4.29.12(@tanstack/react-query@4.29.12)
       '@wagmi/core': 1.1.0(react@18.2.0)(typescript@5.1.3)(viem@0.3.50)(zod@3.21.4)
       abitype: 0.8.7(typescript@5.1.3)(zod@3.21.4)
       react: 18.2.0
