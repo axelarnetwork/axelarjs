@@ -21,7 +21,9 @@ export const TokenRegistration: FC<{}> = () => {
   );
   return (
     <>
-      <span>Register origin token on: </span>
+      <span>
+        Register <span className="hidden sm:inline">origin</span> token on:{" "}
+      </span>
       <EVMChainsDropdown
         compact={true}
         selectedChain={selectedChain}
