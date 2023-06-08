@@ -102,7 +102,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           className={clsx(
             "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",
             {
-              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 -translate-x-52 overflow-x-scroll md:w-96 md:translate-x-8":
+              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 -translate-x-44 overflow-x-scroll md:w-96 md:translate-x-8":
                 props.compact,
             }
           )}

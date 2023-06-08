@@ -11,7 +11,7 @@ export const StepsSummary: FC<StepsSummaryProps> = (
   props: StepsSummaryProps
 ) => {
   return (
-    <Steps className="my-10 h-24 w-full text-sm">
+    <Steps className="my-6 h-20 w-full text-sm sm:my-10 sm:h-24">
       {STEPS.map((step, index) => (
         <Steps.Step key={step} active={props.currentStep >= index}>
           {step}
