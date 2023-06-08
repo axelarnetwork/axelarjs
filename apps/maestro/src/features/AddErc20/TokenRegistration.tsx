@@ -7,7 +7,7 @@ import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useAddErc20StateContainer } from "./AddErc20.state";
 
-export const TokenRegistration: FC<{}> = () => {
+export const TokenRegistration: FC = () => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain: currentChain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
