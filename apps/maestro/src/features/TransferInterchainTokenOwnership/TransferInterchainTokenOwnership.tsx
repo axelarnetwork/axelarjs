@@ -7,72 +7,61 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
-import { useMemo, useState, type FC } from "react";
+import { useCallback, useMemo, useState, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
+import { isAddress } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
-import EVMChainsDropdown from "~/components/EVMChainsDropdown";
-import { useMintInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
+import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 
 type FormState = {
-  amountToMint: string;
+  recipientAddress: `0x${string}`;
 };
 
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
-  tokenDecimals: number;
+  tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   accountAddress: `0x${string}`;
   onClose?: () => void;
 };
 
-const ALLOWED_NON_NUMERIC_KEYS = [
-  "Backspace",
-  "Delete",
-  "Tab",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "ArrowDown",
-  "Enter",
-];
-
-export const MintInterchainToken: FC<Props> = (props) => {
+export const TransferInterchainTokenOwnership: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
   const [txState, setTxState] = useTransactionState();
 
   const {
-    writeAsync: mintTokenAsync,
-    isLoading: isMinting,
-    data: mintResult,
-  } = useMintInterchainToken({
+    writeAsync: transferOwnershipAsync,
+    isLoading: isTransfering,
+    data: transferResult,
+  } = useTransferInterchainTokenOnwership({
     address: props.tokenAddress,
   });
 
   const trpcContext = trpc.useContext();
 
   useWaitForTransaction({
-    hash: mintResult?.hash,
+    hash: transferResult?.hash,
     confirmations: 5,
     async onSuccess(receipt) {
-      if (!mintResult) {
+      if (!transferResult) {
         return;
       }
 
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate();
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+      await trpcContext.interchainToken.searchInterchainToken.invalidate();
+      await trpcContext.interchainToken.searchInterchainToken.refetch();
 
       setTxState({
         status: "confirmed",
         receipt,
       });
 
-      toast.success("Successfully minted interchain tokens");
+      toast.success("Successfully transferred token ownership");
     },
   });
 
@@ -83,52 +72,52 @@ export const MintInterchainToken: FC<Props> = (props) => {
     reset: resetForm,
   } = useForm<FormState>({
     defaultValues: {
-      amountToMint: undefined,
+      recipientAddress: undefined,
     },
     mode: "onChange",
     reValidateMode: "onChange",
   });
 
-  const submitHandler: SubmitHandler<FormState> = async (data, e) => {
-    e?.preventDefault();
+  const submitHandler = useCallback<SubmitHandler<FormState>>(
+    async (data, e) => {
+      e?.preventDefault();
 
-    const decimalAdjustment = BigInt(10 ** props.tokenDecimals);
-    const adjustedAmount = BigInt(data.amountToMint) * decimalAdjustment;
+      setTxState({
+        status: "awaiting_approval",
+      });
 
-    setTxState({
-      status: "awaiting_approval",
-    });
+      const txResult = await transferOwnershipAsync({
+        args: [data.recipientAddress],
+      });
 
-    const txResult = await mintTokenAsync({
-      args: [props.accountAddress, adjustedAmount],
-    });
-
-    setTxState({
-      status: "submitted",
-      hash: txResult?.hash,
-    });
-  };
+      setTxState({
+        status: "submitted",
+        hash: txResult?.hash,
+      });
+    },
+    [setTxState, transferOwnershipAsync]
+  );
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
       case "idle":
       case "confirmed":
-        return "Mint tokens";
+        return "Transfer token ownership";
       case "awaiting_approval":
         return "Waiting for approval";
       case "reverted":
-        return "Failed to mint tokens";
+        return "Failed to transfer ownership";
     }
   }, [txState]);
 
   return (
     <Modal
       trigger={props.trigger}
-      disableCloseButton={isMinting}
+      disableCloseButton={isTransfering}
       open={isModalOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          if (isMinting) {
+          if (isTransfering) {
             return;
           }
           props.onClose?.();
@@ -139,42 +128,26 @@ export const MintInterchainToken: FC<Props> = (props) => {
     >
       <Modal.Body className="flex h-96 flex-col">
         <Modal.Title className="flex">
-          <span>Mint interchain tokens on</span>
-          <EVMChainsDropdown
-            disabled
-            compact
-            selectedChain={props.sourceChain}
-          />
+          <span>Transfer interchain token ownership</span>
         </Modal.Title>
         <form
           className="flex flex-1 flex-col justify-between"
           onSubmit={handleSubmit(submitHandler)}
         >
           <FormControl>
-            <Label htmlFor="amountToMint">
-              <Label.Text>Amount to mint</Label.Text>
+            <Label htmlFor="recipientAddress">
+              <Label.Text>Recipient address</Label.Text>
             </Label>
             <TextInput
-              id="amountToMint"
+              id="recipientAddress"
               bordered
-              placeholder="Enter your amount to mint"
+              placeholder="Enter recipient address"
               min={0}
-              onKeyDown={(e) => {
-                // prevent non-numeric characters
-                if (
-                  // allow backspace, delete, tab, arrow keys, enter
-                  !ALLOWED_NON_NUMERIC_KEYS.includes(e.key) &&
-                  // is not numeric
-                  !/^[0-9.]+$/.test(e.key)
-                ) {
-                  e.preventDefault();
-                }
-              }}
-              {...register("amountToMint", {
-                disabled: isMinting,
+              {...register("recipientAddress", {
+                disabled: isTransfering,
                 validate(value) {
-                  if (!value || value === "0") {
-                    return "Amount must be greater than 0";
+                  if (!value || !isAddress(value)) {
+                    return "Invalid address";
                   }
 
                   return true;
@@ -186,7 +159,7 @@ export const MintInterchainToken: FC<Props> = (props) => {
           <Button
             color="primary"
             type="submit"
-            disabled={!formState.isValid || isMinting}
+            disabled={!formState.isValid || isTransfering}
             loading={
               txState.status === "awaiting_approval" ||
               txState.status === "submitted"
@@ -200,4 +173,4 @@ export const MintInterchainToken: FC<Props> = (props) => {
   );
 };
 
-export default MintInterchainToken;
+export default TransferInterchainTokenOwnership;

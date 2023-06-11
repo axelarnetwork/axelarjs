@@ -7,7 +7,7 @@ import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useAddErc20StateContainer } from "./AddErc20.state";
 
-export const TokenRegistration: FC<{}> = () => {
+export const TokenRegistration: FC = () => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain: currentChain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
@@ -21,7 +21,9 @@ export const TokenRegistration: FC<{}> = () => {
   );
   return (
     <>
-      <span>Register origin token on: </span>
+      <span>
+        Register <span className="hidden sm:inline">origin</span> token on:{" "}
+      </span>
       <EVMChainsDropdown
         compact={true}
         selectedChain={selectedChain}

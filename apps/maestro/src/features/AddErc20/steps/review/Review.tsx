@@ -36,9 +36,9 @@ const Review: FC = () => {
 
   return (
     <>
-      <div className="grid gap-4">
+      <div className="grid gap-2 sm:gap-3 md:gap-4">
         {state.txState.type === "deployed" && (
-          <Alert status="success">
+          <Alert status="success" className="py-2 sm:py-4">
             <div>Token deployed and registered successfully!</div>
             <div className="flex items-center">
               Address:

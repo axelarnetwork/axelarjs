@@ -92,7 +92,7 @@ const Appbar: FC<AppbarProps> = () => {
         <LinkButton
           className="flex items-center gap-2 text-lg font-bold uppercase"
           onClick={() => router.push("/")}
-          ghost
+          variant="ghost"
         >
           <AxelarIcon className="h-6 w-6 dark:invert" />
           <span>{APP_NAME}</span>

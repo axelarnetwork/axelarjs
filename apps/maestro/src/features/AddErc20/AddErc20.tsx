@@ -62,10 +62,12 @@ const AddErc20: FC<AddErc20Props> = () => {
     >
       <Dialog.Body $as="section">
         <Dialog.CornerCloseAction />
-        <Dialog.Title className="flex items-center gap-2">
+        <Dialog.Title className="flex items-center gap-1 sm:gap-2">
           <TokenRegistration />
         </Dialog.Title>
+
         <StepsSummary currentStep={state.step} />
+
         <CurrentStep />
       </Dialog.Body>
     </Dialog>

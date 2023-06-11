@@ -30,18 +30,20 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         input.tokenAddress as `0x${string}`
       );
 
-      const [tokenBalance, decimals, owner] = await Promise.all([
+      const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
         client.readContract("balanceOf", {
           args: [input.owner as `0x$${string}`],
         }),
         client.readContract("decimals"),
         client.readContract("owner"),
+        client.readContract("pendingOwner"),
       ]);
 
       return {
         tokenBalance: tokenBalance.toString(),
         decimals,
-        isTokenOwner: owner === input.owner,
+        isTokenOwner: input.owner === owner,
+        isTokenPendingOwner: input.owner === pendingOwner,
       };
     } catch (error) {
       // If we get a TRPC error, we throw it

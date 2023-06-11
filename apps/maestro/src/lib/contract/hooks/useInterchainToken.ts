@@ -63,6 +63,14 @@ export function useMintInterchainToken(config: Config) {
   });
 }
 
+export function useTransferInterchainTokenOnwership(config: Config) {
+  return useContractWrite({
+    address: config.address,
+    abi: ABI,
+    functionName: "transferOwnership",
+  });
+}
+
 export function useTransferInterchainToken(
   config: Config & {
     value: bigint;
