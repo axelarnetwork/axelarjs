@@ -1,17 +1,12 @@
-import {
-  FormControl,
-  InputGroup,
-  SpinnerIcon,
-  TextInput,
-  Tooltip,
-} from "@axelarjs/ui";
+import { FormControl, InputGroup, SpinnerIcon, TextInput } from "@axelarjs/ui";
 import { useEffect, useState, type FC } from "react";
 
-import { HelpCircleIcon } from "lucide-react";
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 
-import { ChainIcon } from "~/components/EVMChainsDropdown";
+import EVMChainsDropdown, {
+  ChainIcon,
+} from "~/components/EVMChainsDropdown/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -75,18 +70,15 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
         <span>
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
+          ) : selectedChain ? (
+            <ChainIcon
+              src={selectedChain.image}
+              className="h-6 w-6"
+              size="md"
+              alt={selectedChain.name}
+            />
           ) : (
-            <Tooltip tip={chain?.name || "You're not connected to any chain"}>
-              {selectedChain ? (
-                <ChainIcon
-                  src={selectedChain?.image || ""}
-                  alt={chain?.name || ""}
-                  size="md"
-                />
-              ) : (
-                <HelpCircleIcon />
-              )}
-            </Tooltip>
+            <EVMChainsDropdown triggerClassName="btn-sm btn-circle" compact />
           )}
         </span>
       </InputGroup>

@@ -1,19 +1,14 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { Dropdown } from "@axelarjs/ui";
+import { Maybe } from "@axelarjs/utils";
 import { useState, type FC } from "react";
 import Image from "next/image";
 
 import clsx from "clsx";
+import { find } from "rambda";
+import { useNetwork } from "wagmi";
 
-type Props = {
-  onSwitchNetwork?: (chainId: number) => void;
-  selectedChain?: EVMChainConfig;
-  chains?: EVMChainConfig[];
-  compact?: boolean;
-  disabled?: boolean;
-  triggerClassName?: string;
-  chainIconClassName?: string;
-};
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
 const iconSizes = {
   xs: 14,
@@ -48,7 +43,25 @@ export const ChainIcon: FC<{
   );
 };
 
+type Props = {
+  onSwitchNetwork?: (chainId: number) => void;
+  selectedChain?: EVMChainConfig;
+  chains?: EVMChainConfig[];
+  compact?: boolean;
+  disabled?: boolean;
+  triggerClassName?: string;
+  chainIconClassName?: string;
+  renderTrigger?: () => React.ReactNode;
+};
+
 const EVMChainsDropdown: FC<Props> = (props) => {
+  const { data: evmChains } = useEVMChainConfigsQuery();
+  const { chain } = useNetwork();
+
+  const defaultSelectedChain = Maybe.of(evmChains).mapOrUndefined(
+    find((x) => x.chain_id === chain?.id)
+  );
+
   const handleChainChange = (chainId: number) => {
     try {
       props.onSwitchNetwork?.(chainId);
@@ -63,46 +76,58 @@ const EVMChainsDropdown: FC<Props> = (props) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!props.selectedChain) {
-    return null;
-  }
+  const selectedChain = props.selectedChain ?? defaultSelectedChain;
 
-  const eligibleChains = (props.chains ?? []).filter(
-    (chain) => chain.chain_id !== props.selectedChain?.chain_id
+  const eligibleChains = Maybe.of(props.chains ?? evmChains).mapOr(
+    [],
+    (chains) =>
+      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 
-  const windowWidth = window.innerWidth;
-
   return (
-    <Dropdown align={windowWidth > 768 ? "end" : undefined}>
-      <Dropdown.Trigger
-        $as="button"
-        className={clsx(
-          "btn btn-sm btn-ghost group flex items-center gap-2",
-          {
-            "pointer-events-none": props.disabled,
-          },
-          props.triggerClassName
-        )}
-        tabIndex={props.compact ? -1 : 0}
-        onClick={() => {
-          setIsOpen(!isOpen);
-        }}
-      >
-        <ChainIcon
-          src={props.selectedChain.image}
-          alt={props.selectedChain.chain_name}
-          size="sm"
-          className={props.chainIconClassName}
-        />
-        <span>{props.selectedChain.name}</span>
-      </Dropdown.Trigger>
+    <Dropdown align="end">
+      {props.renderTrigger?.() ?? (
+        <Dropdown.Trigger
+          $as="button"
+          className={clsx(
+            "btn btn-sm btn-ghost group flex items-center gap-2",
+            {
+              "pointer-events-none": props.disabled,
+            },
+            props.triggerClassName
+          )}
+          tabIndex={props.compact ? -1 : 0}
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
+        >
+          {selectedChain ? (
+            <>
+              <ChainIcon
+                src={selectedChain.image}
+                alt={selectedChain.chain_name}
+                size="sm"
+                className={props.chainIconClassName}
+              />
+              <span>{selectedChain.name}</span>
+            </>
+          ) : (
+            <ChainIcon
+              src="/logos/chains/ethereum.svg"
+              alt="Ethereum"
+              size="sm"
+              className={props.chainIconClassName}
+            />
+          )}
+        </Dropdown.Trigger>
+      )}
+
       {eligibleChains.length > 0 && (
         <Dropdown.Content
           className={clsx(
             "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",
             {
-              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 -translate-x-44 overflow-x-scroll md:w-96 md:translate-x-8":
+              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 translate-x-4 overflow-x-scroll md:w-96":
                 props.compact,
             }
           )}
