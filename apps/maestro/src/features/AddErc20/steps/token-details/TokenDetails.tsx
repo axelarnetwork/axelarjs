@@ -44,7 +44,7 @@ const TokenDetails: FC = () => {
   return (
     <>
       <form
-        className="grid grid-cols-1 gap-y-2"
+        className="grid grid-cols-1 sm:gap-2"
         onSubmit={handleSubmit(submitHandler)}
       >
         <FormControl>

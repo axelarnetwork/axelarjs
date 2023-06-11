@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
-import { useCallback, useState, type FC } from "react";
+import { useCallback, type FC } from "react";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
@@ -19,6 +19,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import { MintInterchainToken } from "../MintInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
+import { TransferInterchainTokenOwnership } from "../TransferInterchainTokenOwnership";
 import type { TokenInfo } from "./types";
 
 const StatusIndicator = (
@@ -69,8 +70,6 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     router,
     switchNetworkAsync,
   ]);
-
-  const [activeModal, setActiveModal] = useState<"send" | "mint" | null>(null);
 
   const isSourceChain = chain?.id === props.chainId;
 
@@ -144,25 +143,40 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 </span>
                 {balance.isTokenOwner &&
                   (isSourceChain ? (
-                    <MintInterchainToken
-                      isOpen={activeModal === "mint"}
-                      onClose={setActiveModal.bind(null, null)}
-                      accountAddress={address as `0x${string}`}
-                      trigger={
-                        <Button
-                          size="xs"
-                          color="primary"
-                          // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                          className="absolute right-6"
-                        >
-                          mint
-                        </Button>
-                      }
-                      tokenAddress={props.tokenAddress}
-                      tokenDecimals={props.decimals}
-                      tokenId={props.tokenId}
-                      sourceChain={props.chain as EVMChainConfig}
-                    />
+                    <>
+                      <MintInterchainToken
+                        accountAddress={address as `0x${string}`}
+                        trigger={
+                          <Button
+                            size="xs"
+                            color="primary"
+                            // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                            className="absolute right-6"
+                          >
+                            mint
+                          </Button>
+                        }
+                        tokenAddress={props.tokenAddress}
+                        tokenDecimals={props.decimals}
+                        sourceChain={props.chain as EVMChainConfig}
+                      />
+                      <TransferInterchainTokenOwnership
+                        accountAddress={address as `0x${string}`}
+                        trigger={
+                          <Button
+                            size="xs"
+                            color="primary"
+                            // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                            className="absolute right-20"
+                          >
+                            transfer
+                          </Button>
+                        }
+                        tokenAddress={props.tokenAddress}
+                        sourceChain={props.chain as EVMChainConfig}
+                        tokenId={props.tokenId}
+                      />
+                    </>
                   ) : (
                     switchChainButton
                   ))}
@@ -183,8 +197,6 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 </div>
                 {isSourceChain ? (
                   <SendInterchainToken
-                    isOpen={activeModal === "send"}
-                    onClose={setActiveModal.bind(null, null)}
                     trigger={
                       <Button
                         size="xs"

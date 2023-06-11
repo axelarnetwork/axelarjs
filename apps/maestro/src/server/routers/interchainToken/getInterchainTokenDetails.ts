@@ -67,12 +67,14 @@ export const getInterchainTokenDetails = publicProcedure
   });
 
 async function getTokenDetails(client: InterchainTokenClient) {
-  const [tokenName, tokenSymbol, decimals, owner] = await Promise.all([
-    client.readContract("name"),
-    client.readContract("symbol"),
-    client.readContract("decimals"),
-    client.readContract("owner"),
-  ]);
+  const [tokenName, tokenSymbol, decimals, owner, pendingOwner] =
+    await Promise.all([
+      client.readContract("name"),
+      client.readContract("symbol"),
+      client.readContract("decimals"),
+      client.readContract("owner"),
+      client.readContract("pendingOwner"),
+    ]);
 
   return {
     name: String(tokenName),
@@ -81,5 +83,6 @@ async function getTokenDetails(client: InterchainTokenClient) {
     owner: String(owner) as `0x${string}`,
     chainId: client.chain?.id,
     chainName: client.chain?.name,
+    pendingOwner: String(pendingOwner) as `0x${string}`,
   };
 }

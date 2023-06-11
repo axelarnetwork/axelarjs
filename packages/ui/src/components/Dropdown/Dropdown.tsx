@@ -39,20 +39,18 @@ const _Dropdown: FC<DropdownProps> = ({
   align,
   hover,
   children,
-}) => {
-  return (
-    <div
-      className={dropdownVariance({
-        placement,
-        align,
-        hover,
-        className,
-      })}
-    >
-      {children}
-    </div>
-  );
-};
+}) => (
+  <div
+    className={dropdownVariance({
+      placement,
+      align,
+      hover,
+      className,
+    })}
+  >
+    {children}
+  </div>
+);
 
 export const Dropdown = Object.assign(_Dropdown, {
   Trigger: tw.label`cursor-pointer`,

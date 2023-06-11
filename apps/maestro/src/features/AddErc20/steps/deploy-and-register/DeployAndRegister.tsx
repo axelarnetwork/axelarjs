@@ -15,6 +15,8 @@ import React, {
 } from "react";
 import Image from "next/image";
 
+import clsx from "clsx";
+
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 import { useDeployInterchainTokenMutation } from "../../hooks/useDeployInterchainTokenMutation";
@@ -109,7 +111,7 @@ export const Step3: FC = () => {
 
   return (
     <>
-      <form className="grid gap-4" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <FormControl>
           <Label>
             <Label.Text>Also deploy on this chains (optional):</Label.Text>
@@ -117,7 +119,7 @@ export const Step3: FC = () => {
             {Boolean(state.gasFees?.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
-                  <span className="ml-2 text-xs">
+                  <span className="ml-2 whitespace-nowrap text-xs">
                     (≈ {state.totalGasFee}{" "}
                     {state?.sourceChainId &&
                       getNativeToken(state.sourceChainId)}{" "}
@@ -127,7 +129,7 @@ export const Step3: FC = () => {
               </Label.AltText>
             )}
           </Label>
-          <div className="bg-base-300 flex flex-wrap gap-2 rounded-3xl p-4">
+          <div className="bg-base-300 flex flex-wrap gap-1 rounded-3xl p-4 sm:gap-2">
             {eligibleChains?.map((chain) => {
               const isSelected = rootState.selectedChains.includes(
                 chain.chain_name
@@ -173,11 +175,17 @@ export const Step3: FC = () => {
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
           onClick={() => formSubmitRef.current?.click()}
         >
-          Deploy{" "}
-          {Boolean(state.gasFees?.length) &&
-            `& register token on ${state.gasFees?.length} chain${
-              Number(state.gasFees?.length) > 1 ? "s" : ""
-            }`}
+          <span
+            className={clsx({
+              "hidden md:inline": state.isDeploying,
+            })}
+          >
+            Deploy{" "}
+            {Boolean(state.gasFees?.length) &&
+              ` on ${state.gasFees?.length} chain${
+                Number(state.gasFees?.length) > 1 ? "s" : ""
+              }`}
+          </span>
         </NextButton>
       </Dialog.Actions>
     </>
