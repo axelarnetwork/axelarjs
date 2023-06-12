@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import clsx from "clsx";
 import { find } from "rambda";
-import { useNetwork } from "wagmi";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
@@ -57,14 +57,22 @@ type Props = {
 const EVMChainsDropdown: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
+
+  const [selectedChainId, setSelectedChainId] = useState<number | undefined>(
+    props.selectedChain?.chain_id
+  );
 
   const defaultSelectedChain = Maybe.of(evmChains).mapOrUndefined(
-    find((x) => x.chain_id === chain?.id)
+    find((x) => [chain?.id, selectedChainId].includes(x.chain_id))
   );
+
+  const onSwitchNetwork = props.onSwitchNetwork ?? switchNetworkAsync;
 
   const handleChainChange = (chainId: number) => {
     try {
-      props.onSwitchNetwork?.(chainId);
+      setSelectedChainId(chainId);
+      onSwitchNetwork?.(chainId);
     } catch (error) {
       if (process.env.NODE_ENV === "development") {
         if (error instanceof Error) {
@@ -109,7 +117,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 size="sm"
                 className={props.chainIconClassName}
               />
-              <span>{selectedChain.name}</span>
+              {!props.compact && <span>{selectedChain.name}</span>}
             </>
           ) : (
             <ChainIcon

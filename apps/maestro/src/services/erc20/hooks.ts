@@ -1,3 +1,5 @@
+import { Maybe } from "@axelarjs/utils";
+
 import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
@@ -8,11 +10,11 @@ export function useERC20TokenDetailsQuery(input: {
 }) {
   return trpc.erc20.getERC20TokenDetails.useQuery(
     {
-      chainId: Number(input.chainId),
+      chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
       tokenAddress: String(input.tokenAddress),
     },
     {
-      enabled: Boolean(input.chainId) && isAddress(input.tokenAddress ?? ""),
+      enabled: isAddress(input.tokenAddress ?? ""),
       staleTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,
     }
