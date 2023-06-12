@@ -78,7 +78,7 @@ async function getTokenPublicDetails(client: InterchainTokenClient) {
     client.readContract("name"),
     client.readContract("symbol"),
     client.readContract("decimals"),
-    client.readContract("owner"),
+    client.readContract("owner").catch(() => undefined),
     client.readContract("pendingOwner").catch(() => undefined),
   ]);
 

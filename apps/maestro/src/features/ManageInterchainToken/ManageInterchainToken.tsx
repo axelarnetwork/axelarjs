@@ -23,6 +23,7 @@ type Option = {
   label: string;
   value: InterchainTokenAction;
   icon: JSX.Element;
+  criteria: (props: Props) => boolean;
 };
 
 export const ManageInterchainToken: FC<Props> = (props) => {
@@ -33,21 +34,25 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Mint",
       value: "mint",
       icon: <CoinsIcon />,
+      criteria: (props) => props.isTokenOwner,
     },
     {
       label: "Interchain Transfer",
       value: "interchainTransfer",
       icon: <SendIcon />,
+      criteria: (props) => props.balance > BigInt(0),
     },
     {
       label: "Transfer Ownership",
       value: "transferOwnership",
       icon: <GiftIcon />,
+      criteria: (props) => props.isTokenOwner && !props.hasPendingOwner,
     },
     {
       label: "Accept Ownership",
       value: "acceptOwnership",
       icon: <PackageCheckIcon />,
+      criteria: (props) => props.isPendingOnwer,
     },
   ];
 
