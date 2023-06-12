@@ -42,6 +42,10 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
       await trpcContext.interchainToken.searchInterchainToken.invalidate();
       await trpcContext.interchainToken.searchInterchainToken.refetch();
+
+      await trpcContext.interchainToken.getInterchainTokenDetails.invalidate();
+      await trpcContext.interchainToken.getInterchainTokenDetails.refetch();
+
       await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
       await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch();
 

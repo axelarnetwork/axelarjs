@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { zeroAddress } from "viem";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
@@ -40,11 +41,11 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       ]);
 
       return {
-        tokenBalance: tokenBalance.toString(),
         decimals,
+        tokenBalance: tokenBalance.toString(),
         isTokenOwner: input.owner === owner,
         isTokenPendingOwner: input.owner === pendingOwner,
-        hasPendingOwner: pendingOwner !== undefined,
+        hasPendingOwner: pendingOwner && pendingOwner !== zeroAddress,
       };
     } catch (error) {
       // If we get a TRPC error, we throw it
