@@ -8,8 +8,8 @@ import EVMChainsDropdown, {
   ChainIcon,
 } from "~/components/EVMChainsDropdown/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
 export type SearchInterchainTokens = {
   onTokenFound: (result: {
@@ -29,7 +29,7 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
 
   const isValidAddress = isAddress(search as `0x${string}`);
 
-  const { data: tokenDetails } = useInterchainTokenDetailsQuery({
+  const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: chain?.id,
     tokenAddress: search as `0x${string}`,
   });

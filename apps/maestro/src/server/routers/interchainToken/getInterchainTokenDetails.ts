@@ -1,6 +1,7 @@
 import type { InterchainTokenClient } from "@axelarjs/evm";
 
 import { TRPCError } from "@trpc/server";
+import invariant from "tiny-invariant";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
@@ -28,7 +29,7 @@ export const getInterchainTokenDetails = publicProcedure
           );
 
           try {
-            const details = await getTokenDetails(client);
+            const details = await getTokenPublicDetails(client);
 
             if (details) {
               return details;
@@ -38,6 +39,10 @@ export const getInterchainTokenDetails = publicProcedure
             console.log(
               `Token ${input.tokenAddress} not deployed on ${chainConfig.name}`
             );
+
+            if (error instanceof Error) {
+              console.log(error.message);
+            }
           }
         }
 
@@ -52,7 +57,7 @@ export const getInterchainTokenDetails = publicProcedure
         input.tokenAddress as `0x${string}`
       );
 
-      return getTokenDetails(client);
+      return getTokenPublicDetails(client);
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -66,23 +71,24 @@ export const getInterchainTokenDetails = publicProcedure
     }
   });
 
-async function getTokenDetails(client: InterchainTokenClient) {
-  const [tokenName, tokenSymbol, decimals, owner, pendingOwner] =
-    await Promise.all([
-      client.readContract("name"),
-      client.readContract("symbol"),
-      client.readContract("decimals"),
-      client.readContract("owner"),
-      client.readContract("pendingOwner"),
-    ]);
+async function getTokenPublicDetails(client: InterchainTokenClient) {
+  invariant(client.chain, "client.chain must be defined");
+
+  const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
+    client.readContract("name"),
+    client.readContract("symbol"),
+    client.readContract("decimals"),
+    client.readContract("owner"),
+    client.readContract("pendingOwner").catch(() => undefined),
+  ]);
 
   return {
-    name: String(tokenName),
-    symbol: String(tokenSymbol),
-    decimals: Number(decimals),
-    owner: String(owner) as `0x${string}`,
-    chainId: client.chain?.id,
-    chainName: client.chain?.name,
-    pendingOwner: String(pendingOwner) as `0x${string}`,
+    chainId: client.chain.id,
+    chainName: client.chain.name,
+    name,
+    symbol,
+    decimals,
+    owner,
+    pendingOwner,
   };
 }
