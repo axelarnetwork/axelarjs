@@ -1,5 +1,7 @@
-import { Modal } from "@axelarjs/ui";
+import { Button, Modal } from "@axelarjs/ui";
 import { type FC } from "react";
+
+import { CoinsIcon, GiftIcon, PackageCheckIcon, SendIcon } from "lucide-react";
 
 import {
   useManageInterchainTokenContainer,
@@ -20,6 +22,7 @@ type Props = {
 type Option = {
   label: string;
   value: InterchainTokenAction;
+  icon: JSX.Element;
 };
 
 export const ManageInterchainToken: FC<Props> = (props) => {
@@ -29,18 +32,22 @@ export const ManageInterchainToken: FC<Props> = (props) => {
     {
       label: "Mint",
       value: "mint",
+      icon: <CoinsIcon />,
     },
     {
       label: "Interchain Transfer",
       value: "interchainTransfer",
+      icon: <SendIcon />,
     },
     {
       label: "Transfer Ownership",
       value: "transferOwnership",
+      icon: <GiftIcon />,
     },
     {
       label: "Accept Ownership",
       value: "acceptOwnership",
+      icon: <PackageCheckIcon />,
     },
   ];
 
@@ -63,7 +70,12 @@ export const ManageInterchainToken: FC<Props> = (props) => {
         </Modal.Title>
         <ul className="grid">
           {options.map((option) => (
-            <li key={option.value}>{option.label}</li>
+            <li key={option.value}>
+              <Button>
+                {option.icon}
+                <span>{option.label}</span>
+              </Button>
+            </li>
           ))}
         </ul>
       </Modal.Body>
