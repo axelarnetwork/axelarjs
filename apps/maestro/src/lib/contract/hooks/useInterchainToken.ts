@@ -71,6 +71,14 @@ export function useTransferInterchainTokenOnwership(config: Config) {
   });
 }
 
+export function useAcceptInterchainTokenOnwership(config: Config) {
+  return useContractWrite({
+    address: config.address,
+    abi: ABI,
+    functionName: "acceptOwnership",
+  });
+}
+
 export function useTransferInterchainToken(
   config: Config & {
     value: bigint;
