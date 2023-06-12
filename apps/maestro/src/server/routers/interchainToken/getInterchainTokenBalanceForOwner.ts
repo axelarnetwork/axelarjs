@@ -36,7 +36,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         }),
         client.readContract("decimals"),
         client.readContract("owner"),
-        client.readContract("pendingOwner"),
+        client.readContract("pendingOwner").catch(() => undefined),
       ]);
 
       return {
@@ -44,6 +44,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         decimals,
         isTokenOwner: input.owner === owner,
         isTokenPendingOwner: input.owner === pendingOwner,
+        hasPendingOwner: pendingOwner !== undefined,
       };
     } catch (error) {
       // If we get a TRPC error, we throw it

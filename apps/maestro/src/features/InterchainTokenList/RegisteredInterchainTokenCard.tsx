@@ -17,6 +17,7 @@ import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
+import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import { MintInterchainToken } from "../MintInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
 import { TransferInterchainTokenOwnership } from "../TransferInterchainTokenOwnership";
@@ -136,7 +137,9 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               <div className="flex w-full items-center justify-between">
                 <span
                   className={clsx({
-                    "mx-auto": !isSourceChain || !balance.isTokenOwner,
+                    "mx-auto":
+                      !isSourceChain ||
+                      (!balance.isTokenOwner && !balance.isTokenPendingOwner),
                   })}
                 >
                   No balance
@@ -160,26 +163,39 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                         tokenDecimals={props.decimals}
                         sourceChain={props.chain as EVMChainConfig}
                       />
-                      <TransferInterchainTokenOwnership
-                        accountAddress={address as `0x${string}`}
-                        trigger={
-                          <Button
-                            size="xs"
-                            color="primary"
-                            // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                            className="absolute right-20"
-                          >
-                            transfer
-                          </Button>
-                        }
-                        tokenAddress={props.tokenAddress}
-                        sourceChain={props.chain as EVMChainConfig}
-                        tokenId={props.tokenId}
-                      />
+                      {!balance.hasPendingOwner && (
+                        <TransferInterchainTokenOwnership
+                          accountAddress={address as `0x${string}`}
+                          trigger={
+                            <Button
+                              size="xs"
+                              color="primary"
+                              // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                              className="absolute right-20"
+                            >
+                              transfer
+                            </Button>
+                          }
+                          tokenAddress={props.tokenAddress}
+                          sourceChain={props.chain as EVMChainConfig}
+                          tokenId={props.tokenId}
+                        />
+                      )}
                     </>
                   ) : (
                     switchChainButton
                   ))}
+
+                {balance.isTokenPendingOwner && (
+                  <>
+                    <AcceptInterchainTokenOwnership
+                      accountAddress={address as `0x${string}`}
+                      tokenAddress={props.tokenAddress}
+                      sourceChain={props.chain as EVMChainConfig}
+                      tokenId={props.tokenId}
+                    />
+                  </>
+                )}
               </div>
             ) : (
               <>

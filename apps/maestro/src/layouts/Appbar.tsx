@@ -89,6 +89,15 @@ const Appbar: FC<AppbarProps> = () => {
       })}
     >
       <Navbar.Start>
+        <Button
+          shape="square"
+          onClick={actions.toggleDrawer}
+          aria-label="Toggle Drawer"
+          size="sm"
+          className="hover:bg-base-300/50 active:bg-base-300 rounded-lg transition-all md:hidden"
+        >
+          <MenuIcon className="h-6 w-6" />
+        </Button>
         <LinkButton
           className="flex items-center gap-2 text-lg font-bold uppercase"
           onClick={() => router.push("/")}
@@ -136,13 +145,6 @@ const Appbar: FC<AppbarProps> = () => {
           )}
           <ThemeSwitcher />
         </div>
-        <button
-          onClick={actions.toggleDrawer}
-          aria-label="Toggle Drawer"
-          className="hover:bg-base-300/50 active:bg-base-300 rounded-lg p-2 px-3 transition-all md:hidden"
-        >
-          <MenuIcon className="h-6 w-6" />
-        </button>
       </Navbar.End>
     </Navbar>
   );
