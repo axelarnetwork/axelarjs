@@ -237,13 +237,13 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         <Card.Actions className="justify-between">
           <CopyToClipboardButton
             copyText={props.tokenAddress}
-            ghost={true}
+            variant="ghost"
             length="block"
             size="sm"
             className="bg-base-300 dark:bg-base-100"
           >
             {maskAddress(props.tokenAddress, {
-              segmentA: 14,
+              segmentA: 10,
               segmentB: -10,
             })}
           </CopyToClipboardButton>
