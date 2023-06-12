@@ -109,37 +109,43 @@ const Appbar: FC<AppbarProps> = () => {
       </Navbar.Start>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">
-          <EVMChainsDropdown
-            onSwitchNetwork={switchNetworkAsync}
-            selectedChain={selectedChain}
-            chains={evmChains}
-            triggerClassName="w-full md:w-auto rounded-full"
-            chainIconClassName="-translate-x-1.5"
-          />
           {isConnected && address ? (
-            <Dropdown align="end">
-              <Dropdown.Trigger>
-                <button className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring">
-                  <Identicon address={address ?? ""} diameter={18} />
-                </button>
-              </Dropdown.Trigger>
-              <Dropdown.Content className="dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-4 p-4 md:w-48">
-                <>
-                  <CopyToClipboardButton
-                    size="sm"
-                    copyText={address}
-                    outline={true}
-                    className="flex items-center gap-1"
-                  >
-                    <Identicon address={address ?? ""} diameter={18} />{" "}
-                    {maskAddress(address)}
-                  </CopyToClipboardButton>
-                  <Button size="sm" color="error" onClick={() => disconnect()}>
-                    Disconnect
-                  </Button>
-                </>
-              </Dropdown.Content>
-            </Dropdown>
+            <>
+              <EVMChainsDropdown
+                onSwitchNetwork={switchNetworkAsync}
+                selectedChain={selectedChain}
+                chains={evmChains}
+                triggerClassName="w-full md:w-auto rounded-full"
+                chainIconClassName="-translate-x-1.5"
+              />
+              <Dropdown align="end">
+                <Dropdown.Trigger>
+                  <button className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring">
+                    <Identicon address={address ?? ""} diameter={18} />
+                  </button>
+                </Dropdown.Trigger>
+                <Dropdown.Content className="dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-4 p-4 md:w-48">
+                  <>
+                    <CopyToClipboardButton
+                      size="sm"
+                      copyText={address}
+                      outline={true}
+                      className="flex items-center gap-1"
+                    >
+                      <Identicon address={address ?? ""} diameter={18} />{" "}
+                      {maskAddress(address)}
+                    </CopyToClipboardButton>
+                    <Button
+                      size="sm"
+                      color="error"
+                      onClick={() => disconnect()}
+                    >
+                      Disconnect
+                    </Button>
+                  </>
+                </Dropdown.Content>
+              </Dropdown>
+            </>
           ) : (
             <ConnectWalletButton />
           )}
