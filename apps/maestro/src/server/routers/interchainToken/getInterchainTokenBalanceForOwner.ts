@@ -41,8 +41,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       ]);
 
       return {
-        tokenBalance: tokenBalance.toString(),
         decimals,
+        tokenBalance: tokenBalance.toString(),
         isTokenOwner: input.owner === owner,
         isTokenPendingOwner: input.owner === pendingOwner,
         hasPendingOwner: pendingOwner && pendingOwner !== zeroAddress,
