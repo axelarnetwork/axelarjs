@@ -23,4 +23,3 @@ Apps:
 | app                         | description               |
 | --------------------------- | ------------------------- |
 | 🎼 [maestro](/apps/maestro) | Interchain Maestro Portal |
-| 📚 [docs](/apps/docs)       | SDK Docs (placeholder)    |
