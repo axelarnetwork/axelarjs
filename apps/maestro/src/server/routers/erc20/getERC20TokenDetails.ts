@@ -72,7 +72,7 @@ async function getTokenPublicDetails(client: ERC20Client) {
     client.readContract("name"),
     client.readContract("symbol"),
     client.readContract("decimals"),
-    client.readContract("owner"),
+    client.readContract("owner").catch(() => undefined),
     client.readContract("pendingOwner").catch(() => undefined),
   ]);
 
