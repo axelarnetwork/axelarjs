@@ -1,4 +1,8 @@
-import { parseUnits } from "viem";
+import {
+  parseUnits,
+  TransactionExecutionError,
+  UserRejectedRequestError,
+} from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useERC20Reads } from "~/lib/contract/hooks/useERC20";
@@ -67,12 +71,21 @@ export function useSendInterchainTokenMutation(
 
         const txResult = await transferAsync({
           args: [config.destinationChainId, address, bnAmount, `0x`],
+        }).catch((error) => {
+          if (
+            error instanceof TransactionExecutionError &&
+            error.cause instanceof UserRejectedRequestError
+          ) {
+            console.log("User rejected request");
+          }
         });
 
-        onStatusUpdate?.({
-          status: "submitted",
-          hash: txResult.hash,
-        });
+        if (txResult?.hash) {
+          onStatusUpdate?.({
+            status: "submitted",
+            hash: txResult.hash,
+          });
+        }
       } catch (e) {
         if (e instanceof Error) {
           onStatusUpdate?.({

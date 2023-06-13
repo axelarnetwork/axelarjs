@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { always } from "rambda";
 import { zeroAddress } from "viem";
 import { z } from "zod";
 
@@ -36,8 +37,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           args: [input.owner as `0x$${string}`],
         }),
         client.readContract("decimals"),
-        client.readContract("owner"),
-        client.readContract("pendingOwner").catch(() => undefined),
+        client.readContract("owner").catch(always(null)),
+        client.readContract("pendingOwner").catch(always(null)),
       ]);
 
       return {
