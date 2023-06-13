@@ -45,7 +45,7 @@ const DrawerRoot: FC<DrawerProps> = ({ end, mobile, className, ...props }) => {
 export const Drawer = Object.assign(DrawerRoot, {
   Toggle: tw.input`drawer-toggle`,
   Content: tw.div`drawer-content`,
-  Side: tw.div`drawer-side`,
+  Side: tw.section`drawer-side`,
   Overlay: tw.div`drawer-overlay`,
 });
 

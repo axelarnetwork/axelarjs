@@ -10,7 +10,11 @@ import {
 import { useCallback, useMemo, useState, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { isAddress } from "viem";
+import {
+  isAddress,
+  TransactionExecutionError,
+  UserRejectedRequestError,
+} from "viem";
 import { useWaitForTransaction } from "wagmi";
 
 import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
@@ -88,12 +92,21 @@ export const TransferInterchainTokenOwnership: FC<Props> = (props) => {
 
       const txResult = await transferOwnershipAsync({
         args: [data.recipientAddress],
+      }).catch((error) => {
+        if (
+          error instanceof TransactionExecutionError &&
+          error.cause instanceof UserRejectedRequestError
+        ) {
+          console.log("User rejected request");
+        }
       });
 
-      setTxState({
-        status: "submitted",
-        hash: txResult?.hash,
-      });
+      if (txResult?.hash) {
+        setTxState({
+          status: "submitted",
+          hash: txResult?.hash,
+        });
+      }
     },
     [setTxState, transferOwnershipAsync]
   );

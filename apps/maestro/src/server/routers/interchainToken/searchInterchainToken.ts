@@ -1,7 +1,7 @@
 import type { InterchainTokenServiceClient } from "@axelarjs/evm";
 
 import { TRPCError } from "@trpc/server";
-import { partition } from "rambda";
+import { always, partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
@@ -37,7 +37,7 @@ export const searchInterchainToken = publicProcedure
 
             if (tokenId && !isAddressZero(tokenId)) {
               console.log("Found token ID on chain", chainConfig.name);
-              return doStuffWithClient(
+              return getInterchainTokenDetails(
                 client,
                 chainConfig,
                 remainingChainConfigs,
@@ -61,7 +61,7 @@ export const searchInterchainToken = publicProcedure
       const client =
         ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-      return doStuffWithClient(
+      return getInterchainTokenDetails(
         client,
         chainConfig,
         remainingChainConfigs,
@@ -82,7 +82,7 @@ export const searchInterchainToken = publicProcedure
     }
   });
 
-async function doStuffWithClient(
+async function getInterchainTokenDetails(
   client: InterchainTokenServiceClient,
   chainConfig: WagmiEVMChainConfig,
   remainingChainConfigs: WagmiEVMChainConfig[],
@@ -93,12 +93,16 @@ async function doStuffWithClient(
   ctx: Context
 ) {
   const [tokenId, originTokenId] = await Promise.all([
-    client.readContract("getTokenId", {
-      args: [input.tokenAddress as `0x${string}`],
-    }),
-    client.readContract("getOriginTokenId", {
-      args: [input.tokenAddress as `0x${string}`],
-    }),
+    client
+      .readContract("getTokenId", {
+        args: [input.tokenAddress as `0x${string}`],
+      })
+      .catch(always(null)),
+    client
+      .readContract("getOriginTokenId", {
+        args: [input.tokenAddress as `0x${string}`],
+      })
+      .catch(always(null)),
   ]);
 
   if (!tokenId || isAddressZero(tokenId)) {

@@ -1,6 +1,7 @@
 import type { ERC20Client } from "@axelarjs/evm";
 
 import { TRPCError } from "@trpc/server";
+import { always } from "rambda";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
@@ -72,8 +73,8 @@ async function getTokenPublicDetails(client: ERC20Client) {
     client.readContract("name"),
     client.readContract("symbol"),
     client.readContract("decimals"),
-    client.readContract("owner").catch(() => undefined),
-    client.readContract("pendingOwner").catch(() => undefined),
+    client.readContract("owner").catch(always(null)),
+    client.readContract("pendingOwner").catch(always(null)),
   ]);
 
   return {
