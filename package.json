@@ -19,7 +19,6 @@
     "storybook": "pnpm -C ./packages/ui run storybook ",
     "build-storybook": "turbo run build-storybook",
     "docs:dev": "pnpm -C ./apps/docs dev",
-    "e2e": "pnpm -C ./apps/e2e run test",
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
     "dev:docs": "pnpm -C ./apps/docs run dev",
     "changeset": "changeset",

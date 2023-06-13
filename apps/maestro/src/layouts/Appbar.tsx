@@ -120,7 +120,10 @@ const Appbar: FC<AppbarProps> = () => {
               />
               <Dropdown align="end">
                 <Dropdown.Trigger>
-                  <button className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring">
+                  <button
+                    className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring"
+                    aria-label="connected wallet dropdown trigger"
+                  >
                     <Identicon address={address ?? ""} diameter={18} />
                   </button>
                 </Dropdown.Trigger>
