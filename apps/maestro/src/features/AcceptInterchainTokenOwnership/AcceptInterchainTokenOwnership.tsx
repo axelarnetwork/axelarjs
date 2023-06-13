@@ -64,10 +64,11 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     });
 
     const txResult = await acceptOwnershipAsync().catch((error) => {
-      if (error instanceof TransactionExecutionError) {
-        if (error.cause instanceof UserRejectedRequestError) {
-          console.log("User rejected request");
-        }
+      if (
+        error instanceof TransactionExecutionError &&
+        error.cause instanceof UserRejectedRequestError
+      ) {
+        console.log("User rejected request");
       }
     });
 

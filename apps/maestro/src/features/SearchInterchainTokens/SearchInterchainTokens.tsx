@@ -65,7 +65,7 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           color={error ? "error" : undefined}
-          className="flex-1"
+          className="bg-base-200 flex-1"
         />
         <span>
           {isLoading && isAddress(search) ? (

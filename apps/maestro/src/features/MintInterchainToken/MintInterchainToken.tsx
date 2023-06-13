@@ -10,6 +10,7 @@ import {
 import { useMemo, useState, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
+import { TransactionExecutionError, UserRejectedRequestError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -101,12 +102,21 @@ export const MintInterchainToken: FC<Props> = (props) => {
 
     const txResult = await mintTokenAsync({
       args: [props.accountAddress, adjustedAmount],
+    }).catch((error) => {
+      if (
+        error instanceof TransactionExecutionError &&
+        error.cause instanceof UserRejectedRequestError
+      ) {
+        console.log("User rejected request");
+      }
     });
 
-    setTxState({
-      status: "submitted",
-      hash: txResult?.hash,
-    });
+    if (txResult?.hash) {
+      setTxState({
+        status: "submitted",
+        hash: txResult?.hash,
+      });
+    }
   };
 
   const buttonChildren = useMemo(() => {
