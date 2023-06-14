@@ -12,12 +12,14 @@ import { useCallback, type FC } from "react";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
+import { CogIcon, SettingsIcon } from "lucide-react";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
+import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { MintInterchainToken } from "../MintInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
 import { TransferInterchainTokenOwnership } from "../TransferInterchainTokenOwnership";
@@ -109,10 +111,30 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               {props.chain.name}
             </span>
           )}
-          <StatusIndicator
-            isOriginToken={props.isOriginToken}
-            isRegistered={props.isRegistered}
-          />
+          {props.isOriginToken && balance ? (
+            <ManageInterchainToken
+              trigger={
+                <Button
+                  size="xs"
+                  color="primary"
+                  // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
+                  className="absolute right-6"
+                >
+                  <SettingsIcon className="h-4 w-4" /> manage token
+                </Button>
+              }
+              tokenAddress={props.tokenAddress}
+              balance={BigInt(balance.tokenBalance)}
+              isTokenOwner={balance.isTokenOwner}
+              isTokenPendingOnwer={balance.isTokenPendingOwner}
+              hasPendingOwner={balance.hasPendingOwner}
+            />
+          ) : (
+            <StatusIndicator
+              isOriginToken={props.isOriginToken}
+              isRegistered={props.isRegistered}
+            />
+          )}
           {props.deploymentStatus && (
             <Badge
               outline
@@ -144,47 +166,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 >
                   No balance
                 </span>
-                {balance.isTokenOwner &&
-                  (isSourceChain ? (
-                    <>
-                      <MintInterchainToken
-                        accountAddress={address as `0x${string}`}
-                        trigger={
-                          <Button
-                            size="xs"
-                            color="primary"
-                            // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                            className="absolute right-6"
-                          >
-                            mint
-                          </Button>
-                        }
-                        tokenAddress={props.tokenAddress}
-                        tokenDecimals={props.decimals}
-                        sourceChain={props.chain as EVMChainConfig}
-                      />
-                      {!balance.hasPendingOwner && (
-                        <TransferInterchainTokenOwnership
-                          accountAddress={address as `0x${string}`}
-                          trigger={
-                            <Button
-                              size="xs"
-                              color="primary"
-                              // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                              className="absolute right-20"
-                            >
-                              transfer
-                            </Button>
-                          }
-                          tokenAddress={props.tokenAddress}
-                          sourceChain={props.chain as EVMChainConfig}
-                          tokenId={props.tokenId}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    switchChainButton
-                  ))}
+                {balance.isTokenOwner && !isSourceChain && switchChainButton}
 
                 {balance.isTokenPendingOwner && (
                   <>
