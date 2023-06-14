@@ -4,6 +4,7 @@ import {
   w3mConnectors,
   w3mProvider,
 } from "@web3modal/ethereum";
+import { createWalletClient, http } from "viem";
 import { configureChains, createConfig } from "wagmi";
 import {
   arbitrum,
@@ -21,6 +22,7 @@ import {
   fantomTestnet,
   filecoin,
   filecoinHyperspace,
+  foundry,
   goerli,
   mainnet,
   moonbaseAlpha,
@@ -32,6 +34,8 @@ import {
 } from "wagmi/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { LedgerConnector } from "wagmi/connectors/ledger";
+import { MockConnector } from "wagmi/connectors/mock";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import { logger } from "~/lib/logger";
 import { APP_NAME } from "./app";
@@ -48,17 +52,33 @@ export const EVM_CHAIN_CONFIGS = [
   { ...mainnet, networkNameOnAxelar: "ethereum", environment: "mainnet" },
   { ...goerli, networkNameOnAxelar: "ethereum-2", environment: "testnet" },
   { ...moonbeam, networkNameOnAxelar: "moonbeam", environment: "mainnet" },
-  { ...moonbaseAlpha, networkNameOnAxelar: "moonbeam", environment: "testnet" },
+  {
+    ...moonbaseAlpha,
+    networkNameOnAxelar: "moonbeam",
+    environment: "testnet",
+  },
   { ...fantom, networkNameOnAxelar: "fantom", environment: "mainnet" },
-  { ...fantomTestnet, networkNameOnAxelar: "fantom", environment: "testnet" },
-  { ...avalanche, networkNameOnAxelar: "avalanche", environment: "mainnet" },
+  {
+    ...fantomTestnet,
+    networkNameOnAxelar: "fantom",
+    environment: "testnet",
+  },
+  {
+    ...avalanche,
+    networkNameOnAxelar: "avalanche",
+    environment: "mainnet",
+  },
   {
     ...avalancheFuji,
     networkNameOnAxelar: "avalanche",
     environment: "testnet",
   },
   { ...polygon, networkNameOnAxelar: "polygon", environment: "mainnet" },
-  { ...polygonMumbai, networkNameOnAxelar: "polygon", environment: "testnet" },
+  {
+    ...polygonMumbai,
+    networkNameOnAxelar: "polygon",
+    environment: "testnet",
+  },
   { ...bsc, networkNameOnAxelar: "binance", environment: "mainnet" },
   { ...bscTestnet, networkNameOnAxelar: "binance", environment: "testnet" },
   { ...arbitrum, networkNameOnAxelar: "arbitrum", environment: "mainnet" },
@@ -70,7 +90,11 @@ export const EVM_CHAIN_CONFIGS = [
   { ...celo, networkNameOnAxelar: "celo", environment: "mainnet" },
   { ...celoAlfajores, networkNameOnAxelar: "celo", environment: "testnet" },
   { ...aurora, networkNameOnAxelar: "aurora", environment: "mainnet" },
-  { ...auroraTestnet, networkNameOnAxelar: "aurora", environment: "testnet" },
+  {
+    ...auroraTestnet,
+    networkNameOnAxelar: "aurora",
+    environment: "testnet",
+  },
   { ...optimism, networkNameOnAxelar: "optimism", environment: "mainnet" },
   {
     ...optimismGoerli,
@@ -148,14 +172,29 @@ if (typeof window !== "undefined") {
   });
 }
 
-const { webSocketPublicClient, publicClient } = configureChains(
-  EVM_CHAIN_CONFIGS,
-  [
-    w3mProvider({
-      projectId: WALLECTCONNECT_PROJECT_ID,
-    }),
-  ]
-);
+/**
+ * whether the app is running in e2e test mode
+ */
+export const IS_E2E_TEST = process.env.NEXT_PUBLIC_E2E_ENABLED === "true";
+
+const { webSocketPublicClient, publicClient } = IS_E2E_TEST
+  ? configureChains(
+      // only use foundry for e2e tests
+      [foundry],
+      [
+        // use jsonRpcProvider as the provider for e2e tests
+        jsonRpcProvider({
+          rpc: (chain_) => ({
+            http: chain_.rpcUrls.default.http[0],
+          }),
+        }),
+      ]
+    )
+  : configureChains(EVM_CHAIN_CONFIGS, [
+      w3mProvider({
+        projectId: WALLECTCONNECT_PROJECT_ID,
+      }),
+    ]);
 
 export const queryClient = new QueryClient();
 
@@ -165,24 +204,38 @@ const W3M_CONNECTORS = w3mConnectors({
   version: 2,
 });
 
+export const getMockWalletClient = () =>
+  createWalletClient({
+    transport: http(foundry.rpcUrls.default.http[0]),
+    chain: foundry,
+    account: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+    pollingInterval: 100,
+  });
+
 export const wagmiConfig = createConfig({
   autoConnect: true,
   publicClient,
   webSocketPublicClient,
   queryClient,
   logger, // custom logger
-  connectors: [
-    new CoinbaseWalletConnector({
-      chains: EVM_CHAIN_CONFIGS,
-      options: {
-        appName: APP_NAME,
-      },
-    }),
-    new LedgerConnector({
-      chains: EVM_CHAIN_CONFIGS,
-    }),
-    ...W3M_CONNECTORS,
-  ],
+  connectors: IS_E2E_TEST
+    ? [
+        new MockConnector({ options: { walletClient: getMockWalletClient() } }),
+        ...W3M_CONNECTORS,
+      ]
+    : [
+        new CoinbaseWalletConnector({
+          chains: EVM_CHAIN_CONFIGS,
+          options: {
+            appName: APP_NAME,
+          },
+        }),
+        new LedgerConnector({
+          chains: EVM_CHAIN_CONFIGS,
+        }),
+        ...W3M_CONNECTORS,
+      ],
 });
 
 export const ethereumClient = new EthereumClient(
