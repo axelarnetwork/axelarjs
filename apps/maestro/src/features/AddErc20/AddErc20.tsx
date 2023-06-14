@@ -60,7 +60,7 @@ const AddErc20: FC<AddErc20Props> = () => {
         </Button>
       )}
     >
-      <Dialog.Body $as="section" className="border-t md:border-0">
+      <Dialog.Body $as="section">
         <Dialog.CornerCloseAction />
         <Dialog.Title className="flex items-center gap-1 sm:gap-2">
           <TokenRegistration />
