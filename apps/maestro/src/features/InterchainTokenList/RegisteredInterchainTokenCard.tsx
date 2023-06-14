@@ -12,7 +12,7 @@ import { useCallback, type FC } from "react";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
-import { CogIcon, SettingsIcon } from "lucide-react";
+import { SettingsIcon } from "lucide-react";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
@@ -20,9 +20,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
-import { MintInterchainToken } from "../MintInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
-import { TransferInterchainTokenOwnership } from "../TransferInterchainTokenOwnership";
 import type { TokenInfo } from "./types";
 
 const StatusIndicator = (
