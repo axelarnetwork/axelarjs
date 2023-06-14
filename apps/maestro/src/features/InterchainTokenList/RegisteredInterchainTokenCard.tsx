@@ -116,11 +116,12 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               trigger={
                 <Button
                   size="xs"
-                  color="primary"
-                  // TODO absolute positioning is used to prevent the button from shifting the card. This is a temporary fix.
-                  className="absolute right-6"
+                  aria-label="manage interchain token"
+                  className="group absolute right-2 top-2"
+                  shape="circle"
+                  variant="neutral"
                 >
-                  <SettingsIcon className="h-4 w-4" /> manage token
+                  <SettingsIcon className="text-success/75 group-hover:text-success h-5 w-5" />
                 </Button>
               }
               tokenAddress={props.tokenAddress}
