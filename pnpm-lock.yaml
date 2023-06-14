@@ -233,19 +233,19 @@ importers:
         specifier: 18.2.5
         version: 18.2.5
       '@types/react-dom':
-        specifier: ^18.2.3
-        version: 18.2.4
+        specifier: ^18.2.5
+        version: 18.2.5
       '@types/testing-library__jest-dom':
-        specifier: ^5.14.5
+        specifier: ^5.14.6
         version: 5.14.6
       '@vitejs/plugin-react':
         specifier: ^3.1.0
         version: 3.1.0(vite@4.3.9)
       fast-check:
-        specifier: ^3.8.1
+        specifier: ^3.10.0
         version: 3.10.0
       happy-dom:
-        specifier: ^9.10.1
+        specifier: ^9.20.3
         version: 9.20.3
       matchers:
         specifier: link:@testing-library/jest-dom/matchers
@@ -311,8 +311,8 @@ importers:
         specifier: ^0.30.1
         version: 0.30.1
       chain-registry:
-        specifier: ^1.13.0
-        version: 1.13.0
+        specifier: ^1.14.0
+        version: 1.14.0
     devDependencies:
       '@cosmjs/proto-signing':
         specifier: ^0.30.1
@@ -374,8 +374,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1
       ts-proto:
-        specifier: ^1.147.3
-        version: 1.147.3
+        specifier: ^1.149.0
+        version: 1.149.0
       typescript:
         specifier: 5.1.3
         version: 5.1.3
@@ -610,25 +610,25 @@ importers:
         specifier: 18.15.3
         version: 18.15.3
       '@types/ramda':
-        specifier: ^0.29.1
-        version: 0.29.1
+        specifier: ^0.29.2
+        version: 0.29.2
       '@types/react':
         specifier: 18.2.5
         version: 18.2.5
       '@types/react-dom':
-        specifier: ^18.2.3
-        version: 18.2.4
+        specifier: ^18.2.5
+        version: 18.2.5
       '@types/testing-library__jest-dom':
-        specifier: ^5.14.5
+        specifier: ^5.14.6
         version: 5.14.6
       '@vitejs/plugin-react':
         specifier: ^3.1.0
         version: 3.1.0(vite@4.3.9)
       fast-check:
-        specifier: ^3.8.2
+        specifier: ^3.10.0
         version: 3.10.0
       happy-dom:
-        specifier: ^9.18.3
+        specifier: ^9.20.3
         version: 9.20.3
       matchers:
         specifier: link:@testing-library/jest-dom/matchers
@@ -7525,8 +7525,8 @@ packages:
     resolution: {integrity: sha512-1cYJrqq9GezNFPsWTZpFut/d4CjpZqA0vhqDUPFWYKF1oIyBz5qnoYMzR+0C/T96t3ebLAC1SSnwrVOm5/j74A==}
     dev: true
 
-  /@types/object-hash@1.3.4:
-    resolution: {integrity: sha512-xFdpkAkikBgqBdG9vIlsqffDV8GpvnPEzs0IUtr1v3BEB97ijsFQ4RXVbUZwjFThhB4MDSTUfvmxUD5PGx0wXA==}
+  /@types/object-hash@3.0.2:
+    resolution: {integrity: sha512-tfyXl1JPCf2hzIDK29gO7qGqJjThKBzg/Cn3bA68R9NmWdOx+f7k5mm4to/n43BHspCwcoUC6FU4NpUoK/h9bQ==}
     dev: true
 
   /@types/pretty-hrtime@1.0.1:
@@ -7544,8 +7544,8 @@ packages:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
     dev: true
 
-  /@types/ramda@0.29.1:
-    resolution: {integrity: sha512-Ff5RRG9YRqMgWOqZVVavSjGEvYHUnXnGF0YPGbzIWhB3o8qiccSJZlFX2z8qm3G1H/IC5w0ozHmlezUeQCtGfQ==}
+  /@types/ramda@0.29.2:
+    resolution: {integrity: sha512-JxvBGR3G4gV3RTOBugVHAAOD6iiv2WjlJ8BHr0s7KALdPpx2l+didoTuoJMmrA0eqpUaCm/slKP4TmxMRihd8g==}
     dependencies:
       types-ramda: 0.29.3
     dev: true
@@ -9134,8 +9134,8 @@ packages:
       type-detect: 4.0.8
     dev: true
 
-  /chain-registry@1.13.0:
-    resolution: {integrity: sha512-LFfKuEN2fV1QHJuTdqz1VmdiMGy87yAAYODy6i6/9tC+m6hwDroIPhR8iwuY4BxyJMZj9yr2cpD8m+8X8cZ/PA==}
+  /chain-registry@1.14.0:
+    resolution: {integrity: sha512-j5PgLP8coJ4uIUtpd2fXTLa3ass2ahbx35+g6eLquDZpIg/0Sr7SKX7M2/0jnaT7ohHKnRLMJxOnBHaDpuotoQ==}
     dependencies:
       '@babel/runtime': 7.22.3
       '@chain-registry/types': 0.16.0
@@ -13259,11 +13259,6 @@ packages:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
 
-  /object-hash@1.3.1:
-    resolution: {integrity: sha512-OSuu/pU4ENM9kmREg0BdNrUDIl1heYa4mBZacJc+vVWz4GtAwu7jO8s4AIt2aGRUTqxykpWzI3Oqnsm13tTMDA==}
-    engines: {node: '>= 0.10.0'}
-    dev: true
-
   /object-hash@3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
     engines: {node: '>= 6'}
@@ -15626,14 +15621,14 @@ packages:
       protobufjs: 6.11.3
     dev: true
 
-  /ts-proto@1.147.3:
-    resolution: {integrity: sha512-379/IfSY1MmX+7ohEREAOPO3Pw3AIiBO2WSZr58pnVaeMHZipyAa8jj6j7rjcHmqIx8l0sgelFumWhB8yA5k9w==}
+  /ts-proto@1.149.0:
+    resolution: {integrity: sha512-+KK+diaqj86XHdq+fkbFWeTLVE6s69jApyQF34cwL1M3h+gS1sjDy/lf0rUgeQtgMQ/K3qxQElbVTusV7Z3otQ==}
     hasBin: true
     dependencies:
-      '@types/object-hash': 1.3.4
+      '@types/object-hash': 3.0.2
       case-anything: 2.1.13
       dataloader: 1.4.0
-      object-hash: 1.3.1
+      object-hash: 3.0.0
       protobufjs: 6.11.3
       ts-poet: 6.4.1
       ts-proto-descriptors: 1.9.0
