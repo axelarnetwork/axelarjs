@@ -46,7 +46,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         tokenBalance: tokenBalance.toString(),
         isTokenOwner: input.owner === owner,
         isTokenPendingOwner: input.owner === pendingOwner,
-        hasPendingOwner: pendingOwner && pendingOwner !== zeroAddress,
+        hasPendingOwner: Boolean(pendingOwner) && pendingOwner !== zeroAddress,
       };
     } catch (error) {
       // If we get a TRPC error, we throw it

@@ -14,7 +14,7 @@ type Props = {
   balance: bigint;
   tokenAddress: `0x${string}`;
   isTokenOwner: boolean;
-  isPendingOnwer: boolean;
+  isTokenPendingOnwer: boolean;
   hasPendingOwner: boolean;
   onClose?: () => void;
 };
@@ -33,26 +33,26 @@ export const ManageInterchainToken: FC<Props> = (props) => {
     {
       label: "Mint",
       value: "mint",
-      icon: <CoinsIcon />,
+      icon: <CoinsIcon className="h-7 w-7 md:h-8 md:w-8" />,
       criteria: (props) => props.isTokenOwner,
     },
     {
       label: "Interchain Transfer",
       value: "interchainTransfer",
-      icon: <SendIcon />,
+      icon: <SendIcon className="h-7 w-7 md:h-8 md:w-8" />,
       criteria: (props) => props.balance > BigInt(0),
     },
     {
       label: "Transfer Ownership",
       value: "transferOwnership",
-      icon: <GiftIcon />,
+      icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       criteria: (props) => props.isTokenOwner && !props.hasPendingOwner,
     },
     {
       label: "Accept Ownership",
       value: "acceptOwnership",
-      icon: <PackageCheckIcon />,
-      criteria: (props) => props.isPendingOnwer,
+      icon: <PackageCheckIcon className="h-7 w-7 md:h-8 md:w-8" />,
+      criteria: (props) => props.isTokenPendingOnwer,
     },
   ];
 
@@ -69,19 +69,21 @@ export const ManageInterchainToken: FC<Props> = (props) => {
         }
       }}
     >
-      <Modal.Body className="flex h-96 flex-col">
+      <Modal.Body className="flex flex-col gap-4">
         <Modal.Title className="flex">
           <span>Manage Interchain Token</span>
         </Modal.Title>
-        <ul className="grid">
-          {options.map((option) => (
-            <li key={option.value}>
-              <Button>
-                {option.icon}
-                <span>{option.label}</span>
-              </Button>
-            </li>
-          ))}
+        <ul className="grid grid-cols-2 gap-2">
+          {options
+            .filter((option) => option.criteria(props))
+            .map((option) => (
+              <li key={option.value}>
+                <Button className="grid h-24 w-full place-items-center gap-2.5 p-3 md:h-32">
+                  {option.icon}
+                  <span>{option.label}</span>
+                </Button>
+              </li>
+            ))}
         </ul>
       </Modal.Body>
     </Modal>

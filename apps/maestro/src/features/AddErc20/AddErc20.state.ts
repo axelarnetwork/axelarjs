@@ -22,7 +22,7 @@ export const INITIAL_STATE = {
   tokenDetails: {
     tokenName: "",
     tokenSymbol: "",
-    tokenDecimals: 0,
+    tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
