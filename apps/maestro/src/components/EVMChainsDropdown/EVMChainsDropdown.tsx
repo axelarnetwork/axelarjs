@@ -11,7 +11,6 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
-  EVMChainsDropdownProvider,
   useEVMChainsDropdownContainer,
   withEVMChainsDropdownProvider,
 } from "./EVMChainsDropdown.state";
