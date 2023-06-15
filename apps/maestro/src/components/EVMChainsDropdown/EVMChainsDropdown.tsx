@@ -5,6 +5,7 @@ import { useState, type FC } from "react";
 import Image from "next/image";
 
 import clsx from "clsx";
+import { HelpCircleIcon } from "lucide-react";
 import { find } from "rambda";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -97,6 +98,8 @@ const EVMChainsDropdown: FC<Props> = (props) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log({ selectedChain });
+
   return (
     <Dropdown align="end">
       {props.renderTrigger?.() ?? (
@@ -114,7 +117,20 @@ const EVMChainsDropdown: FC<Props> = (props) => {
             setIsOpen(!isOpen);
           }}
         >
-          {selectedChain ? (
+          {/* if both selectedChain and onSelectedChain exist, 
+              operate in controlled mode 
+          */}
+          {props.selectedChain && props.onSelectChain ? (
+            <>
+              <ChainIcon
+                src={props.selectedChain.image}
+                alt={props.selectedChain.chain_name}
+                size="sm"
+                className={props.chainIconClassName}
+              />
+              {!props.compact && <span>{props.selectedChain.name}</span>}
+            </>
+          ) : selectedChain ? (
             <>
               <ChainIcon
                 src={selectedChain.image}
@@ -125,12 +141,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
               {!props.compact && <span>{selectedChain.name}</span>}
             </>
           ) : (
-            <ChainIcon
-              src="/logos/chains/ethereum.svg"
-              alt="Ethereum"
-              size="sm"
-              className={props.chainIconClassName}
-            />
+            <HelpCircleIcon size="24" className={props.chainIconClassName} />
           )}
         </Dropdown.Trigger>
       )}
