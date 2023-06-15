@@ -2,12 +2,12 @@ import { Button, Dialog, LinkButton } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
+import EVMChainsDropdown from "~/components/EVMChainsDropdown/EVMChainsDropdown";
 import {
   AddErc20StateProvider,
   useAddErc20StateContainer,
   type TokenDetails,
 } from "./AddErc20.state";
-import { TokenRegistration } from "./TokenRegistration";
 
 const StepLoading = () => (
   <div className="grid h-64 place-items-center">
@@ -60,10 +60,18 @@ const AddErc20: FC<AddErc20Props> = () => {
         </Button>
       )}
     >
-      <Dialog.Body $as="section" className="border-t md:border-0">
+      <Dialog.Body $as="section">
         <Dialog.CornerCloseAction />
         <Dialog.Title className="flex items-center gap-1 sm:gap-2">
-          <TokenRegistration />
+          <span>
+            Register <span className="hidden sm:inline">origin</span> token on:{" "}
+          </span>
+          <EVMChainsDropdown
+            compact
+            disabled={state.isPreExistingToken}
+            contentClassName="translate-x-28 sm:translate-x-40"
+            triggerClassName="btn-sm btn-circle"
+          />
         </Dialog.Title>
 
         <StepsSummary currentStep={state.step} />

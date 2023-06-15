@@ -150,11 +150,7 @@ export const MintInterchainToken: FC<Props> = (props) => {
       <Modal.Body className="flex h-96 flex-col">
         <Modal.Title className="flex">
           <span>Mint interchain tokens on</span>
-          <EVMChainsDropdown
-            disabled
-            compact
-            selectedChain={props.sourceChain}
-          />
+          <EVMChainsDropdown disabled compact />
         </Modal.Title>
         <form
           className="flex flex-1 flex-col justify-between"

@@ -203,11 +203,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
               selectedChain={selectedToChain}
               chains={eligibleTargetChains}
               disabled={isFormDisabled || eligibleTargetChains.length <= 1}
-              onSwitchNetwork={(chain_id) => {
-                const target = computed.indexedByChainId[chain_id];
-                if (target) {
-                  setToChainId(target?.chain_id);
-                }
+              onSelectChain={(chain) => {
+                setToChainId(chain?.chain_id);
               }}
             />
           </div>

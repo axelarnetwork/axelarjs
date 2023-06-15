@@ -50,6 +50,7 @@ const TokenDetails: FC = () => {
         <FormControl>
           <Label>Token Name</Label>
           <TextInput
+            className="bg-base-200"
             bordered
             placeholder="Enter your token name"
             disabled={isReadonly}
@@ -59,6 +60,7 @@ const TokenDetails: FC = () => {
         <FormControl>
           <Label>Token Symbol</Label>
           <TextInput
+            className="bg-base-200"
             bordered
             placeholder="Enter your token symbol"
             maxLength={11}
@@ -69,6 +71,7 @@ const TokenDetails: FC = () => {
         <FormControl>
           <Label>Token Decimals</Label>
           <TextInput
+            className="bg-base-200"
             bordered
             type="number"
             placeholder="Enter your token decimals"
