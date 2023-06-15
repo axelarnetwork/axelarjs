@@ -68,6 +68,7 @@ const DialogRoot: FC<DialogProps> = (props) => {
     <>
       {trigger}
       <StyledDialog ref={dialogRef} open={state.isOpen} onClose={actions.close}>
+        {state.isOpen && <div className="modal-backdrop bg-base-300/50" />}
         {props.children}
       </StyledDialog>
     </>
