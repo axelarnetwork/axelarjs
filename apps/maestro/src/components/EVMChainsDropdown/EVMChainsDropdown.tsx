@@ -9,6 +9,10 @@ import { find } from "rambda";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import {
+  useEVMChainsDropdownContainer,
+  withEVMChainsDropdownProvider,
+} from "./EVMChainsDropdown.state";
 
 const iconSizes = {
   xs: 14,
@@ -44,14 +48,15 @@ export const ChainIcon: FC<{
 };
 
 type Props = {
-  onSwitchNetwork?: (chainId: number) => void;
-  selectedChain?: EVMChainConfig;
   chains?: EVMChainConfig[];
   compact?: boolean;
   disabled?: boolean;
   triggerClassName?: string;
   chainIconClassName?: string;
+  contentClassName?: string;
   renderTrigger?: () => React.ReactNode;
+  selectedChain?: EVMChainConfig;
+  onSelectChain?: (chain: EVMChainConfig) => void;
 };
 
 const EVMChainsDropdown: FC<Props> = (props) => {
@@ -59,20 +64,28 @@ const EVMChainsDropdown: FC<Props> = (props) => {
   const { chain } = useNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
 
-  const [selectedChainId, setSelectedChainId] = useState<number | undefined>(
-    props.selectedChain?.chain_id
+  const [state, actions] = useEVMChainsDropdownContainer();
+
+  const selectedChain = Maybe.of(evmChains).mapOrUndefined(
+    find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
   );
 
-  const defaultSelectedChain = Maybe.of(evmChains).mapOrUndefined(
-    find((x) => [chain?.id, selectedChainId].includes(x.chain_id))
+  const eligibleChains = Maybe.of(props.chains ?? evmChains).mapOr(
+    [],
+    (chains) =>
+      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 
-  const onSwitchNetwork = props.onSwitchNetwork ?? switchNetworkAsync;
-
-  const handleChainChange = (chainId: number) => {
+  const handleChainChange = async (chainId: number) => {
     try {
-      setSelectedChainId(chainId);
-      onSwitchNetwork?.(chainId);
+      if (props.onSelectChain) {
+        props.onSelectChain(
+          eligibleChains.find((x) => x.chain_id === chainId)!
+        );
+      } else {
+        await switchNetworkAsync?.(chainId);
+        actions.selectChainId(chainId);
+      }
     } catch (error) {
       if (process.env.NODE_ENV === "development") {
         if (error instanceof Error) {
@@ -83,14 +96,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-
-  const selectedChain = props.selectedChain ?? defaultSelectedChain;
-
-  const eligibleChains = Maybe.of(props.chains ?? evmChains).mapOr(
-    [],
-    (chains) =>
-      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
-  );
 
   return (
     <Dropdown align="end">
@@ -135,9 +140,10 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           className={clsx(
             "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",
             {
-              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 translate-x-4 overflow-x-scroll md:w-96":
+              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
                 props.compact,
-            }
+            },
+            props.contentClassName
           )}
         >
           {eligibleChains.map((chain) => (
@@ -145,7 +151,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
               key={chain.chain_id}
               className={clsx({
                 "pointer-events-none":
-                  chain.chain_id === props.selectedChain?.chain_id,
+                  chain.chain_id === selectedChain?.chain_id,
               })}
             >
               {/* rome-ignore lint/a11y/useValidAnchor: needed by daisyui */}
@@ -168,4 +174,4 @@ const EVMChainsDropdown: FC<Props> = (props) => {
   );
 };
 
-export default EVMChainsDropdown;
+export default withEVMChainsDropdownProvider(EVMChainsDropdown);

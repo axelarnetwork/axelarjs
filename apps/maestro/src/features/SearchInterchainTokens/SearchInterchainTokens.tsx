@@ -4,10 +4,7 @@ import { useEffect, useState, type FC } from "react";
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 
-import EVMChainsDropdown, {
-  ChainIcon,
-} from "~/components/EVMChainsDropdown/EVMChainsDropdown";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import EVMChainsDropdown from "~/components/EVMChainsDropdown/EVMChainsDropdown";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
@@ -23,9 +20,6 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
   const [search, setSearch] = useState<string>("");
 
   const { chain } = useNetwork();
-  const { data: evmChains } = useEVMChainConfigsQuery();
-
-  const selectedChain = evmChains?.find((c) => c.chain_id === chain?.id);
 
   const isValidAddress = isAddress(search as `0x${string}`);
 
@@ -70,15 +64,12 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
         <span>
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
-          ) : selectedChain ? (
-            <ChainIcon
-              src={selectedChain.image}
-              className="h-6 w-6"
-              size="md"
-              alt={selectedChain.name}
-            />
           ) : (
-            <EVMChainsDropdown triggerClassName="btn-sm btn-circle" compact />
+            <EVMChainsDropdown
+              triggerClassName="btn-sm btn-circle"
+              contentClassName="translate-x-4 translate-y-2 sm:w-96"
+              compact
+            />
           )}
         </span>
       </InputGroup>

@@ -10,34 +10,25 @@ import {
   useIsSticky,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import React, { useEffect, useMemo, type FC } from "react";
+import React, { useEffect, type FC } from "react";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
 import { MenuIcon } from "lucide-react";
-import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useLayoutStateContainer } from "./MainLayout.state";
 
 export type AppbarProps = {};
 
 const Appbar: FC<AppbarProps> = () => {
   const { disconnect } = useDisconnect();
-  const { chain } = useNetwork();
   const { isConnected, address } = useAccount();
-  const { switchNetworkAsync } = useSwitchNetwork();
+
   const router = useRouter();
-
-  const { data: evmChains } = useEVMChainConfigsQuery();
-
-  const selectedChain = useMemo(
-    () => evmChains?.find?.((x) => x.chain_id === chain?.id),
-    [chain, evmChains]
-  );
 
   const isSticky = useIsSticky(100);
 
@@ -112,9 +103,6 @@ const Appbar: FC<AppbarProps> = () => {
           {isConnected && address ? (
             <>
               <EVMChainsDropdown
-                onSwitchNetwork={switchNetworkAsync}
-                selectedChain={selectedChain}
-                chains={evmChains}
                 triggerClassName="w-full md:w-auto rounded-full"
                 chainIconClassName="-translate-x-1.5"
               />
