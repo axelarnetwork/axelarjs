@@ -129,7 +129,7 @@ export const Step3: FC = () => {
               </Label.AltText>
             )}
           </Label>
-          <div className="bg-base-300 flex flex-wrap gap-1 rounded-3xl p-4 sm:gap-2">
+          <div className="bg-base-300 grid grid-cols-2 justify-start gap-1 rounded-3xl p-4 sm:grid-cols-3 sm:gap-2">
             {eligibleChains?.map((chain) => {
               const isSelected = rootState.selectedChains.includes(
                 chain.chain_name
@@ -142,18 +142,17 @@ export const Step3: FC = () => {
                   position="top"
                 >
                   <Button
-                    ghost={true}
-                    className="rounded-2xl hover:ring"
+                    className="relative w-full rounded-2xl hover:ring"
                     size="sm"
                     role="button"
-                    color="primary"
+                    variant={isSelected ? "success" : "neutral"}
                     outline={isSelected}
                     onClick={() => {
                       rootActions.toggleAdditionalChain(chain.chain_name);
                     }}
                   >
                     <Image
-                      className="pointer-events-none -translate-x-2 rounded-full"
+                      className="pointer-events-none absolute left-3 -translate-x-2 rounded-full"
                       src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
                       width={24}
                       height={24}
