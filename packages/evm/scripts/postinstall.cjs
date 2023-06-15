@@ -5,7 +5,7 @@ const stripAnsi = require("strip-ansi");
 
 const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs-sdk";
 
-const pad = (n = 0) => " ".repeat(n);
+const pad = (n = 0, char = " ") => char.repeat(n);
 
 /**
  *
@@ -30,12 +30,7 @@ function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
 
   const border = h.repeat(maxLength);
 
-  console.log({ padding });
-
-  const py =
-    padding / 2 >= 1
-      ? [...new Array(padding / 2)].fill(`${v}${pad(maxLength)}${v}`).join("\n")
-      : "";
+  const py = `\n${v}${pad(maxLength)}${v}`.repeat(padding / 2);
 
   console.log(`
 ${tl}${border}${tr}${py}
@@ -95,7 +90,7 @@ async function main() {
   // check for latest version on npm
   const { version: latest } = await packageJson(name, {
     version: "latest",
-  }).catch(() => ({ version }));
+  }).catch(() => ({ version: "2.0.0" }));
 
   if (version == latest) {
     // nothing to see here
