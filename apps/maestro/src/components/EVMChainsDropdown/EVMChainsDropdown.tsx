@@ -1,7 +1,7 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { Dropdown } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { useState, type FC } from "react";
+import { useMemo, useState, type FC } from "react";
 import Image from "next/image";
 
 import clsx from "clsx";
@@ -11,6 +11,7 @@ import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
+  EVMChainsDropdownProvider,
   useEVMChainsDropdownContainer,
   withEVMChainsDropdownProvider,
 } from "./EVMChainsDropdown.state";
@@ -67,8 +68,12 @@ const EVMChainsDropdown: FC<Props> = (props) => {
 
   const [state, actions] = useEVMChainsDropdownContainer();
 
-  const selectedChain = Maybe.of(evmChains).mapOrUndefined(
-    find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
+  const selectedChain = useMemo(
+    () =>
+      Maybe.of(evmChains).mapOrUndefined(
+        find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
+      ),
+    [chain?.id, evmChains, state.selectedChainId]
   );
 
   const eligibleChains = Maybe.of(props.chains ?? evmChains).mapOr(
@@ -85,7 +90,10 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         );
       } else {
         await switchNetworkAsync?.(chainId);
-        actions.selectChainId(chainId);
+        if (!chain) {
+          // only update state if not connected to a chain
+          actions.selectChainId(chainId);
+        }
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") {
@@ -97,8 +105,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-
-  console.log({ selectedChain });
 
   return (
     <Dropdown align="end">
@@ -184,5 +190,4 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     </Dropdown>
   );
 };
-
 export default withEVMChainsDropdownProvider(EVMChainsDropdown);
