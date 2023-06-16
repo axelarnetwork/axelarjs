@@ -81,24 +81,19 @@ const AddErc20: FC<AddErc20Props> = () => {
               onClick={actions.prevStep}
               shape="square"
               size="lg"
-              className="absolute left-0 top-0 rounded-none rounded-br-lg"
+              className="absolute left-0 top-0 rounded-none rounded-br-2xl"
             />
           )}
-
-          <span
-            className={clsx({
-              "ml-14": showBackButton,
-            })}
-          >
+          <span className={clsx("-translate-y-2", { "ml-14": showBackButton })}>
             Register <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
           <EVMChainsDropdown
             compact
             disabled={state.isPreExistingToken}
-            contentClassName={clsx("translate-x-28 sm:translate-x-40", {
+            contentClassName={clsx("translate-x-28 sm:translate-x-40 z-40", {
               "translate-x-20 sm:translate-x-40": showBackButton,
             })}
-            triggerClassName="btn-sm btn-circle"
+            triggerClassName="btn-sm btn-circle -translate-y-1 active:-translate-y-1"
           />
         </Dialog.Title>
 
