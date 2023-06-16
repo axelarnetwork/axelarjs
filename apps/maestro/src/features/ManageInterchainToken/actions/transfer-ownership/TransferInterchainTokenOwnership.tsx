@@ -1,8 +1,8 @@
 import {
   Button,
+  Dialog,
   FormControl,
   Label,
-  Modal,
   TextInput,
   toast,
 } from "@axelarjs/ui";
@@ -110,9 +110,9 @@ export const TransferInterchainTokenOwnership: FC = () => {
 
   return (
     <>
-      <Modal.Title className="flex">
+      <Dialog.Title className="flex">
         <span>Transfer token ownership</span>
-      </Modal.Title>
+      </Dialog.Title>
       <form
         className="flex flex-1 flex-col justify-between gap-4"
         onSubmit={handleSubmit(submitHandler)}

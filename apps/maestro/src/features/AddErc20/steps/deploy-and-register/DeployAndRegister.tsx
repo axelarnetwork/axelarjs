@@ -15,8 +15,6 @@ import React, {
 } from "react";
 import Image from "next/image";
 
-import clsx from "clsx";
-
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";
 import { NextButton } from "~/features/AddErc20/steps/shared";
@@ -42,6 +40,9 @@ export const Step3: FC = () => {
         rootActions.setTxState(txState);
         rootActions.nextStep();
         actions.setIsDeploying(false);
+      }
+      if (txState.type === "pending_approval") {
+        rootActions.setTxState(txState);
       }
     },
   });
@@ -110,9 +111,13 @@ export const Step3: FC = () => {
   const hasTxError = Boolean(deployInterchainTokenError);
 
   const buttonChildren = useMemo(() => {
-    if (state.isDeploying) {
+    if (rootState.txState.type === "pending_approval") {
+      return "Check your wallet";
+    }
+    if (rootState.txState.type === "deploying") {
       return "Deploying interchain token";
     }
+
     if (state.isGasPriceQueryLoading) {
       return "Loading gas fees";
     }
@@ -134,9 +139,9 @@ export const Step3: FC = () => {
     );
   }, [
     state.gasFees?.length,
-    state.isDeploying,
     state.isGasPriceQueryError,
     state.isGasPriceQueryLoading,
+    rootState.txState,
   ]);
 
   return (
@@ -204,13 +209,7 @@ export const Step3: FC = () => {
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
           onClick={() => formSubmitRef.current?.click()}
         >
-          <span
-            className={clsx({
-              "hidden md:inline": state.isDeploying,
-            })}
-          >
-            {buttonChildren}
-          </span>
+          <span>{buttonChildren}</span>
         </NextButton>
       </Dialog.Actions>
     </>

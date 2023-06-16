@@ -21,7 +21,6 @@ test("Index page", async ({ page }) => {
     await expect(connectedWalletDropdownTrigger).toBeEnabled();
   } else {
     // is connected
-
     await expect(connectedWalletDropdownTrigger).toBeEnabled();
 
     connectedWalletDropdownTrigger.click();

@@ -3,7 +3,12 @@ import { useMemo, type ComponentType, type FC } from "react";
 import dynamic from "next/dynamic";
 
 import clsx from "clsx";
-import { CoinsIcon, GiftIcon } from "lucide-react";
+import {
+  CoinsIcon,
+  GiftIcon,
+  // PackageCheckIcon,
+  // SendIcon
+} from "lucide-react";
 
 import {
   INITIAL_STATE,
@@ -43,7 +48,7 @@ const ACTIONS: Record<InterchainTokenAction, ComponentType<any>> = {
   mint: MintInterchainToken,
   transferOwnership: TransferOwnership,
   // acceptOwnership: TransferOwnership,
-  // interchainTransfer: StepLoading,
+  //interchainTransfer: StepLoading,
 };
 
 type Props = {

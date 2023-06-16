@@ -8,6 +8,9 @@ export type DeployAndRegisterTransactionState =
       type: "idle";
     }
   | {
+      type: "pending_approval";
+    }
+  | {
       type: "deploying";
       txHash: `0x${string}`;
     }

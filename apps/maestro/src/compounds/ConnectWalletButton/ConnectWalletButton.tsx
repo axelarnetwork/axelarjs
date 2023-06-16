@@ -11,11 +11,13 @@ type Props = ButtonProps;
 const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
   (props, ref) => {
     const { open } = useWeb3Modal();
-    const { connectors } = useConnect();
+    const { connect } = useConnect();
 
-    const handleConnect = () => {
-      if (IS_E2E_TEST && connectors[0]) {
-        connectors[0].connect();
+    const handleConnect = async () => {
+      if (IS_E2E_TEST) {
+        connect({
+          chainId: 1,
+        });
       } else {
         open();
       }

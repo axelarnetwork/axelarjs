@@ -115,6 +115,10 @@ export function useDeployInterchainTokenMutation(config: {
           32
         ) as `0x${string}`;
 
+        onStatusUpdate({
+          type: "pending_approval",
+        });
+
         const tx = await deployInterchainTokenAsync({
           args: [
             input.tokenName,
