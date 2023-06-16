@@ -151,7 +151,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         </Dropdown.Trigger>
       )}
 
-      {eligibleChains.length > 0 && (
+      {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
           className={clsx(
             "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",

@@ -1,13 +1,12 @@
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
-import { type FC } from "react";
 
 import type { TransactionState } from "~/lib/hooks/useTransaction";
 
 export type InterchainTokenAction =
   | "mint"
-  | "interchainTransfer"
-  | "transferOwnership"
-  | "acceptOwnership";
+  //| "interchainTransfer"
+  | "transferOwnership";
+//  | "acceptOwnership";
 
 export const INITIAL_STATE = {
   selectedAction: null as InterchainTokenAction | null,
@@ -15,6 +14,7 @@ export const INITIAL_STATE = {
   transactionState: {
     status: "idle",
   } as TransactionState,
+  tokenAddress: `0x` as `0x${string}`,
 };
 
 function useManageInterchainTokenState(initialState = INITIAL_STATE) {
@@ -45,7 +45,13 @@ function useManageInterchainTokenState(initialState = INITIAL_STATE) {
       });
     },
     reset: () => {
-      setState(INITIAL_STATE);
+      setState((draft) => {
+        draft.selectedAction = null;
+        draft.isModalOpen = false;
+        draft.transactionState = {
+          status: "idle",
+        };
+      });
     },
     setTransactionState: (transactionState: TransactionState) => {
       setState((state) => {
@@ -61,17 +67,3 @@ export const {
   Provider: ManageInterchainTokenProvider,
   useContainer: useManageInterchainTokenContainer,
 } = createContainer(useManageInterchainTokenState);
-
-export function withManageInterchainTokenProvider<TProps = {}>(
-  Component: FC<TProps>
-) {
-  const Inner = (props: TProps) => (
-    <ManageInterchainTokenProvider>
-      <Component {...(props as TProps & JSX.IntrinsicAttributes)} />
-    </ManageInterchainTokenProvider>
-  );
-  Inner.displayName = `withManageInterchainTokenProvider(${
-    Component.displayName ?? Component.name ?? "Component"
-  })`;
-  return Inner;
-}

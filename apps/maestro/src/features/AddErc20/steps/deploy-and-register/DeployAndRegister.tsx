@@ -17,10 +17,10 @@ import Image from "next/image";
 
 import clsx from "clsx";
 
+import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
+import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";
+import { NextButton } from "~/features/AddErc20/steps/shared";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useAddErc20StateContainer } from "../../AddErc20.state";
-import { useDeployInterchainTokenMutation } from "../../hooks/useDeployInterchainTokenMutation";
-import { NextButton, PrevButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
@@ -109,12 +109,42 @@ export const Step3: FC = () => {
 
   const hasTxError = Boolean(deployInterchainTokenError);
 
+  const buttonChildren = useMemo(() => {
+    if (state.isDeploying) {
+      return "Deploying interchain token";
+    }
+    if (state.isGasPriceQueryLoading) {
+      return "Loading gas fees";
+    }
+    if (state.isGasPriceQueryError) {
+      return "Failed to load gas prices";
+    }
+    return (
+      <>
+        Deploy{" "}
+        {Boolean(state.gasFees?.length) && (
+          <>
+            {state.gasFees?.length && <span>and register</span>}
+            {` on ${state.gasFees?.length} chain${
+              Number(state.gasFees?.length) > 1 ? "s" : ""
+            }`}
+          </>
+        )}
+      </>
+    );
+  }, [
+    state.gasFees?.length,
+    state.isDeploying,
+    state.isGasPriceQueryError,
+    state.isGasPriceQueryLoading,
+  ]);
+
   return (
     <>
       <form onSubmit={handleSubmit}>
         <FormControl>
           <Label>
-            <Label.Text>Also deploy on this chains (optional):</Label.Text>
+            <Label.Text>Additional chains (optional):</Label.Text>
 
             {Boolean(state.gasFees?.length) && (
               <Label.AltText>
@@ -129,7 +159,7 @@ export const Step3: FC = () => {
               </Label.AltText>
             )}
           </Label>
-          <div className="bg-base-300 grid grid-cols-2 justify-start gap-1 rounded-3xl p-4 sm:grid-cols-3 sm:gap-2">
+          <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
             {eligibleChains?.map((chain) => {
               const isSelected = rootState.selectedChains.includes(
                 chain.chain_name
@@ -168,8 +198,8 @@ export const Step3: FC = () => {
         <button type="submit" ref={formSubmitRef} />
       </form>
       <Dialog.Actions>
-        <PrevButton onClick={rootActions.prevStep}>Token details</PrevButton>
         <NextButton
+          length="block"
           loading={state.isDeploying && !hasTxError}
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
           onClick={() => formSubmitRef.current?.click()}
@@ -179,11 +209,7 @@ export const Step3: FC = () => {
               "hidden md:inline": state.isDeploying,
             })}
           >
-            Deploy{" "}
-            {Boolean(state.gasFees?.length) &&
-              ` on ${state.gasFees?.length} chain${
-                Number(state.gasFees?.length) > 1 ? "s" : ""
-              }`}
+            {buttonChildren}
           </span>
         </NextButton>
       </Dialog.Actions>
