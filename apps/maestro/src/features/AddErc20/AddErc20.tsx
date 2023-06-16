@@ -14,7 +14,12 @@ import { PrevButton } from "./steps/shared";
 
 const StepLoading = () => (
   <div className="grid h-64 place-items-center">
-    <LinkButton loading ghost length="block" className="pointer-events-none">
+    <LinkButton
+      loading
+      variant="ghost"
+      length="block"
+      className="pointer-events-none"
+    >
       Loading...
     </LinkButton>
   </div>

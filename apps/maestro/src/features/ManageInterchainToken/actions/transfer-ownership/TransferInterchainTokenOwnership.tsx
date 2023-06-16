@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Button,
   FormControl,
@@ -7,7 +6,7 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
-import { useCallback, useMemo, useState, type FC } from "react";
+import { useCallback, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -20,31 +19,22 @@ import { useWaitForTransaction } from "wagmi";
 import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
+import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 
 type FormState = {
   recipientAddress: `0x${string}`;
 };
 
-type Props = {
-  trigger?: JSX.Element;
-  tokenAddress: `0x${string}`;
-  tokenId: `0x${string}`;
-  sourceChain: EVMChainConfig;
-  isOpen?: boolean;
-  accountAddress: `0x${string}`;
-  onClose?: () => void;
-};
-
-export const TransferInterchainTokenOwnership: FC<Props> = (props) => {
-  const [isModalOpen, setIsModalOpen] = useState(props.isOpen ?? false);
+export const TransferInterchainTokenOwnership: FC = () => {
   const [txState, setTxState] = useTransactionState();
+  const [state] = useManageInterchainTokenContainer();
 
   const {
     writeAsync: transferOwnershipAsync,
     isLoading: isTransfering,
     data: transferResult,
   } = useTransferInterchainTokenOnwership({
-    address: props.tokenAddress,
+    address: state.tokenAddress,
   });
 
   const trpcContext = trpc.useContext();
@@ -69,12 +59,7 @@ export const TransferInterchainTokenOwnership: FC<Props> = (props) => {
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState,
-    reset: resetForm,
-  } = useForm<FormState>({
+  const { register, handleSubmit, formState } = useForm<FormState>({
     defaultValues: {
       recipientAddress: undefined,
     },
@@ -124,65 +109,50 @@ export const TransferInterchainTokenOwnership: FC<Props> = (props) => {
   }, [txState]);
 
   return (
-    <Modal
-      trigger={props.trigger}
-      disableCloseButton={isTransfering}
-      open={isModalOpen}
-      onOpenChange={(isOpen) => {
-        if (!isOpen) {
-          if (isTransfering) {
-            return;
+    <>
+      <Modal.Title className="flex">
+        <span>Transfer token ownership</span>
+      </Modal.Title>
+      <form
+        className="flex flex-1 flex-col justify-between gap-4"
+        onSubmit={handleSubmit(submitHandler)}
+      >
+        <FormControl>
+          <Label htmlFor="recipientAddress">
+            <Label.Text>Recipient address</Label.Text>
+          </Label>
+          <TextInput
+            id="recipientAddress"
+            bordered
+            placeholder="Enter recipient address"
+            className="bg-base-200"
+            min={0}
+            {...register("recipientAddress", {
+              disabled: isTransfering,
+              validate(value) {
+                if (!value || !isAddress(value)) {
+                  return "Invalid address";
+                }
+
+                return true;
+              },
+            })}
+          />
+        </FormControl>
+
+        <Button
+          color="primary"
+          type="submit"
+          disabled={!formState.isValid || isTransfering}
+          loading={
+            txState.status === "awaiting_approval" ||
+            txState.status === "submitted"
           }
-          props.onClose?.();
-          resetForm();
-        }
-        setIsModalOpen(isOpen);
-      }}
-    >
-      <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title className="flex">
-          <span>Transfer interchain token ownership</span>
-        </Modal.Title>
-        <form
-          className="flex flex-1 flex-col justify-between"
-          onSubmit={handleSubmit(submitHandler)}
         >
-          <FormControl>
-            <Label htmlFor="recipientAddress">
-              <Label.Text>Recipient address</Label.Text>
-            </Label>
-            <TextInput
-              id="recipientAddress"
-              bordered
-              placeholder="Enter recipient address"
-              min={0}
-              {...register("recipientAddress", {
-                disabled: isTransfering,
-                validate(value) {
-                  if (!value || !isAddress(value)) {
-                    return "Invalid address";
-                  }
-
-                  return true;
-                },
-              })}
-            />
-          </FormControl>
-
-          <Button
-            color="primary"
-            type="submit"
-            disabled={!formState.isValid || isTransfering}
-            loading={
-              txState.status === "awaiting_approval" ||
-              txState.status === "submitted"
-            }
-          >
-            {buttonChildren}
-          </Button>
-        </form>
-      </Modal.Body>
-    </Modal>
+          {buttonChildren}
+        </Button>
+      </form>
+    </>
   );
 };
 
