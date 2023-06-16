@@ -165,10 +165,7 @@ export type WagmiEVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
 if (typeof window !== "undefined") {
   logger.info({
     [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NETWORK_ENV}"`]:
-      EVM_CHAIN_CONFIGS.map((x) => ({
-        id: x.id,
-        name: x.name,
-      })),
+      EVM_CHAIN_CONFIGS.map(({ id, name }) => ({ id, name })),
   });
 }
 
@@ -213,29 +210,31 @@ export const getMockWalletClient = () =>
     pollingInterval: 100,
   });
 
+const connectors = IS_E2E_TEST
+  ? [
+      new MockConnector({ options: { walletClient: getMockWalletClient() } }),
+      ...W3M_CONNECTORS,
+    ]
+  : [
+      new CoinbaseWalletConnector({
+        chains: EVM_CHAIN_CONFIGS,
+        options: {
+          appName: APP_NAME,
+        },
+      }),
+      new LedgerConnector({
+        chains: EVM_CHAIN_CONFIGS,
+      }),
+      ...W3M_CONNECTORS,
+    ];
+
 export const wagmiConfig = createConfig({
   autoConnect: true,
   publicClient,
   webSocketPublicClient,
   queryClient,
+  connectors,
   logger, // custom logger
-  connectors: IS_E2E_TEST
-    ? [
-        new MockConnector({ options: { walletClient: getMockWalletClient() } }),
-        ...W3M_CONNECTORS,
-      ]
-    : [
-        new CoinbaseWalletConnector({
-          chains: EVM_CHAIN_CONFIGS,
-          options: {
-            appName: APP_NAME,
-          },
-        }),
-        new LedgerConnector({
-          chains: EVM_CHAIN_CONFIGS,
-        }),
-        ...W3M_CONNECTORS,
-      ],
 });
 
 export const ethereumClient = new EthereumClient(

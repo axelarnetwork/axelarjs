@@ -78,3 +78,15 @@ export function useInterchainTokenServiceDeployRemoteTokens(
     value: config.value,
   });
 }
+
+export function useInterchainTokenServiceSeTokentMintLimit(
+  config: Config & {
+    value: bigint;
+  }
+) {
+  return useContractWrite({
+    abi: ABI,
+    address: config.address,
+    functionName: "setTokenMintLimit",
+  });
+}
