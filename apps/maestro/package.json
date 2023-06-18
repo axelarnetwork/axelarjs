@@ -40,7 +40,7 @@
     "ky": "^0.33.3",
     "logrocket": "^4.0.3",
     "logrocket-react": "^5.0.1",
-    "lucide-react": "^0.244.0",
+    "lucide-react": "^0.245.0",
     "next": "^13.4.6",
     "nprogress": "^0.2.0",
     "rambda": "^7.5.0",

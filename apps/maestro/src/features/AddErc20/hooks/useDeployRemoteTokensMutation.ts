@@ -1,10 +1,6 @@
 import { toast } from "@axelarjs/ui";
 
-import {
-  ContractFunctionRevertedError,
-  TransactionExecutionError,
-  UserRejectedRequestError,
-} from "viem";
+import { TransactionExecutionError, UserRejectedRequestError } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenServiceDeployRemoteTokens } from "~/lib/contract/hooks/useInterchainTokenService";
