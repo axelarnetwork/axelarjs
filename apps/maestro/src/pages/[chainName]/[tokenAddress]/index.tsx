@@ -13,7 +13,11 @@ import { useRouter } from "next/router";
 
 import { ExternalLink } from "lucide-react";
 import { partition, without } from "rambda";
-import { isAddress } from "viem";
+import {
+  isAddress,
+  TransactionExecutionError,
+  UserRejectedRequestError,
+} from "viem";
 import { useAccount, useWaitForTransaction } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
@@ -187,7 +191,7 @@ const RegisterOriginTokenButton = ({
 
   useWaitForTransaction({
     hash: data?.hash,
-    confirmations: 5,
+    confirmations: 8,
     async onSuccess(receipt) {
       onSuccess();
 
@@ -213,6 +217,17 @@ const RegisterOriginTokenButton = ({
         hash: result.hash,
       });
     } catch (error) {
+      if (
+        error instanceof TransactionExecutionError &&
+        error.cause instanceof UserRejectedRequestError
+      ) {
+        toast.error("Transaction rejected by user");
+        setTxState({
+          status: "idle",
+        });
+        return;
+      }
+
       setTxState({
         status: "reverted",
         error: error as Error,

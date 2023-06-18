@@ -34,20 +34,23 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
   useWaitForTransaction({
     hash: acceptResult?.hash,
-    confirmations: 5,
+    confirmations: 8,
     async onSuccess(receipt) {
       if (!acceptResult) {
         return;
       }
 
-      await trpcContext.interchainToken.searchInterchainToken.invalidate();
-      await trpcContext.interchainToken.searchInterchainToken.refetch();
+      await Promise.all([
+        trpcContext.interchainToken.searchInterchainToken.invalidate(),
+        trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
+      ]);
 
-      await trpcContext.interchainToken.getInterchainTokenDetails.invalidate();
-      await trpcContext.interchainToken.getInterchainTokenDetails.refetch();
-
-      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
-      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch();
+      await Promise.all([
+        trpcContext.interchainToken.searchInterchainToken.refetch(),
+        trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
+      ]);
 
       setTxState({
         status: "confirmed",
@@ -63,19 +66,29 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       status: "awaiting_approval",
     });
 
-    const txResult = await acceptOwnershipAsync().catch((error) => {
+    try {
+      const txResult = await acceptOwnershipAsync();
+
+      if (txResult?.hash) {
+        setTxState({
+          status: "submitted",
+          hash: txResult?.hash,
+        });
+      }
+    } catch (error) {
       if (
         error instanceof TransactionExecutionError &&
         error.cause instanceof UserRejectedRequestError
       ) {
-        console.log("User rejected request");
+        toast.error("Transaction rejected by user");
+        setTxState({
+          status: "idle",
+        });
+        return;
       }
-    });
-
-    if (txResult?.hash) {
       setTxState({
-        status: "submitted",
-        hash: txResult?.hash,
+        status: "reverted",
+        error: error as Error,
       });
     }
   }, [setTxState, acceptOwnershipAsync]);
