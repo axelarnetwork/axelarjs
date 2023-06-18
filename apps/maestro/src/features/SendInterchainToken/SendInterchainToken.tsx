@@ -246,6 +246,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               id="amountToSend"
               bordered
               placeholder="Enter your amount to send"
+              className="bg-base-200"
               min={0}
               onKeyDown={(e) => {
                 // prevent non-numeric characters
