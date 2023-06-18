@@ -34,20 +34,23 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
   useWaitForTransaction({
     hash: acceptResult?.hash,
-    confirmations: 5,
+    confirmations: 10,
     async onSuccess(receipt) {
       if (!acceptResult) {
         return;
       }
 
-      await trpcContext.interchainToken.searchInterchainToken.invalidate();
-      await trpcContext.interchainToken.searchInterchainToken.refetch();
+      await Promise.all([
+        trpcContext.interchainToken.searchInterchainToken.invalidate(),
+        trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
+      ]);
 
-      await trpcContext.interchainToken.getInterchainTokenDetails.invalidate();
-      await trpcContext.interchainToken.getInterchainTokenDetails.refetch();
-
-      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
-      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch();
+      await Promise.all([
+        trpcContext.interchainToken.searchInterchainToken.refetch(),
+        trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
+      ]);
 
       setTxState({
         status: "confirmed",

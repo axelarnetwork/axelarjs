@@ -91,7 +91,7 @@ export function useDeployInterchainTokenMutation(config: {
 
   useWaitForTransaction({
     hash: deployInterchainTokenResult?.hash,
-    confirmations: 5,
+    confirmations: 10,
     onSuccess() {
       if (!deployInterchainTokenResult) {
         return;

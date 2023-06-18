@@ -109,8 +109,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               {props.chain.name}
             </span>
           )}
-          {props.isOriginToken &&
-          (balance?.isTokenOwner || balance?.isTokenPendingOwner) ? (
+          {props.isOriginToken && balance?.isTokenOwner ? (
             <ManageInterchainToken
               trigger={
                 <Button

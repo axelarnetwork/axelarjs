@@ -67,7 +67,7 @@ export const MintInterchainToken: FC = () => {
 
   useWaitForTransaction({
     hash: mintResult?.hash,
-    confirmations: 5,
+    confirmations: 10,
     async onSuccess(receipt) {
       if (!mintResult) {
         return;
