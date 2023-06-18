@@ -34,7 +34,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
   useWaitForTransaction({
     hash: acceptResult?.hash,
-    confirmations: 10,
+    confirmations: 8,
     async onSuccess(receipt) {
       if (!acceptResult) {
         return;
@@ -66,19 +66,29 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       status: "awaiting_approval",
     });
 
-    const txResult = await acceptOwnershipAsync().catch((error) => {
+    try {
+      const txResult = await acceptOwnershipAsync();
+
+      if (txResult?.hash) {
+        setTxState({
+          status: "submitted",
+          hash: txResult?.hash,
+        });
+      }
+    } catch (error) {
       if (
         error instanceof TransactionExecutionError &&
         error.cause instanceof UserRejectedRequestError
       ) {
-        console.log("User rejected request");
+        toast.error("Transaction rejected by user");
+        setTxState({
+          status: "idle",
+        });
+        return;
       }
-    });
-
-    if (txResult?.hash) {
       setTxState({
-        status: "submitted",
-        hash: txResult?.hash,
+        status: "reverted",
+        error: error as Error,
       });
     }
   }, [setTxState, acceptOwnershipAsync]);

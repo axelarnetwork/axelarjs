@@ -1,4 +1,10 @@
-import { ContractFunctionRevertedError, UserRejectedRequestError } from "viem";
+import { toast } from "@axelarjs/ui";
+
+import {
+  ContractFunctionRevertedError,
+  TransactionExecutionError,
+  UserRejectedRequestError,
+} from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenServiceDeployRemoteTokens } from "~/lib/contract/hooks/useInterchainTokenService";
@@ -47,15 +53,14 @@ export function useDeployRemoteTokensMutation(gas: bigint) {
       if (input.onFinished) {
         input.onFinished();
       }
-    } catch (e) {
-      if (input.onStatusUpdate) {
-        input.onStatusUpdate({ type: "idle" });
-      }
-      if (e instanceof UserRejectedRequestError) {
-        throw new Error("User rejected the transaction");
-      }
-      if (e instanceof ContractFunctionRevertedError) {
-        throw new Error("Transaction reverted by EVM");
+    } catch (error) {
+      input.onStatusUpdate?.({ type: "idle" });
+
+      if (
+        error instanceof TransactionExecutionError &&
+        error.cause instanceof UserRejectedRequestError
+      ) {
+        toast.error("Transaction rejected by user");
       }
 
       return;

@@ -5,6 +5,7 @@ import {
   Card,
   CopyToClipboardButton,
   SpinnerIcon,
+  toast,
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
@@ -13,6 +14,7 @@ import { useRouter } from "next/router";
 
 import clsx from "clsx";
 import { SettingsIcon } from "lucide-react";
+import { TransactionExecutionError, UserRejectedRequestError } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText";
@@ -63,7 +65,14 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
       router.push(
         `/${sluggify(props.wagmiConfig?.name ?? "")}/${props.tokenAddress}`
       );
-    } catch (error) {}
+    } catch (error) {
+      if (
+        error instanceof TransactionExecutionError &&
+        error.cause instanceof UserRejectedRequestError
+      ) {
+        toast.error("Transaction rejected by user");
+      }
+    }
   }, [
     props.chainId,
     props.tokenAddress,

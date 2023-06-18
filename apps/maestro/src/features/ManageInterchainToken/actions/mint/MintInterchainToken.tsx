@@ -67,14 +67,18 @@ export const MintInterchainToken: FC = () => {
 
   useWaitForTransaction({
     hash: mintResult?.hash,
-    confirmations: 10,
+    confirmations: 8,
     async onSuccess(receipt) {
       if (!mintResult) {
         return;
       }
 
       await trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate();
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
+        chainId,
+        tokenAddress: state.tokenAddress,
+        owner: accountAddress as `0x${string}`,
+      });
 
       setTxState({
         status: "confirmed",
@@ -105,22 +109,28 @@ export const MintInterchainToken: FC = () => {
 
     invariant(accountAddress, "Account address is required");
 
-    const txResult = await mintTokenAsync({
-      args: [accountAddress, adjustedAmount],
-    }).catch((error) => {
+    try {
+      const txResult = await mintTokenAsync({
+        args: [accountAddress, adjustedAmount],
+      });
+
+      if (txResult?.hash) {
+        setTxState({
+          status: "submitted",
+          hash: txResult?.hash,
+        });
+      }
+    } catch (error) {
+      setTxState({
+        status: "reverted",
+        error: error as Error,
+      });
       if (
         error instanceof TransactionExecutionError &&
         error.cause instanceof UserRejectedRequestError
       ) {
         console.log("User rejected request");
       }
-    });
-
-    if (txResult?.hash) {
-      setTxState({
-        status: "submitted",
-        hash: txResult?.hash,
-      });
     }
   };
 

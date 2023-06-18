@@ -1,11 +1,8 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 
-import {
-  ContractFunctionRevertedError,
-  TransactionExecutionError,
-  UserRejectedRequestError,
-} from "viem";
+import { TransactionExecutionError, UserRejectedRequestError } from "viem";
 import {
   useAccount,
   useMutation,
@@ -91,7 +88,7 @@ export function useDeployInterchainTokenMutation(config: {
 
   useWaitForTransaction({
     hash: deployInterchainTokenResult?.hash,
-    confirmations: 10,
+    confirmations: 8,
     onSuccess() {
       if (!deployInterchainTokenResult) {
         return;
@@ -108,17 +105,16 @@ export function useDeployInterchainTokenMutation(config: {
 
       currentInput = input;
 
+      //deploy and register tokens
+      const salt = hexZeroPad(
+        hexlify(Math.floor(Math.random() * 1_000_000_000)),
+        32
+      ) as `0x${string}`;
+
+      onStatusUpdate({
+        type: "pending_approval",
+      });
       try {
-        //deploy and register tokens
-        const salt = hexZeroPad(
-          hexlify(Math.floor(Math.random() * 1_000_000_000)),
-          32
-        ) as `0x${string}`;
-
-        onStatusUpdate({
-          type: "pending_approval",
-        });
-
         const tx = await deployInterchainTokenAsync({
           args: [
             input.tokenName,
@@ -130,26 +126,22 @@ export function useDeployInterchainTokenMutation(config: {
             input.gasFees,
           ],
         });
-
+        if (tx?.hash) {
+          onStatusUpdate({
+            type: "deploying",
+            txHash: tx.hash,
+          });
+        }
+      } catch (error) {
         onStatusUpdate({
-          type: "deploying",
-          txHash: tx.hash,
+          type: "idle",
         });
-      } catch (e) {
-        onStatusUpdate({ type: "idle" });
-
-        if (e instanceof TransactionExecutionError) {
-          throw e;
+        if (
+          error instanceof TransactionExecutionError &&
+          error.cause instanceof UserRejectedRequestError
+        ) {
+          toast.error("Transaction rejected by user");
         }
-        if (e instanceof UserRejectedRequestError) {
-          throw new Error("User rejected the transaction");
-        }
-
-        if (e instanceof ContractFunctionRevertedError) {
-          throw new Error("Transaction reverted by EVM");
-        }
-
-        return;
       }
     }
   );

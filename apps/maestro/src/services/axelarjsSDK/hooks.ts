@@ -9,6 +9,7 @@ const staleTime = 1000 * 60 * 2; // 2 minutes
 export function useEstimateGasFee(params: EstimateGasFeeParams) {
   return trpc.axelarjsSDK.estimateGasFee.useQuery(params, {
     staleTime,
+    enabled: Boolean(params.destinationChainId),
   });
 }
 

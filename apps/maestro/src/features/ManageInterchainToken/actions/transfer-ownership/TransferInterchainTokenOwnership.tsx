@@ -14,7 +14,7 @@ import {
   TransactionExecutionError,
   UserRejectedRequestError,
 } from "viem";
-import { useWaitForTransaction } from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
@@ -29,6 +29,9 @@ export const TransferInterchainTokenOwnership: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
 
+  const { address: accountAddress } = useAccount();
+  const chainId = useChainId();
+
   const {
     writeAsync: transferOwnershipAsync,
     isLoading: isTransfering,
@@ -41,14 +44,25 @@ export const TransferInterchainTokenOwnership: FC = () => {
 
   useWaitForTransaction({
     hash: transferResult?.hash,
-    confirmations: 10,
+    confirmations: 8,
     async onSuccess(receipt) {
       if (!transferResult) {
         return;
       }
 
-      await trpcContext.interchainToken.searchInterchainToken.invalidate();
-      await trpcContext.interchainToken.searchInterchainToken.refetch();
+      await Promise.all([
+        trpcContext.interchainToken.searchInterchainToken.invalidate(),
+        trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
+      ]);
+
+      await Promise.all([
+        trpcContext.interchainToken.searchInterchainToken.refetch(),
+        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
+          tokenAddress: state.tokenAddress,
+          chainId: chainId,
+          owner: accountAddress as `0x${string}`,
+        }),
+      ]);
 
       setTxState({
         status: "confirmed",
@@ -75,22 +89,29 @@ export const TransferInterchainTokenOwnership: FC = () => {
         status: "awaiting_approval",
       });
 
-      const txResult = await transferOwnershipAsync({
-        args: [data.recipientAddress],
-      }).catch((error) => {
+      try {
+        const txResult = await transferOwnershipAsync({
+          args: [data.recipientAddress],
+        });
+
+        if (txResult?.hash) {
+          setTxState({
+            status: "submitted",
+            hash: txResult?.hash,
+          });
+        }
+      } catch (error) {
+        setTxState({
+          status: "reverted",
+          error: error as Error,
+        });
+
         if (
           error instanceof TransactionExecutionError &&
           error.cause instanceof UserRejectedRequestError
         ) {
           console.log("User rejected request");
         }
-      });
-
-      if (txResult?.hash) {
-        setTxState({
-          status: "submitted",
-          hash: txResult?.hash,
-        });
       }
     },
     [setTxState, transferOwnershipAsync]

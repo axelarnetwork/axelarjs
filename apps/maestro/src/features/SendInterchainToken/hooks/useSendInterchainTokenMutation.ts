@@ -1,3 +1,5 @@
+import { toast } from "@axelarjs/ui";
+
 import {
   parseUnits,
   TransactionExecutionError,
@@ -71,27 +73,30 @@ export function useSendInterchainTokenMutation(
 
         const txResult = await transferAsync({
           args: [config.destinationChainId, address, bnAmount, `0x`],
-        }).catch((error) => {
-          if (
-            error instanceof TransactionExecutionError &&
-            error.cause instanceof UserRejectedRequestError
-          ) {
-            console.log("User rejected request");
-          }
         });
-
         if (txResult?.hash) {
           onStatusUpdate?.({
             status: "submitted",
             hash: txResult.hash,
           });
         }
-      } catch (e) {
-        if (e instanceof Error) {
+      } catch (error) {
+        if (
+          error instanceof TransactionExecutionError &&
+          error.cause instanceof UserRejectedRequestError
+        ) {
+          toast.error("Transaction rejected by user");
+
+          onStatusUpdate?.({
+            status: "idle",
+          });
+          return;
+        }
+
+        if (error instanceof Error) {
           onStatusUpdate?.({
             status: "reverted",
-
-            error: e,
+            error: error,
           });
         } else {
           onStatusUpdate?.({
