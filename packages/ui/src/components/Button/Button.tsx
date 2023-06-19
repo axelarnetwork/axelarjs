@@ -3,6 +3,8 @@ import { forwardRef } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
+import { Loading } from "../Loading";
+
 export const buttonVariance = cva("btn", {
   variants: {
     /**
@@ -154,7 +156,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...componentProps}
         ref={ref}
       >
-        {props.loading && <span className="loading loading-spinner" />}
+        {props.loading && (
+          <Loading
+            size={props.size === "xs" ? "xs" : "sm"}
+            variant={props.variant}
+          />
+        )}
         {props.children}
       </button>
     );
