@@ -56,15 +56,12 @@ export const Loading: FC<LoadingProps> = ({
   className,
   children,
   ...props
-}) => {
-  console.log({ variant, shape, size });
-  return (
-    <StyledLoading
-      className={twMerge(loadingVariance({ variant, shape, size }), className)}
-      {...props}
-    />
-  );
-};
+}) => (
+  <StyledLoading
+    className={twMerge(loadingVariance({ variant, shape, size }), className)}
+    {...props}
+  />
+);
 
 Loading.defaultProps = {
   shape: "dots",

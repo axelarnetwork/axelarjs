@@ -24,10 +24,10 @@ export type AlertProps = ComponentProps<typeof StyledAlert> &
   };
 
 const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
-  info: <Info />,
-  success: <CheckCircle />,
-  warning: <AlertTriangle />,
-  error: <XCircle />,
+  info: <Info className="h-6 w-6" />,
+  success: <CheckCircle className="h-6 w-6" />,
+  warning: <AlertTriangle className="h-6 w-6" />,
+  error: <XCircle className="h-6 w-6" />,
 };
 
 export const Alert: FC<AlertProps> = ({
