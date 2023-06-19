@@ -24,8 +24,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2(prettier@2.8.8)
       eslint:
-        specifier: ^8.42.0
-        version: 8.42.0
+        specifier: ^8.43.0
+        version: 8.43.0
       husky:
         specifier: ^8.0.3
         version: 8.0.3
@@ -67,7 +67,7 @@ importers:
         version: link:../../packages/utils
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.1.1(react-hook-form@7.44.3)
+        version: 3.1.1(react-hook-form@7.45.0)
       '@sentry/nextjs':
         specifier: ^7.55.2
         version: 7.55.2(next@13.4.6)(react@18.2.0)
@@ -138,8 +138,8 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
       react-hook-form:
-        specifier: ^7.44.3
-        version: 7.44.3(react@18.2.0)
+        specifier: ^7.45.0
+        version: 7.45.0(react@18.2.0)
       react-spinners:
         specifier: ^0.13.8
         version: 0.13.8(react-dom@18.2.0)(react@18.2.0)
@@ -266,8 +266,8 @@ importers:
         specifier: ^4.3.9
         version: 4.3.9(@types/node@18.15.3)
       vitest:
-        specifier: ^0.32.0
-        version: 0.32.0(happy-dom@9.20.3)
+        specifier: ^0.32.2
+        version: 0.32.2(happy-dom@9.20.3)
 
   packages/config:
     devDependencies:
@@ -336,8 +336,8 @@ importers:
         specifier: ^5.1.3
         version: 5.1.3
       vitest:
-        specifier: ^0.32.0
-        version: 0.32.0(happy-dom@9.20.3)
+        specifier: ^0.32.2
+        version: 0.32.2(happy-dom@9.20.3)
 
   packages/evm:
     dependencies:
@@ -661,8 +661,8 @@ importers:
         specifier: ^4.3.9
         version: 4.3.9(@types/node@18.15.3)
       vitest:
-        specifier: ^0.32.0
-        version: 0.32.0(happy-dom@9.20.3)
+        specifier: ^0.32.2
+        version: 0.32.2(happy-dom@9.20.3)
 
 packages:
 
@@ -4046,16 +4046,6 @@ packages:
     dev: true
     optional: true
 
-  /@eslint-community/eslint-utils@4.4.0(eslint@8.42.0):
-    resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    peerDependencies:
-      eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
-    dependencies:
-      eslint: 8.42.0
-      eslint-visitor-keys: 3.4.1
-    dev: true
-
   /@eslint-community/eslint-utils@4.4.0(eslint@8.43.0):
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -4084,11 +4074,6 @@ packages:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
-
-  /@eslint/js@8.42.0:
-    resolution: {integrity: sha512-6SWlXpWU5AvId8Ac7zjzmIOqMOba/JWY8XZ4A7q7Gn1Vlfg/SFFIlrtHXt9nPn4op9ZPAkl91Jao+QQv3r/ukw==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    dev: true
 
   /@eslint/js@8.43.0:
     resolution: {integrity: sha512-s2UHCoiXfxMvmfzqoN+vrQ84ahUSYde9qNO1MdxmoEhyHWsfmwOpFlwYV+ePJEVc7gFnATGUi376WowX1N7tFg==}
@@ -4446,12 +4431,12 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@hookform/resolvers@3.1.1(react-hook-form@7.44.3):
+  /@hookform/resolvers@3.1.1(react-hook-form@7.45.0):
     resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.44.3(react@18.2.0)
+      react-hook-form: 7.45.0(react@18.2.0)
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -7892,29 +7877,12 @@ packages:
       - supports-color
     dev: true
 
-  /@vitest/expect@0.32.0:
-    resolution: {integrity: sha512-VxVHhIxKw9Lux+O9bwLEEk2gzOUe93xuFHy9SzYWnnoYZFYg1NfBtnfnYWiJN7yooJ7KNElCK5YtA7DTZvtXtg==}
-    dependencies:
-      '@vitest/spy': 0.32.0
-      '@vitest/utils': 0.32.0
-      chai: 4.3.7
-    dev: true
-
   /@vitest/expect@0.32.2:
     resolution: {integrity: sha512-6q5yzweLnyEv5Zz1fqK5u5E83LU+gOMVBDuxBl2d2Jfx1BAp5M+rZgc5mlyqdnxquyoiOXpXmFNkcGcfFnFH3Q==}
     dependencies:
       '@vitest/spy': 0.32.2
       '@vitest/utils': 0.32.2
       chai: 4.3.7
-    dev: true
-
-  /@vitest/runner@0.32.0:
-    resolution: {integrity: sha512-QpCmRxftHkr72xt5A08xTEs9I4iWEXIOCHWhQQguWOKE4QH7DXSKZSOFibuwEIMAD7G0ERvtUyQn7iPWIqSwmw==}
-    dependencies:
-      '@vitest/utils': 0.32.0
-      concordance: 5.0.4
-      p-limit: 4.0.0
-      pathe: 1.1.1
     dev: true
 
   /@vitest/runner@0.32.2:
@@ -7926,14 +7894,6 @@ packages:
       pathe: 1.1.1
     dev: true
 
-  /@vitest/snapshot@0.32.0:
-    resolution: {integrity: sha512-yCKorPWjEnzpUxQpGlxulujTcSPgkblwGzAUEL+z01FTUg/YuCDZ8dxr9sHA08oO2EwxzHXNLjQKWJ2zc2a19Q==}
-    dependencies:
-      magic-string: 0.30.0
-      pathe: 1.1.1
-      pretty-format: 27.5.1
-    dev: true
-
   /@vitest/snapshot@0.32.2:
     resolution: {integrity: sha512-JwhpeH/PPc7GJX38vEfCy9LtRzf9F4er7i4OsAJyV7sjPwjj+AIR8cUgpMTWK4S3TiamzopcTyLsZDMuldoi5A==}
     dependencies:
@@ -7942,24 +7902,10 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@vitest/spy@0.32.0:
-    resolution: {integrity: sha512-MruAPlM0uyiq3d53BkwTeShXY0rYEfhNGQzVO5GHBmmX3clsxcWp79mMnkOVcV244sNTeDcHbcPFWIjOI4tZvw==}
-    dependencies:
-      tinyspy: 2.1.1
-    dev: true
-
   /@vitest/spy@0.32.2:
     resolution: {integrity: sha512-Q/ZNILJ4ca/VzQbRM8ur3Si5Sardsh1HofatG9wsJY1RfEaw0XKP8IVax2lI1qnrk9YPuG9LA2LkZ0EI/3d4ug==}
     dependencies:
       tinyspy: 2.1.1
-    dev: true
-
-  /@vitest/utils@0.32.0:
-    resolution: {integrity: sha512-53yXunzx47MmbuvcOPpLaVljHaeSu1G2dHdmy7+9ngMnQIkBQcvwOcoclWFnxDMxFbnq8exAfh3aKSZaK71J5A==}
-    dependencies:
-      concordance: 5.0.4
-      loupe: 2.3.6
-      pretty-format: 27.5.1
     dev: true
 
   /@vitest/utils@0.32.2:
@@ -10764,54 +10710,6 @@ packages:
   /eslint-visitor-keys@3.4.1:
     resolution: {integrity: sha512-pZnmmLwYzf+kWaM/Qgrvpen51upAktaaiI01nsJD/Yr3lMOdNtq0cxkrrg16w64VtisN6okbs7Q8AfGqj4c9fA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-
-  /eslint@8.42.0:
-    resolution: {integrity: sha512-ulg9Ms6E1WPf67PHaEY4/6E2tEn5/f7FXGzr3t9cBMugOmf1INYvuUwwh1aXQN4MfJ6a5K2iNwP3w4AColvI9A==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    hasBin: true
-    dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@8.42.0)
-      '@eslint-community/regexpp': 4.5.1
-      '@eslint/eslintrc': 2.0.3
-      '@eslint/js': 8.42.0
-      '@humanwhocodes/config-array': 0.11.10
-      '@humanwhocodes/module-importer': 1.0.1
-      '@nodelib/fs.walk': 1.2.8
-      ajv: 6.12.6
-      chalk: 4.1.2
-      cross-spawn: 7.0.3
-      debug: 4.3.4
-      doctrine: 3.0.0
-      escape-string-regexp: 4.0.0
-      eslint-scope: 7.2.0
-      eslint-visitor-keys: 3.4.1
-      espree: 9.5.2
-      esquery: 1.5.0
-      esutils: 2.0.3
-      fast-deep-equal: 3.1.3
-      file-entry-cache: 6.0.1
-      find-up: 5.0.0
-      glob-parent: 6.0.2
-      globals: 13.20.0
-      graphemer: 1.4.0
-      ignore: 5.2.4
-      import-fresh: 3.3.0
-      imurmurhash: 0.1.4
-      is-glob: 4.0.3
-      is-path-inside: 3.0.3
-      js-yaml: 4.1.0
-      json-stable-stringify-without-jsonify: 1.0.1
-      levn: 0.4.1
-      lodash.merge: 4.6.2
-      minimatch: 3.1.2
-      natural-compare: 1.4.0
-      optionator: 0.9.1
-      strip-ansi: 6.0.1
-      strip-json-comments: 3.1.1
-      text-table: 0.2.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
 
   /eslint@8.43.0:
     resolution: {integrity: sha512-aaCpf2JqqKesMFGgmRPessmVKjcGXqdlAYLLC3THM8t5nBRZRQ+st5WM/hoJXkdioEXLLbXgclUpM0TXo5HX5Q==}
@@ -14622,8 +14520,8 @@ packages:
       react-is: 18.1.0
     dev: true
 
-  /react-hook-form@7.44.3(react@18.2.0):
-    resolution: {integrity: sha512-/tHId6p2ViAka1wECMw8FEPn/oz/w226zehHrJyQ1oIzCBNMIJCaj6ZkQcv+MjDxYh9MWR7RQic7Qqwe4a5nkw==}
+  /react-hook-form@7.45.0(react@18.2.0):
+    resolution: {integrity: sha512-AbHeZ4ad+0dEIknSW9dBgIwcvRDfZ1O97sgj75WaMdOX0eg8TBiUf9wxzVkIjZbk76BBIE9lmFOzyD4PN80ZQg==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
@@ -16571,27 +16469,6 @@ packages:
       - zod
     dev: false
 
-  /vite-node@0.32.0(@types/node@18.16.1):
-    resolution: {integrity: sha512-220P/y8YacYAU+daOAqiGEFXx2A8AwjadDzQqos6wSukjvvTWNqleJSwoUn0ckyNdjHIKoxn93Nh1vWBqEKr3Q==}
-    engines: {node: '>=v14.18.0'}
-    hasBin: true
-    dependencies:
-      cac: 6.7.14
-      debug: 4.3.4
-      mlly: 1.3.0
-      pathe: 1.1.1
-      picocolors: 1.0.0
-      vite: 4.3.9(@types/node@18.16.1)
-    transitivePeerDependencies:
-      - '@types/node'
-      - less
-      - sass
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-    dev: true
-
   /vite-node@0.32.2(@types/node@18.16.1):
     resolution: {integrity: sha512-dTQ1DCLwl2aEseov7cfQ+kDMNJpM1ebpyMMMwWzBvLbis8Nla/6c9WQcqpPssTwS6Rp/+U6KwlIj8Eapw4bLdA==}
     engines: {node: '>=v14.18.0'}
@@ -16677,72 +16554,6 @@ packages:
       rollup: 3.23.1
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
-
-  /vitest@0.32.0(happy-dom@9.20.3):
-    resolution: {integrity: sha512-SW83o629gCqnV3BqBnTxhB10DAwzwEx3z+rqYZESehUB+eWsJxwcBQx7CKy0otuGMJTYh7qCVuUX23HkftGl/Q==}
-    engines: {node: '>=v14.18.0'}
-    hasBin: true
-    peerDependencies:
-      '@edge-runtime/vm': '*'
-      '@vitest/browser': '*'
-      '@vitest/ui': '*'
-      happy-dom: '*'
-      jsdom: '*'
-      playwright: '*'
-      safaridriver: '*'
-      webdriverio: '*'
-    peerDependenciesMeta:
-      '@edge-runtime/vm':
-        optional: true
-      '@vitest/browser':
-        optional: true
-      '@vitest/ui':
-        optional: true
-      happy-dom:
-        optional: true
-      jsdom:
-        optional: true
-      playwright:
-        optional: true
-      safaridriver:
-        optional: true
-      webdriverio:
-        optional: true
-    dependencies:
-      '@types/chai': 4.3.5
-      '@types/chai-subset': 1.3.3
-      '@types/node': 18.16.1
-      '@vitest/expect': 0.32.0
-      '@vitest/runner': 0.32.0
-      '@vitest/snapshot': 0.32.0
-      '@vitest/spy': 0.32.0
-      '@vitest/utils': 0.32.0
-      acorn: 8.8.2
-      acorn-walk: 8.2.0
-      cac: 6.7.14
-      chai: 4.3.7
-      concordance: 5.0.4
-      debug: 4.3.4
-      happy-dom: 9.20.3
-      local-pkg: 0.4.3
-      magic-string: 0.30.0
-      pathe: 1.1.1
-      picocolors: 1.0.0
-      std-env: 3.3.3
-      strip-literal: 1.0.1
-      tinybench: 2.5.0
-      tinypool: 0.5.0
-      vite: 4.3.9(@types/node@18.16.1)
-      vite-node: 0.32.0(@types/node@18.16.1)
-      why-is-node-running: 2.2.2
-    transitivePeerDependencies:
-      - less
-      - sass
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
     dev: true
 
   /vitest@0.32.2(happy-dom@9.20.3):
