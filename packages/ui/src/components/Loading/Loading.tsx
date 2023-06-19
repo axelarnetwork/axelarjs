@@ -1,7 +1,8 @@
-import { FC, forwardRef } from "react";
+import { ComponentProps, FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
+import tw from "tailwind-styled-components";
 
 export const loadingVariance = cva("btn", {
   variants: {
@@ -43,33 +44,28 @@ export const loadingVariance = cva("btn", {
   },
 });
 
-type VProps = VariantProps<typeof loadingVariance>;
+const StyledLoading = tw.span`loading`;
 
-export type LoadingProps = JSX.IntrinsicElements["span"] & VProps;
+export type LoadingProps = ComponentProps<typeof StyledLoading> &
+  VariantProps<typeof loadingVariance>;
 
-export type LinkLoadingProps = JSX.IntrinsicElements["a"] &
-  VProps & {
-    loading?: boolean;
-  };
-
-const getSegmentedProps = <T extends LoadingProps | LinkLoadingProps>(
-  props: T
-) => {
-  const { className, size, variant, shape, children, ...componentProps } =
-    props;
-
-  return [
-    twMerge(loadingVariance({ size, variant, shape }), className),
-    componentProps,
-  ] as const;
-};
-
-export const Loading: FC<LoadingProps> = (props) => {
-  const [className, componentProps] = getSegmentedProps(props);
-
-  return <Loading className={className} {...componentProps} />;
+export const Loading: FC<LoadingProps> = ({
+  variant,
+  shape,
+  size,
+  className,
+  children,
+  ...props
+}) => {
+  return (
+    <StyledLoading
+      className={twMerge(loadingVariance({ variant, shape, size }), className)}
+      {...props}
+    />
+  );
 };
 
 Loading.defaultProps = {
   shape: "spinner",
+  size: "md",
 };
