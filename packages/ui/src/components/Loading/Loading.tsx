@@ -64,6 +64,6 @@ export const Loading: FC<LoadingProps> = ({
 );
 
 Loading.defaultProps = {
-  shape: "dots",
-  size: "lg",
+  shape: "spinner",
+  size: "md",
 };
