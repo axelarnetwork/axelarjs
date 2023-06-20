@@ -3,6 +3,7 @@ import { pluralizeKeys } from "@axelarjs/utils";
 import { Meta, StoryFn } from "@storybook/react";
 
 import { COLOR_VARIANTS, SIZE_VARIANTS } from "~/theme";
+import { AxelarBlueIcon, AxelarIcon } from "../icons";
 import { configurePlayground } from "../StoryPlayground";
 import { Button } from "./Button";
 
@@ -22,6 +23,12 @@ const Template: StoryFn<typeof Button> = (args) => {
 
 export const Default = Template.bind({});
 
+export const Loading = Template.bind({});
+
+Loading.args = {
+  loading: true,
+};
+
 // creates stories for variansts (color, size, shape)
 const { Colors, Sizes, Shapes } = pluralizeKeys(
   configurePlayground(Button, {
@@ -29,7 +36,12 @@ const { Colors, Sizes, Shapes } = pluralizeKeys(
     size: { values: SIZE_VARIANTS },
     shape: {
       values: ["circle", "square"],
-      getChildren: (value) => (value === "circle" ? "🔵" : "🟢"),
+      getChildren: (value) =>
+        value === "circle" ? (
+          <AxelarBlueIcon className="h-6 w-6" />
+        ) : (
+          <AxelarIcon className="h-6 w-6 dark:invert" />
+        ),
     },
   })
 );
