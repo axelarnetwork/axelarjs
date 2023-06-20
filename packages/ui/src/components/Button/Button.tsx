@@ -3,6 +3,7 @@ import { forwardRef } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
+import { isColorVariant } from "~/theme";
 import { Loading } from "../Loading";
 
 export const buttonVariance = cva("btn", {
@@ -159,7 +160,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {props.loading && (
           <Loading
             size={props.size === "xs" ? "xs" : "sm"}
-            variant={props.variant}
+            color={isColorVariant(props.variant) ? props.variant : undefined}
           />
         )}
         {props.children}
