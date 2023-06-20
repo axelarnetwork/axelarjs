@@ -4,7 +4,7 @@ import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 import tw from "tailwind-styled-components";
 
-export const loadingVariance = cva("btn", {
+export const loadingVariance = cva("loading", {
   variants: {
     /**
      * The size of the loading indicator
@@ -18,7 +18,7 @@ export const loadingVariance = cva("btn", {
     /**
      * The color of the loading indicator, configurable in the theme
      **/
-    variant: {
+    color: {
       primary: "text-primary",
       secondary: "text-secondary",
       neutral: "text-neutral",
@@ -27,8 +27,6 @@ export const loadingVariance = cva("btn", {
       success: "text-success",
       warning: "text-warning",
       error: "text-error",
-      ghost: "text-ghost",
-      link: "text-link",
     },
     /**
      * The shape of the loading indicator (circle or square)
@@ -44,21 +42,21 @@ export const loadingVariance = cva("btn", {
   },
 });
 
-const StyledLoading = tw.span`loading`;
+const StyledLoading = tw.span``;
 
 export type LoadingProps = ComponentProps<typeof StyledLoading> &
   VariantProps<typeof loadingVariance>;
 
 export const Loading: FC<LoadingProps> = ({
-  variant,
   shape,
   size,
+  color,
   className,
   children,
   ...props
 }) => (
   <StyledLoading
-    className={twMerge(loadingVariance({ variant, shape, size }), className)}
+    className={twMerge(loadingVariance({ shape, color, size }), className)}
     {...props}
   />
 );
