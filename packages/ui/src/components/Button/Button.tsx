@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-import { isColorVariant } from "~/theme";
+import { isColorVariant } from "../../theme";
 import { Loading } from "../Loading";
 
 export const buttonVariance = cva("btn", {
