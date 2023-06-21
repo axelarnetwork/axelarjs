@@ -14,8 +14,8 @@ import React, { useEffect, type FC } from "react";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
-import { MenuIcon } from "lucide-react";
-import { useAccount, useDisconnect } from "wagmi";
+import { ExternalLinkIcon, MenuIcon } from "lucide-react";
+import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
@@ -27,6 +27,7 @@ export type AppbarProps = {};
 const Appbar: FC<AppbarProps> = () => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
+  const { chain } = useNetwork();
 
   const router = useRouter();
 
@@ -115,7 +116,7 @@ const Appbar: FC<AppbarProps> = () => {
                     <Identicon address={address ?? ""} diameter={18} />
                   </button>
                 </Dropdown.Trigger>
-                <Dropdown.Content className="dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-4 p-4 md:w-48">
+                <Dropdown.Content className="bg-base-100 dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-2 p-3 md:w-48">
                   <>
                     <CopyToClipboardButton
                       size="sm"
@@ -126,9 +127,22 @@ const Appbar: FC<AppbarProps> = () => {
                       <Identicon address={address ?? ""} diameter={18} />{" "}
                       {maskAddress(address)}
                     </CopyToClipboardButton>
+
+                    <LinkButton
+                      size="sm"
+                      variant="info"
+                      outline
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={`${chain?.blockExplorers?.default.url}/address/${address}`}
+                      className="flex flex-nowrap items-center gap-1"
+                    >
+                      View on {chain?.blockExplorers?.default.name}{" "}
+                      <ExternalLinkIcon className="h-[1em] w-[1em]" />
+                    </LinkButton>
                     <Button
                       size="sm"
-                      color="error"
+                      variant="error"
                       onClick={() => disconnect()}
                     >
                       Disconnect
