@@ -30,6 +30,21 @@ const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
   error: <XCircle className="h-6 w-6" />,
 };
 
+/**
+ * This is an alert component
+ *
+ * @param {string} props.status - The status of the alert
+ * @param {ReactNode} props.icon - The icon of the alert
+ * @param {string} props.className - The class name of the alert
+ * @param {ReactNode} props.children - The children of the alert
+ *
+ * @returns {JSX.Element}
+ *
+ * @example
+ * <Alert status="info" icon={<Info className="h-6 w-6" />}>
+ *  This is an alert
+ * </Alert>
+ */
 export const Alert: FC<AlertProps> = ({
   status,
   icon,
