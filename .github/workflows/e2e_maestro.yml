@@ -3,7 +3,7 @@ on:
   - pull_request
 
 jobs:
-  setup-and-test:
+  wait-for-preview-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,10 +22,17 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
       - name: Install playwright
-        run: npx playwright install
+        run: pnpx playwright install
 
       - name: Run tests
         env:
           NEXT_PUBLIC_E2E_URL: ${{ steps.waitForDeploy.outputs.url }}
-        run: npm run e2e:maestro
+        run: pnpm e2e:maestro
