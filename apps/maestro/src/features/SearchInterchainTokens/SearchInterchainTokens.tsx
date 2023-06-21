@@ -1,4 +1,10 @@
-import { FormControl, InputGroup, SpinnerIcon, TextInput } from "@axelarjs/ui";
+import {
+  FormControl,
+  InputGroup,
+  SpinnerIcon,
+  TextInput,
+  Tooltip,
+} from "@axelarjs/ui";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type FC } from "react";
 
@@ -108,17 +114,22 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
-            <EVMChainsDropdown
-              triggerClassName="btn-sm btn-circle"
-              contentClassName="translate-x-4 translate-y-2 sm:w-96"
-              compact
-              selectedChain={defaultChain}
-              onSelectChain={
-                !connectedChain
-                  ? (chain) => setSelectedChainId(chain.chain_id)
-                  : undefined
-              }
-            />
+            <Tooltip
+              tip={`search on ${defaultChain?.name ?? "all chains"}`}
+              className="tooltip-left md:tooltip-top"
+            >
+              <EVMChainsDropdown
+                triggerClassName="btn-sm btn-circle"
+                contentClassName="translate-x-4 translate-y-2 sm:w-96"
+                compact
+                selectedChain={defaultChain}
+                onSelectChain={
+                  !connectedChain
+                    ? (chain) => setSelectedChainId(chain.chain_id)
+                    : undefined
+                }
+              />
+            </Tooltip>
           )}
         </span>
       </InputGroup>
