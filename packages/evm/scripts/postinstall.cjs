@@ -3,7 +3,7 @@ const packageJson = require("package-json");
 const chalk = require("chalk");
 const stripAnsi = require("strip-ansi");
 
-const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs-sdk";
+const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs";
 
 const pad = (n = 0, char = " ") => char.repeat(n);
 
