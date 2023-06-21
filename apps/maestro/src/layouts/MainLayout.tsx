@@ -12,7 +12,8 @@ import type { FC, PropsWithChildren } from "react";
 
 import { Web3Modal } from "@web3modal/react";
 
-import { ethereumClient, WALLECTCONNECT_PROJECT_ID } from "~/config/wagmi";
+import { NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID } from "~/config/env";
+import { ethereumClient } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
 import Appbar from "./Appbar";
 import {
@@ -69,7 +70,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         </Drawer.Side>
       </Drawer>
       <Web3Modal
-        projectId={WALLECTCONNECT_PROJECT_ID}
+        projectId={NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
         ethereumClient={ethereumClient}
         themeMode={theme ?? "light"}
         defaultChain={defaultChain}
