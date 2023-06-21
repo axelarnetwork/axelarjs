@@ -32,7 +32,7 @@ const StatusIndicator = (
     return null;
   }
 
-  const tip = props.isOriginToken ? "orign token" : "registered";
+  const tip = props.isOriginToken ? "origin token" : "registered";
 
   return (
     <Tooltip tip={tip} aria-label={tip} position="left">
