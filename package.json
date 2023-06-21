@@ -25,7 +25,7 @@
     "cs": "pnpm changeset",
     "cs:version": "pnpm: changeset:version",
     "cs:publish": "pnpm changeset:publish",
-    "e2e:maestro": "pnpm -C ./apps/maestro run test:e2e"
+    "e2e:maestro": "pnpm -C ./apps/maestro run ci:e2e"
   },
   "keywords": [
     "Axelar Network",

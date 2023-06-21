@@ -13,7 +13,8 @@
     "start": "next start",
     "lint": "next lint",
     "dev:e2e": "concurrently anvil \"NEXT_PUBLIC_E2E_ENABLED=true pnpm dev\"",
-    "test:e2e": "dotenv -e .env.local npx playwright test --ui"
+    "test:e2e": "dotenv -e .env.local npx playwright test --run",
+    "ci:e2e": "npx playwright test --run"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "0.12.8",
