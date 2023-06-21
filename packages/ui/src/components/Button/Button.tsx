@@ -146,6 +146,19 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   ] as const;
 };
 
+// write tsdoc for this component
+
+/**
+ * A button component
+ *
+ * @param {ButtonProps} props
+ * @returns {JSX.Element}
+ *
+ * @example
+ * <Button variant="primary" size="sm" shape="square" outline>
+ *  Hello World
+ * </Button>
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (props, ref) => {
     const [className, componentProps] = getSegmentedProps(props);
