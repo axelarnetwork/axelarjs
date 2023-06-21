@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("Index page", () => {
+test.describe("Index page", async () => {
   test("Connect/Disconnect wallet", async ({ page }) => {
-    await page.goto(process.env.NEXT_PUBLIC_E2E_URL as string);
+    await page.goto("/");
 
     const connectButton = page
       .locator("button", { hasText: /Connect Wallet/i })

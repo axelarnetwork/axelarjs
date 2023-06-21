@@ -5,7 +5,7 @@ import {
   w3mProvider,
 } from "@web3modal/ethereum";
 import { createWalletClient, http } from "viem";
-import { configureChains, createConfig } from "wagmi";
+import { configureChains, createConfig, type Connector } from "wagmi";
 import {
   arbitrum,
   arbitrumGoerli,
@@ -39,14 +39,11 @@ import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import { logger } from "~/lib/logger";
 import { APP_NAME } from "./app";
-
-export const WALLECTCONNECT_PROJECT_ID = String(
-  process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
-);
-
-export const NETWORK_ENV = String(process.env.NEXT_PUBLIC_NETWORK_ENV) as
-  | "mainnet"
-  | "testnet";
+import {
+  NEXT_PUBLIC_E2E_ENABLED,
+  NEXT_PUBLIC_NETWORK_ENV,
+  NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+} from "./env";
 
 export const EVM_CHAIN_CONFIGS = [
   { ...mainnet, networkNameOnAxelar: "ethereum", environment: "mainnet" },
@@ -158,38 +155,33 @@ export const EVM_CHAIN_CONFIGS = [
     networkNameOnAxelar: "base",
     environment: "testnet",
   },
-].filter((chain) => chain.environment === NETWORK_ENV);
+].filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
 
 export type WagmiEVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
 
 if (typeof window !== "undefined") {
   logger.info({
-    [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NETWORK_ENV}"`]:
+    [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NEXT_PUBLIC_NETWORK_ENV}"`]:
       EVM_CHAIN_CONFIGS.map(({ id, name }) => ({ id, name })),
   });
 }
 
-/**
- * whether the app is running in e2e test mode
- */
-export const IS_E2E_TEST = process.env.NEXT_PUBLIC_E2E_ENABLED === "true";
-
-const { webSocketPublicClient, publicClient } = IS_E2E_TEST
+const { webSocketPublicClient, publicClient } = NEXT_PUBLIC_E2E_ENABLED
   ? configureChains(
       // only use foundry for e2e tests
       [foundry],
       [
         // use jsonRpcProvider as the provider for e2e tests
         jsonRpcProvider({
-          rpc: (chain_) => ({
-            http: chain_.rpcUrls.default.http[0],
+          rpc: ({ rpcUrls }) => ({
+            http: rpcUrls.default.http[0],
           }),
         }),
       ]
     )
   : configureChains(EVM_CHAIN_CONFIGS, [
       w3mProvider({
-        projectId: WALLECTCONNECT_PROJECT_ID,
+        projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
       }),
     ]);
 
@@ -197,22 +189,36 @@ export const queryClient = new QueryClient();
 
 const W3M_CONNECTORS = w3mConnectors({
   chains: EVM_CHAIN_CONFIGS,
-  projectId: WALLECTCONNECT_PROJECT_ID,
+  projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
   version: 2,
 });
 
 export const getMockWalletClient = () =>
   createWalletClient({
     transport: http(foundry.rpcUrls.default.http[0]),
-    chain: foundry,
+    chain: {
+      ...foundry,
+      id: goerli.id,
+      network: goerli.network,
+      name: goerli.name,
+    },
+    name: "Mock Wallet",
     account: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
     key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
     pollingInterval: 100,
   });
 
-const connectors = IS_E2E_TEST
+const connectors: Connector[] = NEXT_PUBLIC_E2E_ENABLED
   ? [
-      new MockConnector({ options: { walletClient: getMockWalletClient() } }),
+      new MockConnector({
+        options: {
+          walletClient: getMockWalletClient(),
+          chainId: goerli.id,
+          flags: {
+            isAuthorized: true,
+          },
+        },
+      }),
       ...W3M_CONNECTORS,
     ]
   : [

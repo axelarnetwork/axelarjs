@@ -18,15 +18,14 @@
     "format": "prettier --write .",
     "storybook": "pnpm -C ./packages/ui run storybook ",
     "build-storybook": "turbo run build-storybook",
-    "docs:dev": "pnpm -C ./apps/docs dev",
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
-    "dev:docs": "pnpm -C ./apps/docs run dev",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "cs": "pnpm changeset",
     "cs:version": "pnpm: changeset:version",
-    "cs:publish": "pnpm changeset:publish"
+    "cs:publish": "pnpm changeset:publish",
+    "e2e:maestro": "pnpm -C ./apps/maestro run ci:e2e"
   },
   "keywords": [
     "Axelar Network",

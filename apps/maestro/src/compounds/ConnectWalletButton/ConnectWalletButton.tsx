@@ -2,9 +2,10 @@ import { Button, type ButtonProps } from "@axelarjs/ui";
 import { forwardRef } from "react";
 
 import { useWeb3Modal } from "@web3modal/react";
+import { goerli } from "viem/chains";
 import { useConnect } from "wagmi";
 
-import { IS_E2E_TEST } from "~/config/wagmi";
+import { NEXT_PUBLIC_E2E_ENABLED } from "~/config/env";
 
 type Props = ButtonProps;
 
@@ -14,9 +15,9 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
     const { connect } = useConnect();
 
     const handleConnect = async () => {
-      if (IS_E2E_TEST) {
+      if (NEXT_PUBLIC_E2E_ENABLED) {
         connect({
-          chainId: 1,
+          chainId: goerli.id,
         });
       } else {
         open();

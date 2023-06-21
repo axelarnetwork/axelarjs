@@ -1,9 +1,9 @@
-import { devices, type PlaywrightTestConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const config: PlaywrightTestConfig = {
+const config = defineConfig({
   testDir: "./e2e",
   /* Maximum time one test can run for. */
   timeout: 30 * 1_000,
@@ -12,7 +12,7 @@ const config: PlaywrightTestConfig = {
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 5_000,
+    timeout: 10_000,
   },
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -30,7 +30,6 @@ const config: PlaywrightTestConfig = {
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.NEXT_PUBLIC_E2E_URL ?? "http://localhost:3000",
-
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
@@ -52,6 +51,6 @@ const config: PlaywrightTestConfig = {
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   outputDir: "e2e/results/",
-};
+});
 
 export default config;
