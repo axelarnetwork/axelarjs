@@ -38,7 +38,7 @@ import { MockConnector } from "wagmi/connectors/mock";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import { logger } from "~/lib/logger";
-import { APP_NAME } from "./app";
+import { APP_NAME } from "../app";
 
 export const WALLECTCONNECT_PROJECT_ID = String(
   process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
@@ -204,7 +204,13 @@ const W3M_CONNECTORS = w3mConnectors({
 export const getMockWalletClient = () =>
   createWalletClient({
     transport: http(foundry.rpcUrls.default.http[0]),
-    chain: foundry,
+    chain: {
+      ...foundry,
+      id: goerli.id,
+      network: goerli.network,
+      name: goerli.name,
+    },
+    name: "Mock Wallet",
     account: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
     key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
     pollingInterval: 100,
@@ -212,7 +218,12 @@ export const getMockWalletClient = () =>
 
 const connectors = IS_E2E_TEST
   ? [
-      new MockConnector({ options: { walletClient: getMockWalletClient() } }),
+      new MockConnector({
+        options: {
+          walletClient: getMockWalletClient(),
+          chainId: goerli.id,
+        },
+      }),
       ...W3M_CONNECTORS,
     ]
   : [
