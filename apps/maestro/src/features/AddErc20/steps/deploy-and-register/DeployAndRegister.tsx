@@ -15,6 +15,9 @@ import React, {
 } from "react";
 import Image from "next/image";
 
+import { propEq } from "rambda";
+import invariant from "tiny-invariant";
+
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";
 import { NextButton } from "~/features/AddErc20/steps/shared";
@@ -31,7 +34,9 @@ export const Step3: FC = () => {
     mutateAsync: deployInterchainToken,
     error: deployInterchainTokenError,
   } = useDeployInterchainTokenMutation({
-    value: BigInt(0),
+    value: state.gasFees?.length
+      ? state.gasFees.reduce((acc, gasFee) => acc + gasFee)
+      : BigInt(0),
     onStatusUpdate(txState) {
       if (txState.type === "deploying") {
         rootActions.setTxState(txState);
@@ -54,12 +59,19 @@ export const Step3: FC = () => {
       if (
         state.isGasPriceQueryLoading ||
         state.isGasPriceQueryError ||
-        !state.gasFees
+        !state.gasFees ||
+        !state.evmChains
       ) {
         console.warn("gas prices not loaded");
         return;
       }
       actions.setIsDeploying(true);
+
+      const sourceChain = state.evmChains.find(
+        propEq("chain_id", state.network.chain?.id)
+      );
+
+      invariant(sourceChain, "source chain not found");
 
       await deployInterchainToken(
         {
@@ -68,9 +80,7 @@ export const Step3: FC = () => {
           decimals: rootState.tokenDetails.tokenDecimals,
           destinationChainIds: Array.from(rootState.selectedChains),
           gasFees: state.gasFees,
-          sourceChainId: state.evmChains?.find(
-            (evmChain) => evmChain.chain_id === state.network.chain?.id
-          )?.chain_name as string,
+          sourceChainId: sourceChain.chain_name,
         },
         {
           onError(error) {

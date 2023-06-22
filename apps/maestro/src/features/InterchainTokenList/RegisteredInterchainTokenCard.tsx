@@ -126,7 +126,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                   aria-label="manage interchain token"
                   className="group absolute right-2 top-2"
                   shape="circle"
-                  variant="neutral"
+                  variant="ghost"
                 >
                   <SettingsIcon className="text-success/75 group-hover:text-success h-5 w-5" />
                 </Button>
