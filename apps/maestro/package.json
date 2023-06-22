@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
-    "@next/bundle-analyzer": "^13.4.6",
+    "@next/bundle-analyzer": "^13.4.7",
     "@playwright/test": "^1.35.1",
     "@tanstack/react-query-devtools": "4.29.12",
     "@types/logrocket-react": "^3.0.0",
