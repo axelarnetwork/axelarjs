@@ -180,8 +180,7 @@ export const Step3: FC = () => {
                     className="relative w-full rounded-2xl hover:ring"
                     size="sm"
                     role="button"
-                    variant={isSelected ? "success" : "neutral"}
-                    outline={isSelected}
+                    variant={isSelected ? "success" : undefined}
                     onClick={() => {
                       rootActions.toggleAdditionalChain(chain.chain_name);
                     }}
