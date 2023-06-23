@@ -1,27 +1,12 @@
-import {
-  Button,
-  Dialog,
-  FormControl,
-  Label,
-  TextInput,
-  toast,
-} from "@axelarjs/ui";
+import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import invariant from "tiny-invariant";
-import {
-  isAddress,
-  TransactionExecutionError,
-  UserRejectedRequestError,
-} from "viem";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import { TransactionExecutionError, UserRejectedRequestError } from "viem";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
-import { useMintInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
-import { useTransactionState } from "~/lib/hooks/useTransaction";
-import { trpc } from "~/lib/trpc";
-import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
+import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
   amountToMint: string;
@@ -39,56 +24,6 @@ const ALLOWED_NON_NUMERIC_KEYS = [
 ];
 
 export const MintInterchainToken: FC = () => {
-  const [txState, setTxState] = useTransactionState();
-  const chainId = useChainId();
-  const { address: accountAddress } = useAccount();
-
-  const [state] = useManageInterchainTokenContainer();
-
-  const { data: erc20Details } = trpc.erc20.getERC20TokenDetails.useQuery(
-    {
-      tokenAddress: state.tokenAddress,
-      chainId,
-    },
-    {
-      enabled: isAddress(state.tokenAddress) && Boolean(chainId),
-    }
-  );
-
-  const {
-    writeAsync: mintTokenAsync,
-    isLoading: isMinting,
-    data: mintResult,
-  } = useMintInterchainToken({
-    address: state.tokenAddress,
-  });
-
-  const trpcContext = trpc.useContext();
-
-  useWaitForTransaction({
-    hash: mintResult?.hash,
-    confirmations: 8,
-    async onSuccess(receipt) {
-      if (!mintResult) {
-        return;
-      }
-
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate();
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
-        chainId,
-        tokenAddress: state.tokenAddress,
-        owner: accountAddress as `0x${string}`,
-      });
-
-      setTxState({
-        status: "confirmed",
-        receipt,
-      });
-
-      toast.success("Successfully minted interchain tokens");
-    },
-  });
-
   const { register, handleSubmit, formState } = useForm<FormState>({
     defaultValues: {
       amountToMint: undefined,
@@ -96,6 +31,11 @@ export const MintInterchainToken: FC = () => {
     mode: "onChange",
     reValidateMode: "onChange",
   });
+
+  const [
+    { txState, accountAddress, erc20Details, isMinting },
+    { setTxState, mintTokenAsync },
+  ] = useMintInterchainTokenState();
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
