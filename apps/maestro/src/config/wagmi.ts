@@ -230,6 +230,7 @@ const connectors: Connector[] = NEXT_PUBLIC_E2E_ENABLED
       }),
       new LedgerConnector({
         chains: EVM_CHAIN_CONFIGS,
+        options: {},
       }),
       ...W3M_CONNECTORS,
     ];
