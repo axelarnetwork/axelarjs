@@ -15,7 +15,7 @@
     "dev:e2e": "concurrently anvil \"NEXT_PUBLIC_E2E_ENABLED=true pnpm dev\"",
     "test:e2e": "dotenv -e .env.local npx playwright test",
     "ci:e2e": "npx playwright test",
-    "test:unit": "vitest --coverage"
+    "test:unit": "NEXT_PUBLIC_E2E_ENABLED=true dotenv -e .env.local vitest --coverage"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "0.12.8",
@@ -63,6 +63,7 @@
     "@playwright/test": "^1.35.1",
     "@tanstack/react-query-devtools": "4.29.12",
     "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/logrocket-react": "^3.0.0",
     "@types/nprogress": "^0.2.0",
     "@types/testing-library__jest-dom": "^5.14.6",
