@@ -174,6 +174,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               onSelectChain={(chain) => {
                 actions.selectToChain(chain?.chain_id);
               }}
+              contentClassName="translate-x-20"
             />
           </div>
         </div>
