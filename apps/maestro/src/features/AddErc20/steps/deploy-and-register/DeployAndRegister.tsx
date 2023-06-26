@@ -20,8 +20,8 @@ import invariant from "tiny-invariant";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";
-import { NextButton } from "~/features/AddErc20/steps/shared";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
