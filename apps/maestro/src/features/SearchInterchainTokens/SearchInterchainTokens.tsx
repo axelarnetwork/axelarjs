@@ -89,12 +89,16 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
     searchERC20Result,
   ]);
 
+  const shouldRenderError =
+    (hasError && !searchERC20Result) ||
+    (!isValidAddress && search.length >= 10);
+
   return (
     <FormControl className="relative w-full max-w-xs md:max-w-md">
       <InputGroup
         className={clsx("rounded-md", {
           "ring-error ring-offset-base-200 rounded-lg ring-1 ring-offset-2":
-            hasError,
+            shouldRenderError,
         })}
       >
         <TextInput
@@ -133,8 +137,7 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
           )}
         </span>
       </InputGroup>
-      {((hasError && !searchERC20Result) ||
-        (!isValidAddress && search.length >= 10)) && (
+      {shouldRenderError && (
         <div role="alert" className="text-error absolute -bottom-9 p-2 text-sm">
           {(searchInterchainTokensError ?? searchERC20Error)?.message ??
             "Invalid ERC-20 token address"}
