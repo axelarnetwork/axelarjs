@@ -7,7 +7,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { HelpCircleIcon } from "lucide-react";
 import { find } from "rambda";
-import { TransactionExecutionError, UserRejectedRequestError } from "viem";
+import { TransactionExecutionError } from "viem";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -96,14 +96,11 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         }
       }
     } catch (error) {
-      if (
-        error instanceof TransactionExecutionError &&
-        error.cause instanceof UserRejectedRequestError
-      ) {
-        toast.error("Transaction rejected by user");
-
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Failed to switch network: ${error.cause.shortMessage}`);
         return;
       }
+
       if (process.env.NODE_ENV === "development") {
         if (error instanceof Error) {
           console.error("failed to switch network:", error.message);

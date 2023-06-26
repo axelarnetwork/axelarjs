@@ -13,11 +13,7 @@ import { useRouter } from "next/router";
 
 import { ExternalLink } from "lucide-react";
 import { partition, without } from "rambda";
-import {
-  isAddress,
-  TransactionExecutionError,
-  UserRejectedRequestError,
-} from "viem";
+import { isAddress, TransactionExecutionError } from "viem";
 import { useAccount, useWaitForTransaction } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
@@ -29,6 +25,7 @@ import Page from "~/layouts/Page";
 import { useInterchainTokenServiceRegisterOriginToken } from "~/lib/contract/hooks/useInterchainTokenService";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
@@ -217,11 +214,9 @@ const RegisterOriginTokenButton = ({
         hash: result.hash,
       });
     } catch (error) {
-      if (
-        error instanceof TransactionExecutionError &&
-        error.cause instanceof UserRejectedRequestError
-      ) {
-        toast.error("Transaction rejected by user");
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
+        logger.error("Failed to register origin token:", error.cause);
         setTxState({
           status: "idle",
         });

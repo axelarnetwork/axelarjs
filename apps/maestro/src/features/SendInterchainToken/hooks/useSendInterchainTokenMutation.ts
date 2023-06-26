@@ -1,16 +1,13 @@
 import { toast } from "@axelarjs/ui";
 
-import {
-  parseUnits,
-  TransactionExecutionError,
-  UserRejectedRequestError,
-} from "viem";
+import { parseUnits, TransactionExecutionError } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useERC20Reads } from "~/lib/contract/hooks/useERC20";
 import { useTransferInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
 import type { TransactionState } from "~/lib/hooks/useTransaction";
+import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 
@@ -81,11 +78,9 @@ export function useSendInterchainTokenMutation(
           });
         }
       } catch (error) {
-        if (
-          error instanceof TransactionExecutionError &&
-          error.cause instanceof UserRejectedRequestError
-        ) {
-          toast.error("Transaction rejected by user");
+        if (error instanceof TransactionExecutionError) {
+          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+          logger.error("Faied to transfer token:", error.cause);
 
           onStatusUpdate?.({
             status: "idle",

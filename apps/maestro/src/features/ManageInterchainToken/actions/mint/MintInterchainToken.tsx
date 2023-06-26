@@ -1,11 +1,19 @@
-import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
+import {
+  Button,
+  Dialog,
+  FormControl,
+  Label,
+  TextInput,
+  toast,
+} from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import invariant from "tiny-invariant";
-import { TransactionExecutionError, UserRejectedRequestError } from "viem";
+import { TransactionExecutionError } from "viem";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
+import { logger } from "~/lib/logger";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
@@ -61,16 +69,20 @@ export const MintInterchainToken: FC = () => {
         });
       }
     } catch (error) {
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Failed to mint tokens: ${error.cause.shortMessage}`);
+        logger.error(`Failed to mint tokens: ${error.cause}`);
+
+        setTxState({
+          status: "idle",
+        });
+        return;
+      }
+
       setTxState({
         status: "reverted",
         error: error as Error,
       });
-      if (
-        error instanceof TransactionExecutionError &&
-        error.cause instanceof UserRejectedRequestError
-      ) {
-        console.log("User rejected request");
-      }
     }
   };
 

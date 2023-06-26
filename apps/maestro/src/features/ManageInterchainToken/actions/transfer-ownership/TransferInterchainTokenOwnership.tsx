@@ -9,15 +9,12 @@ import {
 import { useCallback, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import {
-  isAddress,
-  TransactionExecutionError,
-  UserRejectedRequestError,
-} from "viem";
+import { isAddress, TransactionExecutionError } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 
@@ -101,17 +98,22 @@ export const TransferInterchainTokenOwnership: FC = () => {
           });
         }
       } catch (error) {
+        if (error instanceof TransactionExecutionError) {
+          toast.error(
+            `Failed to transfer token ownership: ${error.cause.shortMessage}`
+          );
+          logger.error(`Failed to transfer token ownership: ${error.cause}`);
+
+          setTxState({
+            status: "idle",
+          });
+          return;
+        }
+
         setTxState({
           status: "reverted",
           error: error as Error,
         });
-
-        if (
-          error instanceof TransactionExecutionError &&
-          error.cause instanceof UserRejectedRequestError
-        ) {
-          console.log("User rejected request");
-        }
       }
     },
     [setTxState, transferOwnershipAsync]
