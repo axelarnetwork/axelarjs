@@ -190,7 +190,6 @@ export const queryClient = new QueryClient();
 const W3M_CONNECTORS = w3mConnectors({
   chains: EVM_CHAIN_CONFIGS,
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  version: 2,
 });
 
 export const getMockWalletClient = () =>
