@@ -30,27 +30,21 @@ export const Step3: FC = () => {
 
   const { state, actions } = useStep3ChainSelectionState();
 
-  const {
-    mutateAsync: deployInterchainToken,
-    error: deployInterchainTokenError,
-  } = useDeployInterchainTokenMutation({
-    value: state.gasFees?.length
-      ? state.gasFees.reduce((acc, gasFee) => acc + gasFee)
-      : BigInt(0),
-    onStatusUpdate(txState) {
-      if (txState.type === "deploying") {
+  const { mutateAsync: deployInterchainTokenAsync } =
+    useDeployInterchainTokenMutation({
+      value: state.gasFees?.length
+        ? state.gasFees.reduce((acc, gasFee) => acc + gasFee)
+        : BigInt(0),
+      onStatusUpdate(txState) {
+        if (txState.type === "deployed") {
+          rootActions.setTxState(txState);
+          rootActions.nextStep();
+          actions.setIsDeploying(false);
+          return;
+        }
         rootActions.setTxState(txState);
-      }
-      if (txState.type === "deployed") {
-        rootActions.setTxState(txState);
-        rootActions.nextStep();
-        actions.setIsDeploying(false);
-      }
-      if (txState.type === "pending_approval") {
-        rootActions.setTxState(txState);
-      }
-    },
-  });
+      },
+    });
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (e) => {
@@ -73,7 +67,7 @@ export const Step3: FC = () => {
 
       invariant(sourceChain, "source chain not found");
 
-      await deployInterchainToken(
+      await deployInterchainTokenAsync(
         {
           tokenName: rootState.tokenDetails.tokenName,
           tokenSymbol: rootState.tokenDetails.tokenSymbol,
@@ -104,7 +98,7 @@ export const Step3: FC = () => {
       rootState.tokenDetails.tokenName,
       rootState.tokenDetails.tokenSymbol,
       rootState.selectedChains,
-      deployInterchainToken,
+      deployInterchainTokenAsync,
     ]
   );
 
@@ -117,8 +111,6 @@ export const Step3: FC = () => {
   );
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);
-
-  const hasTxError = Boolean(deployInterchainTokenError);
 
   const buttonChildren = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
@@ -214,7 +206,10 @@ export const Step3: FC = () => {
       <Dialog.Actions>
         <NextButton
           length="block"
-          loading={state.isDeploying && !hasTxError}
+          loading={
+            rootState.txState.type === "pending_approval" ||
+            rootState.txState.type === "deploying"
+          }
           disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
           onClick={() => formSubmitRef.current?.click()}
         >

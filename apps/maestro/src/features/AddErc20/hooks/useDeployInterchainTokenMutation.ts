@@ -2,7 +2,7 @@ import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 
-import { TransactionExecutionError, UserRejectedRequestError } from "viem";
+import { TransactionExecutionError } from "viem";
 import {
   useAccount,
   useMutation,
@@ -12,6 +12,7 @@ import {
 import { watchContractEvent } from "wagmi/actions";
 
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
+import { logger } from "~/lib/logger";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -136,11 +137,10 @@ export function useDeployInterchainTokenMutation(config: {
         onStatusUpdate({
           type: "idle",
         });
-        if (
-          error instanceof TransactionExecutionError &&
-          error.cause instanceof UserRejectedRequestError
-        ) {
-          toast.error("Transaction rejected by user");
+        if (error instanceof TransactionExecutionError) {
+          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+
+          logger.error("Failed to deploy interchain token", error.cause);
         }
       }
     }

@@ -1,5 +1,5 @@
 import matchers, {
-  TestingLibraryMatchers,
+  type TestingLibraryMatchers,
 } from "@testing-library/jest-dom/matchers";
 import { expect } from "vitest";
 

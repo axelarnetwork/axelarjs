@@ -1,9 +1,10 @@
 import { toast } from "@axelarjs/ui";
 
-import { TransactionExecutionError, UserRejectedRequestError } from "viem";
+import { TransactionExecutionError } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
+import { logger } from "~/lib/logger";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseRegisterInterchainTokenInput = {
@@ -19,14 +20,14 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
 
   const { address } = useAccount();
 
-  const tokenLinker = useInterchainTokenServiceWrites({
+  const interchainTokenService = useInterchainTokenServiceWrites({
     address: String(
       process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
     ) as `0x${string}`,
   });
 
   return useMutation(async (input: UseRegisterInterchainTokenInput) => {
-    if (!(signer && tokenLinker && address)) {
+    if (!(signer && interchainTokenService && address)) {
       return;
     }
 
@@ -34,10 +35,11 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
       //register tokens
 
       const value = input.gasFees.reduce((a, b) => a + b);
-      const txHash = await tokenLinker.registerOriginTokenAndDeployRemoteTokens(
-        [input.tokenAddress, input.destinationChainIds, input.gasFees],
-        { value }
-      );
+      const txHash =
+        await interchainTokenService.registerOriginTokenAndDeployRemoteTokens(
+          [input.tokenAddress, input.destinationChainIds, input.gasFees],
+          { value }
+        );
 
       input.onStatusUpdate?.({
         type: "deployed",
@@ -49,11 +51,12 @@ export function useRegisterOriginTokenAndDeployRemoteTokensMutation() {
     } catch (error) {
       input.onStatusUpdate?.({ type: "idle" });
 
-      if (
-        error instanceof TransactionExecutionError &&
-        error.cause instanceof UserRejectedRequestError
-      ) {
-        toast.error("Transaction rejected by user");
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+        logger.error(
+          "Faied to register originToken and deploy RemoteTokens:",
+          error.cause
+        );
       }
 
       return;

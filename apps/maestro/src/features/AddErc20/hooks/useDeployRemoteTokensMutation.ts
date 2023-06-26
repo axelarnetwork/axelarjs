@@ -1,9 +1,10 @@
 import { toast } from "@axelarjs/ui";
 
-import { TransactionExecutionError, UserRejectedRequestError } from "viem";
+import { TransactionExecutionError } from "viem";
 import { useAccount, useMutation, useWalletClient } from "wagmi";
 
 import { useInterchainTokenServiceDeployRemoteTokens } from "~/lib/contract/hooks/useInterchainTokenService";
+import { logger } from "~/lib/logger";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployRemoteTokenInput = {
@@ -52,11 +53,10 @@ export function useDeployRemoteTokensMutation(gas: bigint) {
     } catch (error) {
       input.onStatusUpdate?.({ type: "idle" });
 
-      if (
-        error instanceof TransactionExecutionError &&
-        error.cause instanceof UserRejectedRequestError
-      ) {
-        toast.error("Transaction rejected by user");
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+
+        logger.error("Faied to accept token ownership:", error.cause);
       }
 
       return;
