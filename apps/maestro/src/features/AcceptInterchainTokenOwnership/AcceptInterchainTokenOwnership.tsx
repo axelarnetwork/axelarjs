@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, toast } from "@axelarjs/ui";
 import { useCallback, useMemo, type FC } from "react";
 
-import { TransactionExecutionError, UserRejectedRequestError } from "viem";
+import { TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
 import { useAcceptInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
@@ -76,11 +76,9 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
         });
       }
     } catch (error) {
-      if (
-        error instanceof TransactionExecutionError &&
-        error.cause instanceof UserRejectedRequestError
-      ) {
-        toast.error("Transaction rejected by user");
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+
         setTxState({
           status: "idle",
         });
