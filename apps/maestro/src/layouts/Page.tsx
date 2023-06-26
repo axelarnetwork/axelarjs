@@ -10,7 +10,7 @@ import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
-import SearchInterchainTokens from "~/features/SearchInterchainTokens";
+import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
@@ -102,7 +102,7 @@ const Page = ({
       case "disconnected":
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
-            <SearchInterchainTokens onTokenFound={handleTokenFound} />
+            <SearchInterchainToken onTokenFound={handleTokenFound} />
           </div>
         ) : (
           children

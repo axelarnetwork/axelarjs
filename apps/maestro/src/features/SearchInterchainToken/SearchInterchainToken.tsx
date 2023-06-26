@@ -17,7 +17,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 
-export type SearchInterchainTokens = {
+export type SearchInterchainTokenProps = {
   onTokenFound: (result: {
     tokenId?: `0x${string}`;
     tokenAddress: `0x${string}`;
@@ -25,7 +25,7 @@ export type SearchInterchainTokens = {
   }) => void;
 };
 
-const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
+const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   const [search, setSearch] = useState<string>("");
 
   const { chain: connectedChain } = useNetwork();
@@ -33,7 +33,7 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
   const { computed } = useEVMChainConfigsQuery();
 
   const [selectedChainId, setSelectedChainId] = useSessionStorageState(
-    "@maestro/SearchInterchainTokens.selectedChainId",
+    "@maestro/SearchInterchainToken.selectedChainId",
     connectedChain?.id ?? 1
   );
   const defaultChain = useMemo(
@@ -55,8 +55,8 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
   });
 
   const {
-    data: searchInterchainTokensResult,
-    error: searchInterchainTokensError,
+    data: searchInterchainTokenResult,
+    error: searchInterchainTokenError,
     isLoading: isSearchingInterchainTokens,
   } = useInterchainTokensQuery({
     chainId: chainId,
@@ -66,24 +66,24 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
   const isLoading = isSearchingERC20 || isSearchingInterchainTokens;
 
   const hasError =
-    Boolean(searchERC20Error || searchInterchainTokensError) && !isLoading;
+    Boolean(searchERC20Error || searchInterchainTokenError) && !isLoading;
 
   useEffect(() => {
     if (
-      (searchInterchainTokensResult?.tokenId &&
-        searchInterchainTokensResult.tokenAddress) ||
+      (searchInterchainTokenResult?.tokenId &&
+        searchInterchainTokenResult.tokenAddress) ||
       searchERC20Result
     ) {
       console.log("tokenFound", { tokenDetails: searchERC20Result });
       props.onTokenFound({
-        tokenId: searchInterchainTokensResult.tokenId,
+        tokenId: searchInterchainTokenResult.tokenId,
         tokenAddress: search as `0x${string}`,
         chainName: searchERC20Result?.chainName,
       });
     }
   }, [
-    searchInterchainTokensResult.tokenAddress,
-    searchInterchainTokensResult.tokenId,
+    searchInterchainTokenResult.tokenAddress,
+    searchInterchainTokenResult.tokenId,
     props,
     search,
     searchERC20Result,
@@ -139,7 +139,7 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
       </InputGroup>
       {shouldRenderError && (
         <div role="alert" className="text-error absolute -bottom-9 p-2 text-sm">
-          {(searchInterchainTokensError ?? searchERC20Error)?.message ??
+          {(searchInterchainTokenError ?? searchERC20Error)?.message ??
             "Invalid ERC-20 token address"}
         </div>
       )}
@@ -147,4 +147,4 @@ const SearchInterchainTokens: FC<SearchInterchainTokens> = (props) => {
   );
 };
 
-export default SearchInterchainTokens;
+export default SearchInterchainToken;

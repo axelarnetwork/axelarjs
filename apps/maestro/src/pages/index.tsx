@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 
 import { useNetwork } from "wagmi";
 
-import SearchInterchainTokens from "~/features/SearchInterchainTokens";
+import SearchInterchainToken from "~/features/SearchInterchainToken";
 import Page from "~/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
@@ -32,7 +32,7 @@ export default function Home() {
       mustBeConnected
     >
       <div className="flex w-full max-w-lg flex-col items-center justify-center">
-        <SearchInterchainTokens onTokenFound={handleTokenFound} />
+        <SearchInterchainToken onTokenFound={handleTokenFound} />
         <div className="divider">OR</div>
         <AddErc20 />
       </div>
