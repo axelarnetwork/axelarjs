@@ -98,7 +98,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   return (
     <FormControl className="relative w-full max-w-xs md:max-w-md">
       <InputGroup
-        className={clsx("rounded-md", {
+        className={clsx("rounded-md transition-transform", {
           "ring-error ring-offset-base-200 -translate-y-3 ring-1 ring-offset-2":
             shouldRenderError,
           "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
