@@ -39,7 +39,6 @@ export function useInterchainTokensQuery(input: {
       {
         chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
         tokenAddress: String(input.tokenAddress),
-        chainIds: input.chainIds ?? uniqueChainsIDs,
       },
       {
         enabled:

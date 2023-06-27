@@ -1,4 +1,5 @@
 import type { InterchainTokenServiceClient } from "@axelarjs/evm";
+import { Maybe } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { always, partition } from "rambda";
@@ -10,13 +11,43 @@ import { publicProcedure } from "~/server/trpc";
 
 const isAddressZero = (address: string) => parseInt(address, 16) === 0;
 
+const aliases = {
+  address64: () => z.string().regex(/^0x[0-9a-f]{64}$/i),
+  address40: () => z.string().regex(/^0x[0-9a-f]{40}$/i),
+};
+const tokenDetails = () => ({
+  tokenId: aliases.address64(),
+  originTokenId: aliases.address64().nullable(),
+  tokenAddress: aliases.address40(),
+  isOriginToken: z.boolean(),
+  isRegistered: z.boolean(),
+  chainId: z.number().nullable(),
+});
+
 export const searchInterchainToken = publicProcedure
+  .meta({
+    openapi: {
+      summary: "Search for an interchain token",
+      description:
+        "Search for an interchain token by address, either on a specific chain or on any chain",
+      method: "GET",
+      path: "/interchain-token/search",
+      tags: ["interchain-token"],
+    },
+  })
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
-      chainIds: z.array(z.number().or(z.string())),
+      tokenAddress: aliases.address40(),
     })
+  )
+  .output(
+    z
+      .object({
+        ...tokenDetails(),
+        matchingTokens: z.array(z.object(tokenDetails())),
+      })
+      .nullable()
   )
   .query(async ({ input, ctx }) => {
     try {
@@ -180,11 +211,13 @@ async function getInterchainTokenDetails(
     tokenAddress,
     isOriginToken,
     isRegistered: parseInt(tokenAddress, 16) > 0,
-    chainId: Number(input.chainId),
+    chainId: Maybe.of(input.chainId).mapOrNull(Number),
   };
 
-  return {
+  const output = {
     ...lookupToken,
     matchingTokens: [lookupToken, ...matchingTokens],
   };
+
+  return output;
 }
