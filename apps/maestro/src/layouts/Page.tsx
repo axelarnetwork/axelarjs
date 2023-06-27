@@ -139,7 +139,7 @@ const Page = ({
                 />
               </div>
               <Button
-                color="primary"
+                variant="primary"
                 length="block"
                 className="max-w-md"
                 onClick={() =>

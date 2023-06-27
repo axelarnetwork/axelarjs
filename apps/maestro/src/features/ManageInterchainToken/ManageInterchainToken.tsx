@@ -65,7 +65,8 @@ type Option = {
   label: string;
   value: InterchainTokenAction;
   icon: JSX.Element;
-  criteria: (props: Props) => boolean;
+  disabled?: boolean;
+  isVisible: (props: Props) => boolean;
 };
 
 export const ManageInterchainToken: FC<Props> = (props) => {
@@ -76,7 +77,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Mint",
       value: "mint",
       icon: <CoinsIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      criteria: (props) => props.isTokenOwner,
+      isVisible: (props) => props.isTokenOwner,
     },
     // {
     //   label: "Interchain Transfer",
@@ -88,7 +89,14 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Transfer Ownership",
       value: "transferOwnership",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      criteria: (props) => props.isTokenOwner && !props.hasPendingOwner,
+      isVisible: (props) => props.isTokenOwner && !props.hasPendingOwner,
+    },
+    {
+      label: "Ownnership Pending Approval",
+      value: "transferOwnership",
+      icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
+      disabled: true,
+      isVisible: (props) => props.isTokenOwner && props.hasPendingOwner,
     },
     // {
     //   label: "Accept Ownership",
@@ -131,12 +139,13 @@ export const ManageInterchainToken: FC<Props> = (props) => {
             </Modal.Title>
             <ul className="grid grid-cols-2 gap-2">
               {options
-                .filter((option) => option.criteria(props))
+                .filter((option) => option.isVisible(props))
                 .map((option) => (
                   <li key={option.value}>
                     <Button
                       className="grid h-24 w-full place-items-center gap-2.5 p-3 md:h-32"
                       onClick={actions.selectAction.bind(null, option.value)}
+                      disabled={option.disabled}
                     >
                       {option.icon}
                       <span>{option.label}</span>

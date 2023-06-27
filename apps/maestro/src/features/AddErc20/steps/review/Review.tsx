@@ -39,7 +39,7 @@ const Review: FC = () => {
       <div className="grid gap-2 sm:gap-3 md:gap-4">
         {state.txState.type === "deployed" && (
           <Alert status="success" className="py-2 sm:py-4">
-            <div>Token deployed and registered successfully!</div>
+            <div>Origin token deployed successfully!</div>
             <div className="flex items-center">
               Address:
               <CopyToClipboardButton
@@ -61,8 +61,11 @@ const Review: FC = () => {
               className="flex items-center gap-2"
               target="_blank"
             >
-              View transaction {maskAddress(state.txState.txHash ?? "")} on{" "}
-              {chain?.blockExplorers?.default.name}{" "}
+              View transaction{" "}
+              <span className="hidden md:inline">
+                {maskAddress(state.txState.txHash ?? "")}
+              </span>{" "}
+              on {chain?.blockExplorers?.default.name}{" "}
               <ExternalLink className="h-4 w-4" />
             </LinkButton>
             {Boolean(state.selectedChains.length) && (
@@ -76,7 +79,7 @@ const Review: FC = () => {
           // if the chain is not the same as the route, we need to refresh the page
           <Dialog.CloseAction
             length="block"
-            color="primary"
+            variant="primary"
             onClick={() => {
               setShouldFetch(true);
               // refresh the page to show the new token
@@ -88,7 +91,7 @@ const Review: FC = () => {
         ) : (
           <Button
             length="block"
-            color="primary"
+            variant="primary"
             disabled={!chain?.name || state.txState.type !== "deployed"}
             onClick={() => {
               if (chain?.name && state.txState.type === "deployed") {

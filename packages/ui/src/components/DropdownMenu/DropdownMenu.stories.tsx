@@ -21,7 +21,9 @@ export const Default = Template.bind({});
 Default.args = {
   children: (
     <>
-      <DropdownMenu.Trigger color="primary">Open Dropdown</DropdownMenu.Trigger>
+      <DropdownMenu.Trigger variant="primary">
+        Open Dropdown
+      </DropdownMenu.Trigger>
       <DropdownMenu.Content rounded className="bg-base-200 w-56 p-2">
         <DropdownMenu.Item>
           <span>Item 1</span>
