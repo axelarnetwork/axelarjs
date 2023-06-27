@@ -89,6 +89,8 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     searchERC20Result,
   ]);
 
+  const [isFocused, setIsFocused] = useState(false);
+
   const shouldRenderError =
     (hasError && !searchERC20Result) ||
     (!isValidAddress && search.length >= 10);
@@ -97,8 +99,9 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     <FormControl className="relative w-full max-w-xs md:max-w-md">
       <InputGroup
         className={clsx("rounded-md", {
-          "ring-error ring-offset-base-200 rounded-lg ring-1 ring-offset-2":
+          "ring-error ring-offset-base-200 -translate-y-3 ring-1 ring-offset-2":
             shouldRenderError,
+          "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
         })}
       >
         <TextInput
@@ -112,7 +115,9 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           }
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-base-200 flex-1"
+          className="bg-base-200 flex-1 focus:outline-none focus:ring-0"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
         <span>
           {isLoading && isAddress(search) ? (
@@ -141,7 +146,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
         </span>
       </InputGroup>
       {shouldRenderError && (
-        <div role="alert" className="text-error absolute -bottom-9 p-2 text-sm">
+        <div role="alert" className="text-error absolute -bottom-6 p-2 text-sm">
           {(searchInterchainTokenError ?? searchERC20Error)?.message ??
             "Invalid ERC-20 token address"}
         </div>
