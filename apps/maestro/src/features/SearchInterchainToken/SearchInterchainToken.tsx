@@ -99,7 +99,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     <FormControl className="relative w-full max-w-xs md:max-w-md">
       <InputGroup
         className={clsx("rounded-md transition-transform", {
-          "ring-error ring-offset-base-200 -translate-y-3 ring-1 ring-offset-2":
+          "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
             shouldRenderError,
           "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
         })}
@@ -146,7 +146,10 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
         </span>
       </InputGroup>
       {shouldRenderError && (
-        <div role="alert" className="text-error absolute -bottom-6 p-2 text-sm">
+        <div
+          role="alert"
+          className="text-error absolute -bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm"
+        >
           {(searchInterchainTokenError ?? searchERC20Error)?.message ??
             "Invalid ERC-20 token address"}
         </div>
