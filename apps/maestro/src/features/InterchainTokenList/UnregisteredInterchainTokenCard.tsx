@@ -76,7 +76,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
                 >
                   <Badge
                     outline
-                    color="warning"
+                    variant="warning"
                     className="flex items-center gap-0.5"
                   >
                     <span className="-translate-x-1">

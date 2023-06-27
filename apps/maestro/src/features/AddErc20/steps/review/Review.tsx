@@ -79,7 +79,7 @@ const Review: FC = () => {
           // if the chain is not the same as the route, we need to refresh the page
           <Dialog.CloseAction
             length="block"
-            color="primary"
+            variant="primary"
             onClick={() => {
               setShouldFetch(true);
               // refresh the page to show the new token
@@ -91,7 +91,7 @@ const Review: FC = () => {
         ) : (
           <Button
             length="block"
-            color="primary"
+            variant="primary"
             disabled={!chain?.name || state.txState.type !== "deployed"}
             onClick={() => {
               if (chain?.name && state.txState.type === "deployed") {

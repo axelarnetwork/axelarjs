@@ -164,7 +164,7 @@ export const TransferInterchainTokenOwnership: FC = () => {
         </FormControl>
 
         <Button
-          color="primary"
+          variant="primary"
           type="submit"
           disabled={!formState.isValid || isTransfering}
           loading={

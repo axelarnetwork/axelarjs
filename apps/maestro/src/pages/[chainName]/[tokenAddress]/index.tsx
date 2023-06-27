@@ -387,7 +387,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               )}
               {selectedChainIds.length > 0 && !deployTokensTxHash ? (
                 <Button
-                  color="accent"
+                  variant="accent"
                   onClick={handleDeployRemoteTokens}
                   disabled={isGasPriceQueryLoading || isGasPriceQueryError}
                   loading={isDeploying}
@@ -398,7 +398,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               ) : undefined}
               {deployTokensTxHash && (
                 <LinkButton
-                  color="accent"
+                  variant="accent"
                   outline
                   href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${deployTokensTxHash}`}
                   className="flex items-center gap-2"

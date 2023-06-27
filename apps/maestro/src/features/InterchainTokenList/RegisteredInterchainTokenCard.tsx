@@ -143,7 +143,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           {props.deploymentStatus && (
             <Badge
               outline
-              color="warning"
+              variant="warning"
               className="flex items-center gap-0.5"
             >
               <span className="-translate-x-1">
@@ -203,7 +203,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                     trigger={
                       <Button
                         size="xs"
-                        color="primary"
+                        variant="primary"
                         className="absolute right-6"
                         disabled={!props.hasRemoteTokens}
                       >

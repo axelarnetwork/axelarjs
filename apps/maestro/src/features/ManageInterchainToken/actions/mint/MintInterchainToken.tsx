@@ -143,7 +143,7 @@ export const MintInterchainToken: FC = () => {
         </FormControl>
 
         <Button
-          color="primary"
+          variant="primary"
           type="submit"
           disabled={!formState.isValid || isMinting}
           loading={
