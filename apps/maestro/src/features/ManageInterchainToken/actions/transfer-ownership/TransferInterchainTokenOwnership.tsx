@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Dialog,
   FormControl,
@@ -10,7 +11,7 @@ import { useCallback, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { isAddress, TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import { useWaitForTransaction } from "wagmi";
 
 import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
@@ -25,9 +26,6 @@ type FormState = {
 export const TransferInterchainTokenOwnership: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
-
-  const { address: accountAddress } = useAccount();
-  const chainId = useChainId();
 
   const {
     writeAsync: transferOwnershipAsync,
@@ -54,11 +52,7 @@ export const TransferInterchainTokenOwnership: FC = () => {
 
       await Promise.all([
         trpcContext.interchainToken.searchInterchainToken.refetch(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
-          tokenAddress: state.tokenAddress,
-          chainId: chainId,
-          owner: accountAddress as `0x${string}`,
-        }),
+        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
       ]);
 
       setTxState({
@@ -125,7 +119,9 @@ export const TransferInterchainTokenOwnership: FC = () => {
       case "confirmed":
         return "Transfer token ownership";
       case "awaiting_approval":
-        return "Waiting for approval";
+        return "Confirm on wallet";
+      case "submitted":
+        return "Transfering token ownership";
       case "reverted":
         return "Failed to transfer ownership";
     }
@@ -136,45 +132,52 @@ export const TransferInterchainTokenOwnership: FC = () => {
       <Dialog.Title className="flex">
         <span>Transfer token ownership</span>
       </Dialog.Title>
-      <form
-        className="flex flex-1 flex-col justify-between gap-4"
-        onSubmit={handleSubmit(submitHandler)}
-      >
-        <FormControl>
-          <Label htmlFor="recipientAddress">
-            <Label.Text>Recipient address</Label.Text>
-          </Label>
-          <TextInput
-            id="recipientAddress"
-            bordered
-            placeholder="Enter recipient address"
-            className="bg-base-200"
-            min={0}
-            {...register("recipientAddress", {
-              disabled: isTransfering,
-              validate(value) {
-                if (!value || !isAddress(value)) {
-                  return "Invalid address";
-                }
-
-                return true;
-              },
-            })}
-          />
-        </FormControl>
-
-        <Button
-          variant="primary"
-          type="submit"
-          disabled={!formState.isValid || isTransfering}
-          loading={
-            txState.status === "awaiting_approval" ||
-            txState.status === "submitted"
-          }
+      {txState.status === "confirmed" ? (
+        <Alert status="success">
+          Token ownership has been successfully transferred. The recipient now
+          must accept the ownership transfer.
+        </Alert>
+      ) : (
+        <form
+          className="flex flex-1 flex-col justify-between gap-4"
+          onSubmit={handleSubmit(submitHandler)}
         >
-          {buttonChildren}
-        </Button>
-      </form>
+          <FormControl>
+            <Label htmlFor="recipientAddress">
+              <Label.Text>Recipient address</Label.Text>
+            </Label>
+            <TextInput
+              id="recipientAddress"
+              bordered
+              placeholder="Enter recipient address"
+              className="bg-base-200"
+              min={0}
+              {...register("recipientAddress", {
+                disabled: isTransfering,
+                validate(value) {
+                  if (!value || !isAddress(value)) {
+                    return "Invalid address";
+                  }
+
+                  return true;
+                },
+              })}
+            />
+          </FormControl>
+
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={!formState.isValid || isTransfering}
+            loading={
+              txState.status === "awaiting_approval" ||
+              txState.status === "submitted"
+            }
+          >
+            {buttonChildren}
+          </Button>
+        </form>
+      )}
     </>
   );
 };

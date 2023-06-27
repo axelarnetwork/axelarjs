@@ -104,7 +104,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const buttonChildren = useMemo(() => {
     switch (state.txState?.status) {
       case "awaiting_approval":
-        return <>Confirm transaction on wallet</>;
+        return "Confirm on wallet";
       case "submitted":
         return (
           <>

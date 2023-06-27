@@ -3,7 +3,6 @@ import { forwardRef } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-import { isColorVariant } from "../../theme";
 import { Loading } from "../Loading";
 
 export const buttonVariance = cva("btn", {
@@ -91,6 +90,9 @@ export const buttonVariance = cva("btn", {
       wide: "btn-wide",
       block: "btn-block",
     },
+    loading: {
+      true: "pointer-events-none",
+    },
   },
 });
 
@@ -139,6 +141,7 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
         glass,
         length,
         variant,
+        loading,
       }),
       className
     ),
@@ -170,12 +173,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...componentProps}
         ref={ref}
       >
-        {props.loading && (
-          <Loading
-            size={props.size === "xs" ? "xs" : "sm"}
-            color={isColorVariant(props.variant) ? props.variant : undefined}
-          />
-        )}
+        {props.loading && <Loading size={props.size === "xs" ? "xs" : "sm"} />}
         {props.children}
       </button>
     );

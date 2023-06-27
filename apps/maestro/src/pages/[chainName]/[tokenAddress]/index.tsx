@@ -160,9 +160,9 @@ const RegisterOriginTokenButton = ({
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
       case "awaiting_approval":
-        return "Approve transaction";
+        return "Confirm on wallet";
       case "submitted":
-        return "Waiting for confirmation...";
+        return "Registering token...";
       case "reverted":
         return "Transaction failed";
       default:

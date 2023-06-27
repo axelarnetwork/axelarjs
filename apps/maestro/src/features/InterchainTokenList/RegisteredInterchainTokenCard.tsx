@@ -199,21 +199,32 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                   </BigNumberText>
                 </div>
                 {isSourceChain ? (
-                  <SendInterchainToken
-                    trigger={
-                      <Button
-                        size="xs"
-                        variant="primary"
-                        className="absolute right-6"
-                        disabled={!props.hasRemoteTokens}
-                      >
-                        send
-                      </Button>
-                    }
-                    tokenAddress={props.tokenAddress}
-                    sourceChain={props.chain as EVMChainConfig}
-                    balance={balance}
-                  />
+                  <>
+                    {balance.isTokenPendingOwner ? (
+                      <AcceptInterchainTokenOwnership
+                        accountAddress={address as `0x${string}`}
+                        tokenAddress={props.tokenAddress}
+                        sourceChain={props.chain as EVMChainConfig}
+                        tokenId={props.tokenId}
+                      />
+                    ) : (
+                      <SendInterchainToken
+                        trigger={
+                          <Button
+                            size="xs"
+                            variant="primary"
+                            className="absolute right-6"
+                            disabled={!props.hasRemoteTokens}
+                          >
+                            send
+                          </Button>
+                        }
+                        tokenAddress={props.tokenAddress}
+                        sourceChain={props.chain as EVMChainConfig}
+                        balance={balance}
+                      />
+                    )}
+                  </>
                 ) : (
                   switchChainButton
                 )}
