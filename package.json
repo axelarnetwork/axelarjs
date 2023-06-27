@@ -35,7 +35,7 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "@changesets/cli": "^2.26.1",
+    "@changesets/cli": "^2.26.2",
     "@commitlint/cli": "^17.6.6",
     "@commitlint/config-conventional": "^17.6.6",
     "@ianvs/prettier-plugin-sort-imports": "^4.0.2",
