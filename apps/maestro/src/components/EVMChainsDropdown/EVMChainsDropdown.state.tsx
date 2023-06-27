@@ -12,7 +12,7 @@ function useEVMChainsDropdownState(initialState = INITIAL_STATE) {
   );
 
   const actions = {
-    selectChainId: (chainId: number) => {
+    selectChainId: (chainId: number | null) => {
       setState((state) => {
         state.selectedChainId = chainId;
       });
