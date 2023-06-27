@@ -92,7 +92,9 @@ export const MintInterchainToken: FC = () => {
       case "confirmed":
         return "Mint tokens";
       case "awaiting_approval":
-        return "Waiting for approval";
+        return "Confirm on wallet";
+      case "submitted":
+        return "Minting tokens...";
       case "reverted":
         return "Failed to mint tokens";
     }
@@ -143,7 +145,7 @@ export const MintInterchainToken: FC = () => {
         </FormControl>
 
         <Button
-          color="primary"
+          variant="primary"
           type="submit"
           disabled={!formState.isValid || isMinting}
           loading={

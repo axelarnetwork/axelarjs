@@ -42,7 +42,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
         {tokens.length > 0 && Boolean(props.onToggleSelection) && (
           <Button
             size="sm"
-            color="primary"
+            variant="primary"
             disabled={Boolean(
               // disable if all tokens are selected or none are selected
               selectedTokens.length && selectedTokens.length !== tokens.length

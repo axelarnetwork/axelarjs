@@ -67,7 +67,7 @@ const AddErc20: FC<AddErc20Props> = () => {
           {...props}
           size="md"
           className="w-full max-w-xs md:max-w-md"
-          color="primary"
+          variant="primary"
         >
           Deploy a new ERC-20 token
         </Button>
