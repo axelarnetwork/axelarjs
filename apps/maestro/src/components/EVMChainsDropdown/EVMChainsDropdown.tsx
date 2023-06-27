@@ -34,7 +34,7 @@ export const ChainIcon: FC<{
   return (
     <div
       className={clsx(
-        "bg-basep-200 relative rounded-full p-0.5 shadow-black group-hover:ring-2",
+        "bg-base-200 relative rounded-full p-0.5 shadow-black group-hover:ring-2",
         props.className
       )}
     >
@@ -58,7 +58,7 @@ type Props = {
   contentClassName?: string;
   renderTrigger?: () => React.ReactNode;
   selectedChain?: EVMChainConfig;
-  onSelectChain?: (chain: EVMChainConfig) => void;
+  onSelectChain?: (chain: EVMChainConfig | null) => void;
 };
 
 const EVMChainsDropdown: FC<Props> = (props) => {
@@ -168,6 +168,26 @@ const EVMChainsDropdown: FC<Props> = (props) => {
             props.contentClassName
           )}
         >
+          {!chain && (
+            <Dropdown.Item className="text-base-content">
+              {/* rome-ignore lint/a11y/useValidAnchor: needed by daisyui */}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  props.onSelectChain?.(null);
+                  actions.selectChainId(null);
+                }}
+                className="group"
+              >
+                <div className="bg-base-200 relative rounded-full p-0.5 shadow-black group-hover:ring-2">
+                  <HelpCircleIcon size="24" />
+                </div>
+                <div>All Chains</div>
+              </a>
+            </Dropdown.Item>
+          )}
           {eligibleChains.map((chain) => (
             <Dropdown.Item
               key={chain.chain_id}
