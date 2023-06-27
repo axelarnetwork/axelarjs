@@ -34,7 +34,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   const [selectedChainId, setSelectedChainId] = useSessionStorageState(
     "@maestro/SearchInterchainToken.selectedChainId",
-    connectedChain?.id ?? 1
+    connectedChain?.id ?? -1
   );
   const defaultChain = useMemo(
     () => computed.indexedByChainId[selectedChainId],
@@ -124,12 +124,15 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
             >
               <EVMChainsDropdown
                 triggerClassName="btn-sm btn-circle"
-                contentClassName="translate-x-4 translate-y-2 sm:w-96"
+                contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
                 compact
                 selectedChain={defaultChain}
                 onSelectChain={
                   !connectedChain
-                    ? (chain) => setSelectedChainId(chain.chain_id)
+                    ? (chain) =>
+                        chain
+                          ? setSelectedChainId(chain.chain_id)
+                          : setSelectedChainId(-1)
                     : undefined
                 }
               />

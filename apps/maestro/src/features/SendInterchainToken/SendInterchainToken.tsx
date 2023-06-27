@@ -172,7 +172,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 isFormDisabled || state.eligibleTargetChains.length <= 1
               }
               onSelectChain={(chain) => {
-                actions.selectToChain(chain?.chain_id);
+                if (chain) {
+                  actions.selectToChain(chain.chain_id);
+                }
               }}
               contentClassName="translate-x-20"
             />
