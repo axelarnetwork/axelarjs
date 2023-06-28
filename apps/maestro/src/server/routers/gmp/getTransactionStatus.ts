@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { hex40 } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 /**
@@ -9,7 +10,7 @@ import { publicProcedure } from "~/server/trpc";
 export const getTransactionStatus = publicProcedure
   .input(
     z.object({
-      txHash: z.string().regex(/^(0x)?[0-9a-f]{64}$/i),
+      txHash: hex40(),
     })
   )
   // a procedure can either be a query or a mutation
