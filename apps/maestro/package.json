@@ -15,10 +15,10 @@
     "dev:e2e": "concurrently anvil \"NEXT_PUBLIC_E2E_ENABLED=true pnpm dev\"",
     "test:e2e": "dotenv -e .env.local npx playwright test",
     "ci:e2e": "npx playwright test",
-    "test:unit": "NEXT_PUBLIC_E2E_ENABLED=true dotenv -e .env.local vitest --coverage"
+    "test": "vitest --run",
+    "test:coverage": "vitest --coverage --run"
   },
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "0.12.8",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
