@@ -337,6 +337,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
+        listClassName="grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
         tokens={unregistered.map((token) => {
           const gmpInfo = token.chain?.id
             ? statusesByChain[token.chain.id]

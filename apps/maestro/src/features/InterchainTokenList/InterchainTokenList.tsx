@@ -1,4 +1,4 @@
-import { Button } from "@axelarjs/ui";
+import { Button, cn } from "@axelarjs/ui";
 import { useMemo, type FC, type ReactNode } from "react";
 
 import RegisteredInterchainTokenCard from "./RegisteredInterchainTokenCard";
@@ -10,6 +10,8 @@ export type InterchainTokenListProps = {
   tokens: TokenInfo[];
   onToggleSelection?: (chainId: number) => void;
   footer?: ReactNode;
+  listClassName?: string;
+  itemClassName?: string;
 };
 
 export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
@@ -60,7 +62,12 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
         )}
       </header>
       <main>
-        <ul className="grid w-full gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-5">
+        <ul
+          className={cn(
+            "grid w-full gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-5",
+            props.listClassName
+          )}
+        >
           {tokens.map((token) =>
             token.isRegistered ? (
               <RegisteredInterchainTokenCard

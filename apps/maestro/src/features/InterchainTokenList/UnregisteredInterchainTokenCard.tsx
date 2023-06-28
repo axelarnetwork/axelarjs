@@ -9,6 +9,7 @@ import type { TokenInfo } from "./types";
 
 export type Props = TokenInfo & {
   onToggleSelection?: () => void;
+  className?: string;
 };
 
 export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
@@ -25,7 +26,8 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
             "cursor-pointer": props.onToggleSelection,
             "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 -translate-y-1.5 ring-4":
               props.isSelected,
-          }
+          },
+          props.className
         )}
         aria-label={
           props.onToggleSelection
@@ -56,7 +58,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
           />
         )}
         <Card.Body className="w-full">
-          <Card.Title className="justify-between">
+          <Card.Title className="flex-wrap justify-center md:justify-between">
             {props.chain && (
               <span className="flex items-center gap-2">
                 <ChainIcon
