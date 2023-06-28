@@ -8,6 +8,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { inferAsyncReturnType } from "@trpc/server";
 import type { Chain } from "wagmi";
 
+import { NEXT_PUBLIC_TOKEN_LINKER_ADDRESS } from "~/config/env";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
 import gmpClient from "~/services/gmp";
@@ -16,10 +17,6 @@ type ContextConfig = {
   req: NextApiRequest;
   res: NextApiResponse<unknown>;
 };
-
-const DEFAULT_INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
-  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-) as `0x${string}`;
 
 const createContextInner = async ({ req, res }: ContextConfig) => {
   return {
@@ -43,7 +40,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       ) {
         return new InterchainTokenServiceClient({
           chain,
-          address: address ?? DEFAULT_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+          address: address ?? NEXT_PUBLIC_TOKEN_LINKER_ADDRESS,
         });
       },
     },
