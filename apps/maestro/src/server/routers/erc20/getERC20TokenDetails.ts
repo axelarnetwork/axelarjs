@@ -6,13 +6,14 @@ import invariant from "tiny-invariant";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { hex64 } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
+      tokenAddress: hex64(),
     })
   )
   .query(async ({ input, ctx }) => {

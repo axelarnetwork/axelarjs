@@ -5,20 +5,16 @@ import { always, partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
+import { hex40, hex64 } from "~/lib/utils/schemas";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
 const isAddressZero = (address: string) => parseInt(address, 16) === 0;
 
-const aliases = {
-  address64: () => z.string().regex(/^0x[0-9a-f]{64}$/i),
-  address40: () => z.string().regex(/^0x[0-9a-f]{40}$/i),
-};
-
 const tokenDetails = () => ({
-  tokenId: aliases.address64(),
-  originTokenId: aliases.address64().nullable(),
-  tokenAddress: aliases.address40(),
+  tokenId: hex40(),
+  originTokenId: hex40().nullable(),
+  tokenAddress: hex64(),
   isOriginToken: z.boolean(),
   isRegistered: z.boolean(),
   chainId: z.number(),
@@ -51,7 +47,7 @@ export const searchInterchainToken = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: aliases.address40(),
+      tokenAddress: hex64(),
     })
   )
   .output(
