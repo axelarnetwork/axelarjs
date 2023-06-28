@@ -76,7 +76,7 @@ const InterchainTokensPage = () => {
           decimals={tokenDetails.decimals}
           name={tokenDetails.name}
           symbol={tokenDetails.symbol}
-          tokenId={interchainToken?.tokenId}
+          tokenId={interchainToken?.tokenId as `0x${string}`}
         />
       )}
       {routeChain && (
@@ -208,6 +208,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     interchainToken?.matchingTokens?.map((x) => ({
       ...x,
       decimals: Number(tokenDetails?.decimals),
+      tokenId: x.tokenId as `0x${string}`,
+      tokenAddress: x.tokenAddress as `0x${string}`,
     }))
   ).mapOr(
     [[], []],
@@ -291,7 +293,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     await deployRemoteTokens({
       destinationChainIds: targetDeploymentChains,
       tokenAddress: props.tokenAddress,
-      tokenId: interchainToken.tokenId,
+      tokenId: interchainToken.tokenId as `0x${string}`,
       gasFees,
       onStatusUpdate(status) {
         if (status.type === "deployed") {

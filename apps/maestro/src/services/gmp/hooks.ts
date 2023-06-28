@@ -38,7 +38,7 @@ export function useInterchainTokensQuery(input: {
     trpc.interchainToken.searchInterchainToken.useQuery(
       {
         chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
-        tokenAddress: String(input.tokenAddress),
+        tokenAddress: input.tokenAddress as `0x${string}`,
       },
       {
         enabled:
