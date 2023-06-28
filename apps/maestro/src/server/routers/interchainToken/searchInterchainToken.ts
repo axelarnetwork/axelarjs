@@ -105,13 +105,18 @@ export const searchInterchainToken = publicProcedure
       const client =
         ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-      return getInterchainTokenDetails(
+      const result = await getInterchainTokenDetails(
         client,
         chainConfig,
         remainingChainConfigs,
         input,
         ctx
       );
+
+      // cache for 1 hour
+      ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+
+      return result;
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {

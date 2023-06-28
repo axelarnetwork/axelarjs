@@ -65,8 +65,16 @@ export const getInterchainTokenABI = publicProcedure
     openapi: {
       method: "GET",
       path: "/interchain-token/abi",
+      summary: "Get the ABI for the InterchainToken contract",
+      description: "Get the ABI for the InterchainToken contract",
+      tags: ["interchain-token"],
     },
   })
   .input(z.object({}).optional())
   .output(ZodContractABI)
-  .query(() => InterchainTokenClient.ABI as any);
+  .query(({ ctx }) => {
+    // cache for 1 day
+    ctx.res.setHeader("Cache-Control", "public, max-age=86400");
+
+    return InterchainTokenClient.ABI as any;
+  });
