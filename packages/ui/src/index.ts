@@ -2,6 +2,7 @@ import toast, { Toaster, useToaster, useToasterStore } from "react-hot-toast";
 
 export * from "./components";
 export * from "./hooks";
+export * from "./utils";
 
 export { toast, Toaster, useToaster, useToasterStore };
 
