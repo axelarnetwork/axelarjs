@@ -207,6 +207,7 @@ export const getMockWalletClient = () =>
     pollingInterval: 100,
   });
 
+// @ts-ignore - minor change in the Connector interface temporarily breaks this type check
 const connectors: Connector[] = NEXT_PUBLIC_E2E_ENABLED
   ? [
       new MockConnector({
