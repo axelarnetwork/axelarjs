@@ -10,13 +10,57 @@ import { publicProcedure } from "~/server/trpc";
 
 const isAddressZero = (address: string) => parseInt(address, 16) === 0;
 
+const aliases = {
+  address64: () => z.string().regex(/^0x[0-9a-f]{64}$/i),
+  address40: () => z.string().regex(/^0x[0-9a-f]{40}$/i),
+};
+
+const tokenDetails = () => ({
+  tokenId: aliases.address64(),
+  originTokenId: aliases.address64().nullable(),
+  tokenAddress: aliases.address40(),
+  isOriginToken: z.boolean(),
+  isRegistered: z.boolean(),
+  chainId: z.number(),
+});
+
+export type IntercahinTokenInfo = {
+  tokenId: `0x${string}`;
+  originTokenId: `0x${string}` | null;
+  tokenAddress: `0x${string}`;
+  isOriginToken: boolean;
+  isRegistered: boolean;
+  chainId: number;
+};
+
+export type SearchInterchainTokenOutput = IntercahinTokenInfo & {
+  matchingTokens: IntercahinTokenInfo[];
+};
+
 export const searchInterchainToken = publicProcedure
+  .meta({
+    openapi: {
+      summary: "Search for an interchain token",
+      description:
+        "Search for an interchain token by address, either on a specific chain or on any chain",
+      method: "GET",
+      path: "/interchain-token/search",
+      tags: ["interchain-token"],
+    },
+  })
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: z.string().regex(/^(0x)?[0-9a-f]{40}$/i),
-      chainIds: z.array(z.number().or(z.string())),
+      tokenAddress: aliases.address40(),
     })
+  )
+  .output(
+    z
+      .object({
+        ...tokenDetails(),
+        matchingTokens: z.array(z.object(tokenDetails())),
+      })
+      .nullable()
   )
   .query(async ({ input, ctx }) => {
     try {
@@ -180,11 +224,13 @@ async function getInterchainTokenDetails(
     tokenAddress,
     isOriginToken,
     isRegistered: parseInt(tokenAddress, 16) > 0,
-    chainId: Number(input.chainId),
+    chainId: chainConfig.id,
   };
 
-  return {
+  const output: SearchInterchainTokenOutput = {
     ...lookupToken,
     matchingTokens: [lookupToken, ...matchingTokens],
   };
+
+  return output;
 }
