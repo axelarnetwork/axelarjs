@@ -17,7 +17,6 @@ import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { logger } from "~/lib/logger";
-import { trpc } from "~/lib/trpc";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
@@ -128,8 +127,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     state.selectedToChain?.name,
     state.txState?.status,
   ]);
-
-  const trpcContext = trpc.useContext();
 
   const isFormDisabled =
     state.txState.status !== "idle" && state.txState.status !== "reverted";
@@ -255,7 +252,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
               onAllChainsExecuted={async () => {
-                await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+                await actions.refetchBalances();
                 resetForm();
                 actions.setTxState({ status: "idle" });
                 toast.success("Tokens sent successfully!");

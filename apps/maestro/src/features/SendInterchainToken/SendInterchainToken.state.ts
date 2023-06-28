@@ -2,6 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { useMemo, useState } from "react";
 
 import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
@@ -47,6 +48,10 @@ export function useSendInterchainTokenState(props: {
     });
 
   const [txState, setTxState] = useTransactionState();
+  const trpcContext = trpc.useContext();
+
+  const refetchBalances = () =>
+    trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
 
   return [
     {
@@ -61,6 +66,7 @@ export function useSendInterchainTokenState(props: {
       setTxState,
       sendTokenAsync,
       selectToChain,
+      refetchBalances,
     },
   ] as const;
 }
