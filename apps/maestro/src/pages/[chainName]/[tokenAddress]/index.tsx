@@ -364,7 +364,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         }}
         footer={
           !selectedChainIds.length ? undefined : (
-            <div className="bg-base-300 flex w-full items-center justify-between rounded-xl p-2 pl-4">
+            <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
               {isGasPriceQueryLoading && <span>estimating gas fee... </span>}
               {gasFees && (
                 <Tooltip
@@ -372,7 +372,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                     selectedChainIds.length
                   } additional chain${selectedChainIds.length > 1 ? "s" : ""}`}
                 >
-                  <div className="flex items-center gap-1 text-sm">
+                  <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
                     ≈{" "}
                     <BigNumberText
                       decimals={18}
