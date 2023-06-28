@@ -1,37 +1,11 @@
 export default {
   _format: "hh-sol-artifact-1",
   contractName: "InterchainToken",
-  sourceName: "contracts/interchainToken/InterchainToken.sol",
+  sourceName: "contracts/interchain-token/InterchainToken.sol",
   abi: [
-    {
-      inputs: [
-        {
-          internalType: "address",
-          name: "interchainTokenServiceAddress",
-          type: "address",
-        },
-      ],
-      stateMutability: "nonpayable",
-      type: "constructor",
-    },
     {
       inputs: [],
       name: "InvalidAccount",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "InvalidOwner",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "NotOwner",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "NotProxy",
       type: "error",
     },
     {
@@ -65,32 +39,6 @@ export default {
         {
           indexed: true,
           internalType: "address",
-          name: "newOwner",
-          type: "address",
-        },
-      ],
-      name: "OwnershipTransferStarted",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "address",
-          name: "newOwner",
-          type: "address",
-        },
-      ],
-      name: "OwnershipTransferred",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "address",
           name: "from",
           type: "address",
         },
@@ -109,13 +57,6 @@ export default {
       ],
       name: "Transfer",
       type: "event",
-    },
-    {
-      inputs: [],
-      name: "acceptOwnership",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
     },
     {
       inputs: [
@@ -185,24 +126,6 @@ export default {
       type: "function",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "account",
-          type: "address",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "burnFrom",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
       inputs: [],
       name: "decimals",
       outputs: [
@@ -241,11 +164,11 @@ export default {
     },
     {
       inputs: [],
-      name: "implementationAddress",
+      name: "getTokenManager",
       outputs: [
         {
-          internalType: "address",
-          name: "",
+          internalType: "contract ITokenManager",
+          name: "tokenManager",
           type: "address",
         },
       ],
@@ -274,19 +197,6 @@ export default {
         },
       ],
       stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "interchainTokenService",
-      outputs: [
-        {
-          internalType: "contract IInterchainTokenService",
-          name: "",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
       type: "function",
     },
     {
@@ -351,24 +261,6 @@ export default {
       type: "function",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "account",
-          type: "address",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "mint",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
       inputs: [],
       name: "name",
       outputs: [
@@ -383,51 +275,25 @@ export default {
     },
     {
       inputs: [],
-      name: "owner",
-      outputs: [
-        {
-          internalType: "address",
-          name: "owner_",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "pendingOwner",
-      outputs: [
-        {
-          internalType: "address",
-          name: "owner_",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes",
-          name: "setupParams",
-          type: "bytes",
-        },
-      ],
-      name: "setup",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [],
       name: "symbol",
       outputs: [
         {
           internalType: "string",
           name: "",
           type: "string",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "tokenManagerRequiresApproval",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
         },
       ],
       stateMutability: "view",
@@ -496,19 +362,6 @@ export default {
           type: "bool",
         },
       ],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "address",
-          name: "newOwner",
-          type: "address",
-        },
-      ],
-      name: "transferOwnership",
-      outputs: [],
       stateMutability: "nonpayable",
       type: "function",
     },
