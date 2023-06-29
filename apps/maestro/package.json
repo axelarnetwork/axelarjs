@@ -19,6 +19,7 @@
     "test:coverage": "vitest --coverage --run"
   },
   "dependencies": {
+    "@axelar-network/axelarjs-sdk": "^0.12.8",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
