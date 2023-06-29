@@ -39,7 +39,7 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "^1.2.2"
+    "viem": "^1.2.5"
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
@@ -47,6 +47,6 @@
     "package-json": "^7.0.0",
     "rimraf": "^5.0.1",
     "strip-ansi": "^6.0.1",
-    "typescript": "^5.1.5"
+    "typescript": "^5.1.6"
   }
 }
