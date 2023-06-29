@@ -1,7 +1,9 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it, vi, vitest } from "vitest";
+import { vi } from "vitest";
 
+import { setupWithUserEvent } from "~/lib/utils/tests";
 import SendInterchainToken from "./SendInterchainToken";
+import type { Actions, State } from "./SendInterchainToken.state";
 
 const MOCK_EVM_CHAIN_CONFIG = {
   id: "1",
@@ -42,24 +44,32 @@ const MOCK_EVM_CHAIN_CONFIG = {
   no_inflation: true,
 };
 
+const mocks = {
+  setIsModalOpen: vi.fn(),
+  setTxState: vi.fn(),
+  sendTokenAsync: vi.fn(),
+  selectToChain: vi.fn(),
+  refetchBalances: vi.fn(),
+};
+
 vi.mock("./SendInterchainToken.state.ts", () => ({
-  useSendInterchainTokenState: vitest.fn(() => [
+  useSendInterchainTokenState: vi.fn(() => [
     {
       isModalOpen: true,
       txState: {
-        type: "idle",
+        status: "idle",
       },
       isSending: false,
       selectedToChain: MOCK_EVM_CHAIN_CONFIG,
       eligibleTargetChains: [MOCK_EVM_CHAIN_CONFIG],
-    },
+    } as State,
     {
-      setIsModalOpen: vitest.fn(),
-      setTxState: vitest.fn(),
-      sendTokenAsync: vitest.fn(),
-      selectToChain: vitest.fn(),
-      refetchBalances: vitest.fn(),
-    },
+      setIsModalOpen: mocks.setIsModalOpen,
+      setTxState: mocks.setTxState,
+      sendTokenAsync: mocks.sendTokenAsync,
+      selectToChain: mocks.selectToChain,
+      refetchBalances: mocks.refetchBalances,
+    } as Actions,
   ]),
 }));
 
@@ -73,28 +83,65 @@ vi.mock("~/components/EVMChainsDropdown/index.ts", () => ({
 
 describe("SendInterchainToken", () => {
   it("should render correctly", async () => {
-    const { findByRole } = render(
+    const { ...screen } = render(
       <SendInterchainToken
         tokenAddress="0x00"
         balance={{
           decimals: 18,
-          tokenBalance: "10000",
+          tokenBalance: "100000000000000000000000000",
         }}
+        isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
       />
     );
 
-    const button = await findByRole("button", { name: "Send" });
+    expect(
+      screen.getByRole("button", {
+        name: /set max balance/i,
+      })
+    ).toMatchInlineSnapshot(`
+      <span
+        aria-label="set max balance to send"
+        class="label-text-alt"
+        role="button"
+      >
+        Balance:
+         
+        100,000,000
+      </span>
+    `);
 
-    expect(button).toBeTruthy();
-    expect(button).toMatchInlineSnapshot(`
+    expect(
+      screen.getByRole("button", { name: /Amount is required/ })
+    ).toBeDisabled();
+  });
+
+  it("should update the button text when entering an amount", async () => {
+    const { user, ...screen } = setupWithUserEvent(
+      <SendInterchainToken
+        tokenAddress="0x00"
+        balance={{
+          decimals: 18,
+          tokenBalance: "100000000000000000000000000",
+        }}
+        isOpen
+        sourceChain={MOCK_EVM_CHAIN_CONFIG}
+      />
+    );
+
+    // type in an amount
+    await user.type(
+      screen.getByPlaceholderText("Enter your amount to send"),
+      "100"
+    );
+
+    expect(screen.getByRole("button", { name: /Send/ })).toMatchInlineSnapshot(`
       <button
-        class="btn btn-primary btn-disabled"
-        disabled=""
+        class="btn btn-primary"
         type="submit"
       >
         Send 
-        0
+        100
          tokens to 
         Ethereum Mainnet
       </button>

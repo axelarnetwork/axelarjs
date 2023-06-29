@@ -48,7 +48,7 @@ importers:
   apps/maestro:
     dependencies:
       '@axelar-network/axelarjs-sdk':
-        specifier: 0.12.8
+        specifier: ^0.12.8
         version: 0.12.8
       '@axelarjs/api':
         specifier: workspace:*
@@ -183,6 +183,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: 4.29.12
         version: 4.29.12(@tanstack/react-query@4.29.12)(react-dom@18.2.0)(react@18.2.0)
+      '@testing-library/jest-dom':
+        specifier: ^5.16.5
+        version: 5.16.5
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -256,30 +259,9 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
-      '@testing-library/jest-dom':
-        specifier: ^5.16.5
-        version: 5.16.5
-      '@testing-library/react':
-        specifier: ^14.0.0
-        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
-      '@tsconfig/strictest':
-        specifier: ^2.0.1
-        version: 2.0.1
       '@types/node':
         specifier: 18.15.3
         version: 18.15.3
-      '@types/react':
-        specifier: 18.2.5
-        version: 18.2.5
-      '@types/react-dom':
-        specifier: ^18.2.6
-        version: 18.2.6
-      '@types/testing-library__jest-dom':
-        specifier: ^5.14.6
-        version: 5.14.6
-      '@vitejs/plugin-react':
-        specifier: ^3.1.0
-        version: 3.1.0(vite@4.3.9)
       fast-check:
         specifier: ^3.10.0
         version: 3.10.0
@@ -749,7 +731,7 @@ packages:
       clone-deep: 4.0.1
       cross-fetch: 3.1.6
       ethers: 5.7.2
-      socket.io-client: 4.6.2
+      socket.io-client: 4.7.1
       standard-http-error: 2.0.1
       string-similarity-js: 2.1.4
       uuid: 8.3.2
@@ -10796,12 +10778,12 @@ packages:
     dependencies:
       once: 1.4.0
 
-  /engine.io-client@6.4.0:
-    resolution: {integrity: sha512-GyKPDyoEha+XZ7iEqam49vz6auPnNJ9ZBfy89f+rMMas8AuiMWOZ9PVzu8xb9ZC6rafUqiGHSCfu22ih66E+1g==}
+  /engine.io-client@6.5.1:
+    resolution: {integrity: sha512-hE5wKXH8Ru4L19MbM1GgYV/2Qo54JSMh1rlJbfpa40bEWkCKNo3ol2eOtGmowcr+ysgbI7+SGL+by42Q3pt/Ng==}
     dependencies:
       '@socket.io/component-emitter': 3.1.0
       debug: 4.3.4
-      engine.io-parser: 5.0.7
+      engine.io-parser: 5.1.0
       ws: 8.11.0
       xmlhttprequest-ssl: 2.0.0
     transitivePeerDependencies:
@@ -10810,8 +10792,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /engine.io-parser@5.0.7:
-    resolution: {integrity: sha512-P+jDFbvK6lE3n1OL+q9KuzdOFWkkZ/cMV9gol/SbVfpyqfvrfrFTOFJ6fQm2VC3PZHlU3QPhVwmbsCnauHF2MQ==}
+  /engine.io-parser@5.1.0:
+    resolution: {integrity: sha512-enySgNiK5tyZFynt3z7iqBR+Bto9EVVVvDFuTT0ioHCGbzirZVGDGiQjZzEp8hWl6hd5FSVytJGuScX1C1C35w==}
     engines: {node: '>=10.0.0'}
     dev: false
 
@@ -16220,13 +16202,13 @@ packages:
       yargs: 15.4.1
     dev: true
 
-  /socket.io-client@4.6.2:
-    resolution: {integrity: sha512-OwWrMbbA8wSqhBAR0yoPK6EdQLERQAYjXb3A0zLpgxfM1ZGLKoxHx8gVmCHA6pcclRX5oA/zvQf7bghAS11jRA==}
+  /socket.io-client@4.7.1:
+    resolution: {integrity: sha512-Qk3Xj8ekbnzKu3faejo4wk2MzXA029XppiXtTF/PkbTg+fcwaTw1PlDrTrrrU4mKoYC4dvlApOnSeyLCKwek2w==}
     engines: {node: '>=10.0.0'}
     dependencies:
       '@socket.io/component-emitter': 3.1.0
       debug: 4.3.4
-      engine.io-client: 6.4.0
+      engine.io-client: 6.5.1
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
       - bufferutil

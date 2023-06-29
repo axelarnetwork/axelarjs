@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import { caseInsensitiveRecord, pluralizeKeys } from "./record";
 
 describe("caseInsensitiveRecord", () => {
