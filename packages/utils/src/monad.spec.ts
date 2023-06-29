@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import { Maybe } from "./monad";
 
 describe("Maybe", () => {

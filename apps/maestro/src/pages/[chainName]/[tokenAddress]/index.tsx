@@ -15,7 +15,12 @@ import { useRouter } from "next/router";
 import { ExternalLink, InfoIcon } from "lucide-react";
 import { partition, without } from "rambda";
 import { isAddress, TransactionExecutionError } from "viem";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useNetwork,
+  useSwitchNetwork,
+  useWaitForTransaction,
+} from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
@@ -187,6 +192,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
   const { address } = useAccount();
+  const { chain } = useNetwork();
   const {
     data: interchainToken,
     refetch,
@@ -310,6 +316,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     targetDeploymentChains,
   ]);
 
+  const originToken = useMemo(
+    () => interchainToken.matchingTokens?.find((x) => x.isOriginToken),
+    [interchainToken]
+  );
+
+  const { switchNetworkAsync } = useSwitchNetwork();
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -337,7 +350,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
-        listClassName="grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
+        listClassName="grid-cols-2 sm:grid-cols-3"
         tokens={unregistered.map((token) => {
           const gmpInfo = token.chain?.id
             ? statusesByChain[token.chain.id]
@@ -366,7 +379,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         footer={
           !selectedChainIds.length ? undefined : (
             <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
-              {isGasPriceQueryLoading && <span>estimating gas fee... </span>}
+              {isGasPriceQueryLoading && (
+                <span className="md:ml-2">estimating gas fee... </span>
+              )}
               {gasFees && (
                 <Tooltip
                   tip={`Estimated gas fee for deploying token on ${
@@ -388,17 +403,35 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   </div>
                 </Tooltip>
               )}
-              {selectedChainIds.length > 0 && !deployTokensTxHash ? (
-                <Button
-                  variant="accent"
-                  onClick={handleDeployRemoteTokens}
-                  disabled={isGasPriceQueryLoading || isGasPriceQueryError}
-                  loading={isDeploying}
-                >
-                  Deploy token on {selectedChainIds.length} additional chain
-                  {selectedChainIds.length > 1 ? "s" : ""}
-                </Button>
-              ) : undefined}
+              {selectedChainIds.length > 0 && !deployTokensTxHash && (
+                <>
+                  {originToken?.chainId === chain?.id ? (
+                    <Button
+                      variant="primary"
+                      onClick={handleDeployRemoteTokens}
+                      disabled={isGasPriceQueryLoading || isGasPriceQueryError}
+                      loading={isDeploying}
+                    >
+                      Register token on {selectedChainIds.length} additional
+                      chain
+                      {selectedChainIds.length > 1 ? "s" : ""}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="accent"
+                      onClick={() => {
+                        if (originToken) {
+                          switchNetworkAsync?.(originToken.chainId);
+                        }
+                      }}
+                    >
+                      Switch to {originToken?.chain.name} to register token
+                      {selectedChainIds.length > 1 ? "s" : ""}
+                    </Button>
+                  )}
+                </>
+              )}
+
               {deployTokensTxHash && (
                 <LinkButton
                   variant="accent"
@@ -419,14 +452,16 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 };
 
-const TokenDetailsSection: FC<{
+type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
   tokenId?: `0x${string}`;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
   decimals: number;
-}> = (props) => {
+};
+
+const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   return (
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
