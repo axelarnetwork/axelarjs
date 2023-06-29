@@ -337,7 +337,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
-        listClassName="grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
+        listClassName="grid-cols-2 sm:grid-cols-3"
         tokens={unregistered.map((token) => {
           const gmpInfo = token.chain?.id
             ? statusesByChain[token.chain.id]
@@ -366,7 +366,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         footer={
           !selectedChainIds.length ? undefined : (
             <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
-              {isGasPriceQueryLoading && <span>estimating gas fee... </span>}
+              {isGasPriceQueryLoading && (
+                <span className="md:ml-2">estimating gas fee... </span>
+              )}
               {gasFees && (
                 <Tooltip
                   tip={`Estimated gas fee for deploying token on ${
@@ -419,14 +421,16 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 };
 
-const TokenDetailsSection: FC<{
+type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
   tokenId?: `0x${string}`;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
   decimals: number;
-}> = (props) => {
+};
+
+const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   return (
     <section className="grid gap-6">
       <div className="flex items-center justify-between">

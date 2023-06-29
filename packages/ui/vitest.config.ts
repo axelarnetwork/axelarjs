@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     setupFiles: resolve(__dirname, "vitest.setup.ts"),
+    globals: true,
   },
   resolve: {
     alias: {

@@ -1,21 +1,19 @@
-// useCopyToClipboard.test.ts
-
 import { act, renderHook } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vitest } from "vitest";
+import { vi } from "vitest";
 
 import { useCopyToClipboard } from "./useCopyToClipboard";
 
 describe("useCopyToClipboard", () => {
   beforeEach(() => {
-    vitest.useFakeTimers();
+    vi.useFakeTimers();
 
     userEvent.setup();
   });
 
   afterEach(() => {
-    vitest.useRealTimers();
-    vitest.resetAllMocks();
+    vi.useRealTimers();
+    vi.resetAllMocks();
   });
 
   it("copies the given text to clipboard and updates the copiedText state", async () => {
@@ -31,7 +29,7 @@ describe("useCopyToClipboard", () => {
     const [updatedCopiedText] = result.current;
     expect(updatedCopiedText).toBe(textToCopy);
 
-    vitest.advanceTimersByTime(3000);
+    vi.advanceTimersByTime(3000);
 
     rerender();
 
@@ -40,9 +38,9 @@ describe("useCopyToClipboard", () => {
   });
 
   it("handles clipboard write failure", async () => {
-    vitest
-      .spyOn(navigator.clipboard, "writeText")
-      .mockRejectedValue(new Error("Copy failed"));
+    vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(
+      new Error("Copy failed")
+    );
 
     const { result } = renderHook(useCopyToClipboard);
     const [, copy] = result.current;
