@@ -112,7 +112,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         );
       default:
         if (!formState.isValid) {
-          return formState.errors.amountToSend?.message ?? "Amount is reauired";
+          return formState.errors.amountToSend?.message ?? "Amount is required";
         }
         return (
           <>
@@ -128,8 +128,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
     state.txState?.status,
   ]);
 
-  const isFormDisabled =
-    state.txState.status !== "idle" && state.txState.status !== "reverted";
+  const isFormDisabled = useMemo(
+    () =>
+      state.txState.status !== "idle" && state.txState.status !== "reverted",
+    [state.txState.status]
+  );
 
   return (
     <Modal
@@ -187,6 +190,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               <Label.Text>Amount to send</Label.Text>
               <Label.AltText
                 role="button"
+                aria-label="set max balance to send"
                 onClick={() => {
                   setValue(
                     "amountToSend",

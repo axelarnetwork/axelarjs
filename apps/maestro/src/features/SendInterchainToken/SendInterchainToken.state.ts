@@ -70,3 +70,10 @@ export function useSendInterchainTokenState(props: {
     },
   ] as const;
 }
+
+export type UseSendInterchainTokenState = ReturnType<
+  typeof useSendInterchainTokenState
+>;
+
+export type State = UseSendInterchainTokenState[0];
+export type Actions = UseSendInterchainTokenState[1];

@@ -183,6 +183,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: 4.29.12
         version: 4.29.12(@tanstack/react-query@4.29.12)(react-dom@18.2.0)(react@18.2.0)
+      '@testing-library/jest-dom':
+        specifier: ^5.16.5
+        version: 5.16.5
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -256,15 +259,6 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
-      '@testing-library/jest-dom':
-        specifier: ^5.16.5
-        version: 5.16.5
-      '@testing-library/react':
-        specifier: ^14.0.0
-        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
-      '@tsconfig/strictest':
-        specifier: ^2.0.1
-        version: 2.0.1
       '@types/node':
         specifier: 18.15.3
         version: 18.15.3

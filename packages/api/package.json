@@ -49,9 +49,6 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@tsconfig/strictest": "^2.0.1",
     "@types/node": "18.15.3",
     "fast-check": "^3.10.0",
     "happy-dom": "^9.20.3",
