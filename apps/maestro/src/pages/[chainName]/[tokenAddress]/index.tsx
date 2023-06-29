@@ -15,7 +15,12 @@ import { useRouter } from "next/router";
 import { ExternalLink, InfoIcon } from "lucide-react";
 import { partition, without } from "rambda";
 import { isAddress, TransactionExecutionError } from "viem";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useNetwork,
+  useSwitchNetwork,
+  useWaitForTransaction,
+} from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
@@ -187,6 +192,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
   const { address } = useAccount();
+  const { chain } = useNetwork();
   const {
     data: interchainToken,
     refetch,
@@ -310,6 +316,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     targetDeploymentChains,
   ]);
 
+  const originToken = useMemo(
+    () => interchainToken.matchingTokens?.find((x) => x.isOriginToken),
+    [interchainToken]
+  );
+
+  const { switchNetworkAsync } = useSwitchNetwork();
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -390,17 +403,35 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   </div>
                 </Tooltip>
               )}
-              {selectedChainIds.length > 0 && !deployTokensTxHash ? (
-                <Button
-                  variant="accent"
-                  onClick={handleDeployRemoteTokens}
-                  disabled={isGasPriceQueryLoading || isGasPriceQueryError}
-                  loading={isDeploying}
-                >
-                  Deploy token on {selectedChainIds.length} additional chain
-                  {selectedChainIds.length > 1 ? "s" : ""}
-                </Button>
-              ) : undefined}
+              {selectedChainIds.length > 0 && !deployTokensTxHash && (
+                <>
+                  {originToken?.chainId === chain?.id ? (
+                    <Button
+                      variant="primary"
+                      onClick={handleDeployRemoteTokens}
+                      disabled={isGasPriceQueryLoading || isGasPriceQueryError}
+                      loading={isDeploying}
+                    >
+                      Register token on {selectedChainIds.length} additional
+                      chain
+                      {selectedChainIds.length > 1 ? "s" : ""}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="accent"
+                      onClick={() => {
+                        if (originToken) {
+                          switchNetworkAsync?.(originToken.chainId);
+                        }
+                      }}
+                    >
+                      Switch to {originToken?.chain.name} to register token
+                      {selectedChainIds.length > 1 ? "s" : ""}
+                    </Button>
+                  )}
+                </>
+              )}
+
               {deployTokensTxHash && (
                 <LinkButton
                   variant="accent"
