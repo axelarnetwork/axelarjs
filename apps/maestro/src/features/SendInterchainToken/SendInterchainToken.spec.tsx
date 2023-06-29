@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { describe, expect, it, vi, vitest } from "vitest";
+import { vi } from "vitest";
 
 import SendInterchainToken from "./SendInterchainToken";
 
@@ -43,7 +43,7 @@ const MOCK_EVM_CHAIN_CONFIG = {
 };
 
 vi.mock("./SendInterchainToken.state.ts", () => ({
-  useSendInterchainTokenState: vitest.fn(() => [
+  useSendInterchainTokenState: vi.fn(() => [
     {
       isModalOpen: true,
       txState: {
@@ -54,11 +54,11 @@ vi.mock("./SendInterchainToken.state.ts", () => ({
       eligibleTargetChains: [MOCK_EVM_CHAIN_CONFIG],
     },
     {
-      setIsModalOpen: vitest.fn(),
-      setTxState: vitest.fn(),
-      sendTokenAsync: vitest.fn(),
-      selectToChain: vitest.fn(),
-      refetchBalances: vitest.fn(),
+      setIsModalOpen: vi.fn(),
+      setTxState: vi.fn(),
+      sendTokenAsync: vi.fn(),
+      selectToChain: vi.fn(),
+      refetchBalances: vi.fn(),
     },
   ]),
 }));
