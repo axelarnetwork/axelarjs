@@ -45,11 +45,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             {children}
           </Clamp>
           <Footer
-            className="bg-neutral text-neutral-content relative p-8"
+            className="bg-neutral text-neutral-content relative p-6 md:p-8 xl:p-10"
             center={true}
           >
-            <Footer.Title className="flex items-center">
-              &copy;{new Date().getFullYear()} &middot;{" "}
+            <div className="flex items-center text-sm">
+              &copy;{new Date().getFullYear()} <span>&middot;</span>
               <Link
                 rel="noopener noreferrer"
                 href="https://axelar.network"
@@ -58,7 +58,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               >
                 Axelar Network
               </Link>
-            </Footer.Title>
+            </div>
           </Footer>
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />
