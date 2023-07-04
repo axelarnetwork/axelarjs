@@ -68,6 +68,11 @@ export function useDeployInterchainTokenMutation(config: {
       enabled: Boolean(tokenId),
     });
 
+  const { data: tokenManagerAddress } =
+    useInterchainTokenServiceGetTokenManagerAddress({
+      enabled: Boolean(tokenId),
+    });
+
   const { writeAsync: deplyAndRegisterAsync, data: deployAndRegisterResult } =
     useInterchainTokenServiceDeployAndRegisterStandardizedToken({
       address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
