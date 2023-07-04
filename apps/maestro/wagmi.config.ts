@@ -1,10 +1,19 @@
 import { defineConfig } from "@wagmi/cli";
-import { erc, react } from "@wagmi/cli/plugins";
+import { actions, react } from "@wagmi/cli/plugins";
 
 import { contracts } from "./src/lib/contracts";
 
-export default defineConfig({
-  out: "src/lib/contracts/hooks.ts",
-  contracts,
-  plugins: [react({}), erc({ 20: true })],
-});
+export default defineConfig(
+  contracts.flatMap((contract) => [
+    {
+      out: `src/lib/contracts/${contract.name}.hooks.ts`,
+      contracts: [contract],
+      plugins: [react()],
+    },
+    {
+      out: `src/lib/contracts/${contract.name}.actions.ts`,
+      contracts: [contract],
+      plugins: [actions()],
+    },
+  ])
+);

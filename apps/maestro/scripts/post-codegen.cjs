@@ -1,13 +1,14 @@
 const path = require("path");
 const fs = require("fs/promises");
-const prettier = require("prettier");
 
-async function main() {
-  const destFolder = path.join(__dirname, "..", "src", "lib", "contracts");
+const destFolder = path.join(__dirname, "..", "src", "lib", "contracts");
 
-  // prepednd /* eslint-disable */ to the top of the file
-
-  const filePath = path.join(destFolder, "hooks.ts");
+/**
+ * prepend eslint-disable to the top of the file
+ * @param {string} fileName
+ */
+async function prepend(fileName) {
+  const filePath = path.join(destFolder, fileName);
 
   const content = await fs.readFile(filePath, "utf-8");
 
@@ -17,6 +18,14 @@ async function main() {
   ].join("\n\n");
 
   await fs.writeFile(filePath, updatedContent);
+}
+
+async function main() {
+  const patchFiles = await fs
+    .readdir(destFolder)
+    .then((xs) => xs.filter((x) => /\.(hooks|actions)\.ts/.test(x)));
+
+  await Promise.all(patchFiles.map(prepend));
 }
 
 main();

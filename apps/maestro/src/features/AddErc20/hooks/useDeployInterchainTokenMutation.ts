@@ -1,6 +1,7 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
+import { useMemo } from "react";
 
 import { TransactionExecutionError } from "viem";
 import {
@@ -11,9 +12,15 @@ import {
 } from "wagmi";
 import { watchContractEvent } from "wagmi/actions";
 
-import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
+import {
+  useInterchainTokenServiceDeployAndRegisterStandardizedToken,
+  useInterchainTokenServiceGetCustomTokenId,
+  useInterchainTokenServiceGetStandardizedTokenAddress,
+  useInterchainTokenServiceGetTokenManagerAddress,
+} from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
+import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
@@ -27,6 +34,8 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   decimals: number;
   destinationChainIds: string[];
   gasFees: bigint[];
+  mint: bigint;
+  mintTo: `0x${string}`;
 };
 
 export function useDeployInterchainTokenMutation(config: {
@@ -38,13 +47,31 @@ export function useDeployInterchainTokenMutation(config: {
 
   const { address } = useAccount();
 
-  const {
-    writeAsync: deployInterchainTokenAsync,
-    data: deployInterchainTokenResult,
-  } = useInterchainTokenServiceDeployInterchainToken({
-    address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-    value: config.value,
+  const salt = useMemo(
+    () =>
+      hexZeroPad(
+        hexlify(Math.floor(Math.random() * 1_000_000_000)),
+        32
+      ) as `0x${string}`,
+    []
+  );
+
+  const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
+    args: [address as `0x${string}`, salt],
+    enabled: address && isValidEVMAddress(address),
   });
+
+  const { data: tokenAddress } =
+    useInterchainTokenServiceGetStandardizedTokenAddress({
+      args: [tokenId as `0x${string}`],
+      enabled: Boolean(tokenId),
+    });
+
+  const { writeAsync: deplyAndRegisterAsync, data: deployAndRegisterResult } =
+    useInterchainTokenServiceDeployAndRegisterStandardizedToken({
+      address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+      value: config.value,
+    });
 
   let currentInput: UseDeployAndRegisterInterchainTokenInput = {
     sourceChainId: "",
@@ -53,6 +80,8 @@ export function useDeployInterchainTokenMutation(config: {
     decimals: 0,
     destinationChainIds: [],
     gasFees: [],
+    mint: BigInt(0),
+    mintTo: `0x000`,
   };
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
@@ -84,16 +113,16 @@ export function useDeployInterchainTokenMutation(config: {
       onStatusUpdate({
         type: "deployed",
         tokenAddress: tokenAddress as `0x${string}`,
-        txHash: deployInterchainTokenResult?.hash as `0x${string}`,
+        txHash: deployAndRegisterResult?.hash as `0x${string}`,
       });
     }
   );
 
   useWaitForTransaction({
-    hash: deployInterchainTokenResult?.hash,
+    hash: deployAndRegisterResult?.hash,
     confirmations: 8,
     onSuccess() {
-      if (!deployInterchainTokenResult) {
+      if (!deployAndRegisterResult) {
         return;
       }
       config.onFinished?.();
@@ -108,25 +137,18 @@ export function useDeployInterchainTokenMutation(config: {
 
       currentInput = input;
 
-      //deploy and register tokens
-      const salt = hexZeroPad(
-        hexlify(Math.floor(Math.random() * 1_000_000_000)),
-        32
-      ) as `0x${string}`;
-
       onStatusUpdate({
         type: "pending_approval",
       });
       try {
-        const tx = await deployInterchainTokenAsync({
+        const tx = await deplyAndRegisterAsync({
           args: [
+            salt,
             input.tokenName,
             input.tokenSymbol,
             input.decimals,
-            address,
-            salt,
-            input.destinationChainIds,
-            input.gasFees,
+            input.mint,
+            input.mintTo,
           ],
         });
         if (tx?.hash) {
