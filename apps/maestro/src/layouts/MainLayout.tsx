@@ -9,6 +9,7 @@ import {
   useTheme,
 } from "@axelarjs/ui";
 import type { FC, PropsWithChildren } from "react";
+import Link from "next/link";
 
 import { Web3Modal } from "@web3modal/react";
 
@@ -39,23 +40,32 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     <>
       <Drawer>
         <Drawer.Toggle checked={isDrawerOpen} />
-        <Drawer.Content className="flex min-h-screen flex-1 flex-col gap-4">
+        <Drawer.Content className="flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen">
           <Appbar />
           <Clamp $as="main" className="flex flex-1">
             {children}
           </Clamp>
-          <Footer className="bg-neutral text-neutral-content p-8" center={true}>
-            <Footer.Title>
-              &copy;{new Date().getFullYear()} &middot; Powered by AxelarUI
+          <Footer
+            className="bg-neutral text-neutral-content relative p-8"
+            center={true}
+          >
+            <Footer.Title className="flex items-center">
+              &copy;{new Date().getFullYear()} &middot;{" "}
+              <Link
+                rel="noopener noreferrer"
+                href="https://axelar.network"
+                target="_blank"
+                className="text-accent"
+              >
+                Axelar Network
+              </Link>
             </Footer.Title>
             {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-              <Badge
-                className="absolute right-4 lowercase"
-                size="lg"
-                variant="accent"
-              >
-                env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
-              </Badge>
+              <div className="absolute right-4 p-2">
+                <Badge variant="accent">
+                  env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
+                </Badge>
+              </div>
             )}
           </Footer>
           {shouldRenderTestnetBanner && (

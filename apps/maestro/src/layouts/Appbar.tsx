@@ -5,6 +5,7 @@ import {
   Dropdown,
   Identicon,
   LinkButton,
+  Menu,
   Navbar,
   ThemeSwitcher,
   useIsSticky,
@@ -21,6 +22,18 @@ import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
 import { useLayoutStateContainer } from "./MainLayout.state";
+
+const MENU_ITEMS = [
+  {
+    label: "Getting started",
+  },
+  {
+    label: "Support",
+  },
+  {
+    label: "Terms of Use",
+  },
+];
 
 export type AppbarProps = {};
 
@@ -66,6 +79,14 @@ const Appbar: FC<AppbarProps> = () => {
           <div className="absolute right-4 top-6">
             <ThemeSwitcher />
           </div>
+          <div className="flex-1" />
+          <Menu>
+            {MENU_ITEMS.map((item, index) => (
+              <Menu.Item key={index} onClick={() => router.push("/")}>
+                <a>{item.label}</a>
+              </Menu.Item>
+            ))}
+          </Menu>
         </div>
       ));
     },
@@ -99,6 +120,15 @@ const Appbar: FC<AppbarProps> = () => {
           <span>{APP_NAME}</span>
         </LinkButton>
       </Navbar.Start>
+      <div className="hidden flex-none md:block">
+        <Menu direction="horizontal">
+          {MENU_ITEMS.map((item, index) => (
+            <Menu.Item key={index} onClick={() => router.push("/")}>
+              <a>{item.label}</a>
+            </Menu.Item>
+          ))}
+        </Menu>
+      </div>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
