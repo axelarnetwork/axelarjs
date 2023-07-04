@@ -61,9 +61,19 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               </Link>
             </Footer.Title>
             {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-              <div className="absolute right-4 p-2">
-                <Badge variant="accent">
-                  env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
+              <div className="absolute right-2 top-2 md:bottom-auto md:right-3 md:p-4">
+                <Badge
+                  size="sm"
+                  className="md:badge-md relative flex items-center"
+                >
+                  <Badge
+                    size="xs"
+                    className="origin-left -translate-x-1 scale-75 animate-pulse md:scale-100"
+                    variant="info"
+                  />
+                  <span className="pb-0.5">
+                    env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
+                  </span>
                 </Badge>
               </div>
             )}
