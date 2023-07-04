@@ -1,4 +1,4 @@
-import { convertCase } from "./case"; // Assuming the convertCase function is in a separate file
+import { convertCase } from "./case-conversion"; // Assuming the convertCase function is in a separate file
 
 const TEST_CASES = [
   {
