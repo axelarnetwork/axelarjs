@@ -17,6 +17,7 @@ import {
   useInterchainTokenServiceGetCustomTokenId,
   useInterchainTokenServiceGetStandardizedTokenAddress,
   useInterchainTokenServiceGetTokenManagerAddress,
+  useInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
