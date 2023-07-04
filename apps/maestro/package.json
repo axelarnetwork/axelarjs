@@ -16,7 +16,9 @@
     "test:e2e": "dotenv -e .env.local npx playwright test",
     "ci:e2e": "npx playwright test",
     "test": "vitest --run",
-    "test:coverage": "vitest --coverage --run"
+    "test:coverage": "vitest --coverage --run",
+    "abi:sync": "node scripts/sync-abis.cjs",
+    "wagmi:codegen": "pnpm wagmi generate"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.12.8",
@@ -27,7 +29,7 @@
     "@axelarjs/utils": "workspace:*",
     "@hookform/resolvers": "^3.1.1",
     "@sentry/nextjs": "^7.57.0",
-    "@tanstack/react-query": "4.29.12",
+    "@tanstack/react-query": "4.29.19",
     "@trpc/client": "^10.33.0",
     "@trpc/next": "^10.33.0",
     "@trpc/react-query": "^10.33.0",
@@ -58,17 +60,17 @@
     "trpc-openapi": "^1.2.0",
     "typescript": "^5.1.6",
     "viem": "^1.2.9",
-    "wagmi": "^1.3.4",
+    "wagmi": "^1.3.5",
     "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
     "@next/bundle-analyzer": "^13.4.8",
     "@playwright/test": "^1.35.1",
-    "@tanstack/react-query-devtools": "4.29.12",
+    "@tanstack/react-query-devtools": "4.29.19",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
-    "@testing-library/jest-dom": "^5.16.5",
     "@types/logrocket-react": "^3.0.0",
     "@types/nprogress": "^0.2.0",
     "@types/swagger-ui-react": "^4.18.0",
@@ -77,6 +79,7 @@
     "@typescript-eslint/parser": "^5.61.0",
     "@vitejs/plugin-react": "^4.0.1",
     "@vitest/coverage-v8": "^0.32.4",
+    "@wagmi/cli": "^1.3.0",
     "autoprefixer": "^10.4.14",
     "concurrently": "^8.2.0",
     "dotenv-cli": "^7.2.1",

@@ -60,17 +60,17 @@ export function useDeployInterchainTokenMutation(config: {
   const unwatch = watchContractEvent(
     {
       address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-      eventName: "TokenDeployed",
+      eventName: "StandardizedTokenDeployed",
       abi: INTERCHAIN_TOKEN_SERVICE_ABI,
     },
     (logs) => {
       const log = logs.find(
         (log) =>
-          Boolean(log.args?.tokenAddress) &&
+          Boolean(log.args?.tokenId) &&
           log?.args.decimals === currentInput.decimals &&
           log?.args.name === currentInput.tokenName &&
           log?.args.symbol === currentInput.tokenSymbol &&
-          log?.args.owner === address
+          log?.args.mintTo === address
       );
 
       if (!log) {
@@ -79,9 +79,11 @@ export function useDeployInterchainTokenMutation(config: {
 
       unwatch();
 
+      const tokenAddress = `0x${log.args?.tokenId}`;
+
       onStatusUpdate({
         type: "deployed",
-        tokenAddress: log.args?.tokenAddress as `0x${string}`,
+        tokenAddress: tokenAddress as `0x${string}`,
         txHash: deployInterchainTokenResult?.hash as `0x${string}`,
       });
     }
