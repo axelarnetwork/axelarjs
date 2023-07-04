@@ -65,7 +65,6 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 <Badge
                   size="sm"
                   className="md:badge-md relative flex items-center"
-                  outline
                 >
                   <Badge
                     size="xs"
