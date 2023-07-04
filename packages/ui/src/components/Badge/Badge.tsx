@@ -4,7 +4,7 @@ import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 import tw from "tailwind-styled-components";
 
-const StyledBadge = tw.div``;
+const StyledBadge = tw.span`pb-0.5`;
 
 const badgeVariance = cva("badge", {
   variants: {
