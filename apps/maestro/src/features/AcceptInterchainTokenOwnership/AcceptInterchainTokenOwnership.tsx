@@ -5,7 +5,7 @@ import { useCallback, useMemo, type FC } from "react";
 import { TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
-import { useAcceptInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
+import { useInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 
@@ -26,7 +26,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     writeAsync: acceptOwnershipAsync,
     isLoading: isAccepting,
     data: acceptResult,
-  } = useAcceptInterchainTokenOnwership({
+  } = useInterchainTokenServiceAcceptOwnership({
     address: props.tokenAddress,
   });
 

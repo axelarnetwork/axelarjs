@@ -11,7 +11,6 @@ async function main() {
     "packages",
     "evm",
     "src",
-    "lib",
     "contracts"
   );
 
@@ -19,11 +18,13 @@ async function main() {
     .readdir(contractsDir)
     .then((xs) => xs.filter((x) => /^[a-z-]+$/.test(x)));
 
+  const destFolder = path.join(__dirname, "..", "src", "lib", "contracts");
+
   await Promise.all(
     contractFolders.map((folder) =>
       fs.copyFile(
         path.join(contractsDir, folder, `${folder}.abi.ts`),
-        path.join(__dirname, "..", "src", "contracts", `${folder}.abi.ts`)
+        path.join(destFolder, `${folder}.abi.ts`)
       )
     )
   );
@@ -46,7 +47,7 @@ async function main() {
     .concat("\n\n", contractConfigs);
 
   await fs.writeFile(
-    path.join(__dirname, "..", "src", "contracts", "index.ts"),
+    path.join(destFolder, "index.ts"),
     prettier.format(indexContent, { parser: "babel-ts" })
   );
 }
