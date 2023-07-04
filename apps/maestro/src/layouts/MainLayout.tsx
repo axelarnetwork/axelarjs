@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   Clamp,
@@ -60,23 +59,6 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 Axelar Network
               </Link>
             </Footer.Title>
-            {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-              <div className="absolute right-2 top-2 md:bottom-auto md:right-3 md:p-4">
-                <Badge
-                  size="sm"
-                  className="md:badge-md relative flex items-center"
-                >
-                  <Badge
-                    size="xs"
-                    className="origin-left -translate-x-1 scale-75 animate-pulse md:scale-100"
-                    variant="info"
-                  />
-                  <span className="pb-0.5">
-                    env: {process.env.NEXT_PUBLIC_NETWORK_ENV}
-                  </span>
-                </Badge>
-              </div>
-            )}
           </Footer>
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />

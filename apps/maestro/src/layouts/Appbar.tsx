@@ -1,5 +1,6 @@
 import {
   AxelarIcon,
+  Badge,
   Button,
   CopyToClipboardButton,
   Dropdown,
@@ -117,7 +118,18 @@ const Appbar: FC<AppbarProps> = () => {
           variant="ghost"
         >
           <AxelarIcon className="h-6 w-6 dark:invert" />
-          <span>{APP_NAME}</span>
+          <div className="indicator">
+            <span>{APP_NAME}</span>
+            {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+              <Badge
+                size="xs"
+                variant="info"
+                className="indicator-item indicator-bottom lowercase"
+              >
+                {process.env.NEXT_PUBLIC_NETWORK_ENV}
+              </Badge>
+            )}
+          </div>
         </LinkButton>
       </Navbar.Start>
       <div className="hidden flex-none md:block">
