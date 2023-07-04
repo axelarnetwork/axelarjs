@@ -11,6 +11,7 @@ export * from "./DropdownMenu";
 export * from "./Footer";
 export * from "./icons";
 export * from "./Identicon";
+export * from "./Indicator";
 export * from "./InputGroup";
 export * from "./Kbd";
 export * from "./Loading";
