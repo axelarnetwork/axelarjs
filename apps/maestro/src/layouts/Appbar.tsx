@@ -108,7 +108,7 @@ const Appbar: FC<AppbarProps> = () => {
       ));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isConnected]
+    [isConnected, address]
   );
 
   return (
