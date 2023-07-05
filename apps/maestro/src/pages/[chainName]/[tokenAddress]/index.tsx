@@ -25,10 +25,9 @@ import {
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
-import { useDeployRemoteTokensMutation } from "~/features/AddErc20/hooks/useDeployRemoteTokensMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import Page from "~/layouts/Page";
-import { useInterchainTokenServiceRegisterOriginToken } from "~/lib/contract/hooks/useInterchainTokenService";
+import { useInterchainTokenServiceRegisterCanonicalToken } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { logger } from "~/lib/logger";
@@ -114,8 +113,9 @@ const RegisterOriginTokenButton = ({
 }) => {
   const [txState, setTxState] = useTransactionState();
 
-  const { writeAsync, data } = useInterchainTokenServiceRegisterOriginToken({
+  const { writeAsync, data } = useInterchainTokenServiceRegisterCanonicalToken({
     address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+    value: BigInt(0),
   });
 
   useWaitForTransaction({
@@ -286,35 +286,23 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     gasMultipler: 2,
   });
 
-  const { mutateAsync: deployRemoteTokens, isLoading: isDeploying } =
-    useDeployRemoteTokensMutation(
-      gasFees?.reduce((acc, x) => acc + x, BigInt(0)) ?? BigInt(0)
-    );
-
   const handleDeployRemoteTokens = useCallback(async () => {
     if (!(props.chainId && interchainToken?.tokenId && gasFees)) {
       return;
     }
 
-    await deployRemoteTokens({
-      destinationChainIds: targetDeploymentChains,
-      tokenAddress: props.tokenAddress,
-      tokenId: interchainToken.tokenId as `0x${string}`,
-      gasFees,
-      onStatusUpdate(status) {
-        if (status.type === "deployed") {
-          setDeployTokensTxHash(status.txHash);
-        }
-      },
-    });
-  }, [
-    props.chainId,
-    props.tokenAddress,
-    interchainToken.tokenId,
-    gasFees,
-    deployRemoteTokens,
-    targetDeploymentChains,
-  ]);
+    // await deployRemoteTokens({
+    //   destinationChainIds: targetDeploymentChains,
+    //   tokenAddress: props.tokenAddress,
+    //   tokenId: interchainToken.tokenId as `0x${string}`,
+    //   gasFees,
+    //   onStatusUpdate(status) {
+    //     if (status.type === "deployed") {
+    //       setDeployTokensTxHash(status.txHash);
+    //     }
+    //   },
+    // });
+  }, [props.chainId, interchainToken?.tokenId, gasFees]);
 
   const originToken = useMemo(
     () => interchainToken.matchingTokens?.find((x) => x.isOriginToken),
@@ -410,7 +398,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                       variant="primary"
                       onClick={handleDeployRemoteTokens}
                       disabled={isGasPriceQueryLoading || isGasPriceQueryError}
-                      loading={isDeploying}
+                      // loading={isDeploying}
                     >
                       Register token on {selectedChainIds.length} additional
                       chain

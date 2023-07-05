@@ -1,4 +1,4 @@
-import type { InterchainTokenClient } from "@axelarjs/evm";
+import type { ERC20Client } from "@axelarjs/evm";
 
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
@@ -25,7 +25,7 @@ export const getInterchainTokenDetails = publicProcedure
       if (!chainConfig) {
         // scan all chains
         for (const chainConfig of EVM_CHAIN_CONFIGS) {
-          const client = ctx.contracts.createInterchainTokenClient(
+          const client = ctx.contracts.createERC20Client(
             chainConfig,
             input.tokenAddress as `0x${string}`
           );
@@ -54,7 +54,7 @@ export const getInterchainTokenDetails = publicProcedure
         });
       }
 
-      const client = ctx.contracts.createInterchainTokenClient(
+      const client = ctx.contracts.createERC20Client(
         chainConfig,
         input.tokenAddress as `0x${string}`
       );
@@ -73,7 +73,7 @@ export const getInterchainTokenDetails = publicProcedure
     }
   });
 
-async function getTokenPublicDetails(client: InterchainTokenClient) {
+async function getTokenPublicDetails(client: ERC20Client) {
   invariant(client.chain, "client.chain must be defined");
 
   const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([

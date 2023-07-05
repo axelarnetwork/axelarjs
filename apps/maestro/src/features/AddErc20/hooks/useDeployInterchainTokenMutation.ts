@@ -14,14 +14,14 @@ import { watchContractEvent } from "wagmi/actions";
 
 import {
   useInterchainTokenServiceDeployAndRegisterStandardizedToken,
-  useInterchainTokenServiceGetCustomTokenId,
-  useInterchainTokenServiceGetStandardizedTokenAddress,
-  useInterchainTokenServiceGetTokenManagerAddress,
-  useInterchainTokenServiceMulticall,
+  // useInterchainTokenServiceGetCustomTokenId,
+  // useInterchainTokenServiceGetStandardizedTokenAddress,
+  // useInterchainTokenServiceGetTokenManagerAddress,
+  // useInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
-import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
+// import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
@@ -35,8 +35,8 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   decimals: number;
   destinationChainIds: string[];
   gasFees: bigint[];
-  mint: bigint;
-  mintTo: `0x${string}`;
+  cap?: bigint;
+  mintTo?: `0x${string}`;
 };
 
 export function useDeployInterchainTokenMutation(config: {
@@ -57,21 +57,21 @@ export function useDeployInterchainTokenMutation(config: {
     []
   );
 
-  const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: [address as `0x${string}`, salt],
-    enabled: address && isValidEVMAddress(address),
-  });
+  // const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
+  //   args: [address as `0x${string}`, salt],
+  //   enabled: address && isValidEVMAddress(address),
+  // });
 
-  const { data: tokenAddress } =
-    useInterchainTokenServiceGetStandardizedTokenAddress({
-      args: [tokenId as `0x${string}`],
-      enabled: Boolean(tokenId),
-    });
+  // const { data: tokenAddress } =
+  //   useInterchainTokenServiceGetStandardizedTokenAddress({
+  //     args: [tokenId as `0x${string}`],
+  //     enabled: Boolean(tokenId),
+  //   });
 
-  const { data: tokenManagerAddress } =
-    useInterchainTokenServiceGetTokenManagerAddress({
-      enabled: Boolean(tokenId),
-    });
+  // const { data: tokenManagerAddress } =
+  //   useInterchainTokenServiceGetTokenManagerAddress({
+  //     enabled: Boolean(tokenId),
+  //   });
 
   const { writeAsync: deplyAndRegisterAsync, data: deployAndRegisterResult } =
     useInterchainTokenServiceDeployAndRegisterStandardizedToken({
@@ -86,7 +86,7 @@ export function useDeployInterchainTokenMutation(config: {
     decimals: 0,
     destinationChainIds: [],
     gasFees: [],
-    mint: BigInt(0),
+    cap: BigInt(0),
     mintTo: `0x000`,
   };
 
@@ -153,8 +153,8 @@ export function useDeployInterchainTokenMutation(config: {
             input.tokenName,
             input.tokenSymbol,
             input.decimals,
-            input.mint,
-            input.mintTo,
+            input.cap ?? BigInt(0),
+            input.mintTo ?? address,
           ],
         });
         if (tx?.hash) {

@@ -75,6 +75,8 @@ export const Step3: FC = () => {
           destinationChainIds: Array.from(rootState.selectedChains),
           gasFees: state.gasFees,
           sourceChainId: sourceChain.chain_name,
+          cap: rootState.tokenDetails.cap,
+          mintTo: rootState.tokenDetails.mintTo,
         },
         {
           onError(error) {
@@ -94,11 +96,13 @@ export const Step3: FC = () => {
       state.evmChains,
       state.network.chain?.id,
       actions,
-      rootState.tokenDetails.tokenDecimals,
+      deployInterchainTokenAsync,
       rootState.tokenDetails.tokenName,
       rootState.tokenDetails.tokenSymbol,
+      rootState.tokenDetails.tokenDecimals,
+      rootState.tokenDetails.cap,
+      rootState.tokenDetails.mintTo,
       rootState.selectedChains,
-      deployInterchainTokenAsync,
     ]
   );
 

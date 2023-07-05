@@ -28,7 +28,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     }
 
     try {
-      const client = ctx.contracts.createInterchainTokenClient(
+      const client = ctx.contracts.createERC20Client(
         chainConfig,
         input.tokenAddress as `0x${string}`
       );

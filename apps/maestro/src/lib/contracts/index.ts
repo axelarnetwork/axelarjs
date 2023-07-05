@@ -1,8 +1,10 @@
+import ERC_20_ABI from "./erc-20.abi";
 import INTERCHAIN_TOKEN_SERVICE_ABI from "./interchain-token-service.abi";
 import INTERCHAIN_TOKEN_ABI from "./interchain-token.abi";
 import TOKEN_MANAGER_ABI from "./token-manager.abi";
 
 export const contracts = [
+  { name: ERC_20_ABI.contractName, abi: ERC_20_ABI.abi },
   { name: INTERCHAIN_TOKEN_ABI.contractName, abi: INTERCHAIN_TOKEN_ABI.abi },
   {
     name: INTERCHAIN_TOKEN_SERVICE_ABI.contractName,

@@ -18,11 +18,14 @@ import {
 } from "wagmi/actions";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// InterchainToken
+// IERC20BurnableMintable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const interchainTokenABI = [
+export const ierc20BurnableMintableABI = [
   { type: "error", inputs: [], name: "InvalidAccount" },
+  { type: "error", inputs: [], name: "InvalidOwner" },
+  { type: "error", inputs: [], name: "NotOwner" },
+  { type: "error", inputs: [], name: "NotSelf" },
   {
     type: "event",
     anonymous: false,
@@ -52,6 +55,32 @@ export const interchainTokenABI = [
     type: "event",
     anonymous: false,
     inputs: [
+      {
+        name: "newOwner",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+    ],
+    name: "OwnershipTransferStarted",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "newOwner",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+    ],
+    name: "OwnershipTransferred",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
       { name: "from", internalType: "address", type: "address", indexed: true },
       { name: "to", internalType: "address", type: "address", indexed: true },
       {
@@ -64,11 +93,18 @@ export const interchainTokenABI = [
     name: "Transfer",
   },
   {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [],
+    name: "acceptOwnership",
+    outputs: [],
+  },
+  {
     stateMutability: "view",
     type: "function",
     inputs: [
-      { name: "", internalType: "address", type: "address" },
-      { name: "", internalType: "address", type: "address" },
+      { name: "owner", internalType: "address", type: "address" },
+      { name: "spender", internalType: "address", type: "address" },
     ],
     name: "allowance",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
@@ -86,9 +122,19 @@ export const interchainTokenABI = [
   {
     stateMutability: "view",
     type: "function",
-    inputs: [{ name: "", internalType: "address", type: "address" }],
+    inputs: [{ name: "account", internalType: "address", type: "address" }],
     name: "balanceOf",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "from", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "burnFrom",
+    outputs: [],
   },
   {
     stateMutability: "view",
@@ -101,58 +147,10 @@ export const interchainTokenABI = [
     stateMutability: "nonpayable",
     type: "function",
     inputs: [
-      { name: "spender", internalType: "address", type: "address" },
-      { name: "subtractedValue", internalType: "uint256", type: "uint256" },
-    ],
-    name: "decreaseAllowance",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "getTokenManager",
-    outputs: [
-      {
-        name: "tokenManager",
-        internalType: "contract ITokenManager",
-        type: "address",
-      },
-    ],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "spender", internalType: "address", type: "address" },
-      { name: "addedValue", internalType: "uint256", type: "uint256" },
-    ],
-    name: "increaseAllowance",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "destinationChain", internalType: "string", type: "string" },
-      { name: "recipient", internalType: "bytes", type: "bytes" },
+      { name: "to", internalType: "address", type: "address" },
       { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "metadata", internalType: "bytes", type: "bytes" },
     ],
-    name: "interchainTransfer",
-    outputs: [],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "sender", internalType: "address", type: "address" },
-      { name: "destinationChain", internalType: "string", type: "string" },
-      { name: "recipient", internalType: "bytes", type: "bytes" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "metadata", internalType: "bytes", type: "bytes" },
-    ],
-    name: "interchainTransferFrom",
+    name: "mint",
     outputs: [],
   },
   {
@@ -166,15 +164,34 @@ export const interchainTokenABI = [
     stateMutability: "view",
     type: "function",
     inputs: [],
-    name: "symbol",
-    outputs: [{ name: "", internalType: "string", type: "string" }],
+    name: "owner",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
   },
   {
     stateMutability: "view",
     type: "function",
     inputs: [],
-    name: "tokenManagerRequiresApproval",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    name: "pendingOwner",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "name_", internalType: "string", type: "string" },
+      { name: "symbol_", internalType: "string", type: "string" },
+      { name: "decimals_", internalType: "uint8", type: "uint8" },
+      { name: "owner", internalType: "address", type: "address" },
+    ],
+    name: "setup",
+    outputs: [],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "symbol",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
   },
   {
     stateMutability: "view",
@@ -204,6 +221,13 @@ export const interchainTokenABI = [
     name: "transferFrom",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
   },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
+    name: "transferOwnership",
+    outputs: [],
+  },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,70 +235,78 @@ export const interchainTokenABI = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link getContract}__ with `abi` set to __{@link interchainTokenABI}__.
+ * Wraps __{@link getContract}__ with `abi` set to __{@link ierc20BurnableMintableABI}__.
  */
-export function getInterchainToken(config: Omit<GetContractArgs, "abi">) {
-  return getContract({ abi: interchainTokenABI, ...config });
+export function getIerc20BurnableMintable(
+  config: Omit<GetContractArgs, "abi">
+) {
+  return getContract({ abi: ierc20BurnableMintableABI, ...config });
 }
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link interchainTokenABI}__.
+ * Wraps __{@link readContract}__ with `abi` set to __{@link ierc20BurnableMintableABI}__.
  */
-export function readInterchainToken<
-  TAbi extends readonly unknown[] = typeof interchainTokenABI,
+export function readIerc20BurnableMintable<
+  TAbi extends readonly unknown[] = typeof ierc20BurnableMintableABI,
   TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, "abi">) {
   return readContract({
-    abi: interchainTokenABI,
+    abi: ierc20BurnableMintableABI,
     ...config,
   } as unknown as ReadContractConfig<TAbi, TFunctionName>);
 }
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link interchainTokenABI}__.
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc20BurnableMintableABI}__.
  */
-export function writeInterchainToken<TFunctionName extends string>(
+export function writeIerc20BurnableMintable<TFunctionName extends string>(
   config:
     | Omit<
-        WriteContractPreparedArgs<typeof interchainTokenABI, TFunctionName>,
+        WriteContractPreparedArgs<
+          typeof ierc20BurnableMintableABI,
+          TFunctionName
+        >,
         "abi"
       >
     | Omit<
-        WriteContractUnpreparedArgs<typeof interchainTokenABI, TFunctionName>,
+        WriteContractUnpreparedArgs<
+          typeof ierc20BurnableMintableABI,
+          TFunctionName
+        >,
         "abi"
       >
 ) {
   return writeContract({
-    abi: interchainTokenABI,
+    abi: ierc20BurnableMintableABI,
     ...config,
-  } as unknown as WriteContractArgs<typeof interchainTokenABI, TFunctionName>);
+  } as unknown as WriteContractArgs<typeof ierc20BurnableMintableABI, TFunctionName>);
 }
 
 /**
- * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link interchainTokenABI}__.
+ * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link ierc20BurnableMintableABI}__.
  */
-export function prepareWriteInterchainToken<
-  TAbi extends readonly unknown[] = typeof interchainTokenABI,
+export function prepareWriteIerc20BurnableMintable<
+  TAbi extends readonly unknown[] = typeof ierc20BurnableMintableABI,
   TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, "abi">) {
   return prepareWriteContract({
-    abi: interchainTokenABI,
+    abi: ierc20BurnableMintableABI,
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>);
 }
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link interchainTokenABI}__.
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link ierc20BurnableMintableABI}__.
  */
-export function watchInterchainTokenEvent<
-  TAbi extends readonly unknown[] = typeof interchainTokenABI,
+export function watchIerc20BurnableMintableEvent<
+  TAbi extends readonly unknown[] = typeof ierc20BurnableMintableABI,
   TEventName extends string = string
 >(
   config: Omit<WatchContractEventConfig<TAbi, TEventName>, "abi">,
   callback: WatchContractEventCallback<TAbi, TEventName>
 ) {
   return watchContractEvent(
-    { abi: interchainTokenABI, ...config } as WatchContractEventConfig<
+    { abi: ierc20BurnableMintableABI, ...config } as WatchContractEventConfig<
       TAbi,
       TEventName
     >,

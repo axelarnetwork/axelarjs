@@ -5,7 +5,7 @@ import { useCallback, useMemo, type FC } from "react";
 import { TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
-import { useInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/hooks";
+import { useInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 

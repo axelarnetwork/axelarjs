@@ -16,7 +16,7 @@ async function main() {
 
   const contractFolders = await fs
     .readdir(contractsDir)
-    .then((xs) => xs.filter((x) => /^[a-z-]+$/.test(x)));
+    .then((xs) => xs.filter((x) => /^[a-z-0-9]+$/.test(x)));
 
   const destFolder = path.join(__dirname, "..", "src", "lib", "contracts");
 

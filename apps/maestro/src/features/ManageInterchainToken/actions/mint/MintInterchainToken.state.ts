@@ -3,7 +3,7 @@ import { toast } from "@axelarjs/ui";
 import { isAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
-import { useMintInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
+import { useIerc20BurnableMintableMint } from "~/lib/contracts/IERC20BurnableMintable.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
@@ -29,7 +29,7 @@ export function useMintInterchainTokenState() {
     writeAsync: mintTokenAsync,
     isLoading: isMinting,
     data: mintResult,
-  } = useMintInterchainToken({
+  } = useIerc20BurnableMintableMint({
     address: managerState.tokenAddress,
   });
 
