@@ -198,16 +198,23 @@ const MENU_ITEMS: Menuitem[] = [
     label: "Getting started",
     ModalContent: () => (
       <article className="grid gap-2">
-        <header className="text-lg font-bold uppercase">
+        <header className="font-bold uppercase">
           What is an Interchain Token?
         </header>
-        <main>
-          Unlock seamless blockchain interoperability with the Interchain Token
-          Standard. Our standards and protocols enable frictionless token
-          transfers and interactions across diverse blockchain networks. Embrace
-          a decentralized ecosystem where tokens flow freely, transcending
-          individual chains. Join our community of innovators driving the future
-          of interconnected blockchains.
+        <main className="grid gap-4">
+          <p>
+            Axelar introduces the Interchain Token Standard to extend ERC-20
+            compatibility across Web3. Now, you can easily make any token an
+            interchain token.
+          </p>
+          <p>
+            Unlock seamless blockchain interoperability with the Interchain
+            Token Standard. Our standards and protocols enable frictionless
+            token transfers and interactions across diverse blockchain networks.
+            Embrace a decentralized ecosystem where tokens flow freely,
+            transcending individual chains. Join our community of innovators
+            driving the future of interconnected blockchains.
+          </p>
         </main>
       </article>
     ),
@@ -219,11 +226,14 @@ const MENU_ITEMS: Menuitem[] = [
         <ul className="grid gap-4">
           <li>
             <article className="grid gap-2">
-              <header className="text-lg font-bold uppercase">
+              <header className="font-bold uppercase">
                 Transaction History
               </header>
               <main>
-                <Link href={NEXT_PUBLIC_EXPLORER_URL} className="flex gap-2">
+                <Link
+                  href={NEXT_PUBLIC_EXPLORER_URL}
+                  className="hover:text-primary flex gap-2"
+                >
                   <span className="text-sm">
                     Search Axelarscan for any transactions you made through
                     Satellite. You can search by sending, receiving, or deposit
@@ -242,7 +252,7 @@ const MENU_ITEMS: Menuitem[] = [
               <main>
                 <Link
                   href={NEXT_PUBLIC_FILE_BUG_REPORT_URL}
-                  className="flex gap-2"
+                  className="hover:text-primary flex gap-2"
                 >
                   <span className="text-sm">
                     For general help, submit your questions/feedback via
@@ -262,7 +272,9 @@ const MENU_ITEMS: Menuitem[] = [
     ModalContent: () => (
       <article className="prose dark:prose-invert max-h-[70dvh] overflow-y-scroll">
         {TERMS_OF_USE_PARAGRAPHS.map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
+          <p className="text-sm" key={index}>
+            {paragraph}
+          </p>
         ))}
       </article>
     ),
