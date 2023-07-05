@@ -75,7 +75,7 @@ export const Step3: FC = () => {
           destinationChainIds: Array.from(rootState.selectedChains),
           gasFees: state.gasFees,
           sourceChainId: sourceChain.chain_name,
-          cap: rootState.tokenDetails.cap,
+          cap: BigInt(rootState.tokenDetails.cap),
           mintTo: rootState.tokenDetails.mintTo,
         },
         {
