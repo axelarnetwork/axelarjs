@@ -61,7 +61,7 @@
     "trpc-openapi": "^1.2.0",
     "typescript": "^5.1.6",
     "viem": "^1.2.9",
-    "wagmi": "^1.3.6",
+    "wagmi": "^1.3.7",
     "zod": "^3.21.4"
   },
   "devDependencies": {
