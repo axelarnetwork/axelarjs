@@ -1,40 +1,36 @@
 import {
   AxelarIcon,
   Button,
+  Card,
   CopyToClipboardButton,
   Dropdown,
   Identicon,
   Indicator,
   LinkButton,
   Menu,
+  Modal,
   Navbar,
   ThemeSwitcher,
   useIsSticky,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import React, { useEffect, type FC } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
-import { ExternalLinkIcon, MenuIcon } from "lucide-react";
+import { ArrowRightIcon, ExternalLinkIcon, MenuIcon } from "lucide-react";
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
+import {
+  NEXT_PUBLIC_EXPLORER_URL,
+  NEXT_PUBLIC_FILE_BUG_REPORT_URL,
+} from "~/config/env";
+import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
 import { useLayoutStateContainer } from "./MainLayout.state";
-
-const MENU_ITEMS = [
-  {
-    label: "Getting started",
-  },
-  {
-    label: "Support",
-  },
-  {
-    label: "Terms of Use",
-  },
-];
 
 export type AppbarProps = {};
 
@@ -49,6 +45,35 @@ const Appbar: FC<AppbarProps> = () => {
 
   const [state, actions] = useLayoutStateContainer();
 
+  const connectedAccountDetails = address ? (
+    <>
+      <CopyToClipboardButton
+        size="sm"
+        copyText={address}
+        outline={true}
+        className="flex items-center gap-1"
+      >
+        <Identicon address={address ?? ""} diameter={18} />{" "}
+        {maskAddress(address)}
+      </CopyToClipboardButton>
+      <LinkButton
+        size="sm"
+        variant="info"
+        outline
+        target="_blank"
+        rel="noopener noreferrer"
+        href={`${chain?.blockExplorers?.default.url}/address/${address}`}
+        className="flex flex-nowrap items-center gap-1"
+      >
+        View on {chain?.blockExplorers?.default.name}{" "}
+        <ExternalLinkIcon className="h-[1em] w-[1em]" />
+      </LinkButton>
+      <Button size="sm" variant="error" onClick={() => disconnect()}>
+        Disconnect
+      </Button>
+    </>
+  ) : null;
+
   useEffect(
     () => {
       actions.setDrawerSideContent(() => (
@@ -60,18 +85,13 @@ const Appbar: FC<AppbarProps> = () => {
           <>
             {isConnected && address ? (
               <>
-                <CopyToClipboardButton
-                  size="sm"
-                  copyText={address}
-                  outline={true}
-                  className="flex items-center gap-2"
-                >
-                  <Identicon address={address ?? ""} diameter={18} />{" "}
-                  {maskAddress(address)}
-                </CopyToClipboardButton>
-                <Button size="sm" onClick={() => disconnect()}>
-                  Disconnect
-                </Button>
+                <EVMChainsDropdown
+                  contentClassName="max-h-[70dvh] w-[300px] translate-x-2"
+                  triggerClassName="btn btn-block justify-between"
+                />
+                <Card className="bg-base-200" compact>
+                  <Card.Body>{connectedAccountDetails}</Card.Body>
+                </Card>
               </>
             ) : (
               <ConnectWalletButton />
@@ -82,11 +102,7 @@ const Appbar: FC<AppbarProps> = () => {
           </div>
           <div className="flex-1" />
           <Menu>
-            {MENU_ITEMS.map((item, index) => (
-              <Menu.Item key={index} onClick={() => router.push("/")}>
-                <a>{item.label}</a>
-              </Menu.Item>
-            ))}
+            <MenuItems />
           </Menu>
         </div>
       ));
@@ -135,11 +151,7 @@ const Appbar: FC<AppbarProps> = () => {
       </Navbar.Start>
       <div className="hidden flex-none md:block">
         <Menu direction="horizontal">
-          {MENU_ITEMS.map((item, index) => (
-            <Menu.Item key={index} onClick={() => router.push("/")}>
-              <a>{item.label}</a>
-            </Menu.Item>
-          ))}
+          <MenuItems />
         </Menu>
       </div>
       <Navbar.End>
@@ -160,37 +172,7 @@ const Appbar: FC<AppbarProps> = () => {
                   </button>
                 </Dropdown.Trigger>
                 <Dropdown.Content className="bg-base-100 dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-2 p-3 md:w-48">
-                  <>
-                    <CopyToClipboardButton
-                      size="sm"
-                      copyText={address}
-                      outline={true}
-                      className="flex items-center gap-1"
-                    >
-                      <Identicon address={address ?? ""} diameter={18} />{" "}
-                      {maskAddress(address)}
-                    </CopyToClipboardButton>
-
-                    <LinkButton
-                      size="sm"
-                      variant="info"
-                      outline
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={`${chain?.blockExplorers?.default.url}/address/${address}`}
-                      className="flex flex-nowrap items-center gap-1"
-                    >
-                      View on {chain?.blockExplorers?.default.name}{" "}
-                      <ExternalLinkIcon className="h-[1em] w-[1em]" />
-                    </LinkButton>
-                    <Button
-                      size="sm"
-                      variant="error"
-                      onClick={() => disconnect()}
-                    >
-                      Disconnect
-                    </Button>
-                  </>
+                  {connectedAccountDetails}
                 </Dropdown.Content>
               </Dropdown>
             </>
@@ -205,3 +187,99 @@ const Appbar: FC<AppbarProps> = () => {
 };
 
 export default Appbar;
+
+type Menuitem = {
+  label: string;
+  ModalContent: FC;
+};
+
+const MENU_ITEMS: Menuitem[] = [
+  {
+    label: "Getting started",
+    ModalContent: () => (
+      <article className="grid gap-2">
+        <header className="text-lg font-bold uppercase">
+          What is an Interchain Token?
+        </header>
+        <main>
+          Unlock seamless blockchain interoperability with the Interchain Token
+          Standard. Our standards and protocols enable frictionless token
+          transfers and interactions across diverse blockchain networks. Embrace
+          a decentralized ecosystem where tokens flow freely, transcending
+          individual chains. Join our community of innovators driving the future
+          of interconnected blockchains.
+        </main>
+      </article>
+    ),
+  },
+  {
+    label: "Support",
+    ModalContent: () => (
+      <>
+        <ul className="grid gap-4">
+          <li>
+            <article className="grid gap-2">
+              <header className="text-lg font-bold uppercase">
+                Transaction History
+              </header>
+              <main>
+                <Link href={NEXT_PUBLIC_EXPLORER_URL} className="flex gap-2">
+                  <span className="text-sm">
+                    Search Axelarscan for any transactions you made through
+                    Satellite. You can search by sending, receiving, or deposit
+                    addresses.
+                  </span>
+                  <ArrowRightIcon />
+                </Link>
+              </main>
+            </article>
+          </li>
+          <li>
+            <article className="grid gap-2">
+              <header className="text-lg font-bold uppercase">
+                File a Bug Report
+              </header>
+              <main>
+                <Link
+                  href={NEXT_PUBLIC_FILE_BUG_REPORT_URL}
+                  className="flex gap-2"
+                >
+                  <span className="text-sm">
+                    For general help, submit your questions/feedback via
+                    Zendesk. Any and all thoughts welcome! Forward Arrow Link
+                  </span>
+                  <ArrowRightIcon />
+                </Link>
+              </main>
+            </article>
+          </li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    label: "Terms of Use",
+    ModalContent: () => (
+      <article className="prose dark:prose-invert max-h-[70dvh] overflow-y-scroll">
+        {TERMS_OF_USE_PARAGRAPHS.map((paragraph, index) => (
+          <p key={index}>{paragraph}</p>
+        ))}
+      </article>
+    ),
+  },
+];
+
+const MenuItems = () => (
+  <>
+    {MENU_ITEMS.map((item, index) => (
+      <Menu.Item key={index}>
+        <Modal
+          trigger={<a className="lg:uppercase lg:underline">{item.label}</a>}
+        >
+          <Modal.Title>{item.label}</Modal.Title>
+          <Modal.Body>{item.ModalContent && <item.ModalContent />}</Modal.Body>
+        </Modal>
+      </Menu.Item>
+    ))}
+  </>
+);
