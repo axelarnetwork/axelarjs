@@ -1,6 +1,6 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
-import { throttle } from "@axelarjs/utils";
+import { hexlify, hexZeroPad, throttle } from "@axelarjs/utils";
 
 import { TransactionExecutionError } from "viem";
 import {
@@ -13,7 +13,6 @@ import { watchContractEvent } from "wagmi/actions";
 
 import { useInterchainTokenServiceDeployInterchainToken } from "~/lib/contract/hooks/useInterchainTokenService";
 import { logger } from "~/lib/logger";
-import { hexlify, hexZeroPad } from "~/lib/utils/hex";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(

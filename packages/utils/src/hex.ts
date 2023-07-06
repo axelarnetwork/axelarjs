@@ -126,8 +126,11 @@ export function hexlify(value: HexIsh, options?: DataOptions): string {
   if (isBytes(value)) {
     let result = "0x";
     for (let i = 0; i < value.length; i++) {
-      const v = value[i];
-      result += HexCharacters[(v & 0xf0) >> 4] + HexCharacters[v & 0x0f];
+      const v = value[i] ?? 0;
+
+      result +=
+        String(HexCharacters[(v & 0xf0) >> 4]) +
+        String(HexCharacters[v & 0x0f]);
     }
     return result;
   }
