@@ -13,7 +13,12 @@ export default defineConfig(
     {
       out: `src/lib/contracts/${contract.name}.actions.ts`,
       contracts: [contract],
-      plugins: [actions()],
+      plugins: [
+        actions({
+          prepareWriteContract: true,
+          watchContractEvent: true,
+        }),
+      ],
     },
   ])
 );

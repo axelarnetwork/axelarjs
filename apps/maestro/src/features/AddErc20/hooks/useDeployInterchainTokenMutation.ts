@@ -3,30 +3,27 @@ import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { TransactionExecutionError } from "viem";
+import { encodeFunctionData, TransactionExecutionError } from "viem";
 import {
   useAccount,
   useMutation,
   useWaitForTransaction,
   useWalletClient,
 } from "wagmi";
-import { watchContractEvent } from "wagmi/actions";
 
 import {
-  useInterchainTokenServiceDeployAndRegisterStandardizedToken,
-  // useInterchainTokenServiceGetCustomTokenId,
-  // useInterchainTokenServiceGetStandardizedTokenAddress,
-  // useInterchainTokenServiceGetTokenManagerAddress,
-  // useInterchainTokenServiceMulticall,
+  prepareWriteInterchainTokenService,
+  watchInterchainTokenServiceEvent,
+} from "~/lib/contracts/InterchainTokenService.actions";
+import {
+  useInterchainTokenServiceGetCustomTokenId,
+  useInterchainTokenServiceGetStandardizedTokenAddress,
+  useInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { hexlify, hexZeroPad } from "~/lib/utils/hex";
-// import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
+import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
-
-const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
-  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-) as `0x${string}`;
 
 export type UseDeployAndRegisterInterchainTokenInput = {
   sourceChainId: string;
@@ -57,27 +54,19 @@ export function useDeployInterchainTokenMutation(config: {
     []
   );
 
-  // const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-  //   args: [address as `0x${string}`, salt],
-  //   enabled: address && isValidEVMAddress(address),
-  // });
+  const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
+    args: [address as `0x${string}`, salt],
+    enabled: address && isValidEVMAddress(address),
+  });
 
-  // const { data: tokenAddress } =
-  //   useInterchainTokenServiceGetStandardizedTokenAddress({
-  //     args: [tokenId as `0x${string}`],
-  //     enabled: Boolean(tokenId),
-  //   });
-
-  // const { data: tokenManagerAddress } =
-  //   useInterchainTokenServiceGetTokenManagerAddress({
-  //     enabled: Boolean(tokenId),
-  //   });
-
-  const { writeAsync: deplyAndRegisterAsync, data: deployAndRegisterResult } =
-    useInterchainTokenServiceDeployAndRegisterStandardizedToken({
-      address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-      value: config.value,
+  const { data: tokenAddress } =
+    useInterchainTokenServiceGetStandardizedTokenAddress({
+      args: [tokenId as `0x${string}`],
+      enabled: Boolean(tokenId),
     });
+
+  const { writeAsync: multicallAsync, data: multicallResult } =
+    useInterchainTokenServiceMulticall();
 
   let currentInput: UseDeployAndRegisterInterchainTokenInput = {
     sourceChainId: "",
@@ -92,11 +81,9 @@ export function useDeployInterchainTokenMutation(config: {
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
-  const unwatch = watchContractEvent(
+  const unwatch = watchInterchainTokenServiceEvent(
     {
-      address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
       eventName: "StandardizedTokenDeployed",
-      abi: INTERCHAIN_TOKEN_SERVICE_ABI,
     },
     (logs) => {
       const log = logs.find(
@@ -114,21 +101,21 @@ export function useDeployInterchainTokenMutation(config: {
 
       unwatch();
 
-      const tokenAddress = `0x${log.args?.tokenId}`;
+      console.log("StandardizedTokenDeployed", { log, tokenId, tokenAddress });
 
       onStatusUpdate({
         type: "deployed",
         tokenAddress: tokenAddress as `0x${string}`,
-        txHash: deployAndRegisterResult?.hash as `0x${string}`,
+        txHash: multicallResult?.hash as `0x${string}`,
       });
     }
   );
 
   useWaitForTransaction({
-    hash: deployAndRegisterResult?.hash,
+    hash: multicallResult?.hash,
     confirmations: 8,
     onSuccess() {
-      if (!deployAndRegisterResult) {
+      if (!multicallResult) {
         return;
       }
       config.onFinished?.();
@@ -147,7 +134,8 @@ export function useDeployInterchainTokenMutation(config: {
         type: "pending_approval",
       });
       try {
-        const tx = await deplyAndRegisterAsync({
+        const deployTxData = encodeFunctionData({
+          functionName: "deployAndRegisterStandardizedToken",
           args: [
             salt,
             input.tokenName,
@@ -156,7 +144,62 @@ export function useDeployInterchainTokenMutation(config: {
             input.cap ?? BigInt(0),
             input.mintTo ?? address,
           ],
+          abi: INTERCHAIN_TOKEN_SERVICE_ABI,
         });
+
+        const totalGasFee = input.gasFees.reduce(
+          (acc, gasFee) => acc + gasFee,
+          BigInt(0)
+        );
+
+        const registerTxData = await Promise.all(
+          input.destinationChainIds.map(async (chainId, i) => {
+            console.log(input.gasFees);
+            const gasFee = input.gasFees[i];
+            const args = [
+              salt,
+              input.tokenName,
+              input.tokenSymbol,
+              input.decimals,
+              input.mintTo ?? address,
+              input.mintTo ?? address,
+              chainId,
+              gasFee,
+            ] as const;
+
+            try {
+              const prepared = await prepareWriteInterchainTokenService({
+                functionName: "deployAndRegisterRemoteStandardizedTokens",
+                args: args,
+                value: gasFee,
+              });
+              console.log({ prepared });
+            } catch (error) {
+              console.log({ error });
+            }
+
+            return encodeFunctionData({
+              functionName: "deployAndRegisterRemoteStandardizedTokens",
+              args: args,
+              abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+            });
+          })
+        );
+
+        // const multicallData = [deployTxData, ...registerTxData];
+
+        console.log({
+          tokenAddress,
+          tokenId,
+          deployTxData,
+          registerTxData,
+        });
+
+        const tx = await multicallAsync({
+          value: totalGasFee,
+          args: [[deployTxData]],
+        });
+
         if (tx?.hash) {
           onStatusUpdate({
             type: "deploying",
@@ -172,6 +215,8 @@ export function useDeployInterchainTokenMutation(config: {
 
           logger.error("Failed to deploy interchain token", error.cause);
         }
+
+        console.error({ error });
       }
     }
   );
