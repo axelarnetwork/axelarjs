@@ -6,3 +6,4 @@ export * from "./string";
 export * from "./function";
 export * from "./types";
 export * from "./case-conversion";
+export * from "./hex";

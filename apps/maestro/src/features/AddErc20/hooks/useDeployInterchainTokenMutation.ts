@@ -1,6 +1,6 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
-import { throttle } from "@axelarjs/utils";
+import { hexlify, hexZeroPad, throttle } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { encodeFunctionData, TransactionExecutionError } from "viem";
@@ -21,7 +21,6 @@ import {
   useInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
-import { hexlify, hexZeroPad } from "~/lib/utils/hex";
 import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
