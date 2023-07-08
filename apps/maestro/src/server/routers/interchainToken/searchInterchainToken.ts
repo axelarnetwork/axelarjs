@@ -232,7 +232,26 @@ async function getInterchainTokenDetails(
 
   const output: SearchInterchainTokenOutput = {
     ...lookupToken,
-    matchingTokens: [lookupToken, ...matchingTokens],
+    matchingTokens: [lookupToken, ...matchingTokens].sort(
+      // isOriginToken first, then isRegistered
+      (a, b) => {
+        if (a.isOriginToken && !b.isOriginToken) {
+          return -1;
+        }
+        if (!a.isOriginToken && b.isOriginToken) {
+          return 1;
+        }
+
+        if (a.isRegistered && !b.isRegistered) {
+          return -1;
+        }
+        if (!a.isRegistered && b.isRegistered) {
+          return 1;
+        }
+
+        return 0;
+      }
+    ),
   };
 
   return output;
