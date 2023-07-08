@@ -1,7 +1,5 @@
 export default {
-  _format: "hh-sol-artifact-1",
   contractName: "TokenManager",
-  sourceName: "contracts/token-manager/TokenManager.sol",
   abi: [
     {
       inputs: [],
@@ -26,7 +24,7 @@ export default {
     },
     {
       inputs: [],
-      name: "NotAdmin",
+      name: "NotOperator",
       type: "error",
     },
     {
@@ -59,26 +57,26 @@ export default {
       inputs: [
         {
           indexed: false,
-          internalType: "address",
-          name: "admin",
-          type: "address",
+          internalType: "uint256",
+          name: "flowLimit",
+          type: "uint256",
         },
       ],
-      name: "AdminChanged",
+      name: "FlowLimitSet",
       type: "event",
     },
     {
-      inputs: [],
-      name: "admin",
-      outputs: [
+      anonymous: false,
+      inputs: [
         {
+          indexed: false,
           internalType: "address",
-          name: "distr",
+          name: "operator",
           type: "address",
         },
       ],
-      stateMutability: "view",
-      type: "function",
+      name: "OperatorChanged",
+      type: "event",
     },
     {
       inputs: [
@@ -198,6 +196,19 @@ export default {
       type: "function",
     },
     {
+      inputs: [],
+      name: "operator",
+      outputs: [
+        {
+          internalType: "address",
+          name: "operator_",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       inputs: [
         {
           internalType: "string",
@@ -228,12 +239,12 @@ export default {
     {
       inputs: [
         {
-          internalType: "address",
-          name: "admin_",
-          type: "address",
+          internalType: "uint256",
+          name: "flowLimit",
+          type: "uint256",
         },
       ],
-      name: "setAdmin",
+      name: "setFlowLimit",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -241,12 +252,12 @@ export default {
     {
       inputs: [
         {
-          internalType: "uint256",
-          name: "flowLimit",
-          type: "uint256",
+          internalType: "address",
+          name: "operator_",
+          type: "address",
         },
       ],
-      name: "setFlowLimit",
+      name: "setOperator",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -311,8 +322,4 @@ export default {
       type: "function",
     },
   ],
-  bytecode: "0x",
-  deployedBytecode: "0x",
-  linkReferences: {},
-  deployedLinkReferences: {},
 } as const;

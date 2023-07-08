@@ -1,7 +1,5 @@
 export default {
-  _format: "hh-sol-artifact-1",
   contractName: "InterchainToken",
-  sourceName: "contracts/interchain-token/InterchainToken.sol",
   abi: [
     {
       inputs: [],
@@ -120,19 +118,6 @@ export default {
           internalType: "uint256",
           name: "",
           type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "decimals",
-      outputs: [
-        {
-          internalType: "uint8",
-          name: "",
-          type: "uint8",
         },
       ],
       stateMutability: "view",
@@ -262,32 +247,6 @@ export default {
     },
     {
       inputs: [],
-      name: "name",
-      outputs: [
-        {
-          internalType: "string",
-          name: "",
-          type: "string",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "symbol",
-      outputs: [
-        {
-          internalType: "string",
-          name: "",
-          type: "string",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
       name: "tokenManagerRequiresApproval",
       outputs: [
         {
@@ -366,8 +325,4 @@ export default {
       type: "function",
     },
   ],
-  bytecode: "0x",
-  deployedBytecode: "0x",
-  linkReferences: {},
-  deployedLinkReferences: {},
 } as const;

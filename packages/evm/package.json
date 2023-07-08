@@ -42,9 +42,11 @@
     "viem": "^1.2.9"
   },
   "devDependencies": {
+    "@axelar-network/interchain-token-service": "^0.1.0",
     "@axelarjs/config": "workspace:*",
     "chalk": "^4.1.2",
     "package-json": "^7.0.0",
+    "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
     "strip-ansi": "^6.0.1",
     "typescript": "^5.1.6"

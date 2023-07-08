@@ -1,7 +1,5 @@
 export default {
-  _format: "hh-sol-artifact-1",
   contractName: "InterchainTokenService",
-  sourceName: "contracts/interchain-token-service/InterchainTokenService.sol",
   abi: [
     {
       inputs: [
@@ -27,7 +25,7 @@ export default {
         },
         {
           internalType: "address",
-          name: "linkerRouter_",
+          name: "remoteAddressValidator_",
           type: "address",
         },
         {
@@ -167,6 +165,11 @@ export default {
     },
     {
       inputs: [],
+      name: "NotOperator",
+      type: "error",
+    },
+    {
+      inputs: [],
       name: "NotOwner",
       type: "error",
     },
@@ -235,6 +238,31 @@ export default {
       inputs: [],
       name: "ZeroAddress",
       type: "error",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+      ],
+      name: "CustomTokenIdClaimed",
+      type: "event",
     },
     {
       anonymous: false,
@@ -362,7 +390,7 @@ export default {
           type: "address",
         },
       ],
-      name: "ExpressReceived",
+      name: "ExpressReceive",
       type: "event",
     },
     {
@@ -417,7 +445,20 @@ export default {
           type: "address",
         },
       ],
-      name: "ExpressReceivedWithData",
+      name: "ExpressReceiveWithData",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: "address",
+          name: "operator",
+          type: "address",
+        },
+      ],
+      name: "OperatorChanged",
       type: "event",
     },
     {
@@ -467,6 +508,36 @@ export default {
           internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
+        },
+        {
+          indexed: false,
+          internalType: "string",
+          name: "tokenName",
+          type: "string",
+        },
+        {
+          indexed: false,
+          internalType: "string",
+          name: "tokenSymbol",
+          type: "string",
+        },
+        {
+          indexed: false,
+          internalType: "uint8",
+          name: "tokenDecimals",
+          type: "uint8",
+        },
+        {
+          indexed: false,
+          internalType: "bytes",
+          name: "distributor",
+          type: "bytes",
+        },
+        {
+          indexed: true,
+          internalType: "bytes",
+          name: "operator",
+          type: "bytes",
         },
         {
           indexed: false,
@@ -525,7 +596,7 @@ export default {
       anonymous: false,
       inputs: [
         {
-          indexed: false,
+          indexed: true,
           internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
@@ -568,13 +639,13 @@ export default {
       anonymous: false,
       inputs: [
         {
-          indexed: false,
+          indexed: true,
           internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
         },
         {
-          indexed: false,
+          indexed: true,
           internalType: "enum ITokenManagerType.TokenManagerType",
           name: "tokenManagerType",
           type: "uint8",
@@ -767,7 +838,7 @@ export default {
           type: "bytes32",
         },
       ],
-      stateMutability: "view",
+      stateMutability: "pure",
       type: "function",
     },
     {
@@ -799,7 +870,7 @@ export default {
         },
         {
           internalType: "bytes",
-          name: "admin",
+          name: "operator",
           type: "bytes",
         },
         {
@@ -813,7 +884,7 @@ export default {
           type: "uint256",
         },
       ],
-      name: "deployAndRegisterRemoteStandardizedTokens",
+      name: "deployAndRegisterRemoteStandardizedToken",
       outputs: [],
       stateMutability: "payable",
       type: "function",
@@ -875,7 +946,13 @@ export default {
         },
       ],
       name: "deployCustomTokenManager",
-      outputs: [],
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
       stateMutability: "payable",
       type: "function",
     },
@@ -931,7 +1008,13 @@ export default {
         },
       ],
       name: "deployRemoteCustomTokenManager",
-      outputs: [],
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
       stateMutability: "payable",
       type: "function",
     },
@@ -1240,6 +1323,63 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "getFlowInAmount",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "flowInAmount",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "getFlowLimit",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "flowLimit",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "getFlowOutAmount",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "flowOutAmount",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "uint256",
           name: "tokenManagerType",
           type: "uint256",
@@ -1260,7 +1400,7 @@ export default {
       inputs: [
         {
           internalType: "bytes",
-          name: "admin",
+          name: "operator",
           type: "bytes",
         },
         {
@@ -1289,7 +1429,7 @@ export default {
       inputs: [
         {
           internalType: "bytes",
-          name: "admin",
+          name: "operator",
           type: "bytes",
         },
         {
@@ -1313,7 +1453,7 @@ export default {
       inputs: [
         {
           internalType: "bytes",
-          name: "admin",
+          name: "operator",
           type: "bytes",
         },
         {
@@ -1436,19 +1576,6 @@ export default {
       type: "function",
     },
     {
-      inputs: [],
-      name: "linkerRouter",
-      outputs: [
-        {
-          internalType: "contract ILinkerRouter",
-          name: "",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
       inputs: [
         {
           internalType: "bytes[]",
@@ -1465,6 +1592,19 @@ export default {
         },
       ],
       stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "operator",
+      outputs: [
+        {
+          internalType: "address",
+          name: "operator_",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
     {
@@ -1513,19 +1653,45 @@ export default {
       type: "function",
     },
     {
+      inputs: [],
+      name: "remoteAddressValidator",
+      outputs: [
+        {
+          internalType: "contract IRemoteAddressValidator",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       inputs: [
         {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
+          internalType: "bytes32[]",
+          name: "tokenIds",
+          type: "bytes32[]",
         },
         {
-          internalType: "uint256",
-          name: "flowLimit",
-          type: "uint256",
+          internalType: "uint256[]",
+          name: "flowLimits",
+          type: "uint256[]",
         },
       ],
       name: "setFlowLimit",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "operator_",
+          type: "address",
+        },
+      ],
+      name: "setOperator",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -1657,8 +1823,4 @@ export default {
       type: "function",
     },
   ],
-  bytecode: "0x",
-  deployedBytecode: "0x",
-  linkReferences: {},
-  deployedLinkReferences: {},
 } as const;
