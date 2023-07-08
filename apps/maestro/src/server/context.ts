@@ -2,6 +2,7 @@ import {
   ERC20Client,
   InterchainTokenClient,
   InterchainTokenServiceClient,
+  TokenManagerClient,
 } from "@axelarjs/evm";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -33,6 +34,9 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       },
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });
+      },
+      createTokenManagerClient(chain: Chain, address: `0x${string}`) {
+        return new TokenManagerClient({ chain, address });
       },
       createInterchainTokenServiceClient(
         chain: Chain,
