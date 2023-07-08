@@ -4,17 +4,9 @@ import { hexlify, hexZeroPad, throttle } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { encodeFunctionData, TransactionExecutionError } from "viem";
-import {
-  useAccount,
-  useMutation,
-  useWaitForTransaction,
-  useWalletClient,
-} from "wagmi";
+import { useAccount, useMutation, useWaitForTransaction } from "wagmi";
 
-import {
-  prepareWriteInterchainTokenService,
-  watchInterchainTokenServiceEvent,
-} from "~/lib/contracts/InterchainTokenService.actions";
+import { watchInterchainTokenServiceEvent } from "~/lib/contracts/InterchainTokenService.actions";
 import {
   useInterchainTokenServiceGetCustomTokenId,
   useInterchainTokenServiceGetStandardizedTokenAddress,
@@ -40,8 +32,6 @@ export function useDeployInterchainTokenMutation(config: {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }) {
-  const signer = useWalletClient();
-
   const { address } = useAccount();
 
   const salt = useMemo(
@@ -123,7 +113,7 @@ export function useDeployInterchainTokenMutation(config: {
 
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
-      if (!(signer && address)) {
+      if (!address) {
         return;
       }
 
@@ -151,52 +141,29 @@ export function useDeployInterchainTokenMutation(config: {
           BigInt(0)
         );
 
-        const registerTxData = await Promise.all(
-          input.destinationChainIds.map(async (chainId, i) => {
-            console.log(input.gasFees);
-            const gasFee = input.gasFees[i];
-            const args = [
-              salt,
-              input.tokenName,
-              input.tokenSymbol,
-              input.decimals,
-              input.mintTo ?? address,
-              input.mintTo ?? address,
-              chainId,
-              gasFee,
-            ] as const;
+        const registerTxData = input.destinationChainIds.map((chainId, i) => {
+          const gasFee = input.gasFees[i];
+          const args = [
+            salt,
+            input.tokenName,
+            input.tokenSymbol,
+            input.decimals,
+            "0x",
+            input.mintTo ?? address,
+            chainId,
+            gasFee,
+          ] as const;
 
-            try {
-              const prepared = await prepareWriteInterchainTokenService({
-                functionName: "deployAndRegisterRemoteStandardizedTokens",
-                args: args,
-                value: gasFee,
-              });
-              console.log({ prepared });
-            } catch (error) {
-              console.log({ error });
-            }
-
-            return encodeFunctionData({
-              functionName: "deployAndRegisterRemoteStandardizedTokens",
-              args: args,
-              abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-            });
-          })
-        );
-
-        // const multicallData = [deployTxData, ...registerTxData];
-
-        console.log({
-          tokenAddress,
-          tokenId,
-          deployTxData,
-          registerTxData,
+          return encodeFunctionData({
+            functionName: "deployAndRegisterRemoteStandardizedToken",
+            args: args,
+            abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+          });
         });
 
         const tx = await multicallAsync({
           value: totalGasFee,
-          args: [[deployTxData]],
+          args: [[deployTxData, ...registerTxData]],
         });
 
         if (tx?.hash) {

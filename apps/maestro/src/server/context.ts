@@ -8,7 +8,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { inferAsyncReturnType } from "@trpc/server";
 import type { Chain } from "wagmi";
 
-import { NEXT_PUBLIC_TOKEN_LINKER_ADDRESS } from "~/config/env";
+import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
 import gmpClient from "~/services/gmp";
@@ -40,7 +40,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       ) {
         return new InterchainTokenServiceClient({
           chain,
-          address: address ?? NEXT_PUBLIC_TOKEN_LINKER_ADDRESS,
+          address: address ?? NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         });
       },
     },

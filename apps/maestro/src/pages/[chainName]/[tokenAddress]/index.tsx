@@ -97,10 +97,6 @@ const InterchainTokensPage = () => {
 
 export default InterchainTokensPage;
 
-const INTERCHAIN_TOKEN_SERVICE_ADDRESS = String(
-  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-) as `0x${string}`;
-
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
   tokenAddress: `0x${string}`;
@@ -114,7 +110,6 @@ const RegisterOriginTokenButton = ({
   const [txState, setTxState] = useTransactionState();
 
   const { writeAsync, data } = useInterchainTokenServiceRegisterCanonicalToken({
-    address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
     value: BigInt(0),
   });
 

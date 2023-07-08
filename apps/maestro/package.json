@@ -18,7 +18,8 @@
     "test": "vitest --run",
     "test:coverage": "vitest --coverage --run",
     "sync": "scripts/sync.cjs",
-    "codegen": "pnpm wagmi generate && scripts/postcodegen.cjs"
+    "codegen": "pnpm wagmi generate && scripts/postcodegen.cjs",
+    "prebuild": "pnpm sync && pnpm codegen"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.12.8",

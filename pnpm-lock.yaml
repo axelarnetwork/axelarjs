@@ -375,6 +375,9 @@ importers:
         specifier: ^1.2.9
         version: 1.2.9(typescript@5.1.6)(zod@3.21.4)
     devDependencies:
+      '@axelar-network/interchain-token-service':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
@@ -384,6 +387,9 @@ importers:
       package-json:
         specifier: ^7.0.0
         version: 7.0.0
+      prettier:
+        specifier: ^2.8.8
+        version: 2.8.8
       rimraf:
         specifier: ^5.0.1
         version: 5.0.1
@@ -729,7 +735,11 @@ packages:
   /@axelar-network/axelar-cgp-solidity@4.5.0:
     resolution: {integrity: sha512-4F4rmHei0cmzeUR7/mW4Bap5rc/KlPV2crD9HA7HTRfl15mVcN6/3z8p+pAm9We6bOrQplNW9KBZ3HJFP3C1Gw==}
     engines: {node: ^16.0.0 || ^18.0.0}
-    dev: false
+
+  /@axelar-network/axelar-gmp-sdk-solidity@3.6.1:
+    resolution: {integrity: sha512-jz8NSSbZpWUyE53JiXYp8cO8G32e7TB1u6tJiQtNKHsthajWxDZ4BcHZkjKMB2jVQJa4bjH2BbDq4BUb6aC90Q==}
+    engines: {node: '>=16'}
+    dev: true
 
   /@axelar-network/axelarjs-sdk@0.12.8:
     resolution: {integrity: sha512-4pb82LMiDOifE69q3OtUbOzcotL06VOU7Vhyk7vS7py+uO4Blu1kWd/pkzv+TH3IXgpIYl961f2ip4njK04qHQ==}
@@ -765,6 +775,13 @@ packages:
       long: 4.0.0
       protobufjs: 6.11.3
     dev: false
+
+  /@axelar-network/interchain-token-service@0.1.0:
+    resolution: {integrity: sha512-RfVjYH4WGazeEVc5B87WMy4F3F21/kBs+t2rdrRSa+sWsTDK22EhuzvrVloSEJ0jCkcoukByDwuYWifUH6MZ3g==}
+    dependencies:
+      '@axelar-network/axelar-cgp-solidity': 4.5.0
+      '@axelar-network/axelar-gmp-sdk-solidity': 3.6.1
+    dev: true
 
   /@babel/code-frame@7.22.5:
     resolution: {integrity: sha512-Xmwn266vad+6DAqEB2A6V/CcZVp62BbwVmcOJc2RPuwih1kw02TjQvWVWlcKGbBPd+8/0V5DEkOcizRGYsspYQ==}

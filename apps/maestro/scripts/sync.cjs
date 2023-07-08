@@ -1,13 +1,21 @@
 #!/usr/bin/env node
 
 const path = require("path");
-const fs = require("fs/promises");
+const fs = require("fs");
 const prettier = require("prettier");
 const dotenv = require("dotenv");
 
-dotenv.config({
-  path: ".env.local",
-});
+// checks if .env.local exists
+const envLocalPath = path.join(__dirname, "..", ".env.local");
+const hasEnvLocal = fs.existsSync(envLocalPath);
+
+dotenv.config(
+  hasEnvLocal
+    ? {
+        path: envLocalPath,
+      }
+    : undefined
+);
 
 async function main() {
   const contractsDir = path.join(
@@ -21,20 +29,18 @@ async function main() {
     "contracts"
   );
 
-  const contractFolders = await fs
-    .readdir(contractsDir)
-    .then((xs) => xs.filter((x) => /^[a-z-0-9]+$/.test(x)));
+  const contractFolders = fs
+    .readdirSync(contractsDir)
+    .filter((x) => /^[a-z-0-9]+$/.test(x));
 
   const destFolder = path.join(__dirname, "..", "src", "lib", "contracts");
 
-  await Promise.all(
-    contractFolders.map((folder) =>
-      fs.copyFile(
-        path.join(contractsDir, folder, `${folder}.abi.ts`),
-        path.join(destFolder, `${folder}.abi.ts`)
-      )
-    )
-  );
+  for (const folder of contractFolders) {
+    fs.copyFileSync(
+      path.join(contractsDir, folder, `${folder}.abi.ts`),
+      path.join(destFolder, `${folder}.abi.ts`)
+    );
+  }
 
   const toConstantName = (contract = "") =>
     contract.toUpperCase().replace(/\-/g, "_");
@@ -74,7 +80,7 @@ async function main() {
     parser: "babel-ts",
   });
 
-  await fs.writeFile(path.join(destFolder, "index.ts"), formattedContent);
+  fs.writeFileSync(path.join(destFolder, "index.ts"), formattedContent);
 
   console.log(
     `Synced ${contractFolders.length} contract ABIs to ${destFolder}`
