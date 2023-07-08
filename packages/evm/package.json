@@ -33,7 +33,8 @@
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
-    "postinstall": "node scripts/postinstall.cjs"
+    "postinstall": "node scripts/postinstall.cjs",
+    "codegen": "node scripts/codegen.cjs"
   },
   "keywords": [],
   "author": "",
