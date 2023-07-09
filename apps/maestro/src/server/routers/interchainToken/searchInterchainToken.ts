@@ -9,26 +9,20 @@ import { hex40, hex64 } from "~/lib/utils/schemas";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
-const isAddressZero = (address: string) => parseInt(address, 16) === 0;
-
 const tokenDetails = () => ({
   tokenId: hex40().nullable(),
-  originTokenId: hex40().nullable(),
   tokenAddress: hex64().nullable(),
   isOriginToken: z.boolean(),
   isRegistered: z.boolean(),
   chainId: z.number(),
-  tokenManagerAddress: hex64().nullable(),
 });
 
 export type IntercahinTokenInfo = {
   tokenId: `0x${string}` | null;
-  originTokenId: `0x${string}` | null;
   tokenAddress: `0x${string}` | null;
   isOriginToken: boolean;
   isRegistered: boolean;
   chainId: number;
-  tokenManagerAddress: `0x${string}` | null;
 };
 
 export type SearchInterchainTokenOutput = IntercahinTokenInfo & {
@@ -158,54 +152,38 @@ async function getInterchainTokenDetails(
   },
   ctx: Context
 ) {
-  console.log({ tokenId, remainingChainConfigs: remainingChainConfigs.length });
   const matchingTokens = await Promise.all(
     remainingChainConfigs.map(async (chain) => {
       try {
         const itsClient =
           ctx.contracts.createInterchainTokenServiceClient(chain);
 
-        console.log(
-          `Checking if token ${tokenId} is registered on ${chain.name}`
+        const chainTokenId = await itsClient.readContract(
+          "getCanonicalTokenId",
+          {
+            args: [input.tokenAddress as `0x${string}`],
+          }
         );
 
-        const tokenManagerAddress = await itsClient
-          .readContract("getTokenManagerAddress", {
-            args: [tokenId],
-          })
-          .catch(always(null));
+        const isRegistered = chainTokenId !== null;
 
-        const tokenAddress =
-          tokenManagerAddress && !isAddressZero(tokenManagerAddress)
-            ? await ctx.contracts
-                .createTokenManagerClient(chain, tokenManagerAddress)
-                .readContract("interchainTokenService")
-                .catch(always(null))
-            : null;
-
-        const isOriginToken = tokenAddress === input.tokenAddress;
+        const isOriginToken = tokenId === chainTokenId;
 
         return {
-          tokenId: isOriginToken ? tokenId : null,
-          isOriginToken: tokenAddress === input.tokenAddress,
+          tokenId: isOriginToken ? tokenId : chainTokenId,
+          isOriginToken: tokenId === chainTokenId,
           chainId: chain.id,
           chainName: chain.name,
-          tokenAddress,
-          originTokenId: tokenId,
-          isRegistered:
-            tokenManagerAddress !== null && !isAddressZero(tokenManagerAddress),
-          tokenManagerAddress,
+          tokenAddress: input.tokenAddress as `0x${string}`,
+          isRegistered,
         };
       } catch (error) {
-        console.log(`Token ${tokenId} not registered on ${chain.name}`);
         return {
           tokenId: null,
-          originTokenId: tokenId,
           chainId: chain.id,
           tokenAddress: null,
           isOriginToken: false,
           isRegistered: false,
-          tokenManagerAddress: null,
         };
       }
     })
@@ -216,23 +194,19 @@ async function getInterchainTokenDetails(
   });
 
   const lookupToken = {
-    tokenId,
-    originTokenId: canonicalTokenId,
+    tokenId: canonicalTokenId,
     tokenAddress: input.tokenAddress as `0x${string}`,
     isOriginToken: canonicalTokenId === tokenId,
     isRegistered: true,
     chainId: chainConfig.id,
-    tokenManagerAddress: await itsClient.readContract(
-      "getTokenManagerAddress",
-      {
-        args: [canonicalTokenId],
-      }
-    ),
   };
 
   const output: SearchInterchainTokenOutput = {
     ...lookupToken,
-    matchingTokens: [lookupToken, ...matchingTokens].sort(
+    matchingTokens: [
+      lookupToken,
+      ...matchingTokens.filter((x) => x.tokenId !== lookupToken.tokenId),
+    ].sort(
       // isOriginToken first, then isRegistered
       (a, b) => {
         if (a.isOriginToken && !b.isOriginToken) {
