@@ -65,8 +65,8 @@ export const getInterchainTokenServiceABI = publicProcedure
     openapi: {
       method: "GET",
       path: "/interchain-token-service/abi",
-      summary: "Get the ABI for the InterchainToken contract",
-      description: "Get the ABI for the InterchainToken contract",
+      summary: "Get the ABI for the InterchainTokenService contract",
+      description: "Get the ABI for the InterchainTokenService contract",
       tags: ["interchain-token"],
     },
   })
