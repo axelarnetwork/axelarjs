@@ -3,10 +3,8 @@ import { toast } from "@axelarjs/ui";
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useAccount, useMutation } from "wagmi";
 
-import {
-  useInterchainTokenDecimals,
-  useInterchainTokenInterchainTransfer,
-} from "~/lib/contracts/InterchainToken.hooks";
+import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20BurnableMintable.hooks";
+import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import type { TransactionState } from "~/lib/hooks/useTransaction";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -28,7 +26,7 @@ export type UseSendInterchainTokenInput = {
 export function useSendInterchainTokenMutation(
   config: UseSendInterchainTokenConfig
 ) {
-  const { data: decimals } = useInterchainTokenDecimals({
+  const { data: decimals } = useIerc20BurnableMintableDecimals({
     address: config.tokenAddress,
   });
 

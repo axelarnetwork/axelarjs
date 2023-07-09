@@ -31,7 +31,7 @@ type Props = {
   onClose?: () => void;
   balance: {
     tokenBalance: string;
-    decimals: string | number;
+    decimals: string | number | null;
   };
 };
 
