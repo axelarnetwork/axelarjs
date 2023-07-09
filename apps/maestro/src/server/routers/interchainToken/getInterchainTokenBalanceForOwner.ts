@@ -37,7 +37,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         client.readContract("balanceOf", {
           args: [input.owner as `0x$${string}`],
         }),
-        client.readContract("decimals"),
+        client.readContract("decimals").catch(always(null)),
         client.readContract("owner").catch(always(null)),
         client.readContract("pendingOwner").catch(always(null)),
       ]);
