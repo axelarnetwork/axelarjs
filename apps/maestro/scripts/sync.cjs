@@ -16,6 +16,9 @@ dotenv.config(
       }
     : undefined
 );
+console.log(
+  `📝 Loaded environment variables ${hasEnvLocal ? ".env.local" : ".env"}\n`
+);
 
 async function main() {
   const contractsDir = path.join(
@@ -53,7 +56,16 @@ async function main() {
         const contractAddress = process.env[envKey];
         const abiConstName = `${constName}_ABI`;
 
-        return `({ 
+        if (!contractAddress) {
+          const envFile = hasEnvLocal
+            ? ".env.local"
+            : "Vercel environment variables";
+          console.warn(
+            `WARNING: ${envKey} is missing under ${envFile}. The interactions will require an explicit addess.\n`
+          );
+        }
+
+        return `({
           name: ${abiConstName}.contractName, 
           abi: ${abiConstName}.abi, 
           address: ${
