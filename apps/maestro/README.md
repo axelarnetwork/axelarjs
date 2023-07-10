@@ -16,6 +16,23 @@ pnpm i
 pnpm dev
 ```
 
+### Scripts
+
+The following scripts are available in the project:
+
+- `dev`: Starts the development server using `next dev`.
+- `build`: Runs the `build.sh` script to build the production version of the app.
+- `build:analyze`: Runs the `build` script with the `ANALYZE` environment variable set to `true`, which generates a report of the bundle size and dependencies.
+- `start`: Starts the production server using `next start`.
+- `lint`: Runs `next lint` to check for linting errors.
+- `dev:e2e`: Starts the development server with end-to-end testing enabled.
+- `test:e2e`: Runs end-to-end tests using `playwright`.
+- `ci:e2e`: Runs end-to-end tests in a continuous integration environment using `playwright`.
+- `test`: Runs unit tests using `vitest`.
+- `test:coverage`: Runs unit tests with coverage reporting using `vitest`.
+- `sync`: Runs the `sync.cjs` script to sync the app with other environments.
+- `codegen`: Runs the `wagmi generate` command to generate TypeScript types for the app's GraphQL queries and mutations, and then runs the `postcodegen.cjs` script to modify the generated types.
+
 ### E2E tests
 
 To run the ui end to end tests, you'll need to install [`foundry`](https://getfoundry.sh/)
