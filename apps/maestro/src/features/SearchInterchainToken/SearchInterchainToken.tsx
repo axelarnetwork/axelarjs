@@ -105,7 +105,6 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
         })}
       >
         <TextInput
-          bordered={true}
           type="search"
           name="tokenAddress"
           placeholder={
