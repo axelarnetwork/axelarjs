@@ -1,5 +1,21 @@
 #!/usr/bin/env node
 
+/**
+ * This script loads environment variables from a local `.env.local` file if it exists, or from a `.env` file otherwise.
+ * It then synchronizes Solidity contracts ABIs from the `packages/evm/src/contracts` directory to the `src/lib/contracts` directory.
+ * Each contract is formatted with Prettier before being written to the destination folder.
+ *
+ * The script also generates a `src/lib/contracts/index.ts` file that exports the contract ABIs and addresses.
+ *
+ * ## Usage
+ *
+ * To run the script, use the following command:
+ *
+ * ```
+ * pnpm sync
+ * ```
+ */
+
 const path = require("path");
 const fs = require("fs");
 const prettier = require("prettier");
