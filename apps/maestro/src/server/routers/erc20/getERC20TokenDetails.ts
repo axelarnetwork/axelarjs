@@ -6,14 +6,14 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64 } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex64(),
+      tokenAddress: hex40Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
