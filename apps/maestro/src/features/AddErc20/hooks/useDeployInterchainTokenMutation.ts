@@ -123,7 +123,8 @@ export function useDeployInterchainTokenMutation(config: {
         deploymentTxHash: log.transactionHash,
         remoteTokens: inputRef.current.destinationChainIds.map((chainId) => ({
           chainId:
-            evmChainConfigs?.find((c) => c.id === chainId)?.chain_id ?? 0,
+            evmChainConfigs?.find((c) => c.id === chainId.toLowerCase())
+              ?.chain_id ?? 0,
           axelarChainId: chainId,
           address: tokenAddress,
         })),
