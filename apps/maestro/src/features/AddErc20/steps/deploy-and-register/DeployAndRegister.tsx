@@ -6,6 +6,7 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
+import { invariant } from "@axelarjs/utils";
 import React, {
   useCallback,
   useMemo,
@@ -16,7 +17,6 @@ import React, {
 import Image from "next/image";
 
 import { propEq } from "rambda";
-import invariant from "tiny-invariant";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";

@@ -6,10 +6,10 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
+import { invariant } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import invariant from "tiny-invariant";
 import { TransactionExecutionError } from "viem";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";

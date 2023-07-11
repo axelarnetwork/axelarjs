@@ -1,8 +1,8 @@
 import type { ERC20Client } from "@axelarjs/evm";
+import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
-import invariant from "tiny-invariant";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";

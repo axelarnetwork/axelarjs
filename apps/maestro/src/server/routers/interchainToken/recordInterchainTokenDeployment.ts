@@ -4,7 +4,7 @@ import { hex64Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 import { interchainTokenDetailsSchema } from "~/services/kv";
 
-export const getInterchainTokenABI = publicProcedure
+export const recordInterchainTokenDeployment = publicProcedure
   .input(
     z.object({
       tokenAddress: hex64Literal(),
