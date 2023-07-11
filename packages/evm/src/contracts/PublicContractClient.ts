@@ -36,7 +36,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     });
 
     this.abi = (options?.abi ?? []) as TAbi;
-    this.address = (options?.address ?? "0x123") as `0x${string}`;
+    this.address = options?.address as `0x${string}`;
     this.chain = options?.chain ?? mainnet;
   }
 

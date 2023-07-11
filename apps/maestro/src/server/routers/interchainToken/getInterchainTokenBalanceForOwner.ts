@@ -4,15 +4,15 @@ import { zeroAddress } from "viem";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64Literal } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getInterchainTokenBalanceForOwner = publicProcedure
   .input(
     z.object({
       chainId: z.number(),
-      tokenAddress: hex64Literal(),
-      owner: hex64Literal(),
+      tokenAddress: hex40Literal(),
+      owner: hex40Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
@@ -30,7 +30,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     try {
       const erc20 = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress as `0x${string}`
+        input.tokenAddress
       );
 
       const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([

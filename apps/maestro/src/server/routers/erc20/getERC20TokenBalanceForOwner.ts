@@ -28,12 +28,12 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     try {
       const client = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress as `0x${string}`
+        input.tokenAddress
       );
 
       const [tokenBalance, decimals] = await Promise.all([
         client.read("balanceOf", {
-          args: [input.owner as `0x$${string}`],
+          args: [input.owner],
         }),
         client.read("decimals"),
       ]);

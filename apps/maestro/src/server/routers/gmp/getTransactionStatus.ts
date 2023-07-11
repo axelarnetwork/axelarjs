@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex40 } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 /**
@@ -10,7 +10,7 @@ import { publicProcedure } from "~/server/trpc";
 export const getTransactionStatus = publicProcedure
   .input(
     z.object({
-      txHash: hex40(),
+      txHash: hex40Literal(),
     })
   )
   // a procedure can either be a query or a mutation
@@ -18,7 +18,7 @@ export const getTransactionStatus = publicProcedure
   .query(async ({ input, ctx }) => {
     try {
       const response = await ctx.services.gmp.searchGMP({
-        txHash: input.txHash as `0x${string}`,
+        txHash: input.txHash,
       });
 
       if (response.length) {

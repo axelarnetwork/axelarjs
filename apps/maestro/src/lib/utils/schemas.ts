@@ -10,11 +10,9 @@ export const hex40 = () => z.string().regex(/^0x[0-9a-fA-F]{40}$/);
  */
 export const hex64 = () => z.string().regex(/^0x[0-9a-fA-F]{64}$/);
 
-export const hex40Literal = () =>
-  hex40().transform((val) => val as `0x${string}`);
+export const hex40Literal = () => hex40().transform((x) => x as `0x${string}`);
 
-export const hex64Literal = () =>
-  hex64().transform((val) => val as `0x${string}`);
+export const hex64Literal = () => hex64().transform((x) => x as `0x${string}`);
 
 export const numericString = () => z.string().regex(/^[0-9.]+$/);
 

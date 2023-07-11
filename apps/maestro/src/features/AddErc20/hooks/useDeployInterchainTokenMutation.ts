@@ -115,7 +115,7 @@ export function useDeployInterchainTokenMutation(config: {
         symbol: inputRef.current.tokenSymbol,
         decimals: inputRef.current.decimals,
         tokenId: tokenId as `0x${string}`,
-        address: tokenAddress as `0x${string}`,
+        address: tokenAddress,
         chainId: chain.id,
         axelarChainId: inputRef.current.sourceChainId,
         deployerAddress,
@@ -125,7 +125,7 @@ export function useDeployInterchainTokenMutation(config: {
           chainId:
             evmChainConfigs?.find((c) => c.id === chainId)?.chain_id ?? 0,
           axelarChainId: chainId,
-          address: tokenAddress as `0x${string}`,
+          address: tokenAddress,
         })),
       });
 

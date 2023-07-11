@@ -26,7 +26,7 @@ export const getERC20TokenDetails = publicProcedure
         for (const config of EVM_CHAIN_CONFIGS) {
           const client = ctx.contracts.createERC20Client(
             config,
-            input.tokenAddress as `0x${string}`
+            input.tokenAddress
           );
 
           try {
@@ -50,7 +50,7 @@ export const getERC20TokenDetails = publicProcedure
 
       const client = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress as `0x${string}`
+        input.tokenAddress
       );
 
       return getTokenPublicDetails(client);

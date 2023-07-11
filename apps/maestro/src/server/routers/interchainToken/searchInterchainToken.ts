@@ -3,13 +3,13 @@ import { partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex40, hex64 } from "~/lib/utils/schemas";
+import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 import type { IntercahinTokenDetails } from "~/services/kv";
 
 const tokenDetails = () => ({
-  tokenId: hex64().nullable(),
-  tokenAddress: hex40().nullable(),
+  tokenId: hex64Literal().nullable(),
+  tokenAddress: hex40Literal().nullable(),
   isOriginToken: z.boolean(),
   isRegistered: z.boolean(),
   chainId: z.number(),
@@ -41,7 +41,7 @@ export const searchInterchainToken = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex40(),
+      tokenAddress: hex40Literal(),
     })
   )
   .output(
@@ -65,21 +65,22 @@ export const searchInterchainToken = publicProcedure
         for (const chainConfig of remainingChainConfigs) {
           const kvResult = await ctx.services.kv.getInterchainTokenDetails({
             chainId: chainConfig.id,
-            tokenAddress: input.tokenAddress as `0x${string}`,
+            tokenAddress: input.tokenAddress,
           });
 
-          if (kvResult) {
-            const result = await getInterchainToken(
-              kvResult,
-              chainConfig,
-              remainingChainConfigs
-            );
-
-            // cache for 1 hour
-            ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
-            return result;
+          if (!kvResult) {
+            continue;
           }
+          const result = await getInterchainToken(
+            kvResult,
+            chainConfig,
+            remainingChainConfigs
+          );
+
+          // cache for 1 hour
+          ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+
+          return result;
         }
 
         throw new TRPCError({
@@ -90,26 +91,25 @@ export const searchInterchainToken = publicProcedure
 
       const kvResult = await ctx.services.kv.getInterchainTokenDetails({
         chainId: chainConfig.id,
-        tokenAddress: input.tokenAddress as `0x${string}`,
+        tokenAddress: input.tokenAddress,
       });
 
-      if (kvResult) {
-        const result = await getInterchainToken(
-          kvResult,
-          chainConfig,
-          remainingChainConfigs
-        );
-
-        // cache for 1 hour
-        ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
-        return result;
+      if (!kvResult) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Token ${input.tokenAddress} not registered on chain ${chainConfig.id}`,
+        });
       }
+      const result = await getInterchainToken(
+        kvResult,
+        chainConfig,
+        remainingChainConfigs
+      );
 
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Token ${input.tokenAddress} not registered on chain ${chainConfig.id}`,
-      });
+      // cache for 1 hour
+      ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+
+      return result;
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
