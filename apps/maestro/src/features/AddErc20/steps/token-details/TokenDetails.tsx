@@ -19,6 +19,15 @@ const formSchema = z.object({
 
 type FormState = z.infer<typeof formSchema>;
 
+const FormInput = {
+  ...TextInput,
+  defaultProps: {
+    ...TextInput.defaultProps,
+    className: "bg-base-200",
+    bordered: true,
+  },
+} as typeof TextInput;
+
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
 
@@ -53,9 +62,7 @@ const TokenDetails: FC = () => {
       >
         <FormControl>
           <Label>Token Name</Label>
-          <TextInput
-            className="bg-base-200"
-            bordered
+          <FormInput
             placeholder="Enter your token name"
             disabled={isReadonly}
             {...register("tokenName")}
@@ -63,9 +70,7 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label>Token Symbol</Label>
-          <TextInput
-            className="bg-base-200"
-            bordered
+          <FormInput
             placeholder="Enter your token symbol"
             maxLength={11}
             disabled={isReadonly}
@@ -74,10 +79,8 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label htmlFor="tokenDecimals">Token Decimals</Label>
-          <TextInput
+          <FormInput
             id="tokenDecimals"
-            className="bg-base-200"
-            bordered
             type="number"
             placeholder="Enter your token decimals"
             min={1}
@@ -88,12 +91,10 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label htmlFor="amountToMint">Amount to mint</Label>
-          <TextInput
+          <FormInput
             id="amountToMint"
-            bordered
             placeholder="Enter your amount to mint"
             min={0}
-            className="bg-base-200"
             onKeyDown={preventNonNumericInput}
             {...register("tokenCap", {
               disabled: isReadonly,
