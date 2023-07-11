@@ -6,21 +6,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20";
+import { numericString } from "~/lib/utils/schemas";
+import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 
-const schema = z.object({
+const formSchema = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
+  tokenCap: numericString(),
 });
 
-type FormState = z.infer<typeof schema>;
+type FormState = z.infer<typeof formSchema>;
 
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
 
   const { register, handleSubmit, formState } = useForm<FormState>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(formSchema),
     defaultValues: state.tokenDetails,
   });
 
@@ -34,6 +37,7 @@ const TokenDetails: FC = () => {
       tokenName: data.tokenName,
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
+      tokenCap: data.tokenCap,
     });
 
     actions.nextStep();
@@ -69,8 +73,9 @@ const TokenDetails: FC = () => {
           />
         </FormControl>
         <FormControl>
-          <Label>Token Decimals</Label>
+          <Label htmlFor="tokenDecimals">Token Decimals</Label>
           <TextInput
+            id="tokenDecimals"
             className="bg-base-200"
             bordered
             type="number"
@@ -79,6 +84,27 @@ const TokenDetails: FC = () => {
             max={18}
             disabled={isReadonly}
             {...register("tokenDecimals")}
+          />
+        </FormControl>
+        <FormControl>
+          <Label htmlFor="amountToMint">Amount to mint</Label>
+          <TextInput
+            id="amountToMint"
+            bordered
+            placeholder="Enter your amount to mint"
+            min={0}
+            className="bg-base-200"
+            onKeyDown={preventNonNumericInput}
+            {...register("tokenCap", {
+              disabled: isReadonly,
+              validate(value) {
+                if (!value || value === "0") {
+                  return "Amount must be greater than 0";
+                }
+
+                return true;
+              },
+            })}
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />

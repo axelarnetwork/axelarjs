@@ -13,7 +13,7 @@ import {
   useInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
-import { isValidEVMAddress } from "~/lib/utils/isValidEVMAddress";
+import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployAndRegisterInterchainTokenInput = {
