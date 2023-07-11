@@ -1,6 +1,6 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
-import { hexlify, hexZeroPad, throttle } from "@axelarjs/utils";
+import { hexlify, throttle } from "@axelarjs/utils";
 import { useMemo, useRef } from "react";
 
 import { encodeFunctionData, TransactionExecutionError } from "viem";
@@ -20,6 +20,7 @@ import {
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployAndRegisterInterchainTokenInput = {
@@ -33,26 +34,38 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   mintTo?: `0x${string}`;
 };
 
+const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
+  sourceChainId: "",
+  tokenName: "",
+  tokenSymbol: "",
+  decimals: 0,
+  destinationChainIds: [],
+  gasFees: [],
+  cap: BigInt(0),
+  mintTo: `0x000`,
+};
+
 export function useDeployInterchainTokenMutation(config: {
   value: bigint;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }) {
-  const { address } = useAccount();
+  const inputRef =
+    useRef<UseDeployAndRegisterInterchainTokenInput>(DEFAULT_INPUT);
+  const { address: deployerAddress } = useAccount();
   const { chain } = useNetwork();
 
   const salt = useMemo(
     () =>
-      hexZeroPad(
-        hexlify(Math.floor(Math.random() * 1_000_000_000)),
-        32
-      ) as `0x${string}`,
+      "crypto" in window
+        ? (hexlify(crypto.getRandomValues(new Uint8Array(32))) as `0x${string}`)
+        : (hexlify(Math.random() * 2 ** 256) as `0x${string}`),
     []
   );
 
   const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: [address as `0x${string}`, salt],
-    enabled: address && isValidEVMAddress(address),
+    args: [deployerAddress as `0x${string}`, salt],
+    enabled: deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
   const { data: tokenAddress } =
@@ -61,26 +74,15 @@ export function useDeployInterchainTokenMutation(config: {
       enabled: Boolean(tokenId),
     });
 
+  const { data: evmChainConfigs } = useEVMChainConfigsQuery();
+
   const { writeAsync: multicallAsync, data: multicallResult } =
     useInterchainTokenServiceMulticall();
-
-  let currentInput: UseDeployAndRegisterInterchainTokenInput = {
-    sourceChainId: "",
-    tokenName: "",
-    tokenSymbol: "",
-    decimals: 0,
-    destinationChainIds: [],
-    gasFees: [],
-    cap: BigInt(0),
-    mintTo: `0x000`,
-  };
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
-
-  const txHashRef = useRef<string>("");
 
   const unwatch = watchInterchainTokenServiceEvent(
     {
@@ -88,43 +90,49 @@ export function useDeployInterchainTokenMutation(config: {
     },
     async (logs) => {
       const log = logs.find(
-        (log) =>
-          Boolean(log.args?.tokenId) &&
-          log?.args.decimals === currentInput.decimals &&
-          log?.args.name === currentInput.tokenName &&
-          log?.args.symbol === currentInput.tokenSymbol &&
-          log?.args.mintTo === address
+        ({ args }) =>
+          Boolean(args?.tokenId) &&
+          args.decimals === inputRef.current.decimals &&
+          args.name === inputRef.current.tokenName &&
+          args.symbol === inputRef.current.tokenSymbol &&
+          args.mintTo === deployerAddress
       );
 
-      if (!log || !chain) {
+      if (
+        !log ||
+        !chain ||
+        !deployerAddress ||
+        !log.transactionHash ||
+        !tokenAddress
+      ) {
         return;
       }
 
       unwatch();
 
-      const details = {
-        name: currentInput.tokenName,
-        symbol: currentInput.tokenSymbol,
-        decimals: currentInput.decimals,
+      await recordDeploymentAsync({
+        name: inputRef.current.tokenName,
+        symbol: inputRef.current.tokenSymbol,
+        decimals: inputRef.current.decimals,
         tokenId: tokenId as `0x${string}`,
         address: tokenAddress as `0x${string}`,
-        originChainId: chain.id,
-        axelarChainId: currentInput.sourceChainId,
-        deployerAddress: address as `0x${string}`,
+        chainId: chain.id,
+        axelarChainId: inputRef.current.sourceChainId,
+        deployerAddress,
         salt,
-        deploymentTxHash: txHashRef.current as `0x${string}`,
-        remoteTokens: currentInput.destinationChainIds.map((chainId) => ({
+        deploymentTxHash: log.transactionHash,
+        remoteTokens: inputRef.current.destinationChainIds.map((chainId) => ({
+          chainId:
+            evmChainConfigs?.find((c) => c.id === chainId)?.chain_id ?? 0,
           axelarChainId: chainId,
           address: tokenAddress as `0x${string}`,
         })),
-      };
-
-      await recordDeploymentAsync(details);
+      });
 
       onStatusUpdate({
         type: "deployed",
-        tokenAddress: tokenAddress as `0x${string}`,
-        txHash: txHashRef.current as `0x${string}`,
+        tokenAddress,
+        txHash: log.transactionHash,
       });
     }
   );
@@ -142,11 +150,11 @@ export function useDeployInterchainTokenMutation(config: {
 
   return useMutation(
     async (input: UseDeployAndRegisterInterchainTokenInput) => {
-      if (!address) {
+      if (!deployerAddress) {
         return;
       }
 
-      currentInput = input;
+      inputRef.current = input;
 
       onStatusUpdate({
         type: "pending_approval",
@@ -160,7 +168,7 @@ export function useDeployInterchainTokenMutation(config: {
             input.tokenSymbol,
             input.decimals,
             input.cap ?? BigInt(0),
-            input.mintTo ?? address,
+            input.mintTo ?? deployerAddress,
           ],
           abi: INTERCHAIN_TOKEN_SERVICE_ABI,
         });
@@ -178,7 +186,7 @@ export function useDeployInterchainTokenMutation(config: {
             input.tokenSymbol,
             input.decimals,
             "0x",
-            input.mintTo ?? address,
+            input.mintTo ?? deployerAddress,
             chainId,
             gasFee,
           ] as const;
@@ -200,8 +208,6 @@ export function useDeployInterchainTokenMutation(config: {
             type: "deploying",
             txHash: tx.hash,
           });
-
-          txHashRef.current = tx.hash;
         }
       } catch (error) {
         onStatusUpdate({

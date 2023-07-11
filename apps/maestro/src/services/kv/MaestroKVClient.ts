@@ -11,13 +11,14 @@ export const interchainTokenDetailsSchema = z.object({
   decimals: z.number(),
   address: hex40Literal(),
   deployerAddress: hex40Literal(),
-  originChainId: z.number(),
+  chainId: z.number(),
   axelarChainId: z.string(),
   tokenId: hex64Literal(),
-  salt: z.string(),
+  salt: hex64Literal(),
   deploymentTxHash: hex64Literal(),
   remoteTokens: z.array(
     z.object({
+      chainId: z.number(),
       axelarChainId: z.string(),
       address: hex40Literal(),
     })
@@ -42,46 +43,70 @@ export const COLLECTIONS = {
 };
 
 export const COLLECTION_KEYS = {
-  interchainTokenDetails: (tokenAddress: `0x${string}`) =>
-    `${COLLECTIONS.interchainTokens}/${tokenAddress}`,
+  interchainTokenDetails: (chainId: number, tokenAddress: `0x${string}`) =>
+    [COLLECTIONS.interchainTokens, chainId, tokenAddress].join("/"),
+
   accountDetails: (accountAddress: `0x${string}`) =>
-    `${COLLECTIONS.accounts}/${accountAddress}`,
+    [COLLECTIONS.accounts, accountAddress].join("/"),
 };
 
 export default class MaestroKVClient {
   constructor(private kv: VercelKV) {}
 
-  async getInterchainTokenDetails(tokenAddress: `0x${string}`) {
-    const key = COLLECTION_KEYS.interchainTokenDetails(tokenAddress);
+  async getInterchainTokenDetails(variables: {
+    chainId: number;
+    tokenAddress: `0x${string}`;
+  }) {
+    const key = COLLECTION_KEYS.interchainTokenDetails(
+      variables.chainId,
+      variables.tokenAddress
+    );
     const val = await this.kv.get<IntercahinTokenDetails>(key);
     return val;
   }
 
   async hgetInterchainTokenDetails(
-    tokenAddress: `0x${string}`,
+    variables: {
+      chainId: number;
+      tokenAddress: `0x${string}`;
+    },
     field: keyof IntercahinTokenDetails
   ) {
-    const key = COLLECTION_KEYS.interchainTokenDetails(tokenAddress);
-    const val = await this.kv.hget<IntercahinTokenDetails>(key, field);
-    return val;
+    const key = COLLECTION_KEYS.interchainTokenDetails(
+      variables.chainId,
+      variables.tokenAddress
+    );
+    return this.kv.hget<IntercahinTokenDetails>(key, field);
   }
 
   async setInterchainTokenDetails(
-    tokenAddress: `0x${string}`,
+    variables: {
+      chainId: number;
+      tokenAddress: `0x${string}`;
+    },
     details: IntercahinTokenDetails
   ) {
-    const key = COLLECTION_KEYS.interchainTokenDetails(tokenAddress);
-    await this.kv.set(key, details);
+    const key = COLLECTION_KEYS.interchainTokenDetails(
+      variables.chainId,
+      variables.tokenAddress
+    );
+    return this.kv.set(key, details);
   }
 
   async patchInterchainTokenDetials(
-    tokenAddress: `0x${string}`,
+    variables: {
+      chainId: number;
+      tokenAddress: `0x${string}`;
+    },
     details: Partial<IntercahinTokenDetails>
   ) {
-    const key = COLLECTION_KEYS.interchainTokenDetails(tokenAddress);
-    const val = await this.kv.get<IntercahinTokenDetails>(key);
-    const newVal = { ...val, ...details };
-    await this.kv.set(key, newVal);
+    const key = COLLECTION_KEYS.interchainTokenDetails(
+      variables.chainId,
+      variables.tokenAddress
+    );
+    const value = await this.kv.get<IntercahinTokenDetails>(key);
+
+    await this.kv.set(key, { ...value, ...details });
   }
 
   async getAccountDetails(accountAddress: `0x${string}`) {

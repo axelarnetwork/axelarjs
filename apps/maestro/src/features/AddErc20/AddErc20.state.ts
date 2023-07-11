@@ -116,6 +116,11 @@ function useAddErc20State(
           }
         });
       },
+      setStep: (step: number) => {
+        setState((draft) => {
+          draft.step = step;
+        });
+      },
       nextStep: () => setState((draft) => draft.step++),
       prevStep: () => setState((draft) => draft.step--),
     },

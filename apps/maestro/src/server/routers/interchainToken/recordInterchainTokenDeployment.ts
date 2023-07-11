@@ -4,5 +4,11 @@ import { interchainTokenDetailsSchema } from "~/services/kv";
 export const recordInterchainTokenDeployment = publicProcedure
   .input(interchainTokenDetailsSchema)
   .mutation(({ ctx, input }) => {
-    ctx.services.kv.setInterchainTokenDetails(input.address, input);
+    return ctx.services.kv.setInterchainTokenDetails(
+      {
+        chainId: input.chainId,
+        tokenAddress: input.address,
+      },
+      input
+    );
   });

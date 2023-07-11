@@ -1,17 +1,15 @@
-import type { InterchainTokenServiceClient } from "@axelarjs/evm";
-
 import { TRPCError } from "@trpc/server";
-import { always, partition } from "rambda";
+import { partition } from "rambda";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
+import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { hex40, hex64 } from "~/lib/utils/schemas";
-import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
+import type { IntercahinTokenDetails } from "~/services/kv";
 
 const tokenDetails = () => ({
-  tokenId: hex40().nullable(),
-  tokenAddress: hex64().nullable(),
+  tokenId: hex64().nullable(),
+  tokenAddress: hex40().nullable(),
   isOriginToken: z.boolean(),
   isRegistered: z.boolean(),
   chainId: z.number(),
@@ -62,57 +60,25 @@ export const searchInterchainToken = publicProcedure
       );
 
       if (!chainConfig) {
-        const kvResult = await ctx.services.kv.getInterchainTokenDetails(
-          input.tokenAddress as `0x${string}`
-        );
+        // if no chainId is provided, search all chains
 
-        console.log(kvResult);
+        for (const chainConfig of remainingChainConfigs) {
+          const kvResult = await ctx.services.kv.getInterchainTokenDetails({
+            chainId: chainConfig.id,
+            tokenAddress: input.tokenAddress as `0x${string}`,
+          });
 
-        for (const chainConfig of EVM_CHAIN_CONFIGS) {
-          const itsClient =
-            ctx.contracts.createInterchainTokenServiceClient(chainConfig);
-
-          try {
-            const tokenId = await itsClient
-              .read("getCanonicalTokenId", {
-                args: [input.tokenAddress as `0x${string}`],
-              })
-              .catch(always(null));
-
-            if (!tokenId) {
-              continue;
-            }
-
-            const derivedAddress = await itsClient
-              .read("getStandardizedTokenAddress", {
-                args: [tokenId],
-              })
-              .catch(always(null));
-
-            if (!derivedAddress || derivedAddress !== input.tokenAddress) {
-              continue;
-            }
-
-            const result = await getInterchainTokenDetails(
-              tokenId,
-              itsClient,
+          if (kvResult) {
+            const result = await getInterchainToken(
+              kvResult,
               chainConfig,
-              remainingChainConfigs,
-              {
-                tokenAddress: input.tokenAddress,
-                chainId: chainConfig.id,
-              },
-              ctx
+              remainingChainConfigs
             );
 
             // cache for 1 hour
             ctx.res.setHeader("Cache-Control", "public, max-age=3600");
 
             return result;
-          } catch (error) {
-            console.log(
-              `Token ${input.tokenAddress} not registered on ${chainConfig.name}`
-            );
           }
         }
 
@@ -122,26 +88,28 @@ export const searchInterchainToken = publicProcedure
         });
       }
 
-      const client =
-        ctx.contracts.createInterchainTokenServiceClient(chainConfig);
-
-      const canonicalTokenId = await client.read("getCanonicalTokenId", {
-        args: [input.tokenAddress as `0x${string}`],
+      const kvResult = await ctx.services.kv.getInterchainTokenDetails({
+        chainId: chainConfig.id,
+        tokenAddress: input.tokenAddress as `0x${string}`,
       });
 
-      const result = await getInterchainTokenDetails(
-        canonicalTokenId,
-        client,
-        chainConfig,
-        remainingChainConfigs,
-        input,
-        ctx
-      );
+      if (kvResult) {
+        const result = await getInterchainToken(
+          kvResult,
+          chainConfig,
+          remainingChainConfigs
+        );
 
-      // cache for 1 hour
-      ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+        // cache for 1 hour
+        ctx.res.setHeader("Cache-Control", "public, max-age=3600");
 
-      return result;
+        return result;
+      }
+
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Token ${input.tokenAddress} not registered on chain ${chainConfig.id}`,
+      });
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -156,89 +124,43 @@ export const searchInterchainToken = publicProcedure
     }
   });
 
-async function getInterchainTokenDetails(
-  tokenId: `0x${string}`,
-  itsClient: InterchainTokenServiceClient,
-  chainConfig: WagmiEVMChainConfig,
-  remainingChainConfigs: WagmiEVMChainConfig[],
-  input: {
-    tokenAddress: string;
-    chainId?: number;
-  },
-  ctx: Context
+async function getInterchainToken(
+  kvResult: IntercahinTokenDetails,
+  chainConfig: (typeof EVM_CHAIN_CONFIGS)[number],
+  remainingChainConfigs: typeof EVM_CHAIN_CONFIGS
 ) {
-  const matchingTokens = await Promise.all(
-    remainingChainConfigs.map(async (chain) => {
-      try {
-        const itsClient =
-          ctx.contracts.createInterchainTokenServiceClient(chain);
-
-        const chainTokenId = await itsClient.read("getCanonicalTokenId", {
-          args: [input.tokenAddress as `0x${string}`],
-        });
-
-        const isRegistered = chainTokenId !== null;
-
-        const isOriginToken = tokenId === chainTokenId;
-
-        return {
-          tokenId: isOriginToken ? tokenId : chainTokenId,
-          isOriginToken: tokenId === chainTokenId,
-          chainId: chain.id,
-          chainName: chain.name,
-          tokenAddress: input.tokenAddress as `0x${string}`,
-          isRegistered,
-        };
-      } catch (error) {
-        return {
-          tokenId: null,
-          chainId: chain.id,
-          tokenAddress: null,
-          isOriginToken: false,
-          isRegistered: false,
-        };
-      }
-    })
-  );
-
-  const canonicalTokenId = await itsClient.read("getCanonicalTokenId", {
-    args: [input.tokenAddress as `0x${string}`],
-  });
-
   const lookupToken = {
-    tokenId: canonicalTokenId,
-    tokenAddress: input.tokenAddress as `0x${string}`,
-    isOriginToken: canonicalTokenId === tokenId,
+    tokenId: kvResult.tokenId,
+    tokenAddress: kvResult.address,
+    isOriginToken: kvResult.chainId === chainConfig.id,
     isRegistered: true,
-    chainId: chainConfig.id,
+    chainId: kvResult.chainId,
   };
 
-  const output: SearchInterchainTokenOutput = {
+  const registered = kvResult.remoteTokens.map((token) => ({
+    tokenId: kvResult.tokenId,
+    tokenAddress: token.address,
+    isOriginToken: false,
+    isRegistered: true,
+    chainId: token.chainId,
+  }));
+
+  const unregistered = remainingChainConfigs
+    .filter(
+      (chain) =>
+        chain.id !== chainConfig.id &&
+        !kvResult.remoteTokens.some((token) => token.chainId === chain.id)
+    )
+    .map((chain) => ({
+      tokenId: null,
+      tokenAddress: null,
+      isOriginToken: false,
+      isRegistered: false,
+      chainId: chain.id,
+    }));
+
+  return {
     ...lookupToken,
-    matchingTokens: [
-      lookupToken,
-      ...matchingTokens.filter((x) => x.tokenId !== lookupToken.tokenId),
-    ].sort(
-      // isOriginToken first, then isRegistered
-      (a, b) => {
-        if (a.isOriginToken && !b.isOriginToken) {
-          return -1;
-        }
-        if (!a.isOriginToken && b.isOriginToken) {
-          return 1;
-        }
-
-        if (a.isRegistered && !b.isRegistered) {
-          return -1;
-        }
-        if (!a.isRegistered && b.isRegistered) {
-          return 1;
-        }
-
-        return 0;
-      }
-    ),
+    matchingTokens: [lookupToken, ...registered, ...unregistered],
   };
-
-  return output;
 }
