@@ -1,7 +1,7 @@
 import { type VercelKV } from "@vercel/kv";
 import { z } from "zod";
 
-import { hex40Literal, hex64, hex64Literal } from "~/lib/utils/schemas";
+import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
 
 export type RemoteInterchainToken = {};
 
@@ -9,13 +9,19 @@ export const interchainTokenDetailsSchema = z.object({
   name: z.string(),
   symbol: z.string(),
   decimals: z.number(),
-  address: hex64Literal(),
-  originChainId: z.number(),
-  tokenId: hex64(),
-  salt: z.string(),
-  remoteTokens: z.array(z.unknown()),
+  address: hex40Literal(),
   deployerAddress: hex40Literal(),
+  originChainId: z.number(),
+  axelarChainId: z.string(),
+  tokenId: hex64Literal(),
+  salt: z.string(),
   deploymentTxHash: hex64Literal(),
+  remoteTokens: z.array(
+    z.object({
+      axelarChainId: z.string(),
+      address: hex40Literal(),
+    })
+  ),
 });
 
 export type IntercahinTokenDetails = z.infer<

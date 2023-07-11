@@ -1,10 +1,15 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { hexlify, hexZeroPad, throttle } from "@axelarjs/utils";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 import { encodeFunctionData, TransactionExecutionError } from "viem";
-import { useAccount, useMutation, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useMutation,
+  useNetwork,
+  useWaitForTransaction,
+} from "wagmi";
 
 import { watchInterchainTokenServiceEvent } from "~/lib/contracts/InterchainTokenService.actions";
 import {
@@ -13,6 +18,7 @@ import {
   useInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
+import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -33,6 +39,7 @@ export function useDeployInterchainTokenMutation(config: {
   onFinished?: () => void;
 }) {
   const { address } = useAccount();
+  const { chain } = useNetwork();
 
   const salt = useMemo(
     () =>
@@ -68,13 +75,18 @@ export function useDeployInterchainTokenMutation(config: {
     mintTo: `0x000`,
   };
 
+  const { mutateAsync: recordDeploymentAsync } =
+    trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
+
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
+
+  const txHashRef = useRef<string>("");
 
   const unwatch = watchInterchainTokenServiceEvent(
     {
       eventName: "StandardizedTokenDeployed",
     },
-    (logs) => {
+    async (logs) => {
       const log = logs.find(
         (log) =>
           Boolean(log.args?.tokenId) &&
@@ -84,18 +96,35 @@ export function useDeployInterchainTokenMutation(config: {
           log?.args.mintTo === address
       );
 
-      if (!log) {
+      if (!log || !chain) {
         return;
       }
 
       unwatch();
 
-      console.log("StandardizedTokenDeployed", { log, tokenId, tokenAddress });
+      const details = {
+        name: currentInput.tokenName,
+        symbol: currentInput.tokenSymbol,
+        decimals: currentInput.decimals,
+        tokenId: tokenId as `0x${string}`,
+        address: tokenAddress as `0x${string}`,
+        originChainId: chain.id,
+        axelarChainId: currentInput.sourceChainId,
+        deployerAddress: address as `0x${string}`,
+        salt,
+        deploymentTxHash: txHashRef.current as `0x${string}`,
+        remoteTokens: currentInput.destinationChainIds.map((chainId) => ({
+          axelarChainId: chainId,
+          address: tokenAddress as `0x${string}`,
+        })),
+      };
+
+      await recordDeploymentAsync(details);
 
       onStatusUpdate({
         type: "deployed",
         tokenAddress: tokenAddress as `0x${string}`,
-        txHash: multicallResult?.hash as `0x${string}`,
+        txHash: txHashRef.current as `0x${string}`,
       });
     }
   );
@@ -171,6 +200,8 @@ export function useDeployInterchainTokenMutation(config: {
             type: "deploying",
             txHash: tx.hash,
           });
+
+          txHashRef.current = tx.hash;
         }
       } catch (error) {
         onStatusUpdate({

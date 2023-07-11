@@ -43,7 +43,7 @@ export const searchInterchainToken = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex64(),
+      tokenAddress: hex40(),
     })
   )
   .output(
@@ -62,6 +62,12 @@ export const searchInterchainToken = publicProcedure
       );
 
       if (!chainConfig) {
+        const kvResult = await ctx.services.kv.getInterchainTokenDetails(
+          input.tokenAddress as `0x${string}`
+        );
+
+        console.log(kvResult);
+
         for (const chainConfig of EVM_CHAIN_CONFIGS) {
           const itsClient =
             ctx.contracts.createInterchainTokenServiceClient(chainConfig);
