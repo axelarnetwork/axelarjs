@@ -34,9 +34,11 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       );
 
       const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
-        client.readContract("balanceOf", {
-          args: [input.owner as `0x$${string}`],
-        }),
+        client
+          .readContract("balanceOf", {
+            args: [input.owner as `0x$${string}`],
+          })
+          .catch(always(BigInt(0))),
         client.readContract("decimals").catch(always(null)),
         client.readContract("owner").catch(always(null)),
         client.readContract("pendingOwner").catch(always(null)),

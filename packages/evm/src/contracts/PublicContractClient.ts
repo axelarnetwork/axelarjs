@@ -41,16 +41,16 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
   }
 
   public readContract<
-    TMethod extends ReadContractParameters<TAbi>["functionName"]
+    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
   >(
-    method: TMethod,
+    functionName: TFunctionName,
     params?: Omit<
-      ReadContractParameters<TAbi, TMethod>,
+      ReadContractParameters<TAbi, TFunctionName>,
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
     }
-  ): Promise<ContractFunctionResult<TAbi, TMethod>> {
+  ): Promise<ContractFunctionResult<TAbi, TFunctionName>> {
     const address = params?.address ?? this.address;
 
     if (!address) {
@@ -60,8 +60,8 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     const contractParams = {
       address,
       abi: this.abi,
-      functionName: method,
-    } as ReadContractParameters<TAbi, TMethod>;
+      functionName,
+    } as ReadContractParameters<TAbi, TFunctionName>;
 
     if (params?.args) {
       contractParams["args"] = params.args;
@@ -70,12 +70,67 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     return this.client.readContract(contractParams);
   }
 
-  public writeContract<
-    TMethod extends ReadContractParameters<TAbi>["functionName"]
+  /**
+   * Batch read contract
+   * @param Calls
+   */
+  public batchRead<
+    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
   >(
-    method: TMethod,
+    calls: {
+      functionName: TFunctionName;
+      params?: Omit<
+        ReadContractParameters<TAbi, TFunctionName>,
+        "address" | "functionName" | "abi"
+      > & {
+        address?: `0x${string}`;
+        /**
+         * Default result to return if the call fails
+         */
+        defaultResult?: ContractFunctionResult<TAbi, TFunctionName> | null;
+      };
+    }[]
+  ): Promise<ContractFunctionResult<TAbi, TFunctionName>[]> {
+    return Promise.all(
+      calls.map(async ({ params, functionName }) => {
+        try {
+          const address = params?.address ?? this.address;
+
+          if (!address) {
+            throw new Error("No address provided");
+          }
+
+          const contractParams = {
+            address,
+            abi: this.abi,
+            functionName,
+          } as ReadContractParameters<TAbi, TFunctionName>;
+
+          if (params?.args) {
+            contractParams["args"] = params.args;
+          }
+          return await this.client.readContract(contractParams);
+        } catch (error) {
+          if (params && "defaultResult" in params) {
+            // return the default result and ignore the error if it exists
+            return params.defaultResult as ContractFunctionResult<
+              TAbi,
+              TFunctionName
+            >;
+          }
+
+          throw error;
+        }
+      })
+    );
+  }
+
+  public writeContract<
+    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
+  >(
+    functionName: TFunctionName,
     params?: Omit<
-      WriteContractParameters<TAbi, TMethod>,
+      WriteContractParameters<TAbi, TFunctionName>,
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
@@ -90,8 +145,8 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     const contractParams = {
       address,
       abi: this.abi,
-      functionName: method,
-    } as WriteContractParameters<TAbi, TMethod, undefined>;
+      functionName: functionName,
+    } as WriteContractParameters<TAbi, TFunctionName, undefined>;
 
     if (params?.args) {
       contractParams["args"] = params.args;

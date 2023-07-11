@@ -73,24 +73,36 @@ export const searchInterchainToken = publicProcedure
               })
               .catch(always(null));
 
-            if (tokenId) {
-              const result = await getInterchainTokenDetails(
-                tokenId,
-                itsClient,
-                chainConfig,
-                remainingChainConfigs,
-                {
-                  tokenAddress: input.tokenAddress,
-                  chainId: chainConfig.id,
-                },
-                ctx
-              );
-
-              // cache for 1 hour
-              ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
-              return result;
+            if (!tokenId) {
+              continue;
             }
+
+            const derivedAddress = await itsClient
+              .readContract("getStandardizedTokenAddress", {
+                args: [tokenId],
+              })
+              .catch(always(null));
+
+            if (!derivedAddress || derivedAddress !== input.tokenAddress) {
+              continue;
+            }
+
+            const result = await getInterchainTokenDetails(
+              tokenId,
+              itsClient,
+              chainConfig,
+              remainingChainConfigs,
+              {
+                tokenAddress: input.tokenAddress,
+                chainId: chainConfig.id,
+              },
+              ctx
+            );
+
+            // cache for 1 hour
+            ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+
+            return result;
           } catch (error) {
             console.log(
               `Token ${input.tokenAddress} not registered on ${chainConfig.name}`
