@@ -40,7 +40,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     this.chain = options?.chain ?? mainnet;
   }
 
-  public readContract<
+  public read<
     TFunctionName extends ReadContractParameters<TAbi>["functionName"]
   >(
     functionName: TFunctionName,
@@ -70,62 +70,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     return this.client.readContract(contractParams);
   }
 
-  /**
-   * Batch read contract
-   * @param Calls
-   */
-  public batchRead<
-    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
-  >(
-    calls: {
-      functionName: TFunctionName;
-      params?: Omit<
-        ReadContractParameters<TAbi, TFunctionName>,
-        "address" | "functionName" | "abi"
-      > & {
-        address?: `0x${string}`;
-        /**
-         * Default result to return if the call fails
-         */
-        defaultResult?: ContractFunctionResult<TAbi, TFunctionName> | null;
-      };
-    }[]
-  ): Promise<ContractFunctionResult<TAbi, TFunctionName>[]> {
-    return Promise.all(
-      calls.map(async ({ params, functionName }) => {
-        try {
-          const address = params?.address ?? this.address;
-
-          if (!address) {
-            throw new Error("No address provided");
-          }
-
-          const contractParams = {
-            address,
-            abi: this.abi,
-            functionName,
-          } as ReadContractParameters<TAbi, TFunctionName>;
-
-          if (params?.args) {
-            contractParams["args"] = params.args;
-          }
-          return await this.client.readContract(contractParams);
-        } catch (error) {
-          if (params && "defaultResult" in params) {
-            // return the default result and ignore the error if it exists
-            return params.defaultResult as ContractFunctionResult<
-              TAbi,
-              TFunctionName
-            >;
-          }
-
-          throw error;
-        }
-      })
-    );
-  }
-
-  public writeContract<
+  public write<
     TFunctionName extends ReadContractParameters<TAbi>["functionName"]
   >(
     functionName: TFunctionName,

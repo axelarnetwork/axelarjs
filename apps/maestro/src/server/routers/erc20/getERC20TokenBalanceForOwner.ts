@@ -2,15 +2,15 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64 } from "~/lib/utils/schemas";
+import { hex64Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getERC20TokenBalanceForOwner = publicProcedure
   .input(
     z.object({
       chainId: z.number(),
-      tokenAddress: hex64(),
-      owner: hex64(),
+      tokenAddress: hex64Literal(),
+      owner: hex64Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
@@ -32,10 +32,10 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       );
 
       const [tokenBalance, decimals] = await Promise.all([
-        client.readContract("balanceOf", {
+        client.read("balanceOf", {
           args: [input.owner as `0x$${string}`],
         }),
-        client.readContract("decimals"),
+        client.read("decimals"),
       ]);
 
       return {

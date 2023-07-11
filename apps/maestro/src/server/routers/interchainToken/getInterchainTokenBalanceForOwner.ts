@@ -4,15 +4,15 @@ import { zeroAddress } from "viem";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64 } from "~/lib/utils/schemas";
+import { hex64Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getInterchainTokenBalanceForOwner = publicProcedure
   .input(
     z.object({
       chainId: z.number(),
-      tokenAddress: hex64(),
-      owner: hex64(),
+      tokenAddress: hex64Literal(),
+      owner: hex64Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
@@ -28,20 +28,18 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     }
 
     try {
-      const client = ctx.contracts.createERC20Client(
+      const erc20 = ctx.contracts.createERC20Client(
         chainConfig,
         input.tokenAddress as `0x${string}`
       );
 
       const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
-        client
-          .readContract("balanceOf", {
-            args: [input.owner as `0x$${string}`],
-          })
+        erc20
+          .read("balanceOf", { args: [input.owner] })
           .catch(always(BigInt(0))),
-        client.readContract("decimals").catch(always(null)),
-        client.readContract("owner").catch(always(null)),
-        client.readContract("pendingOwner").catch(always(null)),
+        erc20.read("decimals").catch(always(null)),
+        erc20.read("owner").catch(always(null)),
+        erc20.read("pendingOwner").catch(always(null)),
       ]);
 
       return {

@@ -68,7 +68,7 @@ export const searchInterchainToken = publicProcedure
 
           try {
             const tokenId = await itsClient
-              .readContract("getCanonicalTokenId", {
+              .read("getCanonicalTokenId", {
                 args: [input.tokenAddress as `0x${string}`],
               })
               .catch(always(null));
@@ -78,7 +78,7 @@ export const searchInterchainToken = publicProcedure
             }
 
             const derivedAddress = await itsClient
-              .readContract("getStandardizedTokenAddress", {
+              .read("getStandardizedTokenAddress", {
                 args: [tokenId],
               })
               .catch(always(null));
@@ -119,12 +119,9 @@ export const searchInterchainToken = publicProcedure
       const client =
         ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-      const canonicalTokenId = await client.readContract(
-        "getCanonicalTokenId",
-        {
-          args: [input.tokenAddress as `0x${string}`],
-        }
-      );
+      const canonicalTokenId = await client.read("getCanonicalTokenId", {
+        args: [input.tokenAddress as `0x${string}`],
+      });
 
       const result = await getInterchainTokenDetails(
         canonicalTokenId,
@@ -170,12 +167,9 @@ async function getInterchainTokenDetails(
         const itsClient =
           ctx.contracts.createInterchainTokenServiceClient(chain);
 
-        const chainTokenId = await itsClient.readContract(
-          "getCanonicalTokenId",
-          {
-            args: [input.tokenAddress as `0x${string}`],
-          }
-        );
+        const chainTokenId = await itsClient.read("getCanonicalTokenId", {
+          args: [input.tokenAddress as `0x${string}`],
+        });
 
         const isRegistered = chainTokenId !== null;
 
@@ -201,7 +195,7 @@ async function getInterchainTokenDetails(
     })
   );
 
-  const canonicalTokenId = await itsClient.readContract("getCanonicalTokenId", {
+  const canonicalTokenId = await itsClient.read("getCanonicalTokenId", {
     args: [input.tokenAddress as `0x${string}`],
   });
 

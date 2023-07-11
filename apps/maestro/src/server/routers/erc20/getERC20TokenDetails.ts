@@ -71,11 +71,11 @@ async function getTokenPublicDetails(client: ERC20Client) {
   invariant(client.chain, "client.chain must be defined");
 
   const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
-    client.readContract("name"),
-    client.readContract("symbol"),
-    client.readContract("decimals"),
-    client.readContract("owner").catch(always(null)),
-    client.readContract("pendingOwner").catch(always(null)),
+    client.read("name"),
+    client.read("symbol"),
+    client.read("decimals"),
+    client.read("owner").catch(always(null)),
+    client.read("pendingOwner").catch(always(null)),
   ]);
 
   return {
