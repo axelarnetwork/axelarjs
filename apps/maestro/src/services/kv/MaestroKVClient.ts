@@ -1,28 +1,34 @@
 import { type VercelKV } from "@vercel/kv";
+import { uniq } from "rambda";
 import { z } from "zod";
 
 import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
 
-export type RemoteInterchainToken = {};
-
-export const interchainTokenDetailsSchema = z.object({
-  name: z.string(),
-  symbol: z.string(),
-  decimals: z.number(),
-  address: hex40Literal(),
-  deployerAddress: hex40Literal(),
+export const remoteInterchainTokenSchema = z.object({
   chainId: z.number(),
   axelarChainId: z.string(),
+  address: hex40Literal(),
+  status: z.enum(["deployed", "pending"]),
+  deplymentTxHash: hex64Literal(),
+  deploymentLogIndex: z.number().optional(),
+});
+
+export type RemoteInterchainTokenDetails = z.infer<
+  typeof remoteInterchainTokenSchema
+>;
+
+export const interchainTokenDetailsSchema = z.object({
+  tokenName: z.string(),
+  tokenSymbol: z.string(),
+  tokenDecimals: z.number(),
+  tokenAddress: hex40Literal(),
+  deployerAddress: hex40Literal(),
+  originChainId: z.number(),
+  originAxelarChainId: z.string(),
   tokenId: hex64Literal(),
   salt: hex64Literal(),
   deploymentTxHash: hex64Literal(),
-  remoteTokens: z.array(
-    z.object({
-      chainId: z.number(),
-      axelarChainId: z.string(),
-      address: hex40Literal(),
-    })
-  ),
+  remoteTokens: z.array(remoteInterchainTokenSchema),
 });
 
 export type IntercahinTokenDetails = z.infer<
@@ -40,14 +46,14 @@ export type AccountDetails = z.infer<typeof accountDetailsSchema>;
 export const COLLECTIONS = {
   interchainTokens: "interchain-tokens",
   accounts: "accounts",
-};
+} as const;
 
 export const COLLECTION_KEYS = {
   interchainTokenDetails: (chainId: number, tokenAddress: `0x${string}`) =>
-    [COLLECTIONS.interchainTokens, chainId, tokenAddress].join("/"),
+    `${COLLECTIONS.interchainTokens}/${chainId}${tokenAddress}` as const,
 
   accountDetails: (accountAddress: `0x${string}`) =>
-    [COLLECTIONS.accounts, accountAddress].join("/"),
+    `${COLLECTIONS.accounts}/${accountAddress}` as const,
 };
 
 export default class MaestroKVClient {
@@ -61,8 +67,7 @@ export default class MaestroKVClient {
       variables.chainId,
       variables.tokenAddress
     );
-    const val = await this.kv.get<IntercahinTokenDetails>(key);
-    return val;
+    return this.kv.get<IntercahinTokenDetails>(key);
   }
 
   async hgetInterchainTokenDetails(
@@ -98,7 +103,11 @@ export default class MaestroKVClient {
       chainId: number;
       tokenAddress: `0x${string}`;
     },
-    details: Partial<IntercahinTokenDetails>
+    details:
+      | Partial<IntercahinTokenDetails>
+      | ((
+          details: IntercahinTokenDetails | null
+        ) => Partial<IntercahinTokenDetails>)
   ) {
     const key = COLLECTION_KEYS.interchainTokenDetails(
       variables.chainId,
@@ -106,7 +115,10 @@ export default class MaestroKVClient {
     );
     const value = await this.kv.get<IntercahinTokenDetails>(key);
 
-    await this.kv.set(key, { ...value, ...details });
+    const nextDetails =
+      typeof details === "function" ? details(value) : details;
+
+    await this.kv.set(key, { ...value, ...nextDetails });
   }
 
   async getAccountDetails(accountAddress: `0x${string}`) {
@@ -134,11 +146,99 @@ export default class MaestroKVClient {
 
   async patchAccountDetails(
     accountAddress: `0x${string}`,
-    details: Partial<AccountDetails>
+    details:
+      | Partial<AccountDetails>
+      | ((details: AccountDetails | null) => Partial<AccountDetails>)
   ) {
     const key = COLLECTION_KEYS.accountDetails(accountAddress);
-    const val = await this.kv.get<AccountDetails>(key);
-    const newVal = { ...val, ...details };
-    await this.kv.set(key, newVal);
+    const value = await this.kv.get<AccountDetails>(key);
+
+    const nextDetetails =
+      typeof details === "function" ? details(value) : details;
+
+    await this.kv.set(key, { ...value, ...nextDetetails });
+  }
+
+  /// convenience methods
+
+  async recordInterchainTokenDeployment(
+    variables: {
+      chainId: number;
+      tokenAddress: `0x${string}`;
+    },
+    details: IntercahinTokenDetails
+  ) {
+    // prevent overwriting existing details
+    const existingDetails = await this.getInterchainTokenDetails(variables);
+
+    if (existingDetails) {
+      throw new Error(
+        `Interchain token details already exist for chainId: ${variables.chainId} and tokenAddress: ${variables.tokenAddress}`
+      );
+    }
+
+    await this.setInterchainTokenDetails(variables, details);
+
+    await this.patchAccountDetails(details.deployerAddress, (accountDetails) =>
+      accountDetails
+        ? {
+            address: details.deployerAddress,
+            nonce: accountDetails.nonce + 1,
+            interchainTokensIds: uniq([
+              ...accountDetails.interchainTokensIds,
+              details.tokenId,
+            ]),
+          }
+        : {
+            address: details.deployerAddress,
+            nonce: 1,
+            interchainTokensIds: [details.tokenId],
+          }
+    );
+  }
+
+  async recordRemoteTokensDeployment(
+    variables: {
+      chainId: number;
+      tokenAddress: `0x${string}`;
+    },
+    remoteTokens: RemoteInterchainTokenDetails[]
+  ) {
+    await this.patchInterchainTokenDetials(variables, (details) => {
+      const patchedRemoteTokens = details
+        ? [
+            ...details.remoteTokens.map((existingRemoteToken) => {
+              // is there a patch for this chainId?
+              const remoteTokenPatch = remoteTokens.find(
+                (x) => x.chainId === existingRemoteToken.chainId
+              );
+
+              return !remoteTokenPatch
+                ? existingRemoteToken
+                : {
+                    ...existingRemoteToken,
+                    ...remoteTokenPatch,
+                  };
+            }),
+          ]
+        : [];
+
+      const existingChainIds = details
+        ? details.remoteTokens.map((x) => x.chainId)
+        : [];
+
+      const addedRemoteTokens = remoteTokens.filter(
+        (x) => !existingChainIds.includes(x.chainId)
+      );
+
+      const nextRemoteTokens = addedRemoteTokens.length
+        ? [...patchedRemoteTokens, ...addedRemoteTokens]
+        : patchedRemoteTokens;
+
+      return {
+        ...details,
+        remoteTokens: nextRemoteTokens,
+      };
+    });
   }
 }

@@ -103,7 +103,8 @@ export function useDeployInterchainTokenMutation(config: {
         !chain ||
         !deployerAddress ||
         !log.transactionHash ||
-        !tokenAddress
+        !tokenAddress ||
+        !tokenId
       ) {
         return;
       }
@@ -111,23 +112,28 @@ export function useDeployInterchainTokenMutation(config: {
       unwatch();
 
       await recordDeploymentAsync({
-        name: inputRef.current.tokenName,
-        symbol: inputRef.current.tokenSymbol,
-        decimals: inputRef.current.decimals,
-        tokenId: tokenId as `0x${string}`,
-        address: tokenAddress,
-        chainId: chain.id,
-        axelarChainId: inputRef.current.sourceChainId,
+        tokenId: tokenId,
+        tokenAddress: tokenAddress,
+        originChainId: chain.id,
         deployerAddress,
         salt,
         deploymentTxHash: log.transactionHash,
-        remoteTokens: inputRef.current.destinationChainIds.map((chainId) => ({
-          chainId:
-            evmChainConfigs?.find((c) => c.id === chainId.toLowerCase())
-              ?.chain_id ?? 0,
-          axelarChainId: chainId,
-          address: tokenAddress,
-        })),
+        tokenName: inputRef.current.tokenName,
+        tokenSymbol: inputRef.current.tokenSymbol,
+        tokenDecimals: inputRef.current.decimals,
+        originAxelarChainId: inputRef.current.sourceChainId,
+        remoteTokens: inputRef.current.destinationChainIds.map(
+          (axelarChainId) => ({
+            axelarChainId,
+            chainId:
+              evmChainConfigs?.find((c) => c.id === axelarChainId.toLowerCase())
+                ?.chain_id ?? 0,
+            address: tokenAddress,
+            status: "pending",
+            deplymentTxHash: log.transactionHash as `0x${string}`,
+            // deploymentLogIndex is unknown at this point
+          })
+        ),
       });
 
       onStatusUpdate({
@@ -161,6 +167,10 @@ export function useDeployInterchainTokenMutation(config: {
         type: "pending_approval",
       });
       try {
+        const decimalAdjustedCap = input.cap
+          ? input.cap * BigInt(10 ** input.decimals)
+          : BigInt(0);
+
         const deployTxData = encodeFunctionData({
           functionName: "deployAndRegisterStandardizedToken",
           args: [
@@ -168,7 +178,7 @@ export function useDeployInterchainTokenMutation(config: {
             input.tokenName,
             input.tokenSymbol,
             input.decimals,
-            input.cap ?? BigInt(0),
+            decimalAdjustedCap,
             input.mintTo ?? deployerAddress,
           ],
           abi: INTERCHAIN_TOKEN_SERVICE_ABI,
