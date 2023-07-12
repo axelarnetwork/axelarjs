@@ -74,7 +74,6 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
         searchInterchainTokenResult.tokenAddress) ||
       searchERC20Result
     ) {
-      console.log("tokenFound", { tokenDetails: searchERC20Result });
       props.onTokenFound({
         tokenId: searchInterchainTokenResult.tokenId as `0x${string}`,
         tokenAddress: search as `0x${string}`,

@@ -1,7 +1,7 @@
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
-import { partition } from "rambda";
+import { has, partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
@@ -117,13 +117,13 @@ async function getInterchainToken(
   );
   const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
 
-  const registered = await Promise.all(
+  const verifiedRemoteTokens = await Promise.all(
     kvResult.remoteTokens.map(async (remoteToken) => {
       const chainConfig = remainingChainConfigs.find(
         (x) => x.id === remoteToken.chainId
       );
 
-      const mappedResult = {
+      const remoteTokenDetails = {
         tokenId: kvResult.tokenId,
         tokenAddress: remoteToken.address,
         isOriginToken: false,
@@ -133,9 +133,9 @@ async function getInterchainToken(
         axelarChainId: remoteToken.axelarChainId,
       };
 
-      if (!hasPendingRemoteTokens || mappedResult.isRegistered) {
+      if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
         // no need to check twice if the token is registered
-        return mappedResult;
+        return remoteTokenDetails;
       }
 
       invariant(chainConfig, "Chain config not found");
@@ -146,7 +146,7 @@ async function getInterchainToken(
       );
 
       return {
-        ...mappedResult,
+        ...remoteTokenDetails,
         isRegistered: await tokenClient
           .read("getTokenManager")
           // attempt to read 'token.getTokenManager'
@@ -157,37 +157,27 @@ async function getInterchainToken(
     })
   );
 
-  const newConfirmedRemoteTokens = hasPendingRemoteTokens
-    ? registered
-        .filter((token) => token.isRegistered)
-        .map(
-          (token) =>
-            kvResult.remoteTokens.find(
-              (x) => x.chainId === token.chainId
-            ) as RemoteInterchainTokenDetails
-        )
-        .filter(Boolean)
-        .map((token) => ({
-          ...token,
-          status: "deployed" as const,
-        }))
-    : [];
+  if (hasPendingRemoteTokens) {
+    // if there are pending remote tokens, mark them as "deployed" if they are now registered
+    const newConfirmedRemoteTokens = verifiedRemoteTokens
+      .filter((token) => token.isRegistered)
+      .map((t) => kvResult.remoteTokens.find((x) => x.chainId === t.chainId))
+      .filter(Boolean)
+      .map((token) => ({
+        ...(token as RemoteInterchainTokenDetails),
+        status: "deployed" as const,
+      }));
 
-  if (newConfirmedRemoteTokens.length > 0) {
-    console.log({
-      newConfirmedRemoteTokens,
-      pendingRemoteTokens,
-    });
-    // update the KV store with the new confirmed remote tokens
-    await ctx.services.kv.recordRemoteTokensDeployment(
-      {
-        chainId: kvResult.originChainId,
-        tokenAddress: kvResult.tokenAddress,
-      },
-      newConfirmedRemoteTokens
-    );
-  } else {
-    console.log("no new confirmed remote tokens");
+    // update the KV store with the new confirmed remote tokens if any
+    if (newConfirmedRemoteTokens.length) {
+      await ctx.services.kv.recordRemoteTokensDeployment(
+        {
+          chainId: kvResult.originChainId,
+          tokenAddress: kvResult.tokenAddress,
+        },
+        newConfirmedRemoteTokens
+      );
+    }
   }
 
   const unregistered = remainingChainConfigs
@@ -208,7 +198,7 @@ async function getInterchainToken(
 
   return {
     ...lookupToken,
-    matchingTokens: [lookupToken, ...registered, ...unregistered],
+    matchingTokens: [lookupToken, ...verifiedRemoteTokens, ...unregistered],
   };
 }
 

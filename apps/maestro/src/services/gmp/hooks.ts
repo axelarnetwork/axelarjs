@@ -2,7 +2,6 @@ import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { uniq } from "rambda";
 import { isAddress } from "viem";
 import { useQuery } from "wagmi";
 
@@ -24,15 +23,12 @@ export function useContractsQuery() {
 export function useInterchainTokensQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
-  chainIds?: number[];
 }) {
   const {
     data: evmChains,
     computed,
     ...evmChainsQuery
   } = useEVMChainConfigsQuery();
-
-  const uniqueChainsIDs = uniq(evmChains?.map?.((x) => x.chain_id) ?? []);
 
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(
@@ -41,9 +37,7 @@ export function useInterchainTokensQuery(input: {
         tokenAddress: input.tokenAddress as `0x${string}`,
       },
       {
-        enabled:
-          isAddress(input.tokenAddress ?? "") &&
-          Boolean(input.chainIds?.length || uniqueChainsIDs.length),
+        enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
         retry: false,
         refetchOnWindowFocus: false,
       }
