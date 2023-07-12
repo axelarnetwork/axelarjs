@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { partition } from "rambda";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
 import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
@@ -50,6 +50,7 @@ export const searchInterchainToken = publicProcedure
     z.object({
       chainId: z.number().optional(),
       tokenAddress: hex40Literal(),
+      strict: z.boolean().optional(),
     })
   )
   .output(
@@ -67,82 +68,33 @@ export const searchInterchainToken = publicProcedure
         EVM_CHAIN_CONFIGS
       );
 
-      if (!chainConfig) {
-        // if no chainId is provided, search all chains
-
-        for (const chainConfig of remainingChainConfigs) {
-          const kvResult = await ctx.services.kv.getInterchainTokenDetails({
-            chainId: chainConfig.id,
-            tokenAddress: input.tokenAddress,
-          });
-
-          if (!kvResult) {
-            continue;
-          }
-          const result = await getInterchainToken(
-            kvResult,
-            chainConfig,
-            remainingChainConfigs,
+      const scanPromise = !chainConfig
+        ? // scan all chains
+          scanChains(remainingChainConfigs, input.tokenAddress, ctx)
+        : // scan the specified chain
+          scanChains(
+            input.strict
+              ? // only scan the specified chain if in strict mode
+                [chainConfig]
+              : // scan all chains, starting with the specified chain
+                [chainConfig, ...remainingChainConfigs],
+            input.tokenAddress,
             ctx
           );
 
-          // cache for 1 hour
-          ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+      const result = await scanPromise;
 
-          return result;
-        }
+      if (result) {
+        // cache for 1 hour
+        ctx.res.setHeader("Cache-Control", "public, max-age=3600");
 
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Token ${input.tokenAddress} not registered on any chain`,
-        });
+        return result;
       }
 
-      const kvResult = await ctx.services.kv.getInterchainTokenDetails({
-        chainId: chainConfig.id,
-        tokenAddress: input.tokenAddress,
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Token ${input.tokenAddress} not registered on any chain`,
       });
-
-      if (!kvResult) {
-        // now have to iterate through remaining chains
-        for (const chainConfig of remainingChainConfigs) {
-          const kvResult = await ctx.services.kv.getInterchainTokenDetails({
-            chainId: chainConfig.id,
-            tokenAddress: input.tokenAddress,
-          });
-
-          if (!kvResult) {
-            continue;
-          }
-          const result = await getInterchainToken(
-            kvResult,
-            chainConfig,
-            remainingChainConfigs,
-            ctx
-          );
-
-          // cache for 1 hour
-          ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
-          return result;
-        }
-
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Token ${input.tokenAddress} not registered on chain ${chainConfig.id}`,
-        });
-      }
-      const result = await getInterchainToken(
-        kvResult,
-        chainConfig,
-        remainingChainConfigs,
-        ctx
-      );
-
-      // cache for 1 hour
-      ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
-      return result;
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -159,8 +111,8 @@ export const searchInterchainToken = publicProcedure
 
 async function getInterchainToken(
   kvResult: IntercahinTokenDetails,
-  chainConfig: (typeof EVM_CHAIN_CONFIGS)[number],
-  remainingChainConfigs: typeof EVM_CHAIN_CONFIGS,
+  chainConfig: WagmiEVMChainConfig,
+  remainingChainConfigs: WagmiEVMChainConfig[],
   ctx: Context
 ) {
   const lookupToken = {
@@ -271,4 +223,32 @@ async function getInterchainToken(
     ...lookupToken,
     matchingTokens: [lookupToken, ...registered, ...unregistered],
   };
+}
+
+/**
+ * Scans all chains for the given token address
+ * @param chainConfigs
+ * @param tokenAddress
+ * @param ctx
+ */
+async function scanChains(
+  chainConfigs: WagmiEVMChainConfig[],
+  tokenAddress: `0x${string}`,
+  ctx: Context
+) {
+  let result: Awaited<ReturnType<typeof getInterchainToken>> | null = null;
+
+  for (const chainConfig of chainConfigs) {
+    const kvEntry = await ctx.services.kv.getInterchainTokenDetails({
+      chainId: chainConfig.id,
+      tokenAddress: tokenAddress,
+    });
+
+    if (!kvEntry) {
+      continue;
+    }
+    result = await getInterchainToken(kvEntry, chainConfig, chainConfigs, ctx);
+  }
+
+  return result;
 }
