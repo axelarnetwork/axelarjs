@@ -104,6 +104,29 @@ export const searchInterchainToken = publicProcedure
       });
 
       if (!kvResult) {
+        // now have to iterate through remaining chains
+        for (const chainConfig of remainingChainConfigs) {
+          const kvResult = await ctx.services.kv.getInterchainTokenDetails({
+            chainId: chainConfig.id,
+            tokenAddress: input.tokenAddress,
+          });
+
+          if (!kvResult) {
+            continue;
+          }
+          const result = await getInterchainToken(
+            kvResult,
+            chainConfig,
+            remainingChainConfigs,
+            ctx
+          );
+
+          // cache for 1 hour
+          ctx.res.setHeader("Cache-Control", "public, max-age=3600");
+
+          return result;
+        }
+
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `Token ${input.tokenAddress} not registered on chain ${chainConfig.id}`,

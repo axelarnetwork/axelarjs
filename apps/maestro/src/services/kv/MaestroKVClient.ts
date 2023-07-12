@@ -50,7 +50,7 @@ export const COLLECTIONS = {
 
 export const COLLECTION_KEYS = {
   interchainTokenDetails: (chainId: number, tokenAddress: `0x${string}`) =>
-    `${COLLECTIONS.interchainTokens}/${chainId}${tokenAddress}` as const,
+    `${COLLECTIONS.interchainTokens}/${chainId}/${tokenAddress}` as const,
 
   accountDetails: (accountAddress: `0x${string}`) =>
     `${COLLECTIONS.accounts}/${accountAddress}` as const,
