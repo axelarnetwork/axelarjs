@@ -23,6 +23,7 @@ export function useContractsQuery() {
 export function useInterchainTokensQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
+  strict?: boolean;
 }) {
   const {
     data: evmChains,
@@ -35,6 +36,7 @@ export function useInterchainTokensQuery(input: {
       {
         chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
         tokenAddress: input.tokenAddress as `0x${string}`,
+        strict: input.strict,
       },
       {
         enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),

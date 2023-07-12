@@ -61,6 +61,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   } = useInterchainTokensQuery({
     chainId: chainId,
     tokenAddress: search as `0x${string}`,
+    strict: chainId !== -1,
   });
 
   const isLoading = isSearchingERC20 || isSearchingInterchainTokens;
