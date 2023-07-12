@@ -473,7 +473,6 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             />
             View token
             <span className="hidden sm:inline">
-              {" "}
               on {props.chain.explorer.name}
             </span>
             <ExternalLink className="h-4 w-4 translate-x-1" />

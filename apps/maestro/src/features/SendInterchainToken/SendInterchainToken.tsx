@@ -151,6 +151,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               compact
               selectedChain={props.sourceChain}
             />
+            {props.sourceChain.chain_name}
           </div>
           <div className="flex items-center gap-2">
             <label className="text-md align-top">To:</label>
@@ -168,6 +169,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               }}
               contentClassName="translate-x-20"
             />
+            {state.selectedToChain.chain_name}
           </div>
         </div>
 
@@ -239,6 +241,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 await actions.refetchBalances();
                 resetForm();
                 actions.setTxState({ status: "idle" });
+                actions.setIsModalOpen(false);
                 toast.success("Tokens sent successfully!");
               }}
             />
