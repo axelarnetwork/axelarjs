@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTransactionState } from "~/lib/hooks/useTransaction";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
 
@@ -17,6 +18,11 @@ export function useSendInterchainTokenState(props: {
   const { data: interchainToken } = useInterchainTokensQuery({
     tokenAddress: props.tokenAddress,
     chainId: props.sourceChain.chain_id,
+  });
+
+  const { data: erc20TokenDetails } = useERC20TokenDetailsQuery({
+    chainId: props.sourceChain.chain_id,
+    tokenAddress: props.tokenAddress,
   });
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
@@ -60,6 +66,7 @@ export function useSendInterchainTokenState(props: {
       isSending,
       selectedToChain,
       eligibleTargetChains,
+      erc20TokenDetails,
     },
     {
       setIsModalOpen,

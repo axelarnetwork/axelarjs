@@ -43,6 +43,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     isModalOpen: props.isOpen,
   });
 
+  console.log({ erc20TokenDetails: state.erc20TokenDetails });
+
   const {
     register,
     handleSubmit,
@@ -97,7 +99,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
       case "submitted":
         return (
           <>
-            Sending {amountToSend} tokens to {state.selectedToChain?.name}
+            Sending {amountToSend} {state.erc20TokenDetails?.symbol} to{" "}
+            {state.selectedToChain?.name}
           </>
         );
       default:
@@ -106,7 +109,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
         }
         return (
           <>
-            Send {amountToSend || 0} tokens to {state.selectedToChain?.name}
+            Send {amountToSend || 0} {state.erc20TokenDetails?.symbol} to{" "}
+            {state.selectedToChain?.name}
           </>
         );
     }
@@ -116,6 +120,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     formState.isValid,
     state.selectedToChain?.name,
     state.txState?.status,
+    state.erc20TokenDetails,
   ]);
 
   const isFormDisabled = useMemo(
