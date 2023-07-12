@@ -1,7 +1,7 @@
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
-import { has, partition } from "rambda";
+import { partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
