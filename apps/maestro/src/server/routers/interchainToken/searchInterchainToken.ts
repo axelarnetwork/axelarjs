@@ -13,7 +13,7 @@ import type {
   RemoteInterchainTokenDetails,
 } from "~/services/kv";
 
-const tokenDetails = () => ({
+const TOKEN_INFO_SCHEMA = z.object({
   tokenId: hex64Literal().nullable(),
   tokenAddress: hex40Literal().nullable(),
   isOriginToken: z.boolean(),
@@ -23,17 +23,11 @@ const tokenDetails = () => ({
   chainName: z.string(),
 });
 
-export type IntercahinTokenInfo = {
-  tokenId: `0x${string}` | null;
-  tokenAddress: `0x${string}` | null;
-  isOriginToken: boolean;
-  isRegistered: boolean;
-  chainId: number;
-};
+const OUTPUT_SCHEMA = TOKEN_INFO_SCHEMA.extend({
+  matchingTokens: z.array(TOKEN_INFO_SCHEMA),
+});
 
-export type SearchInterchainTokenOutput = IntercahinTokenInfo & {
-  matchingTokens: IntercahinTokenInfo[];
-};
+export type SearchInterchainTokenOutput = z.infer<typeof OUTPUT_SCHEMA>;
 
 export const searchInterchainToken = publicProcedure
   .meta({
@@ -53,14 +47,7 @@ export const searchInterchainToken = publicProcedure
       strict: z.boolean().optional(),
     })
   )
-  .output(
-    z
-      .object({
-        ...tokenDetails(),
-        matchingTokens: z.array(z.object(tokenDetails())),
-      })
-      .nullable()
-  )
+  .output(OUTPUT_SCHEMA.nullable())
   .query(async ({ input, ctx }) => {
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
