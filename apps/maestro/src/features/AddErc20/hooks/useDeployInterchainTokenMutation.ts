@@ -1,7 +1,7 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { hexlify, throttle } from "@axelarjs/utils";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { encodeFunctionData, TransactionExecutionError } from "viem";
 import {
@@ -21,6 +21,7 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import type { IntercahinTokenDetails } from "~/services/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployAndRegisterInterchainTokenInput = {
@@ -84,6 +85,9 @@ export function useDeployInterchainTokenMutation(config: {
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
+  const [recordDeploymentArgs, setDeploymentArgs] =
+    useState<IntercahinTokenDetails | null>(null);
+
   const unwatch = watchInterchainTokenServiceEvent(
     {
       eventName: "StandardizedTokenDeployed",
@@ -111,7 +115,7 @@ export function useDeployInterchainTokenMutation(config: {
 
       unwatch();
 
-      await recordDeploymentAsync({
+      setDeploymentArgs({
         tokenId: tokenId,
         tokenAddress: tokenAddress,
         originChainId: chain.id,
@@ -135,14 +139,20 @@ export function useDeployInterchainTokenMutation(config: {
           })
         ),
       });
-
-      onStatusUpdate({
-        type: "deployed",
-        tokenAddress,
-        txHash: log.transactionHash,
-      });
     }
   );
+
+  useEffect(() => {
+    if (recordDeploymentArgs) {
+      recordDeploymentAsync(recordDeploymentArgs).then(() => {
+        onStatusUpdate({
+          type: "deployed",
+          tokenAddress: recordDeploymentArgs.tokenAddress,
+          txHash: recordDeploymentArgs.deploymentTxHash,
+        });
+      });
+    }
+  }, [recordDeploymentArgs]);
 
   useWaitForTransaction({
     hash: multicallResult?.hash,

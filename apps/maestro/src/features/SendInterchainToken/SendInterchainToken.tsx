@@ -169,7 +169,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               }}
               contentClassName="translate-x-20"
             />
-            {state.selectedToChain.chain_name}
+            {state.selectedToChain?.chain_name}
           </div>
         </div>
 

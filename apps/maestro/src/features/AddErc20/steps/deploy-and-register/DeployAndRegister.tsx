@@ -133,11 +133,11 @@ export const Step3: FC = () => {
     return (
       <>
         Deploy{" "}
-        {Boolean(state.gasFees?.length) && (
+        {!!state.gasFees?.length && (
           <>
             {state.gasFees?.length && <span>and register</span>}
-            {` on ${state.gasFees?.length} chain${
-              Number(state.gasFees?.length) > 1 ? "s" : ""
+            {` on ${state.gasFees.length + 1} chain${
+              state.gasFees?.length + 1 > 1 ? "s" : ""
             }`}
           </>
         )}
