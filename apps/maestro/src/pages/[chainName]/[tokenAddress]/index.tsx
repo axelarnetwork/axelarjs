@@ -73,9 +73,9 @@ const InterchainTokensPage = () => {
       isLoading={isLoading && !isError}
       loadingMessage="loading interchain token..."
     >
-      {tokenDetails && (
+      {tokenDetails && interchainToken.chain && (
         <TokenDetailsSection
-          chain={interchainToken?.chain}
+          chain={interchainToken.chain}
           tokenAddress={tokenAddress}
           decimals={tokenDetails.decimals}
           name={tokenDetails.name}
@@ -275,7 +275,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isLoading: isGasPriceQueryLoading,
     isError: isGasPriceQueryError,
   } = useEstimateGasFeeMultipleChains({
-    sourceChainId: interchainToken.chain.id,
+    sourceChainId: interchainToken?.chain?.id ?? "",
     destinationChainIds: targetDeploymentChains,
     gasLimit: 1_000_000,
     gasMultipler: 2,
@@ -317,7 +317,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           {address ? (
             <RegisterOriginTokenButton
               address={props.tokenAddress}
-              chainName={interchainToken.chain.name}
+              chainName={interchainToken.chain?.name}
               onSuccess={refetch}
             />
           ) : (
@@ -365,7 +365,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               {isGasPriceQueryLoading && (
                 <span className="md:ml-2">estimating gas fee... </span>
               )}
-              {gasFees && (
+              {gasFees && interchainToken.chain && (
                 <Tooltip
                   tip={`Estimated gas fee for deploying token on ${
                     selectedChainIds.length

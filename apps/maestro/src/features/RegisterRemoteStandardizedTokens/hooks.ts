@@ -89,7 +89,7 @@ export function useRegisterRemoteStandardizedTokens(input: {
       });
     });
 
-    const tx = await multicallAsync({
+    await multicallAsync({
       value: totalGasFee,
       args: [registerTxData],
     });

@@ -55,12 +55,14 @@ export function useInterchainTokensQuery(input: {
       ...data,
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
-        chain: computed.indexedByChainId[String(token.chainId)],
+        chain: computed.indexedByChainId[token.chainId],
         wagmiConfig: computed.wagmiChains?.find(
           (x) => x?.id === Number(token.chainId)
         ),
       })),
-      chain: computed.indexedByChainId[String(input.chainId)],
+      chain: Maybe.of(input.chainId).mapOrUndefined(
+        (x) => computed.indexedByChainId[x]
+      ),
       wagmiConfig: computed.wagmiChains?.find(
         (x) => x?.id === Number(input.chainId)
       ),
