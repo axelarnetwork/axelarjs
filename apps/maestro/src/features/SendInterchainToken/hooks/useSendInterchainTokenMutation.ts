@@ -5,7 +5,7 @@ import { useAccount, useMutation } from "wagmi";
 
 import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20BurnableMintable.hooks";
 import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
-import type { TransactionState } from "~/lib/hooks/useTransaction";
+import type { TransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";

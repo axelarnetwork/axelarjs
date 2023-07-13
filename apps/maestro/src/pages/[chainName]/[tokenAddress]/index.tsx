@@ -26,10 +26,11 @@ import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
+import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
 import { useInterchainTokenServiceRegisterCanonicalToken } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
-import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -270,34 +271,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     refetch,
   ]);
 
-  const {
-    data: gasFees,
-    isLoading: isGasPriceQueryLoading,
-    isError: isGasPriceQueryError,
-  } = useEstimateGasFeeMultipleChains({
-    sourceChainId: interchainToken?.chain?.id ?? "",
-    destinationChainIds: targetDeploymentChains,
-    gasLimit: 1_000_000,
-    gasMultipler: 2,
-  });
-
-  const handleDeployRemoteTokens = useCallback(async () => {
-    if (!(props.chainId && interchainToken?.tokenId && gasFees)) {
-      return;
-    }
-
-    // await deployRemoteTokens({
-    //   destinationChainIds: targetDeploymentChains,
-    //   tokenAddress: props.tokenAddress,
-    //   tokenId: interchainToken.tokenId as `0x${string}`,
-    //   gasFees,
-    //   onStatusUpdate(status) {
-    //     if (status.type === "deployed") {
-    //       setDeployTokensTxHash(status.txHash);
-    //     }
-    //   },
-    // });
-  }, [props.chainId, interchainToken?.tokenId, gasFees]);
+  const { data: gasFees, isLoading: isGasPriceQueryLoading } =
+    useEstimateGasFeeMultipleChains({
+      sourceChainId: interchainToken?.chain?.id ?? "",
+      destinationChainIds: targetDeploymentChains,
+      gasLimit: 1_000_000,
+      gasMultipler: 2,
+    });
 
   const originToken = useMemo(
     () => interchainToken.matchingTokens?.find((x) => x.isOriginToken),
@@ -386,46 +366,30 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   </div>
                 </Tooltip>
               )}
-              {selectedChainIds.length > 0 && !deployTokensTxHash && (
-                <>
-                  {originToken?.chainId === chain?.id ? (
-                    <Button
-                      variant="primary"
-                      onClick={handleDeployRemoteTokens}
-                      disabled={isGasPriceQueryLoading || isGasPriceQueryError}
-                      // loading={isDeploying}
-                    >
-                      Register token on {selectedChainIds.length} additional
-                      chain
-                      {selectedChainIds.length > 1 ? "s" : ""}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="accent"
-                      onClick={() => {
-                        if (originToken) {
-                          switchNetworkAsync?.(originToken.chainId);
-                        }
-                      }}
-                    >
-                      Switch to {originToken?.chain.name} to register token
-                      {selectedChainIds.length > 1 ? "s" : ""}
-                    </Button>
-                  )}
-                </>
-              )}
 
-              {deployTokensTxHash && (
-                <LinkButton
+              {originToken?.chainId === chain?.id ? (
+                <RegisterRemoteStandardizedTokens
+                  chainIds={selectedChainIds}
+                  tokenAddress={props.tokenAddress}
+                  originChainId={originToken?.chainId}
+                  onTxStateChange={(txState) => {
+                    if (txState.status === "submitted") {
+                      setDeployTokensTxHash(txState.hash);
+                    }
+                  }}
+                />
+              ) : (
+                <Button
                   variant="accent"
-                  outline
-                  href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${deployTokensTxHash}`}
-                  className="flex items-center gap-2"
-                  target="_blank"
+                  onClick={() => {
+                    if (originToken) {
+                      switchNetworkAsync?.(originToken.chainId);
+                    }
+                  }}
                 >
-                  View on Axelarscan {maskAddress(deployTokensTxHash)}{" "}
-                  <ExternalLink className="h-4 w-4" />
-                </LinkButton>
+                  Switch to {originToken?.chain.name} to register token
+                  {selectedChainIds.length > 1 ? "s" : ""}
+                </Button>
               )}
             </div>
           )

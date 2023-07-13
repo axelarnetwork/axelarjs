@@ -23,6 +23,8 @@ export const VALID_NON_NUMERIC_KEYS = [
   "ArrowUp",
   "ArrowDown",
   "Enter",
+  "Home",
+  "End",
 ];
 
 /**

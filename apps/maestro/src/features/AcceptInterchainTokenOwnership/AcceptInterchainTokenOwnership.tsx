@@ -6,7 +6,7 @@ import { TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
 import { useInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
-import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 
 type Props = {
@@ -43,13 +43,13 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       await Promise.all([
         trpcContext.interchainToken.searchInterchainToken.invalidate(),
         trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
-        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
+        trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
       ]);
 
       await Promise.all([
         trpcContext.interchainToken.searchInterchainToken.refetch(),
         trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
-        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
+        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
       ]);
 
       setTxState({

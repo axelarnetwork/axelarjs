@@ -4,7 +4,7 @@ import { isAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import { useIerc20BurnableMintableMint } from "~/lib/contracts/IERC20BurnableMintable.hooks";
-import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 

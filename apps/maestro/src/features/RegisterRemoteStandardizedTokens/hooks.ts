@@ -1,11 +1,14 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
-import { invariant, Maybe } from "@axelarjs/utils";
+import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { encodeFunctionData } from "viem";
 import { useMutation, useNetwork } from "wagmi";
 
-import { useInterchainTokenServiceMulticall } from "~/lib/contracts/InterchainTokenService.hooks";
+import {
+  useInterchainTokenServiceMulticall,
+  usePrepareInterchainTokenServiceMulticall,
+} from "~/lib/contracts/InterchainTokenService.hooks";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -57,19 +60,11 @@ export function useRegisterRemoteStandardizedTokens(input: {
     destinationChainIds,
     sourceChainId: sourceChainId ?? "0",
   });
-  const { writeAsync: multicallAsync } = useInterchainTokenServiceMulticall();
 
-  const totalGasFee = useMemo(
-    () =>
-      gasFees?.reduce((acc, gasFee) => acc + gasFee, BigInt(0)) ?? BigInt(0),
-    [gasFees]
-  );
+  const multicallArgs = useMemo(() => {
+    if (!tokenDeployment || !gasFees) return [];
 
-  return useMutation(async () => {
-    invariant(tokenDeployment, "token deployment not found");
-    invariant(gasFees, "gas fees not found");
-
-    const registerTxData = destinationChainIds.map((chainId, i) => {
+    return destinationChainIds.map((chainId, i) => {
       const gasFee = gasFees[i];
       const args = [
         tokenDeployment.salt,
@@ -88,10 +83,17 @@ export function useRegisterRemoteStandardizedTokens(input: {
         abi: INTERCHAIN_TOKEN_SERVICE_ABI,
       });
     });
+  }, [destinationChainIds, gasFees, tokenDeployment]);
 
-    await multicallAsync({
-      value: totalGasFee,
-      args: [registerTxData],
-    });
+  const totalGasFee = useMemo(
+    () =>
+      gasFees?.reduce((acc, gasFee) => acc + gasFee, BigInt(0)) ?? BigInt(0),
+    [gasFees]
+  );
+  const { config } = usePrepareInterchainTokenServiceMulticall({
+    value: totalGasFee,
+    args: [multicallArgs],
   });
+
+  return useInterchainTokenServiceMulticall(config);
 }

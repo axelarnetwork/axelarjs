@@ -75,7 +75,7 @@ export function useDeployInterchainTokenMutation(config: {
       enabled: Boolean(tokenId),
     });
 
-  const { data: evmChainConfigs } = useEVMChainConfigsQuery();
+  const { computed } = useEVMChainConfigsQuery();
 
   const { writeAsync: multicallAsync, data: multicallResult } =
     useInterchainTokenServiceMulticall();
@@ -85,7 +85,7 @@ export function useDeployInterchainTokenMutation(config: {
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
-  const [recordDeploymentArgs, setDeploymentArgs] =
+  const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<IntercahinTokenDetails | null>(null);
 
   const unwatch = watchInterchainTokenServiceEvent(
@@ -115,7 +115,7 @@ export function useDeployInterchainTokenMutation(config: {
 
       unwatch();
 
-      setDeploymentArgs({
+      setRecordDeploymentArgs({
         tokenId: tokenId,
         tokenAddress: tokenAddress,
         originChainId: chain.id,
@@ -129,9 +129,7 @@ export function useDeployInterchainTokenMutation(config: {
         remoteTokens: inputRef.current.destinationChainIds.map(
           (axelarChainId) => ({
             axelarChainId,
-            chainId:
-              evmChainConfigs?.find((c) => c.id === axelarChainId.toLowerCase())
-                ?.chain_id ?? 0,
+            chainId: computed.indexedById[axelarChainId]?.chain_id,
             address: tokenAddress,
             status: "pending",
             deplymentTxHash: log.transactionHash as `0x${string}`,
@@ -142,17 +140,21 @@ export function useDeployInterchainTokenMutation(config: {
     }
   );
 
-  useEffect(() => {
-    if (recordDeploymentArgs) {
-      recordDeploymentAsync(recordDeploymentArgs).then(() => {
-        onStatusUpdate({
-          type: "deployed",
-          tokenAddress: recordDeploymentArgs.tokenAddress,
-          txHash: recordDeploymentArgs.deploymentTxHash,
+  useEffect(
+    () => {
+      if (recordDeploymentArgs) {
+        recordDeploymentAsync(recordDeploymentArgs).then(() => {
+          onStatusUpdate({
+            type: "deployed",
+            tokenAddress: recordDeploymentArgs.tokenAddress,
+            txHash: recordDeploymentArgs.deploymentTxHash,
+          });
         });
-      });
-    }
-  }, [recordDeploymentArgs]);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recordDeploymentArgs]
+  );
 
   useWaitForTransaction({
     hash: multicallResult?.hash,

@@ -14,7 +14,7 @@ import { isAddress, TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
 import { useIerc20BurnableMintableTransferOwnership } from "~/lib/contracts/IERC20BurnableMintable.hooks";
-import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
