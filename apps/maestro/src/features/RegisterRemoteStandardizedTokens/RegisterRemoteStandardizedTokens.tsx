@@ -81,7 +81,7 @@ export const RegisterRemoteStandardizedTokens: FC<Props> = ({
   const pendingChains = useMemo(
     () =>
       statuses
-        ? chainIds.filter((chainId) => statuses[chainId].status !== "executed")
+        ? chainIds.filter((chainId) => statuses[chainId]?.status !== "executed")
         : undefined,
     [chainIds, statuses]
   );
