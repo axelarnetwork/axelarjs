@@ -1,4 +1,5 @@
 import { publicProcedure, router } from "~/server/trpc";
+import { authRouter } from "./auth";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
 import { axelarscanRouter } from "./axelarscan";
 import { erc20Router } from "./erc20";
@@ -14,6 +15,7 @@ export const appRouter = router({
   erc20: erc20Router,
   axelarjsSDK: axelarjsSDKRouter,
   interchainToken: interchainTokenRouter,
+  auth: authRouter,
 });
 
 export type AppRouter = typeof appRouter;

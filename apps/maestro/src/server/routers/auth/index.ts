@@ -5,7 +5,7 @@ export const authRouter = router({
   signin,
   getSession: publicProcedure.query(async ({ ctx }) => {
     return {
-      session: ctx.session,
+      address: ctx.session?.address,
     };
   }),
 });

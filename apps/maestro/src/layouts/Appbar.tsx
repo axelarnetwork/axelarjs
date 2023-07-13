@@ -31,6 +31,7 @@ import {
   NEXT_PUBLIC_FILE_BUG_REPORT_URL,
 } from "~/config/env";
 import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
+import { useSession } from "~/services/auth";
 import { useLayoutStateContainer } from "./MainLayout.state";
 
 export type AppbarProps = {};
@@ -75,14 +76,21 @@ const Appbar: FC<AppbarProps> = () => {
     </>
   ) : null;
 
+  const { data: session, status: sessionStatus } = useSession();
+
+  useEffect(() => {
+    if (
+      sessionStatus === "success" && // session is loaded
+      address && // user is connected
+      (!session.address || session.address !== address) // session address is different from connected address
+    ) {
+      signIn("web3", { address });
+      console.log(`signed in with ${address}`);
+    }
+  }, [session, address, sessionStatus]);
+
   useEffect(
     () => {
-      getSession().then((session) => {
-        if (!session && address) {
-          signIn("web3", { address });
-        }
-      });
-
       actions.setDrawerSideContent(() => (
         <div className="flex h-full flex-col gap-4">
           <div className="flex gap-2 px-0 py-2">
