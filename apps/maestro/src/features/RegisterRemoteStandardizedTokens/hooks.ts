@@ -3,7 +3,7 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { encodeFunctionData } from "viem";
-import { useMutation, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 
 import {
   useInterchainTokenServiceMulticall,
@@ -50,7 +50,6 @@ export function useRegisterRemoteStandardizedTokens(input: {
   const { data: tokenDeployment } = useInterchainTokenDetailsQuery({
     chainId: input.originChainId,
     tokenAddress: input.tokenAddress,
-    deployerAddress: input.deployerAddress,
   });
 
   // 2. find the token deployment with the given tokenAddress and originChainId

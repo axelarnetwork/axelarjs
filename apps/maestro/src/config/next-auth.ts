@@ -1,23 +1,16 @@
-import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { getAddress } from "viem";
 
-// augment next-auth's User & Session types
+export type Session = {
+  address: `0x${string}`;
+};
 
-declare module "next-auth" {
-  export interface User {
-    id: `0x${string}`;
-  }
-  export interface Session {
-    address: `0x${string}`;
-  }
-}
-
-export default NextAuth({
+export const nextAuthOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: "web3",
       credentials: {
         address: {
           label: "Address",
@@ -55,4 +48,4 @@ export default NextAuth({
     error: "/",
     newUser: "/",
   },
-});
+};

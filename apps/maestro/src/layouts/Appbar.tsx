@@ -15,6 +15,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import React, { useEffect, type FC } from "react";
+import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -76,6 +77,12 @@ const Appbar: FC<AppbarProps> = () => {
 
   useEffect(
     () => {
+      getSession().then((session) => {
+        if (!session && address) {
+          signIn("web3", { address });
+        }
+      });
+
       actions.setDrawerSideContent(() => (
         <div className="flex h-full flex-col gap-4">
           <div className="flex gap-2 px-0 py-2">

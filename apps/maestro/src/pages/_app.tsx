@@ -1,5 +1,7 @@
 import { ThemeProvider, Toaster } from "@axelarjs/ui";
 import { useEffect, useState, type FC } from "react";
+import type { Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
 
@@ -24,7 +26,13 @@ initTelemetryAsync().then((initialized) => {
   }
 });
 
-const App: FC<AppProps> = ({ Component, pageProps }) => {
+interface CustomAppProps extends AppProps {
+  pageProps: {
+    session?: Session;
+  } & AppProps["pageProps"];
+}
+
+const App: FC<CustomAppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
   const [isSSR, setIsSSR] = useState(true);
   const [queryClient] = useState(() => wagmiQueryClient);
@@ -42,23 +50,23 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         `}
       </style>
       <NProgressBar />
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <ThemeProvider>
-            <WagmiConfigPropvider>
-              {!isSSR && (
-                <>
+      <SessionProvider session={pageProps.session}>
+        <QueryClientProvider client={queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <ThemeProvider>
+              <WagmiConfigPropvider>
+                {!isSSR && (
                   <MainLayout>
                     <Component {...pageProps} />
                   </MainLayout>
-                </>
-              )}
-              <ReactQueryDevtools />
-              <Toaster />
-            </WagmiConfigPropvider>
-          </ThemeProvider>
-        </Hydrate>
-      </QueryClientProvider>
+                )}
+                <ReactQueryDevtools />
+                <Toaster />
+              </WagmiConfigPropvider>
+            </ThemeProvider>
+          </Hydrate>
+        </QueryClientProvider>
+      </SessionProvider>
     </>
   );
 };

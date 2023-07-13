@@ -1,19 +1,18 @@
 import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/schemas";
-import { publicProcedure } from "~/server/trpc";
+import { protectedProcedure } from "~/server/trpc";
 import type { IntercahinTokenDetails } from "~/services/kv";
 
-export const getInterchainTokenDetails = publicProcedure
+export const getInterchainTokenDetails = protectedProcedure
   .input(
     z.object({
       chainId: z.number(),
       tokenAddress: hex40Literal(),
-      deployerAddress: hex40Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
-    const kvResult = await ctx.services.kv.getInterchainTokenDetails({
+    const kvResult = await ctx.storage.kv.getInterchainTokenDetails({
       chainId: input.chainId,
       tokenAddress: input.tokenAddress,
     });
@@ -24,7 +23,7 @@ export const getInterchainTokenDetails = publicProcedure
       );
     }
 
-    if (kvResult.deployerAddress !== input.deployerAddress) {
+    if (kvResult.deployerAddress !== ctx.session?.address) {
       throw new Error(
         `Invalid deployer address for interchain token ${input.tokenAddress} on chain ${input.chainId}`
       );
