@@ -3,7 +3,7 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { encodeFunctionData } from "viem";
-import { useMutation, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 
 import {
   useInterchainTokenServiceMulticall,
