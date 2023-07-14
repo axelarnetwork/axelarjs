@@ -46,7 +46,7 @@ const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
   mintTo: `0x000`,
 };
 
-export function useDeployInterchainTokenMutation(config: {
+export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   value: bigint;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
@@ -126,6 +126,7 @@ export function useDeployInterchainTokenMutation(config: {
         tokenSymbol: inputRef.current.tokenSymbol,
         tokenDecimals: inputRef.current.decimals,
         originAxelarChainId: inputRef.current.sourceChainId,
+        category: "StandardizedToken",
         remoteTokens: inputRef.current.destinationChainIds.map(
           (axelarChainId) => ({
             axelarChainId,

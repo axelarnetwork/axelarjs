@@ -29,6 +29,7 @@ export const interchainTokenDetailsSchema = z.object({
   salt: hex64Literal(),
   deploymentTxHash: hex64Literal(),
   remoteTokens: z.array(remoteInterchainTokenSchema),
+  category: z.enum(["CanonicalToken", "StandardizedToken"]),
 });
 
 export type IntercahinTokenDetails = z.infer<

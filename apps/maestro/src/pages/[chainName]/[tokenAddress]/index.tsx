@@ -25,10 +25,14 @@ import {
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
+import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
-import { useInterchainTokenServiceRegisterCanonicalToken } from "~/lib/contracts/InterchainTokenService.hooks";
+import {
+  useInterchainTokenServiceGetCanonicalTokenId,
+  useInterchainTokenServiceRegisterCanonicalToken,
+} from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
@@ -84,11 +88,14 @@ const InterchainTokensPage = () => {
           tokenId={interchainToken?.tokenId as `0x${string}`}
         />
       )}
-      {routeChain && (
+      {routeChain && tokenDetails && (
         <>
           <ConnectedInterchainTokensPage
             chainId={routeChain?.id}
             tokenAddress={tokenAddress}
+            tokenName={tokenDetails.name}
+            tokenSymbol={tokenDetails.symbol}
+            decimals={tokenDetails.decimals}
           />
         </>
       )}
@@ -101,18 +108,32 @@ export default InterchainTokensPage;
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
   tokenAddress: `0x${string}`;
+  tokenName: string;
+  tokenSymbol: string;
+  decimals: number;
 };
 
 const RegisterOriginTokenButton = ({
   address = "0x0" as `0x${string}`,
+  tokenName = "",
+  tokenSymbol = "",
+  decimals = -1,
   chainName = "Axelar",
   onSuccess = () => {},
 }) => {
   const [txState, setTxState] = useTransactionState();
 
-  const { writeAsync, data } = useInterchainTokenServiceRegisterCanonicalToken({
-    value: BigInt(0),
-  });
+  const { mutateAsync: registerToken, data } =
+    useRegisterCanonicalTokenMutation({
+      value: BigInt(0),
+    });
+
+  const { data: expectedTokenId } =
+    useInterchainTokenServiceGetCanonicalTokenId({
+      args: [address],
+    });
+
+  console.log({ expectedTokenId });
 
   useWaitForTransaction({
     hash: data?.hash,
@@ -135,12 +156,20 @@ const RegisterOriginTokenButton = ({
     });
 
     try {
-      const result = await writeAsync({ args: [address] });
-
-      setTxState({
-        status: "submitted",
-        hash: result.hash,
+      const result = await registerToken({
+        tokenAddress: address,
+        sourceChainId: "Avalanche",
+        expectedTokenId,
+        tokenName,
+        tokenSymbol,
+        decimals,
       });
+      console.log({ result });
+
+      // setTxState({
+      //   status: "submitted",
+      //   hash: result,
+      // });
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
@@ -156,7 +185,7 @@ const RegisterOriginTokenButton = ({
         error: error as Error,
       });
     }
-  }, [address, setTxState, writeAsync]);
+  }, [address, setTxState, registerToken]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
@@ -298,6 +327,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             <RegisterOriginTokenButton
               address={props.tokenAddress}
               chainName={interchainToken.chain?.name}
+              tokenName={props.tokenName}
+              tokenSymbol={props.tokenSymbol}
+              decimals={props.decimals}
               onSuccess={refetch}
             />
           ) : (
