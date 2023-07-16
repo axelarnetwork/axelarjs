@@ -29,6 +29,7 @@ import { APP_NAME } from "~/config/app";
 import {
   NEXT_PUBLIC_EXPLORER_URL,
   NEXT_PUBLIC_FILE_BUG_REPORT_URL,
+  NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
 } from "~/config/env";
 import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
 import { useSession } from "~/services/auth";
@@ -248,13 +249,15 @@ const MENU_ITEMS: Menuitem[] = [
               </header>
               <main>
                 <Link
-                  href={NEXT_PUBLIC_EXPLORER_URL}
+                  href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?contractAddress=${NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS}`}
                   className="hover:text-primary flex gap-2"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <span className="text-sm">
                     Search Axelarscan for any transactions you made through
-                    Satellite. You can search by sending, receiving, or deposit
-                    addresses.
+                    Maestro. You can filter the transaction view by the address
+                    you used to deploy your tokens.
                   </span>
                   <ArrowRightIcon />
                 </Link>
@@ -270,10 +273,12 @@ const MENU_ITEMS: Menuitem[] = [
                 <Link
                   href={NEXT_PUBLIC_FILE_BUG_REPORT_URL}
                   className="hover:text-primary flex gap-2"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <span className="text-sm">
                     For general help, submit your questions/feedback via
-                    Zendesk. Any and all thoughts welcome! Forward Arrow Link
+                    Zendesk. Any and all thoughts welcome!
                   </span>
                   <ArrowRightIcon />
                 </Link>
