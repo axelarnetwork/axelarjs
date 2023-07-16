@@ -1,3 +1,5 @@
+import type { EVMChainConfig } from "@axelarjs/api";
+
 import { indexBy, prop } from "rambda";
 import { useQuery } from "wagmi";
 
@@ -20,7 +22,11 @@ export function useEVMChainConfigsQuery() {
     ...queryResult,
     data,
     computed: {
-      indexedByChainId: indexBy(prop("chain_id"), data ?? []),
+      indexedByChainId: indexBy<EVMChainConfig, number>(
+        prop("chain_id"),
+        data ?? []
+      ),
+      indexedById: indexBy<EVMChainConfig, string>(prop("id"), data ?? []),
       wagmiChains: (data ?? []).map(
         (x) => EVM_CHAIN_CONFIGS_BY_ID[String(x.chain_id)]
       ),

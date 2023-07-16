@@ -6,21 +6,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20";
+import { numericString } from "~/lib/utils/schemas";
+import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 
-const schema = z.object({
+const formSchema = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
+  tokenCap: numericString(),
 });
 
-type FormState = z.infer<typeof schema>;
+type FormState = z.infer<typeof formSchema>;
+
+const FormInput = {
+  ...TextInput,
+  defaultProps: {
+    ...TextInput.defaultProps,
+    className: "bg-base-200",
+    bordered: true,
+  },
+} as typeof TextInput;
 
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
 
   const { register, handleSubmit, formState } = useForm<FormState>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(formSchema),
     defaultValues: state.tokenDetails,
   });
 
@@ -34,6 +46,7 @@ const TokenDetails: FC = () => {
       tokenName: data.tokenName,
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
+      tokenCap: data.tokenCap,
     });
 
     actions.nextStep();
@@ -49,9 +62,7 @@ const TokenDetails: FC = () => {
       >
         <FormControl>
           <Label>Token Name</Label>
-          <TextInput
-            className="bg-base-200"
-            bordered
+          <FormInput
             placeholder="Enter your token name"
             disabled={isReadonly}
             {...register("tokenName")}
@@ -59,9 +70,7 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label>Token Symbol</Label>
-          <TextInput
-            className="bg-base-200"
-            bordered
+          <FormInput
             placeholder="Enter your token symbol"
             maxLength={11}
             disabled={isReadonly}
@@ -69,16 +78,34 @@ const TokenDetails: FC = () => {
           />
         </FormControl>
         <FormControl>
-          <Label>Token Decimals</Label>
-          <TextInput
-            className="bg-base-200"
-            bordered
+          <Label htmlFor="tokenDecimals">Token Decimals</Label>
+          <FormInput
+            id="tokenDecimals"
             type="number"
             placeholder="Enter your token decimals"
             min={1}
             max={18}
             disabled={isReadonly}
             {...register("tokenDecimals")}
+          />
+        </FormControl>
+        <FormControl>
+          <Label htmlFor="amountToMint">Amount to mint</Label>
+          <FormInput
+            id="amountToMint"
+            placeholder="Enter your amount to mint"
+            min={0}
+            onKeyDown={preventNonNumericInput}
+            {...register("tokenCap", {
+              disabled: isReadonly,
+              validate(value) {
+                if (!value || value === "0") {
+                  return "Amount must be greater than 0";
+                }
+
+                return true;
+              },
+            })}
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />

@@ -1,7 +1,7 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import { useMemo, useState } from "react";
 
-import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";

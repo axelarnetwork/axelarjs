@@ -3,7 +3,7 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex40 } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 /**
@@ -13,16 +13,14 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
   // a procedure must have a schema for input validation, we use zod for this: https://zod.dev/
   .input(
     z.object({
-      txHash: hex40(),
+      txHash: hex40Literal(),
     })
   )
   // a procedure can either be a query or a mutation
   // a query is a read-only operation, a mutation is a write operation
   .query(async ({ input, ctx }) => {
     try {
-      const data = await ctx.services.gmp.searchGMP({
-        txHash: input.txHash as `0x${string}`,
-      });
+      const data = await ctx.services.gmp.searchGMP({ txHash: input.txHash });
 
       if (data.length) {
         return data.reduce(

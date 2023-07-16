@@ -45,7 +45,7 @@ const Review: FC = () => {
               <CopyToClipboardButton
                 copyText={state.txState.tokenAddress}
                 size="sm"
-                ghost
+                variant="ghost"
               >
                 {maskAddress(state.txState.tokenAddress)}
               </CopyToClipboardButton>

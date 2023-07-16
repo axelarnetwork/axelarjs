@@ -11,8 +11,8 @@ export const NEXT_PUBLIC_NETWORK_ENV = String(
   process.env.NEXT_PUBLIC_NETWORK_ENV ?? "testnet"
 ) as "mainnet" | "testnet";
 
-export const NEXT_PUBLIC_TOKEN_LINKER_ADDRESS = Maybe.of(
-  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
+export const NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS = Maybe.of(
+  process.env.NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
 ).mapOr("0x", String) as `0x${string}`;
 
 export const NEXT_PUBLIC_EXPLORER_URL = Maybe.of(

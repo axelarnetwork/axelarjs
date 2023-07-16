@@ -61,6 +61,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   } = useInterchainTokensQuery({
     chainId: chainId,
     tokenAddress: search as `0x${string}`,
+    strict: chainId !== -1,
   });
 
   const isLoading = isSearchingERC20 || isSearchingInterchainTokens;
@@ -74,7 +75,6 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
         searchInterchainTokenResult.tokenAddress) ||
       searchERC20Result
     ) {
-      console.log("tokenFound", { tokenDetails: searchERC20Result });
       props.onTokenFound({
         tokenId: searchInterchainTokenResult.tokenId as `0x${string}`,
         tokenAddress: search as `0x${string}`,
@@ -105,7 +105,6 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
         })}
       >
         <TextInput
-          bordered={true}
           type="search"
           name="tokenAddress"
           placeholder={

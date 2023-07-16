@@ -27,6 +27,8 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
+    tokenCap: "0",
+    mintTo: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
@@ -112,6 +114,11 @@ function useAddErc20State(
           } else {
             draft.selectedChains.push(item);
           }
+        });
+      },
+      setStep: (step: number) => {
+        setState((draft) => {
+          draft.step = step;
         });
       },
       nextStep: () => setState((draft) => draft.step++),

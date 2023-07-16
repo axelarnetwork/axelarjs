@@ -45,7 +45,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             {children}
           </Clamp>
           <Footer
-            className="bg-neutral text-neutral-content relative p-6 md:p-8 xl:p-10"
+            className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
             center={true}
           >
             <div className="flex items-center text-sm">

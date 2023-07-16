@@ -1,37 +1,33 @@
-import type { InterchainTokenServiceClient } from "@axelarjs/evm";
+import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
-import { always, partition } from "rambda";
+import { partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
-import { hex40, hex64 } from "~/lib/utils/schemas";
+import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
+import type {
+  IntercahinTokenDetails,
+  RemoteInterchainTokenDetails,
+} from "~/services/kv";
 
-const isAddressZero = (address: string) => parseInt(address, 16) === 0;
-
-const tokenDetails = () => ({
-  tokenId: hex40(),
-  originTokenId: hex40().nullable(),
-  tokenAddress: hex64(),
+const TOKEN_INFO_SCHEMA = z.object({
+  tokenId: hex64Literal().nullable(),
+  tokenAddress: hex40Literal().nullable(),
   isOriginToken: z.boolean(),
   isRegistered: z.boolean(),
   chainId: z.number(),
+  axelarChainId: z.string().nullable(),
+  chainName: z.string(),
 });
 
-export type IntercahinTokenInfo = {
-  tokenId: `0x${string}`;
-  originTokenId: `0x${string}` | null;
-  tokenAddress: `0x${string}`;
-  isOriginToken: boolean;
-  isRegistered: boolean;
-  chainId: number;
-};
+const OUTPUT_SCHEMA = TOKEN_INFO_SCHEMA.extend({
+  matchingTokens: z.array(TOKEN_INFO_SCHEMA),
+});
 
-export type SearchInterchainTokenOutput = IntercahinTokenInfo & {
-  matchingTokens: IntercahinTokenInfo[];
-};
+export type SearchInterchainTokenOutput = z.infer<typeof OUTPUT_SCHEMA>;
 
 export const searchInterchainToken = publicProcedure
   .meta({
@@ -47,17 +43,11 @@ export const searchInterchainToken = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex64(),
+      tokenAddress: hex40Literal(),
+      strict: z.boolean().optional(),
     })
   )
-  .output(
-    z
-      .object({
-        ...tokenDetails(),
-        matchingTokens: z.array(z.object(tokenDetails())),
-      })
-      .nullable()
-  )
+  .output(OUTPUT_SCHEMA.nullable())
   .query(async ({ input, ctx }) => {
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
@@ -65,54 +55,33 @@ export const searchInterchainToken = publicProcedure
         EVM_CHAIN_CONFIGS
       );
 
-      if (!chainConfig) {
-        for (const chainConfig of EVM_CHAIN_CONFIGS) {
-          const client =
-            ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+      const scanPromise = !chainConfig
+        ? // scan all chains
+          scanChains(remainingChainConfigs, input.tokenAddress, ctx)
+        : // scan the specified chain
+          scanChains(
+            input.strict
+              ? // only scan the specified chain if in strict mode
+                [chainConfig]
+              : // scan all chains, starting with the specified chain
+                [chainConfig, ...remainingChainConfigs],
+            input.tokenAddress,
+            ctx
+          );
 
-          try {
-            const tokenId = await client.readContract("getTokenId", {
-              args: [input.tokenAddress as `0x${string}`],
-            });
+      const result = await scanPromise;
 
-            if (tokenId && !isAddressZero(tokenId)) {
-              console.log("Found token ID on chain", chainConfig.name);
-              return getInterchainTokenDetails(
-                client,
-                chainConfig,
-                remainingChainConfigs,
-                input,
-                ctx
-              );
-            }
-          } catch (error) {
-            console.log(
-              `Token ${input.tokenAddress} not registered on ${chainConfig.name}`
-            );
-          }
-        }
+      if (result) {
+        // cache for 1 hour
+        ctx.res.setHeader("Cache-Control", "public, max-age=3600");
 
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Token ${input.tokenAddress} not registered on any chain`,
-        });
+        return result;
       }
 
-      const client =
-        ctx.contracts.createInterchainTokenServiceClient(chainConfig);
-
-      const result = await getInterchainTokenDetails(
-        client,
-        chainConfig,
-        remainingChainConfigs,
-        input,
-        ctx
-      );
-
-      // cache for 1 hour
-      ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
-      return result;
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Token ${input.tokenAddress} not registered on any chain`,
+      });
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -127,111 +96,136 @@ export const searchInterchainToken = publicProcedure
     }
   });
 
-async function getInterchainTokenDetails(
-  client: InterchainTokenServiceClient,
+async function getInterchainToken(
+  kvResult: IntercahinTokenDetails,
   chainConfig: WagmiEVMChainConfig,
   remainingChainConfigs: WagmiEVMChainConfig[],
-  input: {
-    tokenAddress: string;
-    chainId?: number;
-  },
   ctx: Context
 ) {
-  const [tokenId, originTokenId] = await Promise.all([
-    client
-      .readContract("getTokenId", {
-        args: [input.tokenAddress as `0x${string}`],
-      })
-      .catch(always(null)),
-    client
-      .readContract("getOriginTokenId", {
-        args: [input.tokenAddress as `0x${string}`],
-      })
-      .catch(always(null)),
-  ]);
+  const lookupToken = {
+    tokenId: kvResult.tokenId,
+    tokenAddress: kvResult.tokenAddress,
+    isOriginToken: kvResult.originChainId === chainConfig.id,
+    isRegistered: true,
+    chainId: kvResult.originChainId,
+    chainName: chainConfig.name,
+    axelarChainId: kvResult.originAxelarChainId,
+  };
 
-  if (!tokenId || isAddressZero(tokenId)) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `Token not found on ${chainConfig.name} (${chainConfig.id})`,
-    });
-  }
+  const pendingRemoteTokens = kvResult.remoteTokens.filter(
+    (token) => token.status === "pending"
+  );
+  const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
 
-  const [tokenAddress, isOriginToken] = await Promise.all([
-    client.readContract("getTokenAddress", {
-      args: [tokenId],
-    }),
-    client.readContract("isOriginToken", {
-      args: [tokenId],
-    }),
-  ]);
+  const verifiedRemoteTokens = await Promise.all(
+    kvResult.remoteTokens.map(async (remoteToken) => {
+      const chainConfig = remainingChainConfigs.find(
+        (x) => x.id === remoteToken.chainId
+      );
 
-  if (tokenAddress.toLowerCase() !== input.tokenAddress.toLowerCase()) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `Token ids don't match. ${{
-        tokenId,
-        tokenAddress,
-      }} `,
-    });
-  }
+      const remoteTokenDetails = {
+        tokenId: kvResult.tokenId,
+        tokenAddress: remoteToken.address,
+        isOriginToken: false,
+        isRegistered: remoteToken.status === "deployed",
+        chainId: remoteToken.chainId,
+        chainName: chainConfig?.name ?? "Unknown",
+        axelarChainId: remoteToken.axelarChainId,
+      };
 
-  const matchingTokens = await Promise.all(
-    remainingChainConfigs.map(async (chain) => {
-      try {
-        const client = ctx.contracts.createInterchainTokenServiceClient(chain);
-
-        const matchingTokenAddressFromTokenId = await client.readContract(
-          "getTokenAddress",
-          {
-            args: [tokenId],
-          }
-        );
-
-        const [matchingOriginTokenId, isOriginToken] = await Promise.all([
-          client.readContract("getOriginTokenId", {
-            args: [matchingTokenAddressFromTokenId as `0x${string}`],
-          }),
-          client.readContract("isOriginToken", {
-            args: [tokenId],
-          }),
-        ]);
-
-        return {
-          tokenId,
-          isOriginToken,
-          chainId: chain.id,
-          chainName: chain.name,
-          tokenAddress: matchingTokenAddressFromTokenId,
-          originTokenId: matchingOriginTokenId,
-          isRegistered: parseInt(matchingTokenAddressFromTokenId, 16) > 0,
-        };
-      } catch (error) {
-        return {
-          tokenId,
-          originTokenId,
-          chainId: chain.id,
-          tokenAddress,
-          isOriginToken: false,
-          isRegistered: false,
-        };
+      if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
+        // no need to check twice if the token is registered
+        return remoteTokenDetails;
       }
+
+      invariant(chainConfig, "Chain config not found");
+
+      const tokenClient = ctx.contracts.createInterchainTokenClient(
+        chainConfig,
+        kvResult.tokenAddress
+      );
+
+      return {
+        ...remoteTokenDetails,
+        isRegistered: await tokenClient
+          .read("getTokenManager")
+          // attempt to read 'token.getTokenManager'
+          .then(() => true)
+          // which will throw if the token is not registered
+          .catch(() => false),
+      };
     })
   );
 
-  const lookupToken = {
-    tokenId,
-    originTokenId,
-    tokenAddress,
-    isOriginToken,
-    isRegistered: parseInt(tokenAddress, 16) > 0,
-    chainId: chainConfig.id,
-  };
+  if (hasPendingRemoteTokens) {
+    // if there are pending remote tokens, mark them as "deployed" if they are now registered
+    const newConfirmedRemoteTokens = verifiedRemoteTokens
+      .filter((token) => token.isRegistered)
+      .map((t) => kvResult.remoteTokens.find((x) => x.chainId === t.chainId))
+      .filter(Boolean)
+      .map((token) => ({
+        ...(token as RemoteInterchainTokenDetails),
+        status: "deployed" as const,
+      }));
 
-  const output: SearchInterchainTokenOutput = {
+    // update the KV store with the new confirmed remote tokens if any
+    if (newConfirmedRemoteTokens.length) {
+      await ctx.storage.kv.recordRemoteTokensDeployment(
+        {
+          chainId: kvResult.originChainId,
+          tokenAddress: kvResult.tokenAddress,
+        },
+        newConfirmedRemoteTokens
+      );
+    }
+  }
+
+  const unregistered = remainingChainConfigs
+    .filter(
+      (chain) =>
+        chain.id !== chainConfig.id &&
+        !kvResult.remoteTokens.some((token) => token.chainId === chain.id)
+    )
+    .map((chain) => ({
+      tokenId: null,
+      tokenAddress: null,
+      isOriginToken: false,
+      isRegistered: false,
+      chainId: chain.id,
+      chainName: chain.name,
+      axelarChainId: null,
+    }));
+
+  return {
     ...lookupToken,
-    matchingTokens: [lookupToken, ...matchingTokens],
+    matchingTokens: [lookupToken, ...verifiedRemoteTokens, ...unregistered],
   };
+}
 
-  return output;
+/**
+ * Scans all chains for the given token address
+ * @param chainConfigs
+ * @param tokenAddress
+ * @param ctx
+ */
+async function scanChains(
+  chainConfigs: WagmiEVMChainConfig[],
+  tokenAddress: `0x${string}`,
+  ctx: Context
+) {
+  let result: Awaited<ReturnType<typeof getInterchainToken>> | null = null;
+
+  for (const chainConfig of chainConfigs) {
+    const kvEntry = await ctx.storage.kv.getInterchainTokenDetails({
+      chainId: chainConfig.id,
+      tokenAddress: tokenAddress,
+    });
+
+    if (!kvEntry) {
+      continue;
+    }
+    result = await getInterchainToken(kvEntry, chainConfig, chainConfigs, ctx);
+  }
+
+  return result;
 }

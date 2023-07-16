@@ -1,12 +1,11 @@
 import { toast } from "@axelarjs/ui";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useMutation, useWalletClient } from "wagmi";
+import { useAccount, useMutation } from "wagmi";
 
-import { useERC20Reads } from "~/lib/contract/hooks/useERC20";
-import { useTransferInterchainToken } from "~/lib/contract/hooks/useInterchainToken";
-import { useInterchainTokenServiceWrites } from "~/lib/contract/hooks/useInterchainTokenService";
-import type { TransactionState } from "~/lib/hooks/useTransaction";
+import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20BurnableMintable.hooks";
+import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
+import type { TransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -24,24 +23,14 @@ export type UseSendInterchainTokenInput = {
   onStatusUpdate?: (message: TransactionState) => void;
 };
 
-const TOKEN_LINKER_ADDRESS = String(
-  process.env.NEXT_PUBLIC_TOKEN_LINKER_ADDRESS
-) as `0x${string}`;
-
 export function useSendInterchainTokenMutation(
   config: UseSendInterchainTokenConfig
 ) {
-  const { data: walletClient } = useWalletClient();
-  const erc20Reads = useERC20Reads({
+  const { data: decimals } = useIerc20BurnableMintableDecimals({
     address: config.tokenAddress,
   });
 
   const { address } = useAccount();
-
-  const tokenLinker = useInterchainTokenServiceWrites({
-    address: TOKEN_LINKER_ADDRESS,
-    walletClient,
-  });
 
   const { data: gas } = trpc.axelarjsSDK.estimateGasFee.useQuery({
     sourceChainId: config.sourceChainId,
@@ -49,18 +38,17 @@ export function useSendInterchainTokenMutation(
     sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
   });
 
-  const { writeAsync: transferAsync } = useTransferInterchainToken({
+  const { writeAsync: transferAsync } = useInterchainTokenInterchainTransfer({
     address: config.tokenAddress,
     value: BigInt(gas ?? 0) * BigInt(2),
   });
 
   return useMutation<void, unknown, UseSendInterchainTokenInput>(
     async ({ amount, onStatusUpdate }) => {
-      if (!(erc20Reads && address && tokenLinker && gas)) {
+      if (!(decimals && address && gas)) {
         return;
       }
 
-      const decimals = await erc20Reads.decimals();
       const bnAmount = parseUnits(`${Number(amount)}`, decimals);
 
       try {

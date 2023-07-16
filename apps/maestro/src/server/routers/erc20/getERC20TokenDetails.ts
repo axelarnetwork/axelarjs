@@ -1,19 +1,19 @@
 import type { ERC20Client } from "@axelarjs/evm";
+import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
-import invariant from "tiny-invariant";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64 } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex64(),
+      tokenAddress: hex40Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
@@ -26,7 +26,7 @@ export const getERC20TokenDetails = publicProcedure
         for (const config of EVM_CHAIN_CONFIGS) {
           const client = ctx.contracts.createERC20Client(
             config,
-            input.tokenAddress as `0x${string}`
+            input.tokenAddress
           );
 
           try {
@@ -50,7 +50,7 @@ export const getERC20TokenDetails = publicProcedure
 
       const client = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress as `0x${string}`
+        input.tokenAddress
       );
 
       return getTokenPublicDetails(client);
@@ -71,11 +71,11 @@ async function getTokenPublicDetails(client: ERC20Client) {
   invariant(client.chain, "client.chain must be defined");
 
   const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
-    client.readContract("name"),
-    client.readContract("symbol"),
-    client.readContract("decimals"),
-    client.readContract("owner").catch(always(null)),
-    client.readContract("pendingOwner").catch(always(null)),
+    client.read("name"),
+    client.read("symbol"),
+    client.read("decimals"),
+    client.read("owner").catch(always(null)),
+    client.read("pendingOwner").catch(always(null)),
   ]);
 
   return {

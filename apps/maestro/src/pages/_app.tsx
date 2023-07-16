@@ -42,16 +42,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         `}
       </style>
       <NProgressBar />
+
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <ThemeProvider>
             <WagmiConfigPropvider>
               {!isSSR && (
-                <>
-                  <MainLayout>
-                    <Component {...pageProps} />
-                  </MainLayout>
-                </>
+                <MainLayout>
+                  <Component {...pageProps} />
+                </MainLayout>
               )}
               <ReactQueryDevtools />
               <Toaster />

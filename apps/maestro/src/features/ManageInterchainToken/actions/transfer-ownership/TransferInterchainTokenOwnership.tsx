@@ -13,8 +13,8 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { isAddress, TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
-import { useTransferInterchainTokenOnwership } from "~/lib/contract/hooks/useInterchainToken";
-import { useTransactionState } from "~/lib/hooks/useTransaction";
+import { useIerc20BurnableMintableTransferOwnership } from "~/lib/contracts/IERC20BurnableMintable.hooks";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
@@ -31,7 +31,7 @@ export const TransferInterchainTokenOwnership: FC = () => {
     writeAsync: transferOwnershipAsync,
     isLoading: isTransfering,
     data: transferResult,
-  } = useTransferInterchainTokenOnwership({
+  } = useIerc20BurnableMintableTransferOwnership({
     address: state.tokenAddress,
   });
 
