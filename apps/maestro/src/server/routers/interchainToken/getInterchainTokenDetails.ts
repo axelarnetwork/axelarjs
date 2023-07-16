@@ -12,7 +12,7 @@ export const getInterchainTokenDetails = protectedProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    console.log({ input });
+    console.log("getInterchainTokenDetails", { input });
     const kvResult = await ctx.storage.kv.getInterchainTokenDetails({
       chainId: input.chainId,
       tokenAddress: input.tokenAddress,
