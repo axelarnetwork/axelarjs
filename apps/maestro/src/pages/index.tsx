@@ -1,3 +1,4 @@
+import { Button, Card } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
@@ -32,6 +33,14 @@ export default function Home() {
       mustBeConnected
     >
       <div className="flex w-full max-w-lg flex-col items-center justify-center">
+        <Card compact className="absolute top-20 w-1/2 bg-slate-200 p-5">
+          <Button shape="square" size="sm">
+            x
+          </Button>
+          <Card.Body>
+            You are using Maestro Beta in testnet. Further improvements to come.
+          </Card.Body>
+        </Card>
         <SearchInterchainToken onTokenFound={handleTokenFound} />
         <div className="divider">OR</div>
         <AddErc20 />
