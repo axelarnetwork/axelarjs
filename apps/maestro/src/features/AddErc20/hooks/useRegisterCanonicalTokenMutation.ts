@@ -58,7 +58,6 @@ export function useRegisterCanonicalTokenMutation(config: {
   useEffect(
     () => {
       if (recordDeploymentArgs) {
-        console.log("trying to record deployment", recordDeploymentArgs);
         recordDeploymentAsync(recordDeploymentArgs).then(() => {
           onStatusUpdate({
             type: "deployed",
@@ -88,8 +87,6 @@ export function useRegisterCanonicalTokenMutation(config: {
       }
 
       unwatch();
-
-      console.log({ log });
 
       setRecordDeploymentArgs({
         kind: "canonical",
@@ -138,8 +135,6 @@ export function useRegisterCanonicalTokenMutation(config: {
       const tx = await multicallAsync({
         args: [[deployTxData]],
       });
-
-      console.log("multicall result", tx);
 
       if (tx?.hash) {
         onStatusUpdate({

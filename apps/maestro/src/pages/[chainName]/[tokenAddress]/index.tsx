@@ -125,7 +125,13 @@ const RegisterOriginTokenButton = ({
   );
 
   const { mutateAsync: registerCanonicalToken } =
-    useRegisterCanonicalTokenMutation({});
+    useRegisterCanonicalTokenMutation({
+      onStatusUpdate(message) {
+        if (message.type === "deployed") {
+          onSuccess();
+        }
+      },
+    });
 
   const { data: expectedTokenId } =
     useInterchainTokenServiceGetCanonicalTokenId({
@@ -156,7 +162,6 @@ const RegisterOriginTokenButton = ({
           hash: txHash,
         });
       }
-      onSuccess();
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
@@ -181,7 +186,6 @@ const RegisterOriginTokenButton = ({
     tokenName,
     tokenSymbol,
     decimals,
-    onSuccess,
   ]);
 
   const buttonChildren = useMemo(() => {
