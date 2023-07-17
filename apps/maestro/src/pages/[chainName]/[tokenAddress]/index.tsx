@@ -8,7 +8,7 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
-import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
+import { invariant, maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
@@ -31,6 +31,7 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
   useGetTransactionStatusOnDestinationChainsQuery,
@@ -114,6 +115,14 @@ const RegisterOriginTokenButton = ({
   onSuccess = () => {},
 }) => {
   const [txState, setTxState] = useTransactionState();
+  const { chain } = useNetwork();
+
+  const { computed } = useEVMChainConfigsQuery();
+
+  const sourceChain = useMemo(
+    () => (chain ? computed.indexedByChainId[chain.id] : undefined),
+    [chain, computed]
+  );
 
   const { mutateAsync: registerCanonicalToken } =
     useRegisterCanonicalTokenMutation({});
@@ -123,31 +132,30 @@ const RegisterOriginTokenButton = ({
       args: [address],
     });
 
-  console.log({ expectedTokenId });
-
   const handleSubmitTransaction = useCallback(async () => {
     if (!expectedTokenId) return;
     setTxState({
       status: "awaiting_approval",
     });
 
+    invariant(sourceChain, "Source chain is not defined");
+
     try {
-      const result = await registerCanonicalToken({
+      const txHash = await registerCanonicalToken({
         tokenAddress: address,
-        sourceChainId: "Avalanche",
+        sourceChainId: sourceChain?.id,
         expectedTokenId,
         tokenName,
         tokenSymbol,
         decimals,
       });
-      console.log({ result });
 
-      setTxState({
-        // @ts-ignore
-        status: "submitted",
-        // @ts-ignore
-        hash: result,
-      });
+      if (txHash) {
+        setTxState({
+          status: "submitted",
+          hash: txHash,
+        });
+      }
       onSuccess();
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
@@ -164,7 +172,17 @@ const RegisterOriginTokenButton = ({
         error: error as Error,
       });
     }
-  }, [address, setTxState, registerCanonicalToken]);
+  }, [
+    expectedTokenId,
+    setTxState,
+    sourceChain,
+    registerCanonicalToken,
+    address,
+    tokenName,
+    tokenSymbol,
+    decimals,
+    onSuccess,
+  ]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
@@ -266,7 +284,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       setSelectedChainIds([]);
       setDeployTokensTxHash(undefined);
 
-      console.log("deployedTokens", deployedTokens);
       refetch();
     }
   }, [

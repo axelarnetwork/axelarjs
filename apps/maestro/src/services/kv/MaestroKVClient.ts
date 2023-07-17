@@ -17,20 +17,31 @@ export type RemoteInterchainTokenDetails = z.infer<
   typeof remoteInterchainTokenSchema
 >;
 
-export const interchainTokenDetailsSchema = z.object({
-  tokenName: z.string(),
-  tokenSymbol: z.string(),
-  tokenDecimals: z.number(),
-  tokenAddress: hex40Literal(),
-  deployerAddress: hex40Literal(),
-  originChainId: z.number(),
-  originAxelarChainId: z.string(),
-  tokenId: hex64Literal(),
-  salt: hex64Literal(),
-  deploymentTxHash: hex64Literal(),
-  remoteTokens: z.array(remoteInterchainTokenSchema),
-  category: z.enum(["CanonicalToken", "StandardizedToken"]),
-});
+const interchainTokenKindSchema = z.union([
+  z.object({
+    kind: z.literal("standardized"),
+    // only applicable to standardized tokens
+    salt: hex64Literal(),
+  }),
+  z.object({
+    kind: z.literal("canonical"),
+  }),
+]);
+
+export const interchainTokenDetailsSchema = interchainTokenKindSchema.and(
+  z.object({
+    tokenName: z.string(),
+    tokenSymbol: z.string(),
+    tokenDecimals: z.number(),
+    tokenAddress: hex40Literal(),
+    deployerAddress: hex40Literal(),
+    originChainId: z.number(),
+    originAxelarChainId: z.string(),
+    tokenId: hex64Literal(),
+    deploymentTxHash: hex64Literal(),
+    remoteTokens: z.array(remoteInterchainTokenSchema),
+  })
+);
 
 export type IntercahinTokenDetails = z.infer<
   typeof interchainTokenDetailsSchema

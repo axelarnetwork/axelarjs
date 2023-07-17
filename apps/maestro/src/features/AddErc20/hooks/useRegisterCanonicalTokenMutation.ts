@@ -55,47 +55,8 @@ export function useRegisterCanonicalTokenMutation(config: {
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<IntercahinTokenDetails | null>(null);
 
-  const unwatch = watchInterchainTokenServiceEvent(
-    {
-      eventName: "TokenManagerDeployed",
-    },
-    async (logs) => {
-      const log = logs.find(
-        ({ args }) =>
-          Boolean(args?.tokenId) &&
-          args.tokenId === inputRef.current.expectedTokenId
-      );
-      console.log("all the logs", log);
-
-      if (!log || !chain || !deployerAddress || !log.transactionHash) {
-        return;
-      }
-
-      unwatch();
-
-      debugger;
-
-      setRecordDeploymentArgs({
-        tokenId: inputRef.current.expectedTokenId,
-        tokenAddress: inputRef.current.tokenAddress,
-        originChainId: chain.id,
-        deployerAddress,
-        category: "CanonicalToken",
-        salt: `0x00`,
-        deploymentTxHash: log.transactionHash,
-        tokenName: inputRef.current.tokenName,
-        tokenSymbol: inputRef.current.tokenSymbol,
-        tokenDecimals: inputRef.current.decimals,
-        originAxelarChainId: inputRef.current.sourceChainId,
-        remoteTokens: [],
-      });
-      debugger;
-    }
-  );
-
   useEffect(
     () => {
-      debugger;
       if (recordDeploymentArgs) {
         console.log("trying to record deployment", recordDeploymentArgs);
         recordDeploymentAsync(recordDeploymentArgs).then(() => {
@@ -109,6 +70,41 @@ export function useRegisterCanonicalTokenMutation(config: {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [recordDeploymentArgs]
+  );
+
+  const unwatch = watchInterchainTokenServiceEvent(
+    {
+      eventName: "TokenManagerDeployed",
+    },
+    async (logs) => {
+      const log = logs.find(
+        ({ args }) =>
+          Boolean(args?.tokenId) &&
+          args.tokenId === inputRef.current.expectedTokenId
+      );
+
+      if (!log || !chain || !deployerAddress || !log.transactionHash) {
+        return;
+      }
+
+      unwatch();
+
+      console.log({ log });
+
+      setRecordDeploymentArgs({
+        kind: "canonical",
+        tokenId: inputRef.current.expectedTokenId,
+        tokenAddress: inputRef.current.tokenAddress,
+        originChainId: chain.id,
+        deployerAddress,
+        deploymentTxHash: log.transactionHash,
+        tokenName: inputRef.current.tokenName,
+        tokenSymbol: inputRef.current.tokenSymbol,
+        tokenDecimals: inputRef.current.decimals,
+        originAxelarChainId: inputRef.current.sourceChainId,
+        remoteTokens: [],
+      });
+    }
   );
 
   useWaitForTransaction({
@@ -143,13 +139,15 @@ export function useRegisterCanonicalTokenMutation(config: {
         args: [[deployTxData]],
       });
 
-      debugger;
+      console.log("multicall result", tx);
 
       if (tx?.hash) {
         onStatusUpdate({
           type: "deploying",
           txHash: tx.hash,
         });
+
+        return tx.hash;
       }
     } catch (error) {
       onStatusUpdate({

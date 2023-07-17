@@ -1,5 +1,5 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
-import { Maybe } from "@axelarjs/utils";
+import { invariant, Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { encodeFunctionData } from "viem";
@@ -63,23 +63,24 @@ export function useRegisterRemoteStandardizedTokens(input: {
   const multicallArgs = useMemo(() => {
     if (!tokenDeployment || !gasFees) return [];
 
+    invariant(tokenDeployment.kind === "standardized", "invalid token kind");
+
     return destinationChainIds.map((chainId, i) => {
       const gasFee = gasFees[i];
-      const args = [
-        tokenDeployment.salt,
-        tokenDeployment.tokenName,
-        tokenDeployment.tokenSymbol,
-        tokenDeployment.tokenDecimals,
-        "0x",
-        tokenDeployment.deployerAddress,
-        chainId,
-        gasFee,
-      ] as const;
 
       return encodeFunctionData({
         functionName: "deployAndRegisterRemoteStandardizedToken",
-        args: args,
         abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+        args: [
+          tokenDeployment.salt,
+          tokenDeployment.tokenName,
+          tokenDeployment.tokenSymbol,
+          tokenDeployment.tokenDecimals,
+          tokenDeployment.deployerAddress,
+          tokenDeployment.deployerAddress,
+          chainId,
+          gasFee,
+        ],
       });
     });
   }, [destinationChainIds, gasFees, tokenDeployment]);
