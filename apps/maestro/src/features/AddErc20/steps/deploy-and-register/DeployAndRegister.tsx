@@ -169,11 +169,12 @@ export const Step3: FC = () => {
       </>
     );
   }, [
-    state.gasFees?.length,
-    state.isGasPriceQueryError,
+    rootState.txState.type,
     state.isGasPriceQueryLoading,
-    rootState.txState,
+    state.isGasPriceQueryError,
+    state.gasFees,
     hasInsufficientGasBalance,
+    nativeTokenSymbol,
   ]);
 
   return (
