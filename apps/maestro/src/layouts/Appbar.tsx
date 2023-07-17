@@ -87,7 +87,7 @@ const Appbar: FC<AppbarProps> = () => {
         session?.address !== address) // or session address is different from connected address
     ) {
       // then sign in with the connected address
-      signIn("web3", { address });
+      signIn("credentials", { address });
       console.log(`signed in with ${address}`);
     }
   }, [session, address, sessionStatus]);

@@ -12,7 +12,7 @@ import { kv } from "@vercel/kv";
 import type { Chain } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
-import { nextAuthOptions, type Session } from "~/config/next-auth";
+import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
 import gmpClient from "~/services/gmp";
@@ -24,10 +24,10 @@ type ContextConfig = {
 };
 
 const createContextInner = async ({ req, res }: ContextConfig) => {
-  const session = await getServerSession<AuthOptions, Session>(
+  const session = await getServerSession<AuthOptions, Web3Session>(
     req,
     res,
-    nextAuthOptions
+    NEXT_AUTH_OPTIONS
   );
 
   return {
