@@ -12,6 +12,7 @@ const GAS_TOKEN_MAP: Record<string, GasTokenKind> = {
   celo: GAS_TOKENS.CELO,
   kava: GAS_TOKENS.KAVA,
   base: GAS_TOKENS.BASE,
+  arbitrum: GAS_TOKENS.ARBITRUM,
 };
 
 export function getNativeToken(chainId: string) {

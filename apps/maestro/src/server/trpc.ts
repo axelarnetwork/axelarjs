@@ -50,7 +50,7 @@ export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
   if (!ctx.session) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: "We don't take kindly to out-of-town folk",
+      message: "You must be logged in to perform this action",
     });
   }
   return next();

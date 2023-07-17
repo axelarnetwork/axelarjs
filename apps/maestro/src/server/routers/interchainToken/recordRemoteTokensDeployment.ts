@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/schemas";
-import { publicProcedure } from "~/server/trpc";
+import { protectedProcedure } from "~/server/trpc";
 import { remoteInterchainTokenSchema } from "~/services/kv";
 
-export const recordRemoteTokensDeployment = publicProcedure
+export const recordRemoteTokensDeployment = protectedProcedure
   .input(
     z.object({
       chainId: z.number(),
@@ -15,7 +15,7 @@ export const recordRemoteTokensDeployment = publicProcedure
   )
   // TODO: this needs to be a protected mutation
   .mutation(({ ctx, input }) => {
-    ctx.services.kv.recordRemoteTokensDeployment(
+    ctx.storage.kv.recordRemoteTokensDeployment(
       {
         chainId: input.chainId,
         tokenAddress: input.tokenAddress,

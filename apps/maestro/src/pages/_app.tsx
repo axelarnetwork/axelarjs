@@ -10,6 +10,8 @@ import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "~/styles/globals.css";
 
+import { SessionProvider } from "next-auth/react";
+
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
 import MainLayout from "~/layouts/MainLayout";
 import NProgressBar from "~/layouts/NProgressBar";
@@ -42,22 +44,23 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         `}
       </style>
       <NProgressBar />
+
       <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <ThemeProvider>
-            <WagmiConfigPropvider>
-              {!isSSR && (
-                <>
+        <SessionProvider session={pageProps.session}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <ThemeProvider>
+              <WagmiConfigPropvider>
+                {!isSSR && (
                   <MainLayout>
                     <Component {...pageProps} />
                   </MainLayout>
-                </>
-              )}
-              <ReactQueryDevtools />
-              <Toaster />
-            </WagmiConfigPropvider>
-          </ThemeProvider>
-        </Hydrate>
+                )}
+                <ReactQueryDevtools />
+                <Toaster />
+              </WagmiConfigPropvider>
+            </ThemeProvider>
+          </Hydrate>
+        </SessionProvider>
       </QueryClientProvider>
     </>
   );

@@ -12,6 +12,7 @@ export const GAS_TOKENS = {
   CELO: "CELO",
   KAVA: "KAVA",
   BASE: "ETH",
+  ARBITRUM: "ETH",
 } as const;
 
 export type GasTokenKind = (typeof GAS_TOKENS)[keyof typeof GAS_TOKENS];

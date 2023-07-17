@@ -1,12 +1,10 @@
-import { publicProcedure } from "~/server/trpc";
+import { protectedProcedure } from "~/server/trpc";
 import { interchainTokenDetailsSchema } from "~/services/kv";
 
-export const recordInterchainTokenDeployment = publicProcedure
+export const recordInterchainTokenDeployment = protectedProcedure
   .input(interchainTokenDetailsSchema)
-  // TODO: this needs to be a protected mutation
   .mutation(async ({ ctx, input }) => {
-    // first record the token details
-    await ctx.services.kv.recordInterchainTokenDeployment(
+    await ctx.storage.kv.recordInterchainTokenDeployment(
       {
         chainId: input.originChainId,
         tokenAddress: input.tokenAddress,

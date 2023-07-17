@@ -39,7 +39,6 @@
     }
   },
   "scripts": {
-    "test": "vitest --run src",
     "compile": "tsc --noEmit",
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh"

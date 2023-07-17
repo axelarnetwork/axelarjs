@@ -17,6 +17,8 @@ import React, {
 import Image from "next/image";
 
 import { propEq } from "rambda";
+import { parseUnits } from "viem";
+import { useAccount, useBalance } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks/useDeployAndRegisterRemoteStandardizedTokenMutation";
@@ -116,6 +118,24 @@ export const Step3: FC = () => {
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);
 
+  const { address } = useAccount();
+
+  const { data: balance } = useBalance({
+    address,
+  });
+
+  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+
+  const hasInsufficientGasBalance = useMemo(() => {
+    if (!balance || !state.gasFees) {
+      return false;
+    }
+
+    const gasFeeBn = parseUnits(state.totalGasFee, balance.decimals);
+
+    return gasFeeBn > balance.value;
+  }, [balance, state.gasFees, state.totalGasFee]);
+
   const buttonChildren = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
       return "Check your wallet";
@@ -130,6 +150,11 @@ export const Step3: FC = () => {
     if (state.isGasPriceQueryError) {
       return "Failed to load gas prices";
     }
+
+    if (hasInsufficientGasBalance) {
+      return `Insufficient ${nativeTokenSymbol} for gas fees`;
+    }
+
     return (
       <>
         Deploy{" "}
@@ -148,6 +173,7 @@ export const Step3: FC = () => {
     state.isGasPriceQueryError,
     state.isGasPriceQueryLoading,
     rootState.txState,
+    hasInsufficientGasBalance,
   ]);
 
   return (
@@ -162,9 +188,7 @@ export const Step3: FC = () => {
                 <Tooltip tip="Approximate gas cost">
                   <span className="ml-2 whitespace-nowrap text-xs">
                     (≈ {state.totalGasFee}{" "}
-                    {state?.sourceChainId &&
-                      getNativeToken(state.sourceChainId)}{" "}
-                    in fees)
+                    {state?.sourceChainId && nativeTokenSymbol} in fees)
                   </span>
                 </Tooltip>
               </Label.AltText>
@@ -214,7 +238,11 @@ export const Step3: FC = () => {
             rootState.txState.type === "pending_approval" ||
             rootState.txState.type === "deploying"
           }
-          disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
+          disabled={
+            state.isGasPriceQueryLoading ||
+            state.isGasPriceQueryError ||
+            hasInsufficientGasBalance
+          }
           onClick={() => formSubmitRef.current?.click()}
         >
           <span>{buttonChildren}</span>

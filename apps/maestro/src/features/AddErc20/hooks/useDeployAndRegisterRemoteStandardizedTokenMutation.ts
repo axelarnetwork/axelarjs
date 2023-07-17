@@ -3,7 +3,11 @@ import { toast } from "@axelarjs/ui";
 import { hexlify, throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { encodeFunctionData, TransactionExecutionError } from "viem";
+import {
+  encodeFunctionData,
+  parseUnits,
+  TransactionExecutionError,
+} from "viem";
 import {
   useAccount,
   useMutation,
@@ -181,7 +185,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
       });
       try {
         const decimalAdjustedCap = input.cap
-          ? input.cap * BigInt(10 ** input.decimals)
+          ? parseUnits(String(input.cap), input.decimals)
           : BigInt(0);
 
         const deployTxData = encodeFunctionData({
@@ -197,10 +201,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
           abi: INTERCHAIN_TOKEN_SERVICE_ABI,
         });
 
-        const totalGasFee = input.gasFees.reduce(
-          (acc, gasFee) => acc + gasFee,
-          BigInt(0)
-        );
+        const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
 
         const registerTxData = input.destinationChainIds.map((chainId, i) => {
           const gasFee = input.gasFees[i];
@@ -242,8 +243,6 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
 
           logger.error("Failed to deploy interchain token", error.cause);
         }
-
-        console.error({ error });
       }
     }
   );
