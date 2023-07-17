@@ -15,7 +15,6 @@ import { watchInterchainTokenServiceEvent } from "~/lib/contracts/InterchainToke
 import { useInterchainTokenServiceMulticall } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { IntercahinTokenDetails } from "~/services/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
@@ -38,15 +37,12 @@ const DEFAULT_INPUT: UseRegisterCanonicalTokenInput = {
 };
 
 export function useRegisterCanonicalTokenMutation(config: {
-  value: bigint;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }) {
   const inputRef = useRef<UseRegisterCanonicalTokenInput>(DEFAULT_INPUT);
   const { address: deployerAddress } = useAccount();
   const { chain } = useNetwork();
-
-  const { computed } = useEVMChainConfigsQuery();
 
   const { writeAsync: multicallAsync, data: multicallResult } =
     useInterchainTokenServiceMulticall();
@@ -78,13 +74,14 @@ export function useRegisterCanonicalTokenMutation(config: {
       unwatch();
 
       debugger;
+
       setRecordDeploymentArgs({
         tokenId: inputRef.current.expectedTokenId,
         tokenAddress: inputRef.current.tokenAddress,
         originChainId: chain.id,
         deployerAddress,
         category: "CanonicalToken",
-        salt: `0x`,
+        salt: `0x00`,
         deploymentTxHash: log.transactionHash,
         tokenName: inputRef.current.tokenName,
         tokenSymbol: inputRef.current.tokenSymbol,
@@ -92,12 +89,15 @@ export function useRegisterCanonicalTokenMutation(config: {
         originAxelarChainId: inputRef.current.sourceChainId,
         remoteTokens: [],
       });
+      debugger;
     }
   );
 
   useEffect(
     () => {
+      debugger;
       if (recordDeploymentArgs) {
+        console.log("trying to record deployment", recordDeploymentArgs);
         recordDeploymentAsync(recordDeploymentArgs).then(() => {
           onStatusUpdate({
             type: "deployed",
@@ -142,6 +142,8 @@ export function useRegisterCanonicalTokenMutation(config: {
       const tx = await multicallAsync({
         args: [[deployTxData]],
       });
+
+      debugger;
 
       if (tx?.hash) {
         onStatusUpdate({

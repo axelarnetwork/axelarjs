@@ -15,12 +15,7 @@ import { useRouter } from "next/router";
 import { ExternalLink, InfoIcon } from "lucide-react";
 import { partition, without } from "rambda";
 import { isAddress, TransactionExecutionError } from "viem";
-import {
-  useAccount,
-  useNetwork,
-  useSwitchNetwork,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
@@ -29,10 +24,7 @@ import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/use
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
-import {
-  useInterchainTokenServiceGetCanonicalTokenId,
-  useInterchainTokenServiceRegisterCanonicalToken,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
@@ -123,10 +115,8 @@ const RegisterOriginTokenButton = ({
 }) => {
   const [txState, setTxState] = useTransactionState();
 
-  const { mutateAsync: registerToken, data } =
-    useRegisterCanonicalTokenMutation({
-      value: BigInt(0),
-    });
+  const { mutateAsync: registerCanonicalToken } =
+    useRegisterCanonicalTokenMutation({});
 
   const { data: expectedTokenId } =
     useInterchainTokenServiceGetCanonicalTokenId({
@@ -135,28 +125,14 @@ const RegisterOriginTokenButton = ({
 
   console.log({ expectedTokenId });
 
-  useWaitForTransaction({
-    hash: data?.hash,
-    confirmations: 8,
-    async onSuccess(receipt) {
-      onSuccess();
-
-      setTxState({
-        status: "confirmed",
-        receipt,
-      });
-
-      toast.success("Token registered successfully");
-    },
-  });
-
   const handleSubmitTransaction = useCallback(async () => {
+    if (!expectedTokenId) return;
     setTxState({
       status: "awaiting_approval",
     });
 
     try {
-      const result = await registerToken({
+      const result = await registerCanonicalToken({
         tokenAddress: address,
         sourceChainId: "Avalanche",
         expectedTokenId,
@@ -166,10 +142,13 @@ const RegisterOriginTokenButton = ({
       });
       console.log({ result });
 
-      // setTxState({
-      //   status: "submitted",
-      //   hash: result,
-      // });
+      setTxState({
+        // @ts-ignore
+        status: "submitted",
+        // @ts-ignore
+        hash: result,
+      });
+      onSuccess();
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
@@ -185,7 +164,7 @@ const RegisterOriginTokenButton = ({
         error: error as Error,
       });
     }
-  }, [address, setTxState, registerToken]);
+  }, [address, setTxState, registerCanonicalToken]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
