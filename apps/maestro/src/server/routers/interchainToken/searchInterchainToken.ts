@@ -1,3 +1,4 @@
+import type { InterchainTokenClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
@@ -144,24 +145,18 @@ async function getInterchainToken(
 
       invariant(chainConfig, "Chain config not found");
 
+      let tokenClient: InterchainTokenClient | undefined;
+
       switch (kvResult.kind) {
-        case "standardized": {
-          const tokenClient = ctx.contracts.createInterchainTokenClient(
+        case "standardized":
+          tokenClient = ctx.contracts.createInterchainTokenClient(
             chainConfig,
             kvResult.tokenAddress
           );
+          break;
+        case "canonical":
+          // for canonical tokens, we need to get the remote token address from the interchain token service
 
-          return {
-            ...remoteTokenDetails,
-            isRegistered: await tokenClient
-              .read("getTokenManager")
-              // attempt to read 'token.getTokenManager'
-              .then(() => true)
-              // which will throw if the token is not registered
-              .catch(() => false),
-          };
-        }
-        case "canonical": {
           const itsClient =
             ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
@@ -169,25 +164,24 @@ async function getInterchainToken(
             args: [kvResult.tokenId],
           });
 
-          console.log({ remoteTokenAddress });
-
-          const tokenClient = ctx.contracts.createInterchainTokenClient(
+          tokenClient = ctx.contracts.createInterchainTokenClient(
             chainConfig,
             remoteTokenAddress
           );
-
-          return {
-            ...remoteTokenDetails,
-            tokenAddress: remoteTokenAddress,
-            isRegistered: await tokenClient
-              .read("getTokenManager")
-              // attempt to read 'token.getTokenManager'
-              .then(() => true)
-              // which will throw if the token is not registered
-              .catch(() => false),
-          };
-        }
+          break;
       }
+
+      return {
+        ...remoteTokenDetails,
+        // derive the token address from the interchain token contract client
+        tokenAddress: tokenClient.address as `0x${string}`,
+        isRegistered: await tokenClient
+          .read("getTokenManager")
+          // attempt to read 'token.getTokenManager'
+          .then(() => true)
+          // which will throw if the token is not registered
+          .catch(() => false),
+      };
     })
   );
 
