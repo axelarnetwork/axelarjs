@@ -22,6 +22,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
+import { RegisterRemoteCanonicalTokens } from "~/features/RegisterRemoteCanonicalTokens/RegisterRemoteCanonicalTokens";
 import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
 import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
@@ -315,6 +316,15 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const { switchNetworkAsync } = useSwitchNetwork();
 
+  const RegisterRemoteTokens = useMemo(() => {
+    switch (originToken?.kind) {
+      case "canonical":
+        return RegisterRemoteCanonicalTokens;
+      case "standardized":
+        return RegisterRemoteStandardizedTokens;
+    }
+  }, [originToken?.kind]);
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -399,8 +409,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                 </Tooltip>
               )}
 
-              {originToken?.chainId === chain?.id ? (
-                <RegisterRemoteStandardizedTokens
+              {originToken?.chainId === chain?.id &&
+              typeof RegisterRemoteTokens === "function" ? (
+                <RegisterRemoteTokens
                   chainIds={selectedChainIds}
                   tokenAddress={props.tokenAddress}
                   originChainId={originToken?.chainId}

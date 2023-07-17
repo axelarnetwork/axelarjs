@@ -21,6 +21,7 @@ const TOKEN_INFO_SCHEMA = z.object({
   chainId: z.number(),
   axelarChainId: z.string().nullable(),
   chainName: z.string(),
+  kind: z.enum(["standardized", "canonical"]).nullable(),
 });
 
 const OUTPUT_SCHEMA = TOKEN_INFO_SCHEMA.extend({
@@ -110,11 +111,13 @@ async function getInterchainToken(
     chainId: kvResult.originChainId,
     chainName: chainConfig.name,
     axelarChainId: kvResult.originAxelarChainId,
+    kind: kvResult.kind,
   };
 
   const pendingRemoteTokens = kvResult.remoteTokens.filter(
     (token) => token.status === "pending"
   );
+
   const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
 
   const verifiedRemoteTokens = await Promise.all(
@@ -131,6 +134,7 @@ async function getInterchainToken(
         chainId: remoteToken.chainId,
         chainName: chainConfig?.name ?? "Unknown",
         axelarChainId: remoteToken.axelarChainId,
+        kind: kvResult.kind,
       };
 
       if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
@@ -140,20 +144,50 @@ async function getInterchainToken(
 
       invariant(chainConfig, "Chain config not found");
 
-      const tokenClient = ctx.contracts.createInterchainTokenClient(
-        chainConfig,
-        kvResult.tokenAddress
-      );
+      switch (kvResult.kind) {
+        case "standardized": {
+          const tokenClient = ctx.contracts.createInterchainTokenClient(
+            chainConfig,
+            kvResult.tokenAddress
+          );
 
-      return {
-        ...remoteTokenDetails,
-        isRegistered: await tokenClient
-          .read("getTokenManager")
-          // attempt to read 'token.getTokenManager'
-          .then(() => true)
-          // which will throw if the token is not registered
-          .catch(() => false),
-      };
+          return {
+            ...remoteTokenDetails,
+            isRegistered: await tokenClient
+              .read("getTokenManager")
+              // attempt to read 'token.getTokenManager'
+              .then(() => true)
+              // which will throw if the token is not registered
+              .catch(() => false),
+          };
+        }
+        case "canonical": {
+          const itsClient =
+            ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+
+          const remoteTokenAddress = await itsClient.read("getTokenAddress", {
+            args: [kvResult.tokenId],
+          });
+
+          console.log({ remoteTokenAddress });
+
+          const tokenClient = ctx.contracts.createInterchainTokenClient(
+            chainConfig,
+            remoteTokenAddress
+          );
+
+          return {
+            ...remoteTokenDetails,
+            tokenAddress: remoteTokenAddress,
+            isRegistered: await tokenClient
+              .read("getTokenManager")
+              // attempt to read 'token.getTokenManager'
+              .then(() => true)
+              // which will throw if the token is not registered
+              .catch(() => false),
+          };
+        }
+      }
     })
   );
 
@@ -161,12 +195,15 @@ async function getInterchainToken(
     // if there are pending remote tokens, mark them as "deployed" if they are now registered
     const newConfirmedRemoteTokens = verifiedRemoteTokens
       .filter((token) => token.isRegistered)
-      .map((t) => kvResult.remoteTokens.find((x) => x.chainId === t.chainId))
-      .filter(Boolean)
-      .map((token) => ({
-        ...(token as RemoteInterchainTokenDetails),
-        status: "deployed" as const,
-      }));
+      .map((t): RemoteInterchainTokenDetails | null => {
+        const match = kvResult.remoteTokens.find(
+          (x) => x.chainId === t.chainId
+        );
+        return match
+          ? { ...match, address: t.tokenAddress, status: "deployed" }
+          : null;
+      })
+      .filter(Boolean) as RemoteInterchainTokenDetails[];
 
     // update the KV store with the new confirmed remote tokens if any
     if (newConfirmedRemoteTokens.length) {
@@ -194,6 +231,7 @@ async function getInterchainToken(
       chainId: chain.id,
       chainName: chain.name,
       axelarChainId: null,
+      kind: null,
     }));
 
   return {

@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { signIn, useSession, type SignInResponse } from "next-auth/react";
 
-import { useAccount } from "wagmi";
+import { watchAccount } from "wagmi/actions";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
@@ -29,14 +29,17 @@ export function useWeb3SignIn({
   onSigninError,
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
-  const { address } = useAccount();
 
   // avoid signing in multiple times
   const isSigningInRef = useRef(false);
 
-  useEffect(() => {
+  watchAccount(({ address }) => {
+    console.log({
+      enabled,
+      address,
+    });
     if (
-      !enabled ||
+      enabled === false ||
       isSigningInRef.current ||
       sessionStatus === "loading" ||
       !address
@@ -63,12 +66,5 @@ export function useWeb3SignIn({
     }
 
     signInWithWeb3();
-  }, [
-    session,
-    address,
-    sessionStatus,
-    enabled,
-    onSigninSuccess,
-    onSigninError,
-  ]);
+  });
 }
