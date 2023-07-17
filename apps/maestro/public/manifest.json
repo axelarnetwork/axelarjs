@@ -1,6 +1,6 @@
 {
-  "short_name": "Interchain Maestro",
-  "name": "Axelar Interchain Maestro",
+  "short_name": "Interchain Token Service",
+  "name": "Axelar Interchain Token Service",
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#050707",

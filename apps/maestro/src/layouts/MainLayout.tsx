@@ -126,7 +126,7 @@ const TestnetBanner = ({ onClose = () => {} }) => (
       >
         ✕
       </Button>
-      <Card.Title>New to Maestro?</Card.Title>
+      <Card.Title>New to the Interchain Token Service?</Card.Title>
       <p>
         Run a few flows in our testnet (with test tokens) and experiment here
         with small amounts first.
