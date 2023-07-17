@@ -1,4 +1,4 @@
-import { Button, Card } from "@axelarjs/ui";
+import { Alert, Dialog } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
 import { useLocalStorageState } from "@axelarjs/utils/react";
 import { useCallback } from "react";
@@ -33,6 +33,10 @@ export default function Home() {
     [chain, router]
   );
 
+  const handleDismissBanner = useCallback(() => {
+    setPersistedState({ showBetaBanner: false });
+  }, [setPersistedState]);
+
   return (
     <Page
       pageTitle="Axelar Interchain Token Service"
@@ -43,20 +47,18 @@ export default function Home() {
       <div className="flex w-full max-w-lg flex-col items-center justify-center">
         {NEXT_PUBLIC_NETWORK_ENV === "testnet" &&
           persistedState.showBetaBanner && (
-            <Card compact className="absolute top-20 w-1/3 bg-slate-200 p-5">
-              <Button
-                shape="square"
-                size="sm"
-                onClick={() => setPersistedState({ showBetaBanner: false })}
-              >
-                x
-              </Button>
-              <Card.Body>
-                You are using the Interchain Token Service Beta in testnet. The
-                app is in active development; further updates and improvements
-                to come!
-              </Card.Body>
-            </Card>
+            <Dialog open onClose={handleDismissBanner} className="bg-warning">
+              <Dialog.Body className="bg-warning text-warning-content">
+                <Dialog.CornerCloseAction onClick={handleDismissBanner} />
+                <Alert status="warning">
+                  <span className="font-semibold">
+                    You are using the Interchain Token Service Beta in testnet.
+                    The app is in active development; further updates and
+                    improvements to come!
+                  </span>
+                </Alert>
+              </Dialog.Body>
+            </Dialog>
           )}
         <SearchInterchainToken onTokenFound={handleTokenFound} />
         <div className="divider">OR</div>
