@@ -15,7 +15,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import React, { useEffect, type FC } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -32,7 +32,6 @@ import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
 } from "~/config/env";
 import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
-import { useSession } from "~/services/auth";
 import { useLayoutStateContainer } from "./MainLayout.state";
 
 export type AppbarProps = {};
@@ -81,10 +80,10 @@ const Appbar: FC<AppbarProps> = () => {
 
   useEffect(() => {
     if (
-      sessionStatus === "success" && // session is loaded
+      sessionStatus !== "loading" && // session is loaded
       address && // and the wallet is connected
-      (!session || // and there is no session
-        session?.address !== address) // or session address is different from connected address
+      (session === null || // and there is no session or
+        session?.address !== address) // the session address is different from connected address
     ) {
       // then sign in with the connected address
       signIn("credentials", { address });
