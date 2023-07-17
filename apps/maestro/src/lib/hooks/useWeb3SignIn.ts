@@ -56,6 +56,7 @@ export function useWeb3SignIn({
 
     async function signInWithWeb3() {
       try {
+        isSigningInRef.current = true;
         const response = await signIn("credentials", { address });
         onSigninSuccess(response);
         isSigningInRef.current = false;
@@ -66,7 +67,6 @@ export function useWeb3SignIn({
       }
     }
 
-    isSigningInRef.current = true;
     signInWithWeb3();
   }, [
     session,
