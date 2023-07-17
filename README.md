@@ -20,6 +20,6 @@ Packages:
 
 Apps:
 
-| app                         | description               |
-| --------------------------- | ------------------------- |
-| 🎼 [maestro](/apps/maestro) | Interchain Maestro Portal |
+| app                         | description                     |
+| --------------------------- | ------------------------------- |
+| 🎼 [maestro](/apps/maestro) | Interchain Token Service Portal |

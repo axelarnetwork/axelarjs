@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <Page
-      pageTitle="Axelar Maestro"
+      pageTitle="Axelar Interchain Token Service"
       pageDescription="Interchain orchestration powered by Axelar"
       className="place-items-center"
       mustBeConnected
@@ -52,8 +52,9 @@ export default function Home() {
                 x
               </Button>
               <Card.Body>
-                You are using Maestro Beta in testnet. The app is in active
-                development; further updates and improvements to come!
+                You are using the Interchain Token Service Beta in testnet. The
+                app is in active development; further updates and improvements
+                to come!
               </Card.Body>
             </Card>
           )}

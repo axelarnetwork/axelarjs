@@ -238,9 +238,9 @@ const MENU_ITEMS: Menuitem[] = [
                   target="_blank"
                 >
                   <span className="text-sm">
-                    Search Axelarscan for any transactions you made through
-                    Maestro. You can filter the transaction view by the address
-                    you used to deploy your tokens.
+                    Search Axelarscan for any transactions you made through the
+                    Interchain Token Service. You can filter the transaction
+                    view by the address you used to deploy your tokens.
                   </span>
                   <ArrowRightIcon />
                 </Link>
