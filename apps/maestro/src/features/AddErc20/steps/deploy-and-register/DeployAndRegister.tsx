@@ -6,6 +6,7 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
+import { invariant } from "@axelarjs/utils";
 import React, {
   useCallback,
   useMemo,
@@ -16,7 +17,8 @@ import React, {
 import Image from "next/image";
 
 import { propEq } from "rambda";
-import invariant from "tiny-invariant";
+import { parseUnits } from "viem";
+import { useAccount, useBalance } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";
@@ -38,7 +40,7 @@ export const Step3: FC = () => {
       onStatusUpdate(txState) {
         if (txState.type === "deployed") {
           rootActions.setTxState(txState);
-          rootActions.nextStep();
+          rootActions.setStep(2);
           actions.setIsDeploying(false);
           return;
         }
@@ -75,6 +77,8 @@ export const Step3: FC = () => {
           destinationChainIds: Array.from(rootState.selectedChains),
           gasFees: state.gasFees,
           sourceChainId: sourceChain.chain_name,
+          cap: BigInt(rootState.tokenDetails.tokenCap),
+          mintTo: rootState.tokenDetails.mintTo,
         },
         {
           onError(error) {
@@ -94,11 +98,13 @@ export const Step3: FC = () => {
       state.evmChains,
       state.network.chain?.id,
       actions,
-      rootState.tokenDetails.tokenDecimals,
+      deployInterchainTokenAsync,
       rootState.tokenDetails.tokenName,
       rootState.tokenDetails.tokenSymbol,
+      rootState.tokenDetails.tokenDecimals,
+      rootState.tokenDetails.tokenCap,
+      rootState.tokenDetails.mintTo,
       rootState.selectedChains,
-      deployInterchainTokenAsync,
     ]
   );
 
@@ -111,6 +117,24 @@ export const Step3: FC = () => {
   );
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);
+
+  const { address } = useAccount();
+
+  const { data: balance } = useBalance({
+    address,
+  });
+
+  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+
+  const hasInsufficientGasBalance = useMemo(() => {
+    if (!balance || !state.gasFees) {
+      return false;
+    }
+
+    const gasFeeBn = parseUnits(state.totalGasFee, balance.decimals);
+
+    return gasFeeBn > balance.value;
+  }, [balance, state.gasFees, state.totalGasFee]);
 
   const buttonChildren = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
@@ -126,24 +150,31 @@ export const Step3: FC = () => {
     if (state.isGasPriceQueryError) {
       return "Failed to load gas prices";
     }
+
+    if (hasInsufficientGasBalance) {
+      return `Insufficient ${nativeTokenSymbol} for gas fees`;
+    }
+
     return (
       <>
         Deploy{" "}
-        {Boolean(state.gasFees?.length) && (
+        {!!state.gasFees?.length && (
           <>
             {state.gasFees?.length && <span>and register</span>}
-            {` on ${state.gasFees?.length} chain${
-              Number(state.gasFees?.length) > 1 ? "s" : ""
+            {` on ${state.gasFees.length + 1} chain${
+              state.gasFees?.length + 1 > 1 ? "s" : ""
             }`}
           </>
         )}
       </>
     );
   }, [
-    state.gasFees?.length,
-    state.isGasPriceQueryError,
+    rootState.txState.type,
     state.isGasPriceQueryLoading,
-    rootState.txState,
+    state.isGasPriceQueryError,
+    state.gasFees,
+    hasInsufficientGasBalance,
+    nativeTokenSymbol,
   ]);
 
   return (
@@ -158,9 +189,7 @@ export const Step3: FC = () => {
                 <Tooltip tip="Approximate gas cost">
                   <span className="ml-2 whitespace-nowrap text-xs">
                     (≈ {state.totalGasFee}{" "}
-                    {state?.sourceChainId &&
-                      getNativeToken(state.sourceChainId)}{" "}
-                    in fees)
+                    {state?.sourceChainId && nativeTokenSymbol} in fees)
                   </span>
                 </Tooltip>
               </Label.AltText>
@@ -210,7 +239,11 @@ export const Step3: FC = () => {
             rootState.txState.type === "pending_approval" ||
             rootState.txState.type === "deploying"
           }
-          disabled={state.isGasPriceQueryLoading || state.isGasPriceQueryError}
+          disabled={
+            state.isGasPriceQueryLoading ||
+            state.isGasPriceQueryError ||
+            hasInsufficientGasBalance
+          }
           onClick={() => formSubmitRef.current?.click()}
         >
           <span>{buttonChildren}</span>

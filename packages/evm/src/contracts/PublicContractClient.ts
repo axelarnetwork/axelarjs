@@ -36,21 +36,21 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     });
 
     this.abi = (options?.abi ?? []) as TAbi;
-    this.address = (options?.address ?? "0x123") as `0x${string}`;
+    this.address = options?.address as `0x${string}`;
     this.chain = options?.chain ?? mainnet;
   }
 
-  public readContract<
-    TMethod extends ReadContractParameters<TAbi>["functionName"]
+  public read<
+    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
   >(
-    method: TMethod,
+    functionName: TFunctionName,
     params?: Omit<
-      ReadContractParameters<TAbi, TMethod>,
+      ReadContractParameters<TAbi, TFunctionName>,
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
     }
-  ): Promise<ContractFunctionResult<TAbi, TMethod>> {
+  ): Promise<ContractFunctionResult<TAbi, TFunctionName>> {
     const address = params?.address ?? this.address;
 
     if (!address) {
@@ -60,8 +60,8 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     const contractParams = {
       address,
       abi: this.abi,
-      functionName: method,
-    } as ReadContractParameters<TAbi, TMethod>;
+      functionName,
+    } as ReadContractParameters<TAbi, TFunctionName>;
 
     if (params?.args) {
       contractParams["args"] = params.args;
@@ -70,12 +70,12 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     return this.client.readContract(contractParams);
   }
 
-  public writeContract<
-    TMethod extends ReadContractParameters<TAbi>["functionName"]
+  public write<
+    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
   >(
-    method: TMethod,
+    functionName: TFunctionName,
     params?: Omit<
-      WriteContractParameters<TAbi, TMethod>,
+      WriteContractParameters<TAbi, TFunctionName>,
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
@@ -90,8 +90,8 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     const contractParams = {
       address,
       abi: this.abi,
-      functionName: method,
-    } as WriteContractParameters<TAbi, TMethod, undefined>;
+      functionName: functionName,
+    } as WriteContractParameters<TAbi, TFunctionName, undefined>;
 
     if (params?.args) {
       contractParams["args"] = params.args;

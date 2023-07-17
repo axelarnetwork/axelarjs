@@ -1,6 +1,6 @@
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 
-import type { TransactionState } from "~/lib/hooks/useTransaction";
+import type { TransactionState } from "~/lib/hooks/useTransactionState";
 
 export type InterchainTokenAction =
   | "mint"

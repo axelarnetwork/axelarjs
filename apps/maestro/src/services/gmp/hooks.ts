@@ -2,7 +2,6 @@ import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { uniq } from "rambda";
 import { isAddress } from "viem";
 import { useQuery } from "wagmi";
 
@@ -24,7 +23,7 @@ export function useContractsQuery() {
 export function useInterchainTokensQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
-  chainIds?: number[];
+  strict?: boolean;
 }) {
   const {
     data: evmChains,
@@ -32,18 +31,15 @@ export function useInterchainTokensQuery(input: {
     ...evmChainsQuery
   } = useEVMChainConfigsQuery();
 
-  const uniqueChainsIDs = uniq(evmChains?.map?.((x) => x.chain_id) ?? []);
-
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(
       {
         chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
         tokenAddress: input.tokenAddress as `0x${string}`,
+        strict: input.strict,
       },
       {
-        enabled:
-          isAddress(input.tokenAddress ?? "") &&
-          Boolean(input.chainIds?.length || uniqueChainsIDs.length),
+        enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
         retry: false,
         refetchOnWindowFocus: false,
       }
@@ -55,12 +51,14 @@ export function useInterchainTokensQuery(input: {
       ...data,
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
-        chain: computed.indexedByChainId[String(token.chainId)],
+        chain: computed.indexedByChainId[token.chainId],
         wagmiConfig: computed.wagmiChains?.find(
           (x) => x?.id === Number(token.chainId)
         ),
       })),
-      chain: computed.indexedByChainId[String(input.chainId)],
+      chain: Maybe.of(input.chainId).mapOrUndefined(
+        (x) => computed.indexedByChainId[x]
+      ),
       wagmiConfig: computed.wagmiChains?.find(
         (x) => x?.id === Number(input.chainId)
       ),

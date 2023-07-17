@@ -1,7 +1,21 @@
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
+import { z } from "zod";
+
+import { numericString } from "~/lib/utils/schemas";
+
+const TOKEN_DETAILS_FORM_SCHEMA = z.object({
+  tokenName: z.string().min(1).max(32),
+  tokenSymbol: z.string().min(1).max(11),
+  tokenDecimals: z.coerce.number().min(1).max(18),
+  tokenCap: numericString(),
+});
+
+export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -27,6 +41,8 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
+    tokenCap: "0",
+    mintTo: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
@@ -59,6 +75,7 @@ function useAddErc20State(
       if (!partialInitialState.tokenDetails?.tokenAddress) {
         return;
       }
+      console.log("fioioioasdasd");
       setState((draft) => {
         draft.step = partialInitialState.step ?? draft.step;
         draft.tokenDetails = {
@@ -71,17 +88,26 @@ function useAddErc20State(
     [partialInitialState.tokenDetails]
   );
 
+  const tokenDetailsForm = useForm<TokenDetailsFormState>({
+    resolver: zodResolver(TOKEN_DETAILS_FORM_SCHEMA),
+    defaultValues: state.tokenDetails,
+  });
+
   return {
     state: {
       ...state,
       // computed state
       isPreExistingToken: Boolean(state.tokenDetails.tokenAddress),
       selectedChains: uniq(state.selectedChains),
+      tokenDetailsForm,
     },
     actions: {
       reset: () => {
         setState((draft) => {
           Object.assign(draft, initialState);
+
+          // reset form
+          tokenDetailsForm.reset(initialState.tokenDetails);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {
@@ -112,6 +138,11 @@ function useAddErc20State(
           } else {
             draft.selectedChains.push(item);
           }
+        });
+      },
+      setStep: (step: number) => {
+        setState((draft) => {
+          draft.step = step;
         });
       },
       nextStep: () => setState((draft) => draft.step++),

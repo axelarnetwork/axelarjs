@@ -9,5 +9,6 @@
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
-  }
+  },
+  "ignorePatterns": ["scripts/*.cjs"]
 }

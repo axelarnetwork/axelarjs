@@ -24,3 +24,16 @@ export const maskAddress = (
   `${address.slice(0, opts?.segmentA ?? 6)}...${address.slice(
     opts?.segmentB ?? -4
   )}`;
+
+export function generateRandomHash(): `0x${string}` {
+  const bytes = new Uint8Array(8);
+  window.crypto.getRandomValues(bytes);
+
+  let hash = "";
+  for (let byte of bytes) {
+    const hex = byte.toString(16).padStart(2, "0");
+    hash += hex;
+  }
+
+  return `0x${hash}`;
+}

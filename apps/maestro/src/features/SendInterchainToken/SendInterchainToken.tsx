@@ -7,16 +7,17 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
+import { invariant } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import invariant from "tiny-invariant";
 import { formatUnits, parseUnits } from "viem";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { logger } from "~/lib/logger";
+import { preventNonNumericInput } from "~/lib/utils/validation";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
@@ -31,20 +32,9 @@ type Props = {
   onClose?: () => void;
   balance: {
     tokenBalance: string;
-    decimals: string | number;
+    decimals: string | number | null;
   };
 };
-
-const ALLOWED_NON_NUMERIC_KEYS = [
-  "Backspace",
-  "Delete",
-  "Tab",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "ArrowDown",
-  "Enter",
-];
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const [state, actions] = useSendInterchainTokenState({
@@ -161,6 +151,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               compact
               selectedChain={props.sourceChain}
             />
+            {props.sourceChain.chain_name}
           </div>
           <div className="flex items-center gap-2">
             <label className="text-md align-top">To:</label>
@@ -178,6 +169,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               }}
               contentClassName="translate-x-20"
             />
+            {state.selectedToChain?.chain_name}
           </div>
         </div>
 
@@ -220,17 +212,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               placeholder="Enter your amount to send"
               className="bg-base-200"
               min={0}
-              onKeyDown={(e) => {
-                // prevent non-numeric characters
-                if (
-                  // allow backspace, delete, tab, arrow keys, enter
-                  !ALLOWED_NON_NUMERIC_KEYS.includes(e.key) &&
-                  // is not numeric
-                  !/^[0-9.]+$/.test(e.key)
-                ) {
-                  e.preventDefault();
-                }
-              }}
+              onKeyDown={preventNonNumericInput}
               {...register("amountToSend", {
                 disabled: isFormDisabled,
                 validate(value) {
@@ -259,6 +241,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 await actions.refetchBalances();
                 resetForm();
                 actions.setTxState({ status: "idle" });
+                actions.setIsModalOpen(false);
                 toast.success("Tokens sent successfully!");
               }}
             />

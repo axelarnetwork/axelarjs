@@ -81,3 +81,23 @@ module.exports = {
   // ...
 };
 ```
+
+### Scripts
+
+The following scripts are available in the project:
+
+- `dev`: Starts the development server using `vite`.
+- `build`: Builds the production version of the app using `vite`.
+- `lint`: Runs `eslint` to check for linting errors.
+- `test`: Runs unit tests using `vitest`.
+- `test:watch`: Runs unit tests in watch mode using `vitest`.
+- `storybook`: Starts the Storybook development server.
+- `build-storybook`: Builds the Storybook production version.
+- `test:e2e`: Runs end-to-end tests using `zx`.
+- `test:e2e:watch`: Runs end-to-end tests in watch mode using `zx`.
+- `test:e2e:debug`: Runs end-to-end tests in debug mode using `zx`.
+- `test:e2e:debug-watch`: Runs end-to-end tests in debug mode with watch mode enabled using `zx`.
+- `test:e2e:ci`: Runs end-to-end tests in a continuous integration environment using `zx`.
+- `format`: Formats the code using `prettier`.
+- `format:check`: Checks the code formatting using `prettier`.
+- `lint-staged`: Runs `eslint` and `prettier` on staged files using `husky` and `lint-staged`.

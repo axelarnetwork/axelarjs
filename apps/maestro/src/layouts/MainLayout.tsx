@@ -12,9 +12,13 @@ import Link from "next/link";
 
 import { Web3Modal } from "@web3modal/react";
 
-import { NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID } from "~/config/env";
+import {
+  NEXT_PUBLIC_NETWORK_ENV,
+  NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+} from "~/config/env";
 import { ethereumClient } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
+import { useWeb3SignIn } from "~/lib/hooks/useWeb3SignIn";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -32,8 +36,15 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const defaultChain = useChainFromRoute();
 
   const shouldRenderTestnetBanner =
-    process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet" &&
-    !isTestnetBannerDismissed;
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" && !isTestnetBannerDismissed;
+
+  useWeb3SignIn({
+    onSigninSuccess() {
+      if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet") {
+        console.log("session initiated");
+      }
+    },
+  });
 
   return (
     <>
@@ -45,7 +56,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             {children}
           </Clamp>
           <Footer
-            className="bg-neutral text-neutral-content relative p-6 md:p-8 xl:p-10"
+            className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
             center={true}
           >
             <div className="flex items-center text-sm">
@@ -115,7 +126,7 @@ const TestnetBanner = ({ onClose = () => {} }) => (
       >
         ✕
       </Button>
-      <Card.Title>New to Maestro?</Card.Title>
+      <Card.Title>New to the Interchain Token Service?</Card.Title>
       <p>
         Run a few flows in our testnet (with test tokens) and experiment here
         with small amounts first.

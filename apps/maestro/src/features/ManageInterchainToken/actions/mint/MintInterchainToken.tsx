@@ -6,30 +6,20 @@ import {
   TextInput,
   toast,
 } from "@axelarjs/ui";
+import { invariant } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import invariant from "tiny-invariant";
 import { TransactionExecutionError } from "viem";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { logger } from "~/lib/logger";
+import { preventNonNumericInput } from "~/lib/utils/validation";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
   amountToMint: string;
 };
-
-const ALLOWED_NON_NUMERIC_KEYS = [
-  "Backspace",
-  "Delete",
-  "Tab",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowUp",
-  "ArrowDown",
-  "Enter",
-];
 
 export const MintInterchainToken: FC = () => {
   const { register, handleSubmit, formState } = useForm<FormState>({
@@ -120,17 +110,7 @@ export const MintInterchainToken: FC = () => {
             placeholder="Enter your amount to mint"
             min={0}
             className="bg-base-200"
-            onKeyDown={(e) => {
-              // prevent non-numeric characters
-              if (
-                // allow backspace, delete, tab, arrow keys, enter
-                !ALLOWED_NON_NUMERIC_KEYS.includes(e.key) &&
-                // is not numeric
-                !/^[0-9.]+$/.test(e.key)
-              ) {
-                e.preventDefault();
-              }
-            }}
+            onKeyDown={preventNonNumericInput}
             {...register("amountToMint", {
               disabled: isMinting,
               validate(value) {

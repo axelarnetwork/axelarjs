@@ -8,7 +8,7 @@
  * @see https://trpc.io/docs/v10/procedures
  */
 
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { OpenApiMeta } from "trpc-openapi";
 
@@ -41,6 +41,20 @@ export const router = t.router;
  * @see https://trpc.io/docs/v10/procedures
  **/
 export const publicProcedure = t.procedure;
+
+/**
+ * Create a protected procedure
+ * @see https://trpc.io/docs/v10/procedures
+ **/
+export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
+  if (!ctx.session) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You must be logged in to perform this action",
+    });
+  }
+  return next();
+});
 
 /**
  * @see https://trpc.io/docs/v10/middlewares

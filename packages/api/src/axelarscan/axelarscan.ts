@@ -1,3 +1,5 @@
+import { partition } from "rambda";
+
 import { HTTPClient, Options } from "../HTTPClient";
 import {
   AxelarAssetPrice,
@@ -25,10 +27,7 @@ export type GetAssetsResponse = AxelarScanAsset[];
 
 export type GetAssetsPriceResponse = AxelarAssetPrice[];
 
-export type GetChainConfigsResponse = {
-  evm: EVMChainConfig[];
-  cosmos: CosmosChainConfig[];
-};
+export type GetChainConfigsResponse = (EVMChainConfig | CosmosChainConfig)[];
 
 export class AxelarscanClient extends HTTPClient {
   static init(options: Options) {
@@ -78,18 +77,18 @@ export class AxelarscanClient extends HTTPClient {
       path: null,
     };
 
-    const { evm, cosmos, ...result } = await this.client
-      .post("", { json })
-      .json<GetChainConfigsResponse>();
+    const [evm, cosmos] = partition(
+      (c) => c.chain_type === "evm",
+      await this.client.post("", { json }).json<GetChainConfigsResponse>()
+    );
 
     const isEligible = (a: EVMChainConfig | CosmosChainConfig) =>
-      (!a?.is_staging || params.isStaging) &&
+      (!a?.deprecated || params.isStaging) &&
       !params.disabledChains?.includes(a.id);
 
     return {
-      ...result,
-      evm: evm.filter(isEligible),
-      cosmos: cosmos.filter(isEligible),
+      evm: evm.filter(isEligible) as EVMChainConfig[],
+      cosmos: cosmos.filter(isEligible) as CosmosChainConfig[],
     };
   }
 }

@@ -189,7 +189,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 <div>
                   Balance:{" "}
                   <BigNumberText
-                    decimals={balance.decimals}
+                    decimals={balance.decimals ?? 0}
                     localeOptions={{
                       minimumFractionDigits: 0,
                       notation: "compact",

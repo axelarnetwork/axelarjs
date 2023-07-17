@@ -1,16 +1,17 @@
 import { TRPCError } from "@trpc/server";
+import { always } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64 } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
 export const getERC20TokenBalanceForOwner = publicProcedure
   .input(
     z.object({
       chainId: z.number(),
-      tokenAddress: hex64(),
-      owner: hex64(),
+      tokenAddress: hex40Literal(),
+      owner: hex40Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
@@ -28,19 +29,24 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     try {
       const client = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress as `0x${string}`
+        input.tokenAddress
       );
 
-      const [tokenBalance, decimals] = await Promise.all([
-        client.readContract("balanceOf", {
-          args: [input.owner as `0x$${string}`],
+      const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
+        client.read("balanceOf", {
+          args: [input.owner],
         }),
-        client.readContract("decimals"),
+        client.read("decimals"),
+        client.read("owner").catch(always(null)),
+        client.read("pendingOwner").catch(always(null)),
       ]);
 
       return {
         tokenBalance: tokenBalance.toString(),
         decimals,
+        isTokenOwner: owner === input.owner,
+        isTokenPendingOwner: pendingOwner === input.owner,
+        hasPendingOwner: pendingOwner !== null,
       };
     } catch (error) {
       // If we get a TRPC error, we throw it

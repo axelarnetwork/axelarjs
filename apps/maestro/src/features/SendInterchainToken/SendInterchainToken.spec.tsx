@@ -1,3 +1,5 @@
+import type { EVMChainConfig } from "@axelarjs/api";
+
 import { render } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -5,14 +7,12 @@ import { setupWithUserEvent } from "~/lib/utils/tests";
 import SendInterchainToken from "./SendInterchainToken";
 import type { Actions, State } from "./SendInterchainToken.state";
 
-const MOCK_EVM_CHAIN_CONFIG = {
+const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
   id: "1",
   maintainer_id: "maintainer_1",
   chain_name: "Ethereum",
   name: "Ethereum Mainnet",
-  short_name: "ETH",
   chain_id: 1,
-  is_staging: false,
   provider_params: [
     {
       chainId: "0x1",
@@ -38,10 +38,19 @@ const MOCK_EVM_CHAIN_CONFIG = {
   },
   image: "ethereum-logo.png",
   color: "#3C3C3D",
-  website: "https://ethereum.org/",
   gateway_address: "0x123456789",
   deprecated: false,
   no_inflation: true,
+  chain_type: "evm",
+  endpoints: {
+    rpc: ["https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"],
+  },
+  native_token: {
+    name: "Ether",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  no_tvl: true,
 };
 
 const mocks = {

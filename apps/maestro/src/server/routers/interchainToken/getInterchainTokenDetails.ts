@@ -1,96 +1,34 @@
-import type { InterchainTokenClient } from "@axelarjs/evm";
-
-import { TRPCError } from "@trpc/server";
-import { always } from "rambda";
-import invariant from "tiny-invariant";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex64 } from "~/lib/utils/schemas";
-import { publicProcedure } from "~/server/trpc";
+import { hex40Literal } from "~/lib/utils/schemas";
+import { protectedProcedure } from "~/server/trpc";
+import type { IntercahinTokenDetails } from "~/services/kv";
 
-export const getInterchainTokenDetails = publicProcedure
+export const getInterchainTokenDetails = protectedProcedure
   .input(
     z.object({
-      chainId: z.number().optional(),
-      tokenAddress: hex64(),
+      chainId: z.number(),
+      tokenAddress: hex40Literal(),
     })
   )
   .query(async ({ input, ctx }) => {
-    try {
-      const chainConfig = EVM_CHAIN_CONFIGS.find(
-        (chain) => chain.id === input.chainId
+    console.log("getInterchainTokenDetails", { input });
+    const kvResult = await ctx.storage.kv.getInterchainTokenDetails({
+      chainId: input.chainId,
+      tokenAddress: input.tokenAddress,
+    });
+
+    if (!kvResult) {
+      throw new Error(
+        `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`
       );
-
-      if (!chainConfig) {
-        // scan all chains
-        for (const chainConfig of EVM_CHAIN_CONFIGS) {
-          const client = ctx.contracts.createInterchainTokenClient(
-            chainConfig,
-            input.tokenAddress as `0x${string}`
-          );
-
-          try {
-            const details = await getTokenPublicDetails(client);
-
-            if (details) {
-              return details;
-            }
-            // continue scanning
-          } catch (error) {
-            console.log(
-              `Token ${input.tokenAddress} not deployed on ${chainConfig.name}`
-            );
-
-            if (error instanceof Error) {
-              console.log(error.message);
-            }
-          }
-        }
-
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid chainId",
-        });
-      }
-
-      const client = ctx.contracts.createInterchainTokenClient(
-        chainConfig,
-        input.tokenAddress as `0x${string}`
-      );
-
-      return getTokenPublicDetails(client);
-    } catch (error) {
-      // If we get a TRPC error, we throw it
-      if (error instanceof TRPCError) {
-        throw error;
-      }
-      // otherwise, we throw an internal server error
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to get Interchaintoken details for ${input.tokenAddress} on ${input.chainId}`,
-      });
     }
+
+    if (kvResult.deployerAddress !== ctx.session?.address) {
+      throw new Error(
+        `Invalid deployer address for interchain token ${input.tokenAddress} on chain ${input.chainId}`
+      );
+    }
+
+    return kvResult as IntercahinTokenDetails;
   });
-
-async function getTokenPublicDetails(client: InterchainTokenClient) {
-  invariant(client.chain, "client.chain must be defined");
-
-  const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
-    client.readContract("name"),
-    client.readContract("symbol"),
-    client.readContract("decimals"),
-    client.readContract("owner").catch(always(null)),
-    client.readContract("pendingOwner").catch(always(null)),
-  ]);
-
-  return {
-    chainId: client.chain.id,
-    chainName: client.chain.name,
-    name,
-    symbol,
-    decimals,
-    owner,
-    pendingOwner,
-  };
-}

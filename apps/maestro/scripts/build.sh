@@ -1,0 +1,2 @@
+pnpm sync
+next build

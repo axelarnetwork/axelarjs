@@ -33,7 +33,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
   const selectedTokens = tokens.filter((x) => x.isSelected);
 
   return (
-    <section className="relative grid gap-4">
+    <section className="grid gap-4">
       <header className="flex items-center justify-between gap-2 text-2xl">
         <div className="flex items-center gap-2">
           <span className="font-bold">{props.title}</span>
