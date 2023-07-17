@@ -29,6 +29,7 @@ export type DialogTriggerProps =
 
 export type DialogProps = ComponentProps<typeof StyledDialog> & {
   defaultOpen?: boolean;
+  onClose?: () => void;
 } & DialogTriggerProps;
 
 const DialogRoot: FC<DialogProps> = (props) => {
@@ -67,7 +68,14 @@ const DialogRoot: FC<DialogProps> = (props) => {
   return (
     <>
       {trigger}
-      <StyledDialog ref={dialogRef} open={state.isOpen} onClose={actions.close}>
+      <StyledDialog
+        ref={dialogRef}
+        open={state.isOpen}
+        onClose={() => {
+          actions.close();
+          props.onClose?.();
+        }}
+      >
         {state.isOpen && <div className="modal-backdrop bg-base-300/50" />}
         {props.children}
       </StyledDialog>

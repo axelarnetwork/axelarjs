@@ -5,14 +5,14 @@ import {
   TokenManagerClient,
 } from "@axelarjs/evm";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
+import { getServerSession, type AuthOptions } from "next-auth";
 
 import type { inferAsyncReturnType } from "@trpc/server";
 import { kv } from "@vercel/kv";
 import type { Chain } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
-import nextAuth from "~/config/next-auth";
+import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
 import gmpClient from "~/services/gmp";
@@ -24,9 +24,11 @@ type ContextConfig = {
 };
 
 const createContextInner = async ({ req, res }: ContextConfig) => {
-  const session = await getServerSession(req, res, nextAuth);
-
-  console.log({ session });
+  const session = await getServerSession<AuthOptions, Web3Session>(
+    req,
+    res,
+    NEXT_AUTH_OPTIONS
+  );
 
   return {
     req,
@@ -36,6 +38,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       gmp: gmpClient,
       axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
+    },
+    storage: {
       kv: new MaestroKVClient(kv),
     },
     contracts: {

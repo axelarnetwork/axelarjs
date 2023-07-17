@@ -1,23 +1,13 @@
 import { Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
 import { useRef, type FC } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
-import { useAddErc20StateContainer } from "~/features/AddErc20";
-import { numericString } from "~/lib/utils/schemas";
+import {
+  useAddErc20StateContainer,
+  type TokenDetailsFormState,
+} from "~/features/AddErc20";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
-
-const formSchema = z.object({
-  tokenName: z.string().min(1).max(32),
-  tokenSymbol: z.string().min(1).max(11),
-  tokenDecimals: z.coerce.number().min(1).max(18),
-  tokenCap: numericString(),
-});
-
-type FormState = z.infer<typeof formSchema>;
 
 const FormInput = {
   ...TextInput,
@@ -31,15 +21,12 @@ const FormInput = {
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
 
-  const { register, handleSubmit, formState } = useForm<FormState>({
-    resolver: zodResolver(formSchema),
-    defaultValues: state.tokenDetails,
-  });
+  const { register, handleSubmit, formState } = state.tokenDetailsForm;
 
   // this is only required because the form and actions are sibling elements
   const formSubmitRef = useRef<HTMLButtonElement>(null);
 
-  const submitHandler: SubmitHandler<FormState> = (data, e) => {
+  const submitHandler: SubmitHandler<TokenDetailsFormState> = (data, e) => {
     e?.preventDefault();
 
     actions.setTokenDetails({

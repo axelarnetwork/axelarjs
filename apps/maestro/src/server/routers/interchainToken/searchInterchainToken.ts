@@ -170,7 +170,7 @@ async function getInterchainToken(
 
     // update the KV store with the new confirmed remote tokens if any
     if (newConfirmedRemoteTokens.length) {
-      await ctx.services.kv.recordRemoteTokensDeployment(
+      await ctx.storage.kv.recordRemoteTokensDeployment(
         {
           chainId: kvResult.originChainId,
           tokenAddress: kvResult.tokenAddress,
@@ -216,7 +216,7 @@ async function scanChains(
   let result: Awaited<ReturnType<typeof getInterchainToken>> | null = null;
 
   for (const chainConfig of chainConfigs) {
-    const kvEntry = await ctx.services.kv.getInterchainTokenDetails({
+    const kvEntry = await ctx.storage.kv.getInterchainTokenDetails({
       chainId: chainConfig.id,
       tokenAddress: tokenAddress,
     });

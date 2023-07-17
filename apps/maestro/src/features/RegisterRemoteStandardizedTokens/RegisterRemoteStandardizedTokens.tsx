@@ -87,11 +87,8 @@ export const RegisterRemoteStandardizedTokens: FC<Props> = ({
   );
 
   useEffect(() => {
-    if (pendingChains) {
-      console.log(`Pending registration on ${pendingChains.length} chains`);
-      if (pendingChains.length === 0) {
-        toast.success("Remote tokens registered");
-      }
+    if (pendingChains && pendingChains.length === 0) {
+      toast.success("Remote tokens registered");
     }
   }, [pendingChains]);
 

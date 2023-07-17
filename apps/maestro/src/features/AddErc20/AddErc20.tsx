@@ -62,6 +62,7 @@ const AddErc20: FC<AddErc20Props> = () => {
 
   return (
     <Dialog
+      onClose={actions.reset}
       renderTrigger={(props) => (
         <Button
           {...props}
@@ -74,7 +75,7 @@ const AddErc20: FC<AddErc20Props> = () => {
       )}
     >
       <Dialog.Body $as="section">
-        <Dialog.CornerCloseAction />
+        <Dialog.CornerCloseAction onClick={actions.reset} />
         <Dialog.Title className="flex items-center gap-1 sm:gap-2">
           {showBackButton && (
             <PrevButton

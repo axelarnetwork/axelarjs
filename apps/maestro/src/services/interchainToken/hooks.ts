@@ -7,18 +7,14 @@ import { trpc } from "~/lib/trpc";
 export function useInterchainTokenDetailsQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
-  deployerAddress?: `0x${string}`;
 }) {
   return trpc.interchainToken.getInterchainTokenDetails.useQuery(
     {
       chainId: Maybe.of(input.chainId).mapOr(0, Number),
       tokenAddress: String(input.tokenAddress),
-      deployerAddress: String(input.deployerAddress),
     },
     {
-      enabled:
-        isAddress(input.tokenAddress ?? "") &&
-        isAddress(input.deployerAddress ?? ""),
+      enabled: isAddress(input.tokenAddress ?? ""),
       staleTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,
     }

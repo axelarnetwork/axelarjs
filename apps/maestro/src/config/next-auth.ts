@@ -1,20 +1,18 @@
-import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { getAddress } from "viem";
 
-// augment next-auth's User & Session types
+export type Web3Session = {
+  address: `0x${string}`;
+};
 
+// augments the default session type
 declare module "next-auth" {
-  export interface User {
-    id: `0x${string}`;
-  }
-  export interface Session {
-    address: `0x${string}`;
-  }
+  interface Session extends Web3Session {}
 }
 
-export default NextAuth({
+export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -43,16 +41,15 @@ export default NextAuth({
   },
   callbacks: {
     async session({ session, token }) {
-      // @ts-ignore
-      session["address"] = token.sub;
+      session.address = token.sub as `0x${string}`;
       return session;
     },
   },
-  secret: process.env.NEXT_PUBLIC_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
     signOut: "/",
     error: "/",
     newUser: "/",
   },
-});
+};
