@@ -31,7 +31,6 @@ import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
 } from "~/config/env";
 import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
-import { useWeb3SignIn } from "~/lib/hooks/useWeb3SignIn";
 import { useLayoutStateContainer } from "./MainLayout.state";
 
 export type AppbarProps = {};
@@ -75,8 +74,6 @@ const Appbar: FC<AppbarProps> = () => {
       </Button>
     </>
   ) : null;
-
-  useWeb3SignIn();
 
   useEffect(
     () => {

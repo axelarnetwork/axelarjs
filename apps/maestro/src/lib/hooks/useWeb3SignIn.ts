@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
-import { signIn, SignInResponse, useSession } from "next-auth/react";
+import { signIn, useSession, type SignInResponse } from "next-auth/react";
 
 import { useAccount } from "wagmi";
 
 export type UseWeb3SignInOptions = {
-  enabled: boolean;
-  onSigninSuccess: (response?: SignInResponse) => void;
-  onSigninError: (error: Error) => void;
+  enabled?: boolean;
+  onSigninSuccess?: (response?: SignInResponse) => void;
+  onSigninError?: (error: Error) => void;
 };
 
 const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
@@ -31,26 +31,21 @@ export function useWeb3SignIn({
   const { data: session, status: sessionStatus } = useSession();
   const { address } = useAccount();
 
+  // avoid signing in multiple times
   const isSigningInRef = useRef(false);
 
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    if (sessionStatus === "loading") {
-      return;
-    }
-
-    if (!address) {
+    if (
+      !enabled ||
+      isSigningInRef.current ||
+      sessionStatus === "loading" ||
+      !address
+    ) {
       return;
     }
 
     if (session?.address === address) {
-      return;
-    }
-
-    if (isSigningInRef.current) {
+      // User is already signed in with the same address
       return;
     }
 
@@ -58,11 +53,11 @@ export function useWeb3SignIn({
       try {
         isSigningInRef.current = true;
         const response = await signIn("credentials", { address });
-        onSigninSuccess(response);
+        onSigninSuccess?.(response);
         isSigningInRef.current = false;
       } catch (error) {
         if (error instanceof Error) {
-          onSigninError(error);
+          onSigninError?.(error);
         }
       }
     }
