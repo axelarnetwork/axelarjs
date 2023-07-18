@@ -27,6 +27,7 @@ type FormState = {
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
+  tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
@@ -39,6 +40,7 @@ type Props = {
 export const SendInterchainToken: FC<Props> = (props) => {
   const [state, actions] = useSendInterchainTokenState({
     tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
     sourceChain: props.sourceChain,
     isModalOpen: props.isOpen,
   });

@@ -220,6 +220,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                           </Button>
                         }
                         tokenAddress={props.tokenAddress}
+                        tokenId={props.tokenId}
                         sourceChain={props.chain as EVMChainConfig}
                         balance={balance}
                       />

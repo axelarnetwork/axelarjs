@@ -9,6 +9,7 @@ import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMu
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
+  tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
   isModalOpen?: boolean;
 }) {
@@ -40,9 +41,17 @@ export function useSendInterchainTokenState(props: {
     [toChainId, eligibleTargetChains]
   );
 
+  // const { mutateAsync: sendTokenAsync, isLoading: isSending } =
+  //   useSendInterchainTokenMutation({
+  //     tokenAddress: props.tokenAddress,
+  //     destinationChainId: selectedToChain?.id,
+  //     sourceChainId: props.sourceChain.id,
+  //   });
+
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
       tokenAddress: props.tokenAddress,
+      tokenId: props.tokenId,
       destinationChainId: selectedToChain?.id,
       sourceChainId: props.sourceChain.id,
     });
