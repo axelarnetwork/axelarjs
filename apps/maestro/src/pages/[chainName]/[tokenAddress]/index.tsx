@@ -8,33 +8,31 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
-import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
+import { invariant, maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
 import { ExternalLink, InfoIcon } from "lucide-react";
 import { partition, without } from "rambda";
 import { isAddress, TransactionExecutionError } from "viem";
-import {
-  useAccount,
-  useNetwork,
-  useSwitchNetwork,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
+import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
+import { RegisterRemoteCanonicalTokens } from "~/features/RegisterRemoteCanonicalTokens/RegisterRemoteCanonicalTokens";
 import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
-import { useInterchainTokenServiceRegisterCanonicalToken } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
   useGetTransactionStatusOnDestinationChainsQuery,
@@ -84,11 +82,14 @@ const InterchainTokensPage = () => {
           tokenId={interchainToken?.tokenId as `0x${string}`}
         />
       )}
-      {routeChain && (
+      {routeChain && tokenDetails && (
         <>
           <ConnectedInterchainTokensPage
             chainId={routeChain?.id}
             tokenAddress={tokenAddress}
+            tokenName={tokenDetails.name}
+            tokenSymbol={tokenDetails.symbol}
+            decimals={tokenDetails.decimals}
           />
         </>
       )}
@@ -101,46 +102,67 @@ export default InterchainTokensPage;
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
   tokenAddress: `0x${string}`;
+  tokenName: string;
+  tokenSymbol: string;
+  decimals: number;
 };
 
 const RegisterOriginTokenButton = ({
   address = "0x0" as `0x${string}`,
+  tokenName = "",
+  tokenSymbol = "",
+  decimals = -1,
   chainName = "Axelar",
   onSuccess = () => {},
 }) => {
   const [txState, setTxState] = useTransactionState();
+  const { chain } = useNetwork();
 
-  const { writeAsync, data } = useInterchainTokenServiceRegisterCanonicalToken({
-    value: BigInt(0),
-  });
+  const { computed } = useEVMChainConfigsQuery();
 
-  useWaitForTransaction({
-    hash: data?.hash,
-    confirmations: 8,
-    async onSuccess(receipt) {
-      onSuccess();
+  const sourceChain = useMemo(
+    () => (chain ? computed.indexedByChainId[chain.id] : undefined),
+    [chain, computed]
+  );
 
-      setTxState({
-        status: "confirmed",
-        receipt,
-      });
+  const { mutateAsync: registerCanonicalToken } =
+    useRegisterCanonicalTokenMutation({
+      onStatusUpdate(message) {
+        if (message.type === "deployed") {
+          onSuccess();
+        }
+      },
+    });
 
-      toast.success("Token registered successfully");
-    },
-  });
+  const { data: expectedTokenId } =
+    useInterchainTokenServiceGetCanonicalTokenId({
+      args: [address],
+    });
 
   const handleSubmitTransaction = useCallback(async () => {
+    if (!expectedTokenId) return;
     setTxState({
       status: "awaiting_approval",
     });
 
-    try {
-      const result = await writeAsync({ args: [address] });
+    invariant(sourceChain, "Source chain is not defined");
 
-      setTxState({
-        status: "submitted",
-        hash: result.hash,
+    try {
+      const txHash = await registerCanonicalToken({
+        tokenAddress: address,
+        sourceChainId: sourceChain?.id,
+        expectedTokenId,
+        tokenName,
+        tokenSymbol,
+        decimals,
       });
+
+      if (txHash) {
+        setTxState({
+          status: "submitted",
+          hash: txHash,
+        });
+      }
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
@@ -156,7 +178,16 @@ const RegisterOriginTokenButton = ({
         error: error as Error,
       });
     }
-  }, [address, setTxState, writeAsync]);
+  }, [
+    expectedTokenId,
+    setTxState,
+    sourceChain,
+    registerCanonicalToken,
+    address,
+    tokenName,
+    tokenSymbol,
+    decimals,
+  ]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
@@ -258,7 +289,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       setSelectedChainIds([]);
       setDeployTokensTxHash(undefined);
 
-      console.log("deployedTokens", deployedTokens);
       refetch();
     }
   }, [
@@ -286,6 +316,15 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const { switchNetworkAsync } = useSwitchNetwork();
 
+  const RegisterRemoteTokens = useMemo(() => {
+    switch (originToken?.kind) {
+      case "canonical":
+        return RegisterRemoteCanonicalTokens;
+      case "standardized":
+        return RegisterRemoteStandardizedTokens;
+    }
+  }, [originToken?.kind]);
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -298,6 +337,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             <RegisterOriginTokenButton
               address={props.tokenAddress}
               chainName={interchainToken.chain?.name}
+              tokenName={props.tokenName}
+              tokenSymbol={props.tokenSymbol}
+              decimals={props.decimals}
               onSuccess={refetch}
             />
           ) : (
@@ -367,8 +409,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                 </Tooltip>
               )}
 
-              {originToken?.chainId === chain?.id ? (
-                <RegisterRemoteStandardizedTokens
+              {originToken?.chainId === chain?.id &&
+              typeof RegisterRemoteTokens === "function" ? (
+                <RegisterRemoteTokens
                   chainIds={selectedChainIds}
                   tokenAddress={props.tokenAddress}
                   originChainId={originToken?.chainId}

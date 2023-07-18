@@ -21,7 +21,7 @@ import { parseUnits } from "viem";
 import { useAccount, useBalance } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
-import { useDeployInterchainTokenMutation } from "~/features/AddErc20/hooks/useDeployInterchainTokenMutation";
+import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks/useDeployAndRegisterRemoteStandardizedTokenMutation";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
@@ -33,7 +33,7 @@ export const Step3: FC = () => {
   const { state, actions } = useStep3ChainSelectionState();
 
   const { mutateAsync: deployInterchainTokenAsync } =
-    useDeployInterchainTokenMutation({
+    useDeployAndRegisterRemoteStandardizedTokenMutation({
       value: state.gasFees?.length
         ? state.gasFees.reduce((acc, gasFee) => acc + gasFee)
         : BigInt(0),
