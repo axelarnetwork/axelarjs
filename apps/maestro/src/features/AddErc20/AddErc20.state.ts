@@ -75,7 +75,7 @@ function useAddErc20State(
       if (!partialInitialState.tokenDetails?.tokenAddress) {
         return;
       }
-      console.log("fioioioasdasd");
+
       setState((draft) => {
         draft.step = partialInitialState.step ?? draft.step;
         draft.tokenDetails = {
