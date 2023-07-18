@@ -80,8 +80,6 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
   const isSourceChain = chain?.id === props.chainId;
 
-  console.log({ props });
-
   const switchChainButton = (
     <Button
       size="xs"
