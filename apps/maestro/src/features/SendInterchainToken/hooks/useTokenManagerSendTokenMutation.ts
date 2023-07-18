@@ -75,7 +75,7 @@ export function useTokenManagerSendTokenMutation(
           status: "awaiting_approval",
         });
 
-        const txResult = await ierc20ApproveAsync({
+        await ierc20ApproveAsync({
           args: [tokenManagerAddress, bnAmount],
         });
       } catch (error) {

@@ -22,6 +22,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
+import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteCanonicalTokens } from "~/features/RegisterRemoteCanonicalTokens/RegisterRemoteCanonicalTokens";
 import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
@@ -325,6 +326,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     }
   }, [originToken?.kind]);
 
+  console.log({ registered, unregistered });
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -351,7 +354,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )}
       <InterchainTokenList
         title="Registered interchain tokens"
-        tokens={registered}
+        tokens={registered as TokenInfo[]}
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
@@ -369,7 +372,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
               ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),
-          };
+          } as TokenInfo;
         })}
         onToggleSelection={(chainId) => {
           if (deployTokensTxHash) {
