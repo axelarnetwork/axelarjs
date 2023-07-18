@@ -21,6 +21,7 @@ const abiInputSchema = z.object({
   type: z.string().optional(),
   internalType: z.string().optional(),
   anonymous: z.boolean().optional(),
+  indexed: z.boolean().optional(),
 });
 
 export const contractABI = z.array(
