@@ -75,20 +75,29 @@ export function useSendInterchainTokenState(props: {
     resetTokenManagerTxState();
   };
 
-  const isSending =
-    props.kind === "canonical"
-      ? isTokenManagerSending
-      : isInterchainTransferSending;
-
-  const txState =
-    props.kind === "canonical"
-      ? tokenManagerTxState
-      : interchainTransferTxState;
-
-  const sendTokenAsync =
-    props.kind === "canonical"
-      ? tokenManagerSendTokenAsync
-      : interchainTransferAsync;
+  const { sendTokenAsync, isSending, txState } = useMemo(
+    () =>
+      props.kind === "canonical"
+        ? {
+            sendTokenAsync: tokenManagerSendTokenAsync,
+            isSending: isTokenManagerSending,
+            txState: tokenManagerTxState,
+          }
+        : {
+            sendTokenAsync: interchainTransferAsync,
+            isSending: isInterchainTransferSending,
+            txState: interchainTransferTxState,
+          },
+    [
+      props.kind,
+      tokenManagerSendTokenAsync,
+      isTokenManagerSending,
+      tokenManagerTxState,
+      interchainTransferAsync,
+      interchainTransferTxState,
+      isInterchainTransferSending,
+    ]
+  );
 
   return [
     {

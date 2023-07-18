@@ -326,8 +326,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     }
   }, [originToken?.kind]);
 
-  console.log({ registered, unregistered });
-
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
