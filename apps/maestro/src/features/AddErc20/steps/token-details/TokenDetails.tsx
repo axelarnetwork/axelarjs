@@ -1,11 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Dialog,
-  FormControl,
-  Label,
-  TextInput,
-} from "@axelarjs/ui";
+import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
 import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
 
@@ -47,7 +40,6 @@ const TokenDetails: FC = () => {
       tokenDecimals: data.tokenDecimals,
       tokenCap: data.tokenCap,
       distributor: data.distributor,
-      allowMinting: data.allowMinting,
       salt: data.salt as `0x${string}`,
     });
 
@@ -124,18 +116,6 @@ const TokenDetails: FC = () => {
         <div>
           {showAdvanced && (
             <>
-              <FormControl>
-                <Label htmlFor="allowMinting">
-                  <Label.Text>
-                    Allow minting more tokens after deployed
-                  </Label.Text>
-                  <Checkbox
-                    id="allowMinting"
-                    onKeyDown={preventNonNumericInput}
-                    {...register("allowMinting", { disabled: isReadonly })}
-                  />
-                </Label>
-              </FormControl>
               <FormControl>
                 <Label htmlFor="distributor">Mint tokens to</Label>
                 <FormInput

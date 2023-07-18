@@ -16,7 +16,6 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenDecimals: z.coerce.number().min(1).max(18),
   tokenCap: numericString(),
   distributor: hex40Literal().optional(),
-  allowMinting: z.boolean(),
   salt: hex64Literal(),
 });
 
@@ -49,7 +48,6 @@ export const INITIAL_STATE = {
     tokenCap: "0",
     distributor: undefined as `0x${string}` | undefined,
     salt: "0x" as `0x${string}`,
-    allowMinting: false,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],

@@ -10,5 +10,5 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
   version: "1.0.0",
   baseUrl: `${getBaseUrl()}/api`,
   docsUrl: "https://github.com/axelarnetwork/axelarjs/tree/main/apps/maestro",
-  tags: ["interchain-token", "interchain-token-service"],
+  tags: ["interchain-token", "abi"],
 });
