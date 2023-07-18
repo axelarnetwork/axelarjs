@@ -43,8 +43,8 @@ export function useSendInterchainTokenState(props: {
   const { mutateAsync: sendTokenAsync, isLoading: isSending } =
     useSendInterchainTokenMutation({
       tokenAddress: props.tokenAddress,
-      destinationChainId: selectedToChain?.chain_name,
-      sourceChainId: props.sourceChain.chain_name,
+      destinationChainId: selectedToChain?.id,
+      sourceChainId: props.sourceChain.id,
     });
 
   const [txState, setTxState] = useTransactionState();
