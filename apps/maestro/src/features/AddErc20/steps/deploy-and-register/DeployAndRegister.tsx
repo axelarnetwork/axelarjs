@@ -202,9 +202,7 @@ export const Step3: FC = () => {
           </Label>
           <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
             {eligibleChains?.map((chain) => {
-              const isSelected = rootState.selectedChains.includes(
-                chain.chain_name
-              );
+              const isSelected = rootState.selectedChains.includes(chain.id);
 
               return (
                 <Tooltip
