@@ -48,14 +48,14 @@ export function useStep3ChainSelectionState() {
     $setTotalGasFee(num.toFixed(4));
   };
 
-  useEffect(
-    () =>
-      setSourceChainId(
-        evmChains?.find((evmChain) => evmChain.chain_id === network.chain?.id)
-          ?.chain_name as string
-      ),
-    [evmChains, network]
-  );
+  useEffect(() => {
+    const candidateChain = evmChains?.find(
+      (evmChain) => evmChain.chain_id === network.chain?.id
+    );
+    if (!candidateChain || candidateChain.chain_name === sourceChainId) return;
+
+    setSourceChainId(candidateChain.chain_name);
+  }, [evmChains, network, sourceChainId]);
 
   return {
     state: {

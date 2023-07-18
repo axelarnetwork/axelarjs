@@ -34,10 +34,6 @@ export function useWeb3SignIn({
   const isSigningInRef = useRef(false);
 
   watchAccount(({ address }) => {
-    console.log({
-      enabled,
-      address,
-    });
     if (
       enabled === false ||
       isSigningInRef.current ||

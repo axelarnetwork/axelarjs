@@ -25,15 +25,13 @@ export const maskAddress = (
     opts?.segmentB ?? -4
   )}`;
 
-export function generateRandomHash(): `0x${string}` {
-  const bytes = new Uint8Array(8);
-  window.crypto.getRandomValues(bytes);
+export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
+  const bytes = window.crypto.getRandomValues(new Uint8Array(bits));
 
-  let hash = "";
-  for (let byte of bytes) {
-    const hex = byte.toString(16).padStart(2, "0");
-    hash += hex;
-  }
+  const hash = bytes.reduce(
+    (acc, byte) => acc + byte.toString(16).padStart(2, "0"),
+    ""
+  );
 
   return `0x${hash}`;
 }

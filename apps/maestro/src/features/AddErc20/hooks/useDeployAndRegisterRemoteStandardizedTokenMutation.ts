@@ -1,7 +1,7 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
-import { hexlify, throttle } from "@axelarjs/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { throttle } from "@axelarjs/utils";
+import { useEffect, useRef, useState } from "react";
 
 import {
   encodeFunctionData,
@@ -35,8 +35,8 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   decimals: number;
   destinationChainIds: string[];
   gasFees: bigint[];
-  cap?: bigint;
-  mintTo?: `0x${string}`;
+  initialSupply?: bigint;
+  distributor?: `0x${string}`;
 };
 
 const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
@@ -46,12 +46,13 @@ const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
   decimals: 0,
   destinationChainIds: [],
   gasFees: [],
-  cap: BigInt(0),
-  mintTo: `0x000`,
+  initialSupply: BigInt(0),
+  distributor: `0x000`,
 };
 
 export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   value: bigint;
+  salt: `0x${string}`;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }) {
@@ -60,16 +61,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   const { address: deployerAddress } = useAccount();
   const { chain } = useNetwork();
 
-  const salt = useMemo(
-    () =>
-      "crypto" in window
-        ? (hexlify(crypto.getRandomValues(new Uint8Array(32))) as `0x${string}`)
-        : (hexlify(Math.random() * 2 ** 256) as `0x${string}`),
-    []
-  );
-
   const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: [deployerAddress as `0x${string}`, salt],
+    args: [deployerAddress as `0x${string}`, config.salt],
     enabled: deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
@@ -121,7 +114,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
 
       setRecordDeploymentArgs({
         kind: "standardized",
-        salt,
+        salt: config.salt,
         tokenId,
         tokenAddress,
         deployerAddress,
@@ -184,20 +177,24 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
         type: "pending_approval",
       });
       try {
-        const cap = input.cap
-          ? parseUnits(String(input.cap), input.decimals)
+        const initialSupply = input.initialSupply
+          ? parseUnits(String(input.initialSupply), input.decimals)
           : BigInt(0);
+
+        const baseArgs = [
+          config.salt,
+          input.tokenName,
+          input.tokenSymbol,
+          input.decimals,
+        ] as const;
 
         const deployTxData = encodeFunctionData({
           functionName: "deployAndRegisterStandardizedToken",
           abi: INTERCHAIN_TOKEN_SERVICE_ABI,
           args: [
-            salt,
-            input.tokenName,
-            input.tokenSymbol,
-            input.decimals,
-            cap,
-            input.mintTo ?? deployerAddress,
+            ...baseArgs,
+            initialSupply,
+            input.distributor ?? deployerAddress,
           ],
         });
 
@@ -210,12 +207,9 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
             functionName: "deployAndRegisterRemoteStandardizedToken",
             abi: INTERCHAIN_TOKEN_SERVICE_ABI,
             args: [
-              salt,
-              input.tokenName,
-              input.tokenSymbol,
-              input.decimals,
-              input.mintTo ?? deployerAddress,
-              input.mintTo ?? deployerAddress,
+              ...baseArgs,
+              "0x", // remote tokens cannot be minted, so the operator is 0x
+              input.distributor ?? deployerAddress,
               chainId,
               gasFee,
             ],

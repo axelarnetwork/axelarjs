@@ -16,58 +16,18 @@ export const hex64Literal = () => hex64().transform((x) => x as `0x${string}`);
 
 export const numericString = () => z.string().regex(/^[0-9.]+$/);
 
-const abiConstructor = z.object({
-  inputs: z.array(
-    z.object({
-      internalType: z.string(),
-      name: z.string(),
-      type: z.string(),
-    })
-  ),
-  stateMutability: z.string(),
-  type: z.string(),
-});
-
-const abiError = z.object({
-  inputs: z.array(z.unknown()),
-  name: z.string(),
-  type: z.string(),
-});
-
-const abiEvent = z.object({
-  anonymous: z.boolean(),
-  inputs: z.array(
-    z.object({
-      indexed: z.boolean(),
-      internalType: z.string(),
-      name: z.string(),
-      type: z.string(),
-    })
-  ),
-  name: z.string(),
-  type: z.string(),
-});
-
-const abiFunction = z.object({
-  inputs: z.array(
-    z.object({
-      internalType: z.string(),
-      name: z.string(),
-      type: z.string(),
-    })
-  ),
-  name: z.string(),
-  outputs: z.array(
-    z.object({
-      internalType: z.string(),
-      name: z.string(),
-      type: z.string(),
-    })
-  ),
-  stateMutability: z.string(),
-  type: z.string(),
+const abiInputSchema = z.object({
+  name: z.string().optional(),
+  type: z.string().optional(),
+  internalType: z.string().optional(),
+  anonymous: z.boolean().optional(),
 });
 
 export const contractABI = z.array(
-  z.union([abiConstructor, abiError, abiEvent, abiFunction])
+  z.object({
+    inputs: z.array(abiInputSchema).optional(),
+    name: z.string().optional(),
+    outputs: z.array(abiInputSchema).optional(),
+    type: z.string().optional(),
+  })
 );
