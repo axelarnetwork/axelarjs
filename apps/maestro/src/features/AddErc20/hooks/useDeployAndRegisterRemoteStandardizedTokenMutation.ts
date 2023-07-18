@@ -50,7 +50,7 @@ const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
   mintTo: `0x000`,
 };
 
-export function useDeployInterchainTokenMutation(config: {
+export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   value: bigint;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
@@ -120,11 +120,12 @@ export function useDeployInterchainTokenMutation(config: {
       unwatch();
 
       setRecordDeploymentArgs({
-        tokenId: tokenId,
-        tokenAddress: tokenAddress,
-        originChainId: chain.id,
-        deployerAddress,
+        kind: "standardized",
         salt,
+        tokenId,
+        tokenAddress,
+        deployerAddress,
+        originChainId: chain.id,
         deploymentTxHash: log.transactionHash,
         tokenName: inputRef.current.tokenName,
         tokenSymbol: inputRef.current.tokenSymbol,
@@ -183,42 +184,41 @@ export function useDeployInterchainTokenMutation(config: {
         type: "pending_approval",
       });
       try {
-        const decimalAdjustedCap = input.cap
+        const cap = input.cap
           ? parseUnits(String(input.cap), input.decimals)
           : BigInt(0);
 
         const deployTxData = encodeFunctionData({
           functionName: "deployAndRegisterStandardizedToken",
+          abi: INTERCHAIN_TOKEN_SERVICE_ABI,
           args: [
             salt,
             input.tokenName,
             input.tokenSymbol,
             input.decimals,
-            decimalAdjustedCap,
+            cap,
             input.mintTo ?? deployerAddress,
           ],
-          abi: INTERCHAIN_TOKEN_SERVICE_ABI,
         });
 
         const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
 
         const registerTxData = input.destinationChainIds.map((chainId, i) => {
           const gasFee = input.gasFees[i];
-          const args = [
-            salt,
-            input.tokenName,
-            input.tokenSymbol,
-            input.decimals,
-            "0x",
-            input.mintTo ?? deployerAddress,
-            chainId,
-            gasFee,
-          ] as const;
 
           return encodeFunctionData({
             functionName: "deployAndRegisterRemoteStandardizedToken",
-            args: args,
             abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+            args: [
+              salt,
+              input.tokenName,
+              input.tokenSymbol,
+              input.decimals,
+              input.mintTo ?? deployerAddress,
+              input.mintTo ?? deployerAddress,
+              chainId,
+              gasFee,
+            ],
           });
         });
 

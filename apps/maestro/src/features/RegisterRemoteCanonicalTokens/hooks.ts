@@ -13,12 +13,7 @@ import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
-// ideas:
-// have the salt encrypted on kv
-// then request the decrypting of the salt by providing a signed message
-// the user can then use the salt to generate the token address
-
-export function useRegisterRemoteStandardizedTokens(input: {
+export function useRegisterRemoteCanonicalTokens(input: {
   chainIds: number[];
   tokenAddress: `0x${string}`;
   originChainId: number;
@@ -45,16 +40,11 @@ export function useRegisterRemoteStandardizedTokens(input: {
     [chain, computed.indexedByChainId]
   );
 
-  // 1. find the token deployment with the given tokenAddress and originChainId
-
   const { data: tokenDeployment } = useInterchainTokenDetailsQuery({
     chainId: input.originChainId,
     tokenAddress: input.tokenAddress,
   });
 
-  // 2. find the token deployment with the given tokenAddress and originChainId
-
-  // 3. get the gas fees for the destination chains
   const { data: gasFees } = useEstimateGasFeeMultipleChains({
     destinationChainIds,
     sourceChainId: sourceChainId ?? "0",
@@ -63,24 +53,15 @@ export function useRegisterRemoteStandardizedTokens(input: {
   const multicallArgs = useMemo(() => {
     if (!tokenDeployment || !gasFees) return [];
 
-    invariant(tokenDeployment.kind === "standardized", "invalid token kind");
+    invariant(tokenDeployment.kind === "canonical", "invalid token kind");
 
-    return destinationChainIds.map((chainId, i) => {
+    return destinationChainIds.map((axelarChainId, i) => {
       const gasFee = gasFees[i];
 
       return encodeFunctionData({
-        functionName: "deployAndRegisterRemoteStandardizedToken",
+        functionName: "deployRemoteCanonicalToken",
         abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-        args: [
-          tokenDeployment.salt,
-          tokenDeployment.tokenName,
-          tokenDeployment.tokenSymbol,
-          tokenDeployment.tokenDecimals,
-          tokenDeployment.deployerAddress,
-          tokenDeployment.deployerAddress,
-          chainId,
-          gasFee,
-        ],
+        args: [tokenDeployment.tokenId, axelarChainId, gasFee],
       });
     });
   }, [destinationChainIds, gasFees, tokenDeployment]);
