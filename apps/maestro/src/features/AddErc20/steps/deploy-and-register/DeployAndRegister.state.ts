@@ -20,7 +20,7 @@ export function useStep3ChainSelectionState() {
   const [sourceChainId, setSourceChainId] = useState(
     evmChains?.find(
       (evmChain: EVMChainConfig) => evmChain.chain_id === network.chain?.id
-    )?.chain_name as string
+    )?.id as string
   );
 
   const { state: rootState } = useAddErc20StateContainer();

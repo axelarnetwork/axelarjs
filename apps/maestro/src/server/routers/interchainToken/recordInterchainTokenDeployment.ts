@@ -4,7 +4,6 @@ import { interchainTokenDetailsSchema } from "~/services/kv";
 export const recordInterchainTokenDeployment = protectedProcedure
   .input(interchainTokenDetailsSchema)
   .mutation(async ({ ctx, input }) => {
-    console.log("trying to record deplyomenttt", ctx, input);
     await ctx.storage.kv
       .recordInterchainTokenDeployment(
         {

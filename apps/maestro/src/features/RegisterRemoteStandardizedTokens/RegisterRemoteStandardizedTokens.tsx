@@ -33,9 +33,13 @@ export const RegisterRemoteStandardizedTokens: FC<Props> = ({
 
   const [txState, setTxState] = useTransactionState();
 
-  useEffect(() => {
-    onTxStateChange?.(txState);
-  }, [onTxStateChange, txState]);
+  useEffect(
+    () => {
+      onTxStateChange?.(txState);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [txState]
+  );
 
   const { writeAsync } = useRegisterRemoteStandardizedTokens({
     chainIds: chainIds,
