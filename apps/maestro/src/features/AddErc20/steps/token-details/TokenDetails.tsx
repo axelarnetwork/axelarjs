@@ -1,6 +1,8 @@
-import { Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
-import { useRef, type FC } from "react";
+import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
+import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
+
+import { EyeIcon, EyeOff } from "lucide-react";
 
 import {
   useAddErc20StateContainer,
@@ -20,6 +22,8 @@ const FormInput = {
 
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { register, handleSubmit, formState } = state.tokenDetailsForm;
 
@@ -95,6 +99,83 @@ const TokenDetails: FC = () => {
             })}
           />
         </FormControl>
+
+        <div className="grid place-content-end">
+          <Button size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
+            {showAdvanced ? "Hide" : "Show"} advanced
+            {showAdvanced ? (
+              <EyeOff className="h-[1.5em]" />
+            ) : (
+              <EyeIcon className="h-[1.5em]" />
+            )}
+          </Button>
+        </div>
+        <div>
+          {showAdvanced && (
+            <>
+              <FormControl>
+                <Label htmlFor="amountToMint">
+                  Allow minting more tokens after deployed
+                </Label>
+                <input
+                  id="amountToMint"
+                  placeholder="Enter your amount to mint"
+                  min={0}
+                  type="checkbox"
+                  onKeyDown={preventNonNumericInput}
+                  {...register("tokenCap", {
+                    disabled: isReadonly,
+                    validate(value) {
+                      if (!value || value === "0") {
+                        return "Amount must be greater than 0";
+                      }
+
+                      return true;
+                    },
+                  })}
+                />
+              </FormControl>
+              <FormControl>
+                <Label htmlFor="amountToMint">Mint to</Label>
+                <FormInput
+                  id="amountToMint"
+                  placeholder="Enter your amount to mint"
+                  min={0}
+                  onKeyDown={preventNonNumericInput}
+                  {...register("tokenCap", {
+                    disabled: isReadonly,
+                    validate(value) {
+                      if (!value || value === "0") {
+                        return "Amount must be greater than 0";
+                      }
+
+                      return true;
+                    },
+                  })}
+                />
+              </FormControl>
+              <FormControl>
+                <Label htmlFor="amountToMint">Salt</Label>
+                <FormInput
+                  id="amountToMint"
+                  placeholder="Enter your amount to mint"
+                  min={0}
+                  onKeyDown={preventNonNumericInput}
+                  {...register("tokenCap", {
+                    disabled: isReadonly,
+                    validate(value) {
+                      if (!value || value === "0") {
+                        return "Amount must be greater than 0";
+                      }
+
+                      return true;
+                    },
+                  })}
+                />
+              </FormControl>
+            </>
+          )}
+        </div>
         <button type="submit" ref={formSubmitRef} />
       </form>
 
