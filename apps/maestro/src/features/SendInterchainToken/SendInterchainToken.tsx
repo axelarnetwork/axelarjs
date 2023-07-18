@@ -28,6 +28,7 @@ type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
+  kind: "canonical" | "standardized";
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
@@ -43,6 +44,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     tokenId: props.tokenId,
     sourceChain: props.sourceChain,
     isModalOpen: props.isOpen,
+    kind: props.kind,
   });
 
   const {

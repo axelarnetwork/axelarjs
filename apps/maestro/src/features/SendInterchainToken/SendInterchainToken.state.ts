@@ -5,12 +5,14 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-import { useSendInterchainTokenMutation } from "./hooks/useSendInterchainTokenMutation";
+import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
+import { useTokenManagerSendTokenMutation } from "./hooks/useTokenManagerSendTokenMutation";
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
+  kind: "canonical" | "standardized";
   isModalOpen?: boolean;
 }) {
   const { computed } = useEVMChainConfigsQuery();
@@ -41,20 +43,24 @@ export function useSendInterchainTokenState(props: {
     [toChainId, eligibleTargetChains]
   );
 
-  // const { mutateAsync: sendTokenAsync, isLoading: isSending } =
-  //   useSendInterchainTokenMutation({
-  //     tokenAddress: props.tokenAddress,
-  //     destinationChainId: selectedToChain?.id,
-  //     sourceChainId: props.sourceChain.id,
-  //   });
+  const {
+    mutateAsync: interchainTransferAsync,
+    isLoading: isInterchainTransferSending,
+  } = useInterchainTransferMutation({
+    tokenAddress: props.tokenAddress,
+    destinationChainId: selectedToChain?.id,
+    sourceChainId: props.sourceChain.id,
+  });
 
-  const { mutateAsync: sendTokenAsync, isLoading: isSending } =
-    useSendInterchainTokenMutation({
-      tokenAddress: props.tokenAddress,
-      tokenId: props.tokenId,
-      destinationChainId: selectedToChain?.id,
-      sourceChainId: props.sourceChain.id,
-    });
+  const {
+    mutateAsync: tokenManagerSendTokenAsync,
+    isLoading: isTokenManagerSending,
+  } = useTokenManagerSendTokenMutation({
+    tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
+    destinationChainId: selectedToChain?.id,
+    sourceChainId: props.sourceChain.id,
+  });
 
   const [txState, setTxState] = useTransactionState();
   const trpcContext = trpc.useContext();
@@ -66,14 +72,20 @@ export function useSendInterchainTokenState(props: {
     {
       isModalOpen,
       txState,
-      isSending,
+      isSending:
+        props.kind === "canonical"
+          ? isTokenManagerSending
+          : isInterchainTransferSending,
       selectedToChain,
       eligibleTargetChains,
     },
     {
       setIsModalOpen,
       setTxState,
-      sendTokenAsync,
+      sendTokenAsync:
+        props.kind === "canonical"
+          ? tokenManagerSendTokenAsync
+          : interchainTransferAsync,
       selectToChain,
       refetchBalances,
     },
