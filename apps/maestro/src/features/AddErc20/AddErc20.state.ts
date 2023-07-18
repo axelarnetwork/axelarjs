@@ -1,18 +1,23 @@
+import { generateRandomHash } from "@axelarjs/utils";
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
+import { useAccount } from "wagmi";
 import { z } from "zod";
 
-import { numericString } from "~/lib/utils/schemas";
+import { hex40Literal, hex64Literal, numericString } from "~/lib/utils/schemas";
 
 const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
   tokenCap: numericString(),
+  mintTo: hex40Literal().optional(),
+  allowMinting: z.boolean(),
+  salt: hex64Literal(),
 });
 
 export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
@@ -43,6 +48,8 @@ export const INITIAL_STATE = {
     tokenAddress: undefined as `0x${string}` | undefined,
     tokenCap: "0",
     mintTo: undefined as `0x${string}` | undefined,
+    salt: "0x" as `0x${string}`,
+    allowMinting: false,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
@@ -64,6 +71,29 @@ function useAddErc20State(
   const [state, setState] = useSessionStorageState(
     "@maestro/add-erc20",
     initialState
+  );
+
+  const tokenDetailsForm = useForm<TokenDetailsFormState>({
+    resolver: zodResolver(TOKEN_DETAILS_FORM_SCHEMA),
+    defaultValues: state.tokenDetails,
+  });
+
+  const { address } = useAccount();
+
+  /**
+   * Generate a random salt on first render
+   * and set it as the default value for the form
+   * also set the default value for mintTo
+   */
+  useEffect(
+    () => {
+      const salt = generateRandomHash();
+
+      tokenDetailsForm.setValue("salt", salt);
+      tokenDetailsForm.setValue("mintTo", address);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   /**
@@ -88,11 +118,6 @@ function useAddErc20State(
     [partialInitialState.tokenDetails]
   );
 
-  const tokenDetailsForm = useForm<TokenDetailsFormState>({
-    resolver: zodResolver(TOKEN_DETAILS_FORM_SCHEMA),
-    defaultValues: state.tokenDetails,
-  });
-
   return {
     state: {
       ...state,
@@ -108,6 +133,9 @@ function useAddErc20State(
 
           // reset form
           tokenDetailsForm.reset(initialState.tokenDetails);
+
+          tokenDetailsForm.setValue("salt", generateRandomHash());
+          tokenDetailsForm.setValue("mintTo", address);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {

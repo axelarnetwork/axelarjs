@@ -1,8 +1,16 @@
-import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  FormControl,
+  Label,
+  TextInput,
+} from "@axelarjs/ui";
 import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
 
 import { EyeIcon, EyeOff } from "lucide-react";
+import { isAddress } from "viem";
 
 import {
   useAddErc20StateContainer,
@@ -38,6 +46,9 @@ const TokenDetails: FC = () => {
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
       tokenCap: data.tokenCap,
+      mintTo: data.mintTo,
+      allowMinting: data.allowMinting,
+      salt: data.salt as `0x${string}`,
     });
 
     actions.nextStep();
@@ -100,13 +111,13 @@ const TokenDetails: FC = () => {
           />
         </FormControl>
 
-        <div className="grid place-content-end">
+        <div className="grid place-content-center pt-4 md:place-content-end">
           <Button size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
-            {showAdvanced ? "Hide" : "Show"} advanced
+            advanced settings
             {showAdvanced ? (
-              <EyeOff className="h-[1.5em]" />
+              <EyeOff className="h-[1.25em]" />
             ) : (
-              <EyeIcon className="h-[1.5em]" />
+              <EyeIcon className="h-[1.25em]" />
             )}
           </Button>
         </div>
@@ -114,20 +125,29 @@ const TokenDetails: FC = () => {
           {showAdvanced && (
             <>
               <FormControl>
-                <Label htmlFor="amountToMint">
-                  Allow minting more tokens after deployed
+                <Label htmlFor="allowMinting">
+                  <Label.Text>
+                    Allow minting more tokens after deployed
+                  </Label.Text>
+                  <Checkbox
+                    id="allowMinting"
+                    onKeyDown={preventNonNumericInput}
+                    {...register("allowMinting", { disabled: isReadonly })}
+                  />
                 </Label>
-                <input
-                  id="amountToMint"
-                  placeholder="Enter your amount to mint"
+              </FormControl>
+              <FormControl>
+                <Label htmlFor="amountToMint">Mint tokens to</Label>
+                <FormInput
+                  id="mintTo"
+                  placeholder="Enter account address to mint to"
                   min={0}
-                  type="checkbox"
                   onKeyDown={preventNonNumericInput}
-                  {...register("tokenCap", {
+                  {...register("mintTo", {
                     disabled: isReadonly,
                     validate(value) {
-                      if (!value || value === "0") {
-                        return "Amount must be greater than 0";
+                      if (!isAddress(String(value))) {
+                        return "Invalid address";
                       }
 
                       return true;
@@ -136,36 +156,17 @@ const TokenDetails: FC = () => {
                 />
               </FormControl>
               <FormControl>
-                <Label htmlFor="amountToMint">Mint to</Label>
+                <Label htmlFor="salt">Salt</Label>
                 <FormInput
-                  id="amountToMint"
+                  id="salt"
                   placeholder="Enter your amount to mint"
                   min={0}
                   onKeyDown={preventNonNumericInput}
-                  {...register("tokenCap", {
+                  {...register("salt", {
                     disabled: isReadonly,
                     validate(value) {
-                      if (!value || value === "0") {
-                        return "Amount must be greater than 0";
-                      }
-
-                      return true;
-                    },
-                  })}
-                />
-              </FormControl>
-              <FormControl>
-                <Label htmlFor="amountToMint">Salt</Label>
-                <FormInput
-                  id="amountToMint"
-                  placeholder="Enter your amount to mint"
-                  min={0}
-                  onKeyDown={preventNonNumericInput}
-                  {...register("tokenCap", {
-                    disabled: isReadonly,
-                    validate(value) {
-                      if (!value || value === "0") {
-                        return "Amount must be greater than 0";
+                      if (!value) {
+                        return "Salt is required";
                       }
 
                       return true;

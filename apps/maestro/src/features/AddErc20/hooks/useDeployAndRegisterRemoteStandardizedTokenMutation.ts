@@ -1,7 +1,7 @@
 import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
-import { hexlify, throttle } from "@axelarjs/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { throttle } from "@axelarjs/utils";
+import { useEffect, useRef, useState } from "react";
 
 import {
   encodeFunctionData,
@@ -52,6 +52,7 @@ const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
 
 export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   value: bigint;
+  salt: `0x${string}`;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }) {
@@ -60,16 +61,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   const { address: deployerAddress } = useAccount();
   const { chain } = useNetwork();
 
-  const salt = useMemo(
-    () =>
-      "crypto" in window
-        ? (hexlify(crypto.getRandomValues(new Uint8Array(32))) as `0x${string}`)
-        : (hexlify(Math.random() * 2 ** 256) as `0x${string}`),
-    []
-  );
-
   const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: [deployerAddress as `0x${string}`, salt],
+    args: [deployerAddress as `0x${string}`, config.salt],
     enabled: deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
@@ -121,7 +114,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
 
       setRecordDeploymentArgs({
         kind: "standardized",
-        salt,
+        salt: config.salt,
         tokenId,
         tokenAddress,
         deployerAddress,
@@ -188,17 +181,17 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
           ? parseUnits(String(input.cap), input.decimals)
           : BigInt(0);
 
+        const baseArgs = [
+          config.salt,
+          input.tokenName,
+          input.tokenSymbol,
+          input.decimals,
+        ] as const;
+
         const deployTxData = encodeFunctionData({
           functionName: "deployAndRegisterStandardizedToken",
           abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-          args: [
-            salt,
-            input.tokenName,
-            input.tokenSymbol,
-            input.decimals,
-            cap,
-            input.mintTo ?? deployerAddress,
-          ],
+          args: [...baseArgs, cap, input.mintTo ?? deployerAddress],
         });
 
         const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
@@ -210,10 +203,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
             functionName: "deployAndRegisterRemoteStandardizedToken",
             abi: INTERCHAIN_TOKEN_SERVICE_ABI,
             args: [
-              salt,
-              input.tokenName,
-              input.tokenSymbol,
-              input.decimals,
+              ...baseArgs,
               input.mintTo ?? deployerAddress,
               input.mintTo ?? deployerAddress,
               chainId,

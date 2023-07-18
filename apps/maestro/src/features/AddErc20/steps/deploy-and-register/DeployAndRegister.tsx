@@ -32,11 +32,16 @@ export const Step3: FC = () => {
 
   const { state, actions } = useStep3ChainSelectionState();
 
+  const totalGasFees = useMemo(
+    () =>
+      (state.gasFees ?? []).reduce((acc, gasFee) => acc + gasFee, BigInt(0)),
+    [state.gasFees]
+  );
+
   const { mutateAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteStandardizedTokenMutation({
-      value: state.gasFees?.length
-        ? state.gasFees.reduce((acc, gasFee) => acc + gasFee)
-        : BigInt(0),
+      salt: rootState.tokenDetails.salt,
+      value: totalGasFees,
       onStatusUpdate(txState) {
         if (txState.type === "deployed") {
           rootActions.setTxState(txState);
