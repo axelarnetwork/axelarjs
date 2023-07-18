@@ -1,6 +1,16 @@
-import { Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
-import { useRef, type FC } from "react";
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  FormControl,
+  Label,
+  TextInput,
+} from "@axelarjs/ui";
+import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
+
+import { EyeIcon, EyeOff } from "lucide-react";
+import { isAddress } from "viem";
 
 import {
   useAddErc20StateContainer,
@@ -21,6 +31,8 @@ const FormInput = {
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();
 
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const { register, handleSubmit, formState } = state.tokenDetailsForm;
 
   // this is only required because the form and actions are sibling elements
@@ -34,6 +46,9 @@ const TokenDetails: FC = () => {
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
       tokenCap: data.tokenCap,
+      distributor: data.distributor,
+      allowMinting: data.allowMinting,
+      salt: data.salt as `0x${string}`,
     });
 
     actions.nextStep();
@@ -95,6 +110,73 @@ const TokenDetails: FC = () => {
             })}
           />
         </FormControl>
+
+        <div className="grid place-content-center pt-4 md:place-content-end">
+          <Button size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
+            advanced settings
+            {showAdvanced ? (
+              <EyeOff className="h-[1.25em]" />
+            ) : (
+              <EyeIcon className="h-[1.25em]" />
+            )}
+          </Button>
+        </div>
+        <div>
+          {showAdvanced && (
+            <>
+              <FormControl>
+                <Label htmlFor="allowMinting">
+                  <Label.Text>
+                    Allow minting more tokens after deployed
+                  </Label.Text>
+                  <Checkbox
+                    id="allowMinting"
+                    onKeyDown={preventNonNumericInput}
+                    {...register("allowMinting", { disabled: isReadonly })}
+                  />
+                </Label>
+              </FormControl>
+              <FormControl>
+                <Label htmlFor="distributor">Mint tokens to</Label>
+                <FormInput
+                  id="distributor"
+                  placeholder="Enter account address to mint to"
+                  min={0}
+                  onKeyDown={preventNonNumericInput}
+                  {...register("distributor", {
+                    disabled: isReadonly,
+                    validate(value) {
+                      if (!isAddress(String(value))) {
+                        return "Invalid address";
+                      }
+
+                      return true;
+                    },
+                  })}
+                />
+              </FormControl>
+              <FormControl>
+                <Label htmlFor="salt">Salt</Label>
+                <FormInput
+                  id="salt"
+                  placeholder="Enter your amount to mint"
+                  min={0}
+                  onKeyDown={preventNonNumericInput}
+                  {...register("salt", {
+                    disabled: isReadonly,
+                    validate(value) {
+                      if (!value) {
+                        return "Salt is required";
+                      }
+
+                      return true;
+                    },
+                  })}
+                />
+              </FormControl>
+            </>
+          )}
+        </div>
         <button type="submit" ref={formSubmitRef} />
       </form>
 

@@ -4,29 +4,28 @@ import type { Meta, StoryFn } from "@storybook/react";
 
 import { COLOR_VARIANTS, SIZE_VARIANTS } from "~/theme";
 import { configurePlayground } from "../StoryPlayground";
-import { TextInput } from "./TextInput";
+import { Checkbox } from "./Checkbox";
 
 export default {
-  title: "components/TextInput",
-  component: TextInput,
+  title: "components/Checkbox",
+  component: Checkbox,
   docs: {
     description: {
-      component: "TextInput, TextInput, does whatever a TextInput do.",
+      component: "Checkbox, Checkbox, does whatever a Checkbox do.",
     },
   },
-} as Meta<typeof TextInput>;
+} as Meta<typeof Checkbox>;
 
-const Template: StoryFn<typeof TextInput> = (args) => {
-  return <TextInput {...args} />;
+const Template: StoryFn<typeof Checkbox> = (args) => {
+  return <Checkbox {...args} />;
 };
 
 export const Default = Template.bind({});
 
-Default.args = {
-  placeholder: "Placeholder",
-};
+Default.args = {};
+
 const { InputSizes, Colors } = pluralizeKeys(
-  configurePlayground(TextInput, {
+  configurePlayground(Checkbox, {
     inputSize: {
       values: SIZE_VARIANTS,
       noChildren: true,

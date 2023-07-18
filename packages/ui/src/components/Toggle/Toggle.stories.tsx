@@ -16,6 +16,10 @@ export default {
   },
 } as Meta<typeof Toggle>;
 
+Toggle.defaultProps = {
+  checked: true,
+};
+
 // creates stories for variansts (color, size, shape)
 const { Colors, Sizes } = pluralizeKeys(
   configurePlayground(Toggle, {
