@@ -218,7 +218,7 @@ export const Step3: FC = () => {
                     role="button"
                     variant={isSelected ? "success" : undefined}
                     onClick={() => {
-                      rootActions.toggleAdditionalChain(chain.chain_name);
+                      rootActions.toggleAdditionalChain(chain.id);
                     }}
                   >
                     <Image
