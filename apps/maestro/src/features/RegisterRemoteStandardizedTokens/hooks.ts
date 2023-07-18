@@ -13,11 +13,6 @@ import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
-// ideas:
-// have the salt encrypted on kv
-// then request the decrypting of the salt by providing a signed message
-// the user can then use the salt to generate the token address
-
 export function useRegisterRemoteStandardizedTokens(input: {
   chainIds: number[];
   tokenAddress: `0x${string}`;
@@ -76,7 +71,7 @@ export function useRegisterRemoteStandardizedTokens(input: {
           tokenDeployment.tokenName,
           tokenDeployment.tokenSymbol,
           tokenDeployment.tokenDecimals,
-          tokenDeployment.deployerAddress,
+          "0x", // set distributor to 0x to
           tokenDeployment.deployerAddress,
           chainId,
           gasFee,
@@ -86,8 +81,7 @@ export function useRegisterRemoteStandardizedTokens(input: {
   }, [destinationChainIds, gasFees, tokenDeployment]);
 
   const totalGasFee = useMemo(
-    () =>
-      gasFees?.reduce((acc, gasFee) => acc + gasFee, BigInt(0)) ?? BigInt(0),
+    () => gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
     [gasFees]
   );
   const { config } = usePrepareInterchainTokenServiceMulticall({

@@ -1,17 +1,17 @@
-import { InterchainTokenServiceClient } from "@axelarjs/evm";
+import { TokenManagerClient } from "@axelarjs/evm";
 
 import { z } from "zod";
 
 import { contractABI } from "~/lib/utils/schemas";
 import { publicProcedure } from "~/server/trpc";
 
-export const getInterchainTokenServiceABI = publicProcedure
+export const getTokenManagerABI = publicProcedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/interchain-token-service/abi",
-      summary: "Get the ABI for the InterchainTokenService contract",
-      description: "Get the ABI for the InterchainTokenService contract",
+      path: "/token-manager/abi",
+      summary: "Get the ABI for the TokenManager contract",
+      description: "Get the ABI for the TokenManager contract",
       tags: ["abi"],
     },
   })
@@ -21,5 +21,5 @@ export const getInterchainTokenServiceABI = publicProcedure
     // cache for 1 day
     ctx.res.setHeader("Cache-Control", "public, max-age=86400");
 
-    return InterchainTokenServiceClient.ABI as any;
+    return TokenManagerClient.ABI as any;
   });

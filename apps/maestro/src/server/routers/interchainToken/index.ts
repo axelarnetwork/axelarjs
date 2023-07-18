@@ -2,6 +2,7 @@ import { router } from "~/server/trpc";
 import { getInterchainTokenABI } from "./getInterchainTokenABI";
 import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
 import { getInterchainTokenServiceABI } from "./getInterchainTokenServiceABI";
+import { getTokenManagerABI } from "./getTokenManagerABI";
 import { recordInterchainTokenDeployment } from "./recordInterchainTokenDeployment";
 import { recordRemoteTokensDeployment } from "./recordRemoteTokensDeployment";
 import { searchInterchainToken } from "./searchInterchainToken";
@@ -10,6 +11,7 @@ export const interchainTokenRouter = router({
   getInterchainTokenABI,
   getInterchainTokenServiceABI,
   getInterchainTokenDetails,
+  getTokenManagerABI,
   searchInterchainToken,
   recordInterchainTokenDeployment,
   recordRemoteTokensDeployment,
