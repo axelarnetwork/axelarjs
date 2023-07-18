@@ -12,7 +12,7 @@ export const getInterchainTokenABI = publicProcedure
       path: "/interchain-token/abi",
       summary: "Get the ABI for the InterchainToken contract",
       description: "Get the ABI for the InterchainToken contract",
-      tags: ["interchain-token"],
+      tags: ["abi"],
     },
   })
   .input(z.object({}).optional())
