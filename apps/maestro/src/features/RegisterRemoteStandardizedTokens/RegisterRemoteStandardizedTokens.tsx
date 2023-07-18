@@ -55,7 +55,7 @@ export const RegisterRemoteStandardizedTokens: FC<Props> = ({
 
   useWaitForTransaction({
     hash: txState.status === "submitted" ? txState.hash : undefined,
-    confirmations: 1,
+    confirmations: 8,
     async onSuccess(receipt) {
       await recordRemoteTokenDeployment({
         tokenAddress,
