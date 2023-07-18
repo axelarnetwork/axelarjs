@@ -73,6 +73,10 @@ export const EVM_CHAIN_CONFIGS = [
   { ...polygon, networkNameOnAxelar: "polygon", environment: "mainnet" },
   {
     ...polygonMumbai,
+    rpcUrls: {
+      default: { http: ["https://polygon-testnet.public.blastapi.io"] },
+      public: { http: ["https://polygon-testnet.public.blastapi.io"] },
+    },
     networkNameOnAxelar: "polygon",
     environment: "testnet",
   },
