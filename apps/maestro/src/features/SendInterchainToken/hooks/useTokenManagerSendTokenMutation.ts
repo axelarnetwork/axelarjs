@@ -1,7 +1,9 @@
 import { toast } from "@axelarjs/ui";
+import { invariant } from "@axelarjs/utils";
+import { useEffect, useRef } from "react";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useMutation } from "wagmi";
+import { useAccount, useMutation, useWaitForTransaction } from "wagmi";
 
 import {
   useIerc20BurnableMintableApprove,
@@ -9,7 +11,7 @@ import {
 } from "~/lib/contracts/IERC20BurnableMintable.hooks";
 import { useInterchainTokenServiceGetTokenManagerAddress } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTokenManagerSendToken } from "~/lib/contracts/TokenManager.hooks";
-import type { TransactionState } from "~/lib/hooks/useTransactionState";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -24,13 +26,13 @@ export type UseSendInterchainTokenConfig = {
 export type UseSendInterchainTokenInput = {
   tokenAddress: `0x${string}`;
   amount: string;
-  onFinished?: () => void;
-  onStatusUpdate?: (message: TransactionState) => void;
 };
 
 export function useTokenManagerSendTokenMutation(
   config: UseSendInterchainTokenConfig
 ) {
+  const [txState, setTxState] = useTransactionState();
+
   const { data: decimals } = useIerc20BurnableMintableDecimals({
     address: config.tokenAddress,
   });
@@ -49,34 +51,100 @@ export function useTokenManagerSendTokenMutation(
       enabled: Boolean(config.tokenId),
     });
 
-  const { writeAsync: ierc20ApproveAsync } = useIerc20BurnableMintableApprove({
-    address: config.tokenAddress,
-  });
+  const { writeAsync: approveERC20Async, data: approveERC20Data } =
+    useIerc20BurnableMintableApprove({
+      address: config.tokenAddress,
+    });
 
-  const { writeAsync: tokenManagerSendToken } = useTokenManagerSendToken({
+  const { writeAsync: sendTokenAsync } = useTokenManagerSendToken({
     address: tokenManagerAddress,
     value: BigInt(gas ?? 0) * BigInt(2),
   });
 
-  return useMutation<void, unknown, UseSendInterchainTokenInput>(
-    async ({ amount, onStatusUpdate }) => {
-      if (!tokenManagerAddress) {
-        console.warn("need token maanger address");
-        return;
+  const { data: approveERC20Recepit } = useWaitForTransaction({
+    hash: approveERC20Data?.hash,
+    confirmations: 1,
+  });
+
+  const approvedAmountRef = useRef(BigInt(0));
+
+  useEffect(
+    () => {
+      async function sendToken() {
+        try {
+          setTxState({
+            status: "awaiting_approval",
+          });
+
+          invariant(address, "need address");
+
+          const txResult = await sendTokenAsync({
+            args: [
+              config.destinationChainId,
+              address,
+              approvedAmountRef.current,
+              "0x",
+            ],
+          });
+          if (txResult?.hash) {
+            setTxState({
+              status: "submitted",
+              hash: txResult.hash,
+            });
+          }
+        } catch (error) {
+          if (error instanceof TransactionExecutionError) {
+            toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+            logger.error("Faied to transfer token:", error.cause);
+
+            setTxState({
+              status: "idle",
+            });
+            return;
+          }
+
+          if (error instanceof Error) {
+            setTxState({
+              status: "reverted",
+              error: error,
+            });
+          } else {
+            setTxState({
+              status: "reverted",
+              error: new Error("failed to transfer token"),
+            });
+          }
+
+          return;
+        }
       }
+
+      if (approveERC20Recepit) {
+        sendToken();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [address, approveERC20Recepit, config.destinationChainId, sendTokenAsync]
+  );
+
+  const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
+    async ({ amount }) => {
       if (!(decimals && address && gas)) {
         return;
       }
 
-      const bnAmount = parseUnits(`${Number(amount)}`, decimals);
+      invariant(tokenManagerAddress, "need token manager address");
 
       try {
-        onStatusUpdate?.({
-          status: "awaiting_approval",
+        approvedAmountRef.current = parseUnits(amount, decimals);
+
+        setTxState({
+          status: "awaiting_spend_approval",
+          amount: approvedAmountRef.current,
         });
 
-        await ierc20ApproveAsync({
-          args: [tokenManagerAddress, bnAmount],
+        await approveERC20Async({
+          args: [tokenManagerAddress, approvedAmountRef.current],
         });
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
@@ -85,53 +153,18 @@ export function useTokenManagerSendTokenMutation(
           );
           logger.error("Failed to approve token transfer:", error.cause);
 
-          onStatusUpdate?.({
-            status: "idle",
-          });
-          return;
+          setTxState({ status: "idle" });
         }
-      }
-
-      try {
-        onStatusUpdate?.({
-          status: "awaiting_approval",
-        });
-        debugger;
-
-        const txResult = await tokenManagerSendToken({
-          args: [config.destinationChainId, address, bnAmount, `0x`],
-        });
-        if (txResult?.hash) {
-          onStatusUpdate?.({
-            status: "submitted",
-            hash: txResult.hash,
-          });
-        }
-      } catch (error) {
-        if (error instanceof TransactionExecutionError) {
-          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-          logger.error("Faied to transfer token:", error.cause);
-
-          onStatusUpdate?.({
-            status: "idle",
-          });
-          return;
-        }
-
-        if (error instanceof Error) {
-          onStatusUpdate?.({
-            status: "reverted",
-            error: error,
-          });
-        } else {
-          onStatusUpdate?.({
-            status: "reverted",
-            error: new Error("failed to transfer token"),
-          });
-        }
-
-        return;
       }
     }
   );
+
+  return {
+    ...mutation,
+    txState,
+    reset: () => {
+      setTxState({ status: "idle" });
+      mutation.reset();
+    },
+  };
 }

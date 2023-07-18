@@ -1,7 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import { useMemo, useState } from "react";
 
-import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -46,6 +45,8 @@ export function useSendInterchainTokenState(props: {
   const {
     mutateAsync: interchainTransferAsync,
     isLoading: isInterchainTransferSending,
+    txState: interchainTransferTxState,
+    reset: resetInterchainTransferTxState,
   } = useInterchainTransferMutation({
     tokenAddress: props.tokenAddress,
     destinationChainId: selectedToChain?.id,
@@ -55,6 +56,8 @@ export function useSendInterchainTokenState(props: {
   const {
     mutateAsync: tokenManagerSendTokenAsync,
     isLoading: isTokenManagerSending,
+    txState: tokenManagerTxState,
+    reset: resetTokenManagerTxState,
   } = useTokenManagerSendTokenMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
@@ -62,30 +65,43 @@ export function useSendInterchainTokenState(props: {
     sourceChainId: props.sourceChain.id,
   });
 
-  const [txState, setTxState] = useTransactionState();
   const trpcContext = trpc.useContext();
 
   const refetchBalances = () =>
     trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
 
+  const resetTxState = () => {
+    resetInterchainTransferTxState();
+    resetTokenManagerTxState();
+  };
+
+  const isSending =
+    props.kind === "canonical"
+      ? isTokenManagerSending
+      : isInterchainTransferSending;
+
+  const txState =
+    props.kind === "canonical"
+      ? tokenManagerTxState
+      : interchainTransferTxState;
+
+  const sendTokenAsync =
+    props.kind === "canonical"
+      ? tokenManagerSendTokenAsync
+      : interchainTransferAsync;
+
   return [
     {
       isModalOpen,
       txState,
-      isSending:
-        props.kind === "canonical"
-          ? isTokenManagerSending
-          : isInterchainTransferSending,
+      isSending,
       selectedToChain,
       eligibleTargetChains,
     },
     {
       setIsModalOpen,
-      setTxState,
-      sendTokenAsync:
-        props.kind === "canonical"
-          ? tokenManagerSendTokenAsync
-          : interchainTransferAsync,
+      resetTxState,
+      sendTokenAsync,
       selectToChain,
       refetchBalances,
     },

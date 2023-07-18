@@ -55,7 +55,7 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
 
 const mocks = {
   setIsModalOpen: vi.fn(),
-  setTxState: vi.fn(),
+  resetTxState: vi.fn(),
   sendTokenAsync: vi.fn(),
   selectToChain: vi.fn(),
   refetchBalances: vi.fn(),
@@ -74,7 +74,7 @@ vi.mock("./SendInterchainToken.state.ts", () => ({
     } as State,
     {
       setIsModalOpen: mocks.setIsModalOpen,
-      setTxState: mocks.setTxState,
+      resetTxState: mocks.resetTxState,
       sendTokenAsync: mocks.sendTokenAsync,
       selectToChain: mocks.selectToChain,
       refetchBalances: mocks.refetchBalances,
@@ -101,6 +101,8 @@ describe("SendInterchainToken", () => {
         }}
         isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
+        kind="standardized"
+        tokenId="0x00"
       />
     );
 
@@ -135,6 +137,8 @@ describe("SendInterchainToken", () => {
         }}
         isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
+        kind="standardized"
+        tokenId="0x00"
       />
     );
 

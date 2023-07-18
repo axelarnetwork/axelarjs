@@ -5,7 +5,7 @@ import { useAccount, useMutation } from "wagmi";
 
 import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20BurnableMintable.hooks";
 import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
-import type { TransactionState } from "~/lib/hooks/useTransactionState";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -19,13 +19,12 @@ export type UseSendInterchainTokenConfig = {
 export type UseSendInterchainTokenInput = {
   tokenAddress: `0x${string}`;
   amount: string;
-  onFinished?: () => void;
-  onStatusUpdate?: (message: TransactionState) => void;
 };
 
 export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
+  const [txState, setTxState] = useTransactionState();
   const { data: decimals } = useIerc20BurnableMintableDecimals({
     address: config.tokenAddress,
   });
@@ -43,8 +42,8 @@ export function useInterchainTransferMutation(
     value: BigInt(gas ?? 0) * BigInt(2),
   });
 
-  return useMutation<void, unknown, UseSendInterchainTokenInput>(
-    async ({ amount, onStatusUpdate }) => {
+  const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
+    async ({ amount }) => {
       if (!(decimals && address && gas)) {
         return;
       }
@@ -52,7 +51,7 @@ export function useInterchainTransferMutation(
       const bnAmount = parseUnits(`${Number(amount)}`, decimals);
 
       try {
-        onStatusUpdate?.({
+        setTxState({
           status: "awaiting_approval",
         });
 
@@ -60,7 +59,7 @@ export function useInterchainTransferMutation(
           args: [config.destinationChainId, address, bnAmount, `0x`],
         });
         if (txResult?.hash) {
-          onStatusUpdate?.({
+          setTxState({
             status: "submitted",
             hash: txResult.hash,
           });
@@ -70,19 +69,19 @@ export function useInterchainTransferMutation(
           toast.error(`Transaction failed: ${error.cause.shortMessage}`);
           logger.error("Faied to transfer token:", error.cause);
 
-          onStatusUpdate?.({
+          setTxState({
             status: "idle",
           });
           return;
         }
 
         if (error instanceof Error) {
-          onStatusUpdate?.({
+          setTxState({
             status: "reverted",
             error: error,
           });
         } else {
-          onStatusUpdate?.({
+          setTxState({
             status: "reverted",
             error: new Error("failed to transfer token"),
           });
@@ -92,4 +91,13 @@ export function useInterchainTransferMutation(
       }
     }
   );
+
+  return {
+    ...mutation,
+    txState,
+    reset: () => {
+      setTxState({ status: "idle" });
+      mutation.reset();
+    },
+  };
 }
