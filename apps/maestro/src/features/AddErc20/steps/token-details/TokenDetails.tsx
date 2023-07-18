@@ -46,7 +46,7 @@ const TokenDetails: FC = () => {
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
       tokenCap: data.tokenCap,
-      mintTo: data.mintTo,
+      distributor: data.distributor,
       allowMinting: data.allowMinting,
       salt: data.salt as `0x${string}`,
     });
@@ -137,13 +137,13 @@ const TokenDetails: FC = () => {
                 </Label>
               </FormControl>
               <FormControl>
-                <Label htmlFor="amountToMint">Mint tokens to</Label>
+                <Label htmlFor="distributor">Mint tokens to</Label>
                 <FormInput
-                  id="mintTo"
+                  id="distributor"
                   placeholder="Enter account address to mint to"
                   min={0}
                   onKeyDown={preventNonNumericInput}
-                  {...register("mintTo", {
+                  {...register("distributor", {
                     disabled: isReadonly,
                     validate(value) {
                       if (!isAddress(String(value))) {

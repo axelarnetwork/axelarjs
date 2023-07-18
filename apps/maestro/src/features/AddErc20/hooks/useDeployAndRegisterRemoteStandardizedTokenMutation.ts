@@ -35,8 +35,8 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   decimals: number;
   destinationChainIds: string[];
   gasFees: bigint[];
-  cap?: bigint;
-  mintTo?: `0x${string}`;
+  initialSupply?: bigint;
+  distributor?: `0x${string}`;
 };
 
 const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
@@ -46,8 +46,8 @@ const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
   decimals: 0,
   destinationChainIds: [],
   gasFees: [],
-  cap: BigInt(0),
-  mintTo: `0x000`,
+  initialSupply: BigInt(0),
+  distributor: `0x000`,
 };
 
 export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
@@ -177,8 +177,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
         type: "pending_approval",
       });
       try {
-        const cap = input.cap
-          ? parseUnits(String(input.cap), input.decimals)
+        const initialSupply = input.initialSupply
+          ? parseUnits(String(input.initialSupply), input.decimals)
           : BigInt(0);
 
         const baseArgs = [
@@ -191,7 +191,11 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
         const deployTxData = encodeFunctionData({
           functionName: "deployAndRegisterStandardizedToken",
           abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-          args: [...baseArgs, cap, input.mintTo ?? deployerAddress],
+          args: [
+            ...baseArgs,
+            initialSupply,
+            input.distributor ?? deployerAddress,
+          ],
         });
 
         const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
@@ -204,8 +208,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
             abi: INTERCHAIN_TOKEN_SERVICE_ABI,
             args: [
               ...baseArgs,
-              input.mintTo ?? deployerAddress,
-              input.mintTo ?? deployerAddress,
+              "0x", // remote tokens cannot be minted, so the operator is 0x
+              input.distributor ?? deployerAddress,
               chainId,
               gasFee,
             ],

@@ -15,7 +15,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
   tokenCap: numericString(),
-  mintTo: hex40Literal().optional(),
+  distributor: hex40Literal().optional(),
   allowMinting: z.boolean(),
   salt: hex64Literal(),
 });
@@ -47,7 +47,7 @@ export const INITIAL_STATE = {
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
     tokenCap: "0",
-    mintTo: undefined as `0x${string}` | undefined,
+    distributor: undefined as `0x${string}` | undefined,
     salt: "0x" as `0x${string}`,
     allowMinting: false,
   },
@@ -83,14 +83,14 @@ function useAddErc20State(
   /**
    * Generate a random salt on first render
    * and set it as the default value for the form
-   * also set the default value for mintTo
+   * also set the default value for distributor
    */
   useEffect(
     () => {
       const salt = generateRandomHash();
 
       tokenDetailsForm.setValue("salt", salt);
-      tokenDetailsForm.setValue("mintTo", address);
+      tokenDetailsForm.setValue("distributor", address);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -135,7 +135,7 @@ function useAddErc20State(
           tokenDetailsForm.reset(initialState.tokenDetails);
 
           tokenDetailsForm.setValue("salt", generateRandomHash());
-          tokenDetailsForm.setValue("mintTo", address);
+          tokenDetailsForm.setValue("distributor", address);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {
