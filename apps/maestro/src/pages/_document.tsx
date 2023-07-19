@@ -2,7 +2,7 @@ import { Head, Html, Main, NextScript } from "next/document";
 
 export default function Document() {
   return (
-    <Html lang="en" data-theme="light">
+    <Html lang="en" data-theme="light" className="scroll-smooth">
       <Head>
         <meta charSet="utf-8" />
         <link rel="manifest" href="/manifest.json" />

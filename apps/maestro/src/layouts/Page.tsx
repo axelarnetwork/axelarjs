@@ -1,6 +1,6 @@
-import { Badge, Button } from "@axelarjs/ui";
+import { Badge, Button, Clamp } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo, type ComponentProps } from "react";
 import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -21,7 +21,7 @@ type PageState =
   | "network-mismatch"
   | "unsupported-network";
 
-type Props = JSX.IntrinsicElements["section"] & {
+type Props = ComponentProps<typeof Clamp> & {
   pageTitle?: string;
   pageDescription?: string;
   mustBeConnected?: boolean;
@@ -176,8 +176,8 @@ const Page = ({
           <meta name="description" content={pageDescription} />
         )}
       </Head>
-
-      <section
+      <Clamp
+        $as="section"
         className={clsx(
           "mt-20 grid flex-1 px-4 xl:px-2 2xl:px-0",
           {
@@ -188,7 +188,7 @@ const Page = ({
         {...props}
       >
         {pageContent}
-      </section>
+      </Clamp>
       {isLoading && (
         <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
           <div className="grid place-items-center gap-12 text-center">
