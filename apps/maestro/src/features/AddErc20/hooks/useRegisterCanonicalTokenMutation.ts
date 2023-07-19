@@ -1,4 +1,7 @@
-import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import {
+  INTERCHAIN_TOKEN_SERVICE_ABI,
+  INTERCHAIN_TOKEN_SERVICE_ARGS,
+} from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useRef, useState } from "react";
@@ -128,8 +131,10 @@ export function useRegisterCanonicalTokenMutation(config: {
     try {
       const deployTxData = encodeFunctionData({
         functionName: "registerCanonicalToken",
-        args: [input.tokenAddress],
         abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+        args: INTERCHAIN_TOKEN_SERVICE_ARGS.registerCanonicalToken({
+          tokenAddress: input.tokenAddress,
+        }),
       });
 
       const tx = await multicallAsync({
