@@ -1,8 +1,7 @@
-import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import { encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData } from "@axelarjs/evm";
 import { invariant, Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { encodeFunctionData } from "viem";
 import { useNetwork } from "wagmi";
 
 import {
@@ -60,24 +59,18 @@ export function useRegisterRemoteStandardizedTokens(input: {
 
     invariant(tokenDeployment.kind === "standardized", "invalid token kind");
 
-    return destinationChainIds.map((chainId, i) => {
-      const gasFee = gasFees[i];
-
-      return encodeFunctionData({
-        functionName: "deployAndRegisterRemoteStandardizedToken",
-        abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-        args: [
-          tokenDeployment.salt,
-          tokenDeployment.tokenName,
-          tokenDeployment.tokenSymbol,
-          tokenDeployment.tokenDecimals,
-          "0x", // set distributor to 0x to
-          tokenDeployment.deployerAddress,
-          chainId,
-          gasFee,
-        ],
-      });
-    });
+    return destinationChainIds.map((chainId, i) =>
+      encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData({
+        salt: tokenDeployment.salt,
+        name: tokenDeployment.tokenName,
+        symbol: tokenDeployment.tokenSymbol,
+        decimals: tokenDeployment.tokenDecimals,
+        distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+        operator: tokenDeployment.deployerAddress,
+        destinationChain: chainId,
+        gasValue: gasFees[i],
+      })
+    );
   }, [destinationChainIds, gasFees, tokenDeployment]);
 
   const totalGasFee = useMemo(
