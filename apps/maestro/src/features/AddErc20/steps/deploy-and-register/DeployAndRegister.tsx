@@ -211,7 +211,7 @@ export const Step3: FC = () => {
                   position="top"
                 >
                   <Button
-                    className="relative w-full rounded-2xl hover:ring"
+                    className="w-full rounded-2xl hover:ring"
                     size="sm"
                     role="button"
                     variant={isSelected ? "success" : undefined}

@@ -34,7 +34,7 @@ export const ChainIcon: FC<{
   return (
     <div
       className={clsx(
-        "bg-base-200 relative rounded-full p-0.5 shadow-black group-hover:ring-2",
+        "bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2",
         props.className
       )}
     >
@@ -181,7 +181,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 }}
                 className="group"
               >
-                <div className="bg-base-200 relative rounded-full p-0.5 shadow-black group-hover:ring-2">
+                <div className="bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2">
                   <HelpCircleIcon size="24" />
                 </div>
                 <div>All Chains</div>

@@ -96,7 +96,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidAddress && search.length >= 10);
 
   return (
-    <FormControl className="relative w-full max-w-xs md:max-w-md">
+    <FormControl className="w-full max-w-xs md:max-w-md">
       <InputGroup
         className={clsx("rounded-md transition-transform", {
           "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
