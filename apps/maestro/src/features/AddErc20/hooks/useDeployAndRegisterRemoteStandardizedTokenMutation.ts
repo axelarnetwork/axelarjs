@@ -1,13 +1,14 @@
-import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import {
+  encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData,
+  encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData,
+  encodeInterchainTokenServiceGetCustomTokenIdArgs,
+  encodeInterchainTokenServiceGetStandardizedTokenAddressArgs,
+} from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useRef, useState } from "react";
 
-import {
-  encodeFunctionData,
-  parseUnits,
-  TransactionExecutionError,
-} from "viem";
+import { parseUnits, TransactionExecutionError } from "viem";
 import {
   useAccount,
   useMutation,
@@ -62,13 +63,18 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   const { chain } = useNetwork();
 
   const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: [deployerAddress as `0x${string}`, config.salt],
+    args: encodeInterchainTokenServiceGetCustomTokenIdArgs({
+      salt: config.salt,
+      sender: deployerAddress as `0x${string}`,
+    }),
     enabled: deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
   const { data: tokenAddress } =
     useInterchainTokenServiceGetStandardizedTokenAddress({
-      args: [tokenId as `0x${string}`],
+      args: encodeInterchainTokenServiceGetStandardizedTokenAddressArgs({
+        tokenId: tokenId as `0x${string}`,
+      }),
       enabled: Boolean(tokenId),
     });
 
@@ -181,39 +187,34 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
           ? parseUnits(String(input.initialSupply), input.decimals)
           : BigInt(0);
 
-        const baseArgs = [
-          config.salt,
-          input.tokenName,
-          input.tokenSymbol,
-          input.decimals,
-        ] as const;
+        const baseArgs = {
+          salt: config.salt,
+          name: input.tokenName,
+          symbol: input.tokenSymbol,
+          decimals: input.decimals,
+        };
 
-        const deployTxData = encodeFunctionData({
-          functionName: "deployAndRegisterStandardizedToken",
-          abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-          args: [
+        const deployTxData =
+          encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData({
             ...baseArgs,
-            initialSupply,
-            input.distributor ?? deployerAddress,
-          ],
-        });
+            mintAmount: initialSupply,
+            distributor: input.distributor ?? deployerAddress,
+          });
 
         const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
 
         const registerTxData = input.destinationChainIds.map((chainId, i) => {
           const gasFee = input.gasFees[i];
 
-          return encodeFunctionData({
-            functionName: "deployAndRegisterRemoteStandardizedToken",
-            abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-            args: [
+          return encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData(
+            {
               ...baseArgs,
-              "0x", // remote tokens cannot be minted, so the operator is 0x
-              input.distributor ?? deployerAddress,
-              chainId,
-              gasFee,
-            ],
-          });
+              operator: input.distributor ?? deployerAddress,
+              distributor: "0x",
+              destinationChain: chainId,
+              gasValue: gasFee,
+            }
+          );
         });
 
         const tx = await multicallAsync({

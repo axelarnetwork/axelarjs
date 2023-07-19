@@ -1,8 +1,7 @@
-import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import { encodeInterchainTokenServiceDeployRemoteCanonicalTokenData } from "@axelarjs/evm";
 import { invariant, Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { encodeFunctionData } from "viem";
 import { useNetwork } from "wagmi";
 
 import {
@@ -58,10 +57,10 @@ export function useRegisterRemoteCanonicalTokens(input: {
     return destinationChainIds.map((axelarChainId, i) => {
       const gasFee = gasFees[i];
 
-      return encodeFunctionData({
-        functionName: "deployRemoteCanonicalToken",
-        abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-        args: [tokenDeployment.tokenId, axelarChainId, gasFee],
+      return encodeInterchainTokenServiceDeployRemoteCanonicalTokenData({
+        tokenId: tokenDeployment.tokenId,
+        destinationChain: axelarChainId,
+        gasValue: gasFee,
       });
     });
   }, [destinationChainIds, gasFees, tokenDeployment]);
