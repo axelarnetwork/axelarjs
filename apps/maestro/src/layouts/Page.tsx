@@ -101,7 +101,11 @@ const Page = ({
         return <div>Loading...</div>;
       case "disconnected":
         return mustBeConnected ? (
-          <div className="grid w-full flex-1 place-items-center">
+          <div
+            className="grid min-h-[100dvh] w-full flex-1 place-items-center"
+            // id needed for the hero cta smooth scroll
+            id="main-content"
+          >
             <SearchInterchainToken onTokenFound={handleTokenFound} />
           </div>
         ) : (
