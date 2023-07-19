@@ -39,7 +39,7 @@ export function useRegisterRemoteCanonicalTokens(input: {
     [chain, computed.indexedByChainId]
   );
 
-  const { data: tokenDeployment } = useInterchainTokenDetailsQuery({
+  const { data: tokenDetails } = useInterchainTokenDetailsQuery({
     chainId: input.originChainId,
     tokenAddress: input.tokenAddress,
   });
@@ -50,20 +50,20 @@ export function useRegisterRemoteCanonicalTokens(input: {
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDeployment || !gasFees) return [];
+    if (!tokenDetails || !gasFees) return [];
 
-    invariant(tokenDeployment.kind === "canonical", "invalid token kind");
+    invariant(tokenDetails.kind === "canonical", "invalid token kind");
 
     return destinationChainIds.map((axelarChainId, i) => {
-      const gasFee = gasFees[i];
+      const gasValue = gasFees[i];
 
       return encodeInterchainTokenServiceDeployRemoteCanonicalTokenData({
-        tokenId: tokenDeployment.tokenId,
+        tokenId: tokenDetails.tokenId,
         destinationChain: axelarChainId,
-        gasValue: gasFee,
+        gasValue,
       });
     });
-  }, [destinationChainIds, gasFees, tokenDeployment]);
+  }, [destinationChainIds, gasFees, tokenDetails]);
 
   const totalGasFee = useMemo(
     () =>

@@ -59,22 +59,18 @@ export function useRegisterRemoteStandardizedTokens(input: {
 
     invariant(tokenDeployment.kind === "standardized", "invalid token kind");
 
-    return destinationChainIds.map((chainId, i) => {
-      const gasFee = gasFees[i];
-
-      return encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData(
-        {
-          salt: tokenDeployment.salt,
-          name: tokenDeployment.tokenName,
-          symbol: tokenDeployment.tokenSymbol,
-          decimals: tokenDeployment.tokenDecimals,
-          distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
-          operator: tokenDeployment.deployerAddress,
-          destinationChain: chainId,
-          gasValue: gasFee,
-        }
-      );
-    });
+    return destinationChainIds.map((chainId, i) =>
+      encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData({
+        salt: tokenDeployment.salt,
+        name: tokenDeployment.tokenName,
+        symbol: tokenDeployment.tokenSymbol,
+        decimals: tokenDeployment.tokenDecimals,
+        distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+        operator: tokenDeployment.deployerAddress,
+        destinationChain: chainId,
+        gasValue: gasFees[i],
+      })
+    );
   }, [destinationChainIds, gasFees, tokenDeployment]);
 
   const totalGasFee = useMemo(

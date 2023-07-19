@@ -204,7 +204,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
         const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
 
         const registerTxData = input.destinationChainIds.map((chainId, i) => {
-          const gasFee = input.gasFees[i];
+          const gasValue = input.gasFees[i];
 
           return encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData(
             {
@@ -212,7 +212,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
               distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
               operator: input.deployerAddress ?? deployerAddress,
               destinationChain: chainId,
-              gasValue: gasFee,
+              gasValue,
             }
           );
         });
