@@ -54,7 +54,7 @@ export default function Home() {
                 variant="ghost"
                 shape="circle"
                 size="lg"
-                className="animate-pulse md:animate-none md:hover:animate-pulse"
+                className="bg-accent/25 animate-pulse"
                 onClick={() => {
                   // Scroll to main content
                   window.scrollTo(
@@ -63,7 +63,7 @@ export default function Home() {
                   );
                 }}
               >
-                <ChevronDownIcon size="2.5rem" />
+                <ChevronDownIcon size="2.5rem" className="text-black/75" />
               </Button>
             </div>
           </div>
