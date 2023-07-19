@@ -9,7 +9,7 @@ import {
   useInterchainTokenServiceMulticall,
   usePrepareInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
-import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
@@ -45,7 +45,7 @@ export function useRegisterRemoteCanonicalTokens(input: {
     tokenAddress: input.tokenAddress,
   });
 
-  const { data: gasFees } = useEstimateGasFeeMultipleChains({
+  const { data: gasFees } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
     sourceChainId: sourceChainId ?? "0",
   });

@@ -1,9 +1,9 @@
-import type { GasToken } from "@axelar-network/axelarjs-sdk";
+import type { GasTokenKind } from "@axelarjs/evm";
 
 export type EstimateGasFeeParams = {
   sourceChainId: string;
   destinationChainId: string;
-  sourceChainTokenSymbol: GasToken;
+  sourceChainTokenSymbol: GasTokenKind;
   gasLimit?: number;
   gasMultipler?: number;
   minGasPrice?: string;

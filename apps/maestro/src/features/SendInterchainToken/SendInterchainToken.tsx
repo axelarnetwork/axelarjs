@@ -32,6 +32,8 @@ type Props = {
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
+  originTokenAddress?: `0x${string}`;
+  originTokenChainId?: number;
   balance: {
     tokenBalance: string;
     decimals: string | number | null;
@@ -45,6 +47,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     sourceChain: props.sourceChain,
     isModalOpen: props.isOpen,
     kind: props.kind,
+    originTokenAddress: props.originTokenAddress,
+    originTokenChainId: props.originTokenChainId,
   });
 
   const {
@@ -55,9 +59,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     reset: resetForm,
     setValue,
   } = useForm<FormState>({
-    defaultValues: {
-      amountToSend: undefined,
-    },
     mode: "onChange",
     reValidateMode: "onChange",
   });

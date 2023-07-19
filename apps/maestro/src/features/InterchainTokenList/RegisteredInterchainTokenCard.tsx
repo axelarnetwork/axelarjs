@@ -43,6 +43,8 @@ const StatusIndicator = (
 
 export type Props = TokenInfo & {
   hasRemoteTokens: boolean;
+  originTokenAddress?: `0x${string}`;
+  originTokenChainId?: number;
 };
 
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
@@ -224,6 +226,8 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                         kind={props.kind}
                         sourceChain={props.chain as EVMChainConfig}
                         balance={balance}
+                        originTokenAddress={props.originTokenAddress}
+                        originTokenChainId={props.originTokenChainId}
                       />
                     )}
                   </>

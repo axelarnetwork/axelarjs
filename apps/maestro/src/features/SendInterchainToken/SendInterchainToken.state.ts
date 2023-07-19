@@ -9,6 +9,8 @@ import { useTokenManagerSendTokenMutation } from "./hooks/useTokenManagerSendTok
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
+  originTokenAddress?: `0x${string}`;
+  originTokenChainId?: number;
   tokenId: `0x${string}`;
   sourceChain: EVMChainConfig;
   kind: "canonical" | "standardized";
@@ -21,15 +23,26 @@ export function useSendInterchainTokenState(props: {
     chainId: props.sourceChain.chain_id,
   });
 
+  const { data: originInterchainToken } = useInterchainTokensQuery({
+    tokenAddress: props.originTokenAddress,
+    chainId: props.originTokenChainId,
+  });
+
+  const referenceToken = useMemo(
+    () =>
+      props.kind === "canonical" ? originInterchainToken : interchainToken,
+    [interchainToken, originInterchainToken, props.kind]
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
 
   const eligibleTargetChains = useMemo(() => {
-    return (interchainToken?.matchingTokens ?? [])
+    return (referenceToken?.matchingTokens ?? [])
       .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
       .map((x) => computed.indexedByChainId[x.chainId]);
   }, [
-    interchainToken?.matchingTokens,
+    referenceToken?.matchingTokens,
     props.sourceChain.chain_id,
     computed.indexedByChainId,
   ]);

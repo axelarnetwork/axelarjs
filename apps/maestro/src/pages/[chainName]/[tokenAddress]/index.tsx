@@ -32,7 +32,7 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
@@ -303,7 +303,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   ]);
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
-    useEstimateGasFeeMultipleChains({
+    useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
       destinationChainIds: targetDeploymentChains,
       gasLimit: 1_000_000,

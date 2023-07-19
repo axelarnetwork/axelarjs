@@ -7,8 +7,8 @@ import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20Burnabl
 import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
-import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
@@ -31,7 +31,7 @@ export function useInterchainTransferMutation(
 
   const { address } = useAccount();
 
-  const { data: gas } = trpc.axelarjsSDK.estimateGasFee.useQuery({
+  const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: config.sourceChainId,
     destinationChainId: config.destinationChainId,
     sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),

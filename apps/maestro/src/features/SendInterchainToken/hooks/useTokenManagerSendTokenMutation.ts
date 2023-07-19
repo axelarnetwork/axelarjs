@@ -13,8 +13,8 @@ import { useInterchainTokenServiceGetTokenManagerAddress } from "~/lib/contracts
 import { useTokenManagerSendToken } from "~/lib/contracts/TokenManager.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
-import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
@@ -39,7 +39,7 @@ export function useTokenManagerSendTokenMutation(
 
   const { address } = useAccount();
 
-  const { data: gas } = trpc.axelarjsSDK.estimateGasFee.useQuery({
+  const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: config.sourceChainId,
     destinationChainId: config.destinationChainId,
     sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
@@ -56,10 +56,11 @@ export function useTokenManagerSendTokenMutation(
       address: config.tokenAddress,
     });
 
-  const { writeAsync: sendTokenAsync } = useTokenManagerSendToken({
-    address: tokenManagerAddress,
-    value: BigInt(gas ?? 0) * BigInt(2),
-  });
+  const { writeAsync: sendTokenAsync, data: sendTokenData } =
+    useTokenManagerSendToken({
+      address: tokenManagerAddress,
+      value: BigInt(gas ?? 0) * BigInt(2),
+    });
 
   const { data: approveERC20Recepit } = useWaitForTransaction({
     hash: approveERC20Data?.hash,
@@ -119,7 +120,7 @@ export function useTokenManagerSendTokenMutation(
         }
       }
 
-      if (approveERC20Recepit) {
+      if (approveERC20Recepit && !sendTokenData?.hash) {
         sendToken();
       }
     },
