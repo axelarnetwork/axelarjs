@@ -68,8 +68,8 @@ export function useRegisterRemoteStandardizedTokens(input: {
           name: tokenDeployment.tokenName,
           symbol: tokenDeployment.tokenSymbol,
           decimals: tokenDeployment.tokenDecimals,
-          operator: "0x",
-          distributor: tokenDeployment.deployerAddress,
+          operator: tokenDeployment.deployerAddress,
+          distributor: "0x",
           destinationChain: chainId,
           gasValue: gasFee,
         }
