@@ -1,14 +1,16 @@
 import { Alert, Button, Dialog } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
-import { useLocalStorageState } from "@axelarjs/utils/react";
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
+import { ChevronDownIcon } from "lucide-react";
 import { useNetwork } from "wagmi";
 
+import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
+import { useLayoutStateContainer } from "~/layouts/MainLayout.state";
 import Page from "~/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
@@ -16,12 +18,7 @@ const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
 export default function Home() {
   const router = useRouter();
   const { chain } = useNetwork();
-  const [persistedState, setPersistedState] = useLocalStorageState(
-    "@axelar/maestro/showBetaBanner",
-    {
-      showBetaBanner: true,
-    }
-  );
+  const [layoutState, layoutActions] = useLayoutStateContainer();
 
   const handleTokenFound = useCallback(
     (result: { tokenAddress: string; tokenId?: string }) => {
@@ -33,43 +30,45 @@ export default function Home() {
     [chain, router]
   );
 
-  const handleDismissBanner = useCallback(() => {
-    setPersistedState({ showBetaBanner: false });
-  }, [setPersistedState]);
+  const handleDismissBanner = layoutActions.dismissDisclaimerBanner;
 
   return (
     <>
-      <div
-        className="hero min-h-[100dvh]"
-        style={{
-          backgroundImage: "url(/ilustrations/hero.webp)",
-        }}
-      >
-        <div className="hero-overlay bg-opacity-60"></div>
-        <div className="hero-content text-neutral-content translate-y-[30dvh] text-center md:-translate-y-[20dvh]">
-          <div className="max-w-lg">
-            <h1 className="mb-5 text-3xl font-bold md:text-5xl">
-              Interchain Token Service
-            </h1>
-            <p className="mb-5 text-sm md:text-base">
-              Interchain token service is a decentralized service that allows
-              you to transfer your tokens between blockchains.
-            </p>
-            <Button
-              variant="primary"
-              onClick={() => {
-                // Scroll to main content
-                window.scrollTo(
-                  0,
-                  document.getElementById("main-content")?.offsetTop ?? 0
-                );
-              }}
-            >
-              Take your token Interchain!
-            </Button>
+      {!layoutState.isHeroBannerDismissed && (
+        <section
+          className="hero animate-fade-in min-h-[100dvh] origin-center [animation-duration:1.5s]"
+          style={{
+            backgroundImage: "url(/ilustrations/hero3.webp)",
+          }}
+        >
+          <div className="hero-overlay bg-opacity-60" />
+          <div className="hero-content text-neutral-content translate-y-[30dvh] text-center md:-translate-y-[15dvh]">
+            <div className="max-w-lg">
+              <h1 className="mb-5 text-3xl font-black text-white/75 drop-shadow-lg md:text-5xl">
+                {APP_NAME}
+              </h1>
+              <p className="mb-5 px-4 text-base text-white/60 drop-shadow-lg md:text-lg">
+                Take your tokens Interchain with the {APP_NAME}
+              </p>
+              <Button
+                variant="ghost"
+                shape="circle"
+                size="lg"
+                className="animate-pulse md:animate-none md:hover:animate-pulse"
+                onClick={() => {
+                  // Scroll to main content
+                  window.scrollTo(
+                    0,
+                    document.getElementById("main-content")?.offsetTop ?? 0
+                  );
+                }}
+              >
+                <ChevronDownIcon size="2.5rem" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+      )}
       <Page
         pageTitle="Axelar Interchain Token Service"
         pageDescription="Interchain orchestration powered by Axelar"
@@ -81,7 +80,7 @@ export default function Home() {
           id="main-content"
         >
           {NEXT_PUBLIC_NETWORK_ENV === "testnet" &&
-            persistedState.showBetaBanner && (
+            !layoutState.isBetaBannerDismissed && (
               <Dialog open onClose={handleDismissBanner} className="bg-warning">
                 <Dialog.Body className="bg-warning text-warning-content">
                   <Dialog.CornerCloseAction onClick={handleDismissBanner} />
