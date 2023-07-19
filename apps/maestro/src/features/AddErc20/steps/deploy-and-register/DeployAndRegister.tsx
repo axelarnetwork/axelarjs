@@ -83,7 +83,7 @@ export const Step3: FC = () => {
           gasFees: state.gasFees,
           sourceChainId: sourceChain.chain_name,
           initialSupply: BigInt(rootState.tokenDetails.tokenCap),
-          distributor: rootState.tokenDetails.distributor,
+          deployerAddress: rootState.tokenDetails.distributor,
         },
         {
           onError(error) {

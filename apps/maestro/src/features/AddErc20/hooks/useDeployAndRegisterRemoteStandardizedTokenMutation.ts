@@ -37,7 +37,7 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   destinationChainIds: string[];
   gasFees: bigint[];
   initialSupply?: bigint;
-  distributor?: `0x${string}`;
+  deployerAddress?: `0x${string}`;
 };
 
 const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
@@ -48,7 +48,7 @@ const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
   destinationChainIds: [],
   gasFees: [],
   initialSupply: BigInt(0),
-  distributor: `0x000`,
+  deployerAddress: `0x`,
 };
 
 export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
@@ -198,7 +198,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
           encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData({
             ...baseArgs,
             mintAmount: initialSupply,
-            distributor: input.distributor ?? deployerAddress,
+            distributor: input.deployerAddress ?? deployerAddress,
           });
 
         const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
@@ -209,8 +209,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
           return encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData(
             {
               ...baseArgs,
-              operator: input.distributor ?? deployerAddress,
-              distributor: "0x",
+              operator: input.deployerAddress ?? deployerAddress,
+              distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
               destinationChain: chainId,
               gasValue: gasFee,
             }
