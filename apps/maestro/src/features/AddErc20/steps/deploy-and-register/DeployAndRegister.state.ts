@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { useNetwork } from "wagmi";
 
-import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 
@@ -29,7 +29,7 @@ export function useStep3ChainSelectionState() {
     data: gasFees,
     isLoading: isGasPriceQueryLoading,
     isError: isGasPriceQueryError,
-  } = useEstimateGasFeeMultipleChains({
+  } = useEstimateGasFeeMultipleChainsQuery({
     sourceChainId,
     destinationChainIds: rootState.selectedChains,
     gasLimit: 1_000_000,

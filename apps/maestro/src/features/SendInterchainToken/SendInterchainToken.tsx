@@ -27,9 +27,13 @@ type FormState = {
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
+  tokenId: `0x${string}`;
+  kind: "canonical" | "standardized";
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
+  originTokenAddress?: `0x${string}`;
+  originTokenChainId?: number;
   balance: {
     tokenBalance: string;
     decimals: string | number | null;
@@ -39,8 +43,12 @@ type Props = {
 export const SendInterchainToken: FC<Props> = (props) => {
   const [state, actions] = useSendInterchainTokenState({
     tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
     sourceChain: props.sourceChain,
     isModalOpen: props.isOpen,
+    kind: props.kind,
+    originTokenAddress: props.originTokenAddress,
+    originTokenChainId: props.originTokenChainId,
   });
 
   const {
@@ -51,9 +59,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     reset: resetForm,
     setValue,
   } = useForm<FormState>({
-    defaultValues: {
-      amountToSend: undefined,
-    },
     mode: "onChange",
     reValidateMode: "onChange",
   });
@@ -69,14 +74,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
       {
         tokenAddress: props.tokenAddress,
         amount: data.amountToSend,
-        onStatusUpdate(state) {
-          if (state.status === "reverted") {
-            toast.error("Failed to send token. Please try again.");
-            logger.always.error(state.error);
-          }
-
-          actions.setTxState(state);
-        },
       },
       {
         // handles unhandled errors in the mutation
@@ -92,6 +89,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   const buttonChildren = useMemo(() => {
     switch (state.txState?.status) {
+      case "awaiting_spend_approval":
+        return "Approve spend on wallet";
       case "awaiting_approval":
         return "Confirm on wallet";
       case "submitted":
@@ -136,7 +135,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           }
           props.onClose?.();
           resetForm();
-          actions.setTxState({ status: "idle" });
+          actions.resetTxState();
         }
         actions.setIsModalOpen(isOpen);
       }}
@@ -240,7 +239,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               onAllChainsExecuted={async () => {
                 await actions.refetchBalances();
                 resetForm();
-                actions.setTxState({ status: "idle" });
+                actions.resetTxState();
                 actions.setIsModalOpen(false);
                 toast.success("Tokens sent successfully!");
               }}

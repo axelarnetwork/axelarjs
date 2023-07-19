@@ -70,7 +70,7 @@ const AddErc20: FC<AddErc20Props> = () => {
           className="w-full max-w-xs md:max-w-md"
           variant="primary"
         >
-          Deploy a new ERC-20 token
+          Deploy a new Interchain Token
         </Button>
       )}
     >
