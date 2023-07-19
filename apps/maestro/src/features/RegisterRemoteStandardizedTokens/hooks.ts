@@ -68,8 +68,8 @@ export function useRegisterRemoteStandardizedTokens(input: {
           name: tokenDeployment.tokenName,
           symbol: tokenDeployment.tokenSymbol,
           decimals: tokenDeployment.tokenDecimals,
-          operator: tokenDeployment.deployerAddress,
           distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+          operator: tokenDeployment.deployerAddress,
           destinationChain: chainId,
           gasValue: gasFee,
         }

@@ -209,8 +209,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
           return encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData(
             {
               ...baseArgs,
-              operator: input.deployerAddress ?? deployerAddress,
               distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+              operator: input.deployerAddress ?? deployerAddress,
               destinationChain: chainId,
               gasValue: gasFee,
             }

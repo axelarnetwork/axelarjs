@@ -17,7 +17,7 @@ export const contracts = [
   {
     name: INTERCHAIN_TOKEN_SERVICE_ABI.contractName,
     abi: INTERCHAIN_TOKEN_SERVICE_ABI.abi,
-    address: undefined, // you can set this as NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS in .env.local for fixed contract addresses
+    address: "0xF786e21509A9D50a9aFD033B5940A2b7D872C208" as `0x${string}`, // read from .env.local (NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS)
   },
   {
     name: TOKEN_MANAGER_ABI.contractName,
