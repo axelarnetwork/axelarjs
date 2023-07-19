@@ -46,7 +46,7 @@ export default function Home() {
         }}
       >
         <div className="hero-overlay bg-opacity-60"></div>
-        <div className="hero-content text-neutral-content translate-y-48 text-center md:-translate-y-56">
+        <div className="hero-content text-neutral-content translate-y-[30dvh] text-center md:-translate-y-[20dvh]">
           <div className="max-w-lg">
             <h1 className="mb-5 text-3xl font-bold md:text-5xl">
               Interchain Token Service
