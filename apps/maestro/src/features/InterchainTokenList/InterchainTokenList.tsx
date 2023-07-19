@@ -32,6 +32,8 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
 
   const selectedTokens = tokens.filter((x) => x.isSelected);
 
+  const originToken = tokens.find((x) => x.isOriginToken);
+
   return (
     <section className="grid gap-4">
       <header className="flex items-center justify-between gap-2 text-2xl">
@@ -74,6 +76,8 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
                 key={token.chainId}
                 {...token}
                 hasRemoteTokens={tokens.length > 1}
+                originTokenAddress={originToken?.tokenAddress}
+                originTokenChainId={originToken?.chainId}
               />
             ) : (
               <UnregisteredInterchainTokenCard

@@ -4,6 +4,7 @@ import type { TransactionReceipt } from "viem";
 
 export type TransactionState<TError = Error> =
   | { status: "idle" }
+  | { status: "awaiting_spend_approval"; amount: bigint }
   | { status: "awaiting_approval" }
   | { status: "submitted"; hash: `0x${string}` }
   | { status: "confirmed"; receipt: TransactionReceipt; hash?: `0x${string}` }
