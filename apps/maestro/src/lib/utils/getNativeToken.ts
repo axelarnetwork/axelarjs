@@ -13,6 +13,7 @@ const GAS_TOKEN_MAP: Record<string, GasTokenKind> = {
   kava: GAS_TOKENS.KAVA,
   base: GAS_TOKENS.BASE,
   arbitrum: GAS_TOKENS.ARBITRUM,
+  linea: GAS_TOKENS.LINEA,
 };
 
 export function getNativeToken(chainId: string) {
