@@ -8,6 +8,7 @@ import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./token-manager.abi";
 
 export * as TOKEN_MANAGER_ARGS from "./token-manager.args";
+export type * as TOKEN_MANAGER_TYPES from "./token-manager.args";
 
 export const TOKEN_MANAGER_ABI = ABI_FILE.abi;
 

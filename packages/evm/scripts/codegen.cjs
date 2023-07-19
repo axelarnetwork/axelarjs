@@ -63,6 +63,7 @@ import { Chain } from "viem";
 import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./${folder}.abi";
 export * as  ${constantName}_ARGS from "./${folder}.args";
+export type * as ${constantName}_TYPES from "./${folder}.args";
 
 export const ${constantName}_ABI = ABI_FILE.abi;
 
