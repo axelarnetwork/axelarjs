@@ -31,7 +31,7 @@ function useThemeState(initialState: ThemeKind | null = null) {
     const persistedTheme = localStorage.getItem(THEME_KEY);
 
     const defaultTheme =
-      persistedTheme && isValidTheme(persistedTheme) ? persistedTheme : "light";
+      persistedTheme && isValidTheme(persistedTheme) ? persistedTheme : "dark";
 
     setTheme(defaultTheme);
   }, [theme]);

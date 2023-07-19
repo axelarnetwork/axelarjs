@@ -22,6 +22,7 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
+import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteCanonicalTokens } from "~/features/RegisterRemoteCanonicalTokens/RegisterRemoteCanonicalTokens";
 import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
 import Page from "~/layouts/Page";
@@ -31,7 +32,7 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useEstimateGasFeeMultipleChains } from "~/services/axelarjsSDK/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
@@ -302,11 +303,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   ]);
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
-    useEstimateGasFeeMultipleChains({
+    useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
       destinationChainIds: targetDeploymentChains,
       gasLimit: 1_000_000,
-      gasMultipler: 2,
+      gasMultipler: 3,
     });
 
   const originToken = useMemo(
@@ -351,7 +352,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )}
       <InterchainTokenList
         title="Registered interchain tokens"
-        tokens={registered}
+        tokens={registered as TokenInfo[]}
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
@@ -369,7 +370,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
               ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),
-          };
+          } as TokenInfo;
         })}
         onToggleSelection={(chainId) => {
           if (deployTokensTxHash) {

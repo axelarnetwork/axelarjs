@@ -1,7 +1,6 @@
 import {
   Button,
   Card,
-  Clamp,
   Drawer,
   Footer,
   LinkButton,
@@ -52,9 +51,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <Drawer.Toggle checked={isDrawerOpen} />
         <Drawer.Content className="flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen">
           <Appbar />
-          <Clamp $as="main" className="flex flex-1">
-            {children}
-          </Clamp>
+          {children}
           <Footer
             className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
             center={true}

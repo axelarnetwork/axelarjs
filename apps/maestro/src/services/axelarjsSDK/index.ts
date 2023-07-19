@@ -1,8 +1,4 @@
-import {
-  AxelarQueryAPI,
-  type Environment,
-  type GasToken,
-} from "@axelar-network/axelarjs-sdk";
+import { AxelarQueryAPI, type Environment } from "@axelar-network/axelarjs-sdk";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import type {
@@ -37,9 +33,7 @@ async function estimateGasFeeMultipleChains(
       estimateGasFee({
         ...params,
         destinationChainId,
-        sourceChainTokenSymbol: getNativeToken(
-          params.sourceChainId
-        ) as GasToken,
+        sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
       })
     ),
   ]);

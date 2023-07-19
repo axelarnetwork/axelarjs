@@ -1,6 +1,12 @@
 import { createContainer, useLocalStorageState } from "@axelarjs/utils/react";
 import { useState, type FC } from "react";
 
+const DEFAULT_BANNERS_STATE = {
+  isTestnetBannerDismissed: false,
+  isHeroBannerDismissed: false,
+  isBetaBannerDismissed: false,
+};
+
 function useLayoutState() {
   const [DrawerSideContent, setDrawerSideContent] = useState<FC>(
     () => () => null
@@ -8,9 +14,7 @@ function useLayoutState() {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [persistedState, setPersistedState] = useLocalStorageState(
     "@axelar/maestro/banners",
-    {
-      isTestnetBannerDismissed: false,
-    }
+    DEFAULT_BANNERS_STATE
   );
 
   /**
@@ -26,7 +30,7 @@ function useLayoutState() {
     {
       DrawerSideContent,
       isDrawerOpen: isDrawerOpen,
-      isTestnetBannerDismissed: persistedState.isTestnetBannerDismissed,
+      ...persistedState,
     },
     {
       setDrawerSideContent: _setDrawerSideContent,
@@ -40,6 +44,16 @@ function useLayoutState() {
       dismissTestnetBanner: () => {
         setPersistedState((stateDraft) => {
           stateDraft.isTestnetBannerDismissed = true;
+        });
+      },
+      dismissHeroBanner: () => {
+        setPersistedState((stateDraft) => {
+          stateDraft.isHeroBannerDismissed = true;
+        });
+      },
+      dismissDisclaimerBanner: () => {
+        setPersistedState((stateDraft) => {
+          stateDraft.isBetaBannerDismissed = true;
         });
       },
     },
