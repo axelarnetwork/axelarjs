@@ -8,9 +8,8 @@ import {
   toast,
   Tooltip,
 } from "@axelarjs/ui";
-import { maskAddress, sluggify } from "@axelarjs/utils";
+import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
-import { useRouter } from "next/router";
 
 import clsx from "clsx";
 import { SettingsIcon } from "lucide-react";
@@ -56,29 +55,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     owner: address,
   });
 
-  const router = useRouter();
-
   const { switchNetworkAsync } = useSwitchNetwork();
 
   const handleSwitchChain = useCallback(async () => {
     try {
       await switchNetworkAsync?.(props.chainId);
-
-      router.push(
-        `/${sluggify(props.wagmiConfig?.name ?? "")}/${props.tokenAddress}`
-      );
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Failed to switch chain: ${error.cause.shortMessage}`);
       }
     }
-  }, [
-    props.chainId,
-    props.tokenAddress,
-    props.wagmiConfig?.name,
-    router,
-    switchNetworkAsync,
-  ]);
+  }, [props.chainId, switchNetworkAsync]);
 
   const isSourceChain = chain?.id === props.chainId;
 
