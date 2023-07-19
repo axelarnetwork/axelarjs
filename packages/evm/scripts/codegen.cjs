@@ -11,6 +11,8 @@ const kebabToPascalCase = (str = "") =>
 
 const kebabToConstantCase = (str = "") => str.toUpperCase().replace(/\-/g, "_");
 
+const capitalize = (str = "") => str[0].toUpperCase().concat(str.slice(1));
+
 const PACKAGE_NAME = "@axelar-network/interchain-token-service";
 
 const CONTRACT_FOLDERS = [
@@ -60,7 +62,7 @@ import { Chain } from "viem";
 
 import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./${folder}.abi";
-export * as  ${constantName}_ARG_FACTORIES from "./${folder}.args";
+export * as  ${constantName}_ARGS from "./${folder}.args";
 
 export const ${constantName}_ABI = ABI_FILE.abi;
 
@@ -134,7 +136,11 @@ export default ${abiJsonFile} as const;`;
           .map((input) => `${input.name}: ${getInputType(input)}`)
           .join("; ");
 
-        return `export const ${name} = (args: {${argsType}}) => [${args}] as const;`;
+        const typeName = `${capitalize(name)}Args`;
+        const typeAliasExport = `export type ${typeName} = {${argsType}}`;
+        const fnExport = `export const ${name} = (args: ${typeName}) => [${args}] as const;`;
+
+        return `${typeAliasExport}\n\n${fnExport}`;
       })
       .join("\n\n");
 

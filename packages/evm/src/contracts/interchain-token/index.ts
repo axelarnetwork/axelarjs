@@ -7,7 +7,7 @@ import { Chain } from "viem";
 import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./interchain-token.abi";
 
-export * as INTERCHAIN_TOKEN_ARG_FACTORIES from "./interchain-token.args";
+export * as INTERCHAIN_TOKEN_ARGS from "./interchain-token.args";
 
 export const INTERCHAIN_TOKEN_ABI = ABI_FILE.abi;
 

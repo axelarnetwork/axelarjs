@@ -7,7 +7,7 @@ import { Chain } from "viem";
 import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./token-manager.abi";
 
-export * as TOKEN_MANAGER_ARG_FACTORIES from "./token-manager.args";
+export * as TOKEN_MANAGER_ARGS from "./token-manager.args";
 
 export const TOKEN_MANAGER_ABI = ABI_FILE.abi;
 
