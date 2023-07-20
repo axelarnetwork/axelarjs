@@ -6,6 +6,7 @@ import stripAnsi from "strip-ansi";
 const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs";
 
 const pad = (n = 0, char = " ") => char.repeat(n);
+
 type Line = string | ((ctx: { center: (str: string) => string }) => string);
 
 const makeCenter =
