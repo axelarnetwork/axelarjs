@@ -7,7 +7,6 @@
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
   "type": "module",
-  "main": "./build/commonjs/index.js",
   "files": [
     "./build",
     "./react",
