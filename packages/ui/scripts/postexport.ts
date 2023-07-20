@@ -2,7 +2,7 @@
 import { exec } from "child_process";
 import { readFile, writeFile } from "fs/promises";
 
-import { rainbow } from "./lib.mjs";
+import { rainbow } from "./lib";
 
 const scriptName = rainbow("postexport");
 

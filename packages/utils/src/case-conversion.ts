@@ -2,7 +2,8 @@ export type CaseConversionOptions =
   | "PascalCase"
   | "snake_case"
   | "CONSTANT_CASE"
-  | "camelCase";
+  | "camelCase"
+  | "kebab-case";
 
 export type ConversionFunction = (input: string) => string;
 
@@ -26,6 +27,12 @@ export const CONVERTERS: ConversionMap = {
     camelCase: (input: string): string =>
       input.charAt(0).toLowerCase() +
       input.slice(1).replace(/_(\w)/g, (_, char) => char.toUpperCase()),
+
+    "kebab-case": (input: string): string =>
+      input
+        .split(/(?=[A-Z])/)
+        .map((word) => word.toLowerCase())
+        .join("-"),
   },
   snake_case: {
     PascalCase: (input: string): string =>
@@ -38,6 +45,8 @@ export const CONVERTERS: ConversionMap = {
 
     camelCase: (input: string): string =>
       input.replace(/_(\w)/g, (_, char) => char.toUpperCase()),
+
+    "kebab-case": (input: string): string => input.replace(/_/g, "-"),
   },
   CONSTANT_CASE: {
     PascalCase: (input: string): string =>
@@ -60,6 +69,9 @@ export const CONVERTERS: ConversionMap = {
         ),
       ].join("");
     },
+
+    "kebab-case": (input: string): string =>
+      input.toLowerCase().replace(/_/g, "-"),
   },
   camelCase: {
     PascalCase: (input: string): string =>
@@ -67,15 +79,33 @@ export const CONVERTERS: ConversionMap = {
       input
         .slice(1)
         .replace(/_(\w)/g, (_, char) => char.toUpperCase())
-        .replace(/(\w)([A-Z])/g, (_, first, second) => first + second),
+        .replace(/(\w)([A-Z])/g, (_, first, second) => `${first}${second}`),
 
     snake_case: (input: string): string =>
-      input.replace(/(\w)([A-Z])/g, (_, first, second) => first + "_" + second),
+      input.replace(/(\w)([A-Z])/g, (_, first, second) => `${first}_${second}`),
 
     CONSTANT_CASE: (input: string): string =>
       input
-        .replace(/(\w)([A-Z])/g, (_, first, second) => first + "_" + second)
+        .replace(/(\w)([A-Z])/g, (_, first, second) => `${first}_${second}`)
         .toUpperCase(),
+
+    "kebab-case": (input: string): string =>
+      input.replace(/(\w)([A-Z])/g, (_, first, second) => `${first}-${second}`),
+  },
+  "kebab-case": {
+    PascalCase: (input: string): string =>
+      input
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(""),
+
+    snake_case: (input: string): string => input.replace(/-/g, "_"),
+
+    CONSTANT_CASE: (input: string): string =>
+      input.toUpperCase().replace(/-/g, "_"),
+
+    camelCase: (input: string): string =>
+      input.replace(/-(\w)/g, (_, char) => char.toUpperCase()),
   },
 };
 

@@ -8,7 +8,7 @@ export function usePersistedState<T>(
   storage: Storage,
   key: string,
   defaultValue: T
-) {
+): readonly [T, (valueOrProducerFn: T | ((draft: Draft<T>) => void)) => void] {
   const [state, _setState] = useState<T>(() =>
     Maybe.of(storage.getItem(key)).mapOr(defaultValue, JSON.parse)
   );
@@ -36,7 +36,7 @@ export function usePersistedState<T>(
     _setState(valueOrProducerFn);
   };
 
-  return [state, setState] as const;
+  return [state, setState];
 }
 
 export function useLocalStorageState<T>(key: string, defaultValue: T) {

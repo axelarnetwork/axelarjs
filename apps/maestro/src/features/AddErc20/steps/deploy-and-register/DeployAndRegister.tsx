@@ -83,7 +83,7 @@ export const Step3: FC = () => {
           gasFees: state.gasFees,
           sourceChainId: sourceChain.chain_name,
           initialSupply: BigInt(rootState.tokenDetails.tokenCap),
-          distributor: rootState.tokenDetails.distributor,
+          deployerAddress: rootState.tokenDetails.distributor,
         },
         {
           onError(error) {
@@ -211,7 +211,7 @@ export const Step3: FC = () => {
                   position="top"
                 >
                   <Button
-                    className="relative w-full rounded-2xl hover:ring"
+                    className="w-full rounded-2xl hover:ring"
                     size="sm"
                     role="button"
                     variant={isSelected ? "success" : undefined}

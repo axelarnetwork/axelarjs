@@ -1,23 +1,37 @@
-const fs = require("fs/promises");
-const packageJson = require("package-json");
-const chalk = require("chalk");
-const stripAnsi = require("strip-ansi");
+import fs from "fs/promises";
+import chalk from "chalk";
+import packageJson from "package-json";
+import stripAnsi from "strip-ansi";
 
 const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs";
 
 const pad = (n = 0, char = " ") => char.repeat(n);
 
-/**
- *
- * @param {(string | (ctx: { center: (str: string) => string }) => string)[]} lines
- */
-function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
-  const maxLineLength = lines.reduce(
-    (max, line) => Math.max(max, stripAnsi(line).length),
-    0
-  );
+type Line = string | ((ctx: { center: (str: string) => string }) => string);
+
+const makeCenter =
+  (maxLength: number, padding: number) =>
+  (str = "") => {
+    const len = stripAnsi(str).length;
+    const raw = (maxLength - padding * 2 - len) / 2;
+    const [padL, padR] = [Math.floor, Math.ceil].map((f) => pad(f(raw)));
+
+    return `${padL}${str}${padR}`;
+  };
+
+function renderBox(
+  lines: Line[] = [],
+  { color = chalk.green, padding = 1 } = {}
+) {
+  const maxLineLength = lines
+    .map((line) =>
+      typeof line === "function" ? line({ center: (x) => x }) : line
+    )
+    .reduce((max, line) => Math.max(max, stripAnsi(line).length), 0);
 
   const maxLength = maxLineLength + padding * 2;
+
+  const center = makeCenter(maxLength, padding);
 
   const [tr, tl, br, bl, h, v] = [
     color("╗"),
@@ -36,24 +50,19 @@ function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
 ${tl}${border}${tr}${py}
 ${lines
   .map((line) => {
-    const [short, long] = [maxLength, stripAnsi(line).length].sort();
+    const [short, long] = [
+      maxLength,
+      stripAnsi(typeof line === "function" ? line({ center }) : line).length,
+    ].sort() as [number, number];
 
     const padX = pad(padding);
     const rPad = long === short ? 0 : long - short - padding * 2;
 
     const withBounds = (str = "") => `${v}${padX}${str}${padX}${v}`;
 
-    if (typeof line === "function") {
-      function center(str = "") {
-        const len = stripAnsi(str).length;
-        const raw = (maxLength - padding * 2 - len) / 2;
-        const [padL, padR] = [Math.floor, Math.ceil].map((f) => pad(f(raw)));
-
-        return `${padL}${str}${padR}`;
-      }
-      return withBounds(`${line({ center })}`);
-    }
-    return withBounds(`${line}${pad(Math.max(rPad, 0))}`);
+    return typeof line === "function"
+      ? withBounds(`${line({ center })}`)
+      : withBounds(`${line}${pad(Math.max(rPad, 0))}`);
   })
   .join("\n")}${py}
 ${bl}${border}${br}`);

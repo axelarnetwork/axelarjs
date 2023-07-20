@@ -1,9 +1,9 @@
-import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import { encodeInterchainTokenServiceRegisterCanonicalTokenData } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useRef, useState } from "react";
 
-import { encodeFunctionData, TransactionExecutionError } from "viem";
+import { TransactionExecutionError } from "viem";
 import {
   useAccount,
   useMutation,
@@ -126,11 +126,10 @@ export function useRegisterCanonicalTokenMutation(config: {
       type: "pending_approval",
     });
     try {
-      const deployTxData = encodeFunctionData({
-        functionName: "registerCanonicalToken",
-        args: [input.tokenAddress],
-        abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-      });
+      const deployTxData =
+        encodeInterchainTokenServiceRegisterCanonicalTokenData({
+          tokenAddress: input.tokenAddress,
+        });
 
       const tx = await multicallAsync({
         args: [[deployTxData]],

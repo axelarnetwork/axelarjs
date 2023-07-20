@@ -7,28 +7,46 @@
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
   "type": "module",
-  "main": "src/index.ts",
+  "files": [
+    "./build",
+    "./react",
+    "./index.js",
+    "./array.js",
+    "./case-conversion.js",
+    "./function.js",
+    "./guard.js",
+    "./hex.js",
+    "./monad.js",
+    "./record.js",
+    "./string.js",
+    "./types.js"
+  ],
   "exports": {
-    ".": "./src/index.ts",
-    "./react": "./src/react/index.ts"
-  },
-  "typesVersions": {
-    "*": {
-      "react": [
-        "./src/react/index.ts"
-      ]
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
+    "./react": {
+      "import": "./build/module/react/index.js",
+      "require": "./build/commonjs/react/index.js"
     }
   },
   "scripts": {
     "test": "vitest --run src",
-    "compile": "tsc --noEmit"
+    "compile": "tsc --noEmit",
+    "build": "scripts/build.sh",
+    "clean": "scripts/clean.sh"
   },
   "keywords": [],
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@tsconfig/strictest": "^2.0.1",
     "@types/lodash.debounce": "^4.0.7",
@@ -45,8 +63,9 @@
     "rambda": "^7.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.1.6",
-    "vite": "^4.4.4",
+    "vite": "^4.4.5",
     "vitest": "^0.33.0"
   },
   "dependencies": {

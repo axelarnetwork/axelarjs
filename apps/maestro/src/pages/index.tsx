@@ -54,7 +54,7 @@ export default function Home() {
                 variant="ghost"
                 shape="circle"
                 size="lg"
-                className="animate-pulse md:animate-none md:hover:animate-pulse"
+                className="bg-accent/25 animate-pulse"
                 onClick={() => {
                   // Scroll to main content
                   window.scrollTo(
@@ -63,7 +63,7 @@ export default function Home() {
                   );
                 }}
               >
-                <ChevronDownIcon size="2.5rem" />
+                <ChevronDownIcon size="2.5rem" className="text-black/75" />
               </Button>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function Home() {
         mustBeConnected
       >
         <div
-          className="flex min-h-[100dvh] w-full max-w-lg flex-col items-center justify-center"
+          className="flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
           id="main-content"
         >
           {NEXT_PUBLIC_NETWORK_ENV === "testnet" &&

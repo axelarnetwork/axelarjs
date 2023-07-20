@@ -101,11 +101,7 @@ const Page = ({
         return <div>Loading...</div>;
       case "disconnected":
         return mustBeConnected ? (
-          <div
-            className="grid min-h-[100dvh] w-full flex-1 place-items-center"
-            // id needed for the hero cta smooth scroll
-            id="main-content"
-          >
+          <div className="grid w-full flex-1 place-items-center">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
           </div>
         ) : (
@@ -182,8 +178,10 @@ const Page = ({
       </Head>
       <Clamp
         $as="section"
+        // id needed for the hero cta smooth scroll
+        id="main-content"
         className={clsx(
-          "mt-20 grid flex-1 px-4 xl:px-2 2xl:px-0",
+          "mt-20 grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
           {
             "place-items-center": isExceptionalState,
           },

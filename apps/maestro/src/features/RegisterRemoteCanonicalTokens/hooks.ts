@@ -1,8 +1,7 @@
-import { INTERCHAIN_TOKEN_SERVICE_ABI } from "@axelarjs/evm";
+import { encodeInterchainTokenServiceDeployRemoteCanonicalTokenData } from "@axelarjs/evm";
 import { invariant, Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { encodeFunctionData } from "viem";
 import { useNetwork } from "wagmi";
 
 import {
@@ -40,7 +39,7 @@ export function useRegisterRemoteCanonicalTokens(input: {
     [chain, computed.indexedByChainId]
   );
 
-  const { data: tokenDeployment } = useInterchainTokenDetailsQuery({
+  const { data: tokenDetails } = useInterchainTokenDetailsQuery({
     chainId: input.originChainId,
     tokenAddress: input.tokenAddress,
   });
@@ -51,20 +50,20 @@ export function useRegisterRemoteCanonicalTokens(input: {
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDeployment || !gasFees) return [];
+    if (!tokenDetails || !gasFees) return [];
 
-    invariant(tokenDeployment.kind === "canonical", "invalid token kind");
+    invariant(tokenDetails.kind === "canonical", "invalid token kind");
 
     return destinationChainIds.map((axelarChainId, i) => {
-      const gasFee = gasFees[i];
+      const gasValue = gasFees[i];
 
-      return encodeFunctionData({
-        functionName: "deployRemoteCanonicalToken",
-        abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-        args: [tokenDeployment.tokenId, axelarChainId, gasFee],
+      return encodeInterchainTokenServiceDeployRemoteCanonicalTokenData({
+        tokenId: tokenDetails.tokenId,
+        destinationChain: axelarChainId,
+        gasValue,
       });
     });
-  }, [destinationChainIds, gasFees, tokenDeployment]);
+  }, [destinationChainIds, gasFees, tokenDetails]);
 
   const totalGasFee = useMemo(
     () =>
