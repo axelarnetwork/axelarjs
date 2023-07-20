@@ -2,6 +2,9 @@
 import fs from "fs/promises";
 import dotenv from "dotenv";
 import prettier from "prettier";
+import { pipe } from "rambda";
+
+const format = (x: string) => prettier.format(x, { parser: "babel-ts" });
 
 /**
  * Generates a TypeScript export statement for an environment variable.
@@ -24,44 +27,25 @@ const generateTsFileContent = (envVars: string[]) => `
 `;
 
 /**
- * Writes content to a file.
- *
- * @param {string} filePath - The path of the file.
- * @param {string} content - The content to write.
- */
-async function writeToFile(filePath: string, content: string) {
-  try {
-    await fs.writeFile(filePath, content);
-    console.log("Generated TypeScript file with environment variables.");
-  } catch (err) {
-    console.error(
-      "Failed to generate TypeScript file with environment variables.",
-      err
-    );
-  }
-}
-
-/**
  * Tries to read a .env file and generate a TypeScript file with type-safe environment variables.
  *
  * @param {string} envFilePath - The path of the .env file.
  * @param {string} outputPath - The path of the TypeScript file to generate.
  */
-async function tryGenerateTsFile(envFilePath: string, outputPath: string) {
-  try {
-    const data = await fs.readFile(envFilePath);
-    const envConfig = dotenv.parse(data);
-    const envVars = Object.keys(envConfig);
-    const content = generateTsFileContent(envVars);
-    const formatted = prettier.format(content, {
-      parser: "babel-ts",
-    });
-
-    await writeToFile(outputPath, formatted);
-    return true;
-  } catch (err) {
-    return false;
-  }
+function tryGenerateTsFile(envFilePath: string, outputPath: string) {
+  return fs
+    .readFile(envFilePath)
+    .then(
+      pipe(
+        dotenv.parse,
+        Object.keys,
+        generateTsFileContent,
+        format,
+        fs.writeFile.bind(null, outputPath)
+      )
+    )
+    .then(() => true)
+    .catch(() => false);
 }
 
 /**
@@ -74,9 +58,10 @@ async function generateTsFile(envFilePaths: string[], outputPath: string) {
   for (const envFilePath of envFilePaths) {
     const success = await tryGenerateTsFile(envFilePath, outputPath);
     if (success) {
+      console.log(`Generated ${outputPath} from ${envFilePath}`);
       break;
     }
   }
 }
 
-generateTsFile([".env.local", ".env"], "src/config/env-safe.ts");
+await generateTsFile([".env.local", ".env"], "src/config/env-safe.ts");

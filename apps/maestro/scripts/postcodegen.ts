@@ -2,6 +2,7 @@
 import fs from "fs/promises";
 import path from "path";
 import prettier from "prettier";
+import { filter, test } from "rambda";
 
 const destFolder = path.join(process.cwd(), "src", "lib", "contracts");
 
@@ -27,14 +28,10 @@ async function prepend(prefix: string, fileName: string) {
   await fs.writeFile(filePath, formattedContent);
 }
 
-async function main() {
-  const patchFiles = (await fs.readdir(destFolder)).filter((x) =>
-    /\.(hooks|actions)\.ts/.test(x)
-  );
+const patchFiles = await fs
+  .readdir(destFolder)
+  .then(filter(test(/\.(hooks|actions)\.ts/)));
 
-  await Promise.all(
-    patchFiles.map((file) => prepend(ESLINT_DISABLE_PREFIX, file))
-  );
-}
-
-main();
+await Promise.all(
+  patchFiles.map((file) => prepend(ESLINT_DISABLE_PREFIX, file))
+);

@@ -25,36 +25,35 @@ console.log(
   }\n`
 );
 
-const main = async () => {
-  const contractsDir = path.join(
-    process.cwd(),
-    "..",
-    "..",
-    "packages",
-    "evm",
-    "src",
-    "contracts"
-  );
+const contractsDir = path.join(
+  process.cwd(),
+  "..",
+  "..",
+  "packages",
+  "evm",
+  "src",
+  "contracts"
+);
 
-  const contractFolders = await fs
-    .readdir(contractsDir)
-    .then((xs) => xs.filter((x) => /^[a-z-0-9]+$/.test(x)));
+const contractFolders = await fs
+  .readdir(contractsDir)
+  .then((xs) => xs.filter((x) => /^[a-z-0-9]+$/.test(x)));
 
-  const destFolder = path.join(process.cwd(), "src", "lib", "contracts");
+const destFolder = path.join(process.cwd(), "src", "lib", "contracts");
 
-  await Promise.all(
-    contractFolders.map((folder) =>
-      fs.copyFile(
-        path.join(contractsDir, folder, `${folder}.abi.ts`),
-        path.join(destFolder, `${folder}.abi.ts`)
-      )
+await Promise.all(
+  contractFolders.map((folder) =>
+    fs.copyFile(
+      path.join(contractsDir, folder, `${folder}.abi.ts`),
+      path.join(destFolder, `${folder}.abi.ts`)
     )
-  );
+  )
+);
 
-  const toConstantName = (contract = "") =>
-    contract.toUpperCase().replace(/\-/g, "_");
+const toConstantName = (contract = "") =>
+  contract.toUpperCase().replace(/\-/g, "_");
 
-  const contractConfigs = `export const contracts = [
+const contractConfigs = `export const contracts = [
     ${contractFolders
       .map((folder) => {
         const constName = toConstantName(folder);
@@ -84,23 +83,15 @@ const main = async () => {
       .join(",\n")}
   ]`;
 
-  const content = "".concat(
-    contractFolders
-      .map(
-        (folder) =>
-          `import  ${toConstantName(folder)}_ABI from "./${folder}.abi";`
-      )
-      .join("\n")
-      .concat("\n\n", contractConfigs)
-  );
+const content = contractFolders
+  .map(
+    (folder) => `import  ${toConstantName(folder)}_ABI from "./${folder}.abi";`
+  )
+  .join("\n")
+  .concat("\n\n", contractConfigs);
 
-  const formatted = prettier.format(content, { parser: "typescript" });
+const formatted = prettier.format(content, { parser: "typescript" });
 
-  await fs.writeFile(path.join(destFolder, "index.ts"), formatted);
+await fs.writeFile(path.join(destFolder, "index.ts"), formatted);
 
-  console.log(
-    `Synced ${contractFolders.length} contract ABIs to ${destFolder}`
-  );
-};
-
-main();
+console.log(`Synced ${contractFolders.length} contract ABIs to ${destFolder}`);
