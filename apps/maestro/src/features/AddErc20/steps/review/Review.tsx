@@ -36,11 +36,13 @@ const Review: FC = () => {
 
   return (
     <>
-      <div className="grid gap-2 sm:gap-3 md:gap-4">
+      <div className="grid gap-4">
         {state.txState.type === "deployed" && (
-          <Alert status="success" className="py-2 sm:py-4">
-            <div>Origin token deployed successfully!</div>
-            <div className="flex items-center">
+          <Alert status="success">
+            <div className="flex justify-center font-semibold md:justify-start">
+              Origin token deployed successfully!
+            </div>
+            <div className="flex items-center justify-center md:justify-start">
               Address:
               <CopyToClipboardButton
                 copyText={state.txState.tokenAddress}
@@ -55,21 +57,22 @@ const Review: FC = () => {
         {(state.txState.type === "deployed" ||
           state.txState.type === "deploying") && (
           <>
-            <LinkButton
-              size="sm"
-              href={`${chain?.blockExplorers?.default.url}/tx/${state.txState.txHash}`}
-              className="flex items-center gap-2"
-              target="_blank"
-            >
-              View transaction{" "}
-              <span className="hidden md:inline">
-                {maskAddress(state.txState.txHash ?? "")}
-              </span>{" "}
-              on {chain?.blockExplorers?.default.name}{" "}
-              <ExternalLink className="h-4 w-4" />
-            </LinkButton>
-            {Boolean(state.selectedChains.length) && (
+            {Boolean(state.selectedChains.length) ? (
               <GMPTxStatusMonitor txHash={state.txState.txHash} />
+            ) : (
+              <LinkButton
+                size="sm"
+                href={`${chain?.blockExplorers?.default.url}/tx/${state.txState.txHash}`}
+                className="flex items-center gap-2"
+                target="_blank"
+              >
+                View transaction{" "}
+                <span className="hidden md:inline">
+                  {maskAddress(state.txState.txHash ?? "")}
+                </span>{" "}
+                on {chain?.blockExplorers?.default.name}{" "}
+                <ExternalLink className="h-4 w-4" />
+              </LinkButton>
             )}
           </>
         )}

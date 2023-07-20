@@ -81,14 +81,14 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
-        <span>
-          {total > 1 && (
+        {total > 1 && (
+          <span>
             <>
               Executed in {executed} of {total} chains
             </>
-          )}
-        </span>
-        <AxelarscanLink txHash={txHash} />
+          </span>
+        )}
+        <AxelarscanLink className="flex-1" txHash={txHash} />
       </div>
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
