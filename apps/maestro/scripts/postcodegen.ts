@@ -35,3 +35,5 @@ const patchFiles = await fs
 await Promise.all(
   patchFiles.map((file) => prepend(ESLINT_DISABLE_PREFIX, file))
 );
+
+console.log(`\nPatched ${patchFiles.length} files 🎉`);

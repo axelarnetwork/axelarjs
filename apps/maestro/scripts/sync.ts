@@ -89,4 +89,5 @@ const formatted = prettier.format(content, { parser: "typescript" });
 
 await fs.writeFile(path.join(destFolder, "index.ts"), formatted);
 
-console.log(`Synced ${contractFolders.length} contract ABIs to ${destFolder}`);
+console.log(`Synced ${contractFolders.length} contract ABIs 🎉`);
+console.log(`dest: ${destFolder}`);

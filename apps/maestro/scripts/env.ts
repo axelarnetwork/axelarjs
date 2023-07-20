@@ -56,9 +56,8 @@ function tryGenerateTsFile(envFilePath: string, outputPath: string) {
  */
 async function generateTsFile(envFilePaths: string[], outputPath: string) {
   for (const envFilePath of envFilePaths) {
-    const success = await tryGenerateTsFile(envFilePath, outputPath);
-    if (success) {
-      console.log(`Generated ${outputPath} from ${envFilePath}`);
+    if (await tryGenerateTsFile(envFilePath, outputPath)) {
+      console.log(`Generated ${outputPath} from ${envFilePath} 🎉`);
       break;
     }
   }
