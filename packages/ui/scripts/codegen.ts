@@ -1,11 +1,10 @@
 #!/usr/bin/env zx
+import { input } from "@inquirer/prompts";
 import { Command } from "commander";
 
 import "zx/globals";
 
 import path from "path";
-
-import { prompt } from "./lib.mjs";
 
 const VALID_KINDS = ["component", "compound", "hook"];
 
@@ -16,11 +15,8 @@ const codegen =
       throw new Error(`Invalid kind: ${kind}`);
     }
 
-    let component = componentName;
-
-    if (!component) {
-      component = await prompt("Component name: ");
-    }
+    const component =
+      componentName || (await input({ message: "Component name: " }));
 
     const targetDirName = `${kind}s`;
 
@@ -38,19 +34,19 @@ The following files will be created:
 - ${targetDir}/${component}.stories.tsx
 - ${targetDir}/${component}.spec.tsx
 
-Do you want to continue?
+Do you want to continue? [Y/n]
   `.trim();
 
-    const answer = await prompt(message, ["y", "n"], "y");
+    const answer = await input({ message, default: "y" });
 
     /**
      * @param {string} content
      * @returns
      */
-    const replaceName = (content) =>
+    const replaceName = (content: string) =>
       content.replace(/ReactComponent/gi, component);
 
-    if (answer === "y") {
+    if (answer.toLowerCase() === "y") {
       $.verbose = false;
 
       const templateName =
@@ -136,7 +132,7 @@ program
   .description(
     "Scaffold a new component under src/components with a stories file"
   )
-  .argument("<componentName>", "component name")
+  .argument("[componentName]", "component name")
   .action(codegen("component"));
 
 program
@@ -144,7 +140,7 @@ program
   .description(
     "Scaffold a new compound under src/compounds with a stories file"
   )
-  .argument("<compoundName>", "compound name")
+  .argument("[compoundName]", "compound name")
   .action(codegen("compound"));
 
 program.parse();

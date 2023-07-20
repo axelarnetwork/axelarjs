@@ -21,9 +21,9 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "codegen:component": "node scripts/codegen.mjs component --",
-    "codegen:compound": "node scripts/codegen.mjs compound --",
-    "codegen:hook": "node scripts/codegen.mjs hook --",
+    "codegen:component": "ts-node scripts/codegen.ts component --",
+    "codegen:compound": "ts-node scripts/codegen.ts compound --",
+    "codegen:hook": "ts-node scripts/codegen.ts hook --",
     "test": "vitest --run src",
     "test:watch": "vitest src",
     "rome:apply": "npx rome check src/ --apply",
@@ -51,6 +51,7 @@
     "tailwind-styled-components": "^2.2.0"
   },
   "devDependencies": {
+    "@inquirer/prompts": "^3.0.0",
     "@storybook/addon-essentials": "^7.1.0",
     "@storybook/addon-interactions": "^7.1.0",
     "@storybook/addon-links": "^7.1.0",
@@ -92,6 +93,7 @@
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.8.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.4",
     "vitest": "^0.33.0",

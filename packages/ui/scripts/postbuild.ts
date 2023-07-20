@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFile, writeFile } from "fs/promises";
 
-import { rainbow } from "./lib.mjs";
+import { rainbow } from "./lib";
 
 const scriptName = rainbow("postbuild");
 
