@@ -82,7 +82,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
       <Web3Modal
         projectId={NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
         ethereumClient={ethereumClient}
-        themeMode={theme ?? "light"}
+        themeMode={theme ?? "dark"}
         defaultChain={defaultChain}
         walletImages={{
           coinbaseWallet:
