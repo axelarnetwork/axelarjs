@@ -11,13 +11,8 @@ const hasEnvLocal = await fs
   .then(() => true)
   .catch(() => false);
 
-dotenv.config(
-  hasEnvLocal
-    ? {
-        path: envLocalPath,
-      }
-    : undefined
-);
+// load .env.local if it exists, otherwise load .env
+dotenv.config(hasEnvLocal ? { path: envLocalPath } : undefined);
 
 console.log(
   `📝 Loaded environment variables from ${
