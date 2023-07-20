@@ -10,7 +10,7 @@ import { useNetwork } from "wagmi";
 import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useLayoutStateContainer } from "~/layouts/MainLayout.state";
+import { useLayoutStateContainer } from "~/layouts/MainLayout";
 import Page from "~/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
