@@ -22,6 +22,7 @@ export type Menuitem =
       kind: "link";
       label: string;
       href: string;
+      external?: boolean;
     };
 
 export const Content = {
@@ -51,6 +52,7 @@ export const MENU_ITEMS: Menuitem[] = [
     kind: "link",
     label: "Docs",
     href: "https://docs.axelar.dev/dev/send-tokens/interchain-tokens",
+    external: true,
   },
   {
     kind: "modal",
@@ -232,14 +234,20 @@ export const MenuItems = () => (
       <Menu.Item key={index}>
         {item.kind === "link" ? (
           <Link
-            href={item.href ?? ""}
-            className="inline-flex lg:uppercase lg:underline"
+            href={item.href}
+            className="hover:text-accent inline-flex hover:underline lg:uppercase"
+            rel={item.external ? "noopener noreferrer" : undefined}
           >
-            {item.label} <ExternalLinkIcon className="h-[1em] w-[1em]" />
+            {item.label}{" "}
+            {item.external && <ExternalLinkIcon className="h-[1em] w-[1em]" />}
           </Link>
         ) : (
           <Modal
-            trigger={<a className="lg:uppercase lg:underline">{item.label}</a>}
+            trigger={
+              <a className="hover:text-accent hover:underline lg:uppercase">
+                {item.label}
+              </a>
+            }
           >
             <Modal.Title>{item.label}</Modal.Title>
             <Modal.Body>
