@@ -9,6 +9,7 @@
       "dependsOn": ["^build"]
     },
     "test": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "lint": {
