@@ -1,0 +1,13 @@
+{
+  "extends": "@axelarjs/config/tsconfig.strictest",
+  "include": ["src"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.spec.tsx"],
+  "compilerOptions": {
+    "declaration": true,
+    "module": "ESNext",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    }
+  }
+}
