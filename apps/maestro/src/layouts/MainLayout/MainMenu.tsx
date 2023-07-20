@@ -12,10 +12,17 @@ import {
 } from "~/config/env";
 import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
 
-export type Menuitem = {
-  label: string;
-  ModalContent: FC;
-};
+export type Menuitem =
+  | {
+      kind: "modal";
+      label: string;
+      ModalContent: FC;
+    }
+  | {
+      kind: "link";
+      label: string;
+      href: string;
+    };
 
 export const Content = {
   Wrapper: tw.div`space-y-6`,
@@ -41,6 +48,12 @@ export const Content = {
 
 export const MENU_ITEMS: Menuitem[] = [
   {
+    kind: "link",
+    label: "Docs",
+    href: "https://docs.axelar.dev/dev/send-tokens/interchain-tokens",
+  },
+  {
+    kind: "modal",
     label: "Getting started",
     ModalContent: () => (
       <Content.Wrapper>
@@ -80,6 +93,7 @@ export const MENU_ITEMS: Menuitem[] = [
     ),
   },
   {
+    kind: "modal",
     label: "Support",
     ModalContent: () => (
       <>
@@ -124,6 +138,7 @@ export const MENU_ITEMS: Menuitem[] = [
     ),
   },
   {
+    kind: "modal",
     label: "Terms of Use",
     ModalContent: () => (
       <article className="prose dark:prose-invert max-h-[70dvh] overflow-y-scroll">
@@ -135,8 +150,8 @@ export const MENU_ITEMS: Menuitem[] = [
       </article>
     ),
   },
-
   {
+    kind: "modal",
     label: "F.A.Q.",
     ModalContent: () => (
       <Content.Wrapper>
@@ -215,12 +230,23 @@ export const MenuItems = () => (
   <>
     {MENU_ITEMS.map((item, index) => (
       <Menu.Item key={index}>
-        <Modal
-          trigger={<a className="lg:uppercase lg:underline">{item.label}</a>}
-        >
-          <Modal.Title>{item.label}</Modal.Title>
-          <Modal.Body>{item.ModalContent && <item.ModalContent />}</Modal.Body>
-        </Modal>
+        {item.kind === "link" ? (
+          <Link
+            href={item.href ?? ""}
+            className="inline-flex lg:uppercase lg:underline"
+          >
+            {item.label} <ExternalLinkIcon className="h-[1em] w-[1em]" />
+          </Link>
+        ) : (
+          <Modal
+            trigger={<a className="lg:uppercase lg:underline">{item.label}</a>}
+          >
+            <Modal.Title>{item.label}</Modal.Title>
+            <Modal.Body>
+              {item.ModalContent && <item.ModalContent />}
+            </Modal.Body>
+          </Modal>
+        )}
       </Menu.Item>
     ))}
   </>
