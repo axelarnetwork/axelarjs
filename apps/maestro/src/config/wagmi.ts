@@ -24,6 +24,7 @@ import {
   filecoinHyperspace,
   foundry,
   goerli,
+  lineaTestnet,
   mainnet,
   moonbaseAlpha,
   moonbeam,
@@ -157,6 +158,11 @@ export const EVM_CHAIN_CONFIGS = [
   {
     ...baseGoerli,
     networkNameOnAxelar: "base",
+    environment: "testnet",
+  },
+  {
+    ...lineaTestnet,
+    networkNameOnAxelar: "linea",
     environment: "testnet",
   },
 ].filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
