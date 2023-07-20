@@ -76,7 +76,7 @@ export default function Home() {
         mustBeConnected
       >
         <div
-          className="flex min-h-[100dvh] w-full max-w-lg flex-col items-center justify-center"
+          className="flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
           id="main-content"
         >
           {NEXT_PUBLIC_NETWORK_ENV === "testnet" &&
