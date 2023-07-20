@@ -17,7 +17,7 @@ export default {
 } as Meta<typeof Toggle>;
 
 Toggle.defaultProps = {
-  checked: true,
+  defaultChecked: true,
 };
 
 // creates stories for variansts (color, size, shape)
