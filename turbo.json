@@ -5,6 +5,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**", ".next/**"]
     },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
     "compile": {
       "dependsOn": ["^build"]
     },
@@ -18,9 +22,6 @@
     "dev": {
       "dependsOn": ["^build"],
       "cache": false
-    },
-    "build-storybook": {
-      "outputs": ["storybook-static/**"]
     }
   }
 }
