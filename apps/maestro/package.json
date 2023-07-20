@@ -18,8 +18,8 @@
     "ci:e2e": "npx playwright test",
     "test": "vitest --run",
     "test:coverage": "vitest --coverage --run",
-    "sync": "scripts/sync.cjs",
-    "codegen": "pnpm wagmi generate && scripts/postcodegen.cjs",
+    "sync": "ts-node-esm scripts/sync.ts",
+    "codegen": "pnpm wagmi generate && ts-node-esm scripts/postcodegen.ts",
     "codegen:env": "ts-node-esm scripts/env.ts"
   },
   "dependencies": {

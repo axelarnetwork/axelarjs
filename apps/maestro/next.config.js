@@ -1,3 +1,8 @@
+// Injected content via Sentry wizard below
+
+import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
+
 /**]
  * @type {import('next').NextConfig}
  */
@@ -9,15 +14,11 @@ const nextConfig = {
   },
 };
 
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
+const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-// Injected content via Sentry wizard below
-
-const { withSentryConfig } = require("@sentry/nextjs");
-
-module.exports = withSentryConfig(
+export default withSentryConfig(
   withBundleAnalyzer(nextConfig),
   {
     // For all available options, see:
