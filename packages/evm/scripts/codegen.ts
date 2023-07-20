@@ -1,4 +1,7 @@
 #!/usr/bin/env zx
+import { convertCase } from "@axelarjs/utils/case-conversion";
+import { capitalize } from "@axelarjs/utils/string";
+
 import fs from "fs/promises";
 import path from "path";
 import prettier from "prettier";
@@ -6,18 +9,9 @@ import { $ } from "zx";
 
 $.verbose = false;
 
-const kebabToPascalCase = (str = "") =>
-  str
-    .split("-")
-    .reduce(
-      (acc, x) => acc.concat((x[0] ?? "").toUpperCase().concat(x.slice(1))),
-      ""
-    );
+const kebabToPascalCase = convertCase("kebab-case", "PascalCase");
 
-const kebabToConstantCase = (str = "") => str.toUpperCase().replace(/\-/g, "_");
-
-const capitalize = (str = "") =>
-  (str[0] ?? "").toUpperCase().concat(str.slice(1));
+const kebabToConstantCase = convertCase("kebab-case", "CONSTANT_CASE");
 
 const PACKAGE_NAME = "@axelar-network/interchain-token-service";
 

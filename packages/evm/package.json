@@ -46,6 +46,7 @@
   "devDependencies": {
     "@axelar-network/interchain-token-service": "^0.1.0",
     "@axelarjs/config": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
     "@types/node": "^20.4.2",
     "@types/prettier": "^2.7.3",
     "chalk": "^4.1.2",
