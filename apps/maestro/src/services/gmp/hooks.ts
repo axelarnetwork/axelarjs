@@ -80,7 +80,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   }
 ) {
   const { data, ...query } = useQuery(
-    ["gmp-get-transaction-status-on-destination-chains", input],
+    ["gmp-get-transaction-status-on-destination-chains", input.txHash],
     async () => {
       const responseData = await gmpClient.searchGMP({
         txHash: input.txHash,

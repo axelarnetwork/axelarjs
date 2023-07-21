@@ -7,7 +7,7 @@ import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
 export const remoteInterchainTokenSchema = z.object({
   chainId: z.number(),
   axelarChainId: z.string(),
-  address: hex40Literal(),
+  address: hex40Literal().nullable(),
   status: z.enum(["deployed", "pending"]),
   deplymentTxHash: hex64Literal(),
   deploymentLogIndex: z.number().optional(),

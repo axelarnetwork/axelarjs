@@ -74,9 +74,6 @@ export const searchInterchainToken = publicProcedure
       const result = await scanPromise;
 
       if (result) {
-        // cache for 1 hour
-        ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
         return result;
       }
 
@@ -160,27 +157,35 @@ async function getInterchainToken(
           const itsClient =
             ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-          const remoteTokenAddress = await itsClient.read("getTokenAddress", {
-            args: [kvResult.tokenId],
-          });
+          const remoteTokenAddress = await itsClient
+            .read("getTokenAddress", {
+              args: [kvResult.tokenId],
+            })
+            .catch(() => null);
 
-          tokenClient = ctx.contracts.createInterchainTokenClient(
-            chainConfig,
-            remoteTokenAddress
-          );
+          if (remoteTokenAddress) {
+            tokenClient = ctx.contracts.createInterchainTokenClient(
+              chainConfig,
+              remoteTokenAddress
+            );
+          }
           break;
       }
+
+      const isRegistered = !tokenClient
+        ? false
+        : await tokenClient
+            .read("getTokenManager")
+            // attempt to read 'token.getTokenManager'
+            .then(() => true)
+            // which will throw if the token is not registered
+            .catch(() => false);
 
       return {
         ...remoteTokenDetails,
         // derive the token address from the interchain token contract client
-        tokenAddress: tokenClient.address as `0x${string}`,
-        isRegistered: await tokenClient
-          .read("getTokenManager")
-          // attempt to read 'token.getTokenManager'
-          .then(() => true)
-          // which will throw if the token is not registered
-          .catch(() => false),
+        tokenAddress: tokenClient?.address ?? null,
+        isRegistered,
       };
     })
   );
