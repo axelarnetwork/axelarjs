@@ -9,7 +9,7 @@ import { maskAddress, sluggify } from "@axelarjs/utils";
 import { useState, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLinkIcon } from "lucide-react";
 import { useNetwork } from "wagmi";
 
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
@@ -71,7 +71,7 @@ const Review: FC = () => {
                   {maskAddress(state.txState.txHash ?? "")}
                 </span>{" "}
                 on {chain?.blockExplorers?.default.name}{" "}
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLinkIcon className="h-4 w-4" />
               </LinkButton>
             )}
           </>
