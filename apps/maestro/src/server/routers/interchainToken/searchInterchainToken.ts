@@ -74,9 +74,6 @@ export const searchInterchainToken = publicProcedure
       const result = await scanPromise;
 
       if (result) {
-        // cache for 1 hour
-        ctx.res.setHeader("Cache-Control", "public, max-age=3600");
-
         return result;
       }
 

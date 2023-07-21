@@ -9,11 +9,12 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { invariant, maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
-import { useCallback, useEffect, useMemo, useState, type FC } from "react";
+import { useSessionStorageState } from "@axelarjs/utils/react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useRouter } from "next/router";
 
 import { ExternalLink, InfoIcon } from "lucide-react";
-import { partition, without } from "rambda";
+import { isEmpty, partition, without } from "rambda";
 import { isAddress, TransactionExecutionError } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -83,7 +84,7 @@ const InterchainTokensPage = () => {
           tokenId={interchainToken?.tokenId as `0x${string}`}
         />
       )}
-      {routeChain && tokenDetails && (
+      {routeChain && tokenDetails && interchainToken?.tokenId && (
         <>
           <ConnectedInterchainTokensPage
             chainId={routeChain?.id}
@@ -91,6 +92,7 @@ const InterchainTokensPage = () => {
             tokenName={tokenDetails.name}
             tokenSymbol={tokenDetails.symbol}
             decimals={tokenDetails.decimals}
+            tokenId={interchainToken.tokenId}
           />
         </>
       )}
@@ -106,9 +108,10 @@ type ConnectedInterchainTokensPageProps = {
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
+  tokenId: `0x${string}`;
 };
 
-const RegisterOriginTokenButton = ({
+const RegisterCanonicalTokenButton = ({
   address = "0x0" as `0x${string}`,
   tokenName = "",
   tokenSymbol = "",
@@ -223,8 +226,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { chain } = useNetwork();
   const {
     data: interchainToken,
-    refetch,
+    refetch: refetchInterchainToken,
     error: interchainTokenError,
+    isLoading: isInterchainTokenLoading,
   } = useInterchainTokensQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress as `0x${string}`,
@@ -236,7 +240,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       tokenAddress: props.tokenAddress,
     });
 
-  const [selectedChainIds, setSelectedChainIds] = useState<number[]>([]);
+  const [sessionState, setSettionState] = useSessionStorageState<{
+    deployTokensTxHash: `0x${string}` | null;
+    selectedChainIds: number[];
+  }>(`@maestro/interchain-token-page/${props.tokenId}`, {
+    deployTokensTxHash: null,
+    selectedChainIds: [],
+  });
 
   const [registered, unregistered] = Maybe.of(
     interchainToken?.matchingTokens?.map((x) => ({
@@ -250,16 +260,18 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     partition((x) => x.isRegistered)
   );
 
-  const [deployTokensTxHash, setDeployTokensTxHash] = useState<`0x${string}`>();
-
   const targetDeploymentChains = useMemo(() => {
-    return selectedChainIds
-      .map((x) => unregistered.find((y) => y.chainId === x)?.chain.id)
+    return sessionState.selectedChainIds
+      .map(
+        (x) =>
+          (interchainToken?.matchingTokens ?? []).find((y) => y.chainId === x)
+            ?.chain.id
+      )
       .filter(Boolean) as string[];
-  }, [selectedChainIds, unregistered]);
+  }, [interchainToken?.matchingTokens, sessionState.selectedChainIds]);
 
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash: deployTokensTxHash,
+    txHash: sessionState.deployTokensTxHash ?? undefined,
   });
 
   const statusesByChain = useMemo(() => {
@@ -275,31 +287,55 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     );
   }, [statuses, targetDeploymentChains]);
 
-  const deployedTokens = useMemo(() => {
+  // reset state when all txs are executed or errored
+  useEffect(() => {
+    if (!statuses || isEmpty(statuses)) return;
+
+    if (
+      Object.values(statuses).every(
+        ({ status }) => status === "executed" || status === "error"
+      )
+    ) {
+      setSettionState((draft) => {
+        draft.deployTokensTxHash = null;
+        draft.selectedChainIds = [];
+      });
+    }
+  }, [setSettionState, statuses]);
+
+  const remoteChainsExecuted = useMemo(() => {
     return Object.entries(statusesByChain)
       .filter(([_, { status }]) => status === "executed")
       .map(([chainId, _]) => chainId);
   }, [statusesByChain]);
 
   useEffect(() => {
-    if (targetDeploymentChains.length === 0 || deployedTokens.length === 0) {
+    if (
+      targetDeploymentChains.length === 0 ||
+      remoteChainsExecuted.length === 0 ||
+      isInterchainTokenLoading
+    ) {
       return;
     }
 
-    if (deployedTokens.length === targetDeploymentChains.length) {
-      setSelectedChainIds([]);
-      setDeployTokensTxHash(undefined);
-
-      refetch();
+    if (remoteChainsExecuted.length === targetDeploymentChains.length) {
+      setSettionState((draft) => {
+        draft.deployTokensTxHash = null;
+        draft.selectedChainIds = [];
+      });
     }
+
+    refetchInterchainToken();
   }, [
     address,
-    deployedTokens,
+    remoteChainsExecuted,
     targetDeploymentChains,
     interchainToken.tokenId,
     props.chainId,
     props.tokenAddress,
-    refetch,
+    refetchInterchainToken,
+    isInterchainTokenLoading,
+    setSettionState,
   ]);
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
@@ -335,13 +371,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
-            <RegisterOriginTokenButton
+            <RegisterCanonicalTokenButton
               address={props.tokenAddress}
               chainName={interchainToken.chain?.name}
               tokenName={props.tokenName}
               tokenSymbol={props.tokenSymbol}
               decimals={props.decimals}
-              onSuccess={refetch}
+              onSuccess={refetchInterchainToken}
             />
           ) : (
             <ConnectWalletButton className="w-full" size="md">
@@ -357,33 +393,39 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       <InterchainTokenList
         title="Unregistered interchain tokens"
         listClassName="grid-cols-2 sm:grid-cols-3"
-        tokens={unregistered.map((token) => {
-          const gmpInfo = token.chain?.id
-            ? statusesByChain[token.chain.id]
-            : undefined;
+        tokens={unregistered
+          .filter((x) => {
+            // filter out tokens that are already registered on the current chain
+            return x.chain && !remoteChainsExecuted.includes(x.chain.id);
+          })
+          .map((token) => {
+            const gmpInfo = token.chain?.id
+              ? statusesByChain[token.chain.id]
+              : undefined;
 
-          return {
-            ...token,
-            isSelected: selectedChainIds.includes(token.chainId),
-            isRegistered: false,
-            deploymentStatus: gmpInfo?.status,
-            deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
-              ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
-            ),
-          } as TokenInfo;
-        })}
+            return {
+              ...token,
+              isSelected: sessionState.selectedChainIds.includes(token.chainId),
+              isRegistered: false,
+              deploymentStatus: gmpInfo?.status,
+              deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
+                ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
+              ),
+            } as TokenInfo;
+          })}
         onToggleSelection={(chainId) => {
-          if (deployTokensTxHash) {
+          if (sessionState.deployTokensTxHash) {
             return;
           }
-          setSelectedChainIds((selected) =>
-            selected.includes(chainId)
-              ? without([chainId], selected)
-              : selected.concat(chainId)
-          );
+
+          setSettionState((draft) => {
+            draft.selectedChainIds = draft.selectedChainIds.includes(chainId)
+              ? without([chainId], draft.selectedChainIds)
+              : draft.selectedChainIds.concat(chainId);
+          });
         }}
         footer={
-          !selectedChainIds.length ? undefined : (
+          !sessionState.selectedChainIds.length ? undefined : (
             <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
               {isGasPriceQueryLoading && (
                 <span className="md:ml-2">estimating gas fee... </span>
@@ -391,8 +433,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               {gasFees && interchainToken.chain && (
                 <Tooltip
                   tip={`Estimated gas fee for deploying token on ${
-                    selectedChainIds.length
-                  } additional chain${selectedChainIds.length > 1 ? "s" : ""}`}
+                    sessionState.selectedChainIds.length
+                  } additional chain${
+                    sessionState.selectedChainIds.length > 1 ? "s" : ""
+                  }`}
                 >
                   <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
                     ≈{" "}
@@ -413,12 +457,15 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               {originToken?.chainId === chain?.id &&
               typeof RegisterRemoteTokens === "function" ? (
                 <RegisterRemoteTokens
-                  chainIds={selectedChainIds}
+                  chainIds={sessionState.selectedChainIds}
                   tokenAddress={props.tokenAddress}
                   originChainId={originToken?.chainId}
+                  existingTxHash={sessionState.deployTokensTxHash}
                   onTxStateChange={(txState) => {
                     if (txState.status === "submitted") {
-                      setDeployTokensTxHash(txState.hash);
+                      setSettionState((draft) => {
+                        draft.deployTokensTxHash = txState.hash;
+                      });
                     }
                   }}
                 />
@@ -432,7 +479,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   }}
                 >
                   Switch to {originToken?.chain.name} to register token
-                  {selectedChainIds.length > 1 ? "s" : ""}
+                  {sessionState.selectedChainIds.length > 1 ? "s" : ""}
                 </Button>
               )}
             </div>

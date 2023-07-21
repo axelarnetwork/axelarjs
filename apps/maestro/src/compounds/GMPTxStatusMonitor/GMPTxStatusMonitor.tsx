@@ -1,6 +1,6 @@
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, Tooltip, type BadgeProps } from "@axelarjs/ui";
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
 import clsx from "clsx";
@@ -11,7 +11,9 @@ import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 
-const STATUS_LABELS: Partial<Record<GMPTxStatus, string>> = {
+type ExtendedGMPTxStatus = GMPTxStatus | "pending";
+
+const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
   called: "Called",
   approvable: "Approvable",
   approving: "Approving",
@@ -23,16 +25,18 @@ const STATUS_LABELS: Partial<Record<GMPTxStatus, string>> = {
   confirming: "Confirming",
   error: "Error",
   insufficient_fee: "Insufficient Fee",
+  pending: "Pending",
 };
 
 const STATUS_COLORS: Partial<
-  Record<GMPTxStatus, NonNullable<BadgeProps["color"]>>
+  Record<ExtendedGMPTxStatus, NonNullable<BadgeProps["variant"]>>
 > = {
   error: "error",
   executed: "success",
   called: "accent",
   confirmed: "info",
   executing: "warning",
+  pending: "neutral",
 };
 
 type Props = {
@@ -108,28 +112,10 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
                   />{" "}
                   {chain.chain_name}
                 </span>
-                <Tooltip tip="View on Axelarscan" position="left">
-                  <Link
-                    href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}:${logIndex}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Badge className="flex items-center">
-                      <Badge
-                        className={clsx("-translate-x-1.5 text-xs", {
-                          "animate-pulse": !["error", "executed"].includes(
-                            status
-                          ),
-                        })}
-                        color={STATUS_COLORS[status]}
-                        size="xs"
-                        aria-label={`status: ${STATUS_LABELS[status]}`}
-                      />
-
-                      {STATUS_LABELS[status]}
-                    </Badge>
-                  </Link>
-                </Tooltip>
+                <GMPStatusIndicator
+                  txHash={`${txHash}:${logIndex}`}
+                  status={status}
+                />
               </li>
             );
           }
@@ -140,3 +126,36 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
 };
 
 export default GMPTxStatusMonitor;
+
+export type StatusIndicatorProps = {
+  txHash: `0x${string}` | `0x${string}:${number}`;
+  status: ExtendedGMPTxStatus;
+};
+
+export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
+  txHash,
+  status,
+}) => {
+  return (
+    <Tooltip tip="View on Axelarscan" position="left">
+      <Link
+        href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Badge className="flex items-center">
+          <Badge
+            className={clsx("-translate-x-1.5 text-xs", {
+              "animate-pulse": !["error", "executed"].includes(status),
+            })}
+            variant={STATUS_COLORS[status]}
+            size="xs"
+            aria-label={`status: ${STATUS_LABELS[status]}`}
+          />
+
+          {STATUS_LABELS[status]}
+        </Badge>
+      </Link>
+    </Tooltip>
+  );
+};

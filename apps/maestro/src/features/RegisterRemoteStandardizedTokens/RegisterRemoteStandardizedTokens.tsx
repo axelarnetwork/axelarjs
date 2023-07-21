@@ -21,6 +21,7 @@ type Props = {
   chainIds: number[];
   originChainId?: number;
   onTxStateChange?: (status: TransactionState) => void;
+  existingTxHash?: `0x${string}` | null;
 };
 
 export const RegisterRemoteStandardizedTokens: FC<Props> = ({
@@ -28,6 +29,7 @@ export const RegisterRemoteStandardizedTokens: FC<Props> = ({
   chainIds,
   originChainId,
   onTxStateChange,
+  existingTxHash,
 }) => {
   const { address } = useAccount();
 
@@ -139,15 +141,22 @@ export const RegisterRemoteStandardizedTokens: FC<Props> = ({
     }
   }, [chainIds.length, txState.status]);
 
-  return "hash" in txState && txState.hash ? (
+  const txHash = useMemo(() => {
+    if (txState.status === "submitted") {
+      return txState.hash;
+    }
+    return existingTxHash;
+  }, [existingTxHash, txState]);
+
+  return txHash ? (
     <LinkButton
       variant="accent"
       outline
-      href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txState.hash}`}
+      href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
       className="flex items-center gap-2"
       target="_blank"
     >
-      View on Axelarscan {maskAddress(txState.hash)}{" "}
+      View on Axelarscan {maskAddress(txHash)}{" "}
       <ExternalLinkIcon className="h-4 w-4" />
     </LinkButton>
   ) : (
