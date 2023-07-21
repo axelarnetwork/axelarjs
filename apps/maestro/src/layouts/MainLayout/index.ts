@@ -1,5 +1,5 @@
 export { default } from "./MainLayout";
 
-export * from "./Hero";
+export * from "./HeroSection";
 
 export * from "./MainLayout.state";

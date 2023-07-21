@@ -9,7 +9,7 @@ type Props = {
   onCTAClick?: () => void;
 };
 
-export const Hero: FC<Props> = ({ onCTAClick }) => {
+export const HeroSection: FC<Props> = ({ onCTAClick }) => {
   return (
     <section
       className="hero animate-fade-in min-h-[100dvh] origin-center [animation-duration:1.5s]"

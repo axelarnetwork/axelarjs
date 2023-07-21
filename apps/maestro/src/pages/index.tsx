@@ -8,7 +8,7 @@ import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { Hero, useLayoutStateContainer } from "~/layouts/MainLayout";
+import { HeroSection, useLayoutStateContainer } from "~/layouts/MainLayout";
 import Page from "~/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
@@ -33,7 +33,7 @@ export default function Home() {
   return (
     <>
       {!layoutState.isHeroBannerDismissed && (
-        <Hero
+        <HeroSection
           onCTAClick={() => {
             // Scroll to main content
             window.scrollTo(
