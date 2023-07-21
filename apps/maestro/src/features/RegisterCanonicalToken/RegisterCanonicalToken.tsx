@@ -1,5 +1,5 @@
-import { Button, toast } from "@axelarjs/ui";
-import { invariant } from "@axelarjs/utils";
+import { Alert, Button, LinkButton, toast } from "@axelarjs/ui";
+import { invariant, maskAddress } from "@axelarjs/utils";
 import { useCallback, useMemo, type FC } from "react";
 
 import { TransactionExecutionError } from "viem";
@@ -116,14 +116,32 @@ export const RegisterCanonicalToken: FC<Props> = ({
   }, [txState, chainName]);
 
   return (
-    <Button
-      length="block"
-      onClick={handleSubmitTransaction}
-      loading={
-        txState.status === "awaiting_approval" || txState.status === "submitted"
-      }
-    >
-      {buttonChildren}
-    </Button>
+    <div className="grid gap-4">
+      <Button
+        length="block"
+        onClick={handleSubmitTransaction}
+        loading={
+          txState.status === "awaiting_approval" ||
+          txState.status === "submitted"
+        }
+      >
+        {buttonChildren}
+      </Button>
+      {txState.status === "reverted" && (
+        <Alert>
+          <p>Transaction failed: {txState.error?.message}</p>
+        </Alert>
+      )}
+      {txState.status === "submitted" && (
+        <LinkButton
+          href={`https://axelar-testnet.etherscan.io/tx/${txState.hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="info"
+        >
+          View {maskAddress(txState.hash)} on {chainName}
+        </LinkButton>
+      )}
+    </div>
   );
 };
