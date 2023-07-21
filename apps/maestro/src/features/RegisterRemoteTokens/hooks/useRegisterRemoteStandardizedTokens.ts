@@ -1,5 +1,5 @@
-import { encodeInterchainTokenServiceDeployRemoteCanonicalTokenData } from "@axelarjs/evm";
-import { invariant, Maybe } from "@axelarjs/utils";
+import { encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData } from "@axelarjs/evm";
+import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { useNetwork } from "wagmi";
@@ -12,12 +12,16 @@ import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hoo
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
-export function useRegisterRemoteCanonicalTokens(input: {
+export type RegisterRemoteStandardizedTokensInput = {
   chainIds: number[];
   tokenAddress: `0x${string}`;
   originChainId: number;
   deployerAddress: `0x${string}`;
-}) {
+};
+
+export default function useRegisterRemoteStandardizedTokens(
+  input: RegisterRemoteStandardizedTokensInput
+) {
   const { computed } = useEVMChainConfigsQuery();
   const { chain } = useNetwork();
 
@@ -39,7 +43,7 @@ export function useRegisterRemoteCanonicalTokens(input: {
     [chain, computed.indexedByChainId]
   );
 
-  const { data: tokenDetails } = useInterchainTokenDetailsQuery({
+  const { data: tokenDeployment } = useInterchainTokenDetailsQuery({
     chainId: input.originChainId,
     tokenAddress: input.tokenAddress,
   });
@@ -50,24 +54,25 @@ export function useRegisterRemoteCanonicalTokens(input: {
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDetails || !gasFees) return [];
+    if (!tokenDeployment || !gasFees || tokenDeployment.kind !== "standardized")
+      return [];
 
-    invariant(tokenDetails.kind === "canonical", "invalid token kind");
-
-    return destinationChainIds.map((axelarChainId, i) => {
-      const gasValue = gasFees[i];
-
-      return encodeInterchainTokenServiceDeployRemoteCanonicalTokenData({
-        tokenId: tokenDetails.tokenId,
-        destinationChain: axelarChainId,
-        gasValue,
-      });
-    });
-  }, [destinationChainIds, gasFees, tokenDetails]);
+    return destinationChainIds.map((chainId, i) =>
+      encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData({
+        salt: tokenDeployment.salt,
+        name: tokenDeployment.tokenName,
+        symbol: tokenDeployment.tokenSymbol,
+        decimals: tokenDeployment.tokenDecimals,
+        distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+        operator: tokenDeployment.deployerAddress,
+        destinationChain: chainId,
+        gasValue: gasFees[i],
+      })
+    );
+  }, [destinationChainIds, gasFees, tokenDeployment]);
 
   const totalGasFee = useMemo(
-    () =>
-      gasFees?.reduce((acc, gasFee) => acc + gasFee, BigInt(0)) ?? BigInt(0),
+    () => gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
     [gasFees]
   );
   const { config } = usePrepareInterchainTokenServiceMulticall({
