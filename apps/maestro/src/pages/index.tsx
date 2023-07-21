@@ -1,16 +1,14 @@
-import { Alert, Button, Dialog } from "@axelarjs/ui";
+import { Alert, Dialog } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
-import { ChevronDownIcon } from "lucide-react";
 import { useNetwork } from "wagmi";
 
-import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useLayoutStateContainer } from "~/layouts/MainLayout";
+import { HeroSection, useLayoutStateContainer } from "~/layouts/MainLayout";
 import Page from "~/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
@@ -35,39 +33,15 @@ export default function Home() {
   return (
     <>
       {!layoutState.isHeroBannerDismissed && (
-        <section
-          className="hero animate-fade-in min-h-[100dvh] origin-center [animation-duration:1.5s]"
-          style={{
-            backgroundImage: "url(/ilustrations/hero3.webp)",
+        <HeroSection
+          onCTAClick={() => {
+            // Scroll to main content
+            window.scrollTo(
+              0,
+              document.getElementById("main-content")?.offsetTop ?? 0
+            );
           }}
-        >
-          <div className="hero-overlay bg-opacity-50" />
-          <div className="hero-content text-neutral-content translate-y-[30dvh] text-center md:-translate-y-[15dvh]">
-            <div className="max-w-lg">
-              <h1 className="mb-5 text-3xl font-black text-white/75 drop-shadow-lg md:text-5xl">
-                {APP_NAME}
-              </h1>
-              <p className="mb-5 px-4 text-base text-white/60 drop-shadow-lg md:text-lg">
-                Take your tokens Interchain with the {APP_NAME}
-              </p>
-              <Button
-                variant="ghost"
-                shape="circle"
-                size="lg"
-                className="bg-accent/25 animate-pulse"
-                onClick={() => {
-                  // Scroll to main content
-                  window.scrollTo(
-                    0,
-                    document.getElementById("main-content")?.offsetTop ?? 0
-                  );
-                }}
-              >
-                <ChevronDownIcon size="2.5rem" className="text-black/75" />
-              </Button>
-            </div>
-          </div>
-        </section>
+        />
       )}
       <Page
         pageTitle="Axelar Interchain Token Service"
