@@ -24,8 +24,7 @@ import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletBu
 import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
-import { RegisterRemoteCanonicalTokens } from "~/features/RegisterRemoteCanonicalTokens/RegisterRemoteCanonicalTokens";
-import { RegisterRemoteStandardizedTokens } from "~/features/RegisterRemoteStandardizedTokens/RegisterRemoteStandardizedTokens";
+import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import Page from "~/layouts/Page";
 import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
@@ -270,9 +269,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       .filter(Boolean) as string[];
   }, [interchainToken?.matchingTokens, sessionState.selectedChainIds]);
 
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash: sessionState.deployTokensTxHash ?? undefined,
-  });
+  const { data: statuses, isSuccess: hasFetchedStatuses } =
+    useGetTransactionStatusOnDestinationChainsQuery({
+      txHash: sessionState.deployTokensTxHash ?? undefined,
+    });
 
   const statusesByChain = useMemo(() => {
     return (
@@ -289,19 +289,21 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   // reset state when all txs are executed or errored
   useEffect(() => {
-    if (!statuses || isEmpty(statuses)) return;
+    if (!hasFetchedStatuses || !statusesByChain || isEmpty(statusesByChain))
+      return;
 
     if (
-      Object.values(statuses).every(
+      Object.values(statusesByChain).every(
         ({ status }) => status === "executed" || status === "error"
       )
     ) {
+      console.log("resetting state");
       setSettionState((draft) => {
         draft.deployTokensTxHash = null;
         draft.selectedChainIds = [];
       });
     }
-  }, [setSettionState, statuses]);
+  }, [hasFetchedStatuses, setSettionState, statuses, statusesByChain]);
 
   const remoteChainsExecuted = useMemo(() => {
     return Object.entries(statusesByChain)
@@ -352,15 +354,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 
   const { switchNetworkAsync } = useSwitchNetwork();
-
-  const RegisterRemoteTokens = useMemo(() => {
-    switch (originToken?.kind) {
-      case "canonical":
-        return RegisterRemoteCanonicalTokens;
-      case "standardized":
-        return RegisterRemoteStandardizedTokens;
-    }
-  }, [originToken?.kind]);
 
   return (
     <div className="flex flex-col gap-8 md:relative">
@@ -454,9 +447,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                 </Tooltip>
               )}
 
-              {originToken?.chainId === chain?.id &&
-              typeof RegisterRemoteTokens === "function" ? (
+              {originToken?.chainId === chain?.id && originToken?.kind ? (
                 <RegisterRemoteTokens
+                  deploymentKind={originToken.kind}
                   chainIds={sessionState.selectedChainIds}
                   tokenAddress={props.tokenAddress}
                   originChainId={originToken?.chainId}
