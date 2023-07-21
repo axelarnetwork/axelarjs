@@ -5,35 +5,30 @@ import {
   Button,
   CopyToClipboardButton,
   LinkButton,
-  toast,
   Tooltip,
 } from "@axelarjs/ui";
-import { invariant, maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
+import { maskAddress, Maybe, unSluggify } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
-import { useCallback, useEffect, useMemo, type FC } from "react";
+import { useEffect, useMemo, type FC } from "react";
 import { useRouter } from "next/router";
 
 import { ExternalLink, InfoIcon } from "lucide-react";
 import { isEmpty, partition, without } from "rambda";
-import { isAddress, TransactionExecutionError } from "viem";
+import { isAddress } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import BigNumberText from "~/components/BigNumberText/BigNumberText";
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
-import { useRegisterCanonicalTokenMutation } from "~/features/AddErc20/hooks/useRegisterCanonicalTokenMutation";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
+import { RegisterCanonicalToken } from "~/features/RegisterCanonicalToken/RegisterCanonicalToken";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import Page from "~/layouts/Page";
-import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useChainFromRoute } from "~/lib/hooks";
-import { useTransactionState } from "~/lib/hooks/useTransactionState";
-import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import {
   useGetTransactionStatusOnDestinationChainsQuery,
@@ -83,7 +78,7 @@ const InterchainTokensPage = () => {
           tokenId={interchainToken?.tokenId as `0x${string}`}
         />
       )}
-      {routeChain && tokenDetails && interchainToken?.tokenId && (
+      {routeChain && tokenDetails && (
         <>
           <ConnectedInterchainTokensPage
             chainId={routeChain?.id}
@@ -107,115 +102,7 @@ type ConnectedInterchainTokensPageProps = {
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
-  tokenId: `0x${string}`;
-};
-
-const RegisterCanonicalTokenButton = ({
-  address = "0x0" as `0x${string}`,
-  tokenName = "",
-  tokenSymbol = "",
-  decimals = -1,
-  chainName = "Axelar",
-  onSuccess = () => {},
-}) => {
-  const [txState, setTxState] = useTransactionState();
-  const { chain } = useNetwork();
-
-  const { computed } = useEVMChainConfigsQuery();
-
-  const sourceChain = useMemo(
-    () => (chain ? computed.indexedByChainId[chain.id] : undefined),
-    [chain, computed]
-  );
-
-  const { mutateAsync: registerCanonicalToken } =
-    useRegisterCanonicalTokenMutation({
-      onStatusUpdate(message) {
-        if (message.type === "deployed") {
-          onSuccess();
-        }
-      },
-    });
-
-  const { data: expectedTokenId } =
-    useInterchainTokenServiceGetCanonicalTokenId({
-      args: [address],
-    });
-
-  const handleSubmitTransaction = useCallback(async () => {
-    if (!expectedTokenId) return;
-    setTxState({
-      status: "awaiting_approval",
-    });
-
-    invariant(sourceChain, "Source chain is not defined");
-
-    try {
-      const txHash = await registerCanonicalToken({
-        tokenAddress: address,
-        sourceChainId: sourceChain?.id,
-        expectedTokenId,
-        tokenName,
-        tokenSymbol,
-        decimals,
-      });
-
-      if (txHash) {
-        setTxState({
-          status: "submitted",
-          hash: txHash,
-        });
-      }
-    } catch (error) {
-      if (error instanceof TransactionExecutionError) {
-        toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
-        logger.error("Failed to register origin token:", error.cause);
-        setTxState({
-          status: "idle",
-        });
-        return;
-      }
-
-      setTxState({
-        status: "reverted",
-        error: error as Error,
-      });
-    }
-  }, [
-    expectedTokenId,
-    setTxState,
-    sourceChain,
-    registerCanonicalToken,
-    address,
-    tokenName,
-    tokenSymbol,
-    decimals,
-  ]);
-
-  const buttonChildren = useMemo(() => {
-    switch (txState.status) {
-      case "awaiting_approval":
-        return "Confirm on wallet";
-      case "submitted":
-        return "Registering token...";
-      case "reverted":
-        return "Transaction failed";
-      default:
-        return `Register origin token on ${chainName}`;
-    }
-  }, [txState, chainName]);
-
-  return (
-    <Button
-      length="block"
-      onClick={handleSubmitTransaction}
-      loading={
-        txState.status === "awaiting_approval" || txState.status === "submitted"
-      }
-    >
-      {buttonChildren}
-    </Button>
-  );
+  tokenId?: `0x${string}` | null;
 };
 
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
@@ -242,7 +129,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const [sessionState, setSettionState] = useSessionStorageState<{
     deployTokensTxHash: `0x${string}` | null;
     selectedChainIds: number[];
-  }>(`@maestro/interchain-token-page/${props.tokenId}`, {
+  }>(`@maestro/interchain-token-page/${props.chainId}/${props.tokenAddress}`, {
     deployTokensTxHash: null,
     selectedChainIds: [],
   });
@@ -297,7 +184,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         ({ status }) => status === "executed" || status === "error"
       )
     ) {
-      console.log("resetting state");
       setSettionState((draft) => {
         draft.deployTokensTxHash = null;
         draft.selectedChainIds = [];
@@ -364,7 +250,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
-            <RegisterCanonicalTokenButton
+            <RegisterCanonicalToken
               address={props.tokenAddress}
               chainName={interchainToken.chain?.name}
               tokenName={props.tokenName}
