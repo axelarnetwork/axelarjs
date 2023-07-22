@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
 import clsx from "clsx";
-import { CheckCircle, ClipboardCopy } from "lucide-react";
+import { CheckCircleIcon, CopyIcon } from "lucide-react";
 
 import { useCopyToClipboard } from "../../hooks";
 import { Button, ButtonProps } from "../Button";
@@ -51,13 +51,13 @@ export const CopyToClipboardButton = forwardRef<
           "swap-active": isCopied,
         })}
       >
-        <CheckCircle
+        <CheckCircleIcon
           className={clsx(
             "swap-on h-[1em] w-[1em]",
             props.color === "success" ? "text-success-content" : "text-success"
           )}
         />
-        <ClipboardCopy className={clsx("swap-off", "h-[1em] w-[1em]")} />
+        <CopyIcon className={clsx("swap-off", "h-[1em] w-[1em]")} />
       </div>
     </Button>
   );

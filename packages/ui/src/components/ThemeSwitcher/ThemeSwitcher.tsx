@@ -2,7 +2,7 @@ import { createContainer } from "@axelarjs/utils/react";
 import { FC, MouseEvent, useCallback, useEffect, useState } from "react";
 
 import clsx from "clsx";
-import { Moon, Sun } from "lucide-react";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 export const VALID_THEMES = ["light", "dark"] as const;
 
@@ -78,8 +78,8 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = (props) => {
       className={clsx("swap-rotate swap", { "swap-active": theme === "dark" })}
       {...props}
     >
-      <Sun className="swap-on pointer-events-none h-6 w-6" />
-      <Moon className="swap-off pointer-events-none h-6 w-6" />
+      <SunIcon className="swap-on pointer-events-none h-6 w-6" />
+      <MoonIcon className="swap-off pointer-events-none h-6 w-6" />
     </button>
   );
 };
