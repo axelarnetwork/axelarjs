@@ -83,7 +83,7 @@
     "happy-dom": "^9.20.3",
     "husky": "^8.0.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
-    "postcss": "^8.4.26",
+    "postcss": "^8.4.27",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
     "pretty-quick": "^3.1.3",
