@@ -126,7 +126,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       tokenAddress: props.tokenAddress,
     });
 
-  const [sessionState, setSettionState] = useSessionStorageState<{
+  const [sessionState, setSessionState] = useSessionStorageState<{
     deployTokensTxHash: `0x${string}` | null;
     selectedChainIds: number[];
   }>(`@maestro/interchain-token-page/${props.chainId}/${props.tokenAddress}`, {
@@ -184,12 +184,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         ({ status }) => status === "executed" || status === "error"
       )
     ) {
-      setSettionState((draft) => {
+      setSessionState((draft) => {
         draft.deployTokensTxHash = null;
         draft.selectedChainIds = [];
       });
     }
-  }, [hasFetchedStatuses, setSettionState, statuses, statusesByChain]);
+  }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
 
   const remoteChainsExecuted = useMemo(() => {
     return Object.entries(statusesByChain)
@@ -207,7 +207,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     }
 
     if (remoteChainsExecuted.length === targetDeploymentChains.length) {
-      setSettionState((draft) => {
+      setSessionState((draft) => {
         draft.deployTokensTxHash = null;
         draft.selectedChainIds = [];
       });
@@ -223,7 +223,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     props.tokenAddress,
     refetchInterchainToken,
     isInterchainTokenLoading,
-    setSettionState,
+    setSessionState,
   ]);
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
@@ -240,6 +240,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 
   const { switchNetworkAsync } = useSwitchNetwork();
+
+  const isReadOnly = !interchainToken.wasDeployedByAccount || !address;
+
+  const shouldRenderFooter =
+    !isReadOnly && sessionState.selectedChainIds.length > 0;
 
   return (
     <div className="flex flex-col gap-8 md:relative">
@@ -292,19 +297,25 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               ),
             } as TokenInfo;
           })}
-        onToggleSelection={(chainId) => {
-          if (sessionState.deployTokensTxHash) {
-            return;
-          }
+        onToggleSelection={
+          isReadOnly
+            ? undefined
+            : (chainId) => {
+                if (sessionState.deployTokensTxHash) {
+                  return;
+                }
 
-          setSettionState((draft) => {
-            draft.selectedChainIds = draft.selectedChainIds.includes(chainId)
-              ? without([chainId], draft.selectedChainIds)
-              : draft.selectedChainIds.concat(chainId);
-          });
-        }}
+                setSessionState((draft) => {
+                  draft.selectedChainIds = draft.selectedChainIds.includes(
+                    chainId
+                  )
+                    ? without([chainId], draft.selectedChainIds)
+                    : draft.selectedChainIds.concat(chainId);
+                });
+              }
+        }
         footer={
-          !sessionState.selectedChainIds.length ? undefined : (
+          shouldRenderFooter && (
             <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
               {isGasPriceQueryLoading && (
                 <span className="md:ml-2">estimating gas fee... </span>
@@ -342,7 +353,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   existingTxHash={sessionState.deployTokensTxHash}
                   onTxStateChange={(txState) => {
                     if (txState.status === "submitted") {
-                      setSettionState((draft) => {
+                      setSessionState((draft) => {
                         draft.deployTokensTxHash = txState.hash;
                       });
                     }

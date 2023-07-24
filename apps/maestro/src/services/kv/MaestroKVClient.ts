@@ -1,5 +1,5 @@
 import { type VercelKV } from "@vercel/kv";
-import { uniq } from "rambda";
+import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
@@ -47,6 +47,13 @@ export type IntercahinTokenDetails = z.infer<
   typeof interchainTokenDetailsSchema
 >;
 
+export const accountDeploymentSchema = z.object({
+  chainId: z.number(),
+  tokenAddress: hex40Literal(),
+});
+
+export type AccountDployment = z.infer<typeof accountDeploymentSchema>;
+
 export const accountDetailsSchema = z.object({
   address: hex40Literal(),
   nonce: z.number(),
@@ -60,12 +67,29 @@ export const COLLECTIONS = {
   accounts: "accounts",
 } as const;
 
-export const COLLECTION_KEYS = {
+export const LEGACY_COLLECTION_KEYS = {
   interchainTokenDetails: (chainId: number, tokenAddress: `0x${string}`) =>
     `${COLLECTIONS.interchainTokens}/${chainId}/${tokenAddress}` as const,
 
   accountDetails: (accountAddress: `0x${string}`) =>
     `${COLLECTIONS.accounts}/${accountAddress}` as const,
+
+  accountDeployments: (accountAddress: `0x${string}`) =>
+    `${COLLECTIONS.accounts}/${accountAddress}` as const,
+};
+
+export const COLLECTION_KEYS = {
+  interchainTokenDetails: (chainId: number, tokenAddress: `0x${string}`) =>
+    `${COLLECTIONS.interchainTokens}:${tokenAddress}:${chainId}` as const,
+
+  accountDetails: (accountAddress: `0x${string}`) =>
+    `${COLLECTIONS.accounts}:${accountAddress}` as const,
+
+  accountNonce: (accountAddress: `0x${string}`) =>
+    `${COLLECTIONS.accounts}:${accountAddress}:nonce` as const,
+
+  accountDeployments: (accountAddress: `0x${string}`) =>
+    `${COLLECTIONS.accounts}:${accountAddress}:deployments` as const,
 };
 
 export default class MaestroKVClient {
@@ -79,21 +103,28 @@ export default class MaestroKVClient {
       variables.chainId,
       variables.tokenAddress
     );
-    return this.kv.get<IntercahinTokenDetails>(key);
-  }
 
-  async hgetInterchainTokenDetails(
-    variables: {
-      chainId: number;
-      tokenAddress: `0x${string}`;
-    },
-    field: keyof IntercahinTokenDetails
-  ) {
-    const key = COLLECTION_KEYS.interchainTokenDetails(
+    const tokenDetails = await this.kv.get<IntercahinTokenDetails>(key);
+
+    if (tokenDetails !== null) {
+      return tokenDetails;
+    }
+
+    // check legacy key & migrate
+
+    const legacyKey = LEGACY_COLLECTION_KEYS.interchainTokenDetails(
       variables.chainId,
       variables.tokenAddress
     );
-    return this.kv.hget<IntercahinTokenDetails>(key, field);
+
+    const legacyTokenDetails = await this.kv.get<IntercahinTokenDetails>(
+      legacyKey
+    );
+
+    if (legacyTokenDetails) {
+      await this.kv.set(key, legacyTokenDetails);
+      return legacyTokenDetails;
+    }
   }
 
   async setInterchainTokenDetails(
@@ -133,42 +164,79 @@ export default class MaestroKVClient {
     await this.kv.set(key, { ...value, ...nextDetails });
   }
 
-  async getAccountDetails(accountAddress: `0x${string}`) {
-    const key = COLLECTION_KEYS.accountDetails(accountAddress);
-    const val = await this.kv.get<AccountDetails>(key);
-    return val;
+  private async getLegacyAccountDetails(accountAddress: `0x${string}`) {
+    const legacyKey = LEGACY_COLLECTION_KEYS.accountDetails(accountAddress);
+    return await this.kv.get<AccountDetails>(legacyKey);
   }
 
-  async hgetAccountDetails(
-    accountAddress: `0x${string}`,
-    field: keyof AccountDetails
-  ) {
-    const key = COLLECTION_KEYS.accountDetails(accountAddress);
-    const val = await this.kv.hget<AccountDetails>(key, field);
-    return val;
+  async createAccount(accountAddress: `0x${string}`) {
+    this.kv.set(COLLECTION_KEYS.accountNonce(accountAddress), 0);
+    this.kv.set(COLLECTION_KEYS.accountDeployments(accountAddress), []);
   }
 
-  async setAccountDetails(
+  async appendAccountDeployments(
     accountAddress: `0x${string}`,
-    details: AccountDetails
+    details: AccountDployment
   ) {
-    const key = COLLECTION_KEYS.accountDetails(accountAddress);
-    await this.kv.set(key, details);
+    const key = COLLECTION_KEYS.accountDeployments(accountAddress);
+    const value = await this.kv.get<AccountDployment[]>(key);
+
+    if (value === null) {
+      return await this.kv.set(key, [details]);
+    }
+
+    await this.kv.set(
+      key,
+      uniqBy((x) => `${x.tokenAddress}:${x.chainId}`, [...value, details])
+    );
   }
 
-  async patchAccountDetails(
-    accountAddress: `0x${string}`,
-    details:
-      | Partial<AccountDetails>
-      | ((details: AccountDetails | null) => Partial<AccountDetails>)
-  ) {
-    const key = COLLECTION_KEYS.accountDetails(accountAddress);
-    const value = await this.kv.get<AccountDetails>(key);
+  async getAccountNonce(accountAddress: `0x${string}`) {
+    const nonce = await this.kv.get<number>(
+      COLLECTION_KEYS.accountNonce(accountAddress)
+    );
 
-    const nextDetetails =
-      typeof details === "function" ? details(value) : details;
+    if (nonce !== null) {
+      return nonce;
+    }
 
-    await this.kv.set(key, { ...value, ...nextDetetails });
+    // check legacy key & migrate
+    const legacyAccount = await this.getLegacyAccountDetails(accountAddress);
+
+    if (legacyAccount) {
+      await this.kv.set(
+        COLLECTION_KEYS.accountNonce(accountAddress),
+        legacyAccount.nonce
+      );
+      return legacyAccount.nonce;
+    }
+
+    return null;
+  }
+
+  async incrementAccountNonce(accountAddress: `0x${string}`) {
+    return await this.kv.incr(COLLECTION_KEYS.accountNonce(accountAddress));
+  }
+
+  async getAccountDeployments(accountAddress: `0x${string}`) {
+    const deployments = await this.kv.get<`0x${string}`[]>(
+      COLLECTION_KEYS.accountDeployments(accountAddress)
+    );
+
+    if (deployments !== null) {
+      return deployments;
+    }
+
+    // check legacy key & migrate
+    const legacyAccount = await this.getLegacyAccountDetails(accountAddress);
+
+    if (legacyAccount) {
+      await this.kv.set(
+        COLLECTION_KEYS.accountNonce(accountAddress),
+        legacyAccount.nonce
+      );
+      return legacyAccount.nonce;
+    }
   }
 
   /// convenience methods
@@ -191,22 +259,10 @@ export default class MaestroKVClient {
 
     await this.setInterchainTokenDetails(variables, details);
 
-    await this.patchAccountDetails(details.deployerAddress, (accountDetails) =>
-      accountDetails
-        ? {
-            address: details.deployerAddress,
-            nonce: accountDetails.nonce + 1,
-            interchainTokensIds: uniq([
-              ...accountDetails.interchainTokensIds,
-              details.tokenId,
-            ]),
-          }
-        : {
-            address: details.deployerAddress,
-            nonce: 1,
-            interchainTokensIds: [details.tokenId],
-          }
-    );
+    await this.appendAccountDeployments(details.deployerAddress, {
+      chainId: variables.chainId,
+      tokenAddress: variables.tokenAddress,
+    });
   }
 
   async recordRemoteTokensDeployment(

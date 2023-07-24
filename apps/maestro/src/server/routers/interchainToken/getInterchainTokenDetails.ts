@@ -24,10 +24,6 @@ export const getInterchainTokenDetails = protectedProcedure
     }
 
     if (kvResult.deployerAddress !== ctx.session?.address) {
-      console.log({
-        deployerAddress: kvResult.deployerAddress,
-        sessionDeployerAddress: ctx.session?.address,
-      });
       throw new Error(
         `Invalid deployer address for interchain token ${input.tokenAddress} on chain ${input.chainId}`
       );
