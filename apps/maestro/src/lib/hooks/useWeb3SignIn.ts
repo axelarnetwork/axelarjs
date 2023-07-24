@@ -9,14 +9,16 @@ import { trpc } from "../trpc";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
-  onSigninSuccess?: (response?: SignInResponse) => void;
-  onSigninError?: (error: Error) => void;
+  onSignInSuccess?: (response?: SignInResponse) => void;
+  onSignInError?: (error: Error) => void;
+  onSignInStart?: () => void;
 };
 
 const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
   enabled: true,
-  onSigninSuccess: () => {},
-  onSigninError: () => {},
+  onSignInSuccess: () => {},
+  onSignInError: () => {},
+  onSignInStart: () => {},
 };
 
 /**
@@ -29,8 +31,9 @@ const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
  */
 export function useWeb3SignIn({
   enabled,
-  onSigninSuccess: onSignInSuccess,
-  onSigninError,
+  onSignInStart,
+  onSignInSuccess,
+  onSignInError,
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
   const { signMessageAsync } = useSignMessage();
@@ -65,6 +68,8 @@ export function useWeb3SignIn({
 
         const { message } = await createSignInMessage({ address });
 
+        onSignInStart?.();
+
         const signature = await signMessageAsync({ message });
 
         const response = await signIn("credentials", { address, signature });
@@ -79,7 +84,7 @@ export function useWeb3SignIn({
         isSigningInRef.current = false;
       } catch (error) {
         if (error instanceof Error) {
-          onSigninError?.(error);
+          onSignInError?.(error);
         }
       }
     }
