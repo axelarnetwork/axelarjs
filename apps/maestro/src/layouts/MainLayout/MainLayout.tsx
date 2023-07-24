@@ -4,12 +4,16 @@ import {
   Drawer,
   Footer,
   LinkButton,
+  Loading,
+  Modal,
   useTheme,
 } from "@axelarjs/ui";
-import type { FC, PropsWithChildren } from "react";
+import { useState, type FC, type PropsWithChildren } from "react";
 import Link from "next/link";
 
 import { Web3Modal } from "@web3modal/react";
+import clsx from "clsx";
+import { CheckCircleIcon, KeyIcon } from "lucide-react";
 
 import {
   NEXT_PUBLIC_NETWORK_ENV,
@@ -32,16 +36,27 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     actions,
   ] = useLayoutStateContainer();
 
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
   const defaultChain = useChainFromRoute();
 
   const shouldRenderTestnetBanner =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" && !isTestnetBannerDismissed;
 
   useWeb3SignIn({
-    onSigninSuccess() {
+    onSignInStart() {
+      setShowSignInModal(true);
+    },
+    onSignInSuccess() {
       if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet") {
         console.log("session initiated");
       }
+      setIsSignedIn(true);
+
+      setTimeout(() => {
+        setShowSignInModal(false);
+      }, 1000);
     },
   });
 
@@ -70,6 +85,26 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           </Footer>
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />
+          )}
+          {showSignInModal && (
+            <Modal open hideCloseButton>
+              <Modal.Body className="grid place-items-center gap-4 py-8">
+                <div
+                  className={clsx(
+                    "swap-rotate swap relative grid h-16 w-16 place-items-center",
+                    { "swap-active": isSignedIn }
+                  )}
+                >
+                  <CheckCircleIcon className="text-success swap-on h-16 w-16" />
+                  <Loading className="swap-off absolute h-16 w-16 animate-pulse" />
+                  <KeyIcon className="swap-off absolute h-8 w-8 animate-pulse" />
+                </div>
+                <div>Authentication required</div>
+                <div className="grid">
+                  Please sign the message to continue using the app.
+                </div>
+              </Modal.Body>
+            </Modal>
           )}
         </Drawer.Content>
         <Drawer.Side>
@@ -111,7 +146,7 @@ export default WithProvider;
 
 const TestnetBanner = ({ onClose = () => {} }) => (
   <Card
-    className="bg-base-200 absolute bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
+    className="bg-base-200 fixed bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
     compact
   >
     <Card.Body>
