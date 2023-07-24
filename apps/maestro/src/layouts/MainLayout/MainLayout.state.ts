@@ -1,5 +1,8 @@
 import { createContainer, useLocalStorageState } from "@axelarjs/utils/react";
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
+
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { useWeb3SignIn } from "~/lib/hooks/useWeb3SignIn";
 
 const DEFAULT_BANNERS_STATE = {
   isTestnetBannerDismissed: false,
@@ -17,6 +20,39 @@ function useLayoutState() {
     DEFAULT_BANNERS_STATE
   );
 
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [signInError, setSignInError] = useState<Error>();
+  const [signInAddress, setSignInAddress] = useState<`0x${string}` | null>(
+    null
+  );
+
+  useEffect(() => {
+    let timeoutId = -1;
+
+    if (isSignedIn) {
+      timeoutId = window.setTimeout(
+        setIsSignInModalOpen.bind(null, false),
+        1500
+      );
+    }
+    return () => window.clearTimeout(timeoutId);
+  }, [isSignedIn]);
+
+  const { signInAsync: retrySignInAsync } = useWeb3SignIn({
+    onSignInStart(address) {
+      setIsSignInModalOpen(true);
+      setSignInAddress(address);
+    },
+    onSignInSuccess() {
+      if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet") {
+        console.log("session initiated");
+      }
+      setIsSignedIn(true);
+    },
+    onSignInError: setSignInError,
+  });
+
   /**
    * Set the component to render in the drawer
    *
@@ -29,7 +65,15 @@ function useLayoutState() {
   return [
     {
       DrawerSideContent,
-      isDrawerOpen: isDrawerOpen,
+      isDrawerOpen,
+      isSignInModalOpen,
+      isSignedIn,
+      signInError,
+      signInAddress,
+      retrySignInAsync: () => {
+        retrySignInAsync(signInAddress);
+        setSignInError(undefined);
+      },
       ...persistedState,
     },
     {
