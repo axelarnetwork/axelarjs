@@ -1,18 +1,29 @@
 import { z } from "zod";
 
+const asHexLiteral = <T extends string>(x: T) => x as `0x${T}`;
+
 /**
- * Zod schema to validate a 64 character hex address
+ * Zod schema to validate a variable length hex address
  */
-export const hex40 = () => z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+export const hexLiteral = () =>
+  z
+    .string()
+    .regex(/^0x[0-9a-fA-F]+$/)
+    .transform(asHexLiteral);
 
 /**
  * Zod schema to validate a 40 character hex address
  */
+export const hex40 = () => z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+
+/**
+ * Zod schema to validate a 64 character hex address
+ */
 export const hex64 = () => z.string().regex(/^0x[0-9a-fA-F]{64}$/);
 
-export const hex40Literal = () => hex40().transform((x) => x as `0x${string}`);
+export const hex40Literal = () => hex40().transform(asHexLiteral);
 
-export const hex64Literal = () => hex64().transform((x) => x as `0x${string}`);
+export const hex64Literal = () => hex64().transform(asHexLiteral);
 
 export const numericString = () => z.string().regex(/^[0-9.]+$/);
 

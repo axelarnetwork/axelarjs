@@ -22,6 +22,7 @@ const TOKEN_INFO_SCHEMA = z.object({
   chainId: z.number(),
   axelarChainId: z.string().nullable(),
   chainName: z.string(),
+  wasDeployedByAccount: z.boolean().optional(),
   kind: z.enum(["standardized", "canonical"]).nullable(),
 });
 
@@ -230,11 +231,13 @@ async function getInterchainToken(
       chainId: chain.id,
       chainName: chain.name,
       axelarChainId: null,
+      wasDeployedByAccount: false,
       kind: null,
     }));
 
   return {
     ...lookupToken,
+    wasDeployedByAccount: kvResult.deployerAddress === ctx.session?.address,
     matchingTokens: [lookupToken, ...verifiedRemoteTokens, ...unregistered],
   };
 }
@@ -250,19 +253,16 @@ async function scanChains(
   tokenAddress: `0x${string}`,
   ctx: Context
 ) {
-  let result: Awaited<ReturnType<typeof getInterchainToken>> | null = null;
-
   for (const chainConfig of chainConfigs) {
     const kvEntry = await ctx.storage.kv.getInterchainTokenDetails({
       chainId: chainConfig.id,
       tokenAddress: tokenAddress,
     });
 
-    if (!kvEntry) {
-      continue;
+    if (kvEntry) {
+      return await getInterchainToken(kvEntry, chainConfig, chainConfigs, ctx);
     }
-    result = await getInterchainToken(kvEntry, chainConfig, chainConfigs, ctx);
   }
 
-  return result;
+  return null;
 }

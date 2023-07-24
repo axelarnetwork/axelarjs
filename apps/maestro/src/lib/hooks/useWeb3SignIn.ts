@@ -1,7 +1,11 @@
+import { invariant } from "@axelarjs/utils";
 import { useRef } from "react";
 import { signIn, useSession, type SignInResponse } from "next-auth/react";
 
+import { useDisconnect, useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
+
+import { trpc } from "../trpc";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
@@ -25,10 +29,15 @@ const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
  */
 export function useWeb3SignIn({
   enabled,
-  onSigninSuccess,
+  onSigninSuccess: onSignInSuccess,
   onSigninError,
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
+  const { signMessageAsync } = useSignMessage();
+  const { disconnectAsync } = useDisconnect();
+
+  const { mutateAsync: createSignInMessage } =
+    trpc.auth.createSignInMessage.useMutation();
 
   // avoid signing in multiple times
   const isSigningInRef = useRef(false);
@@ -51,8 +60,22 @@ export function useWeb3SignIn({
     async function signInWithWeb3() {
       try {
         isSigningInRef.current = true;
-        const response = await signIn("credentials", { address });
-        onSigninSuccess?.(response);
+
+        invariant(address, "Address is required");
+
+        const { message } = await createSignInMessage({ address });
+
+        const signature = await signMessageAsync({ message });
+
+        const response = await signIn("credentials", { address, signature });
+
+        if (response?.error) {
+          await disconnectAsync();
+          throw new Error(response.error);
+        }
+
+        onSignInSuccess?.(response);
+
         isSigningInRef.current = false;
       } catch (error) {
         if (error instanceof Error) {

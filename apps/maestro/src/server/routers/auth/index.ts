@@ -1,8 +1,8 @@
 import { publicProcedure, router } from "~/server/trpc";
-import { signin } from "./signin";
+import { createSignInMessage } from "./createSignInMessage";
 
 export const authRouter = router({
-  signin,
+  createSignInMessage,
   getSession: publicProcedure.query(({ ctx }) =>
     ctx.session ? { address: ctx.session?.address } : null
   ),
