@@ -21,11 +21,14 @@ function useLayoutState() {
   );
 
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [signInError, setSignInError] = useState<Error>();
-  const [signInAddress, setSignInAddress] = useState<`0x${string}` | null>(
-    null
-  );
+
+  const {
+    retryAsync: retrySignInAsync,
+    error: signInError,
+    isSuccess: isSignedIn,
+  } = useWeb3SignIn({
+    onSignInStart: setIsSignInModalOpen.bind(null, true),
+  });
 
   useEffect(() => {
     let timeoutId = -1;
@@ -33,25 +36,15 @@ function useLayoutState() {
     if (isSignedIn) {
       timeoutId = window.setTimeout(
         setIsSignInModalOpen.bind(null, false),
-        1500
+        3000
       );
-    }
-    return () => window.clearTimeout(timeoutId);
-  }, [isSignedIn]);
 
-  const { signInAsync: retrySignInAsync } = useWeb3SignIn({
-    onSignInStart(address) {
-      setIsSignInModalOpen(true);
-      setSignInAddress(address);
-    },
-    onSignInSuccess() {
       if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet") {
         console.log("session initiated");
       }
-      setIsSignedIn(true);
-    },
-    onSignInError: setSignInError,
-  });
+    }
+    return () => window.clearTimeout(timeoutId);
+  }, [isSignedIn]);
 
   /**
    * Set the component to render in the drawer
@@ -69,10 +62,9 @@ function useLayoutState() {
       isSignInModalOpen,
       isSignedIn,
       signInError,
-      signInAddress,
-      retrySignInAsync: () => {
-        retrySignInAsync(signInAddress);
-        setSignInError(undefined);
+      retrySignInAsync,
+      abortSignIn: () => {
+        setIsSignInModalOpen(false);
       },
       ...persistedState,
     },

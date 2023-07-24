@@ -13,7 +13,7 @@ import Link from "next/link";
 
 import { Web3Modal } from "@web3modal/react";
 import clsx from "clsx";
-import { CheckCircleIcon, KeyIcon } from "lucide-react";
+import { CheckCircleIcon, KeyIcon, XCircleIcon } from "lucide-react";
 
 import {
   NEXT_PUBLIC_NETWORK_ENV,
@@ -34,7 +34,6 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     {
       isSignedIn,
       signInError,
-      retrySignInAsync,
       isDrawerOpen,
       isSignInModalOpen,
       DrawerSideContent,
@@ -85,7 +84,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             <SignInModal
               isSignedIn={isSignedIn}
               signInError={signInError}
-              onRetry={retrySignInAsync}
+              // onRetry={retrySignInAsync}
             />
           )}
         </Drawer.Content>
@@ -158,10 +157,18 @@ const TestnetBanner = ({ onClose = () => {} }) => (
   </Card>
 );
 
+const parseSignInErrorMessage = (error: Error) => {
+  if ("shortMessage" in error) {
+    return String(error.shortMessage);
+  }
+  return error.message;
+};
+
 const SignInModal = ({
   isSignedIn = false,
-  signInError = undefined as undefined | Error,
-  onRetry = () => {},
+  signInError = undefined as undefined | null | Error,
+  onAbort = () => {},
+  // onRetry = () => {},
 }) => {
   return (
     <Dialog open trigger={<></>}>
@@ -170,32 +177,43 @@ const SignInModal = ({
           className={clsx(
             "swap-rotate swap relative grid h-16 w-16 place-items-center",
             {
-              "swap-active": isSignedIn,
+              "swap-active": isSignedIn || signInError,
             }
           )}
         >
-          <CheckCircleIcon className="text-success swap-on h-12 w-12 md:h-16 md:w-16" />
+          {signInError ? (
+            <XCircleIcon className="text-error swap-on h-12 w-12 md:h-16 md:w-16" />
+          ) : (
+            <CheckCircleIcon className="text-success swap-on h-12 w-12 md:h-16 md:w-16" />
+          )}
           <div className="swap-off gird h-14 w-14 place-items-center md:h-16 md:w-16">
             <Loading className="absolute h-14 w-14 animate-pulse md:h-20 md:w-20" />
-            <KeyIcon className="md: absolute left-[18px] top-[18px] h-7 w-7 animate-pulse md:left-5 md:h-10 md:w-10" />
+            <KeyIcon className="absolute left-[18px] top-[18px] h-7 w-7 animate-pulse md:left-4 md:top-5 md:h-10 md:w-10" />
           </div>
         </div>
         <div className="grid gap-1.5 text-center">
           {signInError ? (
             <>
               <span className="text-error/90 md:pt-8">
-                {signInError.message}
+                {parseSignInErrorMessage(signInError)}
               </span>
-              <Button onClick={onRetry} length="block" variant="link" size="lg">
+              {/* <Button onClick={onRetry} length="block" variant="link" size="lg">
                 retry signing in
-              </Button>
+              </Button> */}
             </>
           ) : (
             <>
-              <span className="text-warning/90">Authentication required</span>
-              <span className="text-accent/80">
-                Please sign in with your wallet to continue
-              </span>
+              <span className="text-warning/70">Authentication required</span>
+              <span>Please sign in with your wallet to continue</span>
+              <Button
+                onClick={onAbort}
+                length="block"
+                variant="link"
+                size="lg"
+                className="text-error/80"
+              >
+                cancel & exit
+              </Button>
             </>
           )}
         </div>
