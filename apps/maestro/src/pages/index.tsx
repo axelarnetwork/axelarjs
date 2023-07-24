@@ -30,16 +30,23 @@ export default function Home() {
 
   const handleDismissBanner = layoutActions.dismissDisclaimerBanner;
 
+  const shouldRenderTestnetBanner =
+    NEXT_PUBLIC_NETWORK_ENV === "testnet" &&
+    !layoutState.isSignInModalOpen &&
+    !layoutState.isBetaBannerDismissed;
+
   return (
     <>
       {!layoutState.isHeroBannerDismissed && (
         <HeroSection
           onCTAClick={() => {
-            // Scroll to main content
-            window.scrollTo(
-              0,
-              document.getElementById("main-content")?.offsetTop ?? 0
-            );
+            if (layoutState.isSignedIn) {
+              // Scroll to main content
+              window.scrollTo(
+                0,
+                document.getElementById("main-content")?.offsetTop ?? 0
+              );
+            }
           }}
         />
       )}
@@ -53,21 +60,20 @@ export default function Home() {
           className="flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
           id="main-content"
         >
-          {NEXT_PUBLIC_NETWORK_ENV === "testnet" &&
-            !layoutState.isBetaBannerDismissed && (
-              <Dialog open onClose={handleDismissBanner} className="bg-warning">
-                <Dialog.Body className="bg-warning text-warning-content">
-                  <Dialog.CornerCloseAction onClick={handleDismissBanner} />
-                  <Alert status="warning">
-                    <span className="font-semibold">
-                      You are using the Interchain Token Service Beta in
-                      testnet. The app is in active development; further updates
-                      and improvements to come!
-                    </span>
-                  </Alert>
-                </Dialog.Body>
-              </Dialog>
-            )}
+          {shouldRenderTestnetBanner && (
+            <Dialog open onClose={handleDismissBanner} className="bg-warning">
+              <Dialog.Body className="bg-warning text-warning-content">
+                <Dialog.CornerCloseAction onClick={handleDismissBanner} />
+                <Alert status="warning">
+                  <span className="font-semibold">
+                    You are using the Interchain Token Service Beta in testnet.
+                    The app is in active development; further updates and
+                    improvements to come!
+                  </span>
+                </Alert>
+              </Dialog.Body>
+            </Dialog>
+          )}
           <SearchInterchainToken onTokenFound={handleTokenFound} />
           <div className="divider">OR</div>
           <AddErc20 />
