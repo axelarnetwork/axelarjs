@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/schemas";
@@ -18,15 +19,17 @@ export const getInterchainTokenDetails = protectedProcedure
     });
 
     if (!kvResult) {
-      throw new Error(
-        `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`
-      );
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
+      });
     }
 
     if (kvResult.deployerAddress !== ctx.session?.address) {
-      throw new Error(
-        `Invalid deployer address for interchain token ${input.tokenAddress} on chain ${input.chainId}`
-      );
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: `Invalid deployer address for interchain token ${input.tokenAddress} on chain ${input.chainId}`,
+      });
     }
 
     return kvResult as IntercahinTokenDetails;
