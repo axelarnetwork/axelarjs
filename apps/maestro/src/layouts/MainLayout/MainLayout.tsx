@@ -1,14 +1,14 @@
 import {
   Button,
   Card,
+  Dialog,
   Drawer,
   Footer,
   LinkButton,
   Loading,
-  Modal,
   useTheme,
 } from "@axelarjs/ui";
-import { useState, type FC, type PropsWithChildren } from "react";
+import { type FC, type PropsWithChildren } from "react";
 import Link from "next/link";
 
 import { Web3Modal } from "@web3modal/react";
@@ -21,7 +21,6 @@ import {
 } from "~/config/env";
 import { ethereumClient } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
-import { useWeb3SignIn } from "~/lib/hooks/useWeb3SignIn";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -32,39 +31,35 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
 
   const [
-    { isDrawerOpen, DrawerSideContent, isTestnetBannerDismissed },
+    {
+      isSignedIn,
+      signInError,
+      retrySignInAsync,
+      isDrawerOpen,
+      isSignInModalOpen,
+      DrawerSideContent,
+      isTestnetBannerDismissed,
+    },
     actions,
   ] = useLayoutStateContainer();
-
-  const [showSignInModal, setShowSignInModal] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const defaultChain = useChainFromRoute();
 
   const shouldRenderTestnetBanner =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" && !isTestnetBannerDismissed;
 
-  useWeb3SignIn({
-    onSignInStart() {
-      setShowSignInModal(true);
-    },
-    onSignInSuccess() {
-      if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet") {
-        console.log("session initiated");
-      }
-      setIsSignedIn(true);
-
-      setTimeout(() => {
-        setShowSignInModal(false);
-      }, 1000);
-    },
-  });
-
   return (
     <>
       <Drawer>
         <Drawer.Toggle checked={isDrawerOpen} />
-        <Drawer.Content className="flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen">
+        <Drawer.Content
+          className={clsx(
+            "flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen",
+            {
+              "pointer-events-none": isSignInModalOpen,
+            }
+          )}
+        >
           <Appbar />
           {children}
           <Footer
@@ -86,25 +81,12 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />
           )}
-          {showSignInModal && (
-            <Modal open hideCloseButton>
-              <Modal.Body className="grid place-items-center gap-4 py-8">
-                <div
-                  className={clsx(
-                    "swap-rotate swap relative grid h-16 w-16 place-items-center",
-                    { "swap-active": isSignedIn }
-                  )}
-                >
-                  <CheckCircleIcon className="text-success swap-on h-16 w-16" />
-                  <Loading className="swap-off absolute h-16 w-16 animate-pulse" />
-                  <KeyIcon className="swap-off absolute h-8 w-8 animate-pulse" />
-                </div>
-                <div>Authentication required</div>
-                <div className="grid">
-                  Please sign the message to continue using the app.
-                </div>
-              </Modal.Body>
-            </Modal>
+          {isSignInModalOpen && (
+            <SignInModal
+              isSignedIn={isSignedIn}
+              signInError={signInError}
+              onRetry={retrySignInAsync}
+            />
           )}
         </Drawer.Content>
         <Drawer.Side>
@@ -175,3 +157,49 @@ const TestnetBanner = ({ onClose = () => {} }) => (
     </Card.Body>
   </Card>
 );
+
+const SignInModal = ({
+  isSignedIn = false,
+  signInError = undefined as undefined | Error,
+  onRetry = () => {},
+}) => {
+  return (
+    <Dialog open trigger={<></>}>
+      <Dialog.Body className="grid place-items-center gap-6 py-8 md:min-h-[25vh] md:py-12">
+        <div
+          className={clsx(
+            "swap-rotate swap relative grid h-16 w-16 place-items-center",
+            {
+              "swap-active": isSignedIn,
+            }
+          )}
+        >
+          <CheckCircleIcon className="text-success swap-on h-12 w-12 md:h-16 md:w-16" />
+          <div className="swap-off gird h-14 w-14 place-items-center md:h-16 md:w-16">
+            <Loading className="absolute h-14 w-14 animate-pulse md:h-20 md:w-20" />
+            <KeyIcon className="md: absolute left-[18px] top-[18px] h-7 w-7 animate-pulse md:left-5 md:h-10 md:w-10" />
+          </div>
+        </div>
+        <div className="grid gap-1.5 text-center">
+          {signInError ? (
+            <>
+              <span className="text-error/90 md:pt-8">
+                {signInError.message}
+              </span>
+              <Button onClick={onRetry} length="block" variant="link" size="lg">
+                retry signing in
+              </Button>
+            </>
+          ) : (
+            <>
+              <span className="text-warning/90">Authentication required</span>
+              <span className="text-accent/80">
+                Please sign in with your wallet to continue
+              </span>
+            </>
+          )}
+        </div>
+      </Dialog.Body>
+    </Dialog>
+  );
+};
