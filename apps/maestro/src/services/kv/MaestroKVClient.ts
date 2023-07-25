@@ -28,13 +28,12 @@ const interchainTokenKindSchema = z.union([
   }),
 ]);
 
-export const interchainTokenDetailsSchema = interchainTokenKindSchema.and(
+export const interchainTokenDetailsBaseSchema = interchainTokenKindSchema.and(
   z.object({
     tokenName: z.string(),
     tokenSymbol: z.string(),
     tokenDecimals: z.number(),
     tokenAddress: hex40Literal(),
-    deployerAddress: hex40Literal(),
     originChainId: z.number(),
     originAxelarChainId: z.string(),
     tokenId: hex64Literal(),
@@ -42,6 +41,13 @@ export const interchainTokenDetailsSchema = interchainTokenKindSchema.and(
     remoteTokens: z.array(remoteInterchainTokenSchema),
   })
 );
+
+export const interchainTokenDetailsSchema =
+  interchainTokenDetailsBaseSchema.and(
+    z.object({
+      deployerAddress: hex40Literal(),
+    })
+  );
 
 export type IntercahinTokenDetails = z.infer<
   typeof interchainTokenDetailsSchema
