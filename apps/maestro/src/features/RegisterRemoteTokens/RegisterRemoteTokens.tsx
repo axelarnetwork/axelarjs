@@ -80,7 +80,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       await recordRemoteTokenDeployment({
         tokenAddress: props.tokenAddress,
         chainId: props.originChainId ?? -1,
-        deployerAddress: deployerAddress as `0x${string}`,
         remoteTokens: props.chainIds.map((chainId) => ({
           address: props.tokenAddress,
           status: "pending",
