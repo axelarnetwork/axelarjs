@@ -237,6 +237,7 @@ export const MenuItems = () => (
             href={item.href}
             className="hover:text-accent inline-flex hover:underline lg:uppercase"
             rel={item.external ? "noopener noreferrer" : undefined}
+            target={item.external ? "_blank" : undefined}
           >
             {item.label}{" "}
             {item.external && <ExternalLinkIcon className="h-[1em] w-[1em]" />}
