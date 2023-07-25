@@ -3,8 +3,6 @@ import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
 
-export const ETH_AVG_BLOCK_TIME_SECONDS = 15;
-
 export const getChainInfo = publicProcedure
   .meta({
     openapi: {
@@ -26,9 +24,8 @@ export const getChainInfo = publicProcedure
       id: z.string(),
       chainName: z.string(),
       chainSymbol: z.string(),
-      fullySupported: z.boolean(),
-      estimatedWaitTime: z.number(),
-      confirmLevel: z.number().optional(),
+      blockConfirmations: z.number().optional(),
+      estimatedWaitTimeInMinutes: z.number(),
     })
   )
   .query(async ({ ctx, input }) => {
@@ -48,9 +45,8 @@ export const getChainInfo = publicProcedure
         id: chainInfo.id,
         chainName: chainInfo.chainName,
         chainSymbol: chainInfo.chainSymbol,
-        fullySupported: chainInfo.fullySupported,
-        estimatedWaitTime: chainInfo.estimatedWaitTime,
-        confirmLevel: chainInfo.confirmLevel,
+        blockConfirmations: chainInfo.confirmLevel,
+        estimatedWaitTimeInMinutes: chainInfo.estimatedWaitTime,
       };
 
       return output;
