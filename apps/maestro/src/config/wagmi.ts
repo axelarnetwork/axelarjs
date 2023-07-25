@@ -32,6 +32,8 @@ import {
   optimismGoerli,
   polygon,
   polygonMumbai,
+  polygonZkEvm,
+  polygonZkEvmTestnet,
 } from "wagmi/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { LedgerConnector } from "wagmi/connectors/ledger";
@@ -79,6 +81,16 @@ export const EVM_CHAIN_CONFIGS = [
       public: { http: ["https://polygon-testnet.public.blastapi.io"] },
     },
     networkNameOnAxelar: "polygon",
+    environment: "testnet",
+  },
+  {
+    ...polygonZkEvm,
+    networkNameOnAxelar: "polygon-zkevm",
+    environment: "mainnet",
+  },
+  {
+    ...polygonZkEvmTestnet,
+    networkNameOnAxelar: "polygon-zkevm",
     environment: "testnet",
   },
   { ...bsc, networkNameOnAxelar: "binance", environment: "mainnet" },

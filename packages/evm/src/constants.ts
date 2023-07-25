@@ -14,6 +14,8 @@ export const GAS_TOKENS = {
   BASE: "ETH",
   ARBITRUM: "ETH",
   LINEA: "ETH",
+  FILECOIN: "FIL",
+  POLYGON_ZKEVM: "ETH",
 } as const;
 
 export type GasTokenKind = (typeof GAS_TOKENS)[keyof typeof GAS_TOKENS];
