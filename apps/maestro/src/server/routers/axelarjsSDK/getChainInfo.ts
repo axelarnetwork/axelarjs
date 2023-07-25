@@ -6,9 +6,29 @@ import { publicProcedure } from "~/server/trpc";
 export const ETH_AVG_BLOCK_TIME_SECONDS = 15;
 
 export const getChainInfo = publicProcedure
+  .meta({
+    openapi: {
+      summary: "Get chain info for a given chain",
+      description:
+        "Get chain info for a given chain by providing its chain id on Axelar",
+      method: "GET",
+      path: "/axelarjs-sdk/chain-info",
+      tags: ["axelarjs-sdk"],
+    },
+  })
   .input(
     z.object({
-      axelarChainId: z.string(),
+      axelarChainId: z.string().max(64),
+    })
+  )
+  .output(
+    z.object({
+      id: z.string(),
+      chainName: z.string(),
+      chainSymbol: z.string(),
+      fullySupported: z.boolean(),
+      estimatedWaitTime: z.number(),
+      confirmLevel: z.number().optional(),
     })
   )
   .query(async ({ ctx, input }) => {
@@ -24,7 +44,16 @@ export const getChainInfo = publicProcedure
         });
       }
 
-      return chainInfo;
+      const output = {
+        id: chainInfo.id,
+        chainName: chainInfo.chainName,
+        chainSymbol: chainInfo.chainSymbol,
+        fullySupported: chainInfo.fullySupported,
+        estimatedWaitTime: chainInfo.estimatedWaitTime,
+        confirmLevel: chainInfo.confirmLevel,
+      };
+
+      return output;
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
