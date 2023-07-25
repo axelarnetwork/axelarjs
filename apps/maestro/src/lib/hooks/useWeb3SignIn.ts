@@ -1,7 +1,13 @@
-import { invariant } from "@axelarjs/utils";
-import { useCallback, useRef } from "react";
-import { signIn, useSession, type SignInResponse } from "next-auth/react";
+import { debounce, invariant } from "@axelarjs/utils";
+import { useRef } from "react";
+import {
+  signIn,
+  signOut,
+  useSession,
+  type SignInResponse,
+} from "next-auth/react";
 
+import { useMutation } from "@tanstack/react-query";
 import { useDisconnect, useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
@@ -10,14 +16,12 @@ import { trpc } from "../trpc";
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
   onSignInSuccess?: (response?: SignInResponse) => void;
-  onSignInError?: (error: Error) => void;
   onSignInStart?: (address: `0x${string}`) => void;
 };
 
 const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
   enabled: true,
   onSignInSuccess: () => {},
-  onSignInError: () => {},
   onSignInStart: () => {},
 };
 
@@ -33,11 +37,12 @@ export function useWeb3SignIn({
   enabled,
   onSignInStart,
   onSignInSuccess,
-  onSignInError,
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
   const { signMessageAsync } = useSignMessage();
   const { disconnectAsync } = useDisconnect();
+
+  const signInAddressRef = useRef<`0x${string}` | null>(null);
 
   const { mutateAsync: createSignInMessage } =
     trpc.auth.createSignInMessage.useMutation();
@@ -45,62 +50,74 @@ export function useWeb3SignIn({
   // avoid signing in multiple times
   const isSigningInRef = useRef(false);
 
-  const signInWithWeb3Async = useCallback(
-    async (address?: `0x${string}` | null) => {
-      try {
-        isSigningInRef.current = true;
+  const {
+    mutateAsync: signInWithWeb3Async,
+    mutate: signInWithWeb3,
+    error,
+    ...mutation
+  } = useMutation(async (address?: `0x${string}` | null) => {
+    try {
+      invariant(address, "Address is required");
 
-        invariant(address, "Address is required");
+      signInAddressRef.current = address;
+      isSigningInRef.current = true;
 
-        onSignInStart?.(address);
+      const { message } = await createSignInMessage({ address });
 
-        const { message } = await createSignInMessage({ address });
-        const signature = await signMessageAsync({ message });
-        const response = await signIn("credentials", { address, signature });
+      onSignInStart?.(address);
+      const signature = await signMessageAsync({ message });
+      const response = await signIn("credentials", { address, signature });
 
-        if (response?.error) {
-          await disconnectAsync();
-          throw new Error(response.error);
-        }
-
-        onSignInSuccess?.(response);
-
-        isSigningInRef.current = false;
-      } catch (error) {
-        if (error instanceof Error) {
-          onSignInError?.(error);
-        }
+      if (response?.error) {
+        throw new Error(response.error);
       }
-    },
-    [
-      createSignInMessage,
-      disconnectAsync,
-      onSignInError,
-      onSignInStart,
-      onSignInSuccess,
-      signMessageAsync,
-    ]
-  );
 
-  watchAccount(({ address }) => {
-    if (
-      enabled === false ||
-      isSigningInRef.current ||
-      sessionStatus === "loading" ||
-      !address
-    ) {
-      return;
+      onSignInSuccess?.(response);
+
+      isSigningInRef.current = false;
+    } catch (error) {
+      if (error instanceof Error) {
+        await disconnectAsync();
+        await signOut();
+
+        signInAddressRef.current = null;
+        isSigningInRef.current = false;
+
+        throw error;
+      }
     }
-
-    if (session?.address === address) {
-      // User is already signed in with the same address
-      return;
-    }
-
-    signInWithWeb3Async(address);
   });
 
+  const unwatch = watchAccount(
+    debounce(({ address }) => {
+      if (
+        enabled === false ||
+        isSigningInRef.current ||
+        sessionStatus === "loading" ||
+        !address
+      ) {
+        return;
+      }
+
+      if (
+        session?.address === address ||
+        signInAddressRef.current === address
+      ) {
+        // User is already signed in with the same address
+        return;
+      }
+
+      unwatch();
+      signInWithWeb3Async(address);
+    }, 150)
+  );
+
   return {
+    retryAsync: signInWithWeb3Async.bind(null, signInAddressRef.current),
+    retry: signInWithWeb3.bind(null, signInAddressRef.current),
+    signIn: signInWithWeb3,
     signInAsync: signInWithWeb3Async,
+    error: error as Error | null,
+    ...mutation,
   };
 }
