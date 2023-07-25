@@ -40,13 +40,10 @@ export default function Home() {
       {!layoutState.isHeroBannerDismissed && (
         <HeroSection
           onCTAClick={() => {
-            if (layoutState.isSignedIn) {
-              // Scroll to main content
-              window.scrollTo(
-                0,
-                document.getElementById("main-content")?.offsetTop ?? 0
-              );
-            }
+            window.scrollTo(
+              0,
+              document.getElementById("main-content")?.offsetTop ?? 0
+            );
           }}
         />
       )}
