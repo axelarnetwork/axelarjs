@@ -1,4 +1,8 @@
-import { AxelarQueryAPI, type Environment } from "@axelar-network/axelarjs-sdk";
+import {
+  AxelarQueryAPI,
+  loadChains as getChainConfigs,
+  type Environment,
+} from "@axelar-network/axelarjs-sdk";
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import type {
@@ -39,10 +43,30 @@ async function estimateGasFeeMultipleChains(
   ]);
 }
 
+type EstimateFinalityParams = {
+  axelarChainId: string;
+};
+
+async function getChainInfo(params: EstimateFinalityParams) {
+  const chains = await getChainConfigs({
+    environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
+  });
+
+  const chainConfig = chains.find((chain) => chain.id === params.axelarChainId);
+
+  if (!chainConfig) {
+    throw new Error(`Could not find chain config for ${params.axelarChainId}`);
+  }
+
+  return chainConfig;
+}
+
 const extendedClient = {
   ...client,
   estimateGasFee,
   estimateGasFeeMultipleChains,
+  getChainConfigs,
+  getChainInfo,
 };
 
 export default extendedClient;
