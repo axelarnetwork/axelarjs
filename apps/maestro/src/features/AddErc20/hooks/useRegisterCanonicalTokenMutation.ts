@@ -15,7 +15,7 @@ import { watchInterchainTokenServiceEvent } from "~/lib/contracts/InterchainToke
 import { useInterchainTokenServiceMulticall } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import type { IntercahinTokenDetails } from "~/services/kv";
+import type { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseRegisterCanonicalTokenInput = {
@@ -53,7 +53,7 @@ export function useRegisterCanonicalTokenMutation(config: {
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
-    useState<IntercahinTokenDetails | null>(null);
+    useState<RecordInterchainTokenDeploymentInput | null>(null);
 
   useEffect(
     () => {
@@ -93,7 +93,6 @@ export function useRegisterCanonicalTokenMutation(config: {
         tokenId: inputRef.current.expectedTokenId,
         tokenAddress: inputRef.current.tokenAddress,
         originChainId: chain.id,
-        deployerAddress,
         deploymentTxHash: log.transactionHash,
         tokenName: inputRef.current.tokenName,
         tokenSymbol: inputRef.current.tokenSymbol,

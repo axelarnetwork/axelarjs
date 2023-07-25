@@ -23,7 +23,7 @@
     "codegen:env": "ts-node-esm scripts/env.ts"
   },
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "^0.12.8",
+    "@axelar-network/axelarjs-sdk": "^0.13.5",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
