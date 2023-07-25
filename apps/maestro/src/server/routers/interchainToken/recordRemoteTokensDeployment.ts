@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/schemas";
@@ -9,13 +10,30 @@ export const recordRemoteTokensDeployment = protectedProcedure
     z.object({
       chainId: z.number(),
       tokenAddress: hex40Literal(),
-      deployerAddress: hex40Literal(),
       remoteTokens: z.array(remoteInterchainTokenSchema),
     })
   )
-  // TODO: this needs to be a protected mutation
-  .mutation(({ ctx, input }) => {
-    ctx.storage.kv.recordRemoteTokensDeployment(
+  .mutation(async ({ ctx, input }) => {
+    const kvRecord = await ctx.storage.kv.getInterchainTokenDetails({
+      chainId: input.chainId,
+      tokenAddress: input.tokenAddress,
+    });
+
+    if (!kvRecord) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.chainId}`,
+      });
+    }
+
+    if (kvRecord.deployerAddress !== ctx.session?.address) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: `Only the deployer of the token can record remote tokens`,
+      });
+    }
+
+    return ctx.storage.kv.recordRemoteTokensDeployment(
       {
         chainId: input.chainId,
         tokenAddress: input.tokenAddress,
