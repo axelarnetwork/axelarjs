@@ -23,7 +23,6 @@ export const getChainInfo = publicProcedure
     z.object({
       id: z.string(),
       chainName: z.string(),
-      chainSymbol: z.string(),
       blockConfirmations: z.number().optional(),
       estimatedWaitTimeInMinutes: z.number(),
     })
@@ -44,7 +43,6 @@ export const getChainInfo = publicProcedure
       const output = {
         id: chainInfo.id,
         chainName: chainInfo.chainName,
-        chainSymbol: chainInfo.chainSymbol,
         blockConfirmations: chainInfo.confirmLevel,
         estimatedWaitTimeInMinutes: chainInfo.estimatedWaitTime,
       };
