@@ -86,7 +86,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     try {
       if (props.onSelectChain) {
         props.onSelectChain(
-          eligibleChains.find((x) => x.chain_id === chainId)!
+          eligibleChains.find((x) => x.chain_id === chainId) ?? null
         );
       } else {
         await switchNetworkAsync?.(chainId);
