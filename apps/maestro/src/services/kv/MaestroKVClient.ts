@@ -1,5 +1,4 @@
 import { type VercelKV } from "@vercel/kv";
-import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
@@ -98,9 +97,55 @@ export const COLLECTION_KEYS = {
     `${COLLECTIONS.accounts}:${accountAddress}:deployments` as const,
 };
 
-export default class MaestroKVClient {
-  constructor(private kv: VercelKV) {}
+export class BaseMaestroKVClient {
+  constructor(protected kv: VercelKV) {}
 
+  /**
+   * getter helper that migrates legacy string record to hash record
+   *
+   * @param key
+   */
+  protected async getMigrateStringToHash<T extends Record<string, unknown>>(
+    key: string
+  ) {
+    return this.kv.hgetall<T>(key).catch(async () => {
+      // check current key & migrate
+      const value = await this.kv.get<T>(key);
+
+      if (value) {
+        // replace current key
+        await this.kv.del(key);
+        await this.kv.hset(key, value);
+        return value;
+      }
+
+      return null;
+    });
+  }
+
+  /**
+   * getter helper that migrates legacy string record to set record
+   *
+   * @param key
+   */
+  protected async getMigrateStringToSet<T extends unknown[]>(key: string) {
+    return this.kv.smembers<T>(key).catch(async () => {
+      // check current key & migrate
+      const value = await this.kv.get<T>(key);
+
+      if (value) {
+        // replace current key
+        await this.kv.del(key);
+        await this.kv.sadd(key, ...value);
+        return value;
+      }
+
+      return null;
+    });
+  }
+}
+
+export default class MaestroKVClient extends BaseMaestroKVClient {
   async getInterchainTokenDetails(variables: {
     chainId: number;
     tokenAddress: `0x${string}`;
@@ -110,7 +155,8 @@ export default class MaestroKVClient {
       variables.tokenAddress
     );
 
-    const tokenDetails = await this.kv.get<IntercahinTokenDetails>(key);
+    const tokenDetails =
+      await this.getMigrateStringToHash<IntercahinTokenDetails>(key);
 
     if (tokenDetails !== null) {
       return tokenDetails;
@@ -162,12 +208,14 @@ export default class MaestroKVClient {
       variables.chainId,
       variables.tokenAddress
     );
-    const value = await this.kv.get<IntercahinTokenDetails>(key);
+    const value = await this.getMigrateStringToHash<IntercahinTokenDetails>(
+      key
+    );
 
     const nextDetails =
       typeof details === "function" ? details(value) : details;
 
-    await this.kv.set(key, { ...value, ...nextDetails });
+    await this.kv.hset(key, { ...value, ...nextDetails });
   }
 
   private async getLegacyAccountDetails(accountAddress: `0x${string}`) {
@@ -177,7 +225,7 @@ export default class MaestroKVClient {
 
   async createAccount(accountAddress: `0x${string}`) {
     this.kv.set(COLLECTION_KEYS.accountNonce(accountAddress), 0);
-    this.kv.set(COLLECTION_KEYS.accountDeployments(accountAddress), []);
+    this.kv.sadd(COLLECTION_KEYS.accountDeployments(accountAddress), ...[]);
   }
 
   async appendAccountDeployments(
@@ -185,22 +233,18 @@ export default class MaestroKVClient {
     details: AccountDployment
   ) {
     const key = COLLECTION_KEYS.accountDeployments(accountAddress);
-    const value = await this.kv.get<AccountDployment[]>(key);
+    const value = await this.getMigrateStringToSet<AccountDployment[]>(key);
 
     if (value === null) {
-      return await this.kv.set(key, [details]);
+      return await this.kv.sadd(key, details);
     }
 
-    await this.kv.set(
-      key,
-      uniqBy((x) => `${x.tokenAddress}:${x.chainId}`, [...value, details])
-    );
+    await this.kv.sadd(key, details);
   }
 
   async getAccountNonce(accountAddress: `0x${string}`) {
-    const nonce = await this.kv.get<number>(
-      COLLECTION_KEYS.accountNonce(accountAddress)
-    );
+    const key = COLLECTION_KEYS.accountNonce(accountAddress);
+    const nonce = await this.kv.get<number>(key);
 
     if (nonce !== null) {
       return nonce;
@@ -210,10 +254,7 @@ export default class MaestroKVClient {
     const legacyAccount = await this.getLegacyAccountDetails(accountAddress);
 
     if (legacyAccount) {
-      await this.kv.set(
-        COLLECTION_KEYS.accountNonce(accountAddress),
-        legacyAccount.nonce
-      );
+      await this.kv.set(key, legacyAccount.nonce);
       return legacyAccount.nonce;
     }
 
@@ -278,41 +319,47 @@ export default class MaestroKVClient {
     },
     remoteTokens: RemoteInterchainTokenDetails[]
   ) {
-    await this.patchInterchainTokenDetials(variables, (details) => {
-      const patchedRemoteTokens = details
-        ? [
-            ...details.remoteTokens.map((existingRemoteToken) => {
-              // is there a patch for this chainId?
-              const remoteTokenPatch = remoteTokens.find(
-                (x) => x.chainId === existingRemoteToken.chainId
-              );
+    const key = COLLECTION_KEYS.interchainTokenDetails(
+      variables.chainId,
+      variables.tokenAddress
+    );
 
-              return !remoteTokenPatch
-                ? existingRemoteToken
-                : {
-                    ...existingRemoteToken,
-                    ...remoteTokenPatch,
-                  };
-            }),
-          ]
-        : [];
+    const detailsRemoteTokens = await this.kv.hget<
+      IntercahinTokenDetails["remoteTokens"]
+    >(key, "remoteTokens");
 
-      const existingChainIds = details
-        ? details.remoteTokens.map((x) => x.chainId)
-        : [];
+    const patchedRemoteTokens = detailsRemoteTokens
+      ? [
+          ...detailsRemoteTokens.map((existingRemoteToken) => {
+            // is there a patch for this chainId?
+            const remoteTokenPatch = remoteTokens.find(
+              (x) => x.chainId === existingRemoteToken.chainId
+            );
 
-      const addedRemoteTokens = remoteTokens.filter(
-        (x) => !existingChainIds.includes(x.chainId)
-      );
+            return !remoteTokenPatch
+              ? existingRemoteToken
+              : {
+                  ...existingRemoteToken,
+                  ...remoteTokenPatch,
+                };
+          }),
+        ]
+      : [];
 
-      const nextRemoteTokens = addedRemoteTokens.length
-        ? [...patchedRemoteTokens, ...addedRemoteTokens]
-        : patchedRemoteTokens;
+    const existingChainIds = detailsRemoteTokens
+      ? detailsRemoteTokens.map((x) => x.chainId)
+      : [];
 
-      return {
-        ...details,
-        remoteTokens: nextRemoteTokens,
-      };
+    const addedRemoteTokens = remoteTokens.filter(
+      (x) => !existingChainIds.includes(x.chainId)
+    );
+
+    const nextRemoteTokens = addedRemoteTokens.length
+      ? [...patchedRemoteTokens, ...addedRemoteTokens]
+      : patchedRemoteTokens;
+
+    await this.kv.hset(key, {
+      remoteTokens: nextRemoteTokens,
     });
   }
 }
