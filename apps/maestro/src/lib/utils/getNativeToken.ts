@@ -14,7 +14,7 @@ const GAS_TOKEN_MAP: Record<string, GasTokenKind> = {
   base: GAS_TOKENS.BASE,
   arbitrum: GAS_TOKENS.ARBITRUM,
   linea: GAS_TOKENS.LINEA,
-  filecoin: GAS_TOKENS.FILECOIN,
+  "filecoin-2": GAS_TOKENS.FILECOIN,
   "polygon-zkevm": GAS_TOKENS.POLYGON_ZKEVM,
 };
 

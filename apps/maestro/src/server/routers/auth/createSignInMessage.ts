@@ -7,7 +7,7 @@ import { publicProcedure } from "~/server/trpc";
 export const SIGNIN_MESSAGE = `Sign this message to access ${APP_NAME}.`;
 
 export const getSignInMessage = (nonce: number) =>
-  SIGNIN_MESSAGE.concat(`\n\nNonce: ${nonce}`);
+  SIGNIN_MESSAGE.concat(`\n\nnonce: ${nonce}`);
 
 export const createSignInMessage = publicProcedure
   .input(
