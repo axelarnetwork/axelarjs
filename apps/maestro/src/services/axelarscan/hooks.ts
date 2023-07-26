@@ -10,23 +10,19 @@ import axelarscanClient from ".";
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), EVM_CHAIN_CONFIGS);
 
 export function useEVMChainConfigsQuery() {
-  const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery(
-    undefined,
-    {
-      staleTime: 1000 * 60 * 60, // 1 hour
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<
+    EVMChainConfig[]
+  >(undefined, {
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnWindowFocus: false,
+  });
 
   return {
     ...queryResult,
     data,
     computed: {
-      indexedByChainId: indexBy<EVMChainConfig, number>(
-        prop("chain_id"),
-        data ?? []
-      ),
-      indexedById: indexBy<EVMChainConfig, string>(prop("id"), data ?? []),
+      indexedByChainId: indexBy(prop("chain_id"), data ?? []),
+      indexedById: indexBy(prop("id"), data ?? []),
       wagmiChains: (data ?? []).map(
         (x) => EVM_CHAIN_CONFIGS_BY_ID[String(x.chain_id)]
       ),

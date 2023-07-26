@@ -10,8 +10,8 @@ export const getChainInfo = publicProcedure
       description:
         "Get chain info for a given chain by providing its chain id on Axelar",
       method: "GET",
-      path: "/axelarjs-sdk/chain-info",
-      tags: ["axelarjs-sdk"],
+      path: "/chain-infos/{axelarChainId}",
+      tags: ["chain-infos"],
     },
   })
   .input(
