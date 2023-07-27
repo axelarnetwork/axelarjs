@@ -232,14 +232,10 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     accountAddress: `0x${string}`,
     details: AccountDployment
   ) {
-    const key = COLLECTION_KEYS.accountDeployments(accountAddress);
-    const value = await this.getMigrateStringToSet<AccountDployment[]>(key);
-
-    if (value === null) {
-      return await this.kv.sadd(key, details);
-    }
-
-    await this.kv.sadd(key, details);
+    await this.kv.sadd(
+      COLLECTION_KEYS.accountDeployments(accountAddress),
+      details
+    );
   }
 
   async getAccountNonce(accountAddress: `0x${string}`) {
@@ -266,24 +262,14 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   }
 
   async getAccountDeployments(accountAddress: `0x${string}`) {
-    const deployments = await this.kv.get<`0x${string}`[]>(
+    const deployments = await this.getMigrateStringToSet<AccountDployment[]>(
       COLLECTION_KEYS.accountDeployments(accountAddress)
     );
 
     if (deployments !== null) {
       return deployments;
     }
-
-    // check legacy key & migrate
-    const legacyAccount = await this.getLegacyAccountDetails(accountAddress);
-
-    if (legacyAccount) {
-      await this.kv.set(
-        COLLECTION_KEYS.accountNonce(accountAddress),
-        legacyAccount.nonce
-      );
-      return legacyAccount.nonce;
-    }
+    return [];
   }
 
   /// convenience methods
@@ -361,5 +347,29 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     await this.kv.hset(key, {
       remoteTokens: nextRemoteTokens,
     });
+  }
+
+  async getAccountInterchainTokens(accountAddress: `0x${string}`) {
+    const deployments = await this.getAccountDeployments(accountAddress);
+
+    if (deployments === null) {
+      return null;
+    }
+
+    const tokens = await Promise.all(
+      deployments.map(async (deployment) => {
+        const details = await this.getInterchainTokenDetails(deployment);
+
+        if (!details) {
+          throw new Error(
+            `Missing interchain token details for chainId: ${deployment.chainId} and tokenAddress: ${deployment.tokenAddress}`
+          );
+        }
+
+        return details;
+      })
+    );
+
+    return tokens;
   }
 }
