@@ -35,6 +35,8 @@ import {
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 
+export type InterchainTokensPageProps = {};
+
 const InterchainTokensPage = () => {
   const { chainName, tokenAddress } = useRouter().query as {
     chainName: string;
