@@ -1,9 +1,12 @@
 import type { EVMChainConfig } from "@axelarjs/api";
+import { useMemo } from "react";
 
-import { indexBy, prop } from "rambda";
+import { indexBy, partition, prop } from "rambda";
 import { useQuery } from "wagmi";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
 
@@ -17,15 +20,45 @@ export function useEVMChainConfigsQuery() {
     refetchOnWindowFocus: false,
   });
 
+  // Filter out chains that are not configured in the app
+  const [configured, unconfigured] = useMemo(
+    () =>
+      partition(
+        (x) => Boolean(EVM_CHAIN_CONFIGS_BY_ID[x.chain_id]),
+        data ?? []
+      ),
+    [data]
+  );
+
+  if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
+    logger.info(
+      // with emojis
+      `excluded ${unconfigured?.length} chain configs:\n${unconfigured
+        ?.map((x) =>
+          JSON.stringify(
+            {
+              chain_id: x.chain_id,
+              name: x.name,
+            },
+            null,
+            2
+          )
+        )
+        .join("\n")}`
+    );
+  }
+
+  const wagmiChains = configured.map(
+    (x) => EVM_CHAIN_CONFIGS_BY_ID[x.chain_id]
+  );
+
   return {
     ...queryResult,
-    data,
+    data: configured,
     computed: {
-      indexedByChainId: indexBy(prop("chain_id"), data ?? []),
-      indexedById: indexBy(prop("id"), data ?? []),
-      wagmiChains: (data ?? []).map(
-        (x) => EVM_CHAIN_CONFIGS_BY_ID[String(x.chain_id)]
-      ),
+      indexedByChainId: indexBy(prop("chain_id"), configured),
+      indexedById: indexBy(prop("id"), configured),
+      wagmiChains,
     },
   };
 }
