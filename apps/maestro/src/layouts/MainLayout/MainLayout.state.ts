@@ -2,7 +2,7 @@ import { createContainer, useLocalStorageState } from "@axelarjs/utils/react";
 import { useEffect, useState, type FC } from "react";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { useWeb3SignIn } from "~/lib/hooks/useWeb3SignIn";
+import { useWeb3SignIn } from "~/lib/auth";
 
 const DEFAULT_BANNERS_STATE = {
   isTestnetBannerDismissed: false,
