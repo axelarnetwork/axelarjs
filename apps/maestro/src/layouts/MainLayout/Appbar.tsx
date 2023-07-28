@@ -1,5 +1,6 @@
 import {
   AxelarIcon,
+  Badge,
   Button,
   Card,
   CopyToClipboardButton,
@@ -13,6 +14,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import React, { useEffect, type FC } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 import clsx from "clsx";
@@ -43,7 +45,6 @@ const Appbar: FC<AppbarProps> = () => {
       <CopyToClipboardButton
         size="sm"
         copyText={address}
-        outline={true}
         className="flex items-center gap-1"
       >
         <Identicon address={address ?? ""} diameter={18} />{" "}
@@ -51,8 +52,6 @@ const Appbar: FC<AppbarProps> = () => {
       </CopyToClipboardButton>
       <LinkButton
         size="sm"
-        variant="info"
-        outline
         target="_blank"
         rel="noopener noreferrer"
         href={`${chain?.blockExplorers?.default.url}/address/${address}`}
@@ -61,6 +60,21 @@ const Appbar: FC<AppbarProps> = () => {
         View on {chain?.blockExplorers?.default.name}{" "}
         <ExternalLinkIcon className="h-[1em] w-[1em]" />
       </LinkButton>
+
+      <Link
+        href="/interchain-tokens"
+        className="btn btn-sm flex flex-nowrap text-center"
+      >
+        <Indicator>
+          My Interchain Tokens
+          <Indicator.Item
+            $as={Badge}
+            variant="info"
+            size="xs"
+            className="origin-center translate-x-4 animate-pulse"
+          />
+        </Indicator>
+      </Link>
       <Button size="sm" variant="error" onClick={() => disconnect()}>
         Disconnect
       </Button>
