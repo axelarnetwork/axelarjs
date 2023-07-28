@@ -26,3 +26,7 @@ export const NEXT_PUBLIC_FILE_BUG_REPORT_URL = Maybe.of(
 export const NEXT_PUBLIC_VERCEL_URL = Maybe.of(
   process.env.NEXT_PUBLIC_VERCEL_URL
 ).mapOr("http://localhost:3000", String);
+
+export const NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA = Maybe.of(
+  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
+).mapOr("", String);

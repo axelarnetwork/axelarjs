@@ -17,10 +17,12 @@ import { CheckCircleIcon, KeyIcon, XCircleIcon } from "lucide-react";
 
 import {
   NEXT_PUBLIC_NETWORK_ENV,
+  NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "~/config/env";
 import { ethereumClient } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
+import pkg from "../../../package.json";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -61,31 +63,40 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         >
           <Appbar />
           {children}
-          <Footer
-            className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
-            center={true}
-          >
-            <div className="flex items-center text-sm">
-              &copy;{new Date().getFullYear()} <span>&middot;</span>
+          <div>
+            <Footer
+              className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
+              center={true}
+            >
+              <div className="flex items-center text-sm">
+                &copy;{new Date().getFullYear()} <span>&middot;</span>
+                <Link
+                  rel="noopener noreferrer"
+                  href="https://axelar.network"
+                  target="_blank"
+                  className="text-accent"
+                >
+                  Axelar Network
+                </Link>
+              </div>
+            </Footer>
+            <div className="bg-base-300 text-accent p-2 px-4 text-right">
               <Link
                 rel="noopener noreferrer"
-                href="https://axelar.network"
                 target="_blank"
-                className="text-accent"
+                href={`https://github.com/axelarnetwork/axelarjs/commit/${
+                  NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
+                }`}
               >
-                Axelar Network
+                {pkg.name} &middot; v{pkg.version}
               </Link>
             </div>
-          </Footer>
+          </div>
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />
           )}
           {isSignInModalOpen && (
-            <SignInModal
-              isSignedIn={isSignedIn}
-              signInError={signInError}
-              // onRetry={retrySignInAsync}
-            />
+            <SignInModal isSignedIn={isSignedIn} signInError={signInError} />
           )}
         </Drawer.Content>
         <Drawer.Side>
