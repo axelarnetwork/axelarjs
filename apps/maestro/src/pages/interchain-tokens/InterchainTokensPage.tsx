@@ -2,12 +2,13 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
 import { useMemo } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import Page from "~/layouts/Page";
-import { useProtected } from "~/lib/hooks/useProtected";
+import { withRouteProtection } from "~/lib/auth";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { IntercahinTokenDetails } from "~/services/kv";
@@ -20,8 +21,17 @@ const getChainNameSlug = (chainId: number) => {
 
 export type InterchainTokensPageProps = {};
 
-export default function InterchainTokensPage() {
-  const { data } = trpc.interchainToken.getMyInterchainTokens.useQuery();
+const InterchainTokensPage = () => {
+  const { data: session } = useSession();
+
+  const { data } = trpc.interchainToken.getMyInterchainTokens.useQuery(
+    {
+      sessionAddress: session?.address as `0x${string}`,
+    },
+    {
+      enabled: Boolean(session?.address),
+    }
+  );
 
   const { computed } = useEVMChainConfigsQuery();
 
@@ -36,8 +46,6 @@ export default function InterchainTokensPage() {
 
     [computed.indexedByChainId, data]
   );
-
-  useProtected();
 
   return (
     <Page pageTitle="My Interchain Tokens">
@@ -79,4 +87,6 @@ export default function InterchainTokensPage() {
       </div>
     </Page>
   );
-}
+};
+
+export default withRouteProtection(InterchainTokensPage);
