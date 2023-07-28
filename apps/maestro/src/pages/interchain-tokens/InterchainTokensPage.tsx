@@ -1,12 +1,16 @@
+import type { EVMChainConfig } from "@axelarjs/api";
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
+import { useMemo } from "react";
 import Link from "next/link";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import Page from "~/layouts/Page";
+import { useProtected } from "~/lib/hooks/useProtected";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import type { IntercahinTokenDetails } from "~/services/kv";
 
 const getChainNameSlug = (chainId: number) => {
   const chain = EVM_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
@@ -21,14 +25,26 @@ export default function InterchainTokensPage() {
 
   const { computed } = useEVMChainConfigsQuery();
 
+  const filteredTokens = useMemo(
+    () =>
+      (data ?? [])
+        .map((token) => [token, computed.indexedByChainId[token.originChainId]])
+        .filter(([token, chain]) => token && chain) as [
+        IntercahinTokenDetails,
+        EVMChainConfig
+      ][],
+
+    [computed.indexedByChainId, data]
+  );
+
+  useProtected();
+
   return (
     <Page pageTitle="My Interchain Tokens">
       <div className="flex flex-col gap-4">
         <Page.Title>My Interchain Tokens ({data?.length})</Page.Title>
         <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {data?.map((token) => {
-            const chain = computed.indexedByChainId[token.originChainId];
-
+          {filteredTokens.map(([token, chain]) => {
             return (
               <li
                 key={`${token.tokenAddress}:${token.tokenId}`}
