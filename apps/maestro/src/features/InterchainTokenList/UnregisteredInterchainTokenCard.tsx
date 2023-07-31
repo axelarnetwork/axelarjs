@@ -1,4 +1,4 @@
-import { Card } from "@axelarjs/ui";
+import { Card, Indicator } from "@axelarjs/ui";
 import { type FC } from "react";
 
 import clsx from "clsx";
@@ -56,22 +56,26 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
       )}
       <Card.Body className="w-full">
         <Card.Title className="flex-wrap justify-center md:justify-between">
-          {props.chain && (
-            <span className="flex items-center gap-2">
-              <ChainIcon
-                src={props.chain.image}
-                alt={props.chain.name}
-                size="md"
-              />
-              {props.chain.name}
-            </span>
-          )}
-          {props.deploymentStatus && props.deploymentTxHash && (
-            <GMPStatusIndicator
-              txHash={props.deploymentTxHash}
-              status={props.deploymentStatus}
-            />
-          )}
+          <Indicator>
+            {props.chain && (
+              <span className="flex items-center gap-2">
+                <ChainIcon
+                  src={props.chain.image}
+                  alt={props.chain.name}
+                  size="md"
+                />
+                {props.chain.name}
+              </span>
+            )}
+            {props.deploymentStatus && props.deploymentTxHash && (
+              <Indicator.Item $as="div" className="-translate-y-3.5">
+                <GMPStatusIndicator
+                  txHash={props.deploymentTxHash}
+                  status={props.deploymentStatus}
+                />
+              </Indicator.Item>
+            )}
+          </Indicator>
         </Card.Title>
         <div className="mx-auto">Remote token not registered</div>
       </Card.Body>
