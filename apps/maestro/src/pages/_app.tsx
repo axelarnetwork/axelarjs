@@ -1,7 +1,9 @@
 import { ThemeProvider, Toaster } from "@axelarjs/ui";
 import { useEffect, useState, type FC } from "react";
+import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
+import Script from "next/script";
 
 import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -10,8 +12,7 @@ import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "~/styles/globals.css";
 
-import { SessionProvider } from "next-auth/react";
-
+import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
 import MainLayout from "~/layouts/MainLayout";
 import NProgressBar from "~/layouts/NProgressBar";
@@ -36,13 +37,16 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 
   return (
     <>
-      <style jsx={true} global={true}>
+      <style jsx global>
         {`
           :root {
             --font-sans: ${fontSans.style.fontFamily};
           }
         `}
       </style>
+
+      <GoogleAnalytics measurementId={NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+
       <NProgressBar />
 
       <QueryClientProvider client={queryClient}>
@@ -86,3 +90,26 @@ async function initTelemetryAsync() {
   }
   return false;
 }
+
+const GoogleAnalytics = ({ measurementId = "" }) => {
+  if (!measurementId) {
+    return null;
+  }
+
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
+      />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          
+          gtag('config', '${measurementId}');
+      `}
+      </Script>
+    </>
+  );
+};
