@@ -19,8 +19,8 @@ export type LoggerConfig = {
 };
 
 type LogArgs<T extends unknown[]> =
-  | [severity: LogSeverity, alwaysLog: boolean | undefined]
-  | [severity: LogSeverity, alwaysLog: boolean | undefined, message: T];
+  | [severity: LogSeverity, logFrequency: LogFrequency | undefined]
+  | [severity: LogSeverity, logFrequency: LogFrequency | undefined, message: T];
 
 type LoggerFn = <T extends unknown[]>(...message: T) => void;
 
@@ -31,8 +31,13 @@ const PREFIXES: Record<LogSeverity, string> = {
   error: "💥 :",
 };
 
+type LogFrequency = "always" | "once" | "default";
+
 class Logger {
   isDevEnviroment: boolean = false;
+
+  // Tracks keys that have been logged once
+  ackedKeys = new Set<string>();
 
   public configure(config: LoggerConfig) {
     this.isDevEnviroment = ["development", "dev"].includes(config.env);
@@ -45,27 +50,47 @@ class Logger {
   }
 
   private logMessage<T extends unknown[]>(...args: LogArgs<T>) {
-    const [severity, alwaysLog, message] = args;
+    const [severity, frequency, message] = args;
 
-    if (message && message) {
+    if (message) {
       const logger = getLogger(severity);
       const prefix = PREFIXES[severity];
+
+      if (frequency === "once") {
+        // Only log once
+        const key = JSON.stringify(message);
+        if (this.ackedKeys.has(key)) return;
+        this.ackedKeys.add(key);
+      }
+
+      if (frequency === "default") {
+        // Only log in dev enviroment
+        if (!this.isDevEnviroment) return;
+      }
+
       logger(prefix, ...message);
     } else {
-      return (...messages: T) => this.logMessage(severity, alwaysLog, messages);
+      return (...messages: T) => this.logMessage(severity, frequency, messages);
     }
   }
 
-  public log = this.logMessage("log", false) as LoggerFn;
-  public info = this.logMessage("info", false) as LoggerFn;
-  public warn = this.logMessage("warn", false) as LoggerFn;
-  public error = this.logMessage("error", false) as LoggerFn;
+  public log = this.logMessage("log", "default") as LoggerFn;
+  public info = this.logMessage("info", "default") as LoggerFn;
+  public warn = this.logMessage("warn", "default") as LoggerFn;
+  public error = this.logMessage("error", "default") as LoggerFn;
 
   public always = {
-    log: this.logMessage("log", true),
-    info: this.logMessage("info", true),
-    warn: this.logMessage("warn", true),
-    error: this.logMessage("error", true),
+    log: this.logMessage("log", "always"),
+    info: this.logMessage("info", "always"),
+    warn: this.logMessage("warn", "always"),
+    error: this.logMessage("error", "always"),
+  } as Record<LogSeverity, LoggerFn>;
+
+  public once = {
+    log: this.logMessage("log", "once"),
+    info: this.logMessage("info", "once"),
+    warn: this.logMessage("warn", "once"),
+    error: this.logMessage("error", "once"),
   } as Record<LogSeverity, LoggerFn>;
 }
 
