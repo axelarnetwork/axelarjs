@@ -182,7 +182,7 @@ export const EVM_CHAIN_CONFIGS = [
 export type WagmiEVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
 
 if (typeof window !== "undefined") {
-  logger.info({
+  logger.once.info({
     [`${EVM_CHAIN_CONFIGS.length} chain configs on "${NEXT_PUBLIC_NETWORK_ENV}"`]:
       EVM_CHAIN_CONFIGS.map(({ id, name }) => ({ id, name })),
   });

@@ -41,7 +41,7 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "^1.4.1"
+    "viem": "^1.4.2"
   },
   "devDependencies": {
     "@axelar-network/interchain-token-service": "^0.1.0",
