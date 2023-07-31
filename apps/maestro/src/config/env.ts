@@ -30,3 +30,7 @@ export const NEXT_PUBLIC_VERCEL_URL = Maybe.of(
 export const NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA = Maybe.of(
   process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
 ).mapOr("", String);
+
+export const NEXT_PUBLIC_GA_MEASUREMENT_ID = Maybe.of(
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+).mapOr("", String);
