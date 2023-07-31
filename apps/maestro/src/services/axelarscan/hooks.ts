@@ -31,7 +31,7 @@ export function useEVMChainConfigsQuery() {
   );
 
   if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
-    logger.info(
+    logger.once.info(
       // with emojis
       `excluded ${unconfigured?.length} chain configs:\n${unconfigured
         ?.map((x) =>
