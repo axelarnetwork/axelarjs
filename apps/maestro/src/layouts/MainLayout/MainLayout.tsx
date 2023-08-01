@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Card,
   Dialog,
@@ -11,6 +12,7 @@ import {
 import { type FC, type PropsWithChildren } from "react";
 import Link from "next/link";
 
+import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { Web3Modal } from "@web3modal/react";
 import clsx from "clsx";
 import { CheckCircleIcon, KeyIcon, XCircleIcon } from "lucide-react";
@@ -63,35 +65,46 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         >
           <Appbar />
           {children}
-          <div>
-            <Footer
-              className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
-              center={true}
-            >
-              <div className="flex items-center text-sm">
-                &copy;{new Date().getFullYear()} <span>&middot;</span>
-                <Link
-                  rel="noopener noreferrer"
-                  href="https://axelar.network"
-                  target="_blank"
-                  className="text-accent"
-                >
-                  Axelar Network
-                </Link>
-              </div>
-            </Footer>
-            <div className="bg-base-300 text-accent p-2 px-4 text-right">
+
+          <Footer
+            className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
+            center={true}
+          >
+            <div className="flex items-center text-sm">
+              &copy;{new Date().getFullYear()} <span>&middot;</span>
               <Link
                 rel="noopener noreferrer"
+                href="https://axelar.network"
                 target="_blank"
-                href={`https://github.com/axelarnetwork/axelarjs/commit/${
-                  NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
-                }`}
+                className="text-accent"
               >
-                {pkg.name} &middot; v{pkg.version}
+                Axelar Network
               </Link>
             </div>
-          </div>
+            <div className="text-accent flex items-center gap-2 text-right">
+              <Badge className="hover:text-primary text-xs">
+                <Link
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  href={`https://github.com/axelarnetwork/axelarjs/commit/${
+                    NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
+                  }`}
+                >
+                  app @ v{pkg.version}
+                </Link>
+              </Badge>
+              <Badge className="hover:text-primary text-xs">
+                <Link
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  href={`https://github.com/axelarnetwork/axelarjs-sdk/tree/v${sdkPkg.version}`}
+                >
+                  sdk @ v{sdkPkg.version}
+                </Link>
+              </Badge>
+            </div>
+          </Footer>
+
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />
           )}
