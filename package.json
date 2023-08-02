@@ -50,6 +50,6 @@
   },
   "resolutions": {
     "@types/react": "18.2.16",
-    "vite": "4.4.7"
+    "vite": "4.4.8"
   }
 }

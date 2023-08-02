@@ -41,13 +41,13 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "^1.4.2"
+    "viem": "^1.5.2"
   },
   "devDependencies": {
     "@axelar-network/interchain-token-service": "^0.1.0",
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.4.5",
+    "@types/node": "^20.4.6",
     "@types/prettier": "^2.7.3",
     "chalk": "^4.1.2",
     "package-json": "^7.0.0",
