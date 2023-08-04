@@ -134,7 +134,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
       )}
       {txState.status === "submitted" && (
         <LinkButton
-          href={`https://axelar-testnet.etherscan.io/tx/${txState.hash}`}
+          href={`${sourceChain?.explorer.url}/tx/${txState.hash}`}
           target="_blank"
           rel="noopener noreferrer"
           variant="info"
