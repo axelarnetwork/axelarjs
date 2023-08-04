@@ -23,6 +23,7 @@ import {
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "~/config/env";
 import { ethereumClient } from "~/config/wagmi";
+import { useTransactionsContainer } from "~/features/Transactions";
 import { useChainFromRoute } from "~/lib/hooks";
 import pkg from "../../../package.json";
 import Appbar from "./Appbar";
@@ -33,6 +34,10 @@ import {
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
+
+  const [state] = useTransactionsContainer();
+
+  console.log("useTransactionState", { state });
 
   const [
     {
@@ -188,11 +193,16 @@ const parseSignInErrorMessage = (error: Error) => {
   return error.message;
 };
 
-const SignInModal = ({
-  isSignedIn = false,
-  signInError = undefined as undefined | null | Error,
+type SignInModalProps = {
+  isSignedIn?: boolean;
+  signInError?: null | Error;
+  onAbort?: () => void;
+};
+
+const SignInModal: FC<SignInModalProps> = ({
+  isSignedIn,
+  signInError,
   onAbort = () => {},
-  // onRetry = () => {},
 }) => {
   return (
     <Dialog open trigger={<></>}>

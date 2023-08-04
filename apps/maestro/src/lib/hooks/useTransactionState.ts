@@ -2,13 +2,19 @@ import { useState } from "react";
 
 import type { TransactionReceipt } from "viem";
 
-export type TransactionState<TError = Error> =
+export type UnsubmittedTransactionState =
   | { status: "idle" }
   | { status: "awaiting_spend_approval"; amount: bigint }
-  | { status: "awaiting_approval" }
+  | { status: "awaiting_approval" };
+
+export type SubmittedTransactionState<TError = Error> =
   | { status: "submitted"; hash: `0x${string}` }
   | { status: "confirmed"; receipt: TransactionReceipt; hash?: `0x${string}` }
   | { status: "reverted"; error: TError; hash?: `0x${string}` };
+
+export type TransactionState<TError = Error> =
+  | UnsubmittedTransactionState
+  | SubmittedTransactionState<TError>;
 
 export function useTransactionState<TError = Error>(
   initialState: TransactionState<TError> = { status: "idle" }
