@@ -14,7 +14,6 @@ import "~/styles/globals.css";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
-import { TransactionsProvider } from "~/features/Transactions";
 import MainLayout from "~/layouts/MainLayout";
 import NProgressBar from "~/layouts/NProgressBar";
 import { logger } from "~/lib/logger";
@@ -56,11 +55,9 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
             <ThemeProvider>
               <WagmiConfigPropvider>
                 {!isSSR && (
-                  <TransactionsProvider>
-                    <MainLayout>
-                      <Component {...pageProps} />
-                    </MainLayout>
-                  </TransactionsProvider>
+                  <MainLayout>
+                    <Component {...pageProps} />
+                  </MainLayout>
                 )}
                 <ReactQueryDevtools />
                 <Toaster />
