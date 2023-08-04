@@ -188,11 +188,16 @@ const parseSignInErrorMessage = (error: Error) => {
   return error.message;
 };
 
-const SignInModal = ({
-  isSignedIn = false,
-  signInError = undefined as undefined | null | Error,
+type SignInModalProps = {
+  isSignedIn?: boolean;
+  signInError?: null | Error;
+  onAbort?: () => void;
+};
+
+const SignInModal: FC<SignInModalProps> = ({
+  isSignedIn,
+  signInError,
   onAbort = () => {},
-  // onRetry = () => {},
 }) => {
   return (
     <Dialog open trigger={<></>}>
