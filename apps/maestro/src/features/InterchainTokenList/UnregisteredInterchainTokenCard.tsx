@@ -55,8 +55,8 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
         />
       )}
       <Card.Body className="w-full">
-        <Card.Title className="flex-wrap justify-center md:justify-between">
-          <Indicator>
+        <Indicator className="w-full">
+          <Card.Title className="flex-wrap justify-center md:justify-between">
             {props.chain && (
               <span className="flex items-center gap-2">
                 <ChainIcon
@@ -68,15 +68,18 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
               </span>
             )}
             {props.deploymentStatus && props.deploymentTxHash && (
-              <Indicator.Item $as="div" className="-translate-y-3.5">
+              <Indicator.Item
+                $as="div"
+                className="-translate-y-3 translate-x-3"
+              >
                 <GMPStatusIndicator
                   txHash={props.deploymentTxHash}
                   status={props.deploymentStatus}
                 />
               </Indicator.Item>
             )}
-          </Indicator>
-        </Card.Title>
+          </Card.Title>
+        </Indicator>
         <div className="mx-auto">Remote token not registered</div>
       </Card.Body>
     </Card>
