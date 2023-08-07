@@ -15,6 +15,27 @@
       "when": 1691383268543,
       "tag": "0001_ordinary_blob",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1691386426467,
+      "tag": "0002_easy_lenny_balinger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1691386503950,
+      "tag": "0003_mature_scarlet_spider",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1691386612267,
+      "tag": "0004_daffy_zarek",
+      "breakpoints": true
     }
   ]
 }
