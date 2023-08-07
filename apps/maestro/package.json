@@ -20,7 +20,11 @@
     "test:coverage": "vitest --coverage --run",
     "sync": "ts-node-esm scripts/sync.ts",
     "codegen": "pnpm wagmi generate && ts-node-esm scripts/postcodegen.ts",
-    "codegen:env": "ts-node-esm scripts/env.ts"
+    "codegen:env": "ts-node-esm scripts/env.ts",
+    "drizzle:generate": "pnpm drizzle-kit generate:pg",
+    "drizzle:up": "pnpm drizzle-kit up:pg",
+    "drizzle:push": "pnpm drizzle-kit push:pg",
+    "drizzle:studio": "pnpm drizzle-kit studio"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.13.5",
