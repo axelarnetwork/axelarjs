@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   CopyToClipboardButton,
   Dropdown,
   Identicon,
@@ -17,7 +18,6 @@ import React, { useEffect, type FC } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import clsx from "clsx";
 import { ExternalLinkIcon, MenuIcon } from "lucide-react";
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
@@ -27,9 +27,11 @@ import { APP_NAME } from "~/config/app";
 import { useLayoutStateContainer } from "./MainLayout.state";
 import MainMenu from "./MainMenu";
 
-export type AppbarProps = {};
+export type AppbarProps = {
+  className?: string;
+};
 
-const Appbar: FC<AppbarProps> = () => {
+const Appbar: FC<AppbarProps> = (props) => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
@@ -118,10 +120,14 @@ const Appbar: FC<AppbarProps> = () => {
 
   return (
     <Navbar
-      className={clsx("bg-base-100 fixed top-0 px-2 transition-all md:px-6", {
-        "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
-        "z-10": isSticky && !state.isDrawerOpen,
-      })}
+      className={cn(
+        "bg-base-100 fixed top-0 px-2 transition-all md:px-6",
+        {
+          "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
+          "z-10": isSticky && !state.isDrawerOpen,
+        },
+        props.className
+      )}
     >
       <Navbar.Start>
         <Button

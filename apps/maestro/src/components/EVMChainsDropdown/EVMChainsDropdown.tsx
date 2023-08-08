@@ -1,10 +1,9 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
-import { Dropdown, toast } from "@axelarjs/ui";
+import { cn, Dropdown, toast } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import Image from "next/image";
 
-import clsx from "clsx";
 import { HelpCircleIcon } from "lucide-react";
 import { find } from "rambda";
 import { TransactionExecutionError } from "viem";
@@ -33,7 +32,7 @@ export const ChainIcon: FC<{
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2",
         props.className
       )}
@@ -116,7 +115,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       {props.renderTrigger?.() ?? (
         <Dropdown.Trigger
           $as="button"
-          className={clsx(
+          className={cn(
             "btn btn-sm btn-ghost group flex items-center gap-2",
             {
               "pointer-events-none": props.disabled,
@@ -159,7 +158,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
 
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
-          className={clsx(
+          className={cn(
             "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",
             {
               "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
@@ -191,7 +190,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           {eligibleChains.map((chain) => (
             <Dropdown.Item
               key={chain.chain_id}
-              className={clsx({
+              className={cn({
                 "pointer-events-none":
                   chain.chain_id === selectedChain?.chain_id,
               })}

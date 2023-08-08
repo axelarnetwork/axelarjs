@@ -1,9 +1,9 @@
 import { forwardRef } from "react";
 
-import clsx from "clsx";
 import { CheckCircleIcon, CopyIcon } from "lucide-react";
 
 import { useCopyToClipboard } from "../../hooks";
+import { cn } from "../../utils";
 import { Button, ButtonProps } from "../Button";
 
 export type CopyToClipboardButtonProps = Omit<
@@ -39,7 +39,7 @@ export const CopyToClipboardButton = forwardRef<
 
   return (
     <Button
-      className={clsx("flex items-center gap-2", className)}
+      className={cn("flex items-center gap-2", className)}
       onClick={handleCopy.bind(null, textToCopy)}
       {...props}
       ref={ref}
@@ -47,17 +47,17 @@ export const CopyToClipboardButton = forwardRef<
       {children ?? textToCopy}
 
       <div
-        className={clsx("swap swap-rotate", {
+        className={cn("swap swap-rotate", {
           "swap-active": isCopied,
         })}
       >
         <CheckCircleIcon
-          className={clsx(
+          className={cn(
             "swap-on h-[1em] w-[1em]",
             props.color === "success" ? "text-success-content" : "text-success"
           )}
         />
-        <CopyIcon className={clsx("swap-off", "h-[1em] w-[1em]")} />
+        <CopyIcon className={cn("swap-off", "h-[1em] w-[1em]")} />
       </div>
     </Button>
   );

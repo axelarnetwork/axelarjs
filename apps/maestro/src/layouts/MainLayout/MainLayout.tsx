@@ -2,6 +2,7 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   Dialog,
   Drawer,
   Footer,
@@ -14,7 +15,6 @@ import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { Web3Modal } from "@web3modal/react";
-import clsx from "clsx";
 import { CheckCircleIcon, KeyIcon, XCircleIcon } from "lucide-react";
 
 import {
@@ -56,7 +56,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
       <Drawer>
         <Drawer.Toggle checked={isDrawerOpen} />
         <Drawer.Content
-          className={clsx(
+          className={cn(
             "flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen",
             {
               "pointer-events-none": isSignInModalOpen,
@@ -203,7 +203,7 @@ const SignInModal: FC<SignInModalProps> = ({
     <Dialog open trigger={<></>}>
       <Dialog.Body className="grid place-items-center gap-6 py-8 md:min-h-[25vh] md:py-12">
         <div
-          className={clsx(
+          className={cn(
             "swap-rotate swap relative grid h-16 w-16 place-items-center",
             {
               "swap-active": isSignedIn || signInError,

@@ -1,7 +1,6 @@
-import { Button } from "@axelarjs/ui";
+import { Button, cn } from "@axelarjs/ui";
 import type { ComponentProps, FC } from "react";
 
-import clsx from "clsx";
 import { ArrowLeftIcon, ChevronRightIcon } from "lucide-react";
 import tw from "tailwind-styled-components";
 
@@ -13,8 +12,7 @@ export const NextButton: FC<ComponentProps<typeof Button>> = ({
 }) => {
   return (
     <StyledButton {...props}>
-      {children}{" "}
-      <ChevronRightIcon className={clsx({ hidden: props.loading })} />
+      {children} <ChevronRightIcon className={cn({ hidden: props.loading })} />
     </StyledButton>
   );
 };

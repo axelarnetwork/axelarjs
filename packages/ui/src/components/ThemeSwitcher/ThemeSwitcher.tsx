@@ -1,12 +1,14 @@
 import { createContainer } from "@axelarjs/utils/react";
 import { FC, MouseEvent, useCallback, useEffect, useState } from "react";
 
-import clsx from "clsx";
 import { MoonIcon, SunIcon } from "lucide-react";
+
+import { cn } from "../../utils";
 
 export const VALID_THEMES = ["light", "dark"] as const;
 
 export type ThemeKind = (typeof VALID_THEMES)[number];
+
 export const THEME_KEY = "@axelarui/theme";
 
 export function isValidTheme(theme: string): theme is ThemeKind {
@@ -68,14 +70,21 @@ export const { Provider: ThemeProvider, useContainer: useThemeSwitcher } =
 
 export type ThemeSwitcherProps = JSX.IntrinsicElements["button"];
 
-export const ThemeSwitcher: FC<ThemeSwitcherProps> = (props) => {
+export const ThemeSwitcher: FC<ThemeSwitcherProps> = ({
+  className,
+  ...props
+}) => {
   const [theme, actions] = useThemeSwitcher();
 
   return (
     <button
       data-toggle-theme={VALID_THEMES.join(",")}
       onClick={actions.toggleTheme}
-      className={clsx("swap-rotate swap", { "swap-active": theme === "dark" })}
+      className={cn(
+        "swap-rotate swap",
+        { "swap-active": theme === "dark" },
+        className
+      )}
       {...props}
     >
       <SunIcon className="swap-on pointer-events-none h-6 w-6" />

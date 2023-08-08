@@ -1,11 +1,10 @@
-import { Badge, Button, Clamp } from "@axelarjs/ui";
+import { Badge, Button, Clamp, cn } from "@axelarjs/ui";
 import { sluggify } from "@axelarjs/utils";
 import { useCallback, useMemo, type ComponentProps } from "react";
 import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import clsx from "clsx";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -180,7 +179,7 @@ const Page = ({
         $as="section"
         // id needed for the hero cta smooth scroll
         id="main-content"
-        className={clsx(
+        className={cn(
           "mt-20 grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
           {
             "place-items-center": isExceptionalState,

@@ -1,7 +1,5 @@
-import { Card, Indicator } from "@axelarjs/ui";
+import { Card, cn, Indicator } from "@axelarjs/ui";
 import { type FC } from "react";
-
-import clsx from "clsx";
 
 import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { GMPStatusIndicator } from "~/compounds/GMPTxStatusMonitor";
@@ -18,7 +16,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
       compact
       bordered
       onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
-      className={clsx(
+      className={cn(
         "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
         "hover:opacity-75 hover:shadow-xl",
         {
@@ -44,7 +42,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
           style={{
             backgroundImage: `url(${props.chain?.image})`,
           }}
-          className={clsx(
+          className={cn(
             "absolute inset-0 scale-100 bg-cover opacity-0 blur-3xl transition-all duration-300",
             "bg-center delay-150 hover:scale-150 hover:opacity-20",
             {
