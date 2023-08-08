@@ -1,10 +1,9 @@
 import { forwardRef } from "react";
 
-import { CheckCircleIcon, CopyIcon } from "lucide-react";
-
 import { useCopyToClipboard } from "../../hooks";
 import { cn } from "../../utils";
 import { Button, ButtonProps } from "../Button";
+import { CheckCircleIcon, CopyIcon } from "../icons/lucide";
 
 export type CopyToClipboardButtonProps = Omit<
   ButtonProps,

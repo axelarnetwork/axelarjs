@@ -5,6 +5,7 @@ import {
   Card,
   cn,
   CopyToClipboardButton,
+  SettingsIcon,
   SpinnerIcon,
   toast,
   Tooltip,
@@ -12,7 +13,6 @@ import {
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
 
-import { SettingsIcon } from "lucide-react";
 import { TransactionExecutionError } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 

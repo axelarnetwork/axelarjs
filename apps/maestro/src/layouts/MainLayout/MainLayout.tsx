@@ -2,20 +2,22 @@ import {
   Badge,
   Button,
   Card,
+  CheckCircleIcon,
   cn,
   Dialog,
   Drawer,
   Footer,
+  KeyIcon,
   LinkButton,
   Loading,
   useTheme,
+  XCircleIcon,
 } from "@axelarjs/ui";
 import { type FC, type PropsWithChildren } from "react";
 import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { Web3Modal } from "@web3modal/react";
-import { CheckCircleIcon, KeyIcon, XCircleIcon } from "lucide-react";
 
 import {
   NEXT_PUBLIC_NETWORK_ENV,

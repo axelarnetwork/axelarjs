@@ -1,13 +1,13 @@
-import { Button, cn, LinkButton, Modal } from "@axelarjs/ui";
-import { useMemo, type ComponentType, type FC } from "react";
-import dynamic from "next/dynamic";
-
 import {
+  Button,
+  cn,
   CoinsIcon,
   GiftIcon,
-  // PackageCheckIcon,
-  // SendIcon
-} from "lucide-react";
+  LinkButton,
+  Modal,
+} from "@axelarjs/ui";
+import { useMemo, type ComponentType, type FC } from "react";
+import dynamic from "next/dynamic";
 
 import {
   INITIAL_STATE,

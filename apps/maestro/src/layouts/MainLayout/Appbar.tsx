@@ -6,9 +6,11 @@ import {
   cn,
   CopyToClipboardButton,
   Dropdown,
+  ExternalLinkIcon,
   Identicon,
   Indicator,
   LinkButton,
+  MenuIcon,
   Navbar,
   ThemeSwitcher,
   useIsSticky,
@@ -18,7 +20,6 @@ import React, { useEffect, type FC } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { ExternalLinkIcon, MenuIcon } from "lucide-react";
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";

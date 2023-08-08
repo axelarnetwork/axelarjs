@@ -1,10 +1,9 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
-import { cn, Dropdown, toast } from "@axelarjs/ui";
+import { cn, Dropdown, HelpCircleIcon, toast } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import Image from "next/image";
 
-import { HelpCircleIcon } from "lucide-react";
 import { find } from "rambda";
 import { TransactionExecutionError } from "viem";
 import { useNetwork, useSwitchNetwork } from "wagmi";

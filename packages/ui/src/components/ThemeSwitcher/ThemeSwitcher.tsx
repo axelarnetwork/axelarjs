@@ -1,9 +1,8 @@
 import { createContainer } from "@axelarjs/utils/react";
 import { FC, MouseEvent, useCallback, useEffect, useState } from "react";
 
-import { MoonIcon, SunIcon } from "lucide-react";
-
 import { cn } from "../../utils";
+import { MoonIcon, SunIcon } from "../icons/lucide";
 
 export const VALID_THEMES = ["light", "dark"] as const;
 
