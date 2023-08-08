@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "44c74e52-4c41-4a53-96f0-915177fa4168",
-  "prevId": "99080da7-a505-49bc-a8f4-5a4d68d10b00",
+  "id": "edccdccc-a4b2-4f3a-8af4-436a2f1f611f",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "interchain_tokens": {
       "name": "interchain_tokens",
@@ -116,7 +116,7 @@
         },
         "axelar_chain_id": {
           "name": "axelar_chain_id",
-          "type": "varchar(66)",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -140,7 +140,7 @@
         },
         "deployment_status": {
           "name": "deployment_status",
-          "type": "deploymentStatus",
+          "type": "status",
           "primaryKey": false,
           "notNull": false
         },
@@ -171,8 +171,8 @@
         "standardized": "standardized"
       }
     },
-    "deploymentStatus": {
-      "name": "deploymentStatus",
+    "status": {
+      "name": "status",
       "values": {
         "deployed": "deployed",
         "pending": "pending"

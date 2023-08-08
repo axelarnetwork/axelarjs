@@ -7,7 +7,7 @@ const CONNECTION_STRING = `${process.env.POSTGRES_URL}?sslmode=require`;
 
 export default {
   schema: "./src/lib/drizzle/schema",
-  out: "./src/lib/drizzle/client",
+  out: "./src/lib/drizzle/migrations",
   driver: "pg",
   dbCredentials: {
     connectionString: CONNECTION_STRING,
