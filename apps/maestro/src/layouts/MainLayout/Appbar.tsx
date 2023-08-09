@@ -168,10 +168,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
-              <EVMChainsDropdown
-                triggerClassName="w-full md:w-auto rounded-full"
-                chainIconClassName="-translate-x-1.5"
-              />
+              <EVMChainsDropdown />
               <Dropdown align="end">
                 <Dropdown.Trigger>
                   <button

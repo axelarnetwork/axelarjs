@@ -50,6 +50,7 @@ export const ChainIcon: FC<{
 type Props = {
   chains?: EVMChainConfig[];
   compact?: boolean;
+  hideLabel?: boolean;
   disabled?: boolean;
   triggerClassName?: string;
   chainIconClassName?: string;
@@ -115,7 +116,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         <Dropdown.Trigger
           $as="button"
           className={cn(
-            "btn btn-sm btn-ghost group flex items-center gap-2",
+            "btn btn-sm btn-ghost group flex w-full items-center gap-2 rounded-full",
             {
               "pointer-events-none": props.disabled,
             },
@@ -133,11 +134,14 @@ const EVMChainsDropdown: FC<Props> = (props) => {
             <>
               <ChainIcon
                 src={props.selectedChain.image}
-                alt={props.selectedChain.chain_name}
+                alt={props.selectedChain.name}
                 size="sm"
-                className={props.chainIconClassName}
+                className={cn(
+                  { "-translate-x-1.5": !props.hideLabel },
+                  props.chainIconClassName
+                )}
               />
-              {!props.compact && <span>{props.selectedChain.name}</span>}
+              {!props.hideLabel && <span>{props.selectedChain.name}</span>}
             </>
           ) : selectedChain ? (
             <>
@@ -145,12 +149,21 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 src={selectedChain.image}
                 alt={selectedChain.chain_name}
                 size="sm"
-                className={props.chainIconClassName}
+                className={cn(
+                  { "-translate-x-1.5": !props.hideLabel },
+                  props.chainIconClassName
+                )}
               />
-              {!props.compact && <span>{selectedChain.name}</span>}
+              {!props.hideLabel && <span>{selectedChain.name}</span>}
             </>
           ) : (
-            <HelpCircleIcon size="24" className={props.chainIconClassName} />
+            <HelpCircleIcon
+              size="24"
+              className={cn(
+                { "-translate-x-1.5": !props.hideLabel },
+                props.chainIconClassName
+              )}
+            />
           )}
         </Dropdown.Trigger>
       )}

@@ -260,8 +260,8 @@ importers:
         specifier: link:@testing-library/jest-dom/matchers
         version: link:@testing-library/jest-dom/matchers
       next-auth:
-        specifier: ^4.22.4
-        version: 4.22.4(next@13.4.13)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^4.22.5
+        version: 4.22.5(next@13.4.13)(react-dom@18.2.0)(react@18.2.0)
       postcss:
         specifier: ^8.4.27
         version: 8.4.27
@@ -13992,8 +13992,8 @@ packages:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
     dev: true
 
-  /next-auth@4.22.4(next@13.4.13)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-VMI6pq3z4BfvFeCZHBkYtRYa0qqGTYAi2yy3hWCB78KkN1YsSAsOLSssd4oGrQBj0z/0zg2VLzn9tSJ14AtmWw==}
+  /next-auth@4.22.5(next@13.4.13)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-zPVEpqDp4cx1y0HbonCSrz2sA4qw0grTMd/S0PezUKXvDzmVemtsJnfNK/xo5pO2sz5ilM541+EVCTp9QoRLbA==}
     peerDependencies:
       next: ^12.2.5 || ^13
       nodemailer: ^6.6.5

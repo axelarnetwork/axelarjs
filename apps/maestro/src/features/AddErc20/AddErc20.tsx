@@ -2,7 +2,7 @@ import { Button, cn, Dialog, LinkButton } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import EVMChainsDropdown from "~/components/EVMChainsDropdown/EVMChainsDropdown";
+import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import {
   AddErc20StateProvider,
   useAddErc20StateContainer,
@@ -89,10 +89,10 @@ const AddErc20: FC<AddErc20Props> = () => {
           <EVMChainsDropdown
             compact
             disabled={state.isPreExistingToken}
-            contentClassName={cn("translate-x-28 sm:translate-x-40 z-40", {
+            triggerClassName="-translate-y-1.5"
+            contentClassName={cn("translate-x-10 sm:translate-x-28 z-40", {
               "translate-x-20 sm:translate-x-40": showBackButton,
             })}
-            triggerClassName="btn-sm btn-circle -translate-y-1 active:-translate-y-1"
           />
         </Dialog.Title>
 

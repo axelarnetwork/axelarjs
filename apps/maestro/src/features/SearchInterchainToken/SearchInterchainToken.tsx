@@ -130,6 +130,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                 triggerClassName="btn-sm btn-circle"
                 contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
                 compact
+                hideLabel
                 selectedChain={defaultChain}
                 onSelectChain={
                   !connectedChain
