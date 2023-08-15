@@ -8,7 +8,7 @@ import { withSentryConfig } from "@sentry/nextjs";
  */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@axelarjs/ui", "@axelarjs/utils"],
+  transpilePackages: ["@axelarjs/ui"],
   images: {
     domains: ["testnet.axelarscan.io"],
   },
