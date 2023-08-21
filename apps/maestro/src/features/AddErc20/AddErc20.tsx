@@ -1,4 +1,4 @@
-import { Button, cn, Dialog, LinkButton } from "@axelarjs/ui";
+import { Button, cn, Dialog, LinkButton, useWindowSize } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
@@ -58,6 +58,8 @@ const AddErc20: FC<AddErc20Props> = () => {
     [state.step]
   );
 
+  const { width } = useWindowSize();
+
   return (
     <Dialog
       onClose={actions.reset}
@@ -90,8 +92,9 @@ const AddErc20: FC<AddErc20Props> = () => {
             compact
             disabled={state.isPreExistingToken}
             triggerClassName="-translate-y-1.5"
-            contentClassName={cn("translate-x-10 sm:translate-x-28 z-40", {
-              "translate-x-20 sm:translate-x-40": showBackButton,
+            hideLabel={width < 640}
+            contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
+              "translate-x-16 sm:translate-x-0": showBackButton,
             })}
           />
         </Dialog.Title>
