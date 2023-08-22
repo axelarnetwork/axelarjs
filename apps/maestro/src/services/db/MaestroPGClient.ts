@@ -8,7 +8,7 @@ export default class MaestroPGClient {
   constructor(private db: DBClient) {}
 
   async recordInterchainTokenDeployment(
-    variables: RecordInterchainTokenDeploymentVariables
+    _variables: RecordInterchainTokenDeploymentVariables
   ) {
     const { db } = this;
 
@@ -18,7 +18,7 @@ export default class MaestroPGClient {
   }
 
   async recordRemoteInterchainTokenDeployment(
-    variables: RecordRemoteInterchainTokenDeploymentVariables
+    _variables: RecordRemoteInterchainTokenDeploymentVariables
   ) {
     const { db } = this;
 
