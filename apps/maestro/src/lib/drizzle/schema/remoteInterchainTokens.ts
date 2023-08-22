@@ -8,6 +8,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
+import { ADDRESS_LENGTH, HASH_LENGTH } from "./common";
+
 export const deplymentStatusEnum = pgEnum("status", ["deployed", "pending"]);
 
 /**
@@ -18,12 +20,12 @@ export const deplymentStatusEnum = pgEnum("status", ["deployed", "pending"]);
  * interchain token to the original interchain token.
  */
 export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
-  tokenId: varchar("token_id", { length: 66 }).primaryKey(),
-  originTokenId: varchar("origin_token_id", { length: 66 }),
+  tokenId: varchar("token_id", { length: HASH_LENGTH }).primaryKey(),
+  originTokenId: varchar("origin_token_id", { length: HASH_LENGTH }),
   chainId: integer("chain_id"),
   axelarChainId: varchar("axelar_chain_id"),
-  address: varchar("address", { length: 42 }),
-  deploymentTxHash: varchar("deployment_tx_hash", { length: 66 }),
+  address: varchar("address", { length: ADDRESS_LENGTH }),
+  deploymentTxHash: varchar("deployment_tx_hash", { length: HASH_LENGTH }),
   deploymentLogIndex: integer("deployment_log_index"),
   deploymentStatus: deplymentStatusEnum("deployment_status"),
   createdAt: timestamp("created_at").notNull(),

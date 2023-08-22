@@ -1,6 +1,4 @@
-import { sql } from "@vercel/postgres";
 import { relations } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/vercel-postgres";
 
 import { interchainTokens } from "./interchainTokens";
 import { remoteInterchainTokens } from "./remoteInterchainTokens";
@@ -28,5 +26,3 @@ export const remoteInterchainTokenRelations = relations(
     }),
   })
 );
-
-export const db = drizzle(sql);

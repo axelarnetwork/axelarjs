@@ -2,7 +2,7 @@ import { TokenManagerClient } from "@axelarjs/evm";
 
 import { z } from "zod";
 
-import { contractABI } from "~/lib/utils/schemas";
+import { contractABI } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 export const getTokenManagerABI = publicProcedure
