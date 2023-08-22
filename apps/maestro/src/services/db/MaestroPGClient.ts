@@ -12,7 +12,7 @@ export default class MaestroPGClient {
   ) {
     const { db } = this;
 
-    return db.transaction(async (trx) => {
+    return db.transaction(async (_trx) => {
       // TODO
     });
   }
@@ -22,7 +22,7 @@ export default class MaestroPGClient {
   ) {
     const { db } = this;
 
-    return db.transaction(async (trx) => {
+    return db.transaction(async (_trx) => {
       // TODO
     });
   }
