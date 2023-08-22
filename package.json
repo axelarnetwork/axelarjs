@@ -19,6 +19,7 @@
     "storybook": "pnpm -C ./packages/ui run storybook ",
     "build-storybook": "turbo run build-storybook",
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
+    "dev:registry": "pnpm -C ./apps/registry run dev",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
