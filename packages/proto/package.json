@@ -39,7 +39,7 @@
   "license": "LicenseRef-LICENSE",
   "dependencies": {
     "long": "^5.2.3",
-    "protobufjs": "^7.2.4"
+    "protobufjs": "^7.2.5"
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",

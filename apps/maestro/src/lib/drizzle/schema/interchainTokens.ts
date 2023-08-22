@@ -1,4 +1,4 @@
-import { type InferModel } from "drizzle-orm";
+import type { InferModel } from "drizzle-orm";
 import {
   integer,
   pgEnum,
