@@ -47,4 +47,6 @@ export const interchainTokensZodSchemas = {
   select: createSelectSchema(interchainTokens),
 };
 
-export type InterchainTokenModel = InferModel<typeof interchainTokens>;
+export type InterchainToken = InferModel<typeof interchainTokens>;
+
+export type NewInterchainToken = InferModel<typeof interchainTokens, "insert">;

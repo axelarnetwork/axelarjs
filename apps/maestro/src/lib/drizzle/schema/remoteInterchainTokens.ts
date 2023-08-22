@@ -42,6 +42,9 @@ export const remoteInterchainTokensZodSchemas = {
   select: createSelectSchema(remoteInterchainTokens),
 };
 
-export type RemoteInterchainTokenTableEntry = InferModel<
-  typeof remoteInterchainTokens
+export type RemoteInterchainToken = InferModel<typeof remoteInterchainTokens>;
+
+export type NewRemoteInterchainToken = InferModel<
+  typeof remoteInterchainTokens,
+  "insert"
 >;

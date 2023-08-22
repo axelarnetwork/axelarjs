@@ -1,2 +1,2 @@
-export { default } from "./MaestroPGClient";
-export * from "./MaestroPGClient";
+export { default } from "./MaestroDBClient";
+export * from "./MaestroDBClient";
