@@ -132,6 +132,7 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("daisyui"),
   ],
+  /** @type {import('daisyui').Config} */
   daisyui: {
     themes: [
       { light: require("./themes/light.cjs") },

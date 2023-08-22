@@ -1,6 +1,7 @@
 import { fontFamily } from "tailwindcss/defaultTheme";
 
-/** @type {import('tailwindcss').Config} */
+import type { Config } from "tailwindcss";
+
 module.exports = {
   presets: [require("@axelarjs/ui/preset")],
   content: [
@@ -18,4 +19,4 @@ module.exports = {
       },
     },
   },
-};
+} satisfies Config;
