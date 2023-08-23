@@ -10,7 +10,10 @@ const Page: FC<Props> = ({ children, className, ...props }) => {
   return (
     <Clamp
       $as="section"
-      className={cn("mt-20 grid flex-1 px-4 xl:px-2 2xl:px-0", className)}
+      className={cn(
+        "mt-20 flex flex-1 flex-col px-4 xl:px-2 2xl:px-0",
+        className
+      )}
       {...props}
     >
       {children}
