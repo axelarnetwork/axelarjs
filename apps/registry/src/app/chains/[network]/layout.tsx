@@ -7,13 +7,15 @@ import Link from "next/link";
 import { CHAIN_TABS } from "~/app/chains/_shared";
 import Page from "~/layouts/Page";
 
-export type ChainsLayoutProps = PropsWithChildren<{
+export type PropsWithNetworkParam<T = {}> = T & {
   params: {
     network: "evm" | "cosmos";
   };
-}>;
+};
 
-const ChainsLayout: FC<ChainsLayoutProps> = (props) => {
+type Props = PropsWithNetworkParam<PropsWithChildren>;
+
+const ChainsLayout: FC<Props> = (props) => {
   return (
     <Page className="space-y-4">
       <div className="mx-auto">
