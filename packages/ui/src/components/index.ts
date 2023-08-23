@@ -21,6 +21,7 @@ export * from "./Modal";
 export * from "./Navbar";
 export * from "./Steps";
 export * from "./StoryPlayground";
+export * from "./Tabs";
 export * from "./TextInput";
 export * from "./ThemeSwitcher";
 export * from "./Toggle";
