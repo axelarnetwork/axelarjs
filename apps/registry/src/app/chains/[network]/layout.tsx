@@ -16,18 +16,20 @@ export type ChainsLayoutProps = PropsWithChildren<{
 const ChainsLayout: FC<ChainsLayoutProps> = (props) => {
   return (
     <Page className="space-y-4">
-      <Tabs boxed>
-        {CHAIN_TABS.map((tab) => (
-          <Tabs.Tab
-            active={tab.value === props.params.network}
-            key={tab.value}
-            $as={Link}
-            href={`/chains/${tab.value}`}
-          >
-            {tab.label}
-          </Tabs.Tab>
-        ))}
-      </Tabs>
+      <div className="mx-auto">
+        <Tabs boxed>
+          {CHAIN_TABS.map((tab) => (
+            <Tabs.Tab
+              active={tab.value === props.params.network}
+              key={tab.value}
+              $as={Link}
+              href={`/chains/${tab.value}`}
+            >
+              {tab.label}
+            </Tabs.Tab>
+          ))}
+        </Tabs>
+      </div>
 
       {props.children}
     </Page>

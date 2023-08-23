@@ -1,72 +1,78 @@
+import { Card } from "@axelarjs/ui/components/Card";
 import { FC } from "react";
 import Image from "next/image";
 
+import {
+  ChainItem,
+  CosmosChainConfig,
+  EVMChainConfig,
+  NetworkKind,
+} from "~/app/chains/_shared";
+
+const BASE_URL =
+  "https://raw.githubusercontent.com/axelarnetwork/public-chain-configs/main";
+
 const chainsUrl = (network: "evm" | "cosmos") =>
-  `https://raw.githubusercontent.com/axelarnetwork/public-chain-configs/main/registry/${process.env.NEXT_PUBLIC_NETWORK_ENV}/${network}/chains.json`;
+  `${BASE_URL}/registry/${process.env.NEXT_PUBLIC_NETWORK_ENV}/${network}/chains.json`;
 
-/**
- // sample chain
-
- {
-  "id": 5,
-  "network": "goerli",
-  "name": "Goerli",
-  "nativeCurrency": {
-    "name": "Goerli Ether",
-    "symbol": "ETH",
-    "decimals": 18,
-    "iconUrl": "/images/tokens/eth.svg"
-  },
-  "rpcUrls": [
-    "https://rpc.ankr.com/eth_goerli"
-  ],
-  "blockExplorers": [
-    {
-      "name": "Etherscan",
-      "url": "https://goerli.etherscan.io"
-    }
-  ],
-  "iconUrl": "/images/chains/ethereum.svg",
-  "testnet": true
-}
-
- */
-
-type ChainItem = {
-  id: number;
-  network: string;
-  name: string;
-  iconUrl: string;
+type ChainsProps = {
+  network: NetworkKind;
 };
 
-const Chains: FC<{
-  network: "evm" | "cosmos";
-}> = async ({ network }) => {
-  const response = await fetch(chainsUrl(network));
+const Chains: FC<ChainsProps> = async (props) => {
+  const response = await fetch(chainsUrl(props.network));
 
   const body = await response.json();
 
   return (
     <ul className="grid gap-4">
-      {body.chains.map((x: ChainItem) => (
-        <li key={x.id} className="card bg-base-300">
-          <div className="card-body">
-            <h1 className="card-title">
-              <Image
-                src={`https://raw.githubusercontent.com/axelarnetwork/public-chain-configs/main/${x.iconUrl}`}
-                className="mr-2 h-6 w-6"
-                alt={`${x.name} icon`}
-                width={24}
-                height={24}
-              />
+      {body.chains
+        .map((x: EVMChainConfig | CosmosChainConfig) => ({
+          network: props.network,
+          config: x,
+        }))
+        .map(({ config, network }: ChainItem<typeof props.network>) => (
+          <>
+            {network === "evm" && (
+              <Card key={config.id} className="bg-base-200">
+                <Card.Body>
+                  <Card.Title $as="h1">
+                    <Image
+                      src={`${BASE_URL}/${config.iconUrl}`}
+                      className="mr-2 h-6 w-6"
+                      alt={`${config.name} icon`}
+                      width={24}
+                      height={24}
+                    />
 
-              {x.name}
-            </h1>
+                    {config.name}
+                  </Card.Title>
 
-            <pre>{JSON.stringify(x, null, 2)}</pre>
-          </div>
-        </li>
-      ))}
+                  <pre>{JSON.stringify(config, null, 2)}</pre>
+                </Card.Body>
+              </Card>
+            )}
+            {network === "cosmos" && (
+              <Card key={config.chainId} className="bg-base-200">
+                <Card.Body>
+                  <Card.Title $as="h1">
+                    <Image
+                      src={`${BASE_URL}/images/chains/${config.chainName.toLowerCase()}.svg`}
+                      className="mr-2 h-6 w-6"
+                      alt={`${config.chainName} icon`}
+                      width={24}
+                      height={24}
+                    />
+
+                    {config.chainName}
+                  </Card.Title>
+
+                  <pre>{JSON.stringify(config, null, 2)}</pre>
+                </Card.Body>
+              </Card>
+            )}
+          </>
+        ))}
     </ul>
   );
 };

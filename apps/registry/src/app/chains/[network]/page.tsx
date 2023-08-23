@@ -1,7 +1,10 @@
-import { PropsWithChildren } from "react";
+import { FC } from "react";
 
 import Chains from "~/components/Chains";
+import type { ChainsLayoutProps } from "./layout";
 
-export default function ChainsPage() {
-  return <Chains network="evm" />;
-}
+const ChainsPage: FC<ChainsLayoutProps> = (props) => {
+  return <Chains network={props.params.network} />;
+};
+
+export default ChainsPage;

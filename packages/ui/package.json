@@ -17,7 +17,7 @@
     "./hooks": "./src/hooks.ts",
     "./theme": "./src/theme.ts",
     "./components/core": "./src/components/core/index.tsx",
-    "./components/Card": "./src/components/Card/index.tsx"
+    "./components/*": "./src/components/*/index.ts"
   },
   "scripts": {
     "dev": "vite",
