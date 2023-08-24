@@ -21,8 +21,9 @@ type ChainsProps = {
 };
 
 const Chains: FC<ChainsProps> = async (props) => {
-  const { chains } = await fetch(chainsUrl(props.network)).then((res) =>
-    res.json()
+  const url = chainsUrl(props.network);
+  const { chains } = await fetch(url, { next: { revalidate: 60 } }).then(
+    (res) => res.json()
   );
 
   const filteredChains = (
@@ -53,34 +54,29 @@ const Chains: FC<ChainsProps> = async (props) => {
 
   return (
     <ul className="grid gap-4">
-      {filteredChains.map(
-        ({ config, network }: ChainItem<typeof props.network>) => {
-          const chain = getChainCardData({
-            config,
-            network,
-          } as ChainItem<typeof props.network>);
+      {filteredChains.map((chain) => {
+        const chainData = getChainCardData(chain);
 
-          return (
-            <Card key={chain.key} className="bg-base-200">
-              <Card.Body>
-                <Card.Title $as="h1">
-                  <Image
-                    src={`${BASE_URL}/${chain.iconUrl}`}
-                    className="mr-2 h-6 w-6"
-                    alt={`${chain.name} icon`}
-                    width={24}
-                    height={24}
-                  />
+        return (
+          <Card key={chainData.key} className="bg-base-200">
+            <Card.Body>
+              <Card.Title $as="h1">
+                <Image
+                  src={`${BASE_URL}/${chainData.iconUrl}`}
+                  className="mr-2 h-6 w-6"
+                  alt={`${chainData.name} icon`}
+                  width={24}
+                  height={24}
+                />
 
-                  {chain.name}
-                </Card.Title>
+                {chainData.name}
+              </Card.Title>
 
-                <ConfigSnippet config={config} />
-              </Card.Body>
-            </Card>
-          );
-        }
-      )}
+              <ConfigSnippet config={chain.config} />
+            </Card.Body>
+          </Card>
+        );
+      })}
     </ul>
   );
 };
