@@ -25,25 +25,36 @@ const Chains: FC<ChainsProps> = async (props) => {
     res.json()
   );
 
-  return (
-    <ul className="grid gap-4">
-      {chains
-        .filter((config: EVMChainConfig | CosmosChainConfig) => {
-          if (!props.search) return true;
+  const filteredChains = (
+    (chains ?? []) as (EVMChainConfig | CosmosChainConfig)[]
+  )
+    .filter((config) => {
+      if (!props.search) return true;
 
-          const search = props.search.toLowerCase();
+      const search = props.search.toLowerCase();
 
-          return (
-            ("name" in config && config.name.toLowerCase().includes(search)) ||
-            ("chainName" in config &&
-              config.chainName.toLowerCase().includes(search))
-          );
-        })
-        .map((config: EVMChainConfig | CosmosChainConfig) => ({
+      const field = "name" in config ? config.name : config.chainName;
+
+      return field.toLowerCase().includes(search);
+    })
+    .map(
+      (config) =>
+        ({
           network: props.network,
           config,
-        }))
-        .map(({ config, network }: ChainItem<typeof props.network>) => {
+        } as ChainItem<typeof props.network>)
+    )
+    .sort((a, b) => {
+      const aName = "name" in a.config ? a.config.name : a.config.chainName;
+      const bName = "name" in b.config ? b.config.name : b.config.chainName;
+
+      return aName.localeCompare(bName);
+    });
+
+  return (
+    <ul className="grid gap-4">
+      {filteredChains.map(
+        ({ config, network }: ChainItem<typeof props.network>) => {
           const chain = getChainCardData({
             config,
             network,
@@ -68,7 +79,8 @@ const Chains: FC<ChainsProps> = async (props) => {
               </Card.Body>
             </Card>
           );
-        })}
+        }
+      )}
     </ul>
   );
 };
@@ -78,10 +90,19 @@ export default Chains;
 const ConfigSnippet: FC<{
   config: EVMChainConfig | CosmosChainConfig;
 }> = (props) => {
+  const content = JSON.stringify(props.config, null, 2);
+
   return (
-    <div className="flex-1">
-      <pre>{JSON.stringify(props.config, null, 2)}</pre>
-    </div>
+    <details className="collapse">
+      <summary className="collapse-title">
+        <span className="flex items-center gap-2">Full config</span>
+      </summary>
+      <div className="collapse-content">
+        <div className="mockup-code">
+          <pre className="max-w-xs lg:max-w-lg">{content}</pre>
+        </div>
+      </div>
+    </details>
   );
 };
 
