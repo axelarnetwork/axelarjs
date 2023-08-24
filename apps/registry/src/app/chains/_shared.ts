@@ -37,6 +37,7 @@ export type CosmosChainConfig = {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
+    coinImageUrl: string;
   };
   bech32Config: {
     bech32PrefixAccAddr: string;
@@ -53,12 +54,15 @@ export type CosmosChainConfig = {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
+    coinImageUrl: string;
   }[];
   currencies: {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
+    coinImageUrl: string;
   }[];
+  chainIconUrl: string;
 };
 
 export type NetworkKind = "evm" | "cosmos";

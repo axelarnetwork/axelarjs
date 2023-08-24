@@ -20,13 +20,13 @@ type ChainsProps = {
 };
 
 const Chains: FC<ChainsProps> = async (props) => {
-  const response = await fetch(chainsUrl(props.network));
-
-  const body = await response.json();
+  const { chains } = await fetch(chainsUrl(props.network)).then((res) =>
+    res.json()
+  );
 
   return (
     <ul className="grid gap-4">
-      {body.chains
+      {chains
         .map((x: EVMChainConfig | CosmosChainConfig) => ({
           network: props.network,
           config: x,
@@ -57,7 +57,7 @@ const Chains: FC<ChainsProps> = async (props) => {
                 <Card.Body>
                   <Card.Title $as="h1">
                     <Image
-                      src={`${BASE_URL}/images/chains/${config.chainName.toLowerCase()}.svg`}
+                      src={`${BASE_URL}/${config.chainIconUrl}`}
                       className="mr-2 h-6 w-6"
                       alt={`${config.chainName} icon`}
                       width={24}
