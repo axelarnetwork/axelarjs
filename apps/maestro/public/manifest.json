@@ -18,9 +18,9 @@
       "density": "0.75"
     },
     {
-      "src": "favicon.ico",
+      "src": "favicon.png",
       "sizes": "64x64 48x48",
-      "type": "image/x-icon",
+      "type": "image/png",
       "density": "1.0"
     },
     {
