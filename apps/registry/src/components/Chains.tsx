@@ -17,6 +17,7 @@ const chainsUrl = (network: "evm" | "cosmos") =>
 
 type ChainsProps = {
   network: NetworkKind;
+  search?: string;
 };
 
 const Chains: FC<ChainsProps> = async (props) => {
@@ -27,6 +28,17 @@ const Chains: FC<ChainsProps> = async (props) => {
   return (
     <ul className="grid gap-4">
       {chains
+        .filter((config: EVMChainConfig | CosmosChainConfig) => {
+          if (!props.search) return true;
+
+          const search = props.search.toLowerCase();
+
+          return (
+            ("name" in config && config.name.toLowerCase().includes(search)) ||
+            ("chainName" in config &&
+              config.chainName.toLowerCase().includes(search))
+          );
+        })
         .map((config: EVMChainConfig | CosmosChainConfig) => ({
           network: props.network,
           config,
