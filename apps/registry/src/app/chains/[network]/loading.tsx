@@ -1,15 +1,7 @@
 import type { FC } from "react";
 
-import ChainsLayout from "./layout";
-
-const DEFAULT_NETWORK = "evm";
-
 const ChainsLoading: FC = () => {
-  return (
-    <ChainsLayout params={{ network: DEFAULT_NETWORK }}>
-      loading...
-    </ChainsLayout>
-  );
+  return <div className="flex-1">Loading chains...</div>;
 };
 
 export default ChainsLoading;
