@@ -1,7 +1,5 @@
-import { Button } from "@axelarjs/ui";
+import { Button, ChevronDownIcon } from "@axelarjs/ui";
 import type { FC } from "react";
-
-import { ChevronDownIcon } from "lucide-react";
 
 import { APP_NAME } from "~/config/app";
 

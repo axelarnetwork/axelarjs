@@ -21,7 +21,7 @@ async function prepend(prefix: string, fileName: string) {
 
   const updatedContent = [prefix, content].join("\n\n");
 
-  const formattedContent = prettier.format(updatedContent, {
+  const formattedContent = await prettier.format(updatedContent, {
     parser: "typescript",
   });
 

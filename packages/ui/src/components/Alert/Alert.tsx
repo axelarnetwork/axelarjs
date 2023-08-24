@@ -1,9 +1,15 @@
 import type { ComponentProps, FC, ReactNode } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
-import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react";
-import { twMerge } from "tailwind-merge";
 import tw from "tailwind-styled-components";
+
+import { cn } from "../../utils";
+import {
+  AlertTriangleIcon,
+  CheckCircleIcon,
+  InfoIcon,
+  XCircleIcon,
+} from "../icons/lucide";
 
 const StyledAlert = tw.div``;
 
@@ -24,10 +30,10 @@ export type AlertProps = ComponentProps<typeof StyledAlert> &
   };
 
 const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
-  info: <Info className="h-6 w-6" />,
-  success: <CheckCircle className="h-6 w-6" />,
-  warning: <AlertTriangle className="h-6 w-6" />,
-  error: <XCircle className="h-6 w-6" />,
+  info: <InfoIcon className="h-6 w-6" />,
+  success: <CheckCircleIcon className="h-6 w-6" />,
+  warning: <AlertTriangleIcon className="h-6 w-6" />,
+  error: <XCircleIcon className="h-6 w-6" />,
 };
 
 /**
@@ -54,7 +60,7 @@ export const Alert: FC<AlertProps> = ({
 }) => {
   return (
     <StyledAlert
-      className={twMerge(alertVariance({ status }), className)}
+      className={cn(alertVariance({ status }), className)}
       {...props}
     >
       <div className={!status ? "text-info" : ""}>

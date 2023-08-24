@@ -1,14 +1,13 @@
-import { Button, LinkButton, Modal } from "@axelarjs/ui";
-import { useMemo, type ComponentType, type FC } from "react";
-import dynamic from "next/dynamic";
-
-import clsx from "clsx";
 import {
+  Button,
+  cn,
   CoinsIcon,
   GiftIcon,
-  // PackageCheckIcon,
-  // SendIcon
-} from "lucide-react";
+  LinkButton,
+  Modal,
+} from "@axelarjs/ui";
+import { useMemo, type ComponentType, type FC } from "react";
+import dynamic from "next/dynamic";
 
 import {
   INITIAL_STATE,
@@ -126,7 +125,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       }}
     >
       <Modal.Body
-        className={clsx("flex flex-col gap-4", {
+        className={cn("flex flex-col gap-4", {
           "": state.selectedAction === "mint",
         })}
       >

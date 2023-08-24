@@ -3,11 +3,14 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   CopyToClipboardButton,
   Dropdown,
+  ExternalLinkIcon,
   Identicon,
   Indicator,
   LinkButton,
+  MenuIcon,
   Navbar,
   ThemeSwitcher,
   useIsSticky,
@@ -17,8 +20,6 @@ import React, { useEffect, type FC } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import clsx from "clsx";
-import { ExternalLinkIcon, MenuIcon } from "lucide-react";
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import EVMChainsDropdown from "~/components/EVMChainsDropdown";
@@ -27,9 +28,11 @@ import { APP_NAME } from "~/config/app";
 import { useLayoutStateContainer } from "./MainLayout.state";
 import MainMenu from "./MainMenu";
 
-export type AppbarProps = {};
+export type AppbarProps = {
+  className?: string;
+};
 
-const Appbar: FC<AppbarProps> = () => {
+const Appbar: FC<AppbarProps> = (props) => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
@@ -118,10 +121,14 @@ const Appbar: FC<AppbarProps> = () => {
 
   return (
     <Navbar
-      className={clsx("bg-base-100 fixed top-0 px-2 transition-all md:px-6", {
-        "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
-        "z-10": isSticky && !state.isDrawerOpen,
-      })}
+      className={cn(
+        "bg-base-100 fixed top-0 px-2 transition-all md:px-6",
+        {
+          "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
+          "z-10": isSticky && !state.isDrawerOpen,
+        },
+        props.className
+      )}
     >
       <Navbar.Start>
         <Button
@@ -161,10 +168,7 @@ const Appbar: FC<AppbarProps> = () => {
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
-              <EVMChainsDropdown
-                triggerClassName="w-full md:w-auto rounded-full"
-                chainIconClassName="-translate-x-1.5"
-              />
+              <EVMChainsDropdown />
               <Dropdown align="end">
                 <Dropdown.Trigger>
                   <button

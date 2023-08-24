@@ -6,7 +6,7 @@ import { partition } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
-import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 import type {

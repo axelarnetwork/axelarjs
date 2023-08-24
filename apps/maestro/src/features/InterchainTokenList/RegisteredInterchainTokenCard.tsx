@@ -3,7 +3,9 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   CopyToClipboardButton,
+  SettingsIcon,
   SpinnerIcon,
   toast,
   Tooltip,
@@ -11,8 +13,6 @@ import {
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
 
-import clsx from "clsx";
-import { SettingsIcon } from "lucide-react";
 import { TransactionExecutionError } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -44,6 +44,7 @@ export type Props = TokenInfo & {
   hasRemoteTokens: boolean;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
+  className?: string;
 };
 
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
@@ -87,9 +88,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   return (
     <Card
       compact
-      className={clsx(
+      className={cn(
         "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
-        "hover:opacity-75 hover:shadow-xl"
+        "hover:opacity-75 hover:shadow-xl",
+        props.className
       )}
     >
       <Card.Body className="w-full">
@@ -145,14 +147,14 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
         {balance?.tokenBalance && (
           <div
-            className={clsx(
+            className={cn(
               "bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4"
             )}
           >
             {balance.tokenBalance === "0" ? (
               <div className="flex w-full items-center justify-between">
                 <span
-                  className={clsx({
+                  className={cn({
                     "mx-auto":
                       !isSourceChain ||
                       (!balance.isTokenOwner && !balance.isTokenPendingOwner),

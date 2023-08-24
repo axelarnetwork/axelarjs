@@ -85,12 +85,22 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
       session.address = token.sub as `0x${string}`;
       return session;
     },
+    jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id as `0x${string}`;
+      }
+
+      return token;
+    },
   },
+  useSecureCookies: process.env.NODE_ENV === "production",
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
     signOut: "/",
     error: "/",
     newUser: "/",
+    verifyRequest: "/",
   },
+  debug: process.env.NODE_ENV === "development",
 };

@@ -3,13 +3,13 @@ import {
   Button,
   CopyToClipboardButton,
   Dialog,
+  ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
 import { maskAddress, sluggify } from "@axelarjs/utils";
 import { useState, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { ExternalLinkIcon } from "lucide-react";
 import { useNetwork } from "wagmi";
 
 import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";

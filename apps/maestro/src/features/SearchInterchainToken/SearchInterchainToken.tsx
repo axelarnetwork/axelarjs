@@ -1,4 +1,5 @@
 import {
+  cn,
   FormControl,
   InputGroup,
   SpinnerIcon,
@@ -8,7 +9,6 @@ import {
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type FC } from "react";
 
-import clsx from "clsx";
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 
@@ -98,7 +98,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   return (
     <FormControl className="w-full max-w-xs md:max-w-md">
       <InputGroup
-        className={clsx("rounded-md transition-transform", {
+        className={cn("rounded-md transition-transform", {
           "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
             shouldRenderError,
           "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
@@ -130,6 +130,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                 triggerClassName="btn-sm btn-circle"
                 contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
                 compact
+                hideLabel
                 selectedChain={defaultChain}
                 onSelectChain={
                   !connectedChain

@@ -39,14 +39,14 @@
   "license": "LicenseRef-LICENSE",
   "dependencies": {
     "long": "^5.2.3",
-    "protobufjs": "^7.2.4"
+    "protobufjs": "^7.2.5"
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "degit": "^2.8.4",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
-    "ts-proto": "^1.156.2",
+    "ts-proto": "^1.156.7",
     "typescript": "^5.1.6"
   }
 }

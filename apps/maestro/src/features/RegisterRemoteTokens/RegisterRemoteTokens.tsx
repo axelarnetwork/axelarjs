@@ -1,8 +1,7 @@
-import { Button, LinkButton, toast } from "@axelarjs/ui";
+import { Button, ExternalLinkIcon, LinkButton, toast } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { ExternalLinkIcon } from "lucide-react";
 import { TransactionExecutionError } from "viem";
 import { useAccount, useWaitForTransaction } from "wagmi";
 
