@@ -1,10 +1,8 @@
-import { Button, Dialog, LinkButton } from "@axelarjs/ui";
+import { Button, cn, Dialog, LinkButton, useWindowSize } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import clsx from "clsx";
-
-import EVMChainsDropdown from "~/components/EVMChainsDropdown/EVMChainsDropdown";
+import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import {
   AddErc20StateProvider,
   useAddErc20StateContainer,
@@ -60,6 +58,8 @@ const AddErc20: FC<AddErc20Props> = () => {
     [state.step]
   );
 
+  const { width } = useWindowSize();
+
   return (
     <Dialog
       onClose={actions.reset}
@@ -85,16 +85,17 @@ const AddErc20: FC<AddErc20Props> = () => {
               className="absolute left-0 top-0 rounded-none rounded-br-2xl"
             />
           )}
-          <span className={clsx("-translate-y-2", { "ml-14": showBackButton })}>
+          <span className={cn("-translate-y-2", { "ml-14": showBackButton })}>
             Register <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
           <EVMChainsDropdown
             compact
             disabled={state.isPreExistingToken}
-            contentClassName={clsx("translate-x-28 sm:translate-x-40 z-40", {
-              "translate-x-20 sm:translate-x-40": showBackButton,
+            triggerClassName="-translate-y-1.5"
+            hideLabel={width < 640}
+            contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
+              "translate-x-16 sm:translate-x-0": showBackButton,
             })}
-            triggerClassName="btn-sm btn-circle -translate-y-1 active:-translate-y-1"
           />
         </Dialog.Title>
 

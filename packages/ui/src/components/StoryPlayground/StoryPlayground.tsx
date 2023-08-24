@@ -2,8 +2,8 @@ import type { CapitalizeKeys } from "@axelarjs/utils";
 import { ComponentProps, FC, ReactNode, useState } from "react";
 
 import type { StoryFn } from "@storybook/react";
-import clsx from "clsx";
 
+import { cn } from "../../utils";
 import { Card } from "../Card";
 import { ThemeSwitcher } from "../ThemeSwitcher";
 
@@ -133,7 +133,7 @@ const Variants = <
           </Card.Title>
 
           <div
-            className={clsx(
+            className={cn(
               "artboard artboard-demo bg-base-300 mx-auto p-4 transition-all duration-300",
               { ...viewports }
             )}

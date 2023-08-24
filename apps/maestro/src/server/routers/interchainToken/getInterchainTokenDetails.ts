@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
 import type { IntercahinTokenDetails } from "~/services/kv";
 

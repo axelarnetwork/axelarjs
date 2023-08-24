@@ -1,11 +1,9 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
-import { Dropdown, toast } from "@axelarjs/ui";
+import { cn, Dropdown, HelpCircleIcon, toast } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import Image from "next/image";
 
-import clsx from "clsx";
-import { HelpCircleIcon } from "lucide-react";
 import { find } from "rambda";
 import { TransactionExecutionError } from "viem";
 import { useNetwork, useSwitchNetwork } from "wagmi";
@@ -33,7 +31,7 @@ export const ChainIcon: FC<{
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2",
         props.className
       )}
@@ -52,6 +50,7 @@ export const ChainIcon: FC<{
 type Props = {
   chains?: EVMChainConfig[];
   compact?: boolean;
+  hideLabel?: boolean;
   disabled?: boolean;
   triggerClassName?: string;
   chainIconClassName?: string;
@@ -116,8 +115,8 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       {props.renderTrigger?.() ?? (
         <Dropdown.Trigger
           $as="button"
-          className={clsx(
-            "btn btn-sm btn-ghost group flex items-center gap-2",
+          className={cn(
+            "btn btn-sm btn-ghost group flex w-full items-center gap-2 rounded-full",
             {
               "pointer-events-none": props.disabled,
             },
@@ -135,11 +134,14 @@ const EVMChainsDropdown: FC<Props> = (props) => {
             <>
               <ChainIcon
                 src={props.selectedChain.image}
-                alt={props.selectedChain.chain_name}
+                alt={props.selectedChain.name}
                 size="sm"
-                className={props.chainIconClassName}
+                className={cn(
+                  { "-translate-x-1.5": !props.hideLabel },
+                  props.chainIconClassName
+                )}
               />
-              {!props.compact && <span>{props.selectedChain.name}</span>}
+              {!props.hideLabel && <span>{props.selectedChain.name}</span>}
             </>
           ) : selectedChain ? (
             <>
@@ -147,19 +149,28 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 src={selectedChain.image}
                 alt={selectedChain.chain_name}
                 size="sm"
-                className={props.chainIconClassName}
+                className={cn(
+                  { "-translate-x-1.5": !props.hideLabel },
+                  props.chainIconClassName
+                )}
               />
-              {!props.compact && <span>{selectedChain.name}</span>}
+              {!props.hideLabel && <span>{selectedChain.name}</span>}
             </>
           ) : (
-            <HelpCircleIcon size="24" className={props.chainIconClassName} />
+            <HelpCircleIcon
+              size="24"
+              className={cn(
+                { "-translate-x-1.5": !props.hideLabel },
+                props.chainIconClassName
+              )}
+            />
           )}
         </Dropdown.Trigger>
       )}
 
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
-          className={clsx(
+          className={cn(
             "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",
             {
               "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
@@ -191,7 +202,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           {eligibleChains.map((chain) => (
             <Dropdown.Item
               key={chain.chain_id}
-              className={clsx({
+              className={cn({
                 "pointer-events-none":
                   chain.chain_id === selectedChain?.chain_id,
               })}

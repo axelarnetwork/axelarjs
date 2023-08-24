@@ -1,8 +1,15 @@
-import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
+import {
+  Button,
+  Dialog,
+  EyeIcon,
+  EyeOffIcon,
+  FormControl,
+  Label,
+  TextInput,
+} from "@axelarjs/ui";
 import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
 
-import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { isAddress } from "viem";
 
 import {

@@ -61,11 +61,13 @@ Do you want to continue? [Y/n]
       const { stdout: specContent } =
         await $`cat scripts/templates/${templateName}/ReactComponent.spec.tsx`;
 
-      const { stdout: componentsContent } = await $`ls ${componentsDir}`;
-      const components = componentsContent
-        .split("\n")
-        .filter(Boolean)
-        .map((x) => x.trim());
+      const components: string[] = await $`ls ${componentsDir}`.then(
+        ({ stdout }) =>
+          stdout
+            .split("\n")
+            .filter(Boolean)
+            .map((x) => x.trim())
+      );
 
       const componentsIndexContent = components
         .filter((x) => x !== "index.ts")

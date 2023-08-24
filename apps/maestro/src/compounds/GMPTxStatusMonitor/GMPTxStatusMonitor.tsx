@@ -1,9 +1,8 @@
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
-import { Badge, Tooltip, type BadgeProps } from "@axelarjs/ui";
+import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
-import clsx from "clsx";
 import { indexBy } from "rambda";
 
 import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";
@@ -145,7 +144,7 @@ export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
       >
         <Badge className="flex items-center">
           <Badge
-            className={clsx("-translate-x-1.5 text-xs", {
+            className={cn("-translate-x-1.5 text-xs", {
               "animate-pulse": !["error", "executed"].includes(status),
             })}
             variant={STATUS_COLORS[status]}

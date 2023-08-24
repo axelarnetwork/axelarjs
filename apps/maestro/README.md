@@ -31,7 +31,7 @@ The following scripts are available in the project:
 - `test`: Runs unit tests using `vitest`.
 - `test:coverage`: Runs unit tests with coverage reporting using `vitest`.
 - `sync`: Runs the `sync.cjs` script to sync the app with other environments.
-- `codegen`: Runs the `wagmi generate` command to generate TypeScript types for the app's GraphQL queries and mutations, and then runs the `postcodegen.cjs` script to modify the generated types.
+- `codegen`: Runs the `wagmi generate` command to generate typesafe react-query client for interacting with the ITS contracts.
 
 ### E2E tests
 

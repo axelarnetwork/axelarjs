@@ -13,8 +13,10 @@ import type { Chain } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
+import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
+import MaestroDBClient from "~/services/db/MaestroDBClient";
 import gmpClient from "~/services/gmp";
 import MaestroKVClient from "~/services/kv";
 
@@ -41,6 +43,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     },
     storage: {
       kv: new MaestroKVClient(kv),
+      db: new MaestroDBClient(db),
     },
     contracts: {
       createERC20Client(chain: Chain, address: `0x${string}`) {

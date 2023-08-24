@@ -4,6 +4,8 @@ import {
   Alert,
   Button,
   CopyToClipboardButton,
+  ExternalLinkIcon,
+  InfoIcon,
   LinkButton,
   Tooltip,
 } from "@axelarjs/ui";
@@ -12,7 +14,6 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { ExternalLink, InfoIcon } from "lucide-react";
 import { isEmpty, partition, without } from "rambda";
 import { isAddress } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
@@ -422,7 +423,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             <span className="hidden sm:inline">
               on {props.chain.explorer.name}
             </span>
-            <ExternalLink className="h-4 w-4 translate-x-1" />
+            <ExternalLinkIcon className="h-4 w-4 translate-x-1" />
           </LinkButton>
         )}
       </div>

@@ -1,8 +1,7 @@
-import { Menu, Modal } from "@axelarjs/ui";
+import { ArrowRightIcon, ExternalLinkIcon, Menu, Modal } from "@axelarjs/ui";
 import React, { type FC } from "react";
 import Link from "next/link";
 
-import { ArrowRightIcon, ExternalLinkIcon } from "lucide-react";
 import tw from "tailwind-styled-components";
 
 import {

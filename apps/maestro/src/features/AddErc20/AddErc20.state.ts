@@ -8,7 +8,11 @@ import { uniq, without } from "rambda";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal, numericString } from "~/lib/utils/schemas";
+import {
+  hex40Literal,
+  hex64Literal,
+  numericString,
+} from "~/lib/utils/validation";
 
 const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),

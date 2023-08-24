@@ -6,7 +6,7 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import { hex40Literal } from "~/lib/utils/schemas";
+import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 export const getERC20TokenDetails = publicProcedure

@@ -1,7 +1,7 @@
 import { type VercelKV } from "@vercel/kv";
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal } from "~/lib/utils/schemas";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 
 export const remoteInterchainTokenSchema = z.object({
   chainId: z.number(),

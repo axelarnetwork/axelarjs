@@ -226,7 +226,7 @@ export const Step3: FC = () => {
                       height={24}
                       alt={`${chain.name} logo`}
                     />
-                    <span>{chain.name}</span>
+                    <span className="ml-4">{chain.name}</span>
                   </Button>
                 </Tooltip>
               );

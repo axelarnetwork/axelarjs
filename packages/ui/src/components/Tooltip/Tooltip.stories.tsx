@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from "@storybook/react";
-import { PlusIcon } from "lucide-react";
 
 import { Button } from "../Button";
+import { PlusIcon } from "../icons/lucide";
 import { Tooltip, TooltipProps } from "./Tooltip";
 
 export default {

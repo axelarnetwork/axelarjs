@@ -1,5 +1,4 @@
 {
-  "eslint.packageManager": "pnpm",
   "eslint.workingDirectories": [
     { "pattern": "apps/*/" },
     { "pattern": "packages/*/" }
@@ -14,7 +13,8 @@
     "tw`([^`]*)", // tw`...`
     "tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
     "tw\\(.*?\\).*?`([^`]*)", // tw(Component)<xxx>`...`
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
   "editor.quickSuggestions": {
     "strings": true // forces VS Code to trigger completions when editing "string" content
