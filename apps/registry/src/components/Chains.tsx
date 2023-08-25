@@ -47,10 +47,14 @@ const Chains: FC<Props> = async (props) => {
 
 export default Chains;
 
-const ConfigSnippet: FC<{
+type ConfigSnippetProps = {
   config: EVMChainConfig | CosmosChainConfig;
-}> = (props) => {
-  const content = JSON.stringify(props.config, null, "\t").trim();
+  spacing?: number;
+};
+
+const ConfigSnippet: FC<ConfigSnippetProps> = ({ config, spacing = 2 }) => {
+  const content = JSON.stringify(config, null, spacing).trim();
+  const padding = " ".repeat(spacing);
 
   return (
     <details className="collapse">
@@ -63,7 +67,7 @@ const ConfigSnippet: FC<{
             {content.split("\n").map((line, i) => (
               <>
                 <code key={i}>
-                  {i > 0 && " ".repeat(2)}
+                  {i > 0 && padding}
                   {line}
                 </code>
                 {i !== content.split("\n").length - 1 && "\n"}
