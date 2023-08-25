@@ -1,5 +1,5 @@
 import { Card } from "@axelarjs/ui/components/Card";
-import type { FC } from "react";
+import { Fragment, type FC } from "react";
 import Image from "next/image";
 
 import {
@@ -53,8 +53,9 @@ type ConfigSnippetProps = {
 };
 
 const ConfigSnippet: FC<ConfigSnippetProps> = ({ config, spacing = 2 }) => {
-  const content = JSON.stringify(config, null, spacing).trim();
+  const jsonString = JSON.stringify(config, null, spacing).trim();
   const padding = " ".repeat(spacing);
+  const lines = jsonString.split("\n");
 
   return (
     <details className="collapse">
@@ -64,14 +65,14 @@ const ConfigSnippet: FC<ConfigSnippetProps> = ({ config, spacing = 2 }) => {
       <div className="collapse-content">
         <div className="mockup-code">
           <pre>
-            {content.split("\n").map((line, i) => (
-              <>
-                <code key={i}>
+            {lines.map((line, i) => (
+              <Fragment key={i}>
+                <code>
                   {i > 0 && padding}
                   {line}
                 </code>
-                {i !== content.split("\n").length - 1 && "\n"}
-              </>
+                {i !== lines.length - 1 && "\n"}
+              </Fragment>
             ))}
           </pre>
         </div>
