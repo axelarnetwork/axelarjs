@@ -1,5 +1,5 @@
 import { Card } from "@axelarjs/ui/components/Card";
-import { FC } from "react";
+import type { FC } from "react";
 import Image from "next/image";
 
 import {
@@ -37,7 +37,6 @@ const Chains: FC<Props> = async (props) => {
 
               {data.name}
             </Card.Title>
-
             <ConfigSnippet config={chain.config} />
           </Card.Body>
         </Card>
@@ -51,7 +50,7 @@ export default Chains;
 const ConfigSnippet: FC<{
   config: EVMChainConfig | CosmosChainConfig;
 }> = (props) => {
-  const content = JSON.stringify(props.config, null, 2);
+  const content = JSON.stringify(props.config, null, "\t").trim();
 
   return (
     <details className="collapse">
@@ -60,8 +59,16 @@ const ConfigSnippet: FC<{
       </summary>
       <div className="collapse-content">
         <div className="mockup-code">
-          <pre className="max-w-xs lg:max-w-lg">
-            <code>{content}</code>
+          <pre>
+            {content.split("\n").map((line, i) => (
+              <>
+                <code key={i}>
+                  {i > 0 && " ".repeat(2)}
+                  {line}
+                </code>
+                {i !== content.split("\n").length - 1 && "\n"}
+              </>
+            ))}
           </pre>
         </div>
       </div>
