@@ -3,80 +3,45 @@ import { FC } from "react";
 import Image from "next/image";
 
 import {
-  ChainItem,
+  BASE_URL,
   CosmosChainConfig,
   EVMChainConfig,
+  getNormalizedChainConfigs,
   NetworkKind,
-} from "~/app/chains/_shared";
+} from "~/services/chain-registry";
 
-const BASE_URL =
-  "https://raw.githubusercontent.com/axelarnetwork/public-chain-configs/main";
-
-const chainsUrl = (network: "evm" | "cosmos") =>
-  `${BASE_URL}/registry/${process.env.NEXT_PUBLIC_NETWORK_ENV}/${network}/chains.json`;
-
-type ChainsProps = {
+type Props = {
   network: NetworkKind;
   search?: string;
 };
 
-const Chains: FC<ChainsProps> = async (props) => {
-  const url = chainsUrl(props.network);
-  const { chains } = await fetch(url, { next: { revalidate: 60 } }).then(
-    (res) => res.json()
-  );
-
-  const filteredChains = (
-    (chains ?? []) as (EVMChainConfig | CosmosChainConfig)[]
-  )
-    .filter((config) => {
-      if (!props.search) return true;
-
-      const search = props.search.toLowerCase();
-
-      const field = "name" in config ? config.name : config.chainName;
-
-      return field.toLowerCase().includes(search);
-    })
-    .map(
-      (config) =>
-        ({
-          network: props.network,
-          config,
-        } as ChainItem<typeof props.network>)
-    )
-    .sort((a, b) => {
-      const aName = "name" in a.config ? a.config.name : a.config.chainName;
-      const bName = "name" in b.config ? b.config.name : b.config.chainName;
-
-      return aName.localeCompare(bName);
-    });
+const Chains: FC<Props> = async (props) => {
+  const chainConfigs = await getNormalizedChainConfigs({
+    network: props.network,
+    search: props.search,
+  });
 
   return (
     <ul className="grid gap-4">
-      {filteredChains.map((chain) => {
-        const chainData = getChainCardData(chain);
+      {chainConfigs.map(({ data, ...chain }) => (
+        <Card key={data.key} className="bg-base-200">
+          <Card.Body>
+            <Card.Title $as="h1">
+              <Image
+                src={`${BASE_URL}/${data.iconUrl}`}
+                className="mr-2 h-6 w-6"
+                alt={`${data.name} icon`}
+                width={24}
+                height={24}
+              />
 
-        return (
-          <Card key={chainData.key} className="bg-base-200">
-            <Card.Body>
-              <Card.Title $as="h1">
-                <Image
-                  src={`${BASE_URL}/${chainData.iconUrl}`}
-                  className="mr-2 h-6 w-6"
-                  alt={`${chainData.name} icon`}
-                  width={24}
-                  height={24}
-                />
+              {data.name}
+            </Card.Title>
 
-                {chainData.name}
-              </Card.Title>
-
-              <ConfigSnippet config={chain.config} />
-            </Card.Body>
-          </Card>
-        );
-      })}
+            <ConfigSnippet config={chain.config} />
+          </Card.Body>
+        </Card>
+      ))}
     </ul>
   );
 };
@@ -101,20 +66,3 @@ const ConfigSnippet: FC<{
     </details>
   );
 };
-
-function getChainCardData({ config, network }: ChainItem<NetworkKind>) {
-  switch (network) {
-    case "evm":
-      return {
-        key: String(config.id),
-        name: config.name,
-        iconUrl: config.iconUrl,
-      };
-    case "cosmos":
-      return {
-        key: config.chainId,
-        name: config.chainName,
-        iconUrl: config.chainIconUrl,
-      };
-  }
-}
