@@ -60,7 +60,9 @@ const ConfigSnippet: FC<{
       </summary>
       <div className="collapse-content">
         <div className="mockup-code">
-          <pre className="max-w-xs lg:max-w-lg">{content}</pre>
+          <pre className="max-w-xs lg:max-w-lg">
+            <code>{content}</code>
+          </pre>
         </div>
       </div>
     </details>
