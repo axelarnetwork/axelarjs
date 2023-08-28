@@ -1,30 +1,23 @@
 import {
   encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData,
   encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData,
-  encodeInterchainTokenServiceGetCustomTokenIdArgs,
   encodeInterchainTokenServiceGetStandardizedTokenAddressArgs,
 } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import {
-  useAccount,
-  useMutation,
-  useNetwork,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useMutation, useNetwork } from "wagmi";
 
-import { watchInterchainTokenServiceEvent } from "~/lib/contracts/InterchainTokenService.actions";
+import { readInterchainTokenService } from "~/lib/contracts/InterchainTokenService.actions";
 import {
-  useInterchainTokenServiceGetCustomTokenId,
-  useInterchainTokenServiceGetStandardizedTokenAddress,
   useInterchainTokenServiceMulticall,
+  useInterchainTokenServiceStandardizedTokenDeployedEvent,
+  usePrepareInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { IntercahinTokenDetails } from "~/services/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -40,48 +33,19 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   deployerAddress?: `0x${string}`;
 };
 
-const DEFAULT_INPUT: UseDeployAndRegisterInterchainTokenInput = {
-  sourceChainId: "",
-  tokenName: "",
-  tokenSymbol: "",
-  decimals: 0,
-  destinationChainIds: [],
-  gasFees: [],
-  initialSupply: BigInt(0),
-  deployerAddress: `0x`,
-};
-
-export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
-  value: bigint;
-  salt: `0x${string}`;
-  onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
-  onFinished?: () => void;
-}) {
-  const inputRef =
-    useRef<UseDeployAndRegisterInterchainTokenInput>(DEFAULT_INPUT);
+export function useDeployAndRegisterRemoteStandardizedTokenMutation(
+  config: {
+    value: bigint;
+    salt: `0x${string}`;
+    onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
+    onFinished?: () => void;
+  },
+  input?: UseDeployAndRegisterInterchainTokenInput
+) {
   const { address: deployerAddress } = useAccount();
   const { chain } = useNetwork();
 
-  const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: encodeInterchainTokenServiceGetCustomTokenIdArgs({
-      salt: config.salt,
-      sender: deployerAddress as `0x${string}`,
-    }),
-    enabled: deployerAddress && isValidEVMAddress(deployerAddress),
-  });
-
-  const { data: tokenAddress } =
-    useInterchainTokenServiceGetStandardizedTokenAddress({
-      args: encodeInterchainTokenServiceGetStandardizedTokenAddressArgs({
-        tokenId: tokenId as `0x${string}`,
-      }),
-      enabled: Boolean(tokenId),
-    });
-
   const { computed } = useEVMChainConfigsQuery();
-
-  const { writeAsync: multicallAsync, data: multicallResult } =
-    useInterchainTokenServiceMulticall();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -91,58 +55,65 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<IntercahinTokenDetails | null>(null);
 
-  const unwatch = watchInterchainTokenServiceEvent(
-    {
-      eventName: "StandardizedTokenDeployed",
-    },
-    async (logs) => {
+  const unwatch = useInterchainTokenServiceStandardizedTokenDeployedEvent({
+    chainId: chain?.id ?? 0,
+    listener: async (logs) => {
       const log = logs.find(
         ({ args }) =>
           Boolean(args?.tokenId) &&
-          args.decimals === inputRef.current.decimals &&
-          args.name === inputRef.current.tokenName &&
-          args.symbol === inputRef.current.tokenSymbol &&
+          args.decimals === input?.decimals &&
+          args.name === input?.tokenName &&
+          args.symbol === input?.tokenSymbol &&
           args.mintTo === deployerAddress
       );
 
-      if (
-        !log ||
-        !chain ||
-        !deployerAddress ||
-        !log.transactionHash ||
-        !tokenAddress ||
-        !tokenId
-      ) {
+      if (!log) {
         return;
       }
 
-      unwatch();
+      const tokenAddress = await readInterchainTokenService({
+        functionName: "getStandardizedTokenAddress",
+        args: encodeInterchainTokenServiceGetStandardizedTokenAddressArgs({
+          tokenId: log.args?.tokenId as `0x${string}`,
+        }),
+      });
+
+      const isNotReady =
+        !chain ||
+        !deployerAddress ||
+        !log.args?.tokenId ||
+        !input ||
+        !log.transactionHash;
+
+      if (isNotReady) {
+        return;
+      }
+
+      unwatch?.();
 
       setRecordDeploymentArgs({
         kind: "standardized",
         salt: config.salt,
-        tokenId,
+        tokenId: log.args?.tokenId as `0x${string}`,
         tokenAddress,
         deployerAddress,
         originChainId: chain.id,
-        deploymentTxHash: log.transactionHash,
-        tokenName: inputRef.current.tokenName,
-        tokenSymbol: inputRef.current.tokenSymbol,
-        tokenDecimals: inputRef.current.decimals,
-        originAxelarChainId: inputRef.current.sourceChainId,
-        remoteTokens: inputRef.current.destinationChainIds.map(
-          (axelarChainId) => ({
-            axelarChainId,
-            chainId: computed.indexedById[axelarChainId]?.chain_id,
-            address: tokenAddress,
-            status: "pending",
-            deplymentTxHash: log.transactionHash as `0x${string}`,
-            // deploymentLogIndex is unknown at this point
-          })
-        ),
+        deploymentTxHash: log.transactionHash as `0x${string}`,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        originAxelarChainId: input.sourceChainId,
+        remoteTokens: input.destinationChainIds.map((axelarChainId) => ({
+          axelarChainId,
+          chainId: computed.indexedById[axelarChainId]?.chain_id,
+          address: tokenAddress,
+          status: "pending",
+          deplymentTxHash: log.transactionHash as `0x${string}`,
+          // deploymentLogIndex is unknown at this point
+        })),
       });
-    }
-  );
+    },
+  });
 
   useEffect(
     () => {
@@ -160,84 +131,92 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(config: {
     [recordDeploymentArgs]
   );
 
-  useWaitForTransaction({
-    hash: multicallResult?.hash,
-    confirmations: 8,
-    onSuccess() {
-      if (!multicallResult) {
-        return;
-      }
-      config.onFinished?.();
-    },
+  const multicallArgs = useMemo(() => {
+    const deployer = input?.deployerAddress ?? deployerAddress;
+
+    if (!input || !deployer) {
+      return [];
+    }
+
+    const initialSupply = input.initialSupply
+      ? parseUnits(String(input.initialSupply), input.decimals)
+      : BigInt(0);
+
+    const baseArgs = {
+      salt: config.salt,
+      name: input.tokenName,
+      symbol: input.tokenSymbol,
+      decimals: input.decimals,
+    };
+
+    const deployTxData =
+      encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData({
+        ...baseArgs,
+        mintAmount: initialSupply,
+        distributor: deployer,
+      });
+
+    if (!input.destinationChainIds.length) {
+      return [deployTxData];
+    }
+
+    const registerTxData = input.destinationChainIds.map((chainId, i) =>
+      encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData({
+        ...baseArgs,
+        distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+        operator: deployer,
+        destinationChain: chainId,
+        gasValue: input.gasFees[i] ?? BigInt(0),
+      })
+    );
+
+    return [deployTxData, ...registerTxData];
+  }, [input, deployerAddress, config.salt]);
+
+  const totalGasFee = useMemo(
+    () => input?.gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
+    [input?.gasFees]
+  );
+
+  const prepareMulticall = usePrepareInterchainTokenServiceMulticall({
+    value: totalGasFee,
+    chainId: chain?.id ?? 0,
+    args: [multicallArgs],
   });
 
-  return useMutation(
-    async (input: UseDeployAndRegisterInterchainTokenInput) => {
-      if (!deployerAddress) {
-        return;
-      }
+  const multicall = useInterchainTokenServiceMulticall(prepareMulticall.config);
 
-      inputRef.current = input;
+  return useMutation(async () => {
+    if (!deployerAddress) {
+      return;
+    }
 
-      onStatusUpdate({
-        type: "pending_approval",
-      });
-      try {
-        const initialSupply = input.initialSupply
-          ? parseUnits(String(input.initialSupply), input.decimals)
-          : BigInt(0);
+    onStatusUpdate({
+      type: "pending_approval",
+    });
 
-        const baseArgs = {
-          salt: config.salt,
-          name: input.tokenName,
-          symbol: input.tokenSymbol,
-          decimals: input.decimals,
-        };
+    if (!input || !multicall.writeAsync) {
+      return;
+    }
 
-        const deployTxData =
-          encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData({
-            ...baseArgs,
-            mintAmount: initialSupply,
-            distributor: input.deployerAddress ?? deployerAddress,
-          });
+    try {
+      const tx = await multicall.writeAsync();
 
-        const totalGasFee = input.gasFees.reduce((a, b) => a + b, BigInt(0));
-
-        const registerTxData = input.destinationChainIds.map((chainId, i) => {
-          const gasValue = input.gasFees[i];
-
-          return encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData(
-            {
-              ...baseArgs,
-              distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
-              operator: input.deployerAddress ?? deployerAddress,
-              destinationChain: chainId,
-              gasValue,
-            }
-          );
-        });
-
-        const tx = await multicallAsync({
-          value: totalGasFee,
-          args: [[deployTxData, ...registerTxData]],
-        });
-
-        if (tx?.hash) {
-          onStatusUpdate({
-            type: "deploying",
-            txHash: tx.hash,
-          });
-        }
-      } catch (error) {
+      if (tx?.hash) {
         onStatusUpdate({
-          type: "idle",
+          type: "deploying",
+          txHash: tx.hash,
         });
-        if (error instanceof TransactionExecutionError) {
-          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+      }
+    } catch (error) {
+      onStatusUpdate({
+        type: "idle",
+      });
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
 
-          logger.error("Failed to deploy interchain token", error.cause);
-        }
+        logger.error("Failed to deploy interchain token", error.cause);
       }
     }
-  );
+  });
 }

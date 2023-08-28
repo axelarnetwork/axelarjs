@@ -38,20 +38,36 @@ export const Step3: FC = () => {
     [state.gasFees]
   );
 
+  const sourceChain = state.evmChains.find(
+    propEq("chain_id", state.network.chain?.id)
+  );
+
   const { mutateAsync: deployInterchainTokenAsync } =
-    useDeployAndRegisterRemoteStandardizedTokenMutation({
-      salt: rootState.tokenDetails.salt,
-      value: totalGasFees,
-      onStatusUpdate(txState) {
-        if (txState.type === "deployed") {
+    useDeployAndRegisterRemoteStandardizedTokenMutation(
+      {
+        salt: rootState.tokenDetails.salt,
+        value: totalGasFees,
+        onStatusUpdate(txState) {
+          if (txState.type === "deployed") {
+            rootActions.setTxState(txState);
+            rootActions.setStep(2);
+            actions.setIsDeploying(false);
+            return;
+          }
           rootActions.setTxState(txState);
-          rootActions.setStep(2);
-          actions.setIsDeploying(false);
-          return;
-        }
-        rootActions.setTxState(txState);
+        },
       },
-    });
+      {
+        tokenName: rootState.tokenDetails.tokenName,
+        tokenSymbol: rootState.tokenDetails.tokenSymbol,
+        decimals: rootState.tokenDetails.tokenDecimals,
+        destinationChainIds: Array.from(rootState.selectedChains),
+        gasFees: state.gasFees ?? [],
+        sourceChainId: sourceChain?.chain_name ?? "",
+        initialSupply: BigInt(rootState.tokenDetails.tokenCap),
+        deployerAddress: rootState.tokenDetails.distributor,
+      }
+    );
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (e) => {
@@ -74,27 +90,15 @@ export const Step3: FC = () => {
 
       invariant(sourceChain, "source chain not found");
 
-      await deployInterchainTokenAsync(
-        {
-          tokenName: rootState.tokenDetails.tokenName,
-          tokenSymbol: rootState.tokenDetails.tokenSymbol,
-          decimals: rootState.tokenDetails.tokenDecimals,
-          destinationChainIds: Array.from(rootState.selectedChains),
-          gasFees: state.gasFees,
-          sourceChainId: sourceChain.chain_name,
-          initialSupply: BigInt(rootState.tokenDetails.tokenCap),
-          deployerAddress: rootState.tokenDetails.distributor,
-        },
-        {
-          onError(error) {
-            actions.setIsDeploying(false);
+      await deployInterchainTokenAsync(undefined, {
+        onError(error) {
+          actions.setIsDeploying(false);
 
-            if (error instanceof Error) {
-              toast.error(`Failed to register token: ${error?.message}`);
-            }
-          },
-        }
-      );
+          if (error instanceof Error) {
+            toast.error(`Failed to register token: ${error?.message}`);
+          }
+        },
+      });
     },
     [
       state.isGasPriceQueryLoading,
@@ -104,12 +108,6 @@ export const Step3: FC = () => {
       state.network.chain?.id,
       actions,
       deployInterchainTokenAsync,
-      rootState.tokenDetails.tokenName,
-      rootState.tokenDetails.tokenSymbol,
-      rootState.tokenDetails.tokenDecimals,
-      rootState.tokenDetails.tokenCap,
-      rootState.tokenDetails.distributor,
-      rootState.selectedChains,
     ]
   );
 
