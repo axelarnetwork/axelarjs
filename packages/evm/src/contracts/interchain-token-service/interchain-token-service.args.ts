@@ -811,6 +811,29 @@ export const encodeInterchainTokenServiceMulticallData = ({
     args: [data],
   });
 
+export type InterchainTokenServiceProposeOwnershipArgs = {
+  newOwner: `0x${string}`;
+};
+
+/**
+ * Factory function for InterchainTokenService.proposeOwnership function args
+ */
+export const encodeInterchainTokenServiceProposeOwnershipArgs = ({
+  newOwner,
+}: InterchainTokenServiceProposeOwnershipArgs) => [newOwner] as const;
+
+/**
+ * Encoder function for InterchainTokenService.proposeOwnership function data
+ */
+export const encodeInterchainTokenServiceProposeOwnershipData = ({
+  newOwner,
+}: InterchainTokenServiceProposeOwnershipArgs) =>
+  encodeFunctionData({
+    functionName: "proposeOwnership",
+    abi: ABI_FILE.abi,
+    args: [newOwner],
+  });
+
 export type InterchainTokenServiceRegisterCanonicalTokenArgs = {
   tokenAddress: `0x${string}`;
 };
