@@ -75,6 +75,7 @@ export default function useRegisterRemoteStandardizedTokens(
     () => gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
     [gasFees]
   );
+
   const { config } = usePrepareInterchainTokenServiceMulticall({
     value: totalGasFee,
     args: [multicallArgs],

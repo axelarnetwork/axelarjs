@@ -1646,6 +1646,19 @@ export default {
       inputs: [
         {
           internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "proposeOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
           name: "tokenAddress",
           type: "address",
         },
