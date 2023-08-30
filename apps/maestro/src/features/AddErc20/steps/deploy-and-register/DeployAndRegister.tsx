@@ -1,3 +1,4 @@
+import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { invariant } from "@axelarjs/utils";
 import React, {
@@ -18,6 +19,71 @@ import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
+
+const ChainPicker: FC<{
+  eligibleChains: EVMChainConfig[];
+  selectedChains: string[];
+  onChainClick: (chainId: string) => void;
+}> = ({ eligibleChains, selectedChains, onChainClick }) => {
+  const handleToggleAll = useCallback(() => {
+    eligibleChains.forEach((chain, i) =>
+      setTimeout(onChainClick.bind(null, chain.id), 16.6 * i)
+    );
+  }, [eligibleChains, onChainClick]);
+
+  const isToggleAllDisabled = useMemo(
+    () =>
+      Boolean(
+        selectedChains.length && selectedChains.length !== eligibleChains.length
+      ),
+    [selectedChains, eligibleChains]
+  );
+
+  return (
+    <section className="space-y-4">
+      <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
+        {eligibleChains?.map((chain) => {
+          const isSelected = selectedChains.includes(chain.id);
+
+          return (
+            <Tooltip
+              tip={`Deploy on ${chain.name}`}
+              key={chain.chain_name}
+              position="top"
+            >
+              <Button
+                className="w-full rounded-2xl hover:ring"
+                size="sm"
+                role="button"
+                variant={isSelected ? "success" : undefined}
+                onClick={onChainClick.bind(null, chain.id)}
+              >
+                <Image
+                  className="pointer-events-none absolute left-3 -translate-x-2 rounded-full"
+                  src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
+                  width={24}
+                  height={24}
+                  alt={`${chain.name} logo`}
+                />
+                <span className="ml-4">{chain.name}</span>
+              </Button>
+            </Tooltip>
+          );
+        })}
+      </div>
+      <div className="grid place-content-center">
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={isToggleAllDisabled}
+          onClick={handleToggleAll}
+        >
+          toggle all
+        </Button>
+      </div>
+    </section>
+  );
+};
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -195,38 +261,11 @@ export const Step3: FC = () => {
               </Label.AltText>
             )}
           </Label>
-          <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
-            {eligibleChains?.map((chain) => {
-              const isSelected = rootState.selectedChains.includes(chain.id);
-
-              return (
-                <Tooltip
-                  tip={`Deploy on ${chain.name}`}
-                  key={chain.chain_name}
-                  position="top"
-                >
-                  <Button
-                    className="w-full rounded-2xl hover:ring"
-                    size="sm"
-                    role="button"
-                    variant={isSelected ? "success" : undefined}
-                    onClick={() => {
-                      rootActions.toggleAdditionalChain(chain.id);
-                    }}
-                  >
-                    <Image
-                      className="pointer-events-none absolute left-3 -translate-x-2 rounded-full"
-                      src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
-                      width={24}
-                      height={24}
-                      alt={`${chain.name} logo`}
-                    />
-                    <span className="ml-4">{chain.name}</span>
-                  </Button>
-                </Tooltip>
-              );
-            })}
-          </div>
+          <ChainPicker
+            eligibleChains={eligibleChains}
+            selectedChains={rootState.selectedChains}
+            onChainClick={rootActions.toggleAdditionalChain}
+          />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
       </form>
