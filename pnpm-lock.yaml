@@ -534,14 +534,14 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3(@types/react-dom@18.2.7)(@types/react@18.2.16)(react-dom@18.2.0)(react@18.2.0)
       class-variance-authority:
-        specifier: ^0.6.1
-        version: 0.6.1
+        specifier: ^0.7.0
+        version: 0.7.0
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
       lucide-react:
-        specifier: ^0.265.0
-        version: 0.265.0(react@18.2.0)
+        specifier: ^0.272.0
+        version: 0.272.0(react@18.2.0)
       rambda:
         specifier: ^7.5.0
         version: 7.5.0
@@ -646,8 +646,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       daisyui:
-        specifier: ^3.6.3
-        version: 3.6.3(ts-node@10.9.1)
+        specifier: ^3.6.4
+        version: 3.6.4(ts-node@10.9.1)
       fast-check:
         specifier: ^3.12.0
         version: 3.12.0
@@ -9381,10 +9381,10 @@ packages:
     resolution: {integrity: sha512-eXTggHWSooYhq49F2opQhuHWgzucfF2YgODK4e1566GQs5BIfP30B0oenwBJHfWxAs2fyPB1s7Mg949zLf61Yw==}
     engines: {node: '>=8'}
 
-  /class-variance-authority@0.6.1:
-    resolution: {integrity: sha512-eurOEGc7YVx3majOrOb099PNKgO3KnKSApOprXI4BTq6bcfbqbQXPN2u+rPPmIJ2di23bMwhk0SxCCthBmszEQ==}
+  /class-variance-authority@0.7.0:
+    resolution: {integrity: sha512-jFI8IQw4hczaL4ALINxqLEXQbWcNjoSkloa4IaufXCJr6QawJyw7tuRysRsrE8w2p/4gGaxKIt/hX3qz/IbD1A==}
     dependencies:
-      clsx: 1.2.1
+      clsx: 2.0.0
     dev: false
 
   /classnames@2.3.2:
@@ -9894,8 +9894,8 @@ packages:
       type: 1.2.0
     dev: true
 
-  /daisyui@3.6.3(ts-node@10.9.1):
-    resolution: {integrity: sha512-VNWogAjx37H8kNYd2E/+r1OXc6dOvJTKlKltqIKAlNMFVfx2BIKPcmnVxaHQLfj2vhv1mYDBjgWj+1enQ+4yZA==}
+  /daisyui@3.6.4(ts-node@10.9.1):
+    resolution: {integrity: sha512-8cFEkA2CaTKLUBvEU+9cTx6uvLSN2ZUq9fXxMkdiRS7QM79jBFv3klNkbUaPslmVh0eoeeCk0o98sjmfQ7/Cgg==}
     engines: {node: '>=16.9.0'}
     dependencies:
       colord: 2.9.3
@@ -13842,6 +13842,14 @@ packages:
 
   /lucide-react@0.265.0(react@18.2.0):
     resolution: {integrity: sha512-znyvziBEUQ7CKR31GiU4viomQbJrpDLG5ac+FajwiZIavC3YbPFLkzQx3dCXT4JWJx/pB34EwmtiZ0ElGZX0PA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /lucide-react@0.272.0(react@18.2.0):
+    resolution: {integrity: sha512-TXk88XsL9YC9psZR6GSXDLpbppxlm2jN2uMjIWI5A7sPWb/dllib59lNcORC20N33TEeelDwcTR0dLKl/fhYLw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
