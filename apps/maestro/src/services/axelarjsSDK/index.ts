@@ -6,15 +6,16 @@ import {
 
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import type {
-  EstimateGasFeeMultipleChainsParams,
-  EstimateGasFeeParams,
-} from "./types";
+  EstimateGasFeeInput,
+  EstimateGasFeeMultipleChainsInput,
+  GetChainInfoInput,
+} from "~/server/routers/axelarjsSDK";
 
 export const client = new AxelarQueryAPI({
   environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
 });
 
-async function estimateGasFee(params: EstimateGasFeeParams): Promise<bigint> {
+async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
   const response = await client.estimateGasFee(
     params.sourceChainId,
     params.destinationChainId,
@@ -30,7 +31,7 @@ async function estimateGasFee(params: EstimateGasFeeParams): Promise<bigint> {
 }
 
 async function estimateGasFeeMultipleChains(
-  params: EstimateGasFeeMultipleChainsParams
+  params: EstimateGasFeeMultipleChainsInput
 ): Promise<bigint[]> {
   return await Promise.all([
     ...params.destinationChainIds.map((destinationChainId) =>
@@ -43,11 +44,7 @@ async function estimateGasFeeMultipleChains(
   ]);
 }
 
-type EstimateFinalityParams = {
-  axelarChainId: string;
-};
-
-async function getChainInfo(params: EstimateFinalityParams) {
+async function getChainInfo(params: GetChainInfoInput) {
   const chains = await getChainConfigs({
     environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
   });
