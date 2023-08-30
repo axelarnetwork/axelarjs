@@ -1,11 +1,4 @@
-import {
-  Button,
-  Dialog,
-  FormControl,
-  Label,
-  toast,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { invariant } from "@axelarjs/utils";
 import React, {
   useCallback,

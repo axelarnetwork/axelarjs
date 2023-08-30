@@ -1,6 +1,7 @@
 import {
   encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData,
   encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData,
+  encodeInterchainTokenServiceGetCustomTokenIdArgs,
   encodeInterchainTokenServiceGetStandardizedTokenAddressArgs,
 } from "@axelarjs/evm";
 import { throttle } from "@axelarjs/utils";
@@ -9,14 +10,14 @@ import { useEffect, useMemo, useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 
-import { readInterchainTokenService } from "~/lib/contracts/InterchainTokenService.actions";
 import {
   useInterchainTokenServiceGetCustomTokenId,
+  useInterchainTokenServiceGetStandardizedTokenAddress,
   useInterchainTokenServiceMulticall,
-  useInterchainTokenServiceStandardizedTokenDeployedEvent,
   usePrepareInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { trpc } from "~/lib/trpc";
+import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { IntercahinTokenDetails } from "~/services/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -54,82 +55,21 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<IntercahinTokenDetails | null>(null);
 
-  const unwatch = useInterchainTokenServiceStandardizedTokenDeployedEvent({
-    chainId: chain?.id ?? 0,
-    listener: async (logs) => {
-      const log = logs.find(
-        ({ args }) =>
-          Boolean(args?.tokenId) &&
-          args.decimals === input?.decimals &&
-          args.name === input?.tokenName &&
-          args.symbol === input?.tokenSymbol &&
-          args.mintTo === deployerAddress
-      );
-
-      if (!log) {
-        return;
-      }
-
-      const tokenAddress = await readInterchainTokenService({
-        functionName: "getStandardizedTokenAddress",
-        args: encodeInterchainTokenServiceGetStandardizedTokenAddressArgs({
-          tokenId: log.args?.tokenId as `0x${string}`,
-        }),
-      });
-
-      const isNotReady =
-        !chain ||
-        !deployerAddress ||
-        !log.args?.tokenId ||
-        !input ||
-        !log.transactionHash;
-
-      if (isNotReady) {
-        return;
-      }
-
-      unwatch?.();
-
-      setRecordDeploymentArgs({
-        kind: "standardized",
-        salt: config.salt,
-        tokenId: log.args?.tokenId as `0x${string}`,
-        tokenAddress,
-        deployerAddress,
-        originChainId: chain.id,
-        deploymentTxHash: log.transactionHash as `0x${string}`,
-        tokenName: input.tokenName,
-        tokenSymbol: input.tokenSymbol,
-        tokenDecimals: input.decimals,
-        originAxelarChainId: input.sourceChainId,
-        remoteTokens: input.destinationChainIds.map((axelarChainId) => ({
-          axelarChainId,
-          chainId: computed.indexedById[axelarChainId]?.chain_id,
-          address: tokenAddress,
-          status: "pending",
-          deplymentTxHash: log.transactionHash as `0x${string}`,
-          // deploymentLogIndex is unknown at this point
-        })),
-      });
-    },
+  const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
+    args: encodeInterchainTokenServiceGetCustomTokenIdArgs({
+      salt: config.salt,
+      sender: deployerAddress as `0x${string}`,
+    }),
+    enabled: deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
-  useEffect(
-    () => {
-      if (recordDeploymentArgs) {
-        console.log("recordDeploymentArgs", recordDeploymentArgs);
-        recordDeploymentAsync(recordDeploymentArgs).then(() => {
-          onStatusUpdate({
-            type: "deployed",
-            tokenAddress: recordDeploymentArgs.tokenAddress,
-            txHash: recordDeploymentArgs.deploymentTxHash,
-          });
-        });
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [recordDeploymentArgs]
-  );
+  const { data: tokenAddress } =
+    useInterchainTokenServiceGetStandardizedTokenAddress({
+      args: encodeInterchainTokenServiceGetStandardizedTokenAddressArgs({
+        tokenId: tokenId as `0x${string}`,
+      }),
+      enabled: Boolean(tokenId),
+    });
 
   const multicallArgs = useMemo(() => {
     const deployer = input?.deployerAddress ?? deployerAddress;
@@ -190,16 +130,59 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
     hash: multicall?.data?.hash,
     confirmations: 8,
     onSuccess: () => {
-      if (!multicall.data?.hash) {
+      const txHash = multicall?.data?.hash;
+
+      if (
+        !txHash ||
+        !tokenAddress ||
+        !tokenId ||
+        !deployerAddress ||
+        !chain ||
+        !input
+      ) {
         return;
       }
 
-      onStatusUpdate({
-        type: "deploying",
-        txHash: multicall?.data?.hash,
+      setRecordDeploymentArgs({
+        kind: "standardized",
+        salt: config.salt,
+        tokenId,
+        tokenAddress,
+        deployerAddress,
+        originChainId: chain.id,
+        deploymentTxHash: txHash,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        originAxelarChainId: input.sourceChainId,
+        remoteTokens: input.destinationChainIds.map((axelarChainId) => ({
+          axelarChainId,
+          chainId: computed.indexedById[axelarChainId]?.chain_id,
+          address: tokenAddress,
+          status: "pending",
+          deplymentTxHash: txHash,
+          // deploymentLogIndex is unknown at this point
+        })),
       });
     },
   });
+
+  useEffect(
+    () => {
+      if (recordDeploymentArgs) {
+        console.log("recordDeploymentArgs", recordDeploymentArgs);
+        recordDeploymentAsync(recordDeploymentArgs).then(() => {
+          onStatusUpdate({
+            type: "deployed",
+            tokenAddress: recordDeploymentArgs.tokenAddress,
+            txHash: recordDeploymentArgs.deploymentTxHash,
+          });
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [recordDeploymentArgs]
+  );
 
   return multicall;
 }
