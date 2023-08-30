@@ -3,6 +3,12 @@ import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
 
+const INPUT_SCHEMA = z.object({
+  axelarChainId: z.string().max(64),
+});
+
+export type GetChainInfoInput = z.infer<typeof INPUT_SCHEMA>;
+
 export const getChainInfo = publicProcedure
   .meta({
     openapi: {
@@ -14,11 +20,7 @@ export const getChainInfo = publicProcedure
       tags: ["chain-infos"],
     },
   })
-  .input(
-    z.object({
-      axelarChainId: z.string().max(64),
-    })
-  )
+  .input(INPUT_SCHEMA)
   .output(
     z.object({
       id: z.string(),
