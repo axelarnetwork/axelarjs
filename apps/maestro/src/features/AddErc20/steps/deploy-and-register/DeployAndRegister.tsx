@@ -42,7 +42,7 @@ export const Step3: FC = () => {
     propEq("chain_id", state.network.chain?.id)
   );
 
-  const { mutateAsync: deployInterchainTokenAsync } =
+  const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteStandardizedTokenMutation(
       {
         salt: rootState.tokenDetails.salt,
@@ -90,15 +90,18 @@ export const Step3: FC = () => {
 
       invariant(sourceChain, "source chain not found");
 
-      await deployInterchainTokenAsync(undefined, {
-        onError(error) {
-          actions.setIsDeploying(false);
-
-          if (error instanceof Error) {
-            toast.error(`Failed to register token: ${error?.message}`);
-          }
-        },
+      rootActions.setTxState({
+        type: "pending_approval",
       });
+
+      const tx = await deployInterchainTokenAsync?.();
+
+      if (tx?.hash) {
+        rootActions.setTxState({
+          type: "deploying",
+          txHash: tx.hash,
+        });
+      }
     },
     [
       state.isGasPriceQueryLoading,
@@ -107,6 +110,7 @@ export const Step3: FC = () => {
       state.evmChains,
       state.network.chain?.id,
       actions,
+      rootActions,
       deployInterchainTokenAsync,
     ]
   );

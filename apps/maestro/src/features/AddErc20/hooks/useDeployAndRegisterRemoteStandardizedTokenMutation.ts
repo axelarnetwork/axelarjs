@@ -3,20 +3,19 @@ import {
   encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData,
   encodeInterchainTokenServiceGetStandardizedTokenAddressArgs,
 } from "@axelarjs/evm";
-import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
-import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useMutation, useNetwork } from "wagmi";
+import { parseUnits } from "viem";
+import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 
 import { readInterchainTokenService } from "~/lib/contracts/InterchainTokenService.actions";
 import {
+  useInterchainTokenServiceGetCustomTokenId,
   useInterchainTokenServiceMulticall,
   useInterchainTokenServiceStandardizedTokenDeployedEvent,
   usePrepareInterchainTokenServiceMulticall,
 } from "~/lib/contracts/InterchainTokenService.hooks";
-import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { IntercahinTokenDetails } from "~/services/kv";
@@ -118,6 +117,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   useEffect(
     () => {
       if (recordDeploymentArgs) {
+        console.log("recordDeploymentArgs", recordDeploymentArgs);
         recordDeploymentAsync(recordDeploymentArgs).then(() => {
           onStatusUpdate({
             type: "deployed",
@@ -186,37 +186,20 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
 
   const multicall = useInterchainTokenServiceMulticall(prepareMulticall.config);
 
-  return useMutation(async () => {
-    if (!deployerAddress) {
-      return;
-    }
-
-    onStatusUpdate({
-      type: "pending_approval",
-    });
-
-    if (!input || !multicall.writeAsync) {
-      return;
-    }
-
-    try {
-      const tx = await multicall.writeAsync();
-
-      if (tx?.hash) {
-        onStatusUpdate({
-          type: "deploying",
-          txHash: tx.hash,
-        });
+  useWaitForTransaction({
+    hash: multicall?.data?.hash,
+    confirmations: 8,
+    onSuccess: () => {
+      if (!multicall.data?.hash) {
+        return;
       }
-    } catch (error) {
+
       onStatusUpdate({
-        type: "idle",
+        type: "deploying",
+        txHash: multicall?.data?.hash,
       });
-      if (error instanceof TransactionExecutionError) {
-        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-
-        logger.error("Failed to deploy interchain token", error.cause);
-      }
-    }
+    },
   });
+
+  return multicall;
 }
