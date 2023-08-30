@@ -12,9 +12,9 @@ import { useRouter } from "next/router";
 
 import { useNetwork } from "wagmi";
 
-import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { useAddErc20StateContainer } from "../../AddErc20.state";
 
 const Review: FC = () => {

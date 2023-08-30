@@ -8,8 +8,8 @@ import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { HeroSection, useLayoutStateContainer } from "~/layouts/MainLayout";
-import Page from "~/layouts/Page";
+import { HeroSection, useLayoutStateContainer } from "~/ui/layouts/MainLayout";
+import Page from "~/ui/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
 

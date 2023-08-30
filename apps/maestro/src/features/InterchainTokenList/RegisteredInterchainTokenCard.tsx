@@ -16,9 +16,9 @@ import { useCallback, type FC } from "react";
 import { TransactionExecutionError } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
-import BigNumberText from "~/components/BigNumberText";
-import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
+import BigNumberText from "~/ui/components/BigNumberText";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";

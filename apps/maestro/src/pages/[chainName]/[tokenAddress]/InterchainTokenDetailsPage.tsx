@@ -18,14 +18,10 @@ import { isEmpty, partition, without } from "rambda";
 import { isAddress } from "viem";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
-import BigNumberText from "~/components/BigNumberText/BigNumberText";
-import { ChainIcon } from "~/components/EVMChainsDropdown";
-import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterCanonicalToken } from "~/features/RegisterCanonicalToken/RegisterCanonicalToken";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
-import Page from "~/layouts/Page";
 import { useChainFromRoute } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -35,6 +31,10 @@ import {
   useGetTransactionStatusOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
+import BigNumberText from "~/ui/components/BigNumberText";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
+import Page from "~/ui/layouts/Page";
 
 export type InterchainTokensPageProps = {};
 

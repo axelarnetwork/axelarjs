@@ -5,10 +5,10 @@ import Link from "next/link";
 
 import { indexBy } from "rambda";
 
-import AxelarscanLink from "~/components/AxelarsscanLink/AxelarscanLink";
-import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
+import AxelarscanLink from "~/ui/components/AxelarsscanLink";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
 type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 

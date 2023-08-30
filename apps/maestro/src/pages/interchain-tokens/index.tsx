@@ -6,12 +6,12 @@ import Link from "next/link";
 
 import { filter, map, sortBy } from "rambda";
 
-import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import Page from "~/layouts/Page";
 import { withRouteProtection } from "~/lib/auth";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import Page from "~/ui/layouts/Page";
 
 const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
