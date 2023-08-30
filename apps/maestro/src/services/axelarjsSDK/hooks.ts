@@ -1,25 +1,33 @@
 import { trpc } from "~/lib/trpc";
 import type {
-  EstimateGasFeeMultipleChainsParams,
-  EstimateGasFeeParams,
-} from "./types";
+  EstimateGasFeeInput,
+  EstimateGasFeeMultipleChainsInput,
+  GetChainInfoInput,
+} from "~/server/routers/axelarjsSDK";
 
 const staleTime = 1000 * 60 * 2; // 2 minutes
 
-export function useEstimateGasFeeQuery(params: EstimateGasFeeParams) {
-  return trpc.axelarjsSDK.estimateGasFee.useQuery(params, {
+export function useEstimateGasFeeQuery(input: EstimateGasFeeInput) {
+  return trpc.axelarjsSDK.estimateGasFee.useQuery(input, {
     staleTime,
     enabled:
-      Boolean(params.destinationChainId) &&
-      params.destinationChainId !== "undefined",
+      Boolean(input.destinationChainId) &&
+      input.destinationChainId !== "undefined",
   });
 }
 
 export function useEstimateGasFeeMultipleChainsQuery(
-  params: EstimateGasFeeMultipleChainsParams
+  input: EstimateGasFeeMultipleChainsInput
 ) {
-  return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(params, {
+  return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(input, {
     staleTime,
-    enabled: Boolean(params.destinationChainIds),
+    enabled: Boolean(input.destinationChainIds),
+  });
+}
+
+export function useChainInfoQuery(input: GetChainInfoInput) {
+  return trpc.axelarjsSDK.getChainInfo.useQuery(input, {
+    staleTime,
+    enabled: Boolean(input.axelarChainId),
   });
 }

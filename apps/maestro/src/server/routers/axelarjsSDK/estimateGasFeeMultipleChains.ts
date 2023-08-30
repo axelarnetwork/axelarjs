@@ -3,17 +3,19 @@ import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
 
+const INPUT_SCHEMA = z.object({
+  destinationChainIds: z.array(z.string()),
+  sourceChainId: z.string(),
+  gasLimit: z.number().optional(),
+  gasMultipler: z.number().optional(),
+  isGMPExpressTransaction: z.boolean().optional(),
+  minGasPrice: z.string().optional(),
+});
+
+export type EstimateGasFeeMultipleChainsInput = z.infer<typeof INPUT_SCHEMA>;
+
 export const estimateGasFeesMultipleChains = publicProcedure
-  .input(
-    z.object({
-      destinationChainIds: z.array(z.string()),
-      sourceChainId: z.string(),
-      gasLimit: z.number().optional(),
-      gasMultipler: z.number().optional(),
-      isGMPExpressTransaction: z.boolean().optional(),
-      minGasPrice: z.string().optional(),
-    })
-  )
+  .input(INPUT_SCHEMA)
   .query(async ({ ctx, input }) => {
     try {
       const response =
