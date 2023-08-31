@@ -1,3 +1,4 @@
+import type { EVMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
@@ -5,6 +6,7 @@ import Link from "next/link";
 
 import { indexBy } from "rambda";
 
+import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import AxelarscanLink from "~/ui/components/AxelarsscanLink";
@@ -99,23 +101,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
             const chain = chainsByAxelarChainId[axelarChainId];
 
             return (
-              <li
+              <ChainStatusItem
                 key={`chain-status-${axelarChainId}`}
-                className="flex items-center justify-between"
-              >
-                <span className="flex items-center gap-2">
-                  <ChainIcon
-                    src={chain.image}
-                    size="md"
-                    alt={chain.chain_name}
-                  />{" "}
-                  {chain.chain_name}
-                </span>
-                <GMPStatusIndicator
-                  txHash={`${txHash}:${logIndex}`}
-                  status={status}
-                />
-              </li>
+                chain={chain}
+                status={status}
+                txHash={txHash}
+                logIndex={logIndex}
+              />
             );
           }
         )}
@@ -125,6 +117,38 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
 };
 
 export default GMPTxStatusMonitor;
+
+export type ChainStatusItemProps = {
+  status: ExtendedGMPTxStatus;
+  txHash: `0x${string}`;
+  logIndex: number;
+  chain: EVMChainConfig;
+};
+
+export const ChainStatusItem: FC<ChainStatusItemProps> = ({
+  chain,
+  logIndex,
+  status,
+  txHash,
+}) => {
+  const { data: chainInfo } = useChainInfoQuery({
+    axelarChainId: chain.id,
+  });
+
+  return (
+    <Tooltip
+      tip={`Estimated finality: ${chainInfo?.blockConfirmations} blocks (${chainInfo?.estimatedWaitTimeInMinutes}min)`}
+    >
+      <li className="flex items-center justify-between">
+        <span className="flex items-center gap-2">
+          <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
+          {chain.chain_name}
+        </span>
+        <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
+      </li>
+    </Tooltip>
+  );
+};
 
 export type StatusIndicatorProps = {
   txHash: `0x${string}` | `0x${string}:${number}`;
