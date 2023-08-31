@@ -38,19 +38,29 @@ export const RegisterCanonicalToken: FC<Props> = ({
     [chain, computed]
   );
 
-  const { mutateAsync: registerCanonicalToken } =
-    useRegisterCanonicalTokenMutation({
-      onStatusUpdate(message) {
-        if (message.type === "deployed") {
-          onSuccess();
-        }
-      },
-    });
-
   const { data: expectedTokenId } =
     useInterchainTokenServiceGetCanonicalTokenId({
       args: [address],
     });
+
+  const { writeAsync: registerCanonicalToken } =
+    useRegisterCanonicalTokenMutation(
+      {
+        onStatusUpdate(message) {
+          if (message.type === "deployed") {
+            onSuccess();
+          }
+        },
+      },
+      {
+        tokenAddress: address,
+        sourceChainId: sourceChain?.id as string,
+        expectedTokenId: expectedTokenId as `0x${string}`,
+        tokenName,
+        tokenSymbol,
+        decimals,
+      }
+    );
 
   const handleSubmitTransaction = useCallback(async () => {
     if (!expectedTokenId) return;
@@ -61,19 +71,12 @@ export const RegisterCanonicalToken: FC<Props> = ({
     invariant(sourceChain, "Source chain is not defined");
 
     try {
-      const txHash = await registerCanonicalToken({
-        tokenAddress: address,
-        sourceChainId: sourceChain?.id,
-        expectedTokenId,
-        tokenName,
-        tokenSymbol,
-        decimals,
-      });
+      const tx = await registerCanonicalToken?.();
 
-      if (txHash) {
+      if (tx) {
         setTxState({
           status: "submitted",
-          hash: txHash,
+          hash: tx.hash,
         });
       }
     } catch (error) {
@@ -91,16 +94,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
         error: error as Error,
       });
     }
-  }, [
-    expectedTokenId,
-    setTxState,
-    sourceChain,
-    registerCanonicalToken,
-    address,
-    tokenName,
-    tokenSymbol,
-    decimals,
-  ]);
+  }, [expectedTokenId, setTxState, sourceChain, registerCanonicalToken]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {

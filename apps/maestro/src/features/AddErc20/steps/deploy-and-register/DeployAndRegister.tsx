@@ -20,11 +20,19 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
-const ChainPicker: FC<{
+type ChainPickerProps = {
   eligibleChains: EVMChainConfig[];
   selectedChains: string[];
   onChainClick: (chainId: string) => void;
-}> = ({ eligibleChains, selectedChains, onChainClick }) => {
+  disabled?: boolean;
+};
+
+const ChainPicker: FC<ChainPickerProps> = ({
+  eligibleChains,
+  selectedChains,
+  onChainClick,
+  disabled,
+}) => {
   const handleToggleAll = useCallback(() => {
     eligibleChains.forEach((chain, i) =>
       setTimeout(onChainClick.bind(null, chain.id), 16.6 * i)
@@ -52,6 +60,7 @@ const ChainPicker: FC<{
               position="top"
             >
               <Button
+                disabled={disabled}
                 className="w-full rounded-2xl hover:ring"
                 size="sm"
                 role="button"
@@ -75,7 +84,7 @@ const ChainPicker: FC<{
         <Button
           size="sm"
           variant="ghost"
-          disabled={isToggleAllDisabled}
+          disabled={isToggleAllDisabled || disabled}
           onClick={handleToggleAll}
         >
           toggle all
@@ -265,6 +274,10 @@ export const Step3: FC = () => {
             eligibleChains={eligibleChains}
             selectedChains={rootState.selectedChains}
             onChainClick={rootActions.toggleAdditionalChain}
+            disabled={
+              rootState.txState.type === "pending_approval" ||
+              rootState.txState.type === "deploying"
+            }
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
