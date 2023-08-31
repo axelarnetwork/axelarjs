@@ -1,5 +1,12 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import {
+  Button,
+  Dialog,
+  FormControl,
+  Label,
+  toast,
+  Tooltip,
+} from "@axelarjs/ui";
 import { invariant } from "@axelarjs/utils";
 import React, {
   useCallback,
@@ -15,7 +22,8 @@ import { parseUnits } from "viem";
 import { useAccount, useBalance } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
-import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks/useDeployAndRegisterRemoteStandardizedTokenMutation";
+import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks";
+import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
@@ -145,7 +153,8 @@ export const Step3: FC = () => {
         state.isGasPriceQueryLoading ||
         state.isGasPriceQueryError ||
         !state.gasFees ||
-        !state.evmChains
+        !state.evmChains ||
+        !deployInterchainTokenAsync
       ) {
         console.warn("gas prices not loaded");
         return;
@@ -162,14 +171,23 @@ export const Step3: FC = () => {
         type: "pending_approval",
       });
 
-      const tx = await deployInterchainTokenAsync?.();
+      const txPromise = deployInterchainTokenAsync();
 
-      if (tx?.hash) {
-        rootActions.setTxState({
-          type: "deploying",
-          txHash: tx.hash,
-        });
-      }
+      await handleTransactionResult(txPromise, {
+        onSuccess(tx) {
+          rootActions.setTxState({
+            type: "deploying",
+            txHash: tx.hash,
+          });
+        },
+        onTransactionError(txError) {
+          rootActions.setTxState({
+            type: "idle",
+          });
+
+          toast.error(txError.shortMessage);
+        },
+      });
     },
     [
       state.isGasPriceQueryLoading,

@@ -33,13 +33,15 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   deployerAddress?: `0x${string}`;
 };
 
+export type UseDeployAndRegisterRemoteStandardizedTokenConfig = {
+  value: bigint;
+  salt: `0x${string}`;
+  onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
+  onFinished?: () => void;
+};
+
 export function useDeployAndRegisterRemoteStandardizedTokenMutation(
-  config: {
-    value: bigint;
-    salt: `0x${string}`;
-    onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
-    onFinished?: () => void;
-  },
+  config: UseDeployAndRegisterRemoteStandardizedTokenConfig,
   input?: UseDeployAndRegisterInterchainTokenInput
 ) {
   const { address: deployerAddress } = useAccount();

@@ -30,7 +30,7 @@ const DEFAULT_INPUT: UseRegisterCanonicalTokenInput = {
   decimals: -1,
 };
 
-type UseRegisterCanonicalTokenConfig = {
+export type UseRegisterCanonicalTokenConfig = {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 };
