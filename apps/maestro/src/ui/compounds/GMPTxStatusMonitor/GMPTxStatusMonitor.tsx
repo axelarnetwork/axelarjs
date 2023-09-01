@@ -9,7 +9,6 @@ import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import AxelarscanLink from "~/ui/components/AxelarsscanLink";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
 type ExtendedGMPTxStatus = GMPTxStatus | "pending";
@@ -89,13 +88,6 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       }),
     [elapsedBlocks, expectedBlockConfirmations]
   );
-
-  console.log({
-    progress,
-    expectedBlockConfirmations,
-    elapsedBlocks,
-    currentBlock,
-  });
 
   const statusList = Object.values(statuses ?? {});
 
