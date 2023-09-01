@@ -2,7 +2,6 @@ import { Button, ExternalLinkIcon, LinkButton, toast } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { TransactionExecutionError } from "viem";
 import { useAccount, useWaitForTransaction } from "wagmi";
 
 import {
@@ -133,34 +132,25 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       status: "awaiting_approval",
     });
 
-    try {
-      const txPromise = registerTokensAsync();
+    const txPromise = registerTokensAsync();
 
-      await handleTransactionResult(txPromise, {
-        onSuccess(tx) {
-          setTxState({
-            status: "submitted",
-            hash: tx.hash,
-          });
-        },
-        onTransactionError(txError) {
-          setTxState({
-            status: "idle",
-          });
+    await handleTransactionResult(txPromise, {
+      onSuccess(tx) {
+        setTxState({
+          status: "submitted",
+          hash: tx.hash,
+        });
+      },
+      onTransactionError(error) {
+        setTxState({
+          status: "idle",
+        });
 
-          toast.error(txError.shortMessage);
-        },
-      });
-    } catch (error) {
-      setTxState({
-        status: "idle",
-      });
-      if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction failed: ${error.cause.shortMessage}`);
 
         logger.error("Failed to register remote tokens", error.cause);
-      }
-    }
+      },
+    });
   }, [setTxState, registerTokensAsync]);
 
   const buttonChildren = useMemo(() => {

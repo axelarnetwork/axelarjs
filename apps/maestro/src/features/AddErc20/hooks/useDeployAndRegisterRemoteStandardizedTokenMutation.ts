@@ -172,7 +172,6 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   useEffect(
     () => {
       if (recordDeploymentArgs) {
-        console.log("recordDeploymentArgs", recordDeploymentArgs);
         recordDeploymentAsync(recordDeploymentArgs).then(() => {
           onStatusUpdate({
             type: "deployed",

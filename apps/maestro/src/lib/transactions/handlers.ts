@@ -39,22 +39,20 @@ export async function handleTransactionResult(
   tx: Promise<WriteContractResult>,
   hooks: TransactionResultHooks
 ): Promise<void> {
+  const handleSuccess = hooks.onSuccess ?? DEFAULT_HOOKS.onSuccess;
+  const handleTransactionError =
+    hooks.onTransactionError ?? DEFAULT_HOOKS.onTransactionError;
+  const handleUnknownError =
+    hooks.onUnknownError ?? DEFAULT_HOOKS.onUnknownError;
+
   try {
     const result = await tx;
-
-    const handleSuccess = hooks.onSuccess ?? DEFAULT_HOOKS.onSuccess;
 
     handleSuccess?.(result);
   } catch (error) {
     if (error instanceof TransactionExecutionError) {
-      const handleTransactionError =
-        hooks.onTransactionError ?? DEFAULT_HOOKS.onTransactionError;
-
       handleTransactionError?.(error);
     } else if (error instanceof Error) {
-      const handleUnknownError =
-        hooks.onUnknownError ?? DEFAULT_HOOKS.onUnknownError;
-
       handleUnknownError?.(error);
     }
   }

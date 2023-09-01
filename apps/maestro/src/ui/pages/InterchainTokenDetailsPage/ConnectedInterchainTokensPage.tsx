@@ -30,6 +30,27 @@ type ConnectedInterchainTokensPageProps = {
   tokenId?: `0x${string}` | null;
 };
 
+type InterchainTokenDetailsPageSessionStorageProps = {
+  chainId: number;
+  tokenAddress: `0x${string}`;
+};
+
+export const getInterchainTokenDetailsPageSessionStorageKey = (
+  props: InterchainTokenDetailsPageSessionStorageProps
+) => `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}`;
+
+export function useInterchainTokenDetailsPageState(
+  props: InterchainTokenDetailsPageSessionStorageProps
+) {
+  return useSessionStorageState<{
+    deployTokensTxHash: `0x${string}` | null;
+    selectedChainIds: number[];
+  }>(getInterchainTokenDetailsPageSessionStorageKey(props), {
+    deployTokensTxHash: null,
+    selectedChainIds: [],
+  });
+}
+
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
@@ -51,12 +72,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       tokenAddress: props.tokenAddress,
     });
 
-  const [sessionState, setSessionState] = useSessionStorageState<{
-    deployTokensTxHash: `0x${string}` | null;
-    selectedChainIds: number[];
-  }>(`@maestro/interchain-token-page/${props.chainId}/${props.tokenAddress}`, {
-    deployTokensTxHash: null,
-    selectedChainIds: [],
+  const [sessionState, setSessionState] = useInterchainTokenDetailsPageState({
+    chainId: props.chainId,
+    tokenAddress: props.tokenAddress,
   });
 
   const [registered, unregistered] = Maybe.of(
