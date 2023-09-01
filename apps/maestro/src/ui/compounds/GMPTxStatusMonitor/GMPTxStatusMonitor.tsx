@@ -4,7 +4,7 @@ import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
-import { indexBy } from "rambda";
+import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -52,11 +52,40 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({ txHash });
 
-  const { data: evmChains } = useEVMChainConfigsQuery();
+  const { computed } = useEVMChainConfigsQuery();
 
-  const chainsByAxelarChainId = useMemo(
-    () => indexBy((c) => c.id, evmChains ?? []),
-    [evmChains]
+  const chainId = useChainId();
+
+  const { data: txInfo } = useTransaction({
+    chainId,
+    hash: txHash,
+  });
+
+  const { data: currentBlock } = useBlockNumber({
+    chainId,
+  });
+
+  const { data: chainInfo } = useChainInfoQuery({
+    axelarChainId: computed.indexedByChainId[chainId]?.id,
+  });
+
+  const expectedBlockConfirmations = BigInt(chainInfo?.blockConfirmations ?? 0);
+
+  const elapsedBlocks = useMemo(
+    () =>
+      txInfo?.blockNumber && currentBlock
+        ? currentBlock - txInfo.blockNumber
+        : BigInt(0),
+    [txInfo, currentBlock]
+  );
+
+  const progress = useMemo(
+    () =>
+      (elapsedBlocks / expectedBlockConfirmations).toLocaleString("en", {
+        maximumFractionDigits: 0,
+        style: "percent",
+      }),
+    [elapsedBlocks, expectedBlockConfirmations]
   );
 
   const statusList = Object.values(statuses ?? {});
@@ -82,6 +111,10 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     );
   }
 
+  const shouldRenderBlockConfirmations =
+    expectedBlockConfirmations > BigInt(0) &&
+    elapsedBlocks <= expectedBlockConfirmations;
+
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
@@ -94,10 +127,23 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
         )}
         <AxelarscanLink className="flex-1" txHash={txHash} />
       </div>
+      {shouldRenderBlockConfirmations && (
+        <div className="grid place-items-center gap-2 px-8">
+          <span className="text-base-content-secondary text-center text-sm">
+            {elapsedBlocks.toLocaleString()} of {chainInfo?.blockConfirmations}{" "}
+            block confirmations ({progress})
+          </span>
+          <progress
+            className="progress progress-accent w-full"
+            value={Number(elapsedBlocks)}
+            max={chainInfo?.blockConfirmations}
+          />
+        </div>
+      )}
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-            const chain = chainsByAxelarChainId[axelarChainId];
+            const chain = computed.indexedById[axelarChainId];
 
             return (
               <ChainStatusItem
@@ -130,22 +176,14 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   status,
   txHash,
 }) => {
-  const { data: chainInfo } = useChainInfoQuery({
-    axelarChainId: chain.id,
-  });
-
   return (
-    <Tooltip
-      tip={`Estimated finality: ${chainInfo?.blockConfirmations} blocks (${chainInfo?.estimatedWaitTimeInMinutes}min)`}
-    >
-      <li className="flex items-center justify-between">
-        <span className="flex items-center gap-2">
-          <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
-          {chain.chain_name}
-        </span>
-        <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
-      </li>
-    </Tooltip>
+    <li className="flex items-center justify-between">
+      <span className="flex items-center gap-2">
+        <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
+        {chain.chain_name}
+      </span>
+      <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
+    </li>
   );
 };
 
