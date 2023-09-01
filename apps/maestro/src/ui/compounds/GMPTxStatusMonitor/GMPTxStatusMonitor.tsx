@@ -81,12 +81,21 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
 
   const progress = useMemo(
     () =>
-      (elapsedBlocks / expectedBlockConfirmations).toLocaleString("en", {
-        maximumFractionDigits: 0,
+      (expectedBlockConfirmations > BigInt(0)
+        ? Number(elapsedBlocks) / Number(expectedBlockConfirmations)
+        : 0
+      ).toLocaleString("en", {
         style: "percent",
       }),
     [elapsedBlocks, expectedBlockConfirmations]
   );
+
+  console.log({
+    progress,
+    expectedBlockConfirmations,
+    elapsedBlocks,
+    currentBlock,
+  });
 
   const statusList = Object.values(statuses ?? {});
 
@@ -125,18 +134,18 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
             </>
           </span>
         )}
-        <AxelarscanLink className="flex-1" txHash={txHash} />
       </div>
       {shouldRenderBlockConfirmations && (
         <div className="grid place-items-center gap-2 px-8">
           <span className="text-base-content-secondary text-center text-sm">
-            {elapsedBlocks.toLocaleString()} of {chainInfo?.blockConfirmations}{" "}
-            block confirmations ({progress})
+            {elapsedBlocks.toLocaleString()} of{" "}
+            {expectedBlockConfirmations.toString()} block confirmations (
+            {progress.toString()})
           </span>
           <progress
             className="progress progress-accent w-full"
-            value={Number(elapsedBlocks)}
-            max={chainInfo?.blockConfirmations}
+            value={elapsedBlocks.toString()}
+            max={expectedBlockConfirmations.toString()}
           />
         </div>
       )}
