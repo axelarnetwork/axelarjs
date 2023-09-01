@@ -1,0 +1,25 @@
+{
+  "name": "@axelarjs/transaction-recovery",
+  "version": "0.0.1",
+  "description": "Axelarjs Transaction Recovery",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
+    "compile": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LicenseRef-LICENSE",
+  "devDependencies": {
+    "@axelarjs/config": "workspace:*",
+    "@axelarjs/cosmos": "workspace:*",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.3"
+  }
+}

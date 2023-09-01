@@ -25,3 +25,4 @@ export class AxelarQueryClient extends QueryClient {
 }
 
 export const createAxelarQueryClient = AxelarQueryClient.init;
+export * from "~/types";
