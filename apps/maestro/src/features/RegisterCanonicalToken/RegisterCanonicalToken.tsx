@@ -2,12 +2,12 @@ import { Alert, Button, LinkButton, toast } from "@axelarjs/ui";
 import { invariant, maskAddress } from "@axelarjs/utils";
 import { useCallback, useMemo, type FC } from "react";
 
-import { TransactionExecutionError } from "viem";
 import { useNetwork } from "wagmi";
 
 import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
+import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useRegisterCanonicalTokenMutation } from "../AddErc20/hooks/useRegisterCanonicalTokenMutation";
 
@@ -63,37 +63,29 @@ export const RegisterCanonicalToken: FC<Props> = ({
     );
 
   const handleSubmitTransaction = useCallback(async () => {
-    if (!expectedTokenId) return;
+    if (!expectedTokenId || !registerCanonicalToken) return;
     setTxState({
       status: "awaiting_approval",
     });
 
     invariant(sourceChain, "Source chain is not defined");
 
-    try {
-      const tx = await registerCanonicalToken?.();
+    const txPromise = registerCanonicalToken();
 
-      if (tx) {
+    await handleTransactionResult(txPromise, {
+      onSuccess: (tx) => {
         setTxState({
           status: "submitted",
           hash: tx.hash,
         });
-      }
-    } catch (error) {
-      if (error instanceof TransactionExecutionError) {
+      },
+      onTransactionError: (error) => {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
         logger.error("Failed to register origin token:", error.cause);
-        setTxState({
-          status: "idle",
-        });
-        return;
-      }
 
-      setTxState({
-        status: "reverted",
-        error: error as Error,
-      });
-    }
+        setTxState({ status: "idle" });
+      },
+    });
   }, [expectedTokenId, setTxState, sourceChain, registerCanonicalToken]);
 
   const buttonChildren = useMemo(() => {
