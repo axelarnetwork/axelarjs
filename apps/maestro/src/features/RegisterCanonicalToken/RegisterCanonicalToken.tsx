@@ -73,13 +73,13 @@ export const RegisterCanonicalToken: FC<Props> = ({
     const txPromise = registerCanonicalToken();
 
     await handleTransactionResult(txPromise, {
-      onSuccess: (tx) => {
+      onSuccess(tx) {
         setTxState({
           status: "submitted",
           hash: tx.hash,
         });
       },
-      onTransactionError: (error) => {
+      onTransactionError(error) {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
         logger.error("Failed to register origin token:", error.cause);
 
