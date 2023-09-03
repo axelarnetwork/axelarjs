@@ -8,7 +8,7 @@ import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import {
   useInterchainTokenServiceGetCustomTokenId,
@@ -45,7 +45,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   input?: UseDeployAndRegisterInterchainTokenInput
 ) {
   const { address: deployerAddress } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const { computed } = useEVMChainConfigsQuery();
 
@@ -122,7 +122,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
 
   const prepareMulticall = usePrepareInterchainTokenServiceMulticall({
     value: totalGasFee,
-    chainId: chain?.id ?? 0,
+    chainId: chainId,
     args: [multicallArgs],
   });
 
@@ -134,14 +134,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
     onSuccess: () => {
       const txHash = multicall?.data?.hash;
 
-      if (
-        !txHash ||
-        !tokenAddress ||
-        !tokenId ||
-        !deployerAddress ||
-        !chain ||
-        !input
-      ) {
+      if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
         return;
       }
 
@@ -151,7 +144,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
         tokenId,
         tokenAddress,
         deployerAddress,
-        originChainId: chain.id,
+        originChainId: chainId,
         deploymentTxHash: txHash,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,

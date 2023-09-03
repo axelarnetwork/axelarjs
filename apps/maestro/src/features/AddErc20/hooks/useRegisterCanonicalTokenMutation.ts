@@ -2,7 +2,7 @@ import { encodeInterchainTokenServiceRegisterCanonicalTokenData } from "@axelarj
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useNetwork, useWaitForTransaction } from "wagmi";
+import { useChainId, useWaitForTransaction } from "wagmi";
 
 import {
   useInterchainTokenServiceMulticall,
@@ -40,7 +40,7 @@ export function useRegisterCanonicalTokenMutation(
   input: UseRegisterCanonicalTokenInput
 ) {
   const inputRef = useRef<UseRegisterCanonicalTokenInput>(DEFAULT_INPUT);
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -69,7 +69,7 @@ export function useRegisterCanonicalTokenMutation(
     hash: multicall.data?.hash,
     confirmations: 8,
     onSuccess() {
-      if (!multicall.data || !chain) {
+      if (!multicall.data) {
         return;
       }
 
@@ -77,7 +77,7 @@ export function useRegisterCanonicalTokenMutation(
         kind: "canonical",
         tokenId: inputRef.current.expectedTokenId,
         tokenAddress: inputRef.current.tokenAddress,
-        originChainId: chain.id,
+        originChainId: chainId,
         deploymentTxHash: multicall.data.hash,
         tokenName: inputRef.current.tokenName,
         tokenSymbol: inputRef.current.tokenSymbol,

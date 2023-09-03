@@ -2,7 +2,7 @@ import { Alert, Button, LinkButton, toast } from "@axelarjs/ui";
 import { invariant, maskAddress } from "@axelarjs/utils";
 import { useCallback, useMemo, type FC } from "react";
 
-import { useNetwork } from "wagmi";
+import { useChainId } from "wagmi";
 
 import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
@@ -29,13 +29,13 @@ export const RegisterCanonicalToken: FC<Props> = ({
   onSuccess = () => {},
 }) => {
   const [txState, setTxState] = useTransactionState();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const { computed } = useEVMChainConfigsQuery();
 
   const sourceChain = useMemo(
-    () => (chain ? computed.indexedByChainId[chain.id] : undefined),
-    [chain, computed]
+    () => computed.indexedByChainId[chainId],
+    [chainId, computed]
   );
 
   const { data: expectedTokenId } =

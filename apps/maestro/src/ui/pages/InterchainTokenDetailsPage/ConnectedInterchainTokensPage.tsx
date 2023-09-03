@@ -5,7 +5,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
 
 import { isEmpty, partition, without } from "rambda";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
@@ -55,7 +55,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
   const { address } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
   const {
     data: interchainToken,
     refetch: refetchInterchainToken,
@@ -287,7 +287,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                 </Tooltip>
               )}
 
-              {originToken?.chainId === chain?.id && originToken?.kind ? (
+              {originToken?.chainId === chainId && originToken?.kind ? (
                 <RegisterRemoteTokens
                   deploymentKind={originToken.kind}
                   chainIds={sessionState.selectedChainIds}
