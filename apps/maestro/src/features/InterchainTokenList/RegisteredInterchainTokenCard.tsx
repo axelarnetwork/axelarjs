@@ -14,11 +14,11 @@ import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
 
 import { TransactionExecutionError } from "viem";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 
-import BigNumberText from "~/components/BigNumberText";
-import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
+import BigNumberText from "~/ui/components/BigNumberText";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
@@ -49,7 +49,7 @@ export type Props = TokenInfo & {
 
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
   const { data: balance } = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
@@ -68,7 +68,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     }
   }, [props.chainId, switchNetworkAsync]);
 
-  const isSourceChain = chain?.id === props.chainId;
+  const isSourceChain = chainId === props.chainId;
 
   const switchChainButton = (
     <Button

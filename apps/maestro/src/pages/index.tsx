@@ -8,8 +8,8 @@ import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { HeroSection, useLayoutStateContainer } from "~/layouts/MainLayout";
-import Page from "~/layouts/Page";
+import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
+import Page from "~/ui/layouts/Page";
 
 const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
 
@@ -37,7 +37,8 @@ export default function Home() {
 
   return (
     <>
-      {!layoutState.isHeroBannerDismissed && (
+      {/* temporarily disable HeroSection */}
+      {/* {!layoutState.isHeroBannerDismissed && (
         <HeroSection
           onCTAClick={() => {
             window.scrollTo(
@@ -46,7 +47,7 @@ export default function Home() {
             );
           }}
         />
-      )}
+      )} */}
       <Page
         pageTitle="Axelar Interchain Token Service"
         pageDescription="Interchain orchestration powered by Axelar"

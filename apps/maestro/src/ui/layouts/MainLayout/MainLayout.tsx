@@ -26,7 +26,7 @@ import {
 } from "~/config/env";
 import { ethereumClient } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
-import pkg from "../../../package.json";
+import pkg from "../../../../package.json";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,

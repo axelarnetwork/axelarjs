@@ -82,11 +82,11 @@ vi.mock("./SendInterchainToken.state.ts", () => ({
   ]),
 }));
 
-vi.mock("~/compounds/GMPTxStatusMonitor/index.ts", () => ({
+vi.mock("~/ui/compounds/GMPTxStatusMonitor/index.ts", () => ({
   default: () => <div>GMPTxStatusMonitor</div>,
 }));
 
-vi.mock("~/components/EVMChainsDropdown/index.ts", () => ({
+vi.mock("~/ui/components/EVMChainsDropdown/index.ts", () => ({
   default: () => <div>EVMChainsDropdown</div>,
 }));
 

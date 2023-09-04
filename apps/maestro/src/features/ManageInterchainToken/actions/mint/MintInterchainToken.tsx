@@ -12,9 +12,9 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { TransactionExecutionError } from "viem";
 
-import EVMChainsDropdown from "~/components/EVMChainsDropdown";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
+import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {

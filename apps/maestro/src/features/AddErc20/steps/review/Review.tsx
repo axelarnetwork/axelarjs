@@ -12,16 +12,35 @@ import { useRouter } from "next/router";
 
 import { useNetwork } from "wagmi";
 
-import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { useChainFromRoute } from "~/lib/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
+import { getInterchainTokenDetailsPageSessionStorageKey } from "~/ui/pages/InterchainTokenDetailsPage/ConnectedInterchainTokensPage";
 import { useAddErc20StateContainer } from "../../AddErc20.state";
+
+function setRemoteTokenDeploymentTxHash(
+  tokenAddress: `0x${string}`,
+  chainId: number,
+  deployTokensTxHash: `0x${string}`,
+  selectedChainIds: number[]
+) {
+  sessionStorage.setItem(
+    getInterchainTokenDetailsPageSessionStorageKey({ tokenAddress, chainId }),
+    JSON.stringify({
+      deployTokensTxHash,
+      selectedChainIds,
+    })
+  );
+}
 
 const Review: FC = () => {
   const router = useRouter();
   const { state, actions } = useAddErc20StateContainer();
   const { chain } = useNetwork();
   const routeChain = useChainFromRoute();
+
+  const { computed } = useEVMChainConfigsQuery();
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
@@ -97,7 +116,17 @@ const Review: FC = () => {
             variant="primary"
             disabled={!chain?.name || state.txState.type !== "deployed"}
             onClick={() => {
-              if (chain?.name && state.txState.type === "deployed") {
+              if (chain && state.txState.type === "deployed") {
+                setRemoteTokenDeploymentTxHash(
+                  state.txState.tokenAddress,
+                  chain.id,
+                  state.txState.txHash,
+                  state.selectedChains.map(
+                    (axelarChainId) =>
+                      computed.indexedById[axelarChainId].chain_id
+                  )
+                );
+
                 router.push(
                   `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
                 );

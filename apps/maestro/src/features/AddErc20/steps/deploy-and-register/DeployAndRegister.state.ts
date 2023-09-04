@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
-import { useNetwork } from "wagmi";
+import { useChainId } from "wagmi";
 
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -14,13 +14,12 @@ export type UseStep3ChainSelectionStateProps = {
 
 export function useStep3ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
-  const network = useNetwork();
+  const chainId = useChainId();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, $setTotalGasFee] = useState(formatEther(BigInt(0)));
   const [sourceChainId, setSourceChainId] = useState(
-    evmChains?.find(
-      (evmChain: EVMChainConfig) => evmChain.chain_id === network.chain?.id
-    )?.id as string
+    evmChains?.find((evmChain: EVMChainConfig) => evmChain.chain_id === chainId)
+      ?.id as string
   );
 
   const { state: rootState } = useAddErc20StateContainer();
@@ -50,16 +49,15 @@ export function useStep3ChainSelectionState() {
 
   useEffect(() => {
     const candidateChain = evmChains?.find(
-      (evmChain) => evmChain.chain_id === network.chain?.id
+      (evmChain) => evmChain.chain_id === chainId
     );
     if (!candidateChain || candidateChain.chain_name === sourceChainId) return;
 
     setSourceChainId(candidateChain.chain_name);
-  }, [evmChains, network, sourceChainId]);
+  }, [evmChains, chainId, sourceChainId]);
 
   return {
     state: {
-      network,
       isDeploying,
       totalGasFee,
       sourceChainId,

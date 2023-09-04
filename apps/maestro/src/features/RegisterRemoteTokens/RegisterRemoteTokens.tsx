@@ -2,7 +2,6 @@ import { Button, ExternalLinkIcon, LinkButton, toast } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { TransactionExecutionError } from "viem";
 import { useAccount, useWaitForTransaction } from "wagmi";
 
 import {
@@ -10,6 +9,7 @@ import {
   type TransactionState,
 } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
+import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
@@ -96,7 +96,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     },
   });
 
-  const { writeAsync: registerCanonicalTokens } =
+  const { writeAsync: registerCanonicalTokensAsync } =
     useRegisterRemoteCanonicalTokens({
       chainIds: props.chainIds,
       deployerAddress: deployerAddress as `0x${string}`,
@@ -104,7 +104,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
-  const { writeAsync: registerStandardizedTokens } =
+  const { writeAsync: registerStandardizedTokensAsync } =
     useRegisterRemoteStandardizedTokens({
       chainIds: props.chainIds,
       deployerAddress: deployerAddress as `0x${string}`,
@@ -112,45 +112,46 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
-  const registerTokens = useMemo(() => {
+  const registerTokensAsync = useMemo(() => {
     switch (props.deploymentKind) {
       case "canonical":
-        return registerCanonicalTokens;
+        return registerCanonicalTokensAsync;
       case "standardized":
-        return registerStandardizedTokens;
+        return registerStandardizedTokensAsync;
     }
   }, [
     props.deploymentKind,
-    registerCanonicalTokens,
-    registerStandardizedTokens,
+    registerCanonicalTokensAsync,
+    registerStandardizedTokensAsync,
   ]);
 
   const handleClick = useCallback(async () => {
-    if (!registerTokens) return;
+    if (!registerTokensAsync) return;
 
     setTxState({
       status: "awaiting_approval",
     });
 
-    try {
-      const tx = await registerTokens();
-      if (tx.hash) {
+    const txPromise = registerTokensAsync();
+
+    await handleTransactionResult(txPromise, {
+      onSuccess(tx) {
         setTxState({
           status: "submitted",
           hash: tx.hash,
         });
-      }
-    } catch (error) {
-      setTxState({
-        status: "idle",
-      });
-      if (error instanceof TransactionExecutionError) {
+      },
+      onTransactionError(error) {
+        setTxState({
+          status: "idle",
+        });
+
         toast.error(`Transaction failed: ${error.cause.shortMessage}`);
 
         logger.error("Failed to register remote tokens", error.cause);
-      }
-    }
-  }, [setTxState, registerTokens]);
+      },
+    });
+  }, [setTxState, registerTokensAsync]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
@@ -182,7 +183,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   ) : (
     <Button
       onClick={handleClick}
-      disabled={!registerTokens}
+      disabled={!registerTokensAsync}
       variant="primary"
       loading={txState.status === "awaiting_approval"}
     >

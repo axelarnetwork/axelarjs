@@ -2,7 +2,7 @@ import { Button, cn, Dialog, LinkButton, useWindowSize } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import EVMChainsDropdown from "~/components/EVMChainsDropdown";
+import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import {
   AddErc20StateProvider,
   useAddErc20StateContainer,
