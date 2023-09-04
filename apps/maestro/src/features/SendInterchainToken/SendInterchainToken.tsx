@@ -13,11 +13,11 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { formatUnits, parseUnits } from "viem";
 
-import BigNumberText from "~/components/BigNumberText/BigNumberText";
-import EVMChainsDropdown from "~/components/EVMChainsDropdown";
-import GMPTxStatusMonitor from "~/compounds/GMPTxStatusMonitor";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
+import BigNumberText from "~/ui/components/BigNumberText";
+import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {

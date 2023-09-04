@@ -37,13 +37,10 @@ import {
 } from "wagmi/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { LedgerConnector } from "wagmi/connectors/ledger";
-import { MockConnector } from "wagmi/connectors/mock";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import { logger } from "~/lib/logger";
 import { APP_NAME } from "./app";
 import {
-  NEXT_PUBLIC_E2E_ENABLED,
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "./env";
@@ -188,31 +185,21 @@ if (typeof window !== "undefined") {
   });
 }
 
-const { webSocketPublicClient, publicClient } = NEXT_PUBLIC_E2E_ENABLED
-  ? configureChains(
-      // only use foundry for e2e tests
-      [foundry],
-      [
-        // use jsonRpcProvider as the provider for e2e tests
-        jsonRpcProvider({
-          rpc: ({ rpcUrls }) => ({
-            http: rpcUrls.default.http[0],
-          }),
-        }),
-      ]
-    )
-  : configureChains(EVM_CHAIN_CONFIGS, [
-      w3mProvider({
-        projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-      }),
-    ]);
+const { webSocketPublicClient, publicClient } = configureChains(
+  EVM_CHAIN_CONFIGS,
+  [
+    w3mProvider({
+      projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+    }),
+  ]
+);
 
 export const queryClient = new QueryClient();
 
 const W3M_CONNECTORS = w3mConnectors({
   chains: EVM_CHAIN_CONFIGS,
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-});
+}) as Connector[];
 
 export const getMockWalletClient = () =>
   createWalletClient({
@@ -229,32 +216,19 @@ export const getMockWalletClient = () =>
     pollingInterval: 100,
   });
 
-const connectors: Connector[] = NEXT_PUBLIC_E2E_ENABLED
-  ? [
-      new MockConnector({
-        options: {
-          walletClient: getMockWalletClient(),
-          chainId: goerli.id,
-          flags: {
-            isAuthorized: true,
-          },
-        },
-      }),
-      ...W3M_CONNECTORS,
-    ]
-  : [
-      new CoinbaseWalletConnector({
-        chains: EVM_CHAIN_CONFIGS,
-        options: {
-          appName: APP_NAME,
-        },
-      }),
-      new LedgerConnector({
-        chains: EVM_CHAIN_CONFIGS,
-        options: {},
-      }),
-      ...W3M_CONNECTORS,
-    ];
+const connectors: Connector[] = [
+  new CoinbaseWalletConnector({
+    chains: EVM_CHAIN_CONFIGS,
+    options: {
+      appName: APP_NAME,
+    },
+  }),
+  new LedgerConnector({
+    chains: EVM_CHAIN_CONFIGS,
+    options: {},
+  }),
+  ...W3M_CONNECTORS,
+];
 
 export const wagmiConfig = createConfig({
   autoConnect: true,

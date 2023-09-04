@@ -16,7 +16,8 @@ export default defineConfig(
       plugins: [
         actions({
           prepareWriteContract: true,
-          watchContractEvent: true,
+          // temporarily disable until wagmi/cli@v1.3.x fixes the contract event type inference bug
+          watchContractEvent: false,
         }),
       ],
     },

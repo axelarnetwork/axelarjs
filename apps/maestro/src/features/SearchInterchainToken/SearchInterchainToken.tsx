@@ -12,10 +12,10 @@ import { useEffect, useMemo, useState, type FC } from "react";
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 
-import EVMChainsDropdown from "~/components/EVMChainsDropdown/EVMChainsDropdown";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 
 export type SearchInterchainTokenProps = {
   onTokenFound: (result: {

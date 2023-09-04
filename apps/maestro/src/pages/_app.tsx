@@ -14,10 +14,10 @@ import "~/styles/globals.css";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
-import MainLayout from "~/layouts/MainLayout";
-import NProgressBar from "~/layouts/NProgressBar";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import MainLayout from "~/ui/layouts/MainLayout";
+import NProgressBar from "~/ui/layouts/NProgressBar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 

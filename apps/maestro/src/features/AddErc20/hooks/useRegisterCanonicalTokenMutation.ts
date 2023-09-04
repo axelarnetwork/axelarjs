@@ -1,19 +1,13 @@
 import { encodeInterchainTokenServiceRegisterCanonicalTokenData } from "@axelarjs/evm";
-import { toast } from "@axelarjs/ui";
 import { throttle } from "@axelarjs/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { TransactionExecutionError } from "viem";
+import { useChainId, useWaitForTransaction } from "wagmi";
+
 import {
-  useAccount,
-  useMutation,
-  useNetwork,
-  useWaitForTransaction,
-} from "wagmi";
-
-import { watchInterchainTokenServiceEvent } from "~/lib/contracts/InterchainTokenService.actions";
-import { useInterchainTokenServiceMulticall } from "~/lib/contracts/InterchainTokenService.hooks";
-import { logger } from "~/lib/logger";
+  useInterchainTokenServiceMulticall,
+  usePrepareInterchainTokenServiceMulticall,
+} from "~/lib/contracts/InterchainTokenService.hooks";
 import { trpc } from "~/lib/trpc";
 import type { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -36,16 +30,17 @@ const DEFAULT_INPUT: UseRegisterCanonicalTokenInput = {
   decimals: -1,
 };
 
-export function useRegisterCanonicalTokenMutation(config: {
+export type UseRegisterCanonicalTokenConfig = {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
-}) {
-  const inputRef = useRef<UseRegisterCanonicalTokenInput>(DEFAULT_INPUT);
-  const { address: deployerAddress } = useAccount();
-  const { chain } = useNetwork();
+};
 
-  const { writeAsync: multicallAsync, data: multicallResult } =
-    useInterchainTokenServiceMulticall();
+export function useRegisterCanonicalTokenMutation(
+  config: UseRegisterCanonicalTokenConfig,
+  input: UseRegisterCanonicalTokenInput
+) {
+  const inputRef = useRef<UseRegisterCanonicalTokenInput>(DEFAULT_INPUT);
+  const chainId = useChainId();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -54,6 +49,46 @@ export function useRegisterCanonicalTokenMutation(config: {
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<RecordInterchainTokenDeploymentInput | null>(null);
+
+  const multicallArgs = useMemo(
+    () => [
+      encodeInterchainTokenServiceRegisterCanonicalTokenData({
+        tokenAddress: input.tokenAddress,
+      }),
+    ],
+    [input.tokenAddress]
+  );
+
+  const prepared = usePrepareInterchainTokenServiceMulticall({
+    args: [multicallArgs],
+  });
+
+  const multicall = useInterchainTokenServiceMulticall(prepared.config);
+
+  useWaitForTransaction({
+    hash: multicall.data?.hash,
+    confirmations: 8,
+    onSuccess() {
+      if (!multicall.data) {
+        return;
+      }
+
+      setRecordDeploymentArgs({
+        kind: "canonical",
+        tokenId: inputRef.current.expectedTokenId,
+        tokenAddress: inputRef.current.tokenAddress,
+        originChainId: chainId,
+        deploymentTxHash: multicall.data.hash,
+        tokenName: inputRef.current.tokenName,
+        tokenSymbol: inputRef.current.tokenSymbol,
+        tokenDecimals: inputRef.current.decimals,
+        originAxelarChainId: inputRef.current.sourceChainId,
+        remoteTokens: [],
+      });
+
+      config.onFinished?.();
+    },
+  });
 
   useEffect(
     () => {
@@ -71,91 +106,5 @@ export function useRegisterCanonicalTokenMutation(config: {
     [recordDeploymentArgs]
   );
 
-  const unwatch = watchInterchainTokenServiceEvent(
-    {
-      eventName: "TokenManagerDeployed",
-    },
-    async (logs) => {
-      const log = logs.find(
-        ({ args }) =>
-          Boolean(args?.tokenId) &&
-          args.tokenId === inputRef.current.expectedTokenId
-      );
-
-      if (!log || !chain || !deployerAddress || !log.transactionHash) {
-        return;
-      }
-
-      unwatch();
-
-      setRecordDeploymentArgs({
-        kind: "canonical",
-        tokenId: inputRef.current.expectedTokenId,
-        tokenAddress: inputRef.current.tokenAddress,
-        originChainId: chain.id,
-        deploymentTxHash: log.transactionHash,
-        tokenName: inputRef.current.tokenName,
-        tokenSymbol: inputRef.current.tokenSymbol,
-        tokenDecimals: inputRef.current.decimals,
-        originAxelarChainId: inputRef.current.sourceChainId,
-        remoteTokens: [],
-      });
-    }
-  );
-
-  useWaitForTransaction({
-    hash: multicallResult?.hash,
-    confirmations: 8,
-    onSuccess() {
-      if (!multicallResult) {
-        return;
-      }
-      config.onFinished?.();
-    },
-  });
-
-  return useMutation(async (input: UseRegisterCanonicalTokenInput) => {
-    if (!deployerAddress) {
-      return;
-    }
-
-    inputRef.current = input;
-
-    onStatusUpdate({
-      type: "pending_approval",
-    });
-    try {
-      const deployTxData =
-        encodeInterchainTokenServiceRegisterCanonicalTokenData({
-          tokenAddress: input.tokenAddress,
-        });
-
-      const tx = await multicallAsync({
-        args: [[deployTxData]],
-      });
-
-      if (tx?.hash) {
-        onStatusUpdate({
-          type: "deploying",
-          txHash: tx.hash,
-        });
-
-        return tx.hash;
-      }
-    } catch (error) {
-      onStatusUpdate({
-        type: "idle",
-      });
-      if (error instanceof TransactionExecutionError) {
-        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-
-        logger.error(
-          "Failed to register canonical interchain token",
-          error.cause
-        );
-      }
-
-      console.error({ error });
-    }
-  });
+  return multicall;
 }

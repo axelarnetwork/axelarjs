@@ -22,9 +22,9 @@ import { useRouter } from "next/router";
 
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
-import EVMChainsDropdown from "~/components/EVMChainsDropdown";
-import ConnectWalletButton from "~/compounds/ConnectWalletButton/ConnectWalletButton";
 import { APP_NAME } from "~/config/app";
+import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
 import { useLayoutStateContainer } from "./MainLayout.state";
 import MainMenu from "./MainMenu";
 

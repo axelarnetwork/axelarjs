@@ -2,12 +2,12 @@ import { Alert, Button, LinkButton, toast } from "@axelarjs/ui";
 import { invariant, maskAddress } from "@axelarjs/utils";
 import { useCallback, useMemo, type FC } from "react";
 
-import { TransactionExecutionError } from "viem";
-import { useNetwork } from "wagmi";
+import { useChainId } from "wagmi";
 
 import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
+import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useRegisterCanonicalTokenMutation } from "../AddErc20/hooks/useRegisterCanonicalTokenMutation";
 
@@ -29,78 +29,64 @@ export const RegisterCanonicalToken: FC<Props> = ({
   onSuccess = () => {},
 }) => {
   const [txState, setTxState] = useTransactionState();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const { computed } = useEVMChainConfigsQuery();
 
   const sourceChain = useMemo(
-    () => (chain ? computed.indexedByChainId[chain.id] : undefined),
-    [chain, computed]
+    () => computed.indexedByChainId[chainId],
+    [chainId, computed]
   );
-
-  const { mutateAsync: registerCanonicalToken } =
-    useRegisterCanonicalTokenMutation({
-      onStatusUpdate(message) {
-        if (message.type === "deployed") {
-          onSuccess();
-        }
-      },
-    });
 
   const { data: expectedTokenId } =
     useInterchainTokenServiceGetCanonicalTokenId({
       args: [address],
     });
 
+  const { writeAsync: registerCanonicalToken } =
+    useRegisterCanonicalTokenMutation(
+      {
+        onStatusUpdate(message) {
+          if (message.type === "deployed") {
+            onSuccess();
+          }
+        },
+      },
+      {
+        tokenAddress: address,
+        sourceChainId: sourceChain?.id as string,
+        expectedTokenId: expectedTokenId as `0x${string}`,
+        tokenName,
+        tokenSymbol,
+        decimals,
+      }
+    );
+
   const handleSubmitTransaction = useCallback(async () => {
-    if (!expectedTokenId) return;
+    if (!expectedTokenId || !registerCanonicalToken) return;
     setTxState({
       status: "awaiting_approval",
     });
 
     invariant(sourceChain, "Source chain is not defined");
 
-    try {
-      const txHash = await registerCanonicalToken({
-        tokenAddress: address,
-        sourceChainId: sourceChain?.id,
-        expectedTokenId,
-        tokenName,
-        tokenSymbol,
-        decimals,
-      });
+    const txPromise = registerCanonicalToken();
 
-      if (txHash) {
+    await handleTransactionResult(txPromise, {
+      onSuccess(tx) {
         setTxState({
           status: "submitted",
-          hash: txHash,
+          hash: tx.hash,
         });
-      }
-    } catch (error) {
-      if (error instanceof TransactionExecutionError) {
+      },
+      onTransactionError(error) {
         toast.error(`Transaction reverted: ${error.cause.shortMessage}`);
         logger.error("Failed to register origin token:", error.cause);
-        setTxState({
-          status: "idle",
-        });
-        return;
-      }
 
-      setTxState({
-        status: "reverted",
-        error: error as Error,
-      });
-    }
-  }, [
-    expectedTokenId,
-    setTxState,
-    sourceChain,
-    registerCanonicalToken,
-    address,
-    tokenName,
-    tokenSymbol,
-    decimals,
-  ]);
+        setTxState({ status: "idle" });
+      },
+    });
+  }, [expectedTokenId, setTxState, sourceChain, registerCanonicalToken]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {

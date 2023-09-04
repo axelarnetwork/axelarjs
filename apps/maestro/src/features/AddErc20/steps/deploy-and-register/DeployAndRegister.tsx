@@ -1,3 +1,4 @@
+import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Button,
   Dialog,
@@ -18,13 +19,88 @@ import Image from "next/image";
 
 import { propEq } from "rambda";
 import { parseUnits } from "viem";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
-import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks/useDeployAndRegisterRemoteStandardizedTokenMutation";
+import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks";
+import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
+
+type ChainPickerProps = {
+  eligibleChains: EVMChainConfig[];
+  selectedChains: string[];
+  onChainClick: (chainId: string) => void;
+  disabled?: boolean;
+};
+
+const ChainPicker: FC<ChainPickerProps> = ({
+  eligibleChains,
+  selectedChains,
+  onChainClick,
+  disabled,
+}) => {
+  const handleToggleAll = useCallback(() => {
+    eligibleChains.forEach((chain, i) =>
+      setTimeout(onChainClick.bind(null, chain.id), 16.6 * i)
+    );
+  }, [eligibleChains, onChainClick]);
+
+  const isToggleAllDisabled = useMemo(
+    () =>
+      Boolean(
+        selectedChains.length && selectedChains.length !== eligibleChains.length
+      ),
+    [selectedChains, eligibleChains]
+  );
+
+  return (
+    <section className="space-y-4">
+      <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
+        {eligibleChains?.map((chain) => {
+          const isSelected = selectedChains.includes(chain.id);
+
+          return (
+            <Tooltip
+              tip={`Deploy on ${chain.name}`}
+              key={chain.chain_name}
+              position="top"
+            >
+              <Button
+                disabled={disabled}
+                className="w-full rounded-2xl hover:ring"
+                size="sm"
+                role="button"
+                variant={isSelected ? "success" : undefined}
+                onClick={onChainClick.bind(null, chain.id)}
+              >
+                <Image
+                  className="pointer-events-none absolute left-3 -translate-x-2 rounded-full"
+                  src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
+                  width={24}
+                  height={24}
+                  alt={`${chain.name} logo`}
+                />
+                <span className="ml-4">{chain.name}</span>
+              </Button>
+            </Tooltip>
+          );
+        })}
+      </div>
+      <div className="grid place-content-center">
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={isToggleAllDisabled || disabled}
+          onClick={handleToggleAll}
+        >
+          toggle all
+        </Button>
+      </div>
+    </section>
+  );
+};
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -38,11 +114,11 @@ export const Step3: FC = () => {
     [state.gasFees]
   );
 
-  const sourceChain = state.evmChains.find(
-    propEq("chain_id", state.network.chain?.id)
-  );
+  const chainId = useChainId();
 
-  const { mutateAsync: deployInterchainTokenAsync } =
+  const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
+
+  const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteStandardizedTokenMutation(
       {
         salt: rootState.tokenDetails.salt,
@@ -77,26 +153,37 @@ export const Step3: FC = () => {
         state.isGasPriceQueryLoading ||
         state.isGasPriceQueryError ||
         !state.gasFees ||
-        !state.evmChains
+        !state.evmChains ||
+        !deployInterchainTokenAsync
       ) {
         console.warn("gas prices not loaded");
         return;
       }
       actions.setIsDeploying(true);
 
-      const sourceChain = state.evmChains.find(
-        propEq("chain_id", state.network.chain?.id)
-      );
+      const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
 
       invariant(sourceChain, "source chain not found");
 
-      await deployInterchainTokenAsync(undefined, {
-        onError(error) {
-          actions.setIsDeploying(false);
+      rootActions.setTxState({
+        type: "pending_approval",
+      });
 
-          if (error instanceof Error) {
-            toast.error(`Failed to register token: ${error?.message}`);
-          }
+      const txPromise = deployInterchainTokenAsync();
+
+      await handleTransactionResult(txPromise, {
+        onSuccess(tx) {
+          rootActions.setTxState({
+            type: "deploying",
+            txHash: tx.hash,
+          });
+        },
+        onTransactionError(txError) {
+          rootActions.setTxState({
+            type: "idle",
+          });
+
+          toast.error(txError.shortMessage);
         },
       });
     },
@@ -105,18 +192,16 @@ export const Step3: FC = () => {
       state.isGasPriceQueryError,
       state.gasFees,
       state.evmChains,
-      state.network.chain?.id,
+      chainId,
       actions,
+      rootActions,
       deployInterchainTokenAsync,
     ]
   );
 
   const eligibleChains = useMemo(
-    () =>
-      state.evmChains?.filter(
-        (chain) => chain.chain_id !== state.network.chain?.id
-      ),
-    [state.evmChains, state.network.chain?.id]
+    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
+    [state.evmChains, chainId]
   );
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);
@@ -198,38 +283,15 @@ export const Step3: FC = () => {
               </Label.AltText>
             )}
           </Label>
-          <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
-            {eligibleChains?.map((chain) => {
-              const isSelected = rootState.selectedChains.includes(chain.id);
-
-              return (
-                <Tooltip
-                  tip={`Deploy on ${chain.name}`}
-                  key={chain.chain_name}
-                  position="top"
-                >
-                  <Button
-                    className="w-full rounded-2xl hover:ring"
-                    size="sm"
-                    role="button"
-                    variant={isSelected ? "success" : undefined}
-                    onClick={() => {
-                      rootActions.toggleAdditionalChain(chain.id);
-                    }}
-                  >
-                    <Image
-                      className="pointer-events-none absolute left-3 -translate-x-2 rounded-full"
-                      src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
-                      width={24}
-                      height={24}
-                      alt={`${chain.name} logo`}
-                    />
-                    <span className="ml-4">{chain.name}</span>
-                  </Button>
-                </Tooltip>
-              );
-            })}
-          </div>
+          <ChainPicker
+            eligibleChains={eligibleChains}
+            selectedChains={rootState.selectedChains}
+            onChainClick={rootActions.toggleAdditionalChain}
+            disabled={
+              rootState.txState.type === "pending_approval" ||
+              rootState.txState.type === "deploying"
+            }
+          />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
       </form>

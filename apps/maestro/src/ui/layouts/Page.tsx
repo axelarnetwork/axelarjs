@@ -8,10 +8,11 @@ import { useRouter } from "next/router";
 import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
-import { ChainIcon } from "~/components/EVMChainsDropdown";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
 
 type PageState =
   | "loading"
@@ -102,6 +103,8 @@ const Page = ({
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
+            <div className="divider w-full max-w-lg">OR</div>
+            <ConnectWalletButton className="w-full max-w-md" size="md" />
           </div>
         ) : (
           children
@@ -195,7 +198,7 @@ const Page = ({
           <div className="grid place-items-center gap-12 text-center">
             <GridLoader
               color="var(--primary)"
-              className="animate-ping animate-pulse [animation-duration:3s]"
+              className="animate-pulse [animation-duration:3s]"
             />
             <span>{loadingMessage || "loading page data..."}</span>
           </div>

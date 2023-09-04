@@ -1,17 +1,14 @@
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress, Maybe, sluggify } from "@axelarjs/utils";
-import { Suspense, useMemo, type FC } from "react";
-import { useSession } from "next-auth/react";
+import { useMemo, type FC } from "react";
 import Link from "next/link";
 
 import { filter, map, sortBy } from "rambda";
 
-import { ChainIcon } from "~/components/EVMChainsDropdown";
 import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
-import Page from "~/layouts/Page";
-import { withRouteProtection } from "~/lib/auth";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
 const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
@@ -22,44 +19,11 @@ const getChainNameSlug = (chainId: number) => {
   return sluggify(chain?.name ?? "");
 };
 
-export type InterchainTokensPageProps = {};
-
-const InterchainTokensPage = () => {
-  const { data: session } = useSession();
-
-  const { data } = useGetMyInterchainTokensQuery(
-    {
-      sessionAddress: session?.address as `0x${string}`,
-    },
-    {
-      suspense: true,
-      enabled: Boolean(session?.address),
-    }
-  );
-  return (
-    <Page pageTitle="My Interchain Tokens">
-      <div className="flex flex-col gap-4">
-        <Page.Title className="flex items-center gap-2">
-          My Interchain Tokens
-          {Boolean(data?.length) && (
-            <span className="text-base-content-secondary font-mono text-base">
-              ({data?.length})
-            </span>
-          )}
-        </Page.Title>
-        <Suspense fallback={<div>Loading...</div>}>
-          <TokenList sessionAddress={session?.address} />
-        </Suspense>
-      </div>
-    </Page>
-  );
-};
-
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
 };
 
-const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
+const InterchainTokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   const { data } = useGetMyInterchainTokensQuery(
     {
       sessionAddress: sessionAddress as `0x${string}`,
@@ -133,4 +97,4 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   );
 };
 
-export default withRouteProtection(InterchainTokensPage);
+export default InterchainTokenList;
