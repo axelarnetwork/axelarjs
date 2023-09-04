@@ -12,6 +12,7 @@ import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
 
 type PageState =
   | "loading"
@@ -102,6 +103,8 @@ const Page = ({
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
+            <div className="divider w-full max-w-lg">OR</div>
+            <ConnectWalletButton className="w-full max-w-md" size="md" />
           </div>
         ) : (
           children
