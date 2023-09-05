@@ -17,8 +17,9 @@ const kbdVariance = cva("kbd", {
   },
 });
 
-export type KbdProps = ComponentProps<typeof StyledKbd> &
-  VariantProps<typeof kbdVariance>;
+export interface KbdProps
+  extends ComponentProps<typeof StyledKbd>,
+    VariantProps<typeof kbdVariance> {}
 
 export const Kbd: FC<KbdProps> = ({ size, className, ...props }) => {
   return (

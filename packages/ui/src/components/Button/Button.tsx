@@ -16,23 +16,6 @@ export const buttonVariance = cva("btn", {
       md: "btn-md",
       lg: "btn-lg",
     },
-    /**
-     * The color of the button, configurable in the theme
-     *
-     * @deprecated Use `variant` instead
-     **/
-    color: {
-      primary: "btn-primary",
-      secondary: "btn-secondary",
-      neutral: "btn-neutral",
-      accent: "btn-accent",
-      info: "btn-info",
-      success: "btn-success",
-      warning: "btn-warning",
-      error: "btn-error",
-      ghost: "btn-ghost",
-      link: "btn-link",
-    },
     variant: {
       primary: "btn-primary",
       secondary: "btn-secondary",
@@ -65,26 +48,10 @@ export const buttonVariance = cva("btn", {
       true: "btn-disabled",
     },
     /**
-     * Renders a ghost button, which is a transparent button with no border
-     *
-     * @deprecated Use `color="ghost"` instead
-     **/
-    ghost: {
-      true: "btn-ghost",
-    },
-    /**
      * Renders a glass button, which is a semi transparent with a glass effect
      **/
     glass: {
       true: "glass",
-    },
-    /**
-     * Renders a link button, which looks like a link
-     *
-     * @deprecated Use `color="link"` instead
-     **/
-    link: {
-      true: "btn-link",
     },
     length: {
       wide: "btn-wide",
@@ -98,15 +65,18 @@ export const buttonVariance = cva("btn", {
 
 type VProps = VariantProps<typeof buttonVariance>;
 
-export type ButtonProps = JSX.IntrinsicElements["button"] &
-  VProps & {
-    loading?: boolean;
-  };
+type ButtonElement = JSX.IntrinsicElements["button"];
 
-export type LinkButtonProps = JSX.IntrinsicElements["a"] &
-  VProps & {
-    loading?: boolean;
-  };
+export interface ButtonProps extends ButtonElement, VProps {
+  loading?: boolean;
+  disabled?: boolean;
+}
+
+type LinkElement = JSX.IntrinsicElements["a"];
+
+export interface LinkButtonProps extends LinkElement, VProps {
+  loading?: boolean;
+}
 
 const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   props: T
@@ -114,14 +84,11 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   const {
     className,
     size,
-    color,
     disabled,
     shape,
-    ghost,
     glass,
     outline,
     length,
-    link,
     loading,
     children,
     variant,
@@ -132,12 +99,9 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
     twMerge(
       buttonVariance({
         size,
-        color,
         disabled,
         shape,
-        ghost,
         outline,
-        link,
         glass,
         length,
         variant,
@@ -168,7 +132,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        disabled={props.disabled}
+        disabled={Boolean(props.disabled)}
         className={className}
         {...componentProps}
         ref={ref}

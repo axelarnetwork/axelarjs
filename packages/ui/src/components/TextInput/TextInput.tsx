@@ -34,18 +34,24 @@ const inputVariance = cva("input", {
 
 type VProps = VariantProps<typeof inputVariance>;
 
-type NativeElementProps = Omit<JSX.IntrinsicElements["input"], "type">;
+type NativeElementProps = Omit<
+  JSX.IntrinsicElements["input"],
+  "type" | "color"
+>;
 
-export type TextInputProps = NativeElementProps &
-  VProps & {
-    type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
-  };
+export interface TextInputProps extends NativeElementProps, VProps {
+  type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
+  disabled?: boolean;
+}
 
 /**
  * A text input component
  */
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ color, inputSize, ghost, bordered, className, ...props }, ref) => (
+  (
+    { color, inputSize, ghost, bordered, className, disabled, ...props },
+    ref
+  ) => (
     <input
       className={twMerge(
         inputVariance({
@@ -53,10 +59,11 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           color,
           inputSize,
           ghost,
-          disabled: props.disabled,
+          disabled,
         }),
         className
       )}
+      disabled={Boolean(disabled)}
       {...props}
       ref={ref}
     />

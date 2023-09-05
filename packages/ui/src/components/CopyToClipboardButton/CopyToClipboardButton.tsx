@@ -5,14 +5,12 @@ import { cn } from "../../utils";
 import { Button, ButtonProps } from "../Button";
 import { CheckCircleIcon, CopyIcon } from "../icons/lucide";
 
-export type CopyToClipboardButtonProps = Omit<
-  ButtonProps,
-  "onClick" | "$as"
-> & {
+export interface CopyToClipboardButtonProps
+  extends Omit<ButtonProps, "onClick" | "$as"> {
   copyText?: string;
   copyTimeout?: number;
   onCopied?: () => void;
-};
+}
 
 export const CopyToClipboardButton = forwardRef<
   HTMLButtonElement,

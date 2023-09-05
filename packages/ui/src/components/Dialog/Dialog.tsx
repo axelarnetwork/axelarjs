@@ -27,10 +27,12 @@ export type DialogTriggerProps =
       renderTrigger?: (props: { onClick: () => void }) => JSX.Element;
     };
 
-export type DialogProps = ComponentProps<typeof StyledDialog> & {
+interface BaseDialogProps extends ComponentProps<typeof StyledDialog> {
   defaultOpen?: boolean;
   onClose?: () => void;
-} & DialogTriggerProps;
+}
+
+export type DialogProps = BaseDialogProps & DialogTriggerProps;
 
 const DialogRoot: FC<DialogProps> = (props) => {
   const dialogRef = useRef<HTMLDialogElement>(null);

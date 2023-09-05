@@ -14,7 +14,7 @@ StyledToggle.defaultProps = {
 
 const toggleVariance = cva("toggle", {
   variants: {
-    color: {
+    variant: {
       primary: "toggle-primary",
       secondary: "toggle-secondary",
       accent: "toggle-accent",
@@ -34,13 +34,14 @@ const toggleVariance = cva("toggle", {
 
 type VProps = VariantProps<typeof toggleVariance>;
 
-export type ToggleProps = Omit<JSX.IntrinsicElements["input"], "type"> &
-  VProps & {
-    indeterminate?: boolean;
-  };
+type BaseToggleProps = Omit<JSX.IntrinsicElements["input"], "type" | "size">;
+
+export interface ToggleProps extends BaseToggleProps, VProps {
+  indeterminate?: boolean;
+}
 
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
-  ({ color, size, className, indeterminate, ...props }, ref) => {
+  ({ variant, size, className, indeterminate, ...props }, ref) => {
     const innerRef = useSyncedRef(ref);
 
     useEffect(() => {
@@ -53,7 +54,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       <input
         ref={innerRef}
         type="checkbox"
-        className={twMerge(toggleVariance({ color, size }), className)}
+        className={twMerge(toggleVariance({ variant, size }), className)}
         {...props}
       />
     );

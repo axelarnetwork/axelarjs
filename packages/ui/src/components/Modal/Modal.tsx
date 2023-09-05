@@ -18,12 +18,14 @@ const StyledDialogContent = tw(Dialog.Content)`
   top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]
 `;
 
-export type ModalProps = JSX.IntrinsicElements["div"] &
-  DialogTriggerProps &
-  Dialog.DialogProps & {
-    hideCloseButton?: boolean;
-    disableCloseButton?: boolean;
-  };
+type DivElement = JSX.IntrinsicElements["div"];
+
+interface BaseModalProps extends DivElement, Dialog.DialogProps {
+  hideCloseButton?: boolean;
+  disableCloseButton?: boolean;
+}
+
+export type ModalProps = BaseModalProps & DialogTriggerProps;
 
 const ModalRoot: FC<ModalProps> = ({
   modal,

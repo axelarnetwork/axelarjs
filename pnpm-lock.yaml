@@ -646,8 +646,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       daisyui:
-        specifier: ^3.6.4
-        version: 3.6.4(ts-node@10.9.1)
+        specifier: ^3.6.5
+        version: 3.6.5(ts-node@10.9.1)
       fast-check:
         specifier: ^3.12.1
         version: 3.12.1
@@ -10061,8 +10061,8 @@ packages:
       type: 1.2.0
     dev: true
 
-  /daisyui@3.6.4(ts-node@10.9.1):
-    resolution: {integrity: sha512-8cFEkA2CaTKLUBvEU+9cTx6uvLSN2ZUq9fXxMkdiRS7QM79jBFv3klNkbUaPslmVh0eoeeCk0o98sjmfQ7/Cgg==}
+  /daisyui@3.6.5(ts-node@10.9.1):
+    resolution: {integrity: sha512-1yPTKlCf1usfSsUaTvu5l/Fi8TEchy8H9/rAtvPMwWd++ifl56ASnaDQfHZhl9lnPtCWj/mWicrwL7aaNz53KA==}
     engines: {node: '>=16.9.0'}
     dependencies:
       colord: 2.9.3

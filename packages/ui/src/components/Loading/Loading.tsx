@@ -16,9 +16,9 @@ export const loadingVariance = cva("loading", {
       lg: "loading-lg",
     },
     /**
-     * The color of the loading indicator, configurable in the theme
+     * The variant of the loading indicator, configurable in the theme
      **/
-    color: {
+    variant: {
       primary: "text-primary",
       secondary: "text-secondary",
       neutral: "text-neutral",
@@ -44,19 +44,22 @@ export const loadingVariance = cva("loading", {
 
 const StyledLoading = tw.span``;
 
-export type LoadingProps = ComponentProps<typeof StyledLoading> &
-  VariantProps<typeof loadingVariance>;
+type BaseLoadingProps = ComponentProps<typeof StyledLoading>;
+
+export interface LoadingProps
+  extends BaseLoadingProps,
+    VariantProps<typeof loadingVariance> {}
 
 export const Loading: FC<LoadingProps> = ({
   shape,
   size,
-  color,
+  variant,
   className,
   children,
   ...props
 }) => (
   <StyledLoading
-    className={twMerge(loadingVariance({ shape, color, size }), className)}
+    className={twMerge(loadingVariance({ shape, variant, size }), className)}
     {...props}
   />
 );

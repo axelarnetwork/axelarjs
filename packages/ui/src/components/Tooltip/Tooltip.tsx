@@ -30,7 +30,9 @@ const StyledTooltip = tw.div``;
 type BaseTooltipProps = ComponentProps<typeof StyledTooltip>;
 type VProps = VariantProps<typeof variance>;
 
-export type TooltipProps = BaseTooltipProps & VProps & { tip: string };
+export interface TooltipProps extends BaseTooltipProps, VProps {
+  tip: string;
+}
 
 export const Tooltip: FC<TooltipProps> = ({
   tip,

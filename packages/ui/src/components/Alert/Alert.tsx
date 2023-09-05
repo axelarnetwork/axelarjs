@@ -24,10 +24,11 @@ const alertVariance = cva("alert", {
   },
 });
 
-export type AlertProps = ComponentProps<typeof StyledAlert> &
-  VariantProps<typeof alertVariance> & {
-    icon?: ReactNode;
-  };
+export interface AlertProps
+  extends ComponentProps<typeof StyledAlert>,
+    VariantProps<typeof alertVariance> {
+  icon?: ReactNode;
+}
 
 const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
   info: <InfoIcon className="h-6 w-6" />,

@@ -35,4 +35,5 @@ export const DropdownMenu = Object.assign(DropdownMenuPrimitive.Root, {
   ),
 });
 
-export type DropdownMenuProps = ComponentProps<typeof DropdownMenu> & {};
+export interface DropdownMenuProps
+  extends ComponentProps<typeof DropdownMenu> {}

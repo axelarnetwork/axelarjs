@@ -22,7 +22,9 @@ const StyledCard = tw.div``;
 
 type CardBaseProps = VariantProps<typeof cardVariance>;
 
-export type CardProps = ComponentProps<typeof StyledCard> & CardBaseProps & {};
+export interface CardProps
+  extends ComponentProps<typeof StyledCard>,
+    CardBaseProps {}
 
 const CardContainer = ({
   bordered,
