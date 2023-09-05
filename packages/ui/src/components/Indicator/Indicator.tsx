@@ -21,12 +21,14 @@ const indicatorItemVariance = cva("indicator", {
   },
 });
 
-export type IndicatorProps = ComponentProps<typeof StyledIndicator> & {};
+export interface IndicatorProps
+  extends ComponentProps<typeof StyledIndicator> {}
 
 const StyledIndicatorItem = tw(Badge)`indicator-item`;
 
-export type IndicatorItemProps = ComponentProps<typeof StyledIndicatorItem> &
-  VariantProps<typeof indicatorItemVariance>;
+export interface IndicatorItemProps
+  extends ComponentProps<typeof StyledIndicatorItem>,
+    VariantProps<typeof indicatorItemVariance> {}
 
 const IndicatorItem: FC<IndicatorItemProps> = ({
   position,

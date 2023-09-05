@@ -1,8 +1,7 @@
 import { encodeInterchainTokenServiceDeployRemoteCanonicalTokenData } from "@axelarjs/evm";
-import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { useNetwork } from "wagmi";
+import { useChainId } from "wagmi";
 
 import {
   useInterchainTokenServiceMulticall,
@@ -23,7 +22,7 @@ export default function useRegisterRemoteCanonicalTokens(
   input: RegisterRemoteCanonicalTokensInput
 ) {
   const { computed } = useEVMChainConfigsQuery();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const destinationChains = useMemo(
     () =>
@@ -36,11 +35,8 @@ export default function useRegisterRemoteCanonicalTokens(
   const destinationChainIds = destinationChains.map((chain) => chain.id);
 
   const sourceChainId = useMemo(
-    () =>
-      Maybe.of(chain).mapOrNull(
-        (chain) => computed.indexedByChainId[chain.id]?.id
-      ),
-    [chain, computed.indexedByChainId]
+    () => computed.indexedByChainId[chainId]?.id,
+    [chainId, computed.indexedByChainId]
   );
 
   const { data: tokenDetails } = useInterchainTokenDetailsQuery({

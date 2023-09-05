@@ -4,13 +4,13 @@ import { render } from "@testing-library/react";
 import { ThemeProvider } from "../ThemeSwitcher";
 import * as stories from "./Toggle.stories";
 
-const { Colors } = composeStories(stories);
+const { Variants } = composeStories(stories);
 
 describe("Toggle", () => {
   it("renders Colors component story without breaking", () => {
     const { container } = render(
       <ThemeProvider>
-        <Colors />
+        <Variants />
       </ThemeProvider>
     );
     expect(container).toBeVisible();

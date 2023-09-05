@@ -7,8 +7,8 @@ export const remoteInterchainTokenSchema = z.object({
   chainId: z.number(),
   axelarChainId: z.string(),
   address: hex40Literal().nullable(),
-  status: z.enum(["deployed", "pending"]),
-  deplymentTxHash: hex64Literal(),
+  deploymentStatus: z.enum(["deployed", "pending"]),
+  deploymentTxHash: hex64Literal(),
   deploymentLogIndex: z.number().optional(),
 });
 
@@ -33,8 +33,8 @@ export const interchainTokenDetailsBaseSchema = interchainTokenKindSchema.and(
     tokenSymbol: z.string(),
     tokenDecimals: z.number(),
     tokenAddress: hex40Literal(),
-    originChainId: z.number(),
-    originAxelarChainId: z.string(),
+    chainId: z.number(),
+    axelarChainId: z.string(),
     tokenId: hex64Literal(),
     deploymentTxHash: hex64Literal(),
     remoteTokens: z.array(remoteInterchainTokenSchema),

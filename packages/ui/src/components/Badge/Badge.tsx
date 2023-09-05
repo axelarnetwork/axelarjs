@@ -8,20 +8,6 @@ const StyledBadge = tw.span`pb-0.5`;
 
 const badgeVariance = cva("badge", {
   variants: {
-    /**
-     * @deprecated Use `variant` instead
-     */
-    color: {
-      primary: "badge-primary",
-      secondary: "badge-secondary",
-      accent: "badge-accent",
-      neutral: "badge-neutral",
-      success: "badge-success",
-      error: "badge-error",
-      warning: "badge-warning",
-      info: "badge-info",
-      ghost: "badge-ghost",
-    },
     variant: {
       primary: "badge-primary",
       secondary: "badge-secondary",
@@ -41,22 +27,17 @@ const badgeVariance = cva("badge", {
     outline: {
       true: "badge-outline",
     },
-    /**
-     * @deprecated Use `variant='ghost'` instead
-     */
-    ghost: {
-      true: "badge-ghost",
-    },
   },
 });
 
-export type BadgeProps = ComponentProps<typeof StyledBadge> &
-  VariantProps<typeof badgeVariance>;
+type BaseBadgeProps = Omit<ComponentProps<typeof StyledBadge>, "color">;
+
+export interface BadgeProps
+  extends BaseBadgeProps,
+    VariantProps<typeof badgeVariance> {}
 
 export const Badge: FC<BadgeProps> = ({
-  color,
   outline,
-  ghost,
   size,
   className,
   variant,
@@ -64,10 +45,7 @@ export const Badge: FC<BadgeProps> = ({
 }) => {
   return (
     <StyledBadge
-      className={twMerge(
-        badgeVariance({ color, outline, ghost, size, variant }),
-        className
-      )}
+      className={twMerge(badgeVariance({ outline, size, variant }), className)}
       {...props}
     />
   );

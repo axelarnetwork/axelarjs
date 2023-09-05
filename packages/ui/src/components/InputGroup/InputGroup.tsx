@@ -22,8 +22,9 @@ const inputGroupVariance = cva("input-group", {
 
 type BaseInputGroupProps = VariantProps<typeof inputGroupVariance>;
 
-export type InputGroupProps = ComponentProps<typeof StyledInputGroup> &
-  BaseInputGroupProps;
+export interface InputGroupProps
+  extends ComponentProps<typeof StyledInputGroup>,
+    BaseInputGroupProps {}
 
 export const InputGroup: FC<InputGroupProps> = ({
   size,

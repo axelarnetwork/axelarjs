@@ -37,8 +37,9 @@ export const menuItemVariance = cva("menu-item", {
   },
 });
 
-export type MenuProps = ComponentProps<typeof StyledMenu> &
-  VariantProps<typeof menuVariance>;
+export interface MenuProps
+  extends ComponentProps<typeof StyledMenu>,
+    VariantProps<typeof menuVariance> {}
 
 const MenuRoot: FC<MenuProps> = ({
   direction,
@@ -58,8 +59,9 @@ const MenuRoot: FC<MenuProps> = ({
 
 const StyledMenuItem = tw.li``;
 
-export type MenuItemProps = ComponentProps<typeof StyledMenuItem> &
-  VariantProps<typeof menuItemVariance>;
+export interface MenuItemProps
+  extends ComponentProps<typeof StyledMenuItem>,
+    VariantProps<typeof menuItemVariance> {}
 
 const MenuItem: FC<MenuItemProps> = ({
   active,

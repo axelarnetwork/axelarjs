@@ -33,9 +33,10 @@ export const {
   useContainer: useReactComponentStateContainer,
 } = createContainer(useReactComponentState);
 
-export type ReactComponentProps = ComponentProps<
-  typeof StyledReactComponent
-> & {};
+export interface ReactComponentProps
+  extends ComponentProps<typeof StyledReactComponent> {
+  // add props here
+}
 
 const ReactComponentInner: FC<ReactComponentProps> = (props) => {
   const [state] = useReactComponentStateContainer();

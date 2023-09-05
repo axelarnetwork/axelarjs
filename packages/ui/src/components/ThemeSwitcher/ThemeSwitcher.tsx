@@ -67,7 +67,9 @@ function useThemeState(initialState: ThemeKind | null = null) {
 export const { Provider: ThemeProvider, useContainer: useThemeSwitcher } =
   createContainer(useThemeState);
 
-export type ThemeSwitcherProps = JSX.IntrinsicElements["button"];
+type ButtonElement = JSX.IntrinsicElements["button"];
+
+export interface ThemeSwitcherProps extends ButtonElement {}
 
 export const ThemeSwitcher: FC<ThemeSwitcherProps> = ({
   className,

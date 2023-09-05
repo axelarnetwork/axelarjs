@@ -81,10 +81,10 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         chainId: props.originChainId ?? -1,
         remoteTokens: props.chainIds.map((chainId) => ({
           address: props.tokenAddress,
-          status: "pending",
           chainId,
           tokenAddress: props.tokenAddress,
-          deplymentTxHash: receipt.transactionHash,
+          deploymentStatus: "pending",
+          deploymentTxHash: receipt.transactionHash,
           axelarChainId: computed.indexedByChainId[chainId].id,
         })),
       });

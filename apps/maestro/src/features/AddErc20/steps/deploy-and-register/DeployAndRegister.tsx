@@ -19,7 +19,7 @@ import Image from "next/image";
 
 import { propEq } from "rambda";
 import { parseUnits } from "viem";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks";
@@ -114,9 +114,9 @@ export const Step3: FC = () => {
     [state.gasFees]
   );
 
-  const sourceChain = state.evmChains.find(
-    propEq("chain_id", state.network.chain?.id)
-  );
+  const chainId = useChainId();
+
+  const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
 
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteStandardizedTokenMutation(
@@ -161,9 +161,7 @@ export const Step3: FC = () => {
       }
       actions.setIsDeploying(true);
 
-      const sourceChain = state.evmChains.find(
-        propEq("chain_id", state.network.chain?.id)
-      );
+      const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
 
       invariant(sourceChain, "source chain not found");
 
@@ -194,7 +192,7 @@ export const Step3: FC = () => {
       state.isGasPriceQueryError,
       state.gasFees,
       state.evmChains,
-      state.network.chain?.id,
+      chainId,
       actions,
       rootActions,
       deployInterchainTokenAsync,
@@ -202,11 +200,8 @@ export const Step3: FC = () => {
   );
 
   const eligibleChains = useMemo(
-    () =>
-      state.evmChains?.filter(
-        (chain) => chain.chain_id !== state.network.chain?.id
-      ),
-    [state.evmChains, state.network.chain?.id]
+    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
+    [state.evmChains, chainId]
   );
 
   const formSubmitRef = useRef<HTMLButtonElement>(null);

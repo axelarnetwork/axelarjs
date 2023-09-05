@@ -4,9 +4,10 @@ import tw from "tailwind-styled-components";
 
 const StyledReactComponent = tw.div``;
 
-export type ReactComponentProps = ComponentProps<
-  typeof StyledReactComponent
-> & {};
+export interface ReactComponentProps
+  extends ComponentProps<typeof StyledReactComponent> {
+  // add props here
+}
 
 export const ReactComponent: FC<ReactComponentProps> = (props) => {
   return <StyledReactComponent>ReactComponent</StyledReactComponent>;

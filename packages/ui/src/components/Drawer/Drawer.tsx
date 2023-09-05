@@ -22,10 +22,11 @@ const StyledDrawer = tw.div``;
 
 type VPRops = VariantProps<typeof drawerVariance>;
 
-export type DrawerProps = ComponentProps<typeof StyledDrawer> &
-  VPRops & {
-    open?: boolean;
-  };
+export interface DrawerProps
+  extends ComponentProps<typeof StyledDrawer>,
+    VPRops {
+  open?: boolean;
+}
 
 const DrawerRoot: FC<DrawerProps> = ({ end, mobile, className, ...props }) => {
   return (

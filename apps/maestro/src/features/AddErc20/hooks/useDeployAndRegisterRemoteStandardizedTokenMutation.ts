@@ -8,7 +8,7 @@ import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import {
   useInterchainTokenServiceGetCustomTokenId,
@@ -19,7 +19,7 @@ import {
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import type { IntercahinTokenDetails } from "~/services/kv";
+import type { IntercahinTokenDetails } from "~/services/db/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployAndRegisterInterchainTokenInput = {
@@ -45,7 +45,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   input?: UseDeployAndRegisterInterchainTokenInput
 ) {
   const { address: deployerAddress } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const { computed } = useEVMChainConfigsQuery();
 
@@ -122,7 +122,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
 
   const prepareMulticall = usePrepareInterchainTokenServiceMulticall({
     value: totalGasFee,
-    chainId: chain?.id ?? 0,
+    chainId: chainId,
     args: [multicallArgs],
   });
 
@@ -134,14 +134,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
     onSuccess: () => {
       const txHash = multicall?.data?.hash;
 
-      if (
-        !txHash ||
-        !tokenAddress ||
-        !tokenId ||
-        !deployerAddress ||
-        !chain ||
-        !input
-      ) {
+      if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
         return;
       }
 
@@ -151,18 +144,18 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
         tokenId,
         tokenAddress,
         deployerAddress,
-        originChainId: chain.id,
+        chainId: chainId,
         deploymentTxHash: txHash,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
-        originAxelarChainId: input.sourceChainId,
+        axelarChainId: input.sourceChainId,
         remoteTokens: input.destinationChainIds.map((axelarChainId) => ({
           axelarChainId,
           chainId: computed.indexedById[axelarChainId]?.chain_id,
           address: tokenAddress,
-          status: "pending",
-          deplymentTxHash: txHash,
+          deploymentStatus: "pending",
+          deploymentTxHash: txHash,
           // deploymentLogIndex is unknown at this point
         })),
       });

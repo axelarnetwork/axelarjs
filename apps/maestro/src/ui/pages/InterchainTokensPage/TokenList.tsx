@@ -42,7 +42,7 @@ const InterchainTokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, computed.indexedByChainId[token.originChainId]] as const
+              [token, computed.indexedByChainId[token.chainId]] as const
           )
         )
         .map(filter(([token, chain]) => Boolean(token) && Boolean(chain)))
@@ -57,7 +57,7 @@ const InterchainTokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   return (
     <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
       {filteredTokens.map(([token, chain]) => {
-        const href = `/${getChainNameSlug(token.originChainId)}/${
+        const href = `/${getChainNameSlug(token.chainId)}/${
           token.tokenAddress
         }`;
         return (

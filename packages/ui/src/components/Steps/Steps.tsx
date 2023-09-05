@@ -28,7 +28,7 @@ type StepsVProps = VariantProps<typeof stepsVariance>;
 
 const stepVariance = cva("step", {
   variants: {
-    color: {
+    variant: {
       primary: "step-primary",
       secondary: "step-secondary",
       accent: "step-accent",
@@ -62,23 +62,26 @@ type PolymorphicProps =
        */
       stepPrefix?: ReactNode;
       /**
-       * The color for the active steps
+       * The variant for the active steps
        */
-      color?: keyof typeof colorVariants;
+      variant?: keyof typeof colorVariants;
     };
 
-export type StepsProps = Omit<JSX.IntrinsicElements["ul"], "children"> &
-  StepsVProps &
-  PolymorphicProps;
+interface BaseStepsProps
+  extends Omit<JSX.IntrinsicElements["ul"], "children" | "color">,
+    StepsVProps,
+    StepVProps {}
+
+export type StepsProps = BaseStepsProps & PolymorphicProps;
 
 function useStepsState(initialState?: {
   stepIndex: number;
-  color: StepVProps["color"];
+  variant: StepVProps["variant"];
 }) {
   const [stepIndex, setStep] = useState(initialState?.stepIndex ?? 0);
 
   return [
-    { stepIndex, color: initialState?.color ?? "primary" },
+    { stepIndex, variant: initialState?.variant ?? "primary" },
     {
       nextStep: () => setStep(inc),
       prevStep: () => setStep(dec),
@@ -104,7 +107,7 @@ const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
             <Step
               key={`step-${i}`}
               active={i <= props.stepIndex}
-              color={props.color}
+              variant={props.variant}
               content={String(i + 1)}
             >
               {props.stepPrefix && (
@@ -120,16 +123,17 @@ const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
 };
 
 const RootWithProvider: FC<StepsProps> = (props) => {
-  const defaultColor = (props.color ?? "primary") as StepVProps["color"];
+  const defaultColor = props.variant ?? "primary";
+
   const initialState =
     "stepIndex" in props
       ? {
           stepIndex: props.stepIndex,
-          color: defaultColor,
+          variant: defaultColor,
         }
       : {
           stepIndex: 0,
-          color: defaultColor,
+          variant: defaultColor,
         };
   return (
     <StepsStateProvider initialState={initialState}>
@@ -138,23 +142,24 @@ const RootWithProvider: FC<StepsProps> = (props) => {
   );
 };
 
-type StapProps = JSX.IntrinsicElements["li"] &
-  StepVProps & {
-    /**
-     * The content of the step, defaults to the index of the step
-     */
-    content?: string;
-    /**
-     * Whether the step is active
-     */
-    active?: boolean;
-  };
+type LiElement = JSX.IntrinsicElements["li"];
+
+interface StapProps extends LiElement, StepVProps {
+  /**
+   * The content of the step, defaults to the index of the step
+   */
+  content?: string;
+  /**
+   * Whether the step is active
+   */
+  active?: boolean;
+}
 
 const Step: FC<StapProps> = ({
   className,
   content,
   active,
-  color,
+  variant,
   ...props
 }) => {
   const [state] = useStepsStateContainer();
@@ -163,7 +168,7 @@ const Step: FC<StapProps> = ({
     <li
       data-content={content}
       className={twMerge(
-        stepVariance(active ? { color: state.color } : {}),
+        stepVariance(active ? { variant: state.variant } : {}),
         className
       )}
       {...props}

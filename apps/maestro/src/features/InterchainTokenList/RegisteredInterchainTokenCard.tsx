@@ -14,7 +14,7 @@ import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
 
 import { TransactionExecutionError } from "viem";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -24,8 +24,8 @@ import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToke
 import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";
 
-const StatusIndicator = (
-  props: Pick<TokenInfo, "isOriginToken" | "isRegistered">
+const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
+  props
 ) => {
   if (!props.isRegistered && !props.isOriginToken) {
     return null;
@@ -35,7 +35,7 @@ const StatusIndicator = (
 
   return (
     <Tooltip tip={tip} aria-label={tip} position="left">
-      <Badge size="sm" color={props.isOriginToken ? "success" : "info"} />
+      <Badge size="sm" variant={props.isOriginToken ? "success" : "info"} />
     </Tooltip>
   );
 };
@@ -49,7 +49,7 @@ export type Props = TokenInfo & {
 
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
   const { data: balance } = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
@@ -68,7 +68,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     }
   }, [props.chainId, switchNetworkAsync]);
 
-  const isSourceChain = chain?.id === props.chainId;
+  const isSourceChain = chainId === props.chainId;
 
   const switchChainButton = (
     <Button
