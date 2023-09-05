@@ -21,9 +21,9 @@ Toggle.defaultProps = {
 };
 
 // creates stories for variansts (color, size, shape)
-const { Colors, Sizes } = pluralizeKeys(
+const { Variants, Sizes } = pluralizeKeys(
   configurePlayground(Toggle, {
-    color: {
+    variant: {
       values: COLOR_VARIANTS,
       noChildren: true,
     },
@@ -34,4 +34,4 @@ const { Colors, Sizes } = pluralizeKeys(
   })
 );
 
-export { Colors, Sizes };
+export { Variants, Sizes };

@@ -24,17 +24,23 @@ export const Default = Template.bind({});
 
 Default.args = {};
 
-const { InputSizes, Colors } = pluralizeKeys(
-  configurePlayground(Checkbox, {
-    inputSize: {
-      values: SIZE_VARIANTS,
-      noChildren: true,
+const { InputSizes, Variants } = pluralizeKeys(
+  configurePlayground(
+    Checkbox,
+    {
+      inputSize: {
+        values: SIZE_VARIANTS,
+        noChildren: true,
+      },
+      variant: {
+        values: COLOR_VARIANTS,
+        noChildren: true,
+      },
     },
-    color: {
-      values: COLOR_VARIANTS,
-      noChildren: true,
-    },
-  })
+    {
+      defaultChecked: true,
+    }
+  )
 );
 
-export { InputSizes, Colors };
+export { InputSizes, Variants };

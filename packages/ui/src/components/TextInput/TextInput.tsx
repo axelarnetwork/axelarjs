@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 
 const inputVariance = cva("input", {
   variants: {
-    color: {
+    variant: {
       primary: "input-primary",
       secondary: "input-secondary",
       accent: "input-accent",
@@ -49,14 +49,22 @@ export interface TextInputProps extends NativeElementProps, VProps {
  */
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
-    { color, inputSize, ghost, bordered, className, disabled, ...props },
+    {
+      variant: color,
+      inputSize,
+      ghost,
+      bordered,
+      className,
+      disabled,
+      ...props
+    },
     ref
   ) => (
     <input
       className={twMerge(
         inputVariance({
           bordered,
-          color,
+          variant: color,
           inputSize,
           ghost,
           disabled,

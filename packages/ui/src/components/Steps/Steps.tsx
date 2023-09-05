@@ -69,7 +69,8 @@ type PolymorphicProps =
 
 interface BaseStepsProps
   extends Omit<JSX.IntrinsicElements["ul"], "children">,
-    StepsVProps {}
+    StepsVProps,
+    StepVProps {}
 
 export type StepsProps = BaseStepsProps & PolymorphicProps;
 
@@ -106,7 +107,7 @@ const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
             <Step
               key={`step-${i}`}
               active={i <= props.stepIndex}
-              color={props.color}
+              variant={props.variant}
               content={String(i + 1)}
             >
               {props.stepPrefix && (
@@ -122,7 +123,8 @@ const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
 };
 
 const RootWithProvider: FC<StepsProps> = (props) => {
-  const defaultColor = (props.color ?? "primary") as StepVProps["variant"];
+  const defaultColor = props.variant ?? "primary";
+
   const initialState =
     "stepIndex" in props
       ? {

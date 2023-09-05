@@ -24,9 +24,9 @@ export const Default = Template.bind({});
 
 Default.args = {};
 
-const { Colors, Sizes, Shapes } = pluralizeKeys(
+const { Variants, Sizes, Shapes } = pluralizeKeys(
   configurePlayground(Loading, {
-    color: { values: COLOR_VARIANTS },
+    variant: { values: COLOR_VARIANTS },
     size: { values: SIZE_VARIANTS },
     shape: {
       values: ["spinner", "dots", "ring", "infinity", "bars", "ball"],
@@ -35,4 +35,4 @@ const { Colors, Sizes, Shapes } = pluralizeKeys(
   })
 );
 
-export { Colors, Sizes, Shapes };
+export { Variants, Sizes, Shapes };

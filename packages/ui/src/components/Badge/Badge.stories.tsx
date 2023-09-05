@@ -23,11 +23,11 @@ const Template: StoryFn<typeof Badge> = (args) => {
 export const Default = Template.bind({});
 
 // creates stories for variansts (color, size, shape)
-const { Colors, Sizes } = pluralizeKeys(
+const { Variants, Sizes } = pluralizeKeys(
   configurePlayground(Badge, {
-    color: { values: COLOR_VARIANTS },
+    variant: { values: COLOR_VARIANTS },
     size: { values: SIZE_VARIANTS },
   })
 );
 
-export { Colors, Sizes };
+export { Variants, Sizes };
