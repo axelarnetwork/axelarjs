@@ -12,7 +12,7 @@ import { publicProcedure } from "~/server/trpc";
 import type {
   IntercahinTokenDetails,
   RemoteInterchainTokenDetails,
-} from "~/services/kv";
+} from "~/services/db/kv";
 
 const TOKEN_INFO_SCHEMA = z.object({
   tokenId: hex64Literal().nullable(),
@@ -105,16 +105,16 @@ async function getInterchainToken(
   const lookupToken = {
     tokenId: kvResult.tokenId,
     tokenAddress: kvResult.tokenAddress,
-    isOriginToken: kvResult.originChainId === chainConfig.id,
+    isOriginToken: kvResult.chainId === chainConfig.id,
     isRegistered: true,
-    chainId: kvResult.originChainId,
+    chainId: kvResult.chainId,
     chainName: chainConfig.name,
-    axelarChainId: kvResult.originAxelarChainId,
+    axelarChainId: kvResult.axelarChainId,
     kind: kvResult.kind,
   };
 
   const pendingRemoteTokens = kvResult.remoteTokens.filter(
-    (token) => token.status === "pending"
+    (token) => token.deploymentStatus === "pending"
   );
 
   const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
@@ -129,7 +129,7 @@ async function getInterchainToken(
         tokenId: kvResult.tokenId,
         tokenAddress: remoteToken.address,
         isOriginToken: false,
-        isRegistered: remoteToken.status === "deployed",
+        isRegistered: remoteToken.deploymentStatus === "deployed",
         chainId: remoteToken.chainId,
         chainName: chainConfig?.name ?? "Unknown",
         axelarChainId: remoteToken.axelarChainId,
@@ -200,16 +200,16 @@ async function getInterchainToken(
           (x) => x.chainId === t.chainId
         );
         return match
-          ? { ...match, address: t.tokenAddress, status: "deployed" }
+          ? { ...match, address: t.tokenAddress, deploymentStatus: "deployed" }
           : null;
       })
       .filter(Boolean) as RemoteInterchainTokenDetails[];
 
     // update the KV store with the new confirmed remote tokens if any
     if (newConfirmedRemoteTokens.length) {
-      await ctx.storage.kv.recordRemoteTokensDeployment(
+      await ctx.persistence.kv.recordRemoteTokensDeployment(
         {
-          chainId: kvResult.originChainId,
+          chainId: kvResult.chainId,
           tokenAddress: kvResult.tokenAddress,
         },
         newConfirmedRemoteTokens
@@ -254,7 +254,7 @@ async function scanChains(
   ctx: Context
 ) {
   for (const chainConfig of chainConfigs) {
-    const kvEntry = await ctx.storage.kv.getInterchainTokenDetails({
+    const kvEntry = await ctx.persistence.kv.getInterchainTokenDetails({
       chainId: chainConfig.id,
       tokenAddress: tokenAddress,
     });

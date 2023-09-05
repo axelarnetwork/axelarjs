@@ -16,7 +16,7 @@ export const createSignInMessage = publicProcedure
     })
   )
   .mutation(async ({ input, ctx }) => {
-    const { kv } = ctx.storage;
+    const { kv } = ctx.persistence;
 
     const accountNonce = await kv.getAccountNonce(input.address);
 

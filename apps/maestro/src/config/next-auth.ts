@@ -5,7 +5,7 @@ import { kv } from "@vercel/kv";
 import { getAddress, verifyMessage } from "viem";
 
 import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
-import MaestroKVClient from "~/services/kv/MaestroKVClient";
+import MaestroKVClient from "~/services/db/kv";
 
 export type Web3Session = {
   address: `0x${string}`;
@@ -81,7 +81,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
     secret: process.env.JWT_SECRET,
   },
   callbacks: {
-    async session({ session, token }) {
+    session({ session, token }) {
       session.address = token.sub as `0x${string}`;
       return session;
     },

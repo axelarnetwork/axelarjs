@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
-import type { IntercahinTokenDetails } from "~/services/kv";
+import type { IntercahinTokenDetails } from "~/services/db/kv";
 
 export const getInterchainTokenDetails = protectedProcedure
   .input(
@@ -13,7 +13,7 @@ export const getInterchainTokenDetails = protectedProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    const kvResult = await ctx.storage.kv.getInterchainTokenDetails({
+    const kvResult = await ctx.persistence.kv.getInterchainTokenDetails({
       chainId: input.chainId,
       tokenAddress: input.tokenAddress,
     });

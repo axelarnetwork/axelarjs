@@ -24,8 +24,8 @@ import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToke
 import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";
 
-const StatusIndicator = (
-  props: Pick<TokenInfo, "isOriginToken" | "isRegistered">
+const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
+  props
 ) => {
   if (!props.isRegistered && !props.isOriginToken) {
     return null;
