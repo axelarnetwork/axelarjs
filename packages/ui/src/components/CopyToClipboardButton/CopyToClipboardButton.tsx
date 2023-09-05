@@ -51,7 +51,9 @@ export const CopyToClipboardButton = forwardRef<
         <CheckCircleIcon
           className={cn(
             "swap-on h-[1em] w-[1em]",
-            props.color === "success" ? "text-success-content" : "text-success"
+            props.variant === "success"
+              ? "text-success-content"
+              : "text-success"
           )}
         />
         <CopyIcon className={cn("swap-off", "h-[1em] w-[1em]")} />
