@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 
 const inputVariance = cva("checkbox", {
   variants: {
-    color: {
+    variant: {
       primary: "checkbox-primary",
       secondary: "checkbox-secondary",
       accent: "checkbox-accent",
@@ -25,25 +25,24 @@ const inputVariance = cva("checkbox", {
 
 type VProps = VariantProps<typeof inputVariance>;
 
-type NativeElementProps = Omit<JSX.IntrinsicElements["input"], "type">;
+type InputElement = Omit<JSX.IntrinsicElements["input"], "type" | "color">;
 
-export type CheckboxProps = NativeElementProps &
-  VProps & {
-    type?: never;
-    placeholder?: never;
-  };
+export interface CheckboxProps extends InputElement, VProps {
+  type?: never;
+  placeholder?: never;
+}
 
 /**
  * A text input component
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ color, inputSize, className, ...props }, ref) => (
+  ({ variant, inputSize, className, ...props }, ref) => (
     <input
       ref={ref}
       type="checkbox"
       className={twMerge(
         inputVariance({
-          color,
+          variant,
           inputSize,
         }),
         className

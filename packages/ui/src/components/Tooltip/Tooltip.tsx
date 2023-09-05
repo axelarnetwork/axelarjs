@@ -27,10 +27,12 @@ const variance = cva("tooltip", {
 
 const StyledTooltip = tw.div``;
 
-type BaseTooltipProps = ComponentProps<typeof StyledTooltip>;
+type BaseTooltipProps = Omit<ComponentProps<typeof StyledTooltip>, "color">;
 type VProps = VariantProps<typeof variance>;
 
-export type TooltipProps = BaseTooltipProps & VProps & { tip: string };
+export interface TooltipProps extends BaseTooltipProps, VProps {
+  tip: string;
+}
 
 export const Tooltip: FC<TooltipProps> = ({
   tip,

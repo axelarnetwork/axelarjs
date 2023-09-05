@@ -25,17 +25,17 @@ export const Default = Template.bind({});
 Default.args = {
   placeholder: "Placeholder",
 };
-const { InputSizes, Colors } = pluralizeKeys(
+const { InputSizes, Variants } = pluralizeKeys(
   configurePlayground(TextInput, {
     inputSize: {
       values: SIZE_VARIANTS,
       noChildren: true,
     },
-    color: {
+    variant: {
       values: COLOR_VARIANTS,
       noChildren: true,
     },
   })
 );
 
-export { InputSizes, Colors };
+export { InputSizes, Variants };

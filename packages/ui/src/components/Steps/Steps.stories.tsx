@@ -32,7 +32,7 @@ export const Vertical = Template.bind({});
 
 Vertical.args = {
   direction: "vertical",
-  color: "primary",
+  variant: "primary",
   children: (
     <>
       <Steps.Step active>Step 1</Steps.Step>
@@ -46,7 +46,7 @@ export const CustomContent = Template.bind({});
 
 CustomContent.args = {
   direction: "vertical",
-  color: "primary",
+  variant: "primary",
   children: (
     <>
       <Steps.Step active content="?">
@@ -63,7 +63,7 @@ CustomContent.args = {
 export const AutoSteps = Template.bind({});
 
 AutoSteps.args = {
-  color: "primary",
+  variant: "primary",
   stepIndex: 2,
   totalSteps: 4,
 };
@@ -71,7 +71,7 @@ AutoSteps.args = {
 export const AutoStepsWithPrefix = Template.bind({});
 
 AutoStepsWithPrefix.args = {
-  color: "primary",
+  variant: "primary",
   stepPrefix: "Step",
   stepIndex: 2,
   totalSteps: 4,

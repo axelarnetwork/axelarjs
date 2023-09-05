@@ -35,7 +35,7 @@ const StatusIndicator = (
 
   return (
     <Tooltip tip={tip} aria-label={tip} position="left">
-      <Badge size="sm" color={props.isOriginToken ? "success" : "info"} />
+      <Badge size="sm" variant={props.isOriginToken ? "success" : "info"} />
     </Tooltip>
   );
 };
