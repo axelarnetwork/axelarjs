@@ -14,6 +14,6 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "@tsconfig/strictest": "^2.0.1"
+    "@tsconfig/strictest": "^2.0.2"
   }
 }

@@ -22,16 +22,16 @@ const dropdownVariance = cva("dropdown", {
 
 type VProps = VariantProps<typeof dropdownVariance>;
 
-type VariableProps =
+type PolymorphicProps =
   | { $as: never }
   | {
       $as?: "a";
       href?: string;
     };
 
-export type DropdownProps = JSX.IntrinsicElements["div"] &
-  VProps &
-  VariableProps;
+type DivElement = JSX.IntrinsicElements["div"];
+
+export type DropdownProps = DivElement & VProps & PolymorphicProps;
 
 const _Dropdown: FC<DropdownProps> = ({
   className,

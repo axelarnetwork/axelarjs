@@ -34,15 +34,17 @@ export const tabVariance = cva("tab", {
   },
 });
 
-export type TabsProps = ComponentProps<typeof StyledTabs> &
-  VariantProps<typeof tabsVariance>;
+export interface TabsProps
+  extends ComponentProps<typeof StyledTabs>,
+    VariantProps<typeof tabsVariance> {}
 
 const TabsRoot: FC<TabsProps> = ({ boxed, className, ...props }) => (
   <StyledTabs className={cn(tabsVariance({ boxed }), className)} {...props} />
 );
 
-export type TabProps = ComponentProps<typeof StyledTab> &
-  VariantProps<typeof tabVariance>;
+export interface TabProps
+  extends ComponentProps<typeof StyledTab>,
+    VariantProps<typeof tabVariance> {}
 
 const Tab: FC<TabProps> = ({
   active,

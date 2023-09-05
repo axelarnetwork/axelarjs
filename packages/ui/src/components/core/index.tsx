@@ -12,7 +12,7 @@ export const FormControl = tw.div`form-control`;
 
 const StyledLabel = tw.label`label`;
 
-export type LabelProps = ComponentProps<typeof StyledLabel>;
+export interface LabelProps extends ComponentProps<typeof StyledLabel> {}
 
 const BaseLabel: FC<LabelProps> = ({ children, ...props }) => {
   return (

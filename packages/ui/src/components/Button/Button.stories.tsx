@@ -30,10 +30,14 @@ Loading.args = {
 };
 
 // creates stories for variansts (color, size, shape)
-const { Colors, Sizes, Shapes } = pluralizeKeys(
+const { Variants, Sizes, Shapes } = pluralizeKeys(
   configurePlayground(Button, {
-    color: { values: COLOR_VARIANTS },
-    size: { values: SIZE_VARIANTS },
+    variant: {
+      values: COLOR_VARIANTS,
+    },
+    size: {
+      values: SIZE_VARIANTS,
+    },
     shape: {
       values: ["circle", "square"],
       getChildren: (value) =>
@@ -46,4 +50,4 @@ const { Colors, Sizes, Shapes } = pluralizeKeys(
   })
 );
 
-export { Colors, Sizes, Shapes };
+export { Variants, Sizes, Shapes };

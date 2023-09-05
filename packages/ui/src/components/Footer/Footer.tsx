@@ -13,7 +13,9 @@ const footerVariants = cva("footer", {
 
 type VProps = VariantProps<typeof footerVariants>;
 
-export type FooterProps = JSX.IntrinsicElements["div"] & VProps & {};
+type FooterElement = JSX.IntrinsicElements["footer"];
+
+export interface FooterProps extends FooterElement, VProps {}
 
 const BaseFooter: FC<FooterProps> = ({ className, center, ...props }) => (
   <footer className={footerVariants({ center, className })} {...props} />

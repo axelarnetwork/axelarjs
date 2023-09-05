@@ -27,11 +27,15 @@ Default.args = {
   copyText: "Copy me!",
 };
 
-const { Sizes, Colors } = pluralizeKeys(
+const { Sizes, Variants } = pluralizeKeys(
   configurePlayground(CopyToClipboardButton, {
-    color: { values: COLOR_VARIANTS },
-    size: { values: SIZE_VARIANTS },
+    variant: {
+      values: COLOR_VARIANTS,
+    },
+    size: {
+      values: SIZE_VARIANTS,
+    },
   })
 );
 
-export { Sizes, Colors };
+export { Sizes, Variants };
