@@ -4,7 +4,6 @@ import {
   w3mConnectors,
   w3mProvider,
 } from "@web3modal/ethereum";
-import { createWalletClient, http } from "viem";
 import { configureChains, createConfig, type Connector } from "wagmi";
 import {
   arbitrum,
@@ -22,7 +21,6 @@ import {
   fantomTestnet,
   filecoin,
   filecoinCalibration,
-  foundry,
   goerli,
   lineaTestnet,
   mainnet,
@@ -200,21 +198,6 @@ const W3M_CONNECTORS = w3mConnectors({
   chains: EVM_CHAIN_CONFIGS,
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 }) as Connector[];
-
-export const getMockWalletClient = () =>
-  createWalletClient({
-    transport: http(foundry.rpcUrls.default.http[0]),
-    chain: {
-      ...foundry,
-      id: goerli.id,
-      network: goerli.network,
-      name: goerli.name,
-    },
-    name: "Mock Wallet",
-    account: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
-    pollingInterval: 100,
-  });
 
 const connectors: Connector[] = [
   new CoinbaseWalletConnector({
