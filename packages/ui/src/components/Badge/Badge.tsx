@@ -30,7 +30,7 @@ const badgeVariance = cva("badge", {
   },
 });
 
-type BaseBadgeProps = ComponentProps<typeof StyledBadge>;
+type BaseBadgeProps = Omit<ComponentProps<typeof StyledBadge>, "color">;
 
 export interface BadgeProps
   extends BaseBadgeProps,

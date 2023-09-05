@@ -34,7 +34,10 @@ const toggleVariance = cva("toggle", {
 
 type VProps = VariantProps<typeof toggleVariance>;
 
-type BaseToggleProps = Omit<JSX.IntrinsicElements["input"], "type" | "size">;
+type BaseToggleProps = Omit<
+  JSX.IntrinsicElements["input"],
+  "type" | "size" | "color"
+>;
 
 export interface ToggleProps extends BaseToggleProps, VProps {
   indeterminate?: boolean;

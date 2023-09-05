@@ -44,7 +44,7 @@ export const loadingVariance = cva("loading", {
 
 const StyledLoading = tw.span``;
 
-type BaseLoadingProps = ComponentProps<typeof StyledLoading>;
+type BaseLoadingProps = Omit<ComponentProps<typeof StyledLoading>, "color">;
 
 export interface LoadingProps
   extends BaseLoadingProps,

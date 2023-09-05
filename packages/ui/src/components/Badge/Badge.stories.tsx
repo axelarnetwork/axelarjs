@@ -25,8 +25,12 @@ export const Default = Template.bind({});
 // creates stories for variansts (color, size, shape)
 const { Variants, Sizes } = pluralizeKeys(
   configurePlayground(Badge, {
-    variant: { values: COLOR_VARIANTS },
-    size: { values: SIZE_VARIANTS },
+    variant: {
+      values: COLOR_VARIANTS,
+    },
+    size: {
+      values: SIZE_VARIANTS,
+    },
   })
 );
 

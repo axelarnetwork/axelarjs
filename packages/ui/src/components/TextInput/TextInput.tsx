@@ -34,12 +34,12 @@ const inputVariance = cva("input", {
 
 type VProps = VariantProps<typeof inputVariance>;
 
-type NativeElementProps = Omit<
+type BaseTextInputProps = Omit<
   JSX.IntrinsicElements["input"],
   "type" | "color"
 >;
 
-export interface TextInputProps extends NativeElementProps, VProps {
+export interface TextInputProps extends BaseTextInputProps, VProps {
   type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
   disabled?: boolean;
 }

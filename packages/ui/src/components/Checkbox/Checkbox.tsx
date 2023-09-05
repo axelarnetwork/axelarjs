@@ -25,9 +25,9 @@ const inputVariance = cva("checkbox", {
 
 type VProps = VariantProps<typeof inputVariance>;
 
-type NativeElementProps = Omit<JSX.IntrinsicElements["input"], "type">;
+type InputElement = Omit<JSX.IntrinsicElements["input"], "type" | "color">;
 
-export interface CheckboxProps extends NativeElementProps, VProps {
+export interface CheckboxProps extends InputElement, VProps {
   type?: never;
   placeholder?: never;
 }

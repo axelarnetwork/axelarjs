@@ -65,7 +65,7 @@ export const buttonVariance = cva("btn", {
 
 type VProps = VariantProps<typeof buttonVariance>;
 
-type ButtonElement = JSX.IntrinsicElements["button"];
+type ButtonElement = Omit<JSX.IntrinsicElements["button"], "color">;
 
 export interface ButtonProps extends ButtonElement, VProps {
   loading?: boolean;

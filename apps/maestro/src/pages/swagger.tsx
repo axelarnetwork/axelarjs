@@ -10,7 +10,7 @@ const SwaggerUI = dynamic(() => import("swagger-ui-react"), {
     <div className="grid h-[100dvh] place-items-center">
       <GridLoader
         color="var(--primary)"
-        className="animate-ping animate-pulse [animation-duration:3s]"
+        className="animate-pulse [animation-duration:3s]"
       />
     </div>
   ),

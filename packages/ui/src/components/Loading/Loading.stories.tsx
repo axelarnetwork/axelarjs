@@ -26,8 +26,12 @@ Default.args = {};
 
 const { Variants, Sizes, Shapes } = pluralizeKeys(
   configurePlayground(Loading, {
-    variant: { values: COLOR_VARIANTS },
-    size: { values: SIZE_VARIANTS },
+    variant: {
+      values: COLOR_VARIANTS,
+    },
+    size: {
+      values: SIZE_VARIANTS,
+    },
     shape: {
       values: ["spinner", "dots", "ring", "infinity", "bars", "ball"],
       getChildren: (value) => (value === "circle" ? "🔵" : "🟢"),

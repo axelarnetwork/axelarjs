@@ -68,7 +68,7 @@ type PolymorphicProps =
     };
 
 interface BaseStepsProps
-  extends Omit<JSX.IntrinsicElements["ul"], "children">,
+  extends Omit<JSX.IntrinsicElements["ul"], "children" | "color">,
     StepsVProps,
     StepVProps {}
 
