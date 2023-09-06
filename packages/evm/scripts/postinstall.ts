@@ -99,7 +99,7 @@ async function main() {
   // check for latest version on npm
   const { version: latest } = await packageJson(name, {
     version: "latest",
-  }).catch(() => ({ version: "2.0.0" }));
+  }).catch(() => ({ version: "0.1.1" }));
 
   if (version == latest) {
     // nothing to see here

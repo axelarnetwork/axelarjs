@@ -1,6 +1,6 @@
 import { always } from "rambda";
 
-import { HTTPClient, Options } from "../HTTPClient";
+import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
 import {
   EstimateTimeSpentParams,
   GetContractsResponse,
@@ -20,8 +20,8 @@ import {
   SearchGMPResponse,
 } from "./types";
 
-export class GMPClient extends HTTPClient {
-  static init(options: Options) {
+export class GMPClient extends IsomorphicHTTPClient {
+  static init(options: ClientOptions) {
     return new GMPClient(options, {
       name: "GMPClient",
       version: "0.0.1",
@@ -137,5 +137,3 @@ export class GMPClient extends HTTPClient {
       .json<GetContractsResponse>();
   }
 }
-
-export const createGMPClient = GMPClient.init;

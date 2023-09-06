@@ -1,5 +1,5 @@
-import { createGMPClient } from "@axelarjs/api/gmp";
+import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 
-export default createGMPClient({
+export default createGMPBrowserClient({
   prefixUrl: String(process.env.NEXT_PUBLIC_GMP_API_URL),
 });
