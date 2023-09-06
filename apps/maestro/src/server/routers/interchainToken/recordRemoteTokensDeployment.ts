@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
-import { remoteInterchainTokenSchema } from "~/services/kv";
+import { remoteInterchainTokenSchema } from "~/services/db/kv";
 
 export const recordRemoteTokensDeployment = protectedProcedure
   .input(
@@ -14,7 +14,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const kvRecord = await ctx.storage.kv.getInterchainTokenDetails({
+    const kvRecord = await ctx.persistence.kv.getInterchainTokenDetails({
       chainId: input.chainId,
       tokenAddress: input.tokenAddress,
     });
@@ -33,7 +33,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
       });
     }
 
-    return ctx.storage.kv.recordRemoteTokensDeployment(
+    return ctx.persistence.kv.recordRemoteTokensDeployment(
       {
         chainId: input.chainId,
         tokenAddress: input.tokenAddress,

@@ -19,7 +19,7 @@ import {
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import type { IntercahinTokenDetails } from "~/services/kv";
+import type { IntercahinTokenDetails } from "~/services/db/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployAndRegisterInterchainTokenInput = {
@@ -144,18 +144,18 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
         tokenId,
         tokenAddress,
         deployerAddress,
-        originChainId: chainId,
+        chainId: chainId,
         deploymentTxHash: txHash,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
-        originAxelarChainId: input.sourceChainId,
+        axelarChainId: input.sourceChainId,
         remoteTokens: input.destinationChainIds.map((axelarChainId) => ({
           axelarChainId,
           chainId: computed.indexedById[axelarChainId]?.chain_id,
           address: tokenAddress,
-          status: "pending",
-          deplymentTxHash: txHash,
+          deploymentStatus: "pending",
+          deploymentTxHash: txHash,
           // deploymentLogIndex is unknown at this point
         })),
       });

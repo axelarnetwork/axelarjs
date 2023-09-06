@@ -7,21 +7,31 @@
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
   "files": [
-    "build",
-    "query-client",
-    "signing-client"
+    "./build",
+    "./query-client",
+    "./signing-client",
+    "./constants.js",
+    "./utils.js",
+    "./types.js",
+    "./index.js"
   ],
+  "type": "module",
   "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
+    },
+    "./signing-client": {
+      "import": "./build/module/signing-client/index.js",
+      "require": "./build/commonjs/signing-client/index.js"
+    },
+    "./query-client": {
+      "import": "./build/module/query-client/index.js",
+      "require": "./build/commonjs/query-client/index.js"
     }
   },
   "scripts": {

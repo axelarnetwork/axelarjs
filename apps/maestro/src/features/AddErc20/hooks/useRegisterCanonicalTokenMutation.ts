@@ -77,12 +77,12 @@ export function useRegisterCanonicalTokenMutation(
         kind: "canonical",
         tokenId: inputRef.current.expectedTokenId,
         tokenAddress: inputRef.current.tokenAddress,
-        originChainId: chainId,
+        chainId: chainId,
         deploymentTxHash: multicall.data.hash,
         tokenName: inputRef.current.tokenName,
         tokenSymbol: inputRef.current.tokenSymbol,
         tokenDecimals: inputRef.current.decimals,
-        originAxelarChainId: inputRef.current.sourceChainId,
+        axelarChainId: inputRef.current.sourceChainId,
         remoteTokens: [],
       });
 

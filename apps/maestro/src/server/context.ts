@@ -16,9 +16,9 @@ import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
-import MaestroDBClient from "~/services/db/MaestroDBClient";
+import MaestroKVClient from "~/services/db/kv";
+import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
-import MaestroKVClient from "~/services/kv";
 
 type ContextConfig = {
   req: NextApiRequest;
@@ -41,9 +41,15 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
     },
-    storage: {
+    persistence: {
+      /**
+       * key-value store adapter
+       */
       kv: new MaestroKVClient(kv),
-      db: new MaestroDBClient(db),
+      /**
+       * postgres adapter
+       */
+      postgres: new MaestroPostgresClient(db),
     },
     contracts: {
       createERC20Client(chain: Chain, address: `0x${string}`) {
