@@ -12,7 +12,7 @@ describe("addGas", () => {
       environment: "testnet",
       axelarRpcUrl: "https://axelartest-rpc.quickapi.com",
       cosmosBasedWalletDetails: {
-        mnemonic: process.env["WALLET_MNEMONIC"] || "",
+        mnemonic: process.env["COSMOS_WALLET_MNEMONIC"] || "",
       },
       options: {},
     });

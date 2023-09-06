@@ -41,3 +41,5 @@ jobs:
 
       - name: Run tests
         run: pnpm test:ci
+        env:
+          COSMOS_WALLET_MNEMONIC: ${{ secrets.COSMOS_WALLET_MNEMONIC }}
