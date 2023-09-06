@@ -8,7 +8,17 @@ import {
   type NewRemoteInterchainToken,
 } from "~/lib/drizzle/schema";
 
-export default class MaestroDBClient {
+type NewRemoteInterchainTokenInput = Omit<
+  NewRemoteInterchainToken,
+  "createdAt" | "updatedAt"
+>;
+
+type NewInterchainTokenInput = Omit<
+  NewInterchainToken,
+  "createdAt" | "updatedAt"
+>;
+
+export default class MaestroPostgresClient {
   constructor(private db: DBClient) {}
 
   /**
@@ -17,8 +27,10 @@ export default class MaestroDBClient {
    * @param interchainToken
    * @returns
    */
-  async recordInterchainTokenDeployment(value: NewInterchainToken) {
-    await this.db.insert(interchainTokens).values(value);
+  async recordInterchainTokenDeployment(value: NewInterchainTokenInput) {
+    await this.db
+      .insert(interchainTokens)
+      .values({ ...value, createdAt: new Date(), updatedAt: new Date() });
   }
 
   /**
@@ -27,8 +39,30 @@ export default class MaestroDBClient {
    * @param _variables
    * @returns
    */
-  async recordRemoteInterchainTokenDeployment(value: NewRemoteInterchainToken) {
-    await this.db.insert(remoteInterchainTokens).values(value);
+  async recordRemoteInterchainTokenDeployment(
+    value: NewRemoteInterchainTokenInput
+  ) {
+    await this.db
+      .insert(remoteInterchainTokens)
+      .values({ ...value, createdAt: new Date(), updatedAt: new Date() });
+  }
+
+  /**
+   * Records the deployment of multiple remote interchain tokens.
+   *
+   * @param _variables
+   * @returns
+   */
+  async recordRemoteInterchainTokenDeployments(
+    value: NewRemoteInterchainTokenInput[]
+  ) {
+    await this.db.insert(remoteInterchainTokens).values(
+      value.map((v) => ({
+        ...v,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    );
   }
 
   /**

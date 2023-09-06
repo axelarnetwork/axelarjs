@@ -166,8 +166,8 @@ importers:
         specifier: ^1.13.1
         version: 1.13.1
       swagger-ui-react:
-        specifier: ^5.5.0
-        version: 5.5.0(@types/react-dom@18.2.7)(@types/react@18.2.16)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^5.6.1
+        version: 5.6.1(@types/react-dom@18.2.7)(@types/react@18.2.16)(react-dom@18.2.0)(react@18.2.0)
       tailwind-styled-components:
         specifier: ^2.2.0
         version: 2.2.0(react-dom@18.2.0)(react@18.2.0)
@@ -510,6 +510,27 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
 
+  packages/transaction-recovery:
+    devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
+      '@axelarjs/cosmos':
+        specifier: workspace:*
+        version: link:../cosmos
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      rimraf:
+        specifier: ^5.0.1
+        version: 5.0.1
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      vitest:
+        specifier: ^0.34.3
+        version: 0.34.3(happy-dom@9.20.3)
+
   packages/ui:
     dependencies:
       '@axelarjs/config':
@@ -607,8 +628,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       '@tailwindcss/typography':
-        specifier: ^0.5.9
-        version: 0.5.9(tailwindcss@3.3.3)
+        specifier: ^0.5.10
+        version: 0.5.10(tailwindcss@3.3.3)
       '@testing-library/jest-dom':
         specifier: ^5.17.0
         version: 5.17.0
@@ -7197,8 +7218,8 @@ packages:
       defer-to-connect: 2.0.1
     dev: true
 
-  /@tailwindcss/typography@0.5.9(tailwindcss@3.3.3):
-    resolution: {integrity: sha512-t8Sg3DyynFysV9f4JDOVISGsjazNb48AeIYQwcL+Bsq5uf4RYL75C1giZ43KISjeDGBaTN3Kxh7Xj/vRSMJUUg==}
+  /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
     dependencies:
@@ -17465,8 +17486,8 @@ packages:
       - encoding
     dev: false
 
-  /swagger-ui-react@5.5.0(@types/react-dom@18.2.7)(@types/react@18.2.16)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-K2LSaVQwmPa3Rvp9n1ULVMjFArboOI4/mXy1bD6HkENzCABURGvEB5I0wG+L86ExbJd/OQ42iqKOYWcuwW7zvA==}
+  /swagger-ui-react@5.6.1(@types/react-dom@18.2.7)(@types/react@18.2.16)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-qjCcGu1nj1SjkhDw1qKZL+gxlMvLR3H2T36L+yiStMBtNxTQNN9eyu3bah/mdJlTDWF/SKEAV0gzMlqds4XtUg==}
     peerDependencies:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
