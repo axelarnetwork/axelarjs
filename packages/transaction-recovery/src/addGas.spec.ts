@@ -18,6 +18,5 @@ describe("addGas", () => {
     });
 
     await addGas(signingClient, TX_HASH);
-    console.log({ addGas });
   });
 });
