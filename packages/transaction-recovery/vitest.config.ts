@@ -7,6 +7,7 @@ export default defineConfig({
     environment: "node",
     exclude: ["**/node_modules/**"],
     globals: true,
+    setupFiles: ["dotenv/config"],
   },
   resolve: {
     alias: {
