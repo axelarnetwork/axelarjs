@@ -47,7 +47,7 @@
     "@vercel/postgres": "^0.4.1",
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/react": "^2.7.1",
-    "drizzle-orm": "^0.28.5",
+    "drizzle-orm": "^0.28.6",
     "eslint": "^8.48.0",
     "eslint-config-next": "^13.4.19",
     "ky": "^1.0.1",
@@ -69,7 +69,7 @@
     "tailwind-styled-components": "^2.2.0",
     "trpc-openapi": "^1.2.0",
     "typescript": "^5.2.2",
-    "viem": "~1.10.3",
+    "viem": "~1.10.4",
     "wagmi": "^1.4.1",
     "zod": "^3.22.2"
   },
