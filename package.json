@@ -52,5 +52,11 @@
   "resolutions": {
     "@types/react": "18.2.16",
     "vite": "4.4.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "protobufjs@>=6.10.0 <6.11.4": ">=6.11.4",
+      "@adobe/css-tools@<4.3.1": ">=4.3.1"
+    }
   }
 }

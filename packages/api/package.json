@@ -26,16 +26,21 @@
       "import": "./build/module/axelar-query/index.js",
       "require": "./build/commonjs/axelar-query/index.js"
     },
+    "./gmp/*": {
+      "import": "./build/module/gmp/*.js",
+      "require": "./build/commonjs//gmp/*.js"
+    },
+    "./axelarscan/*": {
+      "import": "./build/module/axelarscan/*.js",
+      "require": "./build/commonjs/axelarscan/*.js"
+    },
+    "./axelar-query/*": {
+      "import": "./build/module/axelar-query/*.js",
+      "require": "./build/commonjs/axelar-query/*.js"
+    },
     ".": {
-      "import": "./build/module/index.js",
-      "require": "./build/commonjs/index.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
     }
   },
   "scripts": {
@@ -54,12 +59,14 @@
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
     "vitest": "^0.34.3"
   },
   "dependencies": {
-    "ky": "^0.33.3",
+    "got": "^13.0.0",
+    "ky": "^1.0.1",
     "rambda": "^7.5.0"
   }
 }

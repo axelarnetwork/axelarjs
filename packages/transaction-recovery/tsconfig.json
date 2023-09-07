@@ -1,13 +1,11 @@
 {
   "extends": "@axelarjs/config/tsconfig.strictest",
-  "include": ["src", "test"],
+  "include": ["src", "scripts"],
   "compilerOptions": {
     "baseUrl": ".",
-    "declaration": true,
     "paths": {
       "~/*": ["./src/*"]
     },
     "types": ["vitest/globals"]
-  },
-  "files": ["src/global.d.ts", "vitest.config.ts"]
+  }
 }
