@@ -519,7 +519,7 @@ importers:
   packages/transaction-recovery:
     dependencies:
       '@axelarjs/core':
-        specifier: workspace:^0.1.1
+        specifier: workspace:*
         version: link:../core
       '@cosmjs/proto-signing':
         specifier: ^0.30.1

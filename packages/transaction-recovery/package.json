@@ -26,7 +26,7 @@
     "vitest": "^0.34.3"
   },
   "dependencies": {
-    "@axelarjs/core": "workspace:^0.1.1",
+    "@axelarjs/core": "workspace:*",
     "@cosmjs/proto-signing": "^0.30.1",
     "@cosmjs/stargate": "^0.31.1"
   }
