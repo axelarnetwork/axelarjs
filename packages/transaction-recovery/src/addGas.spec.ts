@@ -4,8 +4,6 @@ import addGas from "./addGas";
 
 const TX_HASH = `A6516262B303AF6D5D1599F46B52D2ED47DC1C1FFA3E56822A4313916C9AC8C4`;
 
-console.log("process.env", process.env);
-
 describe("addGas", () => {
   test("do stuff", async () => {
     const signingClient = await createAxelarSigningClient({
