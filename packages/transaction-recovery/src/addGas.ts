@@ -1,25 +1,66 @@
-import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
-import type { AxelarSigningClient } from "@axelarjs/cosmos/signing-client";
+import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
-const gmpClient = createGMPNodeClient({
-  prefixUrl: "https://testnet.api.gmp.axelarscan.io",
-});
+import type { AccountData } from "@cosmjs/proto-signing";
+import type { Coin, StdFee } from "@cosmjs/stargate";
 
-async function addGas(signingClient: AxelarSigningClient, txHash: string) {
-  const tx = await signingClient.getTx(txHash);
-  console.log({ tx });
+import { getCosmosSigner, getCosmosWallet } from "./cosmosSigner";
+import { gmpClient } from "./services";
 
-  const fees = await gmpClient.getFees({
-    destinationChain: "ethereum-2",
-    sourceChain: "polygon",
-  });
+export type SendOptions = {
+  channelIdToAxelar: string;
+  rpcUrl: string;
+  addressPrefix: string;
+  txFee: StdFee;
+  timeoutTimestamp?: number;
+  environment: Environment;
+  cosmos_mnemonic: string;
+};
+async function addGas(
+  txHash: string,
+  token: Coin | "autocalculate",
+  sendOptions: SendOptions
+) {
+  if (token === "autocalculate")
+    throw new Error("autocalculate not yet supported, but we will soon!");
 
-  console.log({ fees });
+  const tx = await gmpClient(sendOptions.environment)
+    .searchGMP({
+      txHash,
+    })
+    .catch(() => undefined);
 
-  // send ibc transfer with memo field using message ID from tx above
-  // todo
+  if (!tx || tx?.length < 1) throw new Error(`${txHash} could not be found`);
 
-  return {};
+  const offlineSigner = await getCosmosWallet(
+    sendOptions.cosmos_mnemonic,
+    sendOptions.addressPrefix
+  );
+
+  const { address: sender } = (
+    await offlineSigner.getAccounts()
+  )[0] as AccountData;
+
+  const signer = await getCosmosSigner(sendOptions.rpcUrl, offlineSigner);
+
+  return signer.signAndBroadcast(
+    sender,
+    [
+      {
+        typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
+        value: {
+          sourcePort: "transfer",
+          sourceChannel: sendOptions.channelIdToAxelar,
+          token,
+          sender,
+          receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
+          timeoutTimestamp:
+            sendOptions.timeoutTimestamp ?? (Date.now() + 90) * 1e9,
+          memo: tx[0]?.call.id,
+        },
+      },
+    ],
+    sendOptions.txFee
+  );
 }
 
 export default addGas;

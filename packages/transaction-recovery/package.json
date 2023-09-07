@@ -17,12 +17,17 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
+    "@axelarjs/api": "workspace:*",
     "@axelarjs/config": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
-    "@axelarjs/api": "workspace:*",
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vitest": "^0.34.3"
+  },
+  "dependencies": {
+    "@axelarjs/core": "workspace:^0.1.1",
+    "@cosmjs/proto-signing": "^0.30.1",
+    "@cosmjs/stargate": "^0.31.1"
   }
 }
