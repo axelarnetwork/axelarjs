@@ -521,6 +521,9 @@ importers:
       '@axelarjs/core':
         specifier: workspace:*
         version: link:../core
+      '@axelarjs/cosmos':
+        specifier: workspace:*
+        version: link:../cosmos
       '@cosmjs/proto-signing':
         specifier: ^0.30.1
         version: 0.30.1
@@ -534,9 +537,6 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
-      '@axelarjs/cosmos':
-        specifier: workspace:*
-        version: link:../cosmos
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1

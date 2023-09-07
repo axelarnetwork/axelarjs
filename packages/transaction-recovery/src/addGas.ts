@@ -1,6 +1,5 @@
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
-import type { AccountData } from "@cosmjs/proto-signing";
 import type { Coin, StdFee } from "@cosmjs/stargate";
 
 import { getCosmosSigner, getCosmosWallet } from "./cosmosSigner";
@@ -9,19 +8,21 @@ import { gmpClient } from "./services";
 export type SendOptions = {
   channelIdToAxelar: string;
   rpcUrl: string;
-  addressPrefix: string;
   txFee: StdFee;
   timeoutTimestamp?: number;
   environment: Environment;
-  cosmos_mnemonic: string;
+  cosmosAddressPrefix: string;
+  cosmosWalletMnemonic: string;
 };
+
 async function addGas(
   txHash: string,
   token: Coin | "autocalculate",
   sendOptions: SendOptions
 ) {
-  if (token === "autocalculate")
+  if (token === "autocalculate") {
     throw new Error("autocalculate not yet supported, but we will soon!");
+  }
 
   const tx = await gmpClient(sendOptions.environment)
     .searchGMP({
@@ -29,16 +30,22 @@ async function addGas(
     })
     .catch(() => undefined);
 
-  if (!tx || tx?.length < 1) throw new Error(`${txHash} could not be found`);
+  if (!tx || tx?.length < 1) {
+    throw new Error(`${txHash} could not be found`);
+  }
 
   const offlineSigner = await getCosmosWallet(
-    sendOptions.cosmos_mnemonic,
-    sendOptions.addressPrefix
+    sendOptions.cosmosWalletMnemonic,
+    sendOptions.cosmosAddressPrefix
   );
 
-  const { address: sender } = (
-    await offlineSigner.getAccounts()
-  )[0] as AccountData;
+  const sender = await offlineSigner
+    .getAccounts()
+    .then(([acc]) => acc?.address);
+
+  if (!sender) {
+    throw new Error("Sender could not be found");
+  }
 
   const signer = await getCosmosSigner(sendOptions.rpcUrl, offlineSigner);
 
