@@ -46,7 +46,7 @@ type BaseGMPParams = {
 
 export type SearchGMPParams = BaseGMPParams & {
   contractMethod?: "callContrct" | "callContrctWithToken";
-  txHash?: `0x${string}`;
+  txHash?: string | `0x${string}`;
   txLogIndex?: number;
   status?: GMPTxStatus;
   from?: number;
