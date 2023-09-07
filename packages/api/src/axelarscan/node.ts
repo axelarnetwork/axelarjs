@@ -1,4 +1,4 @@
-import got, { type Options } from "got/dist/source";
+import got, { type Options } from "got";
 
 import { AxelarscanClient } from "./isomorphic";
 

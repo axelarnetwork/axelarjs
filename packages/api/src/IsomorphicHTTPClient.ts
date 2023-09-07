@@ -1,4 +1,4 @@
-import type { Got } from "got/dist/source";
+import type { Got } from "got";
 import type { KyInstance } from "ky/distribution/types/ky";
 
 /**
