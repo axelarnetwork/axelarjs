@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/transaction-recovery",
   "version": "0.0.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Axelarjs Transaction Recovery",
   "repository": {
     "type": "git",
