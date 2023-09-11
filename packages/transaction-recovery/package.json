@@ -11,6 +11,9 @@
   },
   "files": [
     "./build",
+    "./cosmosSigner",
+    "./services",
+    "./addGas.js",
     "./index.js"
   ],
   "exports": {
