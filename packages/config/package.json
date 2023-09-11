@@ -2,6 +2,9 @@
   "name": "@axelarjs/config",
   "version": "0.1.1",
   "description": "AxelarJS shared configuration",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
