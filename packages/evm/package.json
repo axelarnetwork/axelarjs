@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/evm",
   "version": "0.1.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "EVM clients & utils",
   "type": "module",
   "repository": {

@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/proto",
   "version": "0.32.5",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Axelarcore supporting protobuf types",
   "repository": {
     "type": "git",
