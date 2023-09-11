@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.7
+
+### Patch Changes
+
+- changing default to named exports for addGas method
+
 ## 0.0.6
 
 ### Patch Changes
