@@ -10,6 +10,7 @@
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
