@@ -9,8 +9,20 @@
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
-  "main": "index.js",
-  "types": "index.d.ts",
+  "files": [
+    "./build",
+    "./index.js"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
