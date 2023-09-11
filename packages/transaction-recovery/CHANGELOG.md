@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.5
+
+### Patch Changes
+
+- adding files to package.json
+
 ## 0.0.4
 
 ### Patch Changes
