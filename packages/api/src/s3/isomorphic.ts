@@ -1,5 +1,3 @@
-import { partition } from "rambda";
-
 import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
 
 export class S3Client extends IsomorphicHTTPClient {
