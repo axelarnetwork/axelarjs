@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.4
+
+### Patch Changes
+
+- adding declaractions flag to tsconfig
+
 ## 0.0.3
 
 ### Patch Changes
