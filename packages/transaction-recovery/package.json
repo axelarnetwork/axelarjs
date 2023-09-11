@@ -16,6 +16,13 @@
     "./addGas.js",
     "./index.js"
   ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "import": "./build/module/index.js",
