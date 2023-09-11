@@ -1,6 +1,9 @@
 {
   "name": "axelarjs",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "restricted"
+  },
   "description": "Axelar Network foundations for javascript/Typescript based applications",
   "repository": {
     "type": "git",
