@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.6
+
+### Patch Changes
+
+- adding typesVersions to transaction-recovery package.json
+
 ## 0.0.5
 
 ### Patch Changes
