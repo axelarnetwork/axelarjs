@@ -6,7 +6,6 @@
     "paths": {
       "~/*": ["./src/*"]
     },
-    "declaration": true,
     "types": ["vitest/globals"]
   }
 }
