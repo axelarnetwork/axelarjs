@@ -2,39 +2,88 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 
-import { PollMetadata } from "../exported/v1beta1/types";
 import { Params } from "./params";
 
 export const protobufPackage = "axelar.vote.v1beta1";
 
-export interface GenesisState {
+/** ParamsRequest represents a message that queries the params */
+export interface ParamsRequest {}
+
+export interface ParamsResponse {
   params?: Params | undefined;
-  pollMetadatas: PollMetadata[];
 }
 
-function createBaseGenesisState(): GenesisState {
-  return { params: undefined, pollMetadatas: [] };
+function createBaseParamsRequest(): ParamsRequest {
+  return {};
 }
 
-export const GenesisState = {
+export const ParamsRequest = {
   encode(
-    message: GenesisState,
+    _: ParamsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsRequest {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): ParamsRequest {
+    return {};
+  },
+
+  toJSON(_: ParamsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    base?: I
+  ): ParamsRequest {
+    return ParamsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    _: I
+  ): ParamsRequest {
+    const message = createBaseParamsRequest();
+    return message;
+  },
+};
+
+function createBaseParamsResponse(): ParamsResponse {
+  return { params: undefined };
+}
+
+export const ParamsResponse = {
+  encode(
+    message: ParamsResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.pollMetadatas) {
-      PollMetadata.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GenesisState {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGenesisState();
+    const message = createBaseParamsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -45,15 +94,6 @@ export const GenesisState = {
 
           message.params = Params.decode(reader, reader.uint32());
           continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.pollMetadatas.push(
-            PollMetadata.decode(reader, reader.uint32())
-          );
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -63,43 +103,33 @@ export const GenesisState = {
     return message;
   },
 
-  fromJSON(object: any): GenesisState {
+  fromJSON(object: any): ParamsResponse {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      pollMetadatas: Array.isArray(object?.pollMetadatas)
-        ? object.pollMetadatas.map((e: any) => PollMetadata.fromJSON(e))
-        : [],
     };
   },
 
-  toJSON(message: GenesisState): unknown {
+  toJSON(message: ParamsResponse): unknown {
     const obj: any = {};
     if (message.params !== undefined) {
       obj.params = Params.toJSON(message.params);
     }
-    if (message.pollMetadatas?.length) {
-      obj.pollMetadatas = message.pollMetadatas.map((e) =>
-        PollMetadata.toJSON(e)
-      );
-    }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GenesisState>, I>>(
+  create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
     base?: I
-  ): GenesisState {
-    return GenesisState.fromPartial(base ?? ({} as any));
+  ): ParamsResponse {
+    return ParamsResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
+  fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
     object: I
-  ): GenesisState {
-    const message = createBaseGenesisState();
+  ): ParamsResponse {
+    const message = createBaseParamsResponse();
     message.params =
       object.params !== undefined && object.params !== null
         ? Params.fromPartial(object.params)
         : undefined;
-    message.pollMetadatas =
-      object.pollMetadatas?.map((e) => PollMetadata.fromPartial(e)) || [];
     return message;
   },
 };

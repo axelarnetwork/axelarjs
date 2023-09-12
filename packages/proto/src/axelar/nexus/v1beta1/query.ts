@@ -16,6 +16,7 @@ import {
   transferStateFromJSON,
   transferStateToJSON,
 } from "../exported/v1beta1/types";
+import { Params } from "./params";
 import { ChainState } from "./types";
 
 export const protobufPackage = "axelar.nexus.v1beta1";
@@ -92,12 +93,12 @@ export interface LatestDepositAddressResponse {
 export interface TransfersForChainRequest {
   chain: string;
   state: TransferState;
-  pagination?: PageRequest;
+  pagination?: PageRequest | undefined;
 }
 
 export interface TransfersForChainResponse {
   transfers: CrossChainTransfer[];
-  pagination?: PageResponse;
+  pagination?: PageResponse | undefined;
 }
 
 /**
@@ -110,7 +111,7 @@ export interface FeeInfoRequest {
 }
 
 export interface FeeInfoResponse {
-  feeInfo?: FeeInfo;
+  feeInfo?: FeeInfo | undefined;
 }
 
 /**
@@ -124,7 +125,7 @@ export interface TransferFeeRequest {
 }
 
 export interface TransferFeeResponse {
-  fee?: Coin;
+  fee?: Coin | undefined;
 }
 
 /**
@@ -160,7 +161,7 @@ export interface ChainStateRequest {
 }
 
 export interface ChainStateResponse {
-  state?: ChainState;
+  state?: ChainState | undefined;
 }
 
 /**
@@ -199,16 +200,16 @@ export interface TransferRateLimitRequest {
 }
 
 export interface TransferRateLimitResponse {
-  transferRateLimit?: TransferRateLimit;
+  transferRateLimit?: TransferRateLimit | undefined;
 }
 
 export interface TransferRateLimit {
   limit: Uint8Array;
-  window?: Duration;
+  window?: Duration | undefined;
   incoming: Uint8Array;
   outgoing: Uint8Array;
   /** time_left indicates the time left in the rate limit window */
-  timeLeft?: Duration;
+  timeLeft?: Duration | undefined;
 }
 
 export interface MessageRequest {
@@ -216,7 +217,14 @@ export interface MessageRequest {
 }
 
 export interface MessageResponse {
-  message?: GeneralMessage;
+  message?: GeneralMessage | undefined;
+}
+
+/** ParamsRequest represents a message that queries the params */
+export interface ParamsRequest {}
+
+export interface ParamsResponse {
+  params?: Params | undefined;
 }
 
 function createBaseChainMaintainersRequest(): ChainMaintainersRequest {
@@ -267,16 +275,17 @@ export const ChainMaintainersRequest = {
 
   toJSON(message: ChainMaintainersRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainMaintainersRequest>, I>>(
     base?: I
   ): ChainMaintainersRequest {
-    return ChainMaintainersRequest.fromPartial(base ?? {});
+    return ChainMaintainersRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainMaintainersRequest>, I>>(
     object: I
   ): ChainMaintainersRequest {
@@ -338,12 +347,8 @@ export const ChainMaintainersResponse = {
 
   toJSON(message: ChainMaintainersResponse): unknown {
     const obj: any = {};
-    if (message.maintainers) {
-      obj.maintainers = message.maintainers.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.maintainers = [];
+    if (message.maintainers?.length) {
+      obj.maintainers = message.maintainers.map((e) => base64FromBytes(e));
     }
     return obj;
   },
@@ -351,9 +356,8 @@ export const ChainMaintainersResponse = {
   create<I extends Exact<DeepPartial<ChainMaintainersResponse>, I>>(
     base?: I
   ): ChainMaintainersResponse {
-    return ChainMaintainersResponse.fromPartial(base ?? {});
+    return ChainMaintainersResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainMaintainersResponse>, I>>(
     object: I
   ): ChainMaintainersResponse {
@@ -441,21 +445,23 @@ export const LatestDepositAddressRequest = {
 
   toJSON(message: LatestDepositAddressRequest): unknown {
     const obj: any = {};
-    message.recipientAddr !== undefined &&
-      (obj.recipientAddr = message.recipientAddr);
-    message.recipientChain !== undefined &&
-      (obj.recipientChain = message.recipientChain);
-    message.depositChain !== undefined &&
-      (obj.depositChain = message.depositChain);
+    if (message.recipientAddr !== "") {
+      obj.recipientAddr = message.recipientAddr;
+    }
+    if (message.recipientChain !== "") {
+      obj.recipientChain = message.recipientChain;
+    }
+    if (message.depositChain !== "") {
+      obj.depositChain = message.depositChain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<LatestDepositAddressRequest>, I>>(
     base?: I
   ): LatestDepositAddressRequest {
-    return LatestDepositAddressRequest.fromPartial(base ?? {});
+    return LatestDepositAddressRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<LatestDepositAddressRequest>, I>>(
     object: I
   ): LatestDepositAddressRequest {
@@ -517,17 +523,17 @@ export const LatestDepositAddressResponse = {
 
   toJSON(message: LatestDepositAddressResponse): unknown {
     const obj: any = {};
-    message.depositAddr !== undefined &&
-      (obj.depositAddr = message.depositAddr);
+    if (message.depositAddr !== "") {
+      obj.depositAddr = message.depositAddr;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<LatestDepositAddressResponse>, I>>(
     base?: I
   ): LatestDepositAddressResponse {
-    return LatestDepositAddressResponse.fromPartial(base ?? {});
+    return LatestDepositAddressResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<LatestDepositAddressResponse>, I>>(
     object: I
   ): LatestDepositAddressResponse {
@@ -611,22 +617,23 @@ export const TransfersForChainRequest = {
 
   toJSON(message: TransfersForChainRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.state !== undefined &&
-      (obj.state = transferStateToJSON(message.state));
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.state !== 0) {
+      obj.state = transferStateToJSON(message.state);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransfersForChainRequest>, I>>(
     base?: I
   ): TransfersForChainRequest {
-    return TransfersForChainRequest.fromPartial(base ?? {});
+    return TransfersForChainRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransfersForChainRequest>, I>>(
     object: I
   ): TransfersForChainRequest {
@@ -711,26 +718,22 @@ export const TransfersForChainResponse = {
 
   toJSON(message: TransfersForChainResponse): unknown {
     const obj: any = {};
-    if (message.transfers) {
+    if (message.transfers?.length) {
       obj.transfers = message.transfers.map((e) =>
-        e ? CrossChainTransfer.toJSON(e) : undefined
+        CrossChainTransfer.toJSON(e)
       );
-    } else {
-      obj.transfers = [];
     }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransfersForChainResponse>, I>>(
     base?: I
   ): TransfersForChainResponse {
-    return TransfersForChainResponse.fromPartial(base ?? {});
+    return TransfersForChainResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransfersForChainResponse>, I>>(
     object: I
   ): TransfersForChainResponse {
@@ -803,17 +806,20 @@ export const FeeInfoRequest = {
 
   toJSON(message: FeeInfoRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.asset !== undefined && (obj.asset = message.asset);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<FeeInfoRequest>, I>>(
     base?: I
   ): FeeInfoRequest {
-    return FeeInfoRequest.fromPartial(base ?? {});
+    return FeeInfoRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<FeeInfoRequest>, I>>(
     object: I
   ): FeeInfoRequest {
@@ -873,19 +879,17 @@ export const FeeInfoResponse = {
 
   toJSON(message: FeeInfoResponse): unknown {
     const obj: any = {};
-    message.feeInfo !== undefined &&
-      (obj.feeInfo = message.feeInfo
-        ? FeeInfo.toJSON(message.feeInfo)
-        : undefined);
+    if (message.feeInfo !== undefined) {
+      obj.feeInfo = FeeInfo.toJSON(message.feeInfo);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<FeeInfoResponse>, I>>(
     base?: I
   ): FeeInfoResponse {
-    return FeeInfoResponse.fromPartial(base ?? {});
+    return FeeInfoResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<FeeInfoResponse>, I>>(
     object: I
   ): FeeInfoResponse {
@@ -969,20 +973,23 @@ export const TransferFeeRequest = {
 
   toJSON(message: TransferFeeRequest): unknown {
     const obj: any = {};
-    message.sourceChain !== undefined &&
-      (obj.sourceChain = message.sourceChain);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.sourceChain !== "") {
+      obj.sourceChain = message.sourceChain;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.amount !== "") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferFeeRequest>, I>>(
     base?: I
   ): TransferFeeRequest {
-    return TransferFeeRequest.fromPartial(base ?? {});
+    return TransferFeeRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferFeeRequest>, I>>(
     object: I
   ): TransferFeeRequest {
@@ -1039,17 +1046,17 @@ export const TransferFeeResponse = {
 
   toJSON(message: TransferFeeResponse): unknown {
     const obj: any = {};
-    message.fee !== undefined &&
-      (obj.fee = message.fee ? Coin.toJSON(message.fee) : undefined);
+    if (message.fee !== undefined) {
+      obj.fee = Coin.toJSON(message.fee);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferFeeResponse>, I>>(
     base?: I
   ): TransferFeeResponse {
-    return TransferFeeResponse.fromPartial(base ?? {});
+    return TransferFeeResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferFeeResponse>, I>>(
     object: I
   ): TransferFeeResponse {
@@ -1109,17 +1116,17 @@ export const ChainsRequest = {
 
   toJSON(message: ChainsRequest): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = chainStatusToJSON(message.status));
+    if (message.status !== 0) {
+      obj.status = chainStatusToJSON(message.status);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainsRequest>, I>>(
     base?: I
   ): ChainsRequest {
-    return ChainsRequest.fromPartial(base ?? {});
+    return ChainsRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainsRequest>, I>>(
     object: I
   ): ChainsRequest {
@@ -1178,10 +1185,8 @@ export const ChainsResponse = {
 
   toJSON(message: ChainsResponse): unknown {
     const obj: any = {};
-    if (message.chains) {
-      obj.chains = message.chains.map((e) => e);
-    } else {
-      obj.chains = [];
+    if (message.chains?.length) {
+      obj.chains = message.chains;
     }
     return obj;
   },
@@ -1189,9 +1194,8 @@ export const ChainsResponse = {
   create<I extends Exact<DeepPartial<ChainsResponse>, I>>(
     base?: I
   ): ChainsResponse {
-    return ChainsResponse.fromPartial(base ?? {});
+    return ChainsResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainsResponse>, I>>(
     object: I
   ): ChainsResponse {
@@ -1246,16 +1250,17 @@ export const AssetsRequest = {
 
   toJSON(message: AssetsRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<AssetsRequest>, I>>(
     base?: I
   ): AssetsRequest {
-    return AssetsRequest.fromPartial(base ?? {});
+    return AssetsRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AssetsRequest>, I>>(
     object: I
   ): AssetsRequest {
@@ -1314,10 +1319,8 @@ export const AssetsResponse = {
 
   toJSON(message: AssetsResponse): unknown {
     const obj: any = {};
-    if (message.assets) {
-      obj.assets = message.assets.map((e) => e);
-    } else {
-      obj.assets = [];
+    if (message.assets?.length) {
+      obj.assets = message.assets;
     }
     return obj;
   },
@@ -1325,9 +1328,8 @@ export const AssetsResponse = {
   create<I extends Exact<DeepPartial<AssetsResponse>, I>>(
     base?: I
   ): AssetsResponse {
-    return AssetsResponse.fromPartial(base ?? {});
+    return AssetsResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AssetsResponse>, I>>(
     object: I
   ): AssetsResponse {
@@ -1382,16 +1384,17 @@ export const ChainStateRequest = {
 
   toJSON(message: ChainStateRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainStateRequest>, I>>(
     base?: I
   ): ChainStateRequest {
-    return ChainStateRequest.fromPartial(base ?? {});
+    return ChainStateRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainStateRequest>, I>>(
     object: I
   ): ChainStateRequest {
@@ -1450,19 +1453,17 @@ export const ChainStateResponse = {
 
   toJSON(message: ChainStateResponse): unknown {
     const obj: any = {};
-    message.state !== undefined &&
-      (obj.state = message.state
-        ? ChainState.toJSON(message.state)
-        : undefined);
+    if (message.state !== undefined) {
+      obj.state = ChainState.toJSON(message.state);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainStateResponse>, I>>(
     base?: I
   ): ChainStateResponse {
-    return ChainStateResponse.fromPartial(base ?? {});
+    return ChainStateResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainStateResponse>, I>>(
     object: I
   ): ChainStateResponse {
@@ -1523,16 +1524,17 @@ export const ChainsByAssetRequest = {
 
   toJSON(message: ChainsByAssetRequest): unknown {
     const obj: any = {};
-    message.asset !== undefined && (obj.asset = message.asset);
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainsByAssetRequest>, I>>(
     base?: I
   ): ChainsByAssetRequest {
-    return ChainsByAssetRequest.fromPartial(base ?? {});
+    return ChainsByAssetRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainsByAssetRequest>, I>>(
     object: I
   ): ChainsByAssetRequest {
@@ -1594,10 +1596,8 @@ export const ChainsByAssetResponse = {
 
   toJSON(message: ChainsByAssetResponse): unknown {
     const obj: any = {};
-    if (message.chains) {
-      obj.chains = message.chains.map((e) => e);
-    } else {
-      obj.chains = [];
+    if (message.chains?.length) {
+      obj.chains = message.chains;
     }
     return obj;
   },
@@ -1605,9 +1605,8 @@ export const ChainsByAssetResponse = {
   create<I extends Exact<DeepPartial<ChainsByAssetResponse>, I>>(
     base?: I
   ): ChainsByAssetResponse {
-    return ChainsByAssetResponse.fromPartial(base ?? {});
+    return ChainsByAssetResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainsByAssetResponse>, I>>(
     object: I
   ): ChainsByAssetResponse {
@@ -1680,19 +1679,20 @@ export const RecipientAddressRequest = {
 
   toJSON(message: RecipientAddressRequest): unknown {
     const obj: any = {};
-    message.depositAddr !== undefined &&
-      (obj.depositAddr = message.depositAddr);
-    message.depositChain !== undefined &&
-      (obj.depositChain = message.depositChain);
+    if (message.depositAddr !== "") {
+      obj.depositAddr = message.depositAddr;
+    }
+    if (message.depositChain !== "") {
+      obj.depositChain = message.depositChain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RecipientAddressRequest>, I>>(
     base?: I
   ): RecipientAddressRequest {
-    return RecipientAddressRequest.fromPartial(base ?? {});
+    return RecipientAddressRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RecipientAddressRequest>, I>>(
     object: I
   ): RecipientAddressRequest {
@@ -1768,19 +1768,20 @@ export const RecipientAddressResponse = {
 
   toJSON(message: RecipientAddressResponse): unknown {
     const obj: any = {};
-    message.recipientAddr !== undefined &&
-      (obj.recipientAddr = message.recipientAddr);
-    message.recipientChain !== undefined &&
-      (obj.recipientChain = message.recipientChain);
+    if (message.recipientAddr !== "") {
+      obj.recipientAddr = message.recipientAddr;
+    }
+    if (message.recipientChain !== "") {
+      obj.recipientChain = message.recipientChain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RecipientAddressResponse>, I>>(
     base?: I
   ): RecipientAddressResponse {
-    return RecipientAddressResponse.fromPartial(base ?? {});
+    return RecipientAddressResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RecipientAddressResponse>, I>>(
     object: I
   ): RecipientAddressResponse {
@@ -1852,17 +1853,20 @@ export const TransferRateLimitRequest = {
 
   toJSON(message: TransferRateLimitRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.asset !== undefined && (obj.asset = message.asset);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferRateLimitRequest>, I>>(
     base?: I
   ): TransferRateLimitRequest {
-    return TransferRateLimitRequest.fromPartial(base ?? {});
+    return TransferRateLimitRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferRateLimitRequest>, I>>(
     object: I
   ): TransferRateLimitRequest {
@@ -1931,19 +1935,19 @@ export const TransferRateLimitResponse = {
 
   toJSON(message: TransferRateLimitResponse): unknown {
     const obj: any = {};
-    message.transferRateLimit !== undefined &&
-      (obj.transferRateLimit = message.transferRateLimit
-        ? TransferRateLimit.toJSON(message.transferRateLimit)
-        : undefined);
+    if (message.transferRateLimit !== undefined) {
+      obj.transferRateLimit = TransferRateLimit.toJSON(
+        message.transferRateLimit
+      );
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferRateLimitResponse>, I>>(
     base?: I
   ): TransferRateLimitResponse {
-    return TransferRateLimitResponse.fromPartial(base ?? {});
+    return TransferRateLimitResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferRateLimitResponse>, I>>(
     object: I
   ): TransferRateLimitResponse {
@@ -1959,10 +1963,10 @@ export const TransferRateLimitResponse = {
 
 function createBaseTransferRateLimit(): TransferRateLimit {
   return {
-    limit: new Uint8Array(),
+    limit: new Uint8Array(0),
     window: undefined,
-    incoming: new Uint8Array(),
-    outgoing: new Uint8Array(),
+    incoming: new Uint8Array(0),
+    outgoing: new Uint8Array(0),
     timeLeft: undefined,
   };
 }
@@ -2046,16 +2050,16 @@ export const TransferRateLimit = {
     return {
       limit: isSet(object.limit)
         ? bytesFromBase64(object.limit)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       window: isSet(object.window)
         ? Duration.fromJSON(object.window)
         : undefined,
       incoming: isSet(object.incoming)
         ? bytesFromBase64(object.incoming)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       outgoing: isSet(object.outgoing)
         ? bytesFromBase64(object.outgoing)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       timeLeft: isSet(object.timeLeft)
         ? Duration.fromJSON(object.timeLeft)
         : undefined,
@@ -2064,46 +2068,40 @@ export const TransferRateLimit = {
 
   toJSON(message: TransferRateLimit): unknown {
     const obj: any = {};
-    message.limit !== undefined &&
-      (obj.limit = base64FromBytes(
-        message.limit !== undefined ? message.limit : new Uint8Array()
-      ));
-    message.window !== undefined &&
-      (obj.window = message.window
-        ? Duration.toJSON(message.window)
-        : undefined);
-    message.incoming !== undefined &&
-      (obj.incoming = base64FromBytes(
-        message.incoming !== undefined ? message.incoming : new Uint8Array()
-      ));
-    message.outgoing !== undefined &&
-      (obj.outgoing = base64FromBytes(
-        message.outgoing !== undefined ? message.outgoing : new Uint8Array()
-      ));
-    message.timeLeft !== undefined &&
-      (obj.timeLeft = message.timeLeft
-        ? Duration.toJSON(message.timeLeft)
-        : undefined);
+    if (message.limit.length !== 0) {
+      obj.limit = base64FromBytes(message.limit);
+    }
+    if (message.window !== undefined) {
+      obj.window = Duration.toJSON(message.window);
+    }
+    if (message.incoming.length !== 0) {
+      obj.incoming = base64FromBytes(message.incoming);
+    }
+    if (message.outgoing.length !== 0) {
+      obj.outgoing = base64FromBytes(message.outgoing);
+    }
+    if (message.timeLeft !== undefined) {
+      obj.timeLeft = Duration.toJSON(message.timeLeft);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferRateLimit>, I>>(
     base?: I
   ): TransferRateLimit {
-    return TransferRateLimit.fromPartial(base ?? {});
+    return TransferRateLimit.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferRateLimit>, I>>(
     object: I
   ): TransferRateLimit {
     const message = createBaseTransferRateLimit();
-    message.limit = object.limit ?? new Uint8Array();
+    message.limit = object.limit ?? new Uint8Array(0);
     message.window =
       object.window !== undefined && object.window !== null
         ? Duration.fromPartial(object.window)
         : undefined;
-    message.incoming = object.incoming ?? new Uint8Array();
-    message.outgoing = object.outgoing ?? new Uint8Array();
+    message.incoming = object.incoming ?? new Uint8Array(0);
+    message.outgoing = object.outgoing ?? new Uint8Array(0);
     message.timeLeft =
       object.timeLeft !== undefined && object.timeLeft !== null
         ? Duration.fromPartial(object.timeLeft)
@@ -2157,16 +2155,17 @@ export const MessageRequest = {
 
   toJSON(message: MessageRequest): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MessageRequest>, I>>(
     base?: I
   ): MessageRequest {
-    return MessageRequest.fromPartial(base ?? {});
+    return MessageRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MessageRequest>, I>>(
     object: I
   ): MessageRequest {
@@ -2225,19 +2224,17 @@ export const MessageResponse = {
 
   toJSON(message: MessageResponse): unknown {
     const obj: any = {};
-    message.message !== undefined &&
-      (obj.message = message.message
-        ? GeneralMessage.toJSON(message.message)
-        : undefined);
+    if (message.message !== undefined) {
+      obj.message = GeneralMessage.toJSON(message.message);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MessageResponse>, I>>(
     base?: I
   ): MessageResponse {
-    return MessageResponse.fromPartial(base ?? {});
+    return MessageResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MessageResponse>, I>>(
     object: I
   ): MessageResponse {
@@ -2250,10 +2247,131 @@ export const MessageResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+function createBaseParamsRequest(): ParamsRequest {
+  return {};
+}
+
+export const ParamsRequest = {
+  encode(
+    _: ParamsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsRequest {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): ParamsRequest {
+    return {};
+  },
+
+  toJSON(_: ParamsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    base?: I
+  ): ParamsRequest {
+    return ParamsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    _: I
+  ): ParamsRequest {
+    const message = createBaseParamsRequest();
+    return message;
+  },
+};
+
+function createBaseParamsResponse(): ParamsResponse {
+  return { params: undefined };
+}
+
+export const ParamsResponse = {
+  encode(
+    message: ParamsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.params = Params.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ParamsResponse {
+    return {
+      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
+    };
+  },
+
+  toJSON(message: ParamsResponse): unknown {
+    const obj: any = {};
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
+    base?: I
+  ): ParamsResponse {
+    return ParamsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
+    object: I
+  ): ParamsResponse {
+    const message = createBaseParamsResponse();
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
+    return message;
+  },
+};
+
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

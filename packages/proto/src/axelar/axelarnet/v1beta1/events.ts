@@ -10,7 +10,7 @@ export interface IBCTransferSent {
   id: Long;
   /** @deprecated */
   receipient: string;
-  asset?: Coin;
+  asset?: Coin | undefined;
   sequence: Long;
   portId: string;
   channelId: string;
@@ -35,7 +35,7 @@ export interface IBCTransferRetried {
   id: Long;
   /** @deprecated */
   receipient: string;
-  asset?: Coin;
+  asset?: Coin | undefined;
   sequence: Long;
   portId: string;
   channelId: string;
@@ -46,19 +46,22 @@ export interface AxelarTransferCompleted {
   id: Long;
   /** @deprecated */
   receipient: string;
-  asset?: Coin;
+  asset?: Coin | undefined;
   recipient: string;
 }
 
 export interface FeeCollected {
   collector: Uint8Array;
-  fee?: Coin;
+  fee?: Coin | undefined;
 }
 
 export interface FeePaid {
   messageId: string;
   recipient: Uint8Array;
-  fee?: Coin;
+  fee?: Coin | undefined;
+  refundRecipient: string;
+  /** registered asset name in nexus */
+  asset: string;
 }
 
 export interface ContractCallSubmitted {
@@ -79,7 +82,7 @@ export interface ContractCallWithTokenSubmitted {
   contractAddress: string;
   payload: Uint8Array;
   payloadHash: Uint8Array;
-  asset?: Coin;
+  asset?: Coin | undefined;
 }
 
 export interface TokenSent {
@@ -88,7 +91,7 @@ export interface TokenSent {
   sourceChain: string;
   destinationChain: string;
   destinationAddress: string;
-  asset?: Coin;
+  asset?: Coin | undefined;
 }
 
 function createBaseIBCTransferSent(): IBCTransferSent {
@@ -214,25 +217,35 @@ export const IBCTransferSent = {
 
   toJSON(message: IBCTransferSent): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.receipient !== undefined && (obj.receipient = message.receipient);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
-    message.sequence !== undefined &&
-      (obj.sequence = (message.sequence || Long.UZERO).toString());
-    message.portId !== undefined && (obj.portId = message.portId);
-    message.channelId !== undefined && (obj.channelId = message.channelId);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (message.receipient !== "") {
+      obj.receipient = message.receipient;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
+    if (!message.sequence.isZero()) {
+      obj.sequence = (message.sequence || Long.UZERO).toString();
+    }
+    if (message.portId !== "") {
+      obj.portId = message.portId;
+    }
+    if (message.channelId !== "") {
+      obj.channelId = message.channelId;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<IBCTransferSent>, I>>(
     base?: I
   ): IBCTransferSent {
-    return IBCTransferSent.fromPartial(base ?? {});
+    return IBCTransferSent.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<IBCTransferSent>, I>>(
     object: I
   ): IBCTransferSent {
@@ -342,21 +355,26 @@ export const IBCTransferCompleted = {
 
   toJSON(message: IBCTransferCompleted): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.sequence !== undefined &&
-      (obj.sequence = (message.sequence || Long.UZERO).toString());
-    message.portId !== undefined && (obj.portId = message.portId);
-    message.channelId !== undefined && (obj.channelId = message.channelId);
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (!message.sequence.isZero()) {
+      obj.sequence = (message.sequence || Long.UZERO).toString();
+    }
+    if (message.portId !== "") {
+      obj.portId = message.portId;
+    }
+    if (message.channelId !== "") {
+      obj.channelId = message.channelId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<IBCTransferCompleted>, I>>(
     base?: I
   ): IBCTransferCompleted {
-    return IBCTransferCompleted.fromPartial(base ?? {});
+    return IBCTransferCompleted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<IBCTransferCompleted>, I>>(
     object: I
   ): IBCTransferCompleted {
@@ -457,21 +475,26 @@ export const IBCTransferFailed = {
 
   toJSON(message: IBCTransferFailed): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.sequence !== undefined &&
-      (obj.sequence = (message.sequence || Long.UZERO).toString());
-    message.portId !== undefined && (obj.portId = message.portId);
-    message.channelId !== undefined && (obj.channelId = message.channelId);
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (!message.sequence.isZero()) {
+      obj.sequence = (message.sequence || Long.UZERO).toString();
+    }
+    if (message.portId !== "") {
+      obj.portId = message.portId;
+    }
+    if (message.channelId !== "") {
+      obj.channelId = message.channelId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<IBCTransferFailed>, I>>(
     base?: I
   ): IBCTransferFailed {
-    return IBCTransferFailed.fromPartial(base ?? {});
+    return IBCTransferFailed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<IBCTransferFailed>, I>>(
     object: I
   ): IBCTransferFailed {
@@ -613,25 +636,35 @@ export const IBCTransferRetried = {
 
   toJSON(message: IBCTransferRetried): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.receipient !== undefined && (obj.receipient = message.receipient);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
-    message.sequence !== undefined &&
-      (obj.sequence = (message.sequence || Long.UZERO).toString());
-    message.portId !== undefined && (obj.portId = message.portId);
-    message.channelId !== undefined && (obj.channelId = message.channelId);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (message.receipient !== "") {
+      obj.receipient = message.receipient;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
+    if (!message.sequence.isZero()) {
+      obj.sequence = (message.sequence || Long.UZERO).toString();
+    }
+    if (message.portId !== "") {
+      obj.portId = message.portId;
+    }
+    if (message.channelId !== "") {
+      obj.channelId = message.channelId;
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<IBCTransferRetried>, I>>(
     base?: I
   ): IBCTransferRetried {
-    return IBCTransferRetried.fromPartial(base ?? {});
+    return IBCTransferRetried.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<IBCTransferRetried>, I>>(
     object: I
   ): IBCTransferRetried {
@@ -739,21 +772,26 @@ export const AxelarTransferCompleted = {
 
   toJSON(message: AxelarTransferCompleted): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.receipient !== undefined && (obj.receipient = message.receipient);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
-    message.recipient !== undefined && (obj.recipient = message.recipient);
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (message.receipient !== "") {
+      obj.receipient = message.receipient;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
+    if (message.recipient !== "") {
+      obj.recipient = message.recipient;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<AxelarTransferCompleted>, I>>(
     base?: I
   ): AxelarTransferCompleted {
-    return AxelarTransferCompleted.fromPartial(base ?? {});
+    return AxelarTransferCompleted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AxelarTransferCompleted>, I>>(
     object: I
   ): AxelarTransferCompleted {
@@ -773,7 +811,7 @@ export const AxelarTransferCompleted = {
 };
 
 function createBaseFeeCollected(): FeeCollected {
-  return { collector: new Uint8Array(), fee: undefined };
+  return { collector: new Uint8Array(0), fee: undefined };
 }
 
 export const FeeCollected = {
@@ -825,33 +863,32 @@ export const FeeCollected = {
     return {
       collector: isSet(object.collector)
         ? bytesFromBase64(object.collector)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       fee: isSet(object.fee) ? Coin.fromJSON(object.fee) : undefined,
     };
   },
 
   toJSON(message: FeeCollected): unknown {
     const obj: any = {};
-    message.collector !== undefined &&
-      (obj.collector = base64FromBytes(
-        message.collector !== undefined ? message.collector : new Uint8Array()
-      ));
-    message.fee !== undefined &&
-      (obj.fee = message.fee ? Coin.toJSON(message.fee) : undefined);
+    if (message.collector.length !== 0) {
+      obj.collector = base64FromBytes(message.collector);
+    }
+    if (message.fee !== undefined) {
+      obj.fee = Coin.toJSON(message.fee);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<FeeCollected>, I>>(
     base?: I
   ): FeeCollected {
-    return FeeCollected.fromPartial(base ?? {});
+    return FeeCollected.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<FeeCollected>, I>>(
     object: I
   ): FeeCollected {
     const message = createBaseFeeCollected();
-    message.collector = object.collector ?? new Uint8Array();
+    message.collector = object.collector ?? new Uint8Array(0);
     message.fee =
       object.fee !== undefined && object.fee !== null
         ? Coin.fromPartial(object.fee)
@@ -861,7 +898,13 @@ export const FeeCollected = {
 };
 
 function createBaseFeePaid(): FeePaid {
-  return { messageId: "", recipient: new Uint8Array(), fee: undefined };
+  return {
+    messageId: "",
+    recipient: new Uint8Array(0),
+    fee: undefined,
+    refundRecipient: "",
+    asset: "",
+  };
 }
 
 export const FeePaid = {
@@ -877,6 +920,12 @@ export const FeePaid = {
     }
     if (message.fee !== undefined) {
       Coin.encode(message.fee, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.refundRecipient !== "") {
+      writer.uint32(34).string(message.refundRecipient);
+    }
+    if (message.asset !== "") {
+      writer.uint32(42).string(message.asset);
     }
     return writer;
   },
@@ -910,6 +959,20 @@ export const FeePaid = {
 
           message.fee = Coin.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.refundRecipient = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.asset = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -924,35 +987,48 @@ export const FeePaid = {
       messageId: isSet(object.messageId) ? String(object.messageId) : "",
       recipient: isSet(object.recipient)
         ? bytesFromBase64(object.recipient)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       fee: isSet(object.fee) ? Coin.fromJSON(object.fee) : undefined,
+      refundRecipient: isSet(object.refundRecipient)
+        ? String(object.refundRecipient)
+        : "",
+      asset: isSet(object.asset) ? String(object.asset) : "",
     };
   },
 
   toJSON(message: FeePaid): unknown {
     const obj: any = {};
-    message.messageId !== undefined && (obj.messageId = message.messageId);
-    message.recipient !== undefined &&
-      (obj.recipient = base64FromBytes(
-        message.recipient !== undefined ? message.recipient : new Uint8Array()
-      ));
-    message.fee !== undefined &&
-      (obj.fee = message.fee ? Coin.toJSON(message.fee) : undefined);
+    if (message.messageId !== "") {
+      obj.messageId = message.messageId;
+    }
+    if (message.recipient.length !== 0) {
+      obj.recipient = base64FromBytes(message.recipient);
+    }
+    if (message.fee !== undefined) {
+      obj.fee = Coin.toJSON(message.fee);
+    }
+    if (message.refundRecipient !== "") {
+      obj.refundRecipient = message.refundRecipient;
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<FeePaid>, I>>(base?: I): FeePaid {
-    return FeePaid.fromPartial(base ?? {});
+    return FeePaid.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<FeePaid>, I>>(object: I): FeePaid {
     const message = createBaseFeePaid();
     message.messageId = object.messageId ?? "";
-    message.recipient = object.recipient ?? new Uint8Array();
+    message.recipient = object.recipient ?? new Uint8Array(0);
     message.fee =
       object.fee !== undefined && object.fee !== null
         ? Coin.fromPartial(object.fee)
         : undefined;
+    message.refundRecipient = object.refundRecipient ?? "";
+    message.asset = object.asset ?? "";
     return message;
   },
 };
@@ -964,8 +1040,8 @@ function createBaseContractCallSubmitted(): ContractCallSubmitted {
     sourceChain: "",
     destinationChain: "",
     contractAddress: "",
-    payload: new Uint8Array(),
-    payloadHash: new Uint8Array(),
+    payload: new Uint8Array(0),
+    payloadHash: new Uint8Array(0),
   };
 }
 
@@ -1080,42 +1156,44 @@ export const ContractCallSubmitted = {
         : "",
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: ContractCallSubmitted): unknown {
     const obj: any = {};
-    message.messageId !== undefined && (obj.messageId = message.messageId);
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.sourceChain !== undefined &&
-      (obj.sourceChain = message.sourceChain);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payload !== undefined &&
-      (obj.payload = base64FromBytes(
-        message.payload !== undefined ? message.payload : new Uint8Array()
-      ));
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
+    if (message.messageId !== "") {
+      obj.messageId = message.messageId;
+    }
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.sourceChain !== "") {
+      obj.sourceChain = message.sourceChain;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payload.length !== 0) {
+      obj.payload = base64FromBytes(message.payload);
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ContractCallSubmitted>, I>>(
     base?: I
   ): ContractCallSubmitted {
-    return ContractCallSubmitted.fromPartial(base ?? {});
+    return ContractCallSubmitted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ContractCallSubmitted>, I>>(
     object: I
   ): ContractCallSubmitted {
@@ -1125,8 +1203,8 @@ export const ContractCallSubmitted = {
     message.sourceChain = object.sourceChain ?? "";
     message.destinationChain = object.destinationChain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payload = object.payload ?? new Uint8Array();
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payload = object.payload ?? new Uint8Array(0);
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1138,8 +1216,8 @@ function createBaseContractCallWithTokenSubmitted(): ContractCallWithTokenSubmit
     sourceChain: "",
     destinationChain: "",
     contractAddress: "",
-    payload: new Uint8Array(),
-    payloadHash: new Uint8Array(),
+    payload: new Uint8Array(0),
+    payloadHash: new Uint8Array(0),
     asset: undefined,
   };
 }
@@ -1265,45 +1343,48 @@ export const ContractCallWithTokenSubmitted = {
         : "",
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       asset: isSet(object.asset) ? Coin.fromJSON(object.asset) : undefined,
     };
   },
 
   toJSON(message: ContractCallWithTokenSubmitted): unknown {
     const obj: any = {};
-    message.messageId !== undefined && (obj.messageId = message.messageId);
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.sourceChain !== undefined &&
-      (obj.sourceChain = message.sourceChain);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payload !== undefined &&
-      (obj.payload = base64FromBytes(
-        message.payload !== undefined ? message.payload : new Uint8Array()
-      ));
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
+    if (message.messageId !== "") {
+      obj.messageId = message.messageId;
+    }
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.sourceChain !== "") {
+      obj.sourceChain = message.sourceChain;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payload.length !== 0) {
+      obj.payload = base64FromBytes(message.payload);
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ContractCallWithTokenSubmitted>, I>>(
     base?: I
   ): ContractCallWithTokenSubmitted {
-    return ContractCallWithTokenSubmitted.fromPartial(base ?? {});
+    return ContractCallWithTokenSubmitted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ContractCallWithTokenSubmitted>, I>>(
     object: I
   ): ContractCallWithTokenSubmitted {
@@ -1313,8 +1394,8 @@ export const ContractCallWithTokenSubmitted = {
     message.sourceChain = object.sourceChain ?? "";
     message.destinationChain = object.destinationChain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payload = object.payload ?? new Uint8Array();
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payload = object.payload ?? new Uint8Array(0);
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     message.asset =
       object.asset !== undefined && object.asset !== null
         ? Coin.fromPartial(object.asset)
@@ -1438,24 +1519,30 @@ export const TokenSent = {
 
   toJSON(message: TokenSent): unknown {
     const obj: any = {};
-    message.transferId !== undefined &&
-      (obj.transferId = (message.transferId || Long.UZERO).toString());
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.sourceChain !== undefined &&
-      (obj.sourceChain = message.sourceChain);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.destinationAddress !== undefined &&
-      (obj.destinationAddress = message.destinationAddress);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
+    if (!message.transferId.isZero()) {
+      obj.transferId = (message.transferId || Long.UZERO).toString();
+    }
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.sourceChain !== "") {
+      obj.sourceChain = message.sourceChain;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.destinationAddress !== "") {
+      obj.destinationAddress = message.destinationAddress;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TokenSent>, I>>(base?: I): TokenSent {
-    return TokenSent.fromPartial(base ?? {});
+    return TokenSent.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TokenSent>, I>>(
     object: I
   ): TokenSent {
@@ -1476,10 +1563,10 @@ export const TokenSent = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

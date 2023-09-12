@@ -17,7 +17,7 @@ export interface Params {
   burnable: Uint8Array;
   revoteLockingPeriod: Long;
   networks: NetworkInfo[];
-  votingThreshold?: Threshold;
+  votingThreshold?: Threshold | undefined;
   minVoterCount: Long;
   commandsGasLimit: number;
   votingGracePeriod: Long;
@@ -26,8 +26,8 @@ export interface Params {
 }
 
 export interface PendingChain {
-  params?: Params;
-  chain?: Chain;
+  params?: Params | undefined;
+  chain?: Chain | undefined;
 }
 
 function createBaseParams(): Params {
@@ -35,8 +35,8 @@ function createBaseParams(): Params {
     chain: "",
     confirmationHeight: Long.UZERO,
     network: "",
-    tokenCode: new Uint8Array(),
-    burnable: new Uint8Array(),
+    tokenCode: new Uint8Array(0),
+    burnable: new Uint8Array(0),
     revoteLockingPeriod: Long.ZERO,
     networks: [],
     votingThreshold: undefined,
@@ -215,10 +215,10 @@ export const Params = {
       network: isSet(object.network) ? String(object.network) : "",
       tokenCode: isSet(object.tokenCode)
         ? bytesFromBase64(object.tokenCode)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       burnable: isSet(object.burnable)
         ? bytesFromBase64(object.burnable)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       revoteLockingPeriod: isSet(object.revoteLockingPeriod)
         ? Long.fromValue(object.revoteLockingPeriod)
         : Long.ZERO,
@@ -248,54 +248,57 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.confirmationHeight !== undefined &&
-      (obj.confirmationHeight = (
-        message.confirmationHeight || Long.UZERO
-      ).toString());
-    message.network !== undefined && (obj.network = message.network);
-    message.tokenCode !== undefined &&
-      (obj.tokenCode = base64FromBytes(
-        message.tokenCode !== undefined ? message.tokenCode : new Uint8Array()
-      ));
-    message.burnable !== undefined &&
-      (obj.burnable = base64FromBytes(
-        message.burnable !== undefined ? message.burnable : new Uint8Array()
-      ));
-    message.revoteLockingPeriod !== undefined &&
-      (obj.revoteLockingPeriod = (
-        message.revoteLockingPeriod || Long.ZERO
-      ).toString());
-    if (message.networks) {
-      obj.networks = message.networks.map((e) =>
-        e ? NetworkInfo.toJSON(e) : undefined
-      );
-    } else {
-      obj.networks = [];
+    if (message.chain !== "") {
+      obj.chain = message.chain;
     }
-    message.votingThreshold !== undefined &&
-      (obj.votingThreshold = message.votingThreshold
-        ? Threshold.toJSON(message.votingThreshold)
-        : undefined);
-    message.minVoterCount !== undefined &&
-      (obj.minVoterCount = (message.minVoterCount || Long.ZERO).toString());
-    message.commandsGasLimit !== undefined &&
-      (obj.commandsGasLimit = Math.round(message.commandsGasLimit));
-    message.votingGracePeriod !== undefined &&
-      (obj.votingGracePeriod = (
+    if (!message.confirmationHeight.isZero()) {
+      obj.confirmationHeight = (
+        message.confirmationHeight || Long.UZERO
+      ).toString();
+    }
+    if (message.network !== "") {
+      obj.network = message.network;
+    }
+    if (message.tokenCode.length !== 0) {
+      obj.tokenCode = base64FromBytes(message.tokenCode);
+    }
+    if (message.burnable.length !== 0) {
+      obj.burnable = base64FromBytes(message.burnable);
+    }
+    if (!message.revoteLockingPeriod.isZero()) {
+      obj.revoteLockingPeriod = (
+        message.revoteLockingPeriod || Long.ZERO
+      ).toString();
+    }
+    if (message.networks?.length) {
+      obj.networks = message.networks.map((e) => NetworkInfo.toJSON(e));
+    }
+    if (message.votingThreshold !== undefined) {
+      obj.votingThreshold = Threshold.toJSON(message.votingThreshold);
+    }
+    if (!message.minVoterCount.isZero()) {
+      obj.minVoterCount = (message.minVoterCount || Long.ZERO).toString();
+    }
+    if (message.commandsGasLimit !== 0) {
+      obj.commandsGasLimit = Math.round(message.commandsGasLimit);
+    }
+    if (!message.votingGracePeriod.isZero()) {
+      obj.votingGracePeriod = (
         message.votingGracePeriod || Long.ZERO
-      ).toString());
-    message.endBlockerLimit !== undefined &&
-      (obj.endBlockerLimit = (message.endBlockerLimit || Long.ZERO).toString());
-    message.transferLimit !== undefined &&
-      (obj.transferLimit = (message.transferLimit || Long.UZERO).toString());
+      ).toString();
+    }
+    if (!message.endBlockerLimit.isZero()) {
+      obj.endBlockerLimit = (message.endBlockerLimit || Long.ZERO).toString();
+    }
+    if (!message.transferLimit.isZero()) {
+      obj.transferLimit = (message.transferLimit || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.chain = object.chain ?? "";
@@ -305,8 +308,8 @@ export const Params = {
         ? Long.fromValue(object.confirmationHeight)
         : Long.UZERO;
     message.network = object.network ?? "";
-    message.tokenCode = object.tokenCode ?? new Uint8Array();
-    message.burnable = object.burnable ?? new Uint8Array();
+    message.tokenCode = object.tokenCode ?? new Uint8Array(0);
+    message.burnable = object.burnable ?? new Uint8Array(0);
     message.revoteLockingPeriod =
       object.revoteLockingPeriod !== undefined &&
       object.revoteLockingPeriod !== null
@@ -398,19 +401,20 @@ export const PendingChain = {
 
   toJSON(message: PendingChain): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    message.chain !== undefined &&
-      (obj.chain = message.chain ? Chain.toJSON(message.chain) : undefined);
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    if (message.chain !== undefined) {
+      obj.chain = Chain.toJSON(message.chain);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PendingChain>, I>>(
     base?: I
   ): PendingChain {
-    return PendingChain.fromPartial(base ?? {});
+    return PendingChain.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PendingChain>, I>>(
     object: I
   ): PendingChain {
@@ -427,10 +431,10 @@ export const PendingChain = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

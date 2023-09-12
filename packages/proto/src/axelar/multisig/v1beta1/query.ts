@@ -11,6 +11,7 @@ import {
   multisigStateFromJSON,
   multisigStateToJSON,
 } from "../exported/v1beta1/types";
+import { Params } from "./params";
 
 export const protobufPackage = "axelar.multisig.v1beta1";
 
@@ -50,7 +51,7 @@ export interface KeyResponse {
   keyId: string;
   state: KeyState;
   startedAt: Long;
-  startedAtTimestamp?: Date;
+  startedAtTimestamp?: Date | undefined;
   thresholdWeight: Uint8Array;
   bondedWeight: Uint8Array;
   /** Keygen participants in descending order by weight */
@@ -64,7 +65,7 @@ export interface KeygenSessionRequest {
 /** KeygenSessionResponse contains the keygen session info for a given key ID. */
 export interface KeygenSessionResponse {
   startedAt: Long;
-  startedAtTimestamp?: Date;
+  startedAtTimestamp?: Date | undefined;
   expiresAt: Long;
   completedAt: Long;
   gracePeriod: Long;
@@ -74,6 +75,13 @@ export interface KeygenSessionResponse {
   bondedWeight: Uint8Array;
   /** Keygen candidates in descending order by weight */
   participants: KeygenParticipant[];
+}
+
+/** ParamsRequest represents a message that queries the params */
+export interface ParamsRequest {}
+
+export interface ParamsResponse {
+  params?: Params | undefined;
 }
 
 function createBaseKeyIDRequest(): KeyIDRequest {
@@ -121,16 +129,17 @@ export const KeyIDRequest = {
 
   toJSON(message: KeyIDRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyIDRequest>, I>>(
     base?: I
   ): KeyIDRequest {
-    return KeyIDRequest.fromPartial(base ?? {});
+    return KeyIDRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyIDRequest>, I>>(
     object: I
   ): KeyIDRequest {
@@ -185,16 +194,17 @@ export const KeyIDResponse = {
 
   toJSON(message: KeyIDResponse): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyIDResponse>, I>>(
     base?: I
   ): KeyIDResponse {
-    return KeyIDResponse.fromPartial(base ?? {});
+    return KeyIDResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyIDResponse>, I>>(
     object: I
   ): KeyIDResponse {
@@ -249,16 +259,17 @@ export const NextKeyIDRequest = {
 
   toJSON(message: NextKeyIDRequest): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<NextKeyIDRequest>, I>>(
     base?: I
   ): NextKeyIDRequest {
-    return NextKeyIDRequest.fromPartial(base ?? {});
+    return NextKeyIDRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<NextKeyIDRequest>, I>>(
     object: I
   ): NextKeyIDRequest {
@@ -313,16 +324,17 @@ export const NextKeyIDResponse = {
 
   toJSON(message: NextKeyIDResponse): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<NextKeyIDResponse>, I>>(
     base?: I
   ): NextKeyIDResponse {
-    return NextKeyIDResponse.fromPartial(base ?? {});
+    return NextKeyIDResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<NextKeyIDResponse>, I>>(
     object: I
   ): NextKeyIDResponse {
@@ -377,14 +389,15 @@ export const KeyRequest = {
 
   toJSON(message: KeyRequest): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyRequest>, I>>(base?: I): KeyRequest {
-    return KeyRequest.fromPartial(base ?? {});
+    return KeyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyRequest>, I>>(
     object: I
   ): KeyRequest {
@@ -395,7 +408,7 @@ export const KeyRequest = {
 };
 
 function createBaseKeygenParticipant(): KeygenParticipant {
-  return { address: "", weight: new Uint8Array(), pubKey: "" };
+  return { address: "", weight: new Uint8Array(0), pubKey: "" };
 }
 
 export const KeygenParticipant = {
@@ -458,34 +471,36 @@ export const KeygenParticipant = {
       address: isSet(object.address) ? String(object.address) : "",
       weight: isSet(object.weight)
         ? bytesFromBase64(object.weight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       pubKey: isSet(object.pubKey) ? String(object.pubKey) : "",
     };
   },
 
   toJSON(message: KeygenParticipant): unknown {
     const obj: any = {};
-    message.address !== undefined && (obj.address = message.address);
-    message.weight !== undefined &&
-      (obj.weight = base64FromBytes(
-        message.weight !== undefined ? message.weight : new Uint8Array()
-      ));
-    message.pubKey !== undefined && (obj.pubKey = message.pubKey);
+    if (message.address !== "") {
+      obj.address = message.address;
+    }
+    if (message.weight.length !== 0) {
+      obj.weight = base64FromBytes(message.weight);
+    }
+    if (message.pubKey !== "") {
+      obj.pubKey = message.pubKey;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeygenParticipant>, I>>(
     base?: I
   ): KeygenParticipant {
-    return KeygenParticipant.fromPartial(base ?? {});
+    return KeygenParticipant.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeygenParticipant>, I>>(
     object: I
   ): KeygenParticipant {
     const message = createBaseKeygenParticipant();
     message.address = object.address ?? "";
-    message.weight = object.weight ?? new Uint8Array();
+    message.weight = object.weight ?? new Uint8Array(0);
     message.pubKey = object.pubKey ?? "";
     return message;
   },
@@ -497,8 +512,8 @@ function createBaseKeyResponse(): KeyResponse {
     state: 0,
     startedAt: Long.ZERO,
     startedAtTimestamp: undefined,
-    thresholdWeight: new Uint8Array(),
-    bondedWeight: new Uint8Array(),
+    thresholdWeight: new Uint8Array(0),
+    bondedWeight: new Uint8Array(0),
     participants: [],
   };
 }
@@ -617,10 +632,10 @@ export const KeyResponse = {
         : undefined,
       thresholdWeight: isSet(object.thresholdWeight)
         ? bytesFromBase64(object.thresholdWeight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       bondedWeight: isSet(object.bondedWeight)
         ? bytesFromBase64(object.bondedWeight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       participants: Array.isArray(object?.participants)
         ? object.participants.map((e: any) => KeygenParticipant.fromJSON(e))
         : [],
@@ -629,38 +644,35 @@ export const KeyResponse = {
 
   toJSON(message: KeyResponse): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    message.state !== undefined && (obj.state = keyStateToJSON(message.state));
-    message.startedAt !== undefined &&
-      (obj.startedAt = (message.startedAt || Long.ZERO).toString());
-    message.startedAtTimestamp !== undefined &&
-      (obj.startedAtTimestamp = message.startedAtTimestamp.toISOString());
-    message.thresholdWeight !== undefined &&
-      (obj.thresholdWeight = base64FromBytes(
-        message.thresholdWeight !== undefined
-          ? message.thresholdWeight
-          : new Uint8Array()
-      ));
-    message.bondedWeight !== undefined &&
-      (obj.bondedWeight = base64FromBytes(
-        message.bondedWeight !== undefined
-          ? message.bondedWeight
-          : new Uint8Array()
-      ));
-    if (message.participants) {
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.state !== 0) {
+      obj.state = keyStateToJSON(message.state);
+    }
+    if (!message.startedAt.isZero()) {
+      obj.startedAt = (message.startedAt || Long.ZERO).toString();
+    }
+    if (message.startedAtTimestamp !== undefined) {
+      obj.startedAtTimestamp = message.startedAtTimestamp.toISOString();
+    }
+    if (message.thresholdWeight.length !== 0) {
+      obj.thresholdWeight = base64FromBytes(message.thresholdWeight);
+    }
+    if (message.bondedWeight.length !== 0) {
+      obj.bondedWeight = base64FromBytes(message.bondedWeight);
+    }
+    if (message.participants?.length) {
       obj.participants = message.participants.map((e) =>
-        e ? KeygenParticipant.toJSON(e) : undefined
+        KeygenParticipant.toJSON(e)
       );
-    } else {
-      obj.participants = [];
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyResponse>, I>>(base?: I): KeyResponse {
-    return KeyResponse.fromPartial(base ?? {});
+    return KeyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyResponse>, I>>(
     object: I
   ): KeyResponse {
@@ -672,8 +684,8 @@ export const KeyResponse = {
         ? Long.fromValue(object.startedAt)
         : Long.ZERO;
     message.startedAtTimestamp = object.startedAtTimestamp ?? undefined;
-    message.thresholdWeight = object.thresholdWeight ?? new Uint8Array();
-    message.bondedWeight = object.bondedWeight ?? new Uint8Array();
+    message.thresholdWeight = object.thresholdWeight ?? new Uint8Array(0);
+    message.bondedWeight = object.bondedWeight ?? new Uint8Array(0);
     message.participants =
       object.participants?.map((e) => KeygenParticipant.fromPartial(e)) || [];
     return message;
@@ -728,16 +740,17 @@ export const KeygenSessionRequest = {
 
   toJSON(message: KeygenSessionRequest): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeygenSessionRequest>, I>>(
     base?: I
   ): KeygenSessionRequest {
-    return KeygenSessionRequest.fromPartial(base ?? {});
+    return KeygenSessionRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeygenSessionRequest>, I>>(
     object: I
   ): KeygenSessionRequest {
@@ -755,9 +768,9 @@ function createBaseKeygenSessionResponse(): KeygenSessionResponse {
     completedAt: Long.ZERO,
     gracePeriod: Long.ZERO,
     state: 0,
-    keygenThresholdWeight: new Uint8Array(),
-    signingThresholdWeight: new Uint8Array(),
-    bondedWeight: new Uint8Array(),
+    keygenThresholdWeight: new Uint8Array(0),
+    signingThresholdWeight: new Uint8Array(0),
+    bondedWeight: new Uint8Array(0),
     participants: [],
   };
 }
@@ -917,13 +930,13 @@ export const KeygenSessionResponse = {
       state: isSet(object.state) ? multisigStateFromJSON(object.state) : 0,
       keygenThresholdWeight: isSet(object.keygenThresholdWeight)
         ? bytesFromBase64(object.keygenThresholdWeight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       signingThresholdWeight: isSet(object.signingThresholdWeight)
         ? bytesFromBase64(object.signingThresholdWeight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       bondedWeight: isSet(object.bondedWeight)
         ? bytesFromBase64(object.bondedWeight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       participants: Array.isArray(object?.participants)
         ? object.participants.map((e: any) => KeygenParticipant.fromJSON(e))
         : [],
@@ -932,42 +945,41 @@ export const KeygenSessionResponse = {
 
   toJSON(message: KeygenSessionResponse): unknown {
     const obj: any = {};
-    message.startedAt !== undefined &&
-      (obj.startedAt = (message.startedAt || Long.ZERO).toString());
-    message.startedAtTimestamp !== undefined &&
-      (obj.startedAtTimestamp = message.startedAtTimestamp.toISOString());
-    message.expiresAt !== undefined &&
-      (obj.expiresAt = (message.expiresAt || Long.ZERO).toString());
-    message.completedAt !== undefined &&
-      (obj.completedAt = (message.completedAt || Long.ZERO).toString());
-    message.gracePeriod !== undefined &&
-      (obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString());
-    message.state !== undefined &&
-      (obj.state = multisigStateToJSON(message.state));
-    message.keygenThresholdWeight !== undefined &&
-      (obj.keygenThresholdWeight = base64FromBytes(
-        message.keygenThresholdWeight !== undefined
-          ? message.keygenThresholdWeight
-          : new Uint8Array()
-      ));
-    message.signingThresholdWeight !== undefined &&
-      (obj.signingThresholdWeight = base64FromBytes(
-        message.signingThresholdWeight !== undefined
-          ? message.signingThresholdWeight
-          : new Uint8Array()
-      ));
-    message.bondedWeight !== undefined &&
-      (obj.bondedWeight = base64FromBytes(
-        message.bondedWeight !== undefined
-          ? message.bondedWeight
-          : new Uint8Array()
-      ));
-    if (message.participants) {
-      obj.participants = message.participants.map((e) =>
-        e ? KeygenParticipant.toJSON(e) : undefined
+    if (!message.startedAt.isZero()) {
+      obj.startedAt = (message.startedAt || Long.ZERO).toString();
+    }
+    if (message.startedAtTimestamp !== undefined) {
+      obj.startedAtTimestamp = message.startedAtTimestamp.toISOString();
+    }
+    if (!message.expiresAt.isZero()) {
+      obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
+    }
+    if (!message.completedAt.isZero()) {
+      obj.completedAt = (message.completedAt || Long.ZERO).toString();
+    }
+    if (!message.gracePeriod.isZero()) {
+      obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
+    }
+    if (message.state !== 0) {
+      obj.state = multisigStateToJSON(message.state);
+    }
+    if (message.keygenThresholdWeight.length !== 0) {
+      obj.keygenThresholdWeight = base64FromBytes(
+        message.keygenThresholdWeight
       );
-    } else {
-      obj.participants = [];
+    }
+    if (message.signingThresholdWeight.length !== 0) {
+      obj.signingThresholdWeight = base64FromBytes(
+        message.signingThresholdWeight
+      );
+    }
+    if (message.bondedWeight.length !== 0) {
+      obj.bondedWeight = base64FromBytes(message.bondedWeight);
+    }
+    if (message.participants?.length) {
+      obj.participants = message.participants.map((e) =>
+        KeygenParticipant.toJSON(e)
+      );
     }
     return obj;
   },
@@ -975,9 +987,8 @@ export const KeygenSessionResponse = {
   create<I extends Exact<DeepPartial<KeygenSessionResponse>, I>>(
     base?: I
   ): KeygenSessionResponse {
-    return KeygenSessionResponse.fromPartial(base ?? {});
+    return KeygenSessionResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeygenSessionResponse>, I>>(
     object: I
   ): KeygenSessionResponse {
@@ -1001,20 +1012,141 @@ export const KeygenSessionResponse = {
         : Long.ZERO;
     message.state = object.state ?? 0;
     message.keygenThresholdWeight =
-      object.keygenThresholdWeight ?? new Uint8Array();
+      object.keygenThresholdWeight ?? new Uint8Array(0);
     message.signingThresholdWeight =
-      object.signingThresholdWeight ?? new Uint8Array();
-    message.bondedWeight = object.bondedWeight ?? new Uint8Array();
+      object.signingThresholdWeight ?? new Uint8Array(0);
+    message.bondedWeight = object.bondedWeight ?? new Uint8Array(0);
     message.participants =
       object.participants?.map((e) => KeygenParticipant.fromPartial(e)) || [];
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+function createBaseParamsRequest(): ParamsRequest {
+  return {};
+}
+
+export const ParamsRequest = {
+  encode(
+    _: ParamsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsRequest {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): ParamsRequest {
+    return {};
+  },
+
+  toJSON(_: ParamsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    base?: I
+  ): ParamsRequest {
+    return ParamsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    _: I
+  ): ParamsRequest {
+    const message = createBaseParamsRequest();
+    return message;
+  },
+};
+
+function createBaseParamsResponse(): ParamsResponse {
+  return { params: undefined };
+}
+
+export const ParamsResponse = {
+  encode(
+    message: ParamsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.params = Params.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ParamsResponse {
+    return {
+      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
+    };
+  },
+
+  toJSON(message: ParamsResponse): unknown {
+    const obj: any = {};
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
+    base?: I
+  ): ParamsResponse {
+    return ParamsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
+    object: I
+  ): ParamsResponse {
+    const message = createBaseParamsResponse();
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
+    return message;
+  },
+};
+
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

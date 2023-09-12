@@ -37,15 +37,29 @@ export interface ConfirmKeyTransferStarted {
   txId: Uint8Array;
   gatewayAddress: Uint8Array;
   confirmationHeight: Long;
-  participants?: PollParticipants;
+  participants?: PollParticipants | undefined;
 }
 
+/** @deprecated */
 export interface ConfirmGatewayTxStarted {
   txId: Uint8Array;
   chain: string;
   gatewayAddress: Uint8Array;
   confirmationHeight: Long;
-  participants?: PollParticipants;
+  participants?: PollParticipants | undefined;
+}
+
+export interface PollMapping {
+  txId: Uint8Array;
+  pollId: Long;
+}
+
+export interface ConfirmGatewayTxsStarted {
+  pollMappings: PollMapping[];
+  chain: string;
+  gatewayAddress: Uint8Array;
+  confirmationHeight: Long;
+  participants: Uint8Array[];
 }
 
 export interface ConfirmDepositStarted {
@@ -54,7 +68,7 @@ export interface ConfirmDepositStarted {
   depositAddress: Uint8Array;
   tokenAddress: Uint8Array;
   confirmationHeight: Long;
-  participants?: PollParticipants;
+  participants?: PollParticipants | undefined;
   asset: string;
 }
 
@@ -63,9 +77,9 @@ export interface ConfirmTokenStarted {
   chain: string;
   gatewayAddress: Uint8Array;
   tokenAddress: Uint8Array;
-  tokenDetails?: TokenDetails;
+  tokenDetails?: TokenDetails | undefined;
   confirmationHeight: Long;
-  participants?: PollParticipants;
+  participants?: PollParticipants | undefined;
 }
 
 export interface ChainAdded {
@@ -129,7 +143,7 @@ export interface ContractCallWithMintApproved {
   destinationChain: string;
   contractAddress: string;
   payloadHash: Uint8Array;
-  asset?: Coin;
+  asset?: Coin | undefined;
 }
 
 export interface TokenSent {
@@ -139,7 +153,7 @@ export interface TokenSent {
   sender: string;
   destinationChain: string;
   destinationAddress: string;
-  asset?: Coin;
+  asset?: Coin | undefined;
 }
 
 export interface MintCommand {
@@ -148,7 +162,7 @@ export interface MintCommand {
   commandId: Uint8Array;
   destinationChain: string;
   destinationAddress: string;
-  asset?: Coin;
+  asset?: Coin | undefined;
 }
 
 export interface BurnCommand {
@@ -160,7 +174,7 @@ export interface BurnCommand {
 }
 
 function createBasePollFailed(): PollFailed {
-  return { txId: new Uint8Array(), chain: "", pollId: Long.UZERO };
+  return { txId: new Uint8Array(0), chain: "", pollId: Long.UZERO };
 }
 
 export const PollFailed = {
@@ -222,7 +236,7 @@ export const PollFailed = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
@@ -230,25 +244,26 @@ export const PollFailed = {
 
   toJSON(message: PollFailed): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PollFailed>, I>>(base?: I): PollFailed {
-    return PollFailed.fromPartial(base ?? {});
+    return PollFailed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollFailed>, I>>(
     object: I
   ): PollFailed {
     const message = createBasePollFailed();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.pollId =
       object.pollId !== undefined && object.pollId !== null
@@ -259,7 +274,7 @@ export const PollFailed = {
 };
 
 function createBasePollExpired(): PollExpired {
-  return { txId: new Uint8Array(), chain: "", pollId: Long.UZERO };
+  return { txId: new Uint8Array(0), chain: "", pollId: Long.UZERO };
 }
 
 export const PollExpired = {
@@ -321,7 +336,7 @@ export const PollExpired = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
@@ -329,25 +344,26 @@ export const PollExpired = {
 
   toJSON(message: PollExpired): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PollExpired>, I>>(base?: I): PollExpired {
-    return PollExpired.fromPartial(base ?? {});
+    return PollExpired.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollExpired>, I>>(
     object: I
   ): PollExpired {
     const message = createBasePollExpired();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.pollId =
       object.pollId !== undefined && object.pollId !== null
@@ -358,7 +374,7 @@ export const PollExpired = {
 };
 
 function createBasePollCompleted(): PollCompleted {
-  return { txId: new Uint8Array(), chain: "", pollId: Long.UZERO };
+  return { txId: new Uint8Array(0), chain: "", pollId: Long.UZERO };
 }
 
 export const PollCompleted = {
@@ -420,7 +436,7 @@ export const PollCompleted = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
@@ -428,27 +444,28 @@ export const PollCompleted = {
 
   toJSON(message: PollCompleted): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PollCompleted>, I>>(
     base?: I
   ): PollCompleted {
-    return PollCompleted.fromPartial(base ?? {});
+    return PollCompleted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollCompleted>, I>>(
     object: I
   ): PollCompleted {
     const message = createBasePollCompleted();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.pollId =
       object.pollId !== undefined && object.pollId !== null
@@ -459,7 +476,7 @@ export const PollCompleted = {
 };
 
 function createBaseNoEventsConfirmed(): NoEventsConfirmed {
-  return { txId: new Uint8Array(), chain: "", pollId: Long.UZERO };
+  return { txId: new Uint8Array(0), chain: "", pollId: Long.UZERO };
 }
 
 export const NoEventsConfirmed = {
@@ -521,7 +538,7 @@ export const NoEventsConfirmed = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
@@ -529,27 +546,28 @@ export const NoEventsConfirmed = {
 
   toJSON(message: NoEventsConfirmed): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<NoEventsConfirmed>, I>>(
     base?: I
   ): NoEventsConfirmed {
-    return NoEventsConfirmed.fromPartial(base ?? {});
+    return NoEventsConfirmed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<NoEventsConfirmed>, I>>(
     object: I
   ): NoEventsConfirmed {
     const message = createBaseNoEventsConfirmed();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.pollId =
       object.pollId !== undefined && object.pollId !== null
@@ -562,8 +580,8 @@ export const NoEventsConfirmed = {
 function createBaseConfirmKeyTransferStarted(): ConfirmKeyTransferStarted {
   return {
     chain: "",
-    txId: new Uint8Array(),
-    gatewayAddress: new Uint8Array(),
+    txId: new Uint8Array(0),
+    gatewayAddress: new Uint8Array(0),
     confirmationHeight: Long.UZERO,
     participants: undefined,
   };
@@ -658,10 +676,10 @@ export const ConfirmKeyTransferStarted = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       gatewayAddress: isSet(object.gatewayAddress)
         ? bytesFromBase64(object.gatewayAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       confirmationHeight: isSet(object.confirmationHeight)
         ? Long.fromValue(object.confirmationHeight)
         : Long.UZERO,
@@ -673,41 +691,38 @@ export const ConfirmKeyTransferStarted = {
 
   toJSON(message: ConfirmKeyTransferStarted): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.gatewayAddress !== undefined &&
-      (obj.gatewayAddress = base64FromBytes(
-        message.gatewayAddress !== undefined
-          ? message.gatewayAddress
-          : new Uint8Array()
-      ));
-    message.confirmationHeight !== undefined &&
-      (obj.confirmationHeight = (
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.gatewayAddress.length !== 0) {
+      obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
+    }
+    if (!message.confirmationHeight.isZero()) {
+      obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
-      ).toString());
-    message.participants !== undefined &&
-      (obj.participants = message.participants
-        ? PollParticipants.toJSON(message.participants)
-        : undefined);
+      ).toString();
+    }
+    if (message.participants !== undefined) {
+      obj.participants = PollParticipants.toJSON(message.participants);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ConfirmKeyTransferStarted>, I>>(
     base?: I
   ): ConfirmKeyTransferStarted {
-    return ConfirmKeyTransferStarted.fromPartial(base ?? {});
+    return ConfirmKeyTransferStarted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ConfirmKeyTransferStarted>, I>>(
     object: I
   ): ConfirmKeyTransferStarted {
     const message = createBaseConfirmKeyTransferStarted();
     message.chain = object.chain ?? "";
-    message.txId = object.txId ?? new Uint8Array();
-    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
+    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array(0);
     message.confirmationHeight =
       object.confirmationHeight !== undefined &&
       object.confirmationHeight !== null
@@ -723,9 +738,9 @@ export const ConfirmKeyTransferStarted = {
 
 function createBaseConfirmGatewayTxStarted(): ConfirmGatewayTxStarted {
   return {
-    txId: new Uint8Array(),
+    txId: new Uint8Array(0),
     chain: "",
-    gatewayAddress: new Uint8Array(),
+    gatewayAddress: new Uint8Array(0),
     confirmationHeight: Long.UZERO,
     participants: undefined,
   };
@@ -819,11 +834,11 @@ export const ConfirmGatewayTxStarted = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       gatewayAddress: isSet(object.gatewayAddress)
         ? bytesFromBase64(object.gatewayAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       confirmationHeight: isSet(object.confirmationHeight)
         ? Long.fromValue(object.confirmationHeight)
         : Long.UZERO,
@@ -835,41 +850,38 @@ export const ConfirmGatewayTxStarted = {
 
   toJSON(message: ConfirmGatewayTxStarted): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.gatewayAddress !== undefined &&
-      (obj.gatewayAddress = base64FromBytes(
-        message.gatewayAddress !== undefined
-          ? message.gatewayAddress
-          : new Uint8Array()
-      ));
-    message.confirmationHeight !== undefined &&
-      (obj.confirmationHeight = (
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.gatewayAddress.length !== 0) {
+      obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
+    }
+    if (!message.confirmationHeight.isZero()) {
+      obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
-      ).toString());
-    message.participants !== undefined &&
-      (obj.participants = message.participants
-        ? PollParticipants.toJSON(message.participants)
-        : undefined);
+      ).toString();
+    }
+    if (message.participants !== undefined) {
+      obj.participants = PollParticipants.toJSON(message.participants);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxStarted>, I>>(
     base?: I
   ): ConfirmGatewayTxStarted {
-    return ConfirmGatewayTxStarted.fromPartial(base ?? {});
+    return ConfirmGatewayTxStarted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxStarted>, I>>(
     object: I
   ): ConfirmGatewayTxStarted {
     const message = createBaseConfirmGatewayTxStarted();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
-    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array();
+    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array(0);
     message.confirmationHeight =
       object.confirmationHeight !== undefined &&
       object.confirmationHeight !== null
@@ -883,12 +895,250 @@ export const ConfirmGatewayTxStarted = {
   },
 };
 
+function createBasePollMapping(): PollMapping {
+  return { txId: new Uint8Array(0), pollId: Long.UZERO };
+}
+
+export const PollMapping = {
+  encode(
+    message: PollMapping,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.txId.length !== 0) {
+      writer.uint32(10).bytes(message.txId);
+    }
+    if (!message.pollId.isZero()) {
+      writer.uint32(16).uint64(message.pollId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PollMapping {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePollMapping();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.txId = reader.bytes();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.pollId = reader.uint64() as Long;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PollMapping {
+    return {
+      txId: isSet(object.txId)
+        ? bytesFromBase64(object.txId)
+        : new Uint8Array(0),
+      pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
+    };
+  },
+
+  toJSON(message: PollMapping): unknown {
+    const obj: any = {};
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PollMapping>, I>>(base?: I): PollMapping {
+    return PollMapping.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PollMapping>, I>>(
+    object: I
+  ): PollMapping {
+    const message = createBasePollMapping();
+    message.txId = object.txId ?? new Uint8Array(0);
+    message.pollId =
+      object.pollId !== undefined && object.pollId !== null
+        ? Long.fromValue(object.pollId)
+        : Long.UZERO;
+    return message;
+  },
+};
+
+function createBaseConfirmGatewayTxsStarted(): ConfirmGatewayTxsStarted {
+  return {
+    pollMappings: [],
+    chain: "",
+    gatewayAddress: new Uint8Array(0),
+    confirmationHeight: Long.UZERO,
+    participants: [],
+  };
+}
+
+export const ConfirmGatewayTxsStarted = {
+  encode(
+    message: ConfirmGatewayTxsStarted,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.pollMappings) {
+      PollMapping.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.chain !== "") {
+      writer.uint32(18).string(message.chain);
+    }
+    if (message.gatewayAddress.length !== 0) {
+      writer.uint32(26).bytes(message.gatewayAddress);
+    }
+    if (!message.confirmationHeight.isZero()) {
+      writer.uint32(32).uint64(message.confirmationHeight);
+    }
+    for (const v of message.participants) {
+      writer.uint32(42).bytes(v!);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ConfirmGatewayTxsStarted {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConfirmGatewayTxsStarted();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pollMappings.push(
+            PollMapping.decode(reader, reader.uint32())
+          );
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.chain = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.gatewayAddress = reader.bytes();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.confirmationHeight = reader.uint64() as Long;
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.participants.push(reader.bytes());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ConfirmGatewayTxsStarted {
+    return {
+      pollMappings: Array.isArray(object?.pollMappings)
+        ? object.pollMappings.map((e: any) => PollMapping.fromJSON(e))
+        : [],
+      chain: isSet(object.chain) ? String(object.chain) : "",
+      gatewayAddress: isSet(object.gatewayAddress)
+        ? bytesFromBase64(object.gatewayAddress)
+        : new Uint8Array(0),
+      confirmationHeight: isSet(object.confirmationHeight)
+        ? Long.fromValue(object.confirmationHeight)
+        : Long.UZERO,
+      participants: Array.isArray(object?.participants)
+        ? object.participants.map((e: any) => bytesFromBase64(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ConfirmGatewayTxsStarted): unknown {
+    const obj: any = {};
+    if (message.pollMappings?.length) {
+      obj.pollMappings = message.pollMappings.map((e) => PollMapping.toJSON(e));
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.gatewayAddress.length !== 0) {
+      obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
+    }
+    if (!message.confirmationHeight.isZero()) {
+      obj.confirmationHeight = (
+        message.confirmationHeight || Long.UZERO
+      ).toString();
+    }
+    if (message.participants?.length) {
+      obj.participants = message.participants.map((e) => base64FromBytes(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ConfirmGatewayTxsStarted>, I>>(
+    base?: I
+  ): ConfirmGatewayTxsStarted {
+    return ConfirmGatewayTxsStarted.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxsStarted>, I>>(
+    object: I
+  ): ConfirmGatewayTxsStarted {
+    const message = createBaseConfirmGatewayTxsStarted();
+    message.pollMappings =
+      object.pollMappings?.map((e) => PollMapping.fromPartial(e)) || [];
+    message.chain = object.chain ?? "";
+    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array(0);
+    message.confirmationHeight =
+      object.confirmationHeight !== undefined &&
+      object.confirmationHeight !== null
+        ? Long.fromValue(object.confirmationHeight)
+        : Long.UZERO;
+    message.participants = object.participants?.map((e) => e) || [];
+    return message;
+  },
+};
+
 function createBaseConfirmDepositStarted(): ConfirmDepositStarted {
   return {
-    txId: new Uint8Array(),
+    txId: new Uint8Array(0),
     chain: "",
-    depositAddress: new Uint8Array(),
-    tokenAddress: new Uint8Array(),
+    depositAddress: new Uint8Array(0),
+    tokenAddress: new Uint8Array(0),
     confirmationHeight: Long.UZERO,
     participants: undefined,
     asset: "",
@@ -1003,14 +1253,14 @@ export const ConfirmDepositStarted = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       depositAddress: isSet(object.depositAddress)
         ? bytesFromBase64(object.depositAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       tokenAddress: isSet(object.tokenAddress)
         ? bytesFromBase64(object.tokenAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       confirmationHeight: isSet(object.confirmationHeight)
         ? Long.fromValue(object.confirmationHeight)
         : Long.UZERO,
@@ -1023,49 +1273,45 @@ export const ConfirmDepositStarted = {
 
   toJSON(message: ConfirmDepositStarted): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.depositAddress !== undefined &&
-      (obj.depositAddress = base64FromBytes(
-        message.depositAddress !== undefined
-          ? message.depositAddress
-          : new Uint8Array()
-      ));
-    message.tokenAddress !== undefined &&
-      (obj.tokenAddress = base64FromBytes(
-        message.tokenAddress !== undefined
-          ? message.tokenAddress
-          : new Uint8Array()
-      ));
-    message.confirmationHeight !== undefined &&
-      (obj.confirmationHeight = (
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.depositAddress.length !== 0) {
+      obj.depositAddress = base64FromBytes(message.depositAddress);
+    }
+    if (message.tokenAddress.length !== 0) {
+      obj.tokenAddress = base64FromBytes(message.tokenAddress);
+    }
+    if (!message.confirmationHeight.isZero()) {
+      obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
-      ).toString());
-    message.participants !== undefined &&
-      (obj.participants = message.participants
-        ? PollParticipants.toJSON(message.participants)
-        : undefined);
-    message.asset !== undefined && (obj.asset = message.asset);
+      ).toString();
+    }
+    if (message.participants !== undefined) {
+      obj.participants = PollParticipants.toJSON(message.participants);
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ConfirmDepositStarted>, I>>(
     base?: I
   ): ConfirmDepositStarted {
-    return ConfirmDepositStarted.fromPartial(base ?? {});
+    return ConfirmDepositStarted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ConfirmDepositStarted>, I>>(
     object: I
   ): ConfirmDepositStarted {
     const message = createBaseConfirmDepositStarted();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
-    message.depositAddress = object.depositAddress ?? new Uint8Array();
-    message.tokenAddress = object.tokenAddress ?? new Uint8Array();
+    message.depositAddress = object.depositAddress ?? new Uint8Array(0);
+    message.tokenAddress = object.tokenAddress ?? new Uint8Array(0);
     message.confirmationHeight =
       object.confirmationHeight !== undefined &&
       object.confirmationHeight !== null
@@ -1082,10 +1328,10 @@ export const ConfirmDepositStarted = {
 
 function createBaseConfirmTokenStarted(): ConfirmTokenStarted {
   return {
-    txId: new Uint8Array(),
+    txId: new Uint8Array(0),
     chain: "",
-    gatewayAddress: new Uint8Array(),
-    tokenAddress: new Uint8Array(),
+    gatewayAddress: new Uint8Array(0),
+    tokenAddress: new Uint8Array(0),
     tokenDetails: undefined,
     confirmationHeight: Long.UZERO,
     participants: undefined,
@@ -1200,14 +1446,14 @@ export const ConfirmTokenStarted = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       gatewayAddress: isSet(object.gatewayAddress)
         ? bytesFromBase64(object.gatewayAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       tokenAddress: isSet(object.tokenAddress)
         ? bytesFromBase64(object.tokenAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       tokenDetails: isSet(object.tokenDetails)
         ? TokenDetails.fromJSON(object.tokenDetails)
         : undefined,
@@ -1222,52 +1468,45 @@ export const ConfirmTokenStarted = {
 
   toJSON(message: ConfirmTokenStarted): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.gatewayAddress !== undefined &&
-      (obj.gatewayAddress = base64FromBytes(
-        message.gatewayAddress !== undefined
-          ? message.gatewayAddress
-          : new Uint8Array()
-      ));
-    message.tokenAddress !== undefined &&
-      (obj.tokenAddress = base64FromBytes(
-        message.tokenAddress !== undefined
-          ? message.tokenAddress
-          : new Uint8Array()
-      ));
-    message.tokenDetails !== undefined &&
-      (obj.tokenDetails = message.tokenDetails
-        ? TokenDetails.toJSON(message.tokenDetails)
-        : undefined);
-    message.confirmationHeight !== undefined &&
-      (obj.confirmationHeight = (
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.gatewayAddress.length !== 0) {
+      obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
+    }
+    if (message.tokenAddress.length !== 0) {
+      obj.tokenAddress = base64FromBytes(message.tokenAddress);
+    }
+    if (message.tokenDetails !== undefined) {
+      obj.tokenDetails = TokenDetails.toJSON(message.tokenDetails);
+    }
+    if (!message.confirmationHeight.isZero()) {
+      obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
-      ).toString());
-    message.participants !== undefined &&
-      (obj.participants = message.participants
-        ? PollParticipants.toJSON(message.participants)
-        : undefined);
+      ).toString();
+    }
+    if (message.participants !== undefined) {
+      obj.participants = PollParticipants.toJSON(message.participants);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ConfirmTokenStarted>, I>>(
     base?: I
   ): ConfirmTokenStarted {
-    return ConfirmTokenStarted.fromPartial(base ?? {});
+    return ConfirmTokenStarted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ConfirmTokenStarted>, I>>(
     object: I
   ): ConfirmTokenStarted {
     const message = createBaseConfirmTokenStarted();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
-    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array();
-    message.tokenAddress = object.tokenAddress ?? new Uint8Array();
+    message.gatewayAddress = object.gatewayAddress ?? new Uint8Array(0);
+    message.tokenAddress = object.tokenAddress ?? new Uint8Array(0);
     message.tokenDetails =
       object.tokenDetails !== undefined && object.tokenDetails !== null
         ? TokenDetails.fromPartial(object.tokenDetails)
@@ -1330,14 +1569,15 @@ export const ChainAdded = {
 
   toJSON(message: ChainAdded): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainAdded>, I>>(base?: I): ChainAdded {
-    return ChainAdded.fromPartial(base ?? {});
+    return ChainAdded.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainAdded>, I>>(
     object: I
   ): ChainAdded {
@@ -1348,7 +1588,7 @@ export const ChainAdded = {
 };
 
 function createBaseCommandBatchSigned(): CommandBatchSigned {
-  return { chain: "", commandBatchId: new Uint8Array() };
+  return { chain: "", commandBatchId: new Uint8Array(0) };
 }
 
 export const CommandBatchSigned = {
@@ -1401,40 +1641,38 @@ export const CommandBatchSigned = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       commandBatchId: isSet(object.commandBatchId)
         ? bytesFromBase64(object.commandBatchId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: CommandBatchSigned): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.commandBatchId !== undefined &&
-      (obj.commandBatchId = base64FromBytes(
-        message.commandBatchId !== undefined
-          ? message.commandBatchId
-          : new Uint8Array()
-      ));
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.commandBatchId.length !== 0) {
+      obj.commandBatchId = base64FromBytes(message.commandBatchId);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CommandBatchSigned>, I>>(
     base?: I
   ): CommandBatchSigned {
-    return CommandBatchSigned.fromPartial(base ?? {});
+    return CommandBatchSigned.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CommandBatchSigned>, I>>(
     object: I
   ): CommandBatchSigned {
     const message = createBaseCommandBatchSigned();
     message.chain = object.chain ?? "";
-    message.commandBatchId = object.commandBatchId ?? new Uint8Array();
+    message.commandBatchId = object.commandBatchId ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseCommandBatchAborted(): CommandBatchAborted {
-  return { chain: "", commandBatchId: new Uint8Array() };
+  return { chain: "", commandBatchId: new Uint8Array(0) };
 }
 
 export const CommandBatchAborted = {
@@ -1487,34 +1725,32 @@ export const CommandBatchAborted = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       commandBatchId: isSet(object.commandBatchId)
         ? bytesFromBase64(object.commandBatchId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: CommandBatchAborted): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.commandBatchId !== undefined &&
-      (obj.commandBatchId = base64FromBytes(
-        message.commandBatchId !== undefined
-          ? message.commandBatchId
-          : new Uint8Array()
-      ));
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.commandBatchId.length !== 0) {
+      obj.commandBatchId = base64FromBytes(message.commandBatchId);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CommandBatchAborted>, I>>(
     base?: I
   ): CommandBatchAborted {
-    return CommandBatchAborted.fromPartial(base ?? {});
+    return CommandBatchAborted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CommandBatchAborted>, I>>(
     object: I
   ): CommandBatchAborted {
     const message = createBaseCommandBatchAborted();
     message.chain = object.chain ?? "";
-    message.commandBatchId = object.commandBatchId ?? new Uint8Array();
+    message.commandBatchId = object.commandBatchId ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1588,18 +1824,23 @@ export const EVMEventConfirmed = {
 
   toJSON(message: EVMEventConfirmed): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.type !== undefined && (obj.type = message.type);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EVMEventConfirmed>, I>>(
     base?: I
   ): EVMEventConfirmed {
-    return EVMEventConfirmed.fromPartial(base ?? {});
+    return EVMEventConfirmed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EVMEventConfirmed>, I>>(
     object: I
   ): EVMEventConfirmed {
@@ -1680,18 +1921,23 @@ export const EVMEventCompleted = {
 
   toJSON(message: EVMEventCompleted): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.type !== undefined && (obj.type = message.type);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EVMEventCompleted>, I>>(
     base?: I
   ): EVMEventCompleted {
-    return EVMEventCompleted.fromPartial(base ?? {});
+    return EVMEventCompleted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EVMEventCompleted>, I>>(
     object: I
   ): EVMEventCompleted {
@@ -1772,18 +2018,23 @@ export const EVMEventFailed = {
 
   toJSON(message: EVMEventFailed): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.type !== undefined && (obj.type = message.type);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EVMEventFailed>, I>>(
     base?: I
   ): EVMEventFailed {
-    return EVMEventFailed.fromPartial(base ?? {});
+    return EVMEventFailed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EVMEventFailed>, I>>(
     object: I
   ): EVMEventFailed {
@@ -1864,18 +2115,23 @@ export const EVMEventRetryFailed = {
 
   toJSON(message: EVMEventRetryFailed): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.type !== undefined && (obj.type = message.type);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EVMEventRetryFailed>, I>>(
     base?: I
   ): EVMEventRetryFailed {
-    return EVMEventRetryFailed.fromPartial(base ?? {});
+    return EVMEventRetryFailed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EVMEventRetryFailed>, I>>(
     object: I
   ): EVMEventRetryFailed {
@@ -1891,11 +2147,11 @@ function createBaseContractCallApproved(): ContractCallApproved {
   return {
     chain: "",
     eventId: "",
-    commandId: new Uint8Array(),
+    commandId: new Uint8Array(0),
     sender: "",
     destinationChain: "",
     contractAddress: "",
-    payloadHash: new Uint8Array(),
+    payloadHash: new Uint8Array(0),
   };
 }
 
@@ -2003,7 +2259,7 @@ export const ContractCallApproved = {
       eventId: isSet(object.eventId) ? String(object.eventId) : "",
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sender: isSet(object.sender) ? String(object.sender) : "",
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
@@ -2013,49 +2269,52 @@ export const ContractCallApproved = {
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: ContractCallApproved): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.commandId !== undefined &&
-      (obj.commandId = base64FromBytes(
-        message.commandId !== undefined ? message.commandId : new Uint8Array()
-      ));
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (message.commandId.length !== 0) {
+      obj.commandId = base64FromBytes(message.commandId);
+    }
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ContractCallApproved>, I>>(
     base?: I
   ): ContractCallApproved {
-    return ContractCallApproved.fromPartial(base ?? {});
+    return ContractCallApproved.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ContractCallApproved>, I>>(
     object: I
   ): ContractCallApproved {
     const message = createBaseContractCallApproved();
     message.chain = object.chain ?? "";
     message.eventId = object.eventId ?? "";
-    message.commandId = object.commandId ?? new Uint8Array();
+    message.commandId = object.commandId ?? new Uint8Array(0);
     message.sender = object.sender ?? "";
     message.destinationChain = object.destinationChain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     return message;
   },
 };
@@ -2118,17 +2377,20 @@ export const ContractCallFailed = {
 
   toJSON(message: ContractCallFailed): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.msgId !== undefined && (obj.msgId = message.msgId);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.msgId !== "") {
+      obj.msgId = message.msgId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ContractCallFailed>, I>>(
     base?: I
   ): ContractCallFailed {
-    return ContractCallFailed.fromPartial(base ?? {});
+    return ContractCallFailed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ContractCallFailed>, I>>(
     object: I
   ): ContractCallFailed {
@@ -2143,11 +2405,11 @@ function createBaseContractCallWithMintApproved(): ContractCallWithMintApproved 
   return {
     chain: "",
     eventId: "",
-    commandId: new Uint8Array(),
+    commandId: new Uint8Array(0),
     sender: "",
     destinationChain: "",
     contractAddress: "",
-    payloadHash: new Uint8Array(),
+    payloadHash: new Uint8Array(0),
     asset: undefined,
   };
 }
@@ -2266,7 +2528,7 @@ export const ContractCallWithMintApproved = {
       eventId: isSet(object.eventId) ? String(object.eventId) : "",
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sender: isSet(object.sender) ? String(object.sender) : "",
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
@@ -2276,52 +2538,56 @@ export const ContractCallWithMintApproved = {
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       asset: isSet(object.asset) ? Coin.fromJSON(object.asset) : undefined,
     };
   },
 
   toJSON(message: ContractCallWithMintApproved): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.commandId !== undefined &&
-      (obj.commandId = base64FromBytes(
-        message.commandId !== undefined ? message.commandId : new Uint8Array()
-      ));
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (message.commandId.length !== 0) {
+      obj.commandId = base64FromBytes(message.commandId);
+    }
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ContractCallWithMintApproved>, I>>(
     base?: I
   ): ContractCallWithMintApproved {
-    return ContractCallWithMintApproved.fromPartial(base ?? {});
+    return ContractCallWithMintApproved.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ContractCallWithMintApproved>, I>>(
     object: I
   ): ContractCallWithMintApproved {
     const message = createBaseContractCallWithMintApproved();
     message.chain = object.chain ?? "";
     message.eventId = object.eventId ?? "";
-    message.commandId = object.commandId ?? new Uint8Array();
+    message.commandId = object.commandId ?? new Uint8Array(0);
     message.sender = object.sender ?? "";
     message.destinationChain = object.destinationChain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     message.asset =
       object.asset !== undefined && object.asset !== null
         ? Coin.fromPartial(object.asset)
@@ -2457,24 +2723,33 @@ export const TokenSent = {
 
   toJSON(message: TokenSent): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.eventId !== undefined && (obj.eventId = message.eventId);
-    message.transferId !== undefined &&
-      (obj.transferId = (message.transferId || Long.UZERO).toString());
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.destinationAddress !== undefined &&
-      (obj.destinationAddress = message.destinationAddress);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.eventId !== "") {
+      obj.eventId = message.eventId;
+    }
+    if (!message.transferId.isZero()) {
+      obj.transferId = (message.transferId || Long.UZERO).toString();
+    }
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.destinationAddress !== "") {
+      obj.destinationAddress = message.destinationAddress;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TokenSent>, I>>(base?: I): TokenSent {
-    return TokenSent.fromPartial(base ?? {});
+    return TokenSent.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TokenSent>, I>>(
     object: I
   ): TokenSent {
@@ -2500,7 +2775,7 @@ function createBaseMintCommand(): MintCommand {
   return {
     chain: "",
     transferId: Long.UZERO,
-    commandId: new Uint8Array(),
+    commandId: new Uint8Array(0),
     destinationChain: "",
     destinationAddress: "",
     asset: undefined,
@@ -2600,7 +2875,7 @@ export const MintCommand = {
         : Long.UZERO,
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
@@ -2613,26 +2888,30 @@ export const MintCommand = {
 
   toJSON(message: MintCommand): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.transferId !== undefined &&
-      (obj.transferId = (message.transferId || Long.UZERO).toString());
-    message.commandId !== undefined &&
-      (obj.commandId = base64FromBytes(
-        message.commandId !== undefined ? message.commandId : new Uint8Array()
-      ));
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.destinationAddress !== undefined &&
-      (obj.destinationAddress = message.destinationAddress);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Coin.toJSON(message.asset) : undefined);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (!message.transferId.isZero()) {
+      obj.transferId = (message.transferId || Long.UZERO).toString();
+    }
+    if (message.commandId.length !== 0) {
+      obj.commandId = base64FromBytes(message.commandId);
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.destinationAddress !== "") {
+      obj.destinationAddress = message.destinationAddress;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Coin.toJSON(message.asset);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MintCommand>, I>>(base?: I): MintCommand {
-    return MintCommand.fromPartial(base ?? {});
+    return MintCommand.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MintCommand>, I>>(
     object: I
   ): MintCommand {
@@ -2642,7 +2921,7 @@ export const MintCommand = {
       object.transferId !== undefined && object.transferId !== null
         ? Long.fromValue(object.transferId)
         : Long.UZERO;
-    message.commandId = object.commandId ?? new Uint8Array();
+    message.commandId = object.commandId ?? new Uint8Array(0);
     message.destinationChain = object.destinationChain ?? "";
     message.destinationAddress = object.destinationAddress ?? "";
     message.asset =
@@ -2656,7 +2935,7 @@ export const MintCommand = {
 function createBaseBurnCommand(): BurnCommand {
   return {
     chain: "",
-    commandId: new Uint8Array(),
+    commandId: new Uint8Array(0),
     destinationChain: "",
     depositAddress: "",
     asset: "",
@@ -2743,7 +3022,7 @@ export const BurnCommand = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
@@ -2756,29 +3035,33 @@ export const BurnCommand = {
 
   toJSON(message: BurnCommand): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.commandId !== undefined &&
-      (obj.commandId = base64FromBytes(
-        message.commandId !== undefined ? message.commandId : new Uint8Array()
-      ));
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.depositAddress !== undefined &&
-      (obj.depositAddress = message.depositAddress);
-    message.asset !== undefined && (obj.asset = message.asset);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.commandId.length !== 0) {
+      obj.commandId = base64FromBytes(message.commandId);
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.depositAddress !== "") {
+      obj.depositAddress = message.depositAddress;
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<BurnCommand>, I>>(base?: I): BurnCommand {
-    return BurnCommand.fromPartial(base ?? {});
+    return BurnCommand.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<BurnCommand>, I>>(
     object: I
   ): BurnCommand {
     const message = createBaseBurnCommand();
     message.chain = object.chain ?? "";
-    message.commandId = object.commandId ?? new Uint8Array();
+    message.commandId = object.commandId ?? new Uint8Array(0);
     message.destinationChain = object.destinationChain ?? "";
     message.depositAddress = object.depositAddress ?? "";
     message.asset = object.asset ?? "";
@@ -2786,10 +3069,10 @@ export const BurnCommand = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

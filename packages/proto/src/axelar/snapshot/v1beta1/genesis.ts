@@ -9,7 +9,7 @@ export const protobufPackage = "axelar.snapshot.v1beta1";
 
 /** GenesisState represents the genesis state */
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
   proxiedValidators: ProxiedValidator[];
 }
 
@@ -75,14 +75,13 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.proxiedValidators) {
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    if (message.proxiedValidators?.length) {
       obj.proxiedValidators = message.proxiedValidators.map((e) =>
-        e ? ProxiedValidator.toJSON(e) : undefined
+        ProxiedValidator.toJSON(e)
       );
-    } else {
-      obj.proxiedValidators = [];
     }
     return obj;
   },
@@ -90,9 +89,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {

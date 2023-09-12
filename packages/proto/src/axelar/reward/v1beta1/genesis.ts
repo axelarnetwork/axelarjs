@@ -9,7 +9,7 @@ export const protobufPackage = "axelar.reward.v1beta1";
 
 /** GenesisState represents the genesis state */
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
   pools: Pool[];
 }
 
@@ -73,12 +73,11 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.pools) {
-      obj.pools = message.pools.map((e) => (e ? Pool.toJSON(e) : undefined));
-    } else {
-      obj.pools = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    if (message.pools?.length) {
+      obj.pools = message.pools.map((e) => Pool.toJSON(e));
     }
     return obj;
   },
@@ -86,9 +85,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {

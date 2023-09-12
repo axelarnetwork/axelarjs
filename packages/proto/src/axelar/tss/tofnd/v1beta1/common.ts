@@ -67,7 +67,7 @@ export function keyPresenceResponse_ResponseToJSON(
 }
 
 function createBaseKeyPresenceRequest(): KeyPresenceRequest {
-  return { keyUid: "", pubKey: new Uint8Array() };
+  return { keyUid: "", pubKey: new Uint8Array(0) };
 }
 
 export const KeyPresenceRequest = {
@@ -120,32 +120,32 @@ export const KeyPresenceRequest = {
       keyUid: isSet(object.keyUid) ? String(object.keyUid) : "",
       pubKey: isSet(object.pubKey)
         ? bytesFromBase64(object.pubKey)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: KeyPresenceRequest): unknown {
     const obj: any = {};
-    message.keyUid !== undefined && (obj.keyUid = message.keyUid);
-    message.pubKey !== undefined &&
-      (obj.pubKey = base64FromBytes(
-        message.pubKey !== undefined ? message.pubKey : new Uint8Array()
-      ));
+    if (message.keyUid !== "") {
+      obj.keyUid = message.keyUid;
+    }
+    if (message.pubKey.length !== 0) {
+      obj.pubKey = base64FromBytes(message.pubKey);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyPresenceRequest>, I>>(
     base?: I
   ): KeyPresenceRequest {
-    return KeyPresenceRequest.fromPartial(base ?? {});
+    return KeyPresenceRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyPresenceRequest>, I>>(
     object: I
   ): KeyPresenceRequest {
     const message = createBaseKeyPresenceRequest();
     message.keyUid = object.keyUid ?? "";
-    message.pubKey = object.pubKey ?? new Uint8Array();
+    message.pubKey = object.pubKey ?? new Uint8Array(0);
     return message;
   },
 };
@@ -199,17 +199,17 @@ export const KeyPresenceResponse = {
 
   toJSON(message: KeyPresenceResponse): unknown {
     const obj: any = {};
-    message.response !== undefined &&
-      (obj.response = keyPresenceResponse_ResponseToJSON(message.response));
+    if (message.response !== 0) {
+      obj.response = keyPresenceResponse_ResponseToJSON(message.response);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyPresenceResponse>, I>>(
     base?: I
   ): KeyPresenceResponse {
-    return KeyPresenceResponse.fromPartial(base ?? {});
+    return KeyPresenceResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyPresenceResponse>, I>>(
     object: I
   ): KeyPresenceResponse {
@@ -219,10 +219,10 @@ export const KeyPresenceResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

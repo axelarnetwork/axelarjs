@@ -59,7 +59,7 @@ export interface ValidatorStatus {
 }
 
 function createBaseKeygenVoteData(): KeygenVoteData {
-  return { pubKey: new Uint8Array(), groupRecoveryInfo: new Uint8Array() };
+  return { pubKey: new Uint8Array(0), groupRecoveryInfo: new Uint8Array(0) };
 }
 
 export const KeygenVoteData = {
@@ -111,40 +111,35 @@ export const KeygenVoteData = {
     return {
       pubKey: isSet(object.pubKey)
         ? bytesFromBase64(object.pubKey)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       groupRecoveryInfo: isSet(object.groupRecoveryInfo)
         ? bytesFromBase64(object.groupRecoveryInfo)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: KeygenVoteData): unknown {
     const obj: any = {};
-    message.pubKey !== undefined &&
-      (obj.pubKey = base64FromBytes(
-        message.pubKey !== undefined ? message.pubKey : new Uint8Array()
-      ));
-    message.groupRecoveryInfo !== undefined &&
-      (obj.groupRecoveryInfo = base64FromBytes(
-        message.groupRecoveryInfo !== undefined
-          ? message.groupRecoveryInfo
-          : new Uint8Array()
-      ));
+    if (message.pubKey.length !== 0) {
+      obj.pubKey = base64FromBytes(message.pubKey);
+    }
+    if (message.groupRecoveryInfo.length !== 0) {
+      obj.groupRecoveryInfo = base64FromBytes(message.groupRecoveryInfo);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeygenVoteData>, I>>(
     base?: I
   ): KeygenVoteData {
-    return KeygenVoteData.fromPartial(base ?? {});
+    return KeygenVoteData.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeygenVoteData>, I>>(
     object: I
   ): KeygenVoteData {
     const message = createBaseKeygenVoteData();
-    message.pubKey = object.pubKey ?? new Uint8Array();
-    message.groupRecoveryInfo = object.groupRecoveryInfo ?? new Uint8Array();
+    message.pubKey = object.pubKey ?? new Uint8Array(0);
+    message.groupRecoveryInfo = object.groupRecoveryInfo ?? new Uint8Array(0);
     return message;
   },
 };
@@ -218,18 +213,21 @@ export const KeyInfo = {
 
   toJSON(message: KeyInfo): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    message.keyRole !== undefined &&
-      (obj.keyRole = keyRoleToJSON(message.keyRole));
-    message.keyType !== undefined &&
-      (obj.keyType = keyTypeToJSON(message.keyType));
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.keyRole !== 0) {
+      obj.keyRole = keyRoleToJSON(message.keyRole);
+    }
+    if (message.keyType !== 0) {
+      obj.keyType = keyTypeToJSON(message.keyType);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyInfo>, I>>(base?: I): KeyInfo {
-    return KeyInfo.fromPartial(base ?? {});
+    return KeyInfo.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyInfo>, I>>(object: I): KeyInfo {
     const message = createBaseKeyInfo();
     message.keyId = object.keyId ?? "";
@@ -325,17 +323,17 @@ export const MultisigInfo = {
 
   toJSON(message: MultisigInfo): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.timeout !== undefined &&
-      (obj.timeout = (message.timeout || Long.ZERO).toString());
-    message.targetNum !== undefined &&
-      (obj.targetNum = (message.targetNum || Long.ZERO).toString());
-    if (message.infos) {
-      obj.infos = message.infos.map((e) =>
-        e ? MultisigInfo_Info.toJSON(e) : undefined
-      );
-    } else {
-      obj.infos = [];
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (!message.timeout.isZero()) {
+      obj.timeout = (message.timeout || Long.ZERO).toString();
+    }
+    if (!message.targetNum.isZero()) {
+      obj.targetNum = (message.targetNum || Long.ZERO).toString();
+    }
+    if (message.infos?.length) {
+      obj.infos = message.infos.map((e) => MultisigInfo_Info.toJSON(e));
     }
     return obj;
   },
@@ -343,9 +341,8 @@ export const MultisigInfo = {
   create<I extends Exact<DeepPartial<MultisigInfo>, I>>(
     base?: I
   ): MultisigInfo {
-    return MultisigInfo.fromPartial(base ?? {});
+    return MultisigInfo.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MultisigInfo>, I>>(
     object: I
   ): MultisigInfo {
@@ -366,7 +363,7 @@ export const MultisigInfo = {
 };
 
 function createBaseMultisigInfo_Info(): MultisigInfo_Info {
-  return { participant: new Uint8Array(), data: [] };
+  return { participant: new Uint8Array(0), data: [] };
 }
 
 export const MultisigInfo_Info = {
@@ -418,7 +415,7 @@ export const MultisigInfo_Info = {
     return {
       participant: isSet(object.participant)
         ? bytesFromBase64(object.participant)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       data: Array.isArray(object?.data)
         ? object.data.map((e: any) => bytesFromBase64(e))
         : [],
@@ -427,18 +424,11 @@ export const MultisigInfo_Info = {
 
   toJSON(message: MultisigInfo_Info): unknown {
     const obj: any = {};
-    message.participant !== undefined &&
-      (obj.participant = base64FromBytes(
-        message.participant !== undefined
-          ? message.participant
-          : new Uint8Array()
-      ));
-    if (message.data) {
-      obj.data = message.data.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.data = [];
+    if (message.participant.length !== 0) {
+      obj.participant = base64FromBytes(message.participant);
+    }
+    if (message.data?.length) {
+      obj.data = message.data.map((e) => base64FromBytes(e));
     }
     return obj;
   },
@@ -446,21 +436,20 @@ export const MultisigInfo_Info = {
   create<I extends Exact<DeepPartial<MultisigInfo_Info>, I>>(
     base?: I
   ): MultisigInfo_Info {
-    return MultisigInfo_Info.fromPartial(base ?? {});
+    return MultisigInfo_Info.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MultisigInfo_Info>, I>>(
     object: I
   ): MultisigInfo_Info {
     const message = createBaseMultisigInfo_Info();
-    message.participant = object.participant ?? new Uint8Array();
+    message.participant = object.participant ?? new Uint8Array(0);
     message.data = object.data?.map((e) => e) || [];
     return message;
   },
 };
 
 function createBaseKeyRecoveryInfo(): KeyRecoveryInfo {
-  return { keyId: "", public: new Uint8Array(), private: {} };
+  return { keyId: "", public: new Uint8Array(0), private: {} };
 }
 
 export const KeyRecoveryInfo = {
@@ -532,7 +521,7 @@ export const KeyRecoveryInfo = {
       keyId: isSet(object.keyId) ? String(object.keyId) : "",
       public: isSet(object.public)
         ? bytesFromBase64(object.public)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       private: isObject(object.private)
         ? Object.entries(object.private).reduce<{ [key: string]: Uint8Array }>(
             (acc, [key, value]) => {
@@ -547,16 +536,20 @@ export const KeyRecoveryInfo = {
 
   toJSON(message: KeyRecoveryInfo): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    message.public !== undefined &&
-      (obj.public = base64FromBytes(
-        message.public !== undefined ? message.public : new Uint8Array()
-      ));
-    obj.private = {};
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.public.length !== 0) {
+      obj.public = base64FromBytes(message.public);
+    }
     if (message.private) {
-      Object.entries(message.private).forEach(([k, v]) => {
-        obj.private[k] = base64FromBytes(v);
-      });
+      const entries = Object.entries(message.private);
+      if (entries.length > 0) {
+        obj.private = {};
+        entries.forEach(([k, v]) => {
+          obj.private[k] = base64FromBytes(v);
+        });
+      }
     }
     return obj;
   },
@@ -564,15 +557,14 @@ export const KeyRecoveryInfo = {
   create<I extends Exact<DeepPartial<KeyRecoveryInfo>, I>>(
     base?: I
   ): KeyRecoveryInfo {
-    return KeyRecoveryInfo.fromPartial(base ?? {});
+    return KeyRecoveryInfo.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyRecoveryInfo>, I>>(
     object: I
   ): KeyRecoveryInfo {
     const message = createBaseKeyRecoveryInfo();
     message.keyId = object.keyId ?? "";
-    message.public = object.public ?? new Uint8Array();
+    message.public = object.public ?? new Uint8Array(0);
     message.private = Object.entries(object.private ?? {}).reduce<{
       [key: string]: Uint8Array;
     }>((acc, [key, value]) => {
@@ -586,7 +578,7 @@ export const KeyRecoveryInfo = {
 };
 
 function createBaseKeyRecoveryInfo_PrivateEntry(): KeyRecoveryInfo_PrivateEntry {
-  return { key: "", value: new Uint8Array() };
+  return { key: "", value: new Uint8Array(0) };
 }
 
 export const KeyRecoveryInfo_PrivateEntry = {
@@ -642,32 +634,32 @@ export const KeyRecoveryInfo_PrivateEntry = {
       key: isSet(object.key) ? String(object.key) : "",
       value: isSet(object.value)
         ? bytesFromBase64(object.value)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: KeyRecoveryInfo_PrivateEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = base64FromBytes(
-        message.value !== undefined ? message.value : new Uint8Array()
-      ));
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value.length !== 0) {
+      obj.value = base64FromBytes(message.value);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyRecoveryInfo_PrivateEntry>, I>>(
     base?: I
   ): KeyRecoveryInfo_PrivateEntry {
-    return KeyRecoveryInfo_PrivateEntry.fromPartial(base ?? {});
+    return KeyRecoveryInfo_PrivateEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyRecoveryInfo_PrivateEntry>, I>>(
     object: I
   ): KeyRecoveryInfo_PrivateEntry {
     const message = createBaseKeyRecoveryInfo_PrivateEntry();
     message.key = object.key ?? "";
-    message.value = object.value ?? new Uint8Array();
+    message.value = object.value ?? new Uint8Array(0);
     return message;
   },
 };
@@ -732,11 +724,11 @@ export const ExternalKeys = {
 
   toJSON(message: ExternalKeys): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    if (message.keyIds) {
-      obj.keyIds = message.keyIds.map((e) => e);
-    } else {
-      obj.keyIds = [];
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.keyIds?.length) {
+      obj.keyIds = message.keyIds;
     }
     return obj;
   },
@@ -744,9 +736,8 @@ export const ExternalKeys = {
   create<I extends Exact<DeepPartial<ExternalKeys>, I>>(
     base?: I
   ): ExternalKeys {
-    return ExternalKeys.fromPartial(base ?? {});
+    return ExternalKeys.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ExternalKeys>, I>>(
     object: I
   ): ExternalKeys {
@@ -758,7 +749,7 @@ export const ExternalKeys = {
 };
 
 function createBaseValidatorStatus(): ValidatorStatus {
-  return { validator: new Uint8Array(), suspendedUntil: Long.UZERO };
+  return { validator: new Uint8Array(0), suspendedUntil: Long.UZERO };
 }
 
 export const ValidatorStatus = {
@@ -810,7 +801,7 @@ export const ValidatorStatus = {
     return {
       validator: isSet(object.validator)
         ? bytesFromBase64(object.validator)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       suspendedUntil: isSet(object.suspendedUntil)
         ? Long.fromValue(object.suspendedUntil)
         : Long.UZERO,
@@ -819,26 +810,25 @@ export const ValidatorStatus = {
 
   toJSON(message: ValidatorStatus): unknown {
     const obj: any = {};
-    message.validator !== undefined &&
-      (obj.validator = base64FromBytes(
-        message.validator !== undefined ? message.validator : new Uint8Array()
-      ));
-    message.suspendedUntil !== undefined &&
-      (obj.suspendedUntil = (message.suspendedUntil || Long.UZERO).toString());
+    if (message.validator.length !== 0) {
+      obj.validator = base64FromBytes(message.validator);
+    }
+    if (!message.suspendedUntil.isZero()) {
+      obj.suspendedUntil = (message.suspendedUntil || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ValidatorStatus>, I>>(
     base?: I
   ): ValidatorStatus {
-    return ValidatorStatus.fromPartial(base ?? {});
+    return ValidatorStatus.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ValidatorStatus>, I>>(
     object: I
   ): ValidatorStatus {
     const message = createBaseValidatorStatus();
-    message.validator = object.validator ?? new Uint8Array();
+    message.validator = object.validator ?? new Uint8Array(0);
     message.suspendedUntil =
       object.suspendedUntil !== undefined && object.suspendedUntil !== null
         ? Long.fromValue(object.suspendedUntil)
@@ -847,10 +837,10 @@ export const ValidatorStatus = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

@@ -75,17 +75,18 @@ export const Threshold = {
 
   toJSON(message: Threshold): unknown {
     const obj: any = {};
-    message.numerator !== undefined &&
-      (obj.numerator = (message.numerator || Long.ZERO).toString());
-    message.denominator !== undefined &&
-      (obj.denominator = (message.denominator || Long.ZERO).toString());
+    if (!message.numerator.isZero()) {
+      obj.numerator = (message.numerator || Long.ZERO).toString();
+    }
+    if (!message.denominator.isZero()) {
+      obj.denominator = (message.denominator || Long.ZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Threshold>, I>>(base?: I): Threshold {
-    return Threshold.fromPartial(base ?? {});
+    return Threshold.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Threshold>, I>>(
     object: I
   ): Threshold {

@@ -78,21 +78,18 @@ export const Pool = {
 
   toJSON(message: Pool): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    if (message.rewards) {
-      obj.rewards = message.rewards.map((e) =>
-        e ? Pool_Reward.toJSON(e) : undefined
-      );
-    } else {
-      obj.rewards = [];
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.rewards?.length) {
+      obj.rewards = message.rewards.map((e) => Pool_Reward.toJSON(e));
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Pool>, I>>(base?: I): Pool {
-    return Pool.fromPartial(base ?? {});
+    return Pool.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Pool>, I>>(object: I): Pool {
     const message = createBasePool();
     message.name = object.name ?? "";
@@ -103,7 +100,7 @@ export const Pool = {
 };
 
 function createBasePool_Reward(): Pool_Reward {
-  return { validator: new Uint8Array(), coins: [] };
+  return { validator: new Uint8Array(0), coins: [] };
 }
 
 export const Pool_Reward = {
@@ -155,7 +152,7 @@ export const Pool_Reward = {
     return {
       validator: isSet(object.validator)
         ? bytesFromBase64(object.validator)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       coins: Array.isArray(object?.coins)
         ? object.coins.map((e: any) => Coin.fromJSON(e))
         : [],
@@ -164,34 +161,30 @@ export const Pool_Reward = {
 
   toJSON(message: Pool_Reward): unknown {
     const obj: any = {};
-    message.validator !== undefined &&
-      (obj.validator = base64FromBytes(
-        message.validator !== undefined ? message.validator : new Uint8Array()
-      ));
-    if (message.coins) {
-      obj.coins = message.coins.map((e) => (e ? Coin.toJSON(e) : undefined));
-    } else {
-      obj.coins = [];
+    if (message.validator.length !== 0) {
+      obj.validator = base64FromBytes(message.validator);
+    }
+    if (message.coins?.length) {
+      obj.coins = message.coins.map((e) => Coin.toJSON(e));
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Pool_Reward>, I>>(base?: I): Pool_Reward {
-    return Pool_Reward.fromPartial(base ?? {});
+    return Pool_Reward.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Pool_Reward>, I>>(
     object: I
   ): Pool_Reward {
     const message = createBasePool_Reward();
-    message.validator = object.validator ?? new Uint8Array();
+    message.validator = object.validator ?? new Uint8Array(0);
     message.coins = object.coins?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
 };
 
 function createBaseRefund(): Refund {
-  return { payer: new Uint8Array(), fees: [] };
+  return { payer: new Uint8Array(0), fees: [] };
 }
 
 export const Refund = {
@@ -243,7 +236,7 @@ export const Refund = {
     return {
       payer: isSet(object.payer)
         ? bytesFromBase64(object.payer)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       fees: Array.isArray(object?.fees)
         ? object.fees.map((e: any) => Coin.fromJSON(e))
         : [],
@@ -252,34 +245,30 @@ export const Refund = {
 
   toJSON(message: Refund): unknown {
     const obj: any = {};
-    message.payer !== undefined &&
-      (obj.payer = base64FromBytes(
-        message.payer !== undefined ? message.payer : new Uint8Array()
-      ));
-    if (message.fees) {
-      obj.fees = message.fees.map((e) => (e ? Coin.toJSON(e) : undefined));
-    } else {
-      obj.fees = [];
+    if (message.payer.length !== 0) {
+      obj.payer = base64FromBytes(message.payer);
+    }
+    if (message.fees?.length) {
+      obj.fees = message.fees.map((e) => Coin.toJSON(e));
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Refund>, I>>(base?: I): Refund {
-    return Refund.fromPartial(base ?? {});
+    return Refund.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Refund>, I>>(object: I): Refund {
     const message = createBaseRefund();
-    message.payer = object.payer ?? new Uint8Array();
+    message.payer = object.payer ?? new Uint8Array(0);
     message.fees = object.fees?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

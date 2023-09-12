@@ -22,9 +22,9 @@ export interface Params {
    * emit the event asking validators to send their heartbeats
    */
   heartbeatPeriodInBlocks: Long;
-  maxMissedBlocksPerWindow?: Threshold;
+  maxMissedBlocksPerWindow?: Threshold | undefined;
   unbondingLockingKeyRotationCount: Long;
-  externalMultisigThreshold?: Threshold;
+  externalMultisigThreshold?: Threshold | undefined;
   maxSignQueueSize: Long;
   maxSimultaneousSignShares: Long;
   tssSignedBlocksWindow: Long;
@@ -209,52 +209,55 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (message.keyRequirements) {
+    if (message.keyRequirements?.length) {
       obj.keyRequirements = message.keyRequirements.map((e) =>
-        e ? KeyRequirement.toJSON(e) : undefined
+        KeyRequirement.toJSON(e)
       );
-    } else {
-      obj.keyRequirements = [];
     }
-    message.suspendDurationInBlocks !== undefined &&
-      (obj.suspendDurationInBlocks = (
+    if (!message.suspendDurationInBlocks.isZero()) {
+      obj.suspendDurationInBlocks = (
         message.suspendDurationInBlocks || Long.ZERO
-      ).toString());
-    message.heartbeatPeriodInBlocks !== undefined &&
-      (obj.heartbeatPeriodInBlocks = (
+      ).toString();
+    }
+    if (!message.heartbeatPeriodInBlocks.isZero()) {
+      obj.heartbeatPeriodInBlocks = (
         message.heartbeatPeriodInBlocks || Long.ZERO
-      ).toString());
-    message.maxMissedBlocksPerWindow !== undefined &&
-      (obj.maxMissedBlocksPerWindow = message.maxMissedBlocksPerWindow
-        ? Threshold.toJSON(message.maxMissedBlocksPerWindow)
-        : undefined);
-    message.unbondingLockingKeyRotationCount !== undefined &&
-      (obj.unbondingLockingKeyRotationCount = (
+      ).toString();
+    }
+    if (message.maxMissedBlocksPerWindow !== undefined) {
+      obj.maxMissedBlocksPerWindow = Threshold.toJSON(
+        message.maxMissedBlocksPerWindow
+      );
+    }
+    if (!message.unbondingLockingKeyRotationCount.isZero()) {
+      obj.unbondingLockingKeyRotationCount = (
         message.unbondingLockingKeyRotationCount || Long.ZERO
-      ).toString());
-    message.externalMultisigThreshold !== undefined &&
-      (obj.externalMultisigThreshold = message.externalMultisigThreshold
-        ? Threshold.toJSON(message.externalMultisigThreshold)
-        : undefined);
-    message.maxSignQueueSize !== undefined &&
-      (obj.maxSignQueueSize = (
-        message.maxSignQueueSize || Long.ZERO
-      ).toString());
-    message.maxSimultaneousSignShares !== undefined &&
-      (obj.maxSimultaneousSignShares = (
+      ).toString();
+    }
+    if (message.externalMultisigThreshold !== undefined) {
+      obj.externalMultisigThreshold = Threshold.toJSON(
+        message.externalMultisigThreshold
+      );
+    }
+    if (!message.maxSignQueueSize.isZero()) {
+      obj.maxSignQueueSize = (message.maxSignQueueSize || Long.ZERO).toString();
+    }
+    if (!message.maxSimultaneousSignShares.isZero()) {
+      obj.maxSimultaneousSignShares = (
         message.maxSimultaneousSignShares || Long.ZERO
-      ).toString());
-    message.tssSignedBlocksWindow !== undefined &&
-      (obj.tssSignedBlocksWindow = (
+      ).toString();
+    }
+    if (!message.tssSignedBlocksWindow.isZero()) {
+      obj.tssSignedBlocksWindow = (
         message.tssSignedBlocksWindow || Long.ZERO
-      ).toString());
+      ).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.keyRequirements =
