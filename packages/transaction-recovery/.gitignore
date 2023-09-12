@@ -1,5 +1,8 @@
 node_modules/
 build/
+/cosmosSigner
+/services
+
 *.d.ts
 *.js
 

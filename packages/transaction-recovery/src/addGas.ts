@@ -15,7 +15,7 @@ export type SendOptions = {
   cosmosWalletMnemonic: string;
 };
 
-async function addGas(
+export async function addGas(
   txHash: string,
   token: Coin | "autocalculate",
   sendOptions: SendOptions
@@ -69,5 +69,3 @@ async function addGas(
     sendOptions.txFee
   );
 }
-
-export default addGas;
