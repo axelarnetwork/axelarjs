@@ -1,6 +1,7 @@
 import {
   createGMPBrowserClient,
   createGMPNodeClient,
+  EstimateGasFeeParams,
   GetFeesParams,
   GMPClient,
 } from "..";
@@ -31,8 +32,74 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
     });
   }
 
-  async estimateGasFee(params: GetFeesParams) {
+  async estimateGasFee(params: EstimateGasFeeParams) {
     const feeAPI = await this.gmpClient.getFees(params);
+
+    // await throwIfInvalidChainIds(
+    //   [sourceChainId, destinationChainId],
+    //   this.environment
+    // );
+
+    // const response = await this.getNativeGasBaseFee(
+    //   sourceChainId,
+    //   destinationChainId,
+    //   sourceChainTokenSymbol as GasToken,
+    //   gmpParams?.tokenSymbol,
+    //   gmpParams?.destinationContractAddress,
+    //   gmpParams?.sourceContractAddress,
+    //   gmpParams?.transferAmount,
+    //   gmpParams?.transferAmountInUnits
+    // );
+
+    // const {
+    //   baseFee,
+    //   expressFee,
+    //   sourceToken,
+    //   destToken,
+    //   apiResponse,
+    //   success,
+    //   expressSupported,
+    // } = response;
+
+    // if (!success || !baseFee || !sourceToken) {
+    //   throw new Error("Failed to estimate gas fee");
+    // }
+
+    // const destGasFeeWei = BigNumberUtils.multiplyToGetWei(
+    //   BigNumber.from(gasLimit),
+    //   destToken.gas_price,
+    //   destToken.decimals
+    // );
+    // const minDestGasFeeWei = BigNumber.from(gasLimit).mul(minGasPrice); //minGasPrice already provided by the user in wei
+
+    // const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
+    //   BigNumber.from(gasLimit),
+    //   sourceToken.gas_price,
+    //   sourceToken.decimals
+    // );
+
+    // const executionFee = destGasFeeWei.gt(minDestGasFeeWei)
+    //   ? srcGasFeeWei
+    //   : srcGasFeeWei.mul(minDestGasFeeWei).div(destGasFeeWei);
+    // const executionFeeWithMultiplier =
+    //   gasMultiplier > 1
+    //     ? executionFee.mul(gasMultiplier * 10000).div(10000)
+    //     : executionFee;
+
+    // return gmpParams?.showDetailedFees
+    //   ? {
+    //       baseFee,
+    //       expressFee,
+    //       executionFee: executionFee.toString(),
+    //       executionFeeWithMultiplier: executionFeeWithMultiplier.toString(),
+    //       gasLimit,
+    //       gasMultiplier,
+    //       minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
+    //       apiResponse,
+    //       isExpressSupported: expressSupported,
+    //     }
+    //   : executionFeeWithMultiplier.add(baseFee).toString();
+
     return feeAPI;
   }
 }
