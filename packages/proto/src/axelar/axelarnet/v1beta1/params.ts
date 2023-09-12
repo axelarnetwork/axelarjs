@@ -2,6 +2,8 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 
+import { Coin } from "../../../cosmos/base/v1beta1/coin";
+
 export const protobufPackage = "axelar.axelarnet.v1beta1";
 
 /** Params represent the genesis parameters for the module */
@@ -10,6 +12,13 @@ export interface Params {
   routeTimeoutWindow: Long;
   transferLimit: Long;
   endBlockerLimit: Long;
+  callContractsProposalMinDeposits: CallContractProposalMinDeposit[];
+}
+
+export interface CallContractProposalMinDeposit {
+  chain: string;
+  contractAddress: string;
+  minDeposits: Coin[];
 }
 
 function createBaseParams(): Params {
@@ -17,6 +26,7 @@ function createBaseParams(): Params {
     routeTimeoutWindow: Long.UZERO,
     transferLimit: Long.UZERO,
     endBlockerLimit: Long.UZERO,
+    callContractsProposalMinDeposits: [],
   };
 }
 
@@ -33,6 +43,12 @@ export const Params = {
     }
     if (!message.endBlockerLimit.isZero()) {
       writer.uint32(32).uint64(message.endBlockerLimit);
+    }
+    for (const v of message.callContractsProposalMinDeposits) {
+      CallContractProposalMinDeposit.encode(
+        v!,
+        writer.uint32(42).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -66,6 +82,15 @@ export const Params = {
 
           message.endBlockerLimit = reader.uint64() as Long;
           continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.callContractsProposalMinDeposits.push(
+            CallContractProposalMinDeposit.decode(reader, reader.uint32())
+          );
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -86,28 +111,41 @@ export const Params = {
       endBlockerLimit: isSet(object.endBlockerLimit)
         ? Long.fromValue(object.endBlockerLimit)
         : Long.UZERO,
+      callContractsProposalMinDeposits: Array.isArray(
+        object?.callContractsProposalMinDeposits
+      )
+        ? object.callContractsProposalMinDeposits.map((e: any) =>
+            CallContractProposalMinDeposit.fromJSON(e)
+          )
+        : [],
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.routeTimeoutWindow !== undefined &&
-      (obj.routeTimeoutWindow = (
+    if (!message.routeTimeoutWindow.isZero()) {
+      obj.routeTimeoutWindow = (
         message.routeTimeoutWindow || Long.UZERO
-      ).toString());
-    message.transferLimit !== undefined &&
-      (obj.transferLimit = (message.transferLimit || Long.UZERO).toString());
-    message.endBlockerLimit !== undefined &&
-      (obj.endBlockerLimit = (
-        message.endBlockerLimit || Long.UZERO
-      ).toString());
+      ).toString();
+    }
+    if (!message.transferLimit.isZero()) {
+      obj.transferLimit = (message.transferLimit || Long.UZERO).toString();
+    }
+    if (!message.endBlockerLimit.isZero()) {
+      obj.endBlockerLimit = (message.endBlockerLimit || Long.UZERO).toString();
+    }
+    if (message.callContractsProposalMinDeposits?.length) {
+      obj.callContractsProposalMinDeposits =
+        message.callContractsProposalMinDeposits.map((e) =>
+          CallContractProposalMinDeposit.toJSON(e)
+        );
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.routeTimeoutWindow =
@@ -123,6 +161,115 @@ export const Params = {
       object.endBlockerLimit !== undefined && object.endBlockerLimit !== null
         ? Long.fromValue(object.endBlockerLimit)
         : Long.UZERO;
+    message.callContractsProposalMinDeposits =
+      object.callContractsProposalMinDeposits?.map((e) =>
+        CallContractProposalMinDeposit.fromPartial(e)
+      ) || [];
+    return message;
+  },
+};
+
+function createBaseCallContractProposalMinDeposit(): CallContractProposalMinDeposit {
+  return { chain: "", contractAddress: "", minDeposits: [] };
+}
+
+export const CallContractProposalMinDeposit = {
+  encode(
+    message: CallContractProposalMinDeposit,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.chain !== "") {
+      writer.uint32(10).string(message.chain);
+    }
+    if (message.contractAddress !== "") {
+      writer.uint32(18).string(message.contractAddress);
+    }
+    for (const v of message.minDeposits) {
+      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): CallContractProposalMinDeposit {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCallContractProposalMinDeposit();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.chain = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.contractAddress = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.minDeposits.push(Coin.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CallContractProposalMinDeposit {
+    return {
+      chain: isSet(object.chain) ? String(object.chain) : "",
+      contractAddress: isSet(object.contractAddress)
+        ? String(object.contractAddress)
+        : "",
+      minDeposits: Array.isArray(object?.minDeposits)
+        ? object.minDeposits.map((e: any) => Coin.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: CallContractProposalMinDeposit): unknown {
+    const obj: any = {};
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.minDeposits?.length) {
+      obj.minDeposits = message.minDeposits.map((e) => Coin.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CallContractProposalMinDeposit>, I>>(
+    base?: I
+  ): CallContractProposalMinDeposit {
+    return CallContractProposalMinDeposit.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CallContractProposalMinDeposit>, I>>(
+    object: I
+  ): CallContractProposalMinDeposit {
+    const message = createBaseCallContractProposalMinDeposit();
+    message.chain = object.chain ?? "";
+    message.contractAddress = object.contractAddress ?? "";
+    message.minDeposits =
+      object.minDeposits?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
 };

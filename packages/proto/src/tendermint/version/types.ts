@@ -81,16 +81,18 @@ export const App = {
 
   toJSON(message: App): unknown {
     const obj: any = {};
-    message.protocol !== undefined &&
-      (obj.protocol = (message.protocol || Long.UZERO).toString());
-    message.software !== undefined && (obj.software = message.software);
+    if (!message.protocol.isZero()) {
+      obj.protocol = (message.protocol || Long.UZERO).toString();
+    }
+    if (message.software !== "") {
+      obj.software = message.software;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<App>, I>>(base?: I): App {
-    return App.fromPartial(base ?? {});
+    return App.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<App>, I>>(object: I): App {
     const message = createBaseApp();
     message.protocol =
@@ -160,17 +162,18 @@ export const Consensus = {
 
   toJSON(message: Consensus): unknown {
     const obj: any = {};
-    message.block !== undefined &&
-      (obj.block = (message.block || Long.UZERO).toString());
-    message.app !== undefined &&
-      (obj.app = (message.app || Long.UZERO).toString());
+    if (!message.block.isZero()) {
+      obj.block = (message.block || Long.UZERO).toString();
+    }
+    if (!message.app.isZero()) {
+      obj.app = (message.app || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Consensus>, I>>(base?: I): Consensus {
-    return Consensus.fromPartial(base ?? {});
+    return Consensus.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Consensus>, I>>(
     object: I
   ): Consensus {

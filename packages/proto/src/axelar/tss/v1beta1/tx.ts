@@ -21,7 +21,7 @@ export const protobufPackage = "axelar.tss.v1beta1";
 /** StartKeygenRequest indicate the start of keygen */
 export interface StartKeygenRequest {
   sender: string;
-  keyInfo?: KeyInfo;
+  keyInfo?: KeyInfo | undefined;
 }
 
 export interface StartKeygenResponse {}
@@ -39,7 +39,7 @@ export interface RotateKeyResponse {}
 export interface ProcessKeygenTrafficRequest {
   sender: Uint8Array;
   sessionId: string;
-  payload?: TrafficOut;
+  payload?: TrafficOut | undefined;
 }
 
 export interface ProcessKeygenTrafficResponse {}
@@ -48,7 +48,7 @@ export interface ProcessKeygenTrafficResponse {}
 export interface ProcessSignTrafficRequest {
   sender: Uint8Array;
   sessionId: string;
-  payload?: TrafficOut;
+  payload?: TrafficOut | undefined;
 }
 
 export interface ProcessSignTrafficResponse {}
@@ -56,8 +56,8 @@ export interface ProcessSignTrafficResponse {}
 /** VotePubKeyRequest represents the message to vote on a public key */
 export interface VotePubKeyRequest {
   sender: Uint8Array;
-  pollKey?: PollKey;
-  result?: MessageOut_KeygenResult;
+  pollKey?: PollKey | undefined;
+  result?: MessageOut_KeygenResult | undefined;
 }
 
 export interface VotePubKeyResponse {
@@ -67,8 +67,8 @@ export interface VotePubKeyResponse {
 /** VoteSigRequest represents a message to vote for a signature */
 export interface VoteSigRequest {
   sender: Uint8Array;
-  pollKey?: PollKey;
-  result?: MessageOut_SignResult;
+  pollKey?: PollKey | undefined;
+  result?: MessageOut_SignResult | undefined;
 }
 
 export interface VoteSigResponse {
@@ -171,20 +171,20 @@ export const StartKeygenRequest = {
 
   toJSON(message: StartKeygenRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined && (obj.sender = message.sender);
-    message.keyInfo !== undefined &&
-      (obj.keyInfo = message.keyInfo
-        ? KeyInfo.toJSON(message.keyInfo)
-        : undefined);
+    if (message.sender !== "") {
+      obj.sender = message.sender;
+    }
+    if (message.keyInfo !== undefined) {
+      obj.keyInfo = KeyInfo.toJSON(message.keyInfo);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<StartKeygenRequest>, I>>(
     base?: I
   ): StartKeygenRequest {
-    return StartKeygenRequest.fromPartial(base ?? {});
+    return StartKeygenRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<StartKeygenRequest>, I>>(
     object: I
   ): StartKeygenRequest {
@@ -239,9 +239,8 @@ export const StartKeygenResponse = {
   create<I extends Exact<DeepPartial<StartKeygenResponse>, I>>(
     base?: I
   ): StartKeygenResponse {
-    return StartKeygenResponse.fromPartial(base ?? {});
+    return StartKeygenResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<StartKeygenResponse>, I>>(
     _: I
   ): StartKeygenResponse {
@@ -251,7 +250,7 @@ export const StartKeygenResponse = {
 };
 
 function createBaseRotateKeyRequest(): RotateKeyRequest {
-  return { sender: new Uint8Array(), chain: "", keyRole: 0, keyId: "" };
+  return { sender: new Uint8Array(0), chain: "", keyRole: 0, keyId: "" };
 }
 
 export const RotateKeyRequest = {
@@ -323,7 +322,7 @@ export const RotateKeyRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       keyRole: isSet(object.keyRole) ? keyRoleFromJSON(object.keyRole) : 0,
       keyId: isSet(object.keyId) ? String(object.keyId) : "",
@@ -332,28 +331,31 @@ export const RotateKeyRequest = {
 
   toJSON(message: RotateKeyRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.keyRole !== undefined &&
-      (obj.keyRole = keyRoleToJSON(message.keyRole));
-    message.keyId !== undefined && (obj.keyId = message.keyId);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.keyRole !== 0) {
+      obj.keyRole = keyRoleToJSON(message.keyRole);
+    }
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RotateKeyRequest>, I>>(
     base?: I
   ): RotateKeyRequest {
-    return RotateKeyRequest.fromPartial(base ?? {});
+    return RotateKeyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RotateKeyRequest>, I>>(
     object: I
   ): RotateKeyRequest {
     const message = createBaseRotateKeyRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.keyRole = object.keyRole ?? 0;
     message.keyId = object.keyId ?? "";
@@ -402,9 +404,8 @@ export const RotateKeyResponse = {
   create<I extends Exact<DeepPartial<RotateKeyResponse>, I>>(
     base?: I
   ): RotateKeyResponse {
-    return RotateKeyResponse.fromPartial(base ?? {});
+    return RotateKeyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RotateKeyResponse>, I>>(
     _: I
   ): RotateKeyResponse {
@@ -414,7 +415,7 @@ export const RotateKeyResponse = {
 };
 
 function createBaseProcessKeygenTrafficRequest(): ProcessKeygenTrafficRequest {
-  return { sender: new Uint8Array(), sessionId: "", payload: undefined };
+  return { sender: new Uint8Array(0), sessionId: "", payload: undefined };
 }
 
 export const ProcessKeygenTrafficRequest = {
@@ -479,7 +480,7 @@ export const ProcessKeygenTrafficRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sessionId: isSet(object.sessionId) ? String(object.sessionId) : "",
       payload: isSet(object.payload)
         ? TrafficOut.fromJSON(object.payload)
@@ -489,29 +490,28 @@ export const ProcessKeygenTrafficRequest = {
 
   toJSON(message: ProcessKeygenTrafficRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.sessionId !== undefined && (obj.sessionId = message.sessionId);
-    message.payload !== undefined &&
-      (obj.payload = message.payload
-        ? TrafficOut.toJSON(message.payload)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.payload !== undefined) {
+      obj.payload = TrafficOut.toJSON(message.payload);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ProcessKeygenTrafficRequest>, I>>(
     base?: I
   ): ProcessKeygenTrafficRequest {
-    return ProcessKeygenTrafficRequest.fromPartial(base ?? {});
+    return ProcessKeygenTrafficRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ProcessKeygenTrafficRequest>, I>>(
     object: I
   ): ProcessKeygenTrafficRequest {
     const message = createBaseProcessKeygenTrafficRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.sessionId = object.sessionId ?? "";
     message.payload =
       object.payload !== undefined && object.payload !== null
@@ -565,9 +565,8 @@ export const ProcessKeygenTrafficResponse = {
   create<I extends Exact<DeepPartial<ProcessKeygenTrafficResponse>, I>>(
     base?: I
   ): ProcessKeygenTrafficResponse {
-    return ProcessKeygenTrafficResponse.fromPartial(base ?? {});
+    return ProcessKeygenTrafficResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ProcessKeygenTrafficResponse>, I>>(
     _: I
   ): ProcessKeygenTrafficResponse {
@@ -577,7 +576,7 @@ export const ProcessKeygenTrafficResponse = {
 };
 
 function createBaseProcessSignTrafficRequest(): ProcessSignTrafficRequest {
-  return { sender: new Uint8Array(), sessionId: "", payload: undefined };
+  return { sender: new Uint8Array(0), sessionId: "", payload: undefined };
 }
 
 export const ProcessSignTrafficRequest = {
@@ -642,7 +641,7 @@ export const ProcessSignTrafficRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sessionId: isSet(object.sessionId) ? String(object.sessionId) : "",
       payload: isSet(object.payload)
         ? TrafficOut.fromJSON(object.payload)
@@ -652,29 +651,28 @@ export const ProcessSignTrafficRequest = {
 
   toJSON(message: ProcessSignTrafficRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.sessionId !== undefined && (obj.sessionId = message.sessionId);
-    message.payload !== undefined &&
-      (obj.payload = message.payload
-        ? TrafficOut.toJSON(message.payload)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.payload !== undefined) {
+      obj.payload = TrafficOut.toJSON(message.payload);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ProcessSignTrafficRequest>, I>>(
     base?: I
   ): ProcessSignTrafficRequest {
-    return ProcessSignTrafficRequest.fromPartial(base ?? {});
+    return ProcessSignTrafficRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ProcessSignTrafficRequest>, I>>(
     object: I
   ): ProcessSignTrafficRequest {
     const message = createBaseProcessSignTrafficRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.sessionId = object.sessionId ?? "";
     message.payload =
       object.payload !== undefined && object.payload !== null
@@ -728,9 +726,8 @@ export const ProcessSignTrafficResponse = {
   create<I extends Exact<DeepPartial<ProcessSignTrafficResponse>, I>>(
     base?: I
   ): ProcessSignTrafficResponse {
-    return ProcessSignTrafficResponse.fromPartial(base ?? {});
+    return ProcessSignTrafficResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ProcessSignTrafficResponse>, I>>(
     _: I
   ): ProcessSignTrafficResponse {
@@ -740,7 +737,7 @@ export const ProcessSignTrafficResponse = {
 };
 
 function createBaseVotePubKeyRequest(): VotePubKeyRequest {
-  return { sender: new Uint8Array(), pollKey: undefined, result: undefined };
+  return { sender: new Uint8Array(0), pollKey: undefined, result: undefined };
 }
 
 export const VotePubKeyRequest = {
@@ -808,7 +805,7 @@ export const VotePubKeyRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       pollKey: isSet(object.pollKey)
         ? PollKey.fromJSON(object.pollKey)
         : undefined,
@@ -820,32 +817,28 @@ export const VotePubKeyRequest = {
 
   toJSON(message: VotePubKeyRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.pollKey !== undefined &&
-      (obj.pollKey = message.pollKey
-        ? PollKey.toJSON(message.pollKey)
-        : undefined);
-    message.result !== undefined &&
-      (obj.result = message.result
-        ? MessageOut_KeygenResult.toJSON(message.result)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.pollKey !== undefined) {
+      obj.pollKey = PollKey.toJSON(message.pollKey);
+    }
+    if (message.result !== undefined) {
+      obj.result = MessageOut_KeygenResult.toJSON(message.result);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VotePubKeyRequest>, I>>(
     base?: I
   ): VotePubKeyRequest {
-    return VotePubKeyRequest.fromPartial(base ?? {});
+    return VotePubKeyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VotePubKeyRequest>, I>>(
     object: I
   ): VotePubKeyRequest {
     const message = createBaseVotePubKeyRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.pollKey =
       object.pollKey !== undefined && object.pollKey !== null
         ? PollKey.fromPartial(object.pollKey)
@@ -903,16 +896,17 @@ export const VotePubKeyResponse = {
 
   toJSON(message: VotePubKeyResponse): unknown {
     const obj: any = {};
-    message.log !== undefined && (obj.log = message.log);
+    if (message.log !== "") {
+      obj.log = message.log;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VotePubKeyResponse>, I>>(
     base?: I
   ): VotePubKeyResponse {
-    return VotePubKeyResponse.fromPartial(base ?? {});
+    return VotePubKeyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VotePubKeyResponse>, I>>(
     object: I
   ): VotePubKeyResponse {
@@ -923,7 +917,7 @@ export const VotePubKeyResponse = {
 };
 
 function createBaseVoteSigRequest(): VoteSigRequest {
-  return { sender: new Uint8Array(), pollKey: undefined, result: undefined };
+  return { sender: new Uint8Array(0), pollKey: undefined, result: undefined };
 }
 
 export const VoteSigRequest = {
@@ -991,7 +985,7 @@ export const VoteSigRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       pollKey: isSet(object.pollKey)
         ? PollKey.fromJSON(object.pollKey)
         : undefined,
@@ -1003,32 +997,28 @@ export const VoteSigRequest = {
 
   toJSON(message: VoteSigRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.pollKey !== undefined &&
-      (obj.pollKey = message.pollKey
-        ? PollKey.toJSON(message.pollKey)
-        : undefined);
-    message.result !== undefined &&
-      (obj.result = message.result
-        ? MessageOut_SignResult.toJSON(message.result)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.pollKey !== undefined) {
+      obj.pollKey = PollKey.toJSON(message.pollKey);
+    }
+    if (message.result !== undefined) {
+      obj.result = MessageOut_SignResult.toJSON(message.result);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VoteSigRequest>, I>>(
     base?: I
   ): VoteSigRequest {
-    return VoteSigRequest.fromPartial(base ?? {});
+    return VoteSigRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VoteSigRequest>, I>>(
     object: I
   ): VoteSigRequest {
     const message = createBaseVoteSigRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.pollKey =
       object.pollKey !== undefined && object.pollKey !== null
         ? PollKey.fromPartial(object.pollKey)
@@ -1086,16 +1076,17 @@ export const VoteSigResponse = {
 
   toJSON(message: VoteSigResponse): unknown {
     const obj: any = {};
-    message.log !== undefined && (obj.log = message.log);
+    if (message.log !== "") {
+      obj.log = message.log;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VoteSigResponse>, I>>(
     base?: I
   ): VoteSigResponse {
-    return VoteSigResponse.fromPartial(base ?? {});
+    return VoteSigResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VoteSigResponse>, I>>(
     object: I
   ): VoteSigResponse {
@@ -1106,7 +1097,7 @@ export const VoteSigResponse = {
 };
 
 function createBaseHeartBeatRequest(): HeartBeatRequest {
-  return { sender: new Uint8Array(), keyIds: [] };
+  return { sender: new Uint8Array(0), keyIds: [] };
 }
 
 export const HeartBeatRequest = {
@@ -1158,7 +1149,7 @@ export const HeartBeatRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       keyIds: Array.isArray(object?.keyIds)
         ? object.keyIds.map((e: any) => String(e))
         : [],
@@ -1167,14 +1158,11 @@ export const HeartBeatRequest = {
 
   toJSON(message: HeartBeatRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    if (message.keyIds) {
-      obj.keyIds = message.keyIds.map((e) => e);
-    } else {
-      obj.keyIds = [];
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.keyIds?.length) {
+      obj.keyIds = message.keyIds;
     }
     return obj;
   },
@@ -1182,14 +1170,13 @@ export const HeartBeatRequest = {
   create<I extends Exact<DeepPartial<HeartBeatRequest>, I>>(
     base?: I
   ): HeartBeatRequest {
-    return HeartBeatRequest.fromPartial(base ?? {});
+    return HeartBeatRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<HeartBeatRequest>, I>>(
     object: I
   ): HeartBeatRequest {
     const message = createBaseHeartBeatRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.keyIds = object.keyIds?.map((e) => e) || [];
     return message;
   },
@@ -1236,9 +1223,8 @@ export const HeartBeatResponse = {
   create<I extends Exact<DeepPartial<HeartBeatResponse>, I>>(
     base?: I
   ): HeartBeatResponse {
-    return HeartBeatResponse.fromPartial(base ?? {});
+    return HeartBeatResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<HeartBeatResponse>, I>>(
     _: I
   ): HeartBeatResponse {
@@ -1248,7 +1234,7 @@ export const HeartBeatResponse = {
 };
 
 function createBaseRegisterExternalKeysRequest(): RegisterExternalKeysRequest {
-  return { sender: new Uint8Array(), chain: "", externalKeys: [] };
+  return { sender: new Uint8Array(0), chain: "", externalKeys: [] };
 }
 
 export const RegisterExternalKeysRequest = {
@@ -1321,7 +1307,7 @@ export const RegisterExternalKeysRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       externalKeys: Array.isArray(object?.externalKeys)
         ? object.externalKeys.map((e: any) =>
@@ -1333,17 +1319,16 @@ export const RegisterExternalKeysRequest = {
 
   toJSON(message: RegisterExternalKeysRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    if (message.externalKeys) {
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.externalKeys?.length) {
       obj.externalKeys = message.externalKeys.map((e) =>
-        e ? RegisterExternalKeysRequest_ExternalKey.toJSON(e) : undefined
+        RegisterExternalKeysRequest_ExternalKey.toJSON(e)
       );
-    } else {
-      obj.externalKeys = [];
     }
     return obj;
   },
@@ -1351,14 +1336,13 @@ export const RegisterExternalKeysRequest = {
   create<I extends Exact<DeepPartial<RegisterExternalKeysRequest>, I>>(
     base?: I
   ): RegisterExternalKeysRequest {
-    return RegisterExternalKeysRequest.fromPartial(base ?? {});
+    return RegisterExternalKeysRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterExternalKeysRequest>, I>>(
     object: I
   ): RegisterExternalKeysRequest {
     const message = createBaseRegisterExternalKeysRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.externalKeys =
       object.externalKeys?.map((e) =>
@@ -1369,7 +1353,7 @@ export const RegisterExternalKeysRequest = {
 };
 
 function createBaseRegisterExternalKeysRequest_ExternalKey(): RegisterExternalKeysRequest_ExternalKey {
-  return { id: "", pubKey: new Uint8Array() };
+  return { id: "", pubKey: new Uint8Array(0) };
 }
 
 export const RegisterExternalKeysRequest_ExternalKey = {
@@ -1425,32 +1409,34 @@ export const RegisterExternalKeysRequest_ExternalKey = {
       id: isSet(object.id) ? String(object.id) : "",
       pubKey: isSet(object.pubKey)
         ? bytesFromBase64(object.pubKey)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: RegisterExternalKeysRequest_ExternalKey): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.pubKey !== undefined &&
-      (obj.pubKey = base64FromBytes(
-        message.pubKey !== undefined ? message.pubKey : new Uint8Array()
-      ));
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.pubKey.length !== 0) {
+      obj.pubKey = base64FromBytes(message.pubKey);
+    }
     return obj;
   },
 
   create<
     I extends Exact<DeepPartial<RegisterExternalKeysRequest_ExternalKey>, I>
   >(base?: I): RegisterExternalKeysRequest_ExternalKey {
-    return RegisterExternalKeysRequest_ExternalKey.fromPartial(base ?? {});
+    return RegisterExternalKeysRequest_ExternalKey.fromPartial(
+      base ?? ({} as any)
+    );
   },
-
   fromPartial<
     I extends Exact<DeepPartial<RegisterExternalKeysRequest_ExternalKey>, I>
   >(object: I): RegisterExternalKeysRequest_ExternalKey {
     const message = createBaseRegisterExternalKeysRequest_ExternalKey();
     message.id = object.id ?? "";
-    message.pubKey = object.pubKey ?? new Uint8Array();
+    message.pubKey = object.pubKey ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1499,9 +1485,8 @@ export const RegisterExternalKeysResponse = {
   create<I extends Exact<DeepPartial<RegisterExternalKeysResponse>, I>>(
     base?: I
   ): RegisterExternalKeysResponse {
-    return RegisterExternalKeysResponse.fromPartial(base ?? {});
+    return RegisterExternalKeysResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterExternalKeysResponse>, I>>(
     _: I
   ): RegisterExternalKeysResponse {
@@ -1511,7 +1496,7 @@ export const RegisterExternalKeysResponse = {
 };
 
 function createBaseSubmitMultisigPubKeysRequest(): SubmitMultisigPubKeysRequest {
-  return { sender: new Uint8Array(), keyId: "", sigKeyPairs: [] };
+  return { sender: new Uint8Array(0), keyId: "", sigKeyPairs: [] };
 }
 
 export const SubmitMultisigPubKeysRequest = {
@@ -1576,7 +1561,7 @@ export const SubmitMultisigPubKeysRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       keyId: isSet(object.keyId) ? String(object.keyId) : "",
       sigKeyPairs: Array.isArray(object?.sigKeyPairs)
         ? object.sigKeyPairs.map((e: any) => SigKeyPair.fromJSON(e))
@@ -1586,17 +1571,14 @@ export const SubmitMultisigPubKeysRequest = {
 
   toJSON(message: SubmitMultisigPubKeysRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    if (message.sigKeyPairs) {
-      obj.sigKeyPairs = message.sigKeyPairs.map((e) =>
-        e ? SigKeyPair.toJSON(e) : undefined
-      );
-    } else {
-      obj.sigKeyPairs = [];
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.sigKeyPairs?.length) {
+      obj.sigKeyPairs = message.sigKeyPairs.map((e) => SigKeyPair.toJSON(e));
     }
     return obj;
   },
@@ -1604,14 +1586,13 @@ export const SubmitMultisigPubKeysRequest = {
   create<I extends Exact<DeepPartial<SubmitMultisigPubKeysRequest>, I>>(
     base?: I
   ): SubmitMultisigPubKeysRequest {
-    return SubmitMultisigPubKeysRequest.fromPartial(base ?? {});
+    return SubmitMultisigPubKeysRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SubmitMultisigPubKeysRequest>, I>>(
     object: I
   ): SubmitMultisigPubKeysRequest {
     const message = createBaseSubmitMultisigPubKeysRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.keyId = object.keyId ?? "";
     message.sigKeyPairs =
       object.sigKeyPairs?.map((e) => SigKeyPair.fromPartial(e)) || [];
@@ -1663,9 +1644,8 @@ export const SubmitMultisigPubKeysResponse = {
   create<I extends Exact<DeepPartial<SubmitMultisigPubKeysResponse>, I>>(
     base?: I
   ): SubmitMultisigPubKeysResponse {
-    return SubmitMultisigPubKeysResponse.fromPartial(base ?? {});
+    return SubmitMultisigPubKeysResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SubmitMultisigPubKeysResponse>, I>>(
     _: I
   ): SubmitMultisigPubKeysResponse {
@@ -1675,7 +1655,7 @@ export const SubmitMultisigPubKeysResponse = {
 };
 
 function createBaseSubmitMultisigSignaturesRequest(): SubmitMultisigSignaturesRequest {
-  return { sender: new Uint8Array(), sigId: "", signatures: [] };
+  return { sender: new Uint8Array(0), sigId: "", signatures: [] };
 }
 
 export const SubmitMultisigSignaturesRequest = {
@@ -1740,7 +1720,7 @@ export const SubmitMultisigSignaturesRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sigId: isSet(object.sigId) ? String(object.sigId) : "",
       signatures: Array.isArray(object?.signatures)
         ? object.signatures.map((e: any) => bytesFromBase64(e))
@@ -1750,17 +1730,14 @@ export const SubmitMultisigSignaturesRequest = {
 
   toJSON(message: SubmitMultisigSignaturesRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.sigId !== undefined && (obj.sigId = message.sigId);
-    if (message.signatures) {
-      obj.signatures = message.signatures.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.signatures = [];
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.sigId !== "") {
+      obj.sigId = message.sigId;
+    }
+    if (message.signatures?.length) {
+      obj.signatures = message.signatures.map((e) => base64FromBytes(e));
     }
     return obj;
   },
@@ -1768,14 +1745,13 @@ export const SubmitMultisigSignaturesRequest = {
   create<I extends Exact<DeepPartial<SubmitMultisigSignaturesRequest>, I>>(
     base?: I
   ): SubmitMultisigSignaturesRequest {
-    return SubmitMultisigSignaturesRequest.fromPartial(base ?? {});
+    return SubmitMultisigSignaturesRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SubmitMultisigSignaturesRequest>, I>>(
     object: I
   ): SubmitMultisigSignaturesRequest {
     const message = createBaseSubmitMultisigSignaturesRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.sigId = object.sigId ?? "";
     message.signatures = object.signatures?.map((e) => e) || [];
     return message;
@@ -1826,9 +1802,8 @@ export const SubmitMultisigSignaturesResponse = {
   create<I extends Exact<DeepPartial<SubmitMultisigSignaturesResponse>, I>>(
     base?: I
   ): SubmitMultisigSignaturesResponse {
-    return SubmitMultisigSignaturesResponse.fromPartial(base ?? {});
+    return SubmitMultisigSignaturesResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<
     I extends Exact<DeepPartial<SubmitMultisigSignaturesResponse>, I>
   >(_: I): SubmitMultisigSignaturesResponse {
@@ -1837,10 +1812,10 @@ export const SubmitMultisigSignaturesResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

@@ -18,7 +18,7 @@ export interface DeactivateProxyRequest {
 export interface DeactivateProxyResponse {}
 
 function createBaseRegisterProxyRequest(): RegisterProxyRequest {
-  return { sender: new Uint8Array(), proxyAddr: new Uint8Array() };
+  return { sender: new Uint8Array(0), proxyAddr: new Uint8Array(0) };
 }
 
 export const RegisterProxyRequest = {
@@ -73,38 +73,35 @@ export const RegisterProxyRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       proxyAddr: isSet(object.proxyAddr)
         ? bytesFromBase64(object.proxyAddr)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: RegisterProxyRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.proxyAddr !== undefined &&
-      (obj.proxyAddr = base64FromBytes(
-        message.proxyAddr !== undefined ? message.proxyAddr : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.proxyAddr.length !== 0) {
+      obj.proxyAddr = base64FromBytes(message.proxyAddr);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RegisterProxyRequest>, I>>(
     base?: I
   ): RegisterProxyRequest {
-    return RegisterProxyRequest.fromPartial(base ?? {});
+    return RegisterProxyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterProxyRequest>, I>>(
     object: I
   ): RegisterProxyRequest {
     const message = createBaseRegisterProxyRequest();
-    message.sender = object.sender ?? new Uint8Array();
-    message.proxyAddr = object.proxyAddr ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
+    message.proxyAddr = object.proxyAddr ?? new Uint8Array(0);
     return message;
   },
 };
@@ -153,9 +150,8 @@ export const RegisterProxyResponse = {
   create<I extends Exact<DeepPartial<RegisterProxyResponse>, I>>(
     base?: I
   ): RegisterProxyResponse {
-    return RegisterProxyResponse.fromPartial(base ?? {});
+    return RegisterProxyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterProxyResponse>, I>>(
     _: I
   ): RegisterProxyResponse {
@@ -165,7 +161,7 @@ export const RegisterProxyResponse = {
 };
 
 function createBaseDeactivateProxyRequest(): DeactivateProxyRequest {
-  return { sender: new Uint8Array() };
+  return { sender: new Uint8Array(0) };
 }
 
 export const DeactivateProxyRequest = {
@@ -210,30 +206,28 @@ export const DeactivateProxyRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: DeactivateProxyRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<DeactivateProxyRequest>, I>>(
     base?: I
   ): DeactivateProxyRequest {
-    return DeactivateProxyRequest.fromPartial(base ?? {});
+    return DeactivateProxyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DeactivateProxyRequest>, I>>(
     object: I
   ): DeactivateProxyRequest {
     const message = createBaseDeactivateProxyRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     return message;
   },
 };
@@ -282,9 +276,8 @@ export const DeactivateProxyResponse = {
   create<I extends Exact<DeepPartial<DeactivateProxyResponse>, I>>(
     base?: I
   ): DeactivateProxyResponse {
-    return DeactivateProxyResponse.fromPartial(base ?? {});
+    return DeactivateProxyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DeactivateProxyResponse>, I>>(
     _: I
   ): DeactivateProxyResponse {
@@ -293,10 +286,10 @@ export const DeactivateProxyResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

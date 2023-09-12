@@ -9,7 +9,7 @@ export const protobufPackage = "axelar.multisig.v1beta1";
 
 /** GenesisState represents the genesis state */
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
   keygenSessions: KeygenSession[];
   signingSessions: SigningSession[];
   keys: Key[];
@@ -125,33 +125,24 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.keygenSessions) {
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    if (message.keygenSessions?.length) {
       obj.keygenSessions = message.keygenSessions.map((e) =>
-        e ? KeygenSession.toJSON(e) : undefined
+        KeygenSession.toJSON(e)
       );
-    } else {
-      obj.keygenSessions = [];
     }
-    if (message.signingSessions) {
+    if (message.signingSessions?.length) {
       obj.signingSessions = message.signingSessions.map((e) =>
-        e ? SigningSession.toJSON(e) : undefined
+        SigningSession.toJSON(e)
       );
-    } else {
-      obj.signingSessions = [];
     }
-    if (message.keys) {
-      obj.keys = message.keys.map((e) => (e ? Key.toJSON(e) : undefined));
-    } else {
-      obj.keys = [];
+    if (message.keys?.length) {
+      obj.keys = message.keys.map((e) => Key.toJSON(e));
     }
-    if (message.keyEpochs) {
-      obj.keyEpochs = message.keyEpochs.map((e) =>
-        e ? KeyEpoch.toJSON(e) : undefined
-      );
-    } else {
-      obj.keyEpochs = [];
+    if (message.keyEpochs?.length) {
+      obj.keyEpochs = message.keyEpochs.map((e) => KeyEpoch.toJSON(e));
     }
     return obj;
   },
@@ -159,9 +150,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {

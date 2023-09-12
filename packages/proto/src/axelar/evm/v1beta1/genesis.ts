@@ -21,16 +21,16 @@ export interface GenesisState {
 }
 
 export interface GenesisState_Chain {
-  params?: Params;
+  params?: Params | undefined;
   burnerInfos: BurnerInfo[];
-  commandQueue?: QueueState;
+  commandQueue?: QueueState | undefined;
   confirmedDeposits: ERC20Deposit[];
   burnedDeposits: ERC20Deposit[];
   commandBatches: CommandBatchMetadata[];
-  gateway?: Gateway;
+  gateway?: Gateway | undefined;
   tokens: ERC20TokenMetadata[];
   events: Event[];
-  confirmedEventQueue?: QueueState;
+  confirmedEventQueue?: QueueState | undefined;
   legacyConfirmedDeposits: ERC20Deposit[];
   legacyBurnedDeposits: ERC20Deposit[];
 }
@@ -86,12 +86,8 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    if (message.chains) {
-      obj.chains = message.chains.map((e) =>
-        e ? GenesisState_Chain.toJSON(e) : undefined
-      );
-    } else {
-      obj.chains = [];
+    if (message.chains?.length) {
+      obj.chains = message.chains.map((e) => GenesisState_Chain.toJSON(e));
     }
     return obj;
   },
@@ -99,9 +95,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {
@@ -340,73 +335,51 @@ export const GenesisState_Chain = {
 
   toJSON(message: GenesisState_Chain): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.burnerInfos) {
-      obj.burnerInfos = message.burnerInfos.map((e) =>
-        e ? BurnerInfo.toJSON(e) : undefined
-      );
-    } else {
-      obj.burnerInfos = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    message.commandQueue !== undefined &&
-      (obj.commandQueue = message.commandQueue
-        ? QueueState.toJSON(message.commandQueue)
-        : undefined);
-    if (message.confirmedDeposits) {
+    if (message.burnerInfos?.length) {
+      obj.burnerInfos = message.burnerInfos.map((e) => BurnerInfo.toJSON(e));
+    }
+    if (message.commandQueue !== undefined) {
+      obj.commandQueue = QueueState.toJSON(message.commandQueue);
+    }
+    if (message.confirmedDeposits?.length) {
       obj.confirmedDeposits = message.confirmedDeposits.map((e) =>
-        e ? ERC20Deposit.toJSON(e) : undefined
+        ERC20Deposit.toJSON(e)
       );
-    } else {
-      obj.confirmedDeposits = [];
     }
-    if (message.burnedDeposits) {
+    if (message.burnedDeposits?.length) {
       obj.burnedDeposits = message.burnedDeposits.map((e) =>
-        e ? ERC20Deposit.toJSON(e) : undefined
+        ERC20Deposit.toJSON(e)
       );
-    } else {
-      obj.burnedDeposits = [];
     }
-    if (message.commandBatches) {
+    if (message.commandBatches?.length) {
       obj.commandBatches = message.commandBatches.map((e) =>
-        e ? CommandBatchMetadata.toJSON(e) : undefined
+        CommandBatchMetadata.toJSON(e)
       );
-    } else {
-      obj.commandBatches = [];
     }
-    message.gateway !== undefined &&
-      (obj.gateway = message.gateway
-        ? Gateway.toJSON(message.gateway)
-        : undefined);
-    if (message.tokens) {
-      obj.tokens = message.tokens.map((e) =>
-        e ? ERC20TokenMetadata.toJSON(e) : undefined
-      );
-    } else {
-      obj.tokens = [];
+    if (message.gateway !== undefined) {
+      obj.gateway = Gateway.toJSON(message.gateway);
     }
-    if (message.events) {
-      obj.events = message.events.map((e) => (e ? Event.toJSON(e) : undefined));
-    } else {
-      obj.events = [];
+    if (message.tokens?.length) {
+      obj.tokens = message.tokens.map((e) => ERC20TokenMetadata.toJSON(e));
     }
-    message.confirmedEventQueue !== undefined &&
-      (obj.confirmedEventQueue = message.confirmedEventQueue
-        ? QueueState.toJSON(message.confirmedEventQueue)
-        : undefined);
-    if (message.legacyConfirmedDeposits) {
+    if (message.events?.length) {
+      obj.events = message.events.map((e) => Event.toJSON(e));
+    }
+    if (message.confirmedEventQueue !== undefined) {
+      obj.confirmedEventQueue = QueueState.toJSON(message.confirmedEventQueue);
+    }
+    if (message.legacyConfirmedDeposits?.length) {
       obj.legacyConfirmedDeposits = message.legacyConfirmedDeposits.map((e) =>
-        e ? ERC20Deposit.toJSON(e) : undefined
+        ERC20Deposit.toJSON(e)
       );
-    } else {
-      obj.legacyConfirmedDeposits = [];
     }
-    if (message.legacyBurnedDeposits) {
+    if (message.legacyBurnedDeposits?.length) {
       obj.legacyBurnedDeposits = message.legacyBurnedDeposits.map((e) =>
-        e ? ERC20Deposit.toJSON(e) : undefined
+        ERC20Deposit.toJSON(e)
       );
-    } else {
-      obj.legacyBurnedDeposits = [];
     }
     return obj;
   },
@@ -414,9 +387,8 @@ export const GenesisState_Chain = {
   create<I extends Exact<DeepPartial<GenesisState_Chain>, I>>(
     base?: I
   ): GenesisState_Chain {
-    return GenesisState_Chain.fromPartial(base ?? {});
+    return GenesisState_Chain.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState_Chain>, I>>(
     object: I
   ): GenesisState_Chain {

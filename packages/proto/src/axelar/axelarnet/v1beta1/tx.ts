@@ -67,7 +67,7 @@ export interface AddCosmosBasedChainRequest {
    *
    * @deprecated
    */
-  chain?: Chain;
+  chain?: Chain | undefined;
   addrPrefix: string;
   /**
    * native_assets was deprecated in v0.27
@@ -89,9 +89,9 @@ export interface AddCosmosBasedChainResponse {}
 export interface RegisterAssetRequest {
   sender: Uint8Array;
   chain: string;
-  asset?: Asset;
+  asset?: Asset | undefined;
   limit: Uint8Array;
-  window?: Duration;
+  window?: Duration | undefined;
 }
 
 export interface RegisterAssetResponse {}
@@ -119,6 +119,7 @@ export interface RegisterFeeCollectorResponse {}
 
 export interface RetryIBCTransferRequest {
   sender: Uint8Array;
+  /** @deprecated */
   chain: string;
   id: Long;
 }
@@ -129,6 +130,7 @@ export interface RouteMessageRequest {
   sender: Uint8Array;
   id: string;
   payload: Uint8Array;
+  feegranter: Uint8Array;
 }
 
 export interface RouteMessageResponse {}
@@ -138,14 +140,14 @@ export interface CallContractRequest {
   chain: string;
   contractAddress: string;
   payload: Uint8Array;
-  fee?: Fee;
+  fee?: Fee | undefined;
 }
 
 export interface CallContractResponse {}
 
 function createBaseLinkRequest(): LinkRequest {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     recipientAddr: "",
     recipientChain: "",
     asset: "",
@@ -221,7 +223,7 @@ export const LinkRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       recipientAddr: isSet(object.recipientAddr)
         ? String(object.recipientAddr)
         : "",
@@ -234,27 +236,29 @@ export const LinkRequest = {
 
   toJSON(message: LinkRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.recipientAddr !== undefined &&
-      (obj.recipientAddr = message.recipientAddr);
-    message.recipientChain !== undefined &&
-      (obj.recipientChain = message.recipientChain);
-    message.asset !== undefined && (obj.asset = message.asset);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.recipientAddr !== "") {
+      obj.recipientAddr = message.recipientAddr;
+    }
+    if (message.recipientChain !== "") {
+      obj.recipientChain = message.recipientChain;
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<LinkRequest>, I>>(base?: I): LinkRequest {
-    return LinkRequest.fromPartial(base ?? {});
+    return LinkRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<LinkRequest>, I>>(
     object: I
   ): LinkRequest {
     const message = createBaseLinkRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.recipientAddr = object.recipientAddr ?? "";
     message.recipientChain = object.recipientChain ?? "";
     message.asset = object.asset ?? "";
@@ -309,17 +313,17 @@ export const LinkResponse = {
 
   toJSON(message: LinkResponse): unknown {
     const obj: any = {};
-    message.depositAddr !== undefined &&
-      (obj.depositAddr = message.depositAddr);
+    if (message.depositAddr !== "") {
+      obj.depositAddr = message.depositAddr;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<LinkResponse>, I>>(
     base?: I
   ): LinkResponse {
-    return LinkResponse.fromPartial(base ?? {});
+    return LinkResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<LinkResponse>, I>>(
     object: I
   ): LinkResponse {
@@ -331,8 +335,8 @@ export const LinkResponse = {
 
 function createBaseConfirmDepositRequest(): ConfirmDepositRequest {
   return {
-    sender: new Uint8Array(),
-    depositAddress: new Uint8Array(),
+    sender: new Uint8Array(0),
+    depositAddress: new Uint8Array(0),
     denom: "",
   };
 }
@@ -399,42 +403,39 @@ export const ConfirmDepositRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       depositAddress: isSet(object.depositAddress)
         ? bytesFromBase64(object.depositAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       denom: isSet(object.denom) ? String(object.denom) : "",
     };
   },
 
   toJSON(message: ConfirmDepositRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.depositAddress !== undefined &&
-      (obj.depositAddress = base64FromBytes(
-        message.depositAddress !== undefined
-          ? message.depositAddress
-          : new Uint8Array()
-      ));
-    message.denom !== undefined && (obj.denom = message.denom);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.depositAddress.length !== 0) {
+      obj.depositAddress = base64FromBytes(message.depositAddress);
+    }
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ConfirmDepositRequest>, I>>(
     base?: I
   ): ConfirmDepositRequest {
-    return ConfirmDepositRequest.fromPartial(base ?? {});
+    return ConfirmDepositRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ConfirmDepositRequest>, I>>(
     object: I
   ): ConfirmDepositRequest {
     const message = createBaseConfirmDepositRequest();
-    message.sender = object.sender ?? new Uint8Array();
-    message.depositAddress = object.depositAddress ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
+    message.depositAddress = object.depositAddress ?? new Uint8Array(0);
     message.denom = object.denom ?? "";
     return message;
   },
@@ -484,9 +485,8 @@ export const ConfirmDepositResponse = {
   create<I extends Exact<DeepPartial<ConfirmDepositResponse>, I>>(
     base?: I
   ): ConfirmDepositResponse {
-    return ConfirmDepositResponse.fromPartial(base ?? {});
+    return ConfirmDepositResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ConfirmDepositResponse>, I>>(
     _: I
   ): ConfirmDepositResponse {
@@ -496,7 +496,7 @@ export const ConfirmDepositResponse = {
 };
 
 function createBaseExecutePendingTransfersRequest(): ExecutePendingTransfersRequest {
-  return { sender: new Uint8Array() };
+  return { sender: new Uint8Array(0) };
 }
 
 export const ExecutePendingTransfersRequest = {
@@ -541,30 +541,28 @@ export const ExecutePendingTransfersRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: ExecutePendingTransfersRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ExecutePendingTransfersRequest>, I>>(
     base?: I
   ): ExecutePendingTransfersRequest {
-    return ExecutePendingTransfersRequest.fromPartial(base ?? {});
+    return ExecutePendingTransfersRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ExecutePendingTransfersRequest>, I>>(
     object: I
   ): ExecutePendingTransfersRequest {
     const message = createBaseExecutePendingTransfersRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     return message;
   },
 };
@@ -613,9 +611,8 @@ export const ExecutePendingTransfersResponse = {
   create<I extends Exact<DeepPartial<ExecutePendingTransfersResponse>, I>>(
     base?: I
   ): ExecutePendingTransfersResponse {
-    return ExecutePendingTransfersResponse.fromPartial(base ?? {});
+    return ExecutePendingTransfersResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ExecutePendingTransfersResponse>, I>>(
     _: I
   ): ExecutePendingTransfersResponse {
@@ -625,7 +622,7 @@ export const ExecutePendingTransfersResponse = {
 };
 
 function createBaseRegisterIBCPathRequest(): RegisterIBCPathRequest {
-  return { sender: new Uint8Array(), chain: "", path: "" };
+  return { sender: new Uint8Array(0), chain: "", path: "" };
 }
 
 export const RegisterIBCPathRequest = {
@@ -690,7 +687,7 @@ export const RegisterIBCPathRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       path: isSet(object.path) ? String(object.path) : "",
     };
@@ -698,26 +695,28 @@ export const RegisterIBCPathRequest = {
 
   toJSON(message: RegisterIBCPathRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.path !== undefined && (obj.path = message.path);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.path !== "") {
+      obj.path = message.path;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RegisterIBCPathRequest>, I>>(
     base?: I
   ): RegisterIBCPathRequest {
-    return RegisterIBCPathRequest.fromPartial(base ?? {});
+    return RegisterIBCPathRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterIBCPathRequest>, I>>(
     object: I
   ): RegisterIBCPathRequest {
     const message = createBaseRegisterIBCPathRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.path = object.path ?? "";
     return message;
@@ -768,9 +767,8 @@ export const RegisterIBCPathResponse = {
   create<I extends Exact<DeepPartial<RegisterIBCPathResponse>, I>>(
     base?: I
   ): RegisterIBCPathResponse {
-    return RegisterIBCPathResponse.fromPartial(base ?? {});
+    return RegisterIBCPathResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterIBCPathResponse>, I>>(
     _: I
   ): RegisterIBCPathResponse {
@@ -781,7 +779,7 @@ export const RegisterIBCPathResponse = {
 
 function createBaseAddCosmosBasedChainRequest(): AddCosmosBasedChainRequest {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     chain: undefined,
     addrPrefix: "",
     nativeAssets: [],
@@ -882,7 +880,7 @@ export const AddCosmosBasedChainRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? Chain.fromJSON(object.chain) : undefined,
       addrPrefix: isSet(object.addrPrefix) ? String(object.addrPrefix) : "",
       nativeAssets: Array.isArray(object?.nativeAssets)
@@ -895,37 +893,37 @@ export const AddCosmosBasedChainRequest = {
 
   toJSON(message: AddCosmosBasedChainRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined &&
-      (obj.chain = message.chain ? Chain.toJSON(message.chain) : undefined);
-    message.addrPrefix !== undefined && (obj.addrPrefix = message.addrPrefix);
-    if (message.nativeAssets) {
-      obj.nativeAssets = message.nativeAssets.map((e) =>
-        e ? Asset.toJSON(e) : undefined
-      );
-    } else {
-      obj.nativeAssets = [];
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
     }
-    message.cosmosChain !== undefined &&
-      (obj.cosmosChain = message.cosmosChain);
-    message.ibcPath !== undefined && (obj.ibcPath = message.ibcPath);
+    if (message.chain !== undefined) {
+      obj.chain = Chain.toJSON(message.chain);
+    }
+    if (message.addrPrefix !== "") {
+      obj.addrPrefix = message.addrPrefix;
+    }
+    if (message.nativeAssets?.length) {
+      obj.nativeAssets = message.nativeAssets.map((e) => Asset.toJSON(e));
+    }
+    if (message.cosmosChain !== "") {
+      obj.cosmosChain = message.cosmosChain;
+    }
+    if (message.ibcPath !== "") {
+      obj.ibcPath = message.ibcPath;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<AddCosmosBasedChainRequest>, I>>(
     base?: I
   ): AddCosmosBasedChainRequest {
-    return AddCosmosBasedChainRequest.fromPartial(base ?? {});
+    return AddCosmosBasedChainRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddCosmosBasedChainRequest>, I>>(
     object: I
   ): AddCosmosBasedChainRequest {
     const message = createBaseAddCosmosBasedChainRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain =
       object.chain !== undefined && object.chain !== null
         ? Chain.fromPartial(object.chain)
@@ -983,9 +981,8 @@ export const AddCosmosBasedChainResponse = {
   create<I extends Exact<DeepPartial<AddCosmosBasedChainResponse>, I>>(
     base?: I
   ): AddCosmosBasedChainResponse {
-    return AddCosmosBasedChainResponse.fromPartial(base ?? {});
+    return AddCosmosBasedChainResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<AddCosmosBasedChainResponse>, I>>(
     _: I
   ): AddCosmosBasedChainResponse {
@@ -996,10 +993,10 @@ export const AddCosmosBasedChainResponse = {
 
 function createBaseRegisterAssetRequest(): RegisterAssetRequest {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     chain: "",
     asset: undefined,
-    limit: new Uint8Array(),
+    limit: new Uint8Array(0),
     window: undefined,
   };
 }
@@ -1086,12 +1083,12 @@ export const RegisterAssetRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       asset: isSet(object.asset) ? Asset.fromJSON(object.asset) : undefined,
       limit: isSet(object.limit)
         ? bytesFromBase64(object.limit)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       window: isSet(object.window)
         ? Duration.fromJSON(object.window)
         : undefined,
@@ -1100,41 +1097,40 @@ export const RegisterAssetRequest = {
 
   toJSON(message: RegisterAssetRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.asset !== undefined &&
-      (obj.asset = message.asset ? Asset.toJSON(message.asset) : undefined);
-    message.limit !== undefined &&
-      (obj.limit = base64FromBytes(
-        message.limit !== undefined ? message.limit : new Uint8Array()
-      ));
-    message.window !== undefined &&
-      (obj.window = message.window
-        ? Duration.toJSON(message.window)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.asset !== undefined) {
+      obj.asset = Asset.toJSON(message.asset);
+    }
+    if (message.limit.length !== 0) {
+      obj.limit = base64FromBytes(message.limit);
+    }
+    if (message.window !== undefined) {
+      obj.window = Duration.toJSON(message.window);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RegisterAssetRequest>, I>>(
     base?: I
   ): RegisterAssetRequest {
-    return RegisterAssetRequest.fromPartial(base ?? {});
+    return RegisterAssetRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterAssetRequest>, I>>(
     object: I
   ): RegisterAssetRequest {
     const message = createBaseRegisterAssetRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.asset =
       object.asset !== undefined && object.asset !== null
         ? Asset.fromPartial(object.asset)
         : undefined;
-    message.limit = object.limit ?? new Uint8Array();
+    message.limit = object.limit ?? new Uint8Array(0);
     message.window =
       object.window !== undefined && object.window !== null
         ? Duration.fromPartial(object.window)
@@ -1187,9 +1183,8 @@ export const RegisterAssetResponse = {
   create<I extends Exact<DeepPartial<RegisterAssetResponse>, I>>(
     base?: I
   ): RegisterAssetResponse {
-    return RegisterAssetResponse.fromPartial(base ?? {});
+    return RegisterAssetResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterAssetResponse>, I>>(
     _: I
   ): RegisterAssetResponse {
@@ -1199,7 +1194,7 @@ export const RegisterAssetResponse = {
 };
 
 function createBaseRouteIBCTransfersRequest(): RouteIBCTransfersRequest {
-  return { sender: new Uint8Array() };
+  return { sender: new Uint8Array(0) };
 }
 
 export const RouteIBCTransfersRequest = {
@@ -1244,30 +1239,28 @@ export const RouteIBCTransfersRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: RouteIBCTransfersRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RouteIBCTransfersRequest>, I>>(
     base?: I
   ): RouteIBCTransfersRequest {
-    return RouteIBCTransfersRequest.fromPartial(base ?? {});
+    return RouteIBCTransfersRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RouteIBCTransfersRequest>, I>>(
     object: I
   ): RouteIBCTransfersRequest {
     const message = createBaseRouteIBCTransfersRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1316,9 +1309,8 @@ export const RouteIBCTransfersResponse = {
   create<I extends Exact<DeepPartial<RouteIBCTransfersResponse>, I>>(
     base?: I
   ): RouteIBCTransfersResponse {
-    return RouteIBCTransfersResponse.fromPartial(base ?? {});
+    return RouteIBCTransfersResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RouteIBCTransfersResponse>, I>>(
     _: I
   ): RouteIBCTransfersResponse {
@@ -1328,7 +1320,7 @@ export const RouteIBCTransfersResponse = {
 };
 
 function createBaseRegisterFeeCollectorRequest(): RegisterFeeCollectorRequest {
-  return { sender: new Uint8Array(), feeCollector: new Uint8Array() };
+  return { sender: new Uint8Array(0), feeCollector: new Uint8Array(0) };
 }
 
 export const RegisterFeeCollectorRequest = {
@@ -1383,40 +1375,35 @@ export const RegisterFeeCollectorRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       feeCollector: isSet(object.feeCollector)
         ? bytesFromBase64(object.feeCollector)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: RegisterFeeCollectorRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.feeCollector !== undefined &&
-      (obj.feeCollector = base64FromBytes(
-        message.feeCollector !== undefined
-          ? message.feeCollector
-          : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.feeCollector.length !== 0) {
+      obj.feeCollector = base64FromBytes(message.feeCollector);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RegisterFeeCollectorRequest>, I>>(
     base?: I
   ): RegisterFeeCollectorRequest {
-    return RegisterFeeCollectorRequest.fromPartial(base ?? {});
+    return RegisterFeeCollectorRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterFeeCollectorRequest>, I>>(
     object: I
   ): RegisterFeeCollectorRequest {
     const message = createBaseRegisterFeeCollectorRequest();
-    message.sender = object.sender ?? new Uint8Array();
-    message.feeCollector = object.feeCollector ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
+    message.feeCollector = object.feeCollector ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1465,9 +1452,8 @@ export const RegisterFeeCollectorResponse = {
   create<I extends Exact<DeepPartial<RegisterFeeCollectorResponse>, I>>(
     base?: I
   ): RegisterFeeCollectorResponse {
-    return RegisterFeeCollectorResponse.fromPartial(base ?? {});
+    return RegisterFeeCollectorResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterFeeCollectorResponse>, I>>(
     _: I
   ): RegisterFeeCollectorResponse {
@@ -1477,7 +1463,7 @@ export const RegisterFeeCollectorResponse = {
 };
 
 function createBaseRetryIBCTransferRequest(): RetryIBCTransferRequest {
-  return { sender: new Uint8Array(), chain: "", id: Long.UZERO };
+  return { sender: new Uint8Array(0), chain: "", id: Long.UZERO };
 }
 
 export const RetryIBCTransferRequest = {
@@ -1542,7 +1528,7 @@ export const RetryIBCTransferRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       id: isSet(object.id) ? Long.fromValue(object.id) : Long.UZERO,
     };
@@ -1550,27 +1536,28 @@ export const RetryIBCTransferRequest = {
 
   toJSON(message: RetryIBCTransferRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RetryIBCTransferRequest>, I>>(
     base?: I
   ): RetryIBCTransferRequest {
-    return RetryIBCTransferRequest.fromPartial(base ?? {});
+    return RetryIBCTransferRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RetryIBCTransferRequest>, I>>(
     object: I
   ): RetryIBCTransferRequest {
     const message = createBaseRetryIBCTransferRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.id =
       object.id !== undefined && object.id !== null
@@ -1624,9 +1611,8 @@ export const RetryIBCTransferResponse = {
   create<I extends Exact<DeepPartial<RetryIBCTransferResponse>, I>>(
     base?: I
   ): RetryIBCTransferResponse {
-    return RetryIBCTransferResponse.fromPartial(base ?? {});
+    return RetryIBCTransferResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RetryIBCTransferResponse>, I>>(
     _: I
   ): RetryIBCTransferResponse {
@@ -1636,7 +1622,12 @@ export const RetryIBCTransferResponse = {
 };
 
 function createBaseRouteMessageRequest(): RouteMessageRequest {
-  return { sender: new Uint8Array(), id: "", payload: new Uint8Array() };
+  return {
+    sender: new Uint8Array(0),
+    id: "",
+    payload: new Uint8Array(0),
+    feegranter: new Uint8Array(0),
+  };
 }
 
 export const RouteMessageRequest = {
@@ -1652,6 +1643,9 @@ export const RouteMessageRequest = {
     }
     if (message.payload.length !== 0) {
       writer.uint32(26).bytes(message.payload);
+    }
+    if (message.feegranter.length !== 0) {
+      writer.uint32(34).bytes(message.feegranter);
     }
     return writer;
   },
@@ -1685,6 +1679,13 @@ export const RouteMessageRequest = {
 
           message.payload = reader.bytes();
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.feegranter = reader.bytes();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1698,41 +1699,47 @@ export const RouteMessageRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       id: isSet(object.id) ? String(object.id) : "",
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
-        : new Uint8Array(),
+        : new Uint8Array(0),
+      feegranter: isSet(object.feegranter)
+        ? bytesFromBase64(object.feegranter)
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: RouteMessageRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.id !== undefined && (obj.id = message.id);
-    message.payload !== undefined &&
-      (obj.payload = base64FromBytes(
-        message.payload !== undefined ? message.payload : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.payload.length !== 0) {
+      obj.payload = base64FromBytes(message.payload);
+    }
+    if (message.feegranter.length !== 0) {
+      obj.feegranter = base64FromBytes(message.feegranter);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RouteMessageRequest>, I>>(
     base?: I
   ): RouteMessageRequest {
-    return RouteMessageRequest.fromPartial(base ?? {});
+    return RouteMessageRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RouteMessageRequest>, I>>(
     object: I
   ): RouteMessageRequest {
     const message = createBaseRouteMessageRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.id = object.id ?? "";
-    message.payload = object.payload ?? new Uint8Array();
+    message.payload = object.payload ?? new Uint8Array(0);
+    message.feegranter = object.feegranter ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1781,9 +1788,8 @@ export const RouteMessageResponse = {
   create<I extends Exact<DeepPartial<RouteMessageResponse>, I>>(
     base?: I
   ): RouteMessageResponse {
-    return RouteMessageResponse.fromPartial(base ?? {});
+    return RouteMessageResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RouteMessageResponse>, I>>(
     _: I
   ): RouteMessageResponse {
@@ -1794,10 +1800,10 @@ export const RouteMessageResponse = {
 
 function createBaseCallContractRequest(): CallContractRequest {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     chain: "",
     contractAddress: "",
-    payload: new Uint8Array(),
+    payload: new Uint8Array(0),
     fee: undefined,
   };
 }
@@ -1881,50 +1887,51 @@ export const CallContractRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chain: isSet(object.chain) ? String(object.chain) : "",
       contractAddress: isSet(object.contractAddress)
         ? String(object.contractAddress)
         : "",
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       fee: isSet(object.fee) ? Fee.fromJSON(object.fee) : undefined,
     };
   },
 
   toJSON(message: CallContractRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payload !== undefined &&
-      (obj.payload = base64FromBytes(
-        message.payload !== undefined ? message.payload : new Uint8Array()
-      ));
-    message.fee !== undefined &&
-      (obj.fee = message.fee ? Fee.toJSON(message.fee) : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payload.length !== 0) {
+      obj.payload = base64FromBytes(message.payload);
+    }
+    if (message.fee !== undefined) {
+      obj.fee = Fee.toJSON(message.fee);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CallContractRequest>, I>>(
     base?: I
   ): CallContractRequest {
-    return CallContractRequest.fromPartial(base ?? {});
+    return CallContractRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CallContractRequest>, I>>(
     object: I
   ): CallContractRequest {
     const message = createBaseCallContractRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.chain = object.chain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payload = object.payload ?? new Uint8Array();
+    message.payload = object.payload ?? new Uint8Array(0);
     message.fee =
       object.fee !== undefined && object.fee !== null
         ? Fee.fromPartial(object.fee)
@@ -1977,9 +1984,8 @@ export const CallContractResponse = {
   create<I extends Exact<DeepPartial<CallContractResponse>, I>>(
     base?: I
   ): CallContractResponse {
-    return CallContractResponse.fromPartial(base ?? {});
+    return CallContractResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CallContractResponse>, I>>(
     _: I
   ): CallContractResponse {
@@ -1988,10 +1994,10 @@ export const CallContractResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

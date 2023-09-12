@@ -16,13 +16,13 @@ export const protobufPackage = "axelar.nexus.v1beta1";
 
 /** GenesisState represents the genesis state */
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
   nonce: Long;
   chains: Chain[];
   chainStates: ChainState[];
   linkedAddresses: LinkedAddresses[];
   transfers: CrossChainTransfer[];
-  fee?: TransferFee;
+  fee?: TransferFee | undefined;
   feeInfos: FeeInfo[];
   rateLimits: RateLimit[];
   transferEpochs: TransferEpoch[];
@@ -235,77 +235,56 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    message.nonce !== undefined &&
-      (obj.nonce = (message.nonce || Long.UZERO).toString());
-    if (message.chains) {
-      obj.chains = message.chains.map((e) => (e ? Chain.toJSON(e) : undefined));
-    } else {
-      obj.chains = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    if (message.chainStates) {
-      obj.chainStates = message.chainStates.map((e) =>
-        e ? ChainState.toJSON(e) : undefined
-      );
-    } else {
-      obj.chainStates = [];
+    if (!message.nonce.isZero()) {
+      obj.nonce = (message.nonce || Long.UZERO).toString();
     }
-    if (message.linkedAddresses) {
+    if (message.chains?.length) {
+      obj.chains = message.chains.map((e) => Chain.toJSON(e));
+    }
+    if (message.chainStates?.length) {
+      obj.chainStates = message.chainStates.map((e) => ChainState.toJSON(e));
+    }
+    if (message.linkedAddresses?.length) {
       obj.linkedAddresses = message.linkedAddresses.map((e) =>
-        e ? LinkedAddresses.toJSON(e) : undefined
+        LinkedAddresses.toJSON(e)
       );
-    } else {
-      obj.linkedAddresses = [];
     }
-    if (message.transfers) {
+    if (message.transfers?.length) {
       obj.transfers = message.transfers.map((e) =>
-        e ? CrossChainTransfer.toJSON(e) : undefined
+        CrossChainTransfer.toJSON(e)
       );
-    } else {
-      obj.transfers = [];
     }
-    message.fee !== undefined &&
-      (obj.fee = message.fee ? TransferFee.toJSON(message.fee) : undefined);
-    if (message.feeInfos) {
-      obj.feeInfos = message.feeInfos.map((e) =>
-        e ? FeeInfo.toJSON(e) : undefined
-      );
-    } else {
-      obj.feeInfos = [];
+    if (message.fee !== undefined) {
+      obj.fee = TransferFee.toJSON(message.fee);
     }
-    if (message.rateLimits) {
-      obj.rateLimits = message.rateLimits.map((e) =>
-        e ? RateLimit.toJSON(e) : undefined
-      );
-    } else {
-      obj.rateLimits = [];
+    if (message.feeInfos?.length) {
+      obj.feeInfos = message.feeInfos.map((e) => FeeInfo.toJSON(e));
     }
-    if (message.transferEpochs) {
+    if (message.rateLimits?.length) {
+      obj.rateLimits = message.rateLimits.map((e) => RateLimit.toJSON(e));
+    }
+    if (message.transferEpochs?.length) {
       obj.transferEpochs = message.transferEpochs.map((e) =>
-        e ? TransferEpoch.toJSON(e) : undefined
+        TransferEpoch.toJSON(e)
       );
-    } else {
-      obj.transferEpochs = [];
     }
-    if (message.messages) {
-      obj.messages = message.messages.map((e) =>
-        e ? GeneralMessage.toJSON(e) : undefined
-      );
-    } else {
-      obj.messages = [];
+    if (message.messages?.length) {
+      obj.messages = message.messages.map((e) => GeneralMessage.toJSON(e));
     }
-    message.messageNonce !== undefined &&
-      (obj.messageNonce = (message.messageNonce || Long.UZERO).toString());
+    if (!message.messageNonce.isZero()) {
+      obj.messageNonce = (message.messageNonce || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {

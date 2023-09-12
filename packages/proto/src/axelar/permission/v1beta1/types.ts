@@ -12,7 +12,7 @@ export interface GovAccount {
 }
 
 function createBaseGovAccount(): GovAccount {
-  return { address: new Uint8Array(), role: 0 };
+  return { address: new Uint8Array(0), role: 0 };
 }
 
 export const GovAccount = {
@@ -64,39 +64,39 @@ export const GovAccount = {
     return {
       address: isSet(object.address)
         ? bytesFromBase64(object.address)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       role: isSet(object.role) ? roleFromJSON(object.role) : 0,
     };
   },
 
   toJSON(message: GovAccount): unknown {
     const obj: any = {};
-    message.address !== undefined &&
-      (obj.address = base64FromBytes(
-        message.address !== undefined ? message.address : new Uint8Array()
-      ));
-    message.role !== undefined && (obj.role = roleToJSON(message.role));
+    if (message.address.length !== 0) {
+      obj.address = base64FromBytes(message.address);
+    }
+    if (message.role !== 0) {
+      obj.role = roleToJSON(message.role);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<GovAccount>, I>>(base?: I): GovAccount {
-    return GovAccount.fromPartial(base ?? {});
+    return GovAccount.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GovAccount>, I>>(
     object: I
   ): GovAccount {
     const message = createBaseGovAccount();
-    message.address = object.address ?? new Uint8Array();
+    message.address = object.address ?? new Uint8Array(0);
     message.role = object.role ?? 0;
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

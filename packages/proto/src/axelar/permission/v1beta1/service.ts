@@ -1,7 +1,12 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 
-import { QueryGovernanceKeyRequest, QueryGovernanceKeyResponse } from "./query";
+import {
+  ParamsRequest,
+  ParamsResponse,
+  QueryGovernanceKeyRequest,
+  QueryGovernanceKeyResponse,
+} from "./query";
 import {
   DeregisterControllerRequest,
   DeregisterControllerResponse,
@@ -26,11 +31,12 @@ export interface Msg {
   ): Promise<UpdateGovernanceKeyResponse>;
 }
 
+export const MsgServiceName = "axelar.permission.v1beta1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.permission.v1beta1.Msg";
+    this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.RegisterController = this.RegisterController.bind(this);
     this.DeregisterController = this.DeregisterController.bind(this);
@@ -77,15 +83,18 @@ export interface Query {
   GovernanceKey(
     request: QueryGovernanceKeyRequest
   ): Promise<QueryGovernanceKeyResponse>;
+  Params(request: ParamsRequest): Promise<ParamsResponse>;
 }
 
+export const QueryServiceName = "axelar.permission.v1beta1.Query";
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.permission.v1beta1.Query";
+    this.service = opts?.service || QueryServiceName;
     this.rpc = rpc;
     this.GovernanceKey = this.GovernanceKey.bind(this);
+    this.Params = this.Params.bind(this);
   }
   GovernanceKey(
     request: QueryGovernanceKeyRequest
@@ -94,6 +103,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request(this.service, "GovernanceKey", data);
     return promise.then((data) =>
       QueryGovernanceKeyResponse.decode(_m0.Reader.create(data))
+    );
+  }
+
+  Params(request: ParamsRequest): Promise<ParamsResponse> {
+    const data = ParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) =>
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 }

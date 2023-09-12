@@ -2,6 +2,8 @@
 import _m0 from "protobufjs/minimal";
 
 import {
+  ParamsRequest,
+  ParamsResponse,
   PendingIBCTransferCountRequest,
   PendingIBCTransferCountResponse,
 } from "./query";
@@ -56,11 +58,12 @@ export interface MsgService {
   CallContract(request: CallContractRequest): Promise<CallContractResponse>;
 }
 
+export const MsgServiceServiceName = "axelar.axelarnet.v1beta1.MsgService";
 export class MsgServiceClientImpl implements MsgService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.axelarnet.v1beta1.MsgService";
+    this.service = opts?.service || MsgServiceServiceName;
     this.rpc = rpc;
     this.Link = this.Link.bind(this);
     this.ConfirmDeposit = this.ConfirmDeposit.bind(this);
@@ -178,15 +181,18 @@ export interface QueryService {
   PendingIBCTransferCount(
     request: PendingIBCTransferCountRequest
   ): Promise<PendingIBCTransferCountResponse>;
+  Params(request: ParamsRequest): Promise<ParamsResponse>;
 }
 
+export const QueryServiceServiceName = "axelar.axelarnet.v1beta1.QueryService";
 export class QueryServiceClientImpl implements QueryService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.axelarnet.v1beta1.QueryService";
+    this.service = opts?.service || QueryServiceServiceName;
     this.rpc = rpc;
     this.PendingIBCTransferCount = this.PendingIBCTransferCount.bind(this);
+    this.Params = this.Params.bind(this);
   }
   PendingIBCTransferCount(
     request: PendingIBCTransferCountRequest
@@ -199,6 +205,14 @@ export class QueryServiceClientImpl implements QueryService {
     );
     return promise.then((data) =>
       PendingIBCTransferCountResponse.decode(_m0.Reader.create(data))
+    );
+  }
+
+  Params(request: ParamsRequest): Promise<ParamsResponse> {
+    const data = ParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) =>
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 }

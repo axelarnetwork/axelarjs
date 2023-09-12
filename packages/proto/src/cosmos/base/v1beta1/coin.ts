@@ -91,15 +91,18 @@ export const Coin = {
 
   toJSON(message: Coin): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.amount !== "") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Coin>, I>>(base?: I): Coin {
-    return Coin.fromPartial(base ?? {});
+    return Coin.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Coin>, I>>(object: I): Coin {
     const message = createBaseCoin();
     message.denom = object.denom ?? "";
@@ -166,15 +169,18 @@ export const DecCoin = {
 
   toJSON(message: DecCoin): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.amount !== undefined && (obj.amount = message.amount);
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.amount !== "") {
+      obj.amount = message.amount;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<DecCoin>, I>>(base?: I): DecCoin {
-    return DecCoin.fromPartial(base ?? {});
+    return DecCoin.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DecCoin>, I>>(object: I): DecCoin {
     const message = createBaseDecCoin();
     message.denom = object.denom ?? "";
@@ -228,14 +234,15 @@ export const IntProto = {
 
   toJSON(message: IntProto): unknown {
     const obj: any = {};
-    message.int !== undefined && (obj.int = message.int);
+    if (message.int !== "") {
+      obj.int = message.int;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<IntProto>, I>>(base?: I): IntProto {
-    return IntProto.fromPartial(base ?? {});
+    return IntProto.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<IntProto>, I>>(object: I): IntProto {
     const message = createBaseIntProto();
     message.int = object.int ?? "";
@@ -288,14 +295,15 @@ export const DecProto = {
 
   toJSON(message: DecProto): unknown {
     const obj: any = {};
-    message.dec !== undefined && (obj.dec = message.dec);
+    if (message.dec !== "") {
+      obj.dec = message.dec;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<DecProto>, I>>(base?: I): DecProto {
-    return DecProto.fromPartial(base ?? {});
+    return DecProto.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DecProto>, I>>(object: I): DecProto {
     const message = createBaseDecProto();
     message.dec = object.dec ?? "";

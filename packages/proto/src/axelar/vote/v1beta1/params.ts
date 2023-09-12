@@ -8,7 +8,7 @@ export const protobufPackage = "axelar.vote.v1beta1";
 
 /** Params represent the genesis parameters for the module */
 export interface Params {
-  defaultVotingThreshold?: Threshold;
+  defaultVotingThreshold?: Threshold | undefined;
   endBlockerLimit: Long;
 }
 
@@ -80,19 +80,20 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.defaultVotingThreshold !== undefined &&
-      (obj.defaultVotingThreshold = message.defaultVotingThreshold
-        ? Threshold.toJSON(message.defaultVotingThreshold)
-        : undefined);
-    message.endBlockerLimit !== undefined &&
-      (obj.endBlockerLimit = (message.endBlockerLimit || Long.ZERO).toString());
+    if (message.defaultVotingThreshold !== undefined) {
+      obj.defaultVotingThreshold = Threshold.toJSON(
+        message.defaultVotingThreshold
+      );
+    }
+    if (!message.endBlockerLimit.isZero()) {
+      obj.endBlockerLimit = (message.endBlockerLimit || Long.ZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.defaultVotingThreshold =

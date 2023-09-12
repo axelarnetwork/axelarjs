@@ -10,8 +10,8 @@ export const protobufPackage = "axelar.permission.v1beta1";
 
 /** GenesisState represents the genesis state */
 export interface GenesisState {
-  params?: Params;
-  governanceKey?: LegacyAminoPubKey;
+  params?: Params | undefined;
+  governanceKey?: LegacyAminoPubKey | undefined;
   govAccounts: GovAccount[];
 }
 
@@ -94,18 +94,14 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    message.governanceKey !== undefined &&
-      (obj.governanceKey = message.governanceKey
-        ? LegacyAminoPubKey.toJSON(message.governanceKey)
-        : undefined);
-    if (message.govAccounts) {
-      obj.govAccounts = message.govAccounts.map((e) =>
-        e ? GovAccount.toJSON(e) : undefined
-      );
-    } else {
-      obj.govAccounts = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    if (message.governanceKey !== undefined) {
+      obj.governanceKey = LegacyAminoPubKey.toJSON(message.governanceKey);
+    }
+    if (message.govAccounts?.length) {
+      obj.govAccounts = message.govAccounts.map((e) => GovAccount.toJSON(e));
     }
     return obj;
   },
@@ -113,9 +109,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {
