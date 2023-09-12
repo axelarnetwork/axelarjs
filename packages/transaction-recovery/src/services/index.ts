@@ -7,7 +7,7 @@ export const gmpClient = (env: Environment) =>
     prefixUrl: AXELARSCAN_API_URLS[env],
   });
 
-export const s3Client = (env: Environment) =>
+export const s3Client = () =>
   createS3NodeClient({
-    prefixUrl: "",
+    prefixUrl: "https://axelar-testnet.s3.us-east-2.amazonaws.com",
   });

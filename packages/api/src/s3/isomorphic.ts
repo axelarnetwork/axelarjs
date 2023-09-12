@@ -1,4 +1,5 @@
 import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
+import { S3Response } from "./types";
 
 export class S3Client extends IsomorphicHTTPClient {
   static init(options: ClientOptions) {
@@ -9,6 +10,8 @@ export class S3Client extends IsomorphicHTTPClient {
   }
 
   async getChainConfigs() {
-    return this.client.get("").json<any>();
+    return this.client
+      .get("configs/testnet-chain-config-latest.json")
+      .json<S3Response>();
   }
 }

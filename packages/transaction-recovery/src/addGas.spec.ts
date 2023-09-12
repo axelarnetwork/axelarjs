@@ -1,5 +1,6 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
 import { addGas, SendOptions } from "./addGas";
@@ -40,19 +41,21 @@ describe("addGas", () => {
       amount: "1",
     };
 
+    const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
+      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      { prefix: "osmo" }
+    );
+
     const sendOptions: SendOptions = {
       txFee: {
         gas: "250000",
         amount: [{ denom: "uosmo", amount: "30000" }],
       },
-      channelIdToAxelar: "channel-3",
-      rpcUrl: "https://rpc.osmotest5.osmosis.zone",
       environment: ENVIRONMENTS.testnet,
-      cosmosAddressPrefix: "osmo",
-      cosmosWalletMnemonic: process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      offlineSigner,
     };
 
-    const res = await addGas(txHash, token, sendOptions);
+    const res = await addGas("osmosis-6", txHash, token, sendOptions);
 
     expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
   });

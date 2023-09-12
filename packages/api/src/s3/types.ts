@@ -43,3 +43,11 @@ export type S3CosmosChainConfig = ChainConfig & {
     channelIdToAxelar: string;
   };
 };
+
+export type ChainConfigs = S3CosmosChainConfig | S3EVMChainConfig;
+
+export type S3Response = {
+  chains: Record<string, ChainConfigs>;
+  version: string;
+  environment: string;
+};

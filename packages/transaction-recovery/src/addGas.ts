@@ -1,21 +1,22 @@
+import { S3CosmosChainConfig } from "@axelarjs/api/s3/types";
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import type { Coin, StdFee } from "@cosmjs/stargate";
 
-import { getCosmosSigner, getCosmosWallet } from "./cosmosSigner";
-import { gmpClient } from "./services";
+import { getCosmosSigner } from "./cosmosSigner";
+import { gmpClient, s3Client } from "./services";
 
 export type SendOptions = {
-  channelIdToAxelar: string;
-  rpcUrl: string;
   txFee: StdFee;
-  timeoutTimestamp?: number;
   environment: Environment;
-  cosmosAddressPrefix: string;
-  cosmosWalletMnemonic: string;
+  offlineSigner: DirectSecp256k1HdWallet;
+  rpcUrl?: string;
+  timeoutTimestamp?: number;
 };
 
 export async function addGas(
+  chain: string,
   txHash: string,
   token: Coin | "autocalculate",
   sendOptions: SendOptions
@@ -23,6 +24,15 @@ export async function addGas(
   if (token === "autocalculate") {
     throw new Error("autocalculate not yet supported, but we will soon!");
   }
+
+  const selectedChainInfo = (await s3Client()
+    .getChainConfigs()
+    .then((res) => res.chains[chain])
+    .catch(() => undefined)) as S3CosmosChainConfig;
+
+  if (!selectedChainInfo) throw new Error(`chain ID ${chain} not found`);
+
+  const { rpc, channelIdToAxelar } = selectedChainInfo.cosmosConfigs;
 
   const tx = await gmpClient(sendOptions.environment)
     .searchGMP({
@@ -34,12 +44,7 @@ export async function addGas(
     throw new Error(`${txHash} could not be found`);
   }
 
-  const offlineSigner = await getCosmosWallet(
-    sendOptions.cosmosWalletMnemonic,
-    sendOptions.cosmosAddressPrefix
-  );
-
-  const sender = await offlineSigner
+  const sender = await sendOptions.offlineSigner
     .getAccounts()
     .then(([acc]) => acc?.address);
 
@@ -47,16 +52,20 @@ export async function addGas(
     throw new Error("Sender could not be found");
   }
 
-  const signer = await getCosmosSigner(sendOptions.rpcUrl, offlineSigner);
+  const rpcUrl = sendOptions.rpcUrl ?? rpc[0];
 
-  return signer.signAndBroadcast(
+  if (!rpcUrl) throw new Error("Pass in an RPC URL");
+
+  return (
+    await getCosmosSigner(rpcUrl, sendOptions.offlineSigner)
+  ).signAndBroadcast(
     sender,
     [
       {
         typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
         value: {
           sourcePort: "transfer",
-          sourceChannel: sendOptions.channelIdToAxelar,
+          sourceChannel: channelIdToAxelar,
           token,
           sender,
           receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
