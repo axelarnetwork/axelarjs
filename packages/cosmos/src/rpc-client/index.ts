@@ -7,9 +7,9 @@ import { AxelarQueryService, setupQueryExtension } from "./types";
 
 export * from "../types";
 
-export type AxelarQueryClientType = QueryClient & AxelarQueryService;
+export type AxelarQueryClientService = QueryClient & AxelarQueryService;
 
-let instance: AxelarQueryClientType;
+let instance: AxelarQueryClientService;
 
 export class AxelarQueryClient extends QueryClient {
   static async init(config: AxelarQueryClientConfig) {
