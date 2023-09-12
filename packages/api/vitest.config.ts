@@ -1,12 +1,13 @@
-/// <reference types="vitest" />
-
 import { resolve } from "path";
 import { defineConfig } from "vitest/config";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   test: {
+    testTimeout: 300000,
+    environment: "node",
+    exclude: ["**/node_modules/**", "build/**", "./*.js"],
     globals: true,
+    setupFiles: ["dotenv/config"],
   },
   resolve: {
     alias: {
