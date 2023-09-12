@@ -23,7 +23,7 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "cs": "pnpm changeset",
-    "cs:version": "pnpm: changeset:version",
+    "cs:version": "pnpm changeset:version",
     "cs:publish": "pnpm changeset:publish",
     "e2e:maestro": "pnpm -C ./apps/maestro run ci:e2e"
   },
