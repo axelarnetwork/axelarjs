@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/utils",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "General purpose utils for axelarjs",
   "repository": {
     "type": "git",
@@ -57,7 +60,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/testing-library__jest-dom": "^5.14.9",
     "@vitejs/plugin-react": "^4.0.4",
-    "fast-check": "^3.12.1",
+    "fast-check": "^3.13.0",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "rambda": "^7.5.0",
@@ -66,7 +69,7 @@
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.4"
   },
   "dependencies": {
     "immer": "^10.0.2",

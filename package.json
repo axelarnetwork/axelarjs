@@ -2,7 +2,6 @@
   "name": "axelarjs",
   "version": "0.1.0",
   "description": "Axelar Network foundations for javascript/Typescript based applications",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
@@ -36,12 +35,13 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2",
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.1.0",
     "@tsconfig/strictest": "^2.0.2",
-    "eslint": "^8.48.0",
+    "eslint": "^8.49.0",
     "husky": "^8.0.3",
     "package-json": "^8.1.1",
     "prettier": "^2.8.8",

@@ -2,7 +2,7 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 
 import { vi } from "vitest";
 
-import addGas, { SendOptions } from "./addGas";
+import { addGas, SendOptions } from "./addGas";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,

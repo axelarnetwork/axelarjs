@@ -1,7 +1,9 @@
 {
   "name": "@axelarjs/registry",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "publishConfig": {
+    "access": "restricted"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

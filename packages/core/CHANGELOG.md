@@ -1,5 +1,11 @@
 # @axelarjs/core
 
+## 0.1.2
+
+### Patch Changes
+
+- Initial release
+
 ## 0.1.1
 
 ### Patch Changes

@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/cosmos",
-  "version": "0.1.1",
+  "version": "0.1.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Cosmos SDK for Axelar Network",
   "repository": {
     "type": "git",
@@ -61,6 +64,6 @@
     "rambda": "^7.5.0",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.4"
   }
 }

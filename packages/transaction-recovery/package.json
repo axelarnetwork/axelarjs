@@ -1,15 +1,38 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.0.1",
+  "version": "0.0.7",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Axelarjs Transaction Recovery",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
-  "publishConfig": {
-    "access": "public"
+  "files": [
+    "./build",
+    "./cosmosSigner",
+    "./services",
+    "./addGas.js",
+    "./index.js"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
+    }
   },
-  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
@@ -25,7 +48,7 @@
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.4"
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
