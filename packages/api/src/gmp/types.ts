@@ -243,6 +243,9 @@ export type GetFeesParams = {
   destinationChain: string;
   sourceTokenSymbol?: string;
   sourceTokenAddress?: `0x${string}`;
+  destinationContractAddress?: `0x${string}`;
+  sourceContractAddress?: `0x${string}`;
+  tokenSymbol?: string;
 };
 
 type ExpressFee = {

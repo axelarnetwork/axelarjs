@@ -10,6 +10,7 @@ import {
   IsomorphicHTTPClient,
   type ClientMeta,
 } from "../IsomorphicHTTPClient";
+import { BigNumberUtils } from "./helpers/BigNumberUtils";
 
 export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   protected gmpClient: GMPClient;
@@ -33,60 +34,50 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   }
 
   async estimateGasFee(params: EstimateGasFeeParams) {
-    const feeAPI = await this.gmpClient.getFees(params);
+    const getFeesParams: GetFeesParams = {
+      sourceChain: params.sourceChain,
+      destinationChain: params.destinationChain,
+      sourceTokenSymbol: params.sourceTokenSymbol ?? "",
+    };
+    const response = await this.gmpClient.getFees(getFeesParams);
 
-    // await throwIfInvalidChainIds(
-    //   [sourceChainId, destinationChainId],
-    //   this.environment
-    // );
+    const {
+      base_fee,
+      express_fee_string,
+      source_token,
+      destination_native_token,
+      express_supported,
+    } = response;
 
-    // const response = await this.getNativeGasBaseFee(
-    //   sourceChainId,
-    //   destinationChainId,
-    //   sourceChainTokenSymbol as GasToken,
-    //   gmpParams?.tokenSymbol,
-    //   gmpParams?.destinationContractAddress,
-    //   gmpParams?.sourceContractAddress,
-    //   gmpParams?.transferAmount,
-    //   gmpParams?.transferAmountInUnits
-    // );
+    if (!response || !base_fee || !source_token) {
+      throw new Error(
+        "Failed to retrieve fee estimate from API. Please try again later."
+      );
+    }
 
-    // const {
-    //   baseFee,
-    //   expressFee,
-    //   sourceToken,
-    //   destToken,
-    //   apiResponse,
-    //   success,
-    //   expressSupported,
-    // } = response;
+    const destGasFeeWei = BigNumberUtils.multiplyToGetWei(
+      params.gasLimit,
+      destination_native_token.gas_price,
+      destination_native_token.decimals
+    );
+    const minDestGasFeeWei = params.gasLimit * BigInt(params.minGasPrice ?? ""); //minGasPrice already provided by the user in wei
 
-    // if (!success || !baseFee || !sourceToken) {
-    //   throw new Error("Failed to estimate gas fee");
-    // }
+    const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
+      params.gasLimit,
+      source_token.gas_price,
+      source_token.decimals
+    );
 
-    // const destGasFeeWei = BigNumberUtils.multiplyToGetWei(
-    //   BigNumber.from(gasLimit),
-    //   destToken.gas_price,
-    //   destToken.decimals
-    // );
-    // const minDestGasFeeWei = BigNumber.from(gasLimit).mul(minGasPrice); //minGasPrice already provided by the user in wei
+    const executionFee =
+      destGasFeeWei > minDestGasFeeWei
+        ? srcGasFeeWei
+        : (srcGasFeeWei * minDestGasFeeWei) / destGasFeeWei;
+    const executionFeeWithMultiplier =
+      params.gasMultiplier && params.gasMultiplier > 1
+        ? executionFee * BigInt(params.gasMultiplier)
+        : executionFee;
 
-    // const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
-    //   BigNumber.from(gasLimit),
-    //   sourceToken.gas_price,
-    //   sourceToken.decimals
-    // );
-
-    // const executionFee = destGasFeeWei.gt(minDestGasFeeWei)
-    //   ? srcGasFeeWei
-    //   : srcGasFeeWei.mul(minDestGasFeeWei).div(destGasFeeWei);
-    // const executionFeeWithMultiplier =
-    //   gasMultiplier > 1
-    //     ? executionFee.mul(gasMultiplier * 10000).div(10000)
-    //     : executionFee;
-
-    // return gmpParams?.showDetailedFees
+    // return params?.showDetailedFees
     //   ? {
     //       baseFee,
     //       expressFee,
@@ -100,6 +91,6 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
     //     }
     //   : executionFeeWithMultiplier.add(baseFee).toString();
 
-    return feeAPI;
+    return response;
   }
 }
