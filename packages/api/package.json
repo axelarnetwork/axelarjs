@@ -46,6 +46,13 @@
       "require": "./build/commonjs/*.js"
     }
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
+    }
+  },
   "scripts": {
     "compile": "tsc --noEmit",
     "build": "./scripts/build.sh",
