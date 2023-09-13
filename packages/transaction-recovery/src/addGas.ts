@@ -1,8 +1,9 @@
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
+import { OfflineSigner } from "@cosmjs/proto-signing";
 import type { Coin, StdFee } from "@cosmjs/stargate";
 
-import { getCosmosSigner, getCosmosWallet } from "./cosmosSigner";
+import { getCosmosSigner } from "./cosmosSigner";
 import { gmpClient } from "./services";
 
 export type SendOptions = {
@@ -11,8 +12,7 @@ export type SendOptions = {
   txFee: StdFee;
   timeoutTimestamp?: number;
   environment: Environment;
-  cosmosAddressPrefix: string;
-  cosmosWalletMnemonic: string;
+  offlineSigner: OfflineSigner;
 };
 
 export async function addGas(
@@ -24,7 +24,9 @@ export async function addGas(
     throw new Error("autocalculate not yet supported, but we will soon!");
   }
 
-  const tx = await gmpClient(sendOptions.environment)
+  const { txFee, timeoutTimestamp, environment, offlineSigner } = sendOptions;
+
+  const tx = await gmpClient(environment)
     .searchGMP({
       txHash,
     })
@@ -33,11 +35,6 @@ export async function addGas(
   if (!tx || tx?.length < 1) {
     throw new Error(`${txHash} could not be found`);
   }
-
-  const offlineSigner = await getCosmosWallet(
-    sendOptions.cosmosWalletMnemonic,
-    sendOptions.cosmosAddressPrefix
-  );
 
   const sender = await offlineSigner
     .getAccounts()
@@ -59,13 +56,12 @@ export async function addGas(
           sourceChannel: sendOptions.channelIdToAxelar,
           token,
           sender,
-          receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
-          timeoutTimestamp:
-            sendOptions.timeoutTimestamp ?? (Date.now() + 90) * 1e9,
+          receiver: COSMOS_GAS_RECEIVER_OPTIONS[environment],
+          timeoutTimestamp: timeoutTimestamp ?? (Date.now() + 90) * 1e9,
           memo: tx[0]?.call.id,
         },
       },
     ],
-    sendOptions.txFee
+    txFee
   );
 }

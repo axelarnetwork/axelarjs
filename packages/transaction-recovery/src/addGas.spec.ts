@@ -3,6 +3,7 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 import { vi } from "vitest";
 
 import { addGas, SendOptions } from "./addGas";
+import { getCosmosWallet } from "./cosmosSigner";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,
@@ -40,6 +41,11 @@ describe("addGas", () => {
       amount: "1",
     };
 
+    const offlineSigner = await getCosmosWallet(
+      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      "osmo"
+    );
+
     const sendOptions: SendOptions = {
       txFee: {
         gas: "250000",
@@ -48,8 +54,7 @@ describe("addGas", () => {
       channelIdToAxelar: "channel-3",
       rpcUrl: "https://rpc.osmotest5.osmosis.zone",
       environment: ENVIRONMENTS.testnet,
-      cosmosAddressPrefix: "osmo",
-      cosmosWalletMnemonic: process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      offlineSigner,
     };
 
     const res = await addGas(txHash, token, sendOptions);

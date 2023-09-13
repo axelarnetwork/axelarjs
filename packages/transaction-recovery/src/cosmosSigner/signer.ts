@@ -1,9 +1,9 @@
-import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
+import type { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
 export const getCosmosSigner = async (
   rpcUrl: string,
-  offlineDirectSigner: OfflineDirectSigner
+  offlineDirectSigner: OfflineSigner
 ) => {
   return SigningStargateClient.connectWithSigner(rpcUrl, offlineDirectSigner);
 };
