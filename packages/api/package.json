@@ -49,7 +49,8 @@
   "scripts": {
     "compile": "tsc --noEmit",
     "build": "./scripts/build.sh",
-    "clean": "./scripts/clean.sh"
+    "clean": "./scripts/clean.sh",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -68,8 +69,10 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
+    "@axelarjs/core": "workspace:*",
     "got": "^12.6.1",
     "ky": "^1.0.1",
-    "rambda": "^7.5.0"
+    "rambda": "^7.5.0",
+    "viem": "~1.10.9"
   }
 }
