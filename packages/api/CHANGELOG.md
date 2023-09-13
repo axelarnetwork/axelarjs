@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.4
+
+### Patch Changes
+
+- add estimateGasFee query
+
 ## 0.1.3
 
 ### Patch Changes
