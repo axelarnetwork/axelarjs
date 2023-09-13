@@ -1,8 +1,10 @@
+import { AXELARSCAN_API_URLS, Environment } from "@axelarjs/core";
+
 import {
   createGMPBrowserClient,
   createGMPNodeClient,
   EstimateGasFeeParams,
-  GetFeesParams,
+  EstimateGasFeeResponse,
   GMPClient,
 } from "..";
 import {
@@ -15,31 +17,53 @@ import { BigNumberUtils } from "./helpers/BigNumberUtils";
 export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   protected gmpClient: GMPClient;
 
-  public constructor(options: ClientOptions, meta?: ClientMeta) {
+  public constructor(
+    env: Environment,
+    options: ClientOptions,
+    meta?: ClientMeta
+  ) {
     super(options, meta);
-    const gmpClientOptions = {
-      prefixUrl: "https://testnet.api.gmp.axelarscan.io",
-    }; //TODO - hard coded
     this.gmpClient =
       options.target === "browser"
-        ? createGMPBrowserClient(gmpClientOptions)
-        : createGMPNodeClient(gmpClientOptions);
+        ? createGMPBrowserClient({
+            prefixUrl: AXELARSCAN_API_URLS[env],
+          })
+        : createGMPNodeClient({
+            prefixUrl: AXELARSCAN_API_URLS[env],
+          });
   }
 
-  static init(options: ClientOptions) {
-    return new AxelarQueryAPIClient(options, {
+  static init(env: Environment, options: ClientOptions) {
+    return new AxelarQueryAPIClient(env, options, {
       name: "AxelarQueryAPI",
       version: "0.0.1",
     });
   }
 
-  async estimateGasFee(params: EstimateGasFeeParams) {
-    const getFeesParams: GetFeesParams = {
-      sourceChain: params.sourceChain,
-      destinationChain: params.destinationChain,
-      sourceTokenSymbol: params.sourceTokenSymbol ?? "",
-    };
-    const response = await this.gmpClient.getFees(getFeesParams);
+  async estimateGasFee({
+    minGasPrice = "0",
+    sourceChain,
+    destinationChain,
+    sourceContractAddress,
+    sourceTokenAddress,
+    sourceTokenSymbol,
+    destinationContractAddress,
+    gasLimit = 1_000_000n,
+    gasMultiplier = 1.0,
+    showDetailedFees = false,
+    amount,
+    amountInUnits,
+  }: EstimateGasFeeParams): Promise<EstimateGasFeeResponse | string> {
+    const response = await this.gmpClient.getFees({
+      sourceChain,
+      destinationChain,
+      sourceTokenSymbol,
+      sourceContractAddress,
+      sourceTokenAddress,
+      destinationContractAddress,
+      amount,
+      amountInUnits,
+    });
 
     const {
       base_fee,
@@ -56,14 +80,14 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
     }
 
     const destGasFeeWei = BigNumberUtils.multiplyToGetWei(
-      params.gasLimit,
+      gasLimit,
       destination_native_token.gas_price,
       destination_native_token.decimals
     );
-    const minDestGasFeeWei = params.gasLimit * BigInt(params.minGasPrice ?? ""); //minGasPrice already provided by the user in wei
+    const minDestGasFeeWei = gasLimit * BigInt(minGasPrice); //minGasPrice already provided by the user in wei
 
     const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
-      params.gasLimit,
+      gasLimit,
       source_token.gas_price,
       source_token.decimals
     );
@@ -73,24 +97,22 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
         ? srcGasFeeWei
         : (srcGasFeeWei * minDestGasFeeWei) / destGasFeeWei;
     const executionFeeWithMultiplier =
-      params.gasMultiplier && params.gasMultiplier > 1
-        ? executionFee * BigInt(params.gasMultiplier)
+      gasMultiplier > 1
+        ? Number(executionFee) * Number(gasMultiplier)
         : executionFee;
 
-    // return params?.showDetailedFees
-    //   ? {
-    //       baseFee,
-    //       expressFee,
-    //       executionFee: executionFee.toString(),
-    //       executionFeeWithMultiplier: executionFeeWithMultiplier.toString(),
-    //       gasLimit,
-    //       gasMultiplier,
-    //       minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
-    //       apiResponse,
-    //       isExpressSupported: expressSupported,
-    //     }
-    //   : executionFeeWithMultiplier.add(baseFee).toString();
-
-    return response;
+    return showDetailedFees
+      ? {
+          baseFee: base_fee,
+          expressFee: express_fee_string,
+          executionFee: executionFee.toString(),
+          executionFeeWithMultiplier: executionFeeWithMultiplier.toString(),
+          gasLimit,
+          gasMultiplier,
+          minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
+          apiResponse: JSON.stringify(response),
+          isExpressSupported: express_supported,
+        }
+      : (Number(executionFeeWithMultiplier) + Number(base_fee)).toFixed(0);
   }
 }

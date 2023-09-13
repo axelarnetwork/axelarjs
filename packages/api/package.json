@@ -69,6 +69,7 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
+    "@axelarjs/core": "workspace:*",
     "got": "^12.6.1",
     "ky": "^1.0.1",
     "rambda": "^7.5.0",
