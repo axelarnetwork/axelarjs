@@ -1,5 +1,7 @@
 import { AXELARSCAN_API_URLS, Environment } from "@axelarjs/core";
 
+import { parseUnits } from "viem";
+
 import {
   createGMPBrowserClient,
   createGMPNodeClient,
@@ -36,7 +38,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   static init(env: Environment, options: ClientOptions) {
     return new AxelarQueryAPIClient(env, options, {
       name: "AxelarQueryAPI",
-      version: "0.0.1",
+      version: "0.0.11",
     });
   }
 
@@ -100,7 +102,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
       destination_native_token.gas_price,
       destination_native_token.decimals
     );
-    const minDestGasFeeWei = gasLimit * BigInt(minGasPrice);
+    const minDestGasFeeWei = BigInt(minGasPrice) * BigInt(gasLimit);
 
     const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
       gasLimit,
@@ -114,12 +116,13 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
         : (srcGasFeeWei * minDestGasFeeWei) / destGasFeeWei;
     const executionFeeWithMultiplier =
       gasMultiplier > 1
-        ? Number(executionFee) * Number(gasMultiplier)
+        ? Math.floor(Number(executionFee) * Number(gasMultiplier))
         : executionFee;
 
+    const baseFee = parseUnits(base_fee.toString(), source_token.decimals);
     return showDetailedFees
       ? {
-          baseFee: base_fee,
+          baseFee,
           expressFee: express_fee_string,
           executionFee: executionFee.toString(),
           executionFeeWithMultiplier: executionFeeWithMultiplier.toString(),
@@ -129,6 +132,6 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
           apiResponse: JSON.stringify(response),
           isExpressSupported: express_supported,
         }
-      : (Number(executionFeeWithMultiplier) + Number(base_fee)).toFixed(0);
+      : (BigInt(executionFeeWithMultiplier) + BigInt(baseFee)).toString();
   }
 }

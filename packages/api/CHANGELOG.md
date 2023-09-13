@@ -1,5 +1,41 @@
 # @axelarjs/api
 
+## 0.1.11
+
+### Patch Changes
+
+- trigger rebuild
+
+## 0.1.10
+
+### Patch Changes
+
+- converting base fee to wei
+
+## 0.1.9
+
+### Patch Changes
+
+- fix bigint issue
+
+## 0.1.8
+
+### Patch Changes
+
+- wrapping bigint class to BigNumberUtils
+
+## 0.1.7
+
+### Patch Changes
+
+- updating api package.json to include wildcard exports
+
+## 0.1.6
+
+### Patch Changes
+
+- adding typesVersions entry to api package.json
+
 ## 0.1.5
 
 ### Patch Changes
