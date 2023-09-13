@@ -241,11 +241,13 @@ export type EstimateTimeSpentResponse = BaseStats<{
 export type GetFeesParams = {
   sourceChain: string;
   destinationChain: string;
-  sourceTokenSymbol?: string;
-  sourceTokenAddress?: `0x${string}`;
-  destinationContractAddress?: `0x${string}`;
-  sourceContractAddress?: `0x${string}`;
-  tokenSymbol?: string;
+  sourceTokenSymbol?: string | undefined;
+  sourceTokenAddress?: `0x${string}` | undefined;
+  destinationContractAddress?: `0x${string}` | undefined;
+  sourceContractAddress?: `0x${string}` | undefined;
+  tokenSymbol?: string | undefined;
+  amount?: number | undefined; // In terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
+  amountInUnits?: string | undefined; // In terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
 };
 
 type ExpressFee = {

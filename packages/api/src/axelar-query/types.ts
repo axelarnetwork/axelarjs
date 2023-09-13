@@ -5,6 +5,16 @@ export type EstimateGasFeeParams = GetFeesParams & {
   gasMultiplier?: number;
   minGasPrice?: string;
   showDetailedFees?: boolean;
-  transferAmount?: number; // In terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
-  transferAmountInUnits?: string; // In terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
+};
+
+export type EstimateGasFeeResponse = {
+  baseFee: number;
+  expressFee: string;
+  executionFee: string;
+  executionFeeWithMultiplier: string;
+  gasLimit: bigint;
+  gasMultiplier: number;
+  minGasPrice: string;
+  apiResponse: string;
+  isExpressSupported: boolean;
 };
