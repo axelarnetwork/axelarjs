@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.7
+
+### Patch Changes
+
+- updating api package.json to include wildcard exports
+
 ## 0.1.6
 
 ### Patch Changes
