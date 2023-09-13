@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.10
+
+### Patch Changes
+
+- converting base fee to wei
+
 ## 0.1.9
 
 ### Patch Changes
