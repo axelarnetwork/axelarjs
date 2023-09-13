@@ -246,8 +246,8 @@ export type GetFeesParams = {
   destinationContractAddress?: `0x${string}` | undefined;
   sourceContractAddress?: `0x${string}` | undefined;
   tokenSymbol?: string | undefined;
-  amount?: number | undefined; // In terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
-  amountInUnits?: string | undefined; // In terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
+  amount?: number | undefined;
+  amountInUnits?: string | undefined;
 };
 
 type ExpressFee = {
