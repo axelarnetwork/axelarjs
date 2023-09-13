@@ -44,6 +44,10 @@
     ".": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
     }
   },
   "typesVersions": {
