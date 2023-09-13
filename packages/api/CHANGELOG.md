@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.6
+
+### Patch Changes
+
+- adding typesVersions entry to api package.json
+
 ## 0.1.5
 
 ### Patch Changes
