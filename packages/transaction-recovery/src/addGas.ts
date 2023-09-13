@@ -1,3 +1,4 @@
+import { createAxelarQueryNodeClient } from "@axelarjs/api";
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
 import { OfflineSigner } from "@cosmjs/proto-signing";
@@ -20,10 +21,6 @@ export async function addGas(
   token: Coin | "autocalculate",
   sendOptions: SendOptions
 ) {
-  if (token === "autocalculate") {
-    throw new Error("autocalculate not yet supported, but we will soon!");
-  }
-
   const { txFee, timeoutTimestamp, environment, offlineSigner } = sendOptions;
 
   const tx = await gmpClient(environment)
@@ -34,6 +31,10 @@ export async function addGas(
 
   if (!tx || tx?.length < 1) {
     throw new Error(`${txHash} could not be found`);
+  }
+
+  if (token === "autocalculate") {
+    token = await getFullFee();
   }
 
   const sender = await offlineSigner
@@ -64,4 +65,16 @@ export async function addGas(
     ],
     txFee
   );
+}
+
+type GetFullFeeOptions = {
+  environment: Environment;
+};
+async function getFullFee({ environment }: GetFullFeeOptions): Promise<Coin> {
+  const apiClient = createAxelarQueryNodeClient(environment, {});
+  const fullFee = await apiClient.estimateGasFee();
+  return {
+    denom: "",
+    amount: "",
+  };
 }
