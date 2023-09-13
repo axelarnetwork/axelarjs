@@ -38,7 +38,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   static init(env: Environment, options: ClientOptions) {
     return new AxelarQueryAPIClient(env, options, {
       name: "AxelarQueryAPI",
-      version: "0.0.1",
+      version: "0.0.11",
     });
   }
 
