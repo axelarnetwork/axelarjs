@@ -100,7 +100,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
       destination_native_token.gas_price,
       destination_native_token.decimals
     );
-    const minDestGasFeeWei = gasLimit * BigInt(minGasPrice);
+    const minDestGasFeeWei = BigInt(gasLimit) * BigInt(minGasPrice);
 
     const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
       gasLimit,
