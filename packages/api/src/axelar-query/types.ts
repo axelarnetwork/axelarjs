@@ -8,7 +8,7 @@ export type EstimateGasFeeParams = GetFeesParams & {
 };
 
 export type EstimateGasFeeResponse = {
-  baseFee: number;
+  baseFee: bigint;
   expressFee: string;
   executionFee: string;
   executionFeeWithMultiplier: string;
