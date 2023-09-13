@@ -40,19 +40,35 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
     });
   }
 
+  /**
+   * Calculate estimated gas amount to pay for the gas receiver contract.
+   * @param sourceChain Chain ID (as recognized by Axelar) of the source chain
+   * @param destinationChain Chain ID (as recognized by Axelar) of the destination chain
+   * @param sourceTokenSymbol (Optional) the token symbol on the source chain
+   * @param sourceContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
+   * @param sourceTokenAddress (Optional) the contract address of the token symbol on the source chain
+   * @param destinationContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
+   * @param amount (Optional) the amount of assets transferred in terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
+   * @param amountInUnits (Optional) the amount of assets transferred in terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
+   * @param minGasPrice (Optional) A minimum value, in wei, for the gas price on the destination chain that is used to override the estimated gas price if it falls below this specified value.
+   * @param gasLimit (Optional) An estimated gas amount required to execute `executeWithToken` function. The default value is 1MM which should be sufficient for most transactions.
+   * @param gasMultiplier (Optional) A multiplier used to create a buffer above the calculated gas fee, to account for potential slippage throughout tx execution, e.g. 1.1 = 10% buffer
+   * @param showDetailedFees (Optional) will return the full breakdown of fee components if specified true
+   * @returns
+   */
   async estimateGasFee({
-    minGasPrice = "0",
     sourceChain,
     destinationChain,
+    sourceTokenSymbol,
     sourceContractAddress,
     sourceTokenAddress,
-    sourceTokenSymbol,
     destinationContractAddress,
+    amount,
+    amountInUnits,
+    minGasPrice = "0",
     gasLimit = 1_000_000n,
     gasMultiplier = 1.0,
     showDetailedFees = false,
-    amount,
-    amountInUnits,
   }: EstimateGasFeeParams): Promise<EstimateGasFeeResponse | string> {
     const response = await this.gmpClient.getFees({
       sourceChain,
@@ -84,7 +100,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
       destination_native_token.gas_price,
       destination_native_token.decimals
     );
-    const minDestGasFeeWei = gasLimit * BigInt(minGasPrice); //minGasPrice already provided by the user in wei
+    const minDestGasFeeWei = gasLimit * BigInt(minGasPrice);
 
     const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
       gasLimit,
