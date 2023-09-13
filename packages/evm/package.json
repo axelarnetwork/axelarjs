@@ -37,8 +37,8 @@
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
-    "postinstall": "ts-node-esm scripts/postinstall.ts",
-    "codegen": "ts-node-esm scripts/codegen.ts"
+    "postinstall": "tsx scripts/postinstall.ts",
+    "codegen": "tsx scripts/codegen.ts"
   },
   "keywords": [],
   "author": "",
@@ -57,7 +57,7 @@
     "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
     "strip-ansi": "^6.0.1",
-    "ts-node": "^10.9.1",
+    "tsx": "^3.12.9",
     "typescript": "^5.2.2",
     "zx": "^7.2.3"
   }
