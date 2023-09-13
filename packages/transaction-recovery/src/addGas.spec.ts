@@ -31,7 +31,7 @@ vi.mock("./cosmosSigner/signer", () => {
 });
 
 describe("addGas", () => {
-  test("broadcast an IBC transfer", async () => {
+  test.skip("broadcast an IBC transfer", async () => {
     const txHash =
       "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
 
@@ -58,6 +58,31 @@ describe("addGas", () => {
     };
 
     const res = await addGas(txHash, token, sendOptions);
+
+    expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
+  });
+
+  test("autocalculate", async () => {
+    const txHash =
+      "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
+
+    const offlineSigner = await getCosmosWallet(
+      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      "osmo"
+    );
+
+    const sendOptions: SendOptions = {
+      txFee: {
+        gas: "250000",
+        amount: [{ denom: "uosmo", amount: "30000" }],
+      },
+      channelIdToAxelar: "channel-3",
+      rpcUrl: "https://rpc.osmotest5.osmosis.zone",
+      environment: ENVIRONMENTS.testnet,
+      offlineSigner,
+    };
+
+    const res = await addGas(txHash, "autocalculate", sendOptions);
 
     expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
   });

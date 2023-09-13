@@ -72,7 +72,17 @@ type GetFullFeeOptions = {
 };
 async function getFullFee({ environment }: GetFullFeeOptions): Promise<Coin> {
   const apiClient = createAxelarQueryNodeClient(environment, {});
-  const fullFee = await apiClient.estimateGasFee();
+  const fullFee = await apiClient.estimateGasFee({
+    sourceChain: "ethereum-2",
+    destinationChain: "avalanche",
+    gasLimit: 700_000 as any,
+    gasMultiplier: 1.1,
+    sourceContractAddress: undefined,
+    destinationContractAddress: undefined,
+    amount: 1,
+    amountInUnits: "1000000",
+  });
+  console.log({ fullFee });
   return {
     denom: "",
     amount: "",
