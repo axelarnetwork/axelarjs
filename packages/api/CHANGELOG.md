@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.9
+
+### Patch Changes
+
+- fix bigint issue
+
 ## 0.1.8
 
 ### Patch Changes
