@@ -8,7 +8,6 @@ export type SendOptions = {
   txFee: StdFee;
   environment: Environment;
   offlineSigner: OfflineSigner;
-
   rpcUrl?: string;
   timeoutTimestamp?: number;
 };
