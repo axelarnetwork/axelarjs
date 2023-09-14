@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.10
+
+### Patch Changes
+
+- incorporating autocalculate gas feature for addGas method
+
 ## 0.0.9
 
 ### Patch Changes
