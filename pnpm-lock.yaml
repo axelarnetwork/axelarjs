@@ -456,6 +456,9 @@ importers:
 
   packages/deposit-address:
     devDependencies:
+      '@axelarjs/config':
+        specifier: workspace:*
+        version: link:../config
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1

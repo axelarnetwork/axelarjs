@@ -20,6 +20,7 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
+    "@axelarjs/config": "workspace:*",
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
