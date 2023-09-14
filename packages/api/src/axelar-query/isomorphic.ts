@@ -91,7 +91,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
       express_supported,
     } = response;
 
-    if (!response || isNaN(base_fee) || !source_token) {
+    if (!response || !source_token || isNaN(base_fee)) {
       throw new Error(
         "Failed to retrieve fee estimate from API. Please try again later."
       );
