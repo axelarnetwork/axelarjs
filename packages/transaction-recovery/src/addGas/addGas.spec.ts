@@ -3,8 +3,8 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
+import { type AutocalculateGasOptions, type SendOptions } from "../types";
 import { addGas } from "./addGas";
-import { type AutocalculateGasOptions, type SendOptions } from "./types";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,
@@ -19,7 +19,7 @@ const MOCK_ADD_GAS_RESPONSE = {
   gasWanted: 250000,
 };
 
-vi.mock("./cosmosSigner/signer", () => {
+vi.mock("../cosmosSigner/signer", () => {
   const mockAddGasSignAndBroadcast = () => MOCK_ADD_GAS_RESPONSE;
 
   const getCosmosSigner = vi.fn(() => ({
@@ -32,7 +32,7 @@ vi.mock("./cosmosSigner/signer", () => {
 });
 
 describe("addGas", () => {
-  test.skip("broadcast an IBC transfer", async () => {
+  test("broadcast an IBC transfer", async () => {
     const txHash =
       "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
 
@@ -63,7 +63,11 @@ describe("addGas", () => {
       chain: "osmosis-6",
     });
 
-    expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
+    expect(res).toEqual({
+      broadcastResult: MOCK_ADD_GAS_RESPONSE,
+      info: "",
+      success: true,
+    });
   });
 
   test("autocalculate", async () => {

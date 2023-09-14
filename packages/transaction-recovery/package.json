@@ -13,8 +13,9 @@
     "./build",
     "./cosmosSigner",
     "./services",
-    "./addGas.js",
-    "./index.js"
+    "./addGas",
+    "./index.js",
+    "./types.js"
   ],
   "typesVersions": {
     "*": {

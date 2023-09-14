@@ -1,3 +1,4 @@
+import { S3CosmosChainConfig, SearchGMPResponseData } from "@axelarjs/api";
 import { Environment } from "@axelarjs/core";
 
 import { OfflineSigner } from "@cosmjs/proto-signing";
@@ -28,4 +29,11 @@ export type AddGasResponse = {
   success: boolean;
   info: string;
   broadcastResult?: DeliverTxResponse;
+};
+
+export type GetFullFeeOptions = {
+  environment: Environment;
+  autocalculateGasOptions?: AutocalculateGasOptions | undefined;
+  tx: SearchGMPResponseData;
+  chainConfig: S3CosmosChainConfig;
 };
