@@ -21,11 +21,13 @@ const getHumanizedElapsedTime = (timestamp: number) => {
 type Props = {
   contractMethod: ContractMethod;
   senderAddress?: Address;
+  title?: string;
 };
 
 export const RecentTransactions: FC<Props> = ({
   contractMethod,
   senderAddress,
+  title,
 }) => {
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
@@ -33,45 +35,49 @@ export const RecentTransactions: FC<Props> = ({
   });
 
   return (
-    <ul className="max-h-96 space-y-2 overflow-y-scroll">
-      {isLoading ? (
-        <li className="grid min-h-[384px] place-items-center text-center">
-          Loading transactions...
-        </li>
-      ) : !txns?.length ? (
-        <li className="grid min-h-[384px] place-items-center text-center">
-          No transactions found
-        </li>
-      ) : (
-        txns.map((tx, i) => (
-          <li
-            key={`${tx.hash}-${contractMethod}-${tx.timestamp}-${i}`}
-            className="flex items-center gap-2"
-          >
-            <div className="avatar placeholder">
-              <div className="bg-neutral-focus text-neutral-content w-12 rounded-full">
-                <span className="text-xl">
-                  {contractMethod === "sendToken" ? "ST" : "TD"}
-                </span>
-              </div>
-            </div>
-            <div>
-              <div>
-                <Link
-                  className="inline-block max-w-[120px] overflow-hidden text-ellipsis font-semibold"
-                  href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {tx.hash}
-                </Link>
-              </div>
-              <div>{getHumanizedElapsedTime(tx.timestamp)}</div>
-            </div>
+    <div className="space-y-4">
+      {title && <h3 className="text-center text-lg font-semibold">{title}</h3>}
+      <ul className="no-scrollbar relative max-h-64 space-y-2 overflow-y-scroll md:max-h-96">
+        {isLoading ? (
+          <li className="grid min-h-[384px] place-items-center text-center">
+            Loading transactions...
           </li>
-        ))
-      )}
-    </ul>
+        ) : !txns?.length ? (
+          <li className="grid min-h-[384px] place-items-center text-center">
+            No transactions found
+          </li>
+        ) : (
+          txns.map((tx, i) => (
+            <li
+              key={`${tx.hash}-${contractMethod}-${tx.timestamp}-${i}`}
+              className="flex items-center gap-2"
+            >
+              <div className="avatar placeholder">
+                <div className="bg-neutral-focus text-neutral-content w-12 rounded-full">
+                  <span className="text-xl">
+                    {contractMethod === "sendToken" ? "ST" : "TD"}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <Link
+                    className="inline-block max-w-[120px] overflow-hidden text-ellipsis font-semibold"
+                    href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {tx.hash}
+                  </Link>
+                </div>
+                <div>{getHumanizedElapsedTime(tx.timestamp)}</div>
+              </div>
+            </li>
+          ))
+        )}
+        <li className="to-base-200/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20"></li>
+      </ul>
+    </div>
   );
 };
 
@@ -93,13 +99,13 @@ const RecentTransactionsTabs = () => {
 
   return (
     <section className="space-y-4">
-      <Card className="bg-base-200 w-full">
+      <Card className="bg-base-200 card-compact md:card-normal w-full">
         <Card.Body>
-          <Card.Title>
+          <Card.Title className="grid place-items-center space-y-2 text-center md:hidden">
             <div>
               <h2 className="text-lg font-semibold">Recent Transactions</h2>
             </div>
-            <Tabs boxed>
+            <Tabs boxed className="md:hidden">
               {CONTRACT_METHODS.map((method) => (
                 <Tabs.Tab
                   key={method}
@@ -114,10 +120,24 @@ const RecentTransactionsTabs = () => {
               ))}
             </Tabs>
           </Card.Title>
-          <RecentTransactions
-            contractMethod={contractMethod}
-            senderAddress={address}
-          />
+          <div className="hidden min-w-max grid-cols-2 md:grid">
+            <RecentTransactions
+              contractMethod="sendToken"
+              senderAddress={address}
+              title="Recent Interchain Transfers"
+            />
+            <RecentTransactions
+              contractMethod="StandardizedTokenDeployed"
+              senderAddress={address}
+              title="Recent Token Deployments"
+            />
+          </div>
+          <div className="md:hidden">
+            <RecentTransactions
+              contractMethod={contractMethod}
+              senderAddress={address}
+            />
+          </div>
         </Card.Body>
       </Card>
     </section>
