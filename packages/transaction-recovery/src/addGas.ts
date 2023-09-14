@@ -25,8 +25,8 @@ export async function addGas(
     throw new Error("autocalculate not yet supported, but we will soon!");
   }
 
-  const selectedChainInfo = (await s3Client()
-    .getChainConfigs()
+  const selectedChainInfo = (await s3Client(sendOptions.environment)
+    .getChainConfigs(sendOptions.environment)
     .then((res) => res.chains[chain])
     .catch(() => undefined)) as S3CosmosChainConfig;
 

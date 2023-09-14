@@ -1,3 +1,5 @@
+import { Environment } from "@axelarjs/core";
+
 import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
 import { S3Response } from "./types";
 
@@ -9,9 +11,9 @@ export class S3Client extends IsomorphicHTTPClient {
     });
   }
 
-  async getChainConfigs() {
+  async getChainConfigs(env: Environment) {
     return this.client
-      .get("configs/testnet-chain-config-latest.json")
+      .get(`configs/${env}-chain-config-latest.json`)
       .json<S3Response>();
   }
 }
