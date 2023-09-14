@@ -451,6 +451,21 @@ importers:
         specifier: ^0.34.4
         version: 0.34.4(happy-dom@9.20.3)
 
+  packages/deposit-address:
+    devDependencies:
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      rimraf:
+        specifier: ^5.0.1
+        version: 5.0.1
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      vitest:
+        specifier: ^0.34.3
+        version: 0.34.4(happy-dom@9.20.3)
+
   packages/evm:
     dependencies:
       viem:
@@ -18808,7 +18823,7 @@ packages:
         optional: true
     dependencies:
       '@types/node': 18.16.1
-      esbuild: 0.18.16
+      esbuild: 0.18.20
       postcss: 8.4.29
       rollup: 3.28.0
     optionalDependencies:
@@ -18844,7 +18859,7 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.4.7
-      esbuild: 0.18.16
+      esbuild: 0.18.20
       postcss: 8.4.29
       rollup: 3.28.0
     optionalDependencies:
@@ -18880,7 +18895,7 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.6.0
-      esbuild: 0.18.16
+      esbuild: 0.18.20
       postcss: 8.4.29
       rollup: 3.28.0
     optionalDependencies:
