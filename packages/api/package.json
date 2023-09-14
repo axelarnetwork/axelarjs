@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.1.2",
+  "version": "0.1.13",
   "publishConfig": {
     "access": "public"
   },
@@ -49,12 +49,24 @@
     ".": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
     }
   },
   "scripts": {
     "compile": "tsc --noEmit",
     "build": "./scripts/build.sh",
-    "clean": "./scripts/clean.sh"
+    "clean": "./scripts/clean.sh",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -73,8 +85,10 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
+    "@axelarjs/core": "workspace:*",
     "got": "^12.6.1",
     "ky": "^1.0.1",
-    "rambda": "^7.5.0"
+    "rambda": "^7.5.0",
+    "viem": "~1.10.9"
   }
 }

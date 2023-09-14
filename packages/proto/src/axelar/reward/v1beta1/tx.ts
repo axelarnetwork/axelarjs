@@ -8,7 +8,7 @@ export const protobufPackage = "axelar.reward.v1beta1";
 
 export interface RefundMsgRequest {
   sender: Uint8Array;
-  innerMessage?: Any;
+  innerMessage?: Any | undefined;
 }
 
 export interface RefundMsgResponse {
@@ -17,7 +17,7 @@ export interface RefundMsgResponse {
 }
 
 function createBaseRefundMsgRequest(): RefundMsgRequest {
-  return { sender: new Uint8Array(), innerMessage: undefined };
+  return { sender: new Uint8Array(0), innerMessage: undefined };
 }
 
 export const RefundMsgRequest = {
@@ -69,7 +69,7 @@ export const RefundMsgRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       innerMessage: isSet(object.innerMessage)
         ? Any.fromJSON(object.innerMessage)
         : undefined,
@@ -78,28 +78,25 @@ export const RefundMsgRequest = {
 
   toJSON(message: RefundMsgRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.innerMessage !== undefined &&
-      (obj.innerMessage = message.innerMessage
-        ? Any.toJSON(message.innerMessage)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.innerMessage !== undefined) {
+      obj.innerMessage = Any.toJSON(message.innerMessage);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RefundMsgRequest>, I>>(
     base?: I
   ): RefundMsgRequest {
-    return RefundMsgRequest.fromPartial(base ?? {});
+    return RefundMsgRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RefundMsgRequest>, I>>(
     object: I
   ): RefundMsgRequest {
     const message = createBaseRefundMsgRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.innerMessage =
       object.innerMessage !== undefined && object.innerMessage !== null
         ? Any.fromPartial(object.innerMessage)
@@ -109,7 +106,7 @@ export const RefundMsgRequest = {
 };
 
 function createBaseRefundMsgResponse(): RefundMsgResponse {
-  return { data: new Uint8Array(), log: "" };
+  return { data: new Uint8Array(0), log: "" };
 }
 
 export const RefundMsgResponse = {
@@ -161,41 +158,41 @@ export const RefundMsgResponse = {
     return {
       data: isSet(object.data)
         ? bytesFromBase64(object.data)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       log: isSet(object.log) ? String(object.log) : "",
     };
   },
 
   toJSON(message: RefundMsgResponse): unknown {
     const obj: any = {};
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(
-        message.data !== undefined ? message.data : new Uint8Array()
-      ));
-    message.log !== undefined && (obj.log = message.log);
+    if (message.data.length !== 0) {
+      obj.data = base64FromBytes(message.data);
+    }
+    if (message.log !== "") {
+      obj.log = message.log;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RefundMsgResponse>, I>>(
     base?: I
   ): RefundMsgResponse {
-    return RefundMsgResponse.fromPartial(base ?? {});
+    return RefundMsgResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RefundMsgResponse>, I>>(
     object: I
   ): RefundMsgResponse {
     const message = createBaseRefundMsgResponse();
-    message.data = object.data ?? new Uint8Array();
+    message.data = object.data ?? new Uint8Array(0);
     message.log = object.log ?? "";
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

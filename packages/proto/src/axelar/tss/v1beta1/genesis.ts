@@ -7,7 +7,7 @@ import { Params } from "./params";
 export const protobufPackage = "axelar.tss.v1beta1";
 
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
 }
 
 function createBaseGenesisState(): GenesisState {
@@ -57,17 +57,17 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {

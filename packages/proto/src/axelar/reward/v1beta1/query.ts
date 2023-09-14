@@ -2,23 +2,20 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 
-import { LegacyAminoPubKey } from "../../../cosmos/crypto/multisig/keys";
 import { Params } from "./params";
 
-export const protobufPackage = "axelar.permission.v1beta1";
+export const protobufPackage = "axelar.reward.v1beta1";
 
 /**
- * QueryGovernanceKeyRequest is the request type for the
- * Query/GovernanceKey RPC method
+ * InflationRateRequest represents a message that queries the Axelar specific
+ * inflation RPC method.
  */
-export interface QueryGovernanceKeyRequest {}
+export interface InflationRateRequest {
+  validator: Uint8Array;
+}
 
-/**
- * QueryGovernanceKeyResponse is the response type for the
- * Query/GovernanceKey RPC method
- */
-export interface QueryGovernanceKeyResponse {
-  governanceKey?: LegacyAminoPubKey | undefined;
+export interface InflationRateResponse {
+  inflationRate: Uint8Array;
 }
 
 /** ParamsRequest represents a message that queries the params */
@@ -28,74 +25,17 @@ export interface ParamsResponse {
   params?: Params | undefined;
 }
 
-function createBaseQueryGovernanceKeyRequest(): QueryGovernanceKeyRequest {
-  return {};
+function createBaseInflationRateRequest(): InflationRateRequest {
+  return { validator: new Uint8Array(0) };
 }
 
-export const QueryGovernanceKeyRequest = {
+export const InflationRateRequest = {
   encode(
-    _: QueryGovernanceKeyRequest,
+    message: InflationRateRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGovernanceKeyRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGovernanceKeyRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): QueryGovernanceKeyRequest {
-    return {};
-  },
-
-  toJSON(_: QueryGovernanceKeyRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<QueryGovernanceKeyRequest>, I>>(
-    base?: I
-  ): QueryGovernanceKeyRequest {
-    return QueryGovernanceKeyRequest.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<QueryGovernanceKeyRequest>, I>>(
-    _: I
-  ): QueryGovernanceKeyRequest {
-    const message = createBaseQueryGovernanceKeyRequest();
-    return message;
-  },
-};
-
-function createBaseQueryGovernanceKeyResponse(): QueryGovernanceKeyResponse {
-  return { governanceKey: undefined };
-}
-
-export const QueryGovernanceKeyResponse = {
-  encode(
-    message: QueryGovernanceKeyResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.governanceKey !== undefined) {
-      LegacyAminoPubKey.encode(
-        message.governanceKey,
-        writer.uint32(10).fork()
-      ).ldelim();
+    if (message.validator.length !== 0) {
+      writer.uint32(10).bytes(message.validator);
     }
     return writer;
   },
@@ -103,11 +43,11 @@ export const QueryGovernanceKeyResponse = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): QueryGovernanceKeyResponse {
+  ): InflationRateRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGovernanceKeyResponse();
+    const message = createBaseInflationRateRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -116,10 +56,7 @@ export const QueryGovernanceKeyResponse = {
             break;
           }
 
-          message.governanceKey = LegacyAminoPubKey.decode(
-            reader,
-            reader.uint32()
-          );
+          message.validator = reader.bytes();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -130,35 +67,104 @@ export const QueryGovernanceKeyResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGovernanceKeyResponse {
+  fromJSON(object: any): InflationRateRequest {
     return {
-      governanceKey: isSet(object.governanceKey)
-        ? LegacyAminoPubKey.fromJSON(object.governanceKey)
-        : undefined,
+      validator: isSet(object.validator)
+        ? bytesFromBase64(object.validator)
+        : new Uint8Array(0),
     };
   },
 
-  toJSON(message: QueryGovernanceKeyResponse): unknown {
+  toJSON(message: InflationRateRequest): unknown {
     const obj: any = {};
-    if (message.governanceKey !== undefined) {
-      obj.governanceKey = LegacyAminoPubKey.toJSON(message.governanceKey);
+    if (message.validator.length !== 0) {
+      obj.validator = base64FromBytes(message.validator);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<QueryGovernanceKeyResponse>, I>>(
+  create<I extends Exact<DeepPartial<InflationRateRequest>, I>>(
     base?: I
-  ): QueryGovernanceKeyResponse {
-    return QueryGovernanceKeyResponse.fromPartial(base ?? ({} as any));
+  ): InflationRateRequest {
+    return InflationRateRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<QueryGovernanceKeyResponse>, I>>(
+  fromPartial<I extends Exact<DeepPartial<InflationRateRequest>, I>>(
     object: I
-  ): QueryGovernanceKeyResponse {
-    const message = createBaseQueryGovernanceKeyResponse();
-    message.governanceKey =
-      object.governanceKey !== undefined && object.governanceKey !== null
-        ? LegacyAminoPubKey.fromPartial(object.governanceKey)
-        : undefined;
+  ): InflationRateRequest {
+    const message = createBaseInflationRateRequest();
+    message.validator = object.validator ?? new Uint8Array(0);
+    return message;
+  },
+};
+
+function createBaseInflationRateResponse(): InflationRateResponse {
+  return { inflationRate: new Uint8Array(0) };
+}
+
+export const InflationRateResponse = {
+  encode(
+    message: InflationRateResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.inflationRate.length !== 0) {
+      writer.uint32(10).bytes(message.inflationRate);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): InflationRateResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInflationRateResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.inflationRate = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): InflationRateResponse {
+    return {
+      inflationRate: isSet(object.inflationRate)
+        ? bytesFromBase64(object.inflationRate)
+        : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: InflationRateResponse): unknown {
+    const obj: any = {};
+    if (message.inflationRate.length !== 0) {
+      obj.inflationRate = base64FromBytes(message.inflationRate);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<InflationRateResponse>, I>>(
+    base?: I
+  ): InflationRateResponse {
+    return InflationRateResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<InflationRateResponse>, I>>(
+    object: I
+  ): InflationRateResponse {
+    const message = createBaseInflationRateResponse();
+    message.inflationRate = object.inflationRate ?? new Uint8Array(0);
     return message;
   },
 };
@@ -283,6 +289,50 @@ export const ParamsResponse = {
     return message;
   },
 };
+
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
+  throw "Unable to locate global object";
+})();
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if (tsProtoGlobalThis.Buffer) {
+    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = tsProtoGlobalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if (tsProtoGlobalThis.Buffer) {
+    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(String.fromCharCode(byte));
+    });
+    return tsProtoGlobalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin =
   | Date

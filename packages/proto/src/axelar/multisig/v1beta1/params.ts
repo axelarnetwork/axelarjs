@@ -8,8 +8,8 @@ export const protobufPackage = "axelar.multisig.v1beta1";
 
 /** Params represent the genesis parameters for the module */
 export interface Params {
-  keygenThreshold?: Threshold;
-  signingThreshold?: Threshold;
+  keygenThreshold?: Threshold | undefined;
+  signingThreshold?: Threshold | undefined;
   keygenTimeout: Long;
   keygenGracePeriod: Long;
   signingTimeout: Long;
@@ -158,37 +158,39 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.keygenThreshold !== undefined &&
-      (obj.keygenThreshold = message.keygenThreshold
-        ? Threshold.toJSON(message.keygenThreshold)
-        : undefined);
-    message.signingThreshold !== undefined &&
-      (obj.signingThreshold = message.signingThreshold
-        ? Threshold.toJSON(message.signingThreshold)
-        : undefined);
-    message.keygenTimeout !== undefined &&
-      (obj.keygenTimeout = (message.keygenTimeout || Long.ZERO).toString());
-    message.keygenGracePeriod !== undefined &&
-      (obj.keygenGracePeriod = (
+    if (message.keygenThreshold !== undefined) {
+      obj.keygenThreshold = Threshold.toJSON(message.keygenThreshold);
+    }
+    if (message.signingThreshold !== undefined) {
+      obj.signingThreshold = Threshold.toJSON(message.signingThreshold);
+    }
+    if (!message.keygenTimeout.isZero()) {
+      obj.keygenTimeout = (message.keygenTimeout || Long.ZERO).toString();
+    }
+    if (!message.keygenGracePeriod.isZero()) {
+      obj.keygenGracePeriod = (
         message.keygenGracePeriod || Long.ZERO
-      ).toString());
-    message.signingTimeout !== undefined &&
-      (obj.signingTimeout = (message.signingTimeout || Long.ZERO).toString());
-    message.signingGracePeriod !== undefined &&
-      (obj.signingGracePeriod = (
+      ).toString();
+    }
+    if (!message.signingTimeout.isZero()) {
+      obj.signingTimeout = (message.signingTimeout || Long.ZERO).toString();
+    }
+    if (!message.signingGracePeriod.isZero()) {
+      obj.signingGracePeriod = (
         message.signingGracePeriod || Long.ZERO
-      ).toString());
-    message.activeEpochCount !== undefined &&
-      (obj.activeEpochCount = (
+      ).toString();
+    }
+    if (!message.activeEpochCount.isZero()) {
+      obj.activeEpochCount = (
         message.activeEpochCount || Long.UZERO
-      ).toString());
+      ).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.keygenThreshold =

@@ -1,5 +1,12 @@
 # @axelarjs/cosmos
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @axelarjs/proto@0.34.1
+
 ## 0.1.2
 
 ### Patch Changes

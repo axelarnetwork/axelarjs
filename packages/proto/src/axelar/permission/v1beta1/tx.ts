@@ -8,7 +8,7 @@ export const protobufPackage = "axelar.permission.v1beta1";
 
 export interface UpdateGovernanceKeyRequest {
   sender: Uint8Array;
-  governanceKey?: LegacyAminoPubKey;
+  governanceKey?: LegacyAminoPubKey | undefined;
 }
 
 export interface UpdateGovernanceKeyResponse {}
@@ -30,7 +30,7 @@ export interface DeregisterControllerRequest {
 export interface DeregisterControllerResponse {}
 
 function createBaseUpdateGovernanceKeyRequest(): UpdateGovernanceKeyRequest {
-  return { sender: new Uint8Array(), governanceKey: undefined };
+  return { sender: new Uint8Array(0), governanceKey: undefined };
 }
 
 export const UpdateGovernanceKeyRequest = {
@@ -91,7 +91,7 @@ export const UpdateGovernanceKeyRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       governanceKey: isSet(object.governanceKey)
         ? LegacyAminoPubKey.fromJSON(object.governanceKey)
         : undefined,
@@ -100,28 +100,25 @@ export const UpdateGovernanceKeyRequest = {
 
   toJSON(message: UpdateGovernanceKeyRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.governanceKey !== undefined &&
-      (obj.governanceKey = message.governanceKey
-        ? LegacyAminoPubKey.toJSON(message.governanceKey)
-        : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.governanceKey !== undefined) {
+      obj.governanceKey = LegacyAminoPubKey.toJSON(message.governanceKey);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<UpdateGovernanceKeyRequest>, I>>(
     base?: I
   ): UpdateGovernanceKeyRequest {
-    return UpdateGovernanceKeyRequest.fromPartial(base ?? {});
+    return UpdateGovernanceKeyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<UpdateGovernanceKeyRequest>, I>>(
     object: I
   ): UpdateGovernanceKeyRequest {
     const message = createBaseUpdateGovernanceKeyRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.governanceKey =
       object.governanceKey !== undefined && object.governanceKey !== null
         ? LegacyAminoPubKey.fromPartial(object.governanceKey)
@@ -174,9 +171,8 @@ export const UpdateGovernanceKeyResponse = {
   create<I extends Exact<DeepPartial<UpdateGovernanceKeyResponse>, I>>(
     base?: I
   ): UpdateGovernanceKeyResponse {
-    return UpdateGovernanceKeyResponse.fromPartial(base ?? {});
+    return UpdateGovernanceKeyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<UpdateGovernanceKeyResponse>, I>>(
     _: I
   ): UpdateGovernanceKeyResponse {
@@ -186,7 +182,7 @@ export const UpdateGovernanceKeyResponse = {
 };
 
 function createBaseRegisterControllerRequest(): RegisterControllerRequest {
-  return { sender: new Uint8Array(), controller: new Uint8Array() };
+  return { sender: new Uint8Array(0), controller: new Uint8Array(0) };
 }
 
 export const RegisterControllerRequest = {
@@ -241,38 +237,35 @@ export const RegisterControllerRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       controller: isSet(object.controller)
         ? bytesFromBase64(object.controller)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: RegisterControllerRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.controller !== undefined &&
-      (obj.controller = base64FromBytes(
-        message.controller !== undefined ? message.controller : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.controller.length !== 0) {
+      obj.controller = base64FromBytes(message.controller);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RegisterControllerRequest>, I>>(
     base?: I
   ): RegisterControllerRequest {
-    return RegisterControllerRequest.fromPartial(base ?? {});
+    return RegisterControllerRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterControllerRequest>, I>>(
     object: I
   ): RegisterControllerRequest {
     const message = createBaseRegisterControllerRequest();
-    message.sender = object.sender ?? new Uint8Array();
-    message.controller = object.controller ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
+    message.controller = object.controller ?? new Uint8Array(0);
     return message;
   },
 };
@@ -321,9 +314,8 @@ export const RegisterControllerResponse = {
   create<I extends Exact<DeepPartial<RegisterControllerResponse>, I>>(
     base?: I
   ): RegisterControllerResponse {
-    return RegisterControllerResponse.fromPartial(base ?? {});
+    return RegisterControllerResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RegisterControllerResponse>, I>>(
     _: I
   ): RegisterControllerResponse {
@@ -333,7 +325,7 @@ export const RegisterControllerResponse = {
 };
 
 function createBaseDeregisterControllerRequest(): DeregisterControllerRequest {
-  return { sender: new Uint8Array(), controller: new Uint8Array() };
+  return { sender: new Uint8Array(0), controller: new Uint8Array(0) };
 }
 
 export const DeregisterControllerRequest = {
@@ -388,38 +380,35 @@ export const DeregisterControllerRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       controller: isSet(object.controller)
         ? bytesFromBase64(object.controller)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: DeregisterControllerRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.controller !== undefined &&
-      (obj.controller = base64FromBytes(
-        message.controller !== undefined ? message.controller : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.controller.length !== 0) {
+      obj.controller = base64FromBytes(message.controller);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<DeregisterControllerRequest>, I>>(
     base?: I
   ): DeregisterControllerRequest {
-    return DeregisterControllerRequest.fromPartial(base ?? {});
+    return DeregisterControllerRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DeregisterControllerRequest>, I>>(
     object: I
   ): DeregisterControllerRequest {
     const message = createBaseDeregisterControllerRequest();
-    message.sender = object.sender ?? new Uint8Array();
-    message.controller = object.controller ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
+    message.controller = object.controller ?? new Uint8Array(0);
     return message;
   },
 };
@@ -468,9 +457,8 @@ export const DeregisterControllerResponse = {
   create<I extends Exact<DeepPartial<DeregisterControllerResponse>, I>>(
     base?: I
   ): DeregisterControllerResponse {
-    return DeregisterControllerResponse.fromPartial(base ?? {});
+    return DeregisterControllerResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<DeregisterControllerResponse>, I>>(
     _: I
   ): DeregisterControllerResponse {
@@ -479,10 +467,10 @@ export const DeregisterControllerResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

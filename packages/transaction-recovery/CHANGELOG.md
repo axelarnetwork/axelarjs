@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.8
+
+### Patch Changes
+
+- @axelarjs/cosmos@0.1.3
+
 ## 0.0.7
 
 ### Patch Changes

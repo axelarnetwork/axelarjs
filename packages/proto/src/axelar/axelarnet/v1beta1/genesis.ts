@@ -9,10 +9,10 @@ import { CosmosChain, IBCTransfer } from "./types";
 export const protobufPackage = "axelar.axelarnet.v1beta1";
 
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
   collectorAddress: Uint8Array;
   chains: CosmosChain[];
-  transferQueue?: QueueState;
+  transferQueue?: QueueState | undefined;
   ibcTransfers: IBCTransfer[];
   seqIdMapping: { [key: string]: Long };
 }
@@ -25,7 +25,7 @@ export interface GenesisState_SeqIdMappingEntry {
 function createBaseGenesisState(): GenesisState {
   return {
     params: undefined,
-    collectorAddress: new Uint8Array(),
+    collectorAddress: new Uint8Array(0),
     chains: [],
     transferQueue: undefined,
     ibcTransfers: [],
@@ -137,7 +137,7 @@ export const GenesisState = {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
       collectorAddress: isSet(object.collectorAddress)
         ? bytesFromBase64(object.collectorAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       chains: Array.isArray(object?.chains)
         ? object.chains.map((e: any) => CosmosChain.fromJSON(e))
         : [],
@@ -161,37 +161,29 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    message.collectorAddress !== undefined &&
-      (obj.collectorAddress = base64FromBytes(
-        message.collectorAddress !== undefined
-          ? message.collectorAddress
-          : new Uint8Array()
-      ));
-    if (message.chains) {
-      obj.chains = message.chains.map((e) =>
-        e ? CosmosChain.toJSON(e) : undefined
-      );
-    } else {
-      obj.chains = [];
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
     }
-    message.transferQueue !== undefined &&
-      (obj.transferQueue = message.transferQueue
-        ? QueueState.toJSON(message.transferQueue)
-        : undefined);
-    if (message.ibcTransfers) {
-      obj.ibcTransfers = message.ibcTransfers.map((e) =>
-        e ? IBCTransfer.toJSON(e) : undefined
-      );
-    } else {
-      obj.ibcTransfers = [];
+    if (message.collectorAddress.length !== 0) {
+      obj.collectorAddress = base64FromBytes(message.collectorAddress);
     }
-    obj.seqIdMapping = {};
+    if (message.chains?.length) {
+      obj.chains = message.chains.map((e) => CosmosChain.toJSON(e));
+    }
+    if (message.transferQueue !== undefined) {
+      obj.transferQueue = QueueState.toJSON(message.transferQueue);
+    }
+    if (message.ibcTransfers?.length) {
+      obj.ibcTransfers = message.ibcTransfers.map((e) => IBCTransfer.toJSON(e));
+    }
     if (message.seqIdMapping) {
-      Object.entries(message.seqIdMapping).forEach(([k, v]) => {
-        obj.seqIdMapping[k] = v.toString();
-      });
+      const entries = Object.entries(message.seqIdMapping);
+      if (entries.length > 0) {
+        obj.seqIdMapping = {};
+        entries.forEach(([k, v]) => {
+          obj.seqIdMapping[k] = v.toString();
+        });
+      }
     }
     return obj;
   },
@@ -199,9 +191,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {
@@ -210,7 +201,7 @@ export const GenesisState = {
       object.params !== undefined && object.params !== null
         ? Params.fromPartial(object.params)
         : undefined;
-    message.collectorAddress = object.collectorAddress ?? new Uint8Array();
+    message.collectorAddress = object.collectorAddress ?? new Uint8Array(0);
     message.chains =
       object.chains?.map((e) => CosmosChain.fromPartial(e)) || [];
     message.transferQueue =
@@ -292,18 +283,20 @@ export const GenesisState_SeqIdMappingEntry = {
 
   toJSON(message: GenesisState_SeqIdMappingEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = (message.value || Long.UZERO).toString());
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (!message.value.isZero()) {
+      obj.value = (message.value || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<GenesisState_SeqIdMappingEntry>, I>>(
     base?: I
   ): GenesisState_SeqIdMappingEntry {
-    return GenesisState_SeqIdMappingEntry.fromPartial(base ?? {});
+    return GenesisState_SeqIdMappingEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState_SeqIdMappingEntry>, I>>(
     object: I
   ): GenesisState_SeqIdMappingEntry {
@@ -317,10 +310,10 @@ export const GenesisState_SeqIdMappingEntry = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

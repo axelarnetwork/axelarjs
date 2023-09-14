@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.3
+
+### Patch Changes
+
+- 0346444: upgrade dependencies
+
 ## 0.1.2
 
 ### Patch Changes

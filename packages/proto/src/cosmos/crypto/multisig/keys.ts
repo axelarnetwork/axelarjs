@@ -76,14 +76,11 @@ export const LegacyAminoPubKey = {
 
   toJSON(message: LegacyAminoPubKey): unknown {
     const obj: any = {};
-    message.threshold !== undefined &&
-      (obj.threshold = Math.round(message.threshold));
-    if (message.publicKeys) {
-      obj.publicKeys = message.publicKeys.map((e) =>
-        e ? Any.toJSON(e) : undefined
-      );
-    } else {
-      obj.publicKeys = [];
+    if (message.threshold !== 0) {
+      obj.threshold = Math.round(message.threshold);
+    }
+    if (message.publicKeys?.length) {
+      obj.publicKeys = message.publicKeys.map((e) => Any.toJSON(e));
     }
     return obj;
   },
@@ -91,9 +88,8 @@ export const LegacyAminoPubKey = {
   create<I extends Exact<DeepPartial<LegacyAminoPubKey>, I>>(
     base?: I
   ): LegacyAminoPubKey {
-    return LegacyAminoPubKey.fromPartial(base ?? {});
+    return LegacyAminoPubKey.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<LegacyAminoPubKey>, I>>(
     object: I
   ): LegacyAminoPubKey {

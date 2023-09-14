@@ -9,7 +9,7 @@ export const protobufPackage = "axelar.axelarnet.v1beta1";
 export interface IBCTransfer {
   sender: Uint8Array;
   receiver: string;
-  token?: Coin;
+  token?: Coin | undefined;
   portId: string;
   channelId: string;
   /** @deprecated */
@@ -78,13 +78,14 @@ export interface Asset {
 }
 
 export interface Fee {
-  amount?: Coin;
+  amount?: Coin | undefined;
   recipient: Uint8Array;
+  refundRecipient: Uint8Array;
 }
 
 function createBaseIBCTransfer(): IBCTransfer {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     receiver: "",
     token: undefined,
     portId: "",
@@ -204,7 +205,7 @@ export const IBCTransfer = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       receiver: isSet(object.receiver) ? String(object.receiver) : "",
       token: isSet(object.token) ? Coin.fromJSON(object.token) : undefined,
       portId: isSet(object.portId) ? String(object.portId) : "",
@@ -221,33 +222,41 @@ export const IBCTransfer = {
 
   toJSON(message: IBCTransfer): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.receiver !== undefined && (obj.receiver = message.receiver);
-    message.token !== undefined &&
-      (obj.token = message.token ? Coin.toJSON(message.token) : undefined);
-    message.portId !== undefined && (obj.portId = message.portId);
-    message.channelId !== undefined && (obj.channelId = message.channelId);
-    message.sequence !== undefined &&
-      (obj.sequence = (message.sequence || Long.UZERO).toString());
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.status !== undefined &&
-      (obj.status = iBCTransfer_StatusToJSON(message.status));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.receiver !== "") {
+      obj.receiver = message.receiver;
+    }
+    if (message.token !== undefined) {
+      obj.token = Coin.toJSON(message.token);
+    }
+    if (message.portId !== "") {
+      obj.portId = message.portId;
+    }
+    if (message.channelId !== "") {
+      obj.channelId = message.channelId;
+    }
+    if (!message.sequence.isZero()) {
+      obj.sequence = (message.sequence || Long.UZERO).toString();
+    }
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (message.status !== 0) {
+      obj.status = iBCTransfer_StatusToJSON(message.status);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<IBCTransfer>, I>>(base?: I): IBCTransfer {
-    return IBCTransfer.fromPartial(base ?? {});
+    return IBCTransfer.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<IBCTransfer>, I>>(
     object: I
   ): IBCTransfer {
     const message = createBaseIBCTransfer();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.receiver = object.receiver ?? "";
     message.token =
       object.token !== undefined && object.token !== null
@@ -350,21 +359,24 @@ export const CosmosChain = {
 
   toJSON(message: CosmosChain): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.ibcPath !== undefined && (obj.ibcPath = message.ibcPath);
-    if (message.assets) {
-      obj.assets = message.assets.map((e) => (e ? Asset.toJSON(e) : undefined));
-    } else {
-      obj.assets = [];
+    if (message.name !== "") {
+      obj.name = message.name;
     }
-    message.addrPrefix !== undefined && (obj.addrPrefix = message.addrPrefix);
+    if (message.ibcPath !== "") {
+      obj.ibcPath = message.ibcPath;
+    }
+    if (message.assets?.length) {
+      obj.assets = message.assets.map((e) => Asset.toJSON(e));
+    }
+    if (message.addrPrefix !== "") {
+      obj.addrPrefix = message.addrPrefix;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CosmosChain>, I>>(base?: I): CosmosChain {
-    return CosmosChain.fromPartial(base ?? {});
+    return CosmosChain.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CosmosChain>, I>>(
     object: I
   ): CosmosChain {
@@ -378,7 +390,7 @@ export const CosmosChain = {
 };
 
 function createBaseAsset(): Asset {
-  return { denom: "", minAmount: new Uint8Array() };
+  return { denom: "", minAmount: new Uint8Array(0) };
 }
 
 export const Asset = {
@@ -428,34 +440,38 @@ export const Asset = {
       denom: isSet(object.denom) ? String(object.denom) : "",
       minAmount: isSet(object.minAmount)
         ? bytesFromBase64(object.minAmount)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Asset): unknown {
     const obj: any = {};
-    message.denom !== undefined && (obj.denom = message.denom);
-    message.minAmount !== undefined &&
-      (obj.minAmount = base64FromBytes(
-        message.minAmount !== undefined ? message.minAmount : new Uint8Array()
-      ));
+    if (message.denom !== "") {
+      obj.denom = message.denom;
+    }
+    if (message.minAmount.length !== 0) {
+      obj.minAmount = base64FromBytes(message.minAmount);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Asset>, I>>(base?: I): Asset {
-    return Asset.fromPartial(base ?? {});
+    return Asset.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Asset>, I>>(object: I): Asset {
     const message = createBaseAsset();
     message.denom = object.denom ?? "";
-    message.minAmount = object.minAmount ?? new Uint8Array();
+    message.minAmount = object.minAmount ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseFee(): Fee {
-  return { amount: undefined, recipient: new Uint8Array() };
+  return {
+    amount: undefined,
+    recipient: new Uint8Array(0),
+    refundRecipient: new Uint8Array(0),
+  };
 }
 
 export const Fee = {
@@ -465,6 +481,9 @@ export const Fee = {
     }
     if (message.recipient.length !== 0) {
       writer.uint32(18).bytes(message.recipient);
+    }
+    if (message.refundRecipient.length !== 0) {
+      writer.uint32(26).bytes(message.refundRecipient);
     }
     return writer;
   },
@@ -491,6 +510,13 @@ export const Fee = {
 
           message.recipient = reader.bytes();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.refundRecipient = reader.bytes();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -505,40 +531,46 @@ export const Fee = {
       amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
       recipient: isSet(object.recipient)
         ? bytesFromBase64(object.recipient)
-        : new Uint8Array(),
+        : new Uint8Array(0),
+      refundRecipient: isSet(object.refundRecipient)
+        ? bytesFromBase64(object.refundRecipient)
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Fee): unknown {
     const obj: any = {};
-    message.amount !== undefined &&
-      (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
-    message.recipient !== undefined &&
-      (obj.recipient = base64FromBytes(
-        message.recipient !== undefined ? message.recipient : new Uint8Array()
-      ));
+    if (message.amount !== undefined) {
+      obj.amount = Coin.toJSON(message.amount);
+    }
+    if (message.recipient.length !== 0) {
+      obj.recipient = base64FromBytes(message.recipient);
+    }
+    if (message.refundRecipient.length !== 0) {
+      obj.refundRecipient = base64FromBytes(message.refundRecipient);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Fee>, I>>(base?: I): Fee {
-    return Fee.fromPartial(base ?? {});
+    return Fee.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Fee>, I>>(object: I): Fee {
     const message = createBaseFee();
     message.amount =
       object.amount !== undefined && object.amount !== null
         ? Coin.fromPartial(object.amount)
         : undefined;
-    message.recipient = object.recipient ?? new Uint8Array();
+    message.recipient = object.recipient ?? new Uint8Array(0);
+    message.refundRecipient = object.refundRecipient ?? new Uint8Array(0);
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

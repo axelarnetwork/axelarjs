@@ -12,7 +12,7 @@ export const protobufPackage = "axelar.vote.v1beta1";
  */
 export interface TalliedVote {
   tally: Uint8Array;
-  data?: Any;
+  data?: Any | undefined;
   pollId: Long;
   isVoterLate: { [key: string]: boolean };
 }
@@ -24,7 +24,7 @@ export interface TalliedVote_IsVoterLateEntry {
 
 function createBaseTalliedVote(): TalliedVote {
   return {
-    tally: new Uint8Array(),
+    tally: new Uint8Array(0),
     data: undefined,
     pollId: Long.UZERO,
     isVoterLate: {},
@@ -109,7 +109,7 @@ export const TalliedVote = {
     return {
       tally: isSet(object.tally)
         ? bytesFromBase64(object.tally)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       data: isSet(object.data) ? Any.fromJSON(object.data) : undefined,
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
       isVoterLate: isObject(object.isVoterLate)
@@ -126,32 +126,35 @@ export const TalliedVote = {
 
   toJSON(message: TalliedVote): unknown {
     const obj: any = {};
-    message.tally !== undefined &&
-      (obj.tally = base64FromBytes(
-        message.tally !== undefined ? message.tally : new Uint8Array()
-      ));
-    message.data !== undefined &&
-      (obj.data = message.data ? Any.toJSON(message.data) : undefined);
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
-    obj.isVoterLate = {};
+    if (message.tally.length !== 0) {
+      obj.tally = base64FromBytes(message.tally);
+    }
+    if (message.data !== undefined) {
+      obj.data = Any.toJSON(message.data);
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
     if (message.isVoterLate) {
-      Object.entries(message.isVoterLate).forEach(([k, v]) => {
-        obj.isVoterLate[k] = v;
-      });
+      const entries = Object.entries(message.isVoterLate);
+      if (entries.length > 0) {
+        obj.isVoterLate = {};
+        entries.forEach(([k, v]) => {
+          obj.isVoterLate[k] = v;
+        });
+      }
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TalliedVote>, I>>(base?: I): TalliedVote {
-    return TalliedVote.fromPartial(base ?? {});
+    return TalliedVote.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TalliedVote>, I>>(
     object: I
   ): TalliedVote {
     const message = createBaseTalliedVote();
-    message.tally = object.tally ?? new Uint8Array();
+    message.tally = object.tally ?? new Uint8Array(0);
     message.data =
       object.data !== undefined && object.data !== null
         ? Any.fromPartial(object.data)
@@ -233,17 +236,20 @@ export const TalliedVote_IsVoterLateEntry = {
 
   toJSON(message: TalliedVote_IsVoterLateEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value === true) {
+      obj.value = message.value;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TalliedVote_IsVoterLateEntry>, I>>(
     base?: I
   ): TalliedVote_IsVoterLateEntry {
-    return TalliedVote_IsVoterLateEntry.fromPartial(base ?? {});
+    return TalliedVote_IsVoterLateEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TalliedVote_IsVoterLateEntry>, I>>(
     object: I
   ): TalliedVote_IsVoterLateEntry {
@@ -254,10 +260,10 @@ export const TalliedVote_IsVoterLateEntry = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

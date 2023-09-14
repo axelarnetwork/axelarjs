@@ -399,7 +399,7 @@ export interface ERC20Deposit {
 export interface ERC20TokenMetadata {
   asset: string;
   chainId: Uint8Array;
-  details?: TokenDetails;
+  details?: TokenDetails | undefined;
   tokenAddress: string;
   txHash: string;
   status: Status;
@@ -430,7 +430,7 @@ export interface CommandBatchMetadata {
   status: BatchedCommandsStatus;
   keyId: string;
   prevBatchedCommandsId: Uint8Array;
-  signature?: Any;
+  signature?: Any | undefined;
 }
 
 /**
@@ -530,19 +530,18 @@ export const VoteEvents = {
 
   toJSON(message: VoteEvents): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    if (message.events) {
-      obj.events = message.events.map((e) => (e ? Event.toJSON(e) : undefined));
-    } else {
-      obj.events = [];
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.events?.length) {
+      obj.events = message.events.map((e) => Event.toJSON(e));
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VoteEvents>, I>>(base?: I): VoteEvents {
-    return VoteEvents.fromPartial(base ?? {});
+    return VoteEvents.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VoteEvents>, I>>(
     object: I
   ): VoteEvents {
@@ -556,7 +555,7 @@ export const VoteEvents = {
 function createBaseEvent(): Event {
   return {
     chain: "",
-    txId: new Uint8Array(),
+    txId: new Uint8Array(0),
     index: Long.UZERO,
     status: 0,
     tokenSent: undefined,
@@ -738,7 +737,7 @@ export const Event = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       index: isSet(object.index) ? Long.fromValue(object.index) : Long.UZERO,
       status: isSet(object.status) ? event_StatusFromJSON(object.status) : 0,
       tokenSent: isSet(object.tokenSent)
@@ -773,59 +772,57 @@ export const Event = {
 
   toJSON(message: Event): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.index !== undefined &&
-      (obj.index = (message.index || Long.UZERO).toString());
-    message.status !== undefined &&
-      (obj.status = event_StatusToJSON(message.status));
-    message.tokenSent !== undefined &&
-      (obj.tokenSent = message.tokenSent
-        ? EventTokenSent.toJSON(message.tokenSent)
-        : undefined);
-    message.contractCall !== undefined &&
-      (obj.contractCall = message.contractCall
-        ? EventContractCall.toJSON(message.contractCall)
-        : undefined);
-    message.contractCallWithToken !== undefined &&
-      (obj.contractCallWithToken = message.contractCallWithToken
-        ? EventContractCallWithToken.toJSON(message.contractCallWithToken)
-        : undefined);
-    message.transfer !== undefined &&
-      (obj.transfer = message.transfer
-        ? EventTransfer.toJSON(message.transfer)
-        : undefined);
-    message.tokenDeployed !== undefined &&
-      (obj.tokenDeployed = message.tokenDeployed
-        ? EventTokenDeployed.toJSON(message.tokenDeployed)
-        : undefined);
-    message.multisigOwnershipTransferred !== undefined &&
-      (obj.multisigOwnershipTransferred = message.multisigOwnershipTransferred
-        ? EventMultisigOwnershipTransferred.toJSON(
-            message.multisigOwnershipTransferred
-          )
-        : undefined);
-    message.multisigOperatorshipTransferred !== undefined &&
-      (obj.multisigOperatorshipTransferred =
-        message.multisigOperatorshipTransferred
-          ? EventMultisigOperatorshipTransferred.toJSON(
-              message.multisigOperatorshipTransferred
-            )
-          : undefined);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (!message.index.isZero()) {
+      obj.index = (message.index || Long.UZERO).toString();
+    }
+    if (message.status !== 0) {
+      obj.status = event_StatusToJSON(message.status);
+    }
+    if (message.tokenSent !== undefined) {
+      obj.tokenSent = EventTokenSent.toJSON(message.tokenSent);
+    }
+    if (message.contractCall !== undefined) {
+      obj.contractCall = EventContractCall.toJSON(message.contractCall);
+    }
+    if (message.contractCallWithToken !== undefined) {
+      obj.contractCallWithToken = EventContractCallWithToken.toJSON(
+        message.contractCallWithToken
+      );
+    }
+    if (message.transfer !== undefined) {
+      obj.transfer = EventTransfer.toJSON(message.transfer);
+    }
+    if (message.tokenDeployed !== undefined) {
+      obj.tokenDeployed = EventTokenDeployed.toJSON(message.tokenDeployed);
+    }
+    if (message.multisigOwnershipTransferred !== undefined) {
+      obj.multisigOwnershipTransferred =
+        EventMultisigOwnershipTransferred.toJSON(
+          message.multisigOwnershipTransferred
+        );
+    }
+    if (message.multisigOperatorshipTransferred !== undefined) {
+      obj.multisigOperatorshipTransferred =
+        EventMultisigOperatorshipTransferred.toJSON(
+          message.multisigOperatorshipTransferred
+        );
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Event>, I>>(base?: I): Event {
-    return Event.fromPartial(base ?? {});
+    return Event.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Event>, I>>(object: I): Event {
     const message = createBaseEvent();
     message.chain = object.chain ?? "";
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.index =
       object.index !== undefined && object.index !== null
         ? Long.fromValue(object.index)
@@ -872,11 +869,11 @@ export const Event = {
 
 function createBaseEventTokenSent(): EventTokenSent {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     destinationChain: "",
     destinationAddress: "",
     symbol: "",
-    amount: new Uint8Array(),
+    amount: new Uint8Array(0),
   };
 }
 
@@ -959,7 +956,7 @@ export const EventTokenSent = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
@@ -969,53 +966,54 @@ export const EventTokenSent = {
       symbol: isSet(object.symbol) ? String(object.symbol) : "",
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: EventTokenSent): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.destinationAddress !== undefined &&
-      (obj.destinationAddress = message.destinationAddress);
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.amount !== undefined &&
-      (obj.amount = base64FromBytes(
-        message.amount !== undefined ? message.amount : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.destinationAddress !== "") {
+      obj.destinationAddress = message.destinationAddress;
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.amount.length !== 0) {
+      obj.amount = base64FromBytes(message.amount);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EventTokenSent>, I>>(
     base?: I
   ): EventTokenSent {
-    return EventTokenSent.fromPartial(base ?? {});
+    return EventTokenSent.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EventTokenSent>, I>>(
     object: I
   ): EventTokenSent {
     const message = createBaseEventTokenSent();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.destinationChain = object.destinationChain ?? "";
     message.destinationAddress = object.destinationAddress ?? "";
     message.symbol = object.symbol ?? "";
-    message.amount = object.amount ?? new Uint8Array();
+    message.amount = object.amount ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseEventContractCall(): EventContractCall {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     destinationChain: "",
     contractAddress: "",
-    payloadHash: new Uint8Array(),
+    payloadHash: new Uint8Array(0),
   };
 }
 
@@ -1088,7 +1086,7 @@ export const EventContractCall = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
@@ -1097,55 +1095,52 @@ export const EventContractCall = {
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: EventContractCall): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EventContractCall>, I>>(
     base?: I
   ): EventContractCall {
-    return EventContractCall.fromPartial(base ?? {});
+    return EventContractCall.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EventContractCall>, I>>(
     object: I
   ): EventContractCall {
     const message = createBaseEventContractCall();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.destinationChain = object.destinationChain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseEventContractCallWithToken(): EventContractCallWithToken {
   return {
-    sender: new Uint8Array(),
+    sender: new Uint8Array(0),
     destinationChain: "",
     contractAddress: "",
-    payloadHash: new Uint8Array(),
+    payloadHash: new Uint8Array(0),
     symbol: "",
-    amount: new Uint8Array(),
+    amount: new Uint8Array(0),
   };
 }
 
@@ -1241,7 +1236,7 @@ export const EventContractCallWithToken = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
@@ -1250,60 +1245,58 @@ export const EventContractCallWithToken = {
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       symbol: isSet(object.symbol) ? String(object.symbol) : "",
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: EventContractCallWithToken): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.contractAddress !== undefined &&
-      (obj.contractAddress = message.contractAddress);
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.amount !== undefined &&
-      (obj.amount = base64FromBytes(
-        message.amount !== undefined ? message.amount : new Uint8Array()
-      ));
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.contractAddress !== "") {
+      obj.contractAddress = message.contractAddress;
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.amount.length !== 0) {
+      obj.amount = base64FromBytes(message.amount);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EventContractCallWithToken>, I>>(
     base?: I
   ): EventContractCallWithToken {
-    return EventContractCallWithToken.fromPartial(base ?? {});
+    return EventContractCallWithToken.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EventContractCallWithToken>, I>>(
     object: I
   ): EventContractCallWithToken {
     const message = createBaseEventContractCallWithToken();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.destinationChain = object.destinationChain ?? "";
     message.contractAddress = object.contractAddress ?? "";
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     message.symbol = object.symbol ?? "";
-    message.amount = object.amount ?? new Uint8Array();
+    message.amount = object.amount ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseEventTransfer(): EventTransfer {
-  return { to: new Uint8Array(), amount: new Uint8Array() };
+  return { to: new Uint8Array(0), amount: new Uint8Array(0) };
 }
 
 export const EventTransfer = {
@@ -1353,44 +1346,41 @@ export const EventTransfer = {
 
   fromJSON(object: any): EventTransfer {
     return {
-      to: isSet(object.to) ? bytesFromBase64(object.to) : new Uint8Array(),
+      to: isSet(object.to) ? bytesFromBase64(object.to) : new Uint8Array(0),
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: EventTransfer): unknown {
     const obj: any = {};
-    message.to !== undefined &&
-      (obj.to = base64FromBytes(
-        message.to !== undefined ? message.to : new Uint8Array()
-      ));
-    message.amount !== undefined &&
-      (obj.amount = base64FromBytes(
-        message.amount !== undefined ? message.amount : new Uint8Array()
-      ));
+    if (message.to.length !== 0) {
+      obj.to = base64FromBytes(message.to);
+    }
+    if (message.amount.length !== 0) {
+      obj.amount = base64FromBytes(message.amount);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EventTransfer>, I>>(
     base?: I
   ): EventTransfer {
-    return EventTransfer.fromPartial(base ?? {});
+    return EventTransfer.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EventTransfer>, I>>(
     object: I
   ): EventTransfer {
     const message = createBaseEventTransfer();
-    message.to = object.to ?? new Uint8Array();
-    message.amount = object.amount ?? new Uint8Array();
+    message.to = object.to ?? new Uint8Array(0);
+    message.amount = object.amount ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseEventTokenDeployed(): EventTokenDeployed {
-  return { symbol: "", tokenAddress: new Uint8Array() };
+  return { symbol: "", tokenAddress: new Uint8Array(0) };
 }
 
 export const EventTokenDeployed = {
@@ -1443,34 +1433,32 @@ export const EventTokenDeployed = {
       symbol: isSet(object.symbol) ? String(object.symbol) : "",
       tokenAddress: isSet(object.tokenAddress)
         ? bytesFromBase64(object.tokenAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: EventTokenDeployed): unknown {
     const obj: any = {};
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.tokenAddress !== undefined &&
-      (obj.tokenAddress = base64FromBytes(
-        message.tokenAddress !== undefined
-          ? message.tokenAddress
-          : new Uint8Array()
-      ));
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.tokenAddress.length !== 0) {
+      obj.tokenAddress = base64FromBytes(message.tokenAddress);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EventTokenDeployed>, I>>(
     base?: I
   ): EventTokenDeployed {
-    return EventTokenDeployed.fromPartial(base ?? {});
+    return EventTokenDeployed.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<EventTokenDeployed>, I>>(
     object: I
   ): EventTokenDeployed {
     const message = createBaseEventTokenDeployed();
     message.symbol = object.symbol ?? "";
-    message.tokenAddress = object.tokenAddress ?? new Uint8Array();
+    message.tokenAddress = object.tokenAddress ?? new Uint8Array(0);
     return message;
   },
 };
@@ -1478,9 +1466,9 @@ export const EventTokenDeployed = {
 function createBaseEventMultisigOwnershipTransferred(): EventMultisigOwnershipTransferred {
   return {
     preOwners: [],
-    prevThreshold: new Uint8Array(),
+    prevThreshold: new Uint8Array(0),
     newOwners: [],
-    newThreshold: new Uint8Array(),
+    newThreshold: new Uint8Array(0),
   };
 }
 
@@ -1559,67 +1547,52 @@ export const EventMultisigOwnershipTransferred = {
         : [],
       prevThreshold: isSet(object.prevThreshold)
         ? bytesFromBase64(object.prevThreshold)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       newOwners: Array.isArray(object?.newOwners)
         ? object.newOwners.map((e: any) => bytesFromBase64(e))
         : [],
       newThreshold: isSet(object.newThreshold)
         ? bytesFromBase64(object.newThreshold)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: EventMultisigOwnershipTransferred): unknown {
     const obj: any = {};
-    if (message.preOwners) {
-      obj.preOwners = message.preOwners.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.preOwners = [];
+    if (message.preOwners?.length) {
+      obj.preOwners = message.preOwners.map((e) => base64FromBytes(e));
     }
-    message.prevThreshold !== undefined &&
-      (obj.prevThreshold = base64FromBytes(
-        message.prevThreshold !== undefined
-          ? message.prevThreshold
-          : new Uint8Array()
-      ));
-    if (message.newOwners) {
-      obj.newOwners = message.newOwners.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.newOwners = [];
+    if (message.prevThreshold.length !== 0) {
+      obj.prevThreshold = base64FromBytes(message.prevThreshold);
     }
-    message.newThreshold !== undefined &&
-      (obj.newThreshold = base64FromBytes(
-        message.newThreshold !== undefined
-          ? message.newThreshold
-          : new Uint8Array()
-      ));
+    if (message.newOwners?.length) {
+      obj.newOwners = message.newOwners.map((e) => base64FromBytes(e));
+    }
+    if (message.newThreshold.length !== 0) {
+      obj.newThreshold = base64FromBytes(message.newThreshold);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<EventMultisigOwnershipTransferred>, I>>(
     base?: I
   ): EventMultisigOwnershipTransferred {
-    return EventMultisigOwnershipTransferred.fromPartial(base ?? {});
+    return EventMultisigOwnershipTransferred.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<
     I extends Exact<DeepPartial<EventMultisigOwnershipTransferred>, I>
   >(object: I): EventMultisigOwnershipTransferred {
     const message = createBaseEventMultisigOwnershipTransferred();
     message.preOwners = object.preOwners?.map((e) => e) || [];
-    message.prevThreshold = object.prevThreshold ?? new Uint8Array();
+    message.prevThreshold = object.prevThreshold ?? new Uint8Array(0);
     message.newOwners = object.newOwners?.map((e) => e) || [];
-    message.newThreshold = object.newThreshold ?? new Uint8Array();
+    message.newThreshold = object.newThreshold ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseEventMultisigOperatorshipTransferred(): EventMultisigOperatorshipTransferred {
-  return { newOperators: [], newThreshold: new Uint8Array(), newWeights: [] };
+  return { newOperators: [], newThreshold: new Uint8Array(0), newWeights: [] };
 }
 
 export const EventMultisigOperatorshipTransferred = {
@@ -1687,7 +1660,7 @@ export const EventMultisigOperatorshipTransferred = {
         : [],
       newThreshold: isSet(object.newThreshold)
         ? bytesFromBase64(object.newThreshold)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       newWeights: Array.isArray(object?.newWeights)
         ? object.newWeights.map((e: any) => bytesFromBase64(e))
         : [],
@@ -1696,25 +1669,14 @@ export const EventMultisigOperatorshipTransferred = {
 
   toJSON(message: EventMultisigOperatorshipTransferred): unknown {
     const obj: any = {};
-    if (message.newOperators) {
-      obj.newOperators = message.newOperators.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.newOperators = [];
+    if (message.newOperators?.length) {
+      obj.newOperators = message.newOperators.map((e) => base64FromBytes(e));
     }
-    message.newThreshold !== undefined &&
-      (obj.newThreshold = base64FromBytes(
-        message.newThreshold !== undefined
-          ? message.newThreshold
-          : new Uint8Array()
-      ));
-    if (message.newWeights) {
-      obj.newWeights = message.newWeights.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.newWeights = [];
+    if (message.newThreshold.length !== 0) {
+      obj.newThreshold = base64FromBytes(message.newThreshold);
+    }
+    if (message.newWeights?.length) {
+      obj.newWeights = message.newWeights.map((e) => base64FromBytes(e));
     }
     return obj;
   },
@@ -1722,22 +1684,23 @@ export const EventMultisigOperatorshipTransferred = {
   create<I extends Exact<DeepPartial<EventMultisigOperatorshipTransferred>, I>>(
     base?: I
   ): EventMultisigOperatorshipTransferred {
-    return EventMultisigOperatorshipTransferred.fromPartial(base ?? {});
+    return EventMultisigOperatorshipTransferred.fromPartial(
+      base ?? ({} as any)
+    );
   },
-
   fromPartial<
     I extends Exact<DeepPartial<EventMultisigOperatorshipTransferred>, I>
   >(object: I): EventMultisigOperatorshipTransferred {
     const message = createBaseEventMultisigOperatorshipTransferred();
     message.newOperators = object.newOperators?.map((e) => e) || [];
-    message.newThreshold = object.newThreshold ?? new Uint8Array();
+    message.newThreshold = object.newThreshold ?? new Uint8Array(0);
     message.newWeights = object.newWeights?.map((e) => e) || [];
     return message;
   },
 };
 
 function createBaseNetworkInfo(): NetworkInfo {
-  return { name: "", id: new Uint8Array() };
+  return { name: "", id: new Uint8Array(0) };
 }
 
 export const NetworkInfo = {
@@ -1788,42 +1751,42 @@ export const NetworkInfo = {
   fromJSON(object: any): NetworkInfo {
     return {
       name: isSet(object.name) ? String(object.name) : "",
-      id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(),
+      id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(0),
     };
   },
 
   toJSON(message: NetworkInfo): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.id !== undefined &&
-      (obj.id = base64FromBytes(
-        message.id !== undefined ? message.id : new Uint8Array()
-      ));
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.id.length !== 0) {
+      obj.id = base64FromBytes(message.id);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<NetworkInfo>, I>>(base?: I): NetworkInfo {
-    return NetworkInfo.fromPartial(base ?? {});
+    return NetworkInfo.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<NetworkInfo>, I>>(
     object: I
   ): NetworkInfo {
     const message = createBaseNetworkInfo();
     message.name = object.name ?? "";
-    message.id = object.id ?? new Uint8Array();
+    message.id = object.id ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseBurnerInfo(): BurnerInfo {
   return {
-    burnerAddress: new Uint8Array(),
-    tokenAddress: new Uint8Array(),
+    burnerAddress: new Uint8Array(0),
+    tokenAddress: new Uint8Array(0),
     destinationChain: "",
     symbol: "",
     asset: "",
-    salt: new Uint8Array(),
+    salt: new Uint8Array(0),
   };
 }
 
@@ -1916,10 +1879,10 @@ export const BurnerInfo = {
     return {
       burnerAddress: isSet(object.burnerAddress)
         ? bytesFromBase64(object.burnerAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       tokenAddress: isSet(object.tokenAddress)
         ? bytesFromBase64(object.tokenAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
@@ -1927,60 +1890,57 @@ export const BurnerInfo = {
       asset: isSet(object.asset) ? String(object.asset) : "",
       salt: isSet(object.salt)
         ? bytesFromBase64(object.salt)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: BurnerInfo): unknown {
     const obj: any = {};
-    message.burnerAddress !== undefined &&
-      (obj.burnerAddress = base64FromBytes(
-        message.burnerAddress !== undefined
-          ? message.burnerAddress
-          : new Uint8Array()
-      ));
-    message.tokenAddress !== undefined &&
-      (obj.tokenAddress = base64FromBytes(
-        message.tokenAddress !== undefined
-          ? message.tokenAddress
-          : new Uint8Array()
-      ));
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.asset !== undefined && (obj.asset = message.asset);
-    message.salt !== undefined &&
-      (obj.salt = base64FromBytes(
-        message.salt !== undefined ? message.salt : new Uint8Array()
-      ));
+    if (message.burnerAddress.length !== 0) {
+      obj.burnerAddress = base64FromBytes(message.burnerAddress);
+    }
+    if (message.tokenAddress.length !== 0) {
+      obj.tokenAddress = base64FromBytes(message.tokenAddress);
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
+    if (message.salt.length !== 0) {
+      obj.salt = base64FromBytes(message.salt);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<BurnerInfo>, I>>(base?: I): BurnerInfo {
-    return BurnerInfo.fromPartial(base ?? {});
+    return BurnerInfo.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<BurnerInfo>, I>>(
     object: I
   ): BurnerInfo {
     const message = createBaseBurnerInfo();
-    message.burnerAddress = object.burnerAddress ?? new Uint8Array();
-    message.tokenAddress = object.tokenAddress ?? new Uint8Array();
+    message.burnerAddress = object.burnerAddress ?? new Uint8Array(0);
+    message.tokenAddress = object.tokenAddress ?? new Uint8Array(0);
     message.destinationChain = object.destinationChain ?? "";
     message.symbol = object.symbol ?? "";
     message.asset = object.asset ?? "";
-    message.salt = object.salt ?? new Uint8Array();
+    message.salt = object.salt ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseERC20Deposit(): ERC20Deposit {
   return {
-    txId: new Uint8Array(),
-    amount: new Uint8Array(),
+    txId: new Uint8Array(0),
+    amount: new Uint8Array(0),
     asset: "",
     destinationChain: "",
-    burnerAddress: new Uint8Array(),
+    burnerAddress: new Uint8Array(0),
     logIndex: Long.UZERO,
   };
 }
@@ -2074,17 +2034,17 @@ export const ERC20Deposit = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       asset: isSet(object.asset) ? String(object.asset) : "",
       destinationChain: isSet(object.destinationChain)
         ? String(object.destinationChain)
         : "",
       burnerAddress: isSet(object.burnerAddress)
         ? bytesFromBase64(object.burnerAddress)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       logIndex: isSet(object.logIndex)
         ? Long.fromValue(object.logIndex)
         : Long.UZERO,
@@ -2093,43 +2053,41 @@ export const ERC20Deposit = {
 
   toJSON(message: ERC20Deposit): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.amount !== undefined &&
-      (obj.amount = base64FromBytes(
-        message.amount !== undefined ? message.amount : new Uint8Array()
-      ));
-    message.asset !== undefined && (obj.asset = message.asset);
-    message.destinationChain !== undefined &&
-      (obj.destinationChain = message.destinationChain);
-    message.burnerAddress !== undefined &&
-      (obj.burnerAddress = base64FromBytes(
-        message.burnerAddress !== undefined
-          ? message.burnerAddress
-          : new Uint8Array()
-      ));
-    message.logIndex !== undefined &&
-      (obj.logIndex = (message.logIndex || Long.UZERO).toString());
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.amount.length !== 0) {
+      obj.amount = base64FromBytes(message.amount);
+    }
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.burnerAddress.length !== 0) {
+      obj.burnerAddress = base64FromBytes(message.burnerAddress);
+    }
+    if (!message.logIndex.isZero()) {
+      obj.logIndex = (message.logIndex || Long.UZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ERC20Deposit>, I>>(
     base?: I
   ): ERC20Deposit {
-    return ERC20Deposit.fromPartial(base ?? {});
+    return ERC20Deposit.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ERC20Deposit>, I>>(
     object: I
   ): ERC20Deposit {
     const message = createBaseERC20Deposit();
-    message.txId = object.txId ?? new Uint8Array();
-    message.amount = object.amount ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
+    message.amount = object.amount ?? new Uint8Array(0);
     message.asset = object.asset ?? "";
     message.destinationChain = object.destinationChain ?? "";
-    message.burnerAddress = object.burnerAddress ?? new Uint8Array();
+    message.burnerAddress = object.burnerAddress ?? new Uint8Array(0);
     message.logIndex =
       object.logIndex !== undefined && object.logIndex !== null
         ? Long.fromValue(object.logIndex)
@@ -2141,13 +2099,13 @@ export const ERC20Deposit = {
 function createBaseERC20TokenMetadata(): ERC20TokenMetadata {
   return {
     asset: "",
-    chainId: new Uint8Array(),
+    chainId: new Uint8Array(0),
     details: undefined,
     tokenAddress: "",
     txHash: "",
     status: 0,
     isExternal: false,
-    burnerCode: new Uint8Array(),
+    burnerCode: new Uint8Array(0),
   };
 }
 
@@ -2261,7 +2219,7 @@ export const ERC20TokenMetadata = {
       asset: isSet(object.asset) ? String(object.asset) : "",
       chainId: isSet(object.chainId)
         ? bytesFromBase64(object.chainId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       details: isSet(object.details)
         ? TokenDetails.fromJSON(object.details)
         : undefined,
@@ -2273,45 +2231,50 @@ export const ERC20TokenMetadata = {
       isExternal: isSet(object.isExternal) ? Boolean(object.isExternal) : false,
       burnerCode: isSet(object.burnerCode)
         ? bytesFromBase64(object.burnerCode)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: ERC20TokenMetadata): unknown {
     const obj: any = {};
-    message.asset !== undefined && (obj.asset = message.asset);
-    message.chainId !== undefined &&
-      (obj.chainId = base64FromBytes(
-        message.chainId !== undefined ? message.chainId : new Uint8Array()
-      ));
-    message.details !== undefined &&
-      (obj.details = message.details
-        ? TokenDetails.toJSON(message.details)
-        : undefined);
-    message.tokenAddress !== undefined &&
-      (obj.tokenAddress = message.tokenAddress);
-    message.txHash !== undefined && (obj.txHash = message.txHash);
-    message.status !== undefined && (obj.status = statusToJSON(message.status));
-    message.isExternal !== undefined && (obj.isExternal = message.isExternal);
-    message.burnerCode !== undefined &&
-      (obj.burnerCode = base64FromBytes(
-        message.burnerCode !== undefined ? message.burnerCode : new Uint8Array()
-      ));
+    if (message.asset !== "") {
+      obj.asset = message.asset;
+    }
+    if (message.chainId.length !== 0) {
+      obj.chainId = base64FromBytes(message.chainId);
+    }
+    if (message.details !== undefined) {
+      obj.details = TokenDetails.toJSON(message.details);
+    }
+    if (message.tokenAddress !== "") {
+      obj.tokenAddress = message.tokenAddress;
+    }
+    if (message.txHash !== "") {
+      obj.txHash = message.txHash;
+    }
+    if (message.status !== 0) {
+      obj.status = statusToJSON(message.status);
+    }
+    if (message.isExternal === true) {
+      obj.isExternal = message.isExternal;
+    }
+    if (message.burnerCode.length !== 0) {
+      obj.burnerCode = base64FromBytes(message.burnerCode);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ERC20TokenMetadata>, I>>(
     base?: I
   ): ERC20TokenMetadata {
-    return ERC20TokenMetadata.fromPartial(base ?? {});
+    return ERC20TokenMetadata.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ERC20TokenMetadata>, I>>(
     object: I
   ): ERC20TokenMetadata {
     const message = createBaseERC20TokenMetadata();
     message.asset = object.asset ?? "";
-    message.chainId = object.chainId ?? new Uint8Array();
+    message.chainId = object.chainId ?? new Uint8Array(0);
     message.details =
       object.details !== undefined && object.details !== null
         ? TokenDetails.fromPartial(object.details)
@@ -2320,13 +2283,13 @@ export const ERC20TokenMetadata = {
     message.txHash = object.txHash ?? "";
     message.status = object.status ?? 0;
     message.isExternal = object.isExternal ?? false;
-    message.burnerCode = object.burnerCode ?? new Uint8Array();
+    message.burnerCode = object.burnerCode ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseTransactionMetadata(): TransactionMetadata {
-  return { rawTx: new Uint8Array(), pubKey: new Uint8Array() };
+  return { rawTx: new Uint8Array(0), pubKey: new Uint8Array(0) };
 }
 
 export const TransactionMetadata = {
@@ -2378,47 +2341,44 @@ export const TransactionMetadata = {
     return {
       rawTx: isSet(object.rawTx)
         ? bytesFromBase64(object.rawTx)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       pubKey: isSet(object.pubKey)
         ? bytesFromBase64(object.pubKey)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: TransactionMetadata): unknown {
     const obj: any = {};
-    message.rawTx !== undefined &&
-      (obj.rawTx = base64FromBytes(
-        message.rawTx !== undefined ? message.rawTx : new Uint8Array()
-      ));
-    message.pubKey !== undefined &&
-      (obj.pubKey = base64FromBytes(
-        message.pubKey !== undefined ? message.pubKey : new Uint8Array()
-      ));
+    if (message.rawTx.length !== 0) {
+      obj.rawTx = base64FromBytes(message.rawTx);
+    }
+    if (message.pubKey.length !== 0) {
+      obj.pubKey = base64FromBytes(message.pubKey);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransactionMetadata>, I>>(
     base?: I
   ): TransactionMetadata {
-    return TransactionMetadata.fromPartial(base ?? {});
+    return TransactionMetadata.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransactionMetadata>, I>>(
     object: I
   ): TransactionMetadata {
     const message = createBaseTransactionMetadata();
-    message.rawTx = object.rawTx ?? new Uint8Array();
-    message.pubKey = object.pubKey ?? new Uint8Array();
+    message.rawTx = object.rawTx ?? new Uint8Array(0);
+    message.pubKey = object.pubKey ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseCommand(): Command {
   return {
-    id: new Uint8Array(),
+    id: new Uint8Array(0),
     command: "",
-    params: new Uint8Array(),
+    params: new Uint8Array(0),
     keyId: "",
     maxGasCost: 0,
     type: 0,
@@ -2512,11 +2472,11 @@ export const Command = {
 
   fromJSON(object: any): Command {
     return {
-      id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(),
+      id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(0),
       command: isSet(object.command) ? String(object.command) : "",
       params: isSet(object.params)
         ? bytesFromBase64(object.params)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       keyId: isSet(object.keyId) ? String(object.keyId) : "",
       maxGasCost: isSet(object.maxGasCost) ? Number(object.maxGasCost) : 0,
       type: isSet(object.type) ? commandTypeFromJSON(object.type) : 0,
@@ -2525,31 +2485,35 @@ export const Command = {
 
   toJSON(message: Command): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = base64FromBytes(
-        message.id !== undefined ? message.id : new Uint8Array()
-      ));
-    message.command !== undefined && (obj.command = message.command);
-    message.params !== undefined &&
-      (obj.params = base64FromBytes(
-        message.params !== undefined ? message.params : new Uint8Array()
-      ));
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    message.maxGasCost !== undefined &&
-      (obj.maxGasCost = Math.round(message.maxGasCost));
-    message.type !== undefined && (obj.type = commandTypeToJSON(message.type));
+    if (message.id.length !== 0) {
+      obj.id = base64FromBytes(message.id);
+    }
+    if (message.command !== "") {
+      obj.command = message.command;
+    }
+    if (message.params.length !== 0) {
+      obj.params = base64FromBytes(message.params);
+    }
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.maxGasCost !== 0) {
+      obj.maxGasCost = Math.round(message.maxGasCost);
+    }
+    if (message.type !== 0) {
+      obj.type = commandTypeToJSON(message.type);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Command>, I>>(base?: I): Command {
-    return Command.fromPartial(base ?? {});
+    return Command.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Command>, I>>(object: I): Command {
     const message = createBaseCommand();
-    message.id = object.id ?? new Uint8Array();
+    message.id = object.id ?? new Uint8Array(0);
     message.command = object.command ?? "";
-    message.params = object.params ?? new Uint8Array();
+    message.params = object.params ?? new Uint8Array(0);
     message.keyId = object.keyId ?? "";
     message.maxGasCost = object.maxGasCost ?? 0;
     message.type = object.type ?? 0;
@@ -2559,13 +2523,13 @@ export const Command = {
 
 function createBaseCommandBatchMetadata(): CommandBatchMetadata {
   return {
-    id: new Uint8Array(),
+    id: new Uint8Array(0),
     commandIds: [],
-    data: new Uint8Array(),
-    sigHash: new Uint8Array(),
+    data: new Uint8Array(0),
+    sigHash: new Uint8Array(0),
     status: 0,
     keyId: "",
-    prevBatchedCommandsId: new Uint8Array(),
+    prevBatchedCommandsId: new Uint8Array(0),
     signature: undefined,
   };
 }
@@ -2680,23 +2644,23 @@ export const CommandBatchMetadata = {
 
   fromJSON(object: any): CommandBatchMetadata {
     return {
-      id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(),
+      id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(0),
       commandIds: Array.isArray(object?.commandIds)
         ? object.commandIds.map((e: any) => bytesFromBase64(e))
         : [],
       data: isSet(object.data)
         ? bytesFromBase64(object.data)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sigHash: isSet(object.sigHash)
         ? bytesFromBase64(object.sigHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       status: isSet(object.status)
         ? batchedCommandsStatusFromJSON(object.status)
         : 0,
       keyId: isSet(object.keyId) ? String(object.keyId) : "",
       prevBatchedCommandsId: isSet(object.prevBatchedCommandsId)
         ? bytesFromBase64(object.prevBatchedCommandsId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       signature: isSet(object.signature)
         ? Any.fromJSON(object.signature)
         : undefined,
@@ -2705,59 +2669,52 @@ export const CommandBatchMetadata = {
 
   toJSON(message: CommandBatchMetadata): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = base64FromBytes(
-        message.id !== undefined ? message.id : new Uint8Array()
-      ));
-    if (message.commandIds) {
-      obj.commandIds = message.commandIds.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.commandIds = [];
+    if (message.id.length !== 0) {
+      obj.id = base64FromBytes(message.id);
     }
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(
-        message.data !== undefined ? message.data : new Uint8Array()
-      ));
-    message.sigHash !== undefined &&
-      (obj.sigHash = base64FromBytes(
-        message.sigHash !== undefined ? message.sigHash : new Uint8Array()
-      ));
-    message.status !== undefined &&
-      (obj.status = batchedCommandsStatusToJSON(message.status));
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    message.prevBatchedCommandsId !== undefined &&
-      (obj.prevBatchedCommandsId = base64FromBytes(
-        message.prevBatchedCommandsId !== undefined
-          ? message.prevBatchedCommandsId
-          : new Uint8Array()
-      ));
-    message.signature !== undefined &&
-      (obj.signature = message.signature
-        ? Any.toJSON(message.signature)
-        : undefined);
+    if (message.commandIds?.length) {
+      obj.commandIds = message.commandIds.map((e) => base64FromBytes(e));
+    }
+    if (message.data.length !== 0) {
+      obj.data = base64FromBytes(message.data);
+    }
+    if (message.sigHash.length !== 0) {
+      obj.sigHash = base64FromBytes(message.sigHash);
+    }
+    if (message.status !== 0) {
+      obj.status = batchedCommandsStatusToJSON(message.status);
+    }
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.prevBatchedCommandsId.length !== 0) {
+      obj.prevBatchedCommandsId = base64FromBytes(
+        message.prevBatchedCommandsId
+      );
+    }
+    if (message.signature !== undefined) {
+      obj.signature = Any.toJSON(message.signature);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CommandBatchMetadata>, I>>(
     base?: I
   ): CommandBatchMetadata {
-    return CommandBatchMetadata.fromPartial(base ?? {});
+    return CommandBatchMetadata.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CommandBatchMetadata>, I>>(
     object: I
   ): CommandBatchMetadata {
     const message = createBaseCommandBatchMetadata();
-    message.id = object.id ?? new Uint8Array();
+    message.id = object.id ?? new Uint8Array(0);
     message.commandIds = object.commandIds?.map((e) => e) || [];
-    message.data = object.data ?? new Uint8Array();
-    message.sigHash = object.sigHash ?? new Uint8Array();
+    message.data = object.data ?? new Uint8Array(0);
+    message.sigHash = object.sigHash ?? new Uint8Array(0);
     message.status = object.status ?? 0;
     message.keyId = object.keyId ?? "";
     message.prevBatchedCommandsId =
-      object.prevBatchedCommandsId ?? new Uint8Array();
+      object.prevBatchedCommandsId ?? new Uint8Array(0);
     message.signature =
       object.signature !== undefined && object.signature !== null
         ? Any.fromPartial(object.signature)
@@ -2767,7 +2724,7 @@ export const CommandBatchMetadata = {
 };
 
 function createBaseSigMetadata(): SigMetadata {
-  return { type: 0, chain: "", commandBatchId: new Uint8Array() };
+  return { type: 0, chain: "", commandBatchId: new Uint8Array(0) };
 }
 
 export const SigMetadata = {
@@ -2831,40 +2788,40 @@ export const SigMetadata = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       commandBatchId: isSet(object.commandBatchId)
         ? bytesFromBase64(object.commandBatchId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: SigMetadata): unknown {
     const obj: any = {};
-    message.type !== undefined && (obj.type = sigTypeToJSON(message.type));
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.commandBatchId !== undefined &&
-      (obj.commandBatchId = base64FromBytes(
-        message.commandBatchId !== undefined
-          ? message.commandBatchId
-          : new Uint8Array()
-      ));
+    if (message.type !== 0) {
+      obj.type = sigTypeToJSON(message.type);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.commandBatchId.length !== 0) {
+      obj.commandBatchId = base64FromBytes(message.commandBatchId);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<SigMetadata>, I>>(base?: I): SigMetadata {
-    return SigMetadata.fromPartial(base ?? {});
+    return SigMetadata.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SigMetadata>, I>>(
     object: I
   ): SigMetadata {
     const message = createBaseSigMetadata();
     message.type = object.type ?? 0;
     message.chain = object.chain ?? "";
-    message.commandBatchId = object.commandBatchId ?? new Uint8Array();
+    message.commandBatchId = object.commandBatchId ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseTransferKey(): TransferKey {
-  return { txId: new Uint8Array(), nextKeyId: "" };
+  return { txId: new Uint8Array(0), nextKeyId: "" };
 }
 
 export const TransferKey = {
@@ -2916,30 +2873,30 @@ export const TransferKey = {
     return {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       nextKeyId: isSet(object.nextKeyId) ? String(object.nextKeyId) : "",
     };
   },
 
   toJSON(message: TransferKey): unknown {
     const obj: any = {};
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
-    message.nextKeyId !== undefined && (obj.nextKeyId = message.nextKeyId);
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
+    if (message.nextKeyId !== "") {
+      obj.nextKeyId = message.nextKeyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferKey>, I>>(base?: I): TransferKey {
-    return TransferKey.fromPartial(base ?? {});
+    return TransferKey.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferKey>, I>>(
     object: I
   ): TransferKey {
     const message = createBaseTransferKey();
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     message.nextKeyId = object.nextKeyId ?? "";
     return message;
   },
@@ -3000,15 +2957,18 @@ export const Asset = {
 
   toJSON(message: Asset): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.name !== undefined && (obj.name = message.name);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Asset>, I>>(base?: I): Asset {
-    return Asset.fromPartial(base ?? {});
+    return Asset.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Asset>, I>>(object: I): Asset {
     const message = createBaseAsset();
     message.chain = object.chain ?? "";
@@ -3018,7 +2978,12 @@ export const Asset = {
 };
 
 function createBaseTokenDetails(): TokenDetails {
-  return { tokenName: "", symbol: "", decimals: 0, capacity: new Uint8Array() };
+  return {
+    tokenName: "",
+    symbol: "",
+    decimals: 0,
+    capacity: new Uint8Array(0),
+  };
 }
 
 export const TokenDetails = {
@@ -3093,29 +3058,32 @@ export const TokenDetails = {
       decimals: isSet(object.decimals) ? Number(object.decimals) : 0,
       capacity: isSet(object.capacity)
         ? bytesFromBase64(object.capacity)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: TokenDetails): unknown {
     const obj: any = {};
-    message.tokenName !== undefined && (obj.tokenName = message.tokenName);
-    message.symbol !== undefined && (obj.symbol = message.symbol);
-    message.decimals !== undefined &&
-      (obj.decimals = Math.round(message.decimals));
-    message.capacity !== undefined &&
-      (obj.capacity = base64FromBytes(
-        message.capacity !== undefined ? message.capacity : new Uint8Array()
-      ));
+    if (message.tokenName !== "") {
+      obj.tokenName = message.tokenName;
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.decimals !== 0) {
+      obj.decimals = Math.round(message.decimals);
+    }
+    if (message.capacity.length !== 0) {
+      obj.capacity = base64FromBytes(message.capacity);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TokenDetails>, I>>(
     base?: I
   ): TokenDetails {
-    return TokenDetails.fromPartial(base ?? {});
+    return TokenDetails.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TokenDetails>, I>>(
     object: I
   ): TokenDetails {
@@ -3123,13 +3091,13 @@ export const TokenDetails = {
     message.tokenName = object.tokenName ?? "";
     message.symbol = object.symbol ?? "";
     message.decimals = object.decimals ?? 0;
-    message.capacity = object.capacity ?? new Uint8Array();
+    message.capacity = object.capacity ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseGateway(): Gateway {
-  return { address: new Uint8Array() };
+  return { address: new Uint8Array(0) };
 }
 
 export const Gateway = {
@@ -3171,32 +3139,30 @@ export const Gateway = {
     return {
       address: isSet(object.address)
         ? bytesFromBase64(object.address)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Gateway): unknown {
     const obj: any = {};
-    message.address !== undefined &&
-      (obj.address = base64FromBytes(
-        message.address !== undefined ? message.address : new Uint8Array()
-      ));
+    if (message.address.length !== 0) {
+      obj.address = base64FromBytes(message.address);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Gateway>, I>>(base?: I): Gateway {
-    return Gateway.fromPartial(base ?? {});
+    return Gateway.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Gateway>, I>>(object: I): Gateway {
     const message = createBaseGateway();
-    message.address = object.address ?? new Uint8Array();
+    message.address = object.address ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBasePollMetadata(): PollMetadata {
-  return { chain: "", txId: new Uint8Array() };
+  return { chain: "", txId: new Uint8Array(0) };
 }
 
 export const PollMetadata = {
@@ -3249,40 +3215,40 @@ export const PollMetadata = {
       chain: isSet(object.chain) ? String(object.chain) : "",
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: PollMetadata): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.txId !== undefined &&
-      (obj.txId = base64FromBytes(
-        message.txId !== undefined ? message.txId : new Uint8Array()
-      ));
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.txId.length !== 0) {
+      obj.txId = base64FromBytes(message.txId);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PollMetadata>, I>>(
     base?: I
   ): PollMetadata {
-    return PollMetadata.fromPartial(base ?? {});
+    return PollMetadata.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollMetadata>, I>>(
     object: I
   ): PollMetadata {
     const message = createBasePollMetadata();
     message.chain = object.chain ?? "";
-    message.txId = object.txId ?? new Uint8Array();
+    message.txId = object.txId ?? new Uint8Array(0);
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
