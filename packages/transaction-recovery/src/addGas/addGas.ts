@@ -1,6 +1,6 @@
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { S3CosmosChainConfig } from "@axelarjs/api/s3/types";
-import { COSMOS_GAS_RECEIVER_OPTIONS } from "@axelarjs/core";
+import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
 import { assertIsDeliverTxSuccess, Coin } from "@cosmjs/stargate";
 
@@ -8,60 +8,61 @@ import { getCosmosSigner } from "../cosmosSigner";
 import { gmpClient, s3Client } from "../services";
 import { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
 
+/**
+ * Adds gas to a transaction that might be stuck due to insufficient gas
+ *
+ * @param params {AddGasParams} - Parameters to add gas to a transaction
+ * @returns {Promise<AddGasResponse>} - Response from adding gas to a transaction
+ */
 export async function addGas({
-  txHash,
-  chain,
-  token,
-  sendOptions,
   autocalculateGasOptions,
+  sendOptions,
+  ...params
 }: AddGasParams): Promise<AddGasResponse> {
-  const { txFee, timeoutTimestamp, environment, offlineSigner } = sendOptions;
+  const chainConfig = await fetchChainConfig(
+    sendOptions.environment,
+    params.chain
+  );
 
-  const chainConfig = (await s3Client(sendOptions.environment)
-    .getChainConfigs(sendOptions.environment)
-    .then((res) => res.chains[chain])
-    .catch(() => undefined)) as S3CosmosChainConfig;
-
-  if (!chainConfig) throw new Error(`chain ID ${chain} not found`);
+  if (!chainConfig) {
+    throw new Error(`chain ID ${params.chain} not found`);
+  }
 
   const { rpc, channelIdToAxelar } = chainConfig.cosmosConfigs;
 
-  const txs = await gmpClient(sendOptions.environment)
-    .searchGMP({
-      txHash,
-    })
-    .catch(() => undefined);
+  const tx = await fetchGMPTransaction(sendOptions.environment, params.txHash);
 
-  if (!txs || txs?.length < 1 || !txs[0]) {
+  if (!tx) {
     return {
       success: false,
-      info: `${txHash} could not be found`,
+      info: `${params.txHash} could not be found`,
     };
   }
 
   const denomOnSrcChain = getIBCDenomOnSrcChain(
-    txs[0].gas_paid.returnValues.denom,
+    tx.gas_paid.returnValues.denom,
     chainConfig
   );
-  if (!matchesOriginalTokenPayment(token, denomOnSrcChain)) {
+
+  if (!matchesOriginalTokenPayment(params.token, denomOnSrcChain)) {
     return {
       success: false,
       info: `The token you are trying to send does not match the token originally \
-        used for gas payment. Please send ${txs[0].gas_paid.returnValues.denom} instead`,
+        used for gas payment. Please send ${tx.gas_paid.returnValues.denom} instead`,
     };
   }
 
-  let coin = token;
-  if (token === "autocalculate") {
-    coin = await getFullFee({
-      tx: txs[0],
-      environment,
-      autocalculateGasOptions,
-      chainConfig,
-    });
-  }
+  const coin =
+    params.token !== "autocalculate"
+      ? params.token
+      : await getFullFee({
+          tx,
+          environment: sendOptions.environment,
+          autocalculateGasOptions,
+          chainConfig,
+        });
 
-  const sender = await offlineSigner
+  const sender = await sendOptions.offlineSigner
     .getAccounts()
     .then(([acc]) => acc?.address);
 
@@ -81,7 +82,7 @@ export async function addGas({
     };
   }
 
-  const signer = await getCosmosSigner(rpcUrl, offlineSigner);
+  const signer = await getCosmosSigner(rpcUrl, sendOptions.offlineSigner);
 
   const broadcastResult = await signer.signAndBroadcast(
     sender,
@@ -93,14 +94,16 @@ export async function addGas({
           sourceChannel: channelIdToAxelar,
           token: coin,
           sender,
-          receiver: COSMOS_GAS_RECEIVER_OPTIONS[environment],
-          timeoutTimestamp: timeoutTimestamp ?? (Date.now() + 90) * 1e9,
-          memo: txs[0]?.call.id,
+          receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
+          timeoutTimestamp:
+            sendOptions.timeoutTimestamp ?? (Date.now() + 90) * 1e9,
+          memo: tx.call.id,
         },
       },
     ],
-    txFee
+    sendOptions.txFee
   );
+
   assertIsDeliverTxSuccess(broadcastResult);
 
   return {
@@ -110,6 +113,21 @@ export async function addGas({
   };
 }
 
+async function fetchChainConfig(environment: Environment, chain: string) {
+  return s3Client(environment)
+    .getChainConfigs(environment)
+    .then((res) => res.chains[chain] as S3CosmosChainConfig)
+    .catch(() => undefined);
+}
+
+async function fetchGMPTransaction(environment: Environment, txHash: string) {
+  const [tx] = await gmpClient(environment)
+    .searchGMP({ txHash })
+    .catch(() => []);
+
+  return tx;
+}
+
 async function getFullFee({
   environment,
   autocalculateGasOptions,
@@ -117,16 +135,22 @@ async function getFullFee({
   chainConfig,
 }: GetFullFeeOptions): Promise<Coin> {
   const apiClient = createAxelarQueryNodeClient(environment, {});
-  const amount = (await apiClient.estimateGasFee({
+  const amount = await apiClient.estimateGasFee({
     sourceChain: tx.call.chain,
     destinationChain: tx.call.returnValues.destinationChain,
     gasLimit: autocalculateGasOptions?.gasLimit ?? BigInt(1_000_000),
     gasMultiplier: autocalculateGasOptions?.gasMultipler ?? 1,
     sourceTokenSymbol: tx.gas_paid.returnValues.denom,
-  })) as string;
+  });
+
+  const denom = getIBCDenomOnSrcChain(
+    tx.gas_paid.returnValues.denom,
+    chainConfig
+  );
+
   return {
-    denom: getIBCDenomOnSrcChain(tx.gas_paid.returnValues.denom, chainConfig),
-    amount,
+    denom,
+    amount: typeof amount === "string" ? amount : amount.executionFee,
   };
 }
 
@@ -141,10 +165,12 @@ function getIBCDenomOnSrcChain(
   denomOnAxelar: string,
   chain: S3CosmosChainConfig
 ) {
-  const ibcDenom = chain.assets?.find(
-    (asset) => asset.id === denomOnAxelar
-  )?.ibcDenom;
-  if (!ibcDenom)
+  const { ibcDenom } =
+    chain.assets?.find(({ id }) => id === denomOnAxelar) ?? {};
+
+  if (!ibcDenom) {
     throw new Error("cannot find token that matches original gas payment");
+  }
+
   return ibcDenom;
 }
