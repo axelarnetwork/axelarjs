@@ -42,16 +42,26 @@ type BaseGMPParams = {
   toTime?: number;
 };
 
-// SearchGMP
+export const VALID_CONTRACT_METHODS = [
+  "callContract",
+  "callContractWithToken",
+  "sendToken",
+  "StandardizedTokenDeployed",
+  "RemoteStandardizedTokenAndManagerDeploymentInitialized",
+] as const;
+
+export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
 
 export type SearchGMPParams = BaseGMPParams & {
-  contractMethod?: "callContrct" | "callContrctWithToken";
+  contractMethod?: ContractMethod;
   txHash?: string | `0x${string}`;
   txLogIndex?: number;
   status?: GMPTxStatus;
   from?: number;
   size?: number;
   sort?: Record<string, SortOrder>;
+  sourceContractAddress?: `0x${string}`;
+  destinationContractAddress?: `0x${string}`;
 };
 
 type HexAmount = {
@@ -62,6 +72,7 @@ type HexAmount = {
 type SearchGMPCall = {
   blockNumber: number;
   blockHash: `0x${string}`;
+  block_timestamp: number;
   transactionIndex: number;
   address: `0x${string}`;
   removed: boolean;
