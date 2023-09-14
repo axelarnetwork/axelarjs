@@ -2,7 +2,7 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 
 import { vi } from "vitest";
 
-import { addGas, SendOptions } from "./addGas";
+import { addGas, SendOptions, type AutocalculateGasOptions } from "./addGas";
 import { getCosmosWallet } from "./cosmosSigner";
 
 const MOCK_ADD_GAS_RESPONSE = {
@@ -57,7 +57,11 @@ describe("addGas", () => {
       offlineSigner,
     };
 
-    const res = await addGas(txHash, token, sendOptions);
+    const res = await addGas({
+      txHash,
+      token,
+      sendOptions,
+    });
 
     expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
   });
@@ -70,6 +74,10 @@ describe("addGas", () => {
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
       "osmo"
     );
+    const autocalculateGasOptions: AutocalculateGasOptions = {
+      gasLimit: BigInt(700_000),
+      gasMultipler: 1.1,
+    };
 
     const sendOptions: SendOptions = {
       txFee: {
@@ -82,7 +90,12 @@ describe("addGas", () => {
       offlineSigner,
     };
 
-    const res = await addGas(txHash, "autocalculate", sendOptions);
+    const res = await addGas({
+      txHash,
+      token: "autocalculate",
+      sendOptions,
+      autocalculateGasOptions,
+    });
 
     expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
   });
