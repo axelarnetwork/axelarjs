@@ -43,14 +43,16 @@ export const RecentTransactions: FC<Props> = ({
           No transactions found
         </li>
       ) : (
-        txns.map((tx) => (
+        txns.map((tx, i) => (
           <li
-            key={tx.hash.concat(contractMethod)}
+            key={`${tx.hash}-${contractMethod}-${tx.timestamp}-${i}`}
             className="flex items-center gap-2"
           >
             <div className="avatar placeholder">
               <div className="bg-neutral-focus text-neutral-content w-12 rounded-full">
-                <span className="text-xl">TX</span>
+                <span className="text-xl">
+                  {contractMethod === "sendToken" ? "ST" : "TD"}
+                </span>
               </div>
             </div>
             <div>
@@ -86,7 +88,6 @@ const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> = {
 const RecentTransactionsTabs = () => {
   const [contractMethod, setContractMethod] =
     useState<ContractMethod>("sendToken");
-  const ctx = trpc.useContext();
 
   const { address } = useAccount();
 
@@ -104,9 +105,7 @@ const RecentTransactionsTabs = () => {
                   key={method}
                   onClick={(e) => {
                     e.preventDefault();
-                    ctx.gmp.getRecentTransactions.invalidate().then(() => {
-                      setContractMethod(method);
-                    });
+                    setContractMethod(method);
                   }}
                   active={contractMethod === method}
                 >
@@ -116,7 +115,7 @@ const RecentTransactionsTabs = () => {
             </Tabs>
           </Card.Title>
           <RecentTransactions
-            contractMethod="StandardizedTokenDeployed"
+            contractMethod={contractMethod}
             senderAddress={address}
           />
         </Card.Body>
