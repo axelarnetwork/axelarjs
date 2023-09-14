@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
@@ -37,17 +38,6 @@ export default function Home() {
 
   return (
     <>
-      {/* temporarily disable HeroSection */}
-      {/* {!layoutState.isHeroBannerDismissed && (
-        <HeroSection
-          onCTAClick={() => {
-            window.scrollTo(
-              0,
-              document.getElementById("main-content")?.offsetTop ?? 0
-            );
-          }}
-        />
-      )} */}
       <Page
         pageTitle="Axelar Interchain Token Service"
         pageDescription="Interchain orchestration powered by Axelar"
@@ -75,6 +65,9 @@ export default function Home() {
           <SearchInterchainToken onTokenFound={handleTokenFound} />
           <div className="divider">OR</div>
           <AddErc20 />
+          <div className="mt-4">
+            <RecentTransactions />
+          </div>
         </div>
       </Page>
     </>

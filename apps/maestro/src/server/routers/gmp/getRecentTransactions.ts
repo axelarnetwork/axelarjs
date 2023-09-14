@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
+import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 /**
@@ -10,7 +11,15 @@ import { publicProcedure } from "~/server/trpc";
 export const getRecentTransactions = publicProcedure
   .input(
     z.object({
-      size: z.number().default(10),
+      size: z.number().optional().default(10),
+      senderAddress: hex40Literal().optional(),
+      contractMethod: z.union([
+        z.literal("callContract"),
+        z.literal("callContractWithToken"),
+        z.literal("sendToken"),
+        z.literal("StandardizedTokenDeployed"),
+        z.literal("RemoteStandardizedTokenAndManagerDeploymentInitialized"),
+      ]),
     })
   )
   .output(
@@ -19,6 +28,7 @@ export const getRecentTransactions = publicProcedure
         hash: z.string(),
         blockHash: z.string(),
         status: z.string(),
+        timestamp: z.number(),
       })
     )
   )
@@ -33,26 +43,27 @@ export const getRecentTransactions = publicProcedure
   .query(async ({ input, ctx }) => {
     try {
       const response = await ctx.services.gmp.searchGMP({
-        senderAddress: ctx.session?.address,
+        senderAddress: input.senderAddress,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         size: input.size,
+        contractMethod: input.contractMethod,
       });
 
       return response.map(({ call, status }) => ({
         status,
         hash: call.transactionHash,
         blockHash: call.blockHash,
+        timestamp: call.block_timestamp,
       }));
     } catch (error) {
-      // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
         throw error;
       }
-      // otherwise, we throw an internal server error
+
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get transaction status",
+        message: "Failed to get recent transactions",
       });
     }
   });
