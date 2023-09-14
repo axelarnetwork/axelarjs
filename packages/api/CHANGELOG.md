@@ -1,5 +1,12 @@
 # @axelarjs/api
 
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies
+  - @axelarjs/core@0.1.3
+
 ## 0.1.13
 
 ### Patch Changes

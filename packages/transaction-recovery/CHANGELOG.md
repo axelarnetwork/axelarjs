@@ -1,5 +1,12 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies
+  - @axelarjs/core@0.1.3
+
 ## 0.0.8
 
 ### Patch Changes
