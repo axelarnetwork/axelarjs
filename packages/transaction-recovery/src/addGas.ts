@@ -3,7 +3,12 @@ import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
 import { OfflineSigner } from "@cosmjs/proto-signing";
-import type { Coin, StdFee } from "@cosmjs/stargate";
+import {
+  assertIsDeliverTxSuccess,
+  Coin,
+  DeliverTxResponse,
+  StdFee,
+} from "@cosmjs/stargate";
 
 import { getCosmosSigner } from "./cosmosSigner";
 import { gmpClient } from "./services";
@@ -27,12 +32,18 @@ export type AddGasParams = {
   autocalculateGasOptions?: AutocalculateGasOptions;
 };
 
+export type AddGasResponse = {
+  success: boolean;
+  info: string;
+  broadcastResult?: DeliverTxResponse;
+};
+
 export async function addGas({
   txHash,
   token,
   sendOptions,
   autocalculateGasOptions,
-}: AddGasParams) {
+}: AddGasParams): Promise<AddGasResponse> {
   const { txFee, timeoutTimestamp, environment, offlineSigner } = sendOptions;
 
   let coin = token;
@@ -43,7 +54,17 @@ export async function addGas({
     .catch(() => undefined);
 
   if (!tx || tx?.length < 1 || !tx[0]) {
-    throw new Error(`${txHash} could not be found`);
+    return {
+      success: false,
+      info: `${txHash} could not be found`,
+    };
+  }
+
+  if (!matchesOriginalTokenPayment(token)) {
+    return {
+      success: false,
+      info: `The token you are trying to send does not match the token originally used for gas payment. Please send ${tx[0].gas_paid.returnValues.denom} instead`,
+    };
   }
 
   if (token === "autocalculate") {
@@ -61,12 +82,15 @@ export async function addGas({
     .then(([acc]) => acc?.address);
 
   if (!sender) {
-    throw new Error("Sender could not be found");
+    return {
+      success: false,
+      info: `Could not find sender from designated offlineSigner`,
+    };
   }
 
   const signer = await getCosmosSigner(sendOptions.rpcUrl, offlineSigner);
 
-  return signer.signAndBroadcast(
+  const broadcastResult = await signer.signAndBroadcast(
     sender,
     [
       {
@@ -84,6 +108,13 @@ export async function addGas({
     ],
     txFee
   );
+  assertIsDeliverTxSuccess(broadcastResult);
+
+  return {
+    success: true,
+    info: "",
+    broadcastResult,
+  };
 }
 
 type GetFullFeeOptions = {
@@ -111,8 +142,14 @@ async function getFullFee({
   };
 }
 
+function matchesOriginalTokenPayment(token: Coin | "autocalculate") {
+  //TODO, once we get the s3 repo merged here, this can be implemented
+  return true;
+}
+
 function getIBCDenomOnSrcChain(denomOnAxelar: string, sourceChain: string) {
-  //TODO, get IBC equivalent of denomOnAxelar on srcChain
+  //TODO, get IBC equivalent of denomOnAxelar on srcChain.
+  //once we get the s3 repo merged here, this can be implemented
   console.log({ denomOnAxelar, sourceChain });
   return "ibc/9463E39D230614B313B487836D13A392BD1731928713D4C8427A083627048DB3"; //TODO
 }
