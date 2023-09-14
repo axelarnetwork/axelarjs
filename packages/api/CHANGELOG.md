@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.13
+
+### Patch Changes
+
+- trigger rebuild
+
 ## 0.1.12
 
 ### Patch Changes
