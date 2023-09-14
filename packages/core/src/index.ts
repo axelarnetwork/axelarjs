@@ -18,3 +18,10 @@ export const AXELARSCAN_API_URLS = {
 } as const;
 
 export type AxelarscanUrl = keyof typeof AXELARSCAN_API_URLS;
+
+export const S3_API_URLS = {
+  testnet: "https://axelar-testnet.s3.us-east-2.amazonaws.com",
+  mainnet: "https://axelar-mainnet.s3.us-east-2.amazonaws.com",
+} as const;
+
+export type S3Url = keyof typeof S3_API_URLS;

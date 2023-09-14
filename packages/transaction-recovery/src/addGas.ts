@@ -1,45 +1,17 @@
 import { SearchGMPResponseData } from "@axelarjs/api";
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
+import { S3CosmosChainConfig } from "@axelarjs/api/s3/types";
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
-import { OfflineSigner } from "@cosmjs/proto-signing";
-import {
-  assertIsDeliverTxSuccess,
-  Coin,
-  DeliverTxResponse,
-  StdFee,
-} from "@cosmjs/stargate";
+import { assertIsDeliverTxSuccess, Coin } from "@cosmjs/stargate";
 
 import { getCosmosSigner } from "./cosmosSigner";
-import { gmpClient } from "./services";
-
-export type SendOptions = {
-  channelIdToAxelar: string;
-  rpcUrl: string;
-  txFee: StdFee;
-  timeoutTimestamp?: number;
-  environment: Environment;
-  offlineSigner: OfflineSigner;
-};
-export type AutocalculateGasOptions = {
-  gasLimit?: bigint;
-  gasMultipler?: number;
-};
-export type AddGasParams = {
-  txHash: string;
-  token: Coin | "autocalculate";
-  sendOptions: SendOptions;
-  autocalculateGasOptions?: AutocalculateGasOptions;
-};
-
-export type AddGasResponse = {
-  success: boolean;
-  info: string;
-  broadcastResult?: DeliverTxResponse;
-};
+import { gmpClient, s3Client } from "./services";
+import { AddGasParams, AddGasResponse, AutocalculateGasOptions } from "./types";
 
 export async function addGas({
   txHash,
+  chain,
   token,
   sendOptions,
   autocalculateGasOptions,
@@ -47,7 +19,17 @@ export async function addGas({
   const { txFee, timeoutTimestamp, environment, offlineSigner } = sendOptions;
 
   let coin = token;
-  const tx = await gmpClient(environment)
+
+  const selectedChainInfo = (await s3Client(sendOptions.environment)
+    .getChainConfigs(sendOptions.environment)
+    .then((res) => res.chains[chain])
+    .catch(() => undefined)) as S3CosmosChainConfig;
+
+  if (!selectedChainInfo) throw new Error(`chain ID ${chain} not found`);
+
+  const { rpc, channelIdToAxelar } = selectedChainInfo.cosmosConfigs;
+
+  const tx = await gmpClient(sendOptions.environment)
     .searchGMP({
       txHash,
     })
@@ -88,16 +70,25 @@ export async function addGas({
     };
   }
 
-  const signer = await getCosmosSigner(sendOptions.rpcUrl, offlineSigner);
+  const rpcUrl = sendOptions.rpcUrl ?? rpc[0];
 
-  const broadcastResult = await signer.signAndBroadcast(
+  if (!rpcUrl) {
+    return {
+      success: false,
+      info: "Missing RPC URL. Please pass in an rpcUrl parameter in the sendOptions parameter",
+    };
+  }
+
+  const broadcastResult = await (
+    await getCosmosSigner(rpcUrl, offlineSigner)
+  ).signAndBroadcast(
     sender,
     [
       {
         typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
         value: {
           sourcePort: "transfer",
-          sourceChannel: sendOptions.channelIdToAxelar,
+          sourceChannel: channelIdToAxelar,
           token: coin,
           sender,
           receiver: COSMOS_GAS_RECEIVER_OPTIONS[environment],

@@ -1,9 +1,10 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
-import { addGas, SendOptions, type AutocalculateGasOptions } from "./addGas";
-import { getCosmosWallet } from "./cosmosSigner";
+import { addGas } from "./addGas";
+import { type AutocalculateGasOptions, type SendOptions } from "./types";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,
@@ -40,10 +41,9 @@ describe("addGas", () => {
         "ibc/9463E39D230614B313B487836D13A392BD1731928713D4C8427A083627048DB3",
       amount: "1",
     };
-
-    const offlineSigner = await getCosmosWallet(
+    const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
-      "osmo"
+      { prefix: "osmo" }
     );
 
     const sendOptions: SendOptions = {
@@ -51,7 +51,6 @@ describe("addGas", () => {
         gas: "250000",
         amount: [{ denom: "uosmo", amount: "30000" }],
       },
-      channelIdToAxelar: "channel-3",
       rpcUrl: "https://rpc.osmotest5.osmosis.zone",
       environment: ENVIRONMENTS.testnet,
       offlineSigner,
@@ -61,6 +60,7 @@ describe("addGas", () => {
       txHash,
       token,
       sendOptions,
+      chain: "osmosis-6",
     });
 
     expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
@@ -70,22 +70,21 @@ describe("addGas", () => {
     const txHash =
       "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
 
-    const offlineSigner = await getCosmosWallet(
-      process.env["COSMOS_WALLET_MNEMONIC"] as string,
-      "osmo"
-    );
     const autocalculateGasOptions: AutocalculateGasOptions = {
       gasLimit: BigInt(700_000),
       gasMultipler: 1.1,
     };
+
+    const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
+      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      { prefix: "osmo" }
+    );
 
     const sendOptions: SendOptions = {
       txFee: {
         gas: "250000",
         amount: [{ denom: "uosmo", amount: "30000" }],
       },
-      channelIdToAxelar: "channel-3",
-      rpcUrl: "https://rpc.osmotest5.osmosis.zone",
       environment: ENVIRONMENTS.testnet,
       offlineSigner,
     };
@@ -95,8 +94,13 @@ describe("addGas", () => {
       token: "autocalculate",
       sendOptions,
       autocalculateGasOptions,
+      chain: "osmosis-6",
     });
 
-    expect(res).toEqual(MOCK_ADD_GAS_RESPONSE);
+    expect(res).toEqual({
+      broadcastResult: MOCK_ADD_GAS_RESPONSE,
+      info: "",
+      success: true,
+    });
   });
 });
