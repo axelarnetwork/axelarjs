@@ -124,10 +124,62 @@ type SearchGMPFees = {
   };
 };
 
+export type SearchGMPGasPaid = {
+  axelarTransactionHash: string;
+  chain: string;
+  chain_type: string;
+  logIndex: number;
+  createdAt: {
+    week: number;
+    hour: number;
+    month: number;
+    year: number;
+    ms: number;
+    day: number;
+    quarter: number;
+  };
+  transactionHash: string;
+
+  returnValues: {
+    refundAddress: string;
+    amount: string;
+    refundRecipient: string;
+    sourceAddress: string;
+    destinationAddress: string;
+    gasFeeAmount: string;
+    recipient: string;
+    messageId: string;
+    payloadHash: string;
+    denom: string;
+    destinationChain: string;
+    asset: string;
+  };
+  blockNumber: number;
+  block_timestamp: number;
+  receipt: {
+    gasUsed: string;
+    blockNumber: number;
+    from: string;
+    transactionHash: string;
+    status: number;
+  };
+  _id: string;
+  id: string;
+  event: string;
+  transaction: {
+    gasLimit: string;
+    blockNumber: number;
+    from: string;
+    hash: string;
+  };
+  destination_chain_type: string;
+};
+
 export type SearchGMPResponseData = {
   call: SearchGMPCall;
   fees: SearchGMPFees;
   status: GMPTxStatus;
+  gas_paid: SearchGMPGasPaid;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;

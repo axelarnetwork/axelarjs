@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.12
+
+### Patch Changes
+
+- update SearchGMPResponse with SearchGMPGasPaid types; change logic that checks for valid base fee
+
 ## 0.1.11
 
 ### Patch Changes
