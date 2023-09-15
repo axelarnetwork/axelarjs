@@ -40,7 +40,7 @@ const RecentTransactionsTabs = () => {
               ))}
             </Tabs>
           </Card.Title>
-          <div className="hidden min-w-max grid-cols-2 md:grid">
+          <div className="hidden min-w-max grid-cols-2 gap-6 md:grid">
             <RecentTransactionsList
               contractMethod="sendToken"
               senderAddress={address}
