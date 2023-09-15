@@ -133,19 +133,14 @@ async function getFullFee({
   tx,
   chainConfig,
 }: GetFullFeeOptions): Promise<Coin> {
-  let apiClient;
-
-  if (typeof window === "undefined") {
-    const { createAxelarQueryNodeClient } = await import(
-      "@axelarjs/api/axelar-query/node"
-    );
-    apiClient = createAxelarQueryNodeClient(environment, {});
-  } else {
-    const { createAxelarQueryBrowserClient } = await import(
-      "@axelarjs/api/axelar-query/browser"
-    );
-    apiClient = createAxelarQueryBrowserClient(environment, {});
-  }
+  const apiClient =
+    typeof window === "undefined"
+      ? (
+          await import("@axelarjs/api/axelar-query/node")
+        ).createAxelarQueryNodeClient(environment, {})
+      : (
+          await import("@axelarjs/api/axelar-query/browser")
+        ).createAxelarQueryBrowserClient(environment, {});
 
   const amount = await apiClient.estimateGasFee({
     sourceChain: tx.call.chain,
@@ -154,6 +149,8 @@ async function getFullFee({
     gasMultiplier: autocalculateGasOptions?.gasMultipler ?? 1,
     sourceTokenSymbol: tx.gas_paid.returnValues.denom,
   });
+
+  console.log({ amount });
 
   const denom = getIBCDenomOnSrcChain(
     tx.gas_paid.returnValues.denom,
