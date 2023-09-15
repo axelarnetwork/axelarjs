@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.11
+
+### Patch Changes
+
+- use window client for axelar-query api
+
 ## 0.0.10
 
 ### Patch Changes
