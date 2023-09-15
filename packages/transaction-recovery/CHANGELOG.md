@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.12
+
+### Patch Changes
+
+- moving @axelarjs/api in package.json
+
 ## 0.0.11
 
 ### Patch Changes

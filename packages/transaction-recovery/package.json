@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "publishConfig": {
     "access": "public"
   },
@@ -44,7 +44,6 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "@axelarjs/api": "workspace:*",
     "@axelarjs/config": "workspace:*",
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
@@ -52,6 +51,7 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
+    "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
     "@cosmjs/proto-signing": "^0.30.1",

@@ -1,5 +1,3 @@
-import { createAxelarQueryBrowserClient } from "@axelarjs/api/axelar-query/browser";
-import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { S3CosmosChainConfig } from "@axelarjs/api/s3/types";
 import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
@@ -135,10 +133,20 @@ async function getFullFee({
   tx,
   chainConfig,
 }: GetFullFeeOptions): Promise<Coin> {
-  const apiClient =
-    typeof window === "object"
-      ? createAxelarQueryBrowserClient(environment, {})
-      : createAxelarQueryNodeClient(environment, {});
+  let apiClient;
+
+  if (typeof window === "undefined") {
+    const { createAxelarQueryNodeClient } = await import(
+      "@axelarjs/api/axelar-query/node"
+    );
+    apiClient = createAxelarQueryNodeClient(environment, {});
+  } else {
+    const { createAxelarQueryBrowserClient } = await import(
+      "@axelarjs/api/axelar-query/browser"
+    );
+    apiClient = createAxelarQueryBrowserClient(environment, {});
+  }
+
   const amount = await apiClient.estimateGasFee({
     sourceChain: tx.call.chain,
     destinationChain: tx.call.returnValues.destinationChain,
