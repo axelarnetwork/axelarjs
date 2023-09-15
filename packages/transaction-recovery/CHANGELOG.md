@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.0.14
+
+### Patch Changes
+
+- converting gmp and s3 service clients to use dynamic imports as well
+
 ## 0.0.13
 
 ### Patch Changes

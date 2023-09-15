@@ -4,7 +4,7 @@ import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 import { assertIsDeliverTxSuccess, Coin } from "@cosmjs/stargate";
 
 import { getCosmosSigner } from "../cosmosSigner";
-import { gmpClient, s3Client } from "../services";
+import { getGmpClient, getS3Client } from "../services";
 import { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
 
 /**
@@ -113,16 +113,16 @@ export async function addGas({
 }
 
 async function fetchChainConfig(environment: Environment, chain: string) {
-  return s3Client(environment)
+  const s3Client = await getS3Client(environment);
+  return s3Client
     .getChainConfigs(environment)
     .then((res) => res.chains[chain] as S3CosmosChainConfig)
     .catch(() => undefined);
 }
 
 async function fetchGMPTransaction(environment: Environment, txHash: string) {
-  const [tx] = await gmpClient(environment)
-    .searchGMP({ txHash })
-    .catch(() => []);
+  const gmpClient = await getGmpClient(environment);
+  const [tx] = await gmpClient.searchGMP({ txHash }).catch(() => []);
 
   return tx;
 }
