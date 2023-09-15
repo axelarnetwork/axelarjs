@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import Link from "next/link";
 
 import { formatDuration, intervalToDuration } from "date-fns";
@@ -9,14 +9,35 @@ import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import { type ContractMethod } from "./types";
 
-const getHumanizedElapsedTime = (timestamp: number) => {
+function useHumanizedElapsedTime(timestamp: number) {
+  const [now, setNow] = useState(Date.now());
   const interval = intervalToDuration({
     start: timestamp * 1000,
-    end: Date.now(),
+    end: now,
   });
 
-  return `${formatDuration(interval)} ago`;
-};
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  const formatted = formatDuration(interval);
+
+  const sanitized = interval.days
+    ? formatted
+        .replace(/\sdays?/, "d")
+        .replace(/\shours?/, "h")
+        .replace(/\sminutes?/, "m")
+        .replace(/\sseconds?/, "s")
+    : formatted;
+
+  return `${sanitized} ago`;
+}
 
 type Props = {
   contractMethod: ContractMethod;
@@ -61,6 +82,8 @@ const TransactionItem: FC<{
   tx: RecentTransactionsOutput[number];
   contractMethod: ContractMethod;
 }> = ({ tx, contractMethod }) => {
+  const humanizedElapsedTime = useHumanizedElapsedTime(tx.timestamp);
+
   return (
     <li className="flex items-center gap-2">
       <div className="avatar placeholder">
@@ -95,7 +118,7 @@ const TransactionItem: FC<{
             </div>
           )}
         </div>
-        <div className="text-xs">{getHumanizedElapsedTime(tx.timestamp)}</div>
+        <div className="font-mono text-xs">{humanizedElapsedTime}</div>
       </div>
     </li>
   );
