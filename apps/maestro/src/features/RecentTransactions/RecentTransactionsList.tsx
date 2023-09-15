@@ -1,3 +1,4 @@
+import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useState, type FC } from "react";
 import Link from "next/link";
 
@@ -56,9 +57,9 @@ export const RecentTransactionsList: FC<Props> = ({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="w-[80vw] space-y-4 md:w-auto">
       {title && <h3 className="text-center text-lg font-semibold">{title}</h3>}
-      <ul className="no-scrollbar relative max-h-64 space-y-2 overflow-y-scroll md:max-h-96">
+      <ul className="no-scrollbar relative max-h-64 min-w-[256px] space-y-4 overflow-y-scroll md:max-h-96">
         {isLoading ? (
           <li className="grid min-h-[384px] place-items-center text-center">
             Loading transactions...
@@ -96,15 +97,18 @@ const TransactionItem: FC<{
       <div>
         <div>
           <Link
-            className="inline-block max-w-[120px] overflow-hidden text-ellipsis text-sm font-semibold"
+            className="inline-block text-sm font-semibold"
             href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            {tx.hash}
+            {maskAddress(tx.hash as `0x${string}`, {
+              segmentA: 12,
+              segmentB: 52,
+            })}
           </Link>
         </div>
-        <div className="text-sm">
+        <div className="p-1 pb-2 text-sm">
           {tx.event?.event === "TokenSent" && (
             <div>
               {tx.event.name}{" "}
