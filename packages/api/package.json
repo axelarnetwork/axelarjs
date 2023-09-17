@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "publishConfig": {
     "access": "public"
   },
@@ -89,6 +89,6 @@
     "got": "^12.6.1",
     "ky": "^1.0.1",
     "rambda": "^7.5.0",
-    "viem": "~1.10.9"
+    "viem": "~1.10.14"
   }
 }
