@@ -548,6 +548,9 @@ importers:
 
   packages/transaction-recovery:
     dependencies:
+      '@axelarjs/api':
+        specifier: workspace:*
+        version: link:../api
       '@axelarjs/core':
         specifier: workspace:*
         version: link:../core
@@ -561,9 +564,6 @@ importers:
         specifier: ^0.31.1
         version: 0.31.1
     devDependencies:
-      '@axelarjs/api':
-        specifier: workspace:*
-        version: link:../api
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
