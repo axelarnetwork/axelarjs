@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@axelarjs/api": "workspace:*",
-    "@axelarjs/core": "workspace:*"
+    "@axelarjs/core": "workspace:*",
+    "viem": "~1.10.9"
   }
 }

@@ -1,30 +1,27 @@
-import { waitForDepositAddress } from "./helpers";
+import {
+  triggerGetDepositAddressFromAxelar,
+  validateAddress,
+  validateChainIds,
+  waitForDepositAddress,
+} from "./helpers";
+import { SendOptions } from "./types";
 
-export type SendOptions = {
-  sourceChain: string;
-  destinationChain: string;
-  destinationAddress: string;
-  asset: string;
-  module: string;
-};
+async function getDepositAddress(params: SendOptions) {
+  /**
+   * input validation
+   */
+  validateAddress(params.destinationAddress);
+  validateChainIds([params.sourceChain, params.destinationChain]);
 
-async function getDepositAddress({
-  sourceChain,
-  destinationAddress,
-  destinationChain,
-  asset,
-  module,
-}: SendOptions) {
-  //invoke api to retrieve deposit address
+  /**
+   * invoke API to get deposit address
+   */
+  triggerGetDepositAddressFromAxelar(params);
 
-  //wait for deposit address
-  return waitForDepositAddress({
-    sourceChain,
-    destinationAddress,
-    destinationChain,
-    asset,
-    module,
-  });
+  /**
+   * wait for and return deposit address
+   */
+  return waitForDepositAddress(params);
 }
 
 export default getDepositAddress;
