@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.1.15
+
+### Patch Changes
+
+- add getRecentLinkTransactions endpoint to axelarscan client
+
 ## 0.1.14
 
 ### Patch Changes

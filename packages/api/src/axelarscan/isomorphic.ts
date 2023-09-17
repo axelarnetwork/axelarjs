@@ -6,6 +6,9 @@ import {
   AxelarScanAsset,
   CosmosChainConfig,
   EVMChainConfig,
+  LinkEvent,
+  LinkRequestRawResponse,
+  LinkRequestResponse,
 } from "./types";
 
 export const MODULES = {
@@ -90,5 +93,46 @@ export class AxelarscanClient extends IsomorphicHTTPClient {
       evm: evm.filter(isEligible) as EVMChainConfig[],
       cosmos: cosmos.filter(isEligible) as CosmosChainConfig[],
     };
+  }
+
+  async searchTransactions(params: { size: number; type: string }) {
+    const json = {
+      method: "searchTransactions",
+      type: params.type,
+      size: params.size,
+    };
+
+    const result = await this.client
+      .post("", { json })
+      .json<LinkRequestRawResponse>();
+
+    return result;
+  }
+
+  async getRecentLinkTransactions(params: {
+    size: number;
+  }): Promise<LinkRequestResponse[]> {
+    return this.searchTransactions({
+      size: params.size,
+      type: "LinkRequest",
+    }).then((res) =>
+      res.data.map((entry) => {
+        const logs = entry.logs[0];
+        const linkEvent = logs.events.find((event) => event.type === "link");
+        const { attributes } = linkEvent as LinkEvent;
+        const find = (key: string) =>
+          attributes.find((attr: { key: string }) => attr.key === key)?.value;
+        return {
+          sourceChain: find("sourceChain"),
+          destinationChain: find("destinationChain"),
+          depositAddress: find("depositAddress"),
+          destinationAddress: find("destinationAddress"),
+          module: find("module"),
+          asset: find("asset"),
+          txHash: entry.txhash,
+          timmestamp: entry.timestamp,
+        };
+      })
+    );
   }
 }
