@@ -1,9 +1,11 @@
 import { LinkRequestResponse } from "@axelarjs/api";
 import { createAxelarscanNodeClient } from "@axelarjs/api/axelarscan/node";
+import { type OTC } from "@axelarjs/api/deposit-address-api/types";
 
+import { depositAddressClient } from "~/services";
 import { SendOptions } from "~/types";
 import { isStrEqual, poll } from "./utils";
-import { createWallet, signOtc } from "./wallet";
+import { createWallet } from "./wallet";
 
 export type ListenerParams = {
   sourceChain: string;
@@ -44,46 +46,37 @@ export async function waitForDepositAddress(params: ListenerParams) {
   );
 }
 
-export async function triggerGetDepositAddressFromAxelar({
-  sourceChain,
-  destinationAddress,
-  destinationChain,
-  asset,
-}: SendOptions): Promise<string> {
-  type RoomIdResponse = Record<"data", Record<"roomId", string>>;
-
+export async function triggerGetDepositAddressFromAxelar(
+  params: SendOptions
+): Promise<any> {
   const wallet = await createWallet();
   const publicAddress = wallet.account.address;
   const { validationMsg } = await getOneTimeCode(publicAddress);
-  const signature = await signOtc(wallet, validationMsg);
-  const payload = {
-    fromChain: sourceChain,
-    toChain: destinationChain,
-    destinationAddress,
-    asset,
-    publicAddress,
-    signature,
+  console.log({ validationMsg, params });
+
+  // then get signature, i.e. await signOTC...
+
+  // then request the deposit address with these params:
+  // const payload = {
+  //   fromChain: sourceChain,
+  //   toChain: destinationChain,
+  //   destinationAddress,
+  //   asset,
+  //   publicAddress,
+  //   signature,
+  // };
+
+  return {
+    success: true,
+    otherInfoTBD: ";-)",
   };
-
-  const response: RoomIdResponse = await this.api
-    .post(CLIENT_API_POST_TRANSFER_ASSET, payload, traceId)
-    .then((response) => response)
-    .catch((error) => {
-      throw error;
-    });
-
-  const roomId = response?.data?.roomId;
-  return roomId;
 }
-async function getOneTimeCode(
-  signerAddress: `0x${string}` | undefined
-): Promise<OTC> {
-  const otc: OTC = await this.api
-    .get(`${CLIENT_API_GET_OTC}?publicAddress=${signerAddress}`)
-    .then((response) => response)
-    .catch((error) => {
-      throw error;
-    });
+async function getOneTimeCode(signerAddress: `0x${string}`): Promise<OTC> {
+  const api = await depositAddressClient();
+  console.log("getting one time code", signerAddress);
+  const otc: OTC = await api.getOTC({ signerAddress });
 
+  //why isn't this reaching?
+  console.log({ otc });
   return otc;
 }

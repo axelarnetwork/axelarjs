@@ -1,4 +1,4 @@
-import { AxelarscanClient, createAxelarscanNodeClient } from "./";
+import { AxelarscanClient, createAxelarscanNodeClient } from "./axelarscan";
 
 describe("axelarscan", () => {
   describe("searchTransactions", () => {

@@ -2,7 +2,6 @@ import {
   triggerGetDepositAddressFromAxelar,
   validateAddress,
   validateChainIds,
-  waitForDepositAddress,
 } from "./helpers";
 import { SendOptions } from "./types";
 
@@ -21,7 +20,7 @@ async function getDepositAddress(params: SendOptions) {
   /**
    * wait for and return deposit address
    */
-  return waitForDepositAddress(params);
+  // return waitForDepositAddress(params);
 }
 
 export default getDepositAddress;

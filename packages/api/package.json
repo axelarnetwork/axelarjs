@@ -15,6 +15,7 @@
     "./axelar-query",
     "./gmp",
     "./s3",
+    "./deposit-address-api",
     "./index.js"
   ],
   "exports": {
@@ -29,6 +30,10 @@
     "./axelar-query": {
       "import": "./build/module/axelar-query/index.js",
       "require": "./build/commonjs/axelar-query/index.js"
+    },
+    "./deposit-address-api": {
+      "import": "./build/module/deposit-address-api/index.js",
+      "require": "./build/commonjs/deposit-address-api/index.js"
     },
     "./gmp/*": {
       "import": "./build/module/gmp/*.js",
@@ -45,6 +50,10 @@
     "./s3/*": {
       "import": "./build/module/s3/*.js",
       "require": "./build/commonjs/s3/*.js"
+    },
+    "./deposit-address-api/*": {
+      "import": "./build/module/deposit-address-api/index.js",
+      "require": "./build/commonjs/deposit-address-api/index.js"
     },
     ".": {
       "import": "./build/module/*.js",

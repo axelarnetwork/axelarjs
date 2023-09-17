@@ -1,5 +1,6 @@
 import { createWalletClient, http, WalletClient } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { mainnet } from "viem/chains";
 
 export async function createWallet() {
   if (globalThis.sessionStorage) {
@@ -9,6 +10,7 @@ export async function createWallet() {
     if (privateKey) {
       return createWalletClient({
         account: privateKeyToAccount(privateKey),
+        chain: mainnet,
         transport: http(),
       });
     } else {
@@ -17,12 +19,14 @@ export async function createWallet() {
       globalThis.sessionStorage.setItem("axelar-wallet", privateKey);
       return createWalletClient({
         account: privateKeyToAccount(privateKey),
+        chain: mainnet,
         transport: http(),
       });
     }
   } else {
     return createWalletClient({
       account: privateKeyToAccount(generatePrivateKey()),
+      chain: mainnet,
       transport: http(),
     });
   }
