@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     testTimeout: 300000,
     environment: "node",
-    exclude: ["**/node_modules/**", "build/**", "./*.js"],
+    exclude: ["**/node_modules/**", "build/**", "**/*.js"],
     globals: true,
     setupFiles: ["dotenv/config"],
   },
