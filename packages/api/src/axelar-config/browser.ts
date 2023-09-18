@@ -2,13 +2,13 @@ import { AXELAR_CONFIG_API_URLS, Environment } from "@axelarjs/core";
 
 import ky, { type Options } from "ky";
 
-import { ConfigClient } from "./isomorphic";
+import { AxelarConfigClient } from "./isomorphic";
 
 export const createAxelarConfigBrowserClient = (
   env: Environment,
   options?: Options
 ) =>
-  ConfigClient.init({
+  AxelarConfigClient.init({
     target: "browser",
     instance: ky.extend({
       ...(options ?? {

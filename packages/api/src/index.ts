@@ -4,5 +4,5 @@ export * from "./axelarscan";
 export * from "./gmp";
 // axelar-query
 export * from "./axelar-query";
-// static configs
-export * from "./config";
+// axelar-config
+export * from "./axelar-config";

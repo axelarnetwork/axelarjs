@@ -2,13 +2,13 @@ import { AXELAR_CONFIG_API_URLS, Environment } from "@axelarjs/core";
 
 import got, { type Options } from "got";
 
-import { ConfigClient } from "./isomorphic";
+import { AxelarConfigClient } from "./isomorphic";
 
 export const createAxelarConfigNodeClient = (
   env: Environment,
   options?: Partial<Options>
 ) =>
-  ConfigClient.init({
+  AxelarConfigClient.init({
     target: "node",
     instance: got.extend({
       ...(options ?? {
