@@ -3,7 +3,7 @@ build/
 /axelarscan/
 /gmp/
 /axelar-query/
-/s3/
+/config/
 *.d.ts
 *.js
 .turbo/

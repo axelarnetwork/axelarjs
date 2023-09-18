@@ -1,9 +1,9 @@
 import got, { type Options } from "got";
 
-import { S3Client } from "./isomorphic";
+import { ConfigClient } from "./isomorphic";
 
 export const createS3NodeClient = (options: Partial<Options>) =>
-  S3Client.init({
+  ConfigClient.init({
     target: "node",
     instance: got.extend(options),
   });
