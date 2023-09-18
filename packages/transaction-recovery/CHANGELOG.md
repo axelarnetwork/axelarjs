@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.3
+
+### Patch Changes
+
+- [`8dce1e7`](https://github.com/axelarnetwork/axelarjs/commit/8dce1e718a106f97563bca74b495eb5ee0f0297e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Expose addGasNode and addGasBrowser from add-gas/index
+
 ## 0.1.2
 
 ### Patch Changes
