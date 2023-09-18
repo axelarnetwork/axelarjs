@@ -1,3 +1,5 @@
+name: Test (E2E)
+
 on:
   - pull_request
 
