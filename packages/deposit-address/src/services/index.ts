@@ -15,5 +15,5 @@ export const s3Client = (env: Environment) =>
 
 export const depositAddressClient = () =>
   createDepositAddressApiNodeClient({
-    prefixUrl: "https://nest-server-testnet.axelar.dev/", //TODO, hard-coded for now
+    prefixUrl: "https://nest-server-testnet.axelar.dev", //TODO, hard-coded for now
   });

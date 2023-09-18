@@ -71,9 +71,11 @@ export async function triggerGetDepositAddressFromAxelar(
     otherInfoTBD: ";-)",
   };
 }
-async function getOneTimeCode(signerAddress: `0x${string}`): Promise<OTC> {
-  const api = await depositAddressClient();
-  console.log("getting one time code", signerAddress);
+export async function getOneTimeCode(
+  signerAddress: `0x${string}`
+): Promise<OTC> {
+  const api = depositAddressClient();
+  console.log("getting one time code", signerAddress, api);
   const otc: OTC = await api.getOTC({ signerAddress });
 
   //why isn't this reaching?

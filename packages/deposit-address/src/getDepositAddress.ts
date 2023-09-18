@@ -15,7 +15,9 @@ async function getDepositAddress(params: SendOptions) {
   /**
    * invoke API to get deposit address
    */
-  triggerGetDepositAddressFromAxelar(params);
+  const waitForTrigger = await triggerGetDepositAddressFromAxelar(params);
+
+  return "canh";
 
   /**
    * wait for and return deposit address
