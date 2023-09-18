@@ -12,9 +12,6 @@ importers:
 
   .:
     devDependencies:
-      '@changesets/changelog-git':
-        specifier: ^0.1.14
-        version: 0.1.14
       '@changesets/changelog-github':
         specifier: ^0.4.8
         version: 0.4.8

@@ -35,7 +35,6 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "@changesets/changelog-git": "^0.1.14",
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2",
     "@commitlint/cli": "^17.7.1",
