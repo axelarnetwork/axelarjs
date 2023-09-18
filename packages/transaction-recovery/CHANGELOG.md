@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.1
+
+### Patch Changes
+
+- 2835b95: Fix @axelarjs/api imports
+
 ## 0.1.0
 
 ### Minor Changes
