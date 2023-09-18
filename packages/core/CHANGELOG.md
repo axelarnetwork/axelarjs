@@ -1,5 +1,11 @@
 # @axelarjs/core
 
+## 0.2.0
+
+### Minor Changes
+
+- aac5d21: Refactor api, transaction-recovery & core modules to support isomorphic clients
+
 ## 0.1.3
 
 ### Patch Changes

@@ -1,7 +1,6 @@
 node_modules/
 build/
-/cosmosSigner
-/services
+/add-gas
 
 *.d.ts
 *.js

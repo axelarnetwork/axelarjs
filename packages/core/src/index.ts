@@ -13,15 +13,22 @@ export const COSMOS_GAS_RECEIVER_OPTIONS = {
 export type CosmosGasReceiver = keyof typeof COSMOS_GAS_RECEIVER_OPTIONS;
 
 export const AXELARSCAN_API_URLS = {
+  testnet: "https://testnet.api.axelarscan.io",
+  mainnet: "https://api.axelarscan.io",
+} as const;
+
+export type AxelarscanAPIUrl = keyof typeof AXELARSCAN_API_URLS;
+
+export const GMP_API_URLS = {
   testnet: "https://testnet.api.gmp.axelarscan.io",
   mainnet: "https://api.gmp.axelarscan.io",
 } as const;
 
-export type AxelarscanUrl = keyof typeof AXELARSCAN_API_URLS;
+export type GMPAPIUrl = keyof typeof GMP_API_URLS;
 
-export const S3_API_URLS = {
+export const AXELAR_CONFIG_API_URLS = {
   testnet: "https://axelar-testnet.s3.us-east-2.amazonaws.com",
   mainnet: "https://axelar-mainnet.s3.us-east-2.amazonaws.com",
 } as const;
 
-export type S3Url = keyof typeof S3_API_URLS;
+export type AxelarConfigAPIUrl = keyof typeof AXELAR_CONFIG_API_URLS;

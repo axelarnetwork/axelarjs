@@ -6,10 +6,10 @@ import {
   AxelarQueryAPIClient,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
-} from "./axelar-query";
-import { createAxelarQueryNodeClient } from "./axelar-query/node";
+} from "../axelar-query";
+import { createAxelarQueryNodeClient } from "./node";
 
-describe("axelar-query", () => {
+describe("axelar-query (node client)", () => {
   describe("estimateGasFee", () => {
     const requestParam: EstimateGasFeeParams = {
       sourceChain: "ethereum-2",

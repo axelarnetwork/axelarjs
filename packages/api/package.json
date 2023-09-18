@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.1.15",
+  "version": "0.2.1",
   "publishConfig": {
     "access": "public"
   },
@@ -14,8 +14,8 @@
     "./axelarscan",
     "./axelar-query",
     "./gmp",
-    "./s3",
     "./deposit-address-api",
+    "./axelar-config",
     "./index.js"
   ],
   "exports": {
@@ -47,9 +47,9 @@
       "import": "./build/module/axelar-query/*.js",
       "require": "./build/commonjs/axelar-query/*.js"
     },
-    "./s3/*": {
-      "import": "./build/module/s3/*.js",
-      "require": "./build/commonjs/s3/*.js"
+    "./axelar-config/*": {
+      "import": "./build/module/axelar-config/*.js",
+      "require": "./build/commonjs/axelar-config/*.js"
     },
     "./deposit-address-api/*": {
       "import": "./build/module/deposit-address-api/index.js",
@@ -62,13 +62,6 @@
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
     }
   },
   "scripts": {
@@ -98,6 +91,6 @@
     "got": "^12.6.1",
     "ky": "^1.0.1",
     "rambda": "^7.5.0",
-    "viem": "~1.10.9"
+    "viem": "~1.10.14"
   }
 }

@@ -12,6 +12,7 @@ export type Asset = {
   ibcDenom: string;
   coingeckoId: string;
 };
+
 export type ChainConfig = {
   id: string;
   externalIdentifiers: {
@@ -23,7 +24,7 @@ export type ChainConfig = {
   module: "axelarnet" | "evm";
 };
 
-export type S3EVMChainConfig = ChainConfig & {
+export type AxelarEVMChainConfig = ChainConfig & {
   evmConfigs: {
     finalityHeight: number;
     contracts: {
@@ -34,7 +35,8 @@ export type S3EVMChainConfig = ChainConfig & {
     };
   };
 };
-export type S3CosmosChainConfig = ChainConfig & {
+
+export type AxelarCosmosChainConfig = ChainConfig & {
   cosmosConfigs: {
     rpc: string[];
     lcd: string[];
@@ -44,7 +46,7 @@ export type S3CosmosChainConfig = ChainConfig & {
   };
 };
 
-export type ChainConfigs = S3CosmosChainConfig | S3EVMChainConfig;
+export type ChainConfigs = AxelarCosmosChainConfig | AxelarEVMChainConfig;
 
 export type S3Response = {
   chains: Record<string, ChainConfigs>;
