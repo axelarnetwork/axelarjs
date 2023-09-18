@@ -1,4 +1,4 @@
-export * from "./networkAddressHelpers";
+export * from "./getDepositAddressFromAxelarNetwork";
 export * from "./validation";
 export * from "./account";
 export * from "./utils";

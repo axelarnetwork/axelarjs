@@ -1,22 +1,12 @@
-import { AxelarConfigClient, AxelarscanClient, GMPClient } from "@axelarjs/api";
 import type { ChainConfigs } from "@axelarjs/api/axelar-config/types";
-import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
 
 import {
-  triggerGetDepositAddressFromAxelar,
+  getDepositAddressFromAxelarNetwork,
   validateAddress,
   validateAsset,
   validateChainIds,
-  waitForDepositAddress,
 } from "./helpers";
-import { SendOptions } from "./types";
-
-export type GetDepositAddressDependencies = {
-  gmpClient: GMPClient;
-  depositAddressClient: DepositAddressClient;
-  configClient: AxelarConfigClient;
-  axelarscanClient: AxelarscanClient;
-};
+import type { GetDepositAddressDependencies, SendOptions } from "./types";
 
 export async function getDepositAddress(
   params: SendOptions,
@@ -40,15 +30,5 @@ export async function getDepositAddress(
     chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfigs
   );
 
-  /**
-   * invoke API to get deposit address
-   */
-  await triggerGetDepositAddressFromAxelar(
-    params,
-    dependencies.depositAddressClient
-  );
-  /**
-   * wait for and return deposit address
-   */
-  return waitForDepositAddress(params, dependencies.axelarscanClient);
+  return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);
 }

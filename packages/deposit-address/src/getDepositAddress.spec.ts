@@ -9,8 +9,7 @@ describe("getDepositAddress - node", () => {
       sourceChain: "Fantom",
       destinationChain: "ethereum-2",
       asset: "uaxl",
-      destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
-      module: "evm",
+      destinationAddress: "0xA57ADCE1d2fE72949E4308867D894CD7E7DE0ef2",
       environment: ENVIRONMENTS.testnet,
     };
     const res = await getDepositAddressNode(params);
