@@ -7,7 +7,7 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { AddGasParams } from "~/types";
 import { addGas } from "./addGas";
 
-export default function addGasBrowser(params: AddGasParams) {
+export function addGasBrowser(params: AddGasParams) {
   const { environment } = params.sendOptions;
 
   return addGas(params, {
@@ -17,3 +17,5 @@ export default function addGasBrowser(params: AddGasParams) {
     getSigningStargateClient: SigningStargateClient.connectWithSigner,
   });
 }
+
+export default addGasBrowser;
