@@ -21,13 +21,13 @@ export async function getDepositAddress(
   params: SendOptions,
   dependencies: GetDepositAddressDependencies
 ) {
-  /**
-   * input validation
-   */
   const chainConfigs = await dependencies.configClient.getChainConfigs(
     params.environment
   );
-  console.log({ chainConfigs });
+
+  /**
+   * input validation
+   */
   validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
   validateAddress(
     params.destinationAddress,

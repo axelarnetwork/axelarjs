@@ -7,8 +7,6 @@ import type {
 import { bech32 } from "bech32";
 import { isAddress } from "viem";
 
-import "@axelarjs/api";
-
 export function validateAddress(
   destinationAddress: string,
   chainConfig: ChainConfigs
