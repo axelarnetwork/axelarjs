@@ -1,4 +1,4 @@
-import { Environment } from "@axelarjs/core";
+import type { Environment } from "@axelarjs/core";
 
 import ky, { type Options } from "ky";
 
