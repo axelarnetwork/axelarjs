@@ -1,5 +1,5 @@
-import { createAxelarscanBrowserClient } from "@axelarjs/api";
 import { createAxelarConfigBrowserClient } from "@axelarjs/api/axelar-config/browser";
+import { createAxelarscanBrowserClient } from "@axelarjs/api/axelarscan/browser";
 import { createDepositAddressApiBrowserClient } from "@axelarjs/api/deposit-address-api/browser";
 import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 
@@ -12,9 +12,7 @@ export default function getDepositAddressBrowser(params: SendOptions) {
   return getDepositAddress(params, {
     configClient: createAxelarConfigBrowserClient(environment),
     gmpClient: createGMPBrowserClient(environment),
-    depositAddressClient: createDepositAddressApiBrowserClient({
-      prefixUrl: "https://nest-server-testnet.axelar.dev", //TODO, hard-coded for now
-    }),
+    depositAddressClient: createDepositAddressApiBrowserClient(environment),
     axelarscanClient: createAxelarscanBrowserClient(environment),
   });
 }
