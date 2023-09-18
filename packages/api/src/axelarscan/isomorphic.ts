@@ -1,7 +1,10 @@
 import { partition } from "rambda";
 
-import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
 import {
+  IsomorphicHTTPClient,
+  type ClientOptions,
+} from "../IsomorphicHTTPClient";
+import type {
   AxelarAssetPrice,
   AxelarScanAsset,
   CosmosChainConfig,

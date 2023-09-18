@@ -1,4 +1,4 @@
-import { Environment, GMP_API_URLS } from "@axelarjs/core";
+import { GMP_API_URLS, type Environment } from "@axelarjs/core";
 
 import got, { type Options } from "got";
 

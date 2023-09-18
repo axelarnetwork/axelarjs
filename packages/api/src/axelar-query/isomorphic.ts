@@ -1,12 +1,13 @@
 import { parseUnits } from "viem";
 
-import { EstimateGasFeeParams, EstimateGasFeeResponse, GMPClient } from "..";
+import type { GMPClient } from "../gmp/isomorphic";
 import {
-  ClientOptions,
   IsomorphicHTTPClient,
   type ClientMeta,
+  type ClientOptions,
 } from "../IsomorphicHTTPClient";
 import { BigNumberUtils } from "./helpers/BigNumberUtils";
+import { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 
 type AxelarscanClientDependencies = {
   gmpClient: GMPClient;

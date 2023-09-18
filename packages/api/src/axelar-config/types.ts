@@ -12,6 +12,7 @@ export type Asset = {
   ibcDenom: string;
   coingeckoId: string;
 };
+
 export type ChainConfig = {
   id: string;
   externalIdentifiers: {
@@ -34,6 +35,7 @@ export type AxelarEVMChainConfig = ChainConfig & {
     };
   };
 };
+
 export type AxelarCosmosChainConfig = ChainConfig & {
   cosmosConfigs: {
     rpc: string[];

@@ -1,7 +1,10 @@
-import { Environment } from "@axelarjs/core";
+import type { Environment } from "@axelarjs/core";
 
-import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
-import { S3Response } from "./types";
+import {
+  IsomorphicHTTPClient,
+  type ClientOptions,
+} from "../IsomorphicHTTPClient";
+import type { S3Response } from "./types";
 
 export class AxelarConfigClient extends IsomorphicHTTPClient {
   static init(options: ClientOptions) {
