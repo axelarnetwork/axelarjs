@@ -43,14 +43,23 @@ function findLinkRequest(
   module: "evm" | "axelarnet" | undefined,
   results: LinkRequestResponse[]
 ) {
-  const foundEntry = results.find(
-    (linkRequest) =>
-      module === "axelarnet" ||
-      (isStrEqual(linkRequest.sourceChain, params.sourceChain) &&
+  const foundEntry = results.find((linkRequest) => {
+    if (module === "axelarnet") {
+      return (
+        linkRequest.module === "axelarnet" &&
         isStrEqual(linkRequest.destinationAddress, params.destinationAddress) &&
         isStrEqual(linkRequest.destinationChain, params.destinationChain) &&
-        isStrEqual(linkRequest.asset, params.asset))
-  );
+        isStrEqual(linkRequest.asset, params.asset)
+      );
+    } else {
+      return (
+        isStrEqual(linkRequest.sourceChain, params.sourceChain) &&
+        isStrEqual(linkRequest.destinationAddress, params.destinationAddress) &&
+        isStrEqual(linkRequest.destinationChain, params.destinationChain) &&
+        isStrEqual(linkRequest.asset, params.asset)
+      );
+    }
+  });
   return foundEntry;
 }
 
