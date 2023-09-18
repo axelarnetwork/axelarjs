@@ -11,19 +11,10 @@
   },
   "files": [
     "./build",
-    "./cosmosSigner",
-    "./services",
-    "./addGas",
+    "./add-gas",
     "./index.js",
     "./types.js"
   ],
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
-    }
-  },
   "exports": {
     ".": {
       "import": "./build/module/index.js",
@@ -32,6 +23,10 @@
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
+    },
+    "./add-gas/*": {
+      "import": "./build/module/add-gas/*.js",
+      "require": "./build/commonjs/add-gas/*.js"
     }
   },
   "scripts": {
