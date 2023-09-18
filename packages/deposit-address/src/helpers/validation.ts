@@ -12,14 +12,21 @@ export function validateAddress(
   chainConfig: ChainConfigs
 ) {
   const { module } = chainConfig;
-  if (module === "evm") return isAddress(destinationAddress);
+  if (module === "evm") {
+    if (!isAddress(destinationAddress))
+      throw new Error(`${destinationAddress} is not a valid EVM address`);
+  }
 
   try {
     const { addressPrefix } = (chainConfig as AxelarCosmosChainConfig)
       .cosmosConfigs;
-    return bech32.decode(destinationAddress).prefix === addressPrefix;
+    if (!(bech32.decode(destinationAddress).prefix === addressPrefix)) {
+      throw new Error(
+        `${destinationAddress} is not a valid address for ${chainConfig.id}`
+      );
+    }
   } catch (e) {
-    return false;
+    throw new Error(`could not validate this address: ${destinationAddress}`);
   }
 }
 export function validateChainIds(
