@@ -1,9 +1,11 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - env/testnet
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
