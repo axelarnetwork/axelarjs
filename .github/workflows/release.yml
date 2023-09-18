@@ -1,11 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: "Reason for manual run"
-        required: false
+  push:
+    branches:
+      - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
