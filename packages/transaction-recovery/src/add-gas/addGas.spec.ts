@@ -1,10 +1,13 @@
+import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
+import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
+import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 import { ENVIRONMENTS } from "@axelarjs/core";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
 import { type AutocalculateGasOptions, type SendOptions } from "../types";
-import { addGas } from "./addGas";
+import { addGas, AddGasDependencies } from "./addGas";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,
@@ -19,19 +22,22 @@ const MOCK_ADD_GAS_RESPONSE = {
   gasWanted: 250000,
 };
 
-vi.mock("../cosmosSigner/signer", () => {
-  const mockAddGasSignAndBroadcast = () => MOCK_ADD_GAS_RESPONSE;
-
-  const getCosmosSigner = vi.fn(() => ({
-    signAndBroadcast: vi.fn().mockImplementation(mockAddGasSignAndBroadcast),
-  }));
-
-  return {
-    getCosmosSigner,
-  };
-});
-
 describe("addGas", () => {
+  const mockSignAndBroadcast = () => MOCK_ADD_GAS_RESPONSE;
+
+  const mockGetSigningStargateClient = vi.fn(() =>
+    Promise.resolve({
+      signAndBroadcast: vi.fn().mockImplementation(mockSignAndBroadcast),
+    })
+  );
+
+  const DEFAULT_ADD_GAS_DEPENDENCIES: AddGasDependencies = {
+    axelarQueryClient: createAxelarQueryNodeClient(ENVIRONMENTS.testnet),
+    configClient: createAxelarConfigNodeClient(ENVIRONMENTS.testnet),
+    gmpClient: createGMPNodeClient(ENVIRONMENTS.testnet),
+    getSigningStargateClient: mockGetSigningStargateClient as any,
+  };
+
   test("broadcast an IBC transfer", async () => {
     const txHash =
       "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
@@ -56,12 +62,15 @@ describe("addGas", () => {
       offlineSigner,
     };
 
-    const res = await addGas({
-      txHash,
-      token,
-      sendOptions,
-      chain: "osmosis-6",
-    });
+    const res = await addGas(
+      {
+        txHash,
+        token,
+        sendOptions,
+        chain: "osmosis-6",
+      },
+      DEFAULT_ADD_GAS_DEPENDENCIES
+    );
 
     expect(res).toEqual({
       broadcastResult: MOCK_ADD_GAS_RESPONSE,
@@ -93,13 +102,16 @@ describe("addGas", () => {
       offlineSigner,
     };
 
-    const res = await addGas({
-      txHash,
-      token: "autocalculate",
-      sendOptions,
-      autocalculateGasOptions,
-      chain: "osmosis-6",
-    });
+    const res = await addGas(
+      {
+        txHash,
+        token: "autocalculate",
+        sendOptions,
+        autocalculateGasOptions,
+        chain: "osmosis-6",
+      },
+      DEFAULT_ADD_GAS_DEPENDENCIES
+    );
 
     expect(res).toEqual({
       broadcastResult: MOCK_ADD_GAS_RESPONSE,

@@ -1,13 +1,25 @@
-import { createAxelarQueryBrowserClient } from "@axelarjs/api/axelar-query/browser";
-import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
-import { S3CosmosChainConfig } from "@axelarjs/api/s3/types";
-import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
+import { AxelarQueryAPIClient, ConfigClient, GMPClient } from "@axelarjs/api";
+import { AxelarCosmosChainConfig } from "@axelarjs/api/config/types";
+import { COSMOS_GAS_RECEIVER_OPTIONS } from "@axelarjs/core";
 
-import { assertIsDeliverTxSuccess, Coin } from "@cosmjs/stargate";
+import { OfflineSigner } from "@cosmjs/proto-signing";
+import {
+  assertIsDeliverTxSuccess,
+  Coin,
+  SigningStargateClient,
+} from "@cosmjs/stargate";
 
-import { getCosmosSigner } from "../cosmosSigner";
-import { gmpClient, s3Client } from "../services";
 import { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
+
+export type AddGasDependencies = {
+  axelarQueryClient: AxelarQueryAPIClient;
+  configClient: ConfigClient;
+  gmpClient: GMPClient;
+  getSigningStargateClient: (
+    rpcUrl: string,
+    offlineSigner: OfflineSigner
+  ) => Promise<SigningStargateClient>;
+};
 
 /**
  * Adds gas to a transaction that might be stuck due to insufficient gas
@@ -15,15 +27,14 @@ import { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
  * @param params {AddGasParams} - Parameters to add gas to a transaction
  * @returns {Promise<AddGasResponse>} - Response from adding gas to a transaction
  */
-export async function addGas({
-  autocalculateGasOptions,
-  sendOptions,
-  ...params
-}: AddGasParams): Promise<AddGasResponse> {
-  const chainConfig = await fetchChainConfig(
-    sendOptions.environment,
-    params.chain
-  );
+export async function addGas(
+  { autocalculateGasOptions, sendOptions, ...params }: AddGasParams,
+  dependencies: AddGasDependencies
+): Promise<AddGasResponse> {
+  const chainConfig = await dependencies.configClient
+    .getChainConfigs(sendOptions.environment)
+    .then((res) => res.chains[params.chain] as AxelarCosmosChainConfig)
+    .catch(() => undefined);
 
   if (!chainConfig) {
     throw new Error(`chain ID ${params.chain} not found`);
@@ -31,7 +42,9 @@ export async function addGas({
 
   const { rpc, channelIdToAxelar } = chainConfig.cosmosConfigs;
 
-  const tx = await fetchGMPTransaction(sendOptions.environment, params.txHash);
+  const [tx] = await dependencies.gmpClient
+    .searchGMP({ txHash: params.txHash })
+    .catch(() => []);
 
   if (!tx) {
     return {
@@ -58,9 +71,9 @@ export async function addGas({
       ? params.token
       : await getFullFee({
           tx,
-          environment: sendOptions.environment,
           autocalculateGasOptions,
           chainConfig,
+          axelarQueryClient: dependencies.axelarQueryClient,
         });
 
   const sender = await sendOptions.offlineSigner
@@ -83,9 +96,12 @@ export async function addGas({
     };
   }
 
-  const signer = await getCosmosSigner(rpcUrl, sendOptions.offlineSigner);
+  const signingStargateClient = await dependencies.getSigningStargateClient(
+    rpcUrl,
+    sendOptions.offlineSigner
+  );
 
-  const broadcastResult = await signer.signAndBroadcast(
+  const broadcastResult = await signingStargateClient.signAndBroadcast(
     sender,
     [
       {
@@ -113,33 +129,13 @@ export async function addGas({
     broadcastResult,
   };
 }
-
-async function fetchChainConfig(environment: Environment, chain: string) {
-  return s3Client(environment)
-    .getChainConfigs(environment)
-    .then((res) => res.chains[chain] as S3CosmosChainConfig)
-    .catch(() => undefined);
-}
-
-async function fetchGMPTransaction(environment: Environment, txHash: string) {
-  const [tx] = await gmpClient(environment)
-    .searchGMP({ txHash })
-    .catch(() => []);
-
-  return tx;
-}
-
 async function getFullFee({
-  environment,
   autocalculateGasOptions,
   tx,
   chainConfig,
+  axelarQueryClient,
 }: GetFullFeeOptions): Promise<Coin> {
-  const apiClient =
-    typeof window === "object"
-      ? createAxelarQueryBrowserClient(environment, {})
-      : createAxelarQueryNodeClient(environment, {});
-  const amount = await apiClient.estimateGasFee({
+  const amount = await axelarQueryClient.estimateGasFee({
     sourceChain: tx.call.chain,
     destinationChain: tx.call.returnValues.destinationChain,
     gasLimit: autocalculateGasOptions?.gasLimit ?? BigInt(1_000_000),
@@ -167,7 +163,7 @@ function matchesOriginalTokenPayment(
 
 function getIBCDenomOnSrcChain(
   denomOnAxelar: string,
-  chain: S3CosmosChainConfig
+  chain: AxelarCosmosChainConfig
 ) {
   const { ibcDenom } =
     chain.assets?.find(({ id }) => id === denomOnAxelar) ?? {};

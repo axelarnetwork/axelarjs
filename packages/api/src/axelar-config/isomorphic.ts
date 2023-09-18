@@ -3,10 +3,10 @@ import { Environment } from "@axelarjs/core";
 import { ClientOptions, IsomorphicHTTPClient } from "../IsomorphicHTTPClient";
 import { S3Response } from "./types";
 
-export class S3Client extends IsomorphicHTTPClient {
+export class AxelarConfigClient extends IsomorphicHTTPClient {
   static init(options: ClientOptions) {
-    return new S3Client(options, {
-      name: "S3Client",
+    return new AxelarConfigClient(options, {
+      name: "AxelarConfigClient",
       version: "0.0.1",
     });
   }

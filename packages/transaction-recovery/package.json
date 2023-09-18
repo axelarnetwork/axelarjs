@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public"
   },
@@ -11,19 +11,10 @@
   },
   "files": [
     "./build",
-    "./cosmosSigner",
-    "./services",
-    "./addGas",
+    "./add-gas",
     "./index.js",
     "./types.js"
   ],
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
-    }
-  },
   "exports": {
     ".": {
       "import": "./build/module/index.js",
@@ -32,6 +23,10 @@
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
+    },
+    "./add-gas/*": {
+      "import": "./build/module/add-gas/*.js",
+      "require": "./build/commonjs/add-gas/*.js"
     }
   },
   "scripts": {
@@ -44,7 +39,6 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "@axelarjs/api": "workspace:*",
     "@axelarjs/config": "workspace:*",
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
@@ -52,6 +46,7 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
+    "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
     "@cosmjs/proto-signing": "^0.30.1",

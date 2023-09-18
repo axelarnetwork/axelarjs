@@ -1,14 +1,6 @@
-import { AXELARSCAN_API_URLS, Environment } from "@axelarjs/core";
-
 import { parseUnits } from "viem";
 
-import {
-  createGMPBrowserClient,
-  createGMPNodeClient,
-  EstimateGasFeeParams,
-  EstimateGasFeeResponse,
-  GMPClient,
-} from "..";
+import { EstimateGasFeeParams, EstimateGasFeeResponse, GMPClient } from "..";
 import {
   ClientOptions,
   IsomorphicHTTPClient,
@@ -16,27 +8,27 @@ import {
 } from "../IsomorphicHTTPClient";
 import { BigNumberUtils } from "./helpers/BigNumberUtils";
 
+type AxelarscanClientDependencies = {
+  gmpClient: GMPClient;
+};
+
 export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   protected gmpClient: GMPClient;
 
   public constructor(
-    env: Environment,
     options: ClientOptions,
+    dependencies: AxelarscanClientDependencies,
     meta?: ClientMeta
   ) {
     super(options, meta);
-    this.gmpClient =
-      options.target === "browser"
-        ? createGMPBrowserClient({
-            prefixUrl: AXELARSCAN_API_URLS[env],
-          })
-        : createGMPNodeClient({
-            prefixUrl: AXELARSCAN_API_URLS[env],
-          });
+    this.gmpClient = dependencies.gmpClient;
   }
 
-  static init(env: Environment, options: ClientOptions) {
-    return new AxelarQueryAPIClient(env, options, {
+  static init(
+    options: ClientOptions,
+    dependencies: AxelarscanClientDependencies
+  ) {
+    return new AxelarQueryAPIClient(options, dependencies, {
       name: "AxelarQueryAPI",
       version: "0.0.11",
     });
