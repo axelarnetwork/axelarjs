@@ -1,1 +1,2 @@
-export * from "./getDepositAddress";
+export * from "./browser";
+export * from "./node";
