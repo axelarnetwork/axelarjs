@@ -14,7 +14,7 @@
     "./axelarscan",
     "./axelar-query",
     "./gmp",
-    "./s3",
+    "./config",
     "./index.js"
   ],
   "exports": {
@@ -42,9 +42,9 @@
       "import": "./build/module/axelar-query/*.js",
       "require": "./build/commonjs/axelar-query/*.js"
     },
-    "./s3/*": {
-      "import": "./build/module/s3/*.js",
-      "require": "./build/commonjs/s3/*.js"
+    "./config/*": {
+      "import": "./build/module/config/*.js",
+      "require": "./build/commonjs/config/*.js"
     },
     ".": {
       "import": "./build/module/*.js",
@@ -53,13 +53,6 @@
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
     }
   },
   "scripts": {
