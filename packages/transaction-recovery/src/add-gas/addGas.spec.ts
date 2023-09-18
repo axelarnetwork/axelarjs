@@ -1,5 +1,5 @@
+import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
-import { createAxelarConfigNodeClient } from "@axelarjs/api/config/node";
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 import { ENVIRONMENTS } from "@axelarjs/core";
 
