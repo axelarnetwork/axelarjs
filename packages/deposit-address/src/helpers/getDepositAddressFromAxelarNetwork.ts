@@ -4,11 +4,6 @@ import type {
   LinkRequestResponse,
 } from "@axelarjs/api";
 import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
-import type {
-  DepositAddressResponse,
-  GetDepositAddressParams,
-  OTC,
-} from "@axelarjs/api/deposit-address-api/types";
 
 import type { GetDepositAddressDependencies, SendOptions } from "~/types";
 import { createDummyAccount, signOtc } from "./account";
@@ -84,32 +79,15 @@ async function triggerGetDepositAddressFromAxelar(
 ): Promise<any> {
   const account = await createDummyAccount();
   const publicAddress = account.address;
-  const { validationMsg } = await getOneTimeCode(
+  const { validationMsg } = await depositAddressClient.getOTC({
+    signerAddress: publicAddress,
+  });
+  return depositAddressClient.requestDepositAddress({
+    fromChain: params.sourceChain,
+    toChain: params.destinationChain,
+    destinationAddress: params.destinationAddress,
+    asset: params.asset,
     publicAddress,
-    depositAddressClient
-  );
-  return await requestDepositAddress(
-    {
-      fromChain: params.sourceChain,
-      toChain: params.destinationChain,
-      destinationAddress: params.destinationAddress,
-      asset: params.asset,
-      publicAddress,
-      signature: await signOtc(account, validationMsg),
-    },
-    depositAddressClient
-  );
-}
-async function getOneTimeCode(
-  signerAddress: `0x${string}`,
-  depositAddressClient: DepositAddressClient
-): Promise<OTC> {
-  return depositAddressClient.getOTC({ signerAddress });
-}
-
-async function requestDepositAddress(
-  params: GetDepositAddressParams,
-  depositAddressClient: DepositAddressClient
-): Promise<DepositAddressResponse> {
-  return depositAddressClient.requestDepositAddress(params);
+    signature: await signOtc(account, validationMsg),
+  });
 }
