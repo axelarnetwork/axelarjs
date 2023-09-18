@@ -7,8 +7,8 @@ import type {
 } from "@axelarjs/api/deposit-address-api/types";
 
 import { SendOptions } from "~/types";
+import { createDummyAccount, signOtc } from "./account";
 import { isStrEqual, poll } from "./utils";
-import { createDummyAccount, signOtc } from "./wallet";
 
 export type ListenerParams = {
   sourceChain: string;

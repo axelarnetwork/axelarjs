@@ -1,6 +1,4 @@
-type BaseParams = {};
-
-export type GetOTCParams = BaseParams & {
+export type GetOTCParams = {
   signerAddress?: `0x${string}`;
 };
 

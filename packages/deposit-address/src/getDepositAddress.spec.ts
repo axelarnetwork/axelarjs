@@ -4,21 +4,9 @@ import { createDepositAddressApiNodeClient } from "@axelarjs/api/deposit-address
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 import { ENVIRONMENTS } from "@axelarjs/core";
 
-import {
-  getDepositAddress,
-  GetDepositAddressDependencies,
-} from "./getDepositAddress";
+import { getDepositAddress } from "./getDepositAddress";
 
 describe("getDepositAddress", () => {
-  const DEFAULT_DEPOSIT_ADDRESS_DEPENDENCIES: GetDepositAddressDependencies = {
-    configClient: createAxelarConfigNodeClient(ENVIRONMENTS.testnet),
-    gmpClient: createGMPNodeClient(ENVIRONMENTS.testnet),
-    depositAddressClient: createDepositAddressApiNodeClient(
-      ENVIRONMENTS.testnet
-    ),
-    axelarscanClient: createAxelarscanNodeClient(ENVIRONMENTS.testnet),
-  };
-
   test("get deposit address", async () => {
     const res = await getDepositAddress(
       {
@@ -29,9 +17,15 @@ describe("getDepositAddress", () => {
         module: "evm",
         environment: ENVIRONMENTS.testnet,
       },
-      DEFAULT_DEPOSIT_ADDRESS_DEPENDENCIES
+      {
+        configClient: createAxelarConfigNodeClient(ENVIRONMENTS.testnet),
+        gmpClient: createGMPNodeClient(ENVIRONMENTS.testnet),
+        depositAddressClient: createDepositAddressApiNodeClient(
+          ENVIRONMENTS.testnet
+        ),
+        axelarscanClient: createAxelarscanNodeClient(ENVIRONMENTS.testnet),
+      }
     );
-    console.log(res);
     expect(res).toBeTruthy();
   });
 });

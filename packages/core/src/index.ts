@@ -42,7 +42,7 @@ export type AxelarConfigAPIUrl = keyof typeof AXELAR_CONFIG_API_URLS;
 
 export const DEPOSIT_ADDRESS_API_URLS = {
   testnet: "https://nest-server-testnet.axelar.dev",
-  mainnet: "https://nest-server-MAINNET.axelar.dev",
+  mainnet: "https://nest-server-mainnet.axelar.dev",
 } as const;
 
 export type DepositAddressAPIUrl = keyof typeof DEPOSIT_ADDRESS_API_URLS;
