@@ -1,8 +1,12 @@
-import { S3CosmosChainConfig, SearchGMPResponseData } from "@axelarjs/api";
-import { Environment } from "@axelarjs/core";
+import type {
+  AxelarCosmosChainConfig,
+  AxelarQueryAPIClient,
+  SearchGMPResponseData,
+} from "@axelarjs/api";
+import type { Environment } from "@axelarjs/core";
 
-import { OfflineSigner } from "@cosmjs/proto-signing";
-import { Coin, DeliverTxResponse, StdFee } from "@cosmjs/stargate";
+import type { OfflineSigner } from "@cosmjs/proto-signing";
+import type { Coin, DeliverTxResponse, StdFee } from "@cosmjs/stargate";
 
 export type SendOptions = {
   txFee: StdFee;
@@ -31,8 +35,8 @@ export type AddGasResponse = {
 };
 
 export type GetFullFeeOptions = {
-  environment: Environment;
   autocalculateGasOptions?: AutocalculateGasOptions | undefined;
   tx: SearchGMPResponseData;
-  chainConfig: S3CosmosChainConfig;
+  chainConfig: AxelarCosmosChainConfig;
+  axelarQueryClient: AxelarQueryAPIClient;
 };

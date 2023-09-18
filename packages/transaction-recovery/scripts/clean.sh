@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npx rimraf build cosmosSigner services *.js *.d.ts
+npx rimraf build add-gas *.js *.d.ts
