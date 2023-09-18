@@ -1,5 +1,13 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.2
+
+### Patch Changes
+
+- 0075481: Avoid circular references between browser and node clients
+- Updated dependencies [0075481]
+  - @axelarjs/api@0.2.1
+
 ## 0.1.1
 
 ### Patch Changes

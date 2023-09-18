@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.2.1
+
+### Patch Changes
+
+- 0075481: Avoid circular references between browser and node clients
+
 ## 0.2.0
 
 ### Minor Changes
