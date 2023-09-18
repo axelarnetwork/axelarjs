@@ -2,9 +2,11 @@ import { AxelarscanClient, LinkRequestResponse } from "@axelarjs/api";
 import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
 import { type OTC } from "@axelarjs/api/deposit-address-api/types";
 
+import { signMessage } from "viem/accounts";
+
 import { SendOptions } from "~/types";
 import { isStrEqual, poll } from "./utils";
-import { createWallet } from "./wallet";
+import { createDummyAccount, signOtc } from "./wallet";
 
 export type ListenerParams = {
   sourceChain: string;
@@ -48,25 +50,25 @@ export async function triggerGetDepositAddressFromAxelar(
   params: SendOptions,
   depositAddressClient: DepositAddressClient
 ): Promise<any> {
-  const wallet = await createWallet();
-  const publicAddress = wallet.account.address;
+  const account = await createDummyAccount();
+  const publicAddress = account.address;
   const { validationMsg } = await getOneTimeCode(
     publicAddress,
     depositAddressClient
   );
-  console.log({ validationMsg, params });
 
   // then get signature, i.e. await signOTC...
+  const signature = await signOtc(account, validationMsg);
+  console.log({ validationMsg, signature, publicAddress });
 
-  // then request the deposit address with these params:
-  // const payload = {
-  //   fromChain: sourceChain,
-  //   toChain: destinationChain,
-  //   destinationAddress,
-  //   asset,
-  //   publicAddress,
-  //   signature,
-  // };
+  const payload = {
+    fromChain: params.sourceChain,
+    toChain: params.destinationChain,
+    destinationAddress: params.destinationAddress,
+    asset: params.asset,
+    publicAddress,
+    signature,
+  };
 
   return {
     success: true,
@@ -77,10 +79,5 @@ export async function getOneTimeCode(
   signerAddress: `0x${string}`,
   depositAddressClient: DepositAddressClient
 ): Promise<OTC> {
-  console.log("getting one time code", signerAddress);
-  const otc: OTC = await depositAddressClient.getOTC({ signerAddress });
-
-  //why isn't this reaching?
-  console.log({ otc });
-  return otc;
+  return depositAddressClient.getOTC({ signerAddress });
 }
