@@ -1,8 +1,7 @@
-import { LinkRequestResponse } from "@axelarjs/api";
-import { createAxelarscanNodeClient } from "@axelarjs/api/axelarscan/node";
+import { AxelarscanClient, LinkRequestResponse } from "@axelarjs/api";
+import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
 import { type OTC } from "@axelarjs/api/deposit-address-api/types";
 
-import { depositAddressClient } from "~/services";
 import { SendOptions } from "~/types";
 import { isStrEqual, poll } from "./utils";
 import { createWallet } from "./wallet";
@@ -30,15 +29,14 @@ const findLinkRequest = (
   return foundEntry;
 };
 
-export async function waitForDepositAddress(params: ListenerParams) {
-  const apiClient = createAxelarscanNodeClient({
-    prefixUrl: "https://testnet.api.axelarscan.io",
-  });
-
+export async function waitForDepositAddress(
+  params: ListenerParams,
+  axelarscanClient: AxelarscanClient
+) {
   return findLinkRequest(
     params,
     await poll(
-      () => apiClient.getRecentLinkTransactions({ size: 10 }),
+      () => axelarscanClient.getRecentLinkTransactions({ size: 10 }),
       (res: LinkRequestResponse[]) => !findLinkRequest(params, res),
       5_000,
       5
@@ -47,11 +45,15 @@ export async function waitForDepositAddress(params: ListenerParams) {
 }
 
 export async function triggerGetDepositAddressFromAxelar(
-  params: SendOptions
+  params: SendOptions,
+  depositAddressClient: DepositAddressClient
 ): Promise<any> {
   const wallet = await createWallet();
   const publicAddress = wallet.account.address;
-  const { validationMsg } = await getOneTimeCode(publicAddress);
+  const { validationMsg } = await getOneTimeCode(
+    publicAddress,
+    depositAddressClient
+  );
   console.log({ validationMsg, params });
 
   // then get signature, i.e. await signOTC...
@@ -72,11 +74,11 @@ export async function triggerGetDepositAddressFromAxelar(
   };
 }
 export async function getOneTimeCode(
-  signerAddress: `0x${string}`
+  signerAddress: `0x${string}`,
+  depositAddressClient: DepositAddressClient
 ): Promise<OTC> {
-  const api = depositAddressClient();
-  console.log("getting one time code", signerAddress, api);
-  const otc: OTC = await api.getOTC({ signerAddress });
+  console.log("getting one time code", signerAddress);
+  const otc: OTC = await depositAddressClient.getOTC({ signerAddress });
 
   //why isn't this reaching?
   console.log({ otc });

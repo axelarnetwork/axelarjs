@@ -1,5 +1,1 @@
-import getDepositAddress from "./getDepositAddress";
-
-export default {
-  getDepositAddress,
-};
+export * from "./getDepositAddress";
