@@ -1,4 +1,5 @@
 import { AxelarConfigClient, AxelarscanClient, GMPClient } from "@axelarjs/api";
+import type { ChainConfigs } from "@axelarjs/api/axelar-config/types";
 import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
 
 import {
@@ -23,8 +24,15 @@ export async function getDepositAddress(
   /**
    * input validation
    */
-  validateAddress(params.destinationAddress);
-  validateChainIds([params.sourceChain, params.destinationChain]);
+  const chainConfigs = await dependencies.configClient.getChainConfigs(
+    params.environment
+  );
+  console.log({ chainConfigs });
+  validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
+  validateAddress(
+    params.destinationAddress,
+    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfigs
+  );
 
   /**
    * invoke API to get deposit address
