@@ -2,7 +2,12 @@ import {
   IsomorphicHTTPClient,
   type ClientOptions,
 } from "../IsomorphicHTTPClient";
-import type { GetOTCParams, OTC } from "./types";
+import type {
+  DepositAddressResponse,
+  GetDepositAddressParams,
+  GetOTCParams,
+  OTC,
+} from "./types";
 
 export class DepositAddressClient extends IsomorphicHTTPClient {
   static init(options: ClientOptions) {
@@ -19,11 +24,13 @@ export class DepositAddressClient extends IsomorphicHTTPClient {
     return res;
   }
 
-  async requestDepositAddress(params: GetOTCParams): Promise<any> {
+  async requestDepositAddress(
+    params: GetDepositAddressParams
+  ): Promise<DepositAddressResponse> {
     return await this.client
-      .post("", {
-        json: { ...params, method: "searchGMP" },
+      .post("transfer-assets", {
+        json: { ...params },
       })
-      .json<any>();
+      .json<DepositAddressResponse>();
   }
 }

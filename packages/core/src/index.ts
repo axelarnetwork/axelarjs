@@ -19,6 +19,13 @@ export const AXELARSCAN_API_URLS = {
 
 export type AxelarscanAPIUrl = keyof typeof AXELARSCAN_API_URLS;
 
+export const AXELARSCAN_UI_URLS = {
+  testnet: "https://testnet.axelarscan.io",
+  mainnet: "https://axelarscan.io",
+} as const;
+
+export type AxelarscanUIUrl = keyof typeof AXELARSCAN_UI_URLS;
+
 export const GMP_API_URLS = {
   testnet: "https://testnet.api.gmp.axelarscan.io",
   mainnet: "https://api.gmp.axelarscan.io",

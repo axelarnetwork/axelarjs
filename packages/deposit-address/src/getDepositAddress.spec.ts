@@ -31,6 +31,7 @@ describe("getDepositAddress", () => {
       },
       DEFAULT_DEPOSIT_ADDRESS_DEPENDENCIES
     );
+    console.log(res);
     expect(res).toBeTruthy();
   });
 });

@@ -1,8 +1,10 @@
 import { AxelarscanClient, LinkRequestResponse } from "@axelarjs/api";
 import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
-import { type OTC } from "@axelarjs/api/deposit-address-api/types";
-
-import { signMessage } from "viem/accounts";
+import type {
+  DepositAddressResponse,
+  GetDepositAddressParams,
+  OTC,
+} from "@axelarjs/api/deposit-address-api/types";
 
 import { SendOptions } from "~/types";
 import { isStrEqual, poll } from "./utils";
@@ -59,7 +61,6 @@ export async function triggerGetDepositAddressFromAxelar(
 
   // then get signature, i.e. await signOTC...
   const signature = await signOtc(account, validationMsg);
-  console.log({ validationMsg, signature, publicAddress });
 
   const payload = {
     fromChain: params.sourceChain,
@@ -70,9 +71,14 @@ export async function triggerGetDepositAddressFromAxelar(
     signature,
   };
 
+  const depositAddressResponse = await requestDepositAddress(
+    payload,
+    depositAddressClient
+  );
+
   return {
     success: true,
-    otherInfoTBD: ";-)",
+    depositAddressResponse,
   };
 }
 export async function getOneTimeCode(
@@ -80,4 +86,11 @@ export async function getOneTimeCode(
   depositAddressClient: DepositAddressClient
 ): Promise<OTC> {
   return depositAddressClient.getOTC({ signerAddress });
+}
+
+export async function requestDepositAddress(
+  params: GetDepositAddressParams,
+  depositAddressClient: DepositAddressClient
+): Promise<DepositAddressResponse> {
+  return depositAddressClient.requestDepositAddress(params);
 }

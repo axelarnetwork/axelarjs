@@ -5,6 +5,7 @@ import {
   triggerGetDepositAddressFromAxelar,
   validateAddress,
   validateChainIds,
+  waitForDepositAddress,
 } from "./helpers";
 import { SendOptions } from "./types";
 
@@ -28,15 +29,12 @@ export async function getDepositAddress(
   /**
    * invoke API to get deposit address
    */
-  const waitForTrigger = await triggerGetDepositAddressFromAxelar(
+  await triggerGetDepositAddressFromAxelar(
     params,
     dependencies.depositAddressClient
   );
-
-  return waitForTrigger;
-
   /**
    * wait for and return deposit address
    */
-  // return waitForDepositAddress(params, dependencies.axelarscanClient);
+  return waitForDepositAddress(params, dependencies.axelarscanClient);
 }

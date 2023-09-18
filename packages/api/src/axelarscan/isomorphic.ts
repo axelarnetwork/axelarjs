@@ -123,7 +123,6 @@ export class AxelarscanClient extends IsomorphicHTTPClient {
         .filter((entry) => entry.code === 0) //only want successfully broadcasted txs
         .map((entry) => {
           const logs = entry.logs[0];
-          console.log({ entry });
           const linkEvent = logs?.events.find((event) => event.type === "link");
           const { attributes } = linkEvent as LinkEvent;
           const find = (key: string) =>
@@ -135,6 +134,7 @@ export class AxelarscanClient extends IsomorphicHTTPClient {
             destinationAddress: find("destinationAddress"),
             module: find("module"),
             asset: find("asset"),
+            tokenAddress: find("tokenAddress"),
             txHash: entry.txhash,
             timmestamp: entry.timestamp,
           };
