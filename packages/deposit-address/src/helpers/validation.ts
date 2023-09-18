@@ -31,3 +31,18 @@ export function validateChainIds(
       throw new Error(`chain ID ${chainId} does not exist`);
   });
 }
+
+export function validateAsset(
+  chainIds: string[],
+  assetId: string,
+  chainConfigs: ChainConfigsResponse
+) {
+  chainIds.forEach((chainId) => {
+    const chainConfig = chainConfigs.chains[chainId.toLowerCase()];
+
+    if (!chainConfig?.assets.find(({ id }) => id === assetId))
+      throw new Error(
+        `asset ID ${assetId} does not exist on chain ${chainConfig?.id}`
+      );
+  });
+}

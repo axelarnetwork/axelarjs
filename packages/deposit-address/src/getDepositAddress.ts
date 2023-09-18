@@ -5,6 +5,7 @@ import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorph
 import {
   triggerGetDepositAddressFromAxelar,
   validateAddress,
+  validateAsset,
   validateChainIds,
   waitForDepositAddress,
 } from "./helpers";
@@ -29,6 +30,11 @@ export async function getDepositAddress(
    * input validation
    */
   validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
+  validateAsset(
+    [params.sourceChain, params.destinationChain],
+    params.asset,
+    chainConfigs
+  );
   validateAddress(
     params.destinationAddress,
     chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfigs
