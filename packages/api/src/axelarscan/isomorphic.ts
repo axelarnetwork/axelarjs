@@ -119,23 +119,26 @@ export class AxelarscanClient extends IsomorphicHTTPClient {
       size: params.size,
       type: "LinkRequest",
     }).then((res) =>
-      res.data.map((entry) => {
-        const logs = entry.logs[0];
-        const linkEvent = logs.events.find((event) => event.type === "link");
-        const { attributes } = linkEvent as LinkEvent;
-        const find = (key: string) =>
-          attributes.find((attr: { key: string }) => attr.key === key)?.value;
-        return {
-          sourceChain: find("sourceChain"),
-          destinationChain: find("destinationChain"),
-          depositAddress: find("depositAddress"),
-          destinationAddress: find("destinationAddress"),
-          module: find("module"),
-          asset: find("asset"),
-          txHash: entry.txhash,
-          timmestamp: entry.timestamp,
-        };
-      })
+      res.data
+        .filter((entry) => entry.code === 0) //only want successfully broadcasted txs
+        .map((entry) => {
+          const logs = entry.logs[0];
+          console.log({ entry });
+          const linkEvent = logs?.events.find((event) => event.type === "link");
+          const { attributes } = linkEvent as LinkEvent;
+          const find = (key: string) =>
+            attributes.find((attr: { key: string }) => attr.key === key)?.value;
+          return {
+            sourceChain: find("sourceChain"),
+            destinationChain: find("destinationChain"),
+            depositAddress: find("depositAddress"),
+            destinationAddress: find("destinationAddress"),
+            module: find("module"),
+            asset: find("asset"),
+            txHash: entry.txhash,
+            timmestamp: entry.timestamp,
+          };
+        })
     );
   }
 }

@@ -16,7 +16,6 @@ export class DepositAddressClient extends IsomorphicHTTPClient {
     const res = await this.client
       .get(`otc?publicAddress=${params.signerAddress}`)
       .json<any>();
-    console.log("otc Ressss", res);
     return res;
   }
 

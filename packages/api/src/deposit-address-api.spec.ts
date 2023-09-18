@@ -1,13 +1,11 @@
-import { DepositAddressClient } from "./deposit-address-api/isomorphic";
+import { ENVIRONMENTS } from "@axelarjs/core";
+
 import { createDepositAddressApiNodeClient } from "./deposit-address-api/node";
 
-describe("deposit address client", () => {
+describe("deposit address client (node)", () => {
   describe("get OTC", () => {
-    let api: DepositAddressClient = createDepositAddressApiNodeClient({
-      prefixUrl: "https://nest-server-testnet.axelar.dev",
-    });
-
     test("It should get an OTC", async () => {
+      const api = createDepositAddressApiNodeClient(ENVIRONMENTS.testnet);
       const otcRes = await api.getOTC({
         signerAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       });
