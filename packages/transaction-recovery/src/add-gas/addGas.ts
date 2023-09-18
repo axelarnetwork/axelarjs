@@ -1,5 +1,9 @@
-import { AxelarQueryAPIClient, ConfigClient, GMPClient } from "@axelarjs/api";
-import { AxelarCosmosChainConfig } from "@axelarjs/api/config/types";
+import type {
+  AxelarConfigClient,
+  AxelarQueryAPIClient,
+  GMPClient,
+} from "@axelarjs/api";
+import type { AxelarCosmosChainConfig } from "@axelarjs/api/axelar-config/types";
 import { COSMOS_GAS_RECEIVER_OPTIONS } from "@axelarjs/core";
 
 import { OfflineSigner } from "@cosmjs/proto-signing";
@@ -13,7 +17,7 @@ import { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
 
 export type AddGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;
-  configClient: ConfigClient;
+  configClient: AxelarConfigClient;
   gmpClient: GMPClient;
   getSigningStargateClient: (
     rpcUrl: string,

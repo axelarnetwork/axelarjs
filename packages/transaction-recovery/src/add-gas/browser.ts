@@ -1,8 +1,6 @@
-import {
-  createAxelarQueryBrowserClient,
-  createConfigBrowserClient,
-  createGMPBrowserClient,
-} from "@axelarjs/api";
+import { createAxelarConfigBrowserClient } from "@axelarjs/api/axelar-config/browser";
+import { createAxelarQueryBrowserClient } from "@axelarjs/api/axelar-query/browser";
+import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 
 import { SigningStargateClient } from "@cosmjs/stargate";
 
@@ -14,7 +12,7 @@ export default function addGasBrowser(params: AddGasParams) {
 
   return addGas(params, {
     axelarQueryClient: createAxelarQueryBrowserClient(environment, {}),
-    configClient: createConfigBrowserClient(environment),
+    configClient: createAxelarConfigBrowserClient(environment),
     gmpClient: createGMPBrowserClient(environment),
     getSigningStargateClient: SigningStargateClient.connectWithSigner,
   });
