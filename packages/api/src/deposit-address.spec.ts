@@ -2,8 +2,8 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
-import { type OTC } from "./deposit-address-api";
-import { createDepositAddressApiNodeClient } from "./deposit-address-api/node";
+import { type OTC } from "./deposit-address";
+import { createDepositAddressApiNodeClient } from "./deposit-address/node";
 
 describe("deposit address client (node)", () => {
   describe("get OTC", () => {

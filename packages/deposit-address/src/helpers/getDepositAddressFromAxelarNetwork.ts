@@ -1,13 +1,13 @@
-import type {
-  AxelarscanClient,
-  ChainConfigsResponse,
-  LinkRequestResponse,
+import {
+  type AxelarscanClient,
+  type ChainConfigsResponse,
+  type DepositAddressClient,
+  type LinkRequestResponse,
 } from "@axelarjs/api";
-import { DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
+import { isStrEqual, poll } from "@axelarjs/utils";
 
 import type { GetDepositAddressDependencies, SendOptions } from "~/types";
 import { createDummyAccount, signOtc } from "./account";
-import { isStrEqual, poll } from "./utils";
 
 export type ListenerParams = {
   sourceChain: string;
@@ -85,7 +85,7 @@ async function waitForDepositAddress(
 async function triggerGetDepositAddressFromAxelar(
   params: SendOptions,
   depositAddressClient: DepositAddressClient
-): Promise<any> {
+) {
   const account = await createDummyAccount();
   const publicAddress = account.address;
   const { validationMsg } = await depositAddressClient.getOTC({

@@ -15,18 +15,18 @@ export function validateAddress(
   if (module === "evm") {
     if (!isAddress(destinationAddress))
       throw new Error(`${destinationAddress} is not a valid EVM address`);
-  }
-
-  try {
-    const { addressPrefix } = (chainConfig as AxelarCosmosChainConfig)
-      .cosmosConfigs;
-    if (!(bech32.decode(destinationAddress).prefix === addressPrefix)) {
-      throw new Error(
-        `${destinationAddress} is not a valid address for ${chainConfig.id}`
-      );
+  } else {
+    try {
+      const { addressPrefix } = (chainConfig as AxelarCosmosChainConfig)
+        .cosmosConfigs;
+      if (!(bech32.decode(destinationAddress).prefix === addressPrefix)) {
+        throw new Error(
+          `${destinationAddress} is not a valid address for ${chainConfig.id}`
+        );
+      }
+    } catch (e) {
+      throw new Error(`could not validate this address: ${destinationAddress}`);
     }
-  } catch (e) {
-    throw new Error(`could not validate this address: ${destinationAddress}`);
   }
 }
 export function validateChainIds(

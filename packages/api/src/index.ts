@@ -6,3 +6,5 @@ export * from "./gmp";
 export * from "./axelar-query";
 // axelar-config
 export * from "./axelar-config";
+// deposit-address
+export * from "./deposit-address";

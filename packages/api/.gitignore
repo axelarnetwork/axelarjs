@@ -4,6 +4,7 @@ build/
 /gmp/
 /axelar-query/
 /axelar-config/
+/deposit-address/
 *.d.ts
 *.js
 .turbo/

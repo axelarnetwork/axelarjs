@@ -31,9 +31,9 @@
       "import": "./build/module/axelar-query/index.js",
       "require": "./build/commonjs/axelar-query/index.js"
     },
-    "./deposit-address-api": {
-      "import": "./build/module/deposit-address-api/index.js",
-      "require": "./build/commonjs/deposit-address-api/index.js"
+    "./deposit-address": {
+      "import": "./build/module/deposit-address/index.js",
+      "require": "./build/commonjs/deposit-address/index.js"
     },
     "./gmp/*": {
       "import": "./build/module/gmp/*.js",
@@ -51,9 +51,9 @@
       "import": "./build/module/axelar-config/*.js",
       "require": "./build/commonjs/axelar-config/*.js"
     },
-    "./deposit-address-api/*": {
-      "import": "./build/module/deposit-address-api/index.js",
-      "require": "./build/commonjs/deposit-address-api/index.js"
+    "./deposit-address/*": {
+      "import": "./build/module/deposit-address/index.js",
+      "require": "./build/commonjs/deposit-address/index.js"
     },
     ".": {
       "import": "./build/module/*.js",
