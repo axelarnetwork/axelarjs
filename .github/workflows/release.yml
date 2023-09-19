@@ -19,20 +19,23 @@ jobs:
         id: checkfile
         run: |
           if ls .changeset/*.md | grep -Eq '^[a-z-]*\.md$'; then
-            echo "::set-output name=has_file::true"
+            echo "has_file=true" >> $GITHUB_STATE
           else
-            echo "::set-output name=has_file::false"
+            echo "has_file=false" >> $GITHUB_STATE
           fi
 
       - name: Install dependencies
-        if: steps.checkfile.outputs.has_file == 'true'
+        env:
+          HAS_FILE: ${{ env.GITHUB_STATE }}
+        if: env.HAS_FILE == 'true'
         uses: ./.github/actions/install-dependencies
 
       - name: Create Release Pull Request
-        if: steps.checkfile.outputs.has_file == 'true'
+        env:
+          HAS_FILE: ${{ env.GITHUB_STATE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.HAS_FILE == 'true'
         uses: changesets/action@v1
         with:
           title: "[changesets] Apply version updates"
           commit: "chore: apply changesets"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
