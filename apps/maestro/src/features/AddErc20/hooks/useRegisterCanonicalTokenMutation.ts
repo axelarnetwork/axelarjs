@@ -1,6 +1,6 @@
 import { encodeInterchainTokenServiceRegisterCanonicalTokenData } from "@axelarjs/evm";
 import { throttle } from "@axelarjs/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useChainId, useWaitForTransaction } from "wagmi";
 
@@ -21,15 +21,6 @@ export type UseRegisterCanonicalTokenInput = {
   expectedTokenId: `0x${string}`;
 };
 
-const DEFAULT_INPUT: UseRegisterCanonicalTokenInput = {
-  sourceChainId: "",
-  tokenAddress: "0x",
-  expectedTokenId: "0x",
-  tokenName: "",
-  tokenSymbol: "",
-  decimals: -1,
-};
-
 export type UseRegisterCanonicalTokenConfig = {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
@@ -39,7 +30,6 @@ export function useRegisterCanonicalTokenMutation(
   config: UseRegisterCanonicalTokenConfig,
   input: UseRegisterCanonicalTokenInput
 ) {
-  const inputRef = useRef<UseRegisterCanonicalTokenInput>(DEFAULT_INPUT);
   const chainId = useChainId();
 
   const { mutateAsync: recordDeploymentAsync } =
@@ -75,14 +65,14 @@ export function useRegisterCanonicalTokenMutation(
 
       setRecordDeploymentArgs({
         kind: "canonical",
-        tokenId: inputRef.current.expectedTokenId,
-        tokenAddress: inputRef.current.tokenAddress,
+        tokenId: input.expectedTokenId,
+        tokenAddress: input.tokenAddress,
         chainId: chainId,
         deploymentTxHash: multicall.data.hash,
-        tokenName: inputRef.current.tokenName,
-        tokenSymbol: inputRef.current.tokenSymbol,
-        tokenDecimals: inputRef.current.decimals,
-        axelarChainId: inputRef.current.sourceChainId,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        axelarChainId: input.sourceChainId,
         remoteTokens: [],
       });
 
