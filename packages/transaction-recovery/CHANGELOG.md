@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.6
+
+### Patch Changes
+
+- [`d11322e3`](https://github.com/axelarnetwork/axelarjs/commit/d11322e34b466dc1e6728a9fc2a4f6ff2b492ba5) Thanks [@alanrsoares](https://github.com/alanrsoares)! - restructure add-gas exports
+
 ## 0.1.5
 
 ### Patch Changes
