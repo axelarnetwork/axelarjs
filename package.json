@@ -23,9 +23,11 @@
     "changeset:release": "pnpm build:packages && changeset publish",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
+    "changeset:snap": "changeset version --snapshot snap",
     "cs": "changeset",
     "cs:release": "pnpm changeset:release",
     "cs:version": "pnpm changeset:version",
+    "cs:snap": "pnpm changeset:snap",
     "cs:publish": "pnpm changeset:publish",
     "e2e:maestro": "pnpm -C ./apps/maestro run ci:e2e"
   },
