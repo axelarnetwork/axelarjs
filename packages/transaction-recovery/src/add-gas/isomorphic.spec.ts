@@ -7,7 +7,7 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
 import { type AutocalculateGasOptions, type SendOptions } from "../types";
-import { addGas, AddGasDependencies } from "./addGas";
+import { addGas, AddGasDependencies } from "./isomorphic";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,
@@ -22,7 +22,7 @@ const MOCK_ADD_GAS_RESPONSE = {
   gasWanted: 250000,
 };
 
-describe("addGas", () => {
+describe("addGas - (isomorphic)", () => {
   const mockSignAndBroadcast = () => MOCK_ADD_GAS_RESPONSE;
 
   const mockGetSigningStargateClient = vi.fn(() =>

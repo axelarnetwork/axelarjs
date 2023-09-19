@@ -1,3 +1,4 @@
-export * from "./addGas";
-export * from "./node";
-export * from "./browser";
+export * from "./isomorphic";
+export { default } from "./node";
+
+// for browser version, import from "@axelarjs/transaction-recovery/add-gas/browser"

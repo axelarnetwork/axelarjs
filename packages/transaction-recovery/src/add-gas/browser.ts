@@ -5,7 +5,7 @@ import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
 import { AddGasParams } from "~/types";
-import { addGas } from "./addGas";
+import { addGas } from "./isomorphic";
 
 export function addGasBrowser(params: AddGasParams) {
   const { environment } = params.sendOptions;
