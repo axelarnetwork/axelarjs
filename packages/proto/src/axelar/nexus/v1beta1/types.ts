@@ -18,14 +18,14 @@ export const protobufPackage = "axelar.nexus.v1beta1";
 
 export interface MaintainerState {
   address: Uint8Array;
-  missingVotes?: Bitmap;
-  incorrectVotes?: Bitmap;
+  missingVotes?: Bitmap | undefined;
+  incorrectVotes?: Bitmap | undefined;
   chain: string;
 }
 
 /** ChainState represents the state of a registered blockchain */
 export interface ChainState {
-  chain?: Chain;
+  chain?: Chain | undefined;
   activated: boolean;
   assets: Asset[];
   /** @deprecated */
@@ -33,19 +33,19 @@ export interface ChainState {
 }
 
 export interface LinkedAddresses {
-  depositAddress?: CrossChainAddress;
-  recipientAddress?: CrossChainAddress;
+  depositAddress?: CrossChainAddress | undefined;
+  recipientAddress?: CrossChainAddress | undefined;
 }
 
 export interface RateLimit {
   chain: string;
-  limit?: Coin;
-  window?: Duration;
+  limit?: Coin | undefined;
+  window?: Duration | undefined;
 }
 
 export interface TransferEpoch {
   chain: string;
-  amount?: Coin;
+  amount?: Coin | undefined;
   epoch: Long;
   /** indicates whether the tracking is for transfers outgoing */
   direction: TransferDirection;
@@ -53,7 +53,7 @@ export interface TransferEpoch {
 
 function createBaseMaintainerState(): MaintainerState {
   return {
-    address: new Uint8Array(),
+    address: new Uint8Array(0),
     missingVotes: undefined,
     incorrectVotes: undefined,
     chain: "",
@@ -129,7 +129,7 @@ export const MaintainerState = {
     return {
       address: isSet(object.address)
         ? bytesFromBase64(object.address)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       missingVotes: isSet(object.missingVotes)
         ? Bitmap.fromJSON(object.missingVotes)
         : undefined,
@@ -142,33 +142,31 @@ export const MaintainerState = {
 
   toJSON(message: MaintainerState): unknown {
     const obj: any = {};
-    message.address !== undefined &&
-      (obj.address = base64FromBytes(
-        message.address !== undefined ? message.address : new Uint8Array()
-      ));
-    message.missingVotes !== undefined &&
-      (obj.missingVotes = message.missingVotes
-        ? Bitmap.toJSON(message.missingVotes)
-        : undefined);
-    message.incorrectVotes !== undefined &&
-      (obj.incorrectVotes = message.incorrectVotes
-        ? Bitmap.toJSON(message.incorrectVotes)
-        : undefined);
-    message.chain !== undefined && (obj.chain = message.chain);
+    if (message.address.length !== 0) {
+      obj.address = base64FromBytes(message.address);
+    }
+    if (message.missingVotes !== undefined) {
+      obj.missingVotes = Bitmap.toJSON(message.missingVotes);
+    }
+    if (message.incorrectVotes !== undefined) {
+      obj.incorrectVotes = Bitmap.toJSON(message.incorrectVotes);
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MaintainerState>, I>>(
     base?: I
   ): MaintainerState {
-    return MaintainerState.fromPartial(base ?? {});
+    return MaintainerState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MaintainerState>, I>>(
     object: I
   ): MaintainerState {
     const message = createBaseMaintainerState();
-    message.address = object.address ?? new Uint8Array();
+    message.address = object.address ?? new Uint8Array(0);
     message.missingVotes =
       object.missingVotes !== undefined && object.missingVotes !== null
         ? Bitmap.fromPartial(object.missingVotes)
@@ -273,28 +271,26 @@ export const ChainState = {
 
   toJSON(message: ChainState): unknown {
     const obj: any = {};
-    message.chain !== undefined &&
-      (obj.chain = message.chain ? Chain.toJSON(message.chain) : undefined);
-    message.activated !== undefined && (obj.activated = message.activated);
-    if (message.assets) {
-      obj.assets = message.assets.map((e) => (e ? Asset.toJSON(e) : undefined));
-    } else {
-      obj.assets = [];
+    if (message.chain !== undefined) {
+      obj.chain = Chain.toJSON(message.chain);
     }
-    if (message.maintainerStates) {
+    if (message.activated === true) {
+      obj.activated = message.activated;
+    }
+    if (message.assets?.length) {
+      obj.assets = message.assets.map((e) => Asset.toJSON(e));
+    }
+    if (message.maintainerStates?.length) {
       obj.maintainerStates = message.maintainerStates.map((e) =>
-        e ? MaintainerState.toJSON(e) : undefined
+        MaintainerState.toJSON(e)
       );
-    } else {
-      obj.maintainerStates = [];
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ChainState>, I>>(base?: I): ChainState {
-    return ChainState.fromPartial(base ?? {});
+    return ChainState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ChainState>, I>>(
     object: I
   ): ChainState {
@@ -385,23 +381,20 @@ export const LinkedAddresses = {
 
   toJSON(message: LinkedAddresses): unknown {
     const obj: any = {};
-    message.depositAddress !== undefined &&
-      (obj.depositAddress = message.depositAddress
-        ? CrossChainAddress.toJSON(message.depositAddress)
-        : undefined);
-    message.recipientAddress !== undefined &&
-      (obj.recipientAddress = message.recipientAddress
-        ? CrossChainAddress.toJSON(message.recipientAddress)
-        : undefined);
+    if (message.depositAddress !== undefined) {
+      obj.depositAddress = CrossChainAddress.toJSON(message.depositAddress);
+    }
+    if (message.recipientAddress !== undefined) {
+      obj.recipientAddress = CrossChainAddress.toJSON(message.recipientAddress);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<LinkedAddresses>, I>>(
     base?: I
   ): LinkedAddresses {
-    return LinkedAddresses.fromPartial(base ?? {});
+    return LinkedAddresses.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<LinkedAddresses>, I>>(
     object: I
   ): LinkedAddresses {
@@ -489,20 +482,21 @@ export const RateLimit = {
 
   toJSON(message: RateLimit): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.limit !== undefined &&
-      (obj.limit = message.limit ? Coin.toJSON(message.limit) : undefined);
-    message.window !== undefined &&
-      (obj.window = message.window
-        ? Duration.toJSON(message.window)
-        : undefined);
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.limit !== undefined) {
+      obj.limit = Coin.toJSON(message.limit);
+    }
+    if (message.window !== undefined) {
+      obj.window = Duration.toJSON(message.window);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RateLimit>, I>>(base?: I): RateLimit {
-    return RateLimit.fromPartial(base ?? {});
+    return RateLimit.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<RateLimit>, I>>(
     object: I
   ): RateLimit {
@@ -602,22 +596,26 @@ export const TransferEpoch = {
 
   toJSON(message: TransferEpoch): unknown {
     const obj: any = {};
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.amount !== undefined &&
-      (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
-    message.epoch !== undefined &&
-      (obj.epoch = (message.epoch || Long.UZERO).toString());
-    message.direction !== undefined &&
-      (obj.direction = transferDirectionToJSON(message.direction));
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.amount !== undefined) {
+      obj.amount = Coin.toJSON(message.amount);
+    }
+    if (!message.epoch.isZero()) {
+      obj.epoch = (message.epoch || Long.UZERO).toString();
+    }
+    if (message.direction !== 0) {
+      obj.direction = transferDirectionToJSON(message.direction);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferEpoch>, I>>(
     base?: I
   ): TransferEpoch {
-    return TransferEpoch.fromPartial(base ?? {});
+    return TransferEpoch.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<TransferEpoch>, I>>(
     object: I
   ): TransferEpoch {
@@ -636,10 +634,10 @@ export const TransferEpoch = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

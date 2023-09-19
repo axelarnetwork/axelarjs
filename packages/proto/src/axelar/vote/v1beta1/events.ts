@@ -100,18 +100,27 @@ export const Voted = {
 
   toJSON(message: Voted): unknown {
     const obj: any = {};
-    message.module !== undefined && (obj.module = message.module);
-    message.action !== undefined && (obj.action = message.action);
-    message.poll !== undefined && (obj.poll = message.poll);
-    message.voter !== undefined && (obj.voter = message.voter);
-    message.state !== undefined && (obj.state = message.state);
+    if (message.module !== "") {
+      obj.module = message.module;
+    }
+    if (message.action !== "") {
+      obj.action = message.action;
+    }
+    if (message.poll !== "") {
+      obj.poll = message.poll;
+    }
+    if (message.voter !== "") {
+      obj.voter = message.voter;
+    }
+    if (message.state !== "") {
+      obj.state = message.state;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Voted>, I>>(base?: I): Voted {
-    return Voted.fromPartial(base ?? {});
+    return Voted.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Voted>, I>>(object: I): Voted {
     const message = createBaseVoted();
     message.module = object.module ?? "";

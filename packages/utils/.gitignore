@@ -3,4 +3,4 @@ build/
 *.js
 *.d.ts
 
-react/
+/react/

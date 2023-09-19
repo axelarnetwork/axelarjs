@@ -1,1 +1,3 @@
-npx rimraf build *.js *.d.ts
+#!/bin/bash
+
+npx rimraf build add-gas *.js *.d.ts

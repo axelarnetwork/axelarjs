@@ -8,7 +8,7 @@ import { Params } from "./params";
 export const protobufPackage = "axelar.vote.v1beta1";
 
 export interface GenesisState {
-  params?: Params;
+  params?: Params | undefined;
   pollMetadatas: PollMetadata[];
 }
 
@@ -74,14 +74,13 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.params !== undefined &&
-      (obj.params = message.params ? Params.toJSON(message.params) : undefined);
-    if (message.pollMetadatas) {
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    if (message.pollMetadatas?.length) {
       obj.pollMetadatas = message.pollMetadatas.map((e) =>
-        e ? PollMetadata.toJSON(e) : undefined
+        PollMetadata.toJSON(e)
       );
-    } else {
-      obj.pollMetadatas = [];
     }
     return obj;
   },
@@ -89,9 +88,8 @@ export const GenesisState = {
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
     base?: I
   ): GenesisState {
-    return GenesisState.fromPartial(base ?? {});
+    return GenesisState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
     object: I
   ): GenesisState {

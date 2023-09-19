@@ -143,13 +143,13 @@ export function keyShareDistributionPolicyToJSON(
 export interface KeyRequirement {
   keyRole: KeyRole;
   keyType: KeyType;
-  minKeygenThreshold?: Threshold;
-  safetyThreshold?: Threshold;
+  minKeygenThreshold?: Threshold | undefined;
+  safetyThreshold?: Threshold | undefined;
   keyShareDistributionPolicy: KeyShareDistributionPolicy;
   maxTotalShareCount: Long;
   minTotalShareCount: Long;
-  keygenVotingThreshold?: Threshold;
-  signVotingThreshold?: Threshold;
+  keygenVotingThreshold?: Threshold | undefined;
+  signVotingThreshold?: Threshold | undefined;
   keygenTimeout: Long;
   signTimeout: Long;
 }
@@ -368,51 +368,55 @@ export const KeyRequirement = {
 
   toJSON(message: KeyRequirement): unknown {
     const obj: any = {};
-    message.keyRole !== undefined &&
-      (obj.keyRole = keyRoleToJSON(message.keyRole));
-    message.keyType !== undefined &&
-      (obj.keyType = keyTypeToJSON(message.keyType));
-    message.minKeygenThreshold !== undefined &&
-      (obj.minKeygenThreshold = message.minKeygenThreshold
-        ? Threshold.toJSON(message.minKeygenThreshold)
-        : undefined);
-    message.safetyThreshold !== undefined &&
-      (obj.safetyThreshold = message.safetyThreshold
-        ? Threshold.toJSON(message.safetyThreshold)
-        : undefined);
-    message.keyShareDistributionPolicy !== undefined &&
-      (obj.keyShareDistributionPolicy = keyShareDistributionPolicyToJSON(
+    if (message.keyRole !== 0) {
+      obj.keyRole = keyRoleToJSON(message.keyRole);
+    }
+    if (message.keyType !== 0) {
+      obj.keyType = keyTypeToJSON(message.keyType);
+    }
+    if (message.minKeygenThreshold !== undefined) {
+      obj.minKeygenThreshold = Threshold.toJSON(message.minKeygenThreshold);
+    }
+    if (message.safetyThreshold !== undefined) {
+      obj.safetyThreshold = Threshold.toJSON(message.safetyThreshold);
+    }
+    if (message.keyShareDistributionPolicy !== 0) {
+      obj.keyShareDistributionPolicy = keyShareDistributionPolicyToJSON(
         message.keyShareDistributionPolicy
-      ));
-    message.maxTotalShareCount !== undefined &&
-      (obj.maxTotalShareCount = (
+      );
+    }
+    if (!message.maxTotalShareCount.isZero()) {
+      obj.maxTotalShareCount = (
         message.maxTotalShareCount || Long.ZERO
-      ).toString());
-    message.minTotalShareCount !== undefined &&
-      (obj.minTotalShareCount = (
+      ).toString();
+    }
+    if (!message.minTotalShareCount.isZero()) {
+      obj.minTotalShareCount = (
         message.minTotalShareCount || Long.ZERO
-      ).toString());
-    message.keygenVotingThreshold !== undefined &&
-      (obj.keygenVotingThreshold = message.keygenVotingThreshold
-        ? Threshold.toJSON(message.keygenVotingThreshold)
-        : undefined);
-    message.signVotingThreshold !== undefined &&
-      (obj.signVotingThreshold = message.signVotingThreshold
-        ? Threshold.toJSON(message.signVotingThreshold)
-        : undefined);
-    message.keygenTimeout !== undefined &&
-      (obj.keygenTimeout = (message.keygenTimeout || Long.ZERO).toString());
-    message.signTimeout !== undefined &&
-      (obj.signTimeout = (message.signTimeout || Long.ZERO).toString());
+      ).toString();
+    }
+    if (message.keygenVotingThreshold !== undefined) {
+      obj.keygenVotingThreshold = Threshold.toJSON(
+        message.keygenVotingThreshold
+      );
+    }
+    if (message.signVotingThreshold !== undefined) {
+      obj.signVotingThreshold = Threshold.toJSON(message.signVotingThreshold);
+    }
+    if (!message.keygenTimeout.isZero()) {
+      obj.keygenTimeout = (message.keygenTimeout || Long.ZERO).toString();
+    }
+    if (!message.signTimeout.isZero()) {
+      obj.signTimeout = (message.signTimeout || Long.ZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyRequirement>, I>>(
     base?: I
   ): KeyRequirement {
-    return KeyRequirement.fromPartial(base ?? {});
+    return KeyRequirement.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyRequirement>, I>>(
     object: I
   ): KeyRequirement {
@@ -462,7 +466,7 @@ export const KeyRequirement = {
 };
 
 function createBaseSigKeyPair(): SigKeyPair {
-  return { pubKey: new Uint8Array(), signature: new Uint8Array() };
+  return { pubKey: new Uint8Array(0), signature: new Uint8Array(0) };
 }
 
 export const SigKeyPair = {
@@ -514,44 +518,41 @@ export const SigKeyPair = {
     return {
       pubKey: isSet(object.pubKey)
         ? bytesFromBase64(object.pubKey)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       signature: isSet(object.signature)
         ? bytesFromBase64(object.signature)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: SigKeyPair): unknown {
     const obj: any = {};
-    message.pubKey !== undefined &&
-      (obj.pubKey = base64FromBytes(
-        message.pubKey !== undefined ? message.pubKey : new Uint8Array()
-      ));
-    message.signature !== undefined &&
-      (obj.signature = base64FromBytes(
-        message.signature !== undefined ? message.signature : new Uint8Array()
-      ));
+    if (message.pubKey.length !== 0) {
+      obj.pubKey = base64FromBytes(message.pubKey);
+    }
+    if (message.signature.length !== 0) {
+      obj.signature = base64FromBytes(message.signature);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<SigKeyPair>, I>>(base?: I): SigKeyPair {
-    return SigKeyPair.fromPartial(base ?? {});
+    return SigKeyPair.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SigKeyPair>, I>>(
     object: I
   ): SigKeyPair {
     const message = createBaseSigKeyPair();
-    message.pubKey = object.pubKey ?? new Uint8Array();
-    message.signature = object.signature ?? new Uint8Array();
+    message.pubKey = object.pubKey ?? new Uint8Array(0);
+    message.signature = object.signature ?? new Uint8Array(0);
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

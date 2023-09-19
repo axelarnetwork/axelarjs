@@ -9,7 +9,7 @@ export const protobufPackage = "axelar.vote.v1beta1";
 export interface VoteRequest {
   sender: Uint8Array;
   pollId: Long;
-  vote?: Any;
+  vote?: Any | undefined;
 }
 
 export interface VoteResponse {
@@ -17,7 +17,7 @@ export interface VoteResponse {
 }
 
 function createBaseVoteRequest(): VoteRequest {
-  return { sender: new Uint8Array(), pollId: Long.UZERO, vote: undefined };
+  return { sender: new Uint8Array(0), pollId: Long.UZERO, vote: undefined };
 }
 
 export const VoteRequest = {
@@ -79,7 +79,7 @@ export const VoteRequest = {
     return {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
       vote: isSet(object.vote) ? Any.fromJSON(object.vote) : undefined,
     };
@@ -87,26 +87,26 @@ export const VoteRequest = {
 
   toJSON(message: VoteRequest): unknown {
     const obj: any = {};
-    message.sender !== undefined &&
-      (obj.sender = base64FromBytes(
-        message.sender !== undefined ? message.sender : new Uint8Array()
-      ));
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
-    message.vote !== undefined &&
-      (obj.vote = message.vote ? Any.toJSON(message.vote) : undefined);
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
+    if (message.vote !== undefined) {
+      obj.vote = Any.toJSON(message.vote);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VoteRequest>, I>>(base?: I): VoteRequest {
-    return VoteRequest.fromPartial(base ?? {});
+    return VoteRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VoteRequest>, I>>(
     object: I
   ): VoteRequest {
     const message = createBaseVoteRequest();
-    message.sender = object.sender ?? new Uint8Array();
+    message.sender = object.sender ?? new Uint8Array(0);
     message.pollId =
       object.pollId !== undefined && object.pollId !== null
         ? Long.fromValue(object.pollId)
@@ -164,16 +164,17 @@ export const VoteResponse = {
 
   toJSON(message: VoteResponse): unknown {
     const obj: any = {};
-    message.log !== undefined && (obj.log = message.log);
+    if (message.log !== "") {
+      obj.log = message.log;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<VoteResponse>, I>>(
     base?: I
   ): VoteResponse {
-    return VoteResponse.fromPartial(base ?? {});
+    return VoteResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<VoteResponse>, I>>(
     object: I
   ): VoteResponse {
@@ -183,10 +184,10 @@ export const VoteResponse = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

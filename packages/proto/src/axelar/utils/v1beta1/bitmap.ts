@@ -5,7 +5,7 @@ import _m0 from "protobufjs/minimal";
 export const protobufPackage = "axelar.utils.v1beta1";
 
 export interface Bitmap {
-  trueCountCache?: CircularBuffer;
+  trueCountCache?: CircularBuffer | undefined;
 }
 
 export interface CircularBuffer {
@@ -69,17 +69,15 @@ export const Bitmap = {
 
   toJSON(message: Bitmap): unknown {
     const obj: any = {};
-    message.trueCountCache !== undefined &&
-      (obj.trueCountCache = message.trueCountCache
-        ? CircularBuffer.toJSON(message.trueCountCache)
-        : undefined);
+    if (message.trueCountCache !== undefined) {
+      obj.trueCountCache = CircularBuffer.toJSON(message.trueCountCache);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Bitmap>, I>>(base?: I): Bitmap {
-    return Bitmap.fromPartial(base ?? {});
+    return Bitmap.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Bitmap>, I>>(object: I): Bitmap {
     const message = createBaseBitmap();
     message.trueCountCache =
@@ -173,25 +171,25 @@ export const CircularBuffer = {
 
   toJSON(message: CircularBuffer): unknown {
     const obj: any = {};
-    if (message.cumulativeValue) {
+    if (message.cumulativeValue?.length) {
       obj.cumulativeValue = message.cumulativeValue.map((e) =>
         (e || Long.UZERO).toString()
       );
-    } else {
-      obj.cumulativeValue = [];
     }
-    message.index !== undefined && (obj.index = Math.round(message.index));
-    message.maxSize !== undefined &&
-      (obj.maxSize = Math.round(message.maxSize));
+    if (message.index !== 0) {
+      obj.index = Math.round(message.index);
+    }
+    if (message.maxSize !== 0) {
+      obj.maxSize = Math.round(message.maxSize);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CircularBuffer>, I>>(
     base?: I
   ): CircularBuffer {
-    return CircularBuffer.fromPartial(base ?? {});
+    return CircularBuffer.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<CircularBuffer>, I>>(
     object: I
   ): CircularBuffer {

@@ -10,6 +10,8 @@ import {
   KeyResponse,
   NextKeyIDRequest,
   NextKeyIDResponse,
+  ParamsRequest,
+  ParamsResponse,
 } from "./query";
 import {
   KeygenOptInRequest,
@@ -40,11 +42,12 @@ export interface MsgService {
   KeygenOptIn(request: KeygenOptInRequest): Promise<KeygenOptInResponse>;
 }
 
+export const MsgServiceServiceName = "axelar.multisig.v1beta1.MsgService";
 export class MsgServiceClientImpl implements MsgService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.multisig.v1beta1.MsgService";
+    this.service = opts?.service || MsgServiceServiceName;
     this.rpc = rpc;
     this.StartKeygen = this.StartKeygen.bind(this);
     this.SubmitPubKey = this.SubmitPubKey.bind(this);
@@ -127,18 +130,21 @@ export interface QueryService {
    * If no key is found, it returns the grpc NOT_FOUND error.
    */
   KeygenSession(request: KeygenSessionRequest): Promise<KeygenSessionResponse>;
+  Params(request: ParamsRequest): Promise<ParamsResponse>;
 }
 
+export const QueryServiceServiceName = "axelar.multisig.v1beta1.QueryService";
 export class QueryServiceClientImpl implements QueryService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.multisig.v1beta1.QueryService";
+    this.service = opts?.service || QueryServiceServiceName;
     this.rpc = rpc;
     this.KeyID = this.KeyID.bind(this);
     this.NextKeyID = this.NextKeyID.bind(this);
     this.Key = this.Key.bind(this);
     this.KeygenSession = this.KeygenSession.bind(this);
+    this.Params = this.Params.bind(this);
   }
   KeyID(request: KeyIDRequest): Promise<KeyIDResponse> {
     const data = KeyIDRequest.encode(request).finish();
@@ -167,6 +173,14 @@ export class QueryServiceClientImpl implements QueryService {
     const promise = this.rpc.request(this.service, "KeygenSession", data);
     return promise.then((data) =>
       KeygenSessionResponse.decode(_m0.Reader.create(data))
+    );
+  }
+
+  Params(request: ParamsRequest): Promise<ParamsResponse> {
+    const data = ParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) =>
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 }

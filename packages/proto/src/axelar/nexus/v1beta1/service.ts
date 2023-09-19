@@ -18,6 +18,8 @@ import {
   LatestDepositAddressResponse,
   MessageRequest,
   MessageResponse,
+  ParamsRequest,
+  ParamsResponse,
   RecipientAddressRequest,
   RecipientAddressResponse,
   TransferFeeRequest,
@@ -64,11 +66,12 @@ export interface MsgService {
   ): Promise<SetTransferRateLimitResponse>;
 }
 
+export const MsgServiceServiceName = "axelar.nexus.v1beta1.MsgService";
 export class MsgServiceClientImpl implements MsgService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.nexus.v1beta1.MsgService";
+    this.service = opts?.service || MsgServiceServiceName;
     this.rpc = rpc;
     this.RegisterChainMaintainer = this.RegisterChainMaintainer.bind(this);
     this.DeregisterChainMaintainer = this.DeregisterChainMaintainer.bind(this);
@@ -189,13 +192,15 @@ export interface QueryService {
     request: TransferRateLimitRequest
   ): Promise<TransferRateLimitResponse>;
   Message(request: MessageRequest): Promise<MessageResponse>;
+  Params(request: ParamsRequest): Promise<ParamsResponse>;
 }
 
+export const QueryServiceServiceName = "axelar.nexus.v1beta1.QueryService";
 export class QueryServiceClientImpl implements QueryService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.nexus.v1beta1.QueryService";
+    this.service = opts?.service || QueryServiceServiceName;
     this.rpc = rpc;
     this.LatestDepositAddress = this.LatestDepositAddress.bind(this);
     this.TransfersForChain = this.TransfersForChain.bind(this);
@@ -209,6 +214,7 @@ export class QueryServiceClientImpl implements QueryService {
     this.ChainMaintainers = this.ChainMaintainers.bind(this);
     this.TransferRateLimit = this.TransferRateLimit.bind(this);
     this.Message = this.Message.bind(this);
+    this.Params = this.Params.bind(this);
   }
   LatestDepositAddress(
     request: LatestDepositAddressRequest
@@ -317,6 +323,14 @@ export class QueryServiceClientImpl implements QueryService {
     const promise = this.rpc.request(this.service, "Message", data);
     return promise.then((data) =>
       MessageResponse.decode(_m0.Reader.create(data))
+    );
+  }
+
+  Params(request: ParamsRequest): Promise<ParamsResponse> {
+    const data = ParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) =>
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 }

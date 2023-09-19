@@ -42,16 +42,26 @@ type BaseGMPParams = {
   toTime?: number;
 };
 
-// SearchGMP
+export const VALID_CONTRACT_METHODS = [
+  "callContract",
+  "callContractWithToken",
+  "sendToken",
+  "StandardizedTokenDeployed",
+  "RemoteStandardizedTokenAndManagerDeploymentInitialized",
+] as const;
+
+export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
 
 export type SearchGMPParams = BaseGMPParams & {
-  contractMethod?: "callContrct" | "callContrctWithToken";
-  txHash?: `0x${string}`;
+  contractMethod?: ContractMethod;
+  txHash?: string | `0x${string}`;
   txLogIndex?: number;
   status?: GMPTxStatus;
   from?: number;
   size?: number;
   sort?: Record<string, SortOrder>;
+  sourceContractAddress?: `0x${string}`;
+  destinationContractAddress?: `0x${string}`;
 };
 
 type HexAmount = {
@@ -62,6 +72,7 @@ type HexAmount = {
 type SearchGMPCall = {
   blockNumber: number;
   blockHash: `0x${string}`;
+  block_timestamp: number;
   transactionIndex: number;
   address: `0x${string}`;
   removed: boolean;
@@ -85,6 +96,40 @@ type SearchGMPCall = {
     symbol: string;
     amount: HexAmount;
   };
+};
+
+export type TokenDeployedEvent = {
+  event: "StandardizedTokenDeployed";
+  mintAmount: string;
+  symbol: string;
+  tokenId: `0x${string}`;
+  mintTo: `0x${string}`;
+  decimals: number;
+  name: string;
+};
+
+export type TokenSentEvent = {
+  event: "TokenSent";
+  symbol: string;
+  amount: string;
+  destinationAddress: `0x${string}`;
+  tokenId: `0x${string}`;
+  decimals: number;
+  name: string;
+  destinationChain: string;
+  contract_address: `0x${string}`;
+};
+
+export type RemoteStandardizedTokenAndManagerDeploymentInitializedEvent = {
+  event: "RemoteStandardizedTokenAndManagerDeploymentInitialized";
+  tokenId: `0x${string}`;
+  tokenSymbol: string;
+  gasValue: string;
+  tokenDecimals: number;
+  tokenName: string;
+  destinationChain: string;
+  distributor: `0x${string}`;
+  operator: `0x${string}`;
 };
 
 type GMPTokenInfo = {
@@ -124,13 +169,68 @@ type SearchGMPFees = {
   };
 };
 
+export type SearchGMPGasPaid = {
+  axelarTransactionHash: string;
+  chain: string;
+  chain_type: string;
+  logIndex: number;
+  createdAt: {
+    week: number;
+    hour: number;
+    month: number;
+    year: number;
+    ms: number;
+    day: number;
+    quarter: number;
+  };
+  transactionHash: string;
+
+  returnValues: {
+    refundAddress: string;
+    amount: string;
+    refundRecipient: string;
+    sourceAddress: string;
+    destinationAddress: string;
+    gasFeeAmount: string;
+    recipient: string;
+    messageId: string;
+    payloadHash: string;
+    denom: string;
+    destinationChain: string;
+    asset: string;
+  };
+  blockNumber: number;
+  block_timestamp: number;
+  receipt: {
+    gasUsed: string;
+    blockNumber: number;
+    from: string;
+    transactionHash: string;
+    status: number;
+  };
+  _id: string;
+  id: string;
+  event: string;
+  transaction: {
+    gasLimit: string;
+    blockNumber: number;
+    from: string;
+    hash: string;
+  };
+  destination_chain_type: string;
+};
+
 export type SearchGMPResponseData = {
   call: SearchGMPCall;
   fees: SearchGMPFees;
   status: GMPTxStatus;
+  gas_paid: SearchGMPGasPaid;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;
+  token_sent?: TokenSentEvent;
+  token_deployed?: TokenDeployedEvent;
+  token_deployment_initialized?: RemoteStandardizedTokenAndManagerDeploymentInitializedEvent;
 };
 
 export type SearchGMPResponse = BaseGMPResponse<{
@@ -241,10 +341,13 @@ export type EstimateTimeSpentResponse = BaseStats<{
 export type GetFeesParams = {
   sourceChain: string;
   destinationChain: string;
-  sourceTokenSymbol?: string;
-  sourceTokenAddress?: `0x${string}`;
-  sourceContractAddress?: `0x${string}`;
-  destinationContractAddress?: `0x${string}`;
+  sourceTokenSymbol?: string | undefined;
+  sourceTokenAddress?: `0x${string}` | undefined;
+  destinationContractAddress?: `0x${string}` | undefined;
+  sourceContractAddress?: `0x${string}` | undefined;
+  tokenSymbol?: string | undefined;
+  amount?: number | undefined;
+  amountInUnits?: string | undefined;
 };
 
 type ExpressFee = {

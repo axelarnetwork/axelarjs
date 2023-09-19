@@ -24,6 +24,8 @@ import {
   GatewayAddressResponse,
   KeyAddressRequest,
   KeyAddressResponse,
+  ParamsRequest,
+  ParamsResponse,
   PendingCommandsRequest,
   PendingCommandsResponse,
   TokenInfoRequest,
@@ -36,6 +38,8 @@ import {
   ConfirmDepositResponse,
   ConfirmGatewayTxRequest,
   ConfirmGatewayTxResponse,
+  ConfirmGatewayTxsRequest,
+  ConfirmGatewayTxsResponse,
   ConfirmTokenRequest,
   ConfirmTokenResponse,
   ConfirmTransferKeyRequest,
@@ -63,9 +67,13 @@ export const protobufPackage = "axelar.evm.v1beta1";
 /** Msg defines the evm Msg service. */
 export interface MsgService {
   SetGateway(request: SetGatewayRequest): Promise<SetGatewayResponse>;
+  /** Deprecated: use ConfirmGatewayTxs instead */
   ConfirmGatewayTx(
     request: ConfirmGatewayTxRequest
   ): Promise<ConfirmGatewayTxResponse>;
+  ConfirmGatewayTxs(
+    request: ConfirmGatewayTxsRequest
+  ): Promise<ConfirmGatewayTxsResponse>;
   Link(request: LinkRequest): Promise<LinkResponse>;
   ConfirmToken(request: ConfirmTokenRequest): Promise<ConfirmTokenResponse>;
   ConfirmDeposit(
@@ -93,14 +101,16 @@ export interface MsgService {
   ): Promise<RetryFailedEventResponse>;
 }
 
+export const MsgServiceServiceName = "axelar.evm.v1beta1.MsgService";
 export class MsgServiceClientImpl implements MsgService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.evm.v1beta1.MsgService";
+    this.service = opts?.service || MsgServiceServiceName;
     this.rpc = rpc;
     this.SetGateway = this.SetGateway.bind(this);
     this.ConfirmGatewayTx = this.ConfirmGatewayTx.bind(this);
+    this.ConfirmGatewayTxs = this.ConfirmGatewayTxs.bind(this);
     this.Link = this.Link.bind(this);
     this.ConfirmToken = this.ConfirmToken.bind(this);
     this.ConfirmDeposit = this.ConfirmDeposit.bind(this);
@@ -129,6 +139,16 @@ export class MsgServiceClientImpl implements MsgService {
     const promise = this.rpc.request(this.service, "ConfirmGatewayTx", data);
     return promise.then((data) =>
       ConfirmGatewayTxResponse.decode(_m0.Reader.create(data))
+    );
+  }
+
+  ConfirmGatewayTxs(
+    request: ConfirmGatewayTxsRequest
+  ): Promise<ConfirmGatewayTxsResponse> {
+    const data = ConfirmGatewayTxsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "ConfirmGatewayTxs", data);
+    return promise.then((data) =>
+      ConfirmGatewayTxsResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -291,13 +311,15 @@ export interface QueryService {
   ERC20Tokens(request: ERC20TokensRequest): Promise<ERC20TokensResponse>;
   /** TokenInfo queries the token info for a registered ERC20 Token */
   TokenInfo(request: TokenInfoRequest): Promise<TokenInfoResponse>;
+  Params(request: ParamsRequest): Promise<ParamsResponse>;
 }
 
+export const QueryServiceServiceName = "axelar.evm.v1beta1.QueryService";
 export class QueryServiceClientImpl implements QueryService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.evm.v1beta1.QueryService";
+    this.service = opts?.service || QueryServiceServiceName;
     this.rpc = rpc;
     this.BatchedCommands = this.BatchedCommands.bind(this);
     this.BurnerInfo = this.BurnerInfo.bind(this);
@@ -312,6 +334,7 @@ export class QueryServiceClientImpl implements QueryService {
     this.Event = this.Event.bind(this);
     this.ERC20Tokens = this.ERC20Tokens.bind(this);
     this.TokenInfo = this.TokenInfo.bind(this);
+    this.Params = this.Params.bind(this);
   }
   BatchedCommands(
     request: BatchedCommandsRequest
@@ -422,6 +445,14 @@ export class QueryServiceClientImpl implements QueryService {
     const promise = this.rpc.request(this.service, "TokenInfo", data);
     return promise.then((data) =>
       TokenInfoResponse.decode(_m0.Reader.create(data))
+    );
+  }
+
+  Params(request: ParamsRequest): Promise<ParamsResponse> {
+    const data = ParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) =>
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 }

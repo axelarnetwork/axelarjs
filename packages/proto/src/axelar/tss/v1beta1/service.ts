@@ -1,6 +1,7 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 
+import { ParamsRequest, ParamsResponse } from "./query";
 import { HeartBeatRequest, HeartBeatResponse } from "./tx";
 
 export const protobufPackage = "axelar.tss.v1beta1";
@@ -10,11 +11,12 @@ export interface MsgService {
   HeartBeat(request: HeartBeatRequest): Promise<HeartBeatResponse>;
 }
 
+export const MsgServiceServiceName = "axelar.tss.v1beta1.MsgService";
 export class MsgServiceClientImpl implements MsgService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.tss.v1beta1.MsgService";
+    this.service = opts?.service || MsgServiceServiceName;
     this.rpc = rpc;
     this.HeartBeat = this.HeartBeat.bind(this);
   }
@@ -28,14 +30,25 @@ export class MsgServiceClientImpl implements MsgService {
 }
 
 /** Query defines the gRPC querier service. */
-export interface QueryService {}
+export interface QueryService {
+  Params(request: ParamsRequest): Promise<ParamsResponse>;
+}
 
+export const QueryServiceServiceName = "axelar.tss.v1beta1.QueryService";
 export class QueryServiceClientImpl implements QueryService {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "axelar.tss.v1beta1.QueryService";
+    this.service = opts?.service || QueryServiceServiceName;
     this.rpc = rpc;
+    this.Params = this.Params.bind(this);
+  }
+  Params(request: ParamsRequest): Promise<ParamsResponse> {
+    const data = ParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) =>
+      ParamsResponse.decode(_m0.Reader.create(data))
+    );
   }
 }
 

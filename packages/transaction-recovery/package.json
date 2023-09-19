@@ -1,12 +1,38 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.0.1",
+  "version": "0.1.7",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Axelarjs Transaction Recovery",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
-  "main": "index.js",
+  "files": [
+    "./build",
+    "./add-gas",
+    "./index.js",
+    "./types.js"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
+    "./add-gas": {
+      "import": "./build/module/add-gas/index.js",
+      "require": "./build/commonjs/add-gas/index.js"
+    },
+    "./add-gas/*": {
+      "import": "./build/module/add-gas/*.js",
+      "require": "./build/commonjs/add-gas/*.js"
+    }
+  },
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
@@ -18,10 +44,16 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@axelarjs/cosmos": "workspace:*",
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.4"
+  },
+  "dependencies": {
+    "@axelarjs/api": "workspace:*",
+    "@axelarjs/core": "workspace:*",
+    "@axelarjs/cosmos": "workspace:*",
+    "@cosmjs/proto-signing": "^0.30.1",
+    "@cosmjs/stargate": "^0.31.1"
   }
 }

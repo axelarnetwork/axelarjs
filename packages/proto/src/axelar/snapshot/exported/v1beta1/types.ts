@@ -12,7 +12,7 @@ export interface Participant {
 }
 
 export interface Snapshot {
-  timestamp?: Date;
+  timestamp?: Date | undefined;
   height: Long;
   participants: { [key: string]: Participant };
   bondedWeight: Uint8Array;
@@ -20,11 +20,11 @@ export interface Snapshot {
 
 export interface Snapshot_ParticipantsEntry {
   key: string;
-  value?: Participant;
+  value?: Participant | undefined;
 }
 
 function createBaseParticipant(): Participant {
-  return { address: new Uint8Array(), weight: new Uint8Array() };
+  return { address: new Uint8Array(0), weight: new Uint8Array(0) };
 }
 
 export const Participant = {
@@ -76,36 +76,33 @@ export const Participant = {
     return {
       address: isSet(object.address)
         ? bytesFromBase64(object.address)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       weight: isSet(object.weight)
         ? bytesFromBase64(object.weight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Participant): unknown {
     const obj: any = {};
-    message.address !== undefined &&
-      (obj.address = base64FromBytes(
-        message.address !== undefined ? message.address : new Uint8Array()
-      ));
-    message.weight !== undefined &&
-      (obj.weight = base64FromBytes(
-        message.weight !== undefined ? message.weight : new Uint8Array()
-      ));
+    if (message.address.length !== 0) {
+      obj.address = base64FromBytes(message.address);
+    }
+    if (message.weight.length !== 0) {
+      obj.weight = base64FromBytes(message.weight);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Participant>, I>>(base?: I): Participant {
-    return Participant.fromPartial(base ?? {});
+    return Participant.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Participant>, I>>(
     object: I
   ): Participant {
     const message = createBaseParticipant();
-    message.address = object.address ?? new Uint8Array();
-    message.weight = object.weight ?? new Uint8Array();
+    message.address = object.address ?? new Uint8Array(0);
+    message.weight = object.weight ?? new Uint8Array(0);
     return message;
   },
 };
@@ -115,7 +112,7 @@ function createBaseSnapshot(): Snapshot {
     timestamp: undefined,
     height: Long.ZERO,
     participants: {},
-    bondedWeight: new Uint8Array(),
+    bondedWeight: new Uint8Array(0),
   };
 }
 
@@ -214,35 +211,36 @@ export const Snapshot = {
         : {},
       bondedWeight: isSet(object.bondedWeight)
         ? bytesFromBase64(object.bondedWeight)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Snapshot): unknown {
     const obj: any = {};
-    message.timestamp !== undefined &&
-      (obj.timestamp = message.timestamp.toISOString());
-    message.height !== undefined &&
-      (obj.height = (message.height || Long.ZERO).toString());
-    obj.participants = {};
-    if (message.participants) {
-      Object.entries(message.participants).forEach(([k, v]) => {
-        obj.participants[k] = Participant.toJSON(v);
-      });
+    if (message.timestamp !== undefined) {
+      obj.timestamp = message.timestamp.toISOString();
     }
-    message.bondedWeight !== undefined &&
-      (obj.bondedWeight = base64FromBytes(
-        message.bondedWeight !== undefined
-          ? message.bondedWeight
-          : new Uint8Array()
-      ));
+    if (!message.height.isZero()) {
+      obj.height = (message.height || Long.ZERO).toString();
+    }
+    if (message.participants) {
+      const entries = Object.entries(message.participants);
+      if (entries.length > 0) {
+        obj.participants = {};
+        entries.forEach(([k, v]) => {
+          obj.participants[k] = Participant.toJSON(v);
+        });
+      }
+    }
+    if (message.bondedWeight.length !== 0) {
+      obj.bondedWeight = base64FromBytes(message.bondedWeight);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Snapshot>, I>>(base?: I): Snapshot {
-    return Snapshot.fromPartial(base ?? {});
+    return Snapshot.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Snapshot>, I>>(object: I): Snapshot {
     const message = createBaseSnapshot();
     message.timestamp = object.timestamp ?? undefined;
@@ -258,7 +256,7 @@ export const Snapshot = {
       }
       return acc;
     }, {});
-    message.bondedWeight = object.bondedWeight ?? new Uint8Array();
+    message.bondedWeight = object.bondedWeight ?? new Uint8Array(0);
     return message;
   },
 };
@@ -326,20 +324,20 @@ export const Snapshot_ParticipantsEntry = {
 
   toJSON(message: Snapshot_ParticipantsEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = message.value
-        ? Participant.toJSON(message.value)
-        : undefined);
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = Participant.toJSON(message.value);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Snapshot_ParticipantsEntry>, I>>(
     base?: I
   ): Snapshot_ParticipantsEntry {
-    return Snapshot_ParticipantsEntry.fromPartial(base ?? {});
+    return Snapshot_ParticipantsEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Snapshot_ParticipantsEntry>, I>>(
     object: I
   ): Snapshot_ParticipantsEntry {
@@ -353,10 +351,10 @@ export const Snapshot_ParticipantsEntry = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

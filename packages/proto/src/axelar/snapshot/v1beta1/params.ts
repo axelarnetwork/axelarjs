@@ -58,15 +58,15 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.minProxyBalance !== undefined &&
-      (obj.minProxyBalance = (message.minProxyBalance || Long.ZERO).toString());
+    if (!message.minProxyBalance.isZero()) {
+      obj.minProxyBalance = (message.minProxyBalance || Long.ZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.minProxyBalance =
