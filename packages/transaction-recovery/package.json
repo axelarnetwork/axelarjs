@@ -24,6 +24,10 @@
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
     },
+    "./add-gas": {
+      "import": "./build/module/add-gas/index.js",
+      "require": "./build/commonjs/add-gas/index.js"
+    },
     "./add-gas/*": {
       "import": "./build/module/add-gas/*.js",
       "require": "./build/commonjs/add-gas/*.js"
