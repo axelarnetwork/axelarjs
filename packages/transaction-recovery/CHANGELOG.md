@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.4
+
+### Patch Changes
+
+- [`aecc465d`](https://github.com/axelarnetwork/axelarjs/commit/aecc465d052ca47d8f13f5e6aa599f14c56571ef) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Fix: add-gas package alias
+
 ## 0.1.3
 
 ### Patch Changes
