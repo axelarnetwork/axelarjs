@@ -1,2 +1,4 @@
 export * from "./types";
-export * from "./axelar-query";
+export * from "./isomorphic";
+export * from "./browser";
+export * from "./node";

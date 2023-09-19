@@ -1,0 +1,58 @@
+{
+  "name": "@axelarjs/deposit-address",
+  "version": "0.0.3",
+  "description": "Axelarjs Deposit Address",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "./build",
+    "./helpers",
+    "./browser.js",
+    "./getDepositAddress.js",
+    "./index.js",
+    "./node.js",
+    "./types.js"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
+    "./helpers/*": {
+      "import": "./build/module/helpers/*.js",
+      "require": "./build/commonjs/helpers/*.js"
+    }
+  },
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
+    "compile": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LicenseRef-LICENSE",
+  "devDependencies": {
+    "@axelarjs/config": "workspace:*",
+    "dotenv": "^16.3.1",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.4"
+  },
+  "dependencies": {
+    "@axelarjs/api": "workspace:*",
+    "@axelarjs/core": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
+    "bech32": "^2.0.0",
+    "viem": "~1.10.9"
+  }
+}

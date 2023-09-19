@@ -15,7 +15,7 @@ export interface QueueState_Item {
 
 export interface QueueState_ItemsEntry {
   key: string;
-  value?: QueueState_Item;
+  value?: QueueState_Item | undefined;
 }
 
 function createBaseQueueState(): QueueState {
@@ -78,19 +78,21 @@ export const QueueState = {
 
   toJSON(message: QueueState): unknown {
     const obj: any = {};
-    obj.items = {};
     if (message.items) {
-      Object.entries(message.items).forEach(([k, v]) => {
-        obj.items[k] = QueueState_Item.toJSON(v);
-      });
+      const entries = Object.entries(message.items);
+      if (entries.length > 0) {
+        obj.items = {};
+        entries.forEach(([k, v]) => {
+          obj.items[k] = QueueState_Item.toJSON(v);
+        });
+      }
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<QueueState>, I>>(base?: I): QueueState {
-    return QueueState.fromPartial(base ?? {});
+    return QueueState.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<QueueState>, I>>(
     object: I
   ): QueueState {
@@ -108,7 +110,7 @@ export const QueueState = {
 };
 
 function createBaseQueueState_Item(): QueueState_Item {
-  return { key: new Uint8Array(), value: new Uint8Array() };
+  return { key: new Uint8Array(0), value: new Uint8Array(0) };
 }
 
 export const QueueState_Item = {
@@ -158,38 +160,35 @@ export const QueueState_Item = {
 
   fromJSON(object: any): QueueState_Item {
     return {
-      key: isSet(object.key) ? bytesFromBase64(object.key) : new Uint8Array(),
+      key: isSet(object.key) ? bytesFromBase64(object.key) : new Uint8Array(0),
       value: isSet(object.value)
         ? bytesFromBase64(object.value)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: QueueState_Item): unknown {
     const obj: any = {};
-    message.key !== undefined &&
-      (obj.key = base64FromBytes(
-        message.key !== undefined ? message.key : new Uint8Array()
-      ));
-    message.value !== undefined &&
-      (obj.value = base64FromBytes(
-        message.value !== undefined ? message.value : new Uint8Array()
-      ));
+    if (message.key.length !== 0) {
+      obj.key = base64FromBytes(message.key);
+    }
+    if (message.value.length !== 0) {
+      obj.value = base64FromBytes(message.value);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<QueueState_Item>, I>>(
     base?: I
   ): QueueState_Item {
-    return QueueState_Item.fromPartial(base ?? {});
+    return QueueState_Item.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<QueueState_Item>, I>>(
     object: I
   ): QueueState_Item {
     const message = createBaseQueueState_Item();
-    message.key = object.key ?? new Uint8Array();
-    message.value = object.value ?? new Uint8Array();
+    message.key = object.key ?? new Uint8Array(0);
+    message.value = object.value ?? new Uint8Array(0);
     return message;
   },
 };
@@ -257,20 +256,20 @@ export const QueueState_ItemsEntry = {
 
   toJSON(message: QueueState_ItemsEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = message.value
-        ? QueueState_Item.toJSON(message.value)
-        : undefined);
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== undefined) {
+      obj.value = QueueState_Item.toJSON(message.value);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<QueueState_ItemsEntry>, I>>(
     base?: I
   ): QueueState_ItemsEntry {
-    return QueueState_ItemsEntry.fromPartial(base ?? {});
+    return QueueState_ItemsEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<QueueState_ItemsEntry>, I>>(
     object: I
   ): QueueState_ItemsEntry {
@@ -284,10 +283,10 @@ export const QueueState_ItemsEntry = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

@@ -12,8 +12,8 @@ export interface Params {
 
 function createBaseParams(): Params {
   return {
-    externalChainVotingInflationRate: new Uint8Array(),
-    keyMgmtRelativeInflationRate: new Uint8Array(),
+    externalChainVotingInflationRate: new Uint8Array(0),
+    keyMgmtRelativeInflationRate: new Uint8Array(0),
   };
 }
 
@@ -68,48 +68,45 @@ export const Params = {
         object.externalChainVotingInflationRate
       )
         ? bytesFromBase64(object.externalChainVotingInflationRate)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       keyMgmtRelativeInflationRate: isSet(object.keyMgmtRelativeInflationRate)
         ? bytesFromBase64(object.keyMgmtRelativeInflationRate)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.externalChainVotingInflationRate !== undefined &&
-      (obj.externalChainVotingInflationRate = base64FromBytes(
-        message.externalChainVotingInflationRate !== undefined
-          ? message.externalChainVotingInflationRate
-          : new Uint8Array()
-      ));
-    message.keyMgmtRelativeInflationRate !== undefined &&
-      (obj.keyMgmtRelativeInflationRate = base64FromBytes(
-        message.keyMgmtRelativeInflationRate !== undefined
-          ? message.keyMgmtRelativeInflationRate
-          : new Uint8Array()
-      ));
+    if (message.externalChainVotingInflationRate.length !== 0) {
+      obj.externalChainVotingInflationRate = base64FromBytes(
+        message.externalChainVotingInflationRate
+      );
+    }
+    if (message.keyMgmtRelativeInflationRate.length !== 0) {
+      obj.keyMgmtRelativeInflationRate = base64FromBytes(
+        message.keyMgmtRelativeInflationRate
+      );
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.externalChainVotingInflationRate =
-      object.externalChainVotingInflationRate ?? new Uint8Array();
+      object.externalChainVotingInflationRate ?? new Uint8Array(0);
     message.keyMgmtRelativeInflationRate =
-      object.keyMgmtRelativeInflationRate ?? new Uint8Array();
+      object.keyMgmtRelativeInflationRate ?? new Uint8Array(0);
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

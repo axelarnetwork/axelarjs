@@ -1,8 +1,10 @@
 node_modules/
 build/
-axelarscan/
-gmp/
-axelar-query/
+/axelarscan/
+/gmp/
+/axelar-query/
+/axelar-config/
+/deposit-address/
 *.d.ts
 *.js
 .turbo/

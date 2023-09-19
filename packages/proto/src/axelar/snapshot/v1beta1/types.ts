@@ -12,8 +12,8 @@ export interface ProxiedValidator {
 
 function createBaseProxiedValidator(): ProxiedValidator {
   return {
-    validator: new Uint8Array(),
-    proxy: new Uint8Array(),
+    validator: new Uint8Array(0),
+    proxy: new Uint8Array(0),
     active: false,
   };
 }
@@ -77,49 +77,48 @@ export const ProxiedValidator = {
     return {
       validator: isSet(object.validator)
         ? bytesFromBase64(object.validator)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       proxy: isSet(object.proxy)
         ? bytesFromBase64(object.proxy)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       active: isSet(object.active) ? Boolean(object.active) : false,
     };
   },
 
   toJSON(message: ProxiedValidator): unknown {
     const obj: any = {};
-    message.validator !== undefined &&
-      (obj.validator = base64FromBytes(
-        message.validator !== undefined ? message.validator : new Uint8Array()
-      ));
-    message.proxy !== undefined &&
-      (obj.proxy = base64FromBytes(
-        message.proxy !== undefined ? message.proxy : new Uint8Array()
-      ));
-    message.active !== undefined && (obj.active = message.active);
+    if (message.validator.length !== 0) {
+      obj.validator = base64FromBytes(message.validator);
+    }
+    if (message.proxy.length !== 0) {
+      obj.proxy = base64FromBytes(message.proxy);
+    }
+    if (message.active === true) {
+      obj.active = message.active;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ProxiedValidator>, I>>(
     base?: I
   ): ProxiedValidator {
-    return ProxiedValidator.fromPartial(base ?? {});
+    return ProxiedValidator.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<ProxiedValidator>, I>>(
     object: I
   ): ProxiedValidator {
     const message = createBaseProxiedValidator();
-    message.validator = object.validator ?? new Uint8Array();
-    message.proxy = object.proxy ?? new Uint8Array();
+    message.validator = object.validator ?? new Uint8Array(0);
+    message.proxy = object.proxy ?? new Uint8Array(0);
     message.active = object.active ?? false;
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

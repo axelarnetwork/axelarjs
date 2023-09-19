@@ -113,3 +113,78 @@ export type CosmosChainConfig = {
   id: string;
   chain_type: "cosmos";
 };
+
+export type LinkEvent = {
+  type: "link";
+  attributes: [
+    { key: "module"; value: string },
+    { key: "sourceChain"; value: string },
+    {
+      key: "depositAddress";
+      value: string;
+    },
+    { key: "destinationChain"; value: string },
+    {
+      key: "destinationAddress";
+      value: string;
+    },
+    { key: "asset"; value: string }
+  ];
+};
+export type MessageEvent = {
+  type: "message";
+  attributes: [{ key: "action"; value: "Link" }];
+};
+export type LinkRequestRawResponse = {
+  data: [
+    {
+      height: number;
+      txhash: string;
+      codespace: string;
+      code: number;
+      logs: [
+        {
+          msg_index: number;
+          log: string;
+          events: (LinkEvent | MessageEvent)[];
+        }
+      ];
+      info: string;
+      gas_wanted: string;
+      gas_used: string;
+      tx: {
+        body: {
+          messages: [
+            {
+              "@type": "/axelar.axelarnet.v1beta1.LinkRequest";
+              sender: string;
+              recipient_addr: string;
+              recipient_chain: string;
+              denom: string;
+            }
+          ];
+          memo: string;
+          timeout_height: string;
+        };
+      };
+      timestamp: number;
+      addresses: string[];
+      types: string[];
+      id: string;
+    }
+  ];
+  total: number;
+  time_spent: number;
+};
+
+export type LinkRequestResponse = {
+  sourceChain: string | undefined;
+  destinationChain: string | undefined;
+  destinationAddress: string | undefined;
+  module: string | undefined;
+  asset: string | undefined;
+  depositAddress: string | undefined;
+  txHash: string;
+  tokenAddress?: string | undefined;
+  timestamp?: number;
+};

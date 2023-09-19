@@ -1,0 +1,27 @@
+name: Release (changesets)
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        with:
+          title: "[changesets] Apply version updates"
+          commit: "chore: apply changesets"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

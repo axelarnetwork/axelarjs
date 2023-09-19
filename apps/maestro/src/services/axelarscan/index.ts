@@ -1,5 +1,5 @@
-import { createAxelarscanClient } from "@axelarjs/api/axelarscan";
+import { createAxelarscanBrowserClient } from "@axelarjs/api/axelarscan/browser";
 
-export default createAxelarscanClient({
-  prefixUrl: String(process.env.NEXT_PUBLIC_EXPLORER_API_URL),
-});
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+
+export default createAxelarscanBrowserClient(NEXT_PUBLIC_NETWORK_ENV);

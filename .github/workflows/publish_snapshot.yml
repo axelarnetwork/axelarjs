@@ -1,0 +1,30 @@
+name: Publish (snapshot versions)
+
+on: workflow_dispatch
+
+jobs:
+  snapshot:
+    name: Publish Snapshot Versions to NPM
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Build packages
+        run: pnpm build:packages
+
+      - name: Set snapshot version
+        run: |
+          pnpm -r exec npm version 0.0.0-snapshot.$(git rev-parse --short HEAD) --git-tag-version=false
+
+      - name: Publish snapshots
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          pnpm -r publish --no-git-checks --tag snapshot --access public

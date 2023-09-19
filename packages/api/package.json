@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.1.1",
+  "version": "0.2.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
@@ -11,6 +14,8 @@
     "./axelarscan",
     "./axelar-query",
     "./gmp",
+    "./deposit-address-api",
+    "./axelar-config",
     "./index.js"
   ],
   "exports": {
@@ -26,22 +31,44 @@
       "import": "./build/module/axelar-query/index.js",
       "require": "./build/commonjs/axelar-query/index.js"
     },
+    "./deposit-address": {
+      "import": "./build/module/deposit-address/index.js",
+      "require": "./build/commonjs/deposit-address/index.js"
+    },
+    "./gmp/*": {
+      "import": "./build/module/gmp/*.js",
+      "require": "./build/commonjs//gmp/*.js"
+    },
+    "./axelarscan/*": {
+      "import": "./build/module/axelarscan/*.js",
+      "require": "./build/commonjs/axelarscan/*.js"
+    },
+    "./axelar-query/*": {
+      "import": "./build/module/axelar-query/*.js",
+      "require": "./build/commonjs/axelar-query/*.js"
+    },
+    "./axelar-config/*": {
+      "import": "./build/module/axelar-config/*.js",
+      "require": "./build/commonjs/axelar-config/*.js"
+    },
+    "./deposit-address/*": {
+      "import": "./build/module/deposit-address/index.js",
+      "require": "./build/commonjs/deposit-address/index.js"
+    },
     ".": {
-      "import": "./build/module/index.js",
-      "require": "./build/commonjs/index.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
     }
   },
   "scripts": {
     "compile": "tsc --noEmit",
     "build": "./scripts/build.sh",
-    "clean": "./scripts/clean.sh"
+    "clean": "./scripts/clean.sh",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -49,17 +76,21 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "@types/node": "18.15.3",
-    "fast-check": "^3.12.1",
+    "fast-check": "^3.13.0",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.4"
   },
   "dependencies": {
-    "ky": "^0.33.3",
-    "rambda": "^7.5.0"
+    "@axelarjs/core": "workspace:*",
+    "got": "^12.6.1",
+    "ky": "^1.0.1",
+    "rambda": "^7.5.0",
+    "viem": "~1.10.14"
   }
 }

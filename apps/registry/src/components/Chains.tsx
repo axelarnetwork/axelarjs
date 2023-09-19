@@ -15,7 +15,7 @@ type Props = {
   search?: string;
 };
 
-const Chains: FC<Props> = async (props) => {
+const Chains = async (props: Props) => {
   const chainConfigs = await getNormalizedChainConfigs({
     network: props.network,
     search: props.search,

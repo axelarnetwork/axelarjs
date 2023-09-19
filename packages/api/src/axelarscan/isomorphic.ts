@@ -1,11 +1,17 @@
 import { partition } from "rambda";
 
-import { HTTPClient, Options } from "../HTTPClient";
 import {
+  IsomorphicHTTPClient,
+  type ClientOptions,
+} from "../IsomorphicHTTPClient";
+import type {
   AxelarAssetPrice,
   AxelarScanAsset,
   CosmosChainConfig,
   EVMChainConfig,
+  LinkEvent,
+  LinkRequestRawResponse,
+  LinkRequestResponse,
 } from "./types";
 
 export const MODULES = {
@@ -29,8 +35,8 @@ export type GetAssetsPriceResponse = AxelarAssetPrice[];
 
 export type GetChainConfigsResponse = (EVMChainConfig | CosmosChainConfig)[];
 
-export class AxelarscanClient extends HTTPClient {
-  static init(options: Options) {
+export class AxelarscanClient extends IsomorphicHTTPClient {
+  static init(options: ClientOptions) {
     return new AxelarscanClient(options, {
       name: "AxelarscanClient",
       version: "0.0.1",
@@ -91,6 +97,48 @@ export class AxelarscanClient extends HTTPClient {
       cosmos: cosmos.filter(isEligible) as CosmosChainConfig[],
     };
   }
-}
 
-export const createAxelarscanClient = AxelarscanClient.init;
+  async searchTransactions(params: { size: number; type: string }) {
+    const json = {
+      method: "searchTransactions",
+      type: params.type,
+      size: params.size,
+    };
+
+    const result = await this.client
+      .post("", { json })
+      .json<LinkRequestRawResponse>();
+
+    return result;
+  }
+
+  async getRecentLinkTransactions(params: {
+    size: number;
+  }): Promise<LinkRequestResponse[]> {
+    return this.searchTransactions({
+      size: params.size,
+      type: "LinkRequest",
+    }).then((res) =>
+      res.data
+        .filter((entry) => entry.code === 0) //only want successfully broadcasted txs
+        .map((entry) => {
+          const logs = entry.logs[0];
+          const linkEvent = logs?.events.find((event) => event.type === "link");
+          const { attributes } = linkEvent as LinkEvent;
+          const find = (key: string) =>
+            attributes.find((attr: { key: string }) => attr.key === key)?.value;
+          return {
+            sourceChain: find("sourceChain"),
+            destinationChain: find("destinationChain"),
+            depositAddress: find("depositAddress"),
+            destinationAddress: find("destinationAddress"),
+            module: find("module"),
+            asset: find("asset"),
+            tokenAddress: find("tokenAddress"),
+            txHash: entry.txhash,
+            timmestamp: entry.timestamp,
+          };
+        })
+    );
+  }
+}

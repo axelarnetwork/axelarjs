@@ -8,9 +8,9 @@ export const protobufPackage = "axelar.nexus.v1beta1";
 
 /** Params represent the genesis parameters for the module */
 export interface Params {
-  chainActivationThreshold?: Threshold;
-  chainMaintainerMissingVoteThreshold?: Threshold;
-  chainMaintainerIncorrectVoteThreshold?: Threshold;
+  chainActivationThreshold?: Threshold | undefined;
+  chainMaintainerMissingVoteThreshold?: Threshold | undefined;
+  chainMaintainerIncorrectVoteThreshold?: Threshold | undefined;
   chainMaintainerCheckWindow: number;
 }
 
@@ -129,31 +129,32 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.chainActivationThreshold !== undefined &&
-      (obj.chainActivationThreshold = message.chainActivationThreshold
-        ? Threshold.toJSON(message.chainActivationThreshold)
-        : undefined);
-    message.chainMaintainerMissingVoteThreshold !== undefined &&
-      (obj.chainMaintainerMissingVoteThreshold =
+    if (message.chainActivationThreshold !== undefined) {
+      obj.chainActivationThreshold = Threshold.toJSON(
+        message.chainActivationThreshold
+      );
+    }
+    if (message.chainMaintainerMissingVoteThreshold !== undefined) {
+      obj.chainMaintainerMissingVoteThreshold = Threshold.toJSON(
         message.chainMaintainerMissingVoteThreshold
-          ? Threshold.toJSON(message.chainMaintainerMissingVoteThreshold)
-          : undefined);
-    message.chainMaintainerIncorrectVoteThreshold !== undefined &&
-      (obj.chainMaintainerIncorrectVoteThreshold =
+      );
+    }
+    if (message.chainMaintainerIncorrectVoteThreshold !== undefined) {
+      obj.chainMaintainerIncorrectVoteThreshold = Threshold.toJSON(
         message.chainMaintainerIncorrectVoteThreshold
-          ? Threshold.toJSON(message.chainMaintainerIncorrectVoteThreshold)
-          : undefined);
-    message.chainMaintainerCheckWindow !== undefined &&
-      (obj.chainMaintainerCheckWindow = Math.round(
+      );
+    }
+    if (message.chainMaintainerCheckWindow !== 0) {
+      obj.chainMaintainerCheckWindow = Math.round(
         message.chainMaintainerCheckWindow
-      ));
+      );
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Params>, I>>(base?: I): Params {
-    return Params.fromPartial(base ?? {});
+    return Params.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.chainActivationThreshold =

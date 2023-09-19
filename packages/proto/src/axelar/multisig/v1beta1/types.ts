@@ -18,9 +18,9 @@ export const protobufPackage = "axelar.multisig.v1beta1";
 
 export interface Key {
   id: string;
-  snapshot?: Snapshot;
+  snapshot?: Snapshot | undefined;
   pubKeys: { [key: string]: Uint8Array };
-  signingThreshold?: Threshold;
+  signingThreshold?: Threshold | undefined;
   state: KeyState;
 }
 
@@ -30,9 +30,9 @@ export interface Key_PubKeysEntry {
 }
 
 export interface KeygenSession {
-  key?: Key;
+  key?: Key | undefined;
   state: MultisigState;
-  keygenThreshold?: Threshold;
+  keygenThreshold?: Threshold | undefined;
   expiresAt: Long;
   completedAt: Long;
   isPubKeyReceived: { [key: string]: boolean };
@@ -57,14 +57,14 @@ export interface MultiSig_SigsEntry {
 
 export interface SigningSession {
   id: Long;
-  multiSig?: MultiSig;
+  multiSig?: MultiSig | undefined;
   state: MultisigState;
-  key?: Key;
+  key?: Key | undefined;
   expiresAt: Long;
   completedAt: Long;
   gracePeriod: Long;
   module: string;
-  moduleMetadata?: Any;
+  moduleMetadata?: Any | undefined;
 }
 
 export interface KeyEpoch {
@@ -188,29 +188,33 @@ export const Key = {
 
   toJSON(message: Key): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.snapshot !== undefined &&
-      (obj.snapshot = message.snapshot
-        ? Snapshot.toJSON(message.snapshot)
-        : undefined);
-    obj.pubKeys = {};
-    if (message.pubKeys) {
-      Object.entries(message.pubKeys).forEach(([k, v]) => {
-        obj.pubKeys[k] = base64FromBytes(v);
-      });
+    if (message.id !== "") {
+      obj.id = message.id;
     }
-    message.signingThreshold !== undefined &&
-      (obj.signingThreshold = message.signingThreshold
-        ? Threshold.toJSON(message.signingThreshold)
-        : undefined);
-    message.state !== undefined && (obj.state = keyStateToJSON(message.state));
+    if (message.snapshot !== undefined) {
+      obj.snapshot = Snapshot.toJSON(message.snapshot);
+    }
+    if (message.pubKeys) {
+      const entries = Object.entries(message.pubKeys);
+      if (entries.length > 0) {
+        obj.pubKeys = {};
+        entries.forEach(([k, v]) => {
+          obj.pubKeys[k] = base64FromBytes(v);
+        });
+      }
+    }
+    if (message.signingThreshold !== undefined) {
+      obj.signingThreshold = Threshold.toJSON(message.signingThreshold);
+    }
+    if (message.state !== 0) {
+      obj.state = keyStateToJSON(message.state);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Key>, I>>(base?: I): Key {
-    return Key.fromPartial(base ?? {});
+    return Key.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Key>, I>>(object: I): Key {
     const message = createBaseKey();
     message.id = object.id ?? "";
@@ -236,7 +240,7 @@ export const Key = {
 };
 
 function createBaseKey_PubKeysEntry(): Key_PubKeysEntry {
-  return { key: "", value: new Uint8Array() };
+  return { key: "", value: new Uint8Array(0) };
 }
 
 export const Key_PubKeysEntry = {
@@ -289,32 +293,32 @@ export const Key_PubKeysEntry = {
       key: isSet(object.key) ? String(object.key) : "",
       value: isSet(object.value)
         ? bytesFromBase64(object.value)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: Key_PubKeysEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = base64FromBytes(
-        message.value !== undefined ? message.value : new Uint8Array()
-      ));
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value.length !== 0) {
+      obj.value = base64FromBytes(message.value);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<Key_PubKeysEntry>, I>>(
     base?: I
   ): Key_PubKeysEntry {
-    return Key_PubKeysEntry.fromPartial(base ?? {});
+    return Key_PubKeysEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<Key_PubKeysEntry>, I>>(
     object: I
   ): Key_PubKeysEntry {
     const message = createBaseKey_PubKeysEntry();
     message.key = object.key ?? "";
-    message.value = object.value ?? new Uint8Array();
+    message.value = object.value ?? new Uint8Array(0);
     return message;
   },
 };
@@ -467,35 +471,41 @@ export const KeygenSession = {
 
   toJSON(message: KeygenSession): unknown {
     const obj: any = {};
-    message.key !== undefined &&
-      (obj.key = message.key ? Key.toJSON(message.key) : undefined);
-    message.state !== undefined &&
-      (obj.state = multisigStateToJSON(message.state));
-    message.keygenThreshold !== undefined &&
-      (obj.keygenThreshold = message.keygenThreshold
-        ? Threshold.toJSON(message.keygenThreshold)
-        : undefined);
-    message.expiresAt !== undefined &&
-      (obj.expiresAt = (message.expiresAt || Long.ZERO).toString());
-    message.completedAt !== undefined &&
-      (obj.completedAt = (message.completedAt || Long.ZERO).toString());
-    obj.isPubKeyReceived = {};
-    if (message.isPubKeyReceived) {
-      Object.entries(message.isPubKeyReceived).forEach(([k, v]) => {
-        obj.isPubKeyReceived[k] = v;
-      });
+    if (message.key !== undefined) {
+      obj.key = Key.toJSON(message.key);
     }
-    message.gracePeriod !== undefined &&
-      (obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString());
+    if (message.state !== 0) {
+      obj.state = multisigStateToJSON(message.state);
+    }
+    if (message.keygenThreshold !== undefined) {
+      obj.keygenThreshold = Threshold.toJSON(message.keygenThreshold);
+    }
+    if (!message.expiresAt.isZero()) {
+      obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
+    }
+    if (!message.completedAt.isZero()) {
+      obj.completedAt = (message.completedAt || Long.ZERO).toString();
+    }
+    if (message.isPubKeyReceived) {
+      const entries = Object.entries(message.isPubKeyReceived);
+      if (entries.length > 0) {
+        obj.isPubKeyReceived = {};
+        entries.forEach(([k, v]) => {
+          obj.isPubKeyReceived[k] = v;
+        });
+      }
+    }
+    if (!message.gracePeriod.isZero()) {
+      obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeygenSession>, I>>(
     base?: I
   ): KeygenSession {
-    return KeygenSession.fromPartial(base ?? {});
+    return KeygenSession.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeygenSession>, I>>(
     object: I
   ): KeygenSession {
@@ -594,17 +604,20 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
 
   toJSON(message: KeygenSession_IsPubKeyReceivedEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value === true) {
+      obj.value = message.value;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeygenSession_IsPubKeyReceivedEntry>, I>>(
     base?: I
   ): KeygenSession_IsPubKeyReceivedEntry {
-    return KeygenSession_IsPubKeyReceivedEntry.fromPartial(base ?? {});
+    return KeygenSession_IsPubKeyReceivedEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<
     I extends Exact<DeepPartial<KeygenSession_IsPubKeyReceivedEntry>, I>
   >(object: I): KeygenSession_IsPubKeyReceivedEntry {
@@ -616,7 +629,7 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
 };
 
 function createBaseMultiSig(): MultiSig {
-  return { keyId: "", payloadHash: new Uint8Array(), sigs: {} };
+  return { keyId: "", payloadHash: new Uint8Array(0), sigs: {} };
 }
 
 export const MultiSig = {
@@ -685,7 +698,7 @@ export const MultiSig = {
       keyId: isSet(object.keyId) ? String(object.keyId) : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
-        : new Uint8Array(),
+        : new Uint8Array(0),
       sigs: isObject(object.sigs)
         ? Object.entries(object.sigs).reduce<{ [key: string]: Uint8Array }>(
             (acc, [key, value]) => {
@@ -700,30 +713,31 @@ export const MultiSig = {
 
   toJSON(message: MultiSig): unknown {
     const obj: any = {};
-    message.keyId !== undefined && (obj.keyId = message.keyId);
-    message.payloadHash !== undefined &&
-      (obj.payloadHash = base64FromBytes(
-        message.payloadHash !== undefined
-          ? message.payloadHash
-          : new Uint8Array()
-      ));
-    obj.sigs = {};
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
     if (message.sigs) {
-      Object.entries(message.sigs).forEach(([k, v]) => {
-        obj.sigs[k] = base64FromBytes(v);
-      });
+      const entries = Object.entries(message.sigs);
+      if (entries.length > 0) {
+        obj.sigs = {};
+        entries.forEach(([k, v]) => {
+          obj.sigs[k] = base64FromBytes(v);
+        });
+      }
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MultiSig>, I>>(base?: I): MultiSig {
-    return MultiSig.fromPartial(base ?? {});
+    return MultiSig.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MultiSig>, I>>(object: I): MultiSig {
     const message = createBaseMultiSig();
     message.keyId = object.keyId ?? "";
-    message.payloadHash = object.payloadHash ?? new Uint8Array();
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     message.sigs = Object.entries(object.sigs ?? {}).reduce<{
       [key: string]: Uint8Array;
     }>((acc, [key, value]) => {
@@ -737,7 +751,7 @@ export const MultiSig = {
 };
 
 function createBaseMultiSig_SigsEntry(): MultiSig_SigsEntry {
-  return { key: "", value: new Uint8Array() };
+  return { key: "", value: new Uint8Array(0) };
 }
 
 export const MultiSig_SigsEntry = {
@@ -790,32 +804,32 @@ export const MultiSig_SigsEntry = {
       key: isSet(object.key) ? String(object.key) : "",
       value: isSet(object.value)
         ? bytesFromBase64(object.value)
-        : new Uint8Array(),
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: MultiSig_SigsEntry): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = base64FromBytes(
-        message.value !== undefined ? message.value : new Uint8Array()
-      ));
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value.length !== 0) {
+      obj.value = base64FromBytes(message.value);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MultiSig_SigsEntry>, I>>(
     base?: I
   ): MultiSig_SigsEntry {
-    return MultiSig_SigsEntry.fromPartial(base ?? {});
+    return MultiSig_SigsEntry.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<MultiSig_SigsEntry>, I>>(
     object: I
   ): MultiSig_SigsEntry {
     const message = createBaseMultiSig_SigsEntry();
     message.key = object.key ?? "";
-    message.value = object.value ?? new Uint8Array();
+    message.value = object.value ?? new Uint8Array(0);
     return message;
   },
 };
@@ -975,36 +989,41 @@ export const SigningSession = {
 
   toJSON(message: SigningSession): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.multiSig !== undefined &&
-      (obj.multiSig = message.multiSig
-        ? MultiSig.toJSON(message.multiSig)
-        : undefined);
-    message.state !== undefined &&
-      (obj.state = multisigStateToJSON(message.state));
-    message.key !== undefined &&
-      (obj.key = message.key ? Key.toJSON(message.key) : undefined);
-    message.expiresAt !== undefined &&
-      (obj.expiresAt = (message.expiresAt || Long.ZERO).toString());
-    message.completedAt !== undefined &&
-      (obj.completedAt = (message.completedAt || Long.ZERO).toString());
-    message.gracePeriod !== undefined &&
-      (obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString());
-    message.module !== undefined && (obj.module = message.module);
-    message.moduleMetadata !== undefined &&
-      (obj.moduleMetadata = message.moduleMetadata
-        ? Any.toJSON(message.moduleMetadata)
-        : undefined);
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (message.multiSig !== undefined) {
+      obj.multiSig = MultiSig.toJSON(message.multiSig);
+    }
+    if (message.state !== 0) {
+      obj.state = multisigStateToJSON(message.state);
+    }
+    if (message.key !== undefined) {
+      obj.key = Key.toJSON(message.key);
+    }
+    if (!message.expiresAt.isZero()) {
+      obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
+    }
+    if (!message.completedAt.isZero()) {
+      obj.completedAt = (message.completedAt || Long.ZERO).toString();
+    }
+    if (!message.gracePeriod.isZero()) {
+      obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
+    }
+    if (message.module !== "") {
+      obj.module = message.module;
+    }
+    if (message.moduleMetadata !== undefined) {
+      obj.moduleMetadata = Any.toJSON(message.moduleMetadata);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<SigningSession>, I>>(
     base?: I
   ): SigningSession {
-    return SigningSession.fromPartial(base ?? {});
+    return SigningSession.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<SigningSession>, I>>(
     object: I
   ): SigningSession {
@@ -1112,17 +1131,21 @@ export const KeyEpoch = {
 
   toJSON(message: KeyEpoch): unknown {
     const obj: any = {};
-    message.epoch !== undefined &&
-      (obj.epoch = (message.epoch || Long.UZERO).toString());
-    message.chain !== undefined && (obj.chain = message.chain);
-    message.keyId !== undefined && (obj.keyId = message.keyId);
+    if (!message.epoch.isZero()) {
+      obj.epoch = (message.epoch || Long.UZERO).toString();
+    }
+    if (message.chain !== "") {
+      obj.chain = message.chain;
+    }
+    if (message.keyId !== "") {
+      obj.keyId = message.keyId;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeyEpoch>, I>>(base?: I): KeyEpoch {
-    return KeyEpoch.fromPartial(base ?? {});
+    return KeyEpoch.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<KeyEpoch>, I>>(object: I): KeyEpoch {
     const message = createBaseKeyEpoch();
     message.epoch =
@@ -1135,10 +1158,10 @@ export const KeyEpoch = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }

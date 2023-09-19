@@ -3,6 +3,7 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 
 import { LegacyAminoPubKey } from "../../../cosmos/crypto/multisig/keys";
+import { Params } from "./params";
 
 export const protobufPackage = "axelar.permission.v1beta1";
 
@@ -17,7 +18,14 @@ export interface QueryGovernanceKeyRequest {}
  * Query/GovernanceKey RPC method
  */
 export interface QueryGovernanceKeyResponse {
-  governanceKey?: LegacyAminoPubKey;
+  governanceKey?: LegacyAminoPubKey | undefined;
+}
+
+/** ParamsRequest represents a message that queries the params */
+export interface ParamsRequest {}
+
+export interface ParamsResponse {
+  params?: Params | undefined;
 }
 
 function createBaseQueryGovernanceKeyRequest(): QueryGovernanceKeyRequest {
@@ -64,9 +72,8 @@ export const QueryGovernanceKeyRequest = {
   create<I extends Exact<DeepPartial<QueryGovernanceKeyRequest>, I>>(
     base?: I
   ): QueryGovernanceKeyRequest {
-    return QueryGovernanceKeyRequest.fromPartial(base ?? {});
+    return QueryGovernanceKeyRequest.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<QueryGovernanceKeyRequest>, I>>(
     _: I
   ): QueryGovernanceKeyRequest {
@@ -133,19 +140,17 @@ export const QueryGovernanceKeyResponse = {
 
   toJSON(message: QueryGovernanceKeyResponse): unknown {
     const obj: any = {};
-    message.governanceKey !== undefined &&
-      (obj.governanceKey = message.governanceKey
-        ? LegacyAminoPubKey.toJSON(message.governanceKey)
-        : undefined);
+    if (message.governanceKey !== undefined) {
+      obj.governanceKey = LegacyAminoPubKey.toJSON(message.governanceKey);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<QueryGovernanceKeyResponse>, I>>(
     base?: I
   ): QueryGovernanceKeyResponse {
-    return QueryGovernanceKeyResponse.fromPartial(base ?? {});
+    return QueryGovernanceKeyResponse.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<QueryGovernanceKeyResponse>, I>>(
     object: I
   ): QueryGovernanceKeyResponse {
@@ -153,6 +158,127 @@ export const QueryGovernanceKeyResponse = {
     message.governanceKey =
       object.governanceKey !== undefined && object.governanceKey !== null
         ? LegacyAminoPubKey.fromPartial(object.governanceKey)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseParamsRequest(): ParamsRequest {
+  return {};
+}
+
+export const ParamsRequest = {
+  encode(
+    _: ParamsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsRequest {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): ParamsRequest {
+    return {};
+  },
+
+  toJSON(_: ParamsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    base?: I
+  ): ParamsRequest {
+    return ParamsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
+    _: I
+  ): ParamsRequest {
+    const message = createBaseParamsRequest();
+    return message;
+  },
+};
+
+function createBaseParamsResponse(): ParamsResponse {
+  return { params: undefined };
+}
+
+export const ParamsResponse = {
+  encode(
+    message: ParamsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ParamsResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.params = Params.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ParamsResponse {
+    return {
+      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
+    };
+  },
+
+  toJSON(message: ParamsResponse): unknown {
+    const obj: any = {};
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
+    base?: I
+  ): ParamsResponse {
+    return ParamsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
+    object: I
+  ): ParamsResponse {
+    const message = createBaseParamsResponse();
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
         : undefined;
     return message;
   },

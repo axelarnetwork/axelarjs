@@ -59,17 +59,17 @@ export function pollStateToJSON(object: PollState): string {
  */
 export interface PollMetadata {
   expiresAt: Long;
-  result?: Any;
-  votingThreshold?: Threshold;
+  result?: Any | undefined;
+  votingThreshold?: Threshold | undefined;
   state: PollState;
   minVoterCount: Long;
   rewardPoolName: string;
   gracePeriod: Long;
   completedAt: Long;
   id: Long;
-  snapshot?: Snapshot;
+  snapshot?: Snapshot | undefined;
   module: string;
-  moduleMetadata?: Any;
+  moduleMetadata?: Any | undefined;
 }
 
 /**
@@ -288,43 +288,50 @@ export const PollMetadata = {
 
   toJSON(message: PollMetadata): unknown {
     const obj: any = {};
-    message.expiresAt !== undefined &&
-      (obj.expiresAt = (message.expiresAt || Long.ZERO).toString());
-    message.result !== undefined &&
-      (obj.result = message.result ? Any.toJSON(message.result) : undefined);
-    message.votingThreshold !== undefined &&
-      (obj.votingThreshold = message.votingThreshold
-        ? Threshold.toJSON(message.votingThreshold)
-        : undefined);
-    message.state !== undefined && (obj.state = pollStateToJSON(message.state));
-    message.minVoterCount !== undefined &&
-      (obj.minVoterCount = (message.minVoterCount || Long.ZERO).toString());
-    message.rewardPoolName !== undefined &&
-      (obj.rewardPoolName = message.rewardPoolName);
-    message.gracePeriod !== undefined &&
-      (obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString());
-    message.completedAt !== undefined &&
-      (obj.completedAt = (message.completedAt || Long.ZERO).toString());
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
-    message.snapshot !== undefined &&
-      (obj.snapshot = message.snapshot
-        ? Snapshot.toJSON(message.snapshot)
-        : undefined);
-    message.module !== undefined && (obj.module = message.module);
-    message.moduleMetadata !== undefined &&
-      (obj.moduleMetadata = message.moduleMetadata
-        ? Any.toJSON(message.moduleMetadata)
-        : undefined);
+    if (!message.expiresAt.isZero()) {
+      obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
+    }
+    if (message.result !== undefined) {
+      obj.result = Any.toJSON(message.result);
+    }
+    if (message.votingThreshold !== undefined) {
+      obj.votingThreshold = Threshold.toJSON(message.votingThreshold);
+    }
+    if (message.state !== 0) {
+      obj.state = pollStateToJSON(message.state);
+    }
+    if (!message.minVoterCount.isZero()) {
+      obj.minVoterCount = (message.minVoterCount || Long.ZERO).toString();
+    }
+    if (message.rewardPoolName !== "") {
+      obj.rewardPoolName = message.rewardPoolName;
+    }
+    if (!message.gracePeriod.isZero()) {
+      obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
+    }
+    if (!message.completedAt.isZero()) {
+      obj.completedAt = (message.completedAt || Long.ZERO).toString();
+    }
+    if (!message.id.isZero()) {
+      obj.id = (message.id || Long.UZERO).toString();
+    }
+    if (message.snapshot !== undefined) {
+      obj.snapshot = Snapshot.toJSON(message.snapshot);
+    }
+    if (message.module !== "") {
+      obj.module = message.module;
+    }
+    if (message.moduleMetadata !== undefined) {
+      obj.moduleMetadata = Any.toJSON(message.moduleMetadata);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PollMetadata>, I>>(
     base?: I
   ): PollMetadata {
-    return PollMetadata.fromPartial(base ?? {});
+    return PollMetadata.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollMetadata>, I>>(
     object: I
   ): PollMetadata {
@@ -430,15 +437,18 @@ export const PollKey = {
 
   toJSON(message: PollKey): unknown {
     const obj: any = {};
-    message.module !== undefined && (obj.module = message.module);
-    message.id !== undefined && (obj.id = message.id);
+    if (message.module !== "") {
+      obj.module = message.module;
+    }
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PollKey>, I>>(base?: I): PollKey {
-    return PollKey.fromPartial(base ?? {});
+    return PollKey.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollKey>, I>>(object: I): PollKey {
     const message = createBasePollKey();
     message.module = object.module ?? "";
@@ -507,14 +517,11 @@ export const PollParticipants = {
 
   toJSON(message: PollParticipants): unknown {
     const obj: any = {};
-    message.pollId !== undefined &&
-      (obj.pollId = (message.pollId || Long.UZERO).toString());
-    if (message.participants) {
-      obj.participants = message.participants.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.participants = [];
+    if (!message.pollId.isZero()) {
+      obj.pollId = (message.pollId || Long.UZERO).toString();
+    }
+    if (message.participants?.length) {
+      obj.participants = message.participants.map((e) => base64FromBytes(e));
     }
     return obj;
   },
@@ -522,9 +529,8 @@ export const PollParticipants = {
   create<I extends Exact<DeepPartial<PollParticipants>, I>>(
     base?: I
   ): PollParticipants {
-    return PollParticipants.fromPartial(base ?? {});
+    return PollParticipants.fromPartial(base ?? ({} as any));
   },
-
   fromPartial<I extends Exact<DeepPartial<PollParticipants>, I>>(
     object: I
   ): PollParticipants {
@@ -538,10 +544,10 @@ export const PollParticipants = {
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
+declare const self: any | undefined;
+declare const window: any | undefined;
+declare const global: any | undefined;
+const tsProtoGlobalThis: any = (() => {
   if (typeof globalThis !== "undefined") {
     return globalThis;
   }
