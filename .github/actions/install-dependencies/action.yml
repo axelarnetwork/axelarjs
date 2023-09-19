@@ -1,12 +1,9 @@
-name: "Checkout & Install"
-description: "Checkout repository, pnpm cache & install all dependencies"
+name: "Install dependencies"
+description: "setup pnpm cache & install all dependencies"
 
 runs:
   using: "composite"
   steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-
     - name: Setup Node.js 18
       uses: actions/setup-node@v3
       with:

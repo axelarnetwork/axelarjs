@@ -15,8 +15,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 300
 
-      - name: Checkout & Install dependencies
-        uses: ./.github/actions/checkout-and-install
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
 
       - name: Install playwright
         run: pnpx playwright install
