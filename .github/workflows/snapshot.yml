@@ -6,6 +6,10 @@ jobs:
   snapshot:
     name: Publish Snapshot Versions to NPM
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
