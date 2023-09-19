@@ -3,11 +3,16 @@ description: "setup pnpm cache & install all dependencies"
 
 runs:
   using: "composite"
+  env:
+    TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+    TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
   steps:
     - name: Setup Node.js 18
       uses: actions/setup-node@v3
       with:
         node-version: 18
+        cache: "pnpm"
 
     - name: Install pnpm
       uses: pnpm/action-setup@v2
