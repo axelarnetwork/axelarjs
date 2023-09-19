@@ -1,5 +1,11 @@
 # @axelarjs/deposit-address
 
+## 0.0.3
+
+### Patch Changes
+
+- [`764a8543`](https://github.com/axelarnetwork/axelarjs/commit/764a8543a82ed57f87be779458bf44593580223b) Thanks [@canhtrinh](https://github.com/canhtrinh)! - update readme
+
 ## 0.0.2
 
 ### Patch Changes
