@@ -4,7 +4,7 @@ import {
   IsomorphicHTTPClient,
   type ClientOptions,
 } from "../IsomorphicHTTPClient";
-import type { S3Response } from "./types";
+import type { ChainConfigsResponse } from "./types";
 
 export class AxelarConfigClient extends IsomorphicHTTPClient {
   static init(options: ClientOptions) {
@@ -17,6 +17,6 @@ export class AxelarConfigClient extends IsomorphicHTTPClient {
   async getChainConfigs(env: Environment) {
     return this.client
       .get(`configs/${env}-chain-config-latest.json`)
-      .json<S3Response>();
+      .json<ChainConfigsResponse>();
   }
 }

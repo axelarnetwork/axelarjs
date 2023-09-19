@@ -185,5 +185,6 @@ export type LinkRequestResponse = {
   asset: string | undefined;
   depositAddress: string | undefined;
   txHash: string;
+  tokenAddress?: string | undefined;
   timestamp?: number;
 };

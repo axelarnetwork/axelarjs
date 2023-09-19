@@ -9,7 +9,29 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "index.js",
+  "files": [
+    "./build",
+    "./helpers",
+    "./browser.js",
+    "./getDepositAddress.js",
+    "./index.js",
+    "./node.js",
+    "./types.js"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
+    "./helpers/*": {
+      "import": "./build/module/helpers/*.js",
+      "require": "./build/commonjs/helpers/*.js"
+    }
+  },
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
@@ -26,5 +48,11 @@
     "typescript": "^5.2.2",
     "vitest": "^0.34.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@axelarjs/api": "workspace:*",
+    "@axelarjs/core": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
+    "bech32": "^2.0.0",
+    "viem": "~1.10.9"
+  }
 }

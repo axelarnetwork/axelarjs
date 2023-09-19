@@ -48,7 +48,7 @@ export type AxelarCosmosChainConfig = ChainConfig & {
 
 export type ChainConfigs = AxelarCosmosChainConfig | AxelarEVMChainConfig;
 
-export type S3Response = {
+export type ChainConfigsResponse = {
   chains: Record<string, ChainConfigs>;
   version: string;
   environment: string;

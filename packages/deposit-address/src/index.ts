@@ -1,5 +1,2 @@
-import getDepositAddress from "./getDepositAddress";
-
-export default {
-  getDepositAddress,
-};
+export * from "./browser";
+export * from "./node";

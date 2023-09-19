@@ -35,3 +35,7 @@ export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
 
   return `0x${hash}`;
 }
+
+export function isStrEqual(a: string | undefined, b: string) {
+  return a?.toLowerCase() === b?.toLowerCase();
+}
