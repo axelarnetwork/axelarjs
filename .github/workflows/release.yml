@@ -20,8 +20,10 @@ jobs:
         run: |
           if ls .changeset/*.md | grep -Eq '^[a-z-]*\.md$'; then
             echo "has_file=true" >> $GITHUB_STATE
+            echo $GITHUB_STATE
           else
             echo "has_file=false" >> $GITHUB_STATE
+            echo $GITHUB_STATE
           fi
 
       - name: Install dependencies
