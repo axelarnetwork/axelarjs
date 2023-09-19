@@ -9,8 +9,7 @@
   "scripts": {
     "prepare": "husky install",
     "build": "turbo run build",
-    "build:packages": "turbo run build --filter=\"./packages/$1\"",
-    "build:pkgs": "turbo run build --filter=\"./packages/*\"",
+    "build:packages": "turbo run build --filter=\"./packages/*\"",
     "test": "turbo run test",
     "test:ci": "CI=true turbo run test",
     "lint": "turbo run lint",
