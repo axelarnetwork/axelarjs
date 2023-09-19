@@ -1,10 +1,10 @@
-name: Publish (Actual Version)
+name: Publish (package versions)
 
 on: workflow_dispatch
 
 jobs:
   changesets:
-    name: Publish Actual Pakcage Versions to NPM
+    name: Publish Package Versions to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo

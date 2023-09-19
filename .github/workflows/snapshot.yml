@@ -1,10 +1,10 @@
-name: Publish (Snapshot)
+name: Publish (snapshot versions)
 
 on: workflow_dispatch
 
 jobs:
   snapshot:
-    name: Publish Snapshot
+    name: Publish Snapshot Versions to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
