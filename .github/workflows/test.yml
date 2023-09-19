@@ -19,6 +19,6 @@ jobs:
         uses: ./.github/actions/install-dependencies
 
       - name: Run tests
-        run: pnpm test:ci
+        run: pnpm test
         env:
           COSMOS_WALLET_MNEMONIC: ${{ secrets.COSMOS_WALLET_MNEMONIC }}
