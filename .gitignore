@@ -4,4 +4,4 @@ node_modules
 .DS_STORE
 .vercel
 .npmrc
-.env.local
+/.env
