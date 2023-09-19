@@ -1,0 +1,36 @@
+name: Publish (snapshot versions)
+
+on: workflow_dispatch
+
+jobs:
+  snapshot:
+    name: Publish Snapshot Versions to NPM
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Create version pull request or publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          title: "chore: snapshot packages"
+          commit: "chore: snapshot packages"
+          publish: pnpm changeset:release -- --snapshot
+          version: pnpm changeset:snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Set snapshot version
+        run: pnpm -r exec npm version 0.0.0-snapshot.$(git rev-parse --short HEAD) --git-tag-version=false
+
+      - name: Publish snapshot
+        run: pnpm -r publish --no-git-checks --tag snapshot --access public
