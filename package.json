@@ -9,6 +9,7 @@
   "scripts": {
     "prepare": "husky install",
     "build": "turbo run build",
+    "build:packages": "turbo run build --filter=\"./packages/$1\"",
     "build:pkgs": "turbo run build --filter=\"./packages/*\"",
     "test": "turbo run test",
     "test:ci": "CI=true turbo run test",
@@ -20,7 +21,7 @@
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
     "dev:registry": "pnpm -C ./apps/registry run dev",
     "changeset": "changeset",
-    "changeset:release": "pnpm build && changeset publish",
+    "changeset:release": "pnpm build:packages && changeset publish",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "cs": "changeset",
