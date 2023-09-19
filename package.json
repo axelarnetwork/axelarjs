@@ -20,9 +20,11 @@
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
     "dev:registry": "pnpm -C ./apps/registry run dev",
     "changeset": "changeset",
+    "changeset:release": "pnpm build && changeset publish",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "cs": "pnpm changeset",
+    "cs": "changeset",
+    "cs:release": "pnpm changeset:release",
     "cs:version": "pnpm changeset:version",
     "cs:publish": "pnpm changeset:publish",
     "e2e:maestro": "pnpm -C ./apps/maestro run ci:e2e"
