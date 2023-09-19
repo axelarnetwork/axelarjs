@@ -1,5 +1,14 @@
 # @axelarjs/api
 
+## 0.2.2
+
+### Patch Changes
+
+- initial release of deposit-address package
+
+- Updated dependencies []:
+  - @axelarjs/core@0.2.1
+
 ## 0.2.1
 
 ### Patch Changes
