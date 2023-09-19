@@ -5,11 +5,6 @@ runs:
   using: "composite"
 
   steps:
-    - name: Setup Node.js 18
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
-
     - name: Install pnpm
       uses: pnpm/action-setup@v2
       id: pnpm-install
@@ -30,6 +25,12 @@ runs:
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
+
+    - name: Setup Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: pnpm
 
     - name: Install dependencies
       shell: bash
