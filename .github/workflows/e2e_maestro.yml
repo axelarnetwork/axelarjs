@@ -1,7 +1,6 @@
 name: Test (E2E)
 
-on:
-  - pull_request
+on: workflow_dispatch
 
 jobs:
   wait-for-preview-and-test:
