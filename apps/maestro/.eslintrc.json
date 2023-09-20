@@ -1,11 +1,8 @@
 {
-  "extends": ["next/core-web-vitals"],
-  "plugins": ["@typescript-eslint"],
-  "parser": "@typescript-eslint/parser",
-  "rules": {
-    "@typescript-eslint/consistent-type-exports": "error",
-    "@typescript-eslint/consistent-type-imports": "error"
-  },
+  "extends": [
+    "next/core-web-vitals",
+    "../../packages/config/eslintrc.strictest.json"
+  ],
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."

@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Axelarjs Core",
   "publishConfig": {
     "access": "public"
@@ -10,10 +10,13 @@
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
-    "compile": "tsc --noEmit"
+    "compile": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

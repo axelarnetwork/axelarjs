@@ -1,12 +1,12 @@
 import {
-  Chain,
-  ContractFunctionResult,
   createPublicClient,
   createWalletClient,
   http,
-  ReadContractParameters,
-  WalletClient,
-  WriteContractParameters,
+  type Chain,
+  type ContractFunctionResult,
+  type ReadContractParameters,
+  type WalletClient,
+  type WriteContractParameters,
 } from "viem";
 import { mainnet } from "viem/chains";
 

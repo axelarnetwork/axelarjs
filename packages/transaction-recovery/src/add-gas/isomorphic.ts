@@ -6,14 +6,14 @@ import type {
 import type { AxelarCosmosChainConfig } from "@axelarjs/api/axelar-config/types";
 import { COSMOS_GAS_RECEIVER_OPTIONS } from "@axelarjs/core";
 
-import { OfflineSigner } from "@cosmjs/proto-signing";
+import type { OfflineSigner } from "@cosmjs/proto-signing";
 import {
   assertIsDeliverTxSuccess,
-  Coin,
-  SigningStargateClient,
+  type Coin,
+  type SigningStargateClient,
 } from "@cosmjs/stargate";
 
-import { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
+import type { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
 
 export type AddGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;

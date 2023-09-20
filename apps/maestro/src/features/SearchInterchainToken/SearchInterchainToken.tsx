@@ -44,6 +44,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   const isValidAddress = isAddress(search as `0x${string}`);
 
   const chainId = connectedChain?.id ?? selectedChainId;
+  const chainName = connectedChain?.name ?? defaultChain?.name;
 
   const {
     data: searchERC20Result,
@@ -59,7 +60,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     error: searchInterchainTokenError,
     isLoading: isSearchingInterchainTokens,
   } = useInterchainTokensQuery({
-    chainId: chainId,
+    chainId,
     tokenAddress: search as `0x${string}`,
     strict: chainId !== -1,
   });
@@ -109,7 +110,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           name="tokenAddress"
           placeholder={
             defaultChain?.name
-              ? `Search for ERC-20 token address on ${defaultChain?.name}`
+              ? `Search for ERC-20 token address on ${chainName}`
               : "Search for ERC-20 token address"
           }
           value={search}
@@ -123,7 +124,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
             <Tooltip
-              tip={`search on ${defaultChain?.name ?? "all chains"}`}
+              tip={`search on ${chainName ?? "all chains"}`}
               className="tooltip-left md:tooltip-top"
             >
               <EVMChainsDropdown

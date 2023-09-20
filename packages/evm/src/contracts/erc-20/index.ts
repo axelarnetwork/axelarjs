@@ -1,4 +1,4 @@
-import { Chain } from "viem";
+import type { Chain } from "viem";
 
 import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./erc-20.abi";

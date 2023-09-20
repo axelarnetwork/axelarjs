@@ -3,8 +3,8 @@
 import { Tabs, TextInput } from "@axelarjs/ui";
 import { debounce } from "@axelarjs/utils";
 import {
-  ChangeEvent,
   useCallback,
+  type ChangeEvent,
   type FC,
   type PropsWithChildren,
 } from "react";

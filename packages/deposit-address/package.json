@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/deposit-address",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Axelarjs Deposit Address",
   "repository": {
     "type": "git",
@@ -13,10 +13,15 @@
     "./build",
     "./helpers",
     "./browser.js",
+    "./browser.d.ts",
     "./getDepositAddress.js",
+    "./getDepositAddress.d.ts",
     "./index.js",
+    "./index.d.ts",
     "./node.js",
-    "./types.js"
+    "./node.d.ts",
+    "./types.js",
+    "./types.d.ts"
   ],
   "exports": {
     ".": {
@@ -36,7 +41,9 @@
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

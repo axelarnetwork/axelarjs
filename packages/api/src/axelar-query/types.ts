@@ -1,4 +1,4 @@
-import { GetFeesParams } from "..";
+import type { GetFeesParams } from "..";
 
 export type EstimateGasFeeParams = GetFeesParams & {
   gasLimit: bigint;

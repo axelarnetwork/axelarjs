@@ -1,4 +1,4 @@
-import { Environment } from "./types";
+import type { Environment } from "./types";
 import { memoize } from "./utils";
 
 export type EnvironmentConfigs = {

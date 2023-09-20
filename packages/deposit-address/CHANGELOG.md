@@ -1,5 +1,22 @@
 # @axelarjs/deposit-address
 
+## 0.0.5
+
+### Patch Changes
+
+- [`7aed955f`](https://github.com/axelarnetwork/axelarjs/commit/7aed955f4282d10df4e222a402b5701f9b874a88) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Add eslint config & scripts to all packages
+
+- Updated dependencies [[`7aed955f`](https://github.com/axelarnetwork/axelarjs/commit/7aed955f4282d10df4e222a402b5701f9b874a88)]:
+  - @axelarjs/api@0.2.3
+  - @axelarjs/core@0.2.2
+  - @axelarjs/utils@0.1.3
+
+## 0.0.4
+
+### Patch Changes
+
+- [#45](https://github.com/axelarnetwork/axelarjs/pull/45) [`a19beccf`](https://github.com/axelarnetwork/axelarjs/commit/a19beccf888e3f0139f7d6519f69bf79f5ba3d64) Thanks [@canhtrinh](https://github.com/canhtrinh)! - add types to deposit address package.json
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,4 +1,4 @@
-import { AXELARSCAN_API_URLS, Environment } from "@axelarjs/core";
+import { AXELARSCAN_API_URLS, type Environment } from "@axelarjs/core";
 
 import ky, { type Options } from "ky";
 

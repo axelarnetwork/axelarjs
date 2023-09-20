@@ -1,5 +1,22 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.9
+
+### Patch Changes
+
+- [`7aed955f`](https://github.com/axelarnetwork/axelarjs/commit/7aed955f4282d10df4e222a402b5701f9b874a88) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Add eslint config & scripts to all packages
+
+- Updated dependencies [[`7aed955f`](https://github.com/axelarnetwork/axelarjs/commit/7aed955f4282d10df4e222a402b5701f9b874a88)]:
+  - @axelarjs/api@0.2.3
+  - @axelarjs/core@0.2.2
+  - @axelarjs/cosmos@0.1.5
+
+## 0.1.8
+
+### Patch Changes
+
+- [`de0fb78`](https://github.com/axelarnetwork/axelarjs/commit/de0fb78fcf50160bcc5555000ee3fe73844f56e6) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix package files list
+
 ## 0.1.7
 
 ### Patch Changes
