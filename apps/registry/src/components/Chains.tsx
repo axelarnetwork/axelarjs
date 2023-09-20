@@ -4,10 +4,10 @@ import Image from "next/image";
 
 import {
   BASE_URL,
-  CosmosChainConfig,
-  EVMChainConfig,
   getNormalizedChainConfigs,
-  NetworkKind,
+  type CosmosChainConfig,
+  type EVMChainConfig,
+  type NetworkKind,
 } from "~/services/chain-registry";
 
 type Props = {

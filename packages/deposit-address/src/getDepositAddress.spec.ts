@@ -1,7 +1,7 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
-import getDepositAddressNode from "./node";
-import { SendOptions } from "./types";
+import getDepositAddress from "./node";
+import type { SendOptions } from "./types";
 
 describe("getDepositAddress - node", () => {
   test("get deposit address from an EVM source chain", async () => {
@@ -12,7 +12,7 @@ describe("getDepositAddress - node", () => {
       destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       environment: ENVIRONMENTS.testnet,
     };
-    const res = await getDepositAddressNode(params);
+    const res = await getDepositAddress(params);
 
     expect(res?.depositAddress).toBeTruthy();
     expect(res?.sourceChain?.toLowerCase()).toEqual(
@@ -28,7 +28,7 @@ describe("getDepositAddress - node", () => {
       destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       environment: ENVIRONMENTS.testnet,
     };
-    const res = await getDepositAddressNode(params);
+    const res = await getDepositAddress(params);
 
     expect(res?.depositAddress).toBeTruthy();
     expect(res?.sourceChain?.toLowerCase()).toEqual("axelarnet");

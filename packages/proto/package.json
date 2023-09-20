@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/proto",
-  "version": "0.34.1",
+  "version": "0.34.2",
   "publishConfig": {
     "access": "public"
   },
@@ -37,7 +37,9 @@
     "build": "./scripts/build.sh",
     "compile": "tsc --noEmit",
     "prepublish": "pnpm run build",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "license": "LicenseRef-LICENSE",
   "dependencies": {

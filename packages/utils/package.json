@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/utils",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publishConfig": {
     "access": "public"
   },
@@ -14,15 +14,25 @@
     "./build",
     "./react",
     "./index.js",
+    "./index.d.ts",
     "./array.js",
+    "./array.d.ts",
     "./case-conversion.js",
+    "./case-conversion.d.ts",
     "./function.js",
+    "./function.d.ts",
     "./guard.js",
+    "./guard.d.ts",
     "./hex.js",
+    "./hex.d.ts",
     "./monad.js",
+    "./monad.d.ts",
     "./record.js",
+    "./record.d.ts",
     "./string.js",
-    "./types.js"
+    "./string.d.ts",
+    "./types.js",
+    "./types.d.ts"
   ],
   "exports": {
     ".": {
@@ -42,7 +52,9 @@
     "test": "vitest --run src",
     "compile": "tsc --noEmit",
     "build": "scripts/build.sh",
-    "clean": "scripts/clean.sh"
+    "clean": "scripts/clean.sh",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

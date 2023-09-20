@@ -7,7 +7,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { Chain } from "viem";
+import type { Chain } from "viem";
 
 import { PublicContractClient } from "../PublicContractClient";
 import ABI_FILE from "./interchain-token-service.abi";

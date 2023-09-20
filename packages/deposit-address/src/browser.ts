@@ -4,7 +4,7 @@ import { createDepositAddressApiBrowserClient } from "@axelarjs/api/deposit-addr
 import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 
 import { getDepositAddress } from "./getDepositAddress";
-import { SendOptions } from "./types";
+import type { SendOptions } from "./types";
 
 export default function getDepositAddressBrowser(params: SendOptions) {
   const { environment } = params;

@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/cosmos",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publishConfig": {
     "access": "public"
   },
@@ -14,9 +14,13 @@
     "./query-client",
     "./signing-client",
     "./constants.js",
+    "./constants.d.ts",
     "./utils.js",
+    "./utils.d.ts",
     "./types.js",
-    "./index.js"
+    "./types.d.ts",
+    "./index.js",
+    "./index.d.ts"
   ],
   "type": "module",
   "exports": {
@@ -40,7 +44,9 @@
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
-    "compile": "tsc --noEmit"
+    "compile": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

@@ -1,3 +1,4 @@
+import { Card } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useState, type FC } from "react";
 import Link from "next/link";
@@ -57,25 +58,37 @@ export const RecentTransactionsList: FC<Props> = ({
   });
 
   return (
-    <div className="w-[80vw] space-y-4 md:w-auto">
-      {title && <h3 className="text-center text-lg font-semibold">{title}</h3>}
-      <ul className="no-scrollbar relative max-h-64 min-w-[256px] space-y-4 overflow-y-scroll md:max-h-96">
-        {isLoading ? (
-          <li className="grid min-h-[384px] place-items-center text-center">
-            Loading transactions...
-          </li>
-        ) : !txns?.length ? (
-          <li className="grid min-h-[384px] place-items-center text-center">
-            No transactions found
-          </li>
-        ) : (
-          txns.map((tx, i) => (
-            <TransactionItem key={i} tx={tx} contractMethod={contractMethod} />
-          ))
+    <Card className="bg-base-300 p-2">
+      <Card.Body>
+        {title && (
+          <Card.Title>
+            <h3>{title}</h3>
+          </Card.Title>
         )}
-        <li className="to-base-200/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20"></li>
-      </ul>
-    </div>
+        <div className="w-[80vw] space-y-4 md:w-auto">
+          <ul className="no-scrollbar relative max-h-64 min-w-[256px] space-y-4 overflow-y-scroll md:max-h-96">
+            {isLoading ? (
+              <li className="grid min-h-[384px] place-items-center text-center">
+                Loading transactions...
+              </li>
+            ) : !txns?.length ? (
+              <li className="grid min-h-[384px] place-items-center text-center">
+                No transactions found
+              </li>
+            ) : (
+              txns.map((tx, i) => (
+                <TransactionItem
+                  key={i}
+                  tx={tx}
+                  contractMethod={contractMethod}
+                />
+              ))
+            )}
+            <li className="to-base-300/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20"></li>
+          </ul>
+        </div>
+      </Card.Body>
+    </Card>
   );
 };
 

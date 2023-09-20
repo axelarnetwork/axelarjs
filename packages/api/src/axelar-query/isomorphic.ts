@@ -7,7 +7,7 @@ import {
   type ClientOptions,
 } from "../IsomorphicHTTPClient";
 import { BigNumberUtils } from "./helpers/BigNumberUtils";
-import { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
+import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 
 type AxelarscanClientDependencies = {
   gmpClient: GMPClient;

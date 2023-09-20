@@ -4,7 +4,7 @@ import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 
 import { SigningStargateClient } from "@cosmjs/stargate";
 
-import { AddGasParams } from "~/types";
+import type { AddGasParams } from "~/types";
 import { addGas } from "./isomorphic";
 
 export function addGasNode(params: AddGasParams) {

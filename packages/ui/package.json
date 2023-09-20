@@ -37,7 +37,9 @@
     "test:watch": "vitest src",
     "rome:apply": "npx rome check src/ --apply",
     "svgr": "svgr ./assets/icons",
-    "sb:upgrade": "npx storybook@next upgrade --prerelease"
+    "sb:upgrade": "npx storybook@next upgrade --prerelease",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "dependencies": {
     "@axelarjs/config": "workspace:*",

@@ -1,21 +1,21 @@
 import {
-  EncodeObject,
-  OfflineSigner,
   Registry,
   DirectSecp256k1HdWallet as Wallet,
+  type EncodeObject,
+  type OfflineSigner,
 } from "@cosmjs/proto-signing";
 import {
-  DeliverTxResponse,
-  SignerData,
   SigningStargateClient,
-  SigningStargateClientOptions,
-  StdFee,
+  type DeliverTxResponse,
+  type SignerData,
+  type SigningStargateClientOptions,
+  type StdFee,
 } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
-import { EnvironmentConfigs, getConfigs } from "../constants";
-import { AxelarSigningClientConfig } from "../types";
+import { getConfigs, type EnvironmentConfigs } from "../constants";
+import type { AxelarSigningClientConfig } from "../types";
 import { registerAxelarnetTxTypes } from "./axelarnet-tx-types";
 import { registerEvmTxTypes } from "./evmish-tx-types";
 

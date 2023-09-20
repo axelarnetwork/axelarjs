@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publishConfig": {
     "access": "public"
   },
@@ -16,7 +16,8 @@
     "./gmp",
     "./deposit-address-api",
     "./axelar-config",
-    "./index.js"
+    "./index.js",
+    "./index.d.ts"
   ],
   "exports": {
     "./gmp": {
@@ -68,7 +69,9 @@
     "compile": "tsc --noEmit",
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

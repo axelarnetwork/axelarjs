@@ -1,4 +1,4 @@
-import { ForwardedRef, useEffect, useRef } from "react";
+import { useEffect, useRef, type ForwardedRef } from "react";
 
 /**
  * Returns a ref that is synced with the provided ref

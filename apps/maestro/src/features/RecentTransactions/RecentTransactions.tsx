@@ -19,7 +19,7 @@ const RecentTransactionsTabs = () => {
 
   return (
     <section className="space-y-4">
-      <Card className="bg-base-200 card-compact md:card-normal w-full">
+      <Card className="bg-base-200 w-full rounded-3xl" compact>
         <Card.Body>
           <Card.Title className="grid place-items-center space-y-2 text-center md:hidden">
             <div>
@@ -40,7 +40,7 @@ const RecentTransactionsTabs = () => {
               ))}
             </Tabs>
           </Card.Title>
-          <div className="hidden min-w-max grid-cols-2 gap-6 md:grid">
+          <div className="hidden w-[90vw] min-w-max max-w-4xl grid-cols-2 gap-4 md:grid">
             <RecentTransactionsList
               contractMethod="sendToken"
               senderAddress={address}
