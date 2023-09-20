@@ -58,10 +58,10 @@ export const RecentTransactionsList: FC<Props> = ({
   });
 
   return (
-    <Card className="bg-base-300 p-2">
-      <Card.Body>
+    <Card className="bg-base-100">
+      <Card.Body className="to-base-200/90 bg-base-100 bg-gradient-to-b from-transparent">
         {title && (
-          <Card.Title>
+          <Card.Title className="grid place-items-center">
             <h3>{title}</h3>
           </Card.Title>
         )}
@@ -84,7 +84,6 @@ export const RecentTransactionsList: FC<Props> = ({
                 />
               ))
             )}
-            <li className="to-base-300/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20"></li>
           </ul>
         </div>
       </Card.Body>

@@ -62,9 +62,11 @@ export default function Home() {
               </Dialog.Body>
             </Dialog>
           )}
-          <SearchInterchainToken onTokenFound={handleTokenFound} />
-          <div className="divider">OR</div>
-          <AddErc20 />
+          <div className="bg-base-200 grid w-full place-items-center rounded-2xl p-5">
+            <SearchInterchainToken onTokenFound={handleTokenFound} />
+            <div className="divider">OR</div>
+            <AddErc20 />
+          </div>
           <div className="mt-4">
             <RecentTransactions />
           </div>
