@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.10
+
+### Patch Changes
+
+- [#48](https://github.com/axelarnetwork/axelarjs/pull/48) [`6f3337d3`](https://github.com/axelarnetwork/axelarjs/commit/6f3337d35123f79328b2c4cda7c935f58f6f4446) Thanks [@canhtrinh](https://github.com/canhtrinh)! - change default currency for addGas to usdc if none is provided
+
 ## 0.1.9
 
 ### Patch Changes

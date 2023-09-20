@@ -8,7 +8,7 @@ import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
-  size: z.number().optional().default(10),
+  size: z.number().optional().default(20),
   senderAddress: hex40Literal().optional(),
   contractMethod: z.union([
     z.literal("sendToken"),

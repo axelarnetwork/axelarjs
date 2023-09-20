@@ -58,12 +58,10 @@ export const RecentTransactionsList: FC<Props> = ({
   });
 
   return (
-    <Card className="bg-base-300 p-2">
-      <Card.Body>
+    <Card className="bg-base-100 overflow-hidden rounded-xl">
+      <Card.Body className="to-base-200/90 dark:to-base-300/90 bg-base-100 bg-gradient-to-b from-transparent">
         {title && (
-          <Card.Title>
-            <h3>{title}</h3>
-          </Card.Title>
+          <Card.Title className="grid place-items-center">{title}</Card.Title>
         )}
         <div className="w-[80vw] space-y-4 md:w-auto">
           <ul className="no-scrollbar relative max-h-64 min-w-[256px] space-y-4 overflow-y-scroll md:max-h-96">
@@ -84,7 +82,7 @@ export const RecentTransactionsList: FC<Props> = ({
                 />
               ))
             )}
-            <li className="to-base-300/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20"></li>
+            <li className="to-base-200/90 dark:to-base-300/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20" />
           </ul>
         </div>
       </Card.Body>

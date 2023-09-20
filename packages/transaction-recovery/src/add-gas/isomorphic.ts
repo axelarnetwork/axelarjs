@@ -4,7 +4,7 @@ import type {
   GMPClient,
 } from "@axelarjs/api";
 import type { AxelarCosmosChainConfig } from "@axelarjs/api/axelar-config/types";
-import { COSMOS_GAS_RECEIVER_OPTIONS } from "@axelarjs/core";
+import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
 import {
@@ -58,7 +58,8 @@ export async function addGas(
   }
 
   const denomOnSrcChain = getIBCDenomOnSrcChain(
-    tx.gas_paid.returnValues.denom,
+    tx.gas_paid?.returnValues?.denom,
+    sendOptions.environment,
     chainConfig
   );
 
@@ -66,7 +67,7 @@ export async function addGas(
     return {
       success: false,
       info: `The token you are trying to send does not match the token originally \
-        used for gas payment. Please send ${tx.gas_paid.returnValues.denom} instead`,
+        used for gas payment. Please send ${tx.gas_paid?.returnValues?.denom} instead`,
     };
   }
 
@@ -77,19 +78,9 @@ export async function addGas(
           tx,
           autocalculateGasOptions,
           chainConfig,
+          environment: sendOptions.environment,
           axelarQueryClient: dependencies.axelarQueryClient,
         });
-
-  const sender = await sendOptions.offlineSigner
-    .getAccounts()
-    .then(([acc]) => acc?.address);
-
-  if (!sender) {
-    return {
-      success: false,
-      info: `Could not find sender from designated offlineSigner`,
-    };
-  }
 
   const rpcUrl = sendOptions.rpcUrl ?? rpc[0];
 
@@ -104,6 +95,17 @@ export async function addGas(
     rpcUrl,
     sendOptions.offlineSigner
   );
+
+  const sender = await sendOptions.offlineSigner
+    .getAccounts()
+    .then(([acc]) => acc?.address);
+
+  if (!sender) {
+    return {
+      success: false,
+      info: `Could not find sender from designated offlineSigner`,
+    };
+  }
 
   const broadcastResult = await signingStargateClient.signAndBroadcast(
     sender,
@@ -138,17 +140,22 @@ async function getFullFee({
   tx,
   chainConfig,
   axelarQueryClient,
+  environment,
 }: GetFullFeeOptions): Promise<Coin> {
   const amount = await axelarQueryClient.estimateGasFee({
     sourceChain: tx.call.chain,
     destinationChain: tx.call.returnValues.destinationChain,
     gasLimit: autocalculateGasOptions?.gasLimit ?? BigInt(1_000_000),
     gasMultiplier: autocalculateGasOptions?.gasMultipler ?? 1,
-    sourceTokenSymbol: tx.gas_paid.returnValues.denom,
+    sourceTokenSymbol:
+      tx.gas_paid?.returnValues?.denom ?? environment === "mainnet"
+        ? "axlUSDC"
+        : "aUSDC",
   });
 
   const denom = getIBCDenomOnSrcChain(
-    tx.gas_paid.returnValues.denom,
+    tx.gas_paid?.returnValues?.denom,
+    environment,
     chainConfig
   );
 
@@ -160,17 +167,24 @@ async function getFullFee({
 
 function matchesOriginalTokenPayment(
   token: Coin | "autocalculate",
-  denomOnSrcChain: string
+  denom: string
 ) {
-  return token === "autocalculate" || token?.denom === denomOnSrcChain;
+  return token === "autocalculate" || token?.denom === denom;
 }
 
 function getIBCDenomOnSrcChain(
-  denomOnAxelar: string,
+  denomOnAxelar: string | undefined,
+  env: Environment,
   chain: AxelarCosmosChainConfig
 ) {
-  const { ibcDenom } =
-    chain.assets?.find(({ id }) => id === denomOnAxelar) ?? {};
+  /**
+   * take the denom that is fetched from the original tx details in the index;
+   * if that does not exist, default to USDC
+   * (i.e. 'uusdc' on mainnet, 'uausdc' on testnet)
+   */
+  const denom = denomOnAxelar ?? (env === "mainnet" ? "uusdc" : "uausdc");
+
+  const { ibcDenom } = chain.assets?.find(({ id }) => id === denom) ?? {};
 
   if (!ibcDenom) {
     throw new Error("cannot find token that matches original gas payment");
