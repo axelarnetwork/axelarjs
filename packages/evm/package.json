@@ -14,7 +14,9 @@
     "./build",
     "./contracts",
     "./index.js",
-    "./clients.js"
+    "./index.d.ts",
+    "./clients.js",
+    "./clients.d.ts"
   ],
   "exports": {
     ".": {
@@ -24,13 +26,6 @@
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/module/*"
-      ]
     }
   },
   "scripts": {
