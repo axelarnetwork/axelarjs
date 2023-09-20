@@ -14,9 +14,13 @@
     "./query-client",
     "./signing-client",
     "./constants.js",
+    "./constants.d.ts",
     "./utils.js",
+    "./utils.d.ts",
     "./types.js",
-    "./index.js"
+    "./types.d.ts",
+    "./index.js",
+    "./index.d.ts"
   ],
   "type": "module",
   "exports": {
