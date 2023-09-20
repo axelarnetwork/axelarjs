@@ -1,6 +1,6 @@
 import { Clamp } from "@axelarjs/ui/components/core";
 import { cn } from "@axelarjs/ui/utils";
-import { FC, PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from "react";
 
 type Props = PropsWithChildren<{
   className?: string;

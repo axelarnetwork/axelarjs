@@ -1,4 +1,4 @@
-import { StdFee } from "@cosmjs/stargate";
+import type { StdFee } from "@cosmjs/stargate";
 
 export const STANDARD_FEE: StdFee = {
   amount: [

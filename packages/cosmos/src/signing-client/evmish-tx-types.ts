@@ -16,7 +16,7 @@ import {
   SignCommandsRequest,
 } from "@axelarjs/proto/axelar/evm/v1beta1/tx";
 
-import { Registry } from "@cosmjs/proto-signing";
+import type { Registry } from "@cosmjs/proto-signing";
 
 const TxTypeUrlMap = {
   EvmLinkRequest: `/${protobufPackage}.LinkRequest`,

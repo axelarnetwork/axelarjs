@@ -4,7 +4,7 @@ import { createDepositAddressApiNodeClient } from "@axelarjs/api/deposit-address
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 
 import { getDepositAddress } from "./getDepositAddress";
-import { SendOptions } from "./types";
+import type { SendOptions } from "./types";
 
 export default function getDepositAddressNode(params: SendOptions) {
   const { environment } = params;

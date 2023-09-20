@@ -1,7 +1,7 @@
 import {
   generatePrivateKey,
-  PrivateKeyAccount,
   privateKeyToAccount,
+  type PrivateKeyAccount,
 } from "viem/accounts";
 
 export async function createDummyAccount() {

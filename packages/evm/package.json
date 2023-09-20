@@ -33,7 +33,9 @@
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
     "postinstall": "tsx scripts/postinstall.ts",
-    "codegen": "tsx scripts/codegen.ts"
+    "codegen": "tsx scripts/codegen.ts",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

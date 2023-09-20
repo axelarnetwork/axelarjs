@@ -16,6 +16,7 @@
     "build:analyze": "ANALYZE=true pnpm build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "dev:e2e": "concurrently anvil \"NEXT_PUBLIC_E2E_ENABLED=true pnpm dev\"",
     "test:e2e": "dotenv -e .env.local npx playwright test",
     "ci:e2e": "npx playwright test",

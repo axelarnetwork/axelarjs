@@ -10,13 +10,11 @@
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
   "files": [
-    "./tsconfig.strictest.json"
+    "tsconfig.strictest.json",
+    "eslintrc.strictest.json"
   ],
   "scripts": {},
   "keywords": [],
   "author": "",
-  "license": "LicenseRef-LICENSE",
-  "devDependencies": {
-    "@tsconfig/strictest": "^2.0.2"
-  }
+  "license": "LicenseRef-LICENSE"
 }

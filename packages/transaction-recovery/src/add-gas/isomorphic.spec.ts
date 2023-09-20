@@ -7,7 +7,7 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
 import { type AutocalculateGasOptions, type SendOptions } from "../types";
-import { addGas, AddGasDependencies } from "./isomorphic";
+import { addGas, type AddGasDependencies } from "./isomorphic";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,

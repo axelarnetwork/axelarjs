@@ -1,7 +1,7 @@
 import {
   createPublicClient as _createPublicClient,
   http,
-  PublicClient,
+  type PublicClient,
 } from "viem";
 import {
   arbitrum,

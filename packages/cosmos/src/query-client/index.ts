@@ -1,9 +1,9 @@
 import { QueryClient } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 
-import { EnvironmentConfigs, getConfigs } from "../constants";
+import { getConfigs, type EnvironmentConfigs } from "../constants";
 import type { AxelarQueryClientConfig } from "../types";
-import { AxelarQueryService, setupQueryExtension } from "./types";
+import { setupQueryExtension, type AxelarQueryService } from "./types";
 
 export * from "../types";
 

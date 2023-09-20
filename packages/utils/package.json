@@ -52,7 +52,9 @@
     "test": "vitest --run src",
     "compile": "tsc --noEmit",
     "build": "scripts/build.sh",
-    "clean": "scripts/clean.sh"
+    "clean": "scripts/clean.sh",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",

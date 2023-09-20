@@ -19,6 +19,9 @@
     "lint": {
       "outputs": []
     },
+    "lint:fix": {
+      "outputs": []
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false

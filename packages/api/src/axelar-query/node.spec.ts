@@ -2,7 +2,7 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 
 import { formatEther } from "viem";
 
-import {
+import type {
   AxelarQueryAPIClient,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,

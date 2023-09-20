@@ -1,7 +1,7 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
 import getDepositAddress from "./node";
-import { SendOptions } from "./types";
+import type { SendOptions } from "./types";
 
 describe("getDepositAddress - node", () => {
   test("get deposit address from an EVM source chain", async () => {

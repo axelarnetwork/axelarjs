@@ -1,5 +1,5 @@
 import { cn } from "@axelarjs/ui/utils";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { Cabin } from "next/font/google";
 
 import MainLayout from "~/layouts/MainLayout";
