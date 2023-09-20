@@ -13,6 +13,8 @@
     "./build",
     "./add-gas",
     "./index.js",
+    "./index.d.ts",
+    "./types.d.ts",
     "./types.js"
   ],
   "exports": {
