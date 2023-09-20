@@ -115,7 +115,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           }
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-base-200 flex-1 focus:outline-none focus:ring-0"
+          className=" flex-1 focus:outline-none focus:ring-0"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />

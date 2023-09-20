@@ -18,13 +18,13 @@ const RecentTransactionsTabs = () => {
   const { address } = useAccount();
 
   return (
-    <section className="space-y-4">
+    <section className="my-10 space-y-4">
+      <div className="divider text-xl font-bold">
+        RECENT INTERCHAIN TRANSACTIONS
+      </div>
       <Card className="bg-base-200 w-full rounded-3xl" compact>
         <Card.Body>
           <Card.Title className="grid place-items-center space-y-2 text-center md:hidden">
-            <div>
-              <h2 className="text-lg font-semibold">Recent Transactions</h2>
-            </div>
             <Tabs boxed className="md:hidden">
               {CONTRACT_METHODS.map((method) => (
                 <Tabs.Tab
@@ -44,12 +44,12 @@ const RecentTransactionsTabs = () => {
             <RecentTransactionsList
               contractMethod="sendToken"
               senderAddress={address}
-              title="Recent Interchain Transfers"
+              title="Transfers"
             />
             <RecentTransactionsList
               contractMethod="StandardizedTokenDeployed"
               senderAddress={address}
-              title="Recent Token Deployments"
+              title="Token Deployments"
             />
           </div>
           <div className="md:hidden">
