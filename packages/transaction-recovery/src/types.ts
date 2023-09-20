@@ -39,4 +39,5 @@ export type GetFullFeeOptions = {
   tx: SearchGMPResponseData;
   chainConfig: AxelarCosmosChainConfig;
   axelarQueryClient: AxelarQueryAPIClient;
+  environment: Environment;
 };
