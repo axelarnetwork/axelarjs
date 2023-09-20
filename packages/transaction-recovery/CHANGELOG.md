@@ -1,5 +1,11 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.9
+
+### Patch Changes
+
+- [`92c4afdd`](https://github.com/axelarnetwork/axelarjs/commit/92c4afddb58d0b424de45b9fabe680dfdebf473e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - sdasdasdas
+
 ## 0.1.8
 
 ### Patch Changes
