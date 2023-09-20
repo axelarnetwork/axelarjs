@@ -14,15 +14,25 @@
     "./build",
     "./react",
     "./index.js",
+    "./index.d.ts",
     "./array.js",
+    "./array.d.ts",
     "./case-conversion.js",
+    "./case-conversion.d.ts",
     "./function.js",
+    "./function.d.ts",
     "./guard.js",
+    "./guard.d.ts",
     "./hex.js",
+    "./hex.d.ts",
     "./monad.js",
+    "./monad.d.ts",
     "./record.js",
+    "./record.d.ts",
     "./string.js",
-    "./types.js"
+    "./string.d.ts",
+    "./types.js",
+    "./types.d.ts"
   ],
   "exports": {
     ".": {
