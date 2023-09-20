@@ -1,5 +1,11 @@
 # @axelarjs/deposit-address
 
+## 0.0.4
+
+### Patch Changes
+
+- [#45](https://github.com/axelarnetwork/axelarjs/pull/45) [`a19beccf`](https://github.com/axelarnetwork/axelarjs/commit/a19beccf888e3f0139f7d6519f69bf79f5ba3d64) Thanks [@canhtrinh](https://github.com/canhtrinh)! - add types to deposit address package.json
+
 ## 0.0.3
 
 ### Patch Changes
