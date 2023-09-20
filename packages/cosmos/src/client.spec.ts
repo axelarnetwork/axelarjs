@@ -57,8 +57,8 @@ class RpcIml implements Rpc {
     const sender = (await wallet.getAccounts())[0]?.address as string;
     const account = await getAccountInfo(sender);
     const pubKey = (await wallet.getAccounts())[0]?.pubkey;
-    const txBody = LinkRequest.decode(data);
-    console.log({ txBody, account });
+    // const txBody = LinkRequest.decode(data);
+    // console.log({ txBody, account });
     if (!account || !pubKey) throw new Error("account not found");
     const signDoc = {
       bodyBytes: TxBody.encode(
@@ -86,7 +86,7 @@ class RpcIml implements Rpc {
                 mode: SignMode.SIGN_MODE_DIRECT,
               },
             },
-            sequence: Long.fromNumber(3205),
+            sequence: Long.fromNumber(account.sequence),
           },
         ],
         fee: Fee.fromPartial({
@@ -127,7 +127,8 @@ export const broadcastTxSync = async (
   );
   const broadcasted = await signer.broadcastTx(tx);
   console.log({ broadcasted });
-  return new Uint8Array();
+  //@ts-ignore
+  return broadcasted?.data[0]?.data as Uint8Array;
   // return wallet.sendTx(chainId,  tx, "sync" as BroadcastMode)
 };
 describe("query client", () => {
@@ -156,6 +157,7 @@ describe("query client", () => {
       recipientChain: "avalanche",
       asset: "wavax-wei",
     });
+    console.log({ broadcastRes });
 
     expect(broadcastRes).toBeTruthy();
     // expect(queryApiRes).toBeTruthy();
