@@ -1,7 +1,8 @@
+import { memoize } from "@axelarjs/utils";
+
 import { GasPrice, StdFee } from "@cosmjs/stargate";
 
 import { Environment } from "./types";
-import { memoize } from "./utils";
 
 export type EnvironmentConfigs = {
   axelarRpcUrl: string;

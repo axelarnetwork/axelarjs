@@ -51,6 +51,7 @@
   "dependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
     "@cosmjs/proto-signing": "^0.31.1",
     "@cosmjs/stargate": "^0.31.1",
     "@cosmjs/tendermint-rpc": "^0.31.1",

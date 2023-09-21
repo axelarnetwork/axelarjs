@@ -409,6 +409,9 @@ importers:
       '@axelarjs/proto':
         specifier: workspace:*
         version: link:../proto
+      '@axelarjs/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@cosmjs/proto-signing':
         specifier: ^0.31.1
         version: 0.31.1

@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import inflection from "inflection";
+import { camelize, underscore } from "inflection";
 
 export const createAminoTypeNameFromProtoTypeUrl = (typeUrl: string) => {
   if (typeUrl.startsWith("/ibc")) {
@@ -16,7 +16,7 @@ export const createAminoTypeNameFromProtoTypeUrl = (typeUrl: string) => {
       .join("/");
   }
 
-  const [_namespace, cosmosModule, _version, messageType] = typeUrl.split(".");
+  const [, cosmosModule, , messageType] = typeUrl.split(".");
 
   const aminoTypeUrl = `${cosmosModule}/${messageType}`;
 
@@ -47,7 +47,7 @@ export const convertToSnakeCaseDeep = (obj: UnknownRecord): any => {
   const newObj: UnknownRecord = {};
 
   for (const prop in obj) {
-    newObj[inflection.underscore(prop)] = convertToSnakeCaseDeep(
+    newObj[underscore(prop)] = convertToSnakeCaseDeep(
       obj[prop] as UnknownRecord
     );
   }
@@ -66,7 +66,7 @@ export const convertToCamelCaseDeep = (obj: UnknownRecord): any => {
   const newObj: UnknownRecord = {};
 
   for (const prop in obj) {
-    newObj[inflection.camelize(prop, true)] = convertToCamelCaseDeep(
+    newObj[camelize(prop, true)] = convertToCamelCaseDeep(
       obj[prop] as UnknownRecord
     );
   }
