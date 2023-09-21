@@ -100,14 +100,14 @@ export function setupQueryExtension(
     },
     broadcast: {
       axelarnet: new AxelarnetMSCI(rpcImpl),
-      evm: new EVMMSCI(client),
-      multisig: new MultisigMSCI(client),
-      permission: new PermissionMSCI(client),
-      nexus: new NexusMSCI(client),
-      reward: new RewardMSCI(client),
-      snapshot: new SnapshotMSCI(client),
-      tss: new TSSMSCI(client),
-      vote: new VoteMSCI(client),
+      evm: new EVMMSCI(rpcImpl),
+      multisig: new MultisigMSCI(rpcImpl),
+      permission: new PermissionMSCI(rpcImpl),
+      nexus: new NexusMSCI(rpcImpl),
+      reward: new RewardMSCI(rpcImpl),
+      snapshot: new SnapshotMSCI(rpcImpl),
+      tss: new TSSMSCI(rpcImpl),
+      vote: new VoteMSCI(rpcImpl),
     },
   };
 }

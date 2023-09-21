@@ -49,19 +49,12 @@
   "dependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
-    "@cosmjs/amino": "^0.31.0",
-    "@cosmjs/encoding": "^0.31.0",
-    "@cosmjs/ledger-amino": "^0.31.0",
-    "@cosmjs/math": "^0.31.0",
+    "@cosmjs/proto-signing": "^0.31.0",
     "@cosmjs/stargate": "^0.31.0",
     "@cosmjs/tendermint-rpc": "^0.31.0",
-    "@cosmjs/utils": "^0.31.0",
-    "chain-registry": "^1.19.0",
-    "long": "^5.2.3",
-    "protobufjs": "^7.2.5"
+    "long": "^5.2.3"
   },
   "devDependencies": {
-    "@cosmjs/proto-signing": "^0.31.0",
     "@tsconfig/strictest": "^2.0.2",
     "cosmjs-types": "^0.8.0",
     "rambda": "^7.5.0",
