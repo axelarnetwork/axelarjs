@@ -1,4 +1,4 @@
-import { StdFee } from "@cosmjs/stargate";
+import { GasPrice, StdFee } from "@cosmjs/stargate";
 
 import { Environment } from "./types";
 import { memoize } from "./utils";
@@ -37,3 +37,5 @@ export const STANDARD_FEE: StdFee = {
   ],
   gas: "500000",
 };
+
+export const STANDARD_GAS_PRICE = GasPrice.fromString("0.025uaxl");

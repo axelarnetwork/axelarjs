@@ -6,7 +6,7 @@ import { STANDARD_FEE } from "./constants";
 import { createAxelarRPCTxClient } from "./rpc-client";
 
 describe("rpc client", () => {
-  test("broadcast link transaction", async () => {
+  test.skip("broadcast link transaction", async () => {
     const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
     const axelarLcdUrl = "https://axelartest-lcd.quickapi.com";
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(

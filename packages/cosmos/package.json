@@ -54,6 +54,7 @@
     "@cosmjs/proto-signing": "^0.31.0",
     "@cosmjs/stargate": "^0.31.0",
     "@cosmjs/tendermint-rpc": "^0.31.0",
+    "inflection": "^2.0.1",
     "long": "^5.2.3"
   },
   "devDependencies": {
