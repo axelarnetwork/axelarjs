@@ -8,20 +8,24 @@ import TokenList from "./TokenList";
 const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
-export type InterchainTokensPageProps = {};
-
 const InterchainTokensPage = () => {
   const { data: session } = useSession();
 
+  const accountAddress =
+    session && "address" in session && typeof session.address === "string"
+      ? (session.address as `0x${string}`)
+      : undefined;
+
   const { data } = useGetMyInterchainTokensQuery(
     {
-      sessionAddress: session?.address as `0x${string}`,
+      sessionAddress: accountAddress as `0x${string}`,
     },
     {
       suspense: true,
-      enabled: Boolean(session?.address),
+      enabled: Boolean(accountAddress),
     }
   );
+
   return (
     <Page pageTitle="My Interchain Tokens">
       <div className="flex flex-col gap-4">
@@ -34,7 +38,7 @@ const InterchainTokensPage = () => {
           )}
         </Page.Title>
         <Suspense fallback={<div>Loading...</div>}>
-          <TokenList sessionAddress={session?.address} />
+          <TokenList sessionAddress={accountAddress} />
         </Suspense>
       </div>
     </Page>
