@@ -53,7 +53,7 @@ import {
   QueryServiceClientImpl as VoteQSCI,
 } from "@axelarjs/proto/axelar/vote/v1beta1/service";
 
-import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
+import { createProtobufRpcClient, QueryClient, StdFee } from "@cosmjs/stargate";
 import { Rpc } from "cosmjs-types/helpers";
 
 export interface AxelarQueryService {
@@ -111,3 +111,11 @@ export function setupQueryExtension(
     },
   };
 }
+
+export type BroadcastTxOptions =
+  | {
+      broadcastPollIntervalMs?: number;
+      broadcastTimeoutMs?: number;
+      fee?: StdFee;
+    }
+  | undefined;

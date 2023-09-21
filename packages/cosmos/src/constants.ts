@@ -32,8 +32,8 @@ export const STANDARD_FEE: StdFee = {
   amount: [
     {
       denom: "uaxl",
-      amount: "1000000",
+      amount: "100000",
     },
   ],
-  gas: "5000000",
+  gas: "500000",
 };

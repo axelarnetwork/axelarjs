@@ -1,5 +1,9 @@
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
+import {
+  DeliverTxResponse,
+  SigningStargateClient,
+  StargateClient,
+} from "@cosmjs/stargate";
 import { PubKey } from "cosmjs-types/cosmos/crypto/secp256k1/keys";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import {
@@ -12,6 +16,7 @@ import { Rpc } from "cosmjs-types/helpers";
 import Long from "long";
 
 import { STANDARD_FEE } from "~/constants";
+import { BroadcastTxOptions } from "./types";
 
 export class RpcIml implements Rpc {
   protected axelarRpcUrl: string;
@@ -19,16 +24,22 @@ export class RpcIml implements Rpc {
   protected offlineSigner: DirectSecp256k1HdWallet;
   protected signer?: StargateClient;
   protected chainId: string;
+  protected broadcastOptions?: BroadcastTxOptions;
+  protected deliverSuccessCb: (deliverTxResponse: DeliverTxResponse) => any;
   constructor(
     axelarRpcUrl: string,
     axelarLcdUrl: string,
     offlineSigner: DirectSecp256k1HdWallet,
-    chainId: string
+    chainId: string,
+    deliverSuccessCb: (deliverTxResponse: DeliverTxResponse) => any,
+    broadcastOptions?: BroadcastTxOptions
   ) {
     this.axelarRpcUrl = axelarRpcUrl;
     this.axelarLcdUrl = axelarLcdUrl;
     this.offlineSigner = offlineSigner;
     this.chainId = chainId;
+    this.broadcastOptions = broadcastOptions;
+    this.deliverSuccessCb = deliverSuccessCb;
   }
 
   public async request(
@@ -54,7 +65,7 @@ export class RpcIml implements Rpc {
               value: data,
             },
           ],
-          memo: `CTT test ${new Date().toLocaleTimeString()}`,
+          memo: `@axelarjs/cosmos tx signed at: ${new Date().toLocaleTimeString()}`,
         })
       ).finish(),
       authInfoBytes: AuthInfo.encode({
@@ -75,13 +86,15 @@ export class RpcIml implements Rpc {
           },
         ],
         fee: Fee.fromPartial({
-          amount: STANDARD_FEE.amount.map((coin) => {
-            return {
-              denom: coin.denom,
-              amount: coin.amount.toString(),
-            };
-          }),
-          gasLimit: STANDARD_FEE.gas,
+          amount: (this.broadcastOptions?.fee ?? STANDARD_FEE).amount.map(
+            (coin) => {
+              return {
+                denom: coin.denom,
+                amount: coin.amount.toString(),
+              };
+            }
+          ),
+          gasLimit: (this.broadcastOptions?.fee ?? STANDARD_FEE).gas,
         }),
       }).finish(),
       chainId: this.chainId,
@@ -99,7 +112,11 @@ export class RpcIml implements Rpc {
       signDoc: signed.signed,
     };
 
-    const txHash = await this.broadcastTxSync(signedTx.tx);
+    const deliverTxResponse = await this.broadcastTx(signedTx.tx);
+
+    this.deliverSuccessCb(deliverTxResponse);
+
+    return new Uint8Array();
   }
 
   private async getSigner() {
@@ -112,20 +129,12 @@ export class RpcIml implements Rpc {
     return this.signer;
   }
 
-  private async broadcastTxSync(tx: Uint8Array): Promise<Uint8Array> {
-    const defaultSigningClientOptions = {
-      broadcastPollIntervalMs: 300,
-      broadcastTimeoutMs: 60_000,
-    };
-    const signer = await this.getSigner();
-    const broadcasted = await signer.broadcastTx(
+  private async broadcastTx(tx: Uint8Array): Promise<DeliverTxResponse> {
+    return (await this.getSigner()).broadcastTx(
       tx,
-      defaultSigningClientOptions.broadcastTimeoutMs,
-      defaultSigningClientOptions.broadcastPollIntervalMs
+      this.broadcastOptions?.broadcastTimeoutMs,
+      this.broadcastOptions?.broadcastPollIntervalMs
     );
-    console.log({ broadcasted });
-    //@ts-ignore
-    return broadcasted?.data[0]?.data as Uint8Array;
   }
 
   private translateTypeUrlHack(service: string, method: string) {
