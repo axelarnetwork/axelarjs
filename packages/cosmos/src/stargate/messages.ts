@@ -23,11 +23,17 @@ import type {
   MsgUndelegateEncodeObject,
   MsgVoteEncodeObject,
   MsgWithdrawDelegatorRewardEncodeObject,
+  SignerData,
   SigningStargateClient,
   StdFee,
 } from "@cosmjs/stargate";
+import type { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { camelize } from "inflection";
 
-import type { EncodeProtoPackage } from "./types";
+import type {
+  EncodeProtoPackage,
+  KeepOnlySimplifiedRequestMethods,
+} from "./types";
 
 export const TRACKED_MODULES = {
   axelarnet,
@@ -57,43 +63,102 @@ type EncodeModule<M extends keyof TrackedModules> = {
           message: ReturnType<TrackedModules[M][P]["fromPartial"]>,
           fee: StdFee
         ): Promise<DeliverTxResponse>;
+        sign(
+          signerAddress: string,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          message: ReturnType<TrackedModules[M][P]["fromPartial"]>,
+          fee: StdFee,
+          memo: string,
+          explicitSignerData?: SignerData
+        ): Promise<TxRaw>;
+        simulate(
+          signerAddress: string,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          message: ReturnType<TrackedModules[M][P]["fromPartial"]>,
+          memo?: string
+        ): Promise<number>;
       }
     : never;
 };
 
 export type AxelarMsgClient = {
-  [M in ModuleNames]: EncodeModule<M>;
+  [M in ModuleNames]: KeepOnlySimplifiedRequestMethods<EncodeModule<M>>;
 };
+
+const createMsgMethodClient =
+  (client: SigningStargateClient, module: { protobufPackage: string }) =>
+  <T extends Record<string, unknown>>(acc: T, [method]: [string, string]) => ({
+    ...acc,
+    [camelize(method, true).replace("Request", "")]: {
+      signAndBroadcast: (
+        senderAddress: string,
+        message: EncodeObject["value"],
+        fee: StdFee
+      ) =>
+        client.signAndBroadcast(
+          senderAddress,
+          [
+            {
+              typeUrl: `/${module.protobufPackage}.${method}`,
+              value: message,
+            },
+          ],
+          fee
+        ),
+      sign(
+        signerAddress: string,
+        message: EncodeObject["value"],
+        fee: StdFee,
+        memo: string,
+        explicitSignerData?: SignerData
+      ) {
+        return client.sign(
+          signerAddress,
+          [
+            {
+              typeUrl: `/${module.protobufPackage}.${method}`,
+              value: message,
+            },
+          ],
+          fee,
+          memo,
+          explicitSignerData
+        );
+      },
+      simulate(
+        signerAddress: string,
+        message: EncodeObject["value"],
+        memo: string | undefined
+      ) {
+        return client.simulate(
+          signerAddress,
+          [
+            {
+              typeUrl: `/${module.protobufPackage}.${method}`,
+              value: message,
+            },
+          ],
+          memo
+        );
+      },
+    },
+  });
 
 export const createMsgClient = (baseClient: SigningStargateClient) =>
   Object.entries(TRACKED_MODULES).reduce(
     (acc, [moduleName, module]) => ({
       ...acc,
       [moduleName]: Object.entries(module)
-        .filter(([, value]) => isTsProtoGeneratedType(value as GeneratedType))
+        .filter(
+          ([method, value]) =>
+            isTsProtoGeneratedType(value as GeneratedType) &&
+            method.endsWith("Request")
+        )
         .reduce(
-          (acc, [key]) => ({
-            ...acc,
-            [key]: {
-              signAndBroadcast(
-                senderAddress: string,
-                message: EncodeObject["value"],
-                fee: StdFee
-              ) {
-                return baseClient.signAndBroadcast(
-                  senderAddress,
-                  [
-                    {
-                      typeUrl: `/${module.protobufPackage}.${key}`,
-                      value: message,
-                    },
-                  ],
-                  fee
-                );
-              },
-            },
-          }),
-          {}
+          createMsgMethodClient(baseClient, module),
+          {} as Record<string, unknown>
         ),
     }),
     {} as AxelarMsgClient

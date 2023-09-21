@@ -42,7 +42,7 @@ describe("signing client", () => {
       return;
     }
 
-    const data = await client.messages.evm.LinkRequest.signAndBroadcast(
+    const txResponse = await client.messages.evm.link.signAndBroadcast(
       accData.address,
       {
         sender: toAccAddress(String(accData?.address)),
@@ -54,8 +54,41 @@ describe("signing client", () => {
       STANDARD_FEE
     );
 
-    expect(data.transactionHash).toEqual(
+    expect(txResponse.transactionHash).toEqual(
       MOCK_BROADCAST_RESPONSE.transactionHash
     );
+  });
+
+  test("simulate link transaction", async () => {
+    const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
+
+    const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
+      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      { prefix: "axelar" }
+    );
+
+    const client = await AxelarSigningStargateClient.connectWithSigner(
+      axelarRpcUrl,
+      offlineSigner
+    );
+
+    const [accData] = await offlineSigner.getAccounts();
+
+    if (!accData) {
+      return;
+    }
+
+    const estimateGas = await client.messages.evm.link.simulate(
+      accData.address,
+      {
+        sender: toAccAddress(String(accData?.address)),
+        recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        recipientChain: "avalanche",
+        asset: "wavax-wei",
+        chain: "fantom",
+      }
+    );
+
+    expect(estimateGas).not.toBeLessThan(10000);
   });
 });

@@ -1,5 +1,21 @@
 import type { TsProtoGeneratedType } from "@cosmjs/proto-signing";
 
+export type CamelCase<S extends string> = S extends `${infer F}${infer R}`
+  ? `${Lowercase<F>}${R}`
+  : never;
+
+export type CamelCaseKeys<T> = {
+  [K in keyof T as CamelCase<K & string>]: T[K];
+};
+
+export type SimplifyRequestMethod<T> = T extends `${infer First}Request`
+  ? CamelCase<First>
+  : never;
+
+export type KeepOnlySimplifiedRequestMethods<T> = {
+  [K in keyof T as SimplifyRequestMethod<K & string>]: T[K];
+};
+
 export type PickType<TObject, TPicked> = Pick<
   TObject,
   Exclude<
