@@ -37,20 +37,15 @@ describe("signing client", () => {
       return;
     }
 
-    const data = await client.signAndBroadcast(
+    const data = await client.messages.evm.LinkRequest.signAndBroadcast(
       accData.address,
-      [
-        {
-          typeUrl: "/axelar.evm.v1beta1.LinkRequest",
-          value: {
-            sender: toAccAddress(String(accData?.address)),
-            recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
-            recipientChain: "avalanche",
-            asset: "wavax-wei",
-            chain: "fantom",
-          },
-        },
-      ],
+      {
+        sender: toAccAddress(String(accData?.address)),
+        recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        recipientChain: "avalanche",
+        asset: "wavax-wei",
+        chain: "fantom",
+      },
       STANDARD_FEE
     );
 

@@ -27,8 +27,14 @@ import {
 import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
 import type { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
-import { STANDARD_GAS_PRICE } from "..";
-import { AxelarEncodeObject, CosmosEncodeObject, MODULES } from "./messages";
+import { STANDARD_GAS_PRICE } from "../constants";
+import {
+  AxelarEncodeObject,
+  AxelarMsgClient,
+  CosmosEncodeObject,
+  createMsgClient,
+  MODULES,
+} from "./messages";
 import {
   convertToCamelCaseDeep,
   convertToSnakeCaseDeep,
@@ -93,6 +99,8 @@ export type AxelarSigningClientMessage =
   | CosmosEncodeObject;
 
 export class AxelarSigningStargateClient extends SigningStargateClient {
+  public messages: AxelarMsgClient;
+
   protected constructor(
     tmClient: Tendermint37Client | undefined,
     signer: OfflineSigner,
@@ -106,6 +114,8 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
       gasPrice: STANDARD_GAS_PRICE,
       ...options,
     });
+
+    this.messages = createMsgClient(this);
   }
 
   static override async connect(

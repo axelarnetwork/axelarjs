@@ -14,7 +14,7 @@ export type ProtoPackageAndMessages<T extends { protobufPackage: any }> = {
   protobufPackage: T["protobufPackage"];
 } & PickType<T, TsProtoGeneratedType>;
 
-export type EncodeObjectRecord<T extends ProtoPackageAndMessages<T>> = {
+export type EncodeProtoPackage<T extends ProtoPackageAndMessages<T>> = {
   [P in keyof PickType<T, TsProtoGeneratedType> as P extends string
     ? `${T["protobufPackage"]}.${P}`
     : never]: {
