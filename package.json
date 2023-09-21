@@ -59,7 +59,7 @@
     "typescript": "^5.2.2"
   },
   "resolutions": {
-    "@types/react": "18.2.16",
+    "@types/react": "18.2.21",
     "vite": "4.4.9"
   },
   "pnpm": {

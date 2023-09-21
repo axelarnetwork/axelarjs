@@ -53,13 +53,13 @@
     "dotenv": "^16.3.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
   },
   "dependencies": {
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "bech32": "^2.0.0",
-    "viem": "~1.10.9"
+    "viem": "~1.10.14"
   }
 }

@@ -51,9 +51,9 @@
   "dependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
-    "@cosmjs/proto-signing": "^0.31.0",
-    "@cosmjs/stargate": "^0.31.0",
-    "@cosmjs/tendermint-rpc": "^0.31.0",
+    "@cosmjs/proto-signing": "^0.31.1",
+    "@cosmjs/stargate": "^0.31.1",
+    "@cosmjs/tendermint-rpc": "^0.31.1",
     "inflection": "^2.0.1",
     "long": "^5.2.3"
   },
@@ -63,6 +63,6 @@
     "rambda": "^7.5.0",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
   }
 }
