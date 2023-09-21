@@ -25,14 +25,18 @@ export class RpcImpl implements Rpc {
   protected signer?: StargateClient;
   protected chainId: string;
   protected broadcastOptions?: BroadcastTxOptions;
-  protected onDeliverTxResponse: (deliverTxResponse: DeliverTxResponse) => void;
+  protected onDeliverTxResponse?:
+    | undefined
+    | ((deliverTxResponse: DeliverTxResponse) => void);
 
   constructor(
     axelarRpcUrl: string,
     axelarLcdUrl: string,
     offlineSigner: DirectSecp256k1HdWallet,
     chainId: string,
-    onDeliverTxResponse: (deliverTxResponse: DeliverTxResponse) => void,
+    onDeliverTxResponse?:
+      | undefined
+      | ((deliverTxResponse: DeliverTxResponse) => void),
     broadcastOptions?: BroadcastTxOptions
   ) {
     this.axelarRpcUrl = axelarRpcUrl;
@@ -117,7 +121,7 @@ export class RpcImpl implements Rpc {
 
     const deliverTxResponse = await this.broadcastTx(signedTx.tx);
 
-    this.onDeliverTxResponse(deliverTxResponse);
+    this.onDeliverTxResponse && this.onDeliverTxResponse(deliverTxResponse);
 
     return new Uint8Array();
   }
@@ -132,7 +136,7 @@ export class RpcImpl implements Rpc {
     return this.signer;
   }
 
-  private async broadcastTx(tx: Uint8Array): Promise<DeliverTxResponse> {
+  public async broadcastTx(tx: Uint8Array): Promise<DeliverTxResponse> {
     const signer = await this.getSigner();
 
     return signer.broadcastTx(

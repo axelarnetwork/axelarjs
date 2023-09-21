@@ -1,11 +1,11 @@
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
-import { STANDARD_FEE } from "../constants";
+import { STANDARD_FEE } from "../../constants";
 import {
   AxelarSigningStargateClient,
   getSigningAxelarClientOptions,
-} from "./client";
+} from "../client";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("signing client", () => {

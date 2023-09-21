@@ -36,7 +36,8 @@ export function createAxelarRPCTxClient(
   config: AxelarRpcClientConfig & {
     axelarLcdUrl: string;
     chainId: string;
-    onDeliverTxResponse: (deliverTxResponse: DeliverTxResponse) => void;
+    onDeliverTxResponse?: (deliverTxResponse: DeliverTxResponse) => void;
+    rpcImpl?: RpcImpl;
   },
   offlineSigner: DirectSecp256k1HdWallet,
   options?: {
@@ -49,14 +50,15 @@ export function createAxelarRPCTxClient(
     config.axelarRpcUrl || getConfigs(config.environment).axelarRpcUrl;
 
   return setupRpcClientBroadcastExtension(
-    new RpcImpl(
-      axelarRpcUrl,
-      config.axelarLcdUrl,
-      offlineSigner,
-      config.chainId,
-      config.onDeliverTxResponse,
-      options
-    )
+    config.rpcImpl ??
+      new RpcImpl(
+        axelarRpcUrl,
+        config.axelarLcdUrl,
+        offlineSigner,
+        config.chainId,
+        config.onDeliverTxResponse,
+        options
+      )
   );
 }
 

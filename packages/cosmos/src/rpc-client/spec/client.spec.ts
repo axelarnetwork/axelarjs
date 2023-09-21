@@ -2,8 +2,10 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { DeliverTxResponse } from "@cosmjs/stargate";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
-import { STANDARD_FEE } from "../constants";
-import { createAxelarRPCTxClient } from "../rpc-client";
+import { STANDARD_FEE } from "../../constants";
+import { createAxelarRPCTxClient } from "../index";
+import { RpcImpl } from "../rpcImpl";
+import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("rpc client", () => {
   test("broadcast link transaction with rpc client implementation", async () => {
@@ -19,6 +21,18 @@ describe("rpc client", () => {
     const onDeliverTxResponse = (data: DeliverTxResponse) => {
       response = data;
     };
+    const stubRpcImpl = new RpcImpl(
+      axelarRpcUrl,
+      axelarLcdUrl,
+      wallet,
+      "axelar-testnet-lisbon-3",
+      onDeliverTxResponse
+    );
+    stubRpcImpl;
+
+    vi.spyOn(stubRpcImpl, "broadcastTx").mockImplementation(() =>
+      Promise.resolve(MOCK_BROADCAST_RESPONSE)
+    );
 
     const rpcClient = createAxelarRPCTxClient(
       {
@@ -26,7 +40,7 @@ describe("rpc client", () => {
         axelarRpcUrl,
         axelarLcdUrl,
         chainId: "axelar-testnet-lisbon-3",
-        onDeliverTxResponse,
+        rpcImpl: stubRpcImpl,
       },
       wallet,
       {
@@ -47,7 +61,9 @@ describe("rpc client", () => {
     });
 
     expect(response).toBeDefined();
-    expect(response?.transactionHash).toBeDefined();
+    expect(response?.transactionHash).toEqual(
+      MOCK_BROADCAST_RESPONSE.transactionHash
+    );
     expect(data.depositAddr).toBeDefined();
   });
 });
