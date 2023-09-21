@@ -6,6 +6,7 @@ import {
   AxelarSigningStargateClient,
   getSigningAxelarClientOptions,
 } from "./client";
+import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("signing client", () => {
   test("default registry", async () => {
@@ -31,6 +32,10 @@ describe("signing client", () => {
       offlineSigner
     );
 
+    vi.spyOn(client, "signAndBroadcast").mockImplementation(() =>
+      Promise.resolve(MOCK_BROADCAST_RESPONSE)
+    );
+
     const [accData] = await offlineSigner.getAccounts();
 
     if (!accData) {
@@ -49,6 +54,8 @@ describe("signing client", () => {
       STANDARD_FEE
     );
 
-    expect(data.transactionHash).toBeDefined();
+    expect(data.transactionHash).toEqual(
+      MOCK_BROADCAST_RESPONSE.transactionHash
+    );
   });
 });

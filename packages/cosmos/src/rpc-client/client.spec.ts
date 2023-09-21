@@ -2,13 +2,13 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { DeliverTxResponse } from "@cosmjs/stargate";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
-import { STANDARD_FEE } from "./constants";
-import { createAxelarRPCTxClient } from "./rpc-client";
+import { STANDARD_FEE } from "../constants";
+import { createAxelarRPCTxClient } from "../rpc-client";
 
 describe("rpc client", () => {
-  test.skip("broadcast link transaction", async () => {
-    const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
-    const axelarLcdUrl = "https://axelartest-lcd.quickapi.com";
+  test("broadcast link transaction with rpc client implementation", async () => {
+    const axelarRpcUrl = "https://rpc-axelar-testnet.imperator.co:443";
+    const axelarLcdUrl = "https://lcd-axelar-testnet.imperator.co";
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
       { prefix: "axelar" }
@@ -47,6 +47,7 @@ describe("rpc client", () => {
     });
 
     expect(response).toBeDefined();
+    expect(response?.transactionHash).toBeDefined();
     expect(data.depositAddr).toBeDefined();
   });
 });
