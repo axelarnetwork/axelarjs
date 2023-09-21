@@ -19,11 +19,11 @@ export class AxelarQueryClient extends QueryClient {
       const rpc: string = axelarRpcUrl || links.axelarRpcUrl;
       instance = QueryClient.withExtensions(
         await Tendermint34Client.connect(rpc),
-        setupQueryExtension
+        (base) => setupQueryExtension(base, config.rpcImpl)
       );
     }
     return instance;
   }
 }
 
-export const createAxelarQueryClient = AxelarQueryClient.init;
+export const createAxelarRPCClient = AxelarQueryClient.init;
