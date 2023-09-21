@@ -12,12 +12,18 @@ export interface AxelarQueryClientConfig {
   axelarRpcUrl?: string;
   environment: Environment;
   rpcImpl: Rpc;
-  broadcastOptions?: {
-    fee?: StdFee;
-  };
+  broadcastOptions?: BroadcastTxOptions;
 }
 
 export interface AxelarSigningClientConfig extends AxelarQueryClientConfig {
   cosmosBasedWalletDetails: CosmosBasedWalletDetails;
   options: SigningStargateClientOptions;
 }
+
+export type BroadcastTxOptions =
+  | {
+      broadcastPollIntervalMs?: number;
+      broadcastTimeoutMs?: number;
+      fee?: StdFee;
+    }
+  | undefined;

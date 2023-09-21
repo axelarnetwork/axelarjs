@@ -111,11 +111,3 @@ export function setupQueryExtension(
     },
   };
 }
-
-export type BroadcastTxOptions =
-  | {
-      broadcastPollIntervalMs?: number;
-      broadcastTimeoutMs?: number;
-      fee?: StdFee;
-    }
-  | undefined;

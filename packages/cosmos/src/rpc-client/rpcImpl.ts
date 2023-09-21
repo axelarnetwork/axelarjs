@@ -16,7 +16,7 @@ import { Rpc } from "cosmjs-types/helpers";
 import Long from "long";
 
 import { STANDARD_FEE } from "~/constants";
-import { BroadcastTxOptions } from "./types";
+import { BroadcastTxOptions } from "../types";
 
 export class RpcIml implements Rpc {
   protected axelarRpcUrl: string;

@@ -41,15 +41,8 @@ describe("rpc client", () => {
       recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       recipientChain: "avalanche",
       asset: "wavax-wei",
-      chain: "ethereum-2",
+      chain: "fantom",
     });
-
-    // await rpcClient.broadcast.axelarnet.Link({
-    //   sender: toAccAddress((await wallet.getAccounts())[0]?.address as string),
-    //   recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
-    //   recipientChain: "avalanche",
-    //   asset: "wavax-wei",
-    // });
 
     expect(response).toBeTruthy();
   });
