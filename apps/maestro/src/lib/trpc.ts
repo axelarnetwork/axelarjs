@@ -47,7 +47,8 @@ export const trpc = createTRPCNext<AppRouter>({
               // To use SSR properly, you need to forward the client's headers to the server
               // This is so you can pass through things like cookies when we're server-side rendering
               // If you're using Node 18, omit the "connection" header
-              const { connection: _connection, ...headers } = ctx.req.headers;
+              const { headers } = ctx.req;
+
               return {
                 ...headers,
                 // Optional: inform server that it's an SSR request
