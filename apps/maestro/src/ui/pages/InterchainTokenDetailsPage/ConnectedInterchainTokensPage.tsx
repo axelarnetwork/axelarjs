@@ -136,8 +136,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const remoteChainsExecuted = useMemo(() => {
     return Object.entries(statusesByChain)
-      .filter(([_, { status }]) => status === "executed")
-      .map(([chainId, _]) => chainId);
+      .filter(([, { status }]) => status === "executed")
+      .map(([chainId]) => chainId);
   }, [statusesByChain]);
 
   useEffect(() => {

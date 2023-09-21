@@ -4,7 +4,7 @@ import type {
   GMPClient,
 } from "@axelarjs/api";
 import type { AxelarCosmosChainConfig } from "@axelarjs/api/axelar-config/types";
-import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
+import { COSMOS_GAS_RECEIVER_OPTIONS, type Environment } from "@axelarjs/core";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
 import {

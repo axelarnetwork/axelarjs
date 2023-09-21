@@ -12,9 +12,7 @@ import Page from "~/ui/layouts/Page";
 import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
 
-export type InterchainTokensPageProps = {};
-
-const InterchainTokensPage: FC<InterchainTokensPageProps> = () => {
+const InterchainTokensPage: FC = () => {
   const { chainName, tokenAddress } = useRouter().query as {
     chainName: string;
     tokenAddress: `0x${string}`;

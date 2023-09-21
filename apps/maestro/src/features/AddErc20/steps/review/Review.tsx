@@ -76,7 +76,7 @@ const Review: FC = () => {
         {(state.txState.type === "deployed" ||
           state.txState.type === "deploying") && (
           <>
-            {Boolean(state.selectedChains.length) ? (
+            {state.selectedChains.length > 0 ? (
               <GMPTxStatusMonitor txHash={state.txState.txHash} />
             ) : (
               <LinkButton
