@@ -418,6 +418,9 @@ importers:
       '@cosmjs/tendermint-rpc':
         specifier: ^0.31.0
         version: 0.31.1
+      inflection:
+        specifier: ^2.0.1
+        version: 2.0.1
       long:
         specifier: ^5.2.3
         version: 5.2.3
@@ -12515,6 +12518,11 @@ packages:
   /inflation@2.0.0:
     resolution: {integrity: sha512-m3xv4hJYR2oXw4o4Y5l6P5P16WYmazYof+el6Al3f+YlggGj6qT9kImBAnzDelRALnP5d3h4jGBPKzYCizjZZw==}
     engines: {node: '>= 0.8.0'}
+    dev: false
+
+  /inflection@2.0.1:
+    resolution: {integrity: sha512-wzkZHqpb4eGrOKBl34xy3umnYHx8Si5R1U4fwmdxLo5gdH6mEK8gclckTj/qWqy4Je0bsDYe/qazZYuO7xe3XQ==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /inflight@1.0.6:
