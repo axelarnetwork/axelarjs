@@ -1,7 +1,7 @@
 # build artifacts
 build/
 /rpc-client/
-/signing-client/
+/stargate/
 *.js
 *.d.ts
 

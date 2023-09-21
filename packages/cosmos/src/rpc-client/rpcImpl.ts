@@ -52,12 +52,11 @@ export class RpcImpl implements Rpc {
     method: string,
     data: Uint8Array
   ): Promise<Uint8Array> {
-    const sender = (await this.offlineSigner.getAccounts())[0]
-      ?.address as string;
-
-    const account = await this.getAccountInfo(sender);
-
     const [accData] = await this.offlineSigner.getAccounts();
+
+    const senderAddress = String(accData?.address);
+
+    const account = await this.getAccountInfo(senderAddress);
 
     if (!account || !accData?.pubkey) {
       throw new Error("account not found");
@@ -108,7 +107,7 @@ export class RpcImpl implements Rpc {
       accountNumber: Long.fromString(account.account_number),
     };
 
-    const signed = await this.offlineSigner.signDirect(sender, signDoc);
+    const signed = await this.offlineSigner.signDirect(senderAddress, signDoc);
 
     const signedTx = {
       tx: TxRaw.encode({
