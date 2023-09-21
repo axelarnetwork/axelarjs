@@ -1,3 +1,5 @@
+import { StdFee } from "@cosmjs/stargate";
+
 import { Environment } from "./types";
 import { memoize } from "./utils";
 
@@ -25,3 +27,13 @@ const configsMap: Record<Environment, EnvironmentConfigs> = {
 export const getConfigs = memoize(
   (environment: Environment): EnvironmentConfigs => configsMap[environment]
 );
+
+export const STANDARD_FEE: StdFee = {
+  amount: [
+    {
+      denom: "uaxl",
+      amount: "1000000",
+    },
+  ],
+  gas: "5000000",
+};

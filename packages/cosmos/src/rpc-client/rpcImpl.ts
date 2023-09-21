@@ -1,9 +1,5 @@
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import {
-  SigningStargateClient,
-  StargateClient,
-  StdFee,
-} from "@cosmjs/stargate";
+import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { PubKey } from "cosmjs-types/cosmos/crypto/secp256k1/keys";
 import { SignMode } from "cosmjs-types/cosmos/tx/signing/v1beta1/signing";
 import {
@@ -15,15 +11,7 @@ import {
 import { Rpc } from "cosmjs-types/helpers";
 import Long from "long";
 
-export const STANDARD_FEE: StdFee = {
-  amount: [
-    {
-      denom: "uaxl",
-      amount: "1000000",
-    },
-  ],
-  gas: "5000000",
-};
+import { STANDARD_FEE } from "~/constants";
 
 export class RpcIml implements Rpc {
   protected axelarRpcUrl: string;
@@ -43,22 +31,6 @@ export class RpcIml implements Rpc {
     this.chainId = chainId;
   }
 
-  private translateTypeUrlHack(service: string, method: string) {
-    return `/${service.replace("MsgService", "")}${method}Request`;
-  }
-
-  private async getAccountInfo(address: string) {
-    try {
-      return (
-        await fetch(
-          `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`
-        ).then((res) => res.json())
-      ).account;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   public async request(
     service: string,
     method: string,
@@ -66,10 +38,13 @@ export class RpcIml implements Rpc {
   ): Promise<any> {
     const sender = (await this.offlineSigner.getAccounts())[0]
       ?.address as string;
+
     const account = await this.getAccountInfo(sender);
+
     const pubKey = (await this.offlineSigner.getAccounts())[0]?.pubkey;
 
     if (!account || !pubKey) throw new Error("account not found");
+
     const signDoc = {
       bodyBytes: TxBody.encode(
         TxBody.fromPartial({
@@ -142,9 +117,8 @@ export class RpcIml implements Rpc {
       broadcastPollIntervalMs: 300,
       broadcastTimeoutMs: 60_000,
     };
-    const broadcasted = await (
-      await this.getSigner()
-    ).broadcastTx(
+    const signer = await this.getSigner();
+    const broadcasted = await signer.broadcastTx(
       tx,
       defaultSigningClientOptions.broadcastTimeoutMs,
       defaultSigningClientOptions.broadcastPollIntervalMs
@@ -152,5 +126,21 @@ export class RpcIml implements Rpc {
     console.log({ broadcasted });
     //@ts-ignore
     return broadcasted?.data[0]?.data as Uint8Array;
+  }
+
+  private translateTypeUrlHack(service: string, method: string) {
+    return `/${service.replace(".MsgService", "")}.${method}Request`;
+  }
+
+  private async getAccountInfo(address: string) {
+    try {
+      return (
+        await fetch(
+          `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`
+        ).then((res) => res.json())
+      ).account;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
