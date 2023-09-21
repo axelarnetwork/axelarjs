@@ -4,7 +4,7 @@ import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
 import { STANDARD_FEE } from "./constants";
 import { createAxelarRPCClient } from "./rpc-client";
-import { RpcIml } from "./rpc-client/rpcImpl";
+import { RpcImpl } from "./rpc-client/rpcImpl";
 
 describe("rpc client", () => {
   test("broadcast link transaction", async () => {
@@ -22,7 +22,7 @@ describe("rpc client", () => {
     const rpcClient = await createAxelarRPCClient({
       environment: "testnet",
       axelarRpcUrl,
-      rpcImpl: new RpcIml(
+      rpcImpl: new RpcImpl(
         axelarRpcUrl,
         axelarLcdUrl,
         wallet,

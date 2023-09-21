@@ -18,7 +18,7 @@ import Long from "long";
 import { STANDARD_FEE } from "~/constants";
 import { BroadcastTxOptions } from "../types";
 
-export class RpcIml implements Rpc {
+export class RpcImpl implements Rpc {
   protected axelarRpcUrl: string;
   protected axelarLcdUrl: string;
   protected offlineSigner: DirectSecp256k1HdWallet;
@@ -26,6 +26,7 @@ export class RpcIml implements Rpc {
   protected chainId: string;
   protected broadcastOptions?: BroadcastTxOptions;
   protected deliverSuccessCb: (deliverTxResponse: DeliverTxResponse) => any;
+
   constructor(
     axelarRpcUrl: string,
     axelarLcdUrl: string,
@@ -42,19 +43,17 @@ export class RpcIml implements Rpc {
     this.deliverSuccessCb = deliverSuccessCb;
   }
 
-  public async request(
-    service: string,
-    method: string,
-    data: Uint8Array
-  ): Promise<any> {
+  public async request(service: string, method: string, data: Uint8Array) {
     const sender = (await this.offlineSigner.getAccounts())[0]
       ?.address as string;
 
     const account = await this.getAccountInfo(sender);
 
-    const pubKey = (await this.offlineSigner.getAccounts())[0]?.pubkey;
+    const [accData] = await this.offlineSigner.getAccounts();
 
-    if (!account || !pubKey) throw new Error("account not found");
+    if (!account || !accData?.pubkey) {
+      throw new Error("account not found");
+    }
 
     const signDoc = {
       bodyBytes: TxBody.encode(
@@ -74,7 +73,7 @@ export class RpcIml implements Rpc {
             publicKey: {
               typeUrl: "/cosmos.crypto.secp256k1.PubKey",
               value: PubKey.encode({
-                key: pubKey,
+                key: accData.pubkey,
               }).finish(),
             },
             modeInfo: {

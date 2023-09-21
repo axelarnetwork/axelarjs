@@ -53,32 +53,32 @@ import {
   QueryServiceClientImpl as VoteQSCI,
 } from "@axelarjs/proto/axelar/vote/v1beta1/service";
 
-import { createProtobufRpcClient, QueryClient, StdFee } from "@cosmjs/stargate";
+import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
 import { Rpc } from "cosmjs-types/helpers";
 
 export interface AxelarQueryService {
-  query: {
-    readonly axelarnet: AxelarnetQS;
-    readonly evm: EvmQS;
-    readonly multisig: MultisigQS;
-    readonly permission: PermissionQS;
-    readonly nexus: NexusQS;
-    readonly reward: RewardQS;
-    readonly snapshot: SnapshotQS;
-    readonly tss: TSSQS;
-    readonly vote: VoteQS;
-  };
-  broadcast: {
-    readonly axelarnet: AxelarnetMS;
-    readonly evm: EVMMS;
-    readonly multisig: MultisigMS;
-    readonly permission: PermissionMS;
-    readonly nexus: NexusMS;
-    readonly reward: RewardMS;
-    readonly snapshot: SnapshotMS;
-    readonly tss: TSSMS;
-    readonly vote: VoteMS;
-  };
+  query: Readonly<{
+    axelarnet: AxelarnetQS;
+    evm: EvmQS;
+    multisig: MultisigQS;
+    permission: PermissionQS;
+    nexus: NexusQS;
+    reward: RewardQS;
+    snapshot: SnapshotQS;
+    tss: TSSQS;
+    vote: VoteQS;
+  }>;
+  broadcast: Readonly<{
+    axelarnet: AxelarnetMS;
+    evm: EVMMS;
+    multisig: MultisigMS;
+    permission: PermissionMS;
+    nexus: NexusMS;
+    reward: RewardMS;
+    snapshot: SnapshotMS;
+    tss: TSSMS;
+    vote: VoteMS;
+  }>;
 }
 
 export function setupQueryExtension(
@@ -86,6 +86,7 @@ export function setupQueryExtension(
   rpcImpl: Rpc
 ): AxelarQueryService {
   const client = createProtobufRpcClient(base);
+
   return {
     query: {
       axelarnet: new AxelarnetQSCI(client),
