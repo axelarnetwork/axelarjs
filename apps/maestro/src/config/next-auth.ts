@@ -15,6 +15,7 @@ const kvClient = new MaestroKVClient(kv);
 
 // augments the default session type
 declare module "next-auth" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Session extends Web3Session {}
 }
 
@@ -34,10 +35,10 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           placeholder: "0x0",
         },
       },
-      authorize: async (credentials, _req) => {
+      authorize: async (credentials) => {
         if (
           !credentials?.address ||
-          !Boolean(getAddress(credentials?.address!)) ||
+          !getAddress(credentials?.address) ||
           !credentials?.signature
         ) {
           return null;

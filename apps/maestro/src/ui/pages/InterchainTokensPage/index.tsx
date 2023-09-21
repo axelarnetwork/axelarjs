@@ -11,18 +11,13 @@ const useGetMyInterchainTokensQuery =
 const InterchainTokensPage = () => {
   const { data: session } = useSession();
 
-  const accountAddress =
-    session && "address" in session && typeof session.address === "string"
-      ? (session.address as `0x${string}`)
-      : undefined;
-
   const { data } = useGetMyInterchainTokensQuery(
     {
-      sessionAddress: accountAddress as `0x${string}`,
+      sessionAddress: session?.address as `0x${string}`,
     },
     {
       suspense: true,
-      enabled: Boolean(accountAddress),
+      enabled: Boolean(session?.address),
     }
   );
 
@@ -38,7 +33,7 @@ const InterchainTokensPage = () => {
           )}
         </Page.Title>
         <Suspense fallback={<div>Loading...</div>}>
-          <TokenList sessionAddress={accountAddress} />
+          <TokenList sessionAddress={session?.address} />
         </Suspense>
       </div>
     </Page>
