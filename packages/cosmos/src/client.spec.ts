@@ -3,8 +3,7 @@ import { DeliverTxResponse } from "@cosmjs/stargate";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
 import { STANDARD_FEE } from "./constants";
-import { createAxelarRPCClient } from "./rpc-client";
-import { RpcImpl } from "./rpc-client/rpcImpl";
+import { createAxelarRPCTxClient } from "./rpc-client";
 
 describe("rpc client", () => {
   test("broadcast link transaction", async () => {
@@ -15,35 +14,39 @@ describe("rpc client", () => {
       { prefix: "axelar" }
     );
 
-    let response;
+    let response: DeliverTxResponse | undefined;
 
-    const cb = (data: DeliverTxResponse) => (response = data);
+    const onDeliverTxResponse = (data: DeliverTxResponse) => {
+      response = data;
+    };
 
-    const rpcClient = await createAxelarRPCClient({
-      environment: "testnet",
-      axelarRpcUrl,
-      rpcImpl: new RpcImpl(
+    const rpcClient = createAxelarRPCTxClient(
+      {
+        environment: "testnet",
         axelarRpcUrl,
         axelarLcdUrl,
-        wallet,
-        "axelar-testnet-lisbon-3",
-        cb,
-        {
-          fee: STANDARD_FEE,
-          broadcastPollIntervalMs: 300,
-          broadcastTimeoutMs: 60_000,
-        }
-      ),
-    });
+        chainId: "axelar-testnet-lisbon-3",
+        onDeliverTxResponse,
+      },
+      wallet,
+      {
+        fee: STANDARD_FEE,
+        broadcastPollIntervalMs: 300,
+        broadcastTimeoutMs: 60_000,
+      }
+    );
 
-    await rpcClient.broadcast.evm.Link({
-      sender: toAccAddress((await wallet.getAccounts())[0]?.address as string),
+    const [accData] = await wallet.getAccounts();
+
+    const data = await rpcClient.evm.Link({
+      sender: toAccAddress(String(accData?.address)),
       recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       recipientChain: "avalanche",
       asset: "wavax-wei",
       chain: "fantom",
     });
 
-    expect(response).toBeTruthy();
+    expect(response).toBeDefined();
+    expect(data.depositAddr).toBeDefined();
   });
 });

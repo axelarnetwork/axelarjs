@@ -1,114 +1,96 @@
 import {
-  MsgService as AxelarnetMS,
   MsgServiceClientImpl as AxelarnetMSCI,
-  QueryService as AxelarnetQS,
   QueryServiceClientImpl as AxelarnetQSCI,
 } from "@axelarjs/proto/axelar/axelarnet/v1beta1/service";
 import {
-  MsgService as EVMMS,
   MsgServiceClientImpl as EVMMSCI,
-  QueryService as EvmQS,
   QueryServiceClientImpl as EVMQSCI,
 } from "@axelarjs/proto/axelar/evm/v1beta1/service";
 import {
-  MsgService as MultisigMS,
   MsgServiceClientImpl as MultisigMSCI,
-  QueryService as MultisigQS,
   QueryServiceClientImpl as MultisigQSCI,
 } from "@axelarjs/proto/axelar/multisig/v1beta1/service";
 import {
-  MsgService as NexusMS,
   MsgServiceClientImpl as NexusMSCI,
-  QueryService as NexusQS,
   QueryServiceClientImpl as NexusQSCI,
 } from "@axelarjs/proto/axelar/nexus/v1beta1/service";
 import {
-  Msg as PermissionMS,
   MsgClientImpl as PermissionMSCI,
-  Query as PermissionQS,
   QueryClientImpl as PermissionQSCI,
 } from "@axelarjs/proto/axelar/permission/v1beta1/service";
 import {
-  MsgService as RewardMS,
   MsgServiceClientImpl as RewardMSCI,
-  QueryService as RewardQS,
   QueryServiceClientImpl as RewardQSCI,
 } from "@axelarjs/proto/axelar/reward/v1beta1/service";
 import {
-  MsgService as SnapshotMS,
   MsgServiceClientImpl as SnapshotMSCI,
-  QueryService as SnapshotQS,
   QueryServiceClientImpl as SnapshotQSCI,
 } from "@axelarjs/proto/axelar/snapshot/v1beta1/service";
 import {
-  MsgService as TSSMS,
   MsgServiceClientImpl as TSSMSCI,
-  QueryService as TSSQS,
   QueryServiceClientImpl as TSSQSCI,
 } from "@axelarjs/proto/axelar/tss/v1beta1/service";
 import {
-  MsgService as VoteMS,
   MsgServiceClientImpl as VoteMSCI,
-  QueryService as VoteQS,
   QueryServiceClientImpl as VoteQSCI,
 } from "@axelarjs/proto/axelar/vote/v1beta1/service";
 
-import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
-import { Rpc } from "cosmjs-types/helpers";
+import {
+  createProtobufRpcClient,
+  ProtobufRpcClient,
+  QueryClient,
+} from "@cosmjs/stargate";
 
-export interface AxelarQueryService {
-  query: Readonly<{
-    axelarnet: AxelarnetQS;
-    evm: EvmQS;
-    multisig: MultisigQS;
-    permission: PermissionQS;
-    nexus: NexusQS;
-    reward: RewardQS;
-    snapshot: SnapshotQS;
-    tss: TSSQS;
-    vote: VoteQS;
-  }>;
-  broadcast: Readonly<{
-    axelarnet: AxelarnetMS;
-    evm: EVMMS;
-    multisig: MultisigMS;
-    permission: PermissionMS;
-    nexus: NexusMS;
-    reward: RewardMS;
-    snapshot: SnapshotMS;
-    tss: TSSMS;
-    vote: VoteMS;
-  }>;
-}
+const QUERY_SERVICES = {
+  axelarnet: AxelarnetQSCI,
+  evm: EVMQSCI,
+  multisig: MultisigQSCI,
+  permission: PermissionQSCI,
+  nexus: NexusQSCI,
+  reward: RewardQSCI,
+  snapshot: SnapshotQSCI,
+  tss: TSSQSCI,
+  vote: VoteQSCI,
+} as const;
 
-export function setupQueryExtension(
-  base: QueryClient,
-  rpcImpl: Rpc
-): AxelarQueryService {
+const BROADCAST_SERVICES = {
+  axelarnet: AxelarnetMSCI,
+  evm: EVMMSCI,
+  multisig: MultisigMSCI,
+  permission: PermissionMSCI,
+  nexus: NexusMSCI,
+  reward: RewardMSCI,
+  snapshot: SnapshotMSCI,
+  tss: TSSMSCI,
+  vote: VoteMSCI,
+} as const;
+
+type QueryServiceName = keyof typeof QUERY_SERVICES;
+
+type BroadcastServiceName = keyof typeof BROADCAST_SERVICES;
+
+export const setupRpcClientQueryExtensions = (client: ProtobufRpcClient) =>
+  Object.entries(QUERY_SERVICES).reduce(
+    (acc, [key, Ctrl]) => ({ ...acc, [key]: new Ctrl(client) }),
+    {} as {
+      [key in QueryServiceName]: InstanceType<(typeof QUERY_SERVICES)[key]>;
+    }
+  );
+
+export const setupRpcClientBroadcastExtension = (rpcImpl: ProtobufRpcClient) =>
+  Object.entries(BROADCAST_SERVICES).reduce(
+    (acc, [key, Ctrl]) => ({ ...acc, [key]: new Ctrl(rpcImpl) }),
+    {} as {
+      [key in BroadcastServiceName]: InstanceType<
+        (typeof BROADCAST_SERVICES)[key]
+      >;
+    }
+  );
+
+export function setupQueryClientExtension(base: QueryClient) {
   const client = createProtobufRpcClient(base);
 
-  return {
-    query: {
-      axelarnet: new AxelarnetQSCI(client),
-      evm: new EVMQSCI(client),
-      multisig: new MultisigQSCI(client),
-      permission: new PermissionQSCI(client),
-      nexus: new NexusQSCI(client),
-      reward: new RewardQSCI(client),
-      snapshot: new SnapshotQSCI(client),
-      tss: new TSSQSCI(client),
-      vote: new VoteQSCI(client),
-    },
-    broadcast: {
-      axelarnet: new AxelarnetMSCI(rpcImpl),
-      evm: new EVMMSCI(rpcImpl),
-      multisig: new MultisigMSCI(rpcImpl),
-      permission: new PermissionMSCI(rpcImpl),
-      nexus: new NexusMSCI(rpcImpl),
-      reward: new RewardMSCI(rpcImpl),
-      snapshot: new SnapshotMSCI(rpcImpl),
-      tss: new TSSMSCI(rpcImpl),
-      vote: new VoteMSCI(rpcImpl),
-    },
-  };
+  return setupRpcClientQueryExtensions(client);
 }
+
+export type AxelarQueryService = ReturnType<typeof setupQueryClientExtension>;

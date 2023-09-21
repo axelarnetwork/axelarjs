@@ -1,6 +1,6 @@
 # build artifacts
 build/
-/query-client/
+/rpc-client/
 /signing-client/
 *.js
 *.d.ts

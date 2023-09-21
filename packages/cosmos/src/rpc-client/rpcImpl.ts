@@ -25,14 +25,14 @@ export class RpcImpl implements Rpc {
   protected signer?: StargateClient;
   protected chainId: string;
   protected broadcastOptions?: BroadcastTxOptions;
-  protected deliverSuccessCb: (deliverTxResponse: DeliverTxResponse) => any;
+  protected onDeliverTxResponse: (deliverTxResponse: DeliverTxResponse) => void;
 
   constructor(
     axelarRpcUrl: string,
     axelarLcdUrl: string,
     offlineSigner: DirectSecp256k1HdWallet,
     chainId: string,
-    deliverSuccessCb: (deliverTxResponse: DeliverTxResponse) => any,
+    onDeliverTxResponse: (deliverTxResponse: DeliverTxResponse) => void,
     broadcastOptions?: BroadcastTxOptions
   ) {
     this.axelarRpcUrl = axelarRpcUrl;
@@ -40,10 +40,14 @@ export class RpcImpl implements Rpc {
     this.offlineSigner = offlineSigner;
     this.chainId = chainId;
     this.broadcastOptions = broadcastOptions;
-    this.deliverSuccessCb = deliverSuccessCb;
+    this.onDeliverTxResponse = onDeliverTxResponse;
   }
 
-  public async request(service: string, method: string, data: Uint8Array) {
+  public async request(
+    service: string,
+    method: string,
+    data: Uint8Array
+  ): Promise<Uint8Array> {
     const sender = (await this.offlineSigner.getAccounts())[0]
       ?.address as string;
 
@@ -113,7 +117,7 @@ export class RpcImpl implements Rpc {
 
     const deliverTxResponse = await this.broadcastTx(signedTx.tx);
 
-    this.deliverSuccessCb(deliverTxResponse);
+    this.onDeliverTxResponse(deliverTxResponse);
 
     return new Uint8Array();
   }
@@ -129,7 +133,9 @@ export class RpcImpl implements Rpc {
   }
 
   private async broadcastTx(tx: Uint8Array): Promise<DeliverTxResponse> {
-    return (await this.getSigner()).broadcastTx(
+    const signer = await this.getSigner();
+
+    return signer.broadcastTx(
       tx,
       this.broadcastOptions?.broadcastTimeoutMs,
       this.broadcastOptions?.broadcastPollIntervalMs
@@ -140,15 +146,23 @@ export class RpcImpl implements Rpc {
     return `/${service.replace(".MsgService", "")}.${method}Request`;
   }
 
-  private async getAccountInfo(address: string) {
+  private async getAccountInfo(address: string): Promise<
+    | {
+        address: string;
+        account_number: string;
+        sequence: number;
+      }
+    | undefined
+  > {
     try {
-      return (
-        await fetch(
-          `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`
-        ).then((res) => res.json())
-      ).account;
+      const { account } = await fetch(
+        `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`
+      ).then((res) => res.json());
+
+      return account;
     } catch (e) {
       console.log(e);
+      return undefined;
     }
   }
 }
