@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.2.6
+
+### Patch Changes
+
+- [`2d76167d`](https://github.com/axelarnetwork/axelarjs/commit/2d76167d40b2a58d753c585d955e0e77c7c028cf) Thanks [@canhtrinh](https://github.com/canhtrinh)! - fix regression issues related to deposit-address-api rename
+
 ## 0.2.5
 
 ### Patch Changes
