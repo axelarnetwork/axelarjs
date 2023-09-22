@@ -20,6 +20,7 @@ Packages:
 
 Apps:
 
-| app                         | description                     |
-| --------------------------- | ------------------------------- |
-| 🎼 [maestro](/apps/maestro) | Interchain Token Service Portal |
+| app                          | description                     |
+| ---------------------------- | ------------------------------- |
+| 🎼 [maestro](/apps/maestro)  | Interchain Token Service Portal |
+| 🔧 [maestro](/apps/registry) | Axelarjs Chain Registry UI      |
