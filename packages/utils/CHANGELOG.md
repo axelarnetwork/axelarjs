@@ -1,5 +1,11 @@
 # @axelarjs/utils
 
+## 0.1.5
+
+### Patch Changes
+
+- [`c9efbb15`](https://github.com/axelarnetwork/axelarjs/commit/c9efbb1523ca6cf06d56865a0115cf214e16b1c7) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Do not use path aliases in publishable packages
+
 ## 0.1.4
 
 ### Patch Changes

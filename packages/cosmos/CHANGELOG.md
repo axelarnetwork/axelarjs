@@ -1,5 +1,15 @@
 # @axelarjs/cosmos
 
+## 0.2.1
+
+### Patch Changes
+
+- [`c9efbb15`](https://github.com/axelarnetwork/axelarjs/commit/c9efbb1523ca6cf06d56865a0115cf214e16b1c7) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Do not use path aliases in publishable packages
+
+- Updated dependencies [[`c9efbb15`](https://github.com/axelarnetwork/axelarjs/commit/c9efbb1523ca6cf06d56865a0115cf214e16b1c7)]:
+  - @axelarjs/proto@0.34.4
+  - @axelarjs/utils@0.1.5
+
 ## 0.2.0
 
 ### Minor Changes
