@@ -11,12 +11,14 @@
   },
   "files": [
     "./build",
-    "./query-client",
-    "./signing-client",
+    "./rpc",
+    "./stargate",
     "./constants.js",
-    "./utils.js",
+    "./constants.d.ts",
     "./types.js",
-    "./index.js"
+    "./types.d.ts",
+    "./index.js",
+    "./index.d.ts"
   ],
   "type": "module",
   "exports": {
@@ -28,13 +30,21 @@
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
     },
-    "./signing-client": {
-      "import": "./build/module/signing-client/index.js",
-      "require": "./build/commonjs/signing-client/index.js"
+    "./rpc": {
+      "import": "./build/module/rpc/index.js",
+      "require": "./build/commonjs/rpc/index.js"
     },
-    "./query-client": {
-      "import": "./build/module/query-client/index.js",
-      "require": "./build/commonjs/query-client/index.js"
+    "./rpc/*": {
+      "import": "./build/module/rpc/*.js",
+      "require": "./build/commonjs/rpc/*.js"
+    },
+    "./stargate": {
+      "import": "./build/module/stargate/index.js",
+      "require": "./build/commonjs/stargate/index.js"
+    },
+    "./stargate/*": {
+      "import": "./build/module/stargate/*.js",
+      "require": "./build/commonjs/stargate/*.js"
     }
   },
   "scripts": {

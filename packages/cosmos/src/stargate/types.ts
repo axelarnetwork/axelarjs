@@ -26,7 +26,7 @@ export type PickType<TObject, TPicked> = Pick<
   >
 >;
 
-export type ProtoPackageAndMessages<T extends { protobufPackage: any }> = {
+export type ProtoPackageAndMessages<T extends { protobufPackage: string }> = {
   protobufPackage: T["protobufPackage"];
 } & PickType<T, TsProtoGeneratedType>;
 

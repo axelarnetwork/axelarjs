@@ -1,6 +1,6 @@
 # build artifacts
 build/
-/rpc-client/
+/rpc/
 /stargate/
 *.js
 *.d.ts
