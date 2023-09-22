@@ -1,5 +1,11 @@
 # @axelarjs/cosmos
 
+## 0.2.0
+
+### Minor Changes
+
+- [`f6a6c66b`](https://github.com/axelarnetwork/axelarjs/commit/f6a6c66bdd347b4e7453c07bf2360a97dbdaefde) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Update @axelarjs/cosmos package structure
+
 ## 0.1.6
 
 ### Patch Changes
