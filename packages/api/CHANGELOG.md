@@ -1,5 +1,14 @@
 # @axelarjs/api
 
+## 0.2.7
+
+### Patch Changes
+
+- [`59d3ff8f`](https://github.com/axelarnetwork/axelarjs/commit/59d3ff8fa77fefe3639a8fb1f7cf3263162c360e) Thanks [@canhtrinh](https://github.com/canhtrinh)! - bumping all dependencies
+
+- Updated dependencies [[`59d3ff8f`](https://github.com/axelarnetwork/axelarjs/commit/59d3ff8fa77fefe3639a8fb1f7cf3263162c360e)]:
+  - @axelarjs/core@0.2.5
+
 ## 0.2.6
 
 ### Patch Changes
