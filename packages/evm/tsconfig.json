@@ -2,10 +2,6 @@
   "extends": "@axelarjs/config/tsconfig.strictest",
   "include": ["src", "scripts"],
   "compilerOptions": {
-    "module": "ESNext",
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "module": "ESNext"
   }
 }

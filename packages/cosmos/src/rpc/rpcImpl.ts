@@ -15,7 +15,7 @@ import {
 import { Rpc } from "cosmjs-types/helpers";
 import Long from "long";
 
-import { STANDARD_FEE } from "~/constants";
+import { STANDARD_FEE } from "../constants";
 import { BroadcastTxOptions } from "../types";
 
 export class RpcImpl implements Rpc {

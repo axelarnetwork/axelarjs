@@ -3,10 +3,6 @@
   "include": ["src"],
   "compilerOptions": {
     "declaration": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./src/*"]
-    },
     "types": ["vitest/globals"],
     "target": "es2020"
   }
