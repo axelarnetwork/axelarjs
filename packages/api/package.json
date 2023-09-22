@@ -14,7 +14,7 @@
     "./axelarscan",
     "./axelar-query",
     "./gmp",
-    "./deposit-address-api",
+    "./deposit-address",
     "./axelar-config",
     "./index.js",
     "./index.d.ts"

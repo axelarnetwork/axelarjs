@@ -1,6 +1,6 @@
 import { createAxelarConfigBrowserClient } from "@axelarjs/api/axelar-config/browser";
 import { createAxelarscanBrowserClient } from "@axelarjs/api/axelarscan/browser";
-import { createDepositAddressApiBrowserClient } from "@axelarjs/api/deposit-address-api/browser";
+import { createDepositAddressApiBrowserClient } from "@axelarjs/api/deposit-address/browser";
 import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 
 import { getDepositAddress } from "./getDepositAddress";

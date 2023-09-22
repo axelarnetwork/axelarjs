@@ -3,7 +3,7 @@ import type {
   AxelarscanClient,
   GMPClient,
 } from "@axelarjs/api";
-import { type DepositAddressClient } from "@axelarjs/api/deposit-address-api/isomorphic";
+import { type DepositAddressClient } from "@axelarjs/api/deposit-address/isomorphic";
 import { type Environment } from "@axelarjs/core";
 
 export type SendOptions = {
