@@ -6,7 +6,7 @@ import {
 } from "@axelarjs/api";
 import { isStrEqual, poll } from "@axelarjs/utils";
 
-import type { GetDepositAddressDependencies, SendOptions } from "~/types";
+import type { GetDepositAddressDependencies, SendOptions } from "../types";
 import { createDummyAccount, signOtc } from "./account";
 
 export type ListenerParams = {

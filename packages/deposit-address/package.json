@@ -32,6 +32,10 @@
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
     },
+    "./helpers": {
+      "import": "./build/module/helpers/index.js",
+      "require": "./build/commonjs/helpers/index.js"
+    },
     "./helpers/*": {
       "import": "./build/module/helpers/*.js",
       "require": "./build/commonjs/helpers/*.js"
