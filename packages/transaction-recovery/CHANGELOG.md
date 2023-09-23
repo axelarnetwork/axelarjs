@@ -1,5 +1,16 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.16
+
+### Patch Changes
+
+- [`a7457a7b`](https://github.com/axelarnetwork/axelarjs/commit/a7457a7b5ad7d0b5bcc1dfcf483dc335ea61cb86) Thanks [@canhtrinh](https://github.com/canhtrinh)! - update build settings for deposit-address module
+
+- Updated dependencies [[`a7457a7b`](https://github.com/axelarnetwork/axelarjs/commit/a7457a7b5ad7d0b5bcc1dfcf483dc335ea61cb86)]:
+  - @axelarjs/api@0.2.8
+  - @axelarjs/core@0.2.6
+  - @axelarjs/cosmos@0.2.3
+
 ## 0.1.15
 
 ### Patch Changes
