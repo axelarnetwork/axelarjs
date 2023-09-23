@@ -1,5 +1,11 @@
 # @axelarjs/deposit-address
 
+## 0.0.11
+
+### Patch Changes
+
+- [`f097e92c`](https://github.com/axelarnetwork/axelarjs/commit/f097e92c51cb29998e39a14928ef57652bac6814) Thanks [@canhtrinh](https://github.com/canhtrinh)! - making isolated build for browser client of deposit-address module
+
 ## 0.0.10
 
 ### Patch Changes
