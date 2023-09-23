@@ -1,2 +1,2 @@
-export * from "./browser";
-export * from "./node";
+export * from "./isomorphicDepositAddress";
+export { default } from "./node";

@@ -3,10 +3,10 @@ import { createAxelarscanBrowserClient } from "@axelarjs/api/axelarscan/browser"
 import { createDepositAddressApiBrowserClient } from "@axelarjs/api/deposit-address/browser";
 import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
 
-import { getDepositAddress } from "./getDepositAddress";
+import { getDepositAddress } from "./isomorphicDepositAddress";
 import type { SendOptions } from "./types";
 
-export default function getDepositAddressBrowser(params: SendOptions) {
+export function getDepositAddressBrowser(params: SendOptions) {
   const { environment } = params;
 
   return getDepositAddress(params, {
@@ -16,3 +16,5 @@ export default function getDepositAddressBrowser(params: SendOptions) {
     axelarscanClient: createAxelarscanBrowserClient(environment),
   });
 }
+
+export default getDepositAddressBrowser;
