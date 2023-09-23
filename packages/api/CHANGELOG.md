@@ -1,5 +1,14 @@
 # @axelarjs/api
 
+## 0.2.8
+
+### Patch Changes
+
+- [`a7457a7b`](https://github.com/axelarnetwork/axelarjs/commit/a7457a7b5ad7d0b5bcc1dfcf483dc335ea61cb86) Thanks [@canhtrinh](https://github.com/canhtrinh)! - update build settings for deposit-address module
+
+- Updated dependencies [[`a7457a7b`](https://github.com/axelarnetwork/axelarjs/commit/a7457a7b5ad7d0b5bcc1dfcf483dc335ea61cb86)]:
+  - @axelarjs/core@0.2.6
+
 ## 0.2.7
 
 ### Patch Changes
