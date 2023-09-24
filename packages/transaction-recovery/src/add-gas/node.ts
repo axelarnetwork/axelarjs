@@ -1,10 +1,9 @@
 import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
+import { AxelarSigningStargateClient } from "@axelarjs/cosmos";
 
-import { SigningStargateClient } from "@cosmjs/stargate";
-
-import type { AddGasParams } from "~/types";
+import type { AddGasParams } from "../types";
 import { addGas } from "./isomorphic";
 
 export function addGasNode(params: AddGasParams) {
@@ -14,7 +13,7 @@ export function addGasNode(params: AddGasParams) {
     axelarQueryClient: createAxelarQueryNodeClient(environment, {}),
     configClient: createAxelarConfigNodeClient(environment),
     gmpClient: createGMPNodeClient(environment),
-    getSigningStargateClient: SigningStargateClient.connectWithSigner,
+    getSigningStargateClient: AxelarSigningStargateClient.connectWithSigner,
   });
 }
 

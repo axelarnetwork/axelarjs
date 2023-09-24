@@ -16,9 +16,11 @@ export const useIntervalAsync = <TCallback extends GenericFunction>(
   useEffect(() => {
     const tick = () => savedCallback.current();
     if (typeof delay === "number") {
-      //@ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       intervalRef.current = window.setInterval(tick, delay);
-      //@ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return () => window.clearInterval(intervalRef.current);
     }
   }, [delay]);

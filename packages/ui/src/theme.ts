@@ -29,7 +29,7 @@ export const SIZE_VARIANTS: SizeVariant[] = ["xs", "sm", "md", "lg"];
  * @param variant - The variant to check
  * @returns - True if the variant is a valid color variant
  */
-export const isColorVariant = (variant: any): variant is ColorVariant =>
+export const isColorVariant = (variant: string): variant is ColorVariant =>
   COLOR_VARIANTS.includes(variant as ColorVariant);
 
 /**
@@ -37,5 +37,5 @@ export const isColorVariant = (variant: any): variant is ColorVariant =>
  * @param variant - The variant to check
  * @returns - True if the variant is a valid size variant
  */
-export const isSizeVariant = (variant: any): variant is SizeVariant =>
+export const isSizeVariant = (variant: string): variant is SizeVariant =>
   SIZE_VARIANTS.includes(variant as SizeVariant);
