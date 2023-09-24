@@ -10,7 +10,7 @@ export function addGasBrowser(params: AddGasParams) {
   const { environment } = params.sendOptions;
 
   return addGas(params, {
-    axelarQueryClient: createAxelarQueryBrowserClient(environment, {}),
+    axelarQueryClient: createAxelarQueryBrowserClient(environment),
     configClient: createAxelarConfigBrowserClient(environment),
     gmpClient: createGMPBrowserClient(environment),
     getSigningStargateClient: AxelarSigningStargateClient.connectWithSigner,

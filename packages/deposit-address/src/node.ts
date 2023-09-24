@@ -3,7 +3,7 @@ import { createAxelarscanNodeClient } from "@axelarjs/api/axelarscan/node";
 import { createDepositAddressApiNodeClient } from "@axelarjs/api/deposit-address/node";
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 
-import { getDepositAddress } from "./isomorphicDepositAddress";
+import { getDepositAddress } from "./isomorphic";
 import type { SendOptions } from "./types";
 
 export function getDepositAddressNode(params: SendOptions) {

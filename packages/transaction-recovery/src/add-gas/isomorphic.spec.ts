@@ -2,6 +2,7 @@ import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 import { ENVIRONMENTS } from "@axelarjs/core";
+import { AxelarSigningStargateClient } from "@axelarjs/cosmos";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
@@ -42,6 +43,7 @@ describe("addGas - (isomorphic)", () => {
     axelarQueryClient: createAxelarQueryNodeClient(ENVIRONMENTS.testnet),
     configClient: createAxelarConfigNodeClient(ENVIRONMENTS.testnet),
     gmpClient: createGMPNodeClient(ENVIRONMENTS.testnet),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getSigningStargateClient: mockGetSigningStargateClient as any,
   };
 
