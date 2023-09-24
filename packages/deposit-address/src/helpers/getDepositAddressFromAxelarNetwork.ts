@@ -1,8 +1,8 @@
-import {
-  type AxelarscanClient,
-  type ChainConfigsResponse,
-  type DepositAddressClient,
-  type LinkRequestResponse,
+import type {
+  AxelarscanClient,
+  ChainConfigsResponse,
+  DepositAddressClient,
+  LinkRequestResponse,
 } from "@axelarjs/api";
 import { isStrEqual, poll } from "@axelarjs/utils";
 

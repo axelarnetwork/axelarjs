@@ -269,7 +269,7 @@ export type GetGasPriceResponse = BaseGMPResponse<{
 
 // GetGMPStatistics
 
-type BaseStats<T = {}> = T & {
+type BaseStats<T = Record<string, unknown>> = T & {
   key: string;
   num_txs: number;
 };
