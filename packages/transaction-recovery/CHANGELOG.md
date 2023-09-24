@@ -1,5 +1,15 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.17
+
+### Patch Changes
+
+- [#59](https://github.com/axelarnetwork/axelarjs/pull/59) [`72df92de`](https://github.com/axelarnetwork/axelarjs/commit/72df92de09c0d41156708ce3f93263c039370675) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Introduce typesafe native cosmos messages via AxelarSigningStargateClient
+
+- Updated dependencies [[`72df92de`](https://github.com/axelarnetwork/axelarjs/commit/72df92de09c0d41156708ce3f93263c039370675)]:
+  - @axelarjs/api@0.2.9
+  - @axelarjs/cosmos@0.2.4
+
 ## 0.1.16
 
 ### Patch Changes
