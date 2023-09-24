@@ -28,6 +28,13 @@ describe("addGas - (isomorphic)", () => {
   const mockGetSigningStargateClient = vi.fn(() =>
     Promise.resolve({
       signAndBroadcast: vi.fn().mockImplementation(mockSignAndBroadcast),
+      messages: {
+        ibcTransfer: {
+          transfer: {
+            signAndBroadcast: vi.fn().mockImplementation(mockSignAndBroadcast),
+          },
+        },
+      },
     })
   );
 
