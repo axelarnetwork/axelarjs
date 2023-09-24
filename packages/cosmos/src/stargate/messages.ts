@@ -27,7 +27,11 @@ import type {
   SigningStargateClient,
   StdFee,
 } from "@cosmjs/stargate";
+// comsmos messages
+
 import type { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import * as ibcFee from "cosmjs-types/ibc/applications/fee/v1/tx";
+import * as ibcTransfer from "cosmjs-types/ibc/applications/transfer/v1/tx";
 import { camelize } from "inflection";
 
 import type {
@@ -45,6 +49,9 @@ export const TRACKED_MODULES = {
   snapshot,
   tss,
   vote,
+  // cosmos messages
+  ibcFee,
+  ibcTransfer,
 };
 
 type TrackedModules = typeof TRACKED_MODULES;
@@ -91,7 +98,7 @@ const createMsgMethodClient =
   (client: SigningStargateClient, module: { protobufPackage: string }) =>
   <T extends Record<string, unknown>>(acc: T, [method]: [string, string]) => ({
     ...acc,
-    [camelize(method, true).replace("Request", "")]: {
+    [camelize(method.replace(/Request$/, "").replace(/^Msg/, ""), true)]: {
       signAndBroadcast: (
         senderAddress: string,
         message: EncodeObject["value"],
@@ -154,7 +161,10 @@ export const createMsgClient = (baseClient: SigningStargateClient) =>
         .filter(
           ([method, value]) =>
             isTsProtoGeneratedType(value as GeneratedType) &&
-            method.endsWith("Request")
+            (method.endsWith("Request") ||
+              (method.startsWith("Msg") &&
+                !method.endsWith("Response") &&
+                !method.endsWith("Impl")))
         )
         .reduce(
           createMsgMethodClient(baseClient, module),
