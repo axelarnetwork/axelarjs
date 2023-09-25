@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export type GenericFunction = (...args: any[]) => any;
+export type GenericFunction = (...args: unknown[]) => unknown;
 
 export const useIntervalAsync = <TCallback extends GenericFunction>(
   callback: TCallback,

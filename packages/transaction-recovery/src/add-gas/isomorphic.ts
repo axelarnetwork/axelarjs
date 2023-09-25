@@ -47,7 +47,7 @@ export async function addGas(
   const { rpc, channelIdToAxelar } = chainConfig.cosmosConfigs;
 
   const [tx] = await dependencies.gmpClient
-    .searchGMP({ txHash: params.txHash })
+    .searchGMP({ txHash: params.txHash as `0x${string}` })
     .catch(() => []);
 
   if (!tx) {
