@@ -2,7 +2,6 @@ import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
 import { ENVIRONMENTS } from "@axelarjs/core";
-import { AxelarSigningStargateClient } from "@axelarjs/cosmos";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
