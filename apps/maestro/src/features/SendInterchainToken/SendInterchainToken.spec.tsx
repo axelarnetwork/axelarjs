@@ -91,7 +91,7 @@ vi.mock("~/ui/components/EVMChainsDropdown/index.ts", () => ({
 }));
 
 describe("SendInterchainToken", () => {
-  it("should render correctly", async () => {
+  it("should render correctly", () => {
     const { ...screen } = render(
       <SendInterchainToken
         tokenAddress="0x00"

@@ -102,10 +102,10 @@ const Review: FC = () => {
           <Dialog.CloseAction
             length="block"
             variant="primary"
-            onClick={() => {
+            onClick={async () => {
               setShouldFetch(true);
               // refresh the page to show the new token
-              router.replace(router.asPath);
+              await router.replace(router.asPath);
             }}
           >
             View token page!
@@ -115,7 +115,7 @@ const Review: FC = () => {
             length="block"
             variant="primary"
             disabled={!chain?.name || state.txState.type !== "deployed"}
-            onClick={() => {
+            onClick={async () => {
               if (chain && state.txState.type === "deployed") {
                 setRemoteTokenDeploymentTxHash(
                   state.txState.tokenAddress,
@@ -127,7 +127,7 @@ const Review: FC = () => {
                   )
                 );
 
-                router.push(
+                await router.push(
                   `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
                 );
 

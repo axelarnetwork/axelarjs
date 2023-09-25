@@ -21,11 +21,15 @@ import NProgressBar from "~/ui/layouts/NProgressBar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 
-initTelemetryAsync().then((initialized) => {
-  if (initialized) {
-    logger.info("Telemetry initialized");
-  }
-});
+initTelemetryAsync()
+  .then((initialized) => {
+    if (initialized) {
+      logger.info("Telemetry initialized");
+    }
+  })
+  .catch((error) => {
+    logger.error(error);
+  });
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server

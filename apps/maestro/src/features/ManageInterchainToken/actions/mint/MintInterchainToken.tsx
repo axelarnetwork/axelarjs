@@ -61,7 +61,7 @@ export const MintInterchainToken: FC = () => {
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Failed to mint tokens: ${error.cause.shortMessage}`);
-        logger.error(`Failed to mint tokens: ${error.cause}`);
+        logger.error(`Failed to mint tokens: ${error.cause.message}`);
 
         setTxState({
           status: "idle",

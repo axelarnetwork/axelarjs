@@ -70,7 +70,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
         await kvClient.incrementAccountNonce(address);
 
         return {
-          id: address as `0x${string}`,
+          id: address,
         };
       },
     }),

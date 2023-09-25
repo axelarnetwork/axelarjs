@@ -54,7 +54,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
       },
       {
         tokenAddress: address,
-        sourceChainId: sourceChain?.id as string,
+        sourceChainId: sourceChain.id,
         expectedTokenId: expectedTokenId as `0x${string}`,
         tokenName,
         tokenSymbol,

@@ -26,12 +26,12 @@ const InterchainTokensPage: FC = () => {
     isError,
   } = useInterchainTokensQuery({
     chainId: routeChain?.id,
-    tokenAddress: tokenAddress as `0x${string}`,
+    tokenAddress,
   });
 
   const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: routeChain?.id,
-    tokenAddress: tokenAddress as `0x${string}`,
+    tokenAddress,
   });
 
   if (!isAddress(tokenAddress)) {

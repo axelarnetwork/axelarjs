@@ -12,7 +12,7 @@ vi.doMock("@web3modal/react", () => ({
 }));
 
 describe("ConnectWalletButton", () => {
-  it("should render correctly", async () => {
+  it("should render correctly", () => {
     mocks.useWeb3Modal.mockReturnValue({
       open: vi.fn(),
     });
@@ -41,6 +41,8 @@ describe("ConnectWalletButton", () => {
 
     getByTestId("connect-button").click();
 
-    waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(open).toHaveBeenCalledTimes(1);
+    });
   });
 });

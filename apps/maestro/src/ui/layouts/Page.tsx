@@ -82,7 +82,7 @@ const Page = ({
   const router = useRouter();
 
   const handleTokenFound = useCallback(
-    (result: {
+    async (result: {
       tokenAddress: string;
       tokenId?: string;
       chainName?: string;
@@ -90,7 +90,9 @@ const Page = ({
       if (!result?.chainName) {
         return;
       }
-      router.push(`/${sluggify(result.chainName)}/${result?.tokenAddress}`);
+      await router.push(
+        `/${sluggify(result.chainName)}/${result?.tokenAddress}`
+      );
     },
     [router]
   );

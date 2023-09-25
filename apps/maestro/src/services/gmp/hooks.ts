@@ -17,7 +17,7 @@ export function useSearchGMPQuery(params: SearchGMPParams) {
 }
 
 export function useContractsQuery() {
-  return useQuery(["gmp-contracts"], gmpClient.getContracts);
+  return useQuery(["gmp-contracts"], gmpClient.getContracts.bind(null));
 }
 
 export function useInterchainTokensQuery(input: {

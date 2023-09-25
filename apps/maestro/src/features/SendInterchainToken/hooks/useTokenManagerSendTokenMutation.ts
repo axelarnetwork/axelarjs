@@ -121,7 +121,9 @@ export function useTokenManagerSendTokenMutation(
       }
 
       if (approveERC20Recepit && !sendTokenData?.hash) {
-        sendToken();
+        sendToken().catch((error) => {
+          logger.error("Failed to send token:", error);
+        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

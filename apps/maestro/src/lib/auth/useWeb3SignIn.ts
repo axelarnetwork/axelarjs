@@ -89,7 +89,7 @@ export function useWeb3SignIn({
   });
 
   const unwatch = watchAccount(
-    debounce(({ address }) => {
+    debounce(async ({ address }) => {
       if (
         enabled === false ||
         isSigningInRef.current ||
@@ -108,7 +108,7 @@ export function useWeb3SignIn({
       }
 
       unwatch();
-      signInWithWeb3Async(address);
+      await signInWithWeb3Async(address);
     }, 150)
   );
 

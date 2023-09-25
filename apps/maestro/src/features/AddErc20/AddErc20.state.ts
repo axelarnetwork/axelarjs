@@ -8,6 +8,7 @@ import { uniq, without } from "rambda";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
+import { logger } from "~/lib/logger";
 import {
   hex40Literal,
   hex64Literal,
@@ -55,7 +56,9 @@ export const INITIAL_STATE = {
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
-  onDeployTxHash: (_txHash: `0x${string}`) => {},
+  onDeployTxHash: (txHash: `0x${string}`) => {
+    logger.log("onDeployTxHash", txHash);
+  },
 };
 
 export type AddErc20State = typeof INITIAL_STATE;

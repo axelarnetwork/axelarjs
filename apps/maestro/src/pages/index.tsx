@@ -20,11 +20,11 @@ export default function Home() {
   const [layoutState, layoutActions] = useLayoutStateContainer();
 
   const handleTokenFound = useCallback(
-    (result: { tokenAddress: string; tokenId?: string }) => {
+    async (result: { tokenAddress: string; tokenId?: string }) => {
       if (!chain) {
         return;
       }
-      router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
+      await router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
     },
     [chain, router]
   );
