@@ -3,7 +3,7 @@
 import React from "react";
 
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { vi } from "vitest";
 
 import ConnectWalletButton from "./ConnectWalletButton";
 
