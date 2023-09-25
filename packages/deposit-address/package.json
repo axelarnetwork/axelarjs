@@ -16,7 +16,8 @@
     "./browser.js",
     "./browser.d.ts",
     "./node.js",
-    "./node.d.ts"
+    "./node.d.ts",
+    "./get-deposit-address"
   ],
   "exports": {
     ".": {
