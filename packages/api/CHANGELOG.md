@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.2.11
+
+### Patch Changes
+
+- [`4b3af121`](https://github.com/axelarnetwork/axelarjs/commit/4b3af121ead0b04685252f0aad8cbc36d7472766) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix module exports
+
 ## 0.2.10
 
 ### Patch Changes
