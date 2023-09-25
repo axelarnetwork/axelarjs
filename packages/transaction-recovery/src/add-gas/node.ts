@@ -13,7 +13,10 @@ export function addGasNode(params: AddGasParams) {
     axelarQueryClient: createAxelarQueryNodeClient(environment, {}),
     configClient: createAxelarConfigNodeClient(environment),
     gmpClient: createGMPNodeClient(environment),
-    getSigningStargateClient: AxelarSigningStargateClient.connectWithSigner,
+    getSigningStargateClient:
+      AxelarSigningStargateClient.connectWithSigner.bind(
+        AxelarSigningStargateClient
+      ),
   });
 }
 

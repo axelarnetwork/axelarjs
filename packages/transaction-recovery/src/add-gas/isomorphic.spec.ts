@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
 import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
 import { createGMPNodeClient } from "@axelarjs/api/gmp/node";

@@ -13,7 +13,10 @@ export function addGasBrowser(params: AddGasParams) {
     axelarQueryClient: createAxelarQueryBrowserClient(environment),
     configClient: createAxelarConfigBrowserClient(environment),
     gmpClient: createGMPBrowserClient(environment),
-    getSigningStargateClient: AxelarSigningStargateClient.connectWithSigner,
+    getSigningStargateClient:
+      AxelarSigningStargateClient.connectWithSigner.bind(
+        AxelarSigningStargateClient
+      ),
   });
 }
 
