@@ -62,4 +62,5 @@ export function createAxelarRPCTxClient(
   );
 }
 
-export const createAxelarRPCQueryClient = AxelarQueryClient.init;
+export const createAxelarRPCQueryClient =
+  AxelarQueryClient.init.bind(AxelarQueryClient);

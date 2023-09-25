@@ -9,7 +9,7 @@ import {
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("signing client", () => {
-  test("default registry", async () => {
+  test("default registry", () => {
     const { registry } = getSigningAxelarClientOptions();
 
     expect(registry).toBeDefined();

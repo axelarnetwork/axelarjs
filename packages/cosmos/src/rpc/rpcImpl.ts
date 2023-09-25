@@ -18,6 +18,12 @@ import Long from "long";
 import { STANDARD_FEE } from "../constants";
 import { BroadcastTxOptions } from "../types";
 
+type AccountData = {
+  address: string;
+  account_number: string;
+  sequence: number;
+};
+
 export class RpcImpl implements Rpc {
   protected axelarRpcUrl: string;
   protected axelarLcdUrl: string;
@@ -149,20 +155,15 @@ export class RpcImpl implements Rpc {
     return `/${service.replace(".MsgService", "")}.${method}Request`;
   }
 
-  private async getAccountInfo(address: string): Promise<
-    | {
-        address: string;
-        account_number: string;
-        sequence: number;
-      }
-    | undefined
-  > {
+  private async getAccountInfo(address: string) {
     try {
-      const { account } = await fetch(
+      const result = await fetch(
         `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`
-      ).then((res) => res.json());
+      )
+        .then((res) => res.json() as Promise<{ account: AccountData }>)
+        .catch(() => undefined);
 
-      return account;
+      return result?.account;
     } catch (e) {
       console.log(e);
       return undefined;

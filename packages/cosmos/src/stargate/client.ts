@@ -41,7 +41,7 @@ import {
   createAminoTypeNameFromProtoTypeUrl,
 } from "./utils";
 
-type ProtobufModule = Record<string, GeneratedType | unknown> & {
+type ProtobufModule = Record<string, unknown> & {
   protobufPackage: string;
 };
 

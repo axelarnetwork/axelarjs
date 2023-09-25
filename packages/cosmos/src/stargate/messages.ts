@@ -109,6 +109,7 @@ const createMsgMethodClient =
           [
             {
               typeUrl: `/${module.protobufPackage}.${method}`,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               value: message,
             },
           ],
@@ -126,6 +127,7 @@ const createMsgMethodClient =
           [
             {
               typeUrl: `/${module.protobufPackage}.${method}`,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               value: message,
             },
           ],
@@ -144,6 +146,7 @@ const createMsgMethodClient =
           [
             {
               typeUrl: `/${module.protobufPackage}.${method}`,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               value: message,
             },
           ],

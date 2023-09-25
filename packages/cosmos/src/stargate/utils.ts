@@ -41,7 +41,7 @@ export const convertToSnakeCaseDeep = (obj: UnknownRecord): any => {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => convertToSnakeCaseDeep(item));
+    return obj.map(convertToSnakeCaseDeep);
   }
 
   const newObj: UnknownRecord = {};
@@ -60,7 +60,7 @@ export const convertToCamelCaseDeep = (obj: UnknownRecord): any => {
     return obj;
   }
   if (Array.isArray(obj)) {
-    return obj.map((item) => convertToCamelCaseDeep(item));
+    return obj.map(convertToCamelCaseDeep);
   }
 
   const newObj: UnknownRecord = {};
