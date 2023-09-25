@@ -1,5 +1,14 @@
 # @axelarjs/transaction-recovery
 
+## 0.1.18
+
+### Patch Changes
+
+- [`15f35e76`](https://github.com/axelarnetwork/axelarjs/commit/15f35e762ce7506ebb80db9eaba6b2f0ad142814) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Standardize isomorphic client package exports
+
+- Updated dependencies [[`15f35e76`](https://github.com/axelarnetwork/axelarjs/commit/15f35e762ce7506ebb80db9eaba6b2f0ad142814)]:
+  - @axelarjs/api@0.2.10
+
 ## 0.1.17
 
 ### Patch Changes
