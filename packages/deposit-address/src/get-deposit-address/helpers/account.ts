@@ -4,7 +4,7 @@ import {
   type PrivateKeyAccount,
 } from "viem/accounts";
 
-export async function createDummyAccount() {
+export function createDummyAccount() {
   if (!globalThis.sessionStorage)
     return privateKeyToAccount(generatePrivateKey());
 

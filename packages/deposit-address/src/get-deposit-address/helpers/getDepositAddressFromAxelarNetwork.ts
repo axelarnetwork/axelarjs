@@ -86,7 +86,7 @@ async function triggerGetDepositAddressFromAxelar(
   params: SendOptions,
   depositAddressClient: DepositAddressClient
 ) {
-  const account = await createDummyAccount();
+  const account = createDummyAccount();
   const publicAddress = account.address;
   const { validationMsg } = await depositAddressClient.getOTC({
     signerAddress: publicAddress,
