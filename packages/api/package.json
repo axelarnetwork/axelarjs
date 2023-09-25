@@ -53,8 +53,8 @@
       "require": "./build/commonjs/axelar-config/*.js"
     },
     "./deposit-address/*": {
-      "import": "./build/module/deposit-address/index.js",
-      "require": "./build/commonjs/deposit-address/index.js"
+      "import": "./build/module/deposit-address/*.js",
+      "require": "./build/commonjs/deposit-address/*.js"
     },
     ".": {
       "import": "./build/module/*.js",

@@ -17,6 +17,8 @@
     "./browser.d.ts",
     "./node.js",
     "./node.d.ts",
+    "./types.js",
+    "./types.d.ts",
     "./get-deposit-address"
   ],
   "exports": {
