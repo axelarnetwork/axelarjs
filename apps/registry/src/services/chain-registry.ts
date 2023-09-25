@@ -74,9 +74,11 @@ export async function getNormalizedChainConfigs({
 }) {
   const url = chainsUrl(network);
   const res = await fetch(url, { next: { revalidate: 60 } });
-  const { chains } = await res.json();
+  const { chains } = ((await res.json()) ?? {}) as {
+    chains: (EVMChainConfig | CosmosChainConfig)[];
+  };
 
-  return ((chains ?? []) as (EVMChainConfig | CosmosChainConfig)[])
+  return (chains ?? [])
     .map(
       (config) =>
         ({
