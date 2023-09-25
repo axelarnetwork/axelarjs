@@ -84,7 +84,7 @@
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rimraf": "^5.0.1",
+    "rimraf": "^5.0.4",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
     "vitest": "^0.34.5"
