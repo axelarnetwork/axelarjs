@@ -1,12 +1,6 @@
 {
-  "extends": "@tsconfig/strictest",
+  "extends": "./packages/config/tsconfig.strictest.json",
   "compilerOptions": {
-    "noEmit": true,
-    "target": "ES2019",
-    "lib": ["ES2021", "DOM"],
-    "ignoreDeprecations": "5.0",
-    "verbatimModuleSyntax": false,
-    "jsx": "react-jsx",
-    "moduleResolution": "node"
+    "noEmit": true
   }
 }
