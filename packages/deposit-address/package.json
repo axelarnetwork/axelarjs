@@ -11,17 +11,12 @@
   },
   "files": [
     "./build",
-    "./helpers",
-    "./browser.js",
-    "./browser.d.ts",
-    "./isomorphic.js",
-    "./isomorphic.d.ts",
     "./index.js",
     "./index.d.ts",
+    "./browser.js",
+    "./browser.d.ts",
     "./node.js",
-    "./node.d.ts",
-    "./types.js",
-    "./types.d.ts"
+    "./node.d.ts"
   ],
   "exports": {
     ".": {
@@ -31,14 +26,6 @@
     "./*": {
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
-    },
-    "./helpers": {
-      "import": "./build/module/helpers/index.js",
-      "require": "./build/commonjs/helpers/index.js"
-    },
-    "./helpers/*": {
-      "import": "./build/module/helpers/*.js",
-      "require": "./build/commonjs/helpers/*.js"
     }
   },
   "scripts": {
