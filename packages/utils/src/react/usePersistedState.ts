@@ -10,6 +10,7 @@ export function usePersistedState<T>(
   defaultValue: T
 ): readonly [T, (valueOrProducerFn: T | ((draft: Draft<T>) => void)) => void] {
   const [state, _setState] = useState<T>(() =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     Maybe.of(storage.getItem(key)).mapOr(defaultValue, JSON.parse)
   );
 
