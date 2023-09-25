@@ -1,10 +1,9 @@
 # @axelarjs
 
 ![build & test workflow](https://github.com/axelarnetwork/axelarjs/actions/workflows/test.yml/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](/LICENSE)
 
 Axelar Network foundations for Javascript/Typescript application development
-
-:building_construction: under construction :building_construction:
 
 Packages:
 
