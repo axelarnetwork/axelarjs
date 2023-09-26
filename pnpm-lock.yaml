@@ -362,6 +362,9 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
+      '@axelarjs/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@types/node':
         specifier: 18.15.3
         version: 18.15.3
@@ -790,6 +793,9 @@ importers:
       immer:
         specifier: ^10.0.2
         version: 10.0.2
+      isomorphic-unfetch:
+        specifier: ^4.0.2
+        version: 4.0.2
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8

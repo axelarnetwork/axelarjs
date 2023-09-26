@@ -24,6 +24,8 @@
     "./guard.d.ts",
     "./hex.js",
     "./hex.d.ts",
+    "./http-client.js",
+    "./http-client.d.ts",
     "./monad.js",
     "./monad.d.ts",
     "./record.js",
@@ -84,6 +86,7 @@
   },
   "dependencies": {
     "immer": "^10.0.2",
+    "isomorphic-unfetch": "^4.0.2",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "ramda": "^0.29.0",

@@ -4,8 +4,8 @@ import type { GMPClient } from "../gmp/isomorphic";
 import {
   IsomorphicHTTPClient,
   type ClientMeta,
-  type ClientOptions,
-} from "../IsomorphicHTTPClient";
+  type IsomorphicClientOptions,
+} from "../isomorphic-http-client";
 import { BigNumberUtils } from "./helpers/BigNumberUtils";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 
@@ -17,7 +17,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   protected gmpClient: GMPClient;
 
   public constructor(
-    options: ClientOptions,
+    options: IsomorphicClientOptions,
     dependencies: AxelarscanClientDependencies,
     meta?: ClientMeta
   ) {
@@ -26,7 +26,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   }
 
   static init(
-    options: ClientOptions,
+    options: IsomorphicClientOptions,
     dependencies: AxelarscanClientDependencies
   ) {
     return new AxelarQueryAPIClient(options, dependencies, {

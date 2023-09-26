@@ -1,7 +1,7 @@
 import {
   IsomorphicHTTPClient,
-  type ClientOptions,
-} from "../IsomorphicHTTPClient";
+  type IsomorphicClientOptions,
+} from "../isomorphic-http-client";
 import type {
   DepositAddressResponse,
   GetDepositAddressParams,
@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 export class DepositAddressClient extends IsomorphicHTTPClient {
-  static init(options: ClientOptions) {
+  static init(options: IsomorphicClientOptions) {
     return new DepositAddressClient(options, {
       name: "DepositAddressClient",
       version: "0.0.1",

@@ -1,8 +1,6 @@
 import unfetch from "isomorphic-unfetch";
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
-
-type Body =
+export type Body =
   | {
       json: Record<string, unknown>;
     }
@@ -10,18 +8,31 @@ type Body =
       [key: string]: unknown;
     };
 
+export type Payload<B extends Body | undefined> =
+  | {
+      method: "GET" | "DELETE";
+      body?: never;
+    }
+  | {
+      method: "POST" | "PUT" | "PATCH";
+      body: B;
+    };
+
+export type HttpMethod = Payload<Body>["method"];
+
 /**
  * Interface describing the unwrapper object returned by the `requestWithUnwrapper` method.
  */
 interface Unwrapper {
   json: <T>() => Promise<T>;
   text: () => Promise<string>;
+  blob: () => Promise<Blob>;
 }
 
 /**
  * Interface describing the options for the BaseHttpClient.
  */
-export interface BaseHttpClientOptions {
+export interface HttpClientOptions {
   prefixUrl?: string;
   defaultHeaders?: Record<string, string>;
   credentials?: "include" | "omit";
@@ -31,7 +42,7 @@ export interface BaseHttpClientOptions {
  * A basic HTTP client supporting various HTTP methods and isomorphic in nature.
  * Uses `isomorphic-unfetch` as the underlying fetch implementation.
  */
-export class BaseHttpClient {
+export class HttpClient {
   private prefixUrl = "";
   private defaultHeaders: Record<string, string> = {
     "Content-Type": "application/json",
@@ -43,7 +54,7 @@ export class BaseHttpClient {
    * Creates a new instance of the BaseHttpClient.
    * @param options - Configuration options for the client.
    */
-  constructor(options: BaseHttpClientOptions = {}) {
+  constructor(options: HttpClientOptions = {}) {
     this.prefixUrl = options.prefixUrl ?? "";
     this.defaultHeaders = { ...this.defaultHeaders, ...options.defaultHeaders };
     this.credentials = options.credentials ?? "omit";
@@ -53,8 +64,8 @@ export class BaseHttpClient {
    * Creates and returns a new BaseHttpClient instance with the provided options.
    * @param options - Configuration options to extend the client with.
    */
-  static extend(options: BaseHttpClientOptions) {
-    return new BaseHttpClient(options);
+  static extend(options: HttpClientOptions) {
+    return new HttpClient(options);
   }
 
   /**
@@ -91,7 +102,7 @@ export class BaseHttpClient {
    * @returns Object with a method `json` that can be used to retrieve the parsed response.
    */
   get(path: string) {
-    return this.requestWithUnwrapper("GET", path);
+    return this.requestWithUnwrapper(path, { method: "GET" });
   }
 
   /**
@@ -101,7 +112,7 @@ export class BaseHttpClient {
    * @returns Object with a method `json` that can be used to retrieve the parsed response.
    */
   post<B extends Body>(path: string, body?: B) {
-    return this.requestWithUnwrapper("POST", path, body);
+    return this.requestWithUnwrapper(path, { method: "POST", body });
   }
 
   /**
@@ -111,7 +122,17 @@ export class BaseHttpClient {
    * @returns Object with a method `json` that can be used to retrieve the parsed response.
    */
   put<B extends Body>(path: string, body?: B) {
-    return this.requestWithUnwrapper("PUT", path, body);
+    return this.requestWithUnwrapper(path, { method: "PUT", body });
+  }
+
+  /**
+   * Makes a PATCH request.
+   * @param path - The API endpoint path.
+   * @param body - The request body to send.
+   * @returns Object with a method `json` that can be used to retrieve the parsed response.
+   */
+  patch<B extends Body>(path: string, body?: B) {
+    return this.requestWithUnwrapper(path, { method: "PATCH", body });
   }
 
   /**
@@ -120,32 +141,39 @@ export class BaseHttpClient {
    * @returns Object with a method `json` that can be used to retrieve the parsed response.
    */
   delete(path: string) {
-    return this.requestWithUnwrapper("DELETE", path);
+    return this.requestWithUnwrapper(path, { method: "DELETE" });
   }
 
   /**
    * Internal method to wrap the fetch request and provide a `.json()` method for parsing.
-   * @param method - The HTTP method to use.
    * @param path - The API endpoint path.
-   * @param body - The request body (if any).
+   * @parm payload - The request payload with the HTTP method and body.
    */
-  private requestWithUnwrapper<B extends Body>(
-    method: HttpMethod,
+  private requestWithUnwrapper<B extends Body | undefined>(
     path: string,
-    body?: B
+    { method, body }: Payload<B>
   ): Unwrapper {
-    const fetcher = async () =>
-      body === undefined
-        ? this.request(path, method)
-        : this.request(path, method, "json" in body ? body["json"] : body);
+    const fetcher = async () => {
+      if (method === "GET" || method === "DELETE") {
+        return this.request(path, method);
+      }
+
+      return this.request(
+        path,
+        method,
+        body && "json" in body ? body.json : body
+      );
+    };
 
     return {
       async json<T>() {
         const res = await fetcher();
+        const content = await res.text();
 
-        return await res.text().then((t) => JSON.parse(t.trim()) as T);
+        return JSON.parse(content.trim()) as T;
       },
       text: () => fetcher().then((res) => res.text()),
+      blob: () => fetcher().then((res) => res.blob()),
     };
   }
 }
