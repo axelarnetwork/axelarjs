@@ -1,7 +1,6 @@
 {
-  "extends": "../config/eslintrc.strictest.json",
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": "."
+  "extends": "../../.eslintrc.js",
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

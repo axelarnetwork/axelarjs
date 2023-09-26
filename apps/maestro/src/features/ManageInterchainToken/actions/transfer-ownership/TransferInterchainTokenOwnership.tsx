@@ -96,7 +96,9 @@ export const TransferInterchainTokenOwnership: FC = () => {
           toast.error(
             `Failed to transfer token ownership: ${error.cause.shortMessage}`
           );
-          logger.error(`Failed to transfer token ownership: ${error.cause}`);
+          logger.error(
+            `Failed to transfer token ownership: ${error.cause.message}`
+          );
 
           setTxState({
             status: "idle",

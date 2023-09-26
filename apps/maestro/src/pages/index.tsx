@@ -20,11 +20,11 @@ export default function Home() {
   const [layoutState, layoutActions] = useLayoutStateContainer();
 
   const handleTokenFound = useCallback(
-    (result: { tokenAddress: string; tokenId?: string }) => {
+    async (result: { tokenAddress: string; tokenId?: string }) => {
       if (!chain) {
         return;
       }
-      router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
+      await router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
     },
     [chain, router]
   );
@@ -62,9 +62,9 @@ export default function Home() {
               </Dialog.Body>
             </Dialog>
           )}
-          <div className="bg-base-200 grid w-full place-items-center rounded-2xl p-8">
+          <div className="bg-base-100 grid w-full place-items-center rounded-2xl p-4">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
-            <div className="divider">OR</div>
+            <div className="divider w-full">OR</div>
             <AddErc20 />
           </div>
           <div className="mt-4">

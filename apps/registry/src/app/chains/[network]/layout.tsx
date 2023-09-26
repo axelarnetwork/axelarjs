@@ -14,7 +14,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CHAIN_TABS } from "~/app/chains/_shared";
 import Page from "~/layouts/Page";
 
-export type PropsWithNetworkParam<T = {}> = T & {
+export type PropsWithNetworkParam<T extends Record<string, unknown>> = T & {
   params: {
     network: "evm" | "cosmos";
   };

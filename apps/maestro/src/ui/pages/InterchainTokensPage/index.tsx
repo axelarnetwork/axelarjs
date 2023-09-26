@@ -8,8 +8,6 @@ import TokenList from "./TokenList";
 const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
-export type InterchainTokensPageProps = {};
-
 const InterchainTokensPage = () => {
   const { data: session } = useSession();
 
@@ -22,6 +20,7 @@ const InterchainTokensPage = () => {
       enabled: Boolean(session?.address),
     }
   );
+
   return (
     <Page pageTitle="My Interchain Tokens">
       <div className="flex flex-col gap-4">

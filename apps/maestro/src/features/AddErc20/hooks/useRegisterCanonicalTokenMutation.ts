@@ -83,13 +83,19 @@ export function useRegisterCanonicalTokenMutation(
   useEffect(
     () => {
       if (recordDeploymentArgs) {
-        recordDeploymentAsync(recordDeploymentArgs).then(() => {
-          onStatusUpdate({
-            type: "deployed",
-            tokenAddress: recordDeploymentArgs.tokenAddress,
-            txHash: recordDeploymentArgs.deploymentTxHash,
+        recordDeploymentAsync(recordDeploymentArgs)
+          .then(() => {
+            onStatusUpdate({
+              type: "deployed",
+              tokenAddress: recordDeploymentArgs.tokenAddress,
+              txHash: recordDeploymentArgs.deploymentTxHash,
+            });
+          })
+          .catch(() => {
+            onStatusUpdate({
+              type: "idle",
+            });
           });
-        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

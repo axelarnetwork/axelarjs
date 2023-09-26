@@ -4,8 +4,9 @@ import matchers, {
 import { expect } from "vitest";
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Vi {
-    // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     interface JestAssertion<T = any>
       extends jest.Matchers<void, T>,
         TestingLibraryMatchers<T, void> {}

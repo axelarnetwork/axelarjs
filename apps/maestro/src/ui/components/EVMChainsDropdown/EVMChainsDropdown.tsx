@@ -8,6 +8,7 @@ import { find } from "rambda";
 import { TransactionExecutionError } from "viem";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
+import { logger } from "~/lib/logger";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useEVMChainsDropdownContainer,
@@ -212,7 +213,9 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleChainChange(chain.chain_id);
+                  handleChainChange(chain.chain_id).catch((error) => {
+                    logger.error(error);
+                  });
                 }}
                 className="group"
               >

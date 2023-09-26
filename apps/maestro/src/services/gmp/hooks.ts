@@ -17,7 +17,7 @@ export function useSearchGMPQuery(params: SearchGMPParams) {
 }
 
 export function useContractsQuery() {
-  return useQuery(["gmp-contracts"], gmpClient.getContracts);
+  return useQuery(["gmp-contracts"], gmpClient.getContracts.bind(null));
 }
 
 export function useInterchainTokensQuery(input: {
@@ -25,11 +25,7 @@ export function useInterchainTokensQuery(input: {
   tokenAddress?: `0x${string}`;
   strict?: boolean;
 }) {
-  const {
-    data: evmChains,
-    computed,
-    ...evmChainsQuery
-  } = useEVMChainConfigsQuery();
+  const { computed, ...evmChainsQuery } = useEVMChainConfigsQuery();
 
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(

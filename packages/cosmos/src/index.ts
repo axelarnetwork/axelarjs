@@ -1,5 +1,4 @@
-export * from "./query-client";
-export * from "./signing-client";
+export * from "./rpc";
+export * from "./stargate";
 export * from "./types";
-export * from "./utils";
 export * from "./constants";

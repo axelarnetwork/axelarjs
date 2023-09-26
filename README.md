@@ -1,10 +1,9 @@
 # @axelarjs
 
 ![build & test workflow](https://github.com/axelarnetwork/axelarjs/actions/workflows/test.yml/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](/LICENSE)
 
 Axelar Network foundations for Javascript/Typescript application development
-
-:building_construction: under construction :building_construction:
 
 Packages:
 
@@ -15,11 +14,12 @@ Packages:
 | ⚙️ [core](/packages//core)     | core utilities, types, constants and data-structures                        |
 | 🗚 [proto](/packages/proto)     | generated types from axelar-core protobuf files                             |
 | 🐬 [evm](/packages//evm)       | evm-specific tooling based on [viem](https://github.com/wagmi-dev/viem)     |
-| ⚛️ [cosmos](/packages//cosmos) | cosmos-specific tooling based on [cosmjs](https://github.com/cosmos/cosmjs) |
+| 🪐 [cosmos](/packages//cosmos) | cosmos-specific tooling based on [cosmjs](https://github.com/cosmos/cosmjs) |
 | 🔧 [utils](/packages/utils)    | framework-agnostic utilities and helper functions                           |
 
 Apps:
 
-| app                         | description                     |
-| --------------------------- | ------------------------------- |
-| 🎼 [maestro](/apps/maestro) | Interchain Token Service Portal |
+| app                           | description                     |
+| ----------------------------- | ------------------------------- |
+| 🎼 [maestro](/apps/maestro)   | Interchain Token Service Portal |
+| 🕵️‍♂️ [registry](/apps/registry) | Axelarjs Chain Registry UI      |

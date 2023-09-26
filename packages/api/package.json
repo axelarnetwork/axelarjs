@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -14,7 +14,7 @@
     "./axelarscan",
     "./axelar-query",
     "./gmp",
-    "./deposit-address-api",
+    "./deposit-address",
     "./axelar-config",
     "./index.js",
     "./index.d.ts"
@@ -53,8 +53,8 @@
       "require": "./build/commonjs/axelar-config/*.js"
     },
     "./deposit-address/*": {
-      "import": "./build/module/deposit-address/index.js",
-      "require": "./build/commonjs/deposit-address/index.js"
+      "import": "./build/module/deposit-address/*.js",
+      "require": "./build/commonjs/deposit-address/*.js"
     },
     ".": {
       "import": "./build/module/*.js",
@@ -84,15 +84,17 @@
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rimraf": "^5.0.1",
+    "rimraf": "^5.0.4",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
+  },
+  "peerDependencies": {
+    "unfetch": "<=4.0.2"
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
-    "got": "^12.6.1",
-    "ky": "^1.0.1",
+    "isomorphic-unfetch": "^4.0.2",
     "rambda": "^7.5.0",
     "viem": "~1.10.14"
   }

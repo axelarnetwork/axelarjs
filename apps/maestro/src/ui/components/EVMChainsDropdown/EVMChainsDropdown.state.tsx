@@ -27,9 +27,7 @@ export const {
   useContainer: useEVMChainsDropdownContainer,
 } = createContainer(useEVMChainsDropdownState);
 
-export function withEVMChainsDropdownProvider<TProps = {}>(
-  Component: FC<TProps>
-) {
+export function withEVMChainsDropdownProvider<TProps>(Component: FC<TProps>) {
   const Inner = (props: TProps) => (
     <EVMChainsDropdownProvider>
       <Component {...(props as TProps & JSX.IntrinsicAttributes)} />
