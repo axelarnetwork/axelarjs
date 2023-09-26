@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/proto",
-  "version": "0.34.7",
+  "version": "0.34.8",
   "publishConfig": {
     "access": "public"
   },

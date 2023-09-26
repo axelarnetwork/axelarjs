@@ -1,5 +1,16 @@
 # @axelarjs/cosmos
 
+## 0.2.6
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
+- Updated dependencies [[`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020)]:
+  - @axelarjs/config@0.1.8
+  - @axelarjs/proto@0.34.8
+  - @axelarjs/utils@0.1.9
+
 ## 0.2.5
 
 ### Patch Changes

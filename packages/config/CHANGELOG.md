@@ -1,5 +1,11 @@
 # @axelarjs/config
 
+## 0.1.8
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
 ## 0.1.7
 
 ### Patch Changes
