@@ -28,7 +28,11 @@
     "drizzle:generate": "pnpm drizzle-kit generate:pg",
     "drizzle:up": "pnpm drizzle-kit up:pg",
     "drizzle:push": "pnpm drizzle-kit push:pg",
-    "drizzle:studio": "pnpm drizzle-kit studio"
+    "drizzle:studio": "pnpm drizzle-kit studio",
+    "eslint": "^8.50.0",
+    "eslint-config-next": "^13.5.3",
+    "logrocket": "^4.0.4",
+    "logrocket-react": "^5.0.1"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.13.6",
@@ -52,10 +56,6 @@
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/react": "^2.7.1",
     "drizzle-orm": "^0.28.6",
-    "eslint": "^8.50.0",
-    "eslint-config-next": "^13.5.3",
-    "logrocket": "^4.0.4",
-    "logrocket-react": "^5.0.1",
     "lucide-react": "^0.265.0",
     "next": "^13.5.3",
     "nextjs-cors": "^2.1.2",

@@ -9,7 +9,6 @@
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
-  "type": "module",
   "files": [
     "./build",
     "./react",

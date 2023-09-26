@@ -5,7 +5,6 @@
     "access": "public"
   },
   "description": "EVM clients & utils",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
