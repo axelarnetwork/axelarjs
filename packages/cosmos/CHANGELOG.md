@@ -1,5 +1,12 @@
 # @axelarjs/cosmos
 
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e)]:
+  - @axelarjs/utils@0.1.10
+
 ## 0.2.6
 
 ### Patch Changes

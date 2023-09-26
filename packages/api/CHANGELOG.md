@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.2
+
+### Patch Changes
+
+- [`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Move http client to packages/utils
+
 ## 0.3.1
 
 ### Patch Changes
