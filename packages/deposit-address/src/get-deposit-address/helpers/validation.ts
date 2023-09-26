@@ -1,6 +1,5 @@
 import type {
-  AxelarCosmosChainConfig,
-  ChainConfigs,
+  ChainConfig,
   ChainConfigsResponse,
 } from "@axelarjs/api/axelar-config/types";
 
@@ -9,7 +8,7 @@ import { isAddress } from "viem";
 
 export function validateAddress(
   destinationAddress: string,
-  chainConfig: ChainConfigs
+  chainConfig: ChainConfig
 ) {
   const { module } = chainConfig;
   if (module === "evm") {
@@ -17,8 +16,7 @@ export function validateAddress(
       throw new Error(`${destinationAddress} is not a valid EVM address`);
   } else {
     try {
-      const { addressPrefix } = (chainConfig as AxelarCosmosChainConfig)
-        .cosmosConfigs;
+      const { addressPrefix } = chainConfig.cosmosConfigs;
       if (!(bech32.decode(destinationAddress).prefix === addressPrefix)) {
         throw new Error(
           `${destinationAddress} is not a valid address for ${chainConfig.id}`

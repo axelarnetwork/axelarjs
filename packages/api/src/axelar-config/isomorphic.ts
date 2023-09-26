@@ -4,7 +4,7 @@ import {
   IsomorphicHTTPClient,
   type IsomorphicClientOptions,
 } from "../isomorphic-http-client";
-import type { ChainConfig, ChainConfigsResponse } from "./types";
+import type { Asset, ChainConfig, ChainConfigsResponse } from "./types";
 
 export class AxelarConfigClient extends IsomorphicHTTPClient {
   static init(options: IsomorphicClientOptions) {
@@ -26,10 +26,13 @@ export class AxelarConfigClient extends IsomorphicHTTPClient {
         chainId,
         {
           ...chainConfig,
-          assets: chainConfig.assets.map((asset) => ({
-            ...asset,
-            kind: chainConfig.module === "evm" ? "evm" : "cosmos",
-          })),
+          assets: chainConfig.assets.map(
+            (asset) =>
+              ({
+                ...asset,
+                module: chainConfig.module === "evm" ? "evm" : "cosmos",
+              } as Asset)
+          ),
         } as ChainConfig,
       ] as const;
 

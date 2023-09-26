@@ -12,13 +12,13 @@ export interface BaseAssetConfig {
 }
 
 export interface ComosAssetConfig extends BaseAssetConfig {
-  kind: "cosmos";
+  module: "cosmos";
   fullDenomPath: string;
   ibcDenom: string;
 }
 
 export interface EVMAssetConfig extends BaseAssetConfig {
-  kind: "evm";
+  module: "evm";
   tokenAddress: string;
 }
 
@@ -32,10 +32,10 @@ export interface BaseChainConfig {
   };
   chainId_internal: string;
   assets: Asset[];
-  module: "axelarnet" | "evm";
 }
 
 export interface AxelarEVMChainConfig extends BaseChainConfig {
+  module: "evm";
   evmConfigs: {
     finalityHeight: number;
     contracts: {
@@ -48,6 +48,7 @@ export interface AxelarEVMChainConfig extends BaseChainConfig {
 }
 
 export interface AxelarCosmosChainConfig extends BaseChainConfig {
+  module: "axelarnet";
   cosmosConfigs: {
     rpc: string[];
     lcd: string[];

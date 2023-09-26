@@ -183,7 +183,13 @@ function getIBCDenomOnSrcChain(
    */
   const denom = denomOnAxelar ?? (env === "mainnet" ? "uusdc" : "uausdc");
 
-  const { ibcDenom } = chain.assets?.find(({ id }) => id === denom) ?? {};
+  const asset = chain.assets?.find(
+    (config) =>
+      config.module === "cosmos" &&
+      (config.id === denom || config.ibcDenom === denom)
+  );
+
+  const ibcDenom = asset?.module === "cosmos" ? asset.ibcDenom : undefined;
 
   if (!ibcDenom) {
     throw new Error("cannot find token that matches original gas payment");
