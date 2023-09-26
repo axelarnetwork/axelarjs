@@ -20,7 +20,7 @@ export class DepositAddressClient extends IsomorphicHTTPClient {
   async getOTC(params: GetOTCParams): Promise<OTC> {
     const res = await this.client
       .get(`otc?publicAddress=${params.signerAddress}`)
-      .json<any>();
+      .json<OTC>();
     return res;
   }
 

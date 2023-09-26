@@ -153,22 +153,23 @@ async function getInterchainToken(
           );
           break;
         case "canonical":
-          // for canonical tokens, we need to get the remote token address from the interchain token service
+          {
+            // for canonical tokens, we need to get the remote token address from the interchain token service
+            const itsClient =
+              ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-          const itsClient =
-            ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+            const remoteTokenAddress = await itsClient
+              .read("getTokenAddress", {
+                args: [kvResult.tokenId],
+              })
+              .catch(() => null);
 
-          const remoteTokenAddress = await itsClient
-            .read("getTokenAddress", {
-              args: [kvResult.tokenId],
-            })
-            .catch(() => null);
-
-          if (remoteTokenAddress) {
-            tokenClient = ctx.contracts.createInterchainTokenClient(
-              chainConfig,
-              remoteTokenAddress
-            );
+            if (remoteTokenAddress) {
+              tokenClient = ctx.contracts.createInterchainTokenClient(
+                chainConfig,
+                remoteTokenAddress
+              );
+            }
           }
           break;
       }

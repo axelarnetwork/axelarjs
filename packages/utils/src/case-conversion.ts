@@ -26,7 +26,7 @@ export const CONVERTERS: ConversionMap = {
 
     camelCase: (input: string): string =>
       input.charAt(0).toLowerCase() +
-      input.slice(1).replace(/_(\w)/g, (_, char) => char.toUpperCase()),
+      input.slice(1).replace(/_(\w)/g, (_, char) => String(char).toUpperCase()),
 
     "kebab-case": (input: string): string =>
       input
@@ -44,7 +44,7 @@ export const CONVERTERS: ConversionMap = {
     CONSTANT_CASE: (input: string): string => input.toUpperCase(),
 
     camelCase: (input: string): string =>
-      input.replace(/_(\w)/g, (_, char) => char.toUpperCase()),
+      input.replace(/_(\w)/g, (_, char) => String(char).toUpperCase()),
 
     "kebab-case": (input: string): string => input.replace(/_/g, "-"),
   },
@@ -78,7 +78,7 @@ export const CONVERTERS: ConversionMap = {
       input.charAt(0).toUpperCase() +
       input
         .slice(1)
-        .replace(/_(\w)/g, (_, char) => char.toUpperCase())
+        .replace(/_(\w)/g, (_, char) => String(char).toUpperCase())
         .replace(/(\w)([A-Z])/g, (_, first, second) => `${first}${second}`),
 
     snake_case: (input: string): string =>
@@ -105,7 +105,7 @@ export const CONVERTERS: ConversionMap = {
       input.toUpperCase().replace(/-/g, "_"),
 
     camelCase: (input: string): string =>
-      input.replace(/-(\w)/g, (_, char) => char.toUpperCase()),
+      input.replace(/-(\w)/g, (_, char) => String(char).toUpperCase()),
   },
 };
 

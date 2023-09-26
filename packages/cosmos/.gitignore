@@ -1,6 +1,8 @@
 # build artifacts
-build/
-/query-client/
-/signing-client/
+/build/
+/rpc/
+/stargate/
 *.js
 *.d.ts
+
+.env

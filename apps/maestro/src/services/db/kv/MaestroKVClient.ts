@@ -224,8 +224,11 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   }
 
   async createAccount(accountAddress: `0x${string}`) {
-    this.kv.set(COLLECTION_KEYS.accountNonce(accountAddress), 0);
-    this.kv.sadd(COLLECTION_KEYS.accountDeployments(accountAddress), ...[]);
+    await this.kv.set(COLLECTION_KEYS.accountNonce(accountAddress), 0);
+    await this.kv.sadd(
+      COLLECTION_KEYS.accountDeployments(accountAddress),
+      ...[]
+    );
   }
 
   async appendAccountDeployments(

@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/evm",
-  "version": "0.1.4",
+  "version": "0.1.9",
   "publishConfig": {
     "access": "public"
   },
@@ -47,14 +47,14 @@
     "@axelar-network/interchain-token-service": "^0.3.0",
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.6.2",
+    "@types/node": "^20.7.0",
     "@types/prettier": "^2.7.3",
     "chalk": "^4.1.2",
     "package-json": "^7.0.0",
     "prettier": "^2.8.8",
-    "rimraf": "^5.0.1",
+    "rimraf": "^5.0.4",
     "strip-ansi": "^6.0.1",
-    "tsx": "^3.12.10",
+    "tsx": "^3.13.0",
     "typescript": "^5.2.2",
     "zx": "^7.2.3"
   }

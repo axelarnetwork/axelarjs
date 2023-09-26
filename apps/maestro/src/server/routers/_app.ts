@@ -7,7 +7,7 @@ import { gmpRouter } from "./gmp";
 import { interchainTokenRouter } from "./interchainToken";
 
 export const appRouter = router({
-  uptime: publicProcedure.query(async () => ({
+  uptime: publicProcedure.query(() => ({
     uptime: process.uptime(),
   })),
   gmp: gmpRouter,

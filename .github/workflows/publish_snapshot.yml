@@ -24,7 +24,7 @@ jobs:
         run: |
           pnpm -r exec npm version 0.0.0-snapshot.$(git rev-parse --short HEAD) --git-tag-version=false
 
-      - name: Publish snapshots
+      - name: Publish snapshots to NPM
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
           pnpm -r publish --no-git-checks --tag snapshot --access public

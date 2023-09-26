@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/cosmos",
-  "version": "0.1.5",
+  "version": "0.2.5",
   "publishConfig": {
     "access": "public"
   },
@@ -11,12 +11,10 @@
   },
   "files": [
     "./build",
-    "./query-client",
-    "./signing-client",
+    "./rpc",
+    "./stargate",
     "./constants.js",
     "./constants.d.ts",
-    "./utils.js",
-    "./utils.d.ts",
     "./types.js",
     "./types.d.ts",
     "./index.js",
@@ -32,19 +30,28 @@
       "import": "./build/module/*.js",
       "require": "./build/commonjs/*.js"
     },
-    "./signing-client": {
-      "import": "./build/module/signing-client/index.js",
-      "require": "./build/commonjs/signing-client/index.js"
+    "./rpc": {
+      "import": "./build/module/rpc/index.js",
+      "require": "./build/commonjs/rpc/index.js"
     },
-    "./query-client": {
-      "import": "./build/module/query-client/index.js",
-      "require": "./build/commonjs/query-client/index.js"
+    "./rpc/*": {
+      "import": "./build/module/rpc/*.js",
+      "require": "./build/commonjs/rpc/*.js"
+    },
+    "./stargate": {
+      "import": "./build/module/stargate/index.js",
+      "require": "./build/commonjs/stargate/index.js"
+    },
+    "./stargate/*": {
+      "import": "./build/module/stargate/*.js",
+      "require": "./build/commonjs/stargate/*.js"
     }
   },
   "scripts": {
     "build": "./scripts/build.sh",
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
+    "test": "vitest run",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix"
   },
@@ -54,22 +61,19 @@
   "dependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
-    "@cosmjs/amino": "^0.30.1",
-    "@cosmjs/encoding": "^0.30.1",
-    "@cosmjs/ledger-amino": "^0.30.1",
-    "@cosmjs/math": "^0.30.1",
-    "@cosmjs/stargate": "^0.30.1",
-    "@cosmjs/tendermint-rpc": "^0.30.1",
-    "@cosmjs/utils": "^0.30.1",
-    "chain-registry": "^1.20.0"
+    "@axelarjs/utils": "workspace:*",
+    "@cosmjs/proto-signing": "^0.31.1",
+    "@cosmjs/stargate": "^0.31.1",
+    "@cosmjs/tendermint-rpc": "^0.31.1",
+    "inflection": "^2.0.1",
+    "long": "^5.2.3"
   },
   "devDependencies": {
-    "@cosmjs/proto-signing": "^0.30.1",
     "@tsconfig/strictest": "^2.0.2",
-    "cosmjs-types": "^0.7.2",
+    "cosmjs-types": "^0.8.0",
     "rambda": "^7.5.0",
-    "rimraf": "^5.0.1",
+    "rimraf": "^5.0.4",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
   }
 }

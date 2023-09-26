@@ -6,8 +6,14 @@ import { filter, test } from "rambda";
 
 const destFolder = path.join(process.cwd(), "src", "lib", "contracts");
 
-const ESLINT_DISABLE_PREFIX =
-  "/* eslint-disable @typescript-eslint/consistent-type-imports */";
+const DISABLED_RULES = [
+  "@typescript-eslint/consistent-type-imports",
+  "@typescript-eslint/no-explicit-any",
+];
+
+const ESLINT_DISABLE_PREFIX = DISABLED_RULES.map(
+  (rule) => `/* eslint-disable ${rule} */`
+).join("\n");
 
 /**
  * prepend eslint-disable to the top of the file

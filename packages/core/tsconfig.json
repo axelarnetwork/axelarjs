@@ -2,10 +2,6 @@
   "extends": "@axelarjs/config/tsconfig.strictest",
   "include": ["src"],
   "compilerOptions": {
-    "baseUrl": ".",
-    "declaration": true,
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "declaration": true
   }
 }

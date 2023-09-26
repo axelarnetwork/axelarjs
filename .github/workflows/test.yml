@@ -4,6 +4,8 @@ on:
   - push
   - pull_request
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   setup-and-test:
     runs-on: ubuntu-latest

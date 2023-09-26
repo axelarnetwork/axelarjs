@@ -54,7 +54,7 @@ export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
 
 export type SearchGMPParams = BaseGMPParams & {
   contractMethod?: ContractMethod;
-  txHash?: string | `0x${string}`;
+  txHash?: `0x${string}`;
   txLogIndex?: number;
   status?: GMPTxStatus;
   from?: number;
@@ -269,7 +269,7 @@ export type GetGasPriceResponse = BaseGMPResponse<{
 
 // GetGMPStatistics
 
-type BaseStats<T = {}> = T & {
+type BaseStats<T = Record<string, unknown>> = T & {
   key: string;
   num_txs: number;
 };

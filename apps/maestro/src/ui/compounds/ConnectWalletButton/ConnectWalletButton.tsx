@@ -9,15 +9,11 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
   (props, ref) => {
     const { open } = useWeb3Modal();
 
-    const handleConnect = async () => {
-      open();
-    };
-
     return (
       <Button
         data-testid="connect-button"
         {...props}
-        onClick={handleConnect}
+        onClick={open}
         ref={ref}
       />
     );

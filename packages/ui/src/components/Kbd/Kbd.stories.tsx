@@ -2,7 +2,7 @@ import { pluralizeKeys } from "@axelarjs/utils";
 
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { SIZE_VARIANTS } from "~/theme";
+import { SIZE_VARIANTS } from "../../theme";
 import { configurePlayground } from "../StoryPlayground";
 import { Kbd } from "./Kbd";
 

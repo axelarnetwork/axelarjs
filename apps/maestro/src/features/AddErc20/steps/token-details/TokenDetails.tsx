@@ -47,7 +47,7 @@ const TokenDetails: FC = () => {
       tokenDecimals: data.tokenDecimals,
       tokenCap: data.tokenCap,
       distributor: data.distributor,
-      salt: data.salt as `0x${string}`,
+      salt: data.salt,
     });
 
     actions.nextStep();

@@ -1,11 +1,16 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "../../packages/config/eslintrc.strictest.json"
-  ],
+  "extends": ["next/core-web-vitals", "../../.eslintrc.js"],
+  "ignorePatterns": ["scripts/*.cjs", "postcss.config.cjs"],
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
   },
-  "ignorePatterns": ["scripts/*.cjs", "postcss.config.cjs"]
+  "rules": {
+    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unbound-functions": "off",
+    "@typescript-eslint/no-unsafe-return": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-argument": "off"
+  }
 }

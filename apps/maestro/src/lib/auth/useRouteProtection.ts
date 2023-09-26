@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 
 import { useAccount, useDisconnect } from "wagmi";
 
+import { logger } from "../logger";
+
 export function useRouteProtection({ redirectTo = "/" }) {
   const { address } = useAccount();
   const { disconnectAsync } = useDisconnect();
@@ -31,8 +33,11 @@ export function useRouteProtection({ redirectTo = "/" }) {
       (sessionStatus !== "loading" && !address && prevAddress) ||
       (sessionStatus === "authenticated" && (!session.address || !address))
     ) {
-      handleSignout();
-      router.push(redirectTo);
+      handleSignout()
+        .then(() => router.push(redirectTo))
+        .catch((err) => {
+          logger.error(err);
+        });
     }
   }, [
     address,

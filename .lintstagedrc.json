@@ -1,0 +1,3 @@
+{
+  "*.{js,cjs,mjs,jsx,ts,tsx}": ["eslint --fix", "pretty-quick --staged"]
+}

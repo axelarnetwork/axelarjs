@@ -11,6 +11,7 @@ import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterCanonicalToken } from "~/features/RegisterCanonicalToken/RegisterCanonicalToken";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
+import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
@@ -63,7 +64,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isLoading: isInterchainTokenLoading,
   } = useInterchainTokensQuery({
     chainId: props.chainId,
-    tokenAddress: props.tokenAddress as `0x${string}`,
+    tokenAddress: props.tokenAddress,
   });
 
   const { data: tokenDetails, error: tokenDetailsError } =
@@ -136,8 +137,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const remoteChainsExecuted = useMemo(() => {
     return Object.entries(statusesByChain)
-      .filter(([_, { status }]) => status === "executed")
-      .map(([chainId, _]) => chainId);
+      .filter(([, { status }]) => status === "executed")
+      .map(([chainId]) => chainId);
   }, [statusesByChain]);
 
   useEffect(() => {
@@ -156,7 +157,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
 
-    refetchInterchainToken();
+    refetchInterchainToken().catch(() => {
+      logger.error("Failed to refetch interchain token");
+    });
   }, [
     address,
     remoteChainsExecuted,
@@ -307,7 +310,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   variant="accent"
                   onClick={() => {
                     if (originToken) {
-                      switchNetworkAsync?.(originToken.chainId);
+                      switchNetworkAsync?.(originToken.chainId).catch(() => {
+                        logger.error("Failed to switch network");
+                      });
                     }
                   }}
                 >

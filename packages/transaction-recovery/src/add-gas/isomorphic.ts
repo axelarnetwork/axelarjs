@@ -4,16 +4,16 @@ import type {
   GMPClient,
 } from "@axelarjs/api";
 import type { AxelarCosmosChainConfig } from "@axelarjs/api/axelar-config/types";
-import { COSMOS_GAS_RECEIVER_OPTIONS, Environment } from "@axelarjs/core";
+import { COSMOS_GAS_RECEIVER_OPTIONS, type Environment } from "@axelarjs/core";
+import { AxelarSigningStargateClient } from "@axelarjs/cosmos";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
-import {
-  assertIsDeliverTxSuccess,
-  type Coin,
-  type SigningStargateClient,
-} from "@cosmjs/stargate";
+import { assertIsDeliverTxSuccess, type Coin } from "@cosmjs/stargate";
+import { longify } from "@cosmjs/stargate/build/queryclient";
 
 import type { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
+
+const getDefaultTimeoutTimestamp = (now = Date.now()) => (now + 90_000) * 1e6; // 90 seconds from now
 
 export type AddGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;
@@ -22,7 +22,7 @@ export type AddGasDependencies = {
   getSigningStargateClient: (
     rpcUrl: string,
     offlineSigner: OfflineSigner
-  ) => Promise<SigningStargateClient>;
+  ) => Promise<AxelarSigningStargateClient>;
 };
 
 /**
@@ -47,7 +47,7 @@ export async function addGas(
   const { rpc, channelIdToAxelar } = chainConfig.cosmosConfigs;
 
   const [tx] = await dependencies.gmpClient
-    .searchGMP({ txHash: params.txHash })
+    .searchGMP({ txHash: params.txHash as `0x${string}` })
     .catch(() => []);
 
   if (!tx) {
@@ -107,25 +107,24 @@ export async function addGas(
     };
   }
 
-  const broadcastResult = await signingStargateClient.signAndBroadcast(
-    sender,
-    [
-      {
-        typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
-        value: {
-          sourcePort: "transfer",
-          sourceChannel: channelIdToAxelar,
-          token: coin,
-          sender,
-          receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
-          timeoutTimestamp:
-            sendOptions.timeoutTimestamp ?? (Date.now() + 90) * 1e9,
-          memo: tx.call.id,
-        },
-      },
-    ],
-    sendOptions.txFee
+  const timeoutTimestamp = longify(
+    sendOptions.timeoutTimestamp ?? getDefaultTimeoutTimestamp()
   );
+
+  const broadcastResult =
+    await signingStargateClient.messages.ibcTransfer.transfer.signAndBroadcast(
+      sender,
+      {
+        sourcePort: "transfer",
+        sourceChannel: channelIdToAxelar,
+        token: coin,
+        sender,
+        receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
+        timeoutTimestamp,
+        memo: tx.call.id,
+      },
+      sendOptions.txFee
+    );
 
   assertIsDeliverTxSuccess(broadcastResult);
 

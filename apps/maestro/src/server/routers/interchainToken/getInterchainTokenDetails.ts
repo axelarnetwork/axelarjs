@@ -32,5 +32,6 @@ export const getInterchainTokenDetails = protectedProcedure
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return kvResult as IntercahinTokenDetails;
   });

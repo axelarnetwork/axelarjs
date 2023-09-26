@@ -12,9 +12,7 @@ import Page from "~/ui/layouts/Page";
 import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
 
-export type InterchainTokensPageProps = {};
-
-const InterchainTokensPage: FC<InterchainTokensPageProps> = () => {
+const InterchainTokensPage: FC = () => {
   const { chainName, tokenAddress } = useRouter().query as {
     chainName: string;
     tokenAddress: `0x${string}`;
@@ -28,12 +26,12 @@ const InterchainTokensPage: FC<InterchainTokensPageProps> = () => {
     isError,
   } = useInterchainTokensQuery({
     chainId: routeChain?.id,
-    tokenAddress: tokenAddress as `0x${string}`,
+    tokenAddress,
   });
 
   const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: routeChain?.id,
-    tokenAddress: tokenAddress as `0x${string}`,
+    tokenAddress,
   });
 
   if (!isAddress(tokenAddress)) {

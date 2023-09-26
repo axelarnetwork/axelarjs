@@ -70,7 +70,7 @@ describe("usePersistedState", () => {
     expect(storage.getItem(key)).toBe(JSON.stringify(expected));
   });
 
-  it("should update the state and storage using an Immer producer function", async () => {
+  it("should update the state and storage using an Immer producer function", () => {
     const { result } = renderHook(() =>
       usePersistedState(storage, key, defaultValue)
     );
