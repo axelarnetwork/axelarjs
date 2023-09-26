@@ -1,4 +1,3 @@
-export * from "./array";
 export * from "./guard";
 export * from "./monad";
 export * from "./record";
