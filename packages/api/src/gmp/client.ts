@@ -1,13 +1,14 @@
 import { GMP_API_URLS, type Environment } from "@axelarjs/core";
 
-import ky, { type Options } from "ky";
-
+import { BaseHttpClient, BaseHttpClientOptions } from "../baseHTTPClient";
 import { GMPClient } from "./isomorphic";
 
-export const createGMPBrowserClient = (env: Environment, options?: Options) =>
+export const createGMPClient = (
+  env: Environment,
+  options?: BaseHttpClientOptions
+) =>
   GMPClient.init({
-    target: "browser",
-    instance: ky.extend({
+    instance: BaseHttpClient.extend({
       ...(options ?? {
         prefixUrl: GMP_API_URLS[env],
       }),

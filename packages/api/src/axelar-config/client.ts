@@ -1,16 +1,14 @@
 import { AXELAR_CONFIG_API_URLS, type Environment } from "@axelarjs/core";
 
-import got, { type Options } from "got";
-
+import { BaseHttpClient, type BaseHttpClientOptions } from "../baseHTTPClient";
 import { AxelarConfigClient } from "./isomorphic";
 
-export const createAxelarConfigNodeClient = (
+export const createAxelarConfigClient = (
   env: Environment,
-  options?: Partial<Options>
+  options?: BaseHttpClientOptions
 ) =>
   AxelarConfigClient.init({
-    target: "node",
-    instance: got.extend({
+    instance: BaseHttpClient.extend({
       ...(options ?? {
         prefixUrl: AXELAR_CONFIG_API_URLS[env],
       }),

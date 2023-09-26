@@ -1,16 +1,14 @@
 import { DEPOSIT_ADDRESS_API_URLS, type Environment } from "@axelarjs/core";
 
-import ky, { type Options } from "ky";
-
+import { BaseHttpClient, BaseHttpClientOptions } from "../baseHTTPClient";
 import { DepositAddressClient } from "./isomorphic";
 
-export const createDepositAddressApiBrowserClient = (
+export const createDepositAddressApiClient = (
   env: Environment,
-  options?: Options
+  options?: BaseHttpClientOptions
 ) =>
   DepositAddressClient.init({
-    target: "browser",
-    instance: ky.extend({
+    instance: BaseHttpClient.extend({
       ...(options ?? {
         prefixUrl: DEPOSIT_ADDRESS_API_URLS[env],
       }),

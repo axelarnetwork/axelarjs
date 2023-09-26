@@ -7,7 +7,7 @@ import type {
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
 } from "../axelar-query";
-import { createAxelarQueryNodeClient } from "./node";
+import { createAxelarQueryClient } from "./client";
 
 describe("axelar-query (node client)", () => {
   describe("estimateGasFee", () => {
@@ -25,7 +25,7 @@ describe("axelar-query (node client)", () => {
     let api: AxelarQueryAPIClient;
 
     beforeEach(() => {
-      api = createAxelarQueryNodeClient(ENVIRONMENTS.testnet, {});
+      api = createAxelarQueryClient(ENVIRONMENTS.testnet, {});
     });
 
     test("It should return estimated gas amount in terms of native tokens", async () => {
@@ -33,6 +33,7 @@ describe("axelar-query (node client)", () => {
         ...requestParam,
         showDetailedFees: false,
       });
+
       expect(fees).toBeTruthy();
       expect(
         Number(formatEther(BigInt(fees as string))) - Number("0.0000001") > 0

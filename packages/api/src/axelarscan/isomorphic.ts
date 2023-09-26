@@ -115,30 +115,30 @@ export class AxelarscanClient extends IsomorphicHTTPClient {
   async getRecentLinkTransactions(params: {
     size: number;
   }): Promise<LinkRequestResponse[]> {
-    return this.searchTransactions({
+    const res = await this.searchTransactions({
       size: params.size,
       type: "LinkRequest",
-    }).then((res) =>
-      res.data
-        .filter((entry) => entry.code === 0) //only want successfully broadcasted txs
-        .map((entry) => {
-          const logs = entry.logs[0];
-          const linkEvent = logs?.events.find((event) => event.type === "link");
-          const { attributes } = linkEvent as LinkEvent;
-          const find = (key: string) =>
-            attributes.find((attr: { key: string }) => attr.key === key)?.value;
-          return {
-            sourceChain: find("sourceChain"),
-            destinationChain: find("destinationChain"),
-            depositAddress: find("depositAddress"),
-            destinationAddress: find("destinationAddress"),
-            module: find("module"),
-            asset: find("asset"),
-            tokenAddress: find("tokenAddress"),
-            txHash: entry.txhash,
-            timmestamp: entry.timestamp,
-          };
-        })
-    );
+    });
+
+    return res.data
+      .filter((entry) => entry.code === 0) //only want successfully broadcasted txs
+      .map((entry) => {
+        const logs = entry.logs[0];
+        const linkEvent = logs?.events.find((event) => event.type === "link");
+        const { attributes } = linkEvent as LinkEvent;
+        const find = (key: string) =>
+          attributes.find((attr: { key: string }) => attr.key === key)?.value;
+        return {
+          sourceChain: find("sourceChain"),
+          destinationChain: find("destinationChain"),
+          depositAddress: find("depositAddress"),
+          destinationAddress: find("destinationAddress"),
+          module: find("module"),
+          asset: find("asset"),
+          tokenAddress: find("tokenAddress"),
+          txHash: entry.txhash,
+          timmestamp: entry.timestamp,
+        };
+      });
   }
 }

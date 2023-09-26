@@ -1,16 +1,14 @@
 import { AXELARSCAN_API_URLS, type Environment } from "@axelarjs/core";
 
-import got, { type Options } from "got";
-
+import { BaseHttpClient, type BaseHttpClientOptions } from "../baseHTTPClient";
 import { AxelarscanClient } from "./isomorphic";
 
-export const createAxelarscanNodeClient = (
+export const createAxelarscanClient = (
   env: Environment,
-  options?: Partial<Options>
+  options?: BaseHttpClientOptions
 ) =>
   AxelarscanClient.init({
-    target: "node",
-    instance: got.extend({
+    instance: BaseHttpClient.extend({
       ...(options ?? {
         prefixUrl: AXELARSCAN_API_URLS[env],
       }),
