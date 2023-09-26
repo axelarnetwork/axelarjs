@@ -1,5 +1,13 @@
 # @axelarjs/deposit-address
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e)]:
+  - @axelarjs/api@0.3.2
+  - @axelarjs/utils@0.1.10
+
 ## 0.1.1
 
 ### Patch Changes
