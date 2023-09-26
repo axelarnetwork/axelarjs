@@ -2,7 +2,9 @@ name: Test (E2E)
 
 on: workflow_dispatch
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   wait-for-preview-and-test:
