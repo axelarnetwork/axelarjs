@@ -1,5 +1,5 @@
-import { createGMPBrowserClient } from "@axelarjs/api/gmp/browser";
+import { createGMPClient } from "@axelarjs/api/gmp";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 
-export default createGMPBrowserClient(NEXT_PUBLIC_NETWORK_ENV);
+export default createGMPClient(NEXT_PUBLIC_NETWORK_ENV);

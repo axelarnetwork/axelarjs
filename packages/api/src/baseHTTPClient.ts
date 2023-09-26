@@ -1,4 +1,4 @@
-import fetch from "isomorphic-unfetch";
+import unfetch from "isomorphic-unfetch";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -70,7 +70,7 @@ export class BaseHttpClient {
   ): Promise<Response> {
     const url = new URL(path, this.prefixUrl).toString();
 
-    const response = await fetch(url, {
+    const response = await unfetch(url, {
       method,
       headers: this.defaultHeaders,
       body: body ? JSON.stringify(body) : null,

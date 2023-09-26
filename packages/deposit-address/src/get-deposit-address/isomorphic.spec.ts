@@ -1,6 +1,6 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
-import getDepositAddress from "./node";
+import getDepositAddress from "./client";
 import type { SendOptions } from "./types";
 
 describe("getDepositAddress - node", () => {

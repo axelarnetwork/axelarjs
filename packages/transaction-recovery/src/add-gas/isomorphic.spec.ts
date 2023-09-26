@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createAxelarConfigNodeClient } from "@axelarjs/api/axelar-config/node";
-import { createAxelarQueryNodeClient } from "@axelarjs/api/axelar-query/node";
-import { createGMPNodeClient } from "@axelarjs/api/gmp/node";
+import { createAxelarConfigClient } from "@axelarjs/api/axelar-config";
+import { createAxelarQueryClient } from "@axelarjs/api/axelar-query";
+import { createGMPClient } from "@axelarjs/api/gmp";
 import { ENVIRONMENTS } from "@axelarjs/core";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
@@ -40,9 +40,9 @@ describe("addGas - (isomorphic)", () => {
   );
 
   const DEFAULT_ADD_GAS_DEPENDENCIES: AddGasDependencies = {
-    axelarQueryClient: createAxelarQueryNodeClient(ENVIRONMENTS.testnet),
-    configClient: createAxelarConfigNodeClient(ENVIRONMENTS.testnet),
-    gmpClient: createGMPNodeClient(ENVIRONMENTS.testnet),
+    axelarQueryClient: createAxelarQueryClient(ENVIRONMENTS.testnet),
+    configClient: createAxelarConfigClient(ENVIRONMENTS.testnet),
+    gmpClient: createGMPClient(ENVIRONMENTS.testnet),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getSigningStargateClient: mockGetSigningStargateClient as any,
   };

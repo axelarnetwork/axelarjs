@@ -73,6 +73,7 @@
     "tailwind-styled-components": "^2.2.0",
     "trpc-openapi": "^1.2.0",
     "typescript": "^5.2.2",
+    "unfetch": "^4.0.2",
     "viem": "~1.10.14",
     "wagmi": "1.4.1",
     "zod": "^3.22.2"
