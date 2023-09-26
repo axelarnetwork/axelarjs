@@ -1,5 +1,12 @@
 # @axelarjs/core
 
+## 0.2.7
+
+### Patch Changes
+
+- [`4b8adb6f`](https://github.com/axelarnetwork/axelarjs/commit/4b8adb6f18b69745aad3045519d870e880ec226a) Thanks [@alanrsoares](https://github.com/alanrsoares)! - - Migrage api clients to use minimalistic isomorphic http client based on `isomorphic-unfetc`
+  - upgrade dependencies
+
 ## 0.2.6
 
 ### Patch Changes
