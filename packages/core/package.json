@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/core",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Axelarjs Core",
   "publishConfig": {
     "access": "public"

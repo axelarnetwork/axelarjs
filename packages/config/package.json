@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/config",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "AxelarJS shared configuration",
   "publishConfig": {
     "access": "public"

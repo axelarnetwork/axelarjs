@@ -1,5 +1,16 @@
 # @axelarjs/deposit-address
 
+## 0.1.1
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
+- Updated dependencies [[`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020)]:
+  - @axelarjs/api@0.3.1
+  - @axelarjs/core@0.2.8
+  - @axelarjs/utils@0.1.9
+
 ## 0.1.0
 
 ### Minor Changes
