@@ -1,4 +1,4 @@
-export type Asset = {
+export interface BaseAssetConfig {
   id: string;
   prettySymbol: string;
   symbol: string;
@@ -8,12 +8,23 @@ export type Asset = {
   name: string;
   decimals: number;
   svg: string;
+  coingeckoId: string;
+}
+
+export interface ComosAssetConfig extends BaseAssetConfig {
+  kind: "cosmos";
   fullDenomPath: string;
   ibcDenom: string;
-  coingeckoId: string;
-};
+}
 
-export type ChainConfig = {
+export interface EVMAssetConfig extends BaseAssetConfig {
+  kind: "evm";
+  tokenAddress: string;
+}
+
+export type Asset = ComosAssetConfig | EVMAssetConfig;
+
+export interface BaseChainConfig {
   id: string;
   externalIdentifiers: {
     chainId: string | number;
@@ -22,9 +33,9 @@ export type ChainConfig = {
   chainId_internal: string;
   assets: Asset[];
   module: "axelarnet" | "evm";
-};
+}
 
-export type AxelarEVMChainConfig = ChainConfig & {
+export interface AxelarEVMChainConfig extends BaseChainConfig {
   evmConfigs: {
     finalityHeight: number;
     contracts: {
@@ -34,9 +45,9 @@ export type AxelarEVMChainConfig = ChainConfig & {
       gateway: `0x${string}`;
     };
   };
-};
+}
 
-export type AxelarCosmosChainConfig = ChainConfig & {
+export interface AxelarCosmosChainConfig extends BaseChainConfig {
   cosmosConfigs: {
     rpc: string[];
     lcd: string[];
@@ -44,12 +55,12 @@ export type AxelarCosmosChainConfig = ChainConfig & {
     addressPrefix: string;
     channelIdToAxelar: string;
   };
-};
+}
 
-export type ChainConfigs = AxelarCosmosChainConfig | AxelarEVMChainConfig;
+export type ChainConfig = AxelarCosmosChainConfig | AxelarEVMChainConfig;
 
-export type ChainConfigsResponse = {
-  chains: Record<string, ChainConfigs>;
+export interface ChainConfigsResponse {
+  chains: { [chainId: string]: ChainConfig };
   version: string;
   environment: string;
-};
+}

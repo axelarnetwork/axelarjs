@@ -4,7 +4,7 @@ import {
   IsomorphicHTTPClient,
   type IsomorphicClientOptions,
 } from "../isomorphic-http-client";
-import type { ChainConfigsResponse } from "./types";
+import type { ChainConfig, ChainConfigsResponse } from "./types";
 
 export class AxelarConfigClient extends IsomorphicHTTPClient {
   static init(options: IsomorphicClientOptions) {
@@ -15,8 +15,27 @@ export class AxelarConfigClient extends IsomorphicHTTPClient {
   }
 
   async getChainConfigs(env: Environment) {
-    return this.client
+    const response = await this.client
       .get(`configs/${env}-chain-config-latest.json`)
       .json<ChainConfigsResponse>();
+
+    const chainEntries = Object.entries(response.chains);
+
+    const tagChainAsset = ([chainId, chainConfig]: [string, ChainConfig]) =>
+      [
+        chainId,
+        {
+          ...chainConfig,
+          assets: chainConfig.assets.map((asset) => ({
+            ...asset,
+            kind: chainConfig.module === "evm" ? "evm" : "cosmos",
+          })),
+        } as ChainConfig,
+      ] as const;
+
+    return {
+      ...response,
+      chains: Object.fromEntries(chainEntries.map(tagChainAsset)),
+    };
   }
 }
