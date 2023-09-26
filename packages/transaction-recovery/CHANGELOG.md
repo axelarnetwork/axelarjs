@@ -1,5 +1,12 @@
 # @axelarjs/transaction-recovery
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`22607518`](https://github.com/axelarnetwork/axelarjs/commit/226075180e5443cf7ad1a2aeb10e6ba9d347e693)]:
+  - @axelarjs/api@0.3.4
+
 ## 0.2.3
 
 ### Patch Changes
