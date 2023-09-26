@@ -92,9 +92,7 @@
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
-    "got": "^12.6.1",
     "isomorphic-unfetch": "^4.0.2",
-    "ky": "^1.0.1",
     "rambda": "^7.5.0",
     "viem": "~1.10.14"
   }
