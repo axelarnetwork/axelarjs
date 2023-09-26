@@ -6,7 +6,7 @@
       "repo": "axelarnetwork/axelarjs"
     }
   ],
-  "commit": false,
+  "commit": true,
   "fixed": [],
   "linked": [],
   "access": "restricted",
