@@ -62,9 +62,9 @@ export default function Home() {
               </Dialog.Body>
             </Dialog>
           )}
-          <div className="bg-base-200 grid w-full place-items-center rounded-2xl p-8">
+          <div className="bg-base-100 grid w-full place-items-center rounded-2xl p-4">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
-            <div className="divider">OR</div>
+            <div className="divider w-full">OR</div>
             <AddErc20 />
           </div>
           <div className="mt-4">
