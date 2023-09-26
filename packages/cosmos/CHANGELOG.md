@@ -1,5 +1,16 @@
 # @axelarjs/cosmos
 
+## 0.2.5
+
+### Patch Changes
+
+- [`4b8adb6f`](https://github.com/axelarnetwork/axelarjs/commit/4b8adb6f18b69745aad3045519d870e880ec226a) Thanks [@alanrsoares](https://github.com/alanrsoares)! - - Migrage api clients to use minimalistic isomorphic http client based on `isomorphic-unfetc`
+  - upgrade dependencies
+- Updated dependencies [[`4b8adb6f`](https://github.com/axelarnetwork/axelarjs/commit/4b8adb6f18b69745aad3045519d870e880ec226a)]:
+  - @axelarjs/config@0.1.7
+  - @axelarjs/proto@0.34.7
+  - @axelarjs/utils@0.1.8
+
 ## 0.2.4
 
 ### Patch Changes
