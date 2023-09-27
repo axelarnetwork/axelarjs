@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.6
+
+### Patch Changes
+
+- [`c2ebc082`](https://github.com/axelarnetwork/axelarjs/commit/c2ebc082d4517e7f920c707e23fd0d00884ed0a1) Thanks [@alanrsoares](https://github.com/alanrsoares)! - "chore: restructure axelarjs/api exports"
+
 ## 0.3.5
 
 ### Patch Changes
