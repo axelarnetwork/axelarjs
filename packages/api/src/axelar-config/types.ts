@@ -12,7 +12,7 @@ export interface BaseAssetConfig {
 }
 
 export interface ComosAssetConfig extends BaseAssetConfig {
-  module: "cosmos";
+  module: "axelarnet";
   fullDenomPath: string;
   ibcDenom: string;
 }

@@ -30,7 +30,7 @@ export class AxelarConfigClient extends IsomorphicHTTPClient {
             (asset) =>
               ({
                 ...asset,
-                module: chainConfig.module === "evm" ? "evm" : "cosmos",
+                module: chainConfig.module === "evm" ? "evm" : "axelarnet",
               } as Asset)
           ),
         } as ChainConfig,
