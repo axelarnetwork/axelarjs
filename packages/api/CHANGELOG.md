@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.5
+
+### Patch Changes
+
+- [`007badef`](https://github.com/axelarnetwork/axelarjs/commit/007badefffc11047e4d50aeb5052fbc2ad91cb57) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Update AssetConfig.module to use 'axelarnet' instead of 'cosmos'
+
 ## 0.3.4
 
 ### Patch Changes
