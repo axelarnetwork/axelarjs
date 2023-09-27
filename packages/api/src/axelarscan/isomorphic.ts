@@ -1,9 +1,6 @@
 import { partition } from "rambda";
 
-import {
-  IsomorphicHTTPClient,
-  type IsomorphicClientOptions,
-} from "../isomorphic-http-client";
+import { RestService, type RestServiceOptions } from "../rest-service";
 import type {
   AxelarAssetPrice,
   AxelarScanAsset,
@@ -35,8 +32,8 @@ export type GetAssetsPriceResponse = AxelarAssetPrice[];
 
 export type GetChainConfigsResponse = (EVMChainConfig | CosmosChainConfig)[];
 
-export class AxelarscanClient extends IsomorphicHTTPClient {
-  static init(options: IsomorphicClientOptions) {
+export class AxelarscanClient extends RestService {
+  static init(options: RestServiceOptions) {
     return new AxelarscanClient(options, {
       name: "AxelarscanClient",
       version: "0.0.1",

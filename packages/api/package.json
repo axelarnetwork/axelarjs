@@ -91,7 +91,7 @@
     "vitest": "^0.34.5"
   },
   "peerDependencies": {
-    "unfetch": "<=4.0.2"
+    "unfetch": "<=4.2"
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",

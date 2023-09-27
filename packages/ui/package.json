@@ -87,7 +87,7 @@
     "chalk": "^5.3.0",
     "commander": "^10.0.1",
     "csstype": "^3.1.2",
-    "daisyui": "^3.7.7",
+    "daisyui": "^3.8.0",
     "fast-check": "^3.13.0",
     "happy-dom": "^9.20.3",
     "husky": "^8.0.3",

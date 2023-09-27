@@ -175,7 +175,7 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
       unfetch:
-        specifier: ^4.0.2
+        specifier: ^4.2.0
         version: 4.2.0
       viem:
         specifier: ~1.10.14
@@ -353,8 +353,8 @@ importers:
         specifier: ^7.5.0
         version: 7.5.0
       unfetch:
-        specifier: <=4.0.2
-        version: 4.0.1
+        specifier: <=4.2
+        version: 4.2.0
       viem:
         specifier: ~1.10.14
         version: 1.10.14(typescript@5.2.2)(zod@3.22.2)
@@ -731,8 +731,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       daisyui:
-        specifier: ^3.7.7
-        version: 3.7.7(ts-node@10.9.1)
+        specifier: ^3.8.0
+        version: 3.8.0(ts-node@10.9.1)
       fast-check:
         specifier: ^3.13.0
         version: 3.13.0
@@ -831,8 +831,8 @@ importers:
         specifier: 18.15.3
         version: 18.15.3
       '@types/ramda':
-        specifier: ^0.29.4
-        version: 0.29.4
+        specifier: ^0.29.5
+        version: 0.29.5
       '@types/react':
         specifier: 18.2.21
         version: 18.2.21
@@ -6740,7 +6740,7 @@ packages:
     dependencies:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-error': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6753,7 +6753,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-ast': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       minim: 0.23.8
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
@@ -6765,7 +6765,7 @@ packages:
     resolution: {integrity: sha512-QxoWL+qGzwftqXSJaYLZ1Nrdtro+U1zX5Q4OLK+Ggg8Hi6Kn1SGXcHhn4JZ9J1rwrP85XCabilL3z9mhdebqWg==}
     dependencies:
       '@babel/runtime-corejs3': 7.22.15
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6776,7 +6776,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6789,7 +6789,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
       '@swagger-api/apidom-ns-openapi-3-1': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6803,7 +6803,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-json-schema-draft-7': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6816,7 +6816,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-ast': 0.76.2
       '@swagger-api/apidom-core': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6830,7 +6830,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
       '@swagger-api/apidom-ns-json-schema-draft-4': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6845,7 +6845,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
       '@swagger-api/apidom-ns-json-schema-draft-6': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6858,7 +6858,7 @@ packages:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-json-schema-draft-4': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6871,7 +6871,7 @@ packages:
       '@swagger-api/apidom-ast': 0.76.2
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-openapi-3-0': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6885,7 +6885,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-api-design-systems': 0.76.2
       '@swagger-api/apidom-parser-adapter-json': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6899,7 +6899,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-api-design-systems': 0.76.2
       '@swagger-api/apidom-parser-adapter-yaml-1-2': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6913,7 +6913,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-asyncapi-2': 0.76.2
       '@swagger-api/apidom-parser-adapter-json': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6927,7 +6927,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-asyncapi-2': 0.76.2
       '@swagger-api/apidom-parser-adapter-yaml-1-2': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6941,7 +6941,7 @@ packages:
       '@swagger-api/apidom-ast': 0.76.2
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -6959,7 +6959,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-openapi-3-0': 0.76.2
       '@swagger-api/apidom-parser-adapter-json': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6973,7 +6973,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-openapi-3-1': 0.76.2
       '@swagger-api/apidom-parser-adapter-json': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -6987,7 +6987,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-openapi-3-0': 0.76.2
       '@swagger-api/apidom-parser-adapter-yaml-1-2': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -7001,7 +7001,7 @@ packages:
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-ns-openapi-3-1': 0.76.2
       '@swagger-api/apidom-parser-adapter-yaml-1-2': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
     dev: false
@@ -7015,7 +7015,7 @@ packages:
       '@swagger-api/apidom-ast': 0.76.2
       '@swagger-api/apidom-core': 0.76.2
       '@swagger-api/apidom-error': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       ramda: 0.29.0
       ramda-adjunct: 4.1.1(ramda@0.29.0)
       stampit: 4.3.2
@@ -7030,7 +7030,7 @@ packages:
     dependencies:
       '@babel/runtime-corejs3': 7.22.15
       '@swagger-api/apidom-core': 0.76.2
-      '@types/ramda': 0.29.4
+      '@types/ramda': 0.29.5
       axios: 1.5.0
       minimatch: 7.4.6
       process: 0.11.10
@@ -7640,8 +7640,8 @@ packages:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
     dev: true
 
-  /@types/ramda@0.29.4:
-    resolution: {integrity: sha512-bd3nyfkZd5EVxuBf1kW6wvFz61SvAEfXXISIEIePJOj2XRjCHyro1ikvDXTXIlpRtuC6lwTMfYdkXCD+oiXQfw==}
+  /@types/ramda@0.29.5:
+    resolution: {integrity: sha512-oBBdRfoZoCl/aBIpBbct/uUHAbJ5i7vSOHK83SvH2Qr9ermYITRNKnEYgGJlnkagUY2cu8L2//Jq7o1355Go5A==}
     dependencies:
       types-ramda: 0.29.4
 
@@ -10190,8 +10190,8 @@ packages:
       type: 1.2.0
     dev: true
 
-  /daisyui@3.7.7(ts-node@10.9.1):
-    resolution: {integrity: sha512-2/nFdW/6R9MMnR8tTm07jPVyPaZwpUSkVsFAADb7Oq8N2Ynbls57laDdNqxTCUmn0QvcZi01TKl8zQbAwRfw1w==}
+  /daisyui@3.8.0(ts-node@10.9.1):
+    resolution: {integrity: sha512-VsWD//XlHkOBFSiRNTOZTxTJ/W8xI65erowErfbDWrPTkMYqf0ee/FTaqn4rquZoCcumENdFegAL8eELMnztxQ==}
     engines: {node: '>=16.9.0'}
     dependencies:
       colord: 2.9.3
@@ -18334,10 +18334,6 @@ packages:
       mime: 3.0.0
       node-fetch-native: 1.4.0
       pathe: 1.1.1
-    dev: false
-
-  /unfetch@4.0.1:
-    resolution: {integrity: sha512-HzDM9NgldcRvHVDb/O9vKoUszVij30Yw5ePjOZJig8nF/YisG7QN/9CBXZ8dsHLouXMeLZ82r+Jod9M2wFkEbQ==}
     dev: false
 
   /unfetch@4.2.0:

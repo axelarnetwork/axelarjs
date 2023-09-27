@@ -1,9 +1,6 @@
 import { always } from "rambda";
 
-import {
-  IsomorphicHTTPClient,
-  type IsomorphicClientOptions,
-} from "../isomorphic-http-client";
+import { RestService, type RestServiceOptions } from "../rest-service";
 import type {
   EstimateTimeSpentParams,
   GetContractsResponse,
@@ -23,8 +20,8 @@ import type {
   SearchGMPResponse,
 } from "./types";
 
-export class GMPClient extends IsomorphicHTTPClient {
-  static init(options: IsomorphicClientOptions) {
+export class GMPClient extends RestService {
+  static init(options: RestServiceOptions) {
     return new GMPClient(options, {
       name: "GMPClient",
       version: "0.0.1",

@@ -2,10 +2,10 @@ import { parseUnits } from "viem";
 
 import type { GMPClient } from "../gmp/isomorphic";
 import {
-  IsomorphicHTTPClient,
+  RestService,
   type ClientMeta,
-  type IsomorphicClientOptions,
-} from "../isomorphic-http-client";
+  type RestServiceOptions,
+} from "../rest-service";
 import { BigNumberUtils } from "./helpers/BigNumberUtils";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 
@@ -13,11 +13,11 @@ type AxelarscanClientDependencies = {
   gmpClient: GMPClient;
 };
 
-export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
+export class AxelarQueryAPIClient extends RestService {
   protected gmpClient: GMPClient;
 
   public constructor(
-    options: IsomorphicClientOptions,
+    options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
     meta?: ClientMeta
   ) {
@@ -26,7 +26,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   }
 
   static init(
-    options: IsomorphicClientOptions,
+    options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies
   ) {
     return new AxelarQueryAPIClient(options, dependencies, {

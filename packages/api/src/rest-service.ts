@@ -4,10 +4,10 @@ import {
 } from "@axelarjs/utils/http-client";
 
 /**
- * Configuration options for creating an instance of `IsomorphicHTTPClient`.
+ * Configuration options for creating an instance of `RestService`.
  * The type is a discriminated union based on the target ("browser" or "node").
  */
-export type IsomorphicClientOptions =
+export type RestServiceOptions =
   | {
       /**
        * The underlying HTTP client instance for browser, based on Ky.
@@ -48,16 +48,16 @@ export type ClientMeta = {
 };
 
 /**
- * Abstract class that defines an isomorphic HTTP client.
+ * Abstract class that defines an REST service client.
  * This can be used both in browser and Node.js environments.
  */
-export abstract class IsomorphicHTTPClient {
+export abstract class RestService {
   /**
-   * The name of the HTTP client.
+   * The name of the Service.
    */
   public name: string;
   /**
-   * The version of the HTTP client.
+   * The version of the Service.
    */
   public version: string;
 
@@ -67,12 +67,12 @@ export abstract class IsomorphicHTTPClient {
   protected client: HttpClient;
 
   /**
-   * Constructs a new instance of `IsomorphicHTTPClient`.
+   * Constructs a new instance of `RestServiceClient`.
    *
    * @param clientConfig - Configuration options for the client instance.
    * @param meta - Optional metadata like name and version for the client.
    */
-  constructor(clientConfig: IsomorphicClientOptions, meta?: ClientMeta) {
+  constructor(clientConfig: RestServiceOptions, meta?: ClientMeta) {
     const safeMeta = meta ?? {
       name: clientConfig.meta?.name ?? "HTTPClient",
       version: clientConfig.meta?.version ?? "0.0.0",
