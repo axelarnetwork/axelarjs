@@ -21,6 +21,14 @@
     "./index.d.ts"
   ],
   "exports": {
+    ".": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    },
     "./gmp": {
       "import": "./build/module/gmp/index.js",
       "require": "./build/commonjs//gmp/index.js"
@@ -56,14 +64,6 @@
     "./deposit-address/*": {
       "import": "./build/module/deposit-address/*.js",
       "require": "./build/commonjs/deposit-address/*.js"
-    },
-    ".": {
-      "import": "./build/module/*.js",
-      "require": "./build/commonjs/*.js"
-    },
-    "./*": {
-      "import": "./build/module/*.js",
-      "require": "./build/commonjs/*.js"
     }
   },
   "scripts": {
