@@ -1,6 +1,6 @@
 import { always } from "rambda";
 
-import { RestService, type RestServiceOptions } from "../rest-service";
+import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type {
   EstimateTimeSpentParams,
   GetContractsResponse,

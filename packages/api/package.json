@@ -11,6 +11,7 @@
   "description": "Axelar typesafe api clients",
   "files": [
     "./build",
+    "./lib",
     "./axelarscan",
     "./axelar-query",
     "./gmp",

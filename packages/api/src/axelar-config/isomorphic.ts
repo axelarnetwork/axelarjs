@@ -1,6 +1,6 @@
 import type { Environment } from "@axelarjs/core";
 
-import { RestService, type RestServiceOptions } from "../rest-service";
+import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type { Asset, ChainConfig, ChainConfigsResponse } from "./types";
 
 export class AxelarConfigClient extends RestService {

@@ -5,7 +5,7 @@ import {
   RestService,
   type ClientMeta,
   type RestServiceOptions,
-} from "../rest-service";
+} from "../lib/rest-service";
 import { BigNumberUtils } from "./helpers/BigNumberUtils";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 
