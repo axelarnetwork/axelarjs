@@ -29,9 +29,9 @@ import type { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 import { STANDARD_GAS_PRICE } from "../constants";
 import {
-  AxelarEncodeObject,
+  AxelarEncodedObject,
   AxelarMsgClient,
-  CosmosEncodeObject,
+  CosmosEncodedObject,
   createMsgClient,
   MODULES,
 } from "./messages";
@@ -95,8 +95,8 @@ export function getSigningAxelarClientOptions(
 }
 
 export type AxelarSigningClientMessage =
-  | AxelarEncodeObject
-  | CosmosEncodeObject;
+  | AxelarEncodedObject
+  | CosmosEncodedObject;
 
 export class AxelarSigningStargateClient extends SigningStargateClient {
   public messages: AxelarMsgClient;

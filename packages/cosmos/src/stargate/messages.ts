@@ -35,7 +35,7 @@ import * as ibcTransfer from "cosmjs-types/ibc/applications/transfer/v1/tx";
 import { camelize } from "inflection";
 
 import type {
-  EncodeProtoPackage,
+  EncodedProtoPackage,
   KeepOnlySimplifiedRequestMethods,
 } from "./types";
 
@@ -177,20 +177,20 @@ export const createMsgClient = (baseClient: SigningStargateClient) =>
     {} as AxelarMsgClient
   );
 
-export type AxelarEncodeObjectRecord = EncodeProtoPackage<typeof axelarnet> &
-  EncodeProtoPackage<typeof evm> &
-  EncodeProtoPackage<typeof multisig> &
-  EncodeProtoPackage<typeof nexus> &
-  EncodeProtoPackage<typeof permission> &
-  EncodeProtoPackage<typeof reward> &
-  EncodeProtoPackage<typeof snapshot> &
-  EncodeProtoPackage<typeof tss> &
-  EncodeProtoPackage<typeof vote>;
+export type AxelarEncodedObjectRecord = EncodedProtoPackage<typeof axelarnet> &
+  EncodedProtoPackage<typeof evm> &
+  EncodedProtoPackage<typeof multisig> &
+  EncodedProtoPackage<typeof nexus> &
+  EncodedProtoPackage<typeof permission> &
+  EncodedProtoPackage<typeof reward> &
+  EncodedProtoPackage<typeof snapshot> &
+  EncodedProtoPackage<typeof tss> &
+  EncodedProtoPackage<typeof vote>;
 
-export type AxelarEncodeObject =
-  AxelarEncodeObjectRecord[keyof AxelarEncodeObjectRecord];
+export type AxelarEncodedObject =
+  AxelarEncodedObjectRecord[keyof AxelarEncodedObjectRecord];
 
-export type CosmosEncodeObject =
+export type CosmosEncodedObject =
   | MsgDelegateEncodeObject
   | MsgDepositEncodeObject
   | MsgSendEncodeObject
