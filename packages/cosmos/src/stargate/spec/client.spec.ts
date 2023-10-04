@@ -5,7 +5,7 @@ import { STANDARD_FEE } from "../../constants";
 import {
   AxelarSigningStargateClient,
   getSigningAxelarClientOptions,
-} from "../client";
+} from "../stargateClient";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("signing client", () => {

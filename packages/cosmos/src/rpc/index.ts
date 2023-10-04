@@ -23,8 +23,11 @@ export class AxelarQueryClient extends QueryClient {
       const { axelarRpcUrl, environment } = config;
       const links: EnvironmentConfigs = getConfigs(environment);
       const rpc: string = axelarRpcUrl || links.axelarRpcUrl;
+
+      const tmClient = await Tendermint34Client.connect(rpc);
+
       instance = QueryClient.withExtensions(
-        await Tendermint34Client.connect(rpc),
+        tmClient,
         setupQueryClientExtension
       );
     }

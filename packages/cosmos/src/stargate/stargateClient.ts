@@ -35,6 +35,7 @@ import {
   createMsgClient,
   MODULES,
 } from "./messages";
+import { AxelarQueryClient, createQueryClient } from "./queryClient";
 import {
   convertToCamelCaseDeep,
   convertToSnakeCaseDeep,
@@ -99,7 +100,12 @@ export type AxelarSigningClientMessage =
   | CosmosEncodeObject;
 
 export class AxelarSigningStargateClient extends SigningStargateClient {
-  public messages: AxelarMsgClient;
+  /**
+   * @deprecated Use the {@link tx} field instead.
+   */
+  public readonly messages: AxelarMsgClient;
+  public readonly tx: AxelarMsgClient;
+  public readonly query?: AxelarQueryClient | undefined;
 
   protected constructor(
     tmClient: Tendermint37Client | undefined,
@@ -115,7 +121,12 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
       ...options,
     });
 
-    this.messages = createMsgClient(this);
+    this.tx = createMsgClient(this);
+
+    this.messages = this.tx;
+
+    this.query =
+      tmClient !== undefined ? createQueryClient(tmClient) : undefined;
   }
 
   static override async connect(
@@ -167,5 +178,19 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     memo?: string
   ) {
     return super.signAndBroadcast(signerAddress, messages, fee, memo);
+  }
+
+  protected override getQueryClient() {
+    return this.query;
+  }
+
+  protected override forceGetQueryClient() {
+    if (this.query === undefined) {
+      throw new Error(
+        "Query client not available. You cannot use online functionality in offline mode."
+      );
+    }
+
+    return this.query;
   }
 }
