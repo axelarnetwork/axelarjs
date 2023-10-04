@@ -60,7 +60,7 @@ type ModuleNames = keyof typeof TRACKED_MODULES;
 
 export const MODULES = Object.values(TRACKED_MODULES);
 
-type EncodeModule<M extends keyof TrackedModules> = {
+type EncodeModule<M extends ModuleNames> = {
   [P in keyof TrackedModules[M]]: TrackedModules[M][P] extends GeneratedType
     ? {
         signAndBroadcast(
