@@ -36,15 +36,12 @@ import {
   MODULES,
 } from "./messages";
 import { AxelarQueryClient, createQueryClient } from "./queryClient";
+import type { ProtobufModule } from "./types";
 import {
   convertToCamelCaseDeep,
   convertToSnakeCaseDeep,
   createAminoTypeNameFromProtoTypeUrl,
 } from "./utils";
-
-type ProtobufModule = Record<string, unknown> & {
-  protobufPackage: string;
-};
 
 export const generateTypeUrlAndTypeRecords = (proto: ProtobufModule) =>
   Object.entries(proto)

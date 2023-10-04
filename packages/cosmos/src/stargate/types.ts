@@ -58,3 +58,7 @@ export type StringLiteral<T> = T extends string
     ? never
     : T
   : never;
+
+export type ProtobufModule = Record<string, unknown> & {
+  protobufPackage: string;
+};
