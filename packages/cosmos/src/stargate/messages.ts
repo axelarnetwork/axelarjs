@@ -54,13 +54,13 @@ export const TRACKED_MODULES = {
   ibcTransfer,
 };
 
-type TrackedModules = typeof TRACKED_MODULES;
+export type TrackedModules = typeof TRACKED_MODULES;
 
-type ModuleNames = keyof typeof TRACKED_MODULES;
+export type ModuleNames = keyof typeof TRACKED_MODULES;
 
 export const MODULES = Object.values(TRACKED_MODULES);
 
-type EncodeModule<M extends ModuleNames> = {
+export type EncodedModule<M extends ModuleNames> = {
   [P in keyof TrackedModules[M]]: TrackedModules[M][P] extends GeneratedType
     ? {
         signAndBroadcast(
@@ -91,14 +91,17 @@ type EncodeModule<M extends ModuleNames> = {
 };
 
 export type AxelarMsgClient = {
-  [M in ModuleNames]: KeepOnlySimplifiedRequestMethods<EncodeModule<M>>;
+  [M in ModuleNames]: KeepOnlySimplifiedRequestMethods<EncodedModule<M>>;
 };
+
+const normalizeMsgMethod = (method: string) =>
+  camelize(method.replace(/Request$/, "").replace(/^Msg/, ""), true);
 
 const createMsgMethodClient =
   (client: SigningStargateClient, module: { protobufPackage: string }) =>
   <T extends Record<string, unknown>>(acc: T, [method]: [string, string]) => ({
     ...acc,
-    [camelize(method.replace(/Request$/, "").replace(/^Msg/, ""), true)]: {
+    [normalizeMsgMethod(method)]: {
       signAndBroadcast: (
         senderAddress: string,
         message: EncodeObject["value"],
@@ -177,7 +180,7 @@ export const createMsgClient = (baseClient: SigningStargateClient) =>
     {} as AxelarMsgClient
   );
 
-export type AxelarEncodedObjectRecord = EncodedProtoPackage<typeof axelarnet> &
+export type AxelarEncodeObjectRecord = EncodedProtoPackage<typeof axelarnet> &
   EncodedProtoPackage<typeof evm> &
   EncodedProtoPackage<typeof multisig> &
   EncodedProtoPackage<typeof nexus> &
@@ -187,10 +190,10 @@ export type AxelarEncodedObjectRecord = EncodedProtoPackage<typeof axelarnet> &
   EncodedProtoPackage<typeof tss> &
   EncodedProtoPackage<typeof vote>;
 
-export type AxelarEncodedObject =
-  AxelarEncodedObjectRecord[keyof AxelarEncodedObjectRecord];
+export type AxelarEncodeObject =
+  AxelarEncodeObjectRecord[keyof AxelarEncodeObjectRecord];
 
-export type CosmosEncodedObject =
+export type CosmosEncodeObject =
   | MsgDelegateEncodeObject
   | MsgDepositEncodeObject
   | MsgSendEncodeObject
