@@ -6,9 +6,10 @@ import {
   AxelarSigningStargateClient,
   getSigningAxelarClientOptions,
 } from "../stargateClient";
+import { AXELAR_RPC_URL } from "./constants";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
-describe("signing client", () => {
+describe("stargate client", () => {
   test("default registry", () => {
     const { registry } = getSigningAxelarClientOptions();
 
@@ -17,18 +18,17 @@ describe("signing client", () => {
     const typeFound = registry.lookupType("/axelar.evm.v1beta1.LinkRequest");
     expect(typeFound).toBeDefined();
     expect(typeFound?.decode).toBeDefined();
+    expect(typeFound?.encode).toBeDefined();
   });
 
   test("broadcast link transaction", async () => {
-    const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
-
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
       { prefix: "axelar" }
     );
 
     const client = await AxelarSigningStargateClient.connectWithSigner(
-      axelarRpcUrl,
+      AXELAR_RPC_URL,
       offlineSigner
     );
 
@@ -60,15 +60,13 @@ describe("signing client", () => {
   });
 
   test("simulate link transaction", async () => {
-    const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
-
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
       { prefix: "axelar" }
     );
 
     const client = await AxelarSigningStargateClient.connectWithSigner(
-      axelarRpcUrl,
+      AXELAR_RPC_URL,
       offlineSigner
     );
 

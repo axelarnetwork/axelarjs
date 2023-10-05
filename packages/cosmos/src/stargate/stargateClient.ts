@@ -20,7 +20,6 @@ import {
   SignerData,
   SigningStargateClient,
   SigningStargateClientOptions,
-  StargateClient,
   StargateClientOptions,
   StdFee,
 } from "@cosmjs/stargate";
@@ -131,7 +130,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     options: StargateClientOptions = {}
   ) {
     const tmClient = await Tendermint37Client.connect(endpoint);
-    return new this(tmClient, {} as OfflineSigner, options) as StargateClient;
+    return new this(tmClient, {} as OfflineSigner, options);
   }
 
   static override async connectWithSigner(
