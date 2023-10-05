@@ -82,7 +82,7 @@ export const createDefaultAminoTypes = () =>
     ...createAxelarAminoConverters(),
   });
 
-export function getSigningAxelarClientOptions(
+export function getAxelarSigningClientOptions(
   defaultTypes = defaultRegistryTypes
 ) {
   return {
@@ -108,7 +108,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     signer: OfflineSigner,
     options: SigningStargateClientOptions
   ) {
-    const { registry, aminoTypes } = getSigningAxelarClientOptions();
+    const { registry, aminoTypes } = getAxelarSigningClientOptions();
 
     super(tmClient, signer, {
       registry,

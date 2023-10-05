@@ -3,15 +3,15 @@ import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
 import { STANDARD_FEE } from "../../constants";
 import {
-  AxelarSigningStargateClient,
-  getSigningAxelarClientOptions,
+  createAxelarSigningClient,
+  getAxelarSigningClientOptions,
 } from "../stargateClient";
 import { AXELAR_RPC_URL } from "./constants";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("stargate client", () => {
   test("default registry", () => {
-    const { registry } = getSigningAxelarClientOptions();
+    const { registry } = getAxelarSigningClientOptions();
 
     expect(registry).toBeDefined();
 
@@ -27,7 +27,7 @@ describe("stargate client", () => {
       { prefix: "axelar" }
     );
 
-    const client = await AxelarSigningStargateClient.connectWithSigner(
+    const client = await createAxelarSigningClient(
       AXELAR_RPC_URL,
       offlineSigner
     );
@@ -65,7 +65,7 @@ describe("stargate client", () => {
       { prefix: "axelar" }
     );
 
-    const client = await AxelarSigningStargateClient.connectWithSigner(
+    const client = await createAxelarSigningClient(
       AXELAR_RPC_URL,
       offlineSigner
     );
