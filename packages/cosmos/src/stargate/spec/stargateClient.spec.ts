@@ -77,7 +77,7 @@ describe("stargate client", () => {
     }
 
     const estimateGas = await client.tx.evm.link.simulate(accData.address, {
-      sender: toAccAddress(String(accData?.address)),
+      sender: toAccAddress(String(accData.address)),
       recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       recipientChain: "avalanche",
       asset: "wavax-wei",
