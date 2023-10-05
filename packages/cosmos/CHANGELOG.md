@@ -1,5 +1,11 @@
 # @axelarjs/cosmos
 
+## 0.2.8
+
+### Patch Changes
+
+- [`6f9fcdf4`](https://github.com/axelarnetwork/axelarjs/commit/6f9fcdf495a70218036bc79ad743d33ad8c3942f) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Introduce axelar query client to cosmos stargate client.
+
 ## 0.2.7
 
 ### Patch Changes
