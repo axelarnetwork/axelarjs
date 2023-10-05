@@ -42,7 +42,7 @@ describe("stargate client", () => {
       return;
     }
 
-    const txResponse = await client.messages.evm.link.signAndBroadcast(
+    const txResponse = await client.tx.evm.link.signAndBroadcast(
       accData.address,
       {
         sender: toAccAddress(String(accData?.address)),
@@ -76,16 +76,13 @@ describe("stargate client", () => {
       return;
     }
 
-    const estimateGas = await client.messages.evm.link.simulate(
-      accData.address,
-      {
-        sender: toAccAddress(String(accData?.address)),
-        recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
-        recipientChain: "avalanche",
-        asset: "wavax-wei",
-        chain: "fantom",
-      }
-    );
+    const estimateGas = await client.tx.evm.link.simulate(accData.address, {
+      sender: toAccAddress(String(accData?.address)),
+      recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+      recipientChain: "avalanche",
+      asset: "wavax-wei",
+      chain: "fantom",
+    });
 
     expect(estimateGas).not.toBeLessThan(10000);
   });

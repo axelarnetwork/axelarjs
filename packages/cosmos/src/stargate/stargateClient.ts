@@ -190,3 +190,17 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     return this.query;
   }
 }
+
+export async function createAxelarQueryClient(
+  endpoint: string | HttpEndpoint,
+  options: StargateClientOptions = {}
+) {
+  const client = await AxelarSigningStargateClient.connect(endpoint, options);
+
+  return client.query as AxelarQueryClient;
+}
+
+export const createAxelarSigningClient =
+  AxelarSigningStargateClient.connectWithSigner.bind(
+    AxelarSigningStargateClient
+  );
