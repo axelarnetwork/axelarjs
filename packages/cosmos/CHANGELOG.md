@@ -1,5 +1,11 @@
 # @axelarjs/cosmos
 
+## 0.2.9
+
+### Patch Changes
+
+- [`d08e02fc`](https://github.com/axelarnetwork/axelarjs/commit/d08e02fca9172afe12671c0b2b66d14c9104f088) Thanks [@alanrsoares](https://github.com/alanrsoares)! - introduce cosmos tx and query client factory functions
+
 ## 0.2.8
 
 ### Patch Changes
