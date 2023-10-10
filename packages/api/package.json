@@ -81,7 +81,7 @@
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "@types/node": "18.15.3",
-    "fast-check": "^3.13.0",
+    "fast-check": "^3.13.1",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
