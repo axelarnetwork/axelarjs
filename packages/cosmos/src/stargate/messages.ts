@@ -27,8 +27,6 @@ import type {
   SigningStargateClient,
   StdFee,
 } from "@cosmjs/stargate";
-// comsmos messages
-
 import type { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import * as ibcFee from "cosmjs-types/ibc/applications/fee/v1/tx";
 import * as ibcTransfer from "cosmjs-types/ibc/applications/transfer/v1/tx";
@@ -56,107 +54,143 @@ export const TRACKED_MODULES = {
 
 export type TrackedModules = typeof TRACKED_MODULES;
 
-export type ModuleNames = keyof typeof TRACKED_MODULES;
+export type ModuleNames = keyof TrackedModules;
 
 export const MODULES = Object.values(TRACKED_MODULES);
 
+export type ModuleMethodApi<T> = T extends GeneratedType
+  ? {
+      signAndBroadcast(
+        senderAddress: string,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        message: ReturnType<T["fromPartial"]>,
+        fee: StdFee
+      ): Promise<DeliverTxResponse>;
+      sign(
+        signerAddress: string,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        message: ReturnType<T["fromPartial"]>,
+        fee: StdFee,
+        memo: string,
+        explicitSignerData?: SignerData
+      ): Promise<TxRaw>;
+      simulate(
+        signerAddress: string,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        message: ReturnType<T["fromPartial"]>,
+        memo?: string
+      ): Promise<number>;
+    }
+  : never;
+
 export type EncodedModule<M extends ModuleNames> = {
-  [P in keyof TrackedModules[M]]: TrackedModules[M][P] extends GeneratedType
-    ? {
-        signAndBroadcast(
-          senderAddress: string,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          message: ReturnType<TrackedModules[M][P]["fromPartial"]>,
-          fee: StdFee
-        ): Promise<DeliverTxResponse>;
-        sign(
-          signerAddress: string,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          message: ReturnType<TrackedModules[M][P]["fromPartial"]>,
-          fee: StdFee,
-          memo: string,
-          explicitSignerData?: SignerData
-        ): Promise<TxRaw>;
-        simulate(
-          signerAddress: string,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          message: ReturnType<TrackedModules[M][P]["fromPartial"]>,
-          memo?: string
-        ): Promise<number>;
-      }
-    : never;
+  [P in keyof TrackedModules[M]]: ModuleMethodApi<TrackedModules[M][P]>;
 };
 
 export type AxelarMsgClient = {
   [M in ModuleNames]: KeepOnlySimplifiedRequestMethods<EncodedModule<M>>;
 };
 
-const normalizeMsgMethod = (method: string) =>
+const normalizeMethodName = (method: string) =>
   camelize(method.replace(/Request$/, "").replace(/^Msg/, ""), true);
+
+const createModuleMethodApi = (
+  client: SigningStargateClient,
+  module: { protobufPackage: string },
+  method: string
+) => ({
+  /**
+   * Sign and broadcast a message.
+   *
+   * @param senderAddress
+   * @param message
+   * @param fee
+   * @returns broadcast response
+   */
+  signAndBroadcast: (
+    senderAddress: string,
+    message: EncodeObject["value"],
+    fee: StdFee
+  ) =>
+    client.signAndBroadcast(
+      senderAddress,
+      [
+        {
+          typeUrl: `/${module.protobufPackage}.${method}`,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          value: message,
+        },
+      ],
+      fee
+    ),
+  /**
+   * Sign a message.
+   *
+   * @param signerAddress
+   * @param message
+   * @param fee
+   * @param memo
+   * @param explicitSignerData
+   *
+   * @returns signed transaction
+   */
+  sign: (
+    signerAddress: string,
+    message: EncodeObject["value"],
+    fee: StdFee,
+    memo: string,
+    explicitSignerData?: SignerData
+  ) =>
+    client.sign(
+      signerAddress,
+      [
+        {
+          typeUrl: `/${module.protobufPackage}.${method}`,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          value: message,
+        },
+      ],
+      fee,
+      memo,
+      explicitSignerData
+    ),
+  /**
+   * Simulate a message.
+   * @param signerAddress
+   * @param message
+   * @param memo
+   * @returns gas estimate
+   */
+  simulate: (
+    signerAddress: string,
+    message: EncodeObject["value"],
+    memo: string | undefined
+  ) =>
+    client.simulate(
+      signerAddress,
+      [
+        {
+          typeUrl: `/${module.protobufPackage}.${method}`,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          value: message,
+        },
+      ],
+      memo
+    ),
+});
 
 const createMsgMethodClient =
   (client: SigningStargateClient, module: { protobufPackage: string }) =>
   <T extends Record<string, unknown>>(acc: T, [method]: [string, string]) => ({
     ...acc,
-    [normalizeMsgMethod(method)]: {
-      signAndBroadcast: (
-        senderAddress: string,
-        message: EncodeObject["value"],
-        fee: StdFee
-      ) =>
-        client.signAndBroadcast(
-          senderAddress,
-          [
-            {
-              typeUrl: `/${module.protobufPackage}.${method}`,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              value: message,
-            },
-          ],
-          fee
-        ),
-      sign(
-        signerAddress: string,
-        message: EncodeObject["value"],
-        fee: StdFee,
-        memo: string,
-        explicitSignerData?: SignerData
-      ) {
-        return client.sign(
-          signerAddress,
-          [
-            {
-              typeUrl: `/${module.protobufPackage}.${method}`,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              value: message,
-            },
-          ],
-          fee,
-          memo,
-          explicitSignerData
-        );
-      },
-      simulate(
-        signerAddress: string,
-        message: EncodeObject["value"],
-        memo: string | undefined
-      ) {
-        return client.simulate(
-          signerAddress,
-          [
-            {
-              typeUrl: `/${module.protobufPackage}.${method}`,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              value: message,
-            },
-          ],
-          memo
-        );
-      },
-    },
+    [normalizeMethodName(method)]: createModuleMethodApi(
+      client,
+      module,
+      method
+    ),
   });
 
 export const createMsgClient = (baseClient: SigningStargateClient) =>
