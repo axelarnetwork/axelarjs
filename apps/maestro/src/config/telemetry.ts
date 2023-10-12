@@ -1,4 +1,4 @@
-import Sentry from "@sentry/nextjs";
+import { configureScope } from "@sentry/nextjs";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 
@@ -16,7 +16,7 @@ export function initLogRocket() {
 
     // set sessionURL as an extra to be sent with Sentry events
     LogRocket.getSessionURL((sessionURL) => {
-      Sentry.configureScope((scope) => {
+      configureScope((scope) => {
         scope.setExtra("sessionURL", sessionURL);
       });
     });
