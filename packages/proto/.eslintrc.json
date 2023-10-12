@@ -1,11 +1,3 @@
 {
-  "extends": "../../.eslintrc.js/*",
-  "ignorePatterns": [
-    "src/axelar/*",
-    "src/cosmos/*",
-    "src/cosmos_proto/*",
-    "src/google/*",
-    "src/gogoproto/*",
-    "src/tendermint/*"
-  ]
+  "extends": "../../.eslintrc.js/*"
 }
