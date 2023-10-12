@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 
-import tw from "tailwind-styled-components";
+import tw from "../../tw";
 
 const StyledNavbar = tw.div`
   navbar bg-base-100

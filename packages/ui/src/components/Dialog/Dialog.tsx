@@ -7,8 +7,7 @@ import {
   useRef,
 } from "react";
 
-import tw from "tailwind-styled-components";
-
+import tw from "../../tw";
 import { Button, ButtonProps } from "../Button";
 import { DialogStateProvider, useDialogStateContiner } from "./Dialog.state";
 
@@ -91,7 +90,10 @@ const DialogRootWithProvider: FC<DialogProps> = ({ children, ...props }) => (
   </DialogStateProvider>
 );
 
-const DialogCloseAction: FC<ButtonProps> = ({ ref, onClick, ...props }) => {
+const DialogCloseAction: FC<Omit<ButtonProps, "ref">> = ({
+  onClick,
+  ...props
+}) => {
   const [, actions] = useDialogStateContiner();
 
   return (

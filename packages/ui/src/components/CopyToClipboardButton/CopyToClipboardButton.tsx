@@ -23,13 +23,13 @@ export const CopyToClipboardButton = forwardRef<
   const textToCopy =
     typeof children === "string" && !copyText ? children : copyText;
 
-  const handleCopy = (text = "") => {
+  const handleCopy = async (text = "") => {
     if (!text) {
       throw new Error(
         "[CopyToClipboardButton]: missing props 'copyText' or string children"
       );
     }
-    copy(text ?? "");
+    await copy(text ?? "");
     onCopied?.();
   };
   const isCopied = copied === textToCopy;
@@ -37,7 +37,7 @@ export const CopyToClipboardButton = forwardRef<
   return (
     <Button
       className={cn("flex items-center gap-2", className)}
-      onClick={handleCopy.bind(null, textToCopy)}
+      onClick={handleCopy.bind(null, textToCopy) as () => void}
       {...props}
       ref={ref}
     >

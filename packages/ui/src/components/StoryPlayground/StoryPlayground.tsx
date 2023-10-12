@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { CapitalizeKeys } from "@axelarjs/utils";
 import { ComponentProps, FC, ReactNode, useState } from "react";
 
@@ -31,11 +32,8 @@ type VariantConfig<
   title?: string;
 } & PolymorphicVariantConfig<TComponent, TKey>;
 
-type VariantConfigLike<TComponent extends FC> = VariantConfig<
-  TComponent,
-  // rome-ignore lint/suspicious/noExplicitAny: <explanation>
-  any
->;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type VariantConfigLike<TComponent extends FC> = VariantConfig<TComponent, any>;
 
 type VariantsProps<
   TComponent extends FC,
@@ -156,12 +154,12 @@ const Variants = <
                     {"noChildren" in props.variant ? (
                       <div>
                         <span className="label">{value}</span>
-                        {/* @ts-ignore\ */}
+                        {/* @ts-ignore */}
                         <props.component {...itemProps} />
                       </div>
                     ) : (
                       <>
-                        {/* @ts-ignore\ */}
+                        {/* @ts-ignore */}
                         <props.component {...itemProps} />
                       </>
                     )}

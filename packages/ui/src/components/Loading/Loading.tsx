@@ -2,7 +2,8 @@ import { ComponentProps, FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
-import tw from "tailwind-styled-components";
+
+import tw from "../../tw";
 
 export const loadingVariance = cva("loading", {
   variants: {
@@ -55,7 +56,6 @@ export const Loading: FC<LoadingProps> = ({
   size,
   variant,
   className,
-  children,
   ...props
 }) => (
   <StyledLoading

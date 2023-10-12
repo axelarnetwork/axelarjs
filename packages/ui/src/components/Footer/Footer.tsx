@@ -1,7 +1,8 @@
 import type { FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
-import tw from "tailwind-styled-components";
+
+import tw from "../../tw";
 
 const footerVariants = cva("footer", {
   variants: {

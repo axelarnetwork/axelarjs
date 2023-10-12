@@ -2,8 +2,8 @@ import { ComponentProps, FC, Fragment, MouseEvent, useMemo } from "react";
 
 import { Transition } from "@headlessui/react";
 import * as Dialog from "@radix-ui/react-dialog";
-import tw from "tailwind-styled-components";
 
+import tw from "../../tw";
 import { Button } from "../Button";
 import { DialogTriggerProps } from "../Dialog";
 import {
@@ -29,7 +29,6 @@ export type ModalProps = BaseModalProps & DialogTriggerProps;
 
 const ModalRoot: FC<ModalProps> = ({
   modal,
-  open,
   onOpenChange,
   defaultOpen,
   hideCloseButton,

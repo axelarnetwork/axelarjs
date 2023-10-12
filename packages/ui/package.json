@@ -5,27 +5,54 @@
   "publishConfig": {
     "access": "restricted"
   },
-  "main": "./src/index.ts",
   "files": [
     "src",
+    "dist",
     "tailwind.config.preset.cjs"
   ],
   "license": "LicenseRef-LICENSE",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./utils": {
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.js"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.js"
+    },
+    "./tw": {
+      "import": "./dist/tw/index.mjs",
+      "require": "./dist/tw/index.js"
+    },
+    "./toast": {
+      "import": "./dist/toast.mjs",
+      "require": "./dist/toast.js"
+    },
+    "./theme": {
+      "import": "./src/theme.mjs",
+      "require": "./src/theme.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js"
+    },
+    "./components/*": {
+      "import": "./dist/components/*/index.mjs",
+      "require": "./dist/components/*/index.js"
+    },
     "./base.css": "./src/base.css",
     "./preset": "./tailwind.config.preset.cjs",
-    "./unstated": "./src/lib/unstated.tsx",
-    "./utils": "./src/utils.ts",
-    "./hooks": "./src/hooks.ts",
-    "./theme": "./src/theme.ts",
-    "./components/core": "./src/components/core/index.tsx",
-    "./components/*": "./src/components/*/index.ts"
+    "./unstated": "./src/lib/unstated.tsx"
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && pnpm bundle",
     "compile": "tsc --noEmit",
+    "bundle": "tsup",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -37,8 +64,8 @@
     "rome:apply": "npx rome check src/ --apply",
     "svgr": "svgr ./assets/icons",
     "sb:upgrade": "npx storybook@next upgrade --prerelease",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@axelarjs/config": "workspace:*",
@@ -101,6 +128,7 @@
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-radix": "^2.8.0",
+    "tsup": "^7.2.0",
     "tsx": "^3.13.0",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
