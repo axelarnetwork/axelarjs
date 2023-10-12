@@ -1,4 +1,4 @@
-import { ThemeProvider, Toaster } from "@axelarjs/ui";
+import { ThemeProvider } from "@axelarjs/ui";
 import { useEffect, useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -11,6 +11,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "~/styles/globals.css";
+
+import { Toaster } from "@axelarjs/ui/toast";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";

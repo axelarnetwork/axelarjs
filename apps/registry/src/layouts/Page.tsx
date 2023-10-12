@@ -1,4 +1,4 @@
-import { Clamp } from "@axelarjs/ui/components/core";
+import { Clamp } from "@axelarjs/ui";
 import { cn } from "@axelarjs/ui/utils";
 import type { FC, PropsWithChildren } from "react";
 

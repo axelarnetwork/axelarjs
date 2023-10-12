@@ -1,8 +1,7 @@
 import { ArrowRightIcon, ExternalLinkIcon, Menu, Modal } from "@axelarjs/ui";
+import tw from "@axelarjs/ui/tw";
 import React, { type FC } from "react";
 import Link from "next/link";
-
-import tw from "tailwind-styled-components";
 
 import {
   NEXT_PUBLIC_EXPLORER_URL,

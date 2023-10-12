@@ -1,12 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import {
-  Button,
-  FormControl,
-  Label,
-  Modal,
-  TextInput,
-  toast,
-} from "@axelarjs/ui";
+import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toast";
 import { invariant } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";

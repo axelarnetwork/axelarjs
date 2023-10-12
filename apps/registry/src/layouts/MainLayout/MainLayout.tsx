@@ -1,6 +1,6 @@
 "use client";
 
-import { Footer } from "@axelarjs/ui";
+import { Footer } from "@axelarjs/ui/components/Footer";
 import { type FC, type PropsWithChildren } from "react";
 import Link from "next/link";
 

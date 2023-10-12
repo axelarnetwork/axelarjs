@@ -1,4 +1,6 @@
-import { Button, cn, Dialog, LinkButton, useWindowSize } from "@axelarjs/ui";
+import { Button, Dialog, LinkButton } from "@axelarjs/ui";
+import { useWindowSize } from "@axelarjs/ui/hooks";
+import { cn } from "@axelarjs/ui/utils";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 

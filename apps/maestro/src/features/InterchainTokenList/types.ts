@@ -1,4 +1,4 @@
-import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api";
+import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api/index";
 
 import type { WagmiEVMChainConfig } from "~/config/wagmi";
 
@@ -15,6 +15,8 @@ export type TokenInfo = {
   isSelected?: boolean;
   chain?: EVMChainConfig;
   wagmiConfig?: WagmiEVMChainConfig;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   deploymentStatus?: "pending" | GMPTxStatus;
   deploymentTxHash?: `0x${string}:${number}` | `0x${string}`;
 };

@@ -1,14 +1,11 @@
-// Injected content via Sentry wizard below
-
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 
-/**]
+/**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@axelarjs/ui"],
   images: {
     domains: ["testnet.axelarscan.io"],
   },
