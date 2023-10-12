@@ -86,7 +86,7 @@ export const GenesisState = {
       governanceKey: isSet(object.governanceKey)
         ? LegacyAminoPubKey.fromJSON(object.governanceKey)
         : undefined,
-      govAccounts: Array.isArray(object?.govAccounts)
+      govAccounts: globalThis.Array.isArray(object?.govAccounts)
         ? object.govAccounts.map((e: any) => GovAccount.fromJSON(e))
         : [],
     };
@@ -142,8 +142,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

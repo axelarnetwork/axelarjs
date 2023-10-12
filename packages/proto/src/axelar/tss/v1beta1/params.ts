@@ -175,7 +175,7 @@ export const Params = {
 
   fromJSON(object: any): Params {
     return {
-      keyRequirements: Array.isArray(object?.keyRequirements)
+      keyRequirements: globalThis.Array.isArray(object?.keyRequirements)
         ? object.keyRequirements.map((e: any) => KeyRequirement.fromJSON(e))
         : [],
       suspendDurationInBlocks: isSet(object.suspendDurationInBlocks)
@@ -318,8 +318,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

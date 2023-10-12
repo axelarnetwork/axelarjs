@@ -12,6 +12,7 @@ export interface Params {
   chainMaintainerMissingVoteThreshold?: Threshold | undefined;
   chainMaintainerIncorrectVoteThreshold?: Threshold | undefined;
   chainMaintainerCheckWindow: number;
+  gateway: Uint8Array;
 }
 
 function createBaseParams(): Params {
@@ -20,6 +21,7 @@ function createBaseParams(): Params {
     chainMaintainerMissingVoteThreshold: undefined,
     chainMaintainerIncorrectVoteThreshold: undefined,
     chainMaintainerCheckWindow: 0,
+    gateway: new Uint8Array(0),
   };
 }
 
@@ -48,6 +50,9 @@ export const Params = {
     }
     if (message.chainMaintainerCheckWindow !== 0) {
       writer.uint32(32).int32(message.chainMaintainerCheckWindow);
+    }
+    if (message.gateway.length !== 0) {
+      writer.uint32(42).bytes(message.gateway);
     }
     return writer;
   },
@@ -97,6 +102,13 @@ export const Params = {
 
           message.chainMaintainerCheckWindow = reader.int32();
           continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.gateway = reader.bytes();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -122,8 +134,11 @@ export const Params = {
         ? Threshold.fromJSON(object.chainMaintainerIncorrectVoteThreshold)
         : undefined,
       chainMaintainerCheckWindow: isSet(object.chainMaintainerCheckWindow)
-        ? Number(object.chainMaintainerCheckWindow)
+        ? globalThis.Number(object.chainMaintainerCheckWindow)
         : 0,
+      gateway: isSet(object.gateway)
+        ? bytesFromBase64(object.gateway)
+        : new Uint8Array(0),
     };
   },
 
@@ -149,6 +164,9 @@ export const Params = {
         message.chainMaintainerCheckWindow
       );
     }
+    if (message.gateway.length !== 0) {
+      obj.gateway = base64FromBytes(message.gateway);
+    }
     return obj;
   },
 
@@ -173,9 +191,35 @@ export const Params = {
         ? Threshold.fromPartial(object.chainMaintainerIncorrectVoteThreshold)
         : undefined;
     message.chainMaintainerCheckWindow = object.chainMaintainerCheckWindow ?? 0;
+    message.gateway = object.gateway ?? new Uint8Array(0);
     return message;
   },
 };
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = globalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(globalThis.String.fromCharCode(byte));
+    });
+    return globalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin =
   | Date
@@ -190,8 +234,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

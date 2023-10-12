@@ -170,7 +170,7 @@ export const PendingIBCTransferCountResponse = {
       object.transfersByChain ?? {}
     ).reduce<{ [key: string]: number }>((acc, [key, value]) => {
       if (value !== undefined) {
-        acc[key] = Number(value);
+        acc[key] = globalThis.Number(value);
       }
       return acc;
     }, {});
@@ -233,8 +233,8 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
 
   fromJSON(object: any): PendingIBCTransferCountResponse_TransfersByChainEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
-      value: isSet(object.value) ? Number(object.value) : 0,
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.Number(object.value) : 0,
     };
   },
 
@@ -409,8 +409,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

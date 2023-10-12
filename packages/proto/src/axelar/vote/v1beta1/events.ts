@@ -90,11 +90,11 @@ export const Voted = {
 
   fromJSON(object: any): Voted {
     return {
-      module: isSet(object.module) ? String(object.module) : "",
-      action: isSet(object.action) ? String(object.action) : "",
-      poll: isSet(object.poll) ? String(object.poll) : "",
-      voter: isSet(object.voter) ? String(object.voter) : "",
-      state: isSet(object.state) ? String(object.state) : "",
+      module: isSet(object.module) ? globalThis.String(object.module) : "",
+      action: isSet(object.action) ? globalThis.String(object.action) : "",
+      poll: isSet(object.poll) ? globalThis.String(object.poll) : "",
+      voter: isSet(object.voter) ? globalThis.String(object.voter) : "",
+      state: isSet(object.state) ? globalThis.String(object.state) : "",
     };
   },
 
@@ -145,8 +145,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

@@ -75,7 +75,9 @@ export const App = {
       protocol: isSet(object.protocol)
         ? Long.fromValue(object.protocol)
         : Long.UZERO,
-      software: isSet(object.software) ? String(object.software) : "",
+      software: isSet(object.software)
+        ? globalThis.String(object.software)
+        : "",
     };
   },
 
@@ -203,8 +205,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

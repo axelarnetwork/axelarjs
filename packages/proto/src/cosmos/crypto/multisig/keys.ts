@@ -67,8 +67,10 @@ export const LegacyAminoPubKey = {
 
   fromJSON(object: any): LegacyAminoPubKey {
     return {
-      threshold: isSet(object.threshold) ? Number(object.threshold) : 0,
-      publicKeys: Array.isArray(object?.publicKeys)
+      threshold: isSet(object.threshold)
+        ? globalThis.Number(object.threshold)
+        : 0,
+      publicKeys: globalThis.Array.isArray(object?.publicKeys)
         ? object.publicKeys.map((e: any) => Any.fromJSON(e))
         : [],
     };
@@ -114,8 +116,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

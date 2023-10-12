@@ -521,8 +521,8 @@ export const VoteEvents = {
 
   fromJSON(object: any): VoteEvents {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      events: Array.isArray(object?.events)
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      events: globalThis.Array.isArray(object?.events)
         ? object.events.map((e: any) => Event.fromJSON(e))
         : [],
     };
@@ -734,7 +734,7 @@ export const Event = {
 
   fromJSON(object: any): Event {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
@@ -958,12 +958,12 @@ export const EventTokenSent = {
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       destinationAddress: isSet(object.destinationAddress)
-        ? String(object.destinationAddress)
+        ? globalThis.String(object.destinationAddress)
         : "",
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
         : new Uint8Array(0),
@@ -1088,10 +1088,10 @@ export const EventContractCall = {
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       contractAddress: isSet(object.contractAddress)
-        ? String(object.contractAddress)
+        ? globalThis.String(object.contractAddress)
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
@@ -1238,15 +1238,15 @@ export const EventContractCallWithToken = {
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       contractAddress: isSet(object.contractAddress)
-        ? String(object.contractAddress)
+        ? globalThis.String(object.contractAddress)
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
         : new Uint8Array(0),
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
         : new Uint8Array(0),
@@ -1430,7 +1430,7 @@ export const EventTokenDeployed = {
 
   fromJSON(object: any): EventTokenDeployed {
     return {
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
       tokenAddress: isSet(object.tokenAddress)
         ? bytesFromBase64(object.tokenAddress)
         : new Uint8Array(0),
@@ -1542,13 +1542,13 @@ export const EventMultisigOwnershipTransferred = {
 
   fromJSON(object: any): EventMultisigOwnershipTransferred {
     return {
-      preOwners: Array.isArray(object?.preOwners)
+      preOwners: globalThis.Array.isArray(object?.preOwners)
         ? object.preOwners.map((e: any) => bytesFromBase64(e))
         : [],
       prevThreshold: isSet(object.prevThreshold)
         ? bytesFromBase64(object.prevThreshold)
         : new Uint8Array(0),
-      newOwners: Array.isArray(object?.newOwners)
+      newOwners: globalThis.Array.isArray(object?.newOwners)
         ? object.newOwners.map((e: any) => bytesFromBase64(e))
         : [],
       newThreshold: isSet(object.newThreshold)
@@ -1655,13 +1655,13 @@ export const EventMultisigOperatorshipTransferred = {
 
   fromJSON(object: any): EventMultisigOperatorshipTransferred {
     return {
-      newOperators: Array.isArray(object?.newOperators)
+      newOperators: globalThis.Array.isArray(object?.newOperators)
         ? object.newOperators.map((e: any) => bytesFromBase64(e))
         : [],
       newThreshold: isSet(object.newThreshold)
         ? bytesFromBase64(object.newThreshold)
         : new Uint8Array(0),
-      newWeights: Array.isArray(object?.newWeights)
+      newWeights: globalThis.Array.isArray(object?.newWeights)
         ? object.newWeights.map((e: any) => bytesFromBase64(e))
         : [],
     };
@@ -1750,7 +1750,7 @@ export const NetworkInfo = {
 
   fromJSON(object: any): NetworkInfo {
     return {
-      name: isSet(object.name) ? String(object.name) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
       id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(0),
     };
   },
@@ -1884,10 +1884,10 @@ export const BurnerInfo = {
         ? bytesFromBase64(object.tokenAddress)
         : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
       salt: isSet(object.salt)
         ? bytesFromBase64(object.salt)
         : new Uint8Array(0),
@@ -2038,9 +2038,9 @@ export const ERC20Deposit = {
       amount: isSet(object.amount)
         ? bytesFromBase64(object.amount)
         : new Uint8Array(0),
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       burnerAddress: isSet(object.burnerAddress)
         ? bytesFromBase64(object.burnerAddress)
@@ -2216,7 +2216,7 @@ export const ERC20TokenMetadata = {
 
   fromJSON(object: any): ERC20TokenMetadata {
     return {
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
       chainId: isSet(object.chainId)
         ? bytesFromBase64(object.chainId)
         : new Uint8Array(0),
@@ -2224,11 +2224,13 @@ export const ERC20TokenMetadata = {
         ? TokenDetails.fromJSON(object.details)
         : undefined,
       tokenAddress: isSet(object.tokenAddress)
-        ? String(object.tokenAddress)
+        ? globalThis.String(object.tokenAddress)
         : "",
-      txHash: isSet(object.txHash) ? String(object.txHash) : "",
+      txHash: isSet(object.txHash) ? globalThis.String(object.txHash) : "",
       status: isSet(object.status) ? statusFromJSON(object.status) : 0,
-      isExternal: isSet(object.isExternal) ? Boolean(object.isExternal) : false,
+      isExternal: isSet(object.isExternal)
+        ? globalThis.Boolean(object.isExternal)
+        : false,
       burnerCode: isSet(object.burnerCode)
         ? bytesFromBase64(object.burnerCode)
         : new Uint8Array(0),
@@ -2473,12 +2475,14 @@ export const Command = {
   fromJSON(object: any): Command {
     return {
       id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(0),
-      command: isSet(object.command) ? String(object.command) : "",
+      command: isSet(object.command) ? globalThis.String(object.command) : "",
       params: isSet(object.params)
         ? bytesFromBase64(object.params)
         : new Uint8Array(0),
-      keyId: isSet(object.keyId) ? String(object.keyId) : "",
-      maxGasCost: isSet(object.maxGasCost) ? Number(object.maxGasCost) : 0,
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
+      maxGasCost: isSet(object.maxGasCost)
+        ? globalThis.Number(object.maxGasCost)
+        : 0,
       type: isSet(object.type) ? commandTypeFromJSON(object.type) : 0,
     };
   },
@@ -2645,7 +2649,7 @@ export const CommandBatchMetadata = {
   fromJSON(object: any): CommandBatchMetadata {
     return {
       id: isSet(object.id) ? bytesFromBase64(object.id) : new Uint8Array(0),
-      commandIds: Array.isArray(object?.commandIds)
+      commandIds: globalThis.Array.isArray(object?.commandIds)
         ? object.commandIds.map((e: any) => bytesFromBase64(e))
         : [],
       data: isSet(object.data)
@@ -2657,7 +2661,7 @@ export const CommandBatchMetadata = {
       status: isSet(object.status)
         ? batchedCommandsStatusFromJSON(object.status)
         : 0,
-      keyId: isSet(object.keyId) ? String(object.keyId) : "",
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
       prevBatchedCommandsId: isSet(object.prevBatchedCommandsId)
         ? bytesFromBase64(object.prevBatchedCommandsId)
         : new Uint8Array(0),
@@ -2785,7 +2789,7 @@ export const SigMetadata = {
   fromJSON(object: any): SigMetadata {
     return {
       type: isSet(object.type) ? sigTypeFromJSON(object.type) : 0,
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       commandBatchId: isSet(object.commandBatchId)
         ? bytesFromBase64(object.commandBatchId)
         : new Uint8Array(0),
@@ -2874,7 +2878,9 @@ export const TransferKey = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      nextKeyId: isSet(object.nextKeyId) ? String(object.nextKeyId) : "",
+      nextKeyId: isSet(object.nextKeyId)
+        ? globalThis.String(object.nextKeyId)
+        : "",
     };
   },
 
@@ -2950,8 +2956,8 @@ export const Asset = {
 
   fromJSON(object: any): Asset {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      name: isSet(object.name) ? String(object.name) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
     };
   },
 
@@ -3053,9 +3059,11 @@ export const TokenDetails = {
 
   fromJSON(object: any): TokenDetails {
     return {
-      tokenName: isSet(object.tokenName) ? String(object.tokenName) : "",
-      symbol: isSet(object.symbol) ? String(object.symbol) : "",
-      decimals: isSet(object.decimals) ? Number(object.decimals) : 0,
+      tokenName: isSet(object.tokenName)
+        ? globalThis.String(object.tokenName)
+        : "",
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
+      decimals: isSet(object.decimals) ? globalThis.Number(object.decimals) : 0,
       capacity: isSet(object.capacity)
         ? bytesFromBase64(object.capacity)
         : new Uint8Array(0),
@@ -3212,7 +3220,7 @@ export const PollMetadata = {
 
   fromJSON(object: any): PollMetadata {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
@@ -3245,30 +3253,11 @@ export const PollMetadata = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -3278,14 +3267,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -3302,8 +3291,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

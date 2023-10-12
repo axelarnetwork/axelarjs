@@ -66,7 +66,7 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      pollMetadatas: Array.isArray(object?.pollMetadatas)
+      pollMetadatas: globalThis.Array.isArray(object?.pollMetadatas)
         ? object.pollMetadatas.map((e: any) => PollMetadata.fromJSON(e))
         : [],
     };
@@ -117,8 +117,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}
