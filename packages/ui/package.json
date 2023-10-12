@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/ui",
   "version": "0.1.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "src",
     "dist",
