@@ -12,5 +12,5 @@
   "access": "restricted",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@axelarjs/registry", "@axelarjs/maestro", "@axelarjs/ui"]
+  "ignore": ["@axelarjs/registry", "@axelarjs/maestro"]
 }
