@@ -58,8 +58,8 @@
       "require": "./build/commonjs/deposit-address/*.js"
     },
     ".": {
-      "import": "./build/module/*.js",
-      "require": "./build/commonjs/*.js"
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
     },
     "./*": {
       "import": "./build/module/*.js",
