@@ -3,20 +3,20 @@ import {
   Badge,
   Button,
   Card,
-  cn,
   CopyToClipboardButton,
   Dropdown,
   ExternalLinkIcon,
-  Identicon,
   Indicator,
   LinkButton,
   MenuIcon,
   Navbar,
   ThemeSwitcher,
-  useIsSticky,
 } from "@axelarjs/ui";
+import { useIsSticky } from "@axelarjs/ui/hooks";
+import { cn } from "@axelarjs/ui/utils";
 import { maskAddress } from "@axelarjs/utils";
 import React, { useEffect, type FC } from "react";
+import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -50,7 +50,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         copyText={address}
         className="flex items-center gap-1"
       >
-        <Identicon address={address ?? ""} diameter={18} />{" "}
+        <Identicon seed={jsNumberForAddress(address)} diameter={18} />{" "}
         {maskAddress(address)}
       </CopyToClipboardButton>
       <LinkButton
@@ -175,7 +175,10 @@ const Appbar: FC<AppbarProps> = (props) => {
                     className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring"
                     aria-label="connected wallet dropdown trigger"
                   >
-                    <Identicon address={address ?? ""} diameter={18} />
+                    <Identicon
+                      seed={jsNumberForAddress(address)}
+                      diameter={18}
+                    />
                   </button>
                 </Dropdown.Trigger>
                 <Dropdown.Content className="bg-base-100 dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-2 p-3 md:w-48">

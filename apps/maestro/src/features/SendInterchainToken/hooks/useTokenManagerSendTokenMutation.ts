@@ -1,4 +1,4 @@
-import { toast } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toast";
 import { invariant } from "@axelarjs/utils";
 import { useEffect, useRef } from "react";
 

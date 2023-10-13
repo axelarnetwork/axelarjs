@@ -1,5 +1,35 @@
 # @axelarjs/cosmos
 
+## 0.2.9
+
+### Patch Changes
+
+- [`d08e02fc`](https://github.com/axelarnetwork/axelarjs/commit/d08e02fca9172afe12671c0b2b66d14c9104f088) Thanks [@alanrsoares](https://github.com/alanrsoares)! - introduce cosmos tx and query client factory functions
+
+## 0.2.8
+
+### Patch Changes
+
+- [`6f9fcdf4`](https://github.com/axelarnetwork/axelarjs/commit/6f9fcdf495a70218036bc79ad743d33ad8c3942f) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Introduce axelar query client to cosmos stargate client.
+
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e)]:
+  - @axelarjs/utils@0.1.10
+
+## 0.2.6
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
+- Updated dependencies [[`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020)]:
+  - @axelarjs/config@0.1.8
+  - @axelarjs/proto@0.34.8
+  - @axelarjs/utils@0.1.9
+
 ## 0.2.5
 
 ### Patch Changes

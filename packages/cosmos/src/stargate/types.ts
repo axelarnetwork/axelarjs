@@ -9,11 +9,11 @@ export type CamelCaseKeys<T> = {
 };
 
 export type SimplifyRequestMethod<T> = T extends `${infer First}Request`
-  ? CamelCase<First>
+  ? CamelCase<First> // maps SendRequest to send
   : T extends `${string}Response` | `${string}Impl`
-  ? never
-  : T extends `Msg${infer First}`
-  ? CamelCase<First>
+  ? never // excludes *Response and *Impl types
+  : T extends `Msg${infer Last}` // maps MsgSend to send
+  ? CamelCase<Last>
   : never;
 
 export type KeepOnlySimplifiedRequestMethods<T> = {
@@ -34,7 +34,7 @@ export type ProtoPackageAndMessages<T extends { protobufPackage: string }> = {
   protobufPackage: T["protobufPackage"];
 } & PickType<T, TsProtoGeneratedType>;
 
-export type EncodeProtoPackage<T extends ProtoPackageAndMessages<T>> = {
+export type EncodedProtoPackage<T extends ProtoPackageAndMessages<T>> = {
   [P in keyof PickType<T, TsProtoGeneratedType> as P extends string
     ? `${T["protobufPackage"]}.${P}`
     : never]: {
@@ -58,3 +58,7 @@ export type StringLiteral<T> = T extends string
     ? never
     : T
   : never;
+
+export type ProtobufModule = Record<string, unknown> & {
+  protobufPackage: string;
+};

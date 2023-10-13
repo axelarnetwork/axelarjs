@@ -9,6 +9,9 @@
       "dependsOn": ["^build"],
       "outputs": ["storybook-static/**"]
     },
+    "clean": {
+      "outputs": []
+    },
     "compile": {
       "dependsOn": ["^build"]
     },

@@ -114,7 +114,9 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
               : "Search for ERC-20 token address"
           }
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          onChange={(e: any) => setSearch(e.target.value)}
           className="bg-base-200 flex-1 focus:outline-none focus:ring-0"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}

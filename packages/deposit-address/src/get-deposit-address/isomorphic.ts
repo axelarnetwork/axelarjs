@@ -1,4 +1,4 @@
-import type { ChainConfigs } from "@axelarjs/api/axelar-config/types";
+import type { ChainConfig } from "@axelarjs/api/axelar-config/types";
 
 import {
   getDepositAddressFromAxelarNetwork,
@@ -27,7 +27,7 @@ export async function getDepositAddress(
   );
   validateAddress(
     params.destinationAddress,
-    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfigs
+    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
   );
 
   return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);

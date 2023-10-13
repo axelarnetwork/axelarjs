@@ -1,5 +1,17 @@
 # @axelarjs/utils
 
+## 0.1.10
+
+### Patch Changes
+
+- [`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Move http client to packages/utils
+
+## 0.1.9
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
 ## 0.1.8
 
 ### Patch Changes

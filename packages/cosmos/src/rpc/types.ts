@@ -69,16 +69,20 @@ type QueryServiceName = keyof typeof QUERY_SERVICES;
 
 type BroadcastServiceName = keyof typeof BROADCAST_SERVICES;
 
+const QUERIES = Object.entries(QUERY_SERVICES);
+
 export const setupRpcClientQueryExtensions = (client: ProtobufRpcClient) =>
-  Object.entries(QUERY_SERVICES).reduce(
+  QUERIES.reduce(
     (acc, [key, Ctrl]) => ({ ...acc, [key]: new Ctrl(client) }),
     {} as {
       [key in QueryServiceName]: InstanceType<(typeof QUERY_SERVICES)[key]>;
     }
   );
 
+const TRANSACTIONS = Object.entries(BROADCAST_SERVICES);
+
 export const setupRpcClientBroadcastExtension = (rpcImpl: ProtobufRpcClient) =>
-  Object.entries(BROADCAST_SERVICES).reduce(
+  TRANSACTIONS.reduce(
     (acc, [key, Ctrl]) => ({ ...acc, [key]: new Ctrl(rpcImpl) }),
     {} as {
       [key in BroadcastServiceName]: InstanceType<

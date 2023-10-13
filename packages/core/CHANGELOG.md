@@ -1,5 +1,17 @@
 # @axelarjs/core
 
+## 0.2.9
+
+### Patch Changes
+
+- [`7376c166`](https://github.com/axelarnetwork/axelarjs/commit/7376c16636b0dc165d26545fc4d094e9917cbcea) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Update packages/core module exports
+
+## 0.2.8
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
 ## 0.2.7
 
 ### Patch Changes

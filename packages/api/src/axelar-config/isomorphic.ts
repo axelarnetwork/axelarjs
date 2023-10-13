@@ -1,13 +1,10 @@
 import type { Environment } from "@axelarjs/core";
 
-import {
-  IsomorphicHTTPClient,
-  type ClientOptions,
-} from "../IsomorphicHTTPClient";
-import type { ChainConfigsResponse } from "./types";
+import { RestService, type RestServiceOptions } from "../lib/rest-service";
+import type { Asset, ChainConfig, ChainConfigsResponse } from "./types";
 
-export class AxelarConfigClient extends IsomorphicHTTPClient {
-  static init(options: ClientOptions) {
+export class AxelarConfigClient extends RestService {
+  static init(options: RestServiceOptions) {
     return new AxelarConfigClient(options, {
       name: "AxelarConfigClient",
       version: "0.0.1",
@@ -15,8 +12,30 @@ export class AxelarConfigClient extends IsomorphicHTTPClient {
   }
 
   async getChainConfigs(env: Environment) {
-    return this.client
+    const response = await this.client
       .get(`configs/${env}-chain-config-latest.json`)
       .json<ChainConfigsResponse>();
+
+    const chainEntries = Object.entries(response.chains);
+
+    const tagChainAsset = ([chainId, chainConfig]: [string, ChainConfig]) =>
+      [
+        chainId,
+        {
+          ...chainConfig,
+          assets: chainConfig.assets.map(
+            (asset) =>
+              ({
+                ...asset,
+                module: chainConfig.module === "evm" ? "evm" : "axelarnet",
+              } as Asset)
+          ),
+        } as ChainConfig,
+      ] as const;
+
+    return {
+      ...response,
+      chains: Object.fromEntries(chainEntries.map(tagChainAsset)),
+    };
   }
 }

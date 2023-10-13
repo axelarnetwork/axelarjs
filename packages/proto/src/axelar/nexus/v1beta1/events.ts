@@ -4,7 +4,7 @@ import _m0 from "protobufjs/minimal";
 
 import { Coin } from "../../../cosmos/base/v1beta1/coin";
 import { Duration } from "../../../google/protobuf/duration";
-import { CrossChainAddress } from "../exported/v1beta1/types";
+import { CrossChainAddress, WasmMessage } from "../exported/v1beta1/types";
 
 export const protobufPackage = "axelar.nexus.v1beta1";
 
@@ -47,6 +47,10 @@ export interface MessageExecuted {
 
 export interface MessageFailed {
   id: string;
+}
+
+export interface WasmMessageRouted {
+  message?: WasmMessage | undefined;
 }
 
 function createBaseFeeDeducted(): FeeDeducted {
@@ -140,10 +144,10 @@ export const FeeDeducted = {
         ? Long.fromValue(object.transferId)
         : Long.UZERO,
       recipientChain: isSet(object.recipientChain)
-        ? String(object.recipientChain)
+        ? globalThis.String(object.recipientChain)
         : "",
       recipientAddress: isSet(object.recipientAddress)
-        ? String(object.recipientAddress)
+        ? globalThis.String(object.recipientAddress)
         : "",
       amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
       fee: isSet(object.fee) ? Coin.fromJSON(object.fee) : undefined,
@@ -286,10 +290,10 @@ export const InsufficientFee = {
         ? Long.fromValue(object.transferId)
         : Long.UZERO,
       recipientChain: isSet(object.recipientChain)
-        ? String(object.recipientChain)
+        ? globalThis.String(object.recipientChain)
         : "",
       recipientAddress: isSet(object.recipientAddress)
-        ? String(object.recipientAddress)
+        ? globalThis.String(object.recipientAddress)
         : "",
       amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
       fee: isSet(object.fee) ? Coin.fromJSON(object.fee) : undefined,
@@ -404,7 +408,7 @@ export const RateLimitUpdated = {
 
   fromJSON(object: any): RateLimitUpdated {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       limit: isSet(object.limit) ? Coin.fromJSON(object.limit) : undefined,
       window: isSet(object.window)
         ? Duration.fromJSON(object.window)
@@ -530,7 +534,7 @@ export const MessageReceived = {
 
   fromJSON(object: any): MessageReceived {
     return {
-      id: isSet(object.id) ? String(object.id) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
         : new Uint8Array(0),
@@ -623,7 +627,7 @@ export const MessageProcessing = {
   },
 
   fromJSON(object: any): MessageProcessing {
-    return { id: isSet(object.id) ? String(object.id) : "" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
   },
 
   toJSON(message: MessageProcessing): unknown {
@@ -688,7 +692,7 @@ export const MessageExecuted = {
   },
 
   fromJSON(object: any): MessageExecuted {
-    return { id: isSet(object.id) ? String(object.id) : "" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
   },
 
   toJSON(message: MessageExecuted): unknown {
@@ -753,7 +757,7 @@ export const MessageFailed = {
   },
 
   fromJSON(object: any): MessageFailed {
-    return { id: isSet(object.id) ? String(object.id) : "" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
   },
 
   toJSON(message: MessageFailed): unknown {
@@ -778,30 +782,83 @@ export const MessageFailed = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
+function createBaseWasmMessageRouted(): WasmMessageRouted {
+  return { message: undefined };
+}
+
+export const WasmMessageRouted = {
+  encode(
+    message: WasmMessageRouted,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.message !== undefined) {
+      WasmMessage.encode(message.message, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): WasmMessageRouted {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWasmMessageRouted();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.message = WasmMessage.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): WasmMessageRouted {
+    return {
+      message: isSet(object.message)
+        ? WasmMessage.fromJSON(object.message)
+        : undefined,
+    };
+  },
+
+  toJSON(message: WasmMessageRouted): unknown {
+    const obj: any = {};
+    if (message.message !== undefined) {
+      obj.message = WasmMessage.toJSON(message.message);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<WasmMessageRouted>, I>>(
+    base?: I
+  ): WasmMessageRouted {
+    return WasmMessageRouted.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<WasmMessageRouted>, I>>(
+    object: I
+  ): WasmMessageRouted {
+    const message = createBaseWasmMessageRouted();
+    message.message =
+      object.message !== undefined && object.message !== null
+        ? WasmMessage.fromPartial(object.message)
+        : undefined;
+    return message;
+  },
+};
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -811,14 +868,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -835,8 +892,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

@@ -1,16 +1,19 @@
 import type { Environment } from "@axelarjs/core";
+import {
+  HttpClient,
+  type HttpClientOptions,
+} from "@axelarjs/utils/http-client";
 
-import { BaseHttpClient, type BaseHttpClientOptions } from "../baseHTTPClient";
 import { createGMPClient } from "../gmp/client";
 import { AxelarQueryAPIClient } from "./isomorphic";
 
 export const createAxelarQueryClient = (
   env: Environment,
-  options?: BaseHttpClientOptions
+  options?: HttpClientOptions
 ) =>
   AxelarQueryAPIClient.init(
     {
-      instance: BaseHttpClient.extend(options ?? {}),
+      instance: HttpClient.extend(options ?? {}),
     },
     {
       gmpClient: createGMPClient(env),

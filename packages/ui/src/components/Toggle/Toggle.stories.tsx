@@ -1,6 +1,6 @@
 import { pluralizeKeys } from "@axelarjs/utils";
 
-import { Meta, StoryFn } from "@storybook/react";
+import { Meta } from "@storybook/react";
 
 import { COLOR_VARIANTS, SIZE_VARIANTS } from "../../theme";
 import { configurePlayground } from "../StoryPlayground";

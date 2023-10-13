@@ -1,11 +1,12 @@
-import { Badge, Button, Clamp, cn } from "@axelarjs/ui";
+import { Badge, Button, Clamp } from "@axelarjs/ui";
+import tw from "@axelarjs/ui/tw";
+import { cn } from "@axelarjs/ui/utils";
 import { sluggify } from "@axelarjs/utils";
 import { useCallback, useMemo, type ComponentProps } from "react";
 import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import tw from "tailwind-styled-components";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
 import SearchInterchainToken from "~/features/SearchInterchainToken";

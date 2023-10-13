@@ -10,6 +10,7 @@ import {
   KeyIcon,
   LinkButton,
   Loading,
+  ThemeProvider,
   useTheme,
   XCircleIcon,
 } from "@axelarjs/ui";
@@ -142,9 +143,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 };
 
 const WithProvider: FC<PropsWithChildren> = (props) => (
-  <LayoutStateProvider>
-    <MainLayout {...props} />
-  </LayoutStateProvider>
+  <ThemeProvider>
+    <LayoutStateProvider>
+      <MainLayout {...props} />
+    </LayoutStateProvider>
+  </ThemeProvider>
 );
 
 WithProvider.displayName = "MainLayout";

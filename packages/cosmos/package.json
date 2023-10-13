@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/cosmos",
-  "version": "0.2.5",
+  "version": "0.2.9",
   "publishConfig": {
     "access": "public"
   },
@@ -20,7 +20,6 @@
     "./index.js",
     "./index.d.ts"
   ],
-  "type": "module",
   "exports": {
     ".": {
       "import": "./build/module/index.js",
@@ -72,8 +71,8 @@
     "@tsconfig/strictest": "^2.0.2",
     "cosmjs-types": "^0.8.0",
     "rambda": "^7.5.0",
-    "rimraf": "^5.0.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.5"
+    "vitest": "^0.34.6"
   }
 }

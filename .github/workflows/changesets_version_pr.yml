@@ -5,11 +5,13 @@ on:
     branches:
       - main
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release:
-    name: Release
+    name: Prepare Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo

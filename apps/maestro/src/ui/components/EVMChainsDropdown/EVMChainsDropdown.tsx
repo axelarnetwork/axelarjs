@@ -1,5 +1,7 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
-import { cn, Dropdown, HelpCircleIcon, toast } from "@axelarjs/ui";
+import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toast";
+import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import Image from "next/image";

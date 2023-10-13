@@ -90,7 +90,6 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
     outline,
     length,
     loading,
-    children,
     variant,
     ...componentProps
   } = props;

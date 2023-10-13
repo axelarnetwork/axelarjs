@@ -155,13 +155,7 @@ interface StapProps extends LiElement, StepVProps {
   active?: boolean;
 }
 
-const Step: FC<StapProps> = ({
-  className,
-  content,
-  active,
-  variant,
-  ...props
-}) => {
+const Step: FC<StapProps> = ({ className, content, active, ...props }) => {
   const [state] = useStepsStateContainer();
 
   return (

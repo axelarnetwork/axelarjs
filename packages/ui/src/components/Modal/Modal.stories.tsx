@@ -15,7 +15,6 @@ export default {
 } as Meta<typeof Modal>;
 
 const Template: StoryFn<typeof Modal> = (args) => {
-  // @ts-ignore
   return (
     <Modal {...args}>
       <Modal.Title>Title</Modal.Title>

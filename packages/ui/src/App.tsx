@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import tw from "tailwind-styled-components";
+import tw from "./tw";
 
 const Container = tw.div`
   inset-0 grid h-screen place-items-center 

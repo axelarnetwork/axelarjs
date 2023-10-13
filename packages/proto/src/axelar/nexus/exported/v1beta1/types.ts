@@ -204,6 +204,16 @@ export function generalMessage_StatusToJSON(
   }
 }
 
+export interface WasmMessage {
+  sourceChain: string;
+  sourceAddress: string;
+  destinationChain: string;
+  destinationAddress: string;
+  payloadHash: Uint8Array;
+  sourceTxId: Uint8Array;
+  sourceTxIndex: Long;
+}
+
 function createBaseChain(): Chain {
   return { name: "", supportsForeignAssets: false, keyType: 0, module: "" };
 }
@@ -272,12 +282,12 @@ export const Chain = {
 
   fromJSON(object: any): Chain {
     return {
-      name: isSet(object.name) ? String(object.name) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
       supportsForeignAssets: isSet(object.supportsForeignAssets)
-        ? Boolean(object.supportsForeignAssets)
+        ? globalThis.Boolean(object.supportsForeignAssets)
         : false,
       keyType: isSet(object.keyType) ? keyTypeFromJSON(object.keyType) : 0,
-      module: isSet(object.module) ? String(object.module) : "",
+      module: isSet(object.module) ? globalThis.String(object.module) : "",
     };
   },
 
@@ -363,7 +373,7 @@ export const CrossChainAddress = {
   fromJSON(object: any): CrossChainAddress {
     return {
       chain: isSet(object.chain) ? Chain.fromJSON(object.chain) : undefined,
-      address: isSet(object.address) ? String(object.address) : "",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
     };
   },
 
@@ -563,7 +573,7 @@ export const TransferFee = {
 
   fromJSON(object: any): TransferFee {
     return {
-      coins: Array.isArray(object?.coins)
+      coins: globalThis.Array.isArray(object?.coins)
         ? object.coins.map((e: any) => Coin.fromJSON(e))
         : [],
     };
@@ -676,8 +686,8 @@ export const FeeInfo = {
 
   fromJSON(object: any): FeeInfo {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
       feeRate: isSet(object.feeRate)
         ? bytesFromBase64(object.feeRate)
         : new Uint8Array(0),
@@ -772,9 +782,9 @@ export const Asset = {
 
   fromJSON(object: any): Asset {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
+      denom: isSet(object.denom) ? globalThis.String(object.denom) : "",
       isNativeAsset: isSet(object.isNativeAsset)
-        ? Boolean(object.isNativeAsset)
+        ? globalThis.Boolean(object.isNativeAsset)
         : false,
     };
   },
@@ -927,7 +937,7 @@ export const GeneralMessage = {
 
   fromJSON(object: any): GeneralMessage {
     return {
-      id: isSet(object.id) ? String(object.id) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
       sender: isSet(object.sender)
         ? CrossChainAddress.fromJSON(object.sender)
         : undefined,
@@ -1012,30 +1022,191 @@ export const GeneralMessage = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
+function createBaseWasmMessage(): WasmMessage {
+  return {
+    sourceChain: "",
+    sourceAddress: "",
+    destinationChain: "",
+    destinationAddress: "",
+    payloadHash: new Uint8Array(0),
+    sourceTxId: new Uint8Array(0),
+    sourceTxIndex: Long.UZERO,
+  };
+}
+
+export const WasmMessage = {
+  encode(
+    message: WasmMessage,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.sourceChain !== "") {
+      writer.uint32(10).string(message.sourceChain);
+    }
+    if (message.sourceAddress !== "") {
+      writer.uint32(18).string(message.sourceAddress);
+    }
+    if (message.destinationChain !== "") {
+      writer.uint32(26).string(message.destinationChain);
+    }
+    if (message.destinationAddress !== "") {
+      writer.uint32(34).string(message.destinationAddress);
+    }
+    if (message.payloadHash.length !== 0) {
+      writer.uint32(42).bytes(message.payloadHash);
+    }
+    if (message.sourceTxId.length !== 0) {
+      writer.uint32(50).bytes(message.sourceTxId);
+    }
+    if (!message.sourceTxIndex.isZero()) {
+      writer.uint32(56).uint64(message.sourceTxIndex);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): WasmMessage {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWasmMessage();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sourceChain = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.sourceAddress = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.destinationChain = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.destinationAddress = reader.string();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.payloadHash = reader.bytes();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.sourceTxId = reader.bytes();
+          continue;
+        case 7:
+          if (tag !== 56) {
+            break;
+          }
+
+          message.sourceTxIndex = reader.uint64() as Long;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): WasmMessage {
+    return {
+      sourceChain: isSet(object.sourceChain)
+        ? globalThis.String(object.sourceChain)
+        : "",
+      sourceAddress: isSet(object.sourceAddress)
+        ? globalThis.String(object.sourceAddress)
+        : "",
+      destinationChain: isSet(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
+        : "",
+      destinationAddress: isSet(object.destinationAddress)
+        ? globalThis.String(object.destinationAddress)
+        : "",
+      payloadHash: isSet(object.payloadHash)
+        ? bytesFromBase64(object.payloadHash)
+        : new Uint8Array(0),
+      sourceTxId: isSet(object.sourceTxId)
+        ? bytesFromBase64(object.sourceTxId)
+        : new Uint8Array(0),
+      sourceTxIndex: isSet(object.sourceTxIndex)
+        ? Long.fromValue(object.sourceTxIndex)
+        : Long.UZERO,
+    };
+  },
+
+  toJSON(message: WasmMessage): unknown {
+    const obj: any = {};
+    if (message.sourceChain !== "") {
+      obj.sourceChain = message.sourceChain;
+    }
+    if (message.sourceAddress !== "") {
+      obj.sourceAddress = message.sourceAddress;
+    }
+    if (message.destinationChain !== "") {
+      obj.destinationChain = message.destinationChain;
+    }
+    if (message.destinationAddress !== "") {
+      obj.destinationAddress = message.destinationAddress;
+    }
+    if (message.payloadHash.length !== 0) {
+      obj.payloadHash = base64FromBytes(message.payloadHash);
+    }
+    if (message.sourceTxId.length !== 0) {
+      obj.sourceTxId = base64FromBytes(message.sourceTxId);
+    }
+    if (!message.sourceTxIndex.isZero()) {
+      obj.sourceTxIndex = (message.sourceTxIndex || Long.UZERO).toString();
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<WasmMessage>, I>>(base?: I): WasmMessage {
+    return WasmMessage.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<WasmMessage>, I>>(
+    object: I
+  ): WasmMessage {
+    const message = createBaseWasmMessage();
+    message.sourceChain = object.sourceChain ?? "";
+    message.sourceAddress = object.sourceAddress ?? "";
+    message.destinationChain = object.destinationChain ?? "";
+    message.destinationAddress = object.destinationAddress ?? "";
+    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
+    message.sourceTxId = object.sourceTxId ?? new Uint8Array(0);
+    message.sourceTxIndex =
+      object.sourceTxIndex !== undefined && object.sourceTxIndex !== null
+        ? Long.fromValue(object.sourceTxIndex)
+        : Long.UZERO;
+    return message;
+  },
+};
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -1045,14 +1216,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -1069,8 +1240,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

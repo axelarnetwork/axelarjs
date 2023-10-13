@@ -202,29 +202,29 @@ export const GenesisState = {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
       nonce: isSet(object.nonce) ? Long.fromValue(object.nonce) : Long.UZERO,
-      chains: Array.isArray(object?.chains)
+      chains: globalThis.Array.isArray(object?.chains)
         ? object.chains.map((e: any) => Chain.fromJSON(e))
         : [],
-      chainStates: Array.isArray(object?.chainStates)
+      chainStates: globalThis.Array.isArray(object?.chainStates)
         ? object.chainStates.map((e: any) => ChainState.fromJSON(e))
         : [],
-      linkedAddresses: Array.isArray(object?.linkedAddresses)
+      linkedAddresses: globalThis.Array.isArray(object?.linkedAddresses)
         ? object.linkedAddresses.map((e: any) => LinkedAddresses.fromJSON(e))
         : [],
-      transfers: Array.isArray(object?.transfers)
+      transfers: globalThis.Array.isArray(object?.transfers)
         ? object.transfers.map((e: any) => CrossChainTransfer.fromJSON(e))
         : [],
       fee: isSet(object.fee) ? TransferFee.fromJSON(object.fee) : undefined,
-      feeInfos: Array.isArray(object?.feeInfos)
+      feeInfos: globalThis.Array.isArray(object?.feeInfos)
         ? object.feeInfos.map((e: any) => FeeInfo.fromJSON(e))
         : [],
-      rateLimits: Array.isArray(object?.rateLimits)
+      rateLimits: globalThis.Array.isArray(object?.rateLimits)
         ? object.rateLimits.map((e: any) => RateLimit.fromJSON(e))
         : [],
-      transferEpochs: Array.isArray(object?.transferEpochs)
+      transferEpochs: globalThis.Array.isArray(object?.transferEpochs)
         ? object.transferEpochs.map((e: any) => TransferEpoch.fromJSON(e))
         : [],
-      messages: Array.isArray(object?.messages)
+      messages: globalThis.Array.isArray(object?.messages)
         ? object.messages.map((e: any) => GeneralMessage.fromJSON(e))
         : [],
       messageNonce: isSet(object.messageNonce)
@@ -337,8 +337,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

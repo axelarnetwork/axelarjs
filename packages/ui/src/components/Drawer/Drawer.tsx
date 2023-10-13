@@ -2,7 +2,8 @@ import type { ComponentProps, FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
-import tw from "tailwind-styled-components";
+
+import tw from "../../tw";
 
 const drawerVariance = cva("drawer", {
   variants: {

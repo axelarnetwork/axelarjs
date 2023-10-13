@@ -1,12 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import {
-  Button,
-  Dialog,
-  FormControl,
-  Label,
-  toast,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toast";
 import { invariant } from "@axelarjs/utils";
 import React, {
   useCallback,

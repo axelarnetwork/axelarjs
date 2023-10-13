@@ -1,8 +1,8 @@
 import { ComponentProps } from "react";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import tw from "tailwind-styled-components";
 
+import tw from "../../tw";
 import { Button } from "../Button";
 import { Menu } from "../Menu";
 

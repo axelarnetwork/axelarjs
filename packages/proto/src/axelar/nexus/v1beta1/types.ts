@@ -136,7 +136,7 @@ export const MaintainerState = {
       incorrectVotes: isSet(object.incorrectVotes)
         ? Bitmap.fromJSON(object.incorrectVotes)
         : undefined,
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
     };
   },
 
@@ -259,11 +259,13 @@ export const ChainState = {
   fromJSON(object: any): ChainState {
     return {
       chain: isSet(object.chain) ? Chain.fromJSON(object.chain) : undefined,
-      activated: isSet(object.activated) ? Boolean(object.activated) : false,
-      assets: Array.isArray(object?.assets)
+      activated: isSet(object.activated)
+        ? globalThis.Boolean(object.activated)
+        : false,
+      assets: globalThis.Array.isArray(object?.assets)
         ? object.assets.map((e: any) => Asset.fromJSON(e))
         : [],
-      maintainerStates: Array.isArray(object?.maintainerStates)
+      maintainerStates: globalThis.Array.isArray(object?.maintainerStates)
         ? object.maintainerStates.map((e: any) => MaintainerState.fromJSON(e))
         : [],
     };
@@ -472,7 +474,7 @@ export const RateLimit = {
 
   fromJSON(object: any): RateLimit {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       limit: isSet(object.limit) ? Coin.fromJSON(object.limit) : undefined,
       window: isSet(object.window)
         ? Duration.fromJSON(object.window)
@@ -585,7 +587,7 @@ export const TransferEpoch = {
 
   fromJSON(object: any): TransferEpoch {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
       epoch: isSet(object.epoch) ? Long.fromValue(object.epoch) : Long.UZERO,
       direction: isSet(object.direction)
@@ -634,30 +636,11 @@ export const TransferEpoch = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -667,14 +650,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -691,8 +674,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

@@ -1,4 +1,4 @@
-import { toast } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toast";
 
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useAccount, useMutation } from "wagmi";

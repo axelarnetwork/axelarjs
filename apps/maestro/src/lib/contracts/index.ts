@@ -1,6 +1,6 @@
 import ERC_20_ABI from "./erc-20.abi";
-import INTERCHAIN_TOKEN_SERVICE_ABI from "./interchain-token-service.abi";
 import INTERCHAIN_TOKEN_ABI from "./interchain-token.abi";
+import INTERCHAIN_TOKEN_SERVICE_ABI from "./interchain-token-service.abi";
 import TOKEN_MANAGER_ABI from "./token-manager.abi";
 
 export const contracts = [

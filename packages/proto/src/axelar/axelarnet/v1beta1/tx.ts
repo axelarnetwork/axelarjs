@@ -225,12 +225,12 @@ export const LinkRequest = {
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
       recipientAddr: isSet(object.recipientAddr)
-        ? String(object.recipientAddr)
+        ? globalThis.String(object.recipientAddr)
         : "",
       recipientChain: isSet(object.recipientChain)
-        ? String(object.recipientChain)
+        ? globalThis.String(object.recipientChain)
         : "",
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
     };
   },
 
@@ -307,7 +307,9 @@ export const LinkResponse = {
 
   fromJSON(object: any): LinkResponse {
     return {
-      depositAddr: isSet(object.depositAddr) ? String(object.depositAddr) : "",
+      depositAddr: isSet(object.depositAddr)
+        ? globalThis.String(object.depositAddr)
+        : "",
     };
   },
 
@@ -407,7 +409,7 @@ export const ConfirmDepositRequest = {
       depositAddress: isSet(object.depositAddress)
         ? bytesFromBase64(object.depositAddress)
         : new Uint8Array(0),
-      denom: isSet(object.denom) ? String(object.denom) : "",
+      denom: isSet(object.denom) ? globalThis.String(object.denom) : "",
     };
   },
 
@@ -688,8 +690,8 @@ export const RegisterIBCPathRequest = {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      path: isSet(object.path) ? String(object.path) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      path: isSet(object.path) ? globalThis.String(object.path) : "",
     };
   },
 
@@ -882,12 +884,16 @@ export const AddCosmosBasedChainRequest = {
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
       chain: isSet(object.chain) ? Chain.fromJSON(object.chain) : undefined,
-      addrPrefix: isSet(object.addrPrefix) ? String(object.addrPrefix) : "",
-      nativeAssets: Array.isArray(object?.nativeAssets)
+      addrPrefix: isSet(object.addrPrefix)
+        ? globalThis.String(object.addrPrefix)
+        : "",
+      nativeAssets: globalThis.Array.isArray(object?.nativeAssets)
         ? object.nativeAssets.map((e: any) => Asset.fromJSON(e))
         : [],
-      cosmosChain: isSet(object.cosmosChain) ? String(object.cosmosChain) : "",
-      ibcPath: isSet(object.ibcPath) ? String(object.ibcPath) : "",
+      cosmosChain: isSet(object.cosmosChain)
+        ? globalThis.String(object.cosmosChain)
+        : "",
+      ibcPath: isSet(object.ibcPath) ? globalThis.String(object.ibcPath) : "",
     };
   },
 
@@ -1084,7 +1090,7 @@ export const RegisterAssetRequest = {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       asset: isSet(object.asset) ? Asset.fromJSON(object.asset) : undefined,
       limit: isSet(object.limit)
         ? bytesFromBase64(object.limit)
@@ -1529,7 +1535,7 @@ export const RetryIBCTransferRequest = {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       id: isSet(object.id) ? Long.fromValue(object.id) : Long.UZERO,
     };
   },
@@ -1700,7 +1706,7 @@ export const RouteMessageRequest = {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
-      id: isSet(object.id) ? String(object.id) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
         : new Uint8Array(0),
@@ -1888,9 +1894,9 @@ export const CallContractRequest = {
       sender: isSet(object.sender)
         ? bytesFromBase64(object.sender)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       contractAddress: isSet(object.contractAddress)
-        ? String(object.contractAddress)
+        ? globalThis.String(object.contractAddress)
         : "",
       payload: isSet(object.payload)
         ? bytesFromBase64(object.payload)
@@ -1994,30 +2000,11 @@ export const CallContractResponse = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -2027,14 +2014,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -2051,8 +2038,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

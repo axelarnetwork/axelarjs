@@ -1,4 +1,4 @@
-import { ThemeProvider, Toaster } from "@axelarjs/ui";
+import { ThemeProvider } from "@axelarjs/ui";
 import { useEffect, useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -12,6 +12,8 @@ import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "~/styles/globals.css";
 
+import { Toaster } from "@axelarjs/ui/toast";
+
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
 import { logger } from "~/lib/logger";
@@ -20,16 +22,6 @@ import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
-
-initTelemetryAsync()
-  .then((initialized) => {
-    if (initialized) {
-      logger.info("Telemetry initialized");
-    }
-  })
-  .catch((error) => {
-    logger.error(error);
-  });
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
@@ -83,17 +75,6 @@ logger.configure({
       ? "development"
       : "production",
 });
-
-async function initTelemetryAsync() {
-  if (process.env.NODE_ENV !== "development") {
-    const { initLogRocket } = await import("~/config/telemetry");
-
-    initLogRocket();
-
-    return true;
-  }
-  return false;
-}
 
 const GoogleAnalytics = ({ measurementId = "" }) => {
   if (!measurementId) {

@@ -118,7 +118,7 @@ export const Proof = {
       leafHash: isSet(object.leafHash)
         ? bytesFromBase64(object.leafHash)
         : new Uint8Array(0),
-      aunts: Array.isArray(object?.aunts)
+      aunts: globalThis.Array.isArray(object?.aunts)
         ? object.aunts.map((e: any) => bytesFromBase64(e))
         : [],
     };
@@ -302,9 +302,9 @@ export const DominoOp = {
 
   fromJSON(object: any): DominoOp {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
-      input: isSet(object.input) ? String(object.input) : "",
-      output: isSet(object.output) ? String(object.output) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      input: isSet(object.input) ? globalThis.String(object.input) : "",
+      output: isSet(object.output) ? globalThis.String(object.output) : "",
     };
   },
 
@@ -395,7 +395,7 @@ export const ProofOp = {
 
   fromJSON(object: any): ProofOp {
     return {
-      type: isSet(object.type) ? String(object.type) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
       key: isSet(object.key) ? bytesFromBase64(object.key) : new Uint8Array(0),
       data: isSet(object.data)
         ? bytesFromBase64(object.data)
@@ -470,7 +470,7 @@ export const ProofOps = {
 
   fromJSON(object: any): ProofOps {
     return {
-      ops: Array.isArray(object?.ops)
+      ops: globalThis.Array.isArray(object?.ops)
         ? object.ops.map((e: any) => ProofOp.fromJSON(e))
         : [],
     };
@@ -494,30 +494,11 @@ export const ProofOps = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -527,14 +508,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -551,8 +532,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

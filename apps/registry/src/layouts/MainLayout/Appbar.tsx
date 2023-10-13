@@ -1,11 +1,6 @@
-import {
-  AxelarIcon,
-  cn,
-  Indicator,
-  LinkButton,
-  Navbar,
-  useIsSticky,
-} from "@axelarjs/ui";
+import { AxelarIcon, Indicator, LinkButton, Navbar } from "@axelarjs/ui";
+import { useIsSticky } from "@axelarjs/ui/hooks";
+import { cn } from "@axelarjs/ui/utils";
 import React, { type FC } from "react";
 
 export type AppbarProps = {

@@ -410,11 +410,11 @@ export const Http = {
 
   fromJSON(object: any): Http {
     return {
-      rules: Array.isArray(object?.rules)
+      rules: globalThis.Array.isArray(object?.rules)
         ? object.rules.map((e: any) => HttpRule.fromJSON(e))
         : [],
       fullyDecodeReservedExpansion: isSet(object.fullyDecodeReservedExpansion)
-        ? Boolean(object.fullyDecodeReservedExpansion)
+        ? globalThis.Boolean(object.fullyDecodeReservedExpansion)
         : false,
     };
   },
@@ -589,20 +589,24 @@ export const HttpRule = {
 
   fromJSON(object: any): HttpRule {
     return {
-      selector: isSet(object.selector) ? String(object.selector) : "",
-      get: isSet(object.get) ? String(object.get) : undefined,
-      put: isSet(object.put) ? String(object.put) : undefined,
-      post: isSet(object.post) ? String(object.post) : undefined,
-      delete: isSet(object.delete) ? String(object.delete) : undefined,
-      patch: isSet(object.patch) ? String(object.patch) : undefined,
+      selector: isSet(object.selector)
+        ? globalThis.String(object.selector)
+        : "",
+      get: isSet(object.get) ? globalThis.String(object.get) : undefined,
+      put: isSet(object.put) ? globalThis.String(object.put) : undefined,
+      post: isSet(object.post) ? globalThis.String(object.post) : undefined,
+      delete: isSet(object.delete)
+        ? globalThis.String(object.delete)
+        : undefined,
+      patch: isSet(object.patch) ? globalThis.String(object.patch) : undefined,
       custom: isSet(object.custom)
         ? CustomHttpPattern.fromJSON(object.custom)
         : undefined,
-      body: isSet(object.body) ? String(object.body) : "",
+      body: isSet(object.body) ? globalThis.String(object.body) : "",
       responseBody: isSet(object.responseBody)
-        ? String(object.responseBody)
+        ? globalThis.String(object.responseBody)
         : "",
-      additionalBindings: Array.isArray(object?.additionalBindings)
+      additionalBindings: globalThis.Array.isArray(object?.additionalBindings)
         ? object.additionalBindings.map((e: any) => HttpRule.fromJSON(e))
         : [],
     };
@@ -719,8 +723,8 @@ export const CustomHttpPattern = {
 
   fromJSON(object: any): CustomHttpPattern {
     return {
-      kind: isSet(object.kind) ? String(object.kind) : "",
-      path: isSet(object.path) ? String(object.path) : "",
+      kind: isSet(object.kind) ? globalThis.String(object.kind) : "",
+      path: isSet(object.path) ? globalThis.String(object.path) : "",
     };
   },
 
@@ -763,8 +767,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}
