@@ -216,9 +216,6 @@ importers:
       '@testing-library/user-event':
         specifier: ^14.5.1
         version: 14.5.1(@testing-library/dom@9.3.1)
-      '@types/logrocket-react':
-        specifier: ^3.0.1
-        version: 3.0.1
       '@types/nprogress':
         specifier: ^0.2.1
         version: 0.2.1
@@ -273,12 +270,6 @@ importers:
       happy-dom:
         specifier: ^9.20.3
         version: 9.20.3
-      logrocket:
-        specifier: ^4.0.4
-        version: 4.0.4
-      logrocket-react:
-        specifier: ^5.0.1
-        version: 5.0.1(logrocket@4.0.4)(react-dom@18.2.0)(react@18.2.0)
       matchers:
         specifier: link:@testing-library/jest-dom/matchers
         version: link:@testing-library/jest-dom/matchers
@@ -7520,12 +7511,6 @@ packages:
     resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==}
     dev: true
 
-  /@types/logrocket-react@3.0.1:
-    resolution: {integrity: sha512-OwCtL6FV+BrbdAipM/VNvF938QIJduOrNorW6PV5gl2Qvm02NirFm3BVmnQBjcwaBoxWVjxYYkxTkvOsXjrw0A==}
-    dependencies:
-      logrocket: 1.0.1
-    dev: true
-
   /@types/long@4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
 
@@ -13941,26 +13926,6 @@ packages:
       slice-ansi: 5.0.0
       strip-ansi: 7.1.0
       wrap-ansi: 8.1.0
-    dev: true
-
-  /logrocket-react@5.0.1(logrocket@4.0.4)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-d5RAi1giur9Yv7/lDK/c2S1hviopN5K1XMMpfpSFRDG3Rr/j5RmGuvNHdXNTJUwGuxTVrpnKUOB43ceQMJfO1Q==}
-    peerDependencies:
-      logrocket: '>=2.0'
-      react: '>=17.0'
-      react-dom: '>=17.0'
-    dependencies:
-      logrocket: 4.0.4
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: true
-
-  /logrocket@1.0.1:
-    resolution: {integrity: sha512-oPA0c5GzMKsWp/6p19OaujZQMzttluqVOI+989uHeciPAljPZvGEpZRbNO3Rr+jC/8jVLJdlMP9IHuyhKsASGA==}
-    dev: true
-
-  /logrocket@4.0.4:
-    resolution: {integrity: sha512-BKberHlh9bo9YZFoDqy1aJoi8KrHXi1Z9DSS6+Nqspr+onqU0wVfLacTb3sZt+KnmSR7uELJGUjE+Tikw3e23Q==}
     dev: true
 
   /long@4.0.0:

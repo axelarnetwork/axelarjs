@@ -23,16 +23,6 @@ import NProgressBar from "~/ui/layouts/NProgressBar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
 
-initTelemetryAsync()
-  .then((initialized) => {
-    if (initialized) {
-      logger.info("Telemetry initialized");
-    }
-  })
-  .catch((error) => {
-    logger.error(error);
-  });
-
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
   const [isSSR, setIsSSR] = useState(true);
@@ -85,17 +75,6 @@ logger.configure({
       ? "development"
       : "production",
 });
-
-async function initTelemetryAsync() {
-  if (process.env.NODE_ENV !== "development") {
-    const { initLogRocket } = await import("~/config/telemetry");
-
-    initLogRocket();
-
-    return true;
-  }
-  return false;
-}
 
 const GoogleAnalytics = ({ measurementId = "" }) => {
   if (!measurementId) {
