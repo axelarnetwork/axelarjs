@@ -61,7 +61,7 @@ export const cleanTemplate = (
     .join(" ")
     .trim()
     .replace(/\n/g, " ") // replace newline with space
-    .replace(/\s{2,}/g, " ") // replace line return by space
+    .replace(/\s{2,}/g, " ") // replace multiple spaces with single space
     .split(" ")
     .filter((c) => c !== ","); // remove comma introduced by template to string
 
@@ -212,13 +212,6 @@ export type IntrinsicElementsTemplateFunctionsMap = {
   >;
 };
 
-/**
- *
- *
- * @export
- * @interface TailwindInterface
- * @extends {IntrinsicElementsTemplateFunctionsMap}
- */
 export interface TailwindInterface
   extends IntrinsicElementsTemplateFunctionsMap {
   <C extends TailwindComponent<any, any>>(component: C): TemplateFunction<
@@ -236,8 +229,6 @@ export interface TailwindInterface
 }
 
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
-
-// type FDF = React.ElementType<JSX.IntrinsicElements['div']>
 
 const templateFunctionFactory: TailwindInterface = (<
   C extends React.ElementType

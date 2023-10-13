@@ -1,6 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/react";
 
-import { configurePlayground } from "../StoryPlayground";
+import { configurePlayground } from "../../StoryPlayground";
 import { Alert } from "./Alert";
 
 export default {

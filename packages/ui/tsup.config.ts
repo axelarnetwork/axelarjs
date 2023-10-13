@@ -6,12 +6,12 @@ const componetns = await glob("src/components/**/index.ts");
 export default defineConfig((options) => ({
   entry: [
     "src/index.ts",
-    "src/hooks/index.ts",
     "src/utils.ts",
     "src/theme.ts",
-    "src/toast.ts",
+    "src/hooks/index.ts",
+    "src/toaster/index.ts",
     "src/tw/index.ts",
-    ...componetns.filter((c) => !c.includes("StoryPlayground")),
+    ...componetns,
   ],
   splitting: false,
   sourcemap: true,

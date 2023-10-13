@@ -1,5 +1,5 @@
 import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
-import { toast } from "@axelarjs/ui/toast";
+import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";

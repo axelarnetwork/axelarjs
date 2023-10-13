@@ -9,7 +9,7 @@ import {
   SpinnerIcon,
   Tooltip,
 } from "@axelarjs/ui";
-import { toast } from "@axelarjs/ui/toast";
+import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
 

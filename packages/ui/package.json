@@ -27,9 +27,9 @@
       "import": "./dist/tw/index.mjs",
       "require": "./dist/tw/index.js"
     },
-    "./toast": {
-      "import": "./dist/toast.mjs",
-      "require": "./dist/toast.js"
+    "./toaster": {
+      "import": "./dist/toaster/index.mjs",
+      "require": "./dist/toaster/index.js"
     },
     "./theme": {
       "import": "./src/theme.mjs",
@@ -48,8 +48,7 @@
     "./unstated": "./src/lib/unstated.tsx"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && pnpm bundle",
+    "build": "pnpm compile && pnpm bundle",
     "compile": "tsc --noEmit",
     "bundle": "tsup",
     "preview": "vite preview",
