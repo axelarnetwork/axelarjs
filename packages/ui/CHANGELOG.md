@@ -1,5 +1,11 @@
 # @axelarjs/ui
 
+## 0.1.3
+
+### Patch Changes
+
+- [`b41bf5f8`](https://github.com/axelarnetwork/axelarjs/commit/b41bf5f83151d2b81e5509f004271dfa40109dc2) Thanks [@alanrsoares](https://github.com/alanrsoares)! - cleanup ui package structure
+
 ## 0.1.2
 
 ### Patch Changes
