@@ -21,7 +21,7 @@ describe("deposit address client (node)", () => {
   });
 
   describe("get deposit address", () => {
-    test("It should get a deposit address after generating a unique OTC", async () => {
+    test("It should get a deposit address after generating a unique OTC (cosmos)", async () => {
       const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
       const dummyAccount = privateKeyToAccount(generatePrivateKey());
       const otcRes: OTC = await api.getOTC({
@@ -41,11 +41,44 @@ describe("deposit address client (node)", () => {
         publicAddress: dummyAccount.address,
         asset,
       });
+
       const expectedResponse = JSON.stringify({
         assetCommonKey: asset,
         destinationAddress: dummyAccount.address,
         destinationChainIdentifier: toChain,
         sourceModule: "axelarnet",
+        type: "link",
+      });
+
+      expect(depositAddressResponse.data.roomId).toEqual(expectedResponse);
+    });
+
+    test("It should get a deposit address after generating a unique OTC (evm)", async () => {
+      const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
+      const dummyAccount = privateKeyToAccount(generatePrivateKey());
+      const otcRes: OTC = await api.getOTC({
+        signerAddress: dummyAccount.address,
+      });
+      const fromChain = "Fantom";
+      const toChain = "ethereum-2";
+      const asset = "uaxl";
+
+      const depositAddressResponse = await api.requestDepositAddress({
+        fromChain,
+        toChain,
+        destinationAddress: dummyAccount.address,
+        signature: await dummyAccount.signMessage({
+          message: otcRes.validationMsg,
+        }),
+        publicAddress: dummyAccount.address,
+        asset,
+      });
+
+      const expectedResponse = JSON.stringify({
+        assetCommonKey: asset,
+        destinationAddress: dummyAccount.address,
+        destinationChainIdentifier: toChain,
+        sourceModule: "evm",
         type: "link",
       });
 
