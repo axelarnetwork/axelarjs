@@ -2,6 +2,7 @@
   "extends": "@axelarjs/config/tsconfig.strictest",
   "include": ["src", "scripts"],
   "compilerOptions": {
-    "module": "ESNext"
+    "module": "ESNext",
+    "declaration": false
   }
 }

@@ -4,6 +4,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "types": ["vitest/globals"],
-    "module": "esnext"
+    "module": "esnext",
+    "declaration": false
   }
 }
