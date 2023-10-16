@@ -1,5 +1,11 @@
 # @axelarjs/utils
 
+## 0.1.11
+
+### Patch Changes
+
+- [`af8138f3`](https://github.com/axelarnetwork/axelarjs/commit/af8138f3825469915e84a81b02c618cd9e70b6f2) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Refactor: rename isStrEqual -> caseInsensitiveEqual
+
 ## 0.1.10
 
 ### Patch Changes
