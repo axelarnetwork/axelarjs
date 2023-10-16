@@ -41,7 +41,7 @@ export const getInterchainTokenDetails = publicProcedure
     if (kvResult.deployerAddress !== ctx.session?.address) {
       return {
         ...kvResult,
-        salt: "0x" as `0x${string}`,
+        salt: "0x".concat("0".repeat(64)),
       } as IntercahinTokenDetails;
     }
 
