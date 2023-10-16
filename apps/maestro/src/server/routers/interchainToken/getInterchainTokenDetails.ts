@@ -3,16 +3,29 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
-import type { IntercahinTokenDetails } from "~/services/db/kv";
+import {
+  interchainTokenDetailsSchema,
+  type IntercahinTokenDetails,
+} from "~/services/db/kv";
 
 export const getInterchainTokenDetails = protectedProcedure
+  .meta({
+    openapi: {
+      summary: "Get interchain token details",
+      description: "Get interchain token details by chainId and tokenAddress.",
+      method: "GET",
+      path: "/interchain-token/details",
+      tags: ["interchain-token"],
+    },
+  })
   .input(
     z.object({
       chainId: z.number(),
       tokenAddress: hex40Literal(),
     })
   )
-  .query(async ({ input, ctx }) => {
+  .output(interchainTokenDetailsSchema)
+  .query(async ({ input, ctx }): Promise<IntercahinTokenDetails> => {
     const kvResult = await ctx.persistence.kv.getInterchainTokenDetails({
       chainId: input.chainId,
       tokenAddress: input.tokenAddress,
@@ -26,12 +39,11 @@ export const getInterchainTokenDetails = protectedProcedure
     }
 
     if (kvResult.deployerAddress !== ctx.session?.address) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: `Invalid deployer address for interchain token ${input.tokenAddress} on chain ${input.chainId}`,
-      });
+      return {
+        ...kvResult,
+        salt: "0x" as `0x${string}`,
+      } as IntercahinTokenDetails;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    return kvResult as IntercahinTokenDetails;
+    return kvResult;
   });
