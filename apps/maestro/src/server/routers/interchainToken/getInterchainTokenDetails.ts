@@ -2,13 +2,13 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
-import { protectedProcedure } from "~/server/trpc";
+import { publicProcedure } from "~/server/trpc";
 import {
   interchainTokenDetailsSchema,
   type IntercahinTokenDetails,
 } from "~/services/db/kv";
 
-export const getInterchainTokenDetails = protectedProcedure
+export const getInterchainTokenDetails = publicProcedure
   .meta({
     openapi: {
       summary: "Get interchain token details",
