@@ -59,7 +59,6 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
     "react-jazzicon": "^1.0.4",
-    "react-markdown": "^8.0.7",
     "react-spinners": "^0.13.8",
     "superjson": "^1.13.3",
     "swagger-ui-react": "~5.7.2",
