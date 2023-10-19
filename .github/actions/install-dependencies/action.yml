@@ -34,10 +34,10 @@ runs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Setup Node.js 18
+    - name: Setup Node.js 20
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: 20
         cache: pnpm
 
     - name: Install dependencies

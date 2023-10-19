@@ -14,7 +14,7 @@ export default defineConfig((options) => ({
     ...componetns,
   ],
   splitting: false,
-  sourcemap: false,
+  sourcemap: true,
   clean: true,
   treeshake: true,
   dts: true,
