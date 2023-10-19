@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { useSessionStorageState } from "@axelarjs/utils/react";
-import { useEffect, useMemo, useState, type FC } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
@@ -114,9 +114,9 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
               : "Search for ERC-20 token address"
           }
           value={search}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          onChange={(e: any) => setSearch(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setSearch(e.target.value)
+          }
           className="bg-base-200 flex-1 focus:outline-none focus:ring-0"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
