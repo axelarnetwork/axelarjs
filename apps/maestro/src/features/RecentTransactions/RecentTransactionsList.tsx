@@ -1,4 +1,4 @@
-import { Card } from "@axelarjs/ui";
+import { Card, ExternalLinkIcon, Tooltip } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useState, type FC } from "react";
 import Link from "next/link";
@@ -107,30 +107,32 @@ const TransactionItem: FC<{
       </div>
       <div>
         <div>
-          <Link
-            className="inline-block text-sm font-semibold"
-            href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {maskAddress(tx.hash as `0x${string}`, {
-              segmentA: 12,
-              segmentB: 52,
-            })}
-          </Link>
+          <Tooltip tip="View on AxelarScan" position="bottom">
+            <Link
+              className="group inline-flex items-center text-sm font-semibold hover:underline"
+              href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {maskAddress(tx.hash as `0x${string}`, {
+                segmentA: 12,
+                segmentB: 52,
+              })}{" "}
+              <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+            </Link>
+          </Tooltip>
         </div>
         <div className="p-1 pb-2 text-sm">
-          {tx.event?.event === "TokenSent" && (
-            <div>
+          {tx.event && (
+            <Link
+              className="hover:text-primary hover:cursor-pointer"
+              href={`/interchain-tokens/${tx.event.tokenId}`}
+            >
               {tx.event.name}{" "}
-              <span className="opacity-70">({tx.event.symbol})</span>
-            </div>
-          )}
-          {tx.event?.event === "StandardizedTokenDeployed" && (
-            <div>
-              {tx.event.name}{" "}
-              <span className="opacity-70">({tx.event.symbol})</span>
-            </div>
+              <span className="text-neutral opacity-50 dark:text-white">
+                ({tx.event.symbol})
+              </span>
+            </Link>
           )}
         </div>
         <div className="font-mono text-xs">{humanizedElapsedTime}</div>

@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
+import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -22,13 +23,13 @@ type PageState =
   | "network-mismatch"
   | "unsupported-network";
 
-type Props = ComponentProps<typeof Clamp> & {
+interface Props extends ComponentProps<typeof Clamp> {
   pageTitle?: string;
   pageDescription?: string;
   mustBeConnected?: boolean;
   isLoading?: boolean;
   loadingMessage?: string;
-};
+}
 
 const Page = ({
   pageTitle,
@@ -108,6 +109,7 @@ const Page = ({
             <SearchInterchainToken onTokenFound={handleTokenFound} />
             <div className="divider w-full max-w-lg">OR</div>
             <ConnectWalletButton className="w-full max-w-md" size="md" />
+            <RecentTransactions />
           </div>
         ) : (
           children
