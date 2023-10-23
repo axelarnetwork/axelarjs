@@ -73,7 +73,7 @@
     "@types/react-dom": "18.2.7",
     "@types/testing-library__jest-dom": "^5.14.9",
     "@vitejs/plugin-react": "^4.1.0",
-    "fast-check": "^3.13.1",
+    "fast-check": "^3.13.2",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "rambda": "^7.5.0",
