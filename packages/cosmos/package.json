@@ -70,7 +70,7 @@
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.2",
     "cosmjs-types": "^0.8.0",
-    "rambda": "^7.5.0",
+    "rambda": "^8.5.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"

@@ -96,23 +96,23 @@ importers:
         specifier: 4.33.0
         version: 4.33.0(react-dom@18.2.0)(react@18.2.0)
       '@trpc/client':
-        specifier: ^10.41.0
-        version: 10.41.0(@trpc/server@10.41.0)
+        specifier: ^10.42.0
+        version: 10.42.0(@trpc/server@10.42.0)
       '@trpc/next':
-        specifier: ^10.41.0
-        version: 10.41.0(@tanstack/react-query@4.33.0)(@trpc/client@10.41.0)(@trpc/react-query@10.41.0)(@trpc/server@10.41.0)(next@13.5.6)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^10.42.0
+        version: 10.42.0(@tanstack/react-query@4.33.0)(@trpc/client@10.42.0)(@trpc/react-query@10.42.0)(@trpc/server@10.42.0)(next@13.5.6)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/react-query':
-        specifier: ^10.41.0
-        version: 10.41.0(@tanstack/react-query@4.33.0)(@trpc/client@10.41.0)(@trpc/server@10.41.0)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^10.42.0
+        version: 10.42.0(@tanstack/react-query@4.33.0)(@trpc/client@10.42.0)(@trpc/server@10.42.0)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server':
-        specifier: ^10.41.0
-        version: 10.41.0
+        specifier: ^10.42.0
+        version: 10.42.0
       '@vercel/kv':
         specifier: ^0.2.3
         version: 0.2.3
       '@vercel/postgres':
-        specifier: ^0.4.2
-        version: 0.4.2
+        specifier: ^0.5.0
+        version: 0.5.0
       '@web3modal/ethereum':
         specifier: ^2.7.1
         version: 2.7.1(@wagmi/core@1.4.1)(viem@1.16.6)
@@ -121,7 +121,7 @@ importers:
         version: 2.7.1(react-dom@18.2.0)(react@18.2.0)
       drizzle-orm:
         specifier: ^0.28.6
-        version: 0.28.6(@vercel/postgres@0.4.2)(pg@8.11.3)
+        version: 0.28.6(@vercel/postgres@0.5.0)(pg@8.11.3)
       lucide-react:
         specifier: ^0.265.0
         version: 0.265.0(react@18.2.0)
@@ -141,8 +141,8 @@ importers:
         specifier: ^8.11.3
         version: 8.11.3
       rambda:
-        specifier: ^7.5.0
-        version: 7.5.0
+        specifier: ^8.5.0
+        version: 8.5.0
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -172,7 +172,7 @@ importers:
         version: 2.2.0(react-dom@18.2.0)(react@18.2.0)
       trpc-openapi:
         specifier: ^1.2.0
-        version: 1.2.0(@trpc/server@10.41.0)(zod@3.22.4)
+        version: 1.2.0(@trpc/server@10.42.0)(zod@3.22.4)
       unfetch:
         specifier: ^4.2.0
         version: 4.2.0
@@ -356,8 +356,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       rambda:
-        specifier: ^7.5.0
-        version: 7.5.0
+        specifier: ^8.5.0
+        version: 8.5.0
       unfetch:
         specifier: <=4.2
         version: 4.2.0
@@ -450,8 +450,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       rambda:
-        specifier: ^7.5.0
-        version: 7.5.0
+        specifier: ^8.5.0
+        version: 8.5.0
       rimraf:
         specifier: ^5.0.5
         version: 5.0.5
@@ -640,8 +640,8 @@ importers:
         specifier: ^0.272.0
         version: 0.272.0(react@18.2.0)
       rambda:
-        specifier: ^7.5.0
-        version: 7.5.0
+        specifier: ^8.5.0
+        version: 8.5.0
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -873,8 +873,8 @@ importers:
         specifier: link:@testing-library/jest-dom/matchers
         version: link:@testing-library/jest-dom/matchers
       rambda:
-        specifier: ^7.5.0
-        version: 7.5.0
+        specifier: ^8.5.0
+        version: 8.5.0
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -4137,8 +4137,8 @@ packages:
       tar-fs: 2.1.1
     dev: true
 
-  /@neondatabase/serverless@0.5.6:
-    resolution: {integrity: sha512-Ru0lG6W/nQtHRkDFVQFF+1PJYx8wd3jereln0Ep0YkiHey50hjTLVUycQoE4X977605pXMuFWORweuktzph+Xg==}
+  /@neondatabase/serverless@0.6.0:
+    resolution: {integrity: sha512-qXxBRYN0m2v8kVQBfMxbzNGn2xFAhTXFibzQlE++NfJ56Shz3m7+MyBBtXDlEH+3Wfa6lToDXf1MElocY4sJ3w==}
     dependencies:
       '@types/pg': 8.6.6
 
@@ -7099,53 +7099,53 @@ packages:
       '@testing-library/dom': 9.3.1
     dev: true
 
-  /@trpc/client@10.41.0(@trpc/server@10.41.0):
-    resolution: {integrity: sha512-W4lYULb7//2yXkULCKim49slXsBwiBq48rfge1yOWXdq0Ed8VxzXvZt8+uWOkxmHbQAw4lq8G5fCNYFB+Za6vQ==}
+  /@trpc/client@10.42.0(@trpc/server@10.42.0):
+    resolution: {integrity: sha512-iHPBVUAvn4VTKE75KLZ2fUQL8wpRY5hiRLyRE8QhGUSDc/RW5Pym9wotryZqz47DHjs2J5Qd16MSGt3tNlclFA==}
     peerDependencies:
-      '@trpc/server': 10.41.0
+      '@trpc/server': 10.42.0
     dependencies:
-      '@trpc/server': 10.41.0
+      '@trpc/server': 10.42.0
     dev: false
 
-  /@trpc/next@10.41.0(@tanstack/react-query@4.33.0)(@trpc/client@10.41.0)(@trpc/react-query@10.41.0)(@trpc/server@10.41.0)(next@13.5.6)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-QwvZrvDjRFEzErmLZ4hMdYfX13nsH0SpijjuTNPIlSIyFISCIfDCqmBvWC07O6fCG/swh+XM19FhJN6RMqTlKQ==}
+  /@trpc/next@10.42.0(@tanstack/react-query@4.33.0)(@trpc/client@10.42.0)(@trpc/react-query@10.42.0)(@trpc/server@10.42.0)(next@13.5.6)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-MIzmCxII+piZ4EaG2oQQ+/WBBHKdcUfNNR/GwYegu9rqTBXZFu8uiB3TQYmSgBXjKKpqLkBYcEdgaQ7EBMBjBA==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.41.0
-      '@trpc/react-query': 10.41.0
-      '@trpc/server': 10.41.0
+      '@trpc/client': 10.42.0
+      '@trpc/react-query': 10.42.0
+      '@trpc/server': 10.42.0
       next: '*'
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
       '@tanstack/react-query': 4.33.0(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.41.0(@trpc/server@10.41.0)
-      '@trpc/react-query': 10.41.0(@tanstack/react-query@4.33.0)(@trpc/client@10.41.0)(@trpc/server@10.41.0)(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/server': 10.41.0
+      '@trpc/client': 10.42.0(@trpc/server@10.42.0)
+      '@trpc/react-query': 10.42.0(@tanstack/react-query@4.33.0)(@trpc/client@10.42.0)(@trpc/server@10.42.0)(react-dom@18.2.0)(react@18.2.0)
+      '@trpc/server': 10.42.0
       next: 13.5.6(@babel/core@7.23.2)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-ssr-prepass: 1.5.0(react@18.2.0)
     dev: false
 
-  /@trpc/react-query@10.41.0(@tanstack/react-query@4.33.0)(@trpc/client@10.41.0)(@trpc/server@10.41.0)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-pCLZfIgcnneq1AocPLvstALawZYWS/sbhujd4mwUwA3UXFBWC/D31ysPlbz7R1dhjxhhPaIM+C6pz8vmr2ctpw==}
+  /@trpc/react-query@10.42.0(@tanstack/react-query@4.33.0)(@trpc/client@10.42.0)(@trpc/server@10.42.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Yzpg/WMrLo9HwWQtpgNutEFB6V/OHvMJf7nziKGPGrHrWJFkRtpQvc9ruDlJUFik+YxXwFRvtGBXbstlNsyhcQ==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.41.0
-      '@trpc/server': 10.41.0
+      '@trpc/client': 10.42.0
+      '@trpc/server': 10.42.0
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
       '@tanstack/react-query': 4.33.0(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.41.0(@trpc/server@10.41.0)
-      '@trpc/server': 10.41.0
+      '@trpc/client': 10.42.0(@trpc/server@10.42.0)
+      '@trpc/server': 10.42.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@trpc/server@10.41.0:
-    resolution: {integrity: sha512-uC0xLelzOuoFwxbBQ3GzX4DaWNucO9lW2vlGPdKu8ycXu2ObSa739oQ/lNF6qWDNUKXS0tQvGnDCAxEd178EzQ==}
+  /@trpc/server@10.42.0:
+    resolution: {integrity: sha512-s0QuK72orW+pYce60sd4I36N3xJKzypS2k+8GJ7phH4KqO4XjBXezOFmGMcXTznsVqEiX5zs5ujLfQdJ9X3Y2g==}
     dev: false
 
   /@trysound/sax@0.2.0:
@@ -7908,14 +7908,14 @@ packages:
       - encoding
     dev: false
 
-  /@vercel/postgres@0.4.2:
-    resolution: {integrity: sha512-jwGBhozSPQBuFVgiXLunpW8iys3qMGyXhTSp7xKVrZjD3hJHunO+i1J6Yq2VP2FNSw36lSg1J2vDzkdOE3303g==}
+  /@vercel/postgres@0.5.0:
+    resolution: {integrity: sha512-MFWp9SZmADqBe2x2mzEvwmGLiwOd8PVkUxYeBZx/RqdHl0bd8/1BH0zBR+zSimGyi9P/MVtZoJLdf5dkWw9m5Q==}
     engines: {node: '>=14.6'}
     dependencies:
-      '@neondatabase/serverless': 0.5.6
+      '@neondatabase/serverless': 0.6.0
       bufferutil: 4.0.7
       utf-8-validate: 6.0.3
-      ws: 8.14.1(bufferutil@4.0.7)(utf-8-validate@6.0.3)
+      ws: 8.14.2(bufferutil@4.0.7)(utf-8-validate@6.0.3)
 
   /@vitejs/plugin-react@3.1.0(vite@4.4.9):
     resolution: {integrity: sha512-AfgcRL8ZBhAlc3BFdigClmTUMISmmzHn7sB2h9U1odvc5U/MjWXsAaz18b/WoppUTDBzxOJwo2VdClfUcItu9g==}
@@ -10488,7 +10488,7 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm@0.28.6(@vercel/postgres@0.4.2)(pg@8.11.3):
+  /drizzle-orm@0.28.6(@vercel/postgres@0.5.0)(pg@8.11.3):
     resolution: {integrity: sha512-yBe+F9htrlYER7uXgDJUQsTHFoIrI5yMm5A0bg0GiZ/kY5jNXTWoEy4KQtg35cE27sw1VbgzoMWHAgCckUUUww==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -10550,7 +10550,7 @@ packages:
       sqlite3:
         optional: true
     dependencies:
-      '@vercel/postgres': 0.4.2
+      '@vercel/postgres': 0.5.0
       pg: 8.11.3
 
   /drizzle-zod@0.5.1(drizzle-orm@0.28.6)(zod@3.22.4):
@@ -10559,7 +10559,7 @@ packages:
       drizzle-orm: '>=0.23.13'
       zod: '*'
     dependencies:
-      drizzle-orm: 0.28.6(@vercel/postgres@0.4.2)(pg@8.11.3)
+      drizzle-orm: 0.28.6(@vercel/postgres@0.5.0)(pg@8.11.3)
       zod: 3.22.4
     dev: true
 
@@ -15663,8 +15663,8 @@ packages:
     resolution: {integrity: sha512-pNsHDxbGORSvuSScqNJ+3Km6QAVqk8CfsCBIEoDgpqLrkD2f3QM4I7d1ozJJ172OmIcoUcerZaNWqtLkRXTV3A==}
     dev: false
 
-  /rambda@7.5.0:
-    resolution: {integrity: sha512-y/M9weqWAH4iopRd7EHDEQQvpFPHj1AA3oHozE9tfITHUtTR7Z9PSlIRRG2l1GuW7sefC1cXFfIcF+cgnShdBA==}
+  /rambda@8.5.0:
+    resolution: {integrity: sha512-+bh+mA8Z2iL8fQR8iEvg04bhjlGcFNPaDkI1bDsbp/SQS8Oz29eA5LtdBDdii8tna1SGBMRNkZJ7tNJW/31K4Q==}
 
   /ramda-adjunct@4.1.1(ramda@0.29.1):
     resolution: {integrity: sha512-BnCGsZybQZMDGram9y7RiryoRHS5uwx8YeGuUeDKuZuvK38XO6JJfmK85BwRWAKFA6pZ5nZBO/HBFtExVaf31w==}
@@ -17638,13 +17638,13 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /trpc-openapi@1.2.0(@trpc/server@10.41.0)(zod@3.22.4):
+  /trpc-openapi@1.2.0(@trpc/server@10.42.0)(zod@3.22.4):
     resolution: {integrity: sha512-pfYoCd/3KYXWXvUPZBKJw455OOwngKN/6SIcj7Yit19OMLJ+8yVZkEvGEeg5wUSwfsiTdRsKuvqkRPXVSwV7ew==}
     peerDependencies:
       '@trpc/server': ^10.0.0
       zod: ^3.14.4
     dependencies:
-      '@trpc/server': 10.41.0
+      '@trpc/server': 10.42.0
       co-body: 6.1.0
       h3: 1.8.1
       lodash.clonedeep: 4.5.0
@@ -18818,8 +18818,8 @@ packages:
       bufferutil: 4.0.7
       utf-8-validate: 5.0.10
 
-  /ws@8.14.1(bufferutil@4.0.7)(utf-8-validate@6.0.3):
-    resolution: {integrity: sha512-4OOseMUq8AzRBI/7SLMUwO+FEDnguetSk7KMb1sHwvF2w2Wv5Hoj0nlifx8vtGsftE/jWHojPy8sMMzYLJ2G/A==}
+  /ws@8.14.2(bufferutil@4.0.7)(utf-8-validate@6.0.3):
+    resolution: {integrity: sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
