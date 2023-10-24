@@ -62,10 +62,9 @@
     "react-jazzicon": "^1.0.4",
     "react-spinners": "^0.13.8",
     "superjson": "^1.13.3",
-    "swagger-ui-react": "~5.7.2",
+    "swagger-ui-react": "^5.9.0",
     "tailwind-styled-components": "^2.2.0",
     "trpc-openapi": "^1.2.0",
-    "typescript": "^5.2.2",
     "unfetch": "^4.2.0",
     "viem": "~1.16.6",
     "wagmi": "1.4.1",
@@ -106,6 +105,7 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.3",
     "tsx": "^3.14.0",
+    "typescript": "^5.2.2",
     "vitest": "^0.34.6",
     "zx": "^7.2.3"
   }
