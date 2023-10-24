@@ -155,8 +155,6 @@ export const Step3: FC = () => {
       }
       actions.setIsDeploying(true);
 
-      const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
-
       invariant(sourceChain, "source chain not found");
 
       rootActions.setTxState({
@@ -186,10 +184,10 @@ export const Step3: FC = () => {
       state.isGasPriceQueryError,
       state.gasFees,
       state.evmChains,
-      chainId,
-      actions,
-      rootActions,
       deployInterchainTokenAsync,
+      actions,
+      sourceChain,
+      rootActions,
     ]
   );
 

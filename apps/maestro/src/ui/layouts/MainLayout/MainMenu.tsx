@@ -45,7 +45,20 @@ export const Content = {
   ),
 };
 
-export const MENU_ITEMS: Menuitem[] = [
+export const TOP_MENU_ITEMS: Menuitem[] = [
+  {
+    kind: "link",
+    label: "My Interchain Tokens",
+    href: "/interchain-tokens",
+  },
+  {
+    kind: "link",
+    label: "Recent Transactions",
+    href: "/recent-transactions",
+  },
+];
+
+export const BOTTOM_MENU_ITEMS: Menuitem[] = [
   {
     kind: "link",
     label: "Docs",
@@ -226,9 +239,9 @@ const FAQ_ITEMS = [
   },
 ];
 
-export const MenuItems = () => (
+export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
   <>
-    {MENU_ITEMS.map((item, index) => (
+    {items.map((item, index) => (
       <Menu.Item key={index}>
         {item.kind === "link" ? (
           <Link

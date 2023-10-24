@@ -2,19 +2,16 @@ import {
   Badge,
   Button,
   Card,
-  CheckCircleIcon,
   cn,
-  Dialog,
   Drawer,
+  ExternalLinkIcon,
   Footer,
-  KeyIcon,
   LinkButton,
-  Loading,
+  Modal,
   ThemeProvider,
   useTheme,
-  XCircleIcon,
 } from "@axelarjs/ui";
-import { type FC, type PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from "react";
 import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
@@ -33,6 +30,8 @@ import {
   LayoutStateProvider,
   useLayoutStateContainer,
 } from "./MainLayout.state";
+import { BOTTOM_MENU_ITEMS } from "./MainMenu";
+import SignInModal from "./SignInModal";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
@@ -67,12 +66,49 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           )}
         >
           <Appbar />
+
           {children}
 
           <Footer
-            className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
+            className="bg-neutral text-neutral-content footer p-6 md:p-8 xl:p-10"
             center={true}
           >
+            <div className="w-full max-w-4xl items-center justify-evenly md:flex">
+              {BOTTOM_MENU_ITEMS.map((item, index) => (
+                <nav key={index}>
+                  <header className="footer-title">
+                    {item.kind === "link" ? (
+                      <Link
+                        href={item.href}
+                        className="hover:text-accent inline-flex hover:underline lg:uppercase"
+                        rel={item.external ? "noopener noreferrer" : undefined}
+                        target={item.external ? "_blank" : undefined}
+                      >
+                        {item.label}{" "}
+                        {item.external && (
+                          <ExternalLinkIcon className="h-[1em] w-[1em]" />
+                        )}
+                      </Link>
+                    ) : (
+                      <>
+                        <Modal
+                          trigger={
+                            <a className="hover:text-accent cursor-pointer hover:underline lg:uppercase">
+                              {item.label}
+                            </a>
+                          }
+                        >
+                          <Modal.Title>{item.label}</Modal.Title>
+                          <Modal.Body>
+                            {item.ModalContent && <item.ModalContent />}
+                          </Modal.Body>
+                        </Modal>
+                      </>
+                    )}
+                  </header>
+                </nav>
+              ))}
+            </div>
             <div className="flex items-center text-sm">
               &copy;{new Date().getFullYear()} <span>&middot;</span>
               <Link
@@ -185,73 +221,3 @@ const TestnetBanner = ({ onClose = () => {} }) => (
     </Card.Body>
   </Card>
 );
-
-const parseSignInErrorMessage = (error: Error) => {
-  if ("shortMessage" in error) {
-    return String(error.shortMessage);
-  }
-  return error.message;
-};
-
-type SignInModalProps = {
-  isSignedIn?: boolean;
-  signInError?: null | Error;
-  onAbort?: () => void;
-};
-
-const SignInModal: FC<SignInModalProps> = ({
-  isSignedIn,
-  signInError,
-  onAbort = () => {},
-}) => {
-  return (
-    <Dialog open trigger={<></>}>
-      <Dialog.Body className="grid place-items-center gap-6 py-8 md:min-h-[25vh] md:py-12">
-        <div
-          className={cn(
-            "swap-rotate swap relative grid h-16 w-16 place-items-center",
-            {
-              "swap-active": isSignedIn || signInError,
-            }
-          )}
-        >
-          {signInError ? (
-            <XCircleIcon className="text-error swap-on h-12 w-12 md:h-16 md:w-16" />
-          ) : (
-            <CheckCircleIcon className="text-success swap-on h-12 w-12 md:h-16 md:w-16" />
-          )}
-          <div className="swap-off gird h-14 w-14 place-items-center md:h-16 md:w-16">
-            <Loading className="absolute h-14 w-14 animate-pulse md:h-20 md:w-20" />
-            <KeyIcon className="absolute left-[18px] top-[18px] h-7 w-7 animate-pulse md:left-4 md:top-5 md:h-10 md:w-10" />
-          </div>
-        </div>
-        <div className="grid gap-1.5 text-center">
-          {signInError ? (
-            <>
-              <span className="text-error/90 md:pt-8">
-                {parseSignInErrorMessage(signInError)}
-              </span>
-              {/* <Button onClick={onRetry} length="block" variant="link" size="lg">
-                retry signing in
-              </Button> */}
-            </>
-          ) : (
-            <>
-              <span className="text-warning/70">Authentication required</span>
-              <span>Please sign in with your wallet to continue</span>
-              <Button
-                onClick={onAbort}
-                length="block"
-                variant="link"
-                size="lg"
-                className="text-error/80"
-              >
-                cancel & exit
-              </Button>
-            </>
-          )}
-        </div>
-      </Dialog.Body>
-    </Dialog>
-  );
-};

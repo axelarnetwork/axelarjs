@@ -381,7 +381,7 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
 
         return details;
       })
-    );
+    ).then((tokens) => tokens.filter((x) => Boolean(x.chainId)));
 
     return tokens;
   }
