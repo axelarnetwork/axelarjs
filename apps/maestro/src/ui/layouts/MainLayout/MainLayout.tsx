@@ -20,6 +20,7 @@ import Link from "next/link";
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { Web3Modal } from "@web3modal/react";
 
+import pkgJson from "~/../package.json";
 import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
@@ -27,7 +28,6 @@ import {
 } from "~/config/env";
 import { ethereumClient } from "~/config/wagmi";
 import { useChainFromRoute } from "~/lib/hooks";
-import pkg from "../../../../package.json";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -93,7 +93,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                     NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
                   }`}
                 >
-                  app @ v{pkg.version}
+                  app @ v{pkgJson.version}
                 </Link>
               </Badge>
               <Badge className="hover:text-primary text-xs">
