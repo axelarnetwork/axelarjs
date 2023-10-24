@@ -19,6 +19,7 @@ export const generateInterchainDeploymentHaiku = protectedProcedure
       description: "Generate interchain deployment haiku",
       summary: "Generate interchain deployment haiku",
       tags: ["openai"],
+      enabled: process.env.NODE_ENV === "development",
     },
   })
   .input(INPPUT_SCHEMA)
