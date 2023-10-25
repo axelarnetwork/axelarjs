@@ -48,7 +48,7 @@
     "./unstated": "./src/lib/unstated.tsx"
   },
   "scripts": {
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' pnpm compile && pnpm bundle",
+    "build": "pnpm compile && pnpm bundle",
     "compile": "tsc --noEmit",
     "bundle": "tsup",
     "preview": "vite preview",
