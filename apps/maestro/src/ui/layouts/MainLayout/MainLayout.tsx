@@ -11,20 +11,17 @@ import {
   ThemeProvider,
   useTheme,
 } from "@axelarjs/ui";
-import type { FC, PropsWithChildren } from "react";
+import { useEffect, type FC, type PropsWithChildren } from "react";
 import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
-import { Web3Modal } from "@web3modal/react";
+import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
 
 import pkgJson from "~/../package.json";
 import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
-  NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "~/config/env";
-import { ethereumClient } from "~/config/wagmi";
-import { useChainFromRoute } from "~/lib/hooks";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -35,6 +32,14 @@ import SignInModal from "./SignInModal";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
+  const { setThemeMode } = useWeb3ModalTheme();
+
+  // sync theme with web3modal
+  useEffect(
+    () => setThemeMode(theme ?? "light"),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [theme]
+  );
 
   const [
     {
@@ -47,8 +52,6 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     },
     actions,
   ] = useLayoutStateContainer();
-
-  const defaultChain = useChainFromRoute();
 
   const shouldRenderTestnetBanner =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" && !isTestnetBannerDismissed;
@@ -158,22 +161,6 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           </aside>
         </Drawer.Side>
       </Drawer>
-      <Web3Modal
-        projectId={NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
-        ethereumClient={ethereumClient}
-        themeMode={theme ?? "dark"}
-        defaultChain={defaultChain}
-        walletImages={{
-          coinbaseWallet:
-            "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
-        }}
-        themeVariables={{
-          "--w3m-font-family": "var(--font-sans)",
-          "--w3m-logo-image-url": "/icons/favicon-32x32.png",
-          "--w3m-accent-color": "var(--primary)",
-          "--w3m-background-color": "var(--primary)",
-        }}
-      />
     </>
   );
 };

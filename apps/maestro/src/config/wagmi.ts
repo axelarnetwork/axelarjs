@@ -1,10 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import {
-  EthereumClient,
-  w3mConnectors,
-  w3mProvider,
-} from "@web3modal/ethereum";
-import { configureChains, createConfig, type Connector } from "wagmi";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 import {
   arbitrum,
   arbitrumGoerli,
@@ -33,11 +28,9 @@ import {
   polygonZkEvm,
   polygonZkEvmTestnet,
 } from "wagmi/chains";
-import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
-import { LedgerConnector } from "wagmi/connectors/ledger";
 
 import { logger } from "~/lib/logger";
-import { APP_NAME } from "./app";
+import { APP_NAME, APP_TITLE } from "./app";
 import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
@@ -183,46 +176,30 @@ if (typeof window !== "undefined") {
   });
 }
 
-const { webSocketPublicClient, publicClient } = configureChains(
-  EVM_CHAIN_CONFIGS,
-  [
-    w3mProvider({
-      projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-    }),
-  ]
-);
-
 export const queryClient = new QueryClient();
 
-const W3M_CONNECTORS = w3mConnectors({
+export const wagmiConfig = defaultWagmiConfig({
   chains: EVM_CHAIN_CONFIGS,
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-}) as Connector[];
-
-const connectors: Connector[] = [
-  new CoinbaseWalletConnector({
-    chains: EVM_CHAIN_CONFIGS,
-    options: {
-      appName: APP_NAME,
-    },
-  }),
-  new LedgerConnector({
-    chains: EVM_CHAIN_CONFIGS,
-    options: {},
-  }),
-  ...W3M_CONNECTORS,
-];
-
-export const wagmiConfig = createConfig({
-  autoConnect: true,
-  publicClient,
-  webSocketPublicClient,
-  queryClient,
-  connectors,
-  logger, // custom logger
+  metadata: {
+    name: APP_NAME,
+    description: APP_TITLE,
+    icons: ["/icons/favicon-32x32.png"],
+  },
 });
 
-export const ethereumClient = new EthereumClient(
+export const WEB3_MODAL = createWeb3Modal({
   wagmiConfig,
-  EVM_CHAIN_CONFIGS
-);
+  projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+  chains: EVM_CHAIN_CONFIGS,
+  themeVariables: {
+    "--w3m-font-family": "var(--font-sans)",
+    "--w3m-accent": "var(--primary)",
+    "--w3m-color-mix": "var(--primary)",
+  },
+  connectorImages: {
+    coinbaseWallet:
+      "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
+  },
+  defaultChain: EVM_CHAIN_CONFIGS[0],
+});
