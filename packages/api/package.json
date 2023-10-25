@@ -80,7 +80,7 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.8.7",
+    "@types/node": "^20.8.9",
     "fast-check": "^3.13.2",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",

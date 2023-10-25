@@ -61,9 +61,9 @@
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@cosmjs/proto-signing": "^0.31.1",
-    "@cosmjs/stargate": "^0.31.1",
-    "@cosmjs/tendermint-rpc": "^0.31.1",
+    "@cosmjs/proto-signing": "^0.31.3",
+    "@cosmjs/stargate": "^0.31.3",
+    "@cosmjs/tendermint-rpc": "^0.31.3",
     "inflection": "^2.0.1",
     "long": "^5.2.3"
   },
