@@ -1,5 +1,14 @@
 # @axelarjs/ui
 
+## 0.1.5
+
+### Patch Changes
+
+- [`e8ac19df`](https://github.com/axelarnetwork/axelarjs/commit/e8ac19df530670f4f7b5b6a35565c2d79c1e0201) Thanks [@alanrsoares](https://github.com/alanrsoares)! - upgrade dependencies
+
+- Updated dependencies [[`e8ac19df`](https://github.com/axelarnetwork/axelarjs/commit/e8ac19df530670f4f7b5b6a35565c2d79c1e0201)]:
+  - @axelarjs/utils@0.1.12
+
 ## 0.1.4
 
 ### Patch Changes
