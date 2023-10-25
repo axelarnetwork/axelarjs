@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-NODE_OPTIONS="--max-old-space-size=4096" pnpm compile
+pnpm compile
 pnpm lint-staged

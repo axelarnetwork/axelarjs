@@ -48,9 +48,9 @@
     "./unstated": "./src/lib/unstated.tsx"
   },
   "scripts": {
-    "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm compile && pnpm bundle",
+    "build": "pnpm compile && pnpm bundle",
     "compile": "tsc --noEmit",
-    "bundle": "tsup",
+    "bundle": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsup",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
