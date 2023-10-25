@@ -23,6 +23,6 @@ jobs:
         uses: ./.github/actions/install-dependencies
 
       - name: Run tests
-        run: NODE_OPTIONS="--max-old-space-size=4096" pnpm test
+        run: pnpm test
         env:
           COSMOS_WALLET_MNEMONIC: ${{ secrets.COSMOS_WALLET_MNEMONIC }}
