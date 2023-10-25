@@ -9,7 +9,7 @@ import ConnectWalletButton from "./ConnectWalletButton";
 
 const mockOpen = vi.fn();
 
-vi.mock("@web3modal/react", () => ({
+vi.mock("@web3modal/wagmi/react", () => ({
   useWeb3Modal: vi.fn().mockImplementation(() => ({
     open: mockOpen,
   })),
