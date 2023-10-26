@@ -92,7 +92,7 @@ describe("addGas - (isomorphic)", () => {
 
   test("autocalculate", async () => {
     const txHash =
-      "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
+      "78377623A0D4643305F02A4F0F825B1C4AAE2868831AE2D59CE4C79A98BD827C";
 
     const autocalculateGasOptions: AutocalculateGasOptions = {
       gasLimit: BigInt(700_000),
