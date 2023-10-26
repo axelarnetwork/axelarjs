@@ -6,8 +6,8 @@ import {
   type ClientMeta,
   type RestServiceOptions,
 } from "../lib/rest-service";
-import { BigNumberUtils } from "./helpers/BigNumberUtils";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
+import { gasToWei } from "./utils/bigint";
 
 type AxelarscanClientDependencies = {
   gmpClient: GMPClient;
@@ -90,14 +90,14 @@ export class AxelarQueryAPIClient extends RestService {
       );
     }
 
-    const destGasFeeWei = BigNumberUtils.multiplyToGetWei(
+    const destGasFeeWei = gasToWei(
       gasLimit,
       destination_native_token.gas_price,
       destination_native_token.decimals
     );
     const minDestGasFeeWei = BigInt(minGasPrice) * BigInt(gasLimit);
 
-    const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
+    const srcGasFeeWei = gasToWei(
       gasLimit,
       source_token.gas_price,
       source_token.decimals

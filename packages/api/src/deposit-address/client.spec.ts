@@ -27,19 +27,21 @@ describe("deposit address client (node)", () => {
       const otcRes: OTC = await api.getOTC({
         signerAddress: dummyAccount.address,
       });
-      const fromChain = "osmosis-6";
+      const fromChain = "osmosis-7";
       const toChain = "ethereum-2";
       const asset = "uaxl";
+
+      const signature = await dummyAccount.signMessage({
+        message: otcRes.validationMsg,
+      });
 
       const depositAddressResponse = await api.requestDepositAddress({
         fromChain,
         toChain,
         destinationAddress: dummyAccount.address,
-        signature: await dummyAccount.signMessage({
-          message: otcRes.validationMsg,
-        }),
         publicAddress: dummyAccount.address,
         asset,
+        signature,
       });
 
       const expectedResponse = JSON.stringify({
@@ -63,15 +65,17 @@ describe("deposit address client (node)", () => {
       const toChain = "ethereum-2";
       const asset = "uaxl";
 
+      const signature = await dummyAccount.signMessage({
+        message: otcRes.validationMsg,
+      });
+
       const depositAddressResponse = await api.requestDepositAddress({
         fromChain,
         toChain,
         destinationAddress: dummyAccount.address,
-        signature: await dummyAccount.signMessage({
-          message: otcRes.validationMsg,
-        }),
         publicAddress: dummyAccount.address,
         asset,
+        signature,
       });
 
       const expectedResponse = JSON.stringify({
