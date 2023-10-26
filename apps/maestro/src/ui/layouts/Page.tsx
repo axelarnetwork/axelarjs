@@ -66,7 +66,7 @@ const Page = ({
       return "disconnected";
     }
 
-    if (chain && !evmChain) {
+    if (chain && evmChains.length && !evmChain) {
       return "unsupported-network";
     }
 
@@ -79,7 +79,14 @@ const Page = ({
     }
 
     return "connected";
-  }, [evmChain, mustBeConnected, isConnected, chainFromRoute, chain]);
+  }, [
+    mustBeConnected,
+    isConnected,
+    chain,
+    evmChains.length,
+    evmChain,
+    chainFromRoute,
+  ]);
 
   const router = useRouter();
 
