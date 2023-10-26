@@ -111,7 +111,7 @@ const Appbar: FC<AppbarProps> = (props) => {
             <ThemeSwitcher />
           </div>
           <div className="flex-1" />
-          <MainMenu />
+          {isConnected && <MainMenu />}
         </div>
       ));
     },
@@ -162,7 +162,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         </LinkButton>
       </Navbar.Start>
       <div className="hidden flex-none md:block">
-        <MainMenu direction="horizontal" />
+        {isConnected && <MainMenu direction="horizontal" />}
       </div>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">

@@ -1,5 +1,5 @@
 import { Button, ExternalLinkIcon, LinkButton } from "@axelarjs/ui";
-import { toast } from "@axelarjs/ui/toast";
+import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 

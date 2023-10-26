@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
+import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -22,13 +23,13 @@ type PageState =
   | "network-mismatch"
   | "unsupported-network";
 
-type Props = ComponentProps<typeof Clamp> & {
+interface Props extends ComponentProps<typeof Clamp> {
   pageTitle?: string;
   pageDescription?: string;
   mustBeConnected?: boolean;
   isLoading?: boolean;
   loadingMessage?: string;
-};
+}
 
 const Page = ({
   pageTitle,
@@ -65,7 +66,7 @@ const Page = ({
       return "disconnected";
     }
 
-    if (chain && !evmChain) {
+    if (chain && evmChains.length && !evmChain) {
       return "unsupported-network";
     }
 
@@ -78,7 +79,14 @@ const Page = ({
     }
 
     return "connected";
-  }, [evmChain, mustBeConnected, isConnected, chainFromRoute, chain]);
+  }, [
+    mustBeConnected,
+    isConnected,
+    chain,
+    evmChains.length,
+    evmChain,
+    chainFromRoute,
+  ]);
 
   const router = useRouter();
 
@@ -105,9 +113,17 @@ const Page = ({
       case "disconnected":
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
-            <SearchInterchainToken onTokenFound={handleTokenFound} />
-            <div className="divider w-full max-w-lg">OR</div>
-            <ConnectWalletButton className="w-full max-w-md" size="md" />
+            <div className="grid w-full flex-1 place-items-center">
+              <SearchInterchainToken onTokenFound={handleTokenFound} />
+              <div className="divider w-full max-w-lg">OR</div>
+              <ConnectWalletButton className="w-full max-w-md" size="md" />
+            </div>
+            <section className="my-10 space-y-4">
+              <div className="text-center text-xl font-bold">
+                RECENT INTERCHAIN TRANSACTIONS
+              </div>
+              <RecentTransactions />
+            </section>
           </div>
         ) : (
           children

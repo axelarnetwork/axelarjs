@@ -1,6 +1,6 @@
 import { Config } from "tailwindcss";
 
-module.exports = {
+const config: Config = {
   presets: [require("./tailwind.config.preset.cjs")],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -27,4 +27,6 @@ module.exports = {
       },
     },
   },
-} satisfies Config;
+};
+
+export default config;

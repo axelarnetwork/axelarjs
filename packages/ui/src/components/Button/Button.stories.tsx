@@ -2,9 +2,9 @@ import { pluralizeKeys } from "@axelarjs/utils";
 
 import { Meta, StoryFn } from "@storybook/react";
 
+import { configurePlayground } from "../../StoryPlayground";
 import { COLOR_VARIANTS, SIZE_VARIANTS } from "../../theme";
 import { AxelarBlueIcon, AxelarIcon } from "../icons";
-import { configurePlayground } from "../StoryPlayground";
 import { Button } from "./Button";
 
 export default {

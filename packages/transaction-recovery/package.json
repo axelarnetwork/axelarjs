@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.2.8",
+  "version": "0.2.10",
   "publishConfig": {
     "access": "public"
   },
@@ -57,7 +57,7 @@
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
-    "@cosmjs/proto-signing": "^0.31.1",
-    "@cosmjs/stargate": "^0.31.1"
+    "@cosmjs/proto-signing": "^0.31.3",
+    "@cosmjs/stargate": "^0.31.3"
   }
 }

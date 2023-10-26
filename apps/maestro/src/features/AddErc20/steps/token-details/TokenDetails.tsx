@@ -19,7 +19,7 @@ import {
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 
-const FormInput = Object.assign(TextInput, {
+const FormInput = Object.assign({}, TextInput, {
   defaultProps: {
     ...TextInput.defaultProps,
     className: "bg-base-200",

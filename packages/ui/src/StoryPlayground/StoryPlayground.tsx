@@ -4,9 +4,9 @@ import { ComponentProps, FC, ReactNode, useState } from "react";
 
 import type { StoryFn } from "@storybook/react";
 
-import { cn } from "../../utils";
-import { Card } from "../Card";
-import { ThemeSwitcher } from "../ThemeSwitcher";
+import { Card } from "../components/Card";
+import { ThemeSwitcher } from "../components/ThemeSwitcher";
+import { cn } from "../utils";
 
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));

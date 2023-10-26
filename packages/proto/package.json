@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/proto",
-  "version": "0.34.8",
+  "version": "0.34.9",
   "publishConfig": {
     "access": "public"
   },
@@ -48,11 +48,11 @@
   },
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@types/node": "^20.8.5",
+    "@types/node": "^20.8.9",
     "degit": "^2.8.4",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.5",
-    "ts-proto": "^1.161.1",
+    "ts-proto": "^1.162.1",
     "typescript": "^5.2.2"
   }
 }

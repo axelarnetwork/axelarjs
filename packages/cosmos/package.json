@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/cosmos",
-  "version": "0.2.9",
+  "version": "0.2.11",
   "publishConfig": {
     "access": "public"
   },
@@ -61,16 +61,16 @@
     "@axelarjs/config": "workspace:*",
     "@axelarjs/proto": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@cosmjs/proto-signing": "^0.31.1",
-    "@cosmjs/stargate": "^0.31.1",
-    "@cosmjs/tendermint-rpc": "^0.31.1",
+    "@cosmjs/proto-signing": "^0.31.3",
+    "@cosmjs/stargate": "^0.31.3",
+    "@cosmjs/tendermint-rpc": "^0.31.3",
     "inflection": "^2.0.1",
     "long": "^5.2.3"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.2",
     "cosmjs-types": "^0.8.0",
-    "rambda": "^7.5.0",
+    "rambda": "^8.5.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"

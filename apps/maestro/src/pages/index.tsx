@@ -68,7 +68,12 @@ export default function Home() {
             <AddErc20 />
           </div>
           <div className="mt-4">
-            <RecentTransactions />
+            <section className="my-10 space-y-4">
+              <div className="text-center text-xl font-bold">
+                RECENT INTERCHAIN TRANSACTIONS
+              </div>
+              <RecentTransactions />
+            </section>
           </div>
         </div>
       </Page>

@@ -1,5 +1,5 @@
 import { Alert, Button, LinkButton } from "@axelarjs/ui";
-import { toast } from "@axelarjs/ui/toast";
+import { toast } from "@axelarjs/ui/toaster";
 import { invariant, maskAddress } from "@axelarjs/utils";
 import { useCallback, useMemo, type FC } from "react";
 
