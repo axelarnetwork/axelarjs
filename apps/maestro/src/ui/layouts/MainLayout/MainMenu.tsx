@@ -53,7 +53,7 @@ export const TOP_MENU_ITEMS: Menuitem[] = [
   },
   {
     kind: "link",
-    label: "Recent Transactions",
+    label: "My Recent Transactions",
     href: "/recent-transactions",
   },
 ];
