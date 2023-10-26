@@ -9,6 +9,9 @@ const nextConfig = {
   images: {
     domains: ["testnet.axelarscan.io"],
   },
+  experimental: {
+    webpackBuildWorker: true,
+  },
 };
 
 const withBundleAnalyzer = bundleAnalyzer({
