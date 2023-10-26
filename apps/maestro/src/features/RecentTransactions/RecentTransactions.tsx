@@ -18,10 +18,7 @@ const RecentTransactionsTabs = ({ maxTransactions = 10 }) => {
   const { address } = useAccount();
 
   return (
-    <section className="my-10 space-y-4">
-      <div className="divider text-xl font-bold">
-        RECENT INTERCHAIN TRANSACTIONS
-      </div>
+    <div>
       <Card className="bg-base-200 w-full rounded-3xl" compact>
         <Card.Body>
           <Card.Title className="grid place-items-center space-y-2 text-center md:hidden">
@@ -62,7 +59,7 @@ const RecentTransactionsTabs = ({ maxTransactions = 10 }) => {
           </div>
         </Card.Body>
       </Card>
-    </section>
+    </div>
   );
 };
 

@@ -5,7 +5,8 @@ import Page from "~/ui/layouts/Page";
 
 const RecentTransactionsPage = () => {
   return (
-    <Page title="Recent Transactions">
+    <Page title="Recent Interchain Transactions">
+      <Page.Title>Recent Transactions</Page.Title>
       <RecentTransactionsTabs maxTransactions={50} />
     </Page>
   );

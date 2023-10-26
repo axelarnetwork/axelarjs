@@ -106,10 +106,17 @@ const Page = ({
       case "disconnected":
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
-            <SearchInterchainToken onTokenFound={handleTokenFound} />
-            <div className="divider w-full max-w-lg">OR</div>
-            <ConnectWalletButton className="w-full max-w-md" size="md" />
-            <RecentTransactions />
+            <div className="grid w-full flex-1 place-items-center">
+              <SearchInterchainToken onTokenFound={handleTokenFound} />
+              <div className="divider w-full max-w-lg">OR</div>
+              <ConnectWalletButton className="w-full max-w-md" size="md" />
+            </div>
+            <section className="my-10 space-y-4">
+              <div className="text-center text-xl font-bold">
+                RECENT INTERCHAIN TRANSACTIONS
+              </div>
+              <RecentTransactions />
+            </section>
           </div>
         ) : (
           children
