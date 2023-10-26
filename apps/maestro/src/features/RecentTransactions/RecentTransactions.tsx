@@ -11,7 +11,7 @@ const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> = {
   StandardizedTokenDeployed: "Token Deployed",
 };
 
-const RecentTransactionsTabs = () => {
+const RecentTransactionsTabs = ({ maxTransactions = 10 }) => {
   const [contractMethod, setContractMethod] =
     useState<ContractMethod>("sendToken");
 
@@ -45,11 +45,13 @@ const RecentTransactionsTabs = () => {
               contractMethod="sendToken"
               senderAddress={address}
               title="Transfers"
+              maxTransactions={maxTransactions}
             />
             <RecentTransactionsList
               contractMethod="StandardizedTokenDeployed"
               senderAddress={address}
               title="Token Deployments"
+              maxTransactions={maxTransactions}
             />
           </div>
           <div className="md:hidden">

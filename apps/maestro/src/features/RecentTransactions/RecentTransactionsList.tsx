@@ -45,16 +45,19 @@ type Props = {
   contractMethod: ContractMethod;
   senderAddress?: Address;
   title?: string;
+  maxTransactions?: number;
 };
 
 export const RecentTransactionsList: FC<Props> = ({
   contractMethod,
   senderAddress,
   title,
+  maxTransactions = 10,
 }) => {
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
     senderAddress,
+    size: maxTransactions,
   });
 
   return (
