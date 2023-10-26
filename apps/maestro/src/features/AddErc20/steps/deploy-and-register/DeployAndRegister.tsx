@@ -11,7 +11,6 @@ import React, {
 } from "react";
 import Image from "next/image";
 
-import { propEq } from "rambda";
 import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
@@ -110,7 +109,7 @@ export const Step3: FC = () => {
 
   const chainId = useChainId();
 
-  const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
+  const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteStandardizedTokenMutation(
