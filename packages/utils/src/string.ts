@@ -35,7 +35,16 @@ export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
 
   return `0x${hash}`;
 }
-
-export function isStrEqual(a: string | undefined, b: string) {
+/**
+ * Compare two strings, ignoring case
+ *
+ * @param a
+ * @param b
+ * @returns
+ */
+export function caseInsensitiveEqual(
+  a: string | undefined,
+  b: string | undefined
+) {
   return a?.toLowerCase() === b?.toLowerCase();
 }

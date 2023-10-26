@@ -108,16 +108,16 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      keygenSessions: Array.isArray(object?.keygenSessions)
+      keygenSessions: globalThis.Array.isArray(object?.keygenSessions)
         ? object.keygenSessions.map((e: any) => KeygenSession.fromJSON(e))
         : [],
-      signingSessions: Array.isArray(object?.signingSessions)
+      signingSessions: globalThis.Array.isArray(object?.signingSessions)
         ? object.signingSessions.map((e: any) => SigningSession.fromJSON(e))
         : [],
-      keys: Array.isArray(object?.keys)
+      keys: globalThis.Array.isArray(object?.keys)
         ? object.keys.map((e: any) => Key.fromJSON(e))
         : [],
-      keyEpochs: Array.isArray(object?.keyEpochs)
+      keyEpochs: globalThis.Array.isArray(object?.keyEpochs)
         ? object.keyEpochs.map((e: any) => KeyEpoch.fromJSON(e))
         : [],
     };
@@ -184,8 +184,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

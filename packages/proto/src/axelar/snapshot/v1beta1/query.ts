@@ -82,7 +82,7 @@ export const QueryValidatorsResponse = {
 
   fromJSON(object: any): QueryValidatorsResponse {
     return {
-      validators: Array.isArray(object?.validators)
+      validators: globalThis.Array.isArray(object?.validators)
         ? object.validators.map((e: any) =>
             QueryValidatorsResponse_Validator.fromJSON(e)
           )
@@ -229,22 +229,24 @@ export const QueryValidatorsResponse_TssIllegibilityInfo = {
 
   fromJSON(object: any): QueryValidatorsResponse_TssIllegibilityInfo {
     return {
-      tombstoned: isSet(object.tombstoned) ? Boolean(object.tombstoned) : false,
-      jailed: isSet(object.jailed) ? Boolean(object.jailed) : false,
+      tombstoned: isSet(object.tombstoned)
+        ? globalThis.Boolean(object.tombstoned)
+        : false,
+      jailed: isSet(object.jailed) ? globalThis.Boolean(object.jailed) : false,
       missedTooManyBlocks: isSet(object.missedTooManyBlocks)
-        ? Boolean(object.missedTooManyBlocks)
+        ? globalThis.Boolean(object.missedTooManyBlocks)
         : false,
       noProxyRegistered: isSet(object.noProxyRegistered)
-        ? Boolean(object.noProxyRegistered)
+        ? globalThis.Boolean(object.noProxyRegistered)
         : false,
       tssSuspended: isSet(object.tssSuspended)
-        ? Boolean(object.tssSuspended)
+        ? globalThis.Boolean(object.tssSuspended)
         : false,
       proxyInsuficientFunds: isSet(object.proxyInsuficientFunds)
-        ? Boolean(object.proxyInsuficientFunds)
+        ? globalThis.Boolean(object.proxyInsuficientFunds)
         : false,
       staleTssHeartbeat: isSet(object.staleTssHeartbeat)
-        ? Boolean(object.staleTssHeartbeat)
+        ? globalThis.Boolean(object.staleTssHeartbeat)
         : false,
     };
   },
@@ -369,9 +371,9 @@ export const QueryValidatorsResponse_Validator = {
   fromJSON(object: any): QueryValidatorsResponse_Validator {
     return {
       operatorAddress: isSet(object.operatorAddress)
-        ? String(object.operatorAddress)
+        ? globalThis.String(object.operatorAddress)
         : "",
-      moniker: isSet(object.moniker) ? String(object.moniker) : "",
+      moniker: isSet(object.moniker) ? globalThis.String(object.moniker) : "",
       tssIllegibilityInfo: isSet(object.tssIllegibilityInfo)
         ? QueryValidatorsResponse_TssIllegibilityInfo.fromJSON(
             object.tssIllegibilityInfo
@@ -553,8 +555,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

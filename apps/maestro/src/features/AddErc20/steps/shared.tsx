@@ -1,7 +1,6 @@
 import { ArrowLeftIcon, Button, ChevronRightIcon, cn } from "@axelarjs/ui";
+import tw from "@axelarjs/ui/tw";
 import type { ComponentProps, FC } from "react";
-
-import tw from "tailwind-styled-components";
 
 const StyledButton = tw(Button)`gap-2`;
 

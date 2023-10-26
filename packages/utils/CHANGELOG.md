@@ -1,5 +1,29 @@
 # @axelarjs/utils
 
+## 0.1.12
+
+### Patch Changes
+
+- [`e8ac19df`](https://github.com/axelarnetwork/axelarjs/commit/e8ac19df530670f4f7b5b6a35565c2d79c1e0201) Thanks [@alanrsoares](https://github.com/alanrsoares)! - upgrade dependencies
+
+## 0.1.11
+
+### Patch Changes
+
+- [`af8138f3`](https://github.com/axelarnetwork/axelarjs/commit/af8138f3825469915e84a81b02c618cd9e70b6f2) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Refactor: rename isStrEqual -> caseInsensitiveEqual
+
+## 0.1.10
+
+### Patch Changes
+
+- [`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Move http client to packages/utils
+
+## 0.1.9
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
 ## 0.1.8
 
 ### Patch Changes

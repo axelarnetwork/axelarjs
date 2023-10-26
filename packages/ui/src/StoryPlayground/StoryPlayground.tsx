@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { CapitalizeKeys } from "@axelarjs/utils";
 import { ComponentProps, FC, ReactNode, useState } from "react";
 
 import type { StoryFn } from "@storybook/react";
 
-import { cn } from "../../utils";
-import { Card } from "../Card";
-import { ThemeSwitcher } from "../ThemeSwitcher";
+import { Card } from "../components/Card";
+import { ThemeSwitcher } from "../components/ThemeSwitcher";
+import { cn } from "../utils";
 
 const capitalize = (str: string) =>
   str.charAt(0).toUpperCase().concat(str.slice(1));
@@ -31,11 +32,8 @@ type VariantConfig<
   title?: string;
 } & PolymorphicVariantConfig<TComponent, TKey>;
 
-type VariantConfigLike<TComponent extends FC> = VariantConfig<
-  TComponent,
-  // rome-ignore lint/suspicious/noExplicitAny: <explanation>
-  any
->;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type VariantConfigLike<TComponent extends FC> = VariantConfig<TComponent, any>;
 
 type VariantsProps<
   TComponent extends FC,
@@ -156,12 +154,12 @@ const Variants = <
                     {"noChildren" in props.variant ? (
                       <div>
                         <span className="label">{value}</span>
-                        {/* @ts-ignore\ */}
+                        {/* @ts-ignore */}
                         <props.component {...itemProps} />
                       </div>
                     ) : (
                       <>
-                        {/* @ts-ignore\ */}
+                        {/* @ts-ignore */}
                         <props.component {...itemProps} />
                       </>
                     )}

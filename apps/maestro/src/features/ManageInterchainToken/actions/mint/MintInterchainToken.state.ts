@@ -1,4 +1,4 @@
-import { toast } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 
 import { isAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";

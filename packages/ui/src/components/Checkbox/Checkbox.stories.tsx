@@ -2,8 +2,8 @@ import { pluralizeKeys } from "@axelarjs/utils";
 
 import type { Meta, StoryFn } from "@storybook/react";
 
+import { configurePlayground } from "../../StoryPlayground";
 import { COLOR_VARIANTS, SIZE_VARIANTS } from "../../theme";
-import { configurePlayground } from "../StoryPlayground";
 import { Checkbox } from "./Checkbox";
 
 export default {

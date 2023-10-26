@@ -87,6 +87,9 @@ export const COLLECTION_KEYS = {
   interchainTokenDetails: (chainId: number, tokenAddress: `0x${string}`) =>
     `${COLLECTIONS.interchainTokens}:${tokenAddress}:${chainId}` as const,
 
+  interchainTokenDetailsByKeyByTokenId: (tokenId: `0x${string}`) =>
+    `${COLLECTIONS.interchainTokens}:keys:${tokenId}` as const,
+
   accountDetails: (accountAddress: `0x${string}`) =>
     `${COLLECTIONS.accounts}:${accountAddress}` as const,
 
@@ -190,6 +193,13 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
       variables.chainId,
       variables.tokenAddress
     );
+
+    const secondaryKey = COLLECTION_KEYS.interchainTokenDetailsByKeyByTokenId(
+      details.tokenId
+    );
+
+    await this.kv.set(secondaryKey, key);
+
     return this.kv.set(key, details);
   }
 
@@ -371,7 +381,7 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
 
         return details;
       })
-    );
+    ).then((tokens) => tokens.filter((x) => Boolean(x.chainId)));
 
     return tokens;
   }

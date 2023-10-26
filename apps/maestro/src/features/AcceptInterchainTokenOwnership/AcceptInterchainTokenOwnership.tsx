@@ -1,5 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import { Button, toast } from "@axelarjs/ui";
+import { Button } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useMemo, type FC } from "react";
 
 import { TransactionExecutionError } from "viem";

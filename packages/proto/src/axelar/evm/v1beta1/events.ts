@@ -237,7 +237,7 @@ export const PollFailed = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
   },
@@ -337,7 +337,7 @@ export const PollExpired = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
   },
@@ -437,7 +437,7 @@ export const PollCompleted = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
   },
@@ -539,7 +539,7 @@ export const NoEventsConfirmed = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
     };
   },
@@ -673,7 +673,7 @@ export const ConfirmKeyTransferStarted = {
 
   fromJSON(object: any): ConfirmKeyTransferStarted {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
@@ -835,7 +835,7 @@ export const ConfirmGatewayTxStarted = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       gatewayAddress: isSet(object.gatewayAddress)
         ? bytesFromBase64(object.gatewayAddress)
         : new Uint8Array(0),
@@ -1072,17 +1072,17 @@ export const ConfirmGatewayTxsStarted = {
 
   fromJSON(object: any): ConfirmGatewayTxsStarted {
     return {
-      pollMappings: Array.isArray(object?.pollMappings)
+      pollMappings: globalThis.Array.isArray(object?.pollMappings)
         ? object.pollMappings.map((e: any) => PollMapping.fromJSON(e))
         : [],
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       gatewayAddress: isSet(object.gatewayAddress)
         ? bytesFromBase64(object.gatewayAddress)
         : new Uint8Array(0),
       confirmationHeight: isSet(object.confirmationHeight)
         ? Long.fromValue(object.confirmationHeight)
         : Long.UZERO,
-      participants: Array.isArray(object?.participants)
+      participants: globalThis.Array.isArray(object?.participants)
         ? object.participants.map((e: any) => bytesFromBase64(e))
         : [],
     };
@@ -1254,7 +1254,7 @@ export const ConfirmDepositStarted = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       depositAddress: isSet(object.depositAddress)
         ? bytesFromBase64(object.depositAddress)
         : new Uint8Array(0),
@@ -1267,7 +1267,7 @@ export const ConfirmDepositStarted = {
       participants: isSet(object.participants)
         ? PollParticipants.fromJSON(object.participants)
         : undefined,
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
     };
   },
 
@@ -1447,7 +1447,7 @@ export const ConfirmTokenStarted = {
       txId: isSet(object.txId)
         ? bytesFromBase64(object.txId)
         : new Uint8Array(0),
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       gatewayAddress: isSet(object.gatewayAddress)
         ? bytesFromBase64(object.gatewayAddress)
         : new Uint8Array(0),
@@ -1564,7 +1564,9 @@ export const ChainAdded = {
   },
 
   fromJSON(object: any): ChainAdded {
-    return { chain: isSet(object.chain) ? String(object.chain) : "" };
+    return {
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+    };
   },
 
   toJSON(message: ChainAdded): unknown {
@@ -1638,7 +1640,7 @@ export const CommandBatchSigned = {
 
   fromJSON(object: any): CommandBatchSigned {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       commandBatchId: isSet(object.commandBatchId)
         ? bytesFromBase64(object.commandBatchId)
         : new Uint8Array(0),
@@ -1722,7 +1724,7 @@ export const CommandBatchAborted = {
 
   fromJSON(object: any): CommandBatchAborted {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       commandBatchId: isSet(object.commandBatchId)
         ? bytesFromBase64(object.commandBatchId)
         : new Uint8Array(0),
@@ -1816,9 +1818,9 @@ export const EVMEventConfirmed = {
 
   fromJSON(object: any): EVMEventConfirmed {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
-      type: isSet(object.type) ? String(object.type) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
     };
   },
 
@@ -1913,9 +1915,9 @@ export const EVMEventCompleted = {
 
   fromJSON(object: any): EVMEventCompleted {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
-      type: isSet(object.type) ? String(object.type) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
     };
   },
 
@@ -2010,9 +2012,9 @@ export const EVMEventFailed = {
 
   fromJSON(object: any): EVMEventFailed {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
-      type: isSet(object.type) ? String(object.type) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
     };
   },
 
@@ -2107,9 +2109,9 @@ export const EVMEventRetryFailed = {
 
   fromJSON(object: any): EVMEventRetryFailed {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
-      type: isSet(object.type) ? String(object.type) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
     };
   },
 
@@ -2255,17 +2257,17 @@ export const ContractCallApproved = {
 
   fromJSON(object: any): ContractCallApproved {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
         : new Uint8Array(0),
-      sender: isSet(object.sender) ? String(object.sender) : "",
+      sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       contractAddress: isSet(object.contractAddress)
-        ? String(object.contractAddress)
+        ? globalThis.String(object.contractAddress)
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
@@ -2370,8 +2372,8 @@ export const ContractCallFailed = {
 
   fromJSON(object: any): ContractCallFailed {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      msgId: isSet(object.msgId) ? String(object.msgId) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      msgId: isSet(object.msgId) ? globalThis.String(object.msgId) : "",
     };
   },
 
@@ -2524,17 +2526,17 @@ export const ContractCallWithMintApproved = {
 
   fromJSON(object: any): ContractCallWithMintApproved {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
         : new Uint8Array(0),
-      sender: isSet(object.sender) ? String(object.sender) : "",
+      sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       contractAddress: isSet(object.contractAddress)
-        ? String(object.contractAddress)
+        ? globalThis.String(object.contractAddress)
         : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
@@ -2705,17 +2707,17 @@ export const TokenSent = {
 
   fromJSON(object: any): TokenSent {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      eventId: isSet(object.eventId) ? String(object.eventId) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      eventId: isSet(object.eventId) ? globalThis.String(object.eventId) : "",
       transferId: isSet(object.transferId)
         ? Long.fromValue(object.transferId)
         : Long.UZERO,
-      sender: isSet(object.sender) ? String(object.sender) : "",
+      sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       destinationAddress: isSet(object.destinationAddress)
-        ? String(object.destinationAddress)
+        ? globalThis.String(object.destinationAddress)
         : "",
       asset: isSet(object.asset) ? Coin.fromJSON(object.asset) : undefined,
     };
@@ -2869,7 +2871,7 @@ export const MintCommand = {
 
   fromJSON(object: any): MintCommand {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       transferId: isSet(object.transferId)
         ? Long.fromValue(object.transferId)
         : Long.UZERO,
@@ -2877,10 +2879,10 @@ export const MintCommand = {
         ? bytesFromBase64(object.commandId)
         : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       destinationAddress: isSet(object.destinationAddress)
-        ? String(object.destinationAddress)
+        ? globalThis.String(object.destinationAddress)
         : "",
       asset: isSet(object.asset) ? Coin.fromJSON(object.asset) : undefined,
     };
@@ -3019,17 +3021,17 @@ export const BurnCommand = {
 
   fromJSON(object: any): BurnCommand {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       commandId: isSet(object.commandId)
         ? bytesFromBase64(object.commandId)
         : new Uint8Array(0),
       destinationChain: isSet(object.destinationChain)
-        ? String(object.destinationChain)
+        ? globalThis.String(object.destinationChain)
         : "",
       depositAddress: isSet(object.depositAddress)
-        ? String(object.depositAddress)
+        ? globalThis.String(object.depositAddress)
         : "",
-      asset: isSet(object.asset) ? String(object.asset) : "",
+      asset: isSet(object.asset) ? globalThis.String(object.asset) : "",
     };
   },
 
@@ -3069,30 +3071,11 @@ export const BurnCommand = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -3102,14 +3085,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -3126,8 +3109,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

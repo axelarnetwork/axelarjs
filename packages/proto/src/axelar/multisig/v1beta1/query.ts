@@ -124,7 +124,9 @@ export const KeyIDRequest = {
   },
 
   fromJSON(object: any): KeyIDRequest {
-    return { chain: isSet(object.chain) ? String(object.chain) : "" };
+    return {
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+    };
   },
 
   toJSON(message: KeyIDRequest): unknown {
@@ -189,7 +191,9 @@ export const KeyIDResponse = {
   },
 
   fromJSON(object: any): KeyIDResponse {
-    return { keyId: isSet(object.keyId) ? String(object.keyId) : "" };
+    return {
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
+    };
   },
 
   toJSON(message: KeyIDResponse): unknown {
@@ -254,7 +258,9 @@ export const NextKeyIDRequest = {
   },
 
   fromJSON(object: any): NextKeyIDRequest {
-    return { chain: isSet(object.chain) ? String(object.chain) : "" };
+    return {
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+    };
   },
 
   toJSON(message: NextKeyIDRequest): unknown {
@@ -319,7 +325,9 @@ export const NextKeyIDResponse = {
   },
 
   fromJSON(object: any): NextKeyIDResponse {
-    return { keyId: isSet(object.keyId) ? String(object.keyId) : "" };
+    return {
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
+    };
   },
 
   toJSON(message: NextKeyIDResponse): unknown {
@@ -384,7 +392,9 @@ export const KeyRequest = {
   },
 
   fromJSON(object: any): KeyRequest {
-    return { keyId: isSet(object.keyId) ? String(object.keyId) : "" };
+    return {
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
+    };
   },
 
   toJSON(message: KeyRequest): unknown {
@@ -468,11 +478,11 @@ export const KeygenParticipant = {
 
   fromJSON(object: any): KeygenParticipant {
     return {
-      address: isSet(object.address) ? String(object.address) : "",
+      address: isSet(object.address) ? globalThis.String(object.address) : "",
       weight: isSet(object.weight)
         ? bytesFromBase64(object.weight)
         : new Uint8Array(0),
-      pubKey: isSet(object.pubKey) ? String(object.pubKey) : "",
+      pubKey: isSet(object.pubKey) ? globalThis.String(object.pubKey) : "",
     };
   },
 
@@ -622,7 +632,7 @@ export const KeyResponse = {
 
   fromJSON(object: any): KeyResponse {
     return {
-      keyId: isSet(object.keyId) ? String(object.keyId) : "",
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
       state: isSet(object.state) ? keyStateFromJSON(object.state) : 0,
       startedAt: isSet(object.startedAt)
         ? Long.fromValue(object.startedAt)
@@ -636,7 +646,7 @@ export const KeyResponse = {
       bondedWeight: isSet(object.bondedWeight)
         ? bytesFromBase64(object.bondedWeight)
         : new Uint8Array(0),
-      participants: Array.isArray(object?.participants)
+      participants: globalThis.Array.isArray(object?.participants)
         ? object.participants.map((e: any) => KeygenParticipant.fromJSON(e))
         : [],
     };
@@ -735,7 +745,9 @@ export const KeygenSessionRequest = {
   },
 
   fromJSON(object: any): KeygenSessionRequest {
-    return { keyId: isSet(object.keyId) ? String(object.keyId) : "" };
+    return {
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
+    };
   },
 
   toJSON(message: KeygenSessionRequest): unknown {
@@ -937,7 +949,7 @@ export const KeygenSessionResponse = {
       bondedWeight: isSet(object.bondedWeight)
         ? bytesFromBase64(object.bondedWeight)
         : new Uint8Array(0),
-      participants: Array.isArray(object?.participants)
+      participants: globalThis.Array.isArray(object?.participants)
         ? object.participants.map((e: any) => KeygenParticipant.fromJSON(e))
         : [],
     };
@@ -1143,30 +1155,11 @@ export const ParamsResponse = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -1176,14 +1169,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -1200,8 +1193,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}
@@ -1224,14 +1217,14 @@ function toTimestamp(date: Date): Timestamp {
 function fromTimestamp(t: Timestamp): Date {
   let millis = (t.seconds.toNumber() || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
-  return new Date(millis);
+  return new globalThis.Date(millis);
 }
 
 function fromJsonTimestamp(o: any): Date {
-  if (o instanceof Date) {
+  if (o instanceof globalThis.Date) {
     return o;
   } else if (typeof o === "string") {
-    return new Date(o);
+    return new globalThis.Date(o);
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }

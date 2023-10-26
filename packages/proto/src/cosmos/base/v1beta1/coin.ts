@@ -84,8 +84,8 @@ export const Coin = {
 
   fromJSON(object: any): Coin {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "",
+      denom: isSet(object.denom) ? globalThis.String(object.denom) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "",
     };
   },
 
@@ -162,8 +162,8 @@ export const DecCoin = {
 
   fromJSON(object: any): DecCoin {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
-      amount: isSet(object.amount) ? String(object.amount) : "",
+      denom: isSet(object.denom) ? globalThis.String(object.denom) : "",
+      amount: isSet(object.amount) ? globalThis.String(object.amount) : "",
     };
   },
 
@@ -229,7 +229,7 @@ export const IntProto = {
   },
 
   fromJSON(object: any): IntProto {
-    return { int: isSet(object.int) ? String(object.int) : "" };
+    return { int: isSet(object.int) ? globalThis.String(object.int) : "" };
   },
 
   toJSON(message: IntProto): unknown {
@@ -290,7 +290,7 @@ export const DecProto = {
   },
 
   fromJSON(object: any): DecProto {
-    return { dec: isSet(object.dec) ? String(object.dec) : "" };
+    return { dec: isSet(object.dec) ? globalThis.String(object.dec) : "" };
   },
 
   toJSON(message: DecProto): unknown {
@@ -324,8 +324,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

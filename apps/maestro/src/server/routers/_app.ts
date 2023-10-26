@@ -5,6 +5,7 @@ import { axelarscanRouter } from "./axelarscan";
 import { erc20Router } from "./erc20";
 import { gmpRouter } from "./gmp";
 import { interchainTokenRouter } from "./interchainToken";
+import { openaiRouter } from "./openai";
 
 export const appRouter = router({
   uptime: publicProcedure.query(() => ({
@@ -16,6 +17,7 @@ export const appRouter = router({
   axelarjsSDK: axelarjsSDKRouter,
   interchainToken: interchainTokenRouter,
   auth: authRouter,
+  openai: openaiRouter,
 });
 
 export type AppRouter = typeof appRouter;

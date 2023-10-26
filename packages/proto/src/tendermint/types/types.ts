@@ -277,7 +277,7 @@ export const PartSetHeader = {
 
   fromJSON(object: any): PartSetHeader {
     return {
-      total: isSet(object.total) ? Number(object.total) : 0,
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
       hash: isSet(object.hash)
         ? bytesFromBase64(object.hash)
         : new Uint8Array(0),
@@ -368,7 +368,7 @@ export const Part = {
 
   fromJSON(object: any): Part {
     return {
-      index: isSet(object.index) ? Number(object.index) : 0,
+      index: isSet(object.index) ? globalThis.Number(object.index) : 0,
       bytes: isSet(object.bytes)
         ? bytesFromBase64(object.bytes)
         : new Uint8Array(0),
@@ -687,7 +687,7 @@ export const Header = {
       version: isSet(object.version)
         ? Consensus.fromJSON(object.version)
         : undefined,
-      chainId: isSet(object.chainId) ? String(object.chainId) : "",
+      chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
       height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO,
       time: isSet(object.time) ? fromJsonTimestamp(object.time) : undefined,
       lastBlockId: isSet(object.lastBlockId)
@@ -840,7 +840,7 @@ export const Data = {
 
   fromJSON(object: any): Data {
     return {
-      txs: Array.isArray(object?.txs)
+      txs: globalThis.Array.isArray(object?.txs)
         ? object.txs.map((e: any) => bytesFromBase64(e))
         : [],
     };
@@ -988,7 +988,7 @@ export const Vote = {
     return {
       type: isSet(object.type) ? signedMsgTypeFromJSON(object.type) : 0,
       height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO,
-      round: isSet(object.round) ? Number(object.round) : 0,
+      round: isSet(object.round) ? globalThis.Number(object.round) : 0,
       blockId: isSet(object.blockId)
         ? BlockID.fromJSON(object.blockId)
         : undefined,
@@ -999,7 +999,7 @@ export const Vote = {
         ? bytesFromBase64(object.validatorAddress)
         : new Uint8Array(0),
       validatorIndex: isSet(object.validatorIndex)
-        ? Number(object.validatorIndex)
+        ? globalThis.Number(object.validatorIndex)
         : 0,
       signature: isSet(object.signature)
         ? bytesFromBase64(object.signature)
@@ -1131,11 +1131,11 @@ export const Commit = {
   fromJSON(object: any): Commit {
     return {
       height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO,
-      round: isSet(object.round) ? Number(object.round) : 0,
+      round: isSet(object.round) ? globalThis.Number(object.round) : 0,
       blockId: isSet(object.blockId)
         ? BlockID.fromJSON(object.blockId)
         : undefined,
-      signatures: Array.isArray(object?.signatures)
+      signatures: globalThis.Array.isArray(object?.signatures)
         ? object.signatures.map((e: any) => CommitSig.fromJSON(e))
         : [],
     };
@@ -1422,8 +1422,8 @@ export const Proposal = {
     return {
       type: isSet(object.type) ? signedMsgTypeFromJSON(object.type) : 0,
       height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO,
-      round: isSet(object.round) ? Number(object.round) : 0,
-      polRound: isSet(object.polRound) ? Number(object.polRound) : 0,
+      round: isSet(object.round) ? globalThis.Number(object.round) : 0,
+      polRound: isSet(object.polRound) ? globalThis.Number(object.polRound) : 0,
       blockId: isSet(object.blockId)
         ? BlockID.fromJSON(object.blockId)
         : undefined,
@@ -1903,30 +1903,11 @@ export const TxProof = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -1936,14 +1917,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -1960,8 +1941,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}
@@ -1984,14 +1965,14 @@ function toTimestamp(date: Date): Timestamp {
 function fromTimestamp(t: Timestamp): Date {
   let millis = (t.seconds.toNumber() || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
-  return new Date(millis);
+  return new globalThis.Date(millis);
 }
 
 function fromJsonTimestamp(o: any): Date {
-  if (o instanceof Date) {
+  if (o instanceof globalThis.Date) {
     return o;
   } else if (typeof o === "string") {
-    return new Date(o);
+    return new globalThis.Date(o);
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }

@@ -3,32 +3,32 @@ import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
 import { STANDARD_FEE } from "../../constants";
 import {
-  AxelarSigningStargateClient,
-  getSigningAxelarClientOptions,
-} from "../client";
+  createAxelarSigningClient,
+  getAxelarSigningClientOptions,
+} from "../stargateClient";
+import { AXELAR_RPC_URL } from "./constants";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
-describe("signing client", () => {
+describe("stargate client", () => {
   test("default registry", () => {
-    const { registry } = getSigningAxelarClientOptions();
+    const { registry } = getAxelarSigningClientOptions();
 
     expect(registry).toBeDefined();
 
     const typeFound = registry.lookupType("/axelar.evm.v1beta1.LinkRequest");
     expect(typeFound).toBeDefined();
     expect(typeFound?.decode).toBeDefined();
+    expect(typeFound?.encode).toBeDefined();
   });
 
   test("broadcast link transaction", async () => {
-    const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
-
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
       { prefix: "axelar" }
     );
 
-    const client = await AxelarSigningStargateClient.connectWithSigner(
-      axelarRpcUrl,
+    const client = await createAxelarSigningClient(
+      AXELAR_RPC_URL,
       offlineSigner
     );
 
@@ -42,7 +42,7 @@ describe("signing client", () => {
       return;
     }
 
-    const txResponse = await client.messages.evm.link.signAndBroadcast(
+    const txResponse = await client.tx.evm.link.signAndBroadcast(
       accData.address,
       {
         sender: toAccAddress(String(accData?.address)),
@@ -60,15 +60,13 @@ describe("signing client", () => {
   });
 
   test("simulate link transaction", async () => {
-    const axelarRpcUrl = "https://axelartest-rpc.quickapi.com";
-
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
       { prefix: "axelar" }
     );
 
-    const client = await AxelarSigningStargateClient.connectWithSigner(
-      axelarRpcUrl,
+    const client = await createAxelarSigningClient(
+      AXELAR_RPC_URL,
       offlineSigner
     );
 
@@ -78,16 +76,13 @@ describe("signing client", () => {
       return;
     }
 
-    const estimateGas = await client.messages.evm.link.simulate(
-      accData.address,
-      {
-        sender: toAccAddress(String(accData?.address)),
-        recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
-        recipientChain: "avalanche",
-        asset: "wavax-wei",
-        chain: "fantom",
-      }
-    );
+    const estimateGas = await client.tx.evm.link.simulate(accData.address, {
+      sender: toAccAddress(String(accData.address)),
+      recipientAddr: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+      recipientChain: "avalanche",
+      asset: "wavax-wei",
+      chain: "fantom",
+    });
 
     expect(estimateGas).not.toBeLessThan(10000);
   });

@@ -267,7 +267,7 @@ export const PollMetadata = {
         ? Long.fromValue(object.minVoterCount)
         : Long.ZERO,
       rewardPoolName: isSet(object.rewardPoolName)
-        ? String(object.rewardPoolName)
+        ? globalThis.String(object.rewardPoolName)
         : "",
       gracePeriod: isSet(object.gracePeriod)
         ? Long.fromValue(object.gracePeriod)
@@ -279,7 +279,7 @@ export const PollMetadata = {
       snapshot: isSet(object.snapshot)
         ? Snapshot.fromJSON(object.snapshot)
         : undefined,
-      module: isSet(object.module) ? String(object.module) : "",
+      module: isSet(object.module) ? globalThis.String(object.module) : "",
       moduleMetadata: isSet(object.moduleMetadata)
         ? Any.fromJSON(object.moduleMetadata)
         : undefined,
@@ -430,8 +430,8 @@ export const PollKey = {
 
   fromJSON(object: any): PollKey {
     return {
-      module: isSet(object.module) ? String(object.module) : "",
-      id: isSet(object.id) ? String(object.id) : "",
+      module: isSet(object.module) ? globalThis.String(object.module) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
     };
   },
 
@@ -509,7 +509,7 @@ export const PollParticipants = {
   fromJSON(object: any): PollParticipants {
     return {
       pollId: isSet(object.pollId) ? Long.fromValue(object.pollId) : Long.UZERO,
-      participants: Array.isArray(object?.participants)
+      participants: globalThis.Array.isArray(object?.participants)
         ? object.participants.map((e: any) => bytesFromBase64(e))
         : [],
     };
@@ -544,30 +544,11 @@ export const PollParticipants = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -577,14 +558,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -601,8 +582,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

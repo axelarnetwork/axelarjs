@@ -111,7 +111,7 @@ export const Params = {
       endBlockerLimit: isSet(object.endBlockerLimit)
         ? Long.fromValue(object.endBlockerLimit)
         : Long.UZERO,
-      callContractsProposalMinDeposits: Array.isArray(
+      callContractsProposalMinDeposits: globalThis.Array.isArray(
         object?.callContractsProposalMinDeposits
       )
         ? object.callContractsProposalMinDeposits.map((e: any) =>
@@ -233,11 +233,11 @@ export const CallContractProposalMinDeposit = {
 
   fromJSON(object: any): CallContractProposalMinDeposit {
     return {
-      chain: isSet(object.chain) ? String(object.chain) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
       contractAddress: isSet(object.contractAddress)
-        ? String(object.contractAddress)
+        ? globalThis.String(object.contractAddress)
         : "",
-      minDeposits: Array.isArray(object?.minDeposits)
+      minDeposits: globalThis.Array.isArray(object?.minDeposits)
         ? object.minDeposits.map((e: any) => Coin.fromJSON(e))
         : [],
     };
@@ -287,8 +287,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

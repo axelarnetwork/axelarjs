@@ -1,6 +1,6 @@
 import type { ComponentProps, FC } from "react";
 
-import tw from "tailwind-styled-components";
+import tw from "../../tw";
 
 const StyledReactComponent = tw.div``;
 

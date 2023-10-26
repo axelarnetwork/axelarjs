@@ -11,8 +11,7 @@ export type ThemeKind = (typeof VALID_THEMES)[number];
 export const THEME_KEY = "@axelarui/theme";
 
 export function isValidTheme(theme: string): theme is ThemeKind {
-  // rome-ignore lint/suspicious/noExplicitAny: avoid union type mismatch
-  return VALID_THEMES.includes(theme as any);
+  return VALID_THEMES.includes(theme as ThemeKind);
 }
 
 function persistTheme(theme: ThemeKind) {

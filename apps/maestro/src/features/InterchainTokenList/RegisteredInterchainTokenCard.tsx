@@ -7,9 +7,9 @@ import {
   CopyToClipboardButton,
   SettingsIcon,
   SpinnerIcon,
-  toast,
   Tooltip,
 } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, type FC } from "react";
 

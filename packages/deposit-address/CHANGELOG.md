@@ -1,5 +1,69 @@
 # @axelarjs/deposit-address
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [[`e8ac19df`](https://github.com/axelarnetwork/axelarjs/commit/e8ac19df530670f4f7b5b6a35565c2d79c1e0201)]:
+  - @axelarjs/api@0.3.7
+  - @axelarjs/utils@0.1.12
+
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`af8138f3`](https://github.com/axelarnetwork/axelarjs/commit/af8138f3825469915e84a81b02c618cd9e70b6f2)]:
+  - @axelarjs/utils@0.1.11
+  - @axelarjs/api@0.3.6
+
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`c2ebc082`](https://github.com/axelarnetwork/axelarjs/commit/c2ebc082d4517e7f920c707e23fd0d00884ed0a1)]:
+  - @axelarjs/api@0.3.6
+
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`007badef`](https://github.com/axelarnetwork/axelarjs/commit/007badefffc11047e4d50aeb5052fbc2ad91cb57)]:
+  - @axelarjs/api@0.3.5
+
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`22607518`](https://github.com/axelarnetwork/axelarjs/commit/226075180e5443cf7ad1a2aeb10e6ba9d347e693)]:
+  - @axelarjs/api@0.3.4
+
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`7376c166`](https://github.com/axelarnetwork/axelarjs/commit/7376c16636b0dc165d26545fc4d094e9917cbcea)]:
+  - @axelarjs/core@0.2.9
+  - @axelarjs/api@0.3.3
+
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e)]:
+  - @axelarjs/api@0.3.2
+  - @axelarjs/utils@0.1.10
+
+## 0.1.1
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
+- Updated dependencies [[`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020)]:
+  - @axelarjs/api@0.3.1
+  - @axelarjs/core@0.2.8
+  - @axelarjs/utils@0.1.9
+
 ## 0.1.0
 
 ### Minor Changes

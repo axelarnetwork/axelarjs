@@ -4,7 +4,7 @@ import type {
   DepositAddressClient,
   LinkRequestResponse,
 } from "@axelarjs/api";
-import { isStrEqual, poll } from "@axelarjs/utils";
+import { caseInsensitiveEqual, poll } from "@axelarjs/utils";
 
 import type { GetDepositAddressDependencies, SendOptions } from "../types";
 import { createDummyAccount, signOtc } from "./account";
@@ -24,10 +24,15 @@ export async function getDepositAddressFromAxelarNetwork(
   /**
    * invoke API to get deposit address
    */
-  await triggerGetDepositAddressFromAxelar(
+  const response = await triggerGetDepositAddressFromAxelar(
     params,
     dependencies.depositAddressClient
   );
+
+  if (!response.data) {
+    throw new Error("No data returned from deposit address API");
+  }
+
   /**
    * wait for and return deposit address
    */
@@ -43,24 +48,28 @@ function findLinkRequest(
   module: "evm" | "axelarnet" | undefined,
   results: LinkRequestResponse[]
 ) {
-  const foundEntry = results.find((linkRequest) => {
-    if (module === "axelarnet") {
-      return (
-        linkRequest.module === "axelarnet" &&
-        isStrEqual(linkRequest.destinationAddress, params.destinationAddress) &&
-        isStrEqual(linkRequest.destinationChain, params.destinationChain) &&
-        isStrEqual(linkRequest.asset, params.asset)
-      );
-    } else {
-      return (
-        isStrEqual(linkRequest.sourceChain, params.sourceChain) &&
-        isStrEqual(linkRequest.destinationAddress, params.destinationAddress) &&
-        isStrEqual(linkRequest.destinationChain, params.destinationChain) &&
-        isStrEqual(linkRequest.asset, params.asset)
-      );
+  return results.find((linkRequest) => {
+    const matchesBaseConditions = [
+      [linkRequest.module, module], // matches module
+      [linkRequest.destinationAddress, params.destinationAddress], // matches destination address
+      [linkRequest.destinationChain, params.destinationChain], // matches destination chain
+      [linkRequest.asset, params.asset], // matches asset
+    ].every(([a, b]) => caseInsensitiveEqual(a, b));
+
+    switch (module) {
+      case "axelarnet":
+        return matchesBaseConditions;
+      case "evm":
+        return (
+          matchesBaseConditions &&
+          // matches source chain
+          caseInsensitiveEqual(linkRequest.sourceChain, params.sourceChain)
+        );
+      default:
+        // invalid module
+        return false;
     }
   });
-  return foundEntry;
 }
 
 async function waitForDepositAddress(
@@ -91,12 +100,15 @@ async function triggerGetDepositAddressFromAxelar(
   const { validationMsg } = await depositAddressClient.getOTC({
     signerAddress: publicAddress,
   });
+
+  const signature = await signOtc(account, validationMsg);
+
   return depositAddressClient.requestDepositAddress({
     fromChain: params.sourceChain,
     toChain: params.destinationChain,
     destinationAddress: params.destinationAddress,
     asset: params.asset,
     publicAddress,
-    signature: await signOtc(account, validationMsg),
+    signature,
   });
 }

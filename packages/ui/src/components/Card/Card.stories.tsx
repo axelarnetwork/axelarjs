@@ -16,7 +16,6 @@ export default {
 } as Meta<typeof Card>;
 
 const Template: StoryFn<typeof Card> = (args) => (
-  // @ts-ignore
   <Card {...args}>
     {typeof args.children === "string" ? (
       <Card.Body>{args.children}</Card.Body>

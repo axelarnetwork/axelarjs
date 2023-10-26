@@ -1,11 +1,10 @@
 {
   "name": "@axelarjs/evm",
-  "version": "0.1.9",
+  "version": "0.1.11",
   "publishConfig": {
     "access": "public"
   },
   "description": "EVM clients & utils",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
@@ -41,20 +40,20 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "~1.10.14"
+    "viem": "~1.16.6"
   },
   "devDependencies": {
     "@axelar-network/interchain-token-service": "^0.3.0",
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.7.0",
+    "@types/node": "^20.8.9",
     "@types/prettier": "^2.7.3",
     "chalk": "^4.1.2",
     "package-json": "^7.0.0",
     "prettier": "^2.8.8",
-    "rimraf": "^5.0.4",
+    "rimraf": "^5.0.5",
     "strip-ansi": "^6.0.1",
-    "tsx": "^3.13.0",
+    "tsx": "^3.14.0",
     "typescript": "^5.2.2",
     "zx": "^7.2.3"
   }

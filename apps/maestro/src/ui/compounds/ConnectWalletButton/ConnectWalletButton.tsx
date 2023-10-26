@@ -1,7 +1,7 @@
 import { Button, type ButtonProps } from "@axelarjs/ui";
 import { forwardRef } from "react";
 
-import { useWeb3Modal } from "@web3modal/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 type Props = ButtonProps;
 
@@ -13,7 +13,7 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
       <Button
         data-testid="connect-button"
         {...props}
-        onClick={open}
+        onClick={open.bind(null, { view: "Connect" })}
         ref={ref}
       />
     );

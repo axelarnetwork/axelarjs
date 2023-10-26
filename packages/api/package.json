@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.3.0",
+  "version": "0.3.7",
   "publishConfig": {
     "access": "public"
   },
@@ -11,6 +11,7 @@
   "description": "Axelar typesafe api clients",
   "files": [
     "./build",
+    "./lib",
     "./axelarscan",
     "./axelar-query",
     "./gmp",
@@ -57,8 +58,8 @@
       "require": "./build/commonjs/deposit-address/*.js"
     },
     ".": {
-      "import": "./build/module/*.js",
-      "require": "./build/commonjs/*.js"
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
     },
     "./*": {
       "import": "./build/module/*.js",
@@ -78,24 +79,25 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@types/node": "18.15.3",
-    "fast-check": "^3.13.0",
+    "@axelarjs/utils": "workspace:*",
+    "@types/node": "^20.8.9",
+    "fast-check": "^3.13.2",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rimraf": "^5.0.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
-    "vitest": "^0.34.5"
+    "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "unfetch": "<=4.0.2"
+    "unfetch": "<=4.2"
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
-    "rambda": "^7.5.0",
-    "viem": "~1.10.14"
+    "rambda": "^8.5.0",
+    "viem": "~1.16.6"
   }
 }

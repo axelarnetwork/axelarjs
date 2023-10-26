@@ -2,7 +2,9 @@ name: Test (E2E)
 
 on: workflow_dispatch
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   wait-for-preview-and-test:
@@ -17,7 +19,7 @@ jobs:
           max_timeout: 300
 
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         uses: ./.github/actions/install-dependencies

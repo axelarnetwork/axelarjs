@@ -1,7 +1,8 @@
 import { fontFamily } from "tailwindcss/defaultTheme";
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+
+const config: Config = {
   presets: [require("@axelarjs/ui/preset")],
   content: [
     "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
@@ -19,3 +20,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

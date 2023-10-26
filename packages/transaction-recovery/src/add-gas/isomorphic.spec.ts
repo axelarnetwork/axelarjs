@@ -23,6 +23,8 @@ const MOCK_ADD_GAS_RESPONSE = {
   gasWanted: 250000,
 };
 
+const COSMOS_WALLET_MNEMONIC = String(process.env["COSMOS_WALLET_MNEMONIC"]);
+
 describe("addGas - (isomorphic)", () => {
   const mockSignAndBroadcast = () => MOCK_ADD_GAS_RESPONSE;
 
@@ -53,11 +55,11 @@ describe("addGas - (isomorphic)", () => {
 
     const token = {
       denom:
-        "ibc/9463E39D230614B313B487836D13A392BD1731928713D4C8427A083627048DB3",
+        "ibc/44E584C7B0EBEE2D268ABE24AE408825A60E55AC08C5E97D94497741B26C9654",
       amount: "1",
     };
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
-      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      COSMOS_WALLET_MNEMONIC,
       { prefix: "osmo" }
     );
 
@@ -76,7 +78,7 @@ describe("addGas - (isomorphic)", () => {
         txHash,
         token,
         sendOptions,
-        chain: "osmosis-6",
+        chain: "osmosis-7",
       },
       DEFAULT_ADD_GAS_DEPENDENCIES
     );
@@ -90,7 +92,7 @@ describe("addGas - (isomorphic)", () => {
 
   test("autocalculate", async () => {
     const txHash =
-      "6118C285B0C7A139C5636184BECBF8C201FF36B61F44060B82EFE4C535084D9C";
+      "78377623A0D4643305F02A4F0F825B1C4AAE2868831AE2D59CE4C79A98BD827C";
 
     const autocalculateGasOptions: AutocalculateGasOptions = {
       gasLimit: BigInt(700_000),
@@ -98,7 +100,7 @@ describe("addGas - (isomorphic)", () => {
     };
 
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
-      process.env["COSMOS_WALLET_MNEMONIC"] as string,
+      COSMOS_WALLET_MNEMONIC,
       { prefix: "osmo" }
     );
 
@@ -117,7 +119,7 @@ describe("addGas - (isomorphic)", () => {
         token: "autocalculate",
         sendOptions,
         autocalculateGasOptions,
-        chain: "osmosis-6",
+        chain: "osmosis-7",
       },
       DEFAULT_ADD_GAS_DEPENDENCIES
     );

@@ -2,22 +2,22 @@ import { parseUnits } from "viem";
 
 import type { GMPClient } from "../gmp/isomorphic";
 import {
-  IsomorphicHTTPClient,
+  RestService,
   type ClientMeta,
-  type ClientOptions,
-} from "../IsomorphicHTTPClient";
-import { BigNumberUtils } from "./helpers/BigNumberUtils";
+  type RestServiceOptions,
+} from "../lib/rest-service";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
+import { gasToWei } from "./utils/bigint";
 
 type AxelarscanClientDependencies = {
   gmpClient: GMPClient;
 };
 
-export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
+export class AxelarQueryAPIClient extends RestService {
   protected gmpClient: GMPClient;
 
   public constructor(
-    options: ClientOptions,
+    options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
     meta?: ClientMeta
   ) {
@@ -26,7 +26,7 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
   }
 
   static init(
-    options: ClientOptions,
+    options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies
   ) {
     return new AxelarQueryAPIClient(options, dependencies, {
@@ -90,14 +90,14 @@ export class AxelarQueryAPIClient extends IsomorphicHTTPClient {
       );
     }
 
-    const destGasFeeWei = BigNumberUtils.multiplyToGetWei(
+    const destGasFeeWei = gasToWei(
       gasLimit,
       destination_native_token.gas_price,
       destination_native_token.decimals
     );
     const minDestGasFeeWei = BigInt(minGasPrice) * BigInt(gasLimit);
 
-    const srcGasFeeWei = BigNumberUtils.multiplyToGetWei(
+    const srcGasFeeWei = gasToWei(
       gasLimit,
       source_token.gas_price,
       source_token.decimals

@@ -1,7 +1,7 @@
-import { toast } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 
 import { TransactionExecutionError } from "viem";
-import type { WriteContractResult } from "wagmi/dist/actions";
+import type { WriteContractResult } from "wagmi/actions";
 
 import { logger } from "~/lib/logger";
 

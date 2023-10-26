@@ -11,17 +11,14 @@ const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> = {
   StandardizedTokenDeployed: "Token Deployed",
 };
 
-const RecentTransactionsTabs = () => {
+const RecentTransactionsTabs = ({ maxTransactions = 10 }) => {
   const [contractMethod, setContractMethod] =
     useState<ContractMethod>("sendToken");
 
   const { address } = useAccount();
 
   return (
-    <section className="my-10 space-y-4">
-      <div className="divider text-xl font-bold">
-        RECENT INTERCHAIN TRANSACTIONS
-      </div>
+    <div>
       <Card className="bg-base-200 w-full rounded-3xl" compact>
         <Card.Body>
           <Card.Title className="grid place-items-center space-y-2 text-center md:hidden">
@@ -45,11 +42,13 @@ const RecentTransactionsTabs = () => {
               contractMethod="sendToken"
               senderAddress={address}
               title="Transfers"
+              maxTransactions={maxTransactions}
             />
             <RecentTransactionsList
               contractMethod="StandardizedTokenDeployed"
               senderAddress={address}
               title="Token Deployments"
+              maxTransactions={maxTransactions}
             />
           </div>
           <div className="md:hidden">
@@ -60,7 +59,7 @@ const RecentTransactionsTabs = () => {
           </div>
         </Card.Body>
       </Card>
-    </section>
+    </div>
   );
 };
 

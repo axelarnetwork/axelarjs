@@ -166,7 +166,7 @@ export const Key = {
 
   fromJSON(object: any): Key {
     return {
-      id: isSet(object.id) ? String(object.id) : "",
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
       snapshot: isSet(object.snapshot)
         ? Snapshot.fromJSON(object.snapshot)
         : undefined,
@@ -290,7 +290,7 @@ export const Key_PubKeysEntry = {
 
   fromJSON(object: any): Key_PubKeysEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
       value: isSet(object.value)
         ? bytesFromBase64(object.value)
         : new Uint8Array(0),
@@ -531,7 +531,7 @@ export const KeygenSession = {
       object.isPubKeyReceived ?? {}
     ).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
       if (value !== undefined) {
-        acc[key] = Boolean(value);
+        acc[key] = globalThis.Boolean(value);
       }
       return acc;
     }, {});
@@ -597,8 +597,8 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
 
   fromJSON(object: any): KeygenSession_IsPubKeyReceivedEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
-      value: isSet(object.value) ? Boolean(object.value) : false,
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.Boolean(object.value) : false,
     };
   },
 
@@ -695,7 +695,7 @@ export const MultiSig = {
 
   fromJSON(object: any): MultiSig {
     return {
-      keyId: isSet(object.keyId) ? String(object.keyId) : "",
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
       payloadHash: isSet(object.payloadHash)
         ? bytesFromBase64(object.payloadHash)
         : new Uint8Array(0),
@@ -801,7 +801,7 @@ export const MultiSig_SigsEntry = {
 
   fromJSON(object: any): MultiSig_SigsEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
       value: isSet(object.value)
         ? bytesFromBase64(object.value)
         : new Uint8Array(0),
@@ -980,7 +980,7 @@ export const SigningSession = {
       gracePeriod: isSet(object.gracePeriod)
         ? Long.fromValue(object.gracePeriod)
         : Long.ZERO,
-      module: isSet(object.module) ? String(object.module) : "",
+      module: isSet(object.module) ? globalThis.String(object.module) : "",
       moduleMetadata: isSet(object.moduleMetadata)
         ? Any.fromJSON(object.moduleMetadata)
         : undefined,
@@ -1124,8 +1124,8 @@ export const KeyEpoch = {
   fromJSON(object: any): KeyEpoch {
     return {
       epoch: isSet(object.epoch) ? Long.fromValue(object.epoch) : Long.UZERO,
-      chain: isSet(object.chain) ? String(object.chain) : "",
-      keyId: isSet(object.keyId) ? String(object.keyId) : "",
+      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
+      keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
     };
   },
 
@@ -1158,30 +1158,11 @@ export const KeyEpoch = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
+  if (globalThis.Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
-    const bin = tsProtoGlobalThis.atob(b64);
+    const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
       arr[i] = bin.charCodeAt(i);
@@ -1191,14 +1172,14 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
+      bin.push(globalThis.String.fromCharCode(byte));
     });
-    return tsProtoGlobalThis.btoa(bin.join(""));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
@@ -1215,8 +1196,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

@@ -1,4 +1,5 @@
-import { ThemeProvider, Toaster } from "@axelarjs/ui";
+import { ThemeProvider } from "@axelarjs/ui";
+import { Toaster } from "@axelarjs/ui/toaster";
 import { useEffect, useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
@@ -20,16 +21,6 @@ import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
-
-initTelemetryAsync()
-  .then((initialized) => {
-    if (initialized) {
-      logger.info("Telemetry initialized");
-    }
-  })
-  .catch((error) => {
-    logger.error(error);
-  });
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
@@ -83,17 +74,6 @@ logger.configure({
       ? "development"
       : "production",
 });
-
-async function initTelemetryAsync() {
-  if (process.env.NODE_ENV !== "development") {
-    const { initLogRocket } = await import("~/config/telemetry");
-
-    initLogRocket();
-
-    return true;
-  }
-  return false;
-}
 
 const GoogleAnalytics = ({ measurementId = "" }) => {
   if (!measurementId) {

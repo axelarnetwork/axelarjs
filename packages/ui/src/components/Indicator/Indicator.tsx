@@ -1,8 +1,8 @@
 import type { ComponentProps, FC } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
-import tw from "tailwind-styled-components";
 
+import tw from "../../tw";
 import { cn } from "../../utils";
 import { Badge } from "../Badge";
 

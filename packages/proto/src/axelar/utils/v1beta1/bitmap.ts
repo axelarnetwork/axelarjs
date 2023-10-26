@@ -161,11 +161,11 @@ export const CircularBuffer = {
 
   fromJSON(object: any): CircularBuffer {
     return {
-      cumulativeValue: Array.isArray(object?.cumulativeValue)
+      cumulativeValue: globalThis.Array.isArray(object?.cumulativeValue)
         ? object.cumulativeValue.map((e: any) => Long.fromValue(e))
         : [],
-      index: isSet(object.index) ? Number(object.index) : 0,
-      maxSize: isSet(object.maxSize) ? Number(object.maxSize) : 0,
+      index: isSet(object.index) ? globalThis.Number(object.index) : 0,
+      maxSize: isSet(object.maxSize) ? globalThis.Number(object.maxSize) : 0,
     };
   },
 
@@ -215,8 +215,8 @@ export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
   ? string | number | Long
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

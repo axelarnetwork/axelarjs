@@ -19,14 +19,13 @@ import {
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 
-const FormInput = {
-  ...TextInput,
+const FormInput = Object.assign({}, TextInput, {
   defaultProps: {
     ...TextInput.defaultProps,
     className: "bg-base-200",
     bordered: true,
   },
-} as typeof TextInput;
+}) as typeof TextInput;
 
 const TokenDetails: FC = () => {
   const { state, actions } = useAddErc20StateContainer();

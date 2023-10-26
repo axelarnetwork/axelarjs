@@ -2,7 +2,8 @@ import { ComponentProps } from "react";
 
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
-import tw from "tailwind-styled-components";
+
+import tw from "../../tw";
 
 const cardVariance = cva("card", {
   variants: {

@@ -1,7 +1,4 @@
-import {
-  IsomorphicHTTPClient,
-  type ClientOptions,
-} from "../IsomorphicHTTPClient";
+import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type {
   DepositAddressResponse,
   GetDepositAddressParams,
@@ -9,8 +6,8 @@ import type {
   OTC,
 } from "./types";
 
-export class DepositAddressClient extends IsomorphicHTTPClient {
-  static init(options: ClientOptions) {
+export class DepositAddressClient extends RestService {
+  static init(options: RestServiceOptions) {
     return new DepositAddressClient(options, {
       name: "DepositAddressClient",
       version: "0.0.1",

@@ -1,6 +1,6 @@
 import { ComponentProps, FC } from "react";
 
-import tw from "tailwind-styled-components";
+import tw from "../../tw";
 
 export const Clamp = tw.div`
   max-w-4xl 

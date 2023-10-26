@@ -1,5 +1,83 @@
 # @axelarjs/transaction-recovery
 
+## 0.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`e8ac19df`](https://github.com/axelarnetwork/axelarjs/commit/e8ac19df530670f4f7b5b6a35565c2d79c1e0201)]:
+  - @axelarjs/api@0.3.7
+  - @axelarjs/cosmos@0.2.11
+
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @axelarjs/api@0.3.6
+  - @axelarjs/cosmos@0.2.10
+
+## 0.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`d08e02fc`](https://github.com/axelarnetwork/axelarjs/commit/d08e02fca9172afe12671c0b2b66d14c9104f088)]:
+  - @axelarjs/cosmos@0.2.9
+
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`6f9fcdf4`](https://github.com/axelarnetwork/axelarjs/commit/6f9fcdf495a70218036bc79ad743d33ad8c3942f)]:
+  - @axelarjs/cosmos@0.2.8
+
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`c2ebc082`](https://github.com/axelarnetwork/axelarjs/commit/c2ebc082d4517e7f920c707e23fd0d00884ed0a1)]:
+  - @axelarjs/api@0.3.6
+
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`007badef`](https://github.com/axelarnetwork/axelarjs/commit/007badefffc11047e4d50aeb5052fbc2ad91cb57)]:
+  - @axelarjs/api@0.3.5
+
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`22607518`](https://github.com/axelarnetwork/axelarjs/commit/226075180e5443cf7ad1a2aeb10e6ba9d347e693)]:
+  - @axelarjs/api@0.3.4
+
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`7376c166`](https://github.com/axelarnetwork/axelarjs/commit/7376c16636b0dc165d26545fc4d094e9917cbcea)]:
+  - @axelarjs/core@0.2.9
+  - @axelarjs/api@0.3.3
+
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`9d629a90`](https://github.com/axelarnetwork/axelarjs/commit/9d629a900e3597d0ddf4944112225873e0e4ca0e)]:
+  - @axelarjs/api@0.3.2
+  - @axelarjs/cosmos@0.2.7
+
+## 0.2.1
+
+### Patch Changes
+
+- [`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Remove `"type": "module"` from packages
+
+- Updated dependencies [[`42204ed7`](https://github.com/axelarnetwork/axelarjs/commit/42204ed79efac23a74b4333a452bb29cb6dfe020)]:
+  - @axelarjs/api@0.3.1
+  - @axelarjs/core@0.2.8
+  - @axelarjs/cosmos@0.2.6
+
 ## 0.2.0
 
 ### Minor Changes

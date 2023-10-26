@@ -1,12 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import {
-  Button,
-  Dialog,
-  FormControl,
-  Label,
-  toast,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import React, {
   useCallback,
@@ -17,7 +11,6 @@ import React, {
 } from "react";
 import Image from "next/image";
 
-import { propEq } from "rambda";
 import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
@@ -116,7 +109,7 @@ export const Step3: FC = () => {
 
   const chainId = useChainId();
 
-  const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
+  const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteStandardizedTokenMutation(
@@ -161,8 +154,6 @@ export const Step3: FC = () => {
       }
       actions.setIsDeploying(true);
 
-      const sourceChain = state.evmChains.find(propEq("chain_id", chainId));
-
       invariant(sourceChain, "source chain not found");
 
       rootActions.setTxState({
@@ -192,10 +183,10 @@ export const Step3: FC = () => {
       state.isGasPriceQueryError,
       state.gasFees,
       state.evmChains,
-      chainId,
-      actions,
-      rootActions,
       deployInterchainTokenAsync,
+      actions,
+      sourceChain,
+      rootActions,
     ]
   );
 

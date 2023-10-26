@@ -20,7 +20,6 @@ import {
   SignerData,
   SigningStargateClient,
   SigningStargateClientOptions,
-  StargateClient,
   StargateClientOptions,
   StdFee,
 } from "@cosmjs/stargate";
@@ -35,15 +34,13 @@ import {
   createMsgClient,
   MODULES,
 } from "./messages";
+import { AxelarQueryClient, createQueryClient } from "./queryClient";
+import type { ProtobufModule } from "./types";
 import {
   convertToCamelCaseDeep,
   convertToSnakeCaseDeep,
   createAminoTypeNameFromProtoTypeUrl,
 } from "./utils";
-
-type ProtobufModule = Record<string, unknown> & {
-  protobufPackage: string;
-};
 
 export const generateTypeUrlAndTypeRecords = (proto: ProtobufModule) =>
   Object.entries(proto)
@@ -85,7 +82,7 @@ export const createDefaultAminoTypes = () =>
     ...createAxelarAminoConverters(),
   });
 
-export function getSigningAxelarClientOptions(
+export function getAxelarSigningClientOptions(
   defaultTypes = defaultRegistryTypes
 ) {
   return {
@@ -99,14 +96,19 @@ export type AxelarSigningClientMessage =
   | CosmosEncodeObject;
 
 export class AxelarSigningStargateClient extends SigningStargateClient {
-  public messages: AxelarMsgClient;
+  /**
+   * @deprecated Use the {@link tx} field instead.
+   */
+  public readonly messages: AxelarMsgClient;
+  public readonly tx: AxelarMsgClient;
+  public readonly query?: AxelarQueryClient | undefined;
 
   protected constructor(
     tmClient: Tendermint37Client | undefined,
     signer: OfflineSigner,
     options: SigningStargateClientOptions
   ) {
-    const { registry, aminoTypes } = getSigningAxelarClientOptions();
+    const { registry, aminoTypes } = getAxelarSigningClientOptions();
 
     super(tmClient, signer, {
       registry,
@@ -115,7 +117,12 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
       ...options,
     });
 
-    this.messages = createMsgClient(this);
+    this.tx = createMsgClient(this);
+
+    this.messages = this.tx;
+
+    this.query =
+      tmClient !== undefined ? createQueryClient(tmClient) : undefined;
   }
 
   static override async connect(
@@ -123,7 +130,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     options: StargateClientOptions = {}
   ) {
     const tmClient = await Tendermint37Client.connect(endpoint);
-    return new this(tmClient, {} as OfflineSigner, options) as StargateClient;
+    return new this(tmClient, {} as OfflineSigner, options);
   }
 
   static override async connectWithSigner(
@@ -168,4 +175,32 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
   ) {
     return super.signAndBroadcast(signerAddress, messages, fee, memo);
   }
+
+  protected override getQueryClient() {
+    return this.query;
+  }
+
+  protected override forceGetQueryClient() {
+    if (this.query === undefined) {
+      throw new Error(
+        "Query client not available. You cannot use online functionality in offline mode."
+      );
+    }
+
+    return this.query;
+  }
 }
+
+export async function createAxelarQueryClient(
+  endpoint: string | HttpEndpoint,
+  options: StargateClientOptions = {}
+) {
+  const client = await AxelarSigningStargateClient.connect(endpoint, options);
+
+  return client.query as AxelarQueryClient;
+}
+
+export const createAxelarSigningClient =
+  AxelarSigningStargateClient.connectWithSigner.bind(
+    AxelarSigningStargateClient
+  );

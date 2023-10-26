@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/deposit-address",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "description": "Axelarjs Deposit Address",
   "repository": {
     "type": "git",
@@ -45,15 +45,15 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "dotenv": "^16.3.1",
-    "rimraf": "^5.0.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.5"
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "bech32": "^2.0.0",
-    "viem": "~1.10.14"
+    "viem": "~1.16.6"
   }
 }
