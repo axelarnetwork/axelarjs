@@ -8,7 +8,8 @@ import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
-  size: z.number().optional().default(20),
+  pageSize: z.number().optional().default(20),
+  page: z.number().optional().default(0),
   senderAddress: hex40Literal().optional(),
   contractMethod: z.union([
     z.literal("sendToken"),
@@ -73,7 +74,8 @@ export const getRecentTransactions = publicProcedure
         senderAddress: input.senderAddress,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-        size: input.size,
+        size: input.pageSize,
+        from: input.page * input.pageSize,
         contractMethod: input.contractMethod,
       });
 
