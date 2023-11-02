@@ -7,20 +7,18 @@ import { type Address } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
-import { CONTRACT_METHODS_LABELS } from ".";
+import { CONTRACT_METHODS_LABELS } from "./RecentTransactions";
 import { type ContractMethod } from "./types";
 
 type Props = {
   contractMethod: ContractMethod;
   senderAddress?: Address;
-  title?: string;
   maxTransactions?: number;
 };
 
 export const RecentTransactionsTable: FC<Props> = ({
   contractMethod,
   senderAddress,
-  title,
   maxTransactions = 10,
 }) => {
   const [page, setPage] = useState(0);
@@ -58,6 +56,8 @@ export const RecentTransactionsTable: FC<Props> = ({
     {
       label: "Token",
       accessor: "contractMethod",
+      className:
+        "from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none",
     },
     {
       label: "Hash",
@@ -110,12 +110,8 @@ export const RecentTransactionsTable: FC<Props> = ({
   );
 
   return (
-    <section className="w-[80vw] space-y-4 md:w-auto">
-      {title && <h2 className="text-2xl font-bold">{title}</h2>}
-      <Table
-        className="no-scrollbar bg-base-200/50 relative max-h-64 space-y-4 overflow-y-scroll md:max-h-96"
-        zebra
-      >
+    <section className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
+      <Table className="relative space-y-4" zebra>
         <Table.Head>
           <Table.Row>
             <Table.Column
@@ -131,7 +127,9 @@ export const RecentTransactionsTable: FC<Props> = ({
           </Table.Row>
           <Table.Row>
             {columns.map((column) => (
-              <Table.Column key={column.label}>{column.label}</Table.Column>
+              <Table.Column key={column.label} className={column.className}>
+                {column.label}
+              </Table.Column>
             ))}
           </Table.Row>
         </Table.Head>
@@ -166,12 +164,15 @@ const TransactionRow: FC<{
 }> = ({ tx }) => {
   return (
     <Table.Row>
-      <Table.Cell>
+      <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
         {tx.event?.name}{" "}
         <span className="opacity-75">({tx.event?.symbol})</span>
       </Table.Cell>
       <Table.Cell>
-        <Link href={`/tx/${tx.hash}`} className="group flex items-center gap-2">
+        <Link
+          href={`/recent-transactions/${tx.hash}`}
+          className="group flex items-center gap-2"
+        >
           <>
             {maskAddress(tx.hash as `0x${string}`)}
             <ExternalLinkIcon

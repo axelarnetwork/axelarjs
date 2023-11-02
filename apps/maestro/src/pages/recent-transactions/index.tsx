@@ -18,9 +18,12 @@ const RecentTransactionsPage = () => {
   const { address } = useAccount();
 
   return (
-    <Page title="My Recent Interchain Transactions" className="space-y-4">
+    <Page
+      title="My Recent Interchain Transactions"
+      className="flex flex-col space-y-4"
+    >
       <Page.Title>My Recent Transactions</Page.Title>
-      <div className="space-y-2">
+      <div className="flex-1 space-y-4">
         <Tabs boxed>
           {CONTRACT_METHODS.map((method) => (
             <Tabs.Tab
