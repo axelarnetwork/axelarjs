@@ -1,12 +1,13 @@
-import { ExternalLinkIcon, Table } from "@axelarjs/ui";
+import { Button, ChevronDownIcon, ExternalLinkIcon, Table } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import { useEffect, useState, type FC } from "react";
+import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
 import { type Address } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
+import { CONTRACT_METHODS_LABELS } from ".";
 import { type ContractMethod } from "./types";
 
 type Props = {
@@ -51,13 +52,11 @@ export const RecentTransactionsTable: FC<Props> = ({
   });
 
   const hasNextPage = Number(nextPageTxns?.length) > 0;
-  const hasPrevPage = Number(prevPageTxns?.length) > 0;
-
-  const hasPagination = hasNextPage || hasPrevPage;
+  const hasPrevPage = page > 0 && Number(prevPageTxns?.length) > 0;
 
   const columns = [
     {
-      label: "Transaction",
+      label: "Token",
       accessor: "contractMethod",
     },
     {
@@ -74,6 +73,42 @@ export const RecentTransactionsTable: FC<Props> = ({
     },
   ];
 
+  const paginationBlock = useMemo(
+    () =>
+      hasNextPage || hasPrevPage ? (
+        <Table.Row>
+          <Table.Cell colSpan={columns.length}>
+            <div className="flex items-center justify-center space-x-4">
+              {hasPrevPage && (
+                <Button
+                  aria-label="previous page"
+                  size="sm"
+                  disabled={!hasPrevPage}
+                  onClick={() => setPage(page - 1)}
+                  className="disabled:opacity-50"
+                >
+                  <ChevronDownIcon size={18} className="rotate-90" />
+                </Button>
+              )}
+              <span>Page {page + 1}</span>
+              {hasNextPage && (
+                <Button
+                  aria-label="next page"
+                  size="sm"
+                  disabled={!hasNextPage}
+                  onClick={() => setPage(page + 1)}
+                  className="disabled:opacity-50"
+                >
+                  <ChevronDownIcon size={18} className="-rotate-90" />
+                </Button>
+              )}
+            </div>
+          </Table.Cell>
+        </Table.Row>
+      ) : null,
+    [columns.length, hasNextPage, hasPrevPage, page]
+  );
+
   return (
     <section className="w-[80vw] space-y-4 md:w-auto">
       {title && <h2 className="text-2xl font-bold">{title}</h2>}
@@ -82,6 +117,18 @@ export const RecentTransactionsTable: FC<Props> = ({
         zebra
       >
         <Table.Head>
+          <Table.Row>
+            <Table.Column
+              colSpan={columns.length}
+              className="text-center text-base"
+            >
+              Recent{" "}
+              <span className="text-accent">
+                {CONTRACT_METHODS_LABELS[contractMethod]}
+              </span>{" "}
+              Transactions
+            </Table.Column>
+          </Table.Row>
           <Table.Row>
             {columns.map((column) => (
               <Table.Column key={column.label}>{column.label}</Table.Column>
@@ -106,33 +153,7 @@ export const RecentTransactionsTable: FC<Props> = ({
               />
             ))
           )}
-          {hasPagination && (
-            <Table.Row>
-              <Table.Cell colSpan={columns.length}>
-                <div className="flex items-center justify-center space-x-4">
-                  {hasPrevPage && (
-                    <button
-                      disabled={!hasPrevPage}
-                      onClick={() => setPage(page - 1)}
-                      className="disabled:opacity-50"
-                    >
-                      &larr; previous
-                    </button>
-                  )}
-                  <span>Page {page + 1}</span>
-                  {hasNextPage && (
-                    <button
-                      disabled={!hasNextPage}
-                      onClick={() => setPage(page + 1)}
-                      className="disabled:opacity-50"
-                    >
-                      next &rarr;
-                    </button>
-                  )}
-                </div>
-              </Table.Cell>
-            </Table.Row>
-          )}
+          {paginationBlock}
         </Table.Body>
       </Table>
     </section>
@@ -142,11 +163,12 @@ export const RecentTransactionsTable: FC<Props> = ({
 const TransactionRow: FC<{
   tx: RecentTransactionsOutput[number];
   contractMethod: ContractMethod;
-}> = ({ tx, contractMethod }) => {
+}> = ({ tx }) => {
   return (
     <Table.Row>
       <Table.Cell>
-        Interchain {contractMethod == "sendToken" ? "transfer" : "deployment"}{" "}
+        {tx.event?.name}{" "}
+        <span className="opacity-75">({tx.event?.symbol})</span>
       </Table.Cell>
       <Table.Cell>
         <Link href={`/tx/${tx.hash}`} className="group flex items-center gap-2">
