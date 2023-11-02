@@ -59,7 +59,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <>
       <Drawer>
-        <Drawer.Toggle checked={isDrawerOpen} />
+        <Drawer.Toggle
+          checked={isDrawerOpen}
+          name="drawer-toggle"
+          aria-label="toggle drawer"
+        />
         <Drawer.Content
           className={cn(
             "flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen",
@@ -96,7 +100,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                       <>
                         <Modal
                           trigger={
-                            <a className="hover:text-accent cursor-pointer hover:underline lg:uppercase">
+                            <a
+                              role="button"
+                              className="hover:text-accent cursor-pointer hover:underline lg:uppercase"
+                              onClick={(e) => e.preventDefault()}
+                            >
                               {item.label}
                             </a>
                           }

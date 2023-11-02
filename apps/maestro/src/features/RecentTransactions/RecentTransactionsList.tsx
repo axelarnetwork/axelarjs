@@ -57,7 +57,7 @@ export const RecentTransactionsList: FC<Props> = ({
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
     senderAddress,
-    size: maxTransactions,
+    pageSize: maxTransactions,
   });
 
   return (

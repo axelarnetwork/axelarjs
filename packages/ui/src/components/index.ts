@@ -19,6 +19,7 @@ export * from "./Menu";
 export * from "./Modal";
 export * from "./Navbar";
 export * from "./Steps";
+export * from "./Table";
 export * from "./Tabs";
 export * from "./TextInput";
 export * from "./ThemeSwitcher";

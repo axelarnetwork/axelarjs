@@ -72,7 +72,7 @@ export default function Home() {
               <div className="text-center text-xl font-bold">
                 RECENT INTERCHAIN TRANSACTIONS
               </div>
-              <RecentTransactions />
+              <RecentTransactions maxTransactions={10} />
             </section>
           </div>
         </div>
