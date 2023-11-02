@@ -18,27 +18,29 @@ const RecentTransactionsPage = () => {
   const { address } = useAccount();
 
   return (
-    <Page title="My Recent Interchain Transactions">
+    <Page title="My Recent Interchain Transactions" className="space-y-4">
       <Page.Title>My Recent Transactions</Page.Title>
-      <Tabs boxed className="md:hidden">
-        {CONTRACT_METHODS.map((method) => (
-          <Tabs.Tab
-            key={method}
-            onClick={(e) => {
-              e.preventDefault();
-              setContractMethod(method);
-            }}
-            active={contractMethod === method}
-          >
-            {CONTRACT_METHODS_LABELS[method]}
-          </Tabs.Tab>
-        ))}
-      </Tabs>
-      <RecentTransactionsTable
-        contractMethod={contractMethod}
-        senderAddress={address}
-        maxTransactions={20}
-      />
+      <div className="space-y-2">
+        <Tabs boxed>
+          {CONTRACT_METHODS.map((method) => (
+            <Tabs.Tab
+              key={method}
+              onClick={(e) => {
+                e.preventDefault();
+                setContractMethod(method);
+              }}
+              active={contractMethod === method}
+            >
+              {CONTRACT_METHODS_LABELS[method]}
+            </Tabs.Tab>
+          ))}
+        </Tabs>
+        <RecentTransactionsTable
+          contractMethod={contractMethod}
+          senderAddress={address}
+          maxTransactions={20}
+        />
+      </div>
     </Page>
   );
 };

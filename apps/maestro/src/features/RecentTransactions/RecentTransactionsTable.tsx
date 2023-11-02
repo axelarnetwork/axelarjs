@@ -1,6 +1,6 @@
 import { ExternalLinkIcon, Table } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import Link from "next/link";
 
 import { type Address } from "wagmi";
@@ -22,7 +22,12 @@ export const RecentTransactionsTable: FC<Props> = ({
   title,
   maxTransactions = 10,
 }) => {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
+
+  // reset page when contract method changes
+  useEffect(() => {
+    setPage(0);
+  }, [contractMethod]);
 
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
@@ -94,7 +99,7 @@ export const RecentTransactionsTable: FC<Props> = ({
             </Table.Row>
           ) : (
             txns.map((tx, i) => (
-              <TransactionItem
+              <TransactionRow
                 key={`${tx.hash}-${i}`}
                 tx={tx}
                 contractMethod={contractMethod}
@@ -111,19 +116,17 @@ export const RecentTransactionsTable: FC<Props> = ({
                       onClick={() => setPage(page - 1)}
                       className="disabled:opacity-50"
                     >
-                      &larr; Previous
+                      &larr; previous
                     </button>
                   )}
-                  <span>
-                    Page {page} of {page + 1}
-                  </span>
+                  <span>Page {page + 1}</span>
                   {hasNextPage && (
                     <button
                       disabled={!hasNextPage}
                       onClick={() => setPage(page + 1)}
                       className="disabled:opacity-50"
                     >
-                      Next &rarr;
+                      next &rarr;
                     </button>
                   )}
                 </div>
@@ -136,7 +139,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   );
 };
 
-const TransactionItem: FC<{
+const TransactionRow: FC<{
   tx: RecentTransactionsOutput[number];
   contractMethod: ContractMethod;
 }> = ({ tx, contractMethod }) => {
@@ -144,7 +147,6 @@ const TransactionItem: FC<{
     <Table.Row>
       <Table.Cell>
         Interchain {contractMethod == "sendToken" ? "transfer" : "deployment"}{" "}
-        <span className="opacity-75">({contractMethod})</span>
       </Table.Cell>
       <Table.Cell>
         <Link href={`/tx/${tx.hash}`} className="group flex items-center gap-2">
