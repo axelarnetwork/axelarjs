@@ -1,17 +1,22 @@
 import { Card, Tabs } from "@axelarjs/ui";
-import { useState } from "react";
+import { FC, useState } from "react";
 
 import { useAccount } from "wagmi";
 
 import RecentTransactionsList from "./RecentTransactionsList";
 import { CONTRACT_METHODS, type ContractMethod } from "./types";
 
-const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> = {
-  sendToken: "Send Token",
-  StandardizedTokenDeployed: "Token Deployed",
+export const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> =
+  {
+    sendToken: "Send Token",
+    StandardizedTokenDeployed: "Token Deployed",
+  };
+
+type Props = {
+  maxTransactions?: number;
 };
 
-const RecentTransactionsTabs = ({ maxTransactions = 10 }) => {
+const RecentTransactionsTabs: FC<Props> = ({ maxTransactions = 10 }) => {
   const [contractMethod, setContractMethod] =
     useState<ContractMethod>("sendToken");
 
