@@ -1,4 +1,4 @@
-import { Button, ChevronDownIcon, ExternalLinkIcon, Table } from "@axelarjs/ui";
+import { Button, ExternalLinkIcon, Table } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
@@ -78,30 +78,30 @@ export const RecentTransactionsTable: FC<Props> = ({
       hasNextPage || hasPrevPage ? (
         <Table.Row>
           <Table.Cell colSpan={columns.length}>
-            <div className="flex items-center justify-center space-x-4">
-              {hasPrevPage && (
+            <div>
+              <div className="join flex items-center justify-center">
                 <Button
                   aria-label="previous page"
                   size="sm"
                   disabled={!hasPrevPage}
-                  onClick={() => setPage(page - 1)}
-                  className="disabled:opacity-50"
+                  onClick={setPage.bind(null, page - 1)}
+                  className="join-item disabled:opacity-50"
                 >
-                  <ChevronDownIcon size={18} className="rotate-90" />
+                  «
                 </Button>
-              )}
-              <span>Page {page + 1}</span>
-              {hasNextPage && (
+                <Button size="sm" className="join-item">
+                  Page {page + 1}
+                </Button>
                 <Button
                   aria-label="next page"
                   size="sm"
                   disabled={!hasNextPage}
-                  onClick={() => setPage(page + 1)}
-                  className="disabled:opacity-50"
+                  onClick={setPage.bind(null, page + 1)}
+                  className="join-item disabled:opacity-50"
                 >
-                  <ChevronDownIcon size={18} className="-rotate-90" />
+                  »
                 </Button>
-              )}
+              </div>
             </div>
           </Table.Cell>
         </Table.Row>
@@ -186,7 +186,7 @@ const TransactionRow: FC<{
           {maskAddress(tx.blockHash as `0x${string}`)}
         </Link>
       </Table.Cell>
-      <Table.Cell>{new Date(tx.timestamp).toLocaleString()}</Table.Cell>
+      <Table.Cell>{new Date(tx.timestamp * 1000).toLocaleString()}</Table.Cell>
     </Table.Row>
   );
 };
