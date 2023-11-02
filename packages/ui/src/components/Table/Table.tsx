@@ -25,7 +25,7 @@ const tableVariance = cva("table", {
   },
 });
 
-const StyledTable = tw.div``;
+const StyledTable = tw.table``;
 
 type TableBaseProps = VariantProps<typeof tableVariance>;
 
@@ -33,7 +33,7 @@ export interface TableProps
   extends ComponentProps<typeof StyledTable>,
     TableBaseProps {}
 
-const TableContainer = ({
+const TableRoot = ({
   zebra,
   pinRows,
   pinCols,
@@ -52,7 +52,7 @@ const TableContainer = ({
   );
 };
 
-export const Table = Object.assign(TableContainer, {
+export const Table = Object.assign(TableRoot, {
   Head: tw.thead``,
   Column: tw.th``,
   Body: tw.tbody``,
