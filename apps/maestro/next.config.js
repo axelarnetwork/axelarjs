@@ -7,7 +7,11 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["testnet.axelarscan.io"],
+    remotePatterns: [
+      {
+        hostname: "testnet.axelar.network",
+      },
+    ],
   },
 };
 
