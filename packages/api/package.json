@@ -80,7 +80,7 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.8.9",
+    "@types/node": "^20.8.10",
     "fast-check": "^3.13.2",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
@@ -98,6 +98,6 @@
     "@axelarjs/core": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^8.5.0",
-    "viem": "~1.16.6"
+    "viem": "~1.18.5"
   }
 }
