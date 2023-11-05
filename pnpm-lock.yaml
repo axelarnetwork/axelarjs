@@ -114,8 +114,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
       '@web3modal/wagmi':
-        specifier: ^3.1.0
-        version: 3.1.0(@types/react@18.2.21)(@wagmi/core@1.4.5)(typescript@5.2.2)(viem@1.18.5)
+        specifier: ^3.2.0
+        version: 3.2.0(@types/react@18.2.21)(@wagmi/core@1.4.5)(typescript@5.2.2)(viem@1.18.5)
       drizzle-orm:
         specifier: ^0.28.6
         version: 0.28.6(@vercel/postgres@0.5.1)(pg@8.11.3)
@@ -8153,7 +8153,6 @@ packages:
       estree-walker: 2.0.2
       source-map-js: 1.0.2
     dev: false
-    optional: true
 
   /@vue/compiler-dom@3.3.7:
     resolution: {integrity: sha512-0LwkyJjnUPssXv/d1vNJ0PKfBlDoQs7n81CbO6Q0zdL7H1EzqYRrTVXDqdBVqro0aJjo/FOa1qBAPVI4PGSHBw==}
@@ -8162,7 +8161,6 @@ packages:
       '@vue/compiler-core': 3.3.7
       '@vue/shared': 3.3.7
     dev: false
-    optional: true
 
   /@vue/compiler-sfc@3.3.7:
     resolution: {integrity: sha512-7pfldWy/J75U/ZyYIXRVqvLRw3vmfxDo2YLMwVtWVNew8Sm8d6wodM+OYFq4ll/UxfqVr0XKiVwti32PCrruAw==}
@@ -8179,7 +8177,6 @@ packages:
       postcss: 8.4.31
       source-map-js: 1.0.2
     dev: false
-    optional: true
 
   /@vue/compiler-ssr@3.3.7:
     resolution: {integrity: sha512-TxOfNVVeH3zgBc82kcUv+emNHo+vKnlRrkv8YvQU5+Y5LJGJwSNzcmLUoxD/dNzv0bhQ/F0s+InlgV0NrApJZg==}
@@ -8188,7 +8185,6 @@ packages:
       '@vue/compiler-dom': 3.3.7
       '@vue/shared': 3.3.7
     dev: false
-    optional: true
 
   /@vue/reactivity-transform@3.3.7:
     resolution: {integrity: sha512-APhRmLVbgE1VPGtoLQoWBJEaQk4V8JUsqrQihImVqKT+8U6Qi3t5ATcg4Y9wGAPb3kIhetpufyZ1RhwbZCIdDA==}
@@ -8200,7 +8196,6 @@ packages:
       estree-walker: 2.0.2
       magic-string: 0.30.5
     dev: false
-    optional: true
 
   /@vue/reactivity@3.3.7:
     resolution: {integrity: sha512-cZNVjWiw00708WqT0zRpyAgduG79dScKEPYJXq2xj/aMtk3SKvL3FBt2QKUlh6EHBJ1m8RhBY+ikBUzwc7/khg==}
@@ -8208,7 +8203,6 @@ packages:
     dependencies:
       '@vue/shared': 3.3.7
     dev: false
-    optional: true
 
   /@vue/runtime-core@3.3.7:
     resolution: {integrity: sha512-LHq9du3ubLZFdK/BP0Ysy3zhHqRfBn80Uc+T5Hz3maFJBGhci1MafccnL3rpd5/3wVfRHAe6c+PnlO2PAavPTQ==}
@@ -8217,7 +8211,6 @@ packages:
       '@vue/reactivity': 3.3.7
       '@vue/shared': 3.3.7
     dev: false
-    optional: true
 
   /@vue/runtime-dom@3.3.7:
     resolution: {integrity: sha512-PFQU1oeJxikdDmrfoNQay5nD4tcPNYixUBruZzVX/l0eyZvFKElZUjW4KctCcs52nnpMGO6UDK+jF5oV4GT5Lw==}
@@ -8227,7 +8220,6 @@ packages:
       '@vue/shared': 3.3.7
       csstype: 3.1.2
     dev: false
-    optional: true
 
   /@vue/server-renderer@3.3.7(vue@3.3.7):
     resolution: {integrity: sha512-UlpKDInd1hIZiNuVVVvLgxpfnSouxKQOSE2bOfQpBuGwxRV/JqqTCyyjXUWiwtVMyeRaZhOYYqntxElk8FhBhw==}
@@ -8239,13 +8231,11 @@ packages:
       '@vue/shared': 3.3.7
       vue: 3.3.7(typescript@5.2.2)
     dev: false
-    optional: true
 
   /@vue/shared@3.3.7:
     resolution: {integrity: sha512-N/tbkINRUDExgcPTBvxNkvHGu504k8lzlNQRITVnm6YjOjwa4r0nnbd4Jb01sNpur5hAllyRJzSK5PvB9PPwRg==}
     requiresBuild: true
     dev: false
-    optional: true
 
   /@wagmi/cli@1.5.2(@wagmi/core@1.4.5)(typescript@5.2.2)(wagmi@1.4.5):
     resolution: {integrity: sha512-UfLMYhW6mQBCjR8A5s01Chf9GpHzdpcuuBuzJ36QGXcMSJAxylz5ImVZWfCRV0ct1UruydjKVSW1QSI6azNxRQ==}
@@ -8695,8 +8685,8 @@ packages:
       '@walletconnect/window-getters': 1.0.1
       tslib: 1.14.1
 
-  /@web3modal/core@3.1.0(@types/react@18.2.21)(react@18.2.0):
-    resolution: {integrity: sha512-gXzUCVr4QkgkwxYgu7PBZIUsv3MEJRsYXUDSCU0LZz5BLXnMVSj0+YPhQ1msZLPCo0el/MTPtAzwu0VEOMijTQ==}
+  /@web3modal/core@3.2.0(@types/react@18.2.21)(react@18.2.0):
+    resolution: {integrity: sha512-TV6jkxuJhCqGkF4cPEKLJj0LPqmnxK/fpIOOWQw7KlwXJUOJrmZCOnPm7jEBLGJEyLisifmBh5oAxd5orWAepg==}
     dependencies:
       valtio: 1.11.2(@types/react@18.2.21)(react@18.2.0)
     transitivePeerDependencies:
@@ -8704,32 +8694,67 @@ packages:
       - react
     dev: false
 
-  /@web3modal/polyfills@3.1.0:
-    resolution: {integrity: sha512-y830qGJW16k7EZe6N2LIhcLWsHv+TkgC4FuARCSQzJPvVsKi/XsKXGk4Fbrv75nETF7AqCiFrEFQVGnAc7mg8A==}
+  /@web3modal/polyfills@3.2.0:
+    resolution: {integrity: sha512-BFUIL7l7UMO7mMQO7qlj6tvZwsF1noOKVO5v5/TXPHw8c9rQOAP1IGP8i9IBrkW3Di5/q2/tYQVwD7upBfUzPQ==}
     dependencies:
       buffer: 6.0.3
     dev: false
 
-  /@web3modal/scaffold@3.1.0(@types/react@18.2.21)(react@18.2.0):
-    resolution: {integrity: sha512-jxCsvkGvVTSds/ezwrX27Xkhlr4IPVeewKAiGxPNZKg9ZGkZ8c+7I2XZnTCKB5XQZvLgqIpGmSYhy4OqAKbHVg==}
+  /@web3modal/scaffold-react@3.2.0(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Ksw9ABijtvvkv7pXnRk3LjucE5yMbs0v4Yi2ly1Hwvg4DtlJzRg0RyRVW8H2riqn2u9lWXD+8GCXMuGhd3Owpg==}
+    peerDependencies:
+      react: '>=17'
+      react-dom: '>=17'
     dependencies:
-      '@web3modal/core': 3.1.0(@types/react@18.2.21)(react@18.2.0)
-      '@web3modal/ui': 3.1.0
+      '@web3modal/scaffold': 3.2.0(@types/react@18.2.21)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+    dev: false
+
+  /@web3modal/scaffold-vue@3.2.0(@types/react@18.2.21)(react@18.2.0)(vue@3.3.7):
+    resolution: {integrity: sha512-+yjRqSBvquLTKXBJmXknnbSLq3w1SsiGlHuf0EG+E2ood1Uw2qCe1YlDpzAoIKKHB0aAp8osh8XDHIghq9awwg==}
+    peerDependencies:
+      vue: '>=3'
+    dependencies:
+      '@web3modal/scaffold': 3.2.0(@types/react@18.2.21)(react@18.2.0)
+      vue: 3.3.7(typescript@5.2.2)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+    dev: false
+
+  /@web3modal/scaffold@3.2.0(@types/react@18.2.21)(react@18.2.0):
+    resolution: {integrity: sha512-BG4vX/o1Z7zNKaRRB8O5nNMbUppH5fVE0I4q4EMYHqCPxRoYGUZDVTfRQTfh/y0qXypuKZAo/nVy3xL2J2GYwQ==}
+    dependencies:
+      '@web3modal/core': 3.2.0(@types/react@18.2.21)(react@18.2.0)
+      '@web3modal/ui': 3.2.0
       lit: 3.0.0
     transitivePeerDependencies:
       - '@types/react'
       - react
     dev: false
 
-  /@web3modal/ui@3.1.0:
-    resolution: {integrity: sha512-8Av6psGG/rO5M+5s+I7l2ESUWfeKkeXMIz/Bp2pP3a3yJ+EfO3V4kN1lO/bnbquMYvO+ETmvUXprvcBPMizSBQ==}
+  /@web3modal/ui@3.2.0:
+    resolution: {integrity: sha512-E7fwsJmr6z9OWVrU8wS+0NNuc3cIOazH+EjM6At0h6SMBzM2c93vOg3z9RJcmKuVggVgGiSsyROWCjZJUsPuJw==}
     dependencies:
       lit: 3.0.0
       qrcode: 1.5.3
     dev: false
 
-  /@web3modal/wagmi@3.1.0(@types/react@18.2.21)(@wagmi/core@1.4.5)(typescript@5.2.2)(viem@1.18.5):
-    resolution: {integrity: sha512-PSzhHtj2GTY+36d6lbfzl4EVeuzA4XcMOW7+/CyLFzUDpG4BI5fsKrDbc7NqZU6L6BjN9dPi/oZO/Q+PM8MrPw==}
+  /@web3modal/utils@3.2.0(@types/react@18.2.21)(react@18.2.0):
+    resolution: {integrity: sha512-Rc2yhRlJcGsQHiIqbC1jTzeWIs4v287113UN3dJuQ+rp2G6KKmwo61ZvJc3u+nTt8K8aOqqPIH2JM6tEJWka3g==}
+    dependencies:
+      '@web3modal/polyfills': 3.2.0
+      '@web3modal/scaffold': 3.2.0(@types/react@18.2.21)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+    dev: false
+
+  /@web3modal/wagmi@3.2.0(@types/react@18.2.21)(@wagmi/core@1.4.5)(typescript@5.2.2)(viem@1.18.5):
+    resolution: {integrity: sha512-xEm1e3Mrg0AAnrUpWdb6UurE6sWT6es9t50pGhrE4gZ/PibEBCbNQQjgiwgEVv9Le9fzXzbQR7/dAxh+Q0hprg==}
     peerDependencies:
       '@wagmi/core': '>=1'
       viem: '>=1'
@@ -8742,8 +8767,11 @@ packages:
         optional: true
     dependencies:
       '@wagmi/core': 1.4.5(@types/react@18.2.21)(react@18.2.0)(typescript@5.2.2)(viem@1.18.5)(zod@3.22.4)
-      '@web3modal/polyfills': 3.1.0
-      '@web3modal/scaffold': 3.1.0(@types/react@18.2.21)(react@18.2.0)
+      '@web3modal/polyfills': 3.2.0
+      '@web3modal/scaffold': 3.2.0(@types/react@18.2.21)(react@18.2.0)
+      '@web3modal/scaffold-react': 3.2.0(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
+      '@web3modal/scaffold-vue': 3.2.0(@types/react@18.2.21)(react@18.2.0)(vue@3.3.7)
+      '@web3modal/utils': 3.2.0(@types/react@18.2.21)(react@18.2.0)
       viem: 1.18.5(typescript@5.2.2)(zod@3.22.4)
     optionalDependencies:
       react: 18.2.0
@@ -18906,7 +18934,6 @@ packages:
       '@vue/shared': 3.3.7
       typescript: 5.2.2
     dev: false
-    optional: true
 
   /wagmi@1.4.5(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.18.5)(zod@3.22.4):
     resolution: {integrity: sha512-Ph62E6cO5n2Z8Z5LTyZrkaNprxTsbC4w0qZJT4OJdXrEELziI8z/b4FO6amVFXdu2rDp/wpvF56e4mhKC8/Kdw==}
