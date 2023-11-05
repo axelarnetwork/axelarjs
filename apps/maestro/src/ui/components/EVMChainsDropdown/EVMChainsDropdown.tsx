@@ -6,7 +6,7 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import Image from "next/image";
 
-import { find } from "rambda";
+import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 
@@ -88,7 +88,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     try {
       if (props.onSelectChain) {
         props.onSelectChain(
-          eligibleChains.find((x) => x.chain_id === chainId) ?? null
+          eligibleChains.find(propEq(chainId, "chain_id")) ?? null
         );
       } else {
         await switchNetworkAsync?.(chainId);
@@ -118,6 +118,8 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       {props.renderTrigger?.() ?? (
         <Dropdown.Trigger
           $as="button"
+          role="button"
+          aria-label="Select Chain"
           className={cn(
             "btn btn-sm btn-ghost group flex w-full items-center gap-2 rounded-full",
             {
@@ -184,7 +186,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         >
           {!chain && (
             <Dropdown.Item className="text-base-content">
-              {/* rome-ignore lint/a11y/useValidAnchor: needed by daisyui */}
               <a
                 href="#"
                 onClick={(e) => {
@@ -194,6 +195,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                   actions.selectChainId(null);
                 }}
                 className="group"
+                role="button"
               >
                 <div className="bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2">
                   <HelpCircleIcon size="24" />
@@ -210,7 +212,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                   chain.chain_id === selectedChain?.chain_id,
               })}
             >
-              {/* rome-ignore lint/a11y/useValidAnchor: needed by daisyui */}
               <a
                 href="#"
                 onClick={(e) => {
