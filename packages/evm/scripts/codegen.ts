@@ -2,10 +2,8 @@
 import { convertCase } from "@axelarjs/utils/case-conversion";
 import { capitalize } from "@axelarjs/utils/string";
 
-import fs from "fs/promises";
-import path from "path";
 import prettier from "prettier";
-import { $, argv, chalk, glob, spinner } from "zx";
+import { $, argv, chalk, fs, glob, path, spinner } from "zx";
 
 $.verbose = false;
 
