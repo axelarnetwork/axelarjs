@@ -13,6 +13,7 @@
     "./build",
     "./contracts",
     "./bin",
+    "./scripts",
     "./index.js",
     "./index.d.ts",
     "./clients.js",
