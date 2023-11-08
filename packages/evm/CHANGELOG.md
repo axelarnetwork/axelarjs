@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.12
+
+### Patch Changes
+
+- [#78](https://github.com/axelarnetwork/axelarjs/pull/78) [`7aede243`](https://github.com/axelarnetwork/axelarjs/commit/7aede2432ac4007c47482e0d8b793e033928d5d5) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: introduce @axelarjs/evm cli
+
 ## 0.1.11
 
 ### Patch Changes
