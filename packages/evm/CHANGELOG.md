@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.15
+
+### Patch Changes
+
+- [`055f3c27`](https://github.com/axelarnetwork/axelarjs/commit/055f3c27a2f179787b16a7ef4b7261d58041b370) Thanks [@alanrsoares](https://github.com/alanrsoares)! - include missing folder in package
+
 ## 0.1.14
 
 ### Patch Changes
