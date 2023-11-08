@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.18
+
+### Patch Changes
+
+- [`3fa4c9ca`](https://github.com/axelarnetwork/axelarjs/commit/3fa4c9cac79fae2b2fba2fe36458fb9cfdb5ca54) Thanks [@alanrsoares](https://github.com/alanrsoares)! - chore: move @axelarjs/utils to dependencies
+
 ## 0.1.17
 
 ### Patch Changes
