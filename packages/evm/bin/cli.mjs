@@ -1,8 +1,31 @@
-#!/usr/bin/env zx
-import { $, argv } from "zx";
+#!/usr/bin/env node
 
-// List of valid commands
-const VALID_COMMANDS = ["codegen"];
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Command } from "commander";
+import { $ } from "zx";
+
+const program = new Command();
+
+// Define the command and its options
+program
+  .command("codegen")
+  .description("Run the code generation script")
+  .option("--src <source>", "The source directory")
+  .option("--out <output>", "The output directory")
+  .option("--flatten", "Flatten the output")
+  .option("--exclude <patterns>", "Patterns to exclude")
+  .action(async (options) => {
+    const { src, out, flatten, exclude } = options;
+
+    const npx = await getNpxCompatibleCommand();
+
+    await $`${npx} tsx ./scripts/codegen.ts --src ${src} --out ${out} --exclude ${exclude} ${
+      flatten ? "--flatten" : ""
+    }`;
+  });
+
+program.parse(process.argv);
 
 async function getNpxCompatibleCommand() {
   const commands = ["npx", "pnpx", "bunx"];
@@ -15,35 +38,10 @@ async function getNpxCompatibleCommand() {
       continue; // Continue to the next iteration if the command is not found
     }
   }
+  throw new Error("No compatible NPX command found");
 }
 
-async function run() {
-  const COMMAND = argv._[1];
-
-  const NPX_COMMAND = await getNpxCompatibleCommand();
-
-  switch (COMMAND) {
-    case "codegen":
-      {
-        const { src, out, flatten, exclude } = argv;
-
-        await $`${NPX_COMMAND} tsx ./scripts/codegen.ts --src ${src} --out ${out} --exclude ${exclude} ${
-          flatten ? "--flatten" : ""
-        }`;
-      }
-      break;
-    default:
-      await $`echo unknown command received: '${COMMAND}'`;
-      await $`echo valid commands:`;
-
-      // eslint-disable-next-line no-undef
-      VALID_COMMANDS.forEach((cmd) => console.log(` * ${cmd}`));
-  }
+// Handle the case when no command is provided
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
 }
-
-run().catch((e) => {
-  // eslint-disable-next-line no-undef
-  console.error(e);
-  // eslint-disable-next-line no-undef
-  process.exit(1);
-});
