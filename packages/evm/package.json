@@ -18,7 +18,7 @@
     "./clients.js",
     "./clients.d.ts"
   ],
-  "bin": "./bin/cli.sh",
+  "bin": "./bin/cli.mjs",
   "exports": {
     ".": {
       "import": "./build/module/index.js",
