@@ -1,4 +1,6 @@
-import chalk from "chalk";
+import { Maybe } from "@axelarjs/utils";
+
+import { chalk } from "zx";
 
 const COLORS = ["red", "green", "yellow", "blue", "magenta", "cyan"] as const;
 
@@ -7,10 +9,10 @@ const COLORS = ["red", "green", "yellow", "blue", "magenta", "cyan"] as const;
  *
  * @param {number} index
  */
-const splitAt =
-  (index: number = 0) =>
-  (x: string | any[]) =>
-    [x.slice(0, index), x.slice(index)];
+const splitAt = <T>(index: number = 0, x: string | T[]) => [
+  x.slice(0, index),
+  x.slice(index),
+];
 
 /**
  * Rainbow text
@@ -24,10 +26,15 @@ const splitAt =
  */
 export function rainbow(text: string = ""): string {
   const rainbowRipple = [..."{{{}}}"]
-    .map((x, i) => chalk[COLORS[i % COLORS.length]](x))
+    .map((x, i) =>
+      Maybe.of(COLORS[i % COLORS.length]).mapOr(x, (color) => chalk[color](x))
+    )
     .join("");
 
-  const [pre, pos] = splitAt(rainbowRipple.length / 2)(rainbowRipple);
+  const [pre, pos] = splitAt(rainbowRipple.length / 2, rainbowRipple) as [
+    string,
+    string
+  ];
 
   return `${pre} ${text} ${pos}`;
 }

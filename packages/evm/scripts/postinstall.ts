@@ -1,7 +1,6 @@
-import fs from "fs/promises";
-import chalk from "chalk";
 import packageJson from "package-json";
 import stripAnsi from "strip-ansi";
+import { chalk, fs } from "zx";
 
 const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs";
 
