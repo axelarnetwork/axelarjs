@@ -12,11 +12,13 @@
   "files": [
     "./build",
     "./contracts",
+    "./bin",
     "./index.js",
     "./index.d.ts",
     "./clients.js",
     "./clients.d.ts"
   ],
+  "bin": "./bin/cli.sh",
   "exports": {
     ".": {
       "import": "./build/module/index.js",
