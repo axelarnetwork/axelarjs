@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.16
+
+### Patch Changes
+
+- [`e9ec97d2`](https://github.com/axelarnetwork/axelarjs/commit/e9ec97d26d6aedef1766d76b9a0a51db7ceb9c9a) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: support inferring script path from withing package
+
 ## 0.1.15
 
 ### Patch Changes
