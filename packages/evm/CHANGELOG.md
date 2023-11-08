@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.13
+
+### Patch Changes
+
+- [`ba335a27`](https://github.com/axelarnetwork/axelarjs/commit/ba335a27ff7748216cd2ffb4c451ec1755fdf18d) Thanks [@alanrsoares](https://github.com/alanrsoares)! - refactor: move cli.sh to cli.mjs
+
 ## 0.1.12
 
 ### Patch Changes
