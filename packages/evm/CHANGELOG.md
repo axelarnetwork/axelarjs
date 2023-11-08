@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.17
+
+### Patch Changes
+
+- [`f7901e1e`](https://github.com/axelarnetwork/axelarjs/commit/f7901e1e31fa2a326ac7c3bd7d4d97416b60d1c1) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: move zx, package-json & tsx to dependencies
+
 ## 0.1.16
 
 ### Patch Changes
