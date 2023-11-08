@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.14
+
+### Patch Changes
+
+- [`27efa5ac`](https://github.com/axelarnetwork/axelarjs/commit/27efa5ac2da552ac045ad29b468ad16affc99ea0) Thanks [@alanrsoares](https://github.com/alanrsoares)! - make cli.mjs compatible with env/node
+
 ## 0.1.13
 
 ### Patch Changes
