@@ -50,7 +50,7 @@
     "zx": "^7.2.3"
   },
   "devDependencies": {
-    "@axelar-network/interchain-token-service": "^0.3.0",
+    "@axelar-network/interchain-token-service": "^1.0.0-beta.2",
     "@axelarjs/config": "workspace:*",
     "@types/node": "^20.8.10",
     "@types/prettier": "^2.7.3",

@@ -513,8 +513,8 @@ importers:
         version: 7.2.3
     devDependencies:
       '@axelar-network/interchain-token-service':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^1.0.0-beta.2
+        version: 1.0.0-beta.2
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
@@ -927,15 +927,15 @@ packages:
     engines: {node: ^16.0.0 || ^18.0.0}
     dev: false
 
-  /@axelar-network/axelar-cgp-solidity@5.0.1:
-    resolution: {integrity: sha512-B7jnNKzV32ZpmIcfX8SYLqaeU8wbDBha5yttWkeEjfSaZe5z1ypABRsLDCSNXAKeR437j6D4AE3MulJriEhIHQ==}
-    engines: {node: ^16.0.0 || ^18.0.0}
+  /@axelar-network/axelar-cgp-solidity@6.1.2:
+    resolution: {integrity: sha512-KOv3Z0u/Xg1HsvTFJzpf0LewT4/HW8yBGb5AfVacFRoL/zor5Q1SwBb5SN12CDpxFebeUPC/MdGAddC2ZfNg8Q==}
+    engines: {node: '>=16'}
     dependencies:
-      '@axelar-network/axelar-gmp-sdk-solidity': 4.0.3
+      '@axelar-network/axelar-gmp-sdk-solidity': 5.6.2
     dev: true
 
-  /@axelar-network/axelar-gmp-sdk-solidity@4.0.3:
-    resolution: {integrity: sha512-7u1pGP66YXnBTRgYRb01ZCAewgYv7+0xjco5uxbG1Rj5S8Nv56GQU8zwE3Y4b424NWlajEiRyf4kmTzKrNORRA==}
+  /@axelar-network/axelar-gmp-sdk-solidity@5.6.2:
+    resolution: {integrity: sha512-lJT1Sily/to5jZHkE3rGtkb8qnurNTFnlz4HwbQec+MtqVgPkY3/SsiPTw7967hmZavAw02eiE1jFSW7XKksZQ==}
     engines: {node: '>=16'}
     dev: true
 
@@ -975,11 +975,12 @@ packages:
       protobufjs: 7.2.5
     dev: false
 
-  /@axelar-network/interchain-token-service@0.3.0:
-    resolution: {integrity: sha512-oIUml4/FBs8zPg7hI7f7cOpo54m15mnUrPth/TlJDPNImRPbSzoN5SIsIF28W7Q2cN0wJ+idNhyQwmo7a2O0jQ==}
+  /@axelar-network/interchain-token-service@1.0.0-beta.2:
+    resolution: {integrity: sha512-dMvwvoJuRBrU6HfmyshSP2PhHxKgQPbDJRYYpoYbfpKeeFxuh1FT/OeYkHRlxaN+619B8mzgLQZkbtIy3QwHLw==}
+    engines: {node: '>=16'}
     dependencies:
-      '@axelar-network/axelar-cgp-solidity': 5.0.1
-      '@axelar-network/axelar-gmp-sdk-solidity': 4.0.3
+      '@axelar-network/axelar-cgp-solidity': 6.1.2
+      '@axelar-network/axelar-gmp-sdk-solidity': 5.6.2
     dev: true
 
   /@babel/code-frame@7.22.13:
