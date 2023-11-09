@@ -2,19 +2,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
+  useContractEvent,
+  UseContractEventConfig,
   useContractRead,
   UseContractReadConfig,
   useContractWrite,
   UseContractWriteConfig,
   usePrepareContractWrite,
   UsePrepareContractWriteConfig,
-  useContractEvent,
-  UseContractEventConfig,
 } from "wagmi";
 import {
+  PrepareWriteContractResult,
   ReadContractResult,
   WriteContractMode,
-  PrepareWriteContractResult,
 } from "wagmi/actions";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,6 +23,46 @@ import {
 
 export const interchainTokenABI = [
   { type: "error", inputs: [], name: "InvalidAccount" },
+  {
+    type: "error",
+    inputs: [
+      { name: "fromAccount", internalType: "address", type: "address" },
+      { name: "toAccount", internalType: "address", type: "address" },
+      { name: "accountRoles", internalType: "uint256", type: "uint256" },
+    ],
+    name: "InvalidProposedRoles",
+  },
+  { type: "error", inputs: [], name: "InvalidS" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidV" },
+  {
+    type: "error",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "accountRoles", internalType: "uint256", type: "uint256" },
+    ],
+    name: "MissingAllRoles",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "accountRoles", internalType: "uint256", type: "uint256" },
+    ],
+    name: "MissingAnyOfRoles",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "role", internalType: "uint8", type: "uint8" },
+    ],
+    name: "MissingRole",
+  },
+  { type: "error", inputs: [], name: "NotProxy" },
+  { type: "error", inputs: [], name: "PermitExpired" },
+  { type: "error", inputs: [], name: "TokenManagerAddressZero" },
+  { type: "error", inputs: [], name: "TokenNameEmpty" },
   {
     type: "event",
     anonymous: false,
@@ -52,6 +92,69 @@ export const interchainTokenABI = [
     type: "event",
     anonymous: false,
     inputs: [
+      {
+        name: "account",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "accountRoles",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "RolesAdded",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "fromAccount",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "toAccount",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "accountRoles",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "RolesProposed",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "account",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "accountRoles",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "RolesRemoved",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
       { name: "from", internalType: "address", type: "address", indexed: true },
       { name: "to", internalType: "address", type: "address", indexed: true },
       {
@@ -62,6 +165,22 @@ export const interchainTokenABI = [
       },
     ],
     name: "Transfer",
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "DOMAIN_SEPARATOR",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "fromDistributor", internalType: "address", type: "address" },
+    ],
+    name: "acceptDistributorship",
+    outputs: [],
   },
   {
     stateMutability: "view",
@@ -94,6 +213,30 @@ export const interchainTokenABI = [
     stateMutability: "nonpayable",
     type: "function",
     inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "burn",
+    outputs: [],
+  },
+  {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [],
+    name: "contractId",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", internalType: "uint8", type: "uint8" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
       { name: "spender", internalType: "address", type: "address" },
       { name: "subtractedValue", internalType: "uint256", type: "uint256" },
     ],
@@ -103,15 +246,12 @@ export const interchainTokenABI = [
   {
     stateMutability: "view",
     type: "function",
-    inputs: [],
-    name: "getTokenManager",
-    outputs: [
-      {
-        name: "tokenManager",
-        internalType: "contract ITokenManager",
-        type: "address",
-      },
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "role", internalType: "uint8", type: "uint8" },
     ],
+    name: "hasRole",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
   },
   {
     stateMutability: "nonpayable",
@@ -151,9 +291,85 @@ export const interchainTokenABI = [
   {
     stateMutability: "view",
     type: "function",
-    inputs: [],
-    name: "tokenManagerRequiresApproval",
+    inputs: [{ name: "addr", internalType: "address", type: "address" }],
+    name: "isDistributor",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "mint",
+    outputs: [],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "name",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "nameHash",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "", internalType: "address", type: "address" }],
+    name: "nonces",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "issuer", internalType: "address", type: "address" },
+      { name: "spender", internalType: "address", type: "address" },
+      { name: "value", internalType: "uint256", type: "uint256" },
+      { name: "deadline", internalType: "uint256", type: "uint256" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+    ],
+    name: "permit",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "distributor_", internalType: "address", type: "address" },
+    ],
+    name: "proposeDistributorship",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "params", internalType: "bytes", type: "bytes" }],
+    name: "setup",
+    outputs: [],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "symbol",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "tokenManager",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
   },
   {
     stateMutability: "view",
@@ -171,6 +387,15 @@ export const interchainTokenABI = [
     ],
     name: "transfer",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "distributor_", internalType: "address", type: "address" },
+    ],
+    name: "transferDistributorship",
+    outputs: [],
   },
   {
     stateMutability: "nonpayable",
@@ -207,6 +432,29 @@ export function useInterchainTokenRead<
 ) {
   return useContractRead({
     abi: interchainTokenABI,
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"DOMAIN_SEPARATOR"`.
+ */
+export function useInterchainTokenDomainSeparator<
+  TFunctionName extends "DOMAIN_SEPARATOR",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "DOMAIN_SEPARATOR",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
 }
@@ -258,10 +506,10 @@ export function useInterchainTokenBalanceOf<
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"getTokenManager"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"contractId"`.
  */
-export function useInterchainTokenGetTokenManager<
-  TFunctionName extends "getTokenManager",
+export function useInterchainTokenContractId<
+  TFunctionName extends "contractId",
   TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
 >(
   config: Omit<
@@ -275,16 +523,16 @@ export function useInterchainTokenGetTokenManager<
 ) {
   return useContractRead({
     abi: interchainTokenABI,
-    functionName: "getTokenManager",
+    functionName: "contractId",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"tokenManagerRequiresApproval"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"decimals"`.
  */
-export function useInterchainTokenTokenManagerRequiresApproval<
-  TFunctionName extends "tokenManagerRequiresApproval",
+export function useInterchainTokenDecimals<
+  TFunctionName extends "decimals",
   TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
 >(
   config: Omit<
@@ -298,7 +546,168 @@ export function useInterchainTokenTokenManagerRequiresApproval<
 ) {
   return useContractRead({
     abi: interchainTokenABI,
-    functionName: "tokenManagerRequiresApproval",
+    functionName: "decimals",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"hasRole"`.
+ */
+export function useInterchainTokenHasRole<
+  TFunctionName extends "hasRole",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "hasRole",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"isDistributor"`.
+ */
+export function useInterchainTokenIsDistributor<
+  TFunctionName extends "isDistributor",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "isDistributor",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"name"`.
+ */
+export function useInterchainTokenName<
+  TFunctionName extends "name",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "name",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"nameHash"`.
+ */
+export function useInterchainTokenNameHash<
+  TFunctionName extends "nameHash",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "nameHash",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"nonces"`.
+ */
+export function useInterchainTokenNonces<
+  TFunctionName extends "nonces",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "nonces",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"symbol"`.
+ */
+export function useInterchainTokenSymbol<
+  TFunctionName extends "symbol",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "symbol",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"tokenManager"`.
+ */
+export function useInterchainTokenTokenManager<
+  TFunctionName extends "tokenManager",
+  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenABI,
+    functionName: "tokenManager",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
 }
@@ -357,6 +766,41 @@ export function useInterchainTokenWrite<
 }
 
 /**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"acceptDistributorship"`.
+ */
+export function useInterchainTokenAcceptDistributorship<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "acceptDistributorship"
+        >["request"]["abi"],
+        "acceptDistributorship",
+        TMode
+      > & { functionName?: "acceptDistributorship" }
+    : UseContractWriteConfig<
+        typeof interchainTokenABI,
+        "acceptDistributorship",
+        TMode
+      > & {
+        abi?: never;
+        functionName?: "acceptDistributorship";
+      } = {} as any
+) {
+  return useContractWrite<
+    typeof interchainTokenABI,
+    "acceptDistributorship",
+    TMode
+  >({
+    abi: interchainTokenABI,
+    functionName: "acceptDistributorship",
+    ...config,
+  } as any);
+}
+
+/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"approve"`.
  */
 export function useInterchainTokenApprove<
@@ -379,6 +823,33 @@ export function useInterchainTokenApprove<
   return useContractWrite<typeof interchainTokenABI, "approve", TMode>({
     abi: interchainTokenABI,
     functionName: "approve",
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"burn"`.
+ */
+export function useInterchainTokenBurn<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "burn"
+        >["request"]["abi"],
+        "burn",
+        TMode
+      > & { functionName?: "burn" }
+    : UseContractWriteConfig<typeof interchainTokenABI, "burn", TMode> & {
+        abi?: never;
+        functionName?: "burn";
+      } = {} as any
+) {
+  return useContractWrite<typeof interchainTokenABI, "burn", TMode>({
+    abi: interchainTokenABI,
+    functionName: "burn",
     ...config,
   } as any);
 }
@@ -524,6 +995,122 @@ export function useInterchainTokenInterchainTransferFrom<
 }
 
 /**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"mint"`.
+ */
+export function useInterchainTokenMint<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "mint"
+        >["request"]["abi"],
+        "mint",
+        TMode
+      > & { functionName?: "mint" }
+    : UseContractWriteConfig<typeof interchainTokenABI, "mint", TMode> & {
+        abi?: never;
+        functionName?: "mint";
+      } = {} as any
+) {
+  return useContractWrite<typeof interchainTokenABI, "mint", TMode>({
+    abi: interchainTokenABI,
+    functionName: "mint",
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"permit"`.
+ */
+export function useInterchainTokenPermit<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "permit"
+        >["request"]["abi"],
+        "permit",
+        TMode
+      > & { functionName?: "permit" }
+    : UseContractWriteConfig<typeof interchainTokenABI, "permit", TMode> & {
+        abi?: never;
+        functionName?: "permit";
+      } = {} as any
+) {
+  return useContractWrite<typeof interchainTokenABI, "permit", TMode>({
+    abi: interchainTokenABI,
+    functionName: "permit",
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"proposeDistributorship"`.
+ */
+export function useInterchainTokenProposeDistributorship<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "proposeDistributorship"
+        >["request"]["abi"],
+        "proposeDistributorship",
+        TMode
+      > & { functionName?: "proposeDistributorship" }
+    : UseContractWriteConfig<
+        typeof interchainTokenABI,
+        "proposeDistributorship",
+        TMode
+      > & {
+        abi?: never;
+        functionName?: "proposeDistributorship";
+      } = {} as any
+) {
+  return useContractWrite<
+    typeof interchainTokenABI,
+    "proposeDistributorship",
+    TMode
+  >({
+    abi: interchainTokenABI,
+    functionName: "proposeDistributorship",
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"setup"`.
+ */
+export function useInterchainTokenSetup<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "setup"
+        >["request"]["abi"],
+        "setup",
+        TMode
+      > & { functionName?: "setup" }
+    : UseContractWriteConfig<typeof interchainTokenABI, "setup", TMode> & {
+        abi?: never;
+        functionName?: "setup";
+      } = {} as any
+) {
+  return useContractWrite<typeof interchainTokenABI, "setup", TMode>({
+    abi: interchainTokenABI,
+    functionName: "setup",
+    ...config,
+  } as any);
+}
+
+/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"transfer"`.
  */
 export function useInterchainTokenTransfer<
@@ -546,6 +1133,41 @@ export function useInterchainTokenTransfer<
   return useContractWrite<typeof interchainTokenABI, "transfer", TMode>({
     abi: interchainTokenABI,
     functionName: "transfer",
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"transferDistributorship"`.
+ */
+export function useInterchainTokenTransferDistributorship<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "transferDistributorship"
+        >["request"]["abi"],
+        "transferDistributorship",
+        TMode
+      > & { functionName?: "transferDistributorship" }
+    : UseContractWriteConfig<
+        typeof interchainTokenABI,
+        "transferDistributorship",
+        TMode
+      > & {
+        abi?: never;
+        functionName?: "transferDistributorship";
+      } = {} as any
+) {
+  return useContractWrite<
+    typeof interchainTokenABI,
+    "transferDistributorship",
+    TMode
+  >({
+    abi: interchainTokenABI,
+    functionName: "transferDistributorship",
     ...config,
   } as any);
 }
@@ -597,6 +1219,25 @@ export function usePrepareInterchainTokenWrite<TFunctionName extends string>(
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"acceptDistributorship"`.
+ */
+export function usePrepareInterchainTokenAcceptDistributorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof interchainTokenABI,
+      "acceptDistributorship"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "acceptDistributorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "acceptDistributorship">);
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"approve"`.
  */
 export function usePrepareInterchainTokenApprove(
@@ -610,6 +1251,22 @@ export function usePrepareInterchainTokenApprove(
     functionName: "approve",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "approve">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"burn"`.
+ */
+export function usePrepareInterchainTokenBurn(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof interchainTokenABI, "burn">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "burn",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "burn">);
 }
 
 /**
@@ -689,6 +1346,73 @@ export function usePrepareInterchainTokenInterchainTransferFrom(
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"mint"`.
+ */
+export function usePrepareInterchainTokenMint(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof interchainTokenABI, "mint">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "mint",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "mint">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"permit"`.
+ */
+export function usePrepareInterchainTokenPermit(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof interchainTokenABI, "permit">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "permit",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "permit">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"proposeDistributorship"`.
+ */
+export function usePrepareInterchainTokenProposeDistributorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof interchainTokenABI,
+      "proposeDistributorship"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "proposeDistributorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "proposeDistributorship">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"setup"`.
+ */
+export function usePrepareInterchainTokenSetup(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof interchainTokenABI, "setup">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "setup",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "setup">);
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"transfer"`.
  */
 export function usePrepareInterchainTokenTransfer(
@@ -702,6 +1426,25 @@ export function usePrepareInterchainTokenTransfer(
     functionName: "transfer",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "transfer">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"transferDistributorship"`.
+ */
+export function usePrepareInterchainTokenTransferDistributorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof interchainTokenABI,
+      "transferDistributorship"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "transferDistributorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "transferDistributorship">);
 }
 
 /**
@@ -749,6 +1492,54 @@ export function useInterchainTokenApprovalEvent(
     eventName: "Approval",
     ...config,
   } as UseContractEventConfig<typeof interchainTokenABI, "Approval">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenABI}__ and `eventName` set to `"RolesAdded"`.
+ */
+export function useInterchainTokenRolesAddedEvent(
+  config: Omit<
+    UseContractEventConfig<typeof interchainTokenABI, "RolesAdded">,
+    "abi" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenABI,
+    eventName: "RolesAdded",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenABI, "RolesAdded">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenABI}__ and `eventName` set to `"RolesProposed"`.
+ */
+export function useInterchainTokenRolesProposedEvent(
+  config: Omit<
+    UseContractEventConfig<typeof interchainTokenABI, "RolesProposed">,
+    "abi" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenABI,
+    eventName: "RolesProposed",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenABI, "RolesProposed">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenABI}__ and `eventName` set to `"RolesRemoved"`.
+ */
+export function useInterchainTokenRolesRemovedEvent(
+  config: Omit<
+    UseContractEventConfig<typeof interchainTokenABI, "RolesRemoved">,
+    "abi" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenABI,
+    eventName: "RolesRemoved",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenABI, "RolesRemoved">);
 }
 
 /**

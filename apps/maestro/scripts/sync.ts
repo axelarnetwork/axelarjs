@@ -27,7 +27,8 @@ const contractsDir = path.join(
   "packages",
   "evm",
   "src",
-  "contracts"
+  "contracts",
+  "its"
 );
 
 const contractFolders = await fs
@@ -46,7 +47,7 @@ await Promise.all(
 );
 
 const toConstantName = (contract = "") =>
-  contract.toUpperCase().replace(/\-/g, "_");
+  contract.toUpperCase().replace(/-/g, "_");
 
 const contractConfigs = `export const contracts = [
     ${contractFolders

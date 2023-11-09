@@ -18,10 +18,21 @@ import {
 } from "wagmi/actions";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TokenManager
+// TokenManagerMintBurnFrom
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const tokenManagerABI = [
+export const tokenManagerMintBurnFromABI = [
+  {
+    stateMutability: "nonpayable",
+    type: "constructor",
+    inputs: [
+      {
+        name: "interchainTokenService_",
+        internalType: "address",
+        type: "address",
+      },
+    ],
+  },
   {
     type: "error",
     inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
@@ -92,6 +103,7 @@ export const tokenManagerABI = [
   },
   { type: "error", inputs: [], name: "TakeTokenFailed" },
   { type: "error", inputs: [], name: "TokenLinkerZeroAddress" },
+  { type: "error", inputs: [], name: "TokenTransferFailed" },
   { type: "error", inputs: [], name: "ZeroAddress" },
   {
     type: "event",
@@ -308,6 +320,16 @@ export const tokenManagerABI = [
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
   },
   {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [
+      { name: "operator_", internalType: "bytes", type: "bytes" },
+      { name: "tokenAddress_", internalType: "address", type: "address" },
+    ],
+    name: "params",
+    outputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
+  },
+  {
     stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "operator", internalType: "address", type: "address" }],
@@ -381,256 +403,364 @@ export const tokenManagerABI = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__.
  */
-export function useTokenManagerRead<
+export function useTokenManagerMintBurnFromRead<
   TFunctionName extends string,
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"contractId"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"contractId"`.
  */
-export function useTokenManagerContractId<
+export function useTokenManagerMintBurnFromContractId<
   TFunctionName extends "contractId",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "contractId",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"flowInAmount"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"flowInAmount"`.
  */
-export function useTokenManagerFlowInAmount<
+export function useTokenManagerMintBurnFromFlowInAmount<
   TFunctionName extends "flowInAmount",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "flowInAmount",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"flowLimit"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"flowLimit"`.
  */
-export function useTokenManagerFlowLimit<
+export function useTokenManagerMintBurnFromFlowLimit<
   TFunctionName extends "flowLimit",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "flowLimit",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"flowOutAmount"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"flowOutAmount"`.
  */
-export function useTokenManagerFlowOutAmount<
+export function useTokenManagerMintBurnFromFlowOutAmount<
   TFunctionName extends "flowOutAmount",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "flowOutAmount",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"hasRole"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"hasRole"`.
  */
-export function useTokenManagerHasRole<
+export function useTokenManagerMintBurnFromHasRole<
   TFunctionName extends "hasRole",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "hasRole",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"implementationType"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"implementationType"`.
  */
-export function useTokenManagerImplementationType<
+export function useTokenManagerMintBurnFromImplementationType<
   TFunctionName extends "implementationType",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "implementationType",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTokenId"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"interchainTokenId"`.
  */
-export function useTokenManagerInterchainTokenId<
+export function useTokenManagerMintBurnFromInterchainTokenId<
   TFunctionName extends "interchainTokenId",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "interchainTokenId",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTokenService"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"interchainTokenService"`.
  */
-export function useTokenManagerInterchainTokenService<
+export function useTokenManagerMintBurnFromInterchainTokenService<
   TFunctionName extends "interchainTokenService",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "interchainTokenService",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"isOperator"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"isOperator"`.
  */
-export function useTokenManagerIsOperator<
+export function useTokenManagerMintBurnFromIsOperator<
   TFunctionName extends "isOperator",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "isOperator",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"tokenAddress"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"params"`.
  */
-export function useTokenManagerTokenAddress<
-  TFunctionName extends "tokenAddress",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+export function useTokenManagerMintBurnFromParams<
+  TFunctionName extends "params",
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
 >(
   config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
-    abi: tokenManagerABI,
-    functionName: "tokenAddress",
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "params",
     ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"tokenAddress"`.
  */
-export function useTokenManagerWrite<
+export function useTokenManagerMintBurnFromTokenAddress<
+  TFunctionName extends "tokenAddress",
+  TSelectData = ReadContractResult<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "tokenAddress",
+    ...config,
+  } as UseContractReadConfig<typeof tokenManagerMintBurnFromABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__.
+ */
+export function useTokenManagerMintBurnFromWrite<
   TFunctionName extends string,
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           string
         >["request"]["abi"],
         TFunctionName,
         TMode
       >
-    : UseContractWriteConfig<typeof tokenManagerABI, TFunctionName, TMode> & {
+    : UseContractWriteConfig<
+        typeof tokenManagerMintBurnFromABI,
+        TFunctionName,
+        TMode
+      > & {
         abi?: never;
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, TFunctionName, TMode>({
-    abi: tokenManagerABI,
-    ...config,
-  } as any);
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    TFunctionName,
+    TMode
+  >({ abi: tokenManagerMintBurnFromABI, ...config } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"acceptOperatorship"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"acceptOperatorship"`.
  */
-export function useTokenManagerAcceptOperatorship<
+export function useTokenManagerMintBurnFromAcceptOperatorship<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "acceptOperatorship"
         >["request"]["abi"],
         "acceptOperatorship",
         TMode
       > & { functionName?: "acceptOperatorship" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "acceptOperatorship",
         TMode
       > & {
@@ -638,30 +768,34 @@ export function useTokenManagerAcceptOperatorship<
         functionName?: "acceptOperatorship";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "acceptOperatorship", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "acceptOperatorship",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "acceptOperatorship",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowLimiter"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"addFlowLimiter"`.
  */
-export function useTokenManagerAddFlowLimiter<
+export function useTokenManagerMintBurnFromAddFlowLimiter<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "addFlowLimiter"
         >["request"]["abi"],
         "addFlowLimiter",
         TMode
       > & { functionName?: "addFlowLimiter" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "addFlowLimiter",
         TMode
       > & {
@@ -669,30 +803,34 @@ export function useTokenManagerAddFlowLimiter<
         functionName?: "addFlowLimiter";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "addFlowLimiter", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "addFlowLimiter",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "addFlowLimiter",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
  */
-export function useTokenManagerCallContractWithInterchainToken<
+export function useTokenManagerMintBurnFromCallContractWithInterchainToken<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "callContractWithInterchainToken"
         >["request"]["abi"],
         "callContractWithInterchainToken",
         TMode
       > & { functionName?: "callContractWithInterchainToken" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "callContractWithInterchainToken",
         TMode
       > & {
@@ -701,60 +839,68 @@ export function useTokenManagerCallContractWithInterchainToken<
       } = {} as any
 ) {
   return useContractWrite<
-    typeof tokenManagerABI,
+    typeof tokenManagerMintBurnFromABI,
     "callContractWithInterchainToken",
     TMode
   >({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "callContractWithInterchainToken",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"giveToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"giveToken"`.
  */
-export function useTokenManagerGiveToken<
+export function useTokenManagerMintBurnFromGiveToken<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "giveToken"
         >["request"]["abi"],
         "giveToken",
         TMode
       > & { functionName?: "giveToken" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "giveToken", TMode> & {
+    : UseContractWriteConfig<
+        typeof tokenManagerMintBurnFromABI,
+        "giveToken",
+        TMode
+      > & {
         abi?: never;
         functionName?: "giveToken";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "giveToken", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "giveToken",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "giveToken",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTransfer"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"interchainTransfer"`.
  */
-export function useTokenManagerInterchainTransfer<
+export function useTokenManagerMintBurnFromInterchainTransfer<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "interchainTransfer"
         >["request"]["abi"],
         "interchainTransfer",
         TMode
       > & { functionName?: "interchainTransfer" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "interchainTransfer",
         TMode
       > & {
@@ -762,30 +908,34 @@ export function useTokenManagerInterchainTransfer<
         functionName?: "interchainTransfer";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "interchainTransfer", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "interchainTransfer",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "interchainTransfer",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"proposeOperatorship"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"proposeOperatorship"`.
  */
-export function useTokenManagerProposeOperatorship<
+export function useTokenManagerMintBurnFromProposeOperatorship<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "proposeOperatorship"
         >["request"]["abi"],
         "proposeOperatorship",
         TMode
       > & { functionName?: "proposeOperatorship" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "proposeOperatorship",
         TMode
       > & {
@@ -793,32 +943,34 @@ export function useTokenManagerProposeOperatorship<
         functionName?: "proposeOperatorship";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "proposeOperatorship", TMode>(
-    {
-      abi: tokenManagerABI,
-      functionName: "proposeOperatorship",
-      ...config,
-    } as any
-  );
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "proposeOperatorship",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "proposeOperatorship",
+    ...config,
+  } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"removeFlowLimiter"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"removeFlowLimiter"`.
  */
-export function useTokenManagerRemoveFlowLimiter<
+export function useTokenManagerMintBurnFromRemoveFlowLimiter<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "removeFlowLimiter"
         >["request"]["abi"],
         "removeFlowLimiter",
         TMode
       > & { functionName?: "removeFlowLimiter" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "removeFlowLimiter",
         TMode
       > & {
@@ -826,111 +978,135 @@ export function useTokenManagerRemoveFlowLimiter<
         functionName?: "removeFlowLimiter";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "removeFlowLimiter", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "removeFlowLimiter",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "removeFlowLimiter",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setFlowLimit"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"setFlowLimit"`.
  */
-export function useTokenManagerSetFlowLimit<
+export function useTokenManagerMintBurnFromSetFlowLimit<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "setFlowLimit"
         >["request"]["abi"],
         "setFlowLimit",
         TMode
       > & { functionName?: "setFlowLimit" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "setFlowLimit", TMode> & {
+    : UseContractWriteConfig<
+        typeof tokenManagerMintBurnFromABI,
+        "setFlowLimit",
+        TMode
+      > & {
         abi?: never;
         functionName?: "setFlowLimit";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "setFlowLimit", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "setFlowLimit",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "setFlowLimit",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setup"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"setup"`.
  */
-export function useTokenManagerSetup<
+export function useTokenManagerMintBurnFromSetup<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "setup"
         >["request"]["abi"],
         "setup",
         TMode
       > & { functionName?: "setup" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "setup", TMode> & {
+    : UseContractWriteConfig<
+        typeof tokenManagerMintBurnFromABI,
+        "setup",
+        TMode
+      > & {
         abi?: never;
         functionName?: "setup";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "setup", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<typeof tokenManagerMintBurnFromABI, "setup", TMode>({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "setup",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"takeToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"takeToken"`.
  */
-export function useTokenManagerTakeToken<
+export function useTokenManagerMintBurnFromTakeToken<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "takeToken"
         >["request"]["abi"],
         "takeToken",
         TMode
       > & { functionName?: "takeToken" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "takeToken", TMode> & {
+    : UseContractWriteConfig<
+        typeof tokenManagerMintBurnFromABI,
+        "takeToken",
+        TMode
+      > & {
         abi?: never;
         functionName?: "takeToken";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "takeToken", TMode>({
-    abi: tokenManagerABI,
+  return useContractWrite<
+    typeof tokenManagerMintBurnFromABI,
+    "takeToken",
+    TMode
+  >({
+    abi: tokenManagerMintBurnFromABI,
     functionName: "takeToken",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transferOperatorship"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"transferOperatorship"`.
  */
-export function useTokenManagerTransferOperatorship<
+export function useTokenManagerMintBurnFromTransferOperatorship<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "transferOperatorship"
         >["request"]["abi"],
         "transferOperatorship",
         TMode
       > & { functionName?: "transferOperatorship" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "transferOperatorship",
         TMode
       > & {
@@ -939,33 +1115,33 @@ export function useTokenManagerTransferOperatorship<
       } = {} as any
 ) {
   return useContractWrite<
-    typeof tokenManagerABI,
+    typeof tokenManagerMintBurnFromABI,
     "transferOperatorship",
     TMode
   >({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "transferOperatorship",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
  */
-export function useTokenManagerTransmitInterchainTransfer<
+export function useTokenManagerMintBurnFromTransmitInterchainTransfer<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
-          typeof tokenManagerABI,
+          typeof tokenManagerMintBurnFromABI,
           "transmitInterchainTransfer"
         >["request"]["abi"],
         "transmitInterchainTransfer",
         TMode
       > & { functionName?: "transmitInterchainTransfer" }
     : UseContractWriteConfig<
-        typeof tokenManagerABI,
+        typeof tokenManagerMintBurnFromABI,
         "transmitInterchainTransfer",
         TMode
       > & {
@@ -974,310 +1150,336 @@ export function useTokenManagerTransmitInterchainTransfer<
       } = {} as any
 ) {
   return useContractWrite<
-    typeof tokenManagerABI,
+    typeof tokenManagerMintBurnFromABI,
     "transmitInterchainTransfer",
     TMode
   >({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "transmitInterchainTransfer",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__.
  */
-export function usePrepareTokenManagerWrite<TFunctionName extends string>(
+export function usePrepareTokenManagerMintBurnFromWrite<
+  TFunctionName extends string
+>(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, TFunctionName>,
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
+      TFunctionName
+    >,
     "abi"
   > = {} as any
 ) {
   return usePrepareContractWrite({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, TFunctionName>);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, TFunctionName>);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"acceptOperatorship"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"acceptOperatorship"`.
  */
-export function usePrepareTokenManagerAcceptOperatorship(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "acceptOperatorship">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "acceptOperatorship",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "acceptOperatorship">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowLimiter"`.
- */
-export function usePrepareTokenManagerAddFlowLimiter(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowLimiter">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "addFlowLimiter",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowLimiter">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
- */
-export function usePrepareTokenManagerCallContractWithInterchainToken(
+export function usePrepareTokenManagerMintBurnFromAcceptOperatorship(
   config: Omit<
     UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
+      typeof tokenManagerMintBurnFromABI,
+      "acceptOperatorship"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "acceptOperatorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "acceptOperatorship">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"addFlowLimiter"`.
+ */
+export function usePrepareTokenManagerMintBurnFromAddFlowLimiter(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
+      "addFlowLimiter"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "addFlowLimiter",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "addFlowLimiter">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
+ */
+export function usePrepareTokenManagerMintBurnFromCallContractWithInterchainToken(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
       "callContractWithInterchainToken"
     >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "callContractWithInterchainToken",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "callContractWithInterchainToken">);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "callContractWithInterchainToken">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"giveToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"giveToken"`.
  */
-export function usePrepareTokenManagerGiveToken(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "giveToken">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "giveToken",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "giveToken">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTransfer"`.
- */
-export function usePrepareTokenManagerInterchainTransfer(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "interchainTransfer">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "interchainTransfer",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "interchainTransfer">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"proposeOperatorship"`.
- */
-export function usePrepareTokenManagerProposeOperatorship(
+export function usePrepareTokenManagerMintBurnFromGiveToken(
   config: Omit<
     UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
+      typeof tokenManagerMintBurnFromABI,
+      "giveToken"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "giveToken",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "giveToken">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"interchainTransfer"`.
+ */
+export function usePrepareTokenManagerMintBurnFromInterchainTransfer(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
+      "interchainTransfer"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "interchainTransfer",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "interchainTransfer">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"proposeOperatorship"`.
+ */
+export function usePrepareTokenManagerMintBurnFromProposeOperatorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
       "proposeOperatorship"
     >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "proposeOperatorship",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "proposeOperatorship">);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "proposeOperatorship">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"removeFlowLimiter"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"removeFlowLimiter"`.
  */
-export function usePrepareTokenManagerRemoveFlowLimiter(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "removeFlowLimiter">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "removeFlowLimiter",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "removeFlowLimiter">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setFlowLimit"`.
- */
-export function usePrepareTokenManagerSetFlowLimit(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "setFlowLimit">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "setFlowLimit",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "setFlowLimit">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setup"`.
- */
-export function usePrepareTokenManagerSetup(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "setup">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "setup",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "setup">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"takeToken"`.
- */
-export function usePrepareTokenManagerTakeToken(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "takeToken">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "takeToken",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "takeToken">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transferOperatorship"`.
- */
-export function usePrepareTokenManagerTransferOperatorship(
+export function usePrepareTokenManagerMintBurnFromRemoveFlowLimiter(
   config: Omit<
     UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
+      typeof tokenManagerMintBurnFromABI,
+      "removeFlowLimiter"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "removeFlowLimiter",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "removeFlowLimiter">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"setFlowLimit"`.
+ */
+export function usePrepareTokenManagerMintBurnFromSetFlowLimit(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
+      "setFlowLimit"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "setFlowLimit",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "setFlowLimit">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"setup"`.
+ */
+export function usePrepareTokenManagerMintBurnFromSetup(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "setup">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "setup",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "setup">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"takeToken"`.
+ */
+export function usePrepareTokenManagerMintBurnFromTakeToken(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
+      "takeToken"
+    >,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerMintBurnFromABI,
+    functionName: "takeToken",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "takeToken">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"transferOperatorship"`.
+ */
+export function usePrepareTokenManagerMintBurnFromTransferOperatorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof tokenManagerMintBurnFromABI,
       "transferOperatorship"
     >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "transferOperatorship",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "transferOperatorship">);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "transferOperatorship">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
  */
-export function usePrepareTokenManagerTransmitInterchainTransfer(
+export function usePrepareTokenManagerMintBurnFromTransmitInterchainTransfer(
   config: Omit<
     UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
+      typeof tokenManagerMintBurnFromABI,
       "transmitInterchainTransfer"
     >,
     "abi" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     functionName: "transmitInterchainTransfer",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "transmitInterchainTransfer">);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerMintBurnFromABI, "transmitInterchainTransfer">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__.
  */
-export function useTokenManagerEvent<TEventName extends string>(
+export function useTokenManagerMintBurnFromEvent<TEventName extends string>(
   config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, TEventName>,
+    UseContractEventConfig<typeof tokenManagerMintBurnFromABI, TEventName>,
     "abi"
   > = {} as any
 ) {
   return useContractEvent({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, TEventName>);
+  } as UseContractEventConfig<typeof tokenManagerMintBurnFromABI, TEventName>);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"FlowLimitSet"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `eventName` set to `"FlowLimitSet"`.
  */
-export function useTokenManagerFlowLimitSetEvent(
+export function useTokenManagerMintBurnFromFlowLimitSetEvent(
   config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "FlowLimitSet">,
+    UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "FlowLimitSet">,
     "abi" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     eventName: "FlowLimitSet",
     ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "FlowLimitSet">);
+  } as UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "FlowLimitSet">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"RolesAdded"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `eventName` set to `"RolesAdded"`.
  */
-export function useTokenManagerRolesAddedEvent(
+export function useTokenManagerMintBurnFromRolesAddedEvent(
   config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "RolesAdded">,
+    UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "RolesAdded">,
     "abi" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     eventName: "RolesAdded",
     ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "RolesAdded">);
+  } as UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "RolesAdded">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"RolesProposed"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `eventName` set to `"RolesProposed"`.
  */
-export function useTokenManagerRolesProposedEvent(
+export function useTokenManagerMintBurnFromRolesProposedEvent(
   config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "RolesProposed">,
+    UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "RolesProposed">,
     "abi" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     eventName: "RolesProposed",
     ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "RolesProposed">);
+  } as UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "RolesProposed">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"RolesRemoved"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerMintBurnFromABI}__ and `eventName` set to `"RolesRemoved"`.
  */
-export function useTokenManagerRolesRemovedEvent(
+export function useTokenManagerMintBurnFromRolesRemovedEvent(
   config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "RolesRemoved">,
+    UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "RolesRemoved">,
     "abi" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnFromABI,
     eventName: "RolesRemoved",
     ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "RolesRemoved">);
+  } as UseContractEventConfig<typeof tokenManagerMintBurnFromABI, "RolesRemoved">);
 }

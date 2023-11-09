@@ -15,10 +15,21 @@ import {
 } from "wagmi/actions";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TokenManager
+// TokenManagerMintBurn
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const tokenManagerABI = [
+export const tokenManagerMintBurnABI = [
+  {
+    stateMutability: "nonpayable",
+    type: "constructor",
+    inputs: [
+      {
+        name: "interchainTokenService_",
+        internalType: "address",
+        type: "address",
+      },
+    ],
+  },
   {
     type: "error",
     inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
@@ -89,6 +100,7 @@ export const tokenManagerABI = [
   },
   { type: "error", inputs: [], name: "TakeTokenFailed" },
   { type: "error", inputs: [], name: "TokenLinkerZeroAddress" },
+  { type: "error", inputs: [], name: "TokenTransferFailed" },
   { type: "error", inputs: [], name: "ZeroAddress" },
   {
     type: "event",
@@ -305,6 +317,16 @@ export const tokenManagerABI = [
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
   },
   {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [
+      { name: "operator_", internalType: "bytes", type: "bytes" },
+      { name: "tokenAddress_", internalType: "address", type: "address" },
+    ],
+    name: "params",
+    outputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
+  },
+  {
     stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "operator", internalType: "address", type: "address" }],
@@ -378,54 +400,60 @@ export const tokenManagerABI = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link getContract}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link getContract}__ with `abi` set to __{@link tokenManagerMintBurnABI}__.
  */
-export function getTokenManager(config: Omit<GetContractArgs, "abi">) {
-  return getContract({ abi: tokenManagerABI, ...config });
+export function getTokenManagerMintBurn(config: Omit<GetContractArgs, "abi">) {
+  return getContract({ abi: tokenManagerMintBurnABI, ...config });
 }
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenManagerMintBurnABI}__.
  */
-export function readTokenManager<
-  TAbi extends readonly unknown[] = typeof tokenManagerABI,
+export function readTokenManagerMintBurn<
+  TAbi extends readonly unknown[] = typeof tokenManagerMintBurnABI,
   TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, "abi">) {
   return readContract({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnABI,
     ...config,
   } as unknown as ReadContractConfig<TAbi, TFunctionName>);
 }
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenManagerMintBurnABI}__.
  */
-export function writeTokenManager<TFunctionName extends string>(
+export function writeTokenManagerMintBurn<TFunctionName extends string>(
   config:
     | Omit<
-        WriteContractPreparedArgs<typeof tokenManagerABI, TFunctionName>,
+        WriteContractPreparedArgs<
+          typeof tokenManagerMintBurnABI,
+          TFunctionName
+        >,
         "abi"
       >
     | Omit<
-        WriteContractUnpreparedArgs<typeof tokenManagerABI, TFunctionName>,
+        WriteContractUnpreparedArgs<
+          typeof tokenManagerMintBurnABI,
+          TFunctionName
+        >,
         "abi"
       >
 ) {
   return writeContract({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnABI,
     ...config,
-  } as unknown as WriteContractArgs<typeof tokenManagerABI, TFunctionName>);
+  } as unknown as WriteContractArgs<typeof tokenManagerMintBurnABI, TFunctionName>);
 }
 
 /**
- * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link tokenManagerMintBurnABI}__.
  */
-export function prepareWriteTokenManager<
-  TAbi extends readonly unknown[] = typeof tokenManagerABI,
+export function prepareWriteTokenManagerMintBurn<
+  TAbi extends readonly unknown[] = typeof tokenManagerMintBurnABI,
   TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, "abi">) {
   return prepareWriteContract({
-    abi: tokenManagerABI,
+    abi: tokenManagerMintBurnABI,
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>);
 }
