@@ -319,7 +319,7 @@ function printMissingArgument(arg: string) {
 function validateArg(arg: string, type: string) {
   if (!argv[arg] || typeof argv[arg] !== type) {
     printMissingArgument(arg);
-    process.exit(1);
+    process.exit(0);
   }
 }
 
