@@ -307,7 +307,7 @@ Options:
   --flatten           Whether to flatten the output folder structure (optional, default: false)
   --filecase          The case of the generated file names (optional, default: pascal)
   --foldercase        The case of the generated folder names (optional, default: pascal)
-  --index             Whether to generate index files (optional, default: true)
+  --index             Whether to generate index files (optional, default: false)
   --client            Path to the PublicClient module (optional, default: "@axelarjs/evm")
 `;
 
