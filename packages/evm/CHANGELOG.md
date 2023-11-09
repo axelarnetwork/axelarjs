@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.19
+
+### Patch Changes
+
+- [#87](https://github.com/axelarnetwork/axelarjs/pull/87) [`90816933`](https://github.com/axelarnetwork/axelarjs/commit/90816933272a116744802ff579c65ca61a71053e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: more codegen options & ability to generate index files
+
 ## 0.1.18
 
 ### Patch Changes
