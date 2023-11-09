@@ -395,3 +395,23 @@ export const encodeTokenManagerMintBurnTransmitInterchainTransferData = ({
     abi: ABI_FILE.abi,
     args: [sender, destinationChain, destinationAddress, amount, metadata],
   });
+
+export const TOKEN_MANAGER_MINT_BURN_ENCODERS = {
+  acceptOperatorship: encodeTokenManagerMintBurnAcceptOperatorshipArgs,
+  addFlowLimiter: encodeTokenManagerMintBurnAddFlowLimiterArgs,
+  callContractWithInterchainToken:
+    encodeTokenManagerMintBurnCallContractWithInterchainTokenArgs,
+  giveToken: encodeTokenManagerMintBurnGiveTokenArgs,
+  hasRole: encodeTokenManagerMintBurnHasRoleArgs,
+  interchainTransfer: encodeTokenManagerMintBurnInterchainTransferArgs,
+  isOperator: encodeTokenManagerMintBurnIsOperatorArgs,
+  params: encodeTokenManagerMintBurnParamsArgs,
+  proposeOperatorship: encodeTokenManagerMintBurnProposeOperatorshipArgs,
+  removeFlowLimiter: encodeTokenManagerMintBurnRemoveFlowLimiterArgs,
+  setFlowLimit: encodeTokenManagerMintBurnSetFlowLimitArgs,
+  setup: encodeTokenManagerMintBurnSetupArgs,
+  takeToken: encodeTokenManagerMintBurnTakeTokenArgs,
+  transferOperatorship: encodeTokenManagerMintBurnTransferOperatorshipArgs,
+  transmitInterchainTransfer:
+    encodeTokenManagerMintBurnTransmitInterchainTransferArgs,
+};

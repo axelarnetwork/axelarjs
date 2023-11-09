@@ -444,3 +444,22 @@ export const encodeInterchainTokenTransferFromData = ({
     abi: ABI_FILE.abi,
     args: [sender, recipient, amount],
   });
+
+export const INTERCHAIN_TOKEN_ENCODERS = {
+  acceptDistributorship: encodeInterchainTokenAcceptDistributorshipArgs,
+  approve: encodeInterchainTokenApproveArgs,
+  burn: encodeInterchainTokenBurnArgs,
+  decreaseAllowance: encodeInterchainTokenDecreaseAllowanceArgs,
+  hasRole: encodeInterchainTokenHasRoleArgs,
+  increaseAllowance: encodeInterchainTokenIncreaseAllowanceArgs,
+  interchainTransfer: encodeInterchainTokenInterchainTransferArgs,
+  interchainTransferFrom: encodeInterchainTokenInterchainTransferFromArgs,
+  isDistributor: encodeInterchainTokenIsDistributorArgs,
+  mint: encodeInterchainTokenMintArgs,
+  permit: encodeInterchainTokenPermitArgs,
+  proposeDistributorship: encodeInterchainTokenProposeDistributorshipArgs,
+  setup: encodeInterchainTokenSetupArgs,
+  transfer: encodeInterchainTokenTransferArgs,
+  transferDistributorship: encodeInterchainTokenTransferDistributorshipArgs,
+  transferFrom: encodeInterchainTokenTransferFromArgs,
+};

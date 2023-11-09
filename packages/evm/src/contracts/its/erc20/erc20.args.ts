@@ -133,3 +133,11 @@ export const encodeERC20TransferFromData = ({
     abi: ABI_FILE.abi,
     args: [sender, recipient, amount],
   });
+
+export const ERC20_ENCODERS = {
+  approve: encodeERC20ApproveArgs,
+  decreaseAllowance: encodeERC20DecreaseAllowanceArgs,
+  increaseAllowance: encodeERC20IncreaseAllowanceArgs,
+  transfer: encodeERC20TransferArgs,
+  transferFrom: encodeERC20TransferFromArgs,
+};

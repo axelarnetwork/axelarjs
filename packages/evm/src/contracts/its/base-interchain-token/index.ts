@@ -15,7 +15,7 @@ import ABI_FILE from "./base-interchain-token.abi";
 
 export * from "./base-interchain-token.args";
 
-export const _BASE_INTERCHAIN_TOKEN_ABI = ABI_FILE.abi;
+export const BASE_INTERCHAIN_TOKEN_ABI = ABI_FILE.abi;
 
 export class BaseInterchainTokenClient extends PublicContractClient<
   typeof ABI_FILE.abi
@@ -25,7 +25,7 @@ export class BaseInterchainTokenClient extends PublicContractClient<
 
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
-      abi: _BASE_INTERCHAIN_TOKEN_ABI,
+      abi: BASE_INTERCHAIN_TOKEN_ABI,
       address: options.address,
       chain: options.chain,
     });

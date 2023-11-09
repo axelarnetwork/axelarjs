@@ -398,3 +398,23 @@ export const encodeTokenManagerLockUnlockFeeTransmitInterchainTransferData = ({
     abi: ABI_FILE.abi,
     args: [sender, destinationChain, destinationAddress, amount, metadata],
   });
+
+export const TOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS = {
+  acceptOperatorship: encodeTokenManagerLockUnlockFeeAcceptOperatorshipArgs,
+  addFlowLimiter: encodeTokenManagerLockUnlockFeeAddFlowLimiterArgs,
+  callContractWithInterchainToken:
+    encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs,
+  giveToken: encodeTokenManagerLockUnlockFeeGiveTokenArgs,
+  hasRole: encodeTokenManagerLockUnlockFeeHasRoleArgs,
+  interchainTransfer: encodeTokenManagerLockUnlockFeeInterchainTransferArgs,
+  isOperator: encodeTokenManagerLockUnlockFeeIsOperatorArgs,
+  params: encodeTokenManagerLockUnlockFeeParamsArgs,
+  proposeOperatorship: encodeTokenManagerLockUnlockFeeProposeOperatorshipArgs,
+  removeFlowLimiter: encodeTokenManagerLockUnlockFeeRemoveFlowLimiterArgs,
+  setFlowLimit: encodeTokenManagerLockUnlockFeeSetFlowLimitArgs,
+  setup: encodeTokenManagerLockUnlockFeeSetupArgs,
+  takeToken: encodeTokenManagerLockUnlockFeeTakeTokenArgs,
+  transferOperatorship: encodeTokenManagerLockUnlockFeeTransferOperatorshipArgs,
+  transmitInterchainTransfer:
+    encodeTokenManagerLockUnlockFeeTransmitInterchainTransferArgs,
+};

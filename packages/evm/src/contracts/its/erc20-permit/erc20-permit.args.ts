@@ -183,3 +183,12 @@ export const encodeERC20PermitTransferFromData = ({
     abi: ABI_FILE.abi,
     args: [sender, recipient, amount],
   });
+
+export const ERC20_PERMIT_ENCODERS = {
+  approve: encodeERC20PermitApproveArgs,
+  decreaseAllowance: encodeERC20PermitDecreaseAllowanceArgs,
+  increaseAllowance: encodeERC20PermitIncreaseAllowanceArgs,
+  permit: encodeERC20PermitPermitArgs,
+  transfer: encodeERC20PermitTransferArgs,
+  transferFrom: encodeERC20PermitTransferFromArgs,
+};

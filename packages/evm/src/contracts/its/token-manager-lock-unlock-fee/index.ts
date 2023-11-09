@@ -15,7 +15,7 @@ import ABI_FILE from "./token-manager-lock-unlock-fee.abi";
 
 export * from "./token-manager-lock-unlock-fee.args";
 
-export const _TOKEN_MANAGER_LOCK_UNLOCK_FEE_ABI = ABI_FILE.abi;
+export const TOKEN_MANAGER_LOCK_UNLOCK_FEE_ABI = ABI_FILE.abi;
 
 export class TokenManagerLockUnlockFeeClient extends PublicContractClient<
   typeof ABI_FILE.abi
@@ -25,7 +25,7 @@ export class TokenManagerLockUnlockFeeClient extends PublicContractClient<
 
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
-      abi: _TOKEN_MANAGER_LOCK_UNLOCK_FEE_ABI,
+      abi: TOKEN_MANAGER_LOCK_UNLOCK_FEE_ABI,
       address: options.address,
       chain: options.chain,
     });

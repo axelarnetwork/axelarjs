@@ -1003,3 +1003,48 @@ export const encodeInterchainTokenServiceValidTokenManagerAddressData = ({
     abi: ABI_FILE.abi,
     args: [tokenId],
   });
+
+export const INTERCHAIN_TOKEN_SERVICE_ENCODERS = {
+  acceptOperatorship: encodeInterchainTokenServiceAcceptOperatorshipArgs,
+  callContractWithInterchainToken:
+    encodeInterchainTokenServiceCallContractWithInterchainTokenArgs,
+  contractCallValue: encodeInterchainTokenServiceContractCallValueArgs,
+  deployInterchainToken: encodeInterchainTokenServiceDeployInterchainTokenArgs,
+  deployTokenManager: encodeInterchainTokenServiceDeployTokenManagerArgs,
+  execute: encodeInterchainTokenServiceExecuteArgs,
+  expressExecute: encodeInterchainTokenServiceExpressExecuteArgs,
+  flowInAmount: encodeInterchainTokenServiceFlowInAmountArgs,
+  flowLimit: encodeInterchainTokenServiceFlowLimitArgs,
+  flowOutAmount: encodeInterchainTokenServiceFlowOutAmountArgs,
+  getExpressExecutor: encodeInterchainTokenServiceGetExpressExecutorArgs,
+  getExpressExecutorWithToken:
+    encodeInterchainTokenServiceGetExpressExecutorWithTokenArgs,
+  hasRole: encodeInterchainTokenServiceHasRoleArgs,
+  interchainTokenAddress:
+    encodeInterchainTokenServiceInterchainTokenAddressArgs,
+  interchainTokenId: encodeInterchainTokenServiceInterchainTokenIdArgs,
+  interchainTransfer: encodeInterchainTokenServiceInterchainTransferArgs,
+  isOperator: encodeInterchainTokenServiceIsOperatorArgs,
+  isTrustedAddress: encodeInterchainTokenServiceIsTrustedAddressArgs,
+  multicall: encodeInterchainTokenServiceMulticallArgs,
+  proposeOperatorship: encodeInterchainTokenServiceProposeOperatorshipArgs,
+  proposeOwnership: encodeInterchainTokenServiceProposeOwnershipArgs,
+  removeTrustedAddress: encodeInterchainTokenServiceRemoveTrustedAddressArgs,
+  setFlowLimits: encodeInterchainTokenServiceSetFlowLimitsArgs,
+  setPauseStatus: encodeInterchainTokenServiceSetPauseStatusArgs,
+  setTrustedAddress: encodeInterchainTokenServiceSetTrustedAddressArgs,
+  setup: encodeInterchainTokenServiceSetupArgs,
+  tokenManagerAddress: encodeInterchainTokenServiceTokenManagerAddressArgs,
+  tokenManagerImplementation:
+    encodeInterchainTokenServiceTokenManagerImplementationArgs,
+  transferOperatorship: encodeInterchainTokenServiceTransferOperatorshipArgs,
+  transferOwnership: encodeInterchainTokenServiceTransferOwnershipArgs,
+  transmitInterchainTransfer:
+    encodeInterchainTokenServiceTransmitInterchainTransferArgs,
+  trustedAddress: encodeInterchainTokenServiceTrustedAddressArgs,
+  trustedAddressHash: encodeInterchainTokenServiceTrustedAddressHashArgs,
+  upgrade: encodeInterchainTokenServiceUpgradeArgs,
+  validTokenAddress: encodeInterchainTokenServiceValidTokenAddressArgs,
+  validTokenManagerAddress:
+    encodeInterchainTokenServiceValidTokenManagerAddressArgs,
+};

@@ -214,3 +214,13 @@ export const encodeBaseInterchainTokenTransferFromData = ({
     abi: ABI_FILE.abi,
     args: [sender, recipient, amount],
   });
+
+export const BASE_INTERCHAIN_TOKEN_ENCODERS = {
+  approve: encodeBaseInterchainTokenApproveArgs,
+  decreaseAllowance: encodeBaseInterchainTokenDecreaseAllowanceArgs,
+  increaseAllowance: encodeBaseInterchainTokenIncreaseAllowanceArgs,
+  interchainTransfer: encodeBaseInterchainTokenInterchainTransferArgs,
+  interchainTransferFrom: encodeBaseInterchainTokenInterchainTransferFromArgs,
+  transfer: encodeBaseInterchainTokenTransferArgs,
+  transferFrom: encodeBaseInterchainTokenTransferFromArgs,
+};

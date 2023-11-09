@@ -8,7 +8,7 @@ import { $, argv, chalk, fs, glob, path, spinner } from "zx";
 $.verbose = false;
 
 const pascalToKebabCase = convertCase("PascalCase", "kebab-case");
-const pascalToConstantCase = convertCase("PascalCase", "CONSTANT_CASE");
+const kebabToConstantName = convertCase("kebab-case", "CONSTANT_CASE");
 
 type ABIInputItem = {
   name: string;
@@ -123,11 +123,12 @@ async function codegenContract({
     /^(ERC|EIP)([0-9]+)/,
     (_, p1, p2) => `${p1.toLowerCase()}${p2}`
   );
+  const kebabtName = pascalToKebabCase(sanitizedPascalName);
 
-  const fileName =
-    filecase === "kebab"
-      ? convertCase("PascalCase", "kebab-case")(sanitizedPascalName)
-      : pascalName;
+  const fileName = filecase === "kebab" ? kebabtName : pascalName;
+  const folderName = foldercase === "kebab" ? kebabtName : pascalName;
+
+  const constantName = kebabToConstantName(kebabtName);
 
   const argsFile = `
     import { encodeFunctionData } from "viem";
@@ -151,19 +152,29 @@ async function codegenContract({
           /**
            * Factory function for ${pascalName}.${name} function args
            */
-            export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
+          export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
           
           /**
            * Encoder function for ${pascalName}.${name} function data
            */
-            export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}) => encodeFunctionData({
+          export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}) => encodeFunctionData({
               functionName: "${name}",
               abi: ABI_FILE.abi,
               args:[${argNames}]
             });
           `;
       })
-      .join("\n\n")}`;
+      .join("\n\n")}
+      
+      export const ${constantName}_ENCODERS = {
+        ${abiFns
+          .map(
+            ({ name }) =>
+              `"${name}": encode${pascalName}${capitalize(name)}Args`
+          )
+          .join(",\n")}
+      }
+      `;
 
   const abiFile = `
     export default ${abiJsonFile} as const;
@@ -174,11 +185,6 @@ async function codegenContract({
   );
 
   const outputFolderPath = path.resolve(config.outputFolder ?? "");
-
-  const folderName =
-    foldercase === "kebab"
-      ? convertCase("PascalCase", "kebab-case")(sanitizedPascalName)
-      : pascalName;
 
   const outputPath = path.join(
     config.flatten ? outputFolderPath : path.join(outputFolderPath, subPath),
@@ -203,7 +209,6 @@ async function codegenContract({
   ].filter(({ excluded }) => !excluded);
 
   if (index) {
-    const constantName = pascalToConstantCase(sanitizedPascalName);
     const indexFile = `
     import { Chain } from "viem";
 

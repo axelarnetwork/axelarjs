@@ -487,3 +487,29 @@ export const encodeInterchainTokenFactoryUpgradeData = ({
     abi: ABI_FILE.abi,
     args: [newImplementation, newImplementationCodeHash, params],
   });
+
+export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
+  canonicalInterchainTokenId:
+    encodeInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
+  canonicalInterchainTokenSalt:
+    encodeInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
+  deployInterchainToken: encodeInterchainTokenFactoryDeployInterchainTokenArgs,
+  deployRemoteCanonicalInterchainToken:
+    encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs,
+  deployRemoteInterchainToken:
+    encodeInterchainTokenFactoryDeployRemoteInterchainTokenArgs,
+  interchainTokenAddress:
+    encodeInterchainTokenFactoryInterchainTokenAddressArgs,
+  interchainTokenId: encodeInterchainTokenFactoryInterchainTokenIdArgs,
+  interchainTokenSalt: encodeInterchainTokenFactoryInterchainTokenSaltArgs,
+  interchainTransfer: encodeInterchainTokenFactoryInterchainTransferArgs,
+  multicall: encodeInterchainTokenFactoryMulticallArgs,
+  proposeOwnership: encodeInterchainTokenFactoryProposeOwnershipArgs,
+  registerCanonicalInterchainToken:
+    encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
+  setup: encodeInterchainTokenFactorySetupArgs,
+  tokenApprove: encodeInterchainTokenFactoryTokenApproveArgs,
+  tokenTransferFrom: encodeInterchainTokenFactoryTokenTransferFromArgs,
+  transferOwnership: encodeInterchainTokenFactoryTransferOwnershipArgs,
+  upgrade: encodeInterchainTokenFactoryUpgradeArgs,
+};

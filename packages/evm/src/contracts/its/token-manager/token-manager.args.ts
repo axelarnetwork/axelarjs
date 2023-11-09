@@ -358,3 +358,21 @@ export const encodeTokenManagerTransmitInterchainTransferData = ({
     abi: ABI_FILE.abi,
     args: [sender, destinationChain, destinationAddress, amount, metadata],
   });
+
+export const TOKEN_MANAGER_ENCODERS = {
+  acceptOperatorship: encodeTokenManagerAcceptOperatorshipArgs,
+  addFlowLimiter: encodeTokenManagerAddFlowLimiterArgs,
+  callContractWithInterchainToken:
+    encodeTokenManagerCallContractWithInterchainTokenArgs,
+  giveToken: encodeTokenManagerGiveTokenArgs,
+  hasRole: encodeTokenManagerHasRoleArgs,
+  interchainTransfer: encodeTokenManagerInterchainTransferArgs,
+  isOperator: encodeTokenManagerIsOperatorArgs,
+  proposeOperatorship: encodeTokenManagerProposeOperatorshipArgs,
+  removeFlowLimiter: encodeTokenManagerRemoveFlowLimiterArgs,
+  setFlowLimit: encodeTokenManagerSetFlowLimitArgs,
+  setup: encodeTokenManagerSetupArgs,
+  takeToken: encodeTokenManagerTakeTokenArgs,
+  transferOperatorship: encodeTokenManagerTransferOperatorshipArgs,
+  transmitInterchainTransfer: encodeTokenManagerTransmitInterchainTransferArgs,
+};

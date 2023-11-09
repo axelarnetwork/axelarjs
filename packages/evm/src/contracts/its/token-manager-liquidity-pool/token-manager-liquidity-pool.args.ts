@@ -426,3 +426,24 @@ export const encodeTokenManagerLiquidityPoolTransmitInterchainTransferData = ({
     abi: ABI_FILE.abi,
     args: [sender, destinationChain, destinationAddress, amount, metadata],
   });
+
+export const TOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS = {
+  acceptOperatorship: encodeTokenManagerLiquidityPoolAcceptOperatorshipArgs,
+  addFlowLimiter: encodeTokenManagerLiquidityPoolAddFlowLimiterArgs,
+  callContractWithInterchainToken:
+    encodeTokenManagerLiquidityPoolCallContractWithInterchainTokenArgs,
+  giveToken: encodeTokenManagerLiquidityPoolGiveTokenArgs,
+  hasRole: encodeTokenManagerLiquidityPoolHasRoleArgs,
+  interchainTransfer: encodeTokenManagerLiquidityPoolInterchainTransferArgs,
+  isOperator: encodeTokenManagerLiquidityPoolIsOperatorArgs,
+  params: encodeTokenManagerLiquidityPoolParamsArgs,
+  proposeOperatorship: encodeTokenManagerLiquidityPoolProposeOperatorshipArgs,
+  removeFlowLimiter: encodeTokenManagerLiquidityPoolRemoveFlowLimiterArgs,
+  setFlowLimit: encodeTokenManagerLiquidityPoolSetFlowLimitArgs,
+  setLiquidityPool: encodeTokenManagerLiquidityPoolSetLiquidityPoolArgs,
+  setup: encodeTokenManagerLiquidityPoolSetupArgs,
+  takeToken: encodeTokenManagerLiquidityPoolTakeTokenArgs,
+  transferOperatorship: encodeTokenManagerLiquidityPoolTransferOperatorshipArgs,
+  transmitInterchainTransfer:
+    encodeTokenManagerLiquidityPoolTransmitInterchainTransferArgs,
+};

@@ -15,7 +15,7 @@ import ABI_FILE from "./token-manager-mint-burn.abi";
 
 export * from "./token-manager-mint-burn.args";
 
-export const _TOKEN_MANAGER_MINT_BURN_ABI = ABI_FILE.abi;
+export const TOKEN_MANAGER_MINT_BURN_ABI = ABI_FILE.abi;
 
 export class TokenManagerMintBurnClient extends PublicContractClient<
   typeof ABI_FILE.abi
@@ -25,7 +25,7 @@ export class TokenManagerMintBurnClient extends PublicContractClient<
 
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
-      abi: _TOKEN_MANAGER_MINT_BURN_ABI,
+      abi: TOKEN_MANAGER_MINT_BURN_ABI,
       address: options.address,
       chain: options.chain,
     });
