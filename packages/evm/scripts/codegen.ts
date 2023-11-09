@@ -8,6 +8,7 @@ import { $, argv, chalk, fs, glob, path, spinner } from "zx";
 $.verbose = false;
 
 const pascalToKebabCase = convertCase("PascalCase", "kebab-case");
+const pascalToConstantCase = convertCase("PascalCase", "CONSTANT_CASE");
 
 type ABIInputItem = {
   name: string;
@@ -61,10 +62,16 @@ function extractContractNameAndPath(folderPath: string) {
   };
 }
 
+type NamingConvention = "pascal" | "kebab" | undefined;
+
 type CodegenOptions = {
   excludePatterns?: string[];
   outputFolder?: string;
   flatten?: boolean;
+  foldercase?: NamingConvention;
+  filecase?: NamingConvention;
+  index?: boolean;
+  client?: string;
 };
 
 export type CodegenConfig = CodegenOptions & {
@@ -79,6 +86,10 @@ async function codegenContract({
   abiFileJson = "",
   pascalName = "",
   contractFolder = "",
+  foldercase = "",
+  filecase = "",
+  index = false,
+  client = "",
 }) {
   const GENERATED_DISCLAIMER = `
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -107,10 +118,21 @@ async function codegenContract({
       x.inputs.every((input) => input.name)
   );
 
+  // replace ERC* with erc* and EIP* with eip* to avoid inconsistent casing
+  const sanitizedPascalName = pascalName.replace(
+    /^(ERC|EIP)([0-9]+)/,
+    (_, p1, p2) => `${p1.toLowerCase()}${p2}`
+  );
+
+  const fileName =
+    filecase === "kebab"
+      ? convertCase("PascalCase", "kebab-case")(sanitizedPascalName)
+      : pascalName;
+
   const argsFile = `
     import { encodeFunctionData } from "viem";
     
-    import ABI_FILE from "./${pascalName}.abi";
+    import ABI_FILE from "./${fileName}.abi";
     
     ${abiFns
       .map(({ name, inputs }) => {
@@ -141,8 +163,7 @@ async function codegenContract({
             });
           `;
       })
-      .join("\n\n")}
-        `;
+      .join("\n\n")}`;
 
   const abiFile = `
     export default ${abiJsonFile} as const;
@@ -154,9 +175,14 @@ async function codegenContract({
 
   const outputFolderPath = path.resolve(config.outputFolder ?? "");
 
+  const folderName =
+    foldercase === "kebab"
+      ? convertCase("PascalCase", "kebab-case")(sanitizedPascalName)
+      : pascalName;
+
   const outputPath = path.join(
     config.flatten ? outputFolderPath : path.join(outputFolderPath, subPath),
-    pascalName
+    folderName
   );
 
   // create base path folder
@@ -164,17 +190,51 @@ async function codegenContract({
 
   const files = [
     {
-      name: `${pascalName}.abi.ts`,
+      name: `${fileName}.abi.ts`,
       content: abiFile,
       parser: "babel-ts",
     },
     {
-      name: `${pascalName}.args.ts`,
+      name: `${fileName}.args.ts`,
       content: argsFile,
       parser: "babel-ts",
       excluded: !abiFns.length,
     },
   ].filter(({ excluded }) => !excluded);
+
+  if (index) {
+    const constantName = pascalToConstantCase(sanitizedPascalName);
+    const indexFile = `
+    import { Chain } from "viem";
+
+    import { PublicContractClient } from "${client}";
+    import ABI_FILE from "./${fileName}.abi";
+    
+    export * from "./${fileName}.args";
+    
+    export const ${constantName}_ABI = ABI_FILE.abi;
+    
+    export class ${pascalName}Client extends PublicContractClient<
+      typeof ABI_FILE.abi
+    > {
+      static ABI = ABI_FILE.abi;
+      static contractName = ABI_FILE.contractName;
+    
+      constructor(options: { chain: Chain; address: \`0x\${string}\` }) {
+        super({
+          abi: ${constantName}_ABI,
+          address: options.address,
+          chain: options.chain,
+        });
+      }
+    }`;
+
+    files.push({
+      name: `index.ts`,
+      content: indexFile,
+      parser: "babel-ts",
+    });
+  }
 
   // write files
   await Promise.all(
@@ -218,6 +278,10 @@ async function codegen(config: CodegenConfig) {
         abiPath,
         contractFolder,
         pascalName,
+        foldercase: config.foldercase,
+        filecase: config.filecase,
+        index: config.index,
+        client: config.client,
       });
     } catch (error) {
       console.error(`Failed to process contract ${pascalName}`, error);
@@ -241,6 +305,10 @@ Options:
   --out <out>         The folder where the generated files will be written (required)
   --exclude <exclude> Comma separated list of glob patterns to exclude (optional, default: [])
   --flatten           Whether to flatten the output folder structure (optional, default: false)
+  --filecase          The case of the generated file names (optional, default: pascal)
+  --foldercase        The case of the generated folder names (optional, default: pascal)
+  --index             Whether to generate index files (optional, default: false)
+  --client            Path to the PublicClient module (optional, default: "@axelarjs/evm")
 `;
 
 function printMissingArgument(arg: string) {
@@ -251,7 +319,7 @@ function printMissingArgument(arg: string) {
 function validateArg(arg: string, type: string) {
   if (!argv[arg] || typeof argv[arg] !== type) {
     printMissingArgument(arg);
-    process.exit(1);
+    process.exit(0);
   }
 }
 
@@ -269,6 +337,10 @@ function parseConfig(): CodegenConfig {
     contractsFolder: String(argv["src"] ?? ""),
     outputFolder: String(argv["out"] ?? ""),
     excludePatterns: String(argv["exclude"] ?? "").split(","),
+    foldercase: argv["foldercase"] as NamingConvention,
+    filecase: argv["filecase"] as NamingConvention,
+    index: Boolean(argv["index"] ?? false),
+    client: String(argv["client"] ?? "@axelarjs/evm"),
     flatten: Boolean(argv["flatten"] ?? false),
   };
 }

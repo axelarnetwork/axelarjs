@@ -5,25 +5,52 @@
 import { Command } from "commander";
 import { $, path } from "zx";
 
-const program = new Command();
+const program = new Command("codegen");
 
-// Define the command and its options
 program
-  .command("codegen")
   .description("Run the code generation script")
   .option("--src <source>", "The source directory", "")
   .option("--out <output>", "The output directory", "")
-  .option("--exclude <patterns>", "Patterns to exclude")
+  .option(
+    "--foldercase <case>",
+    "The case format for the folder names",
+    "pascal"
+  )
+  .option("--filecase <case>", "The case format for the file names", "pascal")
+  .option("--exclude <patterns>", "Patterns to exclude", "")
+  .option(
+    "--client <path>",
+    "The path to the publicClient module",
+    "@axelarjs/evm"
+  )
   .option("--flatten", "Flatten the output", false)
-  .action(async ({ src, out, flatten, exclude }) => {
-    const npx = await getNpxCompatibleCommand();
+  .option("--index", "Generate index files", false)
+  .action(
+    async ({
+      src,
+      out,
+      flatten,
+      exclude,
+      foldercase,
+      filecase,
+      index,
+      client,
+    }) => {
+      const npx = await getNpxCompatibleCommand();
 
-    const scriptPath = path.join(getDirname(), "../scripts/codegen.ts");
+      const scriptPath = path.join(getDirname(), "../scripts/codegen.ts");
 
-    await $`${npx} tsx ${scriptPath} --src ${src} --out ${out} --exclude ${exclude} ${
-      flatten ? "--flatten" : ""
-    }`;
-  });
+      await $`${npx} tsx ${scriptPath} \
+      --src ${src} \
+      --out ${out} \
+      --foldercase ${foldercase} \
+      --filecase ${filecase} \
+      --exclude ${exclude} \
+      --client ${client} \
+      ${index ? "--index" : ""} \
+      ${flatten ? "--flatten" : ""}`;
+    }
+  );
 
 program.parse(process.argv);
 
