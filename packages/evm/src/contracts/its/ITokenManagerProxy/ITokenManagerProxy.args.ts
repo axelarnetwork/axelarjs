@@ -26,7 +26,7 @@ export const encodeITokenManagerProxySetupArgs = ({
  */
 export const encodeITokenManagerProxySetupData = ({
   setupParams,
-}: ITokenManagerProxySetupArgs) =>
+}: ITokenManagerProxySetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,

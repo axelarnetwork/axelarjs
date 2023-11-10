@@ -35,7 +35,7 @@ export const encodeITokenManagerDeployerDeployTokenManagerData = ({
   tokenId,
   implementationType,
   params,
-}: ITokenManagerDeployerDeployTokenManagerArgs) =>
+}: ITokenManagerDeployerDeployTokenManagerArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployTokenManager",
     abi: ABI_FILE.abi,

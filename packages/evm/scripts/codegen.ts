@@ -166,50 +166,49 @@ async function codegenContract({
   ];
 
   if (abiFns.length) {
+    const toABIFnEncoder = ({ name, inputs }: ABIItem) => {
+      const argNames = inputs.map(({ name = "" }) => name).join(", ");
+
+      const argsType = inputs
+        .map((input) => `${input.name}: ${getInputType(input)}`)
+        .join("; ");
+
+      const fnName = capitalize(name);
+      const typeName = `${pascalName}${fnName}Args`;
+
+      return `
+        export type ${typeName} = {${argsType}}
+        
+        /**
+         * Factory function for ${pascalName}.${name} function args
+         */
+        export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
+        
+        /**
+         * Encoder function for ${pascalName}.${name} function data
+         */
+        export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}): \`0x\${string}\` => encodeFunctionData({
+          functionName: "${name}",
+          abi: ABI_FILE.abi,
+          args:[${argNames}]
+        });`;
+    };
+
     const argsFile = `
       import { encodeFunctionData } from "viem";
       
       import ABI_FILE from "./${fileName}.abi";
       
-      ${abiFns
-        .map(({ name, inputs }) => {
-          const argNames = inputs.map(({ name = "" }) => name).join(", ");
-
-          const argsType = inputs
-            .map((input) => `${input.name}: ${getInputType(input)}`)
-            .join("; ");
-
-          const fnName = capitalize(name);
-          const typeName = `${pascalName}${fnName}Args`;
-
-          return `
-            export type ${typeName} = {${argsType}}
-            
-            /**
-             * Factory function for ${pascalName}.${name} function args
-             */
-            export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
-            
-            /**
-             * Encoder function for ${pascalName}.${name} function data
-             */
-            export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}) => encodeFunctionData({
-                functionName: "${name}",
-                abi: ABI_FILE.abi,
-                args:[${argNames}]
-              });
-            `;
-        })
-        .join("\n\n")}
+      ${abiFns.map(toABIFnEncoder).join("\n\n")}
         
-        export const ${constantName}_ENCODERS = {
-          ${abiFns
-            .map(
-              ({ name }) =>
-                `"${name}": encode${pascalName}${capitalize(name)}Args`
-            )
-            .join(",\n")}
-        }`;
+      export const ${constantName}_ENCODERS = {
+        ${abiFns
+          .map(
+            ({ name }) =>
+              `"${name}": encode${pascalName}${capitalize(name)}Args`
+          )
+          .join(",\n")}
+      }`;
 
     files.push({
       name: `${fileName}.args.ts`,

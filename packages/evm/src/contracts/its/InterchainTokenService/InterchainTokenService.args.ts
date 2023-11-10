@@ -28,7 +28,7 @@ export const encodeInterchainTokenServiceAcceptOperatorshipArgs = ({
  */
 export const encodeInterchainTokenServiceAcceptOperatorshipData = ({
   fromOperator,
-}: InterchainTokenServiceAcceptOperatorshipArgs) =>
+}: InterchainTokenServiceAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -66,7 +66,7 @@ export const encodeInterchainTokenServiceCallContractWithInterchainTokenData =
     destinationAddress,
     amount,
     data,
-  }: InterchainTokenServiceCallContractWithInterchainTokenArgs) =>
+  }: InterchainTokenServiceCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
@@ -96,7 +96,7 @@ export const encodeInterchainTokenServiceContractCallValueData = ({
   sourceChain,
   sourceAddress,
   payload,
-}: InterchainTokenServiceContractCallValueArgs) =>
+}: InterchainTokenServiceContractCallValueArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "contractCallValue",
     abi: ABI_FILE.abi,
@@ -146,7 +146,7 @@ export const encodeInterchainTokenServiceDeployInterchainTokenData = ({
   decimals,
   distributor,
   gasValue,
-}: InterchainTokenServiceDeployInterchainTokenArgs) =>
+}: InterchainTokenServiceDeployInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployInterchainToken",
     abi: ABI_FILE.abi,
@@ -190,7 +190,7 @@ export const encodeInterchainTokenServiceDeployTokenManagerData = ({
   tokenManagerType,
   params,
   gasValue,
-}: InterchainTokenServiceDeployTokenManagerArgs) =>
+}: InterchainTokenServiceDeployTokenManagerArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployTokenManager",
     abi: ABI_FILE.abi,
@@ -223,7 +223,7 @@ export const encodeInterchainTokenServiceExecuteData = ({
   sourceChain,
   sourceAddress,
   payload,
-}: InterchainTokenServiceExecuteArgs) =>
+}: InterchainTokenServiceExecuteArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "execute",
     abi: ABI_FILE.abi,
@@ -256,7 +256,7 @@ export const encodeInterchainTokenServiceExpressExecuteData = ({
   sourceChain,
   sourceAddress,
   payload,
-}: InterchainTokenServiceExpressExecuteArgs) =>
+}: InterchainTokenServiceExpressExecuteArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "expressExecute",
     abi: ABI_FILE.abi,
@@ -277,7 +277,7 @@ export const encodeInterchainTokenServiceFlowInAmountArgs = ({
  */
 export const encodeInterchainTokenServiceFlowInAmountData = ({
   tokenId,
-}: InterchainTokenServiceFlowInAmountArgs) =>
+}: InterchainTokenServiceFlowInAmountArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "flowInAmount",
     abi: ABI_FILE.abi,
@@ -298,7 +298,7 @@ export const encodeInterchainTokenServiceFlowLimitArgs = ({
  */
 export const encodeInterchainTokenServiceFlowLimitData = ({
   tokenId,
-}: InterchainTokenServiceFlowLimitArgs) =>
+}: InterchainTokenServiceFlowLimitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "flowLimit",
     abi: ABI_FILE.abi,
@@ -321,7 +321,7 @@ export const encodeInterchainTokenServiceFlowOutAmountArgs = ({
  */
 export const encodeInterchainTokenServiceFlowOutAmountData = ({
   tokenId,
-}: InterchainTokenServiceFlowOutAmountArgs) =>
+}: InterchainTokenServiceFlowOutAmountArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "flowOutAmount",
     abi: ABI_FILE.abi,
@@ -354,7 +354,7 @@ export const encodeInterchainTokenServiceGetExpressExecutorData = ({
   sourceChain,
   sourceAddress,
   payloadHash,
-}: InterchainTokenServiceGetExpressExecutorArgs) =>
+}: InterchainTokenServiceGetExpressExecutorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "getExpressExecutor",
     abi: ABI_FILE.abi,
@@ -393,7 +393,7 @@ export const encodeInterchainTokenServiceGetExpressExecutorWithTokenData = ({
   payloadHash,
   symbol,
   amount,
-}: InterchainTokenServiceGetExpressExecutorWithTokenArgs) =>
+}: InterchainTokenServiceGetExpressExecutorWithTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "getExpressExecutorWithToken",
     abi: ABI_FILE.abi,
@@ -419,7 +419,7 @@ export const encodeInterchainTokenServiceHasRoleArgs = ({
 export const encodeInterchainTokenServiceHasRoleData = ({
   account,
   role,
-}: InterchainTokenServiceHasRoleArgs) =>
+}: InterchainTokenServiceHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -442,7 +442,7 @@ export const encodeInterchainTokenServiceInterchainTokenAddressArgs = ({
  */
 export const encodeInterchainTokenServiceInterchainTokenAddressData = ({
   tokenId,
-}: InterchainTokenServiceInterchainTokenAddressArgs) =>
+}: InterchainTokenServiceInterchainTokenAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTokenAddress",
     abi: ABI_FILE.abi,
@@ -468,7 +468,7 @@ export const encodeInterchainTokenServiceInterchainTokenIdArgs = ({
 export const encodeInterchainTokenServiceInterchainTokenIdData = ({
   sender,
   salt,
-}: InterchainTokenServiceInterchainTokenIdArgs) =>
+}: InterchainTokenServiceInterchainTokenIdArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTokenId",
     abi: ABI_FILE.abi,
@@ -504,7 +504,7 @@ export const encodeInterchainTokenServiceInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: InterchainTokenServiceInterchainTransferArgs) =>
+}: InterchainTokenServiceInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -525,7 +525,7 @@ export const encodeInterchainTokenServiceIsOperatorArgs = ({
  */
 export const encodeInterchainTokenServiceIsOperatorData = ({
   addr,
-}: InterchainTokenServiceIsOperatorArgs) =>
+}: InterchainTokenServiceIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -551,7 +551,7 @@ export const encodeInterchainTokenServiceIsTrustedAddressArgs = ({
 export const encodeInterchainTokenServiceIsTrustedAddressData = ({
   chain,
   address_,
-}: InterchainTokenServiceIsTrustedAddressArgs) =>
+}: InterchainTokenServiceIsTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isTrustedAddress",
     abi: ABI_FILE.abi,
@@ -572,7 +572,7 @@ export const encodeInterchainTokenServiceMulticallArgs = ({
  */
 export const encodeInterchainTokenServiceMulticallData = ({
   data,
-}: InterchainTokenServiceMulticallArgs) =>
+}: InterchainTokenServiceMulticallArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "multicall",
     abi: ABI_FILE.abi,
@@ -595,7 +595,7 @@ export const encodeInterchainTokenServiceProposeOperatorshipArgs = ({
  */
 export const encodeInterchainTokenServiceProposeOperatorshipData = ({
   operator,
-}: InterchainTokenServiceProposeOperatorshipArgs) =>
+}: InterchainTokenServiceProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -618,7 +618,7 @@ export const encodeInterchainTokenServiceProposeOwnershipArgs = ({
  */
 export const encodeInterchainTokenServiceProposeOwnershipData = ({
   newOwner,
-}: InterchainTokenServiceProposeOwnershipArgs) =>
+}: InterchainTokenServiceProposeOwnershipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOwnership",
     abi: ABI_FILE.abi,
@@ -639,7 +639,7 @@ export const encodeInterchainTokenServiceRemoveTrustedAddressArgs = ({
  */
 export const encodeInterchainTokenServiceRemoveTrustedAddressData = ({
   chain,
-}: InterchainTokenServiceRemoveTrustedAddressArgs) =>
+}: InterchainTokenServiceRemoveTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeTrustedAddress",
     abi: ABI_FILE.abi,
@@ -665,7 +665,7 @@ export const encodeInterchainTokenServiceSetFlowLimitsArgs = ({
 export const encodeInterchainTokenServiceSetFlowLimitsData = ({
   tokenIds,
   flowLimits,
-}: InterchainTokenServiceSetFlowLimitsArgs) =>
+}: InterchainTokenServiceSetFlowLimitsArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setFlowLimits",
     abi: ABI_FILE.abi,
@@ -686,7 +686,7 @@ export const encodeInterchainTokenServiceSetPauseStatusArgs = ({
  */
 export const encodeInterchainTokenServiceSetPauseStatusData = ({
   paused,
-}: InterchainTokenServiceSetPauseStatusArgs) =>
+}: InterchainTokenServiceSetPauseStatusArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setPauseStatus",
     abi: ABI_FILE.abi,
@@ -712,7 +712,7 @@ export const encodeInterchainTokenServiceSetTrustedAddressArgs = ({
 export const encodeInterchainTokenServiceSetTrustedAddressData = ({
   chain,
   address_,
-}: InterchainTokenServiceSetTrustedAddressArgs) =>
+}: InterchainTokenServiceSetTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setTrustedAddress",
     abi: ABI_FILE.abi,
@@ -733,7 +733,7 @@ export const encodeInterchainTokenServiceSetupArgs = ({
  */
 export const encodeInterchainTokenServiceSetupData = ({
   data,
-}: InterchainTokenServiceSetupArgs) =>
+}: InterchainTokenServiceSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -756,7 +756,7 @@ export const encodeInterchainTokenServiceTokenManagerAddressArgs = ({
  */
 export const encodeInterchainTokenServiceTokenManagerAddressData = ({
   tokenId,
-}: InterchainTokenServiceTokenManagerAddressArgs) =>
+}: InterchainTokenServiceTokenManagerAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "tokenManagerAddress",
     abi: ABI_FILE.abi,
@@ -780,7 +780,7 @@ export const encodeInterchainTokenServiceTokenManagerImplementationArgs = ({
  */
 export const encodeInterchainTokenServiceTokenManagerImplementationData = ({
   tokenManagerType,
-}: InterchainTokenServiceTokenManagerImplementationArgs) =>
+}: InterchainTokenServiceTokenManagerImplementationArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "tokenManagerImplementation",
     abi: ABI_FILE.abi,
@@ -803,7 +803,7 @@ export const encodeInterchainTokenServiceTransferOperatorshipArgs = ({
  */
 export const encodeInterchainTokenServiceTransferOperatorshipData = ({
   operator,
-}: InterchainTokenServiceTransferOperatorshipArgs) =>
+}: InterchainTokenServiceTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,
@@ -826,7 +826,7 @@ export const encodeInterchainTokenServiceTransferOwnershipArgs = ({
  */
 export const encodeInterchainTokenServiceTransferOwnershipData = ({
   newOwner,
-}: InterchainTokenServiceTransferOwnershipArgs) =>
+}: InterchainTokenServiceTransferOwnershipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOwnership",
     abi: ABI_FILE.abi,
@@ -872,7 +872,7 @@ export const encodeInterchainTokenServiceTransmitInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: InterchainTokenServiceTransmitInterchainTransferArgs) =>
+}: InterchainTokenServiceTransmitInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transmitInterchainTransfer",
     abi: ABI_FILE.abi,
@@ -900,7 +900,7 @@ export const encodeInterchainTokenServiceTrustedAddressArgs = ({
  */
 export const encodeInterchainTokenServiceTrustedAddressData = ({
   chain,
-}: InterchainTokenServiceTrustedAddressArgs) =>
+}: InterchainTokenServiceTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "trustedAddress",
     abi: ABI_FILE.abi,
@@ -921,7 +921,7 @@ export const encodeInterchainTokenServiceTrustedAddressHashArgs = ({
  */
 export const encodeInterchainTokenServiceTrustedAddressHashData = ({
   chain,
-}: InterchainTokenServiceTrustedAddressHashArgs) =>
+}: InterchainTokenServiceTrustedAddressHashArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "trustedAddressHash",
     abi: ABI_FILE.abi,
@@ -951,7 +951,7 @@ export const encodeInterchainTokenServiceUpgradeData = ({
   newImplementation,
   newImplementationCodeHash,
   params,
-}: InterchainTokenServiceUpgradeArgs) =>
+}: InterchainTokenServiceUpgradeArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "upgrade",
     abi: ABI_FILE.abi,
@@ -974,7 +974,7 @@ export const encodeInterchainTokenServiceValidTokenAddressArgs = ({
  */
 export const encodeInterchainTokenServiceValidTokenAddressData = ({
   tokenId,
-}: InterchainTokenServiceValidTokenAddressArgs) =>
+}: InterchainTokenServiceValidTokenAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "validTokenAddress",
     abi: ABI_FILE.abi,
@@ -997,7 +997,7 @@ export const encodeInterchainTokenServiceValidTokenManagerAddressArgs = ({
  */
 export const encodeInterchainTokenServiceValidTokenManagerAddressData = ({
   tokenId,
-}: InterchainTokenServiceValidTokenManagerAddressArgs) =>
+}: InterchainTokenServiceValidTokenManagerAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "validTokenManagerAddress",
     abi: ABI_FILE.abi,

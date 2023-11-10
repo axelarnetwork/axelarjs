@@ -31,7 +31,7 @@ export const encodeBaseInterchainTokenApproveArgs = ({
 export const encodeBaseInterchainTokenApproveData = ({
   spender,
   amount,
-}: BaseInterchainTokenApproveArgs) =>
+}: BaseInterchainTokenApproveArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "approve",
     abi: ABI_FILE.abi,
@@ -58,7 +58,7 @@ export const encodeBaseInterchainTokenDecreaseAllowanceArgs = ({
 export const encodeBaseInterchainTokenDecreaseAllowanceData = ({
   spender,
   subtractedValue,
-}: BaseInterchainTokenDecreaseAllowanceArgs) =>
+}: BaseInterchainTokenDecreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "decreaseAllowance",
     abi: ABI_FILE.abi,
@@ -84,7 +84,7 @@ export const encodeBaseInterchainTokenIncreaseAllowanceArgs = ({
 export const encodeBaseInterchainTokenIncreaseAllowanceData = ({
   spender,
   addedValue,
-}: BaseInterchainTokenIncreaseAllowanceArgs) =>
+}: BaseInterchainTokenIncreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "increaseAllowance",
     abi: ABI_FILE.abi,
@@ -117,7 +117,7 @@ export const encodeBaseInterchainTokenInterchainTransferData = ({
   recipient,
   amount,
   metadata,
-}: BaseInterchainTokenInterchainTransferArgs) =>
+}: BaseInterchainTokenInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -153,7 +153,7 @@ export const encodeBaseInterchainTokenInterchainTransferFromData = ({
   recipient,
   amount,
   metadata,
-}: BaseInterchainTokenInterchainTransferFromArgs) =>
+}: BaseInterchainTokenInterchainTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransferFrom",
     abi: ABI_FILE.abi,
@@ -179,7 +179,7 @@ export const encodeBaseInterchainTokenTransferArgs = ({
 export const encodeBaseInterchainTokenTransferData = ({
   recipient,
   amount,
-}: BaseInterchainTokenTransferArgs) =>
+}: BaseInterchainTokenTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transfer",
     abi: ABI_FILE.abi,
@@ -208,7 +208,7 @@ export const encodeBaseInterchainTokenTransferFromData = ({
   sender,
   recipient,
   amount,
-}: BaseInterchainTokenTransferFromArgs) =>
+}: BaseInterchainTokenTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferFrom",
     abi: ABI_FILE.abi,

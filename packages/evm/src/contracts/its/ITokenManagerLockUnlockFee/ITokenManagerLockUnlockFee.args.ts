@@ -28,7 +28,7 @@ export const encodeITokenManagerLockUnlockFeeAcceptOperatorshipArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeAcceptOperatorshipData = ({
   fromOperator,
-}: ITokenManagerLockUnlockFeeAcceptOperatorshipArgs) =>
+}: ITokenManagerLockUnlockFeeAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -51,7 +51,7 @@ export const encodeITokenManagerLockUnlockFeeAddFlowLimiterArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeAddFlowLimiterData = ({
   flowLimiter,
-}: ITokenManagerLockUnlockFeeAddFlowLimiterArgs) =>
+}: ITokenManagerLockUnlockFeeAddFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "addFlowLimiter",
     abi: ABI_FILE.abi,
@@ -86,7 +86,7 @@ export const encodeITokenManagerLockUnlockFeeCallContractWithInterchainTokenData
     destinationAddress,
     amount,
     data,
-  }: ITokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs) =>
+  }: ITokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
@@ -113,7 +113,7 @@ export const encodeITokenManagerLockUnlockFeeGiveTokenArgs = ({
 export const encodeITokenManagerLockUnlockFeeGiveTokenData = ({
   destinationAddress,
   amount,
-}: ITokenManagerLockUnlockFeeGiveTokenArgs) =>
+}: ITokenManagerLockUnlockFeeGiveTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "giveToken",
     abi: ABI_FILE.abi,
@@ -139,7 +139,7 @@ export const encodeITokenManagerLockUnlockFeeHasRoleArgs = ({
 export const encodeITokenManagerLockUnlockFeeHasRoleData = ({
   account,
   role,
-}: ITokenManagerLockUnlockFeeHasRoleArgs) =>
+}: ITokenManagerLockUnlockFeeHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -172,7 +172,7 @@ export const encodeITokenManagerLockUnlockFeeInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: ITokenManagerLockUnlockFeeInterchainTransferArgs) =>
+}: ITokenManagerLockUnlockFeeInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -193,7 +193,7 @@ export const encodeITokenManagerLockUnlockFeeIsOperatorArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeIsOperatorData = ({
   addr,
-}: ITokenManagerLockUnlockFeeIsOperatorArgs) =>
+}: ITokenManagerLockUnlockFeeIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -219,7 +219,7 @@ export const encodeITokenManagerLockUnlockFeeParamsArgs = ({
 export const encodeITokenManagerLockUnlockFeeParamsData = ({
   operator_,
   tokenAddress_,
-}: ITokenManagerLockUnlockFeeParamsArgs) =>
+}: ITokenManagerLockUnlockFeeParamsArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "params",
     abi: ABI_FILE.abi,
@@ -242,7 +242,7 @@ export const encodeITokenManagerLockUnlockFeeProposeOperatorshipArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeProposeOperatorshipData = ({
   operator_,
-}: ITokenManagerLockUnlockFeeProposeOperatorshipArgs) =>
+}: ITokenManagerLockUnlockFeeProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -265,7 +265,7 @@ export const encodeITokenManagerLockUnlockFeeRemoveFlowLimiterArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeRemoveFlowLimiterData = ({
   flowLimiter,
-}: ITokenManagerLockUnlockFeeRemoveFlowLimiterArgs) =>
+}: ITokenManagerLockUnlockFeeRemoveFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeFlowLimiter",
     abi: ABI_FILE.abi,
@@ -286,7 +286,7 @@ export const encodeITokenManagerLockUnlockFeeSetFlowLimitArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeSetFlowLimitData = ({
   flowLimit_,
-}: ITokenManagerLockUnlockFeeSetFlowLimitArgs) =>
+}: ITokenManagerLockUnlockFeeSetFlowLimitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setFlowLimit",
     abi: ABI_FILE.abi,
@@ -307,7 +307,7 @@ export const encodeITokenManagerLockUnlockFeeSetupArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeSetupData = ({
   data,
-}: ITokenManagerLockUnlockFeeSetupArgs) =>
+}: ITokenManagerLockUnlockFeeSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -333,7 +333,7 @@ export const encodeITokenManagerLockUnlockFeeTakeTokenArgs = ({
 export const encodeITokenManagerLockUnlockFeeTakeTokenData = ({
   sourceAddress,
   amount,
-}: ITokenManagerLockUnlockFeeTakeTokenArgs) =>
+}: ITokenManagerLockUnlockFeeTakeTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "takeToken",
     abi: ABI_FILE.abi,
@@ -356,7 +356,7 @@ export const encodeITokenManagerLockUnlockFeeTransferOperatorshipArgs = ({
  */
 export const encodeITokenManagerLockUnlockFeeTransferOperatorshipData = ({
   operator_,
-}: ITokenManagerLockUnlockFeeTransferOperatorshipArgs) =>
+}: ITokenManagerLockUnlockFeeTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,
@@ -392,7 +392,7 @@ export const encodeITokenManagerLockUnlockFeeTransmitInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: ITokenManagerLockUnlockFeeTransmitInterchainTransferArgs) =>
+}: ITokenManagerLockUnlockFeeTransmitInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transmitInterchainTransfer",
     abi: ABI_FILE.abi,

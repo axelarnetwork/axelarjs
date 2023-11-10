@@ -31,7 +31,7 @@ export const encodeIAddressTrackerIsTrustedAddressArgs = ({
 export const encodeIAddressTrackerIsTrustedAddressData = ({
   chain,
   address_,
-}: IAddressTrackerIsTrustedAddressArgs) =>
+}: IAddressTrackerIsTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isTrustedAddress",
     abi: ABI_FILE.abi,
@@ -52,7 +52,7 @@ export const encodeIAddressTrackerRemoveTrustedAddressArgs = ({
  */
 export const encodeIAddressTrackerRemoveTrustedAddressData = ({
   chain,
-}: IAddressTrackerRemoveTrustedAddressArgs) =>
+}: IAddressTrackerRemoveTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeTrustedAddress",
     abi: ABI_FILE.abi,
@@ -78,7 +78,7 @@ export const encodeIAddressTrackerSetTrustedAddressArgs = ({
 export const encodeIAddressTrackerSetTrustedAddressData = ({
   chain,
   address_,
-}: IAddressTrackerSetTrustedAddressArgs) =>
+}: IAddressTrackerSetTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setTrustedAddress",
     abi: ABI_FILE.abi,
@@ -99,7 +99,7 @@ export const encodeIAddressTrackerTrustedAddressArgs = ({
  */
 export const encodeIAddressTrackerTrustedAddressData = ({
   chain,
-}: IAddressTrackerTrustedAddressArgs) =>
+}: IAddressTrackerTrustedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "trustedAddress",
     abi: ABI_FILE.abi,
@@ -120,7 +120,7 @@ export const encodeIAddressTrackerTrustedAddressHashArgs = ({
  */
 export const encodeIAddressTrackerTrustedAddressHashData = ({
   chain,
-}: IAddressTrackerTrustedAddressHashArgs) =>
+}: IAddressTrackerTrustedAddressHashArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "trustedAddressHash",
     abi: ABI_FILE.abi,

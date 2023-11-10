@@ -31,7 +31,7 @@ export const encodeIERC20MintableBurnableBurnArgs = ({
 export const encodeIERC20MintableBurnableBurnData = ({
   from,
   amount,
-}: IERC20MintableBurnableBurnArgs) =>
+}: IERC20MintableBurnableBurnArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "burn",
     abi: ABI_FILE.abi,
@@ -57,7 +57,7 @@ export const encodeIERC20MintableBurnableMintArgs = ({
 export const encodeIERC20MintableBurnableMintData = ({
   to,
   amount,
-}: IERC20MintableBurnableMintArgs) =>
+}: IERC20MintableBurnableMintArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "mint",
     abi: ABI_FILE.abi,

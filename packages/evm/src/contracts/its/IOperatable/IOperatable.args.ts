@@ -26,7 +26,7 @@ export const encodeIOperatableAcceptOperatorshipArgs = ({
  */
 export const encodeIOperatableAcceptOperatorshipData = ({
   fromOperator,
-}: IOperatableAcceptOperatorshipArgs) =>
+}: IOperatableAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -49,7 +49,7 @@ export const encodeIOperatableHasRoleArgs = ({
 export const encodeIOperatableHasRoleData = ({
   account,
   role,
-}: IOperatableHasRoleArgs) =>
+}: IOperatableHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -70,7 +70,7 @@ export const encodeIOperatableIsOperatorArgs = ({
  */
 export const encodeIOperatableIsOperatorData = ({
   addr,
-}: IOperatableIsOperatorArgs) =>
+}: IOperatableIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -91,7 +91,7 @@ export const encodeIOperatableProposeOperatorshipArgs = ({
  */
 export const encodeIOperatableProposeOperatorshipData = ({
   operator_,
-}: IOperatableProposeOperatorshipArgs) =>
+}: IOperatableProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -112,7 +112,7 @@ export const encodeIOperatableTransferOperatorshipArgs = ({
  */
 export const encodeIOperatableTransferOperatorshipData = ({
   operator_,
-}: IOperatableTransferOperatorshipArgs) =>
+}: IOperatableTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,

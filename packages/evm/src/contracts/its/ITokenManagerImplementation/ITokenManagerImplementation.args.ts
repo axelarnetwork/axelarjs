@@ -31,7 +31,7 @@ export const encodeITokenManagerImplementationTokenManagerImplementationArgs =
 export const encodeITokenManagerImplementationTokenManagerImplementationData =
   ({
     tokenManagerType,
-  }: ITokenManagerImplementationTokenManagerImplementationArgs) =>
+  }: ITokenManagerImplementationTokenManagerImplementationArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "tokenManagerImplementation",
       abi: ABI_FILE.abi,

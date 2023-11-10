@@ -31,7 +31,7 @@ export const encodeIERC20NamedAllowanceArgs = ({
 export const encodeIERC20NamedAllowanceData = ({
   owner,
   spender,
-}: IERC20NamedAllowanceArgs) =>
+}: IERC20NamedAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "allowance",
     abi: ABI_FILE.abi,
@@ -54,7 +54,7 @@ export const encodeIERC20NamedApproveArgs = ({
 export const encodeIERC20NamedApproveData = ({
   spender,
   amount,
-}: IERC20NamedApproveArgs) =>
+}: IERC20NamedApproveArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "approve",
     abi: ABI_FILE.abi,
@@ -75,7 +75,7 @@ export const encodeIERC20NamedBalanceOfArgs = ({
  */
 export const encodeIERC20NamedBalanceOfData = ({
   account,
-}: IERC20NamedBalanceOfArgs) =>
+}: IERC20NamedBalanceOfArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "balanceOf",
     abi: ABI_FILE.abi,
@@ -101,7 +101,7 @@ export const encodeIERC20NamedTransferArgs = ({
 export const encodeIERC20NamedTransferData = ({
   recipient,
   amount,
-}: IERC20NamedTransferArgs) =>
+}: IERC20NamedTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transfer",
     abi: ABI_FILE.abi,
@@ -130,7 +130,7 @@ export const encodeIERC20NamedTransferFromData = ({
   sender,
   recipient,
   amount,
-}: IERC20NamedTransferFromArgs) =>
+}: IERC20NamedTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferFrom",
     abi: ABI_FILE.abi,

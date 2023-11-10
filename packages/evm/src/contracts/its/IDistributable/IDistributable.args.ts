@@ -28,7 +28,7 @@ export const encodeIDistributableAcceptDistributorshipArgs = ({
  */
 export const encodeIDistributableAcceptDistributorshipData = ({
   fromDistributor,
-}: IDistributableAcceptDistributorshipArgs) =>
+}: IDistributableAcceptDistributorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptDistributorship",
     abi: ABI_FILE.abi,
@@ -54,7 +54,7 @@ export const encodeIDistributableHasRoleArgs = ({
 export const encodeIDistributableHasRoleData = ({
   account,
   role,
-}: IDistributableHasRoleArgs) =>
+}: IDistributableHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -75,7 +75,7 @@ export const encodeIDistributableIsDistributorArgs = ({
  */
 export const encodeIDistributableIsDistributorData = ({
   addr,
-}: IDistributableIsDistributorArgs) =>
+}: IDistributableIsDistributorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isDistributor",
     abi: ABI_FILE.abi,
@@ -98,7 +98,7 @@ export const encodeIDistributableProposeDistributorshipArgs = ({
  */
 export const encodeIDistributableProposeDistributorshipData = ({
   distributor_,
-}: IDistributableProposeDistributorshipArgs) =>
+}: IDistributableProposeDistributorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeDistributorship",
     abi: ABI_FILE.abi,
@@ -121,7 +121,7 @@ export const encodeIDistributableTransferDistributorshipArgs = ({
  */
 export const encodeIDistributableTransferDistributorshipData = ({
   distributor_,
-}: IDistributableTransferDistributorshipArgs) =>
+}: IDistributableTransferDistributorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferDistributorship",
     abi: ABI_FILE.abi,

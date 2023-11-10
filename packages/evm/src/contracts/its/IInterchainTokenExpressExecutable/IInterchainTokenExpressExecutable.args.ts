@@ -46,7 +46,7 @@ export const encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenDa
     tokenId,
     token,
     amount,
-  }: IInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs) =>
+  }: IInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "executeWithInterchainToken",
       abi: ABI_FILE.abi,
@@ -88,7 +88,7 @@ export const encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchain
     tokenId,
     token,
     amount,
-  }: IInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs) =>
+  }: IInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "expressExecuteWithInterchainToken",
       abi: ABI_FILE.abi,

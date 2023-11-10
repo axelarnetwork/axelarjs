@@ -44,7 +44,7 @@ export const encodeIInterchainTokenExecutableExecuteWithInterchainTokenData = ({
   tokenId,
   token,
   amount,
-}: IInterchainTokenExecutableExecuteWithInterchainTokenArgs) =>
+}: IInterchainTokenExecutableExecuteWithInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "executeWithInterchainToken",
     abi: ABI_FILE.abi,

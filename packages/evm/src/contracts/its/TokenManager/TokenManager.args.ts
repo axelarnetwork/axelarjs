@@ -28,7 +28,7 @@ export const encodeTokenManagerAcceptOperatorshipArgs = ({
  */
 export const encodeTokenManagerAcceptOperatorshipData = ({
   fromOperator,
-}: TokenManagerAcceptOperatorshipArgs) =>
+}: TokenManagerAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -49,7 +49,7 @@ export const encodeTokenManagerAddFlowLimiterArgs = ({
  */
 export const encodeTokenManagerAddFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerAddFlowLimiterArgs) =>
+}: TokenManagerAddFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "addFlowLimiter",
     abi: ABI_FILE.abi,
@@ -82,7 +82,7 @@ export const encodeTokenManagerCallContractWithInterchainTokenData = ({
   destinationAddress,
   amount,
   data,
-}: TokenManagerCallContractWithInterchainTokenArgs) =>
+}: TokenManagerCallContractWithInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "callContractWithInterchainToken",
     abi: ABI_FILE.abi,
@@ -108,7 +108,7 @@ export const encodeTokenManagerGiveTokenArgs = ({
 export const encodeTokenManagerGiveTokenData = ({
   destinationAddress,
   amount,
-}: TokenManagerGiveTokenArgs) =>
+}: TokenManagerGiveTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "giveToken",
     abi: ABI_FILE.abi,
@@ -131,7 +131,7 @@ export const encodeTokenManagerHasRoleArgs = ({
 export const encodeTokenManagerHasRoleData = ({
   account,
   role,
-}: TokenManagerHasRoleArgs) =>
+}: TokenManagerHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -164,7 +164,7 @@ export const encodeTokenManagerInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerInterchainTransferArgs) =>
+}: TokenManagerInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -185,7 +185,7 @@ export const encodeTokenManagerIsOperatorArgs = ({
  */
 export const encodeTokenManagerIsOperatorData = ({
   addr,
-}: TokenManagerIsOperatorArgs) =>
+}: TokenManagerIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -206,7 +206,7 @@ export const encodeTokenManagerProposeOperatorshipArgs = ({
  */
 export const encodeTokenManagerProposeOperatorshipData = ({
   operator,
-}: TokenManagerProposeOperatorshipArgs) =>
+}: TokenManagerProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -227,7 +227,7 @@ export const encodeTokenManagerRemoveFlowLimiterArgs = ({
  */
 export const encodeTokenManagerRemoveFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerRemoveFlowLimiterArgs) =>
+}: TokenManagerRemoveFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeFlowLimiter",
     abi: ABI_FILE.abi,
@@ -248,7 +248,7 @@ export const encodeTokenManagerSetFlowLimitArgs = ({
  */
 export const encodeTokenManagerSetFlowLimitData = ({
   flowLimit_,
-}: TokenManagerSetFlowLimitArgs) =>
+}: TokenManagerSetFlowLimitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setFlowLimit",
     abi: ABI_FILE.abi,
@@ -269,7 +269,7 @@ export const encodeTokenManagerSetupArgs = ({
  */
 export const encodeTokenManagerSetupData = ({
   params,
-}: TokenManagerSetupArgs) =>
+}: TokenManagerSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -295,7 +295,7 @@ export const encodeTokenManagerTakeTokenArgs = ({
 export const encodeTokenManagerTakeTokenData = ({
   sourceAddress,
   amount,
-}: TokenManagerTakeTokenArgs) =>
+}: TokenManagerTakeTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "takeToken",
     abi: ABI_FILE.abi,
@@ -316,7 +316,7 @@ export const encodeTokenManagerTransferOperatorshipArgs = ({
  */
 export const encodeTokenManagerTransferOperatorshipData = ({
   operator,
-}: TokenManagerTransferOperatorshipArgs) =>
+}: TokenManagerTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,
@@ -352,7 +352,7 @@ export const encodeTokenManagerTransmitInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerTransmitInterchainTransferArgs) =>
+}: TokenManagerTransmitInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transmitInterchainTransfer",
     abi: ABI_FILE.abi,

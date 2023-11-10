@@ -38,7 +38,7 @@ export const encodeIInterchainTokenStandardInterchainTransferData = ({
   recipient,
   amount,
   metadata,
-}: IInterchainTokenStandardInterchainTransferArgs) =>
+}: IInterchainTokenStandardInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -74,7 +74,7 @@ export const encodeIInterchainTokenStandardInterchainTransferFromData = ({
   recipient,
   amount,
   metadata,
-}: IInterchainTokenStandardInterchainTransferFromArgs) =>
+}: IInterchainTokenStandardInterchainTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransferFrom",
     abi: ABI_FILE.abi,

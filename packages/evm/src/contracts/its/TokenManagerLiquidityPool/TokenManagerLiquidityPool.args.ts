@@ -28,7 +28,7 @@ export const encodeTokenManagerLiquidityPoolAcceptOperatorshipArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolAcceptOperatorshipData = ({
   fromOperator,
-}: TokenManagerLiquidityPoolAcceptOperatorshipArgs) =>
+}: TokenManagerLiquidityPoolAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -51,7 +51,7 @@ export const encodeTokenManagerLiquidityPoolAddFlowLimiterArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolAddFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerLiquidityPoolAddFlowLimiterArgs) =>
+}: TokenManagerLiquidityPoolAddFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "addFlowLimiter",
     abi: ABI_FILE.abi,
@@ -86,7 +86,7 @@ export const encodeTokenManagerLiquidityPoolCallContractWithInterchainTokenData 
     destinationAddress,
     amount,
     data,
-  }: TokenManagerLiquidityPoolCallContractWithInterchainTokenArgs) =>
+  }: TokenManagerLiquidityPoolCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
@@ -113,7 +113,7 @@ export const encodeTokenManagerLiquidityPoolGiveTokenArgs = ({
 export const encodeTokenManagerLiquidityPoolGiveTokenData = ({
   destinationAddress,
   amount,
-}: TokenManagerLiquidityPoolGiveTokenArgs) =>
+}: TokenManagerLiquidityPoolGiveTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "giveToken",
     abi: ABI_FILE.abi,
@@ -139,7 +139,7 @@ export const encodeTokenManagerLiquidityPoolHasRoleArgs = ({
 export const encodeTokenManagerLiquidityPoolHasRoleData = ({
   account,
   role,
-}: TokenManagerLiquidityPoolHasRoleArgs) =>
+}: TokenManagerLiquidityPoolHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -172,7 +172,7 @@ export const encodeTokenManagerLiquidityPoolInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerLiquidityPoolInterchainTransferArgs) =>
+}: TokenManagerLiquidityPoolInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -193,7 +193,7 @@ export const encodeTokenManagerLiquidityPoolIsOperatorArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolIsOperatorData = ({
   addr,
-}: TokenManagerLiquidityPoolIsOperatorArgs) =>
+}: TokenManagerLiquidityPoolIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -223,7 +223,7 @@ export const encodeTokenManagerLiquidityPoolParamsData = ({
   operator_,
   tokenAddress_,
   liquidityPoolAddress,
-}: TokenManagerLiquidityPoolParamsArgs) =>
+}: TokenManagerLiquidityPoolParamsArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "params",
     abi: ABI_FILE.abi,
@@ -246,7 +246,7 @@ export const encodeTokenManagerLiquidityPoolProposeOperatorshipArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolProposeOperatorshipData = ({
   operator,
-}: TokenManagerLiquidityPoolProposeOperatorshipArgs) =>
+}: TokenManagerLiquidityPoolProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -269,7 +269,7 @@ export const encodeTokenManagerLiquidityPoolRemoveFlowLimiterArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolRemoveFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerLiquidityPoolRemoveFlowLimiterArgs) =>
+}: TokenManagerLiquidityPoolRemoveFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeFlowLimiter",
     abi: ABI_FILE.abi,
@@ -290,7 +290,7 @@ export const encodeTokenManagerLiquidityPoolSetFlowLimitArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolSetFlowLimitData = ({
   flowLimit_,
-}: TokenManagerLiquidityPoolSetFlowLimitArgs) =>
+}: TokenManagerLiquidityPoolSetFlowLimitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setFlowLimit",
     abi: ABI_FILE.abi,
@@ -314,7 +314,7 @@ export const encodeTokenManagerLiquidityPoolSetLiquidityPoolArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolSetLiquidityPoolData = ({
   newLiquidityPool,
-}: TokenManagerLiquidityPoolSetLiquidityPoolArgs) =>
+}: TokenManagerLiquidityPoolSetLiquidityPoolArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setLiquidityPool",
     abi: ABI_FILE.abi,
@@ -335,7 +335,7 @@ export const encodeTokenManagerLiquidityPoolSetupArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolSetupData = ({
   params,
-}: TokenManagerLiquidityPoolSetupArgs) =>
+}: TokenManagerLiquidityPoolSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -361,7 +361,7 @@ export const encodeTokenManagerLiquidityPoolTakeTokenArgs = ({
 export const encodeTokenManagerLiquidityPoolTakeTokenData = ({
   sourceAddress,
   amount,
-}: TokenManagerLiquidityPoolTakeTokenArgs) =>
+}: TokenManagerLiquidityPoolTakeTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "takeToken",
     abi: ABI_FILE.abi,
@@ -384,7 +384,7 @@ export const encodeTokenManagerLiquidityPoolTransferOperatorshipArgs = ({
  */
 export const encodeTokenManagerLiquidityPoolTransferOperatorshipData = ({
   operator,
-}: TokenManagerLiquidityPoolTransferOperatorshipArgs) =>
+}: TokenManagerLiquidityPoolTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,
@@ -420,7 +420,7 @@ export const encodeTokenManagerLiquidityPoolTransmitInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerLiquidityPoolTransmitInterchainTransferArgs) =>
+}: TokenManagerLiquidityPoolTransmitInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transmitInterchainTransfer",
     abi: ABI_FILE.abi,

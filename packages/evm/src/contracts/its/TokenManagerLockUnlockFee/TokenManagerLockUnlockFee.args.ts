@@ -28,7 +28,7 @@ export const encodeTokenManagerLockUnlockFeeAcceptOperatorshipArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeAcceptOperatorshipData = ({
   fromOperator,
-}: TokenManagerLockUnlockFeeAcceptOperatorshipArgs) =>
+}: TokenManagerLockUnlockFeeAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -51,7 +51,7 @@ export const encodeTokenManagerLockUnlockFeeAddFlowLimiterArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeAddFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerLockUnlockFeeAddFlowLimiterArgs) =>
+}: TokenManagerLockUnlockFeeAddFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "addFlowLimiter",
     abi: ABI_FILE.abi,
@@ -86,7 +86,7 @@ export const encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenData 
     destinationAddress,
     amount,
     data,
-  }: TokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs) =>
+  }: TokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
@@ -113,7 +113,7 @@ export const encodeTokenManagerLockUnlockFeeGiveTokenArgs = ({
 export const encodeTokenManagerLockUnlockFeeGiveTokenData = ({
   destinationAddress,
   amount,
-}: TokenManagerLockUnlockFeeGiveTokenArgs) =>
+}: TokenManagerLockUnlockFeeGiveTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "giveToken",
     abi: ABI_FILE.abi,
@@ -139,7 +139,7 @@ export const encodeTokenManagerLockUnlockFeeHasRoleArgs = ({
 export const encodeTokenManagerLockUnlockFeeHasRoleData = ({
   account,
   role,
-}: TokenManagerLockUnlockFeeHasRoleArgs) =>
+}: TokenManagerLockUnlockFeeHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -172,7 +172,7 @@ export const encodeTokenManagerLockUnlockFeeInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerLockUnlockFeeInterchainTransferArgs) =>
+}: TokenManagerLockUnlockFeeInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -193,7 +193,7 @@ export const encodeTokenManagerLockUnlockFeeIsOperatorArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeIsOperatorData = ({
   addr,
-}: TokenManagerLockUnlockFeeIsOperatorArgs) =>
+}: TokenManagerLockUnlockFeeIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -219,7 +219,7 @@ export const encodeTokenManagerLockUnlockFeeParamsArgs = ({
 export const encodeTokenManagerLockUnlockFeeParamsData = ({
   operator_,
   tokenAddress_,
-}: TokenManagerLockUnlockFeeParamsArgs) =>
+}: TokenManagerLockUnlockFeeParamsArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "params",
     abi: ABI_FILE.abi,
@@ -242,7 +242,7 @@ export const encodeTokenManagerLockUnlockFeeProposeOperatorshipArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeProposeOperatorshipData = ({
   operator,
-}: TokenManagerLockUnlockFeeProposeOperatorshipArgs) =>
+}: TokenManagerLockUnlockFeeProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -265,7 +265,7 @@ export const encodeTokenManagerLockUnlockFeeRemoveFlowLimiterArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeRemoveFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerLockUnlockFeeRemoveFlowLimiterArgs) =>
+}: TokenManagerLockUnlockFeeRemoveFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeFlowLimiter",
     abi: ABI_FILE.abi,
@@ -286,7 +286,7 @@ export const encodeTokenManagerLockUnlockFeeSetFlowLimitArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeSetFlowLimitData = ({
   flowLimit_,
-}: TokenManagerLockUnlockFeeSetFlowLimitArgs) =>
+}: TokenManagerLockUnlockFeeSetFlowLimitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setFlowLimit",
     abi: ABI_FILE.abi,
@@ -307,7 +307,7 @@ export const encodeTokenManagerLockUnlockFeeSetupArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeSetupData = ({
   params,
-}: TokenManagerLockUnlockFeeSetupArgs) =>
+}: TokenManagerLockUnlockFeeSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -333,7 +333,7 @@ export const encodeTokenManagerLockUnlockFeeTakeTokenArgs = ({
 export const encodeTokenManagerLockUnlockFeeTakeTokenData = ({
   sourceAddress,
   amount,
-}: TokenManagerLockUnlockFeeTakeTokenArgs) =>
+}: TokenManagerLockUnlockFeeTakeTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "takeToken",
     abi: ABI_FILE.abi,
@@ -356,7 +356,7 @@ export const encodeTokenManagerLockUnlockFeeTransferOperatorshipArgs = ({
  */
 export const encodeTokenManagerLockUnlockFeeTransferOperatorshipData = ({
   operator,
-}: TokenManagerLockUnlockFeeTransferOperatorshipArgs) =>
+}: TokenManagerLockUnlockFeeTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,
@@ -392,7 +392,7 @@ export const encodeTokenManagerLockUnlockFeeTransmitInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerLockUnlockFeeTransmitInterchainTransferArgs) =>
+}: TokenManagerLockUnlockFeeTransmitInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transmitInterchainTransfer",
     abi: ABI_FILE.abi,

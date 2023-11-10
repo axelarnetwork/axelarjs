@@ -28,7 +28,7 @@ export const encodeTokenManagerMintBurnFromAcceptOperatorshipArgs = ({
  */
 export const encodeTokenManagerMintBurnFromAcceptOperatorshipData = ({
   fromOperator,
-}: TokenManagerMintBurnFromAcceptOperatorshipArgs) =>
+}: TokenManagerMintBurnFromAcceptOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptOperatorship",
     abi: ABI_FILE.abi,
@@ -51,7 +51,7 @@ export const encodeTokenManagerMintBurnFromAddFlowLimiterArgs = ({
  */
 export const encodeTokenManagerMintBurnFromAddFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerMintBurnFromAddFlowLimiterArgs) =>
+}: TokenManagerMintBurnFromAddFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "addFlowLimiter",
     abi: ABI_FILE.abi,
@@ -86,7 +86,7 @@ export const encodeTokenManagerMintBurnFromCallContractWithInterchainTokenData =
     destinationAddress,
     amount,
     data,
-  }: TokenManagerMintBurnFromCallContractWithInterchainTokenArgs) =>
+  }: TokenManagerMintBurnFromCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
@@ -113,7 +113,7 @@ export const encodeTokenManagerMintBurnFromGiveTokenArgs = ({
 export const encodeTokenManagerMintBurnFromGiveTokenData = ({
   destinationAddress,
   amount,
-}: TokenManagerMintBurnFromGiveTokenArgs) =>
+}: TokenManagerMintBurnFromGiveTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "giveToken",
     abi: ABI_FILE.abi,
@@ -139,7 +139,7 @@ export const encodeTokenManagerMintBurnFromHasRoleArgs = ({
 export const encodeTokenManagerMintBurnFromHasRoleData = ({
   account,
   role,
-}: TokenManagerMintBurnFromHasRoleArgs) =>
+}: TokenManagerMintBurnFromHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -172,7 +172,7 @@ export const encodeTokenManagerMintBurnFromInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerMintBurnFromInterchainTransferArgs) =>
+}: TokenManagerMintBurnFromInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -193,7 +193,7 @@ export const encodeTokenManagerMintBurnFromIsOperatorArgs = ({
  */
 export const encodeTokenManagerMintBurnFromIsOperatorData = ({
   addr,
-}: TokenManagerMintBurnFromIsOperatorArgs) =>
+}: TokenManagerMintBurnFromIsOperatorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
@@ -219,7 +219,7 @@ export const encodeTokenManagerMintBurnFromParamsArgs = ({
 export const encodeTokenManagerMintBurnFromParamsData = ({
   operator_,
   tokenAddress_,
-}: TokenManagerMintBurnFromParamsArgs) =>
+}: TokenManagerMintBurnFromParamsArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "params",
     abi: ABI_FILE.abi,
@@ -242,7 +242,7 @@ export const encodeTokenManagerMintBurnFromProposeOperatorshipArgs = ({
  */
 export const encodeTokenManagerMintBurnFromProposeOperatorshipData = ({
   operator,
-}: TokenManagerMintBurnFromProposeOperatorshipArgs) =>
+}: TokenManagerMintBurnFromProposeOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeOperatorship",
     abi: ABI_FILE.abi,
@@ -265,7 +265,7 @@ export const encodeTokenManagerMintBurnFromRemoveFlowLimiterArgs = ({
  */
 export const encodeTokenManagerMintBurnFromRemoveFlowLimiterData = ({
   flowLimiter,
-}: TokenManagerMintBurnFromRemoveFlowLimiterArgs) =>
+}: TokenManagerMintBurnFromRemoveFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "removeFlowLimiter",
     abi: ABI_FILE.abi,
@@ -286,7 +286,7 @@ export const encodeTokenManagerMintBurnFromSetFlowLimitArgs = ({
  */
 export const encodeTokenManagerMintBurnFromSetFlowLimitData = ({
   flowLimit_,
-}: TokenManagerMintBurnFromSetFlowLimitArgs) =>
+}: TokenManagerMintBurnFromSetFlowLimitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setFlowLimit",
     abi: ABI_FILE.abi,
@@ -307,7 +307,7 @@ export const encodeTokenManagerMintBurnFromSetupArgs = ({
  */
 export const encodeTokenManagerMintBurnFromSetupData = ({
   params,
-}: TokenManagerMintBurnFromSetupArgs) =>
+}: TokenManagerMintBurnFromSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -333,7 +333,7 @@ export const encodeTokenManagerMintBurnFromTakeTokenArgs = ({
 export const encodeTokenManagerMintBurnFromTakeTokenData = ({
   sourceAddress,
   amount,
-}: TokenManagerMintBurnFromTakeTokenArgs) =>
+}: TokenManagerMintBurnFromTakeTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "takeToken",
     abi: ABI_FILE.abi,
@@ -356,7 +356,7 @@ export const encodeTokenManagerMintBurnFromTransferOperatorshipArgs = ({
  */
 export const encodeTokenManagerMintBurnFromTransferOperatorshipData = ({
   operator,
-}: TokenManagerMintBurnFromTransferOperatorshipArgs) =>
+}: TokenManagerMintBurnFromTransferOperatorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferOperatorship",
     abi: ABI_FILE.abi,
@@ -392,7 +392,7 @@ export const encodeTokenManagerMintBurnFromTransmitInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
-}: TokenManagerMintBurnFromTransmitInterchainTransferArgs) =>
+}: TokenManagerMintBurnFromTransmitInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transmitInterchainTransfer",
     abi: ABI_FILE.abi,

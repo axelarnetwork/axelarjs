@@ -28,7 +28,7 @@ export const encodeInterchainTokenAcceptDistributorshipArgs = ({
  */
 export const encodeInterchainTokenAcceptDistributorshipData = ({
   fromDistributor,
-}: InterchainTokenAcceptDistributorshipArgs) =>
+}: InterchainTokenAcceptDistributorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "acceptDistributorship",
     abi: ABI_FILE.abi,
@@ -54,7 +54,7 @@ export const encodeInterchainTokenApproveArgs = ({
 export const encodeInterchainTokenApproveData = ({
   spender,
   amount,
-}: InterchainTokenApproveArgs) =>
+}: InterchainTokenApproveArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "approve",
     abi: ABI_FILE.abi,
@@ -80,7 +80,7 @@ export const encodeInterchainTokenBurnArgs = ({
 export const encodeInterchainTokenBurnData = ({
   account,
   amount,
-}: InterchainTokenBurnArgs) =>
+}: InterchainTokenBurnArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "burn",
     abi: ABI_FILE.abi,
@@ -106,7 +106,7 @@ export const encodeInterchainTokenDecreaseAllowanceArgs = ({
 export const encodeInterchainTokenDecreaseAllowanceData = ({
   spender,
   subtractedValue,
-}: InterchainTokenDecreaseAllowanceArgs) =>
+}: InterchainTokenDecreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "decreaseAllowance",
     abi: ABI_FILE.abi,
@@ -132,7 +132,7 @@ export const encodeInterchainTokenHasRoleArgs = ({
 export const encodeInterchainTokenHasRoleData = ({
   account,
   role,
-}: InterchainTokenHasRoleArgs) =>
+}: InterchainTokenHasRoleArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "hasRole",
     abi: ABI_FILE.abi,
@@ -158,7 +158,7 @@ export const encodeInterchainTokenIncreaseAllowanceArgs = ({
 export const encodeInterchainTokenIncreaseAllowanceData = ({
   spender,
   addedValue,
-}: InterchainTokenIncreaseAllowanceArgs) =>
+}: InterchainTokenIncreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "increaseAllowance",
     abi: ABI_FILE.abi,
@@ -191,7 +191,7 @@ export const encodeInterchainTokenInterchainTransferData = ({
   recipient,
   amount,
   metadata,
-}: InterchainTokenInterchainTransferArgs) =>
+}: InterchainTokenInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
@@ -227,7 +227,7 @@ export const encodeInterchainTokenInterchainTransferFromData = ({
   recipient,
   amount,
   metadata,
-}: InterchainTokenInterchainTransferFromArgs) =>
+}: InterchainTokenInterchainTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransferFrom",
     abi: ABI_FILE.abi,
@@ -248,7 +248,7 @@ export const encodeInterchainTokenIsDistributorArgs = ({
  */
 export const encodeInterchainTokenIsDistributorData = ({
   addr,
-}: InterchainTokenIsDistributorArgs) =>
+}: InterchainTokenIsDistributorArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "isDistributor",
     abi: ABI_FILE.abi,
@@ -274,7 +274,7 @@ export const encodeInterchainTokenMintArgs = ({
 export const encodeInterchainTokenMintData = ({
   account,
   amount,
-}: InterchainTokenMintArgs) =>
+}: InterchainTokenMintArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "mint",
     abi: ABI_FILE.abi,
@@ -316,7 +316,7 @@ export const encodeInterchainTokenPermitData = ({
   v,
   r,
   s,
-}: InterchainTokenPermitArgs) =>
+}: InterchainTokenPermitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "permit",
     abi: ABI_FILE.abi,
@@ -339,7 +339,7 @@ export const encodeInterchainTokenProposeDistributorshipArgs = ({
  */
 export const encodeInterchainTokenProposeDistributorshipData = ({
   distributor_,
-}: InterchainTokenProposeDistributorshipArgs) =>
+}: InterchainTokenProposeDistributorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "proposeDistributorship",
     abi: ABI_FILE.abi,
@@ -360,7 +360,7 @@ export const encodeInterchainTokenSetupArgs = ({
  */
 export const encodeInterchainTokenSetupData = ({
   params,
-}: InterchainTokenSetupArgs) =>
+}: InterchainTokenSetupArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "setup",
     abi: ABI_FILE.abi,
@@ -386,7 +386,7 @@ export const encodeInterchainTokenTransferArgs = ({
 export const encodeInterchainTokenTransferData = ({
   recipient,
   amount,
-}: InterchainTokenTransferArgs) =>
+}: InterchainTokenTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transfer",
     abi: ABI_FILE.abi,
@@ -409,7 +409,7 @@ export const encodeInterchainTokenTransferDistributorshipArgs = ({
  */
 export const encodeInterchainTokenTransferDistributorshipData = ({
   distributor_,
-}: InterchainTokenTransferDistributorshipArgs) =>
+}: InterchainTokenTransferDistributorshipArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferDistributorship",
     abi: ABI_FILE.abi,
@@ -438,7 +438,7 @@ export const encodeInterchainTokenTransferFromData = ({
   sender,
   recipient,
   amount,
-}: InterchainTokenTransferFromArgs) =>
+}: InterchainTokenTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferFrom",
     abi: ABI_FILE.abi,

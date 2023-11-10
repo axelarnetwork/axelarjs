@@ -44,7 +44,7 @@ export const encodeIInterchainTokenDeployerDeployInterchainTokenData = ({
   name,
   symbol,
   decimals,
-}: IInterchainTokenDeployerDeployInterchainTokenArgs) =>
+}: IInterchainTokenDeployerDeployInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployInterchainToken",
     abi: ABI_FILE.abi,
@@ -67,7 +67,7 @@ export const encodeIInterchainTokenDeployerDeployedAddressArgs = ({
  */
 export const encodeIInterchainTokenDeployerDeployedAddressData = ({
   salt,
-}: IInterchainTokenDeployerDeployedAddressArgs) =>
+}: IInterchainTokenDeployerDeployedAddressArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployedAddress",
     abi: ABI_FILE.abi,

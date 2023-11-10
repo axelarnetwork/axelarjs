@@ -23,7 +23,10 @@ export const encodeERC20ApproveArgs = ({ spender, amount }: ERC20ApproveArgs) =>
 /**
  * Encoder function for ERC20.approve function data
  */
-export const encodeERC20ApproveData = ({ spender, amount }: ERC20ApproveArgs) =>
+export const encodeERC20ApproveData = ({
+  spender,
+  amount,
+}: ERC20ApproveArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "approve",
     abi: ABI_FILE.abi,
@@ -49,7 +52,7 @@ export const encodeERC20DecreaseAllowanceArgs = ({
 export const encodeERC20DecreaseAllowanceData = ({
   spender,
   subtractedValue,
-}: ERC20DecreaseAllowanceArgs) =>
+}: ERC20DecreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "decreaseAllowance",
     abi: ABI_FILE.abi,
@@ -75,7 +78,7 @@ export const encodeERC20IncreaseAllowanceArgs = ({
 export const encodeERC20IncreaseAllowanceData = ({
   spender,
   addedValue,
-}: ERC20IncreaseAllowanceArgs) =>
+}: ERC20IncreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "increaseAllowance",
     abi: ABI_FILE.abi,
@@ -98,7 +101,7 @@ export const encodeERC20TransferArgs = ({
 export const encodeERC20TransferData = ({
   recipient,
   amount,
-}: ERC20TransferArgs) =>
+}: ERC20TransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transfer",
     abi: ABI_FILE.abi,
@@ -127,7 +130,7 @@ export const encodeERC20TransferFromData = ({
   sender,
   recipient,
   amount,
-}: ERC20TransferFromArgs) =>
+}: ERC20TransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferFrom",
     abi: ABI_FILE.abi,

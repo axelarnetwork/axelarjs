@@ -28,7 +28,7 @@ export const encodeERC20PermitApproveArgs = ({
 export const encodeERC20PermitApproveData = ({
   spender,
   amount,
-}: ERC20PermitApproveArgs) =>
+}: ERC20PermitApproveArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "approve",
     abi: ABI_FILE.abi,
@@ -54,7 +54,7 @@ export const encodeERC20PermitDecreaseAllowanceArgs = ({
 export const encodeERC20PermitDecreaseAllowanceData = ({
   spender,
   subtractedValue,
-}: ERC20PermitDecreaseAllowanceArgs) =>
+}: ERC20PermitDecreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "decreaseAllowance",
     abi: ABI_FILE.abi,
@@ -80,7 +80,7 @@ export const encodeERC20PermitIncreaseAllowanceArgs = ({
 export const encodeERC20PermitIncreaseAllowanceData = ({
   spender,
   addedValue,
-}: ERC20PermitIncreaseAllowanceArgs) =>
+}: ERC20PermitIncreaseAllowanceArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "increaseAllowance",
     abi: ABI_FILE.abi,
@@ -122,7 +122,7 @@ export const encodeERC20PermitPermitData = ({
   v,
   r,
   s,
-}: ERC20PermitPermitArgs) =>
+}: ERC20PermitPermitArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "permit",
     abi: ABI_FILE.abi,
@@ -148,7 +148,7 @@ export const encodeERC20PermitTransferArgs = ({
 export const encodeERC20PermitTransferData = ({
   recipient,
   amount,
-}: ERC20PermitTransferArgs) =>
+}: ERC20PermitTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transfer",
     abi: ABI_FILE.abi,
@@ -177,7 +177,7 @@ export const encodeERC20PermitTransferFromData = ({
   sender,
   recipient,
   amount,
-}: ERC20PermitTransferFromArgs) =>
+}: ERC20PermitTransferFromArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "transferFrom",
     abi: ABI_FILE.abi,
