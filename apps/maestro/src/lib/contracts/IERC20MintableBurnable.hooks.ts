@@ -7,7 +7,7 @@ import {
   usePrepareContractWrite,
   UsePrepareContractWriteConfig,
 } from "wagmi";
-import { PrepareWriteContractResult, WriteContractMode } from "wagmi/actions";
+import { WriteContractMode, PrepareWriteContractResult } from "wagmi/actions";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC20MintableBurnable

@@ -2,19 +2,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
-  useContractEvent,
-  UseContractEventConfig,
   useContractRead,
   UseContractReadConfig,
   useContractWrite,
   UseContractWriteConfig,
   usePrepareContractWrite,
   UsePrepareContractWriteConfig,
+  useContractEvent,
+  UseContractEventConfig,
 } from "wagmi";
 import {
-  PrepareWriteContractResult,
   ReadContractResult,
   WriteContractMode,
+  PrepareWriteContractResult,
 } from "wagmi/actions";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
