@@ -8,7 +8,16 @@ import { $, argv, chalk, fs, glob, path, spinner } from "zx";
 $.verbose = false;
 
 const pascalToKebabCase = convertCase("PascalCase", "kebab-case");
-const kebabToConstantName = convertCase("kebab-case", "CONSTANT_CASE");
+const pascalToConstName = (contract = "") =>
+  contract
+    .replace(/([A-Z])/g, "_$1")
+    .replace(/-/g, "_")
+    .replace(/^_/, "")
+    .toUpperCase()
+    // handle ERC*, IERC* and Interface* names
+    .replace(/^E_R_C/, "ERC")
+    .replace(/^I_E_R_C/, "IERC")
+    .replace(/^I_/, "I");
 
 type ABIInputItem = {
   name: string;
@@ -128,7 +137,7 @@ async function codegenContract({
   const fileName = filecase === "kebab" ? kebabtName : pascalName;
   const folderName = foldercase === "kebab" ? kebabtName : pascalName;
 
-  const constantName = kebabToConstantName(kebabtName);
+  const constantName = pascalToConstName(pascalName);
 
   const argsFile = `
     import { encodeFunctionData } from "viem";
