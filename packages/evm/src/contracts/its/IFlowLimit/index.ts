@@ -13,8 +13,6 @@ import { Chain } from "viem";
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IFlowLimit.abi";
 
-export * from "./IFlowLimit.args";
-
 export const IFLOW_LIMIT_ABI = ABI_FILE.abi;
 
 export class IFlowLimitClient extends PublicContractClient<

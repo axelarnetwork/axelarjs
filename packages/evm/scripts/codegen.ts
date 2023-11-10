@@ -139,52 +139,6 @@ async function codegenContract({
 
   const constantName = pascalToConstName(pascalName);
 
-  const argsFile = `
-    import { encodeFunctionData } from "viem";
-    
-    import ABI_FILE from "./${fileName}.abi";
-    
-    ${abiFns
-      .map(({ name, inputs }) => {
-        const argNames = inputs.map(({ name = "" }) => name).join(", ");
-
-        const argsType = inputs
-          .map((input) => `${input.name}: ${getInputType(input)}`)
-          .join("; ");
-
-        const fnName = capitalize(name);
-        const typeName = `${pascalName}${fnName}Args`;
-
-        return `
-          export type ${typeName} = {${argsType}}
-          
-          /**
-           * Factory function for ${pascalName}.${name} function args
-           */
-          export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
-          
-          /**
-           * Encoder function for ${pascalName}.${name} function data
-           */
-          export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}) => encodeFunctionData({
-              functionName: "${name}",
-              abi: ABI_FILE.abi,
-              args:[${argNames}]
-            });
-          `;
-      })
-      .join("\n\n")}
-      
-      export const ${constantName}_ENCODERS = {
-        ${abiFns
-          .map(
-            ({ name }) =>
-              `"${name}": encode${pascalName}${capitalize(name)}Args`
-          )
-          .join(",\n")}
-      }
-      `;
-
   const abiFile = `
     export default ${abiJsonFile} as const;
     `;
@@ -209,39 +163,86 @@ async function codegenContract({
       content: abiFile,
       parser: "babel-ts",
     },
-    {
+  ];
+
+  if (abiFns.length) {
+    const argsFile = `
+      import { encodeFunctionData } from "viem";
+      
+      import ABI_FILE from "./${fileName}.abi";
+      
+      ${abiFns
+        .map(({ name, inputs }) => {
+          const argNames = inputs.map(({ name = "" }) => name).join(", ");
+
+          const argsType = inputs
+            .map((input) => `${input.name}: ${getInputType(input)}`)
+            .join("; ");
+
+          const fnName = capitalize(name);
+          const typeName = `${pascalName}${fnName}Args`;
+
+          return `
+            export type ${typeName} = {${argsType}}
+            
+            /**
+             * Factory function for ${pascalName}.${name} function args
+             */
+            export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
+            
+            /**
+             * Encoder function for ${pascalName}.${name} function data
+             */
+            export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}) => encodeFunctionData({
+                functionName: "${name}",
+                abi: ABI_FILE.abi,
+                args:[${argNames}]
+              });
+            `;
+        })
+        .join("\n\n")}
+        
+        export const ${constantName}_ENCODERS = {
+          ${abiFns
+            .map(
+              ({ name }) =>
+                `"${name}": encode${pascalName}${capitalize(name)}Args`
+            )
+            .join(",\n")}
+        }`;
+
+    files.push({
       name: `${fileName}.args.ts`,
       content: argsFile,
       parser: "babel-ts",
-      excluded: !abiFns.length,
-    },
-  ].filter(({ excluded }) => !excluded);
+    });
+  }
 
   if (index) {
     const indexFile = `
-    import { Chain } from "viem";
+      import { Chain } from "viem";
 
-    import { PublicContractClient } from "${client}";
-    import ABI_FILE from "./${fileName}.abi";
-    
-    export * from "./${fileName}.args";
-    
-    export const ${constantName}_ABI = ABI_FILE.abi;
-    
-    export class ${pascalName}Client extends PublicContractClient<
-      typeof ABI_FILE.abi
-    > {
-      static ABI = ABI_FILE.abi;
-      static contractName = ABI_FILE.contractName;
-    
-      constructor(options: { chain: Chain; address: \`0x\${string}\` }) {
-        super({
-          abi: ${constantName}_ABI,
-          address: options.address,
-          chain: options.chain,
-        });
-      }
-    }`;
+      import { PublicContractClient } from "${client}";
+      import ABI_FILE from "./${fileName}.abi";
+      
+      ${abiFns.length ? `export * from "./${fileName}.args";` : ""}
+      
+      export const ${constantName}_ABI = ABI_FILE.abi;
+      
+      export class ${pascalName}Client extends PublicContractClient<
+        typeof ABI_FILE.abi
+      > {
+        static ABI = ABI_FILE.abi;
+        static contractName = ABI_FILE.contractName;
+      
+        constructor(options: { chain: Chain; address: \`0x\${string}\` }) {
+          super({
+            abi: ${constantName}_ABI,
+            address: options.address,
+            chain: options.chain,
+          });
+        }
+      }`;
 
     files.push({
       name: `index.ts`,

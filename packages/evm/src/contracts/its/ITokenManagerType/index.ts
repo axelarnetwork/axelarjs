@@ -13,8 +13,6 @@ import { Chain } from "viem";
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerType.abi";
 
-export * from "./ITokenManagerType.args";
-
 export const ITOKEN_MANAGER_TYPE_ABI = ABI_FILE.abi;
 
 export class ITokenManagerTypeClient extends PublicContractClient<
