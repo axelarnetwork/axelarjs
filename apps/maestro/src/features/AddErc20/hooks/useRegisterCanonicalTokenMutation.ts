@@ -1,13 +1,13 @@
-import { encodeInterchainTokenServiceRegisterCanonicalTokenData } from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
 import { useChainId, useWaitForTransaction } from "wagmi";
 
 import {
-  useInterchainTokenServiceMulticall,
-  usePrepareInterchainTokenServiceMulticall,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+  useInterchainTokenFactoryMulticall,
+  usePrepareInterchainTokenFactoryMulticall,
+} from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { trpc } from "~/lib/trpc";
 import type { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -38,22 +38,22 @@ export function useRegisterCanonicalTokenMutation(
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
-    useState<RecordInterchainTokenDeploymentInput | null>(null);
+    useState<RecordInterchainTokenDeploymentInput>();
 
   const multicallArgs = useMemo(
     () => [
-      encodeInterchainTokenServiceRegisterCanonicalTokenData({
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
         tokenAddress: input.tokenAddress,
       }),
     ],
     [input.tokenAddress]
   );
 
-  const prepared = usePrepareInterchainTokenServiceMulticall({
+  const prepared = usePrepareInterchainTokenFactoryMulticall({
     args: [multicallArgs],
   });
 
-  const multicall = useInterchainTokenServiceMulticall(prepared.config);
+  const multicall = useInterchainTokenFactoryMulticall(prepared.config);
 
   useWaitForTransaction({
     hash: multicall.data?.hash,
