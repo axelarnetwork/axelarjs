@@ -397,21 +397,64 @@ export const encodeTokenManagerMintBurnTransmitInterchainTransferData = ({
   });
 
 export const TOKEN_MANAGER_MINT_BURN_ENCODERS = {
-  acceptOperatorship: encodeTokenManagerMintBurnAcceptOperatorshipArgs,
-  addFlowLimiter: encodeTokenManagerMintBurnAddFlowLimiterArgs,
-  callContractWithInterchainToken:
-    encodeTokenManagerMintBurnCallContractWithInterchainTokenArgs,
-  giveToken: encodeTokenManagerMintBurnGiveTokenArgs,
-  hasRole: encodeTokenManagerMintBurnHasRoleArgs,
-  interchainTransfer: encodeTokenManagerMintBurnInterchainTransferArgs,
-  isOperator: encodeTokenManagerMintBurnIsOperatorArgs,
-  params: encodeTokenManagerMintBurnParamsArgs,
-  proposeOperatorship: encodeTokenManagerMintBurnProposeOperatorshipArgs,
-  removeFlowLimiter: encodeTokenManagerMintBurnRemoveFlowLimiterArgs,
-  setFlowLimit: encodeTokenManagerMintBurnSetFlowLimitArgs,
-  setup: encodeTokenManagerMintBurnSetupArgs,
-  takeToken: encodeTokenManagerMintBurnTakeTokenArgs,
-  transferOperatorship: encodeTokenManagerMintBurnTransferOperatorshipArgs,
-  transmitInterchainTransfer:
-    encodeTokenManagerMintBurnTransmitInterchainTransferArgs,
+  acceptOperatorship: {
+    args: encodeTokenManagerMintBurnAcceptOperatorshipArgs,
+    data: encodeTokenManagerMintBurnAcceptOperatorshipData,
+  },
+  addFlowLimiter: {
+    args: encodeTokenManagerMintBurnAddFlowLimiterArgs,
+    data: encodeTokenManagerMintBurnAddFlowLimiterData,
+  },
+  callContractWithInterchainToken: {
+    args: encodeTokenManagerMintBurnCallContractWithInterchainTokenArgs,
+    data: encodeTokenManagerMintBurnCallContractWithInterchainTokenData,
+  },
+  giveToken: {
+    args: encodeTokenManagerMintBurnGiveTokenArgs,
+    data: encodeTokenManagerMintBurnGiveTokenData,
+  },
+  hasRole: {
+    args: encodeTokenManagerMintBurnHasRoleArgs,
+    data: encodeTokenManagerMintBurnHasRoleData,
+  },
+  interchainTransfer: {
+    args: encodeTokenManagerMintBurnInterchainTransferArgs,
+    data: encodeTokenManagerMintBurnInterchainTransferData,
+  },
+  isOperator: {
+    args: encodeTokenManagerMintBurnIsOperatorArgs,
+    data: encodeTokenManagerMintBurnIsOperatorData,
+  },
+  params: {
+    args: encodeTokenManagerMintBurnParamsArgs,
+    data: encodeTokenManagerMintBurnParamsData,
+  },
+  proposeOperatorship: {
+    args: encodeTokenManagerMintBurnProposeOperatorshipArgs,
+    data: encodeTokenManagerMintBurnProposeOperatorshipData,
+  },
+  removeFlowLimiter: {
+    args: encodeTokenManagerMintBurnRemoveFlowLimiterArgs,
+    data: encodeTokenManagerMintBurnRemoveFlowLimiterData,
+  },
+  setFlowLimit: {
+    args: encodeTokenManagerMintBurnSetFlowLimitArgs,
+    data: encodeTokenManagerMintBurnSetFlowLimitData,
+  },
+  setup: {
+    args: encodeTokenManagerMintBurnSetupArgs,
+    data: encodeTokenManagerMintBurnSetupData,
+  },
+  takeToken: {
+    args: encodeTokenManagerMintBurnTakeTokenArgs,
+    data: encodeTokenManagerMintBurnTakeTokenData,
+  },
+  transferOperatorship: {
+    args: encodeTokenManagerMintBurnTransferOperatorshipArgs,
+    data: encodeTokenManagerMintBurnTransferOperatorshipData,
+  },
+  transmitInterchainTransfer: {
+    args: encodeTokenManagerMintBurnTransmitInterchainTransferArgs,
+    data: encodeTokenManagerMintBurnTransmitInterchainTransferData,
+  },
 };

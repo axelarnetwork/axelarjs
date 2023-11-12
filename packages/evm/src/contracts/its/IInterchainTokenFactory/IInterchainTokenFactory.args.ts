@@ -371,22 +371,52 @@ export const encodeIInterchainTokenFactoryTokenTransferFromData = ({
   });
 
 export const IINTERCHAIN_TOKEN_FACTORY_ENCODERS = {
-  canonicalInterchainTokenId:
-    encodeIInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
-  canonicalInterchainTokenSalt:
-    encodeIInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
-  deployInterchainToken: encodeIInterchainTokenFactoryDeployInterchainTokenArgs,
-  deployRemoteCanonicalInterchainToken:
-    encodeIInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs,
-  deployRemoteInterchainToken:
-    encodeIInterchainTokenFactoryDeployRemoteInterchainTokenArgs,
-  interchainTokenAddress:
-    encodeIInterchainTokenFactoryInterchainTokenAddressArgs,
-  interchainTokenId: encodeIInterchainTokenFactoryInterchainTokenIdArgs,
-  interchainTokenSalt: encodeIInterchainTokenFactoryInterchainTokenSaltArgs,
-  interchainTransfer: encodeIInterchainTokenFactoryInterchainTransferArgs,
-  registerCanonicalInterchainToken:
-    encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
-  tokenApprove: encodeIInterchainTokenFactoryTokenApproveArgs,
-  tokenTransferFrom: encodeIInterchainTokenFactoryTokenTransferFromArgs,
+  canonicalInterchainTokenId: {
+    args: encodeIInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
+    data: encodeIInterchainTokenFactoryCanonicalInterchainTokenIdData,
+  },
+  canonicalInterchainTokenSalt: {
+    args: encodeIInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
+    data: encodeIInterchainTokenFactoryCanonicalInterchainTokenSaltData,
+  },
+  deployInterchainToken: {
+    args: encodeIInterchainTokenFactoryDeployInterchainTokenArgs,
+    data: encodeIInterchainTokenFactoryDeployInterchainTokenData,
+  },
+  deployRemoteCanonicalInterchainToken: {
+    args: encodeIInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs,
+    data: encodeIInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenData,
+  },
+  deployRemoteInterchainToken: {
+    args: encodeIInterchainTokenFactoryDeployRemoteInterchainTokenArgs,
+    data: encodeIInterchainTokenFactoryDeployRemoteInterchainTokenData,
+  },
+  interchainTokenAddress: {
+    args: encodeIInterchainTokenFactoryInterchainTokenAddressArgs,
+    data: encodeIInterchainTokenFactoryInterchainTokenAddressData,
+  },
+  interchainTokenId: {
+    args: encodeIInterchainTokenFactoryInterchainTokenIdArgs,
+    data: encodeIInterchainTokenFactoryInterchainTokenIdData,
+  },
+  interchainTokenSalt: {
+    args: encodeIInterchainTokenFactoryInterchainTokenSaltArgs,
+    data: encodeIInterchainTokenFactoryInterchainTokenSaltData,
+  },
+  interchainTransfer: {
+    args: encodeIInterchainTokenFactoryInterchainTransferArgs,
+    data: encodeIInterchainTokenFactoryInterchainTransferData,
+  },
+  registerCanonicalInterchainToken: {
+    args: encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
+    data: encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenData,
+  },
+  tokenApprove: {
+    args: encodeIInterchainTokenFactoryTokenApproveArgs,
+    data: encodeIInterchainTokenFactoryTokenApproveData,
+  },
+  tokenTransferFrom: {
+    args: encodeIInterchainTokenFactoryTokenTransferFromArgs,
+    data: encodeIInterchainTokenFactoryTokenTransferFromData,
+  },
 };

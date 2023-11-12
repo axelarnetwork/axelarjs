@@ -34,5 +34,8 @@ export const encodeITokenManagerProxySetupData = ({
   });
 
 export const ITOKEN_MANAGER_PROXY_ENCODERS = {
-  setup: encodeITokenManagerProxySetupArgs,
+  setup: {
+    args: encodeITokenManagerProxySetupArgs,
+    data: encodeITokenManagerProxySetupData,
+  },
 };

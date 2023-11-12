@@ -138,9 +138,24 @@ export const encodeERC20TransferFromData = ({
   });
 
 export const ERC20_ENCODERS = {
-  approve: encodeERC20ApproveArgs,
-  decreaseAllowance: encodeERC20DecreaseAllowanceArgs,
-  increaseAllowance: encodeERC20IncreaseAllowanceArgs,
-  transfer: encodeERC20TransferArgs,
-  transferFrom: encodeERC20TransferFromArgs,
+  approve: {
+    args: encodeERC20ApproveArgs,
+    data: encodeERC20ApproveData,
+  },
+  decreaseAllowance: {
+    args: encodeERC20DecreaseAllowanceArgs,
+    data: encodeERC20DecreaseAllowanceData,
+  },
+  increaseAllowance: {
+    args: encodeERC20IncreaseAllowanceArgs,
+    data: encodeERC20IncreaseAllowanceData,
+  },
+  transfer: {
+    args: encodeERC20TransferArgs,
+    data: encodeERC20TransferData,
+  },
+  transferFrom: {
+    args: encodeERC20TransferFromArgs,
+    data: encodeERC20TransferFromData,
+  },
 };

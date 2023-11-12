@@ -205,7 +205,10 @@ async function codegenContract({
         ${abiFns
           .map(
             ({ name }) =>
-              `"${name}": encode${pascalName}${capitalize(name)}Args`
+              `"${name}": {
+                args: encode${pascalName}${capitalize(name)}Args,
+                data: encode${pascalName}${capitalize(name)}Data,
+              }`
           )
           .join(",\n")}
       }`;
@@ -244,7 +247,7 @@ async function codegenContract({
       }`;
 
     files.push({
-      name: `index.ts`,
+      name: "index.ts",
       content: indexFile,
       parser: "babel-ts",
     });

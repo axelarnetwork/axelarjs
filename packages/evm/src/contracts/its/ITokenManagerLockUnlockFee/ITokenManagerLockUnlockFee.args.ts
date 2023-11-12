@@ -400,22 +400,64 @@ export const encodeITokenManagerLockUnlockFeeTransmitInterchainTransferData = ({
   });
 
 export const ITOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS = {
-  acceptOperatorship: encodeITokenManagerLockUnlockFeeAcceptOperatorshipArgs,
-  addFlowLimiter: encodeITokenManagerLockUnlockFeeAddFlowLimiterArgs,
-  callContractWithInterchainToken:
-    encodeITokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs,
-  giveToken: encodeITokenManagerLockUnlockFeeGiveTokenArgs,
-  hasRole: encodeITokenManagerLockUnlockFeeHasRoleArgs,
-  interchainTransfer: encodeITokenManagerLockUnlockFeeInterchainTransferArgs,
-  isOperator: encodeITokenManagerLockUnlockFeeIsOperatorArgs,
-  params: encodeITokenManagerLockUnlockFeeParamsArgs,
-  proposeOperatorship: encodeITokenManagerLockUnlockFeeProposeOperatorshipArgs,
-  removeFlowLimiter: encodeITokenManagerLockUnlockFeeRemoveFlowLimiterArgs,
-  setFlowLimit: encodeITokenManagerLockUnlockFeeSetFlowLimitArgs,
-  setup: encodeITokenManagerLockUnlockFeeSetupArgs,
-  takeToken: encodeITokenManagerLockUnlockFeeTakeTokenArgs,
-  transferOperatorship:
-    encodeITokenManagerLockUnlockFeeTransferOperatorshipArgs,
-  transmitInterchainTransfer:
-    encodeITokenManagerLockUnlockFeeTransmitInterchainTransferArgs,
+  acceptOperatorship: {
+    args: encodeITokenManagerLockUnlockFeeAcceptOperatorshipArgs,
+    data: encodeITokenManagerLockUnlockFeeAcceptOperatorshipData,
+  },
+  addFlowLimiter: {
+    args: encodeITokenManagerLockUnlockFeeAddFlowLimiterArgs,
+    data: encodeITokenManagerLockUnlockFeeAddFlowLimiterData,
+  },
+  callContractWithInterchainToken: {
+    args: encodeITokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs,
+    data: encodeITokenManagerLockUnlockFeeCallContractWithInterchainTokenData,
+  },
+  giveToken: {
+    args: encodeITokenManagerLockUnlockFeeGiveTokenArgs,
+    data: encodeITokenManagerLockUnlockFeeGiveTokenData,
+  },
+  hasRole: {
+    args: encodeITokenManagerLockUnlockFeeHasRoleArgs,
+    data: encodeITokenManagerLockUnlockFeeHasRoleData,
+  },
+  interchainTransfer: {
+    args: encodeITokenManagerLockUnlockFeeInterchainTransferArgs,
+    data: encodeITokenManagerLockUnlockFeeInterchainTransferData,
+  },
+  isOperator: {
+    args: encodeITokenManagerLockUnlockFeeIsOperatorArgs,
+    data: encodeITokenManagerLockUnlockFeeIsOperatorData,
+  },
+  params: {
+    args: encodeITokenManagerLockUnlockFeeParamsArgs,
+    data: encodeITokenManagerLockUnlockFeeParamsData,
+  },
+  proposeOperatorship: {
+    args: encodeITokenManagerLockUnlockFeeProposeOperatorshipArgs,
+    data: encodeITokenManagerLockUnlockFeeProposeOperatorshipData,
+  },
+  removeFlowLimiter: {
+    args: encodeITokenManagerLockUnlockFeeRemoveFlowLimiterArgs,
+    data: encodeITokenManagerLockUnlockFeeRemoveFlowLimiterData,
+  },
+  setFlowLimit: {
+    args: encodeITokenManagerLockUnlockFeeSetFlowLimitArgs,
+    data: encodeITokenManagerLockUnlockFeeSetFlowLimitData,
+  },
+  setup: {
+    args: encodeITokenManagerLockUnlockFeeSetupArgs,
+    data: encodeITokenManagerLockUnlockFeeSetupData,
+  },
+  takeToken: {
+    args: encodeITokenManagerLockUnlockFeeTakeTokenArgs,
+    data: encodeITokenManagerLockUnlockFeeTakeTokenData,
+  },
+  transferOperatorship: {
+    args: encodeITokenManagerLockUnlockFeeTransferOperatorshipArgs,
+    data: encodeITokenManagerLockUnlockFeeTransferOperatorshipData,
+  },
+  transmitInterchainTransfer: {
+    args: encodeITokenManagerLockUnlockFeeTransmitInterchainTransferArgs,
+    data: encodeITokenManagerLockUnlockFeeTransmitInterchainTransferData,
+  },
 };

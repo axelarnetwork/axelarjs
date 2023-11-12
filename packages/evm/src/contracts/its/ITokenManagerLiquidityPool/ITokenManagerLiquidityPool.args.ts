@@ -428,23 +428,68 @@ export const encodeITokenManagerLiquidityPoolTransmitInterchainTransferData = ({
   });
 
 export const ITOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS = {
-  acceptOperatorship: encodeITokenManagerLiquidityPoolAcceptOperatorshipArgs,
-  addFlowLimiter: encodeITokenManagerLiquidityPoolAddFlowLimiterArgs,
-  callContractWithInterchainToken:
-    encodeITokenManagerLiquidityPoolCallContractWithInterchainTokenArgs,
-  giveToken: encodeITokenManagerLiquidityPoolGiveTokenArgs,
-  hasRole: encodeITokenManagerLiquidityPoolHasRoleArgs,
-  interchainTransfer: encodeITokenManagerLiquidityPoolInterchainTransferArgs,
-  isOperator: encodeITokenManagerLiquidityPoolIsOperatorArgs,
-  params: encodeITokenManagerLiquidityPoolParamsArgs,
-  proposeOperatorship: encodeITokenManagerLiquidityPoolProposeOperatorshipArgs,
-  removeFlowLimiter: encodeITokenManagerLiquidityPoolRemoveFlowLimiterArgs,
-  setFlowLimit: encodeITokenManagerLiquidityPoolSetFlowLimitArgs,
-  setLiquidityPool: encodeITokenManagerLiquidityPoolSetLiquidityPoolArgs,
-  setup: encodeITokenManagerLiquidityPoolSetupArgs,
-  takeToken: encodeITokenManagerLiquidityPoolTakeTokenArgs,
-  transferOperatorship:
-    encodeITokenManagerLiquidityPoolTransferOperatorshipArgs,
-  transmitInterchainTransfer:
-    encodeITokenManagerLiquidityPoolTransmitInterchainTransferArgs,
+  acceptOperatorship: {
+    args: encodeITokenManagerLiquidityPoolAcceptOperatorshipArgs,
+    data: encodeITokenManagerLiquidityPoolAcceptOperatorshipData,
+  },
+  addFlowLimiter: {
+    args: encodeITokenManagerLiquidityPoolAddFlowLimiterArgs,
+    data: encodeITokenManagerLiquidityPoolAddFlowLimiterData,
+  },
+  callContractWithInterchainToken: {
+    args: encodeITokenManagerLiquidityPoolCallContractWithInterchainTokenArgs,
+    data: encodeITokenManagerLiquidityPoolCallContractWithInterchainTokenData,
+  },
+  giveToken: {
+    args: encodeITokenManagerLiquidityPoolGiveTokenArgs,
+    data: encodeITokenManagerLiquidityPoolGiveTokenData,
+  },
+  hasRole: {
+    args: encodeITokenManagerLiquidityPoolHasRoleArgs,
+    data: encodeITokenManagerLiquidityPoolHasRoleData,
+  },
+  interchainTransfer: {
+    args: encodeITokenManagerLiquidityPoolInterchainTransferArgs,
+    data: encodeITokenManagerLiquidityPoolInterchainTransferData,
+  },
+  isOperator: {
+    args: encodeITokenManagerLiquidityPoolIsOperatorArgs,
+    data: encodeITokenManagerLiquidityPoolIsOperatorData,
+  },
+  params: {
+    args: encodeITokenManagerLiquidityPoolParamsArgs,
+    data: encodeITokenManagerLiquidityPoolParamsData,
+  },
+  proposeOperatorship: {
+    args: encodeITokenManagerLiquidityPoolProposeOperatorshipArgs,
+    data: encodeITokenManagerLiquidityPoolProposeOperatorshipData,
+  },
+  removeFlowLimiter: {
+    args: encodeITokenManagerLiquidityPoolRemoveFlowLimiterArgs,
+    data: encodeITokenManagerLiquidityPoolRemoveFlowLimiterData,
+  },
+  setFlowLimit: {
+    args: encodeITokenManagerLiquidityPoolSetFlowLimitArgs,
+    data: encodeITokenManagerLiquidityPoolSetFlowLimitData,
+  },
+  setLiquidityPool: {
+    args: encodeITokenManagerLiquidityPoolSetLiquidityPoolArgs,
+    data: encodeITokenManagerLiquidityPoolSetLiquidityPoolData,
+  },
+  setup: {
+    args: encodeITokenManagerLiquidityPoolSetupArgs,
+    data: encodeITokenManagerLiquidityPoolSetupData,
+  },
+  takeToken: {
+    args: encodeITokenManagerLiquidityPoolTakeTokenArgs,
+    data: encodeITokenManagerLiquidityPoolTakeTokenData,
+  },
+  transferOperatorship: {
+    args: encodeITokenManagerLiquidityPoolTransferOperatorshipArgs,
+    data: encodeITokenManagerLiquidityPoolTransferOperatorshipData,
+  },
+  transmitInterchainTransfer: {
+    args: encodeITokenManagerLiquidityPoolTransmitInterchainTransferArgs,
+    data: encodeITokenManagerLiquidityPoolTransmitInterchainTransferData,
+  },
 };

@@ -362,19 +362,60 @@ export const encodeITokenManagerTransmitInterchainTransferData = ({
   });
 
 export const ITOKEN_MANAGER_ENCODERS = {
-  acceptOperatorship: encodeITokenManagerAcceptOperatorshipArgs,
-  addFlowLimiter: encodeITokenManagerAddFlowLimiterArgs,
-  callContractWithInterchainToken:
-    encodeITokenManagerCallContractWithInterchainTokenArgs,
-  giveToken: encodeITokenManagerGiveTokenArgs,
-  hasRole: encodeITokenManagerHasRoleArgs,
-  interchainTransfer: encodeITokenManagerInterchainTransferArgs,
-  isOperator: encodeITokenManagerIsOperatorArgs,
-  proposeOperatorship: encodeITokenManagerProposeOperatorshipArgs,
-  removeFlowLimiter: encodeITokenManagerRemoveFlowLimiterArgs,
-  setFlowLimit: encodeITokenManagerSetFlowLimitArgs,
-  setup: encodeITokenManagerSetupArgs,
-  takeToken: encodeITokenManagerTakeTokenArgs,
-  transferOperatorship: encodeITokenManagerTransferOperatorshipArgs,
-  transmitInterchainTransfer: encodeITokenManagerTransmitInterchainTransferArgs,
+  acceptOperatorship: {
+    args: encodeITokenManagerAcceptOperatorshipArgs,
+    data: encodeITokenManagerAcceptOperatorshipData,
+  },
+  addFlowLimiter: {
+    args: encodeITokenManagerAddFlowLimiterArgs,
+    data: encodeITokenManagerAddFlowLimiterData,
+  },
+  callContractWithInterchainToken: {
+    args: encodeITokenManagerCallContractWithInterchainTokenArgs,
+    data: encodeITokenManagerCallContractWithInterchainTokenData,
+  },
+  giveToken: {
+    args: encodeITokenManagerGiveTokenArgs,
+    data: encodeITokenManagerGiveTokenData,
+  },
+  hasRole: {
+    args: encodeITokenManagerHasRoleArgs,
+    data: encodeITokenManagerHasRoleData,
+  },
+  interchainTransfer: {
+    args: encodeITokenManagerInterchainTransferArgs,
+    data: encodeITokenManagerInterchainTransferData,
+  },
+  isOperator: {
+    args: encodeITokenManagerIsOperatorArgs,
+    data: encodeITokenManagerIsOperatorData,
+  },
+  proposeOperatorship: {
+    args: encodeITokenManagerProposeOperatorshipArgs,
+    data: encodeITokenManagerProposeOperatorshipData,
+  },
+  removeFlowLimiter: {
+    args: encodeITokenManagerRemoveFlowLimiterArgs,
+    data: encodeITokenManagerRemoveFlowLimiterData,
+  },
+  setFlowLimit: {
+    args: encodeITokenManagerSetFlowLimitArgs,
+    data: encodeITokenManagerSetFlowLimitData,
+  },
+  setup: {
+    args: encodeITokenManagerSetupArgs,
+    data: encodeITokenManagerSetupData,
+  },
+  takeToken: {
+    args: encodeITokenManagerTakeTokenArgs,
+    data: encodeITokenManagerTakeTokenData,
+  },
+  transferOperatorship: {
+    args: encodeITokenManagerTransferOperatorshipArgs,
+    data: encodeITokenManagerTransferOperatorshipData,
+  },
+  transmitInterchainTransfer: {
+    args: encodeITokenManagerTransmitInterchainTransferArgs,
+    data: encodeITokenManagerTransmitInterchainTransferData,
+  },
 };

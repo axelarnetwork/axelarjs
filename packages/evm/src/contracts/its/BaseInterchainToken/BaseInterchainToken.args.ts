@@ -216,11 +216,32 @@ export const encodeBaseInterchainTokenTransferFromData = ({
   });
 
 export const BASE_INTERCHAIN_TOKEN_ENCODERS = {
-  approve: encodeBaseInterchainTokenApproveArgs,
-  decreaseAllowance: encodeBaseInterchainTokenDecreaseAllowanceArgs,
-  increaseAllowance: encodeBaseInterchainTokenIncreaseAllowanceArgs,
-  interchainTransfer: encodeBaseInterchainTokenInterchainTransferArgs,
-  interchainTransferFrom: encodeBaseInterchainTokenInterchainTransferFromArgs,
-  transfer: encodeBaseInterchainTokenTransferArgs,
-  transferFrom: encodeBaseInterchainTokenTransferFromArgs,
+  approve: {
+    args: encodeBaseInterchainTokenApproveArgs,
+    data: encodeBaseInterchainTokenApproveData,
+  },
+  decreaseAllowance: {
+    args: encodeBaseInterchainTokenDecreaseAllowanceArgs,
+    data: encodeBaseInterchainTokenDecreaseAllowanceData,
+  },
+  increaseAllowance: {
+    args: encodeBaseInterchainTokenIncreaseAllowanceArgs,
+    data: encodeBaseInterchainTokenIncreaseAllowanceData,
+  },
+  interchainTransfer: {
+    args: encodeBaseInterchainTokenInterchainTransferArgs,
+    data: encodeBaseInterchainTokenInterchainTransferData,
+  },
+  interchainTransferFrom: {
+    args: encodeBaseInterchainTokenInterchainTransferFromArgs,
+    data: encodeBaseInterchainTokenInterchainTransferFromData,
+  },
+  transfer: {
+    args: encodeBaseInterchainTokenTransferArgs,
+    data: encodeBaseInterchainTokenTransferData,
+  },
+  transferFrom: {
+    args: encodeBaseInterchainTokenTransferFromArgs,
+    data: encodeBaseInterchainTokenTransferFromData,
+  },
 };

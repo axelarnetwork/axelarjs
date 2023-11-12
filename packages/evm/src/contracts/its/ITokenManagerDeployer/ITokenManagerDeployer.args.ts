@@ -43,5 +43,8 @@ export const encodeITokenManagerDeployerDeployTokenManagerData = ({
   });
 
 export const ITOKEN_MANAGER_DEPLOYER_ENCODERS = {
-  deployTokenManager: encodeITokenManagerDeployerDeployTokenManagerArgs,
+  deployTokenManager: {
+    args: encodeITokenManagerDeployerDeployTokenManagerArgs,
+    data: encodeITokenManagerDeployerDeployTokenManagerData,
+  },
 };

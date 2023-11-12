@@ -489,27 +489,72 @@ export const encodeInterchainTokenFactoryUpgradeData = ({
   });
 
 export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
-  canonicalInterchainTokenId:
-    encodeInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
-  canonicalInterchainTokenSalt:
-    encodeInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
-  deployInterchainToken: encodeInterchainTokenFactoryDeployInterchainTokenArgs,
-  deployRemoteCanonicalInterchainToken:
-    encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs,
-  deployRemoteInterchainToken:
-    encodeInterchainTokenFactoryDeployRemoteInterchainTokenArgs,
-  interchainTokenAddress:
-    encodeInterchainTokenFactoryInterchainTokenAddressArgs,
-  interchainTokenId: encodeInterchainTokenFactoryInterchainTokenIdArgs,
-  interchainTokenSalt: encodeInterchainTokenFactoryInterchainTokenSaltArgs,
-  interchainTransfer: encodeInterchainTokenFactoryInterchainTransferArgs,
-  multicall: encodeInterchainTokenFactoryMulticallArgs,
-  proposeOwnership: encodeInterchainTokenFactoryProposeOwnershipArgs,
-  registerCanonicalInterchainToken:
-    encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
-  setup: encodeInterchainTokenFactorySetupArgs,
-  tokenApprove: encodeInterchainTokenFactoryTokenApproveArgs,
-  tokenTransferFrom: encodeInterchainTokenFactoryTokenTransferFromArgs,
-  transferOwnership: encodeInterchainTokenFactoryTransferOwnershipArgs,
-  upgrade: encodeInterchainTokenFactoryUpgradeArgs,
+  canonicalInterchainTokenId: {
+    args: encodeInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
+    data: encodeInterchainTokenFactoryCanonicalInterchainTokenIdData,
+  },
+  canonicalInterchainTokenSalt: {
+    args: encodeInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
+    data: encodeInterchainTokenFactoryCanonicalInterchainTokenSaltData,
+  },
+  deployInterchainToken: {
+    args: encodeInterchainTokenFactoryDeployInterchainTokenArgs,
+    data: encodeInterchainTokenFactoryDeployInterchainTokenData,
+  },
+  deployRemoteCanonicalInterchainToken: {
+    args: encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs,
+    data: encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenData,
+  },
+  deployRemoteInterchainToken: {
+    args: encodeInterchainTokenFactoryDeployRemoteInterchainTokenArgs,
+    data: encodeInterchainTokenFactoryDeployRemoteInterchainTokenData,
+  },
+  interchainTokenAddress: {
+    args: encodeInterchainTokenFactoryInterchainTokenAddressArgs,
+    data: encodeInterchainTokenFactoryInterchainTokenAddressData,
+  },
+  interchainTokenId: {
+    args: encodeInterchainTokenFactoryInterchainTokenIdArgs,
+    data: encodeInterchainTokenFactoryInterchainTokenIdData,
+  },
+  interchainTokenSalt: {
+    args: encodeInterchainTokenFactoryInterchainTokenSaltArgs,
+    data: encodeInterchainTokenFactoryInterchainTokenSaltData,
+  },
+  interchainTransfer: {
+    args: encodeInterchainTokenFactoryInterchainTransferArgs,
+    data: encodeInterchainTokenFactoryInterchainTransferData,
+  },
+  multicall: {
+    args: encodeInterchainTokenFactoryMulticallArgs,
+    data: encodeInterchainTokenFactoryMulticallData,
+  },
+  proposeOwnership: {
+    args: encodeInterchainTokenFactoryProposeOwnershipArgs,
+    data: encodeInterchainTokenFactoryProposeOwnershipData,
+  },
+  registerCanonicalInterchainToken: {
+    args: encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
+    data: encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenData,
+  },
+  setup: {
+    args: encodeInterchainTokenFactorySetupArgs,
+    data: encodeInterchainTokenFactorySetupData,
+  },
+  tokenApprove: {
+    args: encodeInterchainTokenFactoryTokenApproveArgs,
+    data: encodeInterchainTokenFactoryTokenApproveData,
+  },
+  tokenTransferFrom: {
+    args: encodeInterchainTokenFactoryTokenTransferFromArgs,
+    data: encodeInterchainTokenFactoryTokenTransferFromData,
+  },
+  transferOwnership: {
+    args: encodeInterchainTokenFactoryTransferOwnershipArgs,
+    data: encodeInterchainTokenFactoryTransferOwnershipData,
+  },
+  upgrade: {
+    args: encodeInterchainTokenFactoryUpgradeArgs,
+    data: encodeInterchainTokenFactoryUpgradeData,
+  },
 };

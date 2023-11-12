@@ -128,9 +128,24 @@ export const encodeIAddressTrackerTrustedAddressHashData = ({
   });
 
 export const IADDRESS_TRACKER_ENCODERS = {
-  isTrustedAddress: encodeIAddressTrackerIsTrustedAddressArgs,
-  removeTrustedAddress: encodeIAddressTrackerRemoveTrustedAddressArgs,
-  setTrustedAddress: encodeIAddressTrackerSetTrustedAddressArgs,
-  trustedAddress: encodeIAddressTrackerTrustedAddressArgs,
-  trustedAddressHash: encodeIAddressTrackerTrustedAddressHashArgs,
+  isTrustedAddress: {
+    args: encodeIAddressTrackerIsTrustedAddressArgs,
+    data: encodeIAddressTrackerIsTrustedAddressData,
+  },
+  removeTrustedAddress: {
+    args: encodeIAddressTrackerRemoveTrustedAddressArgs,
+    data: encodeIAddressTrackerRemoveTrustedAddressData,
+  },
+  setTrustedAddress: {
+    args: encodeIAddressTrackerSetTrustedAddressArgs,
+    data: encodeIAddressTrackerSetTrustedAddressData,
+  },
+  trustedAddress: {
+    args: encodeIAddressTrackerTrustedAddressArgs,
+    data: encodeIAddressTrackerTrustedAddressData,
+  },
+  trustedAddressHash: {
+    args: encodeIAddressTrackerTrustedAddressHashArgs,
+    data: encodeIAddressTrackerTrustedAddressHashData,
+  },
 };

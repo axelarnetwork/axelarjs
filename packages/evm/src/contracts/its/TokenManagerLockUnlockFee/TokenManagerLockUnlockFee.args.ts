@@ -400,21 +400,64 @@ export const encodeTokenManagerLockUnlockFeeTransmitInterchainTransferData = ({
   });
 
 export const TOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS = {
-  acceptOperatorship: encodeTokenManagerLockUnlockFeeAcceptOperatorshipArgs,
-  addFlowLimiter: encodeTokenManagerLockUnlockFeeAddFlowLimiterArgs,
-  callContractWithInterchainToken:
-    encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs,
-  giveToken: encodeTokenManagerLockUnlockFeeGiveTokenArgs,
-  hasRole: encodeTokenManagerLockUnlockFeeHasRoleArgs,
-  interchainTransfer: encodeTokenManagerLockUnlockFeeInterchainTransferArgs,
-  isOperator: encodeTokenManagerLockUnlockFeeIsOperatorArgs,
-  params: encodeTokenManagerLockUnlockFeeParamsArgs,
-  proposeOperatorship: encodeTokenManagerLockUnlockFeeProposeOperatorshipArgs,
-  removeFlowLimiter: encodeTokenManagerLockUnlockFeeRemoveFlowLimiterArgs,
-  setFlowLimit: encodeTokenManagerLockUnlockFeeSetFlowLimitArgs,
-  setup: encodeTokenManagerLockUnlockFeeSetupArgs,
-  takeToken: encodeTokenManagerLockUnlockFeeTakeTokenArgs,
-  transferOperatorship: encodeTokenManagerLockUnlockFeeTransferOperatorshipArgs,
-  transmitInterchainTransfer:
-    encodeTokenManagerLockUnlockFeeTransmitInterchainTransferArgs,
+  acceptOperatorship: {
+    args: encodeTokenManagerLockUnlockFeeAcceptOperatorshipArgs,
+    data: encodeTokenManagerLockUnlockFeeAcceptOperatorshipData,
+  },
+  addFlowLimiter: {
+    args: encodeTokenManagerLockUnlockFeeAddFlowLimiterArgs,
+    data: encodeTokenManagerLockUnlockFeeAddFlowLimiterData,
+  },
+  callContractWithInterchainToken: {
+    args: encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs,
+    data: encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenData,
+  },
+  giveToken: {
+    args: encodeTokenManagerLockUnlockFeeGiveTokenArgs,
+    data: encodeTokenManagerLockUnlockFeeGiveTokenData,
+  },
+  hasRole: {
+    args: encodeTokenManagerLockUnlockFeeHasRoleArgs,
+    data: encodeTokenManagerLockUnlockFeeHasRoleData,
+  },
+  interchainTransfer: {
+    args: encodeTokenManagerLockUnlockFeeInterchainTransferArgs,
+    data: encodeTokenManagerLockUnlockFeeInterchainTransferData,
+  },
+  isOperator: {
+    args: encodeTokenManagerLockUnlockFeeIsOperatorArgs,
+    data: encodeTokenManagerLockUnlockFeeIsOperatorData,
+  },
+  params: {
+    args: encodeTokenManagerLockUnlockFeeParamsArgs,
+    data: encodeTokenManagerLockUnlockFeeParamsData,
+  },
+  proposeOperatorship: {
+    args: encodeTokenManagerLockUnlockFeeProposeOperatorshipArgs,
+    data: encodeTokenManagerLockUnlockFeeProposeOperatorshipData,
+  },
+  removeFlowLimiter: {
+    args: encodeTokenManagerLockUnlockFeeRemoveFlowLimiterArgs,
+    data: encodeTokenManagerLockUnlockFeeRemoveFlowLimiterData,
+  },
+  setFlowLimit: {
+    args: encodeTokenManagerLockUnlockFeeSetFlowLimitArgs,
+    data: encodeTokenManagerLockUnlockFeeSetFlowLimitData,
+  },
+  setup: {
+    args: encodeTokenManagerLockUnlockFeeSetupArgs,
+    data: encodeTokenManagerLockUnlockFeeSetupData,
+  },
+  takeToken: {
+    args: encodeTokenManagerLockUnlockFeeTakeTokenArgs,
+    data: encodeTokenManagerLockUnlockFeeTakeTokenData,
+  },
+  transferOperatorship: {
+    args: encodeTokenManagerLockUnlockFeeTransferOperatorshipArgs,
+    data: encodeTokenManagerLockUnlockFeeTransferOperatorshipData,
+  },
+  transmitInterchainTransfer: {
+    args: encodeTokenManagerLockUnlockFeeTransmitInterchainTransferArgs,
+    data: encodeTokenManagerLockUnlockFeeTransmitInterchainTransferData,
+  },
 };

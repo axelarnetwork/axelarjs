@@ -52,6 +52,8 @@ export const encodeIInterchainTokenExecutableExecuteWithInterchainTokenData = ({
   });
 
 export const IINTERCHAIN_TOKEN_EXECUTABLE_ENCODERS = {
-  executeWithInterchainToken:
-    encodeIInterchainTokenExecutableExecuteWithInterchainTokenArgs,
+  executeWithInterchainToken: {
+    args: encodeIInterchainTokenExecutableExecuteWithInterchainTokenArgs,
+    data: encodeIInterchainTokenExecutableExecuteWithInterchainTokenData,
+  },
 };

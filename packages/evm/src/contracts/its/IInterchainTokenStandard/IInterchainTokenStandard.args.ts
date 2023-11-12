@@ -82,7 +82,12 @@ export const encodeIInterchainTokenStandardInterchainTransferFromData = ({
   });
 
 export const IINTERCHAIN_TOKEN_STANDARD_ENCODERS = {
-  interchainTransfer: encodeIInterchainTokenStandardInterchainTransferArgs,
-  interchainTransferFrom:
-    encodeIInterchainTokenStandardInterchainTransferFromArgs,
+  interchainTransfer: {
+    args: encodeIInterchainTokenStandardInterchainTransferArgs,
+    data: encodeIInterchainTokenStandardInterchainTransferData,
+  },
+  interchainTransferFrom: {
+    args: encodeIInterchainTokenStandardInterchainTransferFromArgs,
+    data: encodeIInterchainTokenStandardInterchainTransferFromData,
+  },
 };

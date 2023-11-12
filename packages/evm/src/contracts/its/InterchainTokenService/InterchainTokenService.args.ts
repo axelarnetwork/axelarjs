@@ -1005,46 +1005,148 @@ export const encodeInterchainTokenServiceValidTokenManagerAddressData = ({
   });
 
 export const INTERCHAIN_TOKEN_SERVICE_ENCODERS = {
-  acceptOperatorship: encodeInterchainTokenServiceAcceptOperatorshipArgs,
-  callContractWithInterchainToken:
-    encodeInterchainTokenServiceCallContractWithInterchainTokenArgs,
-  contractCallValue: encodeInterchainTokenServiceContractCallValueArgs,
-  deployInterchainToken: encodeInterchainTokenServiceDeployInterchainTokenArgs,
-  deployTokenManager: encodeInterchainTokenServiceDeployTokenManagerArgs,
-  execute: encodeInterchainTokenServiceExecuteArgs,
-  expressExecute: encodeInterchainTokenServiceExpressExecuteArgs,
-  flowInAmount: encodeInterchainTokenServiceFlowInAmountArgs,
-  flowLimit: encodeInterchainTokenServiceFlowLimitArgs,
-  flowOutAmount: encodeInterchainTokenServiceFlowOutAmountArgs,
-  getExpressExecutor: encodeInterchainTokenServiceGetExpressExecutorArgs,
-  getExpressExecutorWithToken:
-    encodeInterchainTokenServiceGetExpressExecutorWithTokenArgs,
-  hasRole: encodeInterchainTokenServiceHasRoleArgs,
-  interchainTokenAddress:
-    encodeInterchainTokenServiceInterchainTokenAddressArgs,
-  interchainTokenId: encodeInterchainTokenServiceInterchainTokenIdArgs,
-  interchainTransfer: encodeInterchainTokenServiceInterchainTransferArgs,
-  isOperator: encodeInterchainTokenServiceIsOperatorArgs,
-  isTrustedAddress: encodeInterchainTokenServiceIsTrustedAddressArgs,
-  multicall: encodeInterchainTokenServiceMulticallArgs,
-  proposeOperatorship: encodeInterchainTokenServiceProposeOperatorshipArgs,
-  proposeOwnership: encodeInterchainTokenServiceProposeOwnershipArgs,
-  removeTrustedAddress: encodeInterchainTokenServiceRemoveTrustedAddressArgs,
-  setFlowLimits: encodeInterchainTokenServiceSetFlowLimitsArgs,
-  setPauseStatus: encodeInterchainTokenServiceSetPauseStatusArgs,
-  setTrustedAddress: encodeInterchainTokenServiceSetTrustedAddressArgs,
-  setup: encodeInterchainTokenServiceSetupArgs,
-  tokenManagerAddress: encodeInterchainTokenServiceTokenManagerAddressArgs,
-  tokenManagerImplementation:
-    encodeInterchainTokenServiceTokenManagerImplementationArgs,
-  transferOperatorship: encodeInterchainTokenServiceTransferOperatorshipArgs,
-  transferOwnership: encodeInterchainTokenServiceTransferOwnershipArgs,
-  transmitInterchainTransfer:
-    encodeInterchainTokenServiceTransmitInterchainTransferArgs,
-  trustedAddress: encodeInterchainTokenServiceTrustedAddressArgs,
-  trustedAddressHash: encodeInterchainTokenServiceTrustedAddressHashArgs,
-  upgrade: encodeInterchainTokenServiceUpgradeArgs,
-  validTokenAddress: encodeInterchainTokenServiceValidTokenAddressArgs,
-  validTokenManagerAddress:
-    encodeInterchainTokenServiceValidTokenManagerAddressArgs,
+  acceptOperatorship: {
+    args: encodeInterchainTokenServiceAcceptOperatorshipArgs,
+    data: encodeInterchainTokenServiceAcceptOperatorshipData,
+  },
+  callContractWithInterchainToken: {
+    args: encodeInterchainTokenServiceCallContractWithInterchainTokenArgs,
+    data: encodeInterchainTokenServiceCallContractWithInterchainTokenData,
+  },
+  contractCallValue: {
+    args: encodeInterchainTokenServiceContractCallValueArgs,
+    data: encodeInterchainTokenServiceContractCallValueData,
+  },
+  deployInterchainToken: {
+    args: encodeInterchainTokenServiceDeployInterchainTokenArgs,
+    data: encodeInterchainTokenServiceDeployInterchainTokenData,
+  },
+  deployTokenManager: {
+    args: encodeInterchainTokenServiceDeployTokenManagerArgs,
+    data: encodeInterchainTokenServiceDeployTokenManagerData,
+  },
+  execute: {
+    args: encodeInterchainTokenServiceExecuteArgs,
+    data: encodeInterchainTokenServiceExecuteData,
+  },
+  expressExecute: {
+    args: encodeInterchainTokenServiceExpressExecuteArgs,
+    data: encodeInterchainTokenServiceExpressExecuteData,
+  },
+  flowInAmount: {
+    args: encodeInterchainTokenServiceFlowInAmountArgs,
+    data: encodeInterchainTokenServiceFlowInAmountData,
+  },
+  flowLimit: {
+    args: encodeInterchainTokenServiceFlowLimitArgs,
+    data: encodeInterchainTokenServiceFlowLimitData,
+  },
+  flowOutAmount: {
+    args: encodeInterchainTokenServiceFlowOutAmountArgs,
+    data: encodeInterchainTokenServiceFlowOutAmountData,
+  },
+  getExpressExecutor: {
+    args: encodeInterchainTokenServiceGetExpressExecutorArgs,
+    data: encodeInterchainTokenServiceGetExpressExecutorData,
+  },
+  getExpressExecutorWithToken: {
+    args: encodeInterchainTokenServiceGetExpressExecutorWithTokenArgs,
+    data: encodeInterchainTokenServiceGetExpressExecutorWithTokenData,
+  },
+  hasRole: {
+    args: encodeInterchainTokenServiceHasRoleArgs,
+    data: encodeInterchainTokenServiceHasRoleData,
+  },
+  interchainTokenAddress: {
+    args: encodeInterchainTokenServiceInterchainTokenAddressArgs,
+    data: encodeInterchainTokenServiceInterchainTokenAddressData,
+  },
+  interchainTokenId: {
+    args: encodeInterchainTokenServiceInterchainTokenIdArgs,
+    data: encodeInterchainTokenServiceInterchainTokenIdData,
+  },
+  interchainTransfer: {
+    args: encodeInterchainTokenServiceInterchainTransferArgs,
+    data: encodeInterchainTokenServiceInterchainTransferData,
+  },
+  isOperator: {
+    args: encodeInterchainTokenServiceIsOperatorArgs,
+    data: encodeInterchainTokenServiceIsOperatorData,
+  },
+  isTrustedAddress: {
+    args: encodeInterchainTokenServiceIsTrustedAddressArgs,
+    data: encodeInterchainTokenServiceIsTrustedAddressData,
+  },
+  multicall: {
+    args: encodeInterchainTokenServiceMulticallArgs,
+    data: encodeInterchainTokenServiceMulticallData,
+  },
+  proposeOperatorship: {
+    args: encodeInterchainTokenServiceProposeOperatorshipArgs,
+    data: encodeInterchainTokenServiceProposeOperatorshipData,
+  },
+  proposeOwnership: {
+    args: encodeInterchainTokenServiceProposeOwnershipArgs,
+    data: encodeInterchainTokenServiceProposeOwnershipData,
+  },
+  removeTrustedAddress: {
+    args: encodeInterchainTokenServiceRemoveTrustedAddressArgs,
+    data: encodeInterchainTokenServiceRemoveTrustedAddressData,
+  },
+  setFlowLimits: {
+    args: encodeInterchainTokenServiceSetFlowLimitsArgs,
+    data: encodeInterchainTokenServiceSetFlowLimitsData,
+  },
+  setPauseStatus: {
+    args: encodeInterchainTokenServiceSetPauseStatusArgs,
+    data: encodeInterchainTokenServiceSetPauseStatusData,
+  },
+  setTrustedAddress: {
+    args: encodeInterchainTokenServiceSetTrustedAddressArgs,
+    data: encodeInterchainTokenServiceSetTrustedAddressData,
+  },
+  setup: {
+    args: encodeInterchainTokenServiceSetupArgs,
+    data: encodeInterchainTokenServiceSetupData,
+  },
+  tokenManagerAddress: {
+    args: encodeInterchainTokenServiceTokenManagerAddressArgs,
+    data: encodeInterchainTokenServiceTokenManagerAddressData,
+  },
+  tokenManagerImplementation: {
+    args: encodeInterchainTokenServiceTokenManagerImplementationArgs,
+    data: encodeInterchainTokenServiceTokenManagerImplementationData,
+  },
+  transferOperatorship: {
+    args: encodeInterchainTokenServiceTransferOperatorshipArgs,
+    data: encodeInterchainTokenServiceTransferOperatorshipData,
+  },
+  transferOwnership: {
+    args: encodeInterchainTokenServiceTransferOwnershipArgs,
+    data: encodeInterchainTokenServiceTransferOwnershipData,
+  },
+  transmitInterchainTransfer: {
+    args: encodeInterchainTokenServiceTransmitInterchainTransferArgs,
+    data: encodeInterchainTokenServiceTransmitInterchainTransferData,
+  },
+  trustedAddress: {
+    args: encodeInterchainTokenServiceTrustedAddressArgs,
+    data: encodeInterchainTokenServiceTrustedAddressData,
+  },
+  trustedAddressHash: {
+    args: encodeInterchainTokenServiceTrustedAddressHashArgs,
+    data: encodeInterchainTokenServiceTrustedAddressHashData,
+  },
+  upgrade: {
+    args: encodeInterchainTokenServiceUpgradeArgs,
+    data: encodeInterchainTokenServiceUpgradeData,
+  },
+  validTokenAddress: {
+    args: encodeInterchainTokenServiceValidTokenAddressArgs,
+    data: encodeInterchainTokenServiceValidTokenAddressData,
+  },
+  validTokenManagerAddress: {
+    args: encodeInterchainTokenServiceValidTokenManagerAddressArgs,
+    data: encodeInterchainTokenServiceValidTokenManagerAddressData,
+  },
 };

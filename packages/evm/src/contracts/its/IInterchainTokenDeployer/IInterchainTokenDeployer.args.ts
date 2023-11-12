@@ -75,7 +75,12 @@ export const encodeIInterchainTokenDeployerDeployedAddressData = ({
   });
 
 export const IINTERCHAIN_TOKEN_DEPLOYER_ENCODERS = {
-  deployInterchainToken:
-    encodeIInterchainTokenDeployerDeployInterchainTokenArgs,
-  deployedAddress: encodeIInterchainTokenDeployerDeployedAddressArgs,
+  deployInterchainToken: {
+    args: encodeIInterchainTokenDeployerDeployInterchainTokenArgs,
+    data: encodeIInterchainTokenDeployerDeployInterchainTokenData,
+  },
+  deployedAddress: {
+    args: encodeIInterchainTokenDeployerDeployedAddressArgs,
+    data: encodeIInterchainTokenDeployerDeployedAddressData,
+  },
 };

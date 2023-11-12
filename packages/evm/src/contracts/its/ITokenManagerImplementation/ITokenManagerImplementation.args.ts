@@ -39,6 +39,8 @@ export const encodeITokenManagerImplementationTokenManagerImplementationData =
     });
 
 export const ITOKEN_MANAGER_IMPLEMENTATION_ENCODERS = {
-  tokenManagerImplementation:
-    encodeITokenManagerImplementationTokenManagerImplementationArgs,
+  tokenManagerImplementation: {
+    args: encodeITokenManagerImplementationTokenManagerImplementationArgs,
+    data: encodeITokenManagerImplementationTokenManagerImplementationData,
+  },
 };

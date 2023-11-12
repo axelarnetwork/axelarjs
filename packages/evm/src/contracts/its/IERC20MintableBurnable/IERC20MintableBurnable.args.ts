@@ -65,6 +65,12 @@ export const encodeIERC20MintableBurnableMintData = ({
   });
 
 export const IERC20_MINTABLE_BURNABLE_ENCODERS = {
-  burn: encodeIERC20MintableBurnableBurnArgs,
-  mint: encodeIERC20MintableBurnableMintArgs,
+  burn: {
+    args: encodeIERC20MintableBurnableBurnArgs,
+    data: encodeIERC20MintableBurnableBurnData,
+  },
+  mint: {
+    args: encodeIERC20MintableBurnableMintArgs,
+    data: encodeIERC20MintableBurnableMintData,
+  },
 };

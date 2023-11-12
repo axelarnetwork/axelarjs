@@ -138,9 +138,24 @@ export const encodeIERC20NamedTransferFromData = ({
   });
 
 export const IERC20_NAMED_ENCODERS = {
-  allowance: encodeIERC20NamedAllowanceArgs,
-  approve: encodeIERC20NamedApproveArgs,
-  balanceOf: encodeIERC20NamedBalanceOfArgs,
-  transfer: encodeIERC20NamedTransferArgs,
-  transferFrom: encodeIERC20NamedTransferFromArgs,
+  allowance: {
+    args: encodeIERC20NamedAllowanceArgs,
+    data: encodeIERC20NamedAllowanceData,
+  },
+  approve: {
+    args: encodeIERC20NamedApproveArgs,
+    data: encodeIERC20NamedApproveData,
+  },
+  balanceOf: {
+    args: encodeIERC20NamedBalanceOfArgs,
+    data: encodeIERC20NamedBalanceOfData,
+  },
+  transfer: {
+    args: encodeIERC20NamedTransferArgs,
+    data: encodeIERC20NamedTransferData,
+  },
+  transferFrom: {
+    args: encodeIERC20NamedTransferFromArgs,
+    data: encodeIERC20NamedTransferFromData,
+  },
 };

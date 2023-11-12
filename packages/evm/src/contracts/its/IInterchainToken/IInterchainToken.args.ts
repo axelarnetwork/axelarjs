@@ -393,19 +393,64 @@ export const encodeIInterchainTokenTransferFromData = ({
   });
 
 export const IINTERCHAIN_TOKEN_ENCODERS = {
-  acceptDistributorship: encodeIInterchainTokenAcceptDistributorshipArgs,
-  allowance: encodeIInterchainTokenAllowanceArgs,
-  approve: encodeIInterchainTokenApproveArgs,
-  balanceOf: encodeIInterchainTokenBalanceOfArgs,
-  burn: encodeIInterchainTokenBurnArgs,
-  hasRole: encodeIInterchainTokenHasRoleArgs,
-  interchainTransfer: encodeIInterchainTokenInterchainTransferArgs,
-  interchainTransferFrom: encodeIInterchainTokenInterchainTransferFromArgs,
-  isDistributor: encodeIInterchainTokenIsDistributorArgs,
-  mint: encodeIInterchainTokenMintArgs,
-  proposeDistributorship: encodeIInterchainTokenProposeDistributorshipArgs,
-  setup: encodeIInterchainTokenSetupArgs,
-  transfer: encodeIInterchainTokenTransferArgs,
-  transferDistributorship: encodeIInterchainTokenTransferDistributorshipArgs,
-  transferFrom: encodeIInterchainTokenTransferFromArgs,
+  acceptDistributorship: {
+    args: encodeIInterchainTokenAcceptDistributorshipArgs,
+    data: encodeIInterchainTokenAcceptDistributorshipData,
+  },
+  allowance: {
+    args: encodeIInterchainTokenAllowanceArgs,
+    data: encodeIInterchainTokenAllowanceData,
+  },
+  approve: {
+    args: encodeIInterchainTokenApproveArgs,
+    data: encodeIInterchainTokenApproveData,
+  },
+  balanceOf: {
+    args: encodeIInterchainTokenBalanceOfArgs,
+    data: encodeIInterchainTokenBalanceOfData,
+  },
+  burn: {
+    args: encodeIInterchainTokenBurnArgs,
+    data: encodeIInterchainTokenBurnData,
+  },
+  hasRole: {
+    args: encodeIInterchainTokenHasRoleArgs,
+    data: encodeIInterchainTokenHasRoleData,
+  },
+  interchainTransfer: {
+    args: encodeIInterchainTokenInterchainTransferArgs,
+    data: encodeIInterchainTokenInterchainTransferData,
+  },
+  interchainTransferFrom: {
+    args: encodeIInterchainTokenInterchainTransferFromArgs,
+    data: encodeIInterchainTokenInterchainTransferFromData,
+  },
+  isDistributor: {
+    args: encodeIInterchainTokenIsDistributorArgs,
+    data: encodeIInterchainTokenIsDistributorData,
+  },
+  mint: {
+    args: encodeIInterchainTokenMintArgs,
+    data: encodeIInterchainTokenMintData,
+  },
+  proposeDistributorship: {
+    args: encodeIInterchainTokenProposeDistributorshipArgs,
+    data: encodeIInterchainTokenProposeDistributorshipData,
+  },
+  setup: {
+    args: encodeIInterchainTokenSetupArgs,
+    data: encodeIInterchainTokenSetupData,
+  },
+  transfer: {
+    args: encodeIInterchainTokenTransferArgs,
+    data: encodeIInterchainTokenTransferData,
+  },
+  transferDistributorship: {
+    args: encodeIInterchainTokenTransferDistributorshipArgs,
+    data: encodeIInterchainTokenTransferDistributorshipData,
+  },
+  transferFrom: {
+    args: encodeIInterchainTokenTransferFromArgs,
+    data: encodeIInterchainTokenTransferFromData,
+  },
 };

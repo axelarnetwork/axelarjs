@@ -120,9 +120,24 @@ export const encodeIOperatableTransferOperatorshipData = ({
   });
 
 export const IOPERATABLE_ENCODERS = {
-  acceptOperatorship: encodeIOperatableAcceptOperatorshipArgs,
-  hasRole: encodeIOperatableHasRoleArgs,
-  isOperator: encodeIOperatableIsOperatorArgs,
-  proposeOperatorship: encodeIOperatableProposeOperatorshipArgs,
-  transferOperatorship: encodeIOperatableTransferOperatorshipArgs,
+  acceptOperatorship: {
+    args: encodeIOperatableAcceptOperatorshipArgs,
+    data: encodeIOperatableAcceptOperatorshipData,
+  },
+  hasRole: {
+    args: encodeIOperatableHasRoleArgs,
+    data: encodeIOperatableHasRoleData,
+  },
+  isOperator: {
+    args: encodeIOperatableIsOperatorArgs,
+    data: encodeIOperatableIsOperatorData,
+  },
+  proposeOperatorship: {
+    args: encodeIOperatableProposeOperatorshipArgs,
+    data: encodeIOperatableProposeOperatorshipData,
+  },
+  transferOperatorship: {
+    args: encodeIOperatableTransferOperatorshipArgs,
+    data: encodeIOperatableTransferOperatorshipData,
+  },
 };

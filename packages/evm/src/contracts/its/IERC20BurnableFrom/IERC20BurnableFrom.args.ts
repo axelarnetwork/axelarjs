@@ -39,5 +39,8 @@ export const encodeIERC20BurnableFromBurnFromData = ({
   });
 
 export const IERC20_BURNABLE_FROM_ENCODERS = {
-  burnFrom: encodeIERC20BurnableFromBurnFromArgs,
+  burnFrom: {
+    args: encodeIERC20BurnableFromBurnFromArgs,
+    data: encodeIERC20BurnableFromBurnFromData,
+  },
 };

@@ -129,9 +129,24 @@ export const encodeIDistributableTransferDistributorshipData = ({
   });
 
 export const IDISTRIBUTABLE_ENCODERS = {
-  acceptDistributorship: encodeIDistributableAcceptDistributorshipArgs,
-  hasRole: encodeIDistributableHasRoleArgs,
-  isDistributor: encodeIDistributableIsDistributorArgs,
-  proposeDistributorship: encodeIDistributableProposeDistributorshipArgs,
-  transferDistributorship: encodeIDistributableTransferDistributorshipArgs,
+  acceptDistributorship: {
+    args: encodeIDistributableAcceptDistributorshipArgs,
+    data: encodeIDistributableAcceptDistributorshipData,
+  },
+  hasRole: {
+    args: encodeIDistributableHasRoleArgs,
+    data: encodeIDistributableHasRoleData,
+  },
+  isDistributor: {
+    args: encodeIDistributableIsDistributorArgs,
+    data: encodeIDistributableIsDistributorData,
+  },
+  proposeDistributorship: {
+    args: encodeIDistributableProposeDistributorshipArgs,
+    data: encodeIDistributableProposeDistributorshipData,
+  },
+  transferDistributorship: {
+    args: encodeIDistributableTransferDistributorshipArgs,
+    data: encodeIDistributableTransferDistributorshipData,
+  },
 };

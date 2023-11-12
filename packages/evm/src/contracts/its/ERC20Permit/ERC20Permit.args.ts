@@ -185,10 +185,28 @@ export const encodeERC20PermitTransferFromData = ({
   });
 
 export const ERC20_PERMIT_ENCODERS = {
-  approve: encodeERC20PermitApproveArgs,
-  decreaseAllowance: encodeERC20PermitDecreaseAllowanceArgs,
-  increaseAllowance: encodeERC20PermitIncreaseAllowanceArgs,
-  permit: encodeERC20PermitPermitArgs,
-  transfer: encodeERC20PermitTransferArgs,
-  transferFrom: encodeERC20PermitTransferFromArgs,
+  approve: {
+    args: encodeERC20PermitApproveArgs,
+    data: encodeERC20PermitApproveData,
+  },
+  decreaseAllowance: {
+    args: encodeERC20PermitDecreaseAllowanceArgs,
+    data: encodeERC20PermitDecreaseAllowanceData,
+  },
+  increaseAllowance: {
+    args: encodeERC20PermitIncreaseAllowanceArgs,
+    data: encodeERC20PermitIncreaseAllowanceData,
+  },
+  permit: {
+    args: encodeERC20PermitPermitArgs,
+    data: encodeERC20PermitPermitData,
+  },
+  transfer: {
+    args: encodeERC20PermitTransferArgs,
+    data: encodeERC20PermitTransferData,
+  },
+  transferFrom: {
+    args: encodeERC20PermitTransferFromArgs,
+    data: encodeERC20PermitTransferFromData,
+  },
 };

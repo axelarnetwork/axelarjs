@@ -96,8 +96,12 @@ export const encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchain
     });
 
 export const IINTERCHAIN_TOKEN_EXPRESS_EXECUTABLE_ENCODERS = {
-  executeWithInterchainToken:
-    encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs,
-  expressExecuteWithInterchainToken:
-    encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs,
+  executeWithInterchainToken: {
+    args: encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs,
+    data: encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenData,
+  },
+  expressExecuteWithInterchainToken: {
+    args: encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs,
+    data: encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenData,
+  },
 };
