@@ -1,9 +1,4 @@
-import {
-  encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData,
-  encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData,
-  encodeInterchainTokenServiceGetCustomTokenIdArgs,
-  encodeInterchainTokenServiceGetStandardizedTokenAddressArgs,
-} from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
@@ -11,11 +6,11 @@ import { parseUnits } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import {
-  useInterchainTokenServiceGetCustomTokenId,
-  useInterchainTokenServiceGetStandardizedTokenAddress,
-  useInterchainTokenServiceMulticall,
-  usePrepareInterchainTokenServiceMulticall,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+  useInterchainTokenFactoryInterchainTokenAddress,
+  useInterchainTokenFactoryInterchainTokenId,
+  useInterchainTokenFactoryMulticall,
+  usePrepareInterchainTokenFactoryMulticall,
+} from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -55,20 +50,21 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
-    useState<IntercahinTokenDetails | null>(null);
+    useState<IntercahinTokenDetails>();
 
-  const { data: tokenId } = useInterchainTokenServiceGetCustomTokenId({
-    args: encodeInterchainTokenServiceGetCustomTokenIdArgs({
+  const { data: tokenId } = useInterchainTokenFactoryInterchainTokenId({
+    args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
       salt: config.salt,
-      sender: deployerAddress as `0x${string}`,
+      deployer: deployerAddress as `0x${string}`,
     }),
     enabled: deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
   const { data: tokenAddress } =
-    useInterchainTokenServiceGetStandardizedTokenAddress({
-      args: encodeInterchainTokenServiceGetStandardizedTokenAddressArgs({
-        tokenId: tokenId as `0x${string}`,
+    useInterchainTokenFactoryInterchainTokenAddress({
+      args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenAddress.args({
+        salt: config.salt,
+        deployer: deployerAddress as `0x${string}`,
       }),
       enabled: Boolean(tokenId),
     });
@@ -92,7 +88,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
     };
 
     const deployTxData =
-      encodeInterchainTokenServiceDeployAndRegisterStandardizedTokenData({
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...baseArgs,
         mintAmount: initialSupply,
         distributor: deployer,
@@ -102,14 +98,15 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
       return [deployTxData];
     }
 
-    const registerTxData = input.destinationChainIds.map((chainId, i) =>
-      encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData({
-        ...baseArgs,
-        distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
-        operator: deployer,
-        destinationChain: chainId,
-        gasValue: input.gasFees[i] ?? BigInt(0),
-      })
+    const registerTxData = input.destinationChainIds.map(
+      (destinationChain, i) =>
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+          destinationChain: destinationChain,
+          gasValue: input.gasFees[i] ?? BigInt(0),
+          distributor: deployer,
+          originalChainName: input.sourceChainId,
+          salt: config.salt,
+        })
     );
 
     return [deployTxData, ...registerTxData];
@@ -120,13 +117,13 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
     [input?.gasFees]
   );
 
-  const prepareMulticall = usePrepareInterchainTokenServiceMulticall({
+  const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     chainId: chainId,
     args: [multicallArgs],
   });
 
-  const multicall = useInterchainTokenServiceMulticall(prepareMulticall.config);
+  const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);
 
   useWaitForTransaction({
     hash: multicall?.data?.hash,
