@@ -50,7 +50,7 @@ async function codegenContract({
   foldercase = "",
   filecase = "",
   index = false,
-  client = "",
+  clientPath = "",
 }) {
   const { abi, contractName } = JSON.parse(abiFileJson) as {
     abi: ABIItem[];
@@ -116,7 +116,7 @@ async function codegenContract({
       fileName,
       constantName,
       readFns,
-      client,
+      clientPath,
     });
 
     files.push({
@@ -131,7 +131,7 @@ async function codegenContract({
       fileName,
       constantName,
       pascalName,
-      client,
+      clientPath,
       hasArgs: abiFns.length > 0,
       hasReadFns: readFns.length > 0,
     });
@@ -186,12 +186,11 @@ async function codegen(config: CodegenConfig) {
         abiFileJson,
         abiPath,
         contractFolder,
-
         pascalName,
         foldercase: config.foldercase,
         filecase: config.filecase,
         index: config.index,
-        client: config.client,
+        clientPath: config.client,
       });
     } catch (error) {
       console.error(`Failed to process contract ${pascalName}`, error);

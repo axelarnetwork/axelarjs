@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManager.abi";
 import { createTokenManagerReadClient } from "./TokenManager.args";
 
-export * from "./TokenManager.args";
-
 const createReadClient = createTokenManagerReadClient;
+
+export * from "./TokenManager.args";
 
 export const TOKEN_MANAGER_ABI = ABI_FILE.abi;
 

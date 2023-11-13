@@ -29,29 +29,24 @@ export const INDEX_FILE = ({
   fileName = "",
   constantName = "",
   pascalName = "",
+  clientPath = "",
   hasArgs = false,
-  client = "",
   hasReadFns = false,
 }) => `
   import { Chain } from "viem";
 
-  import { PublicContractClient } from "${client}";
+  import { PublicContractClient } from "${clientPath}";
   import ABI_FILE from "./${fileName}.abi";
-  
   ${
-    hasArgs
-      ? `
-  ${
-    hasReadFns
+    hasReadFns && hasArgs
       ? `import { create${pascalName}ReadClient } from "./${fileName}.args";`
       : ""
   }
-  export * from "./${fileName}.args";`
-      : ""
-  }
-
+  
   ${hasReadFns ? `const createReadClient = create${pascalName}ReadClient;` : ""}
   
+  ${hasArgs ? `export * from "./${fileName}.args";` : ""}
+
   export const ${constantName}_ABI = ABI_FILE.abi;
   
   export class ${pascalName}Client extends PublicContractClient<
@@ -83,7 +78,7 @@ export const ARGS_FILE = ({
   readFns = [] as ABIItem[],
   fileName = "",
   constantName = "",
-  client = "",
+  clientPath = "",
 }) => {
   const toABIFnEncoder = ({ name, inputs }: ABIItem) => {
     const argNames = inputs.map(({ name = "" }) => name).join(", ");
@@ -136,9 +131,9 @@ export const ARGS_FILE = ({
   return `
     import { encodeFunctionData } from "viem";
     ${
-      readFns.length
+      readFns.length > 0
         ? `import type { PublicContractClient } from "${
-            client.startsWith(".")
+            clientPath.startsWith(".")
               ? "../../PublicContractClient"
               : "@axelarjs/evm"
           }";`

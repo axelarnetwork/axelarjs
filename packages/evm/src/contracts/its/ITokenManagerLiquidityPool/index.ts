@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerLiquidityPool.abi";
 import { createITokenManagerLiquidityPoolReadClient } from "./ITokenManagerLiquidityPool.args";
 
-export * from "./ITokenManagerLiquidityPool.args";
-
 const createReadClient = createITokenManagerLiquidityPoolReadClient;
+
+export * from "./ITokenManagerLiquidityPool.args";
 
 export const ITOKEN_MANAGER_LIQUIDITY_POOL_ABI = ABI_FILE.abi;
 

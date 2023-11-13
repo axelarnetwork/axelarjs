@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManagerLockUnlockFee.abi";
 import { createTokenManagerLockUnlockFeeReadClient } from "./TokenManagerLockUnlockFee.args";
 
-export * from "./TokenManagerLockUnlockFee.args";
-
 const createReadClient = createTokenManagerLockUnlockFeeReadClient;
+
+export * from "./TokenManagerLockUnlockFee.args";
 
 export const TOKEN_MANAGER_LOCK_UNLOCK_FEE_ABI = ABI_FILE.abi;
 

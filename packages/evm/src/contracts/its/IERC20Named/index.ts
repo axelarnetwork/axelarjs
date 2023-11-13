@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IERC20Named.abi";
 import { createIERC20NamedReadClient } from "./IERC20Named.args";
 
-export * from "./IERC20Named.args";
-
 const createReadClient = createIERC20NamedReadClient;
+
+export * from "./IERC20Named.args";
 
 export const IERC20_NAMED_ABI = ABI_FILE.abi;
 

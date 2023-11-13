@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IOperatable.abi";
 import { createIOperatableReadClient } from "./IOperatable.args";
 
-export * from "./IOperatable.args";
-
 const createReadClient = createIOperatableReadClient;
+
+export * from "./IOperatable.args";
 
 export const IOPERATABLE_ABI = ABI_FILE.abi;
 

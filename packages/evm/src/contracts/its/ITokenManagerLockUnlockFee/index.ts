@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerLockUnlockFee.abi";
 import { createITokenManagerLockUnlockFeeReadClient } from "./ITokenManagerLockUnlockFee.args";
 
-export * from "./ITokenManagerLockUnlockFee.args";
-
 const createReadClient = createITokenManagerLockUnlockFeeReadClient;
+
+export * from "./ITokenManagerLockUnlockFee.args";
 
 export const ITOKEN_MANAGER_LOCK_UNLOCK_FEE_ABI = ABI_FILE.abi;
 

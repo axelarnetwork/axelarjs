@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IDistributable.abi";
 import { createIDistributableReadClient } from "./IDistributable.args";
 
-export * from "./IDistributable.args";
-
 const createReadClient = createIDistributableReadClient;
+
+export * from "./IDistributable.args";
 
 export const IDISTRIBUTABLE_ABI = ABI_FILE.abi;
 

@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IAddressTracker.abi";
 import { createIAddressTrackerReadClient } from "./IAddressTracker.args";
 
-export * from "./IAddressTracker.args";
-
 const createReadClient = createIAddressTrackerReadClient;
+
+export * from "./IAddressTracker.args";
 
 export const IADDRESS_TRACKER_ABI = ABI_FILE.abi;
 

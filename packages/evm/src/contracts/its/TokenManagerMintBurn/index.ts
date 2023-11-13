@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManagerMintBurn.abi";
 import { createTokenManagerMintBurnReadClient } from "./TokenManagerMintBurn.args";
 
-export * from "./TokenManagerMintBurn.args";
-
 const createReadClient = createTokenManagerMintBurnReadClient;
+
+export * from "./TokenManagerMintBurn.args";
 
 export const TOKEN_MANAGER_MINT_BURN_ABI = ABI_FILE.abi;
 

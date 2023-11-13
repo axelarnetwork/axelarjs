@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerImplementation.abi";
 import { createITokenManagerImplementationReadClient } from "./ITokenManagerImplementation.args";
 
-export * from "./ITokenManagerImplementation.args";
-
 const createReadClient = createITokenManagerImplementationReadClient;
+
+export * from "./ITokenManagerImplementation.args";
 
 export const ITOKEN_MANAGER_IMPLEMENTATION_ABI = ABI_FILE.abi;
 

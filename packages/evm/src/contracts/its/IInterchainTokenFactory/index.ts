@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IInterchainTokenFactory.abi";
 import { createIInterchainTokenFactoryReadClient } from "./IInterchainTokenFactory.args";
 
-export * from "./IInterchainTokenFactory.args";
-
 const createReadClient = createIInterchainTokenFactoryReadClient;
+
+export * from "./IInterchainTokenFactory.args";
 
 export const IINTERCHAIN_TOKEN_FACTORY_ABI = ABI_FILE.abi;
 

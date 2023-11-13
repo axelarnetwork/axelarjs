@@ -14,9 +14,9 @@ import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerMintBurn.abi";
 import { createITokenManagerMintBurnReadClient } from "./ITokenManagerMintBurn.args";
 
-export * from "./ITokenManagerMintBurn.args";
-
 const createReadClient = createITokenManagerMintBurnReadClient;
+
+export * from "./ITokenManagerMintBurn.args";
 
 export const ITOKEN_MANAGER_MINT_BURN_ABI = ABI_FILE.abi;
 
