@@ -7,34 +7,15 @@ import {
   usePrepareContractWrite,
   UsePrepareContractWriteConfig,
 } from "wagmi";
-import { WriteContractMode, PrepareWriteContractResult } from "wagmi/actions";
+import { PrepareWriteContractResult, WriteContractMode } from "wagmi/actions";
+
+import ABI from "./IERC20MintableBurnable.abi";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC20MintableBurnable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const ierc20MintableBurnableABI = [
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "from", internalType: "address", type: "address" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-    ],
-    name: "burn",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "to", internalType: "address", type: "address" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-    ],
-    name: "mint",
-    outputs: [],
-  },
-] as const;
+export const ierc20MintableBurnableABI = ABI.abi;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
