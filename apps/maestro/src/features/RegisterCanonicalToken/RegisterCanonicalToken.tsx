@@ -5,7 +5,7 @@ import { useCallback, useMemo, type FC } from "react";
 
 import { useChainId } from "wagmi";
 
-import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useInterchainTokenFactoryCanonicalInterchainTokenId } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
@@ -40,7 +40,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
   );
 
   const { data: expectedTokenId } =
-    useInterchainTokenServiceGetCanonicalTokenId({
+    useInterchainTokenFactoryCanonicalInterchainTokenId({
       args: [address],
     });
 
