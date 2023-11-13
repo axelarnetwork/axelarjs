@@ -1,4 +1,4 @@
-import { encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData } from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
 import { useChainId } from "wagmi";
@@ -34,8 +34,8 @@ export default function useRegisterRemoteStandardizedTokens(
 
   const destinationChainIds = destinationChains.map((chain) => chain.id);
 
-  const sourceChainId = useMemo(
-    () => computed.indexedByChainId[chainId]?.id,
+  const sourceChain = useMemo(
+    () => computed.indexedByChainId[chainId],
     [chainId, computed.indexedByChainId]
   );
 
@@ -46,7 +46,7 @@ export default function useRegisterRemoteStandardizedTokens(
 
   const { data: gasFees } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
-    sourceChainId: sourceChainId ?? "0",
+    sourceChainId: sourceChain?.id ?? "0",
   });
 
   const multicallArgs = useMemo(() => {
@@ -54,18 +54,16 @@ export default function useRegisterRemoteStandardizedTokens(
       return [];
 
     return destinationChainIds.map((chainId, i) =>
-      encodeInterchainTokenServiceDeployAndRegisterRemoteStandardizedTokenData({
+      // encode InterchainTokenService DeployAndRegisterRemoteStandardizedTokenData
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        name: tokenDeployment.tokenName,
-        symbol: tokenDeployment.tokenSymbol,
-        decimals: tokenDeployment.tokenDecimals,
+        originalChainName: sourceChain?.name ?? "",
         distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
-        operator: tokenDeployment.deployerAddress,
         destinationChain: chainId,
         gasValue: gasFees[i],
       })
     );
-  }, [destinationChainIds, gasFees, tokenDeployment]);
+  }, [destinationChainIds, gasFees, sourceChain?.name, tokenDeployment]);
 
   const totalGasFee = useMemo(
     () => gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
