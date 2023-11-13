@@ -14,30 +14,36 @@ export const recordRemoteTokensDeployment = protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const kvRecord = await ctx.persistence.kv.getInterchainTokenDetails({
-      chainId: input.chainId,
-      tokenAddress: input.tokenAddress,
-    });
+    const originToken =
+      await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+        input.chainId,
+        input.tokenAddress
+      );
 
-    if (!kvRecord) {
+    if (!originToken) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.chainId}`,
       });
     }
 
-    if (kvRecord.deployerAddress !== ctx.session?.address) {
+    if (originToken.deployerAddress !== ctx.session?.address) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: `Only the deployer of the token can record remote tokens`,
       });
     }
 
-    return ctx.persistence.kv.recordRemoteTokensDeployment(
-      {
-        chainId: input.chainId,
-        tokenAddress: input.tokenAddress,
-      },
-      input.remoteTokens
+    return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
+      input.remoteTokens.map((remoteToken) => ({
+        tokenId: originToken.tokenId,
+        originTokenId: originToken.tokenId,
+        address: originToken.tokenAddress,
+        deploymentTxHash: remoteToken.deploymentTxHash,
+        deploymentStatus: remoteToken.deploymentStatus,
+        chainId: remoteToken.chainId,
+        axelarChainId: remoteToken.axelarChainId,
+        deploymentLogIndex: remoteToken.deploymentLogIndex,
+      }))
     );
   });

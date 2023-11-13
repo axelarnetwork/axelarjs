@@ -98,4 +98,19 @@ export default class MaestroPostgresClient {
 
     return await query;
   }
+
+  /**
+   * Returns the interchain tokens deployed by the given `deployerAddress`,
+   * including their remote interchain tokens.
+   */
+  async getInterchainTokensByDeployerAddress(deployerAddress: Address) {
+    const query = this.db.query.interchainTokens.findMany({
+      where: (table, { eq }) => eq(table.deployerAddress, deployerAddress),
+      with: {
+        remoteInterchainTokens: true,
+      },
+    });
+
+    return await query;
+  }
 }
