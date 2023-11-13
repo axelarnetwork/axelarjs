@@ -1,6 +1,7 @@
 import {
-  ERC20Client,
+  IERC20BurnableMintableClient,
   InterchainTokenClient,
+  InterchainTokenFactoryClient,
   InterchainTokenServiceClient,
   TokenManagerClient,
 } from "@axelarjs/evm";
@@ -12,7 +13,10 @@ import { kv } from "@vercel/kv";
 import OpenAI from "openai";
 import type { Chain } from "wagmi";
 
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
+import {
+  NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS,
+  NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+} from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
@@ -57,7 +61,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     },
     contracts: {
       createERC20Client(chain: Chain, address: `0x${string}`) {
-        return new ERC20Client({ chain, address });
+        return new IERC20BurnableMintableClient({ chain, address });
       },
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });
@@ -72,6 +76,15 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         return new InterchainTokenServiceClient({
           chain,
           address: address ?? NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+        });
+      },
+      createInterchainTokenFactoryClient(
+        chain: Chain,
+        address?: `0x${string}`
+      ) {
+        return new InterchainTokenFactoryClient({
+          chain,
+          address: address ?? NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS,
         });
       },
     },
