@@ -1,5 +1,5 @@
 import { defineConfig } from "@wagmi/cli";
-import { actions, react } from "@wagmi/cli/plugins";
+import { react } from "@wagmi/cli/plugins";
 
 import { contracts } from "./src/lib/contracts";
 
@@ -9,17 +9,6 @@ export default defineConfig(
       out: `src/lib/contracts/${contract.name}.hooks.ts`,
       contracts: [contract],
       plugins: [react()],
-    },
-    {
-      out: `src/lib/contracts/${contract.name}.actions.ts`,
-      contracts: [contract],
-      plugins: [
-        actions({
-          prepareWriteContract: true,
-          // temporarily disable until wagmi/cli@v1.3.x fixes the contract event type inference bug
-          watchContractEvent: false,
-        }),
-      ],
     },
   ])
 );
