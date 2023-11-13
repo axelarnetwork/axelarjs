@@ -30,7 +30,7 @@ type Props = {
   originTokenChainId?: number;
   balance: {
     tokenBalance: string;
-    decimals: string | number | null;
+    decimals: string | number | bigint | null;
   };
 };
 
