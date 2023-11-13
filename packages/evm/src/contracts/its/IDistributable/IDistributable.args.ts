@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IDistributable.abi";
 
 export type IDistributableAcceptDistributorshipArgs = {
@@ -150,3 +151,22 @@ export const IDISTRIBUTABLE_ENCODERS = {
     data: encodeIDistributableTransferDistributorshipData,
   },
 };
+
+export function createIDistributableReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: IDistributableHasRoleArgs) {
+      const encoder = IDISTRIBUTABLE_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isDistributor(isDistributorArgs: IDistributableIsDistributorArgs) {
+      const encoder = IDISTRIBUTABLE_ENCODERS["isDistributor"];
+      const encodedArgs = encoder.args(isDistributorArgs);
+
+      return publicClient.read("isDistributor", { args: encodedArgs });
+    },
+  };
+}

@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerLockUnlockFee.abi";
 
 export type ITokenManagerLockUnlockFeeAcceptOperatorshipArgs = {
@@ -461,3 +462,28 @@ export const ITOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS = {
     data: encodeITokenManagerLockUnlockFeeTransmitInterchainTransferData,
   },
 };
+
+export function createITokenManagerLockUnlockFeeReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: ITokenManagerLockUnlockFeeHasRoleArgs) {
+      const encoder = ITOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: ITokenManagerLockUnlockFeeIsOperatorArgs) {
+      const encoder = ITOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+    params(paramsArgs: ITokenManagerLockUnlockFeeParamsArgs) {
+      const encoder = ITOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS["params"];
+      const encodedArgs = encoder.args(paramsArgs);
+
+      return publicClient.read("params", { args: encodedArgs });
+    },
+  };
+}

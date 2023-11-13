@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IInterchainToken.abi";
 
 export type IInterchainTokenAcceptDistributorshipArgs = {
@@ -454,3 +455,34 @@ export const IINTERCHAIN_TOKEN_ENCODERS = {
     data: encodeIInterchainTokenTransferFromData,
   },
 };
+
+export function createIInterchainTokenReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    allowance(allowanceArgs: IInterchainTokenAllowanceArgs) {
+      const encoder = IINTERCHAIN_TOKEN_ENCODERS["allowance"];
+      const encodedArgs = encoder.args(allowanceArgs);
+
+      return publicClient.read("allowance", { args: encodedArgs });
+    },
+    balanceOf(balanceOfArgs: IInterchainTokenBalanceOfArgs) {
+      const encoder = IINTERCHAIN_TOKEN_ENCODERS["balanceOf"];
+      const encodedArgs = encoder.args(balanceOfArgs);
+
+      return publicClient.read("balanceOf", { args: encodedArgs });
+    },
+    hasRole(hasRoleArgs: IInterchainTokenHasRoleArgs) {
+      const encoder = IINTERCHAIN_TOKEN_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isDistributor(isDistributorArgs: IInterchainTokenIsDistributorArgs) {
+      const encoder = IINTERCHAIN_TOKEN_ENCODERS["isDistributor"];
+      const encodedArgs = encoder.args(isDistributorArgs);
+
+      return publicClient.read("isDistributor", { args: encodedArgs });
+    },
+  };
+}

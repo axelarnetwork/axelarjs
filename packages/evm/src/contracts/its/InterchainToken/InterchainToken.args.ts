@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainToken.abi";
 
 export type InterchainTokenAcceptDistributorshipArgs = {
@@ -511,3 +512,22 @@ export const INTERCHAIN_TOKEN_ENCODERS = {
     data: encodeInterchainTokenTransferFromData,
   },
 };
+
+export function createInterchainTokenReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: InterchainTokenHasRoleArgs) {
+      const encoder = INTERCHAIN_TOKEN_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isDistributor(isDistributorArgs: InterchainTokenIsDistributorArgs) {
+      const encoder = INTERCHAIN_TOKEN_ENCODERS["isDistributor"];
+      const encodedArgs = encoder.args(isDistributorArgs);
+
+      return publicClient.read("isDistributor", { args: encodedArgs });
+    },
+  };
+}

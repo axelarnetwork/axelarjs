@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IERC20Named.abi";
 
 export type IERC20NamedAllowanceArgs = {
@@ -159,3 +160,22 @@ export const IERC20_NAMED_ENCODERS = {
     data: encodeIERC20NamedTransferFromData,
   },
 };
+
+export function createIERC20NamedReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    allowance(allowanceArgs: IERC20NamedAllowanceArgs) {
+      const encoder = IERC20_NAMED_ENCODERS["allowance"];
+      const encodedArgs = encoder.args(allowanceArgs);
+
+      return publicClient.read("allowance", { args: encodedArgs });
+    },
+    balanceOf(balanceOfArgs: IERC20NamedBalanceOfArgs) {
+      const encoder = IERC20_NAMED_ENCODERS["balanceOf"];
+      const encodedArgs = encoder.args(balanceOfArgs);
+
+      return publicClient.read("balanceOf", { args: encodedArgs });
+    },
+  };
+}

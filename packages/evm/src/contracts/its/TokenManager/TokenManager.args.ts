@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManager.abi";
 
 export type TokenManagerAcceptOperatorshipArgs = {
@@ -417,3 +418,22 @@ export const TOKEN_MANAGER_ENCODERS = {
     data: encodeTokenManagerTransmitInterchainTransferData,
   },
 };
+
+export function createTokenManagerReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: TokenManagerHasRoleArgs) {
+      const encoder = TOKEN_MANAGER_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: TokenManagerIsOperatorArgs) {
+      const encoder = TOKEN_MANAGER_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+  };
+}

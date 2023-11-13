@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerImplementation.abi";
 
 export type ITokenManagerImplementationTokenManagerImplementationArgs = {
@@ -44,3 +45,21 @@ export const ITOKEN_MANAGER_IMPLEMENTATION_ENCODERS = {
     data: encodeITokenManagerImplementationTokenManagerImplementationData,
   },
 };
+
+export function createITokenManagerImplementationReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    tokenManagerImplementation(
+      tokenManagerImplementationArgs: ITokenManagerImplementationTokenManagerImplementationArgs
+    ) {
+      const encoder =
+        ITOKEN_MANAGER_IMPLEMENTATION_ENCODERS["tokenManagerImplementation"];
+      const encodedArgs = encoder.args(tokenManagerImplementationArgs);
+
+      return publicClient.read("tokenManagerImplementation", {
+        args: encodedArgs,
+      });
+    },
+  };
+}

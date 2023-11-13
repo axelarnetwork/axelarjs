@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManagerMintBurnFrom.abi";
 
 export type TokenManagerMintBurnFromAcceptOperatorshipArgs = {
@@ -461,3 +462,28 @@ export const TOKEN_MANAGER_MINT_BURN_FROM_ENCODERS = {
     data: encodeTokenManagerMintBurnFromTransmitInterchainTransferData,
   },
 };
+
+export function createTokenManagerMintBurnFromReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: TokenManagerMintBurnFromHasRoleArgs) {
+      const encoder = TOKEN_MANAGER_MINT_BURN_FROM_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: TokenManagerMintBurnFromIsOperatorArgs) {
+      const encoder = TOKEN_MANAGER_MINT_BURN_FROM_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+    params(paramsArgs: TokenManagerMintBurnFromParamsArgs) {
+      const encoder = TOKEN_MANAGER_MINT_BURN_FROM_ENCODERS["params"];
+      const encodedArgs = encoder.args(paramsArgs);
+
+      return publicClient.read("params", { args: encodedArgs });
+    },
+  };
+}

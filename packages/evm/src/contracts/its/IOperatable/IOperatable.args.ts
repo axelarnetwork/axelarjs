@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IOperatable.abi";
 
 export type IOperatableAcceptOperatorshipArgs = { fromOperator: `0x${string}` };
@@ -141,3 +142,22 @@ export const IOPERATABLE_ENCODERS = {
     data: encodeIOperatableTransferOperatorshipData,
   },
 };
+
+export function createIOperatableReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: IOperatableHasRoleArgs) {
+      const encoder = IOPERATABLE_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: IOperatableIsOperatorArgs) {
+      const encoder = IOPERATABLE_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+  };
+}

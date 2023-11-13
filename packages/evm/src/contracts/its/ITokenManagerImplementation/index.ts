@@ -12,8 +12,11 @@ import { Chain } from "viem";
 
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerImplementation.abi";
+import { createITokenManagerImplementationReadClient } from "./ITokenManagerImplementation.args";
 
 export * from "./ITokenManagerImplementation.args";
+
+const createReadClient = createITokenManagerImplementationReadClient;
 
 export const ITOKEN_MANAGER_IMPLEMENTATION_ABI = ABI_FILE.abi;
 
@@ -23,11 +26,15 @@ export class ITokenManagerImplementationClient extends PublicContractClient<
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
 
+  public readonly reads: ReturnType<typeof createReadClient>;
+
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
       abi: ITOKEN_MANAGER_IMPLEMENTATION_ABI,
       address: options.address,
       chain: options.chain,
     });
+
+    this.reads = createReadClient(this);
   }
 }

@@ -31,6 +31,7 @@ type ABIItem = {
     name: string;
     type: string;
   }[];
+  stateMutability?: string;
 };
 
 const getInputType = (input: ABIInputItem) => {
@@ -165,53 +166,19 @@ async function codegenContract({
     },
   ];
 
+  const readFns = abiFns.filter(
+    (x) => x.stateMutability === "view" || x.stateMutability === "pure"
+  );
+
   if (abiFns.length) {
-    const toABIFnEncoder = ({ name, inputs }: ABIItem) => {
-      const argNames = inputs.map(({ name = "" }) => name).join(", ");
-
-      const argsType = inputs
-        .map((input) => `${input.name}: ${getInputType(input)}`)
-        .join("; ");
-
-      const fnName = capitalize(name);
-      const typeName = `${pascalName}${fnName}Args`;
-
-      return `
-        export type ${typeName} = {${argsType}}
-        
-        /**
-         * Factory function for ${pascalName}.${name} function args
-         */
-        export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
-        
-        /**
-         * Encoder function for ${pascalName}.${name} function data
-         */
-        export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}): \`0x\${string}\` => encodeFunctionData({
-          functionName: "${name}",
-          abi: ABI_FILE.abi,
-          args:[${argNames}]
-        });`;
-    };
-
-    const argsFile = `
-      import { encodeFunctionData } from "viem";
-      
-      import ABI_FILE from "./${fileName}.abi";
-      
-      ${abiFns.map(toABIFnEncoder).join("\n\n")}
-        
-      export const ${constantName}_ENCODERS = {
-        ${abiFns
-          .map(
-            ({ name }) =>
-              `"${name}": {
-                args: encode${pascalName}${capitalize(name)}Args,
-                data: encode${pascalName}${capitalize(name)}Data,
-              }`
-          )
-          .join(",\n")}
-      }`;
+    const argsFile = TEMPLATES.argsFile({
+      pascalName,
+      abiFns,
+      fileName,
+      constantName,
+      readFns,
+      client,
+    });
 
     files.push({
       name: `${fileName}.args.ts`,
@@ -221,30 +188,14 @@ async function codegenContract({
   }
 
   if (index) {
-    const indexFile = `
-      import { Chain } from "viem";
-
-      import { PublicContractClient } from "${client}";
-      import ABI_FILE from "./${fileName}.abi";
-      
-      ${abiFns.length ? `export * from "./${fileName}.args";` : ""}
-      
-      export const ${constantName}_ABI = ABI_FILE.abi;
-      
-      export class ${pascalName}Client extends PublicContractClient<
-        typeof ABI_FILE.abi
-      > {
-        static ABI = ABI_FILE.abi;
-        static contractName = ABI_FILE.contractName;
-      
-        constructor(options: { chain: Chain; address: \`0x\${string}\` }) {
-          super({
-            abi: ${constantName}_ABI,
-            address: options.address,
-            chain: options.chain,
-          });
-        }
-      }`;
+    const indexFile = TEMPLATES.indexFile({
+      fileName,
+      constantName,
+      pascalName,
+      client,
+      hasArgs: abiFns.length > 0,
+      hasReadFns: readFns.length > 0,
+    });
 
     files.push({
       name: "index.ts",
@@ -368,3 +319,149 @@ codegen(config).catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+const TEMPLATES = {
+  indexFile: ({
+    fileName = "",
+    constantName = "",
+    pascalName = "",
+    hasArgs = false,
+    client = "",
+    hasReadFns = false,
+  }) => `
+    import { Chain } from "viem";
+
+    import { PublicContractClient } from "${client}";
+    import ABI_FILE from "./${fileName}.abi";
+    
+    ${
+      hasArgs
+        ? `
+    ${
+      hasReadFns
+        ? `import { create${pascalName}ReadClient } from "./${fileName}.args";`
+        : ""
+    }
+    export * from "./${fileName}.args";`
+        : ""
+    }
+
+    ${
+      hasReadFns
+        ? `const createReadClient = create${pascalName}ReadClient;`
+        : ""
+    }
+    
+    export const ${constantName}_ABI = ABI_FILE.abi;
+    
+    export class ${pascalName}Client extends PublicContractClient<
+      typeof ABI_FILE.abi
+    > {
+      static ABI = ABI_FILE.abi;
+      static contractName = ABI_FILE.contractName;
+
+      ${
+        hasReadFns
+          ? `public readonly reads: ReturnType<typeof createReadClient>;`
+          : ""
+      }
+    
+      constructor(options: { chain: Chain; address: \`0x\${string}\` }) {
+        super({
+          abi: ${constantName}_ABI,
+          address: options.address,
+          chain: options.chain,
+        });
+
+        ${hasReadFns ? `this.reads = createReadClient(this);` : ""}
+      }
+    }`,
+
+  argsFile: ({
+    pascalName = "",
+    abiFns = [] as ABIItem[],
+    readFns = [] as ABIItem[],
+    fileName = "",
+    constantName = "",
+    client = "",
+  }) => {
+    const toABIFnEncoder = ({ name, inputs }: ABIItem) => {
+      const argNames = inputs.map(({ name = "" }) => name).join(", ");
+
+      const argsType = inputs
+        .map((input) => `${input.name}: ${getInputType(input)}`)
+        .join("; ");
+
+      const fnName = capitalize(name);
+      const typeName = `${pascalName}${fnName}Args`;
+
+      return `
+        export type ${typeName} = {${argsType}}
+        
+        /**
+         * Factory function for ${pascalName}.${name} function args
+         */
+        export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
+        
+        /**
+         * Encoder function for ${pascalName}.${name} function data
+         */
+        export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}): \`0x\${string}\` => encodeFunctionData({
+          functionName: "${name}",
+          abi: ABI_FILE.abi,
+          args:[${argNames}]
+        });`;
+    };
+
+    const readsClient = readFns?.length
+      ? `
+      export function create${pascalName}ReadClient(
+        publicClient: PublicContractClient<typeof ABI_FILE.abi>
+      ) {
+        return {
+          ${readFns
+            .map(
+              ({ name }) =>
+                `"${name}"(${name}Args: ${pascalName}${capitalize(name)}Args) {
+                  const encoder = ${constantName}_ENCODERS["${name}"];
+                  const encodedArgs = encoder.args(${name}Args);
+
+                  return publicClient.read("${name}", { args: encodedArgs });
+                }`
+            )
+            .join(",\n")}
+        }
+      }`
+      : "";
+
+    return `
+      import { encodeFunctionData } from "viem";
+
+      ${
+        readFns.length
+          ? `import type { PublicContractClient } from "${
+              client.startsWith(".")
+                ? "../../PublicContractClient"
+                : "@axelarjs/evm"
+            }";`
+          : ""
+      }
+      import ABI_FILE from "./${fileName}.abi";
+
+      ${abiFns.map(toABIFnEncoder).join("\n\n")}
+        
+      export const ${constantName}_ENCODERS = {
+        ${abiFns
+          .map(
+            ({ name }) =>
+              `"${name}": {
+                args: encode${pascalName}${capitalize(name)}Args,
+                data: encode${pascalName}${capitalize(name)}Data,
+              }`
+          )
+          .join(",\n")}
+      }
+      
+      ${readsClient}`;
+  },
+};

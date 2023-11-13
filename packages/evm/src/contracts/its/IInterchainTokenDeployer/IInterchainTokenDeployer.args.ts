@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IInterchainTokenDeployer.abi";
 
 export type IInterchainTokenDeployerDeployInterchainTokenArgs = {
@@ -84,3 +85,18 @@ export const IINTERCHAIN_TOKEN_DEPLOYER_ENCODERS = {
     data: encodeIInterchainTokenDeployerDeployedAddressData,
   },
 };
+
+export function createIInterchainTokenDeployerReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    deployedAddress(
+      deployedAddressArgs: IInterchainTokenDeployerDeployedAddressArgs
+    ) {
+      const encoder = IINTERCHAIN_TOKEN_DEPLOYER_ENCODERS["deployedAddress"];
+      const encodedArgs = encoder.args(deployedAddressArgs);
+
+      return publicClient.read("deployedAddress", { args: encodedArgs });
+    },
+  };
+}

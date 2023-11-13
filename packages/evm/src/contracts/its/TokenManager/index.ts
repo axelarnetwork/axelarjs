@@ -12,8 +12,11 @@ import { Chain } from "viem";
 
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManager.abi";
+import { createTokenManagerReadClient } from "./TokenManager.args";
 
 export * from "./TokenManager.args";
+
+const createReadClient = createTokenManagerReadClient;
 
 export const TOKEN_MANAGER_ABI = ABI_FILE.abi;
 
@@ -23,11 +26,15 @@ export class TokenManagerClient extends PublicContractClient<
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
 
+  public readonly reads: ReturnType<typeof createReadClient>;
+
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
       abi: TOKEN_MANAGER_ABI,
       address: options.address,
       chain: options.chain,
     });
+
+    this.reads = createReadClient(this);
   }
 }

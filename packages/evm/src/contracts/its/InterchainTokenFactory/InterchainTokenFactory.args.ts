@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainTokenFactory.abi";
 
 export type InterchainTokenFactoryCanonicalInterchainTokenIdArgs = {
@@ -558,3 +559,57 @@ export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
     data: encodeInterchainTokenFactoryUpgradeData,
   },
 };
+
+export function createInterchainTokenFactoryReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    canonicalInterchainTokenId(
+      canonicalInterchainTokenIdArgs: InterchainTokenFactoryCanonicalInterchainTokenIdArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenId"];
+      const encodedArgs = encoder.args(canonicalInterchainTokenIdArgs);
+
+      return publicClient.read("canonicalInterchainTokenId", {
+        args: encodedArgs,
+      });
+    },
+    canonicalInterchainTokenSalt(
+      canonicalInterchainTokenSaltArgs: InterchainTokenFactoryCanonicalInterchainTokenSaltArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenSalt"];
+      const encodedArgs = encoder.args(canonicalInterchainTokenSaltArgs);
+
+      return publicClient.read("canonicalInterchainTokenSalt", {
+        args: encodedArgs,
+      });
+    },
+    interchainTokenAddress(
+      interchainTokenAddressArgs: InterchainTokenFactoryInterchainTokenAddressArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenAddress"];
+      const encodedArgs = encoder.args(interchainTokenAddressArgs);
+
+      return publicClient.read("interchainTokenAddress", { args: encodedArgs });
+    },
+    interchainTokenId(
+      interchainTokenIdArgs: InterchainTokenFactoryInterchainTokenIdArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenId"];
+      const encodedArgs = encoder.args(interchainTokenIdArgs);
+
+      return publicClient.read("interchainTokenId", { args: encodedArgs });
+    },
+    interchainTokenSalt(
+      interchainTokenSaltArgs: InterchainTokenFactoryInterchainTokenSaltArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenSalt"];
+      const encodedArgs = encoder.args(interchainTokenSaltArgs);
+
+      return publicClient.read("interchainTokenSalt", { args: encodedArgs });
+    },
+  };
+}

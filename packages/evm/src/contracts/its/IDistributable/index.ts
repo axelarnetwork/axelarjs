@@ -12,8 +12,11 @@ import { Chain } from "viem";
 
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IDistributable.abi";
+import { createIDistributableReadClient } from "./IDistributable.args";
 
 export * from "./IDistributable.args";
+
+const createReadClient = createIDistributableReadClient;
 
 export const IDISTRIBUTABLE_ABI = ABI_FILE.abi;
 
@@ -23,11 +26,15 @@ export class IDistributableClient extends PublicContractClient<
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
 
+  public readonly reads: ReturnType<typeof createReadClient>;
+
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
       abi: IDISTRIBUTABLE_ABI,
       address: options.address,
       chain: options.chain,
     });
+
+    this.reads = createReadClient(this);
   }
 }

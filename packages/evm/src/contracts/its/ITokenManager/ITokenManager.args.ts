@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManager.abi";
 
 export type ITokenManagerAcceptOperatorshipArgs = {
@@ -419,3 +420,22 @@ export const ITOKEN_MANAGER_ENCODERS = {
     data: encodeITokenManagerTransmitInterchainTransferData,
   },
 };
+
+export function createITokenManagerReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: ITokenManagerHasRoleArgs) {
+      const encoder = ITOKEN_MANAGER_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: ITokenManagerIsOperatorArgs) {
+      const encoder = ITOKEN_MANAGER_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+  };
+}

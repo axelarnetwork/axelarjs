@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerLiquidityPool.abi";
 
 export type ITokenManagerLiquidityPoolAcceptOperatorshipArgs = {
@@ -493,3 +494,28 @@ export const ITOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS = {
     data: encodeITokenManagerLiquidityPoolTransmitInterchainTransferData,
   },
 };
+
+export function createITokenManagerLiquidityPoolReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: ITokenManagerLiquidityPoolHasRoleArgs) {
+      const encoder = ITOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: ITokenManagerLiquidityPoolIsOperatorArgs) {
+      const encoder = ITOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+    params(paramsArgs: ITokenManagerLiquidityPoolParamsArgs) {
+      const encoder = ITOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS["params"];
+      const encodedArgs = encoder.args(paramsArgs);
+
+      return publicClient.read("params", { args: encodedArgs });
+    },
+  };
+}

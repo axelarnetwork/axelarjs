@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IAddressTracker.abi";
 
 export type IAddressTrackerIsTrustedAddressArgs = {
@@ -149,3 +150,32 @@ export const IADDRESS_TRACKER_ENCODERS = {
     data: encodeIAddressTrackerTrustedAddressHashData,
   },
 };
+
+export function createIAddressTrackerReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    isTrustedAddress(
+      isTrustedAddressArgs: IAddressTrackerIsTrustedAddressArgs
+    ) {
+      const encoder = IADDRESS_TRACKER_ENCODERS["isTrustedAddress"];
+      const encodedArgs = encoder.args(isTrustedAddressArgs);
+
+      return publicClient.read("isTrustedAddress", { args: encodedArgs });
+    },
+    trustedAddress(trustedAddressArgs: IAddressTrackerTrustedAddressArgs) {
+      const encoder = IADDRESS_TRACKER_ENCODERS["trustedAddress"];
+      const encodedArgs = encoder.args(trustedAddressArgs);
+
+      return publicClient.read("trustedAddress", { args: encodedArgs });
+    },
+    trustedAddressHash(
+      trustedAddressHashArgs: IAddressTrackerTrustedAddressHashArgs
+    ) {
+      const encoder = IADDRESS_TRACKER_ENCODERS["trustedAddressHash"];
+      const encodedArgs = encoder.args(trustedAddressHashArgs);
+
+      return publicClient.read("trustedAddressHash", { args: encodedArgs });
+    },
+  };
+}

@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./TokenManagerLiquidityPool.abi";
 
 export type TokenManagerLiquidityPoolAcceptOperatorshipArgs = {
@@ -493,3 +494,28 @@ export const TOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS = {
     data: encodeTokenManagerLiquidityPoolTransmitInterchainTransferData,
   },
 };
+
+export function createTokenManagerLiquidityPoolReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    hasRole(hasRoleArgs: TokenManagerLiquidityPoolHasRoleArgs) {
+      const encoder = TOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: TokenManagerLiquidityPoolIsOperatorArgs) {
+      const encoder = TOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+    params(paramsArgs: TokenManagerLiquidityPoolParamsArgs) {
+      const encoder = TOKEN_MANAGER_LIQUIDITY_POOL_ENCODERS["params"];
+      const encodedArgs = encoder.args(paramsArgs);
+
+      return publicClient.read("params", { args: encodedArgs });
+    },
+  };
+}

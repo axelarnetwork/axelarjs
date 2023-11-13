@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainTokenService.abi";
 
 export type InterchainTokenServiceAcceptOperatorshipArgs = {
@@ -1150,3 +1151,146 @@ export const INTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     data: encodeInterchainTokenServiceValidTokenManagerAddressData,
   },
 };
+
+export function createInterchainTokenServiceReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    contractCallValue(
+      contractCallValueArgs: InterchainTokenServiceContractCallValueArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["contractCallValue"];
+      const encodedArgs = encoder.args(contractCallValueArgs);
+
+      return publicClient.read("contractCallValue", { args: encodedArgs });
+    },
+    flowInAmount(flowInAmountArgs: InterchainTokenServiceFlowInAmountArgs) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["flowInAmount"];
+      const encodedArgs = encoder.args(flowInAmountArgs);
+
+      return publicClient.read("flowInAmount", { args: encodedArgs });
+    },
+    flowLimit(flowLimitArgs: InterchainTokenServiceFlowLimitArgs) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["flowLimit"];
+      const encodedArgs = encoder.args(flowLimitArgs);
+
+      return publicClient.read("flowLimit", { args: encodedArgs });
+    },
+    flowOutAmount(flowOutAmountArgs: InterchainTokenServiceFlowOutAmountArgs) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["flowOutAmount"];
+      const encodedArgs = encoder.args(flowOutAmountArgs);
+
+      return publicClient.read("flowOutAmount", { args: encodedArgs });
+    },
+    getExpressExecutor(
+      getExpressExecutorArgs: InterchainTokenServiceGetExpressExecutorArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["getExpressExecutor"];
+      const encodedArgs = encoder.args(getExpressExecutorArgs);
+
+      return publicClient.read("getExpressExecutor", { args: encodedArgs });
+    },
+    getExpressExecutorWithToken(
+      getExpressExecutorWithTokenArgs: InterchainTokenServiceGetExpressExecutorWithTokenArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_SERVICE_ENCODERS["getExpressExecutorWithToken"];
+      const encodedArgs = encoder.args(getExpressExecutorWithTokenArgs);
+
+      return publicClient.read("getExpressExecutorWithToken", {
+        args: encodedArgs,
+      });
+    },
+    hasRole(hasRoleArgs: InterchainTokenServiceHasRoleArgs) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    interchainTokenAddress(
+      interchainTokenAddressArgs: InterchainTokenServiceInterchainTokenAddressArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_SERVICE_ENCODERS["interchainTokenAddress"];
+      const encodedArgs = encoder.args(interchainTokenAddressArgs);
+
+      return publicClient.read("interchainTokenAddress", { args: encodedArgs });
+    },
+    interchainTokenId(
+      interchainTokenIdArgs: InterchainTokenServiceInterchainTokenIdArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["interchainTokenId"];
+      const encodedArgs = encoder.args(interchainTokenIdArgs);
+
+      return publicClient.read("interchainTokenId", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: InterchainTokenServiceIsOperatorArgs) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
+    },
+    isTrustedAddress(
+      isTrustedAddressArgs: InterchainTokenServiceIsTrustedAddressArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["isTrustedAddress"];
+      const encodedArgs = encoder.args(isTrustedAddressArgs);
+
+      return publicClient.read("isTrustedAddress", { args: encodedArgs });
+    },
+    tokenManagerAddress(
+      tokenManagerAddressArgs: InterchainTokenServiceTokenManagerAddressArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerAddress"];
+      const encodedArgs = encoder.args(tokenManagerAddressArgs);
+
+      return publicClient.read("tokenManagerAddress", { args: encodedArgs });
+    },
+    tokenManagerImplementation(
+      tokenManagerImplementationArgs: InterchainTokenServiceTokenManagerImplementationArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerImplementation"];
+      const encodedArgs = encoder.args(tokenManagerImplementationArgs);
+
+      return publicClient.read("tokenManagerImplementation", {
+        args: encodedArgs,
+      });
+    },
+    trustedAddress(
+      trustedAddressArgs: InterchainTokenServiceTrustedAddressArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["trustedAddress"];
+      const encodedArgs = encoder.args(trustedAddressArgs);
+
+      return publicClient.read("trustedAddress", { args: encodedArgs });
+    },
+    trustedAddressHash(
+      trustedAddressHashArgs: InterchainTokenServiceTrustedAddressHashArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["trustedAddressHash"];
+      const encodedArgs = encoder.args(trustedAddressHashArgs);
+
+      return publicClient.read("trustedAddressHash", { args: encodedArgs });
+    },
+    validTokenAddress(
+      validTokenAddressArgs: InterchainTokenServiceValidTokenAddressArgs
+    ) {
+      const encoder = INTERCHAIN_TOKEN_SERVICE_ENCODERS["validTokenAddress"];
+      const encodedArgs = encoder.args(validTokenAddressArgs);
+
+      return publicClient.read("validTokenAddress", { args: encodedArgs });
+    },
+    validTokenManagerAddress(
+      validTokenManagerAddressArgs: InterchainTokenServiceValidTokenManagerAddressArgs
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_SERVICE_ENCODERS["validTokenManagerAddress"];
+      const encodedArgs = encoder.args(validTokenManagerAddressArgs);
+
+      return publicClient.read("validTokenManagerAddress", {
+        args: encodedArgs,
+      });
+    },
+  };
+}
