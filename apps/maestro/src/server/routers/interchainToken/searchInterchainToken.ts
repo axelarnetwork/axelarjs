@@ -1,4 +1,4 @@
-import type { InterchainTokenClient } from "@axelarjs/evm";
+import { type InterchainTokenClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
@@ -158,9 +158,9 @@ async function getInterchainToken(
             const itsClient =
               ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-            const remoteTokenAddress = await itsClient
-              .read("getTokenAddress", {
-                args: [kvResult.tokenId],
+            const remoteTokenAddress = await itsClient.reads
+              .interchainTokenAddress({
+                tokenId: kvResult.tokenId,
               })
               .catch(() => null);
 
@@ -177,8 +177,8 @@ async function getInterchainToken(
       const isRegistered = !tokenClient
         ? false
         : await tokenClient
-            .read("getTokenManager")
-            // attempt to read 'token.getTokenManager'
+            .read("tokenManager")
+            // attempt to read 'token.tokenManager'
             .then(() => true)
             // which will throw if the token is not registered
             .catch(() => false);
@@ -196,7 +196,7 @@ async function getInterchainToken(
     // if there are pending remote tokens, mark them as "deployed" if they are now registered
     const newConfirmedRemoteTokens = verifiedRemoteTokens
       .filter((token) => token.isRegistered)
-      .map((t): RemoteInterchainTokenDetails | null => {
+      .map((t) => {
         const match = kvResult.remoteTokens.find(
           (x) => x.chainId === t.chainId
         );

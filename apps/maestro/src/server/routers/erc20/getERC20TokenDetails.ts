@@ -1,4 +1,4 @@
-import type { ERC20Client } from "@axelarjs/evm";
+import type { IERC20BurnableMintableClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
@@ -67,7 +67,7 @@ export const getERC20TokenDetails = publicProcedure
     }
   });
 
-async function getTokenPublicDetails(client: ERC20Client) {
+async function getTokenPublicDetails(client: IERC20BurnableMintableClient) {
   invariant(client.chain, "client.chain must be defined");
 
   const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
