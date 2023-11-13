@@ -32,7 +32,7 @@ export const MintInterchainToken: FC = () => {
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
-    const decimalAdjustment = BigInt(10 ** (erc20Details?.decimals ?? 18));
+    const decimalAdjustment = 10n ** BigInt(erc20Details?.decimals ?? 18n);
     const adjustedAmount = BigInt(data.amountToMint) * decimalAdjustment;
 
     setTxState({
