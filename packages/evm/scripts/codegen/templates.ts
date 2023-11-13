@@ -130,6 +130,7 @@ export const ARGS_FILE = ({
 
   return `
     import { encodeFunctionData } from "viem";
+    
     ${
       readFns.length > 0
         ? `import type { PublicContractClient } from "${
