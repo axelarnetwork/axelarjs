@@ -38,7 +38,7 @@ program
     }) => {
       const npx = await getNpxCompatibleCommand();
 
-      const scriptPath = path.join(getDirname(), "../scripts/codegen.ts");
+      const scriptPath = path.join(getDirname(), "../scripts/codegen");
 
       await $`${npx} tsx ${scriptPath} \
       --src ${src} \
