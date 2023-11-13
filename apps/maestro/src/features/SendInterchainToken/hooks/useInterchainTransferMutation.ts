@@ -3,8 +3,10 @@ import { toast } from "@axelarjs/ui/toaster";
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useAccount, useMutation } from "wagmi";
 
-import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20BurnableMintable.hooks";
-import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
+import {
+  useInterchainTokenDecimals,
+  useInterchainTokenInterchainTransfer,
+} from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -25,7 +27,7 @@ export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
-  const { data: decimals } = useIerc20BurnableMintableDecimals({
+  const { data: decimals } = useInterchainTokenDecimals({
     address: config.tokenAddress,
   });
 
