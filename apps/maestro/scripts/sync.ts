@@ -36,6 +36,7 @@ const WHITELISTED_CONTRACTS = [
   "InterchainTokenService",
   "InterchainTokenFactory",
   "InterchainToken",
+  "TokenManager",
 ];
 
 const contractFolders = await fs
