@@ -56,7 +56,7 @@ async function replaceContentInFile(filePath: string) {
     .replace(
       `from "wagmi";`,
       `from "wagmi";
-    import ABI from "./${fileName.replace("hooks.ts", "abi")}";`
+       import ABI from "./${fileName.replace("hooks.ts", "abi")}";`
     );
 
   const formattedContent = prettier.format(replacedContent, {
