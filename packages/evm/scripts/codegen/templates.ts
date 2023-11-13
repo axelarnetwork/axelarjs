@@ -1,29 +1,7 @@
 import { capitalize } from "@axelarjs/utils/string";
 
-import type { ABIInputItem, ABIItem } from "./types";
-
-const getInputType = (input: ABIInputItem) => {
-  switch (input.type) {
-    // string types
-    case "address":
-    case "bytes32":
-    case "bytes":
-      return "`0x${string}`";
-    case "string":
-      return "string";
-    // number types
-    case "uint256":
-      return "bigint";
-    case "uint8":
-      return "number";
-    // boolean
-    case "bool":
-      return "boolean";
-    // default
-    default:
-      return "any";
-  }
-};
+import type { ABIItem } from "./types";
+import { parseInputType } from "./utils";
 
 export const INDEX_FILE = ({
   fileName = "",
@@ -84,7 +62,7 @@ export const ARGS_FILE = ({
     const argNames = inputs.map(({ name = "" }) => name).join(", ");
 
     const argsType = inputs
-      .map((input) => `${input.name}: ${getInputType(input)}`)
+      .map((input) => `${input.name}: ${parseInputType(input)}`)
       .join("; ");
 
     const fnName = capitalize(name);
