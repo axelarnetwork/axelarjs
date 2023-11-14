@@ -1,16 +1,19 @@
-import { type InferModel } from "drizzle-orm";
-import {
-  integer,
-  pgEnum,
-  pgTable,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { ADDRESS_LENGTH, HASH_LENGTH } from "./common";
+import {
+  ADDRESS_LENGTH,
+  axelarChainId,
+  createdAt,
+  deploymentMessageId,
+  tokenAddress,
+  tokenId,
+  updatedAt,
+} from "./common";
+import { interchainTokens } from "./interchainTokens";
 
-export const deplymentStatusEnum = pgEnum("status", ["deployed", "pending"]);
+export const deplymentStatusEnum = pgEnum("status", ["confirmed", "pending"]);
 
 /**
  * Remote Interchain Tokens
@@ -20,16 +23,19 @@ export const deplymentStatusEnum = pgEnum("status", ["deployed", "pending"]);
  * interchain token to the original interchain token.
  */
 export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
-  tokenId: varchar("token_id", { length: HASH_LENGTH }).primaryKey(),
-  originTokenId: varchar("origin_token_id", { length: HASH_LENGTH }),
-  chainId: integer("chain_id"),
-  axelarChainId: varchar("axelar_chain_id"),
-  address: varchar("address", { length: ADDRESS_LENGTH }),
-  deploymentTxHash: varchar("deployment_tx_hash", { length: HASH_LENGTH }),
-  deploymentLogIndex: integer("deployment_log_index"),
-  deploymentStatus: deplymentStatusEnum("deployment_status"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  tokenId: tokenId
+    .notNull()
+    .primaryKey()
+    .references(() => interchainTokens.tokenId),
+  axelarChainId: axelarChainId.notNull().primaryKey(),
+  tokenAddress: tokenAddress.notNull(),
+  tokenManagerAddress: varchar("token_manager_address", {
+    length: ADDRESS_LENGTH,
+  }).notNull(),
+  deploymentMessageId: deploymentMessageId.notNull(),
+  deploymentStatus: deplymentStatusEnum("deployment_status").default("pending"),
+  createdAt,
+  updatedAt,
 });
 
 /**
@@ -42,9 +48,10 @@ export const remoteInterchainTokensZodSchemas = {
   select: createSelectSchema(remoteInterchainTokens),
 };
 
-export type RemoteInterchainToken = InferModel<typeof remoteInterchainTokens>;
+export type RemoteInterchainToken = InferSelectModel<
+  typeof remoteInterchainTokens
+>;
 
-export type NewRemoteInterchainToken = InferModel<
-  typeof remoteInterchainTokens,
-  "insert"
+export type NewRemoteInterchainToken = InferInsertModel<
+  typeof remoteInterchainTokens
 >;

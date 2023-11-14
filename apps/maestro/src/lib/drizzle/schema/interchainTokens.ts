@@ -1,17 +1,20 @@
-import type { InferModel } from "drizzle-orm";
-import {
-  integer,
-  pgEnum,
-  pgTable,
-  smallint,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { pgEnum, pgTable, smallint, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { ADDRESS_LENGTH, HASH_LENGTH } from "./common";
+import {
+  ADDRESS_LENGTH,
+  axelarChainId,
+  createdAt,
+  deploymentMessageId,
+  HASH_LENGTH,
+  tokenAddress,
+  tokenId,
+  tokenManagerAddress,
+  updatedAt,
+} from "./common";
 
-export const kindEnum = pgEnum("kind", ["canonical", "standardized"]);
+export const kindEnum = pgEnum("kind", ["canonical", "interchain", "custom"]);
 
 /**
  * Interchain Tokens
@@ -19,21 +22,26 @@ export const kindEnum = pgEnum("kind", ["canonical", "standardized"]);
  * This table is used to track the interchain tokens that are deployed on the origin chain.
  */
 export const interchainTokens = pgTable("interchain_tokens", {
-  tokenId: varchar("token_id", { length: HASH_LENGTH }).primaryKey(),
-  tokenAddress: varchar("token_address", { length: ADDRESS_LENGTH }).notNull(),
+  tokenId: tokenId.primaryKey(),
+  tokenAddress: tokenAddress.notNull(),
+  axelarChainId: axelarChainId.notNull(),
   tokenName: varchar("token_name", { length: 100 }).notNull(),
   tokenSymbol: varchar("token_symbol", { length: 100 }).notNull(),
   tokenDecimals: smallint("token_decimals").notNull(),
-  chainId: integer("chain_id").notNull(),
-  axelarChainId: varchar("axelar_chain_id", { length: HASH_LENGTH }).notNull(),
-  deploymentTxHash: varchar("deployment_tx_hash", { length: HASH_LENGTH }),
+  deploymentMessageId: deploymentMessageId.notNull(),
   deployerAddress: varchar("deployer_address", {
     length: ADDRESS_LENGTH,
   }).notNull(),
+  tokenManagerAddress: tokenManagerAddress.notNull(),
+  originalDistributorAddress: varchar("original_distributor_address", {
+    length: ADDRESS_LENGTH,
+  }).notNull(),
   kind: kindEnum("kind").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
-  // only for kind=standardized
+  createdAt,
+  updatedAt,
+  /**
+   * Token deployment salt. Only applicable for kind=intechain|custom.
+   */
   salt: varchar("salt", { length: HASH_LENGTH }),
 });
 
@@ -47,6 +55,5 @@ export const interchainTokensZodSchemas = {
   select: createSelectSchema(interchainTokens),
 };
 
-export type InterchainToken = InferModel<typeof interchainTokens>;
-
-export type NewInterchainToken = InferModel<typeof interchainTokens, "insert">;
+export type InterchainToken = InferSelectModel<typeof interchainTokens>;
+export type NewInterchainToken = InferInsertModel<typeof interchainTokens>;
