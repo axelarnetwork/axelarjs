@@ -11,10 +11,13 @@ import {
   useInterchainTokenFactoryMulticall,
   usePrepareInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
+import type {
+  DeploymentMessageId,
+  NewInterchainToken,
+} from "~/lib/drizzle/schema";
+import { decodeDeploymentMessageId } from "~/lib/drizzle/schema/utils";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import type { IntercahinTokenDetails } from "~/services/db/kv";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export type UseDeployAndRegisterInterchainTokenInput = {
@@ -42,15 +45,13 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
 
-  const { computed } = useEVMChainConfigsQuery();
-
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
-    useState<IntercahinTokenDetails>();
+    useState<NewInterchainToken>();
 
   const { data: tokenId } = useInterchainTokenFactoryInterchainTokenId({
     args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
@@ -136,25 +137,18 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
       }
 
       setRecordDeploymentArgs({
-        kind: "standardized",
+        kind: "interchain",
         salt: config.salt,
         tokenId,
         tokenAddress,
         deployerAddress,
-        chainId: chainId,
-        deploymentTxHash: txHash,
+        deploymentMessageId: `${txHash}-0`,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
-        remoteTokens: input.destinationChainIds.map((axelarChainId) => ({
-          axelarChainId,
-          chainId: computed.indexedById[axelarChainId]?.chain_id,
-          address: tokenAddress,
-          deploymentStatus: "pending",
-          deploymentTxHash: txHash,
-          // deploymentLogIndex is unknown at this point
-        })),
+        tokenManagerAddress: `0x${"0".repeat(40)}`,
+        originalDistributorAddress: deployerAddress,
       });
     },
   });
@@ -164,10 +158,13 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
       if (recordDeploymentArgs) {
         recordDeploymentAsync(recordDeploymentArgs)
           .then(() => {
+            const tx = decodeDeploymentMessageId(
+              recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
+            );
             onStatusUpdate({
               type: "deployed",
-              tokenAddress: recordDeploymentArgs.tokenAddress,
-              txHash: recordDeploymentArgs.deploymentTxHash,
+              tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
+              txHash: tx.hash,
             });
           })
           .catch(() => {
