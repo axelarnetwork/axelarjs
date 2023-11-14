@@ -1,3 +1,4 @@
+import { and, eq, inArray } from "drizzle-orm";
 import type { Address } from "viem";
 
 import type { DBClient } from "~/lib/drizzle/client";
@@ -66,6 +67,25 @@ export default class MaestroPostgresClient {
   }
 
   /**
+   * Updates the deployment status of a list of remote interchain tokens.
+   */
+  async updateRemoteInterchainTokenDeploymentsStatus(
+    tokenId: string,
+    deploymentStatus: "confirmed" | "pending",
+    axelarChainIds: string[]
+  ) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({ deploymentStatus })
+      .where(
+        and(
+          eq(remoteInterchainTokens.tokenId, tokenId),
+          inArray(remoteInterchainTokens.axelarChainId, axelarChainIds)
+        )
+      );
+  }
+
+  /**
    * Returns the interchain token with the given `tokenId`,
    * including its remote interchain tokens.
    */
@@ -73,7 +93,7 @@ export default class MaestroPostgresClient {
     const query = this.db.query.interchainTokens.findFirst({
       where: (table, { eq }) => eq(table.tokenId, tokenId),
       with: {
-        remoteInterchainTokens: true,
+        remoteTokens: true,
       },
     });
 
@@ -85,14 +105,17 @@ export default class MaestroPostgresClient {
    * including its remote interchain tokens.
    */
   async getInterchainTokenByChainIdAndTokenAddress(
-    chainId: number,
+    axelarChainId: string,
     tokenAddress: Address
   ) {
     const query = this.db.query.interchainTokens.findFirst({
       where: (table, { eq, and }) =>
-        and(eq(table.chainId, chainId), eq(table.tokenAddress, tokenAddress)),
+        and(
+          eq(table.axelarChainId, axelarChainId),
+          eq(table.tokenAddress, tokenAddress)
+        ),
       with: {
-        remoteInterchainTokens: true,
+        remoteTokens: true,
       },
     });
 
@@ -101,14 +124,10 @@ export default class MaestroPostgresClient {
 
   /**
    * Returns the interchain tokens deployed by the given `deployerAddress`,
-   * including their remote interchain tokens.
    */
   async getInterchainTokensByDeployerAddress(deployerAddress: Address) {
     const query = this.db.query.interchainTokens.findMany({
       where: (table, { eq }) => eq(table.deployerAddress, deployerAddress),
-      with: {
-        remoteInterchainTokens: true,
-      },
     });
 
     return await query;
