@@ -3,10 +3,6 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
-import {
-  interchainTokenDetailsSchema,
-  type IntercahinTokenDetails,
-} from "~/services/db/kv";
 
 export const getInterchainTokenDetails = publicProcedure
   .meta({
@@ -24,27 +20,30 @@ export const getInterchainTokenDetails = publicProcedure
       tokenAddress: hex40Literal(),
     })
   )
-  .output(interchainTokenDetailsSchema)
-  .query(async ({ input, ctx }): Promise<IntercahinTokenDetails> => {
-    const kvResult = await ctx.persistence.kv.getInterchainTokenDetails({
-      chainId: input.chainId,
-      tokenAddress: input.tokenAddress,
-    });
+  .query(async ({ input, ctx }) => {
+    // translate the chainId to the corresponding axelar chainId
+    const axelarChainId = ctx.configs.evmChains[input.chainId]?.id;
 
-    if (!kvResult) {
+    const tokenRecord =
+      await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+        axelarChainId,
+        input.tokenAddress
+      );
+
+    if (!tokenRecord) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
       });
     }
 
-    if (kvResult.deployerAddress !== ctx.session?.address) {
+    if (tokenRecord.deployerAddress !== ctx.session?.address) {
       return {
-        ...kvResult,
+        ...tokenRecord,
         // salt is not returned if the caller is not the deployer
         salt: "0x".concat("0".repeat(64)),
-      } as IntercahinTokenDetails;
+      };
     }
 
-    return kvResult;
+    return tokenRecord;
   });

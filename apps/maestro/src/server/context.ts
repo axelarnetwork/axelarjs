@@ -1,3 +1,4 @@
+import { EVMChainConfig } from "@axelarjs/api";
 import {
   IERC20BurnableMintableClient,
   InterchainTokenClient,
@@ -37,6 +38,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     NEXT_AUTH_OPTIONS
   );
 
+  const chainConfigs = await axelarscanClient.getChainConfigs();
+
   return {
     req,
     res,
@@ -48,6 +51,23 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       openai: new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       }),
+    },
+    configs: {
+      /**
+       * EVM chain configs indexed by chain id and chain_id
+       * @example
+       * ```ts
+       * const chainConfig = ctx.configs.evmChains[1]; // => Ethereum
+       * ```
+       */
+      evmChains: chainConfigs.evm.reduce(
+        (acc, chain) => ({
+          ...acc,
+          [chain.id]: chain,
+          [chain.chain_id]: chain,
+        }),
+        {} as Record<string | number, EVMChainConfig>
+      ),
     },
     persistence: {
       /**
