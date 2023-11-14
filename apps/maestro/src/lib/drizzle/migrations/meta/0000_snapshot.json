@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "edccdccc-a4b2-4f3a-8af4-436a2f1f611f",
+  "id": "620b4f11-3e9b-4353-be14-40d8691e0f9b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "interchain_tokens": {
@@ -17,6 +17,12 @@
         "token_address": {
           "name": "token_address",
           "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "axelar_chain_id": {
+          "name": "axelar_chain_id",
+          "type": "varchar(66)",
           "primaryKey": false,
           "notNull": true
         },
@@ -38,26 +44,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "chain_id": {
-          "name": "chain_id",
-          "type": "integer",
+        "deployment_message_id": {
+          "name": "deployment_message_id",
+          "type": "varchar(71)",
           "primaryKey": false,
           "notNull": true
-        },
-        "axelar_chain_id": {
-          "name": "axelar_chain_id",
-          "type": "varchar(66)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "deployment_tx_hash": {
-          "name": "deployment_tx_hash",
-          "type": "varchar(66)",
-          "primaryKey": false,
-          "notNull": false
         },
         "deployer_address": {
           "name": "deployer_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_manager_address": {
+          "name": "token_manager_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "original_distributor_address": {
+          "name": "original_distributor_address",
           "type": "varchar(42)",
           "primaryKey": false,
           "notNull": true
@@ -72,13 +78,15 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "salt": {
           "name": "salt",
@@ -102,63 +110,68 @@
           "primaryKey": true,
           "notNull": true
         },
-        "origin_token_id": {
-          "name": "origin_token_id",
-          "type": "varchar(66)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "chain_id": {
-          "name": "chain_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "axelar_chain_id": {
           "name": "axelar_chain_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
+          "type": "varchar(66)",
+          "primaryKey": true,
+          "notNull": true
         },
-        "address": {
-          "name": "address",
+        "token_address": {
+          "name": "token_address",
           "type": "varchar(42)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "deployment_tx_hash": {
-          "name": "deployment_tx_hash",
-          "type": "varchar(66)",
+        "token_manager_address": {
+          "name": "token_manager_address",
+          "type": "varchar(42)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "deployment_log_index": {
-          "name": "deployment_log_index",
-          "type": "integer",
+        "deployment_message_id": {
+          "name": "deployment_message_id",
+          "type": "varchar(71)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "deployment_status": {
           "name": "deployment_status",
           "type": "status",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'pending'"
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "remote_interchain_tokens_token_id_interchain_tokens_token_id_fk": {
+          "name": "remote_interchain_tokens_token_id_interchain_tokens_token_id_fk",
+          "tableFrom": "remote_interchain_tokens",
+          "tableTo": "interchain_tokens",
+          "columnsFrom": [
+            "token_id"
+          ],
+          "columnsTo": [
+            "token_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }
@@ -168,13 +181,14 @@
       "name": "kind",
       "values": {
         "canonical": "canonical",
-        "standardized": "standardized"
+        "interchain": "interchain",
+        "custom": "custom"
       }
     },
     "status": {
       "name": "status",
       "values": {
-        "deployed": "deployed",
+        "confirmed": "confirmed",
         "pending": "pending"
       }
     }
