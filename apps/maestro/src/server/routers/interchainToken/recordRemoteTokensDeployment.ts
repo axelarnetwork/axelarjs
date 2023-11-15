@@ -3,12 +3,16 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
-import { remoteInterchainTokenSchema } from "~/services/db/kv";
+
+const remoteInterchainTokenSchema = z.object({
+  axelarChainId: z.string(),
+});
 
 export const recordRemoteTokensDeployment = protectedProcedure
   .input(
     z.object({
-      chainId: z.number(),
+      axelarChainId: z.string(),
+      deploymentMessageId: z.string(),
       tokenAddress: hex40Literal(),
       remoteTokens: z.array(remoteInterchainTokenSchema),
     })
@@ -16,14 +20,14 @@ export const recordRemoteTokensDeployment = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     const originToken =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-        input.chainId,
+        input.axelarChainId,
         input.tokenAddress
       );
 
     if (!originToken) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.chainId}`,
+        message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.axelarChainId}`,
       });
     }
 
@@ -34,16 +38,30 @@ export const recordRemoteTokensDeployment = protectedProcedure
       });
     }
 
+    const remoteTokens = await Promise.all(
+      input.remoteTokens.map(async (remoteToken) => {
+        const config = ctx.configs.evmChains[remoteToken.axelarChainId];
+
+        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+          config.wagmi
+        );
+
+        const tokenManagerAddress = await itsClient.reads.tokenManagerAddress({
+          tokenId: originToken.tokenId as `0x${string}`,
+        });
+
+        return {
+          tokenManagerAddress,
+          tokenId: originToken.tokenId,
+          axelarChainId: remoteToken.axelarChainId,
+          deploymentStatus: "pending" as const,
+          tokenAddress: input.tokenAddress,
+          deploymentMessageId: input.deploymentMessageId,
+        };
+      })
+    );
+
     return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      input.remoteTokens.map((remoteToken) => ({
-        tokenId: originToken.tokenId,
-        originTokenId: originToken.tokenId,
-        address: originToken.tokenAddress,
-        deploymentTxHash: remoteToken.deploymentTxHash,
-        deploymentStatus: remoteToken.deploymentStatus,
-        chainId: remoteToken.chainId,
-        axelarChainId: remoteToken.axelarChainId,
-        deploymentLogIndex: remoteToken.deploymentLogIndex,
-      }))
+      remoteTokens
     );
   });

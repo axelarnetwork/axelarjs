@@ -7,9 +7,27 @@ import { z } from "zod";
 
 import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
-import { hex40Literal } from "~/lib/utils/validation";
+import { hex40Literal, hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
+
+const tokenDetailsSchema = z.object({
+  tokenId: hexLiteral().optional(),
+  tokenAddress: hex40Literal().optional(),
+  isOriginToken: z.boolean().optional(),
+  isRegistered: z.boolean(),
+  chainId: z.number().optional(),
+  chainName: z.string().optional(),
+  axelarChainId: z.string().optional(),
+  kind: z.enum(["interchain", "canonical", "custom"]).optional(),
+});
+
+const outputSchema = tokenDetailsSchema.extend({
+  wasDeployedByAccount: z.boolean(),
+  matchingTokens: z.array(tokenDetailsSchema),
+});
+
+type Output = z.infer<typeof outputSchema>;
 
 export const searchInterchainToken = publicProcedure
   .meta({
@@ -29,6 +47,7 @@ export const searchInterchainToken = publicProcedure
       strict: z.boolean().optional(),
     })
   )
+  .output(outputSchema)
   .query(async ({ input, ctx }) => {
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
@@ -89,7 +108,7 @@ async function getInterchainToken(
     tokenAddress: tokenDetails.tokenAddress,
     isOriginToken: tokenDetails.axelarChainId === chainConfig?.axelarChainId,
     isRegistered: true,
-    chainId: chainConfig?.id ?? null,
+    chainId: chainConfig.id,
     chainName: chainConfig.name,
     axelarChainId: tokenDetails.axelarChainId,
     kind: tokenDetails.kind,
@@ -221,8 +240,8 @@ async function getInterchainToken(
       isOriginToken: false,
       isRegistered: false,
       chainId: chain.id,
+      axealrChainId: chain.axelarChainId,
       chainName: chain.name,
-      axelarChainId: null,
       wasDeployedByAccount: false,
       kind: null,
     }));
@@ -231,7 +250,7 @@ async function getInterchainToken(
     ...lookupToken,
     wasDeployedByAccount: tokenDetails.deployerAddress === ctx.session?.address,
     matchingTokens: [lookupToken, ...verifiedRemoteTokens, ...unregistered],
-  };
+  } as Output;
 }
 
 /**

@@ -5,15 +5,6 @@ import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 export const getInterchainTokenDetails = publicProcedure
-  .meta({
-    openapi: {
-      summary: "Get interchain token details",
-      description: "Get interchain token details by chainId and tokenAddress.",
-      method: "GET",
-      path: "/interchain-token/details",
-      tags: ["interchain-token"],
-    },
-  })
   .input(
     z.object({
       chainId: z.number(),
@@ -22,7 +13,7 @@ export const getInterchainTokenDetails = publicProcedure
   )
   .query(async ({ input, ctx }) => {
     // translate the chainId to the corresponding axelar chainId
-    const axelarChainId = ctx.configs.evmChains[input.chainId]?.id;
+    const axelarChainId = ctx.configs.evmChains[input.chainId]?.info.id;
 
     const tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(

@@ -6,6 +6,7 @@ import {
   InterchainTokenServiceClient,
   TokenManagerClient,
 } from "@axelarjs/evm";
+import { invariant } from "@axelarjs/utils";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession, type AuthOptions } from "next-auth";
 
@@ -19,6 +20,7 @@ import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
 } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
+import { EVM_CHAIN_CONFIGS, WagmiEVMChainConfig } from "~/config/wagmi";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
@@ -60,14 +62,39 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
        * const chainConfig = ctx.configs.evmChains[1]; // => Ethereum
        * ```
        */
-      evmChains: chainConfigs.evm.reduce(
-        (acc, chain) => ({
-          ...acc,
-          [chain.id]: chain,
-          [chain.chain_id]: chain,
-        }),
-        {} as Record<string | number, EVMChainConfig>
-      ),
+      evmChains: chainConfigs.evm
+        // filter out chains that are do not have a wagmi config
+        .filter((chain) =>
+          EVM_CHAIN_CONFIGS.some((config) => config.id === chain.chain_id)
+        )
+        .reduce(
+          (acc, chain) => {
+            const wagmiConfig = EVM_CHAIN_CONFIGS.find(
+              (config) => config.id === chain.chain_id
+            );
+
+            // for type safety
+            invariant(wagmiConfig, "wagmiConfig is required");
+
+            const entry = {
+              info: chain,
+              wagmi: wagmiConfig,
+            };
+
+            return {
+              ...acc,
+              [chain.id]: entry,
+              [chain.chain_id]: entry,
+            };
+          },
+          {} as Record<
+            string | number,
+            {
+              info: EVMChainConfig;
+              wagmi: WagmiEVMChainConfig;
+            }
+          >
+        ),
     },
     persistence: {
       /**
