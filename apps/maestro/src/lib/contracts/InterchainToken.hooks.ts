@@ -121,29 +121,6 @@ export function useInterchainTokenBalanceOf<
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"contractId"`.
- */
-export function useInterchainTokenContractId<
-  TFunctionName extends "contractId",
-  TSelectData = ReadContractResult<typeof interchainTokenABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenABI,
-    functionName: "contractId",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenABI, TFunctionName, TSelectData>);
-}
-
-/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"decimals"`.
  */
 export function useInterchainTokenDecimals<
@@ -540,6 +517,33 @@ export function useInterchainTokenIncreaseAllowance<
 }
 
 /**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"init"`.
+ */
+export function useInterchainTokenInit<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenABI,
+          "init"
+        >["request"]["abi"],
+        "init",
+        TMode
+      > & { functionName?: "init" }
+    : UseContractWriteConfig<typeof interchainTokenABI, "init", TMode> & {
+        abi?: never;
+        functionName?: "init";
+      } = {} as any
+) {
+  return useContractWrite<typeof interchainTokenABI, "init", TMode>({
+    abi: interchainTokenABI,
+    functionName: "init",
+    ...config,
+  } as any);
+}
+
+/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"interchainTransfer"`.
  */
 export function useInterchainTokenInterchainTransfer<
@@ -694,33 +698,6 @@ export function useInterchainTokenProposeDistributorship<
   >({
     abi: interchainTokenABI,
     functionName: "proposeDistributorship",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"setup"`.
- */
-export function useInterchainTokenSetup<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof interchainTokenABI,
-          "setup"
-        >["request"]["abi"],
-        "setup",
-        TMode
-      > & { functionName?: "setup" }
-    : UseContractWriteConfig<typeof interchainTokenABI, "setup", TMode> & {
-        abi?: never;
-        functionName?: "setup";
-      } = {} as any
-) {
-  return useContractWrite<typeof interchainTokenABI, "setup", TMode>({
-    abi: interchainTokenABI,
-    functionName: "setup",
     ...config,
   } as any);
 }
@@ -923,6 +900,22 @@ export function usePrepareInterchainTokenIncreaseAllowance(
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"init"`.
+ */
+export function usePrepareInterchainTokenInit(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof interchainTokenABI, "init">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenABI,
+    functionName: "init",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "init">);
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"interchainTransfer"`.
  */
 export function usePrepareInterchainTokenInterchainTransfer(
@@ -1009,22 +1002,6 @@ export function usePrepareInterchainTokenProposeDistributorship(
     functionName: "proposeDistributorship",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "proposeDistributorship">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenABI}__ and `functionName` set to `"setup"`.
- */
-export function usePrepareInterchainTokenSetup(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof interchainTokenABI, "setup">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: interchainTokenABI,
-    functionName: "setup",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenABI, "setup">);
 }
 
 /**

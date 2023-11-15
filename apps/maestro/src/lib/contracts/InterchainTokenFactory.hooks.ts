@@ -172,6 +172,33 @@ export function useInterchainTokenFactoryContractId<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"gateway"`.
+ */
+export function useInterchainTokenFactoryGateway<
+  TFunctionName extends "gateway",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenFactoryABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenFactoryABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
+    functionName: "gateway",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"implementation"`.
  */
 export function useInterchainTokenFactoryImplementation<

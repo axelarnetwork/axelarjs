@@ -11,6 +11,9 @@ const nextConfig = {
       {
         hostname: "testnet.axelar.network",
       },
+      {
+        hostname: "testnet.axelarscan.io",
+      },
     ],
   },
 };

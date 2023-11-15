@@ -513,8 +513,8 @@ importers:
         version: 7.2.3
     devDependencies:
       '@axelar-network/interchain-token-service':
-        specifier: ^1.0.0-beta.2
-        version: 1.0.0-beta.2
+        specifier: ^1.0.0-beta.3
+        version: 1.0.0-beta.3
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
@@ -975,8 +975,8 @@ packages:
       protobufjs: 7.2.5
     dev: false
 
-  /@axelar-network/interchain-token-service@1.0.0-beta.2:
-    resolution: {integrity: sha512-dMvwvoJuRBrU6HfmyshSP2PhHxKgQPbDJRYYpoYbfpKeeFxuh1FT/OeYkHRlxaN+619B8mzgLQZkbtIy3QwHLw==}
+  /@axelar-network/interchain-token-service@1.0.0-beta.3:
+    resolution: {integrity: sha512-yoW1sxDg5LB25w9fSgtPcu/8vbOo4MzxlpJvHLnMrHmXAKwDJMaNDt0X1JgME8bH8aiyHh/ciB6ajBnN7oFkgw==}
     engines: {node: '>=16'}
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 6.1.2

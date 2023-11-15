@@ -124,6 +124,25 @@ export function useTokenManagerFlowOutAmount<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"getTokenAddressFromParams"`.
+ */
+export function useTokenManagerGetTokenAddressFromParams<
+  TFunctionName extends "getTokenAddressFromParams",
+  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: tokenManagerABI,
+    functionName: "getTokenAddressFromParams",
+    ...config,
+  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"hasRole"`.
  */
 export function useTokenManagerHasRole<
