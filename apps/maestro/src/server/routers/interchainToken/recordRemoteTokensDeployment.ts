@@ -11,23 +11,24 @@ const remoteInterchainTokenSchema = z.object({
 export const recordRemoteTokensDeployment = protectedProcedure
   .input(
     z.object({
-      axelarChainId: z.string(),
+      chainId: z.number(),
       deploymentMessageId: z.string(),
       tokenAddress: hex40Literal(),
       remoteTokens: z.array(remoteInterchainTokenSchema),
     })
   )
   .mutation(async ({ ctx, input }) => {
+    const chain = ctx.configs.evmChains[input.chainId];
     const originToken =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-        input.axelarChainId,
+        chain.info.id,
         input.tokenAddress
       );
 
     if (!originToken) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.axelarChainId}`,
+        message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.chainId}`,
       });
     }
 

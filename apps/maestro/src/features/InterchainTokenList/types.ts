@@ -2,7 +2,7 @@ import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api/index";
 
 import type { WagmiEVMChainConfig } from "~/config/wagmi";
 
-type Kind = "canonical" | "standardized";
+type Kind = "canonical" | "interchain";
 
 export type TokenInfo = {
   chainId: number;

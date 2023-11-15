@@ -11,16 +11,16 @@ import {
   useInterchainTokenFactoryMulticall,
   usePrepareInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import type {
-  DeploymentMessageId,
-  NewInterchainToken,
+import {
+  decodeDeploymentMessageId,
+  type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { decodeDeploymentMessageId } from "~/lib/drizzle/schema/utils";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
+import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
-export type UseDeployAndRegisterInterchainTokenInput = {
+export interface UseDeployAndRegisterInterchainTokenInput {
   sourceChainId: string;
   tokenName: string;
   tokenSymbol: string;
@@ -29,17 +29,17 @@ export type UseDeployAndRegisterInterchainTokenInput = {
   gasFees: bigint[];
   initialSupply?: bigint;
   deployerAddress?: `0x${string}`;
-};
+}
 
-export type UseDeployAndRegisterRemoteStandardizedTokenConfig = {
+export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
   value: bigint;
   salt: `0x${string}`;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
-};
+}
 
-export function useDeployAndRegisterRemoteStandardizedTokenMutation(
-  config: UseDeployAndRegisterRemoteStandardizedTokenConfig,
+export function useDeployAndRegisterRemoteInterchainTokenMutation(
+  config: UseDeployAndRegisterRemoteInterchainTokenConfig,
   input?: UseDeployAndRegisterInterchainTokenInput
 ) {
   const { address: deployerAddress } = useAccount();
@@ -51,7 +51,7 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
-    useState<NewInterchainToken>();
+    useState<RecordInterchainTokenDeploymentInput>();
 
   const { data: tokenId } = useInterchainTokenFactoryInterchainTokenId({
     args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
@@ -147,8 +147,8 @@ export function useDeployAndRegisterRemoteStandardizedTokenMutation(
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
-        tokenManagerAddress: `0x${"0".repeat(40)}`,
         originalDistributorAddress: deployerAddress,
+        destinationAxelarChainIds: input.destinationChainIds,
       });
     },
   });

@@ -1,23 +1,31 @@
 import { and, eq, inArray } from "drizzle-orm";
 import type { Address } from "viem";
+import { z } from "zod";
 
 import type { DBClient } from "~/lib/drizzle/client";
 import {
   interchainTokens,
+  interchainTokensZodSchemas,
   remoteInterchainTokens,
-  type NewInterchainToken,
-  type NewRemoteInterchainToken,
+  remoteInterchainTokensZodSchemas,
 } from "~/lib/drizzle/schema";
 
-type NewRemoteInterchainTokenInput = Omit<
-  NewRemoteInterchainToken,
-  "createdAt" | "updatedAt"
+export const newRemoteInterchainTokenSchema =
+  remoteInterchainTokensZodSchemas.insert.omit({
+    createdAt: true,
+    updatedAt: true,
+  });
+
+export const newInterchainTokenSchema = interchainTokensZodSchemas.insert.omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type NewRemoteInterchainTokenInput = z.infer<
+  typeof newRemoteInterchainTokenSchema
 >;
 
-type NewInterchainTokenInput = Omit<
-  NewInterchainToken,
-  "createdAt" | "updatedAt"
->;
+export type NewInterchainTokenInput = z.infer<typeof newInterchainTokenSchema>;
 
 export default class MaestroPostgresClient {
   constructor(private db: DBClient) {}

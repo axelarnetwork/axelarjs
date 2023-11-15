@@ -43,7 +43,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, computed.indexedByChainId[token.chainId]] as const
+              [token, computed.indexedById[token.axelarChainId]] as const
           )
         )
         .map(filter(([token, chain]) => Boolean(token) && Boolean(chain)))
@@ -52,7 +52,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
           [],
           sortBy(([, chain]) => chain.id)
         ),
-    [computed.indexedByChainId, data]
+    [computed.indexedById, data]
   );
 
   return (
@@ -67,7 +67,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
       </Page.Title>
       <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {filteredTokens.map(([token, chain]) => {
-          const href = `/${getChainNameSlug(token.chainId)}/${
+          const href = `/${getChainNameSlug(chain.chain_id)}/${
             token.tokenAddress
           }`;
           return (
@@ -91,7 +91,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
                         size="sm"
                         className="bg-base-300 dark:bg-base-100"
                       >
-                        {maskAddress(token.tokenAddress, {
+                        {maskAddress(token.tokenAddress as `0x${string}`, {
                           segmentA: 10,
                           segmentB: -10,
                         })}

@@ -11,15 +11,15 @@ import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hoo
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
-export type RegisterRemoteStandardizedTokensInput = {
+export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
   tokenAddress: `0x${string}`;
   originChainId: number;
   deployerAddress: `0x${string}`;
 };
 
-export default function useRegisterRemoteStandardizedTokens(
-  input: RegisterRemoteStandardizedTokensInput
+export default function useRegisterRemoteInterchainTokens(
+  input: RegisterRemoteInterchainTokensInput
 ) {
   const { computed } = useEVMChainConfigsQuery();
   const chainId = useChainId();
@@ -50,13 +50,12 @@ export default function useRegisterRemoteStandardizedTokens(
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDeployment || !gasFees || tokenDeployment.kind !== "standardized")
+    if (!tokenDeployment || !gasFees || tokenDeployment.kind !== "interchain")
       return [];
 
     return destinationChainIds.map((chainId, i) =>
-      // encode InterchainTokenService DeployAndRegisterRemoteStandardizedTokenData
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
-        salt: tokenDeployment.salt,
+        salt: tokenDeployment.salt as `0x${string}`,
         originalChainName: sourceChain?.name ?? "",
         distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
         destinationChain: chainId,

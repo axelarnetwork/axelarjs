@@ -15,7 +15,7 @@ import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
-import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks";
+import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/AddErc20/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { NextButton } from "../shared";
@@ -112,7 +112,7 @@ export const Step3: FC = () => {
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
   const { writeAsync: deployInterchainTokenAsync } =
-    useDeployAndRegisterRemoteStandardizedTokenMutation(
+    useDeployAndRegisterRemoteInterchainTokenMutation(
       {
         salt: rootState.tokenDetails.salt,
         value: totalGasFees,

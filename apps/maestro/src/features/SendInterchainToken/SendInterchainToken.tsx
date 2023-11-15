@@ -22,7 +22,7 @@ type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  kind: "canonical" | "standardized";
+  kind: "canonical" | "interchain";
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
