@@ -158,6 +158,54 @@ export const encodeIInterchainTokenHasRoleData = ({
     args: [account, role],
   });
 
+export type IInterchainTokenInitArgs = {
+  tokenManagerAddress: `0x${string}`;
+  distributor: `0x${string}`;
+  tokenName: string;
+  tokenSymbol: string;
+  tokenDecimals: number;
+};
+
+/**
+ * Factory function for IInterchainToken.init function args
+ */
+export const encodeIInterchainTokenInitArgs = ({
+  tokenManagerAddress,
+  distributor,
+  tokenName,
+  tokenSymbol,
+  tokenDecimals,
+}: IInterchainTokenInitArgs) =>
+  [
+    tokenManagerAddress,
+    distributor,
+    tokenName,
+    tokenSymbol,
+    tokenDecimals,
+  ] as const;
+
+/**
+ * Encoder function for IInterchainToken.init function data
+ */
+export const encodeIInterchainTokenInitData = ({
+  tokenManagerAddress,
+  distributor,
+  tokenName,
+  tokenSymbol,
+  tokenDecimals,
+}: IInterchainTokenInitArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "init",
+    abi: ABI_FILE.abi,
+    args: [
+      tokenManagerAddress,
+      distributor,
+      tokenName,
+      tokenSymbol,
+      tokenDecimals,
+    ],
+  });
+
 export type IInterchainTokenInterchainTransferArgs = {
   destinationChain: string;
   recipient: `0x${string}`;
@@ -294,27 +342,6 @@ export const encodeIInterchainTokenProposeDistributorshipData = ({
     args: [distributor_],
   });
 
-export type IInterchainTokenSetupArgs = { data: `0x${string}` };
-
-/**
- * Factory function for IInterchainToken.setup function args
- */
-export const encodeIInterchainTokenSetupArgs = ({
-  data,
-}: IInterchainTokenSetupArgs) => [data] as const;
-
-/**
- * Encoder function for IInterchainToken.setup function data
- */
-export const encodeIInterchainTokenSetupData = ({
-  data,
-}: IInterchainTokenSetupArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "setup",
-    abi: ABI_FILE.abi,
-    args: [data],
-  });
-
 export type IInterchainTokenTransferArgs = {
   recipient: `0x${string}`;
   amount: bigint;
@@ -418,6 +445,10 @@ export const IINTERCHAIN_TOKEN_ENCODERS = {
     args: encodeIInterchainTokenHasRoleArgs,
     data: encodeIInterchainTokenHasRoleData,
   },
+  init: {
+    args: encodeIInterchainTokenInitArgs,
+    data: encodeIInterchainTokenInitData,
+  },
   interchainTransfer: {
     args: encodeIInterchainTokenInterchainTransferArgs,
     data: encodeIInterchainTokenInterchainTransferData,
@@ -437,10 +468,6 @@ export const IINTERCHAIN_TOKEN_ENCODERS = {
   proposeDistributorship: {
     args: encodeIInterchainTokenProposeDistributorshipArgs,
     data: encodeIInterchainTokenProposeDistributorshipData,
-  },
-  setup: {
-    args: encodeIInterchainTokenSetupArgs,
-    data: encodeIInterchainTokenSetupData,
   },
   transfer: {
     args: encodeIInterchainTokenTransferArgs,

@@ -90,6 +90,29 @@ export const encodeTokenManagerCallContractWithInterchainTokenData = ({
     args: [destinationChain, destinationAddress, amount, data],
   });
 
+export type TokenManagerGetTokenAddressFromParamsArgs = {
+  params: `0x${string}`;
+};
+
+/**
+ * Factory function for TokenManager.getTokenAddressFromParams function args
+ */
+export const encodeTokenManagerGetTokenAddressFromParamsArgs = ({
+  params,
+}: TokenManagerGetTokenAddressFromParamsArgs) => [params] as const;
+
+/**
+ * Encoder function for TokenManager.getTokenAddressFromParams function data
+ */
+export const encodeTokenManagerGetTokenAddressFromParamsData = ({
+  params,
+}: TokenManagerGetTokenAddressFromParamsArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "getTokenAddressFromParams",
+    abi: ABI_FILE.abi,
+    args: [params],
+  });
+
 export type TokenManagerGiveTokenArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
@@ -373,6 +396,10 @@ export const TOKEN_MANAGER_ENCODERS = {
     args: encodeTokenManagerCallContractWithInterchainTokenArgs,
     data: encodeTokenManagerCallContractWithInterchainTokenData,
   },
+  getTokenAddressFromParams: {
+    args: encodeTokenManagerGetTokenAddressFromParamsArgs,
+    data: encodeTokenManagerGetTokenAddressFromParamsData,
+  },
   giveToken: {
     args: encodeTokenManagerGiveTokenArgs,
     data: encodeTokenManagerGiveTokenData,
@@ -423,6 +450,16 @@ export function createTokenManagerReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    getTokenAddressFromParams(
+      getTokenAddressFromParamsArgs: TokenManagerGetTokenAddressFromParamsArgs
+    ) {
+      const encoder = TOKEN_MANAGER_ENCODERS["getTokenAddressFromParams"];
+      const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);
+
+      return publicClient.read("getTokenAddressFromParams", {
+        args: encodedArgs,
+      });
+    },
     hasRole(hasRoleArgs: TokenManagerHasRoleArgs) {
       const encoder = TOKEN_MANAGER_ENCODERS["hasRole"];
       const encodedArgs = encoder.args(hasRoleArgs);

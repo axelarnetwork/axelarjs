@@ -17,6 +17,17 @@ export default {
       type: "error",
     },
     {
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+      ],
+      name: "GatewayToken",
+      type: "error",
+    },
+    {
       inputs: [],
       name: "InvalidChainName",
       type: "error",
@@ -76,7 +87,7 @@ export default {
       inputs: [
         {
           internalType: "bytes32",
-          name: "chainAddressHash_",
+          name: "chainNameHash_",
           type: "bytes32",
         },
         {
@@ -151,12 +162,12 @@ export default {
       inputs: [
         {
           internalType: "string",
-          name: "originalChainName",
+          name: "originalChain",
           type: "string",
         },
         {
           internalType: "address",
-          name: "originalAddress",
+          name: "originalTokenAddress",
           type: "address",
         },
         {
@@ -260,7 +271,7 @@ export default {
       inputs: [
         {
           internalType: "bytes32",
-          name: "chainAddressHash_",
+          name: "chainNameHash_",
           type: "bytes32",
         },
         {

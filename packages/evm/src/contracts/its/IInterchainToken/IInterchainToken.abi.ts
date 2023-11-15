@@ -13,6 +13,11 @@ export default {
   abi: [
     {
       inputs: [],
+      name: "AlreadyInitialized",
+      type: "error",
+    },
+    {
+      inputs: [],
       name: "InvalidAccount",
       type: "error",
     },
@@ -83,11 +88,6 @@ export default {
         },
       ],
       name: "MissingRole",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "NotProxy",
       type: "error",
     },
     {
@@ -313,19 +313,6 @@ export default {
     },
     {
       inputs: [],
-      name: "contractId",
-      outputs: [
-        {
-          internalType: "bytes32",
-          name: "",
-          type: "bytes32",
-        },
-      ],
-      stateMutability: "pure",
-      type: "function",
-    },
-    {
-      inputs: [],
       name: "decimals",
       outputs: [
         {
@@ -359,6 +346,39 @@ export default {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenManagerAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "distributor",
+          type: "address",
+        },
+        {
+          internalType: "string",
+          name: "tokenName",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "tokenSymbol",
+          type: "string",
+        },
+        {
+          internalType: "uint8",
+          name: "tokenDecimals",
+          type: "uint8",
+        },
+      ],
+      name: "init",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
@@ -481,19 +501,6 @@ export default {
         },
       ],
       name: "proposeDistributorship",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes",
-          name: "data",
-          type: "bytes",
-        },
-      ],
-      name: "setup",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",

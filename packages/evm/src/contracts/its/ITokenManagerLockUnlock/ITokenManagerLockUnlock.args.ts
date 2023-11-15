@@ -94,6 +94,29 @@ export const encodeITokenManagerLockUnlockCallContractWithInterchainTokenData =
       args: [destinationChain, destinationAddress, amount, data],
     });
 
+export type ITokenManagerLockUnlockGetTokenAddressFromParamsArgs = {
+  params: `0x${string}`;
+};
+
+/**
+ * Factory function for ITokenManagerLockUnlock.getTokenAddressFromParams function args
+ */
+export const encodeITokenManagerLockUnlockGetTokenAddressFromParamsArgs = ({
+  params,
+}: ITokenManagerLockUnlockGetTokenAddressFromParamsArgs) => [params] as const;
+
+/**
+ * Encoder function for ITokenManagerLockUnlock.getTokenAddressFromParams function data
+ */
+export const encodeITokenManagerLockUnlockGetTokenAddressFromParamsData = ({
+  params,
+}: ITokenManagerLockUnlockGetTokenAddressFromParamsArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "getTokenAddressFromParams",
+    abi: ABI_FILE.abi,
+    args: [params],
+  });
+
 export type ITokenManagerLockUnlockGiveTokenArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
@@ -413,6 +436,10 @@ export const ITOKEN_MANAGER_LOCK_UNLOCK_ENCODERS = {
     args: encodeITokenManagerLockUnlockCallContractWithInterchainTokenArgs,
     data: encodeITokenManagerLockUnlockCallContractWithInterchainTokenData,
   },
+  getTokenAddressFromParams: {
+    args: encodeITokenManagerLockUnlockGetTokenAddressFromParamsArgs,
+    data: encodeITokenManagerLockUnlockGetTokenAddressFromParamsData,
+  },
   giveToken: {
     args: encodeITokenManagerLockUnlockGiveTokenArgs,
     data: encodeITokenManagerLockUnlockGiveTokenData,
@@ -467,6 +494,17 @@ export function createITokenManagerLockUnlockReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    getTokenAddressFromParams(
+      getTokenAddressFromParamsArgs: ITokenManagerLockUnlockGetTokenAddressFromParamsArgs
+    ) {
+      const encoder =
+        ITOKEN_MANAGER_LOCK_UNLOCK_ENCODERS["getTokenAddressFromParams"];
+      const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);
+
+      return publicClient.read("getTokenAddressFromParams", {
+        args: encodedArgs,
+      });
+    },
     hasRole(hasRoleArgs: ITokenManagerLockUnlockHasRoleArgs) {
       const encoder = ITOKEN_MANAGER_LOCK_UNLOCK_ENCODERS["hasRole"];
       const encodedArgs = encoder.args(hasRoleArgs);

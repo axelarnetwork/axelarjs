@@ -62,7 +62,7 @@ export default {
           type: "address",
         },
       ],
-      stateMutability: "payable",
+      stateMutability: "nonpayable",
       type: "function",
     },
     {

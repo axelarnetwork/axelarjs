@@ -362,6 +362,25 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes",
+          name: "params",
+          type: "bytes",
+        },
+      ],
+      name: "getTokenAddressFromParams",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "pure",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "address",
           name: "destinationAddress",
           type: "address",

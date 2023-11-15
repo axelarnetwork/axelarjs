@@ -94,6 +94,29 @@ export const encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenData 
       args: [destinationChain, destinationAddress, amount, data],
     });
 
+export type TokenManagerLockUnlockFeeGetTokenAddressFromParamsArgs = {
+  params: `0x${string}`;
+};
+
+/**
+ * Factory function for TokenManagerLockUnlockFee.getTokenAddressFromParams function args
+ */
+export const encodeTokenManagerLockUnlockFeeGetTokenAddressFromParamsArgs = ({
+  params,
+}: TokenManagerLockUnlockFeeGetTokenAddressFromParamsArgs) => [params] as const;
+
+/**
+ * Encoder function for TokenManagerLockUnlockFee.getTokenAddressFromParams function data
+ */
+export const encodeTokenManagerLockUnlockFeeGetTokenAddressFromParamsData = ({
+  params,
+}: TokenManagerLockUnlockFeeGetTokenAddressFromParamsArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "getTokenAddressFromParams",
+    abi: ABI_FILE.abi,
+    args: [params],
+  });
+
 export type TokenManagerLockUnlockFeeGiveTokenArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
@@ -413,6 +436,10 @@ export const TOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS = {
     args: encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenArgs,
     data: encodeTokenManagerLockUnlockFeeCallContractWithInterchainTokenData,
   },
+  getTokenAddressFromParams: {
+    args: encodeTokenManagerLockUnlockFeeGetTokenAddressFromParamsArgs,
+    data: encodeTokenManagerLockUnlockFeeGetTokenAddressFromParamsData,
+  },
   giveToken: {
     args: encodeTokenManagerLockUnlockFeeGiveTokenArgs,
     data: encodeTokenManagerLockUnlockFeeGiveTokenData,
@@ -467,6 +494,17 @@ export function createTokenManagerLockUnlockFeeReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    getTokenAddressFromParams(
+      getTokenAddressFromParamsArgs: TokenManagerLockUnlockFeeGetTokenAddressFromParamsArgs
+    ) {
+      const encoder =
+        TOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS["getTokenAddressFromParams"];
+      const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);
+
+      return publicClient.read("getTokenAddressFromParams", {
+        args: encodedArgs,
+      });
+    },
     hasRole(hasRoleArgs: TokenManagerLockUnlockFeeHasRoleArgs) {
       const encoder = TOKEN_MANAGER_LOCK_UNLOCK_FEE_ENCODERS["hasRole"];
       const encodedArgs = encoder.args(hasRoleArgs);

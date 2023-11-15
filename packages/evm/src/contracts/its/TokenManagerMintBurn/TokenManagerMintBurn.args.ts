@@ -92,6 +92,29 @@ export const encodeTokenManagerMintBurnCallContractWithInterchainTokenData = ({
     args: [destinationChain, destinationAddress, amount, data],
   });
 
+export type TokenManagerMintBurnGetTokenAddressFromParamsArgs = {
+  params: `0x${string}`;
+};
+
+/**
+ * Factory function for TokenManagerMintBurn.getTokenAddressFromParams function args
+ */
+export const encodeTokenManagerMintBurnGetTokenAddressFromParamsArgs = ({
+  params,
+}: TokenManagerMintBurnGetTokenAddressFromParamsArgs) => [params] as const;
+
+/**
+ * Encoder function for TokenManagerMintBurn.getTokenAddressFromParams function data
+ */
+export const encodeTokenManagerMintBurnGetTokenAddressFromParamsData = ({
+  params,
+}: TokenManagerMintBurnGetTokenAddressFromParamsArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "getTokenAddressFromParams",
+    abi: ABI_FILE.abi,
+    args: [params],
+  });
+
 export type TokenManagerMintBurnGiveTokenArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
@@ -410,6 +433,10 @@ export const TOKEN_MANAGER_MINT_BURN_ENCODERS = {
     args: encodeTokenManagerMintBurnCallContractWithInterchainTokenArgs,
     data: encodeTokenManagerMintBurnCallContractWithInterchainTokenData,
   },
+  getTokenAddressFromParams: {
+    args: encodeTokenManagerMintBurnGetTokenAddressFromParamsArgs,
+    data: encodeTokenManagerMintBurnGetTokenAddressFromParamsData,
+  },
   giveToken: {
     args: encodeTokenManagerMintBurnGiveTokenArgs,
     data: encodeTokenManagerMintBurnGiveTokenData,
@@ -464,6 +491,17 @@ export function createTokenManagerMintBurnReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    getTokenAddressFromParams(
+      getTokenAddressFromParamsArgs: TokenManagerMintBurnGetTokenAddressFromParamsArgs
+    ) {
+      const encoder =
+        TOKEN_MANAGER_MINT_BURN_ENCODERS["getTokenAddressFromParams"];
+      const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);
+
+      return publicClient.read("getTokenAddressFromParams", {
+        args: encodedArgs,
+      });
+    },
     hasRole(hasRoleArgs: TokenManagerMintBurnHasRoleArgs) {
       const encoder = TOKEN_MANAGER_MINT_BURN_ENCODERS["hasRole"];
       const encodedArgs = encoder.args(hasRoleArgs);

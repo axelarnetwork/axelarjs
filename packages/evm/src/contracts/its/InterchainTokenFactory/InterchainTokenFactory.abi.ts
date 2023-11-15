@@ -30,6 +30,17 @@ export default {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+      ],
+      name: "GatewayToken",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
           internalType: "bytes",
           name: "bytesAddress",
           type: "bytes",
@@ -332,6 +343,19 @@ export default {
       name: "deployRemoteInterchainToken",
       outputs: [],
       stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "gateway",
+      outputs: [
+        {
+          internalType: "contract IAxelarGateway",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
     {

@@ -43,6 +43,24 @@ export default {
     },
     {
       inputs: [],
+      name: "getImplementationTypeAndTokenAddress",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
       name: "implementation",
       outputs: [
         {
@@ -91,6 +109,19 @@ export default {
       name: "setup",
       outputs: [],
       stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "tokenAddress",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
   ],
