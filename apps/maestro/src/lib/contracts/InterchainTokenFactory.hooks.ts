@@ -25,6 +25,14 @@ import ABI from "./InterchainTokenFactory.abi";
 
 export const interchainTokenFactoryABI = ABI.abi;
 
+export const interchainTokenFactoryAddress =
+  "0xe93462bc7Ef7692D763C4d4DbCE7B870c0958c59" as const;
+
+export const interchainTokenFactoryConfig = {
+  address: interchainTokenFactoryAddress,
+  abi: interchainTokenFactoryABI,
+} as const;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,11 +53,12 @@ export function useInterchainTokenFactoryRead<
       TFunctionName,
       TSelectData
     >,
-    "abi"
+    "abi" | "address"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
 }
@@ -70,11 +79,12 @@ export function useInterchainTokenFactoryCanonicalInterchainTokenId<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "canonicalInterchainTokenId",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -96,11 +106,12 @@ export function useInterchainTokenFactoryCanonicalInterchainTokenSalt<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "canonicalInterchainTokenSalt",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -122,11 +133,12 @@ export function useInterchainTokenFactoryChainNameHash<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "chainNameHash",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -148,11 +160,12 @@ export function useInterchainTokenFactoryContractId<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "contractId",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -174,11 +187,12 @@ export function useInterchainTokenFactoryImplementation<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "implementation",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -200,11 +214,12 @@ export function useInterchainTokenFactoryInterchainTokenAddress<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "interchainTokenAddress",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -226,11 +241,12 @@ export function useInterchainTokenFactoryInterchainTokenId<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "interchainTokenId",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -252,11 +268,12 @@ export function useInterchainTokenFactoryInterchainTokenSalt<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "interchainTokenSalt",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -278,11 +295,12 @@ export function useInterchainTokenFactoryOwner<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "owner",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -304,11 +322,12 @@ export function useInterchainTokenFactoryPendingOwner<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "pendingOwner",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -330,11 +349,12 @@ export function useInterchainTokenFactoryService<
       TFunctionName,
       TSelectData
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return useContractRead({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "service",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
@@ -368,7 +388,11 @@ export function useInterchainTokenFactoryWrite<
     typeof interchainTokenFactoryABI,
     TFunctionName,
     TMode
-  >({ abi: interchainTokenFactoryABI, ...config } as any);
+  >({
+    abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
+    ...config,
+  } as any);
 }
 
 /**
@@ -401,6 +425,7 @@ export function useInterchainTokenFactoryAcceptOwnership<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "acceptOwnership",
     ...config,
   } as any);
@@ -436,6 +461,7 @@ export function useInterchainTokenFactoryDeployInterchainToken<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "deployInterchainToken",
     ...config,
   } as any);
@@ -471,6 +497,7 @@ export function useInterchainTokenFactoryDeployRemoteCanonicalInterchainToken<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteCanonicalInterchainToken",
     ...config,
   } as any);
@@ -506,6 +533,7 @@ export function useInterchainTokenFactoryDeployRemoteInterchainToken<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteInterchainToken",
     ...config,
   } as any);
@@ -541,6 +569,7 @@ export function useInterchainTokenFactoryInterchainTransfer<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "interchainTransfer",
     ...config,
   } as any);
@@ -573,6 +602,7 @@ export function useInterchainTokenFactoryMulticall<
   return useContractWrite<typeof interchainTokenFactoryABI, "multicall", TMode>(
     {
       abi: interchainTokenFactoryABI,
+      address: interchainTokenFactoryAddress,
       functionName: "multicall",
       ...config,
     } as any
@@ -609,6 +639,7 @@ export function useInterchainTokenFactoryProposeOwnership<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "proposeOwnership",
     ...config,
   } as any);
@@ -644,6 +675,7 @@ export function useInterchainTokenFactoryRegisterCanonicalInterchainToken<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
     ...config,
   } as any);
@@ -675,6 +707,7 @@ export function useInterchainTokenFactorySetup<
 ) {
   return useContractWrite<typeof interchainTokenFactoryABI, "setup", TMode>({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "setup",
     ...config,
   } as any);
@@ -710,6 +743,7 @@ export function useInterchainTokenFactoryTokenApprove<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "tokenApprove",
     ...config,
   } as any);
@@ -745,6 +779,7 @@ export function useInterchainTokenFactoryTokenTransferFrom<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "tokenTransferFrom",
     ...config,
   } as any);
@@ -780,6 +815,7 @@ export function useInterchainTokenFactoryTransferOwnership<
     TMode
   >({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "transferOwnership",
     ...config,
   } as any);
@@ -811,6 +847,7 @@ export function useInterchainTokenFactoryUpgrade<
 ) {
   return useContractWrite<typeof interchainTokenFactoryABI, "upgrade", TMode>({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "upgrade",
     ...config,
   } as any);
@@ -827,11 +864,12 @@ export function usePrepareInterchainTokenFactoryWrite<
       typeof interchainTokenFactoryABI,
       TFunctionName
     >,
-    "abi"
+    "abi" | "address"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, TFunctionName>);
 }
@@ -845,11 +883,12 @@ export function usePrepareInterchainTokenFactoryAcceptOwnership(
       typeof interchainTokenFactoryABI,
       "acceptOwnership"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "acceptOwnership",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "acceptOwnership">);
@@ -864,11 +903,12 @@ export function usePrepareInterchainTokenFactoryDeployInterchainToken(
       typeof interchainTokenFactoryABI,
       "deployInterchainToken"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "deployInterchainToken",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "deployInterchainToken">);
@@ -883,11 +923,12 @@ export function usePrepareInterchainTokenFactoryDeployRemoteCanonicalInterchainT
       typeof interchainTokenFactoryABI,
       "deployRemoteCanonicalInterchainToken"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteCanonicalInterchainToken",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "deployRemoteCanonicalInterchainToken">);
@@ -902,11 +943,12 @@ export function usePrepareInterchainTokenFactoryDeployRemoteInterchainToken(
       typeof interchainTokenFactoryABI,
       "deployRemoteInterchainToken"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteInterchainToken",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "deployRemoteInterchainToken">);
@@ -921,11 +963,12 @@ export function usePrepareInterchainTokenFactoryInterchainTransfer(
       typeof interchainTokenFactoryABI,
       "interchainTransfer"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "interchainTransfer",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "interchainTransfer">);
@@ -940,11 +983,12 @@ export function usePrepareInterchainTokenFactoryMulticall(
       typeof interchainTokenFactoryABI,
       "multicall"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "multicall",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "multicall">);
@@ -959,11 +1003,12 @@ export function usePrepareInterchainTokenFactoryProposeOwnership(
       typeof interchainTokenFactoryABI,
       "proposeOwnership"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "proposeOwnership",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "proposeOwnership">);
@@ -978,11 +1023,12 @@ export function usePrepareInterchainTokenFactoryRegisterCanonicalInterchainToken
       typeof interchainTokenFactoryABI,
       "registerCanonicalInterchainToken"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "registerCanonicalInterchainToken">);
@@ -994,11 +1040,12 @@ export function usePrepareInterchainTokenFactoryRegisterCanonicalInterchainToken
 export function usePrepareInterchainTokenFactorySetup(
   config: Omit<
     UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "setup">,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "setup",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "setup">);
@@ -1013,11 +1060,12 @@ export function usePrepareInterchainTokenFactoryTokenApprove(
       typeof interchainTokenFactoryABI,
       "tokenApprove"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "tokenApprove",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "tokenApprove">);
@@ -1032,11 +1080,12 @@ export function usePrepareInterchainTokenFactoryTokenTransferFrom(
       typeof interchainTokenFactoryABI,
       "tokenTransferFrom"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "tokenTransferFrom",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "tokenTransferFrom">);
@@ -1051,11 +1100,12 @@ export function usePrepareInterchainTokenFactoryTransferOwnership(
       typeof interchainTokenFactoryABI,
       "transferOwnership"
     >,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "transferOwnership",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "transferOwnership">);
@@ -1067,11 +1117,12 @@ export function usePrepareInterchainTokenFactoryTransferOwnership(
 export function usePrepareInterchainTokenFactoryUpgrade(
   config: Omit<
     UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "upgrade">,
-    "abi" | "functionName"
+    "abi" | "address" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     functionName: "upgrade",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "upgrade">);
@@ -1083,11 +1134,12 @@ export function usePrepareInterchainTokenFactoryUpgrade(
 export function useInterchainTokenFactoryEvent<TEventName extends string>(
   config: Omit<
     UseContractEventConfig<typeof interchainTokenFactoryABI, TEventName>,
-    "abi"
+    "abi" | "address"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     ...config,
   } as UseContractEventConfig<typeof interchainTokenFactoryABI, TEventName>);
 }
@@ -1101,11 +1153,12 @@ export function useInterchainTokenFactoryOwnershipTransferStartedEvent(
       typeof interchainTokenFactoryABI,
       "OwnershipTransferStarted"
     >,
-    "abi" | "eventName"
+    "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     eventName: "OwnershipTransferStarted",
     ...config,
   } as UseContractEventConfig<typeof interchainTokenFactoryABI, "OwnershipTransferStarted">);
@@ -1120,11 +1173,12 @@ export function useInterchainTokenFactoryOwnershipTransferredEvent(
       typeof interchainTokenFactoryABI,
       "OwnershipTransferred"
     >,
-    "abi" | "eventName"
+    "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     eventName: "OwnershipTransferred",
     ...config,
   } as UseContractEventConfig<typeof interchainTokenFactoryABI, "OwnershipTransferred">);
@@ -1136,11 +1190,12 @@ export function useInterchainTokenFactoryOwnershipTransferredEvent(
 export function useInterchainTokenFactoryUpgradedEvent(
   config: Omit<
     UseContractEventConfig<typeof interchainTokenFactoryABI, "Upgraded">,
-    "abi" | "eventName"
+    "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
     eventName: "Upgraded",
     ...config,
   } as UseContractEventConfig<typeof interchainTokenFactoryABI, "Upgraded">);

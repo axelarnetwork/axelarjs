@@ -26,7 +26,7 @@ import ABI from "./InterchainTokenService.abi";
 export const interchainTokenServiceABI = ABI.abi;
 
 export const interchainTokenServiceAddress =
-  "0xF786e21509A9D50a9aFD033B5940A2b7D872C208" as const;
+  "0xa4A9965149388c86E62CDDDd6C95EFe9c294005a" as const;
 
 export const interchainTokenServiceConfig = {
   address: interchainTokenServiceAddress,
