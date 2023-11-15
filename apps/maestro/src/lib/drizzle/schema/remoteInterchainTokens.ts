@@ -23,11 +23,8 @@ export const deplymentStatusEnum = pgEnum("status", ["confirmed", "pending"]);
  * interchain token to the original interchain token.
  */
 export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
-  tokenId: tokenId
-    .notNull()
-    .primaryKey()
-    .references(() => interchainTokens.tokenId),
-  axelarChainId: axelarChainId.notNull().primaryKey(),
+  tokenId: tokenId.notNull().references(() => interchainTokens.tokenId),
+  axelarChainId: axelarChainId.notNull(),
   tokenAddress: tokenAddress.notNull(),
   tokenManagerAddress: varchar("token_manager_address", {
     length: ADDRESS_LENGTH,

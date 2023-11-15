@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "620b4f11-3e9b-4353-be14-40d8691e0f9b",
+  "id": "621f86ee-04b3-4407-90cc-6e861346f545",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "interchain_tokens": {
@@ -113,7 +113,7 @@
         "axelar_chain_id": {
           "name": "axelar_chain_id",
           "type": "varchar(66)",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "token_address": {
@@ -162,12 +162,8 @@
           "name": "remote_interchain_tokens_token_id_interchain_tokens_token_id_fk",
           "tableFrom": "remote_interchain_tokens",
           "tableTo": "interchain_tokens",
-          "columnsFrom": [
-            "token_id"
-          ],
-          "columnsTo": [
-            "token_id"
-          ],
+          "columnsFrom": ["token_id"],
+          "columnsTo": ["token_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

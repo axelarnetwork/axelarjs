@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "interchain_tokens" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "remote_interchain_tokens" (
 	"token_id" varchar(66) PRIMARY KEY NOT NULL,
-	"axelar_chain_id" varchar(66) PRIMARY KEY NOT NULL,
+	"axelar_chain_id" varchar(66) NOT NULL,
 	"token_address" varchar(42) NOT NULL,
 	"token_manager_address" varchar(42) NOT NULL,
 	"deployment_message_id" varchar(71) NOT NULL,
