@@ -42,7 +42,7 @@ export const interchainTokens = pgTable("interchain_tokens", {
   /**
    * Token deployment salt. Only applicable for kind=intechain|custom.
    */
-  salt: varchar("salt", { length: HASH_LENGTH }),
+  salt: varchar("salt", { length: HASH_LENGTH }).notNull().default("0x"),
 });
 
 /**

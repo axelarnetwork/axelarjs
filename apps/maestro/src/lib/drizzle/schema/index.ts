@@ -4,6 +4,7 @@ import { interchainTokens } from "./interchainTokens";
 import { remoteInterchainTokens } from "./remoteInterchainTokens";
 
 export * from "./types";
+export * from "./utils";
 
 export * from "./interchainTokens";
 export * from "./remoteInterchainTokens";
