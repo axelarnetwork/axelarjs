@@ -1,33 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-import {
-  arbitrum,
-  arbitrumGoerli,
-  aurora,
-  auroraTestnet,
-  avalanche,
-  avalancheFuji,
-  baseGoerli,
-  bsc,
-  bscTestnet,
-  celo,
-  celoAlfajores,
-  fantom,
-  fantomTestnet,
-  filecoin,
-  filecoinCalibration,
-  goerli,
-  lineaTestnet,
-  mainnet,
-  moonbaseAlpha,
-  moonbeam,
-  optimism,
-  optimismGoerli,
-  polygon,
-  polygonMumbai,
-  polygonZkEvm,
-  polygonZkEvmTestnet,
-} from "wagmi/chains";
 
 import { logger } from "~/lib/logger";
 import { APP_NAME, APP_TITLE } from "./app";
@@ -35,137 +7,7 @@ import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "./env";
-
-export const EVM_CHAIN_CONFIGS = [
-  { ...mainnet, axelarChainId: "ethereum", environment: "mainnet" },
-  { ...goerli, axelarChainId: "ethereum-2", environment: "testnet" },
-  { ...moonbeam, axelarChainId: "moonbeam", environment: "mainnet" },
-  {
-    ...moonbaseAlpha,
-    axelarChainId: "moonbeam",
-    environment: "testnet",
-  },
-  { ...fantom, axelarChainId: "fantom", environment: "mainnet" },
-  {
-    ...fantomTestnet,
-    axelarChainId: "fantom",
-    environment: "testnet",
-  },
-  {
-    ...avalanche,
-    axelarChainId: "avalanche",
-    environment: "mainnet",
-  },
-  {
-    ...avalancheFuji,
-    axelarChainId: "avalanche",
-    environment: "testnet",
-  },
-  { ...polygon, axelarChainId: "polygon", environment: "mainnet" },
-  {
-    ...polygonMumbai,
-    rpcUrls: {
-      default: { http: ["https://polygon-testnet.public.blastapi.io"] },
-      public: { http: ["https://polygon-testnet.public.blastapi.io"] },
-    },
-    axelarChainId: "polygon",
-    environment: "testnet",
-  },
-  {
-    ...polygonZkEvm,
-    axelarChainId: "polygon-zkevm",
-    environment: "mainnet",
-  },
-  {
-    ...polygonZkEvmTestnet,
-    axelarChainId: "polygon-zkevm",
-    environment: "testnet",
-  },
-  { ...bsc, axelarChainId: "binance", environment: "mainnet" },
-  { ...bscTestnet, axelarChainId: "binance", environment: "testnet" },
-  { ...arbitrum, axelarChainId: "arbitrum", environment: "mainnet" },
-  {
-    ...arbitrumGoerli,
-    axelarChainId: "arbitrum",
-    environment: "testnet",
-  },
-  { ...celo, axelarChainId: "celo", environment: "mainnet" },
-  { ...celoAlfajores, axelarChainId: "celo", environment: "testnet" },
-  { ...aurora, axelarChainId: "aurora", environment: "mainnet" },
-  {
-    ...auroraTestnet,
-    axelarChainId: "aurora",
-    environment: "testnet",
-  },
-  { ...optimism, axelarChainId: "optimism", environment: "mainnet" },
-  {
-    ...optimismGoerli,
-    axelarChainId: "optimism",
-    environment: "testnet",
-  },
-  {
-    id: 2222,
-    name: "Kava EVM",
-    network: "kava",
-    axelarChainId: "kava",
-    environment: "mainnet",
-    nativeCurrency: {
-      name: "KAVA",
-      symbol: "KAVA",
-      decimals: 18,
-    },
-    blockExplorers: {
-      default: {
-        name: "Kava Explorer",
-        url: "https://explorer.kava.io/",
-      },
-    },
-    rpcUrls: {
-      default: { http: ["https://evm.kava.io"] },
-      public: { http: ["https://evm.kava.io"] },
-    },
-    testnet: false,
-  },
-  {
-    id: 2221,
-    name: "Kava EVM Testnet",
-    network: "kava",
-    axelarChainId: "kava",
-    environment: "testnet",
-    nativeCurrency: {
-      name: "KAVA",
-      symbol: "KAVA",
-      decimals: 18,
-    },
-    blockExplorers: {
-      default: {
-        name: "Kava EVM Explorer",
-        url: "https://explorer.evm-alpha.kava.io/",
-      },
-    },
-    rpcUrls: {
-      default: { http: ["https://evm.testnet.kava.io"] },
-      public: { http: ["https://evm.testnet.kava.io"] },
-    },
-    testnet: true,
-  },
-  {
-    ...filecoinCalibration,
-    axelarChainId: "filecoin-2",
-    environment: "testnet",
-  },
-  { ...filecoin, axelarChainId: "filecoin", environment: "mainnet" },
-  {
-    ...baseGoerli,
-    axelarChainId: "base",
-    environment: "testnet",
-  },
-  {
-    ...lineaTestnet,
-    axelarChainId: "linea",
-    environment: "testnet",
-  },
-].filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
+import { EVM_CHAIN_CONFIGS } from "./evm-chains";
 
 export type WagmiEVMChainConfig = (typeof EVM_CHAIN_CONFIGS)[number];
 
@@ -175,6 +17,8 @@ if (typeof window !== "undefined") {
       EVM_CHAIN_CONFIGS.map(({ id, name }) => ({ id, name })),
   });
 }
+
+export { EVM_CHAIN_CONFIGS };
 
 export const queryClient = new QueryClient();
 
