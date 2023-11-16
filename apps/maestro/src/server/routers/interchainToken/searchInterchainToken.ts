@@ -12,22 +12,21 @@ import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
 const tokenDetailsSchema = z.object({
+  chainId: z.number(),
+  chainName: z.string(),
+  axelarChainId: z.string(),
+  // nullable fields
   tokenId: hexLiteral().nullable(),
   tokenAddress: hex40Literal().nullable(),
   isOriginToken: z.boolean().nullable(),
   isRegistered: z.boolean(),
-  chainId: z.number().nullable(),
-  chainName: z.string().nullable(),
-  axelarChainId: z.string().nullable(),
-  kind: z.enum(["interchain", "canonical", "custom"]).nullable(),
+  kind: z.enum(["interchain", "canonical", "custom"]),
 });
 
 const outputSchema = tokenDetailsSchema.extend({
   wasDeployedByAccount: z.boolean(),
   matchingTokens: z.array(tokenDetailsSchema),
 });
-
-type Output = z.infer<typeof outputSchema>;
 
 export const searchInterchainToken = publicProcedure
   .meta({
@@ -121,79 +120,88 @@ async function getInterchainToken(
   const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
 
   const verifiedRemoteTokens = await Promise.all(
-    tokenDetails.remoteTokens.map(async (remoteToken) => {
-      const chainConfig = remainingChainConfigs.find(
-        (x) => x.axelarChainId === remoteToken.axelarChainId
-      );
+    tokenDetails.remoteTokens
+      .map(
+        (remoteToken) =>
+          [
+            remoteToken,
+            remainingChainConfigs.find(
+              ({ axelarChainId }) => axelarChainId === remoteToken.axelarChainId
+            ),
+          ] as const
+      )
+      .filter(([, chain]) => chain)
+      .map(async ([remoteToken, chainConfig]) => {
+        invariant(chainConfig, "Chain config not found");
 
-      const remoteTokenDetails = {
-        tokenId: tokenDetails.tokenId,
-        tokenAddress: remoteToken.tokenAddress,
-        isOriginToken: false,
-        isRegistered: remoteToken.deploymentStatus === "confirmed",
-        chainId: chainConfig?.id,
-        chainName: chainConfig?.name ?? "Unknown",
-        axelarChainId: remoteToken.axelarChainId,
-        kind: tokenDetails.kind,
-      };
+        const remoteTokenDetails = {
+          tokenId: tokenDetails.tokenId,
+          tokenAddress: remoteToken.tokenAddress,
+          isOriginToken: false,
+          isRegistered: remoteToken.deploymentStatus === "confirmed",
+          chainId: chainConfig.id,
+          chainName: chainConfig.name,
+          axelarChainId: remoteToken.axelarChainId,
+          kind: tokenDetails.kind,
+        };
 
-      if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
-        // no need to check twice if the token is registered
-        return remoteTokenDetails;
-      }
+        if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
+          // no need to check twice if the token is registered
+          return remoteTokenDetails;
+        }
 
-      invariant(chainConfig, "Chain config not found");
+        invariant(chainConfig, "Chain config not found");
 
-      let tokenClient: InterchainTokenClient | undefined;
+        let tokenClient: InterchainTokenClient | undefined;
 
-      switch (tokenDetails.kind) {
-        case "interchain":
-          tokenClient = ctx.contracts.createInterchainTokenClient(
-            chainConfig,
-            tokenDetails.tokenAddress as `0x${string}`
-          );
-          break;
-        case "canonical":
-          {
-            // for canonical tokens, we need to get the remote token address from the interchain token service
-            const itsClient =
-              ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+        switch (tokenDetails.kind) {
+          case "interchain":
+            tokenClient = ctx.contracts.createInterchainTokenClient(
+              chainConfig,
+              tokenDetails.tokenAddress as `0x${string}`
+            );
+            break;
+          case "canonical":
+            {
+              // for canonical tokens, we need to get the remote token address from the interchain token service
+              const itsClient =
+                ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-            const remoteTokenAddress = await itsClient.reads
-              .interchainTokenAddress({
-                tokenId: tokenDetails.tokenId as `0x${string}`,
-              })
-              .catch(() => null);
+              const remoteTokenAddress = await itsClient.reads
+                .interchainTokenAddress({
+                  tokenId: tokenDetails.tokenId as `0x${string}`,
+                })
+                .catch(() => null);
 
-            if (remoteTokenAddress) {
-              tokenClient = ctx.contracts.createInterchainTokenClient(
-                chainConfig,
-                remoteTokenAddress
-              );
+              if (remoteTokenAddress) {
+                tokenClient = ctx.contracts.createInterchainTokenClient(
+                  chainConfig,
+                  remoteTokenAddress
+                );
+              }
             }
-          }
-          break;
-      }
+            break;
+        }
 
-      // TODO: use InterchainTokenService.validTokenManagerAddress to check if the token is registered
-      // alternatively, we can use InterchainTokenService.validTokenAddress to check if the token is registered
+        // TODO: use InterchainTokenService.validTokenManagerAddress to check if the token is registered
+        // alternatively, we can use InterchainTokenService.validTokenAddress to check if the token is registered
 
-      const isRegistered = !tokenClient
-        ? false
-        : await tokenClient
-            .read("tokenManager")
-            // attempt to read 'token.tokenManager'
-            .then(() => true)
-            // which will throw if the token is not registered
-            .catch(() => false);
+        const isRegistered = !tokenClient
+          ? false
+          : await tokenClient
+              .read("tokenManager")
+              // attempt to read 'token.tokenManager'
+              .then(() => true)
+              // which will throw if the token is not registered
+              .catch(() => false);
 
-      return {
-        ...remoteTokenDetails,
-        // derive the token address from the interchain token contract client
-        tokenAddress: tokenClient?.address ?? null,
-        isRegistered,
-      };
-    })
+        return {
+          ...remoteTokenDetails,
+          // derive the token address from the interchain token contract client
+          tokenAddress: tokenClient?.address ?? null,
+          isRegistered,
+        };
+      })
   );
 
   if (hasPendingRemoteTokens) {
@@ -235,22 +243,22 @@ async function getInterchainToken(
         )
     )
     .map((chain) => ({
+      chainId: chain.id,
+      axelarChainId: chain.axelarChainId,
+      chainName: chain.name,
       tokenId: null,
       tokenAddress: null,
       isOriginToken: false,
       isRegistered: false,
-      chainId: chain.id,
-      axelarChainId: chain.axelarChainId,
-      chainName: chain.name,
       wasDeployedByAccount: false,
-      kind: null,
+      kind: lookupToken.kind,
     }));
 
   return {
     ...lookupToken,
     wasDeployedByAccount: tokenDetails.deployerAddress === ctx.session?.address,
     matchingTokens: [lookupToken, ...verifiedRemoteTokens, ...unregistered],
-  } as Output;
+  };
 }
 
 /**
