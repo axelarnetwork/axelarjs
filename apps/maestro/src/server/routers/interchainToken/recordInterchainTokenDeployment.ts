@@ -22,10 +22,11 @@ export const recordInterchainTokenDeployment = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "ctx.session.address is required");
 
-    const config = ctx.configs.evmChains[input.axelarChainId];
+    const chains = await ctx.configs.evmChains();
+    const configs = chains[input.axelarChainId];
 
     const originChainServiceClient =
-      ctx.contracts.createInterchainTokenServiceClient(config.wagmi);
+      ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
 
     const tokenManagerAddress =
       await originChainServiceClient.reads.tokenManagerAddress({
@@ -37,29 +38,18 @@ export const recordInterchainTokenDeployment = protectedProcedure
       tokenManagerAddress,
     });
 
-    const remoteTokens = await Promise.all(
-      input.destinationAxelarChainIds.map(async (axelarChainId) => {
-        const remoteChainConfig = ctx.configs.evmChains[axelarChainId];
+    if (!input.destinationAxelarChainIds.length) {
+      return;
+    }
 
-        const remoteChainServiceClient =
-          ctx.contracts.createInterchainTokenServiceClient(
-            remoteChainConfig.wagmi
-          );
-
-        const tokenManagerAddress =
-          await remoteChainServiceClient.reads.tokenManagerAddress({
-            tokenId: input.tokenId as `0x${string}`,
-          });
-
-        return {
-          axelarChainId,
-          tokenManagerAddress,
-          tokenId: input.tokenId,
-          tokenAddress: input.tokenAddress,
-          deployerAddress: ctx.session!.address,
-          deploymentMessageId: input.deploymentMessageId,
-          deploymentStatus: "pending" as const,
-        };
+    const remoteTokens = input.destinationAxelarChainIds.map(
+      (axelarChainId) => ({
+        axelarChainId,
+        tokenId: input.tokenId,
+        tokenAddress: input.tokenAddress,
+        deployerAddress: ctx.session!.address,
+        deploymentMessageId: input.deploymentMessageId,
+        deploymentStatus: "pending" as const,
       })
     );
 

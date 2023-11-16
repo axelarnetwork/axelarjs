@@ -12,12 +12,12 @@ export const getInterchainTokenDetails = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    // translate the chainId to the corresponding axelar chainId
-    const axelarChainId = ctx.configs.evmChains[input.chainId]?.info.id;
+    const chains = await ctx.configs.evmChains();
+    const configs = chains[input.chainId];
 
     const tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-        axelarChainId,
+        configs.info.id,
         input.tokenAddress
       );
 

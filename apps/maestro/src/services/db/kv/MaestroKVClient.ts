@@ -28,4 +28,12 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   async incrementAccountNonce(accountAddress: `0x${string}`) {
     return await this.kv.incr(COLLECTION_KEYS.accountNonce(accountAddress));
   }
+
+  async setCached<T>(key: string, value: T, ttl = 3600) {
+    await this.kv.set(`cached:${key}`, value, { ex: ttl });
+  }
+
+  async getCached<T>(key: string) {
+    return await this.kv.get<T>(`cached:${key}`);
+  }
 }

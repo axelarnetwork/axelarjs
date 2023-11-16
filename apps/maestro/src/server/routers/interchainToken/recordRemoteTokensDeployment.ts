@@ -18,10 +18,12 @@ export const recordRemoteTokensDeployment = protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const chain = ctx.configs.evmChains[input.chainId];
+    const chains = await ctx.configs.evmChains();
+    const configs = chains[input.chainId];
+
     const originToken =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-        chain.info.id,
+        configs.info.id,
         input.tokenAddress
       );
 
@@ -41,10 +43,11 @@ export const recordRemoteTokensDeployment = protectedProcedure
 
     const remoteTokens = await Promise.all(
       input.remoteTokens.map(async (remoteToken) => {
-        const config = ctx.configs.evmChains[remoteToken.axelarChainId];
+        const chains = await ctx.configs.evmChains();
+        const configs = chains[remoteToken.axelarChainId];
 
         const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          config.wagmi
+          configs.wagmi
         );
 
         const tokenManagerAddress = await itsClient.reads.tokenManagerAddress({

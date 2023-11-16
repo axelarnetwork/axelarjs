@@ -1,4 +1,4 @@
-import { EVMChainConfig } from "@axelarjs/api";
+import { AxelarscanClient, EVMChainConfig } from "@axelarjs/api";
 import {
   IERC20BurnableMintableClient,
   InterchainTokenClient,
@@ -40,7 +40,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     NEXT_AUTH_OPTIONS
   );
 
-  const chainConfigs = await axelarscanClient.getChainConfigs();
+  const maestroKVClient = new MaestroKVClient(kv);
+  const maestroPostgresClient = new MaestroPostgresClient(db);
 
   return {
     req,
@@ -56,55 +57,24 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     },
     configs: {
       /**
-       * EVM chain configs indexed by chain id and chain_id
-       * @example
-       * ```ts
-       * const chainConfig = ctx.configs.evmChains[1]; // => Ethereum
-       * ```
+       * Cached accessor for EVM chain configs
        */
-      evmChains: chainConfigs.evm
-        // filter out chains that are do not have a wagmi config
-        .filter((chain) =>
-          EVM_CHAIN_CONFIGS.some((config) => config.id === chain.chain_id)
-        )
-        .reduce(
-          (acc, chain) => {
-            const wagmiConfig = EVM_CHAIN_CONFIGS.find(
-              (config) => config.id === chain.chain_id
-            );
-
-            // for type safety
-            invariant(wagmiConfig, "wagmiConfig is required");
-
-            const entry = {
-              info: chain,
-              wagmi: wagmiConfig,
-            };
-
-            return {
-              ...acc,
-              [chain.id]: entry,
-              [chain.chain_id]: entry,
-            };
-          },
-          {} as Record<
-            string | number,
-            {
-              info: EVMChainConfig;
-              wagmi: WagmiEVMChainConfig;
-            }
-          >
-        ),
+      evmChains: evmChains.bind(
+        null,
+        maestroKVClient,
+        axelarscanClient,
+        "evmChains" as const
+      ),
     },
     persistence: {
       /**
        * key-value store adapter
        */
-      kv: new MaestroKVClient(kv),
+      kv: maestroKVClient,
       /**
        * postgres adapter
        */
-      postgres: new MaestroPostgresClient(db),
+      postgres: maestroPostgresClient,
     },
     contracts: {
       createERC20Client(chain: Chain, address: `0x${string}`) {
@@ -145,3 +115,65 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
 export const createContext = createContextInner;
 
 export type Context = inferAsyncReturnType<typeof createContextInner>;
+
+type EVMChainsMap = Record<
+  string | number,
+  {
+    info: EVMChainConfig;
+    wagmi: WagmiEVMChainConfig;
+  }
+>;
+
+async function evmChains<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarscanClient: AxelarscanClient,
+  cacheKey: TCacheKey
+): Promise<EVMChainsMap> {
+  const chainConfigs = await axelarscanClient.getChainConfigs();
+
+  const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
+
+  if (cached) {
+    console.log("using cached evmChains");
+    return cached;
+  }
+
+  const eligibleChains = chainConfigs.evm.filter((chain) =>
+    // filter out chains that are do not have a wagmi config
+    EVM_CHAIN_CONFIGS.some((config) => config.id === chain.chain_id)
+  );
+
+  const evmChainsMap = eligibleChains.reduce(
+    (acc, chain) => {
+      const wagmiConfig = EVM_CHAIN_CONFIGS.find(
+        (config) => config.id === chain.chain_id
+      );
+
+      // for type safety
+      invariant(wagmiConfig, "wagmiConfig is required");
+
+      const entry = {
+        info: chain,
+        wagmi: wagmiConfig,
+      };
+
+      return {
+        ...acc,
+        [chain.id]: entry,
+        [chain.chain_id]: entry,
+      };
+    },
+    {} as Record<
+      string | number,
+      {
+        info: EVMChainConfig;
+        wagmi: WagmiEVMChainConfig;
+      }
+    >
+  );
+
+  // cache for 1 hour
+  await kvClient.setCached<EVMChainsMap>(cacheKey, evmChainsMap, 3600);
+
+  return evmChainsMap;
+}
