@@ -28,7 +28,7 @@ export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
   tokenAddress: tokenAddress.notNull(),
   tokenManagerAddress: varchar("token_manager_address", {
     length: ADDRESS_LENGTH,
-  }).notNull(),
+  }),
   deploymentMessageId: deploymentMessageId.notNull(),
   deploymentStatus: deplymentStatusEnum("deployment_status").default("pending"),
   createdAt,
