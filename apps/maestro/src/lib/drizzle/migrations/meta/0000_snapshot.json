@@ -1,8 +1,8 @@
 {
+  "id": "98a8e39f-07e4-4ba0-90b4-9d11d0416782",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
-  "id": "621f86ee-04b3-4407-90cc-6e861346f545",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "interchain_tokens": {
       "name": "interchain_tokens",
@@ -70,7 +70,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "kind",
+          "type": "token_kind",
           "primaryKey": false,
           "notNull": true
         },
@@ -92,7 +92,8 @@
           "name": "salt",
           "type": "varchar(66)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'0x'"
         }
       },
       "indexes": {},
@@ -104,10 +105,16 @@
       "name": "remote_interchain_tokens",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(128)",
+          "primaryKey": true,
+          "notNull": true
+        },
         "token_id": {
           "name": "token_id",
           "type": "varchar(66)",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "axelar_chain_id": {
@@ -126,7 +133,7 @@
           "name": "token_manager_address",
           "type": "varchar(42)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "deployment_message_id": {
           "name": "deployment_message_id",
@@ -136,7 +143,7 @@
         },
         "deployment_status": {
           "name": "deployment_status",
-          "type": "status",
+          "type": "deployment_status",
           "primaryKey": false,
           "notNull": false,
           "default": "'pending'"
@@ -173,16 +180,16 @@
     }
   },
   "enums": {
-    "kind": {
-      "name": "kind",
+    "token_kind": {
+      "name": "token_kind",
       "values": {
         "canonical": "canonical",
         "interchain": "interchain",
         "custom": "custom"
       }
     },
-    "status": {
-      "name": "status",
+    "deployment_status": {
+      "name": "deployment_status",
       "values": {
         "confirmed": "confirmed",
         "pending": "pending"

@@ -14,6 +14,7 @@ export const newRemoteInterchainTokenSchema =
   remoteInterchainTokensZodSchemas.insert.omit({
     createdAt: true,
     updatedAt: true,
+    id: true,
   });
 
 export const newInterchainTokenSchema = interchainTokensZodSchemas.insert.omit({
@@ -51,9 +52,12 @@ export default class MaestroPostgresClient {
   async recordRemoteInterchainTokenDeployment(
     value: NewRemoteInterchainTokenInput
   ) {
-    await this.db
-      .insert(remoteInterchainTokens)
-      .values({ ...value, createdAt: new Date(), updatedAt: new Date() });
+    await this.db.insert(remoteInterchainTokens).values({
+      ...value,
+      id: `${value.axelarChainId}:${value.tokenAddress}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
   }
 
   /**
@@ -68,6 +72,7 @@ export default class MaestroPostgresClient {
     await this.db.insert(remoteInterchainTokens).values(
       value.map((v) => ({
         ...v,
+        id: `${v.axelarChainId}:${v.tokenAddress}`,
         createdAt: new Date(),
         updatedAt: new Date(),
       }))

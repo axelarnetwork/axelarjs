@@ -9,12 +9,15 @@ import {
   deploymentMessageId,
   HASH_LENGTH,
   tokenAddress,
-  tokenId,
   tokenManagerAddress,
   updatedAt,
 } from "./common";
 
-export const kindEnum = pgEnum("kind", ["canonical", "interchain", "custom"]);
+export const tokenKindEnum = pgEnum("token_kind", [
+  "canonical",
+  "interchain",
+  "custom",
+]);
 
 /**
  * Interchain Tokens
@@ -22,7 +25,7 @@ export const kindEnum = pgEnum("kind", ["canonical", "interchain", "custom"]);
  * This table is used to track the interchain tokens that are deployed on the origin chain.
  */
 export const interchainTokens = pgTable("interchain_tokens", {
-  tokenId: tokenId.primaryKey(),
+  tokenId: varchar("token_id", { length: HASH_LENGTH }).primaryKey(),
   tokenAddress: tokenAddress.notNull(),
   axelarChainId: axelarChainId.notNull(),
   tokenName: varchar("token_name", { length: 100 }).notNull(),
@@ -36,7 +39,7 @@ export const interchainTokens = pgTable("interchain_tokens", {
   originalDistributorAddress: varchar("original_distributor_address", {
     length: ADDRESS_LENGTH,
   }).notNull(),
-  kind: kindEnum("kind").notNull(),
+  kind: tokenKindEnum("kind").notNull(),
   createdAt,
   updatedAt,
   /**

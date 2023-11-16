@@ -1,11 +1,11 @@
 DO $$ BEGIN
- CREATE TYPE "kind" AS ENUM('canonical', 'interchain', 'custom');
+ CREATE TYPE "token_kind" AS ENUM('canonical', 'interchain', 'custom');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "status" AS ENUM('confirmed', 'pending');
+ CREATE TYPE "deployment_status" AS ENUM('confirmed', 'pending');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -21,19 +21,20 @@ CREATE TABLE IF NOT EXISTS "interchain_tokens" (
 	"deployer_address" varchar(42) NOT NULL,
 	"token_manager_address" varchar(42) NOT NULL,
 	"original_distributor_address" varchar(42) NOT NULL,
-	"kind" "kind" NOT NULL,
+	"kind" "token_kind" NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
-	"salt" varchar(66)
+	"salt" varchar(66) DEFAULT '0x' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "remote_interchain_tokens" (
-	"token_id" varchar(66) PRIMARY KEY NOT NULL,
+	"id" varchar(128) PRIMARY KEY NOT NULL,
+	"token_id" varchar(66) NOT NULL,
 	"axelar_chain_id" varchar(66) NOT NULL,
 	"token_address" varchar(42) NOT NULL,
-	"token_manager_address" varchar(42) NOT NULL,
+	"token_manager_address" varchar(42),
 	"deployment_message_id" varchar(71) NOT NULL,
-	"deployment_status" "status" DEFAULT 'pending',
+	"deployment_status" "deployment_status" DEFAULT 'pending',
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

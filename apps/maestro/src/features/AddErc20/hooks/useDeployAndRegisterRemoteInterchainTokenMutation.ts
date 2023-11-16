@@ -18,6 +18,7 @@ import {
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
@@ -45,6 +46,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
 
+  const { computed } = useEVMChainConfigsQuery();
+
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
 
@@ -69,6 +72,26 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       }),
       enabled: Boolean(tokenId),
     });
+
+  const { originalChainName, destinationChainNames } = useMemo(() => {
+    const index = computed.indexedById;
+    const originalChainName =
+      index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
+
+    return {
+      originalChainName,
+      destinationChainNames:
+        input?.destinationChainIds.map(
+          (destinationChainId) =>
+            index[destinationChainId]?.chain_name ?? "Unknown"
+        ) ?? [],
+    };
+  }, [
+    chainId,
+    computed.indexedById,
+    input?.destinationChainIds,
+    input?.sourceChainId,
+  ]);
 
   const multicallArgs = useMemo(() => {
     const deployer = input?.deployerAddress ?? deployerAddress;
@@ -99,19 +122,24 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [deployTxData];
     }
 
-    const registerTxData = input.destinationChainIds.map(
-      (destinationChain, i) =>
-        INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
-          destinationChain: destinationChain,
-          gasValue: input.gasFees[i] ?? BigInt(0),
-          distributor: deployer,
-          originalChainName: input.sourceChainId,
-          salt: config.salt,
-        })
+    const registerTxData = destinationChainNames.map((destinationChain, i) =>
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+        originalChainName,
+        destinationChain,
+        gasValue: input.gasFees[i] ?? BigInt(0),
+        distributor: deployer,
+        salt: config.salt,
+      })
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, deployerAddress, config.salt]);
+  }, [
+    input,
+    deployerAddress,
+    config.salt,
+    destinationChainNames,
+    originalChainName,
+  ]);
 
   const totalGasFee = useMemo(
     () => input?.gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
@@ -123,6 +151,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     chainId: chainId,
     args: [multicallArgs],
   });
+
+  console.log({ prepareMulticall });
 
   const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);
 

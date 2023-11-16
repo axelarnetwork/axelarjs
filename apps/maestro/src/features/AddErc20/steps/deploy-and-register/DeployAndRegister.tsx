@@ -132,7 +132,7 @@ export const Step3: FC = () => {
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
         gasFees: state.gasFees ?? [],
-        sourceChainId: sourceChain?.chain_name ?? "",
+        sourceChainId: sourceChain?.id ?? "",
         initialSupply: BigInt(rootState.tokenDetails.tokenCap),
         deployerAddress: rootState.tokenDetails.distributor,
       }

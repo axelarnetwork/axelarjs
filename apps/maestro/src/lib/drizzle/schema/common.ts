@@ -13,11 +13,6 @@ export const deploymentMessageId = varchar("deployment_message_id", {
 });
 
 /**
- * This is a unique identifier for the token. Format: `0x${string}`
- */
-export const tokenId = varchar("token_id", { length: HASH_LENGTH });
-
-/**
  * Token address. Format: `0x${string}`
  */
 export const tokenAddress = varchar("token_address", {

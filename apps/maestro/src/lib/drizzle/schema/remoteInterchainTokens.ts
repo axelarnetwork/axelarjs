@@ -7,13 +7,16 @@ import {
   axelarChainId,
   createdAt,
   deploymentMessageId,
+  HASH_LENGTH,
   tokenAddress,
-  tokenId,
   updatedAt,
 } from "./common";
 import { interchainTokens } from "./interchainTokens";
 
-export const deplymentStatusEnum = pgEnum("status", ["confirmed", "pending"]);
+export const deplymentStatusEnum = pgEnum("deployment_status", [
+  "confirmed",
+  "pending",
+]);
 
 /**
  * Remote Interchain Tokens
@@ -23,7 +26,14 @@ export const deplymentStatusEnum = pgEnum("status", ["confirmed", "pending"]);
  * interchain token to the original interchain token.
  */
 export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
-  tokenId: tokenId.notNull().references(() => interchainTokens.tokenId),
+  /**
+   * Unique identifier for the remote interchain token.
+   * `${axelarchainId}:${tokenAddress}`.
+   */
+  id: varchar("id", { length: 128 }).primaryKey(),
+  tokenId: varchar("token_id", { length: HASH_LENGTH })
+    .notNull()
+    .references(() => interchainTokens.tokenId),
   axelarChainId: axelarChainId.notNull(),
   tokenAddress: tokenAddress.notNull(),
   tokenManagerAddress: varchar("token_manager_address", {
