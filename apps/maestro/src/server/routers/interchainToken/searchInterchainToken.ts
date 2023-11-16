@@ -12,14 +12,14 @@ import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
 const tokenDetailsSchema = z.object({
-  tokenId: hexLiteral().optional(),
-  tokenAddress: hex40Literal().optional(),
-  isOriginToken: z.boolean().optional(),
+  tokenId: hexLiteral().nullable(),
+  tokenAddress: hex40Literal().nullable(),
+  isOriginToken: z.boolean().nullable(),
   isRegistered: z.boolean(),
-  chainId: z.number().optional(),
-  chainName: z.string().optional(),
-  axelarChainId: z.string().optional(),
-  kind: z.enum(["interchain", "canonical", "custom"]).optional(),
+  chainId: z.number().nullable(),
+  chainName: z.string().nullable(),
+  axelarChainId: z.string().nullable(),
+  kind: z.enum(["interchain", "canonical", "custom"]).nullable(),
 });
 
 const outputSchema = tokenDetailsSchema.extend({
@@ -240,7 +240,7 @@ async function getInterchainToken(
       isOriginToken: false,
       isRegistered: false,
       chainId: chain.id,
-      axealrChainId: chain.axelarChainId,
+      axelarChainId: chain.axelarChainId,
       chainName: chain.name,
       wasDeployedByAccount: false,
       kind: null,
