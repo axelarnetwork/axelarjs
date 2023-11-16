@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { filter, map, sortBy } from "rambda";
 
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -15,7 +15,7 @@ const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
 const getChainNameSlug = (chainId: number) => {
-  const chain = EVM_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
+  const chain = WAGMI_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
 
   return sluggify(chain?.name ?? "");
 };

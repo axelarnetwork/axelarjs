@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { partition, pluck } from "rambda";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
+import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { hex40Literal, hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
@@ -52,7 +52,7 @@ export const searchInterchainToken = publicProcedure
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
         (chain) => chain.id === input.chainId,
-        EVM_CHAIN_CONFIGS
+        ctx.configs.wagmiChainConfigs
       );
 
       const scanPromise = !chainConfig
@@ -99,8 +99,8 @@ interface TokenDetails extends InterchainToken {
 
 async function getInterchainToken(
   tokenDetails: TokenDetails,
-  chainConfig: WagmiEVMChainConfig,
-  remainingChainConfigs: WagmiEVMChainConfig[],
+  chainConfig: ExtendedWagmiChainConfig,
+  remainingChainConfigs: ExtendedWagmiChainConfig[],
   ctx: Context
 ) {
   const lookupToken = {
@@ -260,7 +260,7 @@ async function getInterchainToken(
  * @param ctx
  */
 async function scanChains(
-  chainConfigs: WagmiEVMChainConfig[],
+  chainConfigs: ExtendedWagmiChainConfig[],
   tokenAddress: `0x${string}`,
   ctx: Context
 ) {

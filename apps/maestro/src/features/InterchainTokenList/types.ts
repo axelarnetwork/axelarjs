@@ -1,6 +1,6 @@
 import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api/index";
 
-import type { WagmiEVMChainConfig } from "~/config/wagmi";
+import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
 
 type Kind = "canonical" | "interchain";
 
@@ -14,7 +14,7 @@ export type TokenInfo = {
   kind: Kind;
   isSelected?: boolean;
   chain?: EVMChainConfig;
-  wagmiConfig?: WagmiEVMChainConfig;
+  wagmiConfig?: ExtendedWagmiChainConfig;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   deploymentStatus?: "pending" | GMPTxStatus;

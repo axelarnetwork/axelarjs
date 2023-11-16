@@ -20,7 +20,7 @@ import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
 } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
-import { EVM_CHAIN_CONFIGS, WagmiEVMChainConfig } from "~/config/wagmi";
+import { ExtendedWagmiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
@@ -28,10 +28,10 @@ import MaestroKVClient from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
 
-type ContextConfig = {
+export interface ContextConfig {
   req: NextApiRequest;
   res: NextApiResponse<unknown>;
-};
+}
 
 const createContextInner = async ({ req, res }: ContextConfig) => {
   const session = await getServerSession<AuthOptions, Web3Session>(
@@ -65,6 +65,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         axelarscanClient,
         "evmChains" as const
       ),
+      wagmiChainConfigs: WAGMI_CHAIN_CONFIGS,
     },
     persistence: {
       /**
@@ -120,7 +121,7 @@ type EVMChainsMap = Record<
   string | number,
   {
     info: EVMChainConfig;
-    wagmi: WagmiEVMChainConfig;
+    wagmi: ExtendedWagmiChainConfig;
   }
 >;
 
@@ -140,12 +141,12 @@ async function evmChains<TCacheKey extends string>(
 
   const eligibleChains = chainConfigs.evm.filter((chain) =>
     // filter out chains that are do not have a wagmi config
-    EVM_CHAIN_CONFIGS.some((config) => config.id === chain.chain_id)
+    WAGMI_CHAIN_CONFIGS.some((config) => config.id === chain.chain_id)
   );
 
   const evmChainsMap = eligibleChains.reduce(
     (acc, chain) => {
-      const wagmiConfig = EVM_CHAIN_CONFIGS.find(
+      const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
         (config) => config.id === chain.chain_id
       );
 
@@ -167,7 +168,7 @@ async function evmChains<TCacheKey extends string>(
       string | number,
       {
         info: EVMChainConfig;
-        wagmi: WagmiEVMChainConfig;
+        wagmi: ExtendedWagmiChainConfig;
       }
     >
   );

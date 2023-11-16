@@ -32,7 +32,7 @@ import {
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
 
-interface ExtendedEVMChainConfig extends Chain {
+export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
   axelarChainName: string;
   environment: "mainnet" | "testnet";
@@ -43,7 +43,7 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-export const EVM_CHAIN_CONFIGS: ExtendedEVMChainConfig[] = [
+export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
     axelarChainId: "ethereum",
