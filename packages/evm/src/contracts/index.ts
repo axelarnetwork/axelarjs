@@ -1,4 +1,10 @@
-export * from "./interchain-token";
-export * from "./interchain-token-service";
-export * from "./erc-20";
-export * from "./token-manager";
+// common contracts
+export * from "./common/IERC20BurnableMintable";
+// ITS contracts
+export * from "./its/ERC20";
+export * from "./its/IERC20MintableBurnable";
+export * from "./its/IERC20Named";
+export * from "./its/InterchainToken";
+export * from "./its/InterchainTokenService";
+export * from "./its/InterchainTokenFactory";
+export * from "./its/TokenManager";

@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
-import type { IntercahinTokenDetails } from "~/services/db/kv";
 
 export const getMyInterchainTokens = protectedProcedure
   .input(
@@ -16,9 +15,10 @@ export const getMyInterchainTokens = protectedProcedure
   .query(async ({ ctx }) => {
     invariant(ctx.session?.address, "Missing session address");
 
-    const kvResult = await ctx.persistence.kv.getAccountInterchainTokens(
-      ctx.session?.address
-    );
+    const tokenRecords =
+      await ctx.persistence.postgres.getInterchainTokensByDeployerAddress(
+        ctx.session?.address
+      );
 
-    return kvResult as IntercahinTokenDetails[];
+    return tokenRecords;
   });

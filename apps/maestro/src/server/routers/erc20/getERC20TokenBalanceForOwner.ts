@@ -2,7 +2,6 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
@@ -15,7 +14,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    const chainConfig = EVM_CHAIN_CONFIGS.find(
+    const chainConfig = ctx.configs.wagmiChainConfigs.find(
       (chain) => chain.id === input.chainId
     );
 

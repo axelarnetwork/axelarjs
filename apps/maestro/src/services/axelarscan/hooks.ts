@@ -5,12 +5,12 @@ import { indexBy, partition, prop } from "rambda";
 import { useQuery } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
 
-const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), EVM_CHAIN_CONFIGS);
+const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useEVMChainConfigsQuery() {
   const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<

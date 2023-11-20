@@ -101,7 +101,7 @@ describe("SendInterchainToken", () => {
         }}
         isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
-        kind="standardized"
+        kind="interchain"
         tokenId="0x00"
         originTokenAddress="0x00"
         originTokenChainId={MOCK_EVM_CHAIN_CONFIG.chain_id}
@@ -139,7 +139,7 @@ describe("SendInterchainToken", () => {
         }}
         isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
-        kind="standardized"
+        kind="interchain"
         tokenId="0x00"
         originTokenAddress="0x00"
         originTokenChainId={MOCK_EVM_CHAIN_CONFIG.chain_id}

@@ -35,9 +35,10 @@
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
     "postinstall": "tsx scripts/postinstall.ts",
-    "codegen": "tsx scripts/codegen.ts",
+    "codegen": "./scripts/codegen-its.sh",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write src"
   },
   "keywords": [],
   "author": "",
@@ -45,12 +46,12 @@
   "dependencies": {
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
-    "viem": "^1.18.7",
+    "viem": "^1.19.1",
     "tsx": "^3.14.0",
     "zx": "^7.2.3"
   },
   "devDependencies": {
-    "@axelar-network/interchain-token-service": "^0.3.0",
+    "@axelar-network/interchain-token-service": "^1.0.0-beta.3",
     "@axelarjs/config": "workspace:*",
     "@types/node": "^20.8.10",
     "@types/prettier": "^2.7.3",

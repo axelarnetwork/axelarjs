@@ -1,47 +1,59 @@
 import { invariant } from "@axelarjs/utils";
 
-import type { z } from "zod";
+import { z } from "zod";
 
 import { protectedProcedure } from "~/server/trpc";
-import { interchainTokenDetailsBaseSchema } from "~/services/db/kv";
+import { newInterchainTokenSchema } from "~/services/db/postgres";
+
+const recordInterchainTokenDeploymentInput = newInterchainTokenSchema
+  .extend({
+    destinationAxelarChainIds: z.array(z.string()),
+  })
+  .omit({
+    tokenManagerAddress: true,
+  });
 
 export type RecordInterchainTokenDeploymentInput = z.infer<
-  typeof interchainTokenDetailsBaseSchema
+  typeof recordInterchainTokenDeploymentInput
 >;
 
 export const recordInterchainTokenDeployment = protectedProcedure
-  .input(interchainTokenDetailsBaseSchema)
+  .input(recordInterchainTokenDeploymentInput)
   .mutation(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "ctx.session.address is required");
 
-    // await ctx.persistence.postgres.recordInterchainTokenDeployment({
-    //   deployerAddress: ctx.session.address,
-    //   ...input,
-    // });
+    const chains = await ctx.configs.evmChains();
+    const configs = chains[input.axelarChainId];
 
-    // await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-    //   input.remoteTokens.map((remoteToken) => ({
-    //     tokenId: input.tokenId,
-    //     originTokenId: input.tokenId,
-    //     address: input.tokenAddress,
-    //     deploymentTxHash: remoteToken.deploymentTxHash,
-    //     deploymentStatus: remoteToken.deploymentStatus,
-    //     chainId: remoteToken.chainId,
-    //     axelarChainId: remoteToken.axelarChainId,
-    //     deploymentLogIndex: remoteToken.deploymentLogIndex,
-    //   }))
-    // );
+    const originChainServiceClient =
+      ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
 
-    await ctx.persistence.kv
-      .recordInterchainTokenDeployment(
-        {
-          chainId: input.chainId,
-          tokenAddress: input.tokenAddress,
-        },
-        {
-          ...input,
-          deployerAddress: ctx.session.address,
-        }
-      )
-      .catch((e) => console.log("error recordInterchainTokenDeployment", e));
+    const tokenManagerAddress =
+      await originChainServiceClient.reads.tokenManagerAddress({
+        tokenId: input.tokenId as `0x${string}`,
+      });
+
+    await ctx.persistence.postgres.recordInterchainTokenDeployment({
+      ...input,
+      tokenManagerAddress,
+    });
+
+    if (!input.destinationAxelarChainIds.length) {
+      return;
+    }
+
+    const remoteTokens = input.destinationAxelarChainIds.map(
+      (axelarChainId) => ({
+        axelarChainId,
+        tokenId: input.tokenId,
+        tokenAddress: input.tokenAddress,
+        deployerAddress: ctx.session!.address,
+        deploymentMessageId: input.deploymentMessageId,
+        deploymentStatus: "pending" as const,
+      })
+    );
+
+    await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
+      remoteTokens
+    );
   });

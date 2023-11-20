@@ -6,11 +6,11 @@ import { parseUnits, TransactionExecutionError } from "viem";
 import { useAccount, useMutation, useWaitForTransaction } from "wagmi";
 
 import {
-  useIerc20BurnableMintableApprove,
-  useIerc20BurnableMintableDecimals,
-} from "~/lib/contracts/IERC20BurnableMintable.hooks";
-import { useInterchainTokenServiceGetTokenManagerAddress } from "~/lib/contracts/InterchainTokenService.hooks";
-import { useTokenManagerSendToken } from "~/lib/contracts/TokenManager.hooks";
+  useInterchainTokenApprove,
+  useInterchainTokenDecimals,
+} from "~/lib/contracts/InterchainToken.hooks";
+import { useInterchainTokenServiceTokenManagerAddress } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useTokenManagerInterchainTransfer } from "~/lib/contracts/TokenManager.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -33,7 +33,7 @@ export function useTokenManagerSendTokenMutation(
 ) {
   const [txState, setTxState] = useTransactionState();
 
-  const { data: decimals } = useIerc20BurnableMintableDecimals({
+  const { data: decimals } = useInterchainTokenDecimals({
     address: config.tokenAddress,
   });
 
@@ -46,18 +46,18 @@ export function useTokenManagerSendTokenMutation(
   });
 
   const { data: tokenManagerAddress } =
-    useInterchainTokenServiceGetTokenManagerAddress({
+    useInterchainTokenServiceTokenManagerAddress({
       args: [config.tokenId],
       enabled: Boolean(config.tokenId),
     });
 
-  const { writeAsync: approveERC20Async, data: approveERC20Data } =
-    useIerc20BurnableMintableApprove({
+  const { writeAsync: approveInterchainTokenAsync, data: approveERC20Data } =
+    useInterchainTokenApprove({
       address: config.tokenAddress,
     });
 
-  const { writeAsync: sendTokenAsync, data: sendTokenData } =
-    useTokenManagerSendToken({
+  const { writeAsync: interchainTransferAsync, data: sendTokenData } =
+    useTokenManagerInterchainTransfer({
       address: tokenManagerAddress,
       value: BigInt(gas ?? 0) * BigInt(2),
     });
@@ -79,7 +79,7 @@ export function useTokenManagerSendTokenMutation(
 
           invariant(address, "need address");
 
-          const txResult = await sendTokenAsync({
+          const txResult = await interchainTransferAsync({
             args: [
               config.destinationChainId,
               address,
@@ -127,7 +127,12 @@ export function useTokenManagerSendTokenMutation(
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [address, approveERC20Recepit, config.destinationChainId, sendTokenAsync]
+    [
+      address,
+      approveERC20Recepit,
+      config.destinationChainId,
+      interchainTransferAsync,
+    ]
   );
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
@@ -146,7 +151,7 @@ export function useTokenManagerSendTokenMutation(
           amount: approvedAmountRef.current,
         });
 
-        await approveERC20Async({
+        await approveInterchainTokenAsync({
           args: [tokenManagerAddress, approvedAmountRef.current],
         });
       } catch (error) {
