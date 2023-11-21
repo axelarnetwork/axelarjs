@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { useChainId } from "wagmi";
 
 import {
-  useInterchainTokenServiceMulticall,
-  usePrepareInterchainTokenServiceMulticall,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+  useInterchainTokenFactoryMulticall,
+  usePrepareInterchainTokenFactoryMulticall,
+} from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -32,7 +32,9 @@ export default function useRegisterRemoteInterchainTokens(
     [input.chainIds, computed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map((chain) => chain.id);
+  const destinationChainIds = destinationChains.map(
+    (chain) => chain.chain_name
+  );
 
   const sourceChain = useMemo(
     () => computed.indexedByChainId[chainId],
@@ -56,23 +58,29 @@ export default function useRegisterRemoteInterchainTokens(
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt as `0x${string}`,
-        originalChainName: sourceChain?.name ?? "",
-        distributor: "0x", // remote tokens cannot be minted, so the distributor must be 0x
+        originalChainName: sourceChain?.chain_name ?? "",
+        distributor: input.deployerAddress,
         destinationChain: chainId,
         gasValue: gasFees[i],
       })
     );
-  }, [destinationChainIds, gasFees, sourceChain?.name, tokenDeployment]);
+  }, [
+    destinationChainIds,
+    gasFees,
+    input.deployerAddress,
+    sourceChain?.chain_name,
+    tokenDeployment,
+  ]);
 
   const totalGasFee = useMemo(
     () => gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
     [gasFees]
   );
 
-  const { config } = usePrepareInterchainTokenServiceMulticall({
+  const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
   });
 
-  return useInterchainTokenServiceMulticall(config);
+  return useInterchainTokenFactoryMulticall(config);
 }

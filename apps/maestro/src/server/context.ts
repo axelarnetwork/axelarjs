@@ -135,7 +135,6 @@ async function evmChains<TCacheKey extends string>(
   const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
 
   if (cached) {
-    console.log("using cached evmChains");
     return cached;
   }
 

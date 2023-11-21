@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { useChainId } from "wagmi";
 
 import {
-  useInterchainTokenServiceMulticall,
-  usePrepareInterchainTokenServiceMulticall,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+  useInterchainTokenFactoryMulticall,
+  usePrepareInterchainTokenFactoryMulticall,
+} from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -32,7 +32,9 @@ export default function useRegisterRemoteCanonicalTokens(
     [input.chainIds, computed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map((chain) => chain.id);
+  const destinationChainIds = destinationChains.map(
+    (chain) => chain.chain_name
+  );
 
   const sourceChain = useMemo(
     () => computed.indexedByChainId[chainId],
@@ -58,24 +60,24 @@ export default function useRegisterRemoteCanonicalTokens(
 
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
-          originalChain: sourceChain?.id ?? "0x",
+          originalChain: sourceChain?.chain_name ?? "0x",
           originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
           destinationChain: axelarChainId,
           gasValue,
         }
       );
     });
-  }, [destinationChainIds, gasFees, sourceChain?.id, tokenDetails]);
+  }, [destinationChainIds, gasFees, sourceChain?.chain_name, tokenDetails]);
 
   const totalGasFee = useMemo(
     () =>
       gasFees?.reduce((acc, gasFee) => acc + gasFee, BigInt(0)) ?? BigInt(0),
     [gasFees]
   );
-  const { config } = usePrepareInterchainTokenServiceMulticall({
+  const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
   });
 
-  return useInterchainTokenServiceMulticall(config);
+  return useInterchainTokenFactoryMulticall(config);
 }
