@@ -37,6 +37,6 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "rimraf": "^5.0.5",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.2"
   }
 }

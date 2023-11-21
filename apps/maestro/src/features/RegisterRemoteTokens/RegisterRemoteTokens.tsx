@@ -106,7 +106,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
-  const { writeAsync: registerStandardizedTokensAsync } =
+  const { writeAsync: registerInterchainTokensAsync } =
     useRegisterRemoteInterchainTokens({
       chainIds: props.chainIds,
       deployerAddress: deployerAddress as `0x${string}`,
@@ -114,17 +114,22 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
+  console.log({
+    registerInterchainTokensAsync,
+    registerCanonicalTokensAsync,
+  });
+
   const registerTokensAsync = useMemo(() => {
     switch (props.deploymentKind) {
       case "canonical":
         return registerCanonicalTokensAsync;
       case "interchain":
-        return registerStandardizedTokensAsync;
+        return registerInterchainTokensAsync;
     }
   }, [
     props.deploymentKind,
     registerCanonicalTokensAsync,
-    registerStandardizedTokensAsync,
+    registerInterchainTokensAsync,
   ]);
 
   const handleClick = useCallback(async () => {
