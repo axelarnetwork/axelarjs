@@ -2,6 +2,7 @@ import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { reduce } from "rambda";
 import { parseUnits } from "viem";
 import {
   useAccount,
@@ -107,6 +108,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     [input?.decimals]
   );
 
+  const originTransferGas = input?.originInitialSupply
+    ? (gasEstimate?.gasPrice ?? 0n) * 150_000n // 150k gas limit
+    : 0n;
+
   const multicallArgs = useMemo(() => {
     const distributorAddress =
       input?.distributorAddress ?? input?.deployerAddress ?? deployerAddress;
@@ -150,7 +155,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             amount: parsedOriginInitialSupply,
             destinationAddress: distributorAddress,
             destinationChain: "",
-            gasValue: gasEstimate?.gasPrice ?? 0n,
+            gasValue: originTransferGas,
           }),
         ];
 
@@ -190,19 +195,29 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     tokenId,
     withDecimals,
     config.salt,
+    originTransferGas,
     destinationChainNames,
-    gasEstimate?.gasPrice,
     originalChainName,
   ]);
 
-  const totalGasFee = useMemo(
-    () => input?.gasFees?.reduce((a, b) => a + b, 0n) ?? 0n,
-    [input?.gasFees]
-  );
+  const totalGasFee = useMemo(() => {
+    const remoteDeploymentsGas = Maybe.of(input?.gasFees).mapOr(
+      0n,
+      reduce((a, b) => a + b, 0n)
+    );
+
+    const remoteTransfersGas = input?.remoteInitialSupply
+      ? remoteDeploymentsGas // if remoteInitialSupply is set, remoteTransfersGas is the same as remote deployments gas
+      : 0n;
+
+    // the total gas fee is the sum of the remote deployments gas fee,
+    // the remote transfers gas fee and the origin transfer gas fee
+    return remoteDeploymentsGas + remoteTransfersGas + originTransferGas;
+  }, [input?.gasFees, input?.remoteInitialSupply, originTransferGas]);
 
   const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
+    chainId,
     value: totalGasFee,
-    chainId: chainId,
     args: [multicallArgs],
   });
 
