@@ -102,8 +102,7 @@ export const Step3: FC = () => {
   const { state, actions } = useStep3ChainSelectionState();
 
   const totalGasFees = useMemo(
-    () =>
-      (state.gasFees ?? []).reduce((acc, gasFee) => acc + gasFee, BigInt(0)),
+    () => (state.gasFees ?? []).reduce((acc, gasFee) => acc + gasFee, 0n),
     [state.gasFees]
   );
 
@@ -133,8 +132,8 @@ export const Step3: FC = () => {
         destinationChainIds: Array.from(rootState.selectedChains),
         gasFees: state.gasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
-        initialSupply: BigInt(rootState.tokenDetails.tokenCap),
         deployerAddress: rootState.tokenDetails.distributor,
+        originInitialSupply: BigInt(rootState.tokenDetails.tokenCap),
       }
     );
 

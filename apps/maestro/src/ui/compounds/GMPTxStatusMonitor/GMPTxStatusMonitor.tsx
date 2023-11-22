@@ -74,13 +74,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     () =>
       txInfo?.blockNumber && currentBlock
         ? currentBlock - txInfo.blockNumber
-        : BigInt(0),
+        : 0n,
     [txInfo, currentBlock]
   );
 
   const progress = useMemo(
     () =>
-      (expectedBlockConfirmations > BigInt(0)
+      (expectedBlockConfirmations > 0n
         ? Number(elapsedBlocks) / Number(expectedBlockConfirmations)
         : 0
       ).toLocaleString("en", {
@@ -113,7 +113,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   }
 
   const shouldRenderBlockConfirmations =
-    expectedBlockConfirmations > BigInt(0) &&
+    expectedBlockConfirmations > 0n &&
     elapsedBlocks <= expectedBlockConfirmations;
 
   return (
