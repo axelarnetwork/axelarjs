@@ -135,8 +135,22 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         distributor: distributorAddress,
       });
 
+    const transferTxData: `0x${string}`[] = [];
+
+    if (input.originInitialSupply) {
+      transferTxData.push(
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
+          tokenId,
+          amount: parsedOriginInitialSupply,
+          destinationAddress: distributorAddress,
+          destinationChain: originalChainName,
+          gasValue: 0n,
+        })
+      );
+    }
+
     if (!input.destinationChainIds.length) {
-      return [deployTxData];
+      return [deployTxData, ...transferTxData];
     }
 
     const registerTxData = destinationChainNames.map((destinationChain, i) =>
@@ -148,20 +162,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         salt: config.salt,
       })
     );
-
-    const transferTxData: `0x${string}`[] = [];
-
-    if (input.originInitialSupply) {
-      transferTxData.push(
-        INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
-          tokenId,
-          amount: parsedOriginInitialSupply,
-          destinationAddress: distributorAddress,
-          destinationChain: "",
-          gasValue: 0n,
-        })
-      );
-    }
 
     if (input.remoteInitialSupply) {
       transferTxData.push(
@@ -179,9 +179,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     const txData = [deployTxData, ...registerTxData, ...transferTxData];
 
-    const nonEmptyTxData = txData.filter(Boolean);
-
-    return nonEmptyTxData;
+    return txData;
   }, [
     input,
     deployerAddress,
