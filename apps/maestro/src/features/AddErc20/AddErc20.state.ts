@@ -19,7 +19,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
-  tokenCap: numericString(),
+  originTokenSupply: numericString(),
   distributor: hex40Literal().optional(),
   salt: hex64Literal(),
 });
@@ -50,7 +50,8 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
-    tokenCap: "0",
+    originTokenSupply: "0",
+    remoteTokenSupply: "0",
     distributor: undefined as `0x${string}` | undefined,
     salt: "0x" as `0x${string}`,
   },

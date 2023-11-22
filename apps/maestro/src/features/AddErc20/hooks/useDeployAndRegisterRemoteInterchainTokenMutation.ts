@@ -3,7 +3,12 @@ import { Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useChainId,
+  useFeeData,
+  useWaitForTransaction,
+} from "wagmi";
 
 import {
   useInterchainTokenFactoryInterchainTokenAddress,
@@ -75,6 +80,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       enabled: Boolean(tokenId),
     });
 
+  const { data: gasEstimate } = useFeeData();
+
   const { originalChainName, destinationChainNames } = useMemo(() => {
     const index = computed.indexedById;
     const originalChainName =
@@ -135,21 +142,20 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         distributor: distributorAddress,
       });
 
-    const transferTxData: `0x${string}`[] = [];
-
-    if (input.originInitialSupply) {
-      transferTxData.push(
-        INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
-          tokenId,
-          amount: parsedOriginInitialSupply,
-          destinationAddress: distributorAddress,
-          destinationChain: originalChainName,
-          gasValue: 0n,
-        })
-      );
-    }
+    const transferTxData: `0x${string}`[] = !input.originInitialSupply
+      ? []
+      : [
+          INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
+            tokenId,
+            amount: parsedOriginInitialSupply,
+            destinationAddress: distributorAddress,
+            destinationChain: "",
+            gasValue: gasEstimate?.gasPrice ?? 0n,
+          }),
+        ];
 
     if (!input.destinationChainIds.length) {
+      // early return case, no remote chains
       return [deployTxData, ...transferTxData];
     }
 
@@ -177,9 +183,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       );
     }
 
-    const txData = [deployTxData, ...registerTxData, ...transferTxData];
-
-    return txData;
+    return [deployTxData, ...registerTxData, ...transferTxData];
   }, [
     input,
     deployerAddress,
@@ -187,6 +191,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     withDecimals,
     config.salt,
     destinationChainNames,
+    gasEstimate?.gasPrice,
     originalChainName,
   ]);
 

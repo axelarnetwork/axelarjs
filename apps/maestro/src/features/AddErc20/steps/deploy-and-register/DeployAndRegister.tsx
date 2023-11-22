@@ -1,5 +1,12 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import {
+  Button,
+  Dialog,
+  FormControl,
+  Label,
+  TextInput,
+  Tooltip,
+} from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import React, {
@@ -18,6 +25,7 @@ import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/AddErc20/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
@@ -95,6 +103,14 @@ const ChainPicker: FC<ChainPickerProps> = ({
   );
 };
 
+const FormInput = Object.assign({}, TextInput, {
+  defaultProps: {
+    ...TextInput.defaultProps,
+    className: "bg-base-200",
+    bordered: true,
+  },
+}) as typeof TextInput;
+
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
     useAddErc20StateContainer();
@@ -133,7 +149,7 @@ export const Step3: FC = () => {
         gasFees: state.gasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
         deployerAddress: rootState.tokenDetails.distributor,
-        originInitialSupply: BigInt(rootState.tokenDetails.tokenCap),
+        originInitialSupply: BigInt(rootState.tokenDetails.originTokenSupply),
       }
     );
 
@@ -284,6 +300,19 @@ export const Step3: FC = () => {
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
+        {rootState.selectedChains.length > 0 && (
+          <FormControl>
+            <Label htmlFor="originTokenSupply">
+              Amount to mint on remote chains
+            </Label>
+            <FormInput
+              id="originTokenSupply"
+              placeholder="Enter amount to mint"
+              min={0}
+              onKeyDown={preventNonNumericInput}
+            />
+          </FormControl>
+        )}
       </form>
       <Dialog.Actions>
         <NextButton
