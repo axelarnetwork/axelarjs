@@ -10,6 +10,7 @@ import {
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import React, {
+  ChangeEvent,
   useCallback,
   useMemo,
   useRef,
@@ -150,6 +151,7 @@ export const Step3: FC = () => {
         sourceChainId: sourceChain?.id ?? "",
         deployerAddress: rootState.tokenDetails.distributor,
         originInitialSupply: BigInt(rootState.tokenDetails.originTokenSupply),
+        remoteInitialSupply: BigInt(rootState.tokenDetails.remoteTokenSupply),
       }
     );
 
@@ -306,10 +308,15 @@ export const Step3: FC = () => {
               Amount to mint on remote chains
             </Label>
             <FormInput
-              id="originTokenSupply"
+              id="remoteTokenSupply"
               placeholder="Enter amount to mint"
               min={0}
               onKeyDown={preventNonNumericInput}
+              value={rootState.tokenDetails.remoteTokenSupply}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                console.log(e.target.value);
+                rootActions.setRemoteTokenSupply(e.target.value);
+              }}
             />
           </FormControl>
         )}

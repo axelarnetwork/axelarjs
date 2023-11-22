@@ -152,6 +152,11 @@ function useAddErc20State(
           };
         });
       },
+      setRemoteTokenSupply: (remoteTokenSupply: string) => {
+        setState((draft) => {
+          draft.tokenDetails.remoteTokenSupply = remoteTokenSupply;
+        });
+      },
       setTxState: (txState: DeployAndRegisterTransactionState) => {
         setState((draft) => {
           if (
