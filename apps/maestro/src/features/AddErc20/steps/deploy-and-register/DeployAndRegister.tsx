@@ -314,7 +314,6 @@ export const Step3: FC = () => {
               onKeyDown={preventNonNumericInput}
               value={rootState.tokenDetails.remoteTokenSupply}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                console.log(e.target.value);
                 rootActions.setRemoteTokenSupply(e.target.value);
               }}
             />
