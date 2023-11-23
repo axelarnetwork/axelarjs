@@ -82,7 +82,7 @@ export const ARGS_FILE = ({
       export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}): \`0x\${string}\` => encodeFunctionData({
         functionName: "${name}",
         abi: ABI_FILE.abi,
-        args:[${argNames}]
+        args: [${argNames}]
       });`;
   };
 
