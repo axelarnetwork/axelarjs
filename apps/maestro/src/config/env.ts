@@ -47,3 +47,7 @@ export const NEXT_PUBLIC_DISABLE_AUTH =
   process.env.NODE_ENV === "development" &&
   Maybe.of(process.env.NEXT_PUBLIC_DISABLE_AUTH).mapOr("false", String) ===
     "true";
+
+export const NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT = Maybe.of(
+  process.env.NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT
+).mapOr("150000", String);
