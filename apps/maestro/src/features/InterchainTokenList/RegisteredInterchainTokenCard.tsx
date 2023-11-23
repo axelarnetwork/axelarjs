@@ -145,12 +145,12 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           )}
         </Card.Title>
 
-        {balance?.tokenBalance && (
-          <div
-            className={cn(
-              "bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4"
-            )}
-          >
+        {!balance?.tokenBalance ? (
+          <div className="bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4">
+            <span className="mx-auto">Loading balance...</span>
+          </div>
+        ) : (
+          <div className="bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4">
             {balance.tokenBalance === "0" ? (
               <div className="flex w-full items-center justify-between">
                 <span
