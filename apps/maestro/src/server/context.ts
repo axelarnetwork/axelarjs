@@ -42,6 +42,9 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
 
   const maestroKVClient = new MaestroKVClient(kv);
   const maestroPostgresClient = new MaestroPostgresClient(db);
+  const openaiClient = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
   return {
     req,
@@ -51,9 +54,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       gmp: gmpClient,
       axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
-      openai: new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      }),
+      openai: openaiClient,
     },
     configs: {
       /**

@@ -67,7 +67,7 @@ export function useTokenManagerSendTokenMutation(
     confirmations: 1,
   });
 
-  const approvedAmountRef = useRef(BigInt(0));
+  const approvedAmountRef = useRef(0n);
 
   useEffect(
     () => {

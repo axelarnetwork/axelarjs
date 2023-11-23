@@ -73,7 +73,7 @@ export default function useRegisterRemoteInterchainTokens(
   ]);
 
   const totalGasFee = useMemo(
-    () => gasFees?.reduce((a, b) => a + b, BigInt(0)) ?? BigInt(0),
+    () => gasFees?.reduce((a, b) => a + b, 0n) ?? 0n,
     [gasFees]
   );
 

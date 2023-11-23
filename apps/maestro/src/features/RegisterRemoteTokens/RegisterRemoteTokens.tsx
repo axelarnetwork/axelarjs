@@ -114,11 +114,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
-  console.log({
-    registerInterchainTokensAsync,
-    registerCanonicalTokensAsync,
-  });
-
   const registerTokensAsync = useMemo(() => {
     switch (props.deploymentKind) {
       case "canonical":
