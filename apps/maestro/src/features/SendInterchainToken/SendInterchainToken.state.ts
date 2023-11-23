@@ -62,8 +62,8 @@ export function useSendInterchainTokenState(props: {
     reset: resetInterchainTransferTxState,
   } = useInterchainTransferMutation({
     tokenAddress: props.tokenAddress,
-    destinationChainId: selectedToChain?.id,
-    sourceChainId: props.sourceChain.id,
+    destinationChainName: selectedToChain?.chain_name,
+    sourceChainName: props.sourceChain.chain_name,
   });
 
   const {
@@ -74,11 +74,11 @@ export function useSendInterchainTokenState(props: {
   } = useTokenManagerSendTokenMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
-    destinationChainId: selectedToChain?.id,
-    sourceChainId: props.sourceChain.id,
+    destinationChainName: selectedToChain?.chain_name,
+    sourceChainName: props.sourceChain.chain_name,
   });
 
-  const trpcContext = trpc.useContext();
+  const trpcContext = trpc.useUtils();
 
   const refetchBalances = () =>
     trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
