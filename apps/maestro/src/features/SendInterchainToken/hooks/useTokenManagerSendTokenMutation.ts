@@ -1,3 +1,7 @@
+import {
+  INTERCHAIN_TOKEN_ENCODERS,
+  TOKEN_MANAGER_ENCODERS,
+} from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import { useEffect, useRef } from "react";
@@ -19,8 +23,8 @@ import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  sourceChainId: string;
-  destinationChainId: string;
+  sourceChainName: string;
+  destinationChainName: string;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -40,9 +44,11 @@ export function useTokenManagerSendTokenMutation(
   const { address } = useAccount();
 
   const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: config.sourceChainId,
-    destinationChainId: config.destinationChainId,
-    sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
+    sourceChainId: config.sourceChainName,
+    destinationChainId: config.destinationChainName,
+    sourceChainTokenSymbol: getNativeToken(
+      config.sourceChainName.toLowerCase()
+    ),
   });
 
   const { data: tokenManagerAddress } =
@@ -80,12 +86,12 @@ export function useTokenManagerSendTokenMutation(
           invariant(address, "need address");
 
           const txResult = await interchainTransferAsync({
-            args: [
-              config.destinationChainId,
-              address,
-              approvedAmountRef.current,
-              "0x",
-            ],
+            args: TOKEN_MANAGER_ENCODERS.interchainTransfer.args({
+              destinationChain: config.destinationChainName,
+              amount: approvedAmountRef.current,
+              destinationAddress: address,
+              metadata: "0x",
+            }),
           });
           if (txResult?.hash) {
             setTxState({
@@ -130,7 +136,7 @@ export function useTokenManagerSendTokenMutation(
     [
       address,
       approveERC20Recepit,
-      config.destinationChainId,
+      config.destinationChainName,
       interchainTransferAsync,
     ]
   );
@@ -152,7 +158,10 @@ export function useTokenManagerSendTokenMutation(
         });
 
         await approveInterchainTokenAsync({
-          args: [tokenManagerAddress, approvedAmountRef.current],
+          args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
+            spender: tokenManagerAddress,
+            amount: approvedAmountRef.current,
+          }),
         });
       } catch (error) {
         if (error instanceof TransactionExecutionError) {

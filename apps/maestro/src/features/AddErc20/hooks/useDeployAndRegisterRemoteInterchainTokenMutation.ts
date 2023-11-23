@@ -11,6 +11,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 
+import { NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT } from "~/config/env";
 import {
   useInterchainTokenFactoryInterchainTokenAddress,
   useInterchainTokenFactoryInterchainTokenId,
@@ -109,7 +110,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const originTransferGas = input?.originInitialSupply
-    ? (gasEstimate?.gasPrice ?? 0n) * 150_000n // 150k gas limit
+    ? (gasEstimate?.gasPrice ?? 0n) *
+      BigInt(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT)
     : 0n;
 
   const multicallArgs = useMemo(() => {

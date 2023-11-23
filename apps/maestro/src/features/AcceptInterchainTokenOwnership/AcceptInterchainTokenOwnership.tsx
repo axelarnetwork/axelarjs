@@ -31,7 +31,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     address: props.tokenAddress,
   });
 
-  const trpcContext = trpc.useContext();
+  const trpcContext = trpc.useUtils();
 
   useWaitForTransaction({
     hash: acceptResult?.hash,

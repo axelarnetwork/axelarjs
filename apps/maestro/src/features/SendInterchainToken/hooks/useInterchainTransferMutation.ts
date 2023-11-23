@@ -1,3 +1,4 @@
+import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { parseUnits, TransactionExecutionError } from "viem";
@@ -14,8 +15,8 @@ import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
-  sourceChainId: string;
-  destinationChainId: string;
+  sourceChainName: string;
+  destinationChainName: string;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -34,9 +35,11 @@ export function useInterchainTransferMutation(
   const { address } = useAccount();
 
   const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: config.sourceChainId,
-    destinationChainId: config.destinationChainId,
-    sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
+    sourceChainId: config.sourceChainName,
+    destinationChainId: config.destinationChainName,
+    sourceChainTokenSymbol: getNativeToken(
+      config.sourceChainName.toLowerCase()
+    ),
   });
 
   const { writeAsync: transferAsync } = useInterchainTokenInterchainTransfer({
@@ -58,7 +61,12 @@ export function useInterchainTransferMutation(
         });
 
         const txResult = await transferAsync({
-          args: [config.destinationChainId, address, bnAmount, `0x`],
+          args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
+            destinationChain: config.destinationChainName,
+            recipient: address,
+            amount: bnAmount,
+            metadata: "0x",
+          }),
         });
         if (txResult?.hash) {
           setTxState({
