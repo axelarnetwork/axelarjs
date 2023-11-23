@@ -44,7 +44,7 @@ export const TransferInterchainTokenOwnership: FC = () => {
     account: getValues("recipientAddress"),
   });
 
-  const trpcContext = trpc.useContext();
+  const trpcContext = trpc.useUtils();
 
   useWaitForTransaction({
     hash: transferResult?.hash,

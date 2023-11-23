@@ -33,7 +33,7 @@ export function useMintInterchainTokenState() {
     address: managerState.tokenAddress,
   });
 
-  const trpcContext = trpc.useContext();
+  const trpcContext = trpc.useUtils();
 
   useWaitForTransaction({
     hash: mintResult?.hash,
