@@ -4,9 +4,13 @@ export const COLLECTIONS = {
   accounts: "accounts",
 } as const;
 
+export type AccountStatus = "enabled" | "limited" | "disabled";
+
 export const COLLECTION_KEYS = {
   accountNonce: (accountAddress: `0x${string}`) =>
     `${COLLECTIONS.accounts}:${accountAddress}:nonce` as const,
+  accountStatus: (accountAddress: `0x${string}`) =>
+    `${COLLECTIONS.accounts}:${accountAddress}:status` as const,
 };
 
 export class BaseMaestroKVClient {
@@ -27,6 +31,13 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
 
   async incrementAccountNonce(accountAddress: `0x${string}`) {
     return await this.kv.incr(COLLECTION_KEYS.accountNonce(accountAddress));
+  }
+
+  async getAccountStatus(accountAddress: `0x${string}`) {
+    const key = COLLECTION_KEYS.accountStatus(accountAddress);
+    const status = await this.kv.get<AccountStatus>(key);
+
+    return status;
   }
 
   async setCached<T>(key: string, value: T, ttl = 3600) {
