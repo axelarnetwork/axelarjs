@@ -35,7 +35,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           placeholder: "0x0",
         },
       },
-      authorize: async (credentials) => {
+      async authorize(credentials) {
         if (
           !credentials?.address ||
           !getAddress(credentials?.address) ||
@@ -47,9 +47,12 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
         const address = getAddress(credentials.address);
         const signature = credentials.signature as `0x${string}`;
 
-        const accountNonce = await kvClient.getAccountNonce(address);
+        const [accountNonce, accountStatus] = await Promise.all([
+          kvClient.getAccountNonce(address),
+          kvClient.getAccountStatus(address),
+        ]);
 
-        if (accountNonce === null) {
+        if (accountNonce === null || accountStatus === "disabled") {
           return null;
         }
 

@@ -13,7 +13,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { isAddress, TransactionExecutionError } from "viem";
 import { useWaitForTransaction } from "wagmi";
 
-import { useIerc20BurnableMintableTransferOwnership } from "~/lib/contracts/IERC20BurnableMintable.hooks";
+import { useInterchainTokenServiceTransferOperatorship } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -27,15 +27,24 @@ export const TransferInterchainTokenOwnership: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
 
+  const { register, handleSubmit, formState, getValues } = useForm<FormState>({
+    defaultValues: {
+      recipientAddress: undefined,
+    },
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
   const {
     writeAsync: transferOwnershipAsync,
     isLoading: isTransfering,
     data: transferResult,
-  } = useIerc20BurnableMintableTransferOwnership({
+  } = useInterchainTokenServiceTransferOperatorship({
     address: state.tokenAddress,
+    account: getValues("recipientAddress"),
   });
 
-  const trpcContext = trpc.useContext();
+  const trpcContext = trpc.useUtils();
 
   useWaitForTransaction({
     hash: transferResult?.hash,
@@ -62,14 +71,6 @@ export const TransferInterchainTokenOwnership: FC = () => {
 
       toast.success("Successfully transferred token ownership");
     },
-  });
-
-  const { register, handleSubmit, formState } = useForm<FormState>({
-    defaultValues: {
-      recipientAddress: undefined,
-    },
-    mode: "onChange",
-    reValidateMode: "onChange",
   });
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(

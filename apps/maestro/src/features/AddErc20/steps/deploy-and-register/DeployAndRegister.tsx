@@ -1,8 +1,16 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import { Button, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import {
+  Button,
+  Dialog,
+  FormControl,
+  Label,
+  TextInput,
+  Tooltip,
+} from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import React, {
+  ChangeEvent,
   useCallback,
   useMemo,
   useRef,
@@ -15,9 +23,10 @@ import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
-import { useDeployAndRegisterRemoteStandardizedTokenMutation } from "~/features/AddErc20/hooks";
+import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/AddErc20/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { preventNonNumericInput } from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
@@ -95,6 +104,14 @@ const ChainPicker: FC<ChainPickerProps> = ({
   );
 };
 
+const FormInput = Object.assign({}, TextInput, {
+  defaultProps: {
+    ...TextInput.defaultProps,
+    className: "bg-base-200",
+    bordered: true,
+  },
+}) as typeof TextInput;
+
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
     useAddErc20StateContainer();
@@ -102,8 +119,7 @@ export const Step3: FC = () => {
   const { state, actions } = useStep3ChainSelectionState();
 
   const totalGasFees = useMemo(
-    () =>
-      (state.gasFees ?? []).reduce((acc, gasFee) => acc + gasFee, BigInt(0)),
+    () => (state.gasFees ?? []).reduce((acc, gasFee) => acc + gasFee, 0n),
     [state.gasFees]
   );
 
@@ -112,7 +128,7 @@ export const Step3: FC = () => {
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
   const { writeAsync: deployInterchainTokenAsync } =
-    useDeployAndRegisterRemoteStandardizedTokenMutation(
+    useDeployAndRegisterRemoteInterchainTokenMutation(
       {
         salt: rootState.tokenDetails.salt,
         value: totalGasFees,
@@ -132,9 +148,10 @@ export const Step3: FC = () => {
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
         gasFees: state.gasFees ?? [],
-        sourceChainId: sourceChain?.chain_name ?? "",
-        initialSupply: BigInt(rootState.tokenDetails.tokenCap),
+        sourceChainId: sourceChain?.id ?? "",
         deployerAddress: rootState.tokenDetails.distributor,
+        originInitialSupply: BigInt(rootState.tokenDetails.originTokenSupply),
+        remoteInitialSupply: BigInt(rootState.tokenDetails.remoteTokenSupply),
       }
     );
 
@@ -285,6 +302,23 @@ export const Step3: FC = () => {
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
+        {rootState.selectedChains.length > 0 && (
+          <FormControl>
+            <Label htmlFor="originTokenSupply">
+              Amount to mint on remote chains
+            </Label>
+            <FormInput
+              id="remoteTokenSupply"
+              placeholder="Enter amount to mint"
+              min={0}
+              onKeyDown={preventNonNumericInput}
+              value={rootState.tokenDetails.remoteTokenSupply}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                rootActions.setRemoteTokenSupply(e.target.value);
+              }}
+            />
+          </FormControl>
+        )}
       </form>
       <Dialog.Actions>
         <NextButton

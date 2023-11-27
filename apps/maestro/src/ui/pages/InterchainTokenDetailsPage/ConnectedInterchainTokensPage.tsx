@@ -235,7 +235,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
             return {
               ...token,
-              isSelected: sessionState.selectedChainIds.includes(token.chainId),
+              isSelected: sessionState.selectedChainIds.includes(
+                token.chainId ?? 0
+              ),
               isRegistered: false,
               deploymentStatus: gmpInfo?.status,
               deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(

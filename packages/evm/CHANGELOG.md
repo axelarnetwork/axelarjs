@@ -1,5 +1,53 @@
 # @axelarjs/evm
 
+## 0.1.19
+
+### Patch Changes
+
+- [#87](https://github.com/axelarnetwork/axelarjs/pull/87) [`90816933`](https://github.com/axelarnetwork/axelarjs/commit/90816933272a116744802ff579c65ca61a71053e) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: more codegen options & ability to generate index files
+
+## 0.1.18
+
+### Patch Changes
+
+- [`3fa4c9ca`](https://github.com/axelarnetwork/axelarjs/commit/3fa4c9cac79fae2b2fba2fe36458fb9cfdb5ca54) Thanks [@alanrsoares](https://github.com/alanrsoares)! - chore: move @axelarjs/utils to dependencies
+
+## 0.1.17
+
+### Patch Changes
+
+- [`f7901e1e`](https://github.com/axelarnetwork/axelarjs/commit/f7901e1e31fa2a326ac7c3bd7d4d97416b60d1c1) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: move zx, package-json & tsx to dependencies
+
+## 0.1.16
+
+### Patch Changes
+
+- [`e9ec97d2`](https://github.com/axelarnetwork/axelarjs/commit/e9ec97d26d6aedef1766d76b9a0a51db7ceb9c9a) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: support inferring script path from withing package
+
+## 0.1.15
+
+### Patch Changes
+
+- [`055f3c27`](https://github.com/axelarnetwork/axelarjs/commit/055f3c27a2f179787b16a7ef4b7261d58041b370) Thanks [@alanrsoares](https://github.com/alanrsoares)! - include missing folder in package
+
+## 0.1.14
+
+### Patch Changes
+
+- [`27efa5ac`](https://github.com/axelarnetwork/axelarjs/commit/27efa5ac2da552ac045ad29b468ad16affc99ea0) Thanks [@alanrsoares](https://github.com/alanrsoares)! - make cli.mjs compatible with env/node
+
+## 0.1.13
+
+### Patch Changes
+
+- [`ba335a27`](https://github.com/axelarnetwork/axelarjs/commit/ba335a27ff7748216cd2ffb4c451ec1755fdf18d) Thanks [@alanrsoares](https://github.com/alanrsoares)! - refactor: move cli.sh to cli.mjs
+
+## 0.1.12
+
+### Patch Changes
+
+- [#78](https://github.com/axelarnetwork/axelarjs/pull/78) [`7aede243`](https://github.com/axelarnetwork/axelarjs/commit/7aede2432ac4007c47482e0d8b793e033928d5d5) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: introduce @axelarjs/evm cli
+
 ## 0.1.11
 
 ### Patch Changes

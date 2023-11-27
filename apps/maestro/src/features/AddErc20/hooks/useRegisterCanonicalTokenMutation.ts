@@ -1,13 +1,17 @@
-import { encodeInterchainTokenServiceRegisterCanonicalTokenData } from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { throttle } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
-import { useChainId, useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 
 import {
-  useInterchainTokenServiceMulticall,
-  usePrepareInterchainTokenServiceMulticall,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+  useInterchainTokenFactoryMulticall,
+  usePrepareInterchainTokenFactoryMulticall,
+} from "~/lib/contracts/InterchainTokenFactory.hooks";
+import {
+  decodeDeploymentMessageId,
+  type DeploymentMessageId,
+} from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
 import type { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
@@ -30,30 +34,30 @@ export function useRegisterCanonicalTokenMutation(
   config: UseRegisterCanonicalTokenConfig,
   input: UseRegisterCanonicalTokenInput
 ) {
-  const chainId = useChainId();
-
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
+
+  const account = useAccount();
 
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
-    useState<RecordInterchainTokenDeploymentInput | null>(null);
+    useState<RecordInterchainTokenDeploymentInput>();
 
   const multicallArgs = useMemo(
     () => [
-      encodeInterchainTokenServiceRegisterCanonicalTokenData({
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
         tokenAddress: input.tokenAddress,
       }),
     ],
     [input.tokenAddress]
   );
 
-  const prepared = usePrepareInterchainTokenServiceMulticall({
+  const prepared = usePrepareInterchainTokenFactoryMulticall({
     args: [multicallArgs],
   });
 
-  const multicall = useInterchainTokenServiceMulticall(prepared.config);
+  const multicall = useInterchainTokenFactoryMulticall(prepared.config);
 
   useWaitForTransaction({
     hash: multicall.data?.hash,
@@ -66,14 +70,15 @@ export function useRegisterCanonicalTokenMutation(
       setRecordDeploymentArgs({
         kind: "canonical",
         tokenId: input.expectedTokenId,
-        tokenAddress: input.tokenAddress,
-        chainId: chainId,
-        deploymentTxHash: multicall.data.hash,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,
-        tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
-        remoteTokens: [],
+        tokenAddress: input.tokenAddress,
+        tokenDecimals: input.decimals,
+        deployerAddress: account.address as `0x${string}`,
+        deploymentMessageId: `${multicall.data.hash}-0`,
+        originalDistributorAddress: account.address as `0x${string}`,
+        destinationAxelarChainIds: [],
       });
 
       config.onFinished?.();
@@ -85,10 +90,14 @@ export function useRegisterCanonicalTokenMutation(
       if (recordDeploymentArgs) {
         recordDeploymentAsync(recordDeploymentArgs)
           .then(() => {
+            const { hash: txHash } = decodeDeploymentMessageId(
+              recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
+            );
+
             onStatusUpdate({
               type: "deployed",
-              tokenAddress: recordDeploymentArgs.tokenAddress,
-              txHash: recordDeploymentArgs.deploymentTxHash,
+              tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
+              txHash,
             });
           })
           .catch(() => {

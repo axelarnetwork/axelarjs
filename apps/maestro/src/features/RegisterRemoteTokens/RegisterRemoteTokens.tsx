@@ -15,7 +15,7 @@ import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
-import useRegisterRemoteStandardizedTokens from "./hooks/useRegisterRemoteStandardizedTokens";
+import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
 export type RegisterRemoteTokensProps = {
   tokenAddress: `0x${string}`;
@@ -23,7 +23,7 @@ export type RegisterRemoteTokensProps = {
   originChainId?: number;
   onTxStateChange?: (status: TransactionState) => void;
   existingTxHash?: `0x${string}` | null;
-  deploymentKind: "canonical" | "standardized";
+  deploymentKind: "canonical" | "interchain" | "custom";
 };
 
 export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
@@ -80,6 +80,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       await recordRemoteTokenDeployment({
         tokenAddress: props.tokenAddress,
         chainId: props.originChainId ?? -1,
+        deploymentMessageId: `${receipt.transactionHash}-0`,
         remoteTokens: props.chainIds.map((chainId) => ({
           address: props.tokenAddress,
           chainId,
@@ -105,8 +106,8 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
-  const { writeAsync: registerStandardizedTokensAsync } =
-    useRegisterRemoteStandardizedTokens({
+  const { writeAsync: registerInterchainTokensAsync } =
+    useRegisterRemoteInterchainTokens({
       chainIds: props.chainIds,
       deployerAddress: deployerAddress as `0x${string}`,
       tokenAddress: props.tokenAddress,
@@ -117,13 +118,13 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     switch (props.deploymentKind) {
       case "canonical":
         return registerCanonicalTokensAsync;
-      case "standardized":
-        return registerStandardizedTokensAsync;
+      case "interchain":
+        return registerInterchainTokensAsync;
     }
   }, [
     props.deploymentKind,
     registerCanonicalTokensAsync,
-    registerStandardizedTokensAsync,
+    registerInterchainTokensAsync,
   ]);
 
   const handleClick = useCallback(async () => {

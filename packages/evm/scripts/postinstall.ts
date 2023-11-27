@@ -1,7 +1,6 @@
-import fs from "fs/promises";
-import chalk from "chalk";
 import packageJson from "package-json";
 import stripAnsi from "strip-ansi";
+import { chalk, fs } from "zx";
 
 const REPOSITORY_URL = "https://github.com/axelarnetwork/axelarjs";
 
@@ -91,17 +90,40 @@ async function inferPackageManager() {
   return "npm";
 }
 
+type VersionTuple = [number, number, number];
+
+function isLatestVersion(version: string, latest: string) {
+  const [v1, v2] = [version, latest].map(
+    (v) =>
+      v
+        .replace(/[^0-9.]/g, "")
+        .split(".")
+        .map(Number) as VersionTuple
+  ) as [VersionTuple, VersionTuple];
+
+  for (let i = 0; i < v1.length; i++) {
+    const a = Number(v1[i]);
+    const b = Number(v2[i]);
+
+    if (a === b) continue;
+
+    return a > b;
+  }
+
+  return true;
+}
+
 async function main() {
-  const { version, name } = await fs
+  const { version, name } = (await fs
     .readFile("./package.json", "utf-8")
-    .then(JSON.parse);
+    .then(JSON.parse)) as { version: string; name: string };
 
   // check for latest version on npm
-  const { version: latest } = await packageJson(name, {
+  const { version: latest } = (await packageJson(name, {
     version: "latest",
-  }).catch(() => ({ version: "0.1.1" }));
+  }).catch(() => ({ version }))) as { version: string };
 
-  if (version == latest) {
+  if (version == latest || isLatestVersion(version, latest)) {
     // nothing to see here
     return;
   }

@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/evm",
-  "version": "0.1.11",
+  "version": "0.1.19",
   "publishConfig": {
     "access": "public"
   },
@@ -12,11 +12,14 @@
   "files": [
     "./build",
     "./contracts",
+    "./bin",
+    "./scripts",
     "./index.js",
     "./index.d.ts",
     "./clients.js",
     "./clients.d.ts"
   ],
+  "bin": "./bin/cli.mjs",
   "exports": {
     ".": {
       "import": "./build/module/index.js",
@@ -32,29 +35,30 @@
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
     "postinstall": "tsx scripts/postinstall.ts",
-    "codegen": "tsx scripts/codegen.ts",
+    "codegen": "./scripts/codegen-its.sh",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write src"
   },
   "keywords": [],
   "author": "",
   "license": "LicenseRef-LICENSE",
   "dependencies": {
-    "viem": "~1.18.5"
+    "@axelarjs/utils": "workspace:*",
+    "package-json": "^8.1.1",
+    "viem": "^1.19.9",
+    "tsx": "^3.14.0",
+    "zx": "^7.2.3"
   },
   "devDependencies": {
-    "@axelar-network/interchain-token-service": "^0.3.0",
+    "@axelar-network/interchain-token-service": "^1.0.0-beta.3",
     "@axelarjs/config": "workspace:*",
-    "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.8.10",
+    "@types/node": "^20.10.0",
     "@types/prettier": "^2.7.3",
-    "chalk": "^4.1.2",
-    "package-json": "^7.0.0",
+    "commander": "^11.1.0",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.5",
     "strip-ansi": "^6.0.1",
-    "tsx": "^3.14.0",
-    "typescript": "^5.2.2",
-    "zx": "^7.2.3"
+    "typescript": "^5.3.2"
   }
 }

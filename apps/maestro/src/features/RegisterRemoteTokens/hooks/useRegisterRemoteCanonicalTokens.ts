@@ -1,12 +1,12 @@
-import { encodeInterchainTokenServiceDeployRemoteCanonicalTokenData } from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
 import { useChainId } from "wagmi";
 
 import {
-  useInterchainTokenServiceMulticall,
-  usePrepareInterchainTokenServiceMulticall,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+  useInterchainTokenFactoryMulticall,
+  usePrepareInterchainTokenFactoryMulticall,
+} from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -32,10 +32,12 @@ export default function useRegisterRemoteCanonicalTokens(
     [input.chainIds, computed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map((chain) => chain.id);
+  const destinationChainIds = destinationChains.map(
+    (chain) => chain.chain_name
+  );
 
-  const sourceChainId = useMemo(
-    () => computed.indexedByChainId[chainId]?.id,
+  const sourceChain = useMemo(
+    () => computed.indexedByChainId[chainId],
     [chainId, computed.indexedByChainId]
   );
 
@@ -46,7 +48,7 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const { data: gasFees } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
-    sourceChainId: sourceChainId ?? "0",
+    sourceChainId: sourceChain?.id ?? "0",
   });
 
   const multicallArgs = useMemo(() => {
@@ -56,23 +58,25 @@ export default function useRegisterRemoteCanonicalTokens(
     return destinationChainIds.map((axelarChainId, i) => {
       const gasValue = gasFees[i];
 
-      return encodeInterchainTokenServiceDeployRemoteCanonicalTokenData({
-        tokenId: tokenDetails.tokenId,
-        destinationChain: axelarChainId,
-        gasValue,
-      });
+      return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
+        {
+          originalChain: sourceChain?.chain_name ?? "0x",
+          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
+          destinationChain: axelarChainId,
+          gasValue,
+        }
+      );
     });
-  }, [destinationChainIds, gasFees, tokenDetails]);
+  }, [destinationChainIds, gasFees, sourceChain?.chain_name, tokenDetails]);
 
   const totalGasFee = useMemo(
-    () =>
-      gasFees?.reduce((acc, gasFee) => acc + gasFee, BigInt(0)) ?? BigInt(0),
+    () => gasFees?.reduce((acc, gasFee) => acc + gasFee, 0n) ?? 0n,
     [gasFees]
   );
-  const { config } = usePrepareInterchainTokenServiceMulticall({
+  const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
   });
 
-  return useInterchainTokenServiceMulticall(config);
+  return useInterchainTokenFactoryMulticall(config);
 }

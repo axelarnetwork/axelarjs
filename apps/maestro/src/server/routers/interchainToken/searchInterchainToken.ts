@@ -1,36 +1,32 @@
-import type { InterchainTokenClient } from "@axelarjs/evm";
+import { type InterchainTokenClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
-import { partition } from "rambda";
+import { partition, pluck } from "rambda";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS, type WagmiEVMChainConfig } from "~/config/wagmi";
-import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
+import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
+import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
+import { hex40Literal, hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
-import type {
-  IntercahinTokenDetails,
-  RemoteInterchainTokenDetails,
-} from "~/services/db/kv";
 
-const TOKEN_INFO_SCHEMA = z.object({
-  tokenId: hex64Literal().nullable(),
-  tokenAddress: hex40Literal().nullable(),
-  isOriginToken: z.boolean(),
-  isRegistered: z.boolean(),
+const tokenDetailsSchema = z.object({
   chainId: z.number(),
-  axelarChainId: z.string().nullable(),
   chainName: z.string(),
-  wasDeployedByAccount: z.boolean().optional(),
-  kind: z.enum(["standardized", "canonical"]).nullable(),
+  axelarChainId: z.string(),
+  // nullable fields
+  tokenId: hexLiteral().nullable(),
+  tokenAddress: hex40Literal().nullable(),
+  isOriginToken: z.boolean().nullable(),
+  isRegistered: z.boolean(),
+  kind: z.enum(["interchain", "canonical", "custom"]),
 });
 
-const OUTPUT_SCHEMA = TOKEN_INFO_SCHEMA.extend({
-  matchingTokens: z.array(TOKEN_INFO_SCHEMA),
+const outputSchema = tokenDetailsSchema.extend({
+  wasDeployedByAccount: z.boolean(),
+  matchingTokens: z.array(tokenDetailsSchema),
 });
-
-export type SearchInterchainTokenOutput = z.infer<typeof OUTPUT_SCHEMA>;
 
 export const searchInterchainToken = publicProcedure
   .meta({
@@ -50,12 +46,12 @@ export const searchInterchainToken = publicProcedure
       strict: z.boolean().optional(),
     })
   )
-  .output(OUTPUT_SCHEMA.nullable())
+  .output(outputSchema)
   .query(async ({ input, ctx }) => {
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
         (chain) => chain.id === input.chainId,
-        EVM_CHAIN_CONFIGS
+        ctx.configs.wagmiChainConfigs
       );
 
       const scanPromise = !chainConfig
@@ -96,124 +92,144 @@ export const searchInterchainToken = publicProcedure
     }
   });
 
+interface TokenDetails extends InterchainToken {
+  remoteTokens: RemoteInterchainToken[];
+}
+
 async function getInterchainToken(
-  kvResult: IntercahinTokenDetails,
-  chainConfig: WagmiEVMChainConfig,
-  remainingChainConfigs: WagmiEVMChainConfig[],
+  tokenDetails: TokenDetails,
+  chainConfig: ExtendedWagmiChainConfig,
+  remainingChainConfigs: ExtendedWagmiChainConfig[],
   ctx: Context
 ) {
   const lookupToken = {
-    tokenId: kvResult.tokenId,
-    tokenAddress: kvResult.tokenAddress,
-    isOriginToken: kvResult.chainId === chainConfig.id,
+    tokenId: tokenDetails.tokenId,
+    tokenAddress: tokenDetails.tokenAddress,
+    isOriginToken: tokenDetails.axelarChainId === chainConfig?.axelarChainId,
     isRegistered: true,
-    chainId: kvResult.chainId,
+    chainId: chainConfig.id,
     chainName: chainConfig.name,
-    axelarChainId: kvResult.axelarChainId,
-    kind: kvResult.kind,
+    axelarChainId: tokenDetails.axelarChainId,
+    kind: tokenDetails.kind,
   };
 
-  const pendingRemoteTokens = kvResult.remoteTokens.filter(
+  const pendingRemoteTokens = tokenDetails.remoteTokens.filter(
     (token) => token.deploymentStatus === "pending"
   );
 
   const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
 
   const verifiedRemoteTokens = await Promise.all(
-    kvResult.remoteTokens.map(async (remoteToken) => {
-      const chainConfig = remainingChainConfigs.find(
-        (x) => x.id === remoteToken.chainId
-      );
+    tokenDetails.remoteTokens
+      .map(
+        (remoteToken) =>
+          [
+            remoteToken,
+            remainingChainConfigs.find(
+              ({ axelarChainId }) => axelarChainId === remoteToken.axelarChainId
+            ),
+          ] as const
+      )
+      .filter(([, chain]) => chain)
+      .map(async ([remoteToken, chainConfig]) => {
+        invariant(chainConfig, "Chain config not found");
 
-      const remoteTokenDetails = {
-        tokenId: kvResult.tokenId,
-        tokenAddress: remoteToken.address,
-        isOriginToken: false,
-        isRegistered: remoteToken.deploymentStatus === "deployed",
-        chainId: remoteToken.chainId,
-        chainName: chainConfig?.name ?? "Unknown",
-        axelarChainId: remoteToken.axelarChainId,
-        kind: kvResult.kind,
-      };
+        const remoteTokenDetails = {
+          tokenId: tokenDetails.tokenId,
+          tokenAddress: remoteToken.tokenAddress,
+          isOriginToken: false,
+          isRegistered: remoteToken.deploymentStatus === "confirmed",
+          chainId: chainConfig.id,
+          chainName: chainConfig.name,
+          axelarChainId: remoteToken.axelarChainId,
+          kind: tokenDetails.kind,
+        };
 
-      if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
-        // no need to check twice if the token is registered
-        return remoteTokenDetails;
-      }
+        if (!hasPendingRemoteTokens || remoteTokenDetails.isRegistered) {
+          // no need to check twice if the token is registered
+          return remoteTokenDetails;
+        }
 
-      invariant(chainConfig, "Chain config not found");
+        invariant(chainConfig, "Chain config not found");
 
-      let tokenClient: InterchainTokenClient | undefined;
+        let tokenClient: InterchainTokenClient | undefined;
 
-      switch (kvResult.kind) {
-        case "standardized":
-          tokenClient = ctx.contracts.createInterchainTokenClient(
-            chainConfig,
-            kvResult.tokenAddress
-          );
-          break;
-        case "canonical":
-          {
-            // for canonical tokens, we need to get the remote token address from the interchain token service
-            const itsClient =
-              ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+        switch (tokenDetails.kind) {
+          case "interchain":
+            tokenClient = ctx.contracts.createInterchainTokenClient(
+              chainConfig,
+              tokenDetails.tokenAddress as `0x${string}`
+            );
+            break;
+          case "canonical":
+            {
+              // for canonical tokens, we need to get the remote token address from the interchain token service
+              const itsClient =
+                ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-            const remoteTokenAddress = await itsClient
-              .read("getTokenAddress", {
-                args: [kvResult.tokenId],
-              })
-              .catch(() => null);
+              const remoteTokenAddress = await itsClient.reads
+                .interchainTokenAddress({
+                  tokenId: tokenDetails.tokenId as `0x${string}`,
+                })
+                .catch(() => null);
 
-            if (remoteTokenAddress) {
-              tokenClient = ctx.contracts.createInterchainTokenClient(
-                chainConfig,
-                remoteTokenAddress
-              );
+              if (remoteTokenAddress) {
+                tokenClient = ctx.contracts.createInterchainTokenClient(
+                  chainConfig,
+                  remoteTokenAddress
+                );
+              }
             }
-          }
-          break;
-      }
+            break;
+        }
 
-      const isRegistered = !tokenClient
-        ? false
-        : await tokenClient
-            .read("getTokenManager")
-            // attempt to read 'token.getTokenManager'
-            .then(() => true)
-            // which will throw if the token is not registered
-            .catch(() => false);
+        // TODO: use InterchainTokenService.validTokenManagerAddress to check if the token is registered
+        // alternatively, we can use InterchainTokenService.validTokenAddress to check if the token is registered
 
-      return {
-        ...remoteTokenDetails,
-        // derive the token address from the interchain token contract client
-        tokenAddress: tokenClient?.address ?? null,
-        isRegistered,
-      };
-    })
+        const isRegistered = !tokenClient
+          ? false
+          : await tokenClient
+              .read("tokenManager")
+              // attempt to read 'token.tokenManager'
+              .then(() => true)
+              // which will throw if the token is not registered
+              .catch(() => false);
+
+        return {
+          ...remoteTokenDetails,
+          // derive the token address from the interchain token contract client
+          tokenAddress: tokenClient?.address ?? null,
+          isRegistered,
+        };
+      })
   );
 
   if (hasPendingRemoteTokens) {
     // if there are pending remote tokens, mark them as "deployed" if they are now registered
     const newConfirmedRemoteTokens = verifiedRemoteTokens
       .filter((token) => token.isRegistered)
-      .map((t): RemoteInterchainTokenDetails | null => {
-        const match = kvResult.remoteTokens.find(
-          (x) => x.chainId === t.chainId
+      .map((registeredToken) => {
+        const match = tokenDetails.remoteTokens.find(
+          (token) => token.axelarChainId === registeredToken.axelarChainId
         );
         return match
-          ? { ...match, address: t.tokenAddress, deploymentStatus: "deployed" }
+          ? {
+              ...match,
+              tokenAddress: registeredToken.tokenAddress ?? "0x",
+              deploymentStatus: "confirmed",
+            }
           : null;
       })
-      .filter(Boolean) as RemoteInterchainTokenDetails[];
+      .filter(Boolean) as RemoteInterchainToken[];
 
     // update the KV store with the new confirmed remote tokens if any
     if (newConfirmedRemoteTokens.length) {
-      await ctx.persistence.kv.recordRemoteTokensDeployment(
-        {
-          chainId: kvResult.chainId,
-          tokenAddress: kvResult.tokenAddress,
-        },
-        newConfirmedRemoteTokens
+      const axelarChainIds = pluck("axelarChainId", newConfirmedRemoteTokens);
+
+      await ctx.persistence.postgres.updateRemoteInterchainTokenDeploymentsStatus(
+        tokenDetails.tokenId as `0x${string}`,
+        "confirmed",
+        axelarChainIds
       );
     }
   }
@@ -222,23 +238,25 @@ async function getInterchainToken(
     .filter(
       (chain) =>
         chain.id !== chainConfig.id &&
-        !kvResult.remoteTokens.some((token) => token.chainId === chain.id)
+        !tokenDetails.remoteTokens.some(
+          (token) => token.axelarChainId === chain.axelarChainId
+        )
     )
     .map((chain) => ({
+      chainId: chain.id,
+      axelarChainId: chain.axelarChainId,
+      chainName: chain.name,
       tokenId: null,
       tokenAddress: null,
       isOriginToken: false,
       isRegistered: false,
-      chainId: chain.id,
-      chainName: chain.name,
-      axelarChainId: null,
       wasDeployedByAccount: false,
-      kind: null,
+      kind: lookupToken.kind,
     }));
 
   return {
     ...lookupToken,
-    wasDeployedByAccount: kvResult.deployerAddress === ctx.session?.address,
+    wasDeployedByAccount: tokenDetails.deployerAddress === ctx.session?.address,
     matchingTokens: [lookupToken, ...verifiedRemoteTokens, ...unregistered],
   };
 }
@@ -250,18 +268,24 @@ async function getInterchainToken(
  * @param ctx
  */
 async function scanChains(
-  chainConfigs: WagmiEVMChainConfig[],
+  chainConfigs: ExtendedWagmiChainConfig[],
   tokenAddress: `0x${string}`,
   ctx: Context
 ) {
   for (const chainConfig of chainConfigs) {
-    const kvEntry = await ctx.persistence.kv.getInterchainTokenDetails({
-      chainId: chainConfig.id,
-      tokenAddress: tokenAddress,
-    });
+    const tokenDetails =
+      await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+        chainConfig.axelarChainId,
+        tokenAddress
+      );
 
-    if (kvEntry) {
-      return await getInterchainToken(kvEntry, chainConfig, chainConfigs, ctx);
+    if (tokenDetails) {
+      return await getInterchainToken(
+        tokenDetails,
+        chainConfig,
+        chainConfigs,
+        ctx
+      );
     }
   }
 
