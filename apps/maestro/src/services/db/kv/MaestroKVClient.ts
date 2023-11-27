@@ -4,7 +4,31 @@ export const COLLECTIONS = {
   accounts: "accounts",
 } as const;
 
-export type AccountStatus = "enabled" | "limited" | "disabled";
+/**
+ * Account status
+ * - enabled: account is enabled (default)
+ * - limited:{comma-separated-features}: account cannot use certain features
+ * - disabled: account is disabled (e.g. banned)
+ * - privileged: account is privileged (e.g. admin)
+ */
+export type AccountStatus =
+  | "enabled"
+  | `limited:${string}`
+  | "disabled"
+  | "privileged";
+
+export type MessageKind = "modal" | "banner";
+
+export type Message = {
+  messageKind: MessageKind;
+  content: string;
+  startTimestamp: string;
+  endTimestamp: string;
+};
+
+export type Messages = {
+  [key: string]: Message;
+};
 
 export const COLLECTION_KEYS = {
   accountNonce: (accountAddress: `0x${string}`) =>
@@ -38,6 +62,14 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     const status = await this.kv.get<AccountStatus>(key);
 
     return status;
+  }
+
+  async getMessages() {
+    return await this.kv.hgetall<Messages>("messages");
+  }
+
+  async getAccountMessages(accountAddresss: `0x${string}`) {
+    return await this.kv.hgetall<Messages>(`messages:${accountAddresss}`);
   }
 
   async setCached<T>(key: string, value: T, ttl = 3600) {
