@@ -1,4 +1,5 @@
 import type { VercelKV } from "@vercel/kv";
+import { z } from "zod";
 
 export const COLLECTIONS = {
   accounts: "accounts",
@@ -17,25 +18,26 @@ export type AccountStatus =
   | "disabled"
   | "privileged";
 
-export type MessageKind = "modal" | "banner";
-
-export type Message = {
-  messageKind: MessageKind;
-  content: string;
-  startTimestamp: string;
-  endTimestamp: string;
-};
-
-export type Messages = {
-  [key: string]: Message;
-};
-
 export const COLLECTION_KEYS = {
   accountNonce: (accountAddress: `0x${string}`) =>
     `${COLLECTIONS.accounts}:${accountAddress}:nonce` as const,
   accountStatus: (accountAddress: `0x${string}`) =>
     `${COLLECTIONS.accounts}:${accountAddress}:status` as const,
+  globalMessage: "messages:global" as const,
+  accountMessage: (accountAddress: `0x${string}`) =>
+    `messages:${accountAddress}` as const,
 };
+
+export const messageSchema = z.object({
+  kind: z.enum(["modal", "banner"]),
+  content: z.string(),
+  startTimestamp: z.string().optional(),
+  endTimestamp: z.string().optional(),
+});
+
+export type Message = z.infer<typeof messageSchema>;
+
+export type MessageKind = Message["kind"];
 
 export class BaseMaestroKVClient {
   constructor(protected kv: VercelKV) {}
@@ -64,12 +66,14 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     return status;
   }
 
-  async getMessages() {
-    return await this.kv.hgetall<Messages>("messages");
+  async getGlobalMessage() {
+    return await this.kv.hgetall<Message>(COLLECTION_KEYS.globalMessage);
   }
 
-  async getAccountMessages(accountAddresss: `0x${string}`) {
-    return await this.kv.hgetall<Messages>(`messages:${accountAddresss}`);
+  async getAccountMessage(accountAddresss: `0x${string}`) {
+    return await this.kv.hgetall<Message>(
+      COLLECTION_KEYS.accountMessage(accountAddresss)
+    );
   }
 
   async setCached<T>(key: string, value: T, ttl = 3600) {
