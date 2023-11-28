@@ -5,6 +5,7 @@ import { axelarscanRouter } from "./axelarscan";
 import { erc20Router } from "./erc20";
 import { gmpRouter } from "./gmp";
 import { interchainTokenRouter } from "./interchainToken";
+import { messagesRouter } from "./messages";
 import { openaiRouter } from "./openai";
 
 export const appRouter = router({
@@ -18,6 +19,7 @@ export const appRouter = router({
   interchainToken: interchainTokenRouter,
   auth: authRouter,
   openai: openaiRouter,
+  messages: messagesRouter,
 });
 
 export type AppRouter = typeof appRouter;
