@@ -9,9 +9,12 @@ import {
   LinkButton,
   Modal,
   ThemeProvider,
+  Tooltip,
   useTheme,
+  XCircleIcon,
 } from "@axelarjs/ui";
 import { useEffect, type FC, type PropsWithChildren } from "react";
+import Markdown from "react-markdown";
 import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
@@ -22,6 +25,7 @@ import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 } from "~/config/env";
+import { trpc } from "~/lib/trpc";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -33,6 +37,8 @@ import SignInModal from "./SignInModal";
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
   const { setThemeMode } = useWeb3ModalTheme();
+
+  const { data: globalMessage } = trpc.messages.getGlobalMessage.useQuery();
 
   // sync theme with web3modal
   useEffect(
@@ -49,6 +55,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
       isSignInModalOpen,
       DrawerSideContent,
       isTestnetBannerDismissed,
+      isGlobalBannerDismissed,
     },
     actions,
   ] = useLayoutStateContainer();
@@ -72,6 +79,24 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             }
           )}
         >
+          {globalMessage && !isGlobalBannerDismissed && (
+            <div
+              role="alert"
+              className="bg-warning text-warning-content sticky top-0 z-20 p-4 px-8 text-center"
+            >
+              <Markdown>{globalMessage.content}</Markdown>
+
+              <Tooltip
+                tip="Dismiss this messages"
+                className="text-error absolute right-4 top-4"
+                position="left"
+              >
+                <button onClick={actions.dismissGlobalBanner}>
+                  <XCircleIcon />
+                </button>
+              </Tooltip>
+            </div>
+          )}
           <Appbar />
 
           {children}

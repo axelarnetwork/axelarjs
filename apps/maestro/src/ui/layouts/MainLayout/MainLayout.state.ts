@@ -8,6 +8,7 @@ const DEFAULT_BANNERS_STATE = {
   isTestnetBannerDismissed: false,
   isHeroBannerDismissed: false,
   isBetaBannerDismissed: false,
+  isGlobalBannerDismissed: false,
 };
 
 function useLayoutState() {
@@ -90,6 +91,11 @@ function useLayoutState() {
       dismissDisclaimerBanner: () => {
         setPersistedState((stateDraft) => {
           stateDraft.isBetaBannerDismissed = true;
+        });
+      },
+      dismissGlobalBanner: () => {
+        setPersistedState((stateDraft) => {
+          stateDraft.isGlobalBannerDismissed = true;
         });
       },
     },
