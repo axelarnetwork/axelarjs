@@ -46,6 +46,18 @@ export const preventNonNumericInput = (
   }
 };
 
+export const preventNonHexInput = (
+  e: React.KeyboardEvent<HTMLInputElement>
+) => {
+  if (VALID_NON_NUMERIC_KEYS.includes(e.key)) {
+    // allow valid non-numeric keys
+    return;
+  }
+  if (!/^[0-9a-fA-F]+$/.test(e.key)) {
+    e.preventDefault();
+  }
+};
+
 const asHexLiteral = <T extends string>(x: T) => x as `0x${T}`;
 
 /**

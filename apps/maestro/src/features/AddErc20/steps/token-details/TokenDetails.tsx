@@ -16,7 +16,10 @@ import {
   useAddErc20StateContainer,
   type TokenDetailsFormState,
 } from "~/features/AddErc20";
-import { preventNonNumericInput } from "~/lib/utils/validation";
+import {
+  preventNonHexInput,
+  preventNonNumericInput,
+} from "~/lib/utils/validation";
 import { NextButton } from "../shared";
 
 const FormInput = Object.assign({}, TextInput, {
@@ -127,10 +130,11 @@ const TokenDetails: FC = () => {
                 <FormInput
                   id="distributor"
                   placeholder="Enter account address to mint to"
-                  min={0}
-                  onKeyDown={preventNonNumericInput}
+                  onKeyDown={preventNonHexInput}
+                  // defaultValue={state.tokenDetailsForm.getValues("distributor")}
                   {...register("distributor", {
                     disabled: isReadonly,
+
                     validate(value) {
                       if (!isAddress(String(value))) {
                         return "Invalid address";
@@ -145,9 +149,8 @@ const TokenDetails: FC = () => {
                 <Label htmlFor="salt">Salt</Label>
                 <FormInput
                   id="salt"
-                  placeholder="Enter your amount to mint"
-                  min={0}
-                  onKeyDown={preventNonNumericInput}
+                  onKeyDown={preventNonHexInput}
+                  // defaultValue={state.tokenDetailsForm.getValues("salt")}
                   {...register("salt", {
                     disabled: isReadonly,
                     validate(value) {
