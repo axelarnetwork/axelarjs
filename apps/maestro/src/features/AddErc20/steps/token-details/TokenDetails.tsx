@@ -131,10 +131,9 @@ const TokenDetails: FC = () => {
                   id="distributor"
                   placeholder="Enter account address to mint to"
                   onKeyDown={preventNonHexInput}
-                  // defaultValue={state.tokenDetailsForm.getValues("distributor")}
+                  defaultValue={state.tokenDetailsForm.getValues("distributor")}
                   {...register("distributor", {
                     disabled: isReadonly,
-
                     validate(value) {
                       if (!isAddress(String(value))) {
                         return "Invalid address";
@@ -150,7 +149,7 @@ const TokenDetails: FC = () => {
                 <FormInput
                   id="salt"
                   onKeyDown={preventNonHexInput}
-                  // defaultValue={state.tokenDetailsForm.getValues("salt")}
+                  defaultValue={state.tokenDetailsForm.getValues("salt")}
                   {...register("salt", {
                     disabled: isReadonly,
                     validate(value) {

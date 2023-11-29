@@ -130,7 +130,7 @@ export const Step3: FC = () => {
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteInterchainTokenMutation(
       {
-        salt: rootState.tokenDetails.salt,
+        salt: rootState.tokenDetails.salt as `0x${string}`,
         value: totalGasFees,
         onStatusUpdate(txState) {
           if (txState.type === "deployed") {
