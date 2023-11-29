@@ -165,8 +165,16 @@ const TransactionRow: FC<{
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
-        {tx.event?.name}{" "}
-        <span className="opacity-75">({tx.event?.symbol})</span>
+        {tx.event?.event === "InterchainTransfer"
+          ? tx.event?.name
+          : tx.event?.tokenName}{" "}
+        <span className="opacity-75">
+          (
+          {tx.event?.event === "InterchainTransfer"
+            ? tx.event?.symbol
+            : tx.event?.tokenSymbol}
+          )
+        </span>
       </Table.Cell>
       <Table.Cell>
         <Link
