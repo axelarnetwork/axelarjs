@@ -12,7 +12,9 @@ import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
-const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
+const InterchainTokenDeployment = dynamic(
+  () => import("~/features/InterchainTokenDeployment/InterchainTokenDeployment")
+);
 
 export default function Home() {
   const router = useRouter();
@@ -65,7 +67,7 @@ export default function Home() {
           <div className="bg-base-100 grid w-full place-items-center rounded-2xl p-4">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
             <div className="divider w-full">OR</div>
-            <AddErc20 />
+            <InterchainTokenDeployment />
           </div>
           <div className="mt-4">
             <section className="my-10 space-y-4">

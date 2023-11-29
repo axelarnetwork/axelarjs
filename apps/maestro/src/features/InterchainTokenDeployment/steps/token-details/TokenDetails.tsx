@@ -15,9 +15,9 @@ import { type SubmitHandler } from "react-hook-form";
 import { isAddress } from "viem";
 
 import {
-  useAddErc20StateContainer,
+  useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
-} from "~/features/AddErc20";
+} from "~/features/InterchainTokenDeployment";
 import {
   preventNonHexInput,
   preventNonNumericInput,
@@ -33,7 +33,7 @@ const FormInput = Object.assign({}, TextInput, {
 }) as typeof TextInput;
 
 const TokenDetails: FC = () => {
-  const { state, actions } = useAddErc20StateContainer();
+  const { state, actions } = useInterchainTokenDeploymentStateContainer();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -133,7 +133,7 @@ const TokenDetails: FC = () => {
                     <Tooltip
                       position="right"
                       variant="info"
-                      tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and tranfer distributorship."
+                      tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer distributorship."
                     >
                       <HelpCircleIcon className="text-info mr-1 h-[1em]" />
                     </Tooltip>

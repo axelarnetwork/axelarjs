@@ -26,7 +26,7 @@ import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
+import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
   sourceChainId: string;
@@ -34,16 +34,16 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   tokenSymbol: string;
   decimals: number;
   destinationChainIds: string[];
-  gasFees: bigint[];
+  remoteDeploymentGasFees: bigint[];
+  remoteTransferGasFees: bigint[];
   originInitialSupply?: bigint;
   remoteInitialSupply?: bigint;
+  salt: `0x${string}`;
   deployerAddress?: `0x${string}`;
   distributorAddress?: `0x${string}`;
 }
 
 export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
-  value: bigint;
-  salt: `0x${string}`;
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }
@@ -67,19 +67,20 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
   const { data: tokenId } = useInterchainTokenFactoryInterchainTokenId({
     args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
-      salt: config.salt,
+      salt: input?.salt as `0x${string}`,
       deployer: deployerAddress as `0x${string}`,
     }),
-    enabled: deployerAddress && isValidEVMAddress(deployerAddress),
+    enabled:
+      input?.salt && deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
   const { data: tokenAddress } =
     useInterchainTokenFactoryInterchainTokenAddress({
       args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenAddress.args({
-        salt: config.salt,
+        salt: input?.salt as `0x${string}`,
         deployer: deployerAddress as `0x${string}`,
       }),
-      enabled: Boolean(tokenId),
+      enabled: Boolean(tokenId && input?.salt && deployerAddress),
     });
 
   const { data: gasEstimate } = useFeeData();
@@ -136,7 +137,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       parsedOriginInitialSupply + parsedRemoteInitialSupply;
 
     const baseArgs = {
-      salt: config.salt,
+      salt: input.salt,
       name: input.tokenName,
       symbol: input.tokenSymbol,
       decimals: input.decimals,
@@ -170,9 +171,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         originalChainName,
         destinationChain,
-        gasValue: input.gasFees[i] ?? 0n,
+        gasValue: input.remoteDeploymentGasFees[i] ?? 0n,
         distributor: distributorAddress,
-        salt: config.salt,
+        salt: input.salt,
       })
     );
 
@@ -184,7 +185,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             destinationAddress: distributorAddress,
             destinationChain,
             tokenId: tokenId,
-            gasValue: input.gasFees[i] ?? 0n,
+            gasValue: input.remoteTransferGasFees[i] ?? 0n,
           })
         )
       );
@@ -195,26 +196,30 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     input,
     tokenId,
     withDecimals,
-    config.salt,
     originTransferGas,
     destinationChainNames,
     originalChainName,
   ]);
 
   const totalGasFee = useMemo(() => {
-    const remoteDeploymentsGas = Maybe.of(input?.gasFees).mapOr(
+    const remoteDeploymentsGas = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
       0n,
       reduce((a, b) => a + b, 0n)
     );
 
-    const remoteTransfersGas = input?.remoteInitialSupply
-      ? remoteDeploymentsGas // if remoteInitialSupply is set, remoteTransfersGas is the same as remote deployments gas
-      : 0n;
+    const remoteTransfersGas = Maybe.of(input?.remoteTransferGasFees).mapOr(
+      0n,
+      reduce((a, b) => a + b, 0n)
+    );
 
     // the total gas fee is the sum of the remote deployments gas fee,
     // the remote transfers gas fee and the origin transfer gas fee
     return remoteDeploymentsGas + remoteTransfersGas + originTransferGas;
-  }, [input?.gasFees, input?.remoteInitialSupply, originTransferGas]);
+  }, [
+    input?.remoteDeploymentGasFees,
+    input?.remoteTransferGasFees,
+    originTransferGas,
+  ]);
 
   const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
     chainId,
@@ -236,7 +241,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
       setRecordDeploymentArgs({
         kind: "interchain",
-        salt: config.salt,
+        salt: input.salt,
         tokenId,
         tokenAddress,
         deployerAddress,

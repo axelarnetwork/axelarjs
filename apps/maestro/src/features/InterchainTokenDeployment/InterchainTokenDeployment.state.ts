@@ -63,12 +63,12 @@ export const INITIAL_STATE = {
   },
 };
 
-export type AddErc20State = typeof INITIAL_STATE;
+export type InterchainTokenDeploymentState = typeof INITIAL_STATE;
 
-export type TokenDetails = AddErc20State["tokenDetails"];
+export type TokenDetails = InterchainTokenDeploymentState["tokenDetails"];
 
-function useAddErc20State(
-  partialInitialState: Partial<AddErc20State> = INITIAL_STATE
+function useInterchainTokenDeploymentState(
+  partialInitialState: Partial<InterchainTokenDeploymentState> = INITIAL_STATE
 ) {
   const initialState = {
     ...INITIAL_STATE,
@@ -194,6 +194,6 @@ function useAddErc20State(
 }
 
 export const {
-  Provider: AddErc20StateProvider,
-  useContainer: useAddErc20StateContainer,
-} = createContainer(useAddErc20State);
+  Provider: InterchainTokenDeploymentStateProvider,
+  useContainer: useInterchainTokenDeploymentStateContainer,
+} = createContainer(useInterchainTokenDeploymentState);

@@ -10,7 +10,7 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useRegisterCanonicalTokenMutation } from "../AddErc20/hooks/useRegisterCanonicalTokenMutation";
+import { useRegisterCanonicalTokenMutation } from "../InterchainTokenDeployment/hooks/useRegisterCanonicalTokenMutation";
 
 type Props = {
   address?: `0x${string}`;
