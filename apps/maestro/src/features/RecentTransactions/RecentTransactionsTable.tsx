@@ -182,7 +182,7 @@ const TransactionRow: FC<{
           className="group flex items-center gap-2"
         >
           <>
-            {maskAddress(tx.hash as `0x${string}`)}
+            {maskAddress(tx.hash)}
             <ExternalLinkIcon
               size="16"
               className="text-accent opacity-0 transition-opacity group-hover:opacity-100"
@@ -191,9 +191,7 @@ const TransactionRow: FC<{
         </Link>
       </Table.Cell>
       <Table.Cell>
-        <Link href={`/block/${tx.blockHash}`}>
-          {maskAddress(tx.blockHash as `0x${string}`)}
-        </Link>
+        <Link href={`/block/${tx.blockHash}`}>{maskAddress(tx.blockHash)}</Link>
       </Table.Cell>
       <Table.Cell>{new Date(tx.timestamp * 1000).toLocaleString()}</Table.Cell>
     </Table.Row>
