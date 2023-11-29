@@ -28,20 +28,14 @@ export const VALID_NON_NUMERIC_KEYS = [
   "End",
 ];
 
-/**
- * type guard for numeric keys
- *
- * @param key The key to check.
- * @returns true if the key is a valid numeric key.
- * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
- */
-export const isValidNumericKey = (key: string) =>
-  VALID_NON_NUMERIC_KEYS.includes(key) || /^[0-9.]+$/.test(key);
-
 export const preventNonNumericInput = (
   e: React.KeyboardEvent<HTMLInputElement>
 ) => {
-  if (!isValidNumericKey(e.key)) {
+  if (VALID_NON_NUMERIC_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) {
+    // allow valid non-numeric keys & ctrl shortcuts
+    return;
+  }
+  if (!/^[0-9.]+$/.test(e.key)) {
     e.preventDefault();
   }
 };
@@ -49,16 +43,19 @@ export const preventNonNumericInput = (
 export const preventNonHexInput = (
   e: React.KeyboardEvent<HTMLInputElement>
 ) => {
-  if (VALID_NON_NUMERIC_KEYS.includes(e.key)) {
-    // allow valid non-numeric keys
+  if (VALID_NON_NUMERIC_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) {
+    // allow valid non-numeric keys & ctrl shortcuts
     return;
   }
-  if (!/^[0-9a-fA-F]+$/.test(e.key)) {
+  if (!/^[0-9a-fA-FxX]+$/.test(e.key)) {
     e.preventDefault();
   }
 };
 
 const asHexLiteral = <T extends string>(x: T) => x as `0x${T}`;
+
+const asHexLiteralOptional = <T extends string>(x: T | undefined) =>
+  x as `0x${T}` | undefined;
 
 /**
  * Zod schema to validate a variable length hex address
@@ -68,6 +65,9 @@ export const hexLiteral = () =>
     .string()
     .regex(/^0x[0-9a-fA-F]+$/)
     .transform(asHexLiteral);
+
+export const optionalHexLiteral = () =>
+  z.string().optional().transform(asHexLiteralOptional);
 
 /**
  * Zod schema to validate a 40 character hex address

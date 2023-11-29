@@ -11,9 +11,9 @@ import { z } from "zod";
 
 import { logger } from "~/lib/logger";
 import {
-  hex40Literal,
   hex64Literal,
   numericString,
+  optionalHexLiteral,
 } from "~/lib/utils/validation";
 
 const TOKEN_DETAILS_FORM_SCHEMA = z.object({
@@ -21,7 +21,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
   originTokenSupply: numericString(),
-  distributor: hex40Literal().optional(),
+  distributor: optionalHexLiteral(),
   salt: hex64Literal(),
 });
 

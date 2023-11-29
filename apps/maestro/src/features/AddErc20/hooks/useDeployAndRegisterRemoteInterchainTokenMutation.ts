@@ -116,7 +116,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
   const multicallArgs = useMemo(() => {
     const distributorAddress =
-      input?.distributorAddress ?? input?.deployerAddress ?? deployerAddress;
+      input?.distributorAddress ?? input?.deployerAddress;
 
     if (!input || !distributorAddress || !tokenId) {
       return [];
@@ -193,7 +193,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     return [deployTxData, ...registerTxData, ...transferTxData];
   }, [
     input,
-    deployerAddress,
     tokenId,
     withDecimals,
     config.salt,
