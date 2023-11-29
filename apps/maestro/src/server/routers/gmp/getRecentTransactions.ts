@@ -1,4 +1,4 @@
-import { type ContractMethod, type SearchGMPResponseData } from "@axelarjs/api";
+import type { ContractMethod, SearchGMPResponseData } from "@axelarjs/api";
 
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
