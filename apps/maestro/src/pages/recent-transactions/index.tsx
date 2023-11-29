@@ -13,7 +13,7 @@ import Page from "~/ui/layouts/Page";
 
 const RecentTransactionsPage = () => {
   const [contractMethod, setContractMethod] =
-    useState<ContractMethod>("sendToken");
+    useState<ContractMethod>("InterchainTransfer");
 
   const { address } = useAccount();
 

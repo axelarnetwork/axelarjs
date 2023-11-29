@@ -165,8 +165,16 @@ const TransactionRow: FC<{
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
-        {tx.event?.name}{" "}
-        <span className="opacity-75">({tx.event?.symbol})</span>
+        {tx.event?.event === "InterchainTransfer"
+          ? tx.event?.name
+          : tx.event?.tokenName}{" "}
+        <span className="opacity-75">
+          (
+          {tx.event?.event === "InterchainTransfer"
+            ? tx.event?.symbol
+            : tx.event?.tokenSymbol}
+          )
+        </span>
       </Table.Cell>
       <Table.Cell>
         <Link
@@ -174,7 +182,7 @@ const TransactionRow: FC<{
           className="group flex items-center gap-2"
         >
           <>
-            {maskAddress(tx.hash as `0x${string}`)}
+            {maskAddress(tx.hash)}
             <ExternalLinkIcon
               size="16"
               className="text-accent opacity-0 transition-opacity group-hover:opacity-100"
@@ -183,9 +191,7 @@ const TransactionRow: FC<{
         </Link>
       </Table.Cell>
       <Table.Cell>
-        <Link href={`/block/${tx.blockHash}`}>
-          {maskAddress(tx.blockHash as `0x${string}`)}
-        </Link>
+        <Link href={`/block/${tx.blockHash}`}>{maskAddress(tx.blockHash)}</Link>
       </Table.Cell>
       <Table.Cell>{new Date(tx.timestamp * 1000).toLocaleString()}</Table.Cell>
     </Table.Row>

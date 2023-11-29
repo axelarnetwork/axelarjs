@@ -45,9 +45,8 @@ type BaseGMPParams = {
 export const VALID_CONTRACT_METHODS = [
   "callContract",
   "callContractWithToken",
-  "sendToken",
-  "StandardizedTokenDeployed",
-  "RemoteStandardizedTokenAndManagerDeploymentInitialized",
+  "InterchainTransfer",
+  "InterchainTokenDeploymentStarted",
 ] as const;
 
 export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
@@ -96,40 +95,6 @@ type SearchGMPCall = {
     symbol: string;
     amount: HexAmount;
   };
-};
-
-export type TokenDeployedEvent = {
-  event: "StandardizedTokenDeployed";
-  mintAmount: string;
-  symbol: string;
-  tokenId: `0x${string}`;
-  mintTo: `0x${string}`;
-  decimals: number;
-  name: string;
-};
-
-export type TokenSentEvent = {
-  event: "TokenSent";
-  symbol: string;
-  amount: string;
-  destinationAddress: `0x${string}`;
-  tokenId: `0x${string}`;
-  decimals: number;
-  name: string;
-  destinationChain: string;
-  contract_address: `0x${string}`;
-};
-
-export type RemoteStandardizedTokenAndManagerDeploymentInitializedEvent = {
-  event: "RemoteStandardizedTokenAndManagerDeploymentInitialized";
-  tokenId: `0x${string}`;
-  tokenSymbol: string;
-  gasValue: string;
-  tokenDecimals: number;
-  tokenName: string;
-  destinationChain: string;
-  distributor: `0x${string}`;
-  operator: `0x${string}`;
 };
 
 type GMPTokenInfo = {
@@ -220,6 +185,29 @@ export type SearchGMPGasPaid = {
   destination_chain_type: string;
 };
 
+type InterchainTransferEvent = {
+  event: "InterchainTransfer";
+  symbol: string;
+  amount: string;
+  destinationAddress: `0x${string}`;
+  tokenId: `0x${string}`;
+  decimals: number;
+  name: string;
+  destinationChain: string;
+  contract_address: `0x${string}`;
+  id: string;
+};
+
+type InterchainTokenDeploymentStartedEvent = {
+  event: "InterchainTokenDeploymentStarted";
+  tokenId: `0x${string}`;
+  tokenSymbol: string;
+  tokenDecimals: number;
+  tokenName: string;
+  destinationChain: string;
+  distributor: `0x${string}`;
+};
+
 export type SearchGMPResponseData = {
   call: SearchGMPCall;
   fees: SearchGMPFees;
@@ -228,9 +216,8 @@ export type SearchGMPResponseData = {
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;
-  token_sent?: TokenSentEvent;
-  token_deployed?: TokenDeployedEvent;
-  token_deployment_initialized?: RemoteStandardizedTokenAndManagerDeploymentInitializedEvent;
+  interchain_transfer?: InterchainTransferEvent;
+  interchain_token_deployment_started?: InterchainTokenDeploymentStartedEvent;
 };
 
 export type SearchGMPResponse = BaseGMPResponse<{

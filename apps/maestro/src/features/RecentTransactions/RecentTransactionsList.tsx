@@ -104,7 +104,7 @@ const TransactionItem: FC<{
       <div className="avatar placeholder">
         <div className="bg-neutral-focus text-neutral-content w-12 rounded-full">
           <span className="text-xl">
-            {contractMethod === "sendToken" ? "ST" : "TD"}
+            {contractMethod === "InterchainTransfer" ? "IT" : "TD"}
           </span>
         </div>
       </div>
@@ -131,9 +131,15 @@ const TransactionItem: FC<{
               className="hover:text-primary hover:cursor-pointer"
               href={`/interchain-tokens/${tx.event.tokenId}`}
             >
-              {tx.event.name}{" "}
+              {tx.event.event === "InterchainTransfer"
+                ? tx.event.name
+                : tx.event.tokenName}{" "}
               <span className="text-neutral opacity-50 dark:text-white">
-                ({tx.event.symbol})
+                (
+                {tx.event.event === "InterchainTransfer"
+                  ? tx.event.symbol
+                  : tx.event.tokenSymbol}
+                )
               </span>
             </Link>
           )}
