@@ -1,6 +1,7 @@
 import { generateRandomHash } from "@axelarjs/utils";
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect } from "react";
+import { unstable_batchedUpdates } from "react-dom";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,7 +54,7 @@ export const INITIAL_STATE = {
     originTokenSupply: "0",
     remoteTokenSupply: "0",
     distributor: undefined as `0x${string}` | undefined,
-    salt: "0x" as `0x${string}`,
+    salt: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
@@ -95,11 +96,13 @@ function useAddErc20State(
     () => {
       const salt = generateRandomHash();
 
-      tokenDetailsForm.setValue("salt", salt);
-      tokenDetailsForm.setValue("distributor", address);
+      unstable_batchedUpdates(() => {
+        tokenDetailsForm.setValue("salt", salt);
+        tokenDetailsForm.setValue("distributor", address);
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [address]
   );
 
   /**
