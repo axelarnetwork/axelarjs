@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.8
+
+### Patch Changes
+
+- [#95](https://github.com/axelarnetwork/axelarjs/pull/95) [`6c6912ca1ce5bb6d9bdcd6cd16fe79c93cd01ad0`](https://github.com/axelarnetwork/axelarjs/commit/6c6912ca1ce5bb6d9bdcd6cd16fe79c93cd01ad0) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: migrate recent transactions event mapping for interchain transfers and token deployments
+
 ## 0.3.7
 
 ### Patch Changes
