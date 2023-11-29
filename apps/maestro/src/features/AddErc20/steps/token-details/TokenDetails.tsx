@@ -4,8 +4,10 @@ import {
   EyeIcon,
   EyeOffIcon,
   FormControl,
+  HelpCircleIcon,
   Label,
   TextInput,
+  Tooltip,
 } from "@axelarjs/ui";
 import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
@@ -111,7 +113,6 @@ const TokenDetails: FC = () => {
             })}
           />
         </FormControl>
-
         <div className="grid place-content-center pt-4 md:place-content-end">
           <Button size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
             advanced settings
@@ -126,20 +127,36 @@ const TokenDetails: FC = () => {
           {showAdvanced && (
             <>
               <FormControl>
-                <Label htmlFor="distributor">Mint tokens to</Label>
+                <Label htmlFor="distributor">
+                  <Label.Text className="inline-flex items-center gap-1">
+                    Token Distributor
+                    <Tooltip
+                      position="right"
+                      variant="info"
+                      tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and tranfer distributorship."
+                    >
+                      <HelpCircleIcon className="text-info mr-1 h-[1em]" />
+                    </Tooltip>
+                  </Label.Text>
+                </Label>
                 <FormInput
                   id="distributor"
-                  placeholder="Enter account address to mint to"
+                  placeholder="Enter token distributor address"
                   onKeyDown={preventNonHexInput}
                   defaultValue={state.tokenDetailsForm.getValues("distributor")}
                   {...register("distributor", {
                     disabled: isReadonly,
                     validate(value) {
+                      if (!value) {
+                        return false;
+                      }
+
+                      // this field is optional, so we only validate if it's not empty
                       if (!isAddress(String(value))) {
                         return "Invalid address";
                       }
 
-                      return true;
+                      return false;
                     },
                   })}
                 />
