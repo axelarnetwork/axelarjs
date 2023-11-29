@@ -117,7 +117,7 @@ const TransactionItem: FC<{
               target="_blank"
               rel="noopener noreferrer"
             >
-              {maskAddress(tx.hash as `0x${string}`, {
+              {maskAddress(tx.hash, {
                 segmentA: 12,
                 segmentB: 52,
               })}{" "}
