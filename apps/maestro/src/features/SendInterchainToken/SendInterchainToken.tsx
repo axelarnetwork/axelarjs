@@ -147,9 +147,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
               chainIconClassName="-translate-x-1.5"
               triggerClassName="w-full md:w-auto rounded-full"
             />
-            <span className="-translate-x-2 text-sm font-semibold">
-              {props.sourceChain?.chain_name}
-            </span>
           </div>
           <div className="flex items-center gap-2">
             <label className="text-md align-top">To:</label>
