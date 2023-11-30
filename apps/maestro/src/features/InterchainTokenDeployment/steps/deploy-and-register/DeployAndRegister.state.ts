@@ -1,4 +1,5 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
+import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
@@ -45,10 +46,9 @@ export function useStep3ChainSelectionState() {
     isError: isRemoteTransferGasFeeError,
   } = useEstimateGasFeeMultipleChainsQuery({
     sourceChainId,
-    destinationChainIds:
-      Number(rootState.tokenDetails.remoteTokenSupply ?? "0") > 0
-        ? rootState.selectedChains
-        : [],
+    destinationChainIds: Maybe.of(rootState.tokenDetails.remoteTokenSupply)
+      .map(BigInt)
+      .mapOr([], (supply) => (supply > 0n ? rootState.selectedChains : [])),
     gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT),
     gasMultipler: 2,
   });
