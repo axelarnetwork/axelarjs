@@ -12,13 +12,12 @@ import {
 import { useRef, useState, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
 
-import { isAddress } from "viem";
-
 import {
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
 import {
+  isValidEVMAddress,
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
@@ -152,7 +151,7 @@ const TokenDetails: FC = () => {
                       }
 
                       // this field is optional, so we only validate if it's not empty
-                      if (!isAddress(String(value))) {
+                      if (!isValidEVMAddress(value)) {
                         return "Invalid address";
                       }
 
@@ -185,11 +184,17 @@ const TokenDetails: FC = () => {
         <button type="submit" ref={formSubmitRef} />
       </form>
 
-      {formState.errors && (
-        <div className="text-sm text-red-500">
-          {Object.values(formState.errors).map((error) => (
-            <div key={error.message}>{error.message}</div>
-          ))}
+      {Object.values(formState.errors).length > 0 && (
+        <div className="text-sm">
+          <div>Please fix the following errors:</div>
+          <ul>
+            {Object.entries(formState.errors).map(([key, error]) => (
+              <li key={key} className="list-item">
+                <span>{key}</span>:{" "}
+                <span className="text-red-500">{error.message}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       <Dialog.Actions>

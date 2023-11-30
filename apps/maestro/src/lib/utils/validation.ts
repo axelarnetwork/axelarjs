@@ -66,18 +66,20 @@ export const hexLiteral = () =>
     .regex(/^0x[0-9a-fA-F]+$/)
     .transform(asHexLiteral);
 
-export const optionalHexLiteral = () =>
-  z.string().optional().transform(asHexLiteralOptional);
+export const optionalHex40Literal = () =>
+  hex40Literal().or(z.string().length(0)).transform(asHexLiteralOptional);
 
 /**
  * Zod schema to validate a 40 character hex address
  */
-export const hex40 = () => z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+export const hex40 = () =>
+  z.string().regex(/^0x[0-9a-fA-F]{40}$/, "Invalid address");
 
 /**
  * Zod schema to validate a 64 character hex address
  */
-export const hex64 = () => z.string().regex(/^0x[0-9a-fA-F]{64}$/);
+export const hex64 = () =>
+  z.string().regex(/^0x[0-9a-fA-F]{64}$/, "Invalid hash");
 
 export const hex40Literal = () => hex40().transform(asHexLiteral);
 
