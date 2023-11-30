@@ -1,12 +1,17 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
+import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
 import { useChainId } from "wagmi";
 
+import {
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
+  NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
+} from "~/config/env";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useAddErc20StateContainer } from "../../AddErc20.state";
+import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
 export type UseStep3ChainSelectionStateProps = {
   selectedChains: Set<string>;
@@ -22,28 +27,47 @@ export function useStep3ChainSelectionState() {
       ?.id as string
   );
 
-  const { state: rootState } = useAddErc20StateContainer();
+  const { state: rootState } = useInterchainTokenDeploymentStateContainer();
 
   const {
-    data: gasFees,
-    isLoading: isGasPriceQueryLoading,
-    isError: isGasPriceQueryError,
+    data: remoteDeploymentGasFees,
+    isLoading: isRemoteDeploymentGasFeeLoading,
+    isError: isRemoteDeploymentGasFeeError,
   } = useEstimateGasFeeMultipleChainsQuery({
     sourceChainId,
     destinationChainIds: rootState.selectedChains,
-    gasLimit: 1_000_000,
+    gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT),
     gasMultipler: 2,
   });
 
-  useEffect(() => gasFees && setTotalGasFee(gasFees), [gasFees]);
+  const {
+    data: remoteTransferGasFees,
+    isLoading: isRemoteTransferGasFeeLoading,
+    isError: isRemoteTransferGasFeeError,
+  } = useEstimateGasFeeMultipleChainsQuery({
+    sourceChainId,
+    destinationChainIds: Maybe.of(rootState.tokenDetails.remoteTokenSupply)
+      .map(BigInt)
+      .mapOr([], (supply) => (supply > 0n ? rootState.selectedChains : [])),
+    gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT),
+    gasMultipler: 2,
+  });
+
+  useEffect(
+    () =>
+      remoteDeploymentGasFees &&
+      remoteTransferGasFees &&
+      setTotalGasFee([...remoteDeploymentGasFees, ...remoteTransferGasFees]),
+    [remoteDeploymentGasFees, remoteTransferGasFees]
+  );
 
   const resetState = () => {
     setIsDeploying(false);
     $setTotalGasFee(formatEther(0n));
   };
 
-  const setTotalGasFee = (gasFees: bigint[]) => {
-    const num = Number(formatEther(gasFees.reduce((a, b) => a + b, 0n)));
+  const setTotalGasFee = (fees: bigint[]) => {
+    const num = Number(formatEther(fees.reduce((a, b) => a + b, 0n)));
     $setTotalGasFee(num.toFixed(4));
   };
 
@@ -62,9 +86,12 @@ export function useStep3ChainSelectionState() {
       totalGasFee,
       sourceChainId,
       evmChains,
-      isGasPriceQueryLoading,
-      isGasPriceQueryError,
-      gasFees,
+      isEstimatingGasFees:
+        isRemoteDeploymentGasFeeLoading || isRemoteTransferGasFeeLoading,
+      hasGasFeesEstimationError:
+        isRemoteDeploymentGasFeeError || isRemoteTransferGasFeeError,
+      remoteDeploymentGasFees,
+      remoteTransferGasFees,
     },
     actions: {
       resetState,

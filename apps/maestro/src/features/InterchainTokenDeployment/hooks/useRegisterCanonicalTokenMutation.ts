@@ -14,7 +14,7 @@ import {
 } from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
 import type { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import type { DeployAndRegisterTransactionState } from "../AddErc20.state";
+import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 export type UseRegisterCanonicalTokenInput = {
   sourceChainId: string;

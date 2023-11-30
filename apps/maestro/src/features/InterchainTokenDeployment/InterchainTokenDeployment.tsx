@@ -6,10 +6,10 @@ import dynamic from "next/dynamic";
 
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import {
-  AddErc20StateProvider,
-  useAddErc20StateContainer,
+  InterchainTokenDeploymentStateProvider,
+  useInterchainTokenDeploymentStateContainer,
   type TokenDetails,
-} from "./AddErc20.state";
+} from "./InterchainTokenDeployment.state";
 import { PrevButton } from "./steps/shared";
 
 const StepLoading = () => (
@@ -25,33 +25,40 @@ const StepLoading = () => (
   </div>
 );
 
-const Step1 = dynamic(() => import("~/features/AddErc20/steps/token-details"), {
-  loading: StepLoading,
-});
-
-const Step2 = dynamic(
-  () => import("~/features/AddErc20/steps/deploy-and-register"),
+const Step1 = dynamic(
+  () => import("~/features/InterchainTokenDeployment/steps/token-details"),
   {
     loading: StepLoading,
   }
 );
 
-const Step3 = dynamic(() => import("~/features/AddErc20/steps/review"), {
-  loading: StepLoading,
-});
+const Step2 = dynamic(
+  () =>
+    import("~/features/InterchainTokenDeployment/steps/deploy-and-register"),
+  {
+    loading: StepLoading,
+  }
+);
+
+const Step3 = dynamic(
+  () => import("~/features/InterchainTokenDeployment/steps/review"),
+  {
+    loading: StepLoading,
+  }
+);
 
 const StepsSummary = dynamic(
-  () => import("~/features/AddErc20/steps/StepsSummary")
+  () => import("~/features/InterchainTokenDeployment/steps/StepsSummary")
 );
 
 const STEPS = [Step1, Step2, Step3];
 
-type AddErc20Props = {
+type InterchainTokenDeploymentProps = {
   tokenDetails?: TokenDetails;
 };
 
-const AddErc20: FC<AddErc20Props> = () => {
-  const { state, actions } = useAddErc20StateContainer();
+const InterchainTokenDeployment: FC<InterchainTokenDeploymentProps> = () => {
+  const { state, actions } = useInterchainTokenDeploymentStateContainer();
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
@@ -109,9 +116,11 @@ const AddErc20: FC<AddErc20Props> = () => {
   );
 };
 
-const AddErc20WithProvider = (props: AddErc20Props) => {
+const InterchainTokenDeploymentWithProvider = (
+  props: InterchainTokenDeploymentProps
+) => {
   return (
-    <AddErc20StateProvider
+    <InterchainTokenDeploymentStateProvider
       initialState={
         props.tokenDetails
           ? {
@@ -121,9 +130,9 @@ const AddErc20WithProvider = (props: AddErc20Props) => {
           : undefined
       }
     >
-      <AddErc20 {...props} />
-    </AddErc20StateProvider>
+      <InterchainTokenDeployment {...props} />
+    </InterchainTokenDeploymentStateProvider>
   );
 };
 
-export default AddErc20WithProvider;
+export default InterchainTokenDeploymentWithProvider;

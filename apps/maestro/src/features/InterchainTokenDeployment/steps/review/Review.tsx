@@ -17,7 +17,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { getInterchainTokenDetailsPageSessionStorageKey } from "~/ui/pages/InterchainTokenDetailsPage/ConnectedInterchainTokensPage";
-import { useAddErc20StateContainer } from "../../AddErc20.state";
+import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
 function setRemoteTokenDeploymentTxHash(
   tokenAddress: `0x${string}`,
@@ -36,7 +36,7 @@ function setRemoteTokenDeploymentTxHash(
 
 const Review: FC = () => {
   const router = useRouter();
-  const { state, actions } = useAddErc20StateContainer();
+  const { state, actions } = useInterchainTokenDeploymentStateContainer();
   const { chain } = useNetwork();
   const routeChain = useChainFromRoute();
 
@@ -127,11 +127,11 @@ const Review: FC = () => {
                   )
                 );
 
+                actions.reset();
+
                 await router.push(
                   `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
                 );
-
-                actions.reset();
               }
             }}
           >

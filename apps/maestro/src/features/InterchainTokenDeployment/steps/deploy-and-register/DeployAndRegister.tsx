@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { invariant } from "@axelarjs/utils";
+import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
   ChangeEvent,
   useCallback,
@@ -22,8 +22,8 @@ import Image from "next/image";
 import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
-import { useAddErc20StateContainer } from "~/features/AddErc20/AddErc20.state";
-import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/AddErc20/hooks";
+import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/InterchainTokenDeployment/hooks";
+import { useInterchainTokenDeploymentStateContainer } from "~/features/InterchainTokenDeployment/InterchainTokenDeployment.state";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { preventNonNumericInput } from "~/lib/utils/validation";
@@ -114,14 +114,9 @@ const FormInput = Object.assign({}, TextInput, {
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
-    useAddErc20StateContainer();
+    useInterchainTokenDeploymentStateContainer();
 
   const { state, actions } = useStep3ChainSelectionState();
-
-  const totalGasFees = useMemo(
-    () => (state.gasFees ?? []).reduce((acc, gasFee) => acc + gasFee, 0n),
-    [state.gasFees]
-  );
 
   const chainId = useChainId();
 
@@ -130,8 +125,6 @@ export const Step3: FC = () => {
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteInterchainTokenMutation(
       {
-        salt: rootState.tokenDetails.salt as `0x${string}`,
-        value: totalGasFees,
         onStatusUpdate(txState) {
           if (txState.type === "deployed") {
             rootActions.setTxState(txState);
@@ -143,15 +136,21 @@ export const Step3: FC = () => {
         },
       },
       {
+        salt: rootState.tokenDetails.salt as `0x${string}`,
         tokenName: rootState.tokenDetails.tokenName,
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
-        gasFees: state.gasFees ?? [],
+        remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
+        remoteTransferGasFees: state.remoteTransferGasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
-        deployerAddress: rootState.tokenDetails.distributor,
-        originInitialSupply: BigInt(rootState.tokenDetails.originTokenSupply),
-        remoteInitialSupply: BigInt(rootState.tokenDetails.remoteTokenSupply),
+        distributorAddress: rootState.tokenDetails.distributor,
+        originInitialSupply: Maybe.of(
+          rootState.tokenDetails.originTokenSupply
+        ).mapOrUndefined(BigInt),
+        remoteInitialSupply: Maybe.of(
+          rootState.tokenDetails.remoteTokenSupply
+        ).mapOrUndefined(BigInt),
       }
     );
 
@@ -160,9 +159,9 @@ export const Step3: FC = () => {
       e.preventDefault();
 
       if (
-        state.isGasPriceQueryLoading ||
-        state.isGasPriceQueryError ||
-        !state.gasFees ||
+        state.isEstimatingGasFees ||
+        state.hasGasFeesEstimationError ||
+        !state.remoteDeploymentGasFees ||
         !state.evmChains ||
         !deployInterchainTokenAsync
       ) {
@@ -196,9 +195,9 @@ export const Step3: FC = () => {
       });
     },
     [
-      state.isGasPriceQueryLoading,
-      state.isGasPriceQueryError,
-      state.gasFees,
+      state.isEstimatingGasFees,
+      state.hasGasFeesEstimationError,
+      state.remoteDeploymentGasFees,
       state.evmChains,
       deployInterchainTokenAsync,
       actions,
@@ -223,14 +222,14 @@ export const Step3: FC = () => {
   const nativeTokenSymbol = getNativeToken(state.sourceChainId);
 
   const hasInsufficientGasBalance = useMemo(() => {
-    if (!balance || !state.gasFees) {
+    if (!balance || !state.remoteDeploymentGasFees) {
       return false;
     }
 
     const gasFeeBn = parseUnits(state.totalGasFee, balance.decimals);
 
     return gasFeeBn > balance.value;
-  }, [balance, state.gasFees, state.totalGasFee]);
+  }, [balance, state.remoteDeploymentGasFees, state.totalGasFee]);
 
   const buttonChildren = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
@@ -240,10 +239,10 @@ export const Step3: FC = () => {
       return "Deploying interchain token";
     }
 
-    if (state.isGasPriceQueryLoading) {
+    if (state.isEstimatingGasFees) {
       return "Loading gas fees";
     }
-    if (state.isGasPriceQueryError) {
+    if (state.hasGasFeesEstimationError) {
       return "Failed to load gas prices";
     }
 
@@ -254,11 +253,11 @@ export const Step3: FC = () => {
     return (
       <>
         Deploy{" "}
-        {!!state.gasFees?.length && (
+        {!!state.remoteDeploymentGasFees?.length && (
           <>
-            {state.gasFees?.length && <span>and register</span>}
-            {` on ${state.gasFees.length + 1} chain${
-              state.gasFees?.length + 1 > 1 ? "s" : ""
+            {state.remoteDeploymentGasFees?.length && <span>and register</span>}
+            {` on ${state.remoteDeploymentGasFees.length + 1} chain${
+              state.remoteDeploymentGasFees?.length + 1 > 1 ? "s" : ""
             }`}
           </>
         )}
@@ -266,11 +265,33 @@ export const Step3: FC = () => {
     );
   }, [
     rootState.txState.type,
-    state.isGasPriceQueryLoading,
-    state.isGasPriceQueryError,
-    state.gasFees,
+    state.isEstimatingGasFees,
+    state.hasGasFeesEstimationError,
+    state.remoteDeploymentGasFees,
     hasInsufficientGasBalance,
     nativeTokenSymbol,
+  ]);
+
+  const { totalSupply, totalSupplyBreakdown } = useMemo(() => {
+    const originTokenSupply = Number(rootState.tokenDetails.originTokenSupply);
+    const remoteTokenSupply = Number(rootState.tokenDetails.remoteTokenSupply);
+    const selectedChains = rootState.selectedChains.length;
+
+    const totalSupply = originTokenSupply + remoteTokenSupply * selectedChains;
+
+    const multiplierComment = selectedChains > 1 ? ` × ${selectedChains}` : "";
+
+    const formattedTotalSupply = totalSupply.toLocaleString();
+    const formattedOriginTokenSupply = originTokenSupply.toLocaleString();
+    const formattedRemoteTokenSupply = remoteTokenSupply.toLocaleString();
+
+    const totalSupplyBreakdown = `${formattedOriginTokenSupply} + ${formattedRemoteTokenSupply} ${multiplierComment}`;
+
+    return { totalSupply: formattedTotalSupply, totalSupplyBreakdown };
+  }, [
+    rootState.tokenDetails.originTokenSupply,
+    rootState.tokenDetails.remoteTokenSupply,
+    rootState.selectedChains.length,
   ]);
 
   return (
@@ -280,7 +301,7 @@ export const Step3: FC = () => {
           <Label>
             <Label.Text>Additional chains (optional):</Label.Text>
 
-            {Boolean(state.gasFees?.length) && (
+            {Boolean(state.remoteDeploymentGasFees?.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
                   <span className="ml-2 whitespace-nowrap text-xs">
@@ -317,6 +338,12 @@ export const Step3: FC = () => {
                 rootActions.setRemoteTokenSupply(e.target.value);
               }}
             />
+            {rootState.tokenDetails.remoteTokenSupply && (
+              <small className="p-2 text-center">
+                Initial supply: <span className="font-bold">{totalSupply}</span>{" "}
+                (<span className="font-bold">{totalSupplyBreakdown}</span>)
+              </small>
+            )}
           </FormControl>
         )}
       </form>
@@ -328,8 +355,8 @@ export const Step3: FC = () => {
             rootState.txState.type === "deploying"
           }
           disabled={
-            state.isGasPriceQueryLoading ||
-            state.isGasPriceQueryError ||
+            state.isEstimatingGasFees ||
+            state.hasGasFeesEstimationError ||
             hasInsufficientGasBalance
           }
           onClick={() => formSubmitRef.current?.click()}
