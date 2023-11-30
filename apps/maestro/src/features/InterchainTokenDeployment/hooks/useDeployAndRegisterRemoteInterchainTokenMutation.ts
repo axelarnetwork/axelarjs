@@ -39,7 +39,6 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   originInitialSupply?: bigint;
   remoteInitialSupply?: bigint;
   salt: `0x${string}`;
-  deployerAddress?: `0x${string}`;
   distributorAddress?: `0x${string}`;
 }
 
@@ -116,10 +115,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     : 0n;
 
   const multicallArgs = useMemo(() => {
-    const distributorAddress =
-      input?.distributorAddress ?? input?.deployerAddress;
+    const distributor = input?.distributorAddress ?? deployerAddress;
 
-    if (!input || !distributorAddress || !tokenId) {
+    if (!input || !distributor || !tokenId) {
       return [];
     }
 
@@ -133,8 +131,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       withDecimals
     );
 
-    const totalInitialSupply =
-      parsedOriginInitialSupply + parsedRemoteInitialSupply;
+    const totalRemoteSupply =
+      parsedRemoteInitialSupply * BigInt(input.destinationChainIds.length);
+
+    const totalInitialSupply = parsedOriginInitialSupply + totalRemoteSupply;
 
     const baseArgs = {
       salt: input.salt,
@@ -147,7 +147,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...baseArgs,
         mintAmount: totalInitialSupply,
-        distributor: distributorAddress,
+        distributor: distributor,
       });
 
     const transferTxData: `0x${string}`[] = !input.originInitialSupply
@@ -156,7 +156,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
             tokenId,
             amount: parsedOriginInitialSupply,
-            destinationAddress: distributorAddress,
+            destinationAddress: distributor,
             destinationChain: "",
             gasValue: originTransferGas,
           }),
@@ -172,7 +172,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         originalChainName,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees[i] ?? 0n,
-        distributor: distributorAddress,
+        distributor: distributor,
         salt: input.salt,
       })
     );
@@ -182,7 +182,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         ...destinationChainNames.map((destinationChain, i) =>
           INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
             amount: parsedRemoteInitialSupply,
-            destinationAddress: distributorAddress,
+            destinationAddress: distributor,
             destinationChain,
             tokenId: tokenId,
             gasValue: input.remoteTransferGasFees[i] ?? 0n,
@@ -194,6 +194,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     return [deployTxData, ...registerTxData, ...transferTxData];
   }, [
     input,
+    deployerAddress,
     tokenId,
     withDecimals,
     originTransferGas,
