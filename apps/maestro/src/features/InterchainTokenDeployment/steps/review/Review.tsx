@@ -127,11 +127,11 @@ const Review: FC = () => {
                   )
                 );
 
+                actions.reset();
+
                 await router.push(
                   `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
                 );
-
-                actions.reset();
               }
             }}
           >
