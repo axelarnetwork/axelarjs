@@ -2,7 +2,6 @@ import { sluggify } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-import { withRouteProtection } from "~/lib/auth";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 
@@ -49,4 +48,4 @@ const TokenDetailsRedirectPage = () => {
   );
 };
 
-export default withRouteProtection(TokenDetailsRedirectPage);
+export default TokenDetailsRedirectPage;
