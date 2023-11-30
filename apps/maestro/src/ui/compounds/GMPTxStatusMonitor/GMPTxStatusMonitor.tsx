@@ -180,8 +180,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   return (
     <li className="flex items-center justify-between">
       <span className="flex items-center gap-2">
-        <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
-        {chain.chain_name}
+        <ChainIcon src={chain.image} size="md" alt={chain.name} /> {chain.name}
       </span>
       <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
     </li>

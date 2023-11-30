@@ -338,12 +338,14 @@ export const Step3: FC = () => {
                 rootActions.setRemoteTokenSupply(e.target.value);
               }}
             />
-            {rootState.tokenDetails.remoteTokenSupply && (
-              <small className="p-2 text-center">
-                Initial supply: <span className="font-bold">{totalSupply}</span>{" "}
-                (<span className="font-bold">{totalSupplyBreakdown}</span>)
-              </small>
-            )}
+            <small className="p-2 text-center">
+              Initial supply: <span className="font-bold">{totalSupply}</span>{" "}
+              {Number(rootState.tokenDetails.remoteTokenSupply) > 0 && (
+                <>
+                  (<span className="font-bold">{totalSupplyBreakdown}</span>)
+                </>
+              )}
+            </small>
           </FormControl>
         )}
       </form>

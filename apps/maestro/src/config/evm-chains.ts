@@ -2,6 +2,7 @@ import { Chain } from "viem/chains";
 import {
   arbitrum,
   arbitrumGoerli,
+  arbitrumSepolia,
   aurora,
   auroraTestnet,
   avalanche,
@@ -20,6 +21,8 @@ import {
   kavaTestnet,
   lineaTestnet,
   mainnet,
+  mantle,
+  mantleTestnet,
   moonbaseAlpha,
   moonbeam,
   optimism,
@@ -28,6 +31,9 @@ import {
   polygonMumbai,
   polygonZkEvm,
   polygonZkEvmTestnet,
+  scroll,
+  scrollSepolia,
+  sepolia,
 } from "wagmi/chains";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
@@ -54,6 +60,12 @@ export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
     ...goerli,
     axelarChainId: "ethereum-2",
     axelarChainName: "ethereum-2",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...sepolia,
+    axelarChainId: "ethereum-sepolia",
+    axelarChainName: "ethereum-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
@@ -145,6 +157,12 @@ export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.testnet,
   },
   {
+    ...arbitrumSepolia,
+    axelarChainId: "arbitrum",
+    axelarChainName: "arbitrum",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
     ...celo,
     axelarChainId: "celo",
     axelarChainName: "celo",
@@ -214,6 +232,30 @@ export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
     ...lineaTestnet,
     axelarChainId: "linea",
     axelarChainName: "linea",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...mantle,
+    axelarChainId: "mantle",
+    axelarChainName: "mantle",
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...mantleTestnet,
+    axelarChainId: "mantle",
+    axelarChainName: "mantle",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...scroll,
+    axelarChainId: "scroll",
+    axelarChainName: "scroll",
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...scrollSepolia,
+    axelarChainId: "scroll",
+    axelarChainName: "scroll",
     environment: ENVIRONMENTS.testnet,
   },
 ].filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
