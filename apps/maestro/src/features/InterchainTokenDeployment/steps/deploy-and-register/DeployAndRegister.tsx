@@ -144,7 +144,7 @@ export const Step3: FC = () => {
         remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
         remoteTransferGasFees: state.remoteTransferGasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
-        deployerAddress: rootState.tokenDetails.distributor,
+        distributorAddress: rootState.tokenDetails.distributor,
         originInitialSupply: Maybe.of(
           rootState.tokenDetails.originTokenSupply
         ).mapOrUndefined(BigInt),
@@ -272,6 +272,28 @@ export const Step3: FC = () => {
     nativeTokenSymbol,
   ]);
 
+  const { totalSupply, totalSupplyBreakdown } = useMemo(() => {
+    const originTokenSupply = Number(rootState.tokenDetails.originTokenSupply);
+    const remoteTokenSupply = Number(rootState.tokenDetails.remoteTokenSupply);
+    const selectedChains = rootState.selectedChains.length;
+
+    const totalSupply = originTokenSupply + remoteTokenSupply * selectedChains;
+
+    const multiplierComment = selectedChains > 1 ? ` × ${selectedChains}` : "";
+
+    const formattedTotalSupply = totalSupply.toLocaleString();
+    const formattedOriginTokenSupply = originTokenSupply.toLocaleString();
+    const formattedRemoteTokenSupply = remoteTokenSupply.toLocaleString();
+
+    const totalSupplyBreakdown = `${formattedOriginTokenSupply} + ${formattedRemoteTokenSupply} ${multiplierComment}`;
+
+    return { totalSupply: formattedTotalSupply, totalSupplyBreakdown };
+  }, [
+    rootState.tokenDetails.originTokenSupply,
+    rootState.tokenDetails.remoteTokenSupply,
+    rootState.selectedChains.length,
+  ]);
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -316,6 +338,12 @@ export const Step3: FC = () => {
                 rootActions.setRemoteTokenSupply(e.target.value);
               }}
             />
+            {rootState.tokenDetails.remoteTokenSupply && (
+              <small className="p-2 text-center">
+                Initial supply: <span className="font-bold">{totalSupply}</span>{" "}
+                (<span className="font-bold">{totalSupplyBreakdown}</span>)
+              </small>
+            )}
           </FormControl>
         )}
       </form>
