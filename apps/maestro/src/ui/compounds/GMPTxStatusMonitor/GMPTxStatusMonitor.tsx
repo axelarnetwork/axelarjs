@@ -56,12 +56,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const chainId = useChainId();
 
   const { data: txInfo } = useTransaction({
-    chainId,
     hash: txHash,
+    chainId,
   });
 
   const { data: currentBlock } = useBlockNumber({
     chainId,
+    watch: true,
   });
 
   const { data: chainInfo } = useChainInfoQuery({
@@ -78,16 +79,14 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     [txInfo, currentBlock]
   );
 
-  const progress = useMemo(
-    () =>
-      (expectedBlockConfirmations > 0n
-        ? Number(elapsedBlocks) / Number(expectedBlockConfirmations)
-        : 0
-      ).toLocaleString("en", {
-        style: "percent",
-      }),
-    [elapsedBlocks, expectedBlockConfirmations]
-  );
+  const progress = useMemo(() => {
+    const percentage =
+      Number(elapsedBlocks) / Number(expectedBlockConfirmations);
+
+    return percentage.toLocaleString(undefined, {
+      style: "percent",
+    });
+  }, [elapsedBlocks, expectedBlockConfirmations]);
 
   const statusList = Object.values(statuses ?? {});
 
@@ -132,7 +131,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
           <span className="text-base-content-secondary text-center text-sm">
             {elapsedBlocks.toLocaleString()} of{" "}
             {expectedBlockConfirmations.toString()} block confirmations (
-            {progress.toString()})
+            {progress})
           </span>
           <progress
             className="progress progress-accent w-full"
