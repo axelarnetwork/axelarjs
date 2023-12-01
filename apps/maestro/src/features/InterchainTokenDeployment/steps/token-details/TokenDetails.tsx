@@ -9,15 +9,15 @@ import {
   TextInput,
   Tooltip,
 } from "@axelarjs/ui";
+import { Maybe } from "@axelarjs/utils";
 import { useRef, useState, type FC } from "react";
-import { type SubmitHandler } from "react-hook-form";
+import { FieldError, type SubmitHandler } from "react-hook-form";
 
 import {
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
 import {
-  isValidEVMAddress,
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
@@ -58,6 +58,8 @@ const TokenDetails: FC = () => {
 
   const isReadonly = state.isPreExistingToken;
 
+  const { errors } = state.tokenDetailsForm.formState;
+
   return (
     <>
       <form
@@ -71,6 +73,7 @@ const TokenDetails: FC = () => {
             disabled={isReadonly}
             {...register("tokenName")}
           />
+          {Maybe.of(errors.tokenName).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
           <Label>Token Symbol</Label>
@@ -80,6 +83,7 @@ const TokenDetails: FC = () => {
             disabled={isReadonly}
             {...register("tokenSymbol")}
           />
+          {Maybe.of(errors.tokenSymbol).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
           <Label htmlFor="tokenDecimals">Token Decimals</Label>
@@ -92,6 +96,7 @@ const TokenDetails: FC = () => {
             disabled={isReadonly}
             {...register("tokenDecimals")}
           />
+          {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
           <Label htmlFor="originTokenSupply">Amount to mint</Label>
@@ -111,6 +116,7 @@ const TokenDetails: FC = () => {
               },
             })}
           />
+          {Maybe.of(errors.originTokenSupply).mapOrNull(ValidationError)}
         </FormControl>
         <div className="grid place-content-center pt-4 md:place-content-end">
           <Button size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
@@ -145,20 +151,9 @@ const TokenDetails: FC = () => {
                   defaultValue={state.tokenDetailsForm.getValues("distributor")}
                   {...register("distributor", {
                     disabled: isReadonly,
-                    validate(value) {
-                      if (!value) {
-                        return false;
-                      }
-
-                      // this field is optional, so we only validate if it's not empty
-                      if (!isValidEVMAddress(value)) {
-                        return "Invalid address";
-                      }
-
-                      return false;
-                    },
                   })}
                 />
+                {Maybe.of(errors.distributor).mapOrNull(ValidationError)}
               </FormControl>
               <FormControl>
                 <Label htmlFor="salt">Salt</Label>
@@ -166,17 +161,9 @@ const TokenDetails: FC = () => {
                   id="salt"
                   onKeyDown={preventNonHexInput}
                   defaultValue={state.tokenDetailsForm.getValues("salt")}
-                  {...register("salt", {
-                    disabled: isReadonly,
-                    validate(value) {
-                      if (!value) {
-                        return "Salt is required";
-                      }
-
-                      return true;
-                    },
-                  })}
+                  {...register("salt", { disabled: isReadonly })}
                 />
+                {Maybe.of(errors.salt).mapOrNull(ValidationError)}
               </FormControl>
             </>
           )}
@@ -184,19 +171,6 @@ const TokenDetails: FC = () => {
         <button type="submit" ref={formSubmitRef} />
       </form>
 
-      {Object.values(formState.errors).length > 0 && (
-        <div className="text-sm">
-          <div>Please fix the following errors:</div>
-          <ul>
-            {Object.entries(formState.errors).map(([key, error]) => (
-              <li key={key} className="list-item">
-                <span>{key}</span>:{" "}
-                <span className="text-red-500">{error.message}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       <Dialog.Actions>
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
@@ -213,3 +187,9 @@ const TokenDetails: FC = () => {
 };
 
 export default TokenDetails;
+
+const ValidationError: FC<FieldError> = ({ message }) => (
+  <div role="alert" className="text-error p-1.5 text-xs">
+    {message}
+  </div>
+);
