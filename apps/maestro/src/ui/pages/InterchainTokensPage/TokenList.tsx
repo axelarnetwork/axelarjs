@@ -3,7 +3,7 @@ import { maskAddress, Maybe, sluggify } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import Link from "next/link";
 
-import { filter, map, sortBy } from "rambda";
+import { filter, map } from "rambda";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
@@ -46,11 +46,9 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
               [token, computed.indexedById[token.axelarChainId]] as const
           )
         )
-        .map(filter(([token, chain]) => Boolean(token) && Boolean(chain)))
-        .map(sortBy(([token]) => token.tokenAddress))
         .mapOr(
           [],
-          sortBy(([, chain]) => chain.id)
+          filter(([token, chain]) => Boolean(token) && Boolean(chain))
         ),
     [computed.indexedById, data]
   );
