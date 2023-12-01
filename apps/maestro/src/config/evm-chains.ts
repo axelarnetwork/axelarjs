@@ -158,8 +158,8 @@ export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...arbitrumSepolia,
-    axelarChainId: "arbitrum",
-    axelarChainName: "arbitrum",
+    axelarChainId: "arbitrum-sepolia",
+    axelarChainName: "arbitrum-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
