@@ -44,6 +44,66 @@ type Props = {
   onAllChainsExecuted?: () => void;
 };
 
+const TxFinalityProgress: FC<{ txHash: `0x${string}` }> = ({ txHash }) => {
+  const chainId = useChainId();
+
+  const { computed } = useEVMChainConfigsQuery();
+  const { data: txInfo } = useTransaction({
+    hash: txHash,
+    chainId,
+  });
+
+  const { data: chainInfo } = useChainInfoQuery({
+    axelarChainId: computed.indexedByChainId[chainId]?.id,
+  });
+
+  const { data: currentBlockNumber } = useBlockNumber({
+    chainId,
+    watch: true,
+    enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+  });
+
+  const elapsedBlocks = useMemo(
+    () =>
+      currentBlockNumber && txInfo?.blockNumber
+        ? currentBlockNumber - txInfo.blockNumber
+        : 0n,
+    [currentBlockNumber, txInfo?.blockNumber]
+  );
+
+  const expectedConfirmations = BigInt(chainInfo?.blockConfirmations ?? 1);
+
+  const progress = useMemo(
+    () =>
+      (elapsedBlocks / expectedConfirmations).toLocaleString(undefined, {
+        style: "percent",
+      }),
+    [elapsedBlocks, expectedConfirmations]
+  );
+
+  if (
+    !chainInfo?.blockConfirmations ||
+    !txInfo?.blockNumber ||
+    elapsedBlocks >= expectedConfirmations
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="grid place-items-center gap-2 px-8">
+      <span className="text-base-content-secondary text-center text-sm">
+        {elapsedBlocks.toLocaleString()} of {expectedConfirmations.toString()}{" "}
+        block confirmations ({progress})
+      </span>
+      <progress
+        className="progress progress-accent w-full"
+        value={elapsedBlocks.toString()}
+        max={expectedConfirmations.toString()}
+      />
+    </div>
+  );
+};
+
 const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const {
     data: statuses,
@@ -52,41 +112,6 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   } = useGetTransactionStatusOnDestinationChainsQuery({ txHash });
 
   const { computed } = useEVMChainConfigsQuery();
-
-  const chainId = useChainId();
-
-  const { data: txInfo } = useTransaction({
-    hash: txHash,
-    chainId,
-  });
-
-  const { data: currentBlock } = useBlockNumber({
-    chainId,
-    watch: true,
-  });
-
-  const { data: chainInfo } = useChainInfoQuery({
-    axelarChainId: computed.indexedByChainId[chainId]?.id,
-  });
-
-  const expectedBlockConfirmations = BigInt(chainInfo?.blockConfirmations ?? 0);
-
-  const elapsedBlocks = useMemo(
-    () =>
-      txInfo?.blockNumber && currentBlock
-        ? currentBlock - txInfo.blockNumber
-        : 0n,
-    [txInfo, currentBlock]
-  );
-
-  const progress = useMemo(() => {
-    const percentage =
-      Number(elapsedBlocks) / Number(expectedBlockConfirmations);
-
-    return percentage.toLocaleString(undefined, {
-      style: "percent",
-    });
-  }, [elapsedBlocks, expectedBlockConfirmations]);
 
   const statusList = Object.values(statuses ?? {});
 
@@ -111,10 +136,6 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     );
   }
 
-  const shouldRenderBlockConfirmations =
-    expectedBlockConfirmations > 0n &&
-    elapsedBlocks <= expectedBlockConfirmations;
-
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
@@ -126,20 +147,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
           </span>
         )}
       </div>
-      {shouldRenderBlockConfirmations && (
-        <div className="grid place-items-center gap-2 px-8">
-          <span className="text-base-content-secondary text-center text-sm">
-            {elapsedBlocks.toLocaleString()} of{" "}
-            {expectedBlockConfirmations.toString()} block confirmations (
-            {progress})
-          </span>
-          <progress
-            className="progress progress-accent w-full"
-            value={elapsedBlocks.toString()}
-            max={expectedBlockConfirmations.toString()}
-          />
-        </div>
-      )}
+      <TxFinalityProgress txHash={txHash} />
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
