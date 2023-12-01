@@ -66,12 +66,12 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}` }> = ({ txHash }) => {
   const elapsedBlocks = useMemo(
     () =>
       currentBlockNumber && txInfo?.blockNumber
-        ? currentBlockNumber - txInfo.blockNumber
-        : 0n,
+        ? Number(currentBlockNumber - txInfo.blockNumber)
+        : 0,
     [currentBlockNumber, txInfo?.blockNumber]
   );
 
-  const expectedConfirmations = BigInt(chainInfo?.blockConfirmations ?? 1);
+  const expectedConfirmations = Number(chainInfo?.blockConfirmations ?? 1);
 
   const progress = useMemo(
     () =>
@@ -97,8 +97,8 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}` }> = ({ txHash }) => {
       </span>
       <progress
         className="progress progress-accent w-full"
-        value={elapsedBlocks.toString()}
-        max={expectedConfirmations.toString()}
+        value={elapsedBlocks}
+        max={expectedConfirmations}
       />
     </div>
   );
