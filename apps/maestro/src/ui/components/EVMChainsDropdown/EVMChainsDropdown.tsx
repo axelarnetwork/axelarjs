@@ -176,7 +176,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
           className={cn(
-            "dark:bg-base-200 z-10 mt-2 max-h-[80vh] w-full md:w-48",
+            "dark:bg-base-200 z-10 mt-2 max-h-[90vh] w-full md:w-56",
             {
               "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
                 props.compact,
