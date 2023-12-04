@@ -71,9 +71,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
     ModalContent: () => (
       <Content.Wrapper>
         <Content.Article>
-          <Content.Header>
-            BRIDGES HAVE THEIR HAVE THEIR LIMITS LIMITS
-          </Content.Header>
+          <Content.Header>BRIDGES HAVE THEIR LIMITS</Content.Header>
           <Content.Main>
             <Content.Paragraph>
               Web3 has gone cross-chain, with assets bridging between
@@ -87,7 +85,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
         </Content.Article>
         <Content.Article>
           <Content.Header>
-            WHAT IS INTERCHAIN INTERCHAIN TOKEN TOKEN SERVICE? SERVICE?
+            WHAT IS INTERCHAIN INTERCHAIN TOKEN SERVICE?
           </Content.Header>
           <Content.Main>
             <Content.Paragraph>
