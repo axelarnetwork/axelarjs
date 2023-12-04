@@ -9,7 +9,7 @@ const TokenDetailsRedirectPage = () => {
   const router = useRouter();
   const [message, setMessage] = useState("Loading...");
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { computed, isLoading } = useEVMChainConfigsQuery();
 
   const { tokenId } = router.query;
 
@@ -19,27 +19,31 @@ const TokenDetailsRedirectPage = () => {
     });
 
   useEffect(() => {
-    if (interchainToken) {
-      const wagmiChain = computed.wagmiChains.find(
-        (c) => c.axelarChainId === interchainToken.axelarChainId
-      );
+    if (!isLoading || !interchainToken) return;
 
-      setMessage("Redirecting...");
+    const wagmiChain = computed.wagmiChains.find(
+      (c) => c.axelarChainId === interchainToken.axelarChainId
+    );
 
-      if (!wagmiChain) {
-        setMessage("Axelar chain not found");
-        return;
-      }
+    setMessage("Redirecting...");
 
-      const slug = sluggify(wagmiChain.name);
-
-      router.push(`/${slug}/${interchainToken.tokenAddress}`).catch(() => {
-        setMessage("Error redirecting to token details page");
-      });
-    } else {
-      setMessage("Interchain token not found");
+    if (!wagmiChain) {
+      setMessage("Axelar chain not found");
+      return;
     }
-  }, [computed.indexedById, computed.wagmiChains, interchainToken, router]);
+
+    const slug = sluggify(wagmiChain.name);
+
+    router.push(`/${slug}/${interchainToken.tokenAddress}`).catch(() => {
+      setMessage("Error redirecting to token details page");
+    });
+  }, [
+    computed.indexedById,
+    computed.wagmiChains,
+    interchainToken,
+    isLoading,
+    router,
+  ]);
 
   return (
     <div className="grid flex-1 place-items-center">
