@@ -324,7 +324,8 @@ export const Step3: FC = () => {
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
         {rootState.selectedChains.length > 0 && (
-          <FormControl>
+          // remove the hidden class once the GMP race condition is fixed
+          <FormControl className="hidden">
             <Label htmlFor="originTokenSupply">
               Amount to mint on remote chains
             </Label>

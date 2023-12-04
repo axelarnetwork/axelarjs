@@ -54,12 +54,16 @@ export const recordRemoteTokensDeployment = protectedProcedure
           tokenId: originToken.tokenId as `0x${string}`,
         });
 
+        const tokenAddress = await itsClient.reads.interchainTokenAddress({
+          tokenId: originToken.tokenId as `0x${string}`,
+        });
+
         return {
           tokenManagerAddress,
+          tokenAddress,
           tokenId: originToken.tokenId,
           axelarChainId: remoteToken.axelarChainId,
           deploymentStatus: "pending" as const,
-          tokenAddress: input.tokenAddress,
           deploymentMessageId: input.deploymentMessageId,
         };
       })

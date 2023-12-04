@@ -39,14 +39,7 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
-type Props = {
-  txHash: `0x${string}`;
-  onAllChainsExecuted?: () => void;
-};
-
-const TxFinalityProgress: FC<{ txHash: `0x${string}` }> = ({ txHash }) => {
-  const chainId = useChainId();
-
+export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
   const { computed } = useEVMChainConfigsQuery();
   const { data: txInfo } = useTransaction({
     hash: txHash,
@@ -81,11 +74,30 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}` }> = ({ txHash }) => {
     [elapsedBlocks, expectedConfirmations]
   );
 
-  if (
-    !chainInfo?.blockConfirmations ||
-    !txInfo?.blockNumber ||
-    elapsedBlocks >= expectedConfirmations
-  ) {
+  return {
+    progress,
+    elapsedBlocks,
+    expectedConfirmations,
+    isReady: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+    isConfirmed: elapsedBlocks >= expectedConfirmations,
+  };
+}
+
+type Props = {
+  txHash: `0x${string}`;
+  onAllChainsExecuted?: () => void;
+};
+
+const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
+  txHash,
+  chainId,
+}) => {
+  const { progress, elapsedBlocks, expectedConfirmations } = useGMPTxProgress(
+    txHash,
+    chainId
+  );
+
+  if (elapsedBlocks >= expectedConfirmations) {
     return null;
   }
 
@@ -110,6 +122,8 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     computed: { chains: total, executed },
     isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({ txHash });
+
+  const chainId = useChainId();
 
   const { computed } = useEVMChainConfigsQuery();
 
@@ -147,7 +161,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
           </span>
         )}
       </div>
-      <TxFinalityProgress txHash={txHash} />
+      <TxFinalityProgress txHash={txHash} chainId={chainId} />
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
