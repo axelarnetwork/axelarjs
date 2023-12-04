@@ -1,8 +1,14 @@
+import type { NextConfig } from "next";
+
 import * as trpcNext from "@trpc/server/adapters/next";
 
 import { logger } from "~/lib/logger";
 import { createContext } from "~/server/context";
 import { appRouter } from "~/server/routers/_app";
+
+export const config: NextConfig = {
+  maxDuration: 20,
+};
 
 export default trpcNext.createNextApiHandler({
   router: appRouter,
