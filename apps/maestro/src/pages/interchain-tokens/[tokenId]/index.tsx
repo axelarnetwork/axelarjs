@@ -4,38 +4,49 @@ import { useRouter } from "next/router";
 
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import Page from "~/ui/layouts/Page";
 
 const TokenDetailsRedirectPage = () => {
   const router = useRouter();
-  const [message, setMessage] = useState("Loading...");
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Loading interchain token..."
+  );
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const { computed, isLoading } = useEVMChainConfigsQuery();
+  const { computed, isLoading: isLoadingChains } = useEVMChainConfigsQuery();
 
   const { tokenId } = router.query;
 
-  const { data: interchainToken } =
+  const { data: interchainToken, isLoading: isLoadingToken } =
     trpc.interchainToken.getInterchainTokenByTokenId.useQuery({
       tokenId: tokenId as string,
     });
 
+  const isLoading = isLoadingToken || isLoadingChains;
+
   useEffect(() => {
-    if (!isLoading || !interchainToken) return;
+    if (!interchainToken) {
+      if (!isLoading) {
+        setErrorMessage("Interchain token not found");
+      }
+      return;
+    }
 
     const wagmiChain = computed.wagmiChains.find(
       (c) => c.axelarChainId === interchainToken.axelarChainId
     );
 
-    setMessage("Redirecting...");
+    setLoadingMessage("Redirecting...");
 
     if (!wagmiChain) {
-      setMessage("Axelar chain not found");
+      setErrorMessage("Axelar chain not found");
       return;
     }
 
     const slug = sluggify(wagmiChain.name);
 
     router.push(`/${slug}/${interchainToken.tokenAddress}`).catch(() => {
-      setMessage("Error redirecting to token details page");
+      setErrorMessage("Error redirecting to token details page");
     });
   }, [
     computed.indexedById,
@@ -46,9 +57,11 @@ const TokenDetailsRedirectPage = () => {
   ]);
 
   return (
-    <div className="grid flex-1 place-items-center">
-      <h1>{message}</h1>
-    </div>
+    <Page isLoading={isLoading} loadingMessage={loadingMessage}>
+      {!interchainToken && !isLoading && (
+        <div className="grid place-items-center">{errorMessage}</div>
+      )}
+    </Page>
   );
 };
 

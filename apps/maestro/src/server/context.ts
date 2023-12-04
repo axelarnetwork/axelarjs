@@ -1,4 +1,8 @@
-import { AxelarscanClient, EVMChainConfig } from "@axelarjs/api";
+import {
+  AxelarscanClient,
+  createAxelarQueryClient,
+  EVMChainConfig,
+} from "@axelarjs/api";
 import {
   IERC20BurnableMintableClient,
   InterchainTokenClient,
@@ -18,6 +22,7 @@ import type { Chain } from "wagmi";
 import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS,
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+  NEXT_PUBLIC_NETWORK_ENV,
 } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
 import { ExtendedWagmiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
@@ -30,7 +35,7 @@ import gmpClient from "~/services/gmp";
 
 export interface ContextConfig {
   req: NextApiRequest;
-  res: NextApiResponse<unknown>;
+  res: NextApiResponse;
 }
 
 const createContextInner = async ({ req, res }: ContextConfig) => {
@@ -46,6 +51,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
+  const axelarQueryClient = createAxelarQueryClient(NEXT_PUBLIC_NETWORK_ENV);
+
   return {
     req,
     res,
@@ -54,6 +61,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       gmp: gmpClient,
       axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
+      axelarQuery: axelarQueryClient,
       openai: openaiClient,
     },
     configs: {

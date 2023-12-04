@@ -132,8 +132,8 @@ export const RecentTransactionsTable: FC<Props> = ({
         </Table.Head>
         <Table.Body>
           {isLoading || !txns?.length ? (
-            <Table.Row className="grid min-h-[38px] place-items-center text-center">
-              <Table.Cell colSpan={2}>
+            <Table.Row className="grid min-h-[38px] place-items-center  text-center">
+              <Table.Cell colSpan={3}>
                 {isLoading
                   ? "Loading transactions..."
                   : "No transactions found"}
