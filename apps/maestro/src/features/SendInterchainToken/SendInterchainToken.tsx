@@ -82,6 +82,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
   };
 
   const buttonChildren = useMemo(() => {
+    const pluralized = `token${Number(amountToSend) > 1 ? "s" : ""}`;
+
     switch (state.txState?.status) {
       case "awaiting_spend_approval":
         return "Approve spend on wallet";
@@ -90,7 +92,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       case "submitted":
         return (
           <>
-            Sending {amountToSend} tokens to {state.selectedToChain?.name}
+            Sending {amountToSend} {pluralized} to {state.selectedToChain?.name}
           </>
         );
       default:
@@ -99,7 +101,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
         }
         return (
           <>
-            Send {amountToSend || 0} tokens to {state.selectedToChain?.name}
+            Send {amountToSend || 0} {pluralized} to{" "}
+            {state.selectedToChain?.name}
           </>
         );
     }
