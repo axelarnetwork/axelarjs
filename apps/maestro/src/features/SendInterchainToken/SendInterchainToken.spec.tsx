@@ -159,7 +159,10 @@ describe("SendInterchainToken", () => {
       >
         Send 
         100
-         tokens to 
+         
+        tokens
+         to
+         
         Ethereum Mainnet
       </button>
     `);
