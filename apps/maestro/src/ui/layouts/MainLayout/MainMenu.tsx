@@ -67,7 +67,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
   },
   {
     kind: "modal",
-    label: "Getting started",
+    label: "About",
     ModalContent: () => (
       <Content.Wrapper>
         <Content.Article>
