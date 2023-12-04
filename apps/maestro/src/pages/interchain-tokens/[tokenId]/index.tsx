@@ -48,8 +48,13 @@ const TokenDetailsRedirectPage = () => {
     router.push(`/${slug}/${interchainToken.tokenAddress}`).catch(() => {
       setErrorMessage("Error redirecting to token details page");
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [computed.indexedById, computed.wagmiChains, interchainToken, router]);
+  }, [
+    computed.indexedById,
+    computed.wagmiChains,
+    interchainToken,
+    isLoading,
+    router,
+  ]);
 
   return (
     <Page isLoading={isLoading} loadingMessage={loadingMessage}>
