@@ -11,7 +11,8 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, type FC } from "react";
+import { useCallback, useMemo, type FC } from "react";
+import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
@@ -56,6 +57,21 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     owner: address,
   });
 
+  const { explorerUrl, explorerName } = useMemo(() => {
+    if (!props.tokenAddress || !props.chain) {
+      return {
+        explorerName: "",
+        explorerUrl: "",
+      };
+    }
+    const { explorer } = props.chain;
+
+    return {
+      explorerName: explorer.name,
+      explorerUrl: `${explorer.url}/token/${props.tokenAddress}`,
+    };
+  }, [props.chain, props.tokenAddress]);
+
   const { switchNetworkAsync } = useSwitchNetwork();
 
   const handleSwitchChain = useCallback(async () => {
@@ -97,14 +113,21 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
       <Card.Body className="w-full">
         <Card.Title className="justify-between">
           {props.chain && (
-            <span className="flex items-center gap-2">
-              <ChainIcon
-                src={props.chain.image}
-                alt={props.chain.name}
-                size="md"
-              />
-              {props.chain.name}
-            </span>
+            <Tooltip tip={`View on ${explorerName}`} position="bottom">
+              <Link
+                className="flex items-center gap-2"
+                href={explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ChainIcon
+                  src={props.chain.image}
+                  alt={props.chain.name}
+                  size="md"
+                />
+                {props.chain.name}
+              </Link>
+            </Tooltip>
           )}
           {props.isOriginToken && balance?.isTokenOwner ? (
             <ManageInterchainToken
