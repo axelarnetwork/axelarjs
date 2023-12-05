@@ -187,15 +187,11 @@ export const Step3: FC = () => {
     const originTokenSupply = Number(rootState.tokenDetails.originTokenSupply);
     const remoteTokenSupply = Number(rootState.tokenDetails.remoteTokenSupply);
     const selectedChains = rootState.selectedChains.length;
-
     const totalSupply = originTokenSupply + remoteTokenSupply * selectedChains;
-
     const multiplierComment = selectedChains > 1 ? ` × ${selectedChains}` : "";
-
     const formattedTotalSupply = totalSupply.toLocaleString();
     const formattedOriginTokenSupply = originTokenSupply.toLocaleString();
     const formattedRemoteTokenSupply = remoteTokenSupply.toLocaleString();
-
     const totalSupplyBreakdown = `${formattedOriginTokenSupply} + ${formattedRemoteTokenSupply} ${multiplierComment}`;
 
     return { totalSupply: formattedTotalSupply, totalSupplyBreakdown };
