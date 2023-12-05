@@ -20,7 +20,7 @@ export const getMyInterchainTokens = protectedProcedure
         ctx.session?.address
       );
 
-    return tokenRecords.toSorted(
+    return tokenRecords.sort(
       // sort by creation date newest to oldest
       (a, b) => Number(b.createdAt?.getTime()) - Number(a.createdAt?.getTime())
     );
