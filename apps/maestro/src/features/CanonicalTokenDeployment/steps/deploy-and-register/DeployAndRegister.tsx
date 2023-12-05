@@ -13,8 +13,8 @@ import React, {
 import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
-import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/InterchainTokenDeployment/hooks";
-import { useInterchainTokenDeploymentStateContainer } from "~/features/InterchainTokenDeployment/InterchainTokenDeployment.state";
+import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
+import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { preventNonNumericInput } from "~/lib/utils/validation";
@@ -25,7 +25,7 @@ import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
-    useInterchainTokenDeploymentStateContainer();
+    useCanonicalTokenDeploymentStateContainer();
 
   const { state, actions } = useStep3ChainSelectionState();
 

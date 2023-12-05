@@ -13,13 +13,13 @@ import React, {
 import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
-import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/InterchainTokenDeployment/hooks";
-import { useInterchainTokenDeploymentStateContainer } from "~/features/InterchainTokenDeployment/InterchainTokenDeployment.state";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import ModalFormInput from "~/ui/components/ModalFormInput";
 import ChainPicker from "~/ui/compounds/ChainPicker";
+import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
+import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 

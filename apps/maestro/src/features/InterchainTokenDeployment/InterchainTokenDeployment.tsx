@@ -48,7 +48,7 @@ const Step3 = dynamic(
 );
 
 const StepsSummary = dynamic(
-  () => import("~/features/InterchainTokenDeployment/steps/StepsSummary")
+  () => import("~/features/InterchainTokenDeployment/steps/steps-summary")
 );
 
 const STEPS = [Step1, Step2, Step3];

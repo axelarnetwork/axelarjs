@@ -26,7 +26,7 @@ import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
+import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
   sourceChainId: string;

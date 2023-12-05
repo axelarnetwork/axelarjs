@@ -47,7 +47,7 @@ const Step3 = dynamic(
 );
 
 const StepsSummary = dynamic(
-  () => import("~/features/CanonicalTokenDeployment/steps/StepsSummary")
+  () => import("~/features/CanonicalTokenDeployment/steps/steps-summary")
 );
 
 const STEPS = [Step1, Step2, Step3];
@@ -78,7 +78,7 @@ const CanonicalTokenDeployment: FC<CanonicalTokenDeploymentProps> = () => {
           className="w-full max-w-xs md:max-w-md"
           variant="primary"
         >
-          Deploy a new Interchain Token
+          Register interchain token
         </Button>
       )}
     >

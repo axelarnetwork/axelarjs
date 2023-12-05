@@ -1,3 +1,3 @@
-export * from "./InterchainTokenDeployment";
-export * from "./InterchainTokenDeployment.state";
-export { default } from "./InterchainTokenDeployment";
+export * from "./CanonicalTokenDeployment";
+export * from "./CanonicalTokenDeployment.state";
+export { default } from "./CanonicalTokenDeployment";

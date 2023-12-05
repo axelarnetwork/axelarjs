@@ -7,9 +7,9 @@ import { useEffect, useMemo, type FC } from "react";
 import { isEmpty, partition, without } from "rambda";
 import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 
+import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
-import { RegisterCanonicalToken } from "~/features/RegisterCanonicalToken/RegisterCanonicalToken";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -201,7 +201,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
-            <RegisterCanonicalToken
+            <CanonicalTokenDeployment
               address={props.tokenAddress}
               chainName={interchainToken.chain?.name}
               tokenName={props.tokenName}
