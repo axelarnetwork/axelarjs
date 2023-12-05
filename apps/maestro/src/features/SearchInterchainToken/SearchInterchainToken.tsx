@@ -17,12 +17,14 @@ import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 
+export type TokenFoundResult = {
+  tokenId?: `0x${string}`;
+  tokenAddress: `0x${string}`;
+  chainName?: string;
+};
+
 export type SearchInterchainTokenProps = {
-  onTokenFound: (result: {
-    tokenId?: `0x${string}`;
-    tokenAddress: `0x${string}`;
-    chainName?: string;
-  }) => void;
+  onTokenFound: (result: TokenFoundResult) => void;
 };
 
 const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
@@ -79,7 +81,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
       props.onTokenFound({
         tokenId: searchInterchainTokenResult.tokenId as `0x${string}`,
         tokenAddress: search as `0x${string}`,
-        chainName: searchERC20Result?.chainName,
+        chainName: searchERC20Result?.axelarChainName,
       });
     }
   }, [

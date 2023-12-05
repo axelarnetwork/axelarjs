@@ -1,7 +1,6 @@
 import { Badge, Button, Clamp } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import { cn } from "@axelarjs/ui/utils";
-import { sluggify } from "@axelarjs/utils";
 import { useCallback, useMemo, type ComponentProps } from "react";
 import { GridLoader } from "react-spinners";
 import Head from "next/head";
@@ -99,8 +98,9 @@ const Page = ({
       if (!result?.chainName) {
         return;
       }
+
       await router.push(
-        `/${sluggify(result.chainName)}/${result?.tokenAddress}`
+        `/${result.chainName.toLowerCase()}/${result?.tokenAddress}`
       );
     },
     [router]

@@ -6,7 +6,7 @@ import {
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress, sluggify } from "@axelarjs/utils";
+import { maskAddress } from "@axelarjs/utils";
 import { useState, type FC } from "react";
 import { useRouter } from "next/router";
 
@@ -129,8 +129,12 @@ const Review: FC = () => {
 
                 actions.reset();
 
+                const chainConfig = computed.indexedByChainId[chain.id];
+
                 await router.push(
-                  `/${sluggify(chain?.name)}/${state.txState.tokenAddress}`
+                  `/${chainConfig.chain_name.toLowerCase()}/${
+                    state.txState.tokenAddress
+                  }`
                 );
               }
             }}

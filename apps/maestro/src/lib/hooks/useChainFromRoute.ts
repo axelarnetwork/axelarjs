@@ -1,4 +1,3 @@
-import { sluggify } from "@axelarjs/utils";
 import { useMemo } from "react";
 import { useRouter } from "next/router";
 
@@ -11,7 +10,9 @@ export function useChainFromRoute() {
   return useMemo(() => {
     if (typeof chainName === "string") {
       return WAGMI_CHAIN_CONFIGS.find(
-        (chain) => sluggify(chain.name) === chainName
+        (chain) =>
+          chain.axelarChainName === chainName ||
+          chain.axelarChainId === chainName
       );
     }
   }, [chainName]);

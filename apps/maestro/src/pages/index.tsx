@@ -1,5 +1,4 @@
 import { Alert, Dialog } from "@axelarjs/ui";
-import { sluggify } from "@axelarjs/utils";
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -8,7 +7,9 @@ import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
-import SearchInterchainToken from "~/features/SearchInterchainToken";
+import SearchInterchainToken, {
+  TokenFoundResult,
+} from "~/features/SearchInterchainToken";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
@@ -22,11 +23,14 @@ export default function Home() {
   const [layoutState, layoutActions] = useLayoutStateContainer();
 
   const handleTokenFound = useCallback(
-    async (result: { tokenAddress: string; tokenId?: string }) => {
+    async (result: TokenFoundResult) => {
       if (!chain) {
         return;
       }
-      await router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
+
+      await router.push(
+        `/${result.chainName?.toLowerCase() ?? ""}/${result?.tokenAddress}`
+      );
     },
     [chain, router]
   );
