@@ -14,7 +14,7 @@ import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
-  called: "Called",
+  called: "Initiated",
   approvable: "Approvable",
   approving: "Approving",
   approved: "Approved",

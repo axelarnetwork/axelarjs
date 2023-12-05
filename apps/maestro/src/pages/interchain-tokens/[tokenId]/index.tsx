@@ -1,4 +1,3 @@
-import { sluggify } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
@@ -43,11 +42,15 @@ const TokenDetailsRedirectPage = () => {
       return;
     }
 
-    const slug = sluggify(wagmiChain.name);
-
-    router.push(`/${slug}/${interchainToken.tokenAddress}`).catch(() => {
-      setErrorMessage("Error redirecting to token details page");
-    });
+    router
+      .push(
+        `/${wagmiChain.axelarChainName.toLowerCase()}/${
+          interchainToken.tokenAddress
+        }`
+      )
+      .catch(() => {
+        setErrorMessage("Error redirecting to token details page");
+      });
   }, [
     computed.indexedById,
     computed.wagmiChains,

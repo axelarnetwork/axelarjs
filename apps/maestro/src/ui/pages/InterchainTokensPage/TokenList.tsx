@@ -1,5 +1,5 @@
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
-import { maskAddress, Maybe, sluggify } from "@axelarjs/utils";
+import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import Link from "next/link";
 
@@ -14,11 +14,11 @@ import Page from "~/ui/layouts/Page";
 const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
-const getChainNameSlug = (chainId: number) => {
+function getChainNameSlug(chainId: number) {
   const chain = WAGMI_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
 
-  return sluggify(chain?.name ?? "");
-};
+  return chain?.axelarChainName.toLowerCase() ?? "";
+}
 
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
