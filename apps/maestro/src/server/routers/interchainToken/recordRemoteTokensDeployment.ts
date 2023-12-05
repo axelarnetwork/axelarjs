@@ -50,13 +50,14 @@ export const recordRemoteTokensDeployment = protectedProcedure
           configs.wagmi
         );
 
-        const tokenManagerAddress = await itsClient.reads.tokenManagerAddress({
-          tokenId: originToken.tokenId as `0x${string}`,
-        });
-
-        const tokenAddress = await itsClient.reads.interchainTokenAddress({
-          tokenId: originToken.tokenId as `0x${string}`,
-        });
+        const [tokenManagerAddress, tokenAddress] = await Promise.all([
+          itsClient.reads.tokenManagerAddress({
+            tokenId: originToken.tokenId as `0x${string}`,
+          }),
+          itsClient.reads.interchainTokenAddress({
+            tokenId: originToken.tokenId as `0x${string}`,
+          }),
+        ]);
 
         return {
           tokenManagerAddress,
