@@ -3,16 +3,22 @@ import {
   Button,
   ChevronRightIcon,
   cn,
+  Dialog,
+  DialogProps,
   LinkButton,
   Steps,
   TextInput,
   useWindowSize,
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
-import type { ComponentProps, FC } from "react";
+import type { ComponentProps, FC, PropsWithChildren } from "react";
 import type { FieldError } from "react-hook-form";
+import { useSession } from "next-auth/react";
+
+import { useAccount } from "wagmi";
 
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ConnectWalletButton from "../ConnectWalletButton";
 
 type ButtonProps = ComponentProps<typeof Button>;
 
@@ -113,5 +119,55 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
         "translate-x-16 sm:translate-x-0": props.shift,
       })}
     />
+  );
+};
+
+export type ProtectedDialogProps = PropsWithChildren<{
+  showBackButton?: boolean;
+  onBackClick?: () => void;
+  disableChainsDropdown?: boolean;
+  step: number;
+  triggerLabel?: string;
+  onClose: DialogProps["onClose"];
+}>;
+
+export const MultiStepDialog: FC<ProtectedDialogProps> = ({
+  triggerLabel,
+  ...props
+}) => {
+  const { status, data } = useSession();
+  const { address } = useAccount();
+
+  const isSignedIn =
+    status === "authenticated" &&
+    address &&
+    data?.address &&
+    data.address.toLowerCase() === address.toLowerCase();
+
+  return (
+    <Dialog
+      onClose={props.onClose}
+      renderTrigger={(props) => (
+        <TriggerButton {...props}>{triggerLabel}</TriggerButton>
+      )}
+    >
+      <Dialog.Body $as="section">
+        <Dialog.CornerCloseAction onClick={props.onClose} />
+        <Dialog.Title className="flex items-center gap-1 sm:gap-2">
+          {props.showBackButton && <BackButton onClick={props.onBackClick} />}
+          <span
+            className={cn("-translate-y-2", { "ml-14": props.showBackButton })}
+          >
+            Register <span className="hidden sm:inline">origin</span> token on:{" "}
+          </span>
+          <ChainsDropdown
+            disabled={props.disableChainsDropdown}
+            shift={props.showBackButton}
+          />
+        </Dialog.Title>
+        <StepsSummary currentStep={props.step} />
+        {isSignedIn ? props.children : <ConnectWalletButton />}
+      </Dialog.Body>
+    </Dialog>
   );
 };

@@ -26,7 +26,7 @@ export type Asset = ComosAssetConfig | EVMAssetConfig;
 
 export interface BaseChainConfig {
   id: string;
-  externalIdentifiers: {
+  externalId: {
     chainId: string | number;
     chainName: string;
   };

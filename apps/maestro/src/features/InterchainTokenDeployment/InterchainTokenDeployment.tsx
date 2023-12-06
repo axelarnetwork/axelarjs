@@ -1,15 +1,7 @@
-import { Dialog } from "@axelarjs/ui";
-import { cn } from "@axelarjs/ui/utils";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import {
-  BackButton,
-  ChainsDropdown,
-  StepLoading,
-  StepsSummary,
-  TriggerButton,
-} from "~/ui/compounds/MultiStepForm";
+import { MultiStepDialog, StepLoading } from "~/ui/compounds/MultiStepForm";
 import {
   InterchainTokenDeploymentStateProvider,
   useInterchainTokenDeploymentStateContainer,
@@ -45,28 +37,16 @@ const InterchainTokenDeployment = () => {
   );
 
   return (
-    <Dialog
+    <MultiStepDialog
+      triggerLabel="Deploy a new Interchain Token"
+      step={state.step}
+      showBackButton={showBackButton}
+      onBackClick={actions.prevStep}
       onClose={actions.reset}
-      renderTrigger={(props) => (
-        <TriggerButton {...props}>Deploy a new Interchain Token</TriggerButton>
-      )}
+      disableChainsDropdown={state.isPreExistingToken}
     >
-      <Dialog.Body $as="section">
-        <Dialog.CornerCloseAction onClick={actions.reset} />
-        <Dialog.Title className="flex items-center gap-1 sm:gap-2">
-          {showBackButton && <BackButton onClick={actions.prevStep} />}
-          <span className={cn("-translate-y-2", { "ml-14": showBackButton })}>
-            Register <span className="hidden sm:inline">origin</span> token on:{" "}
-          </span>
-          <ChainsDropdown
-            disabled={state.isPreExistingToken}
-            shift={showBackButton}
-          />
-        </Dialog.Title>
-        <StepsSummary currentStep={state.step} />
-        <CurrentStep />
-      </Dialog.Body>
-    </Dialog>
+      <CurrentStep />
+    </MultiStepDialog>
   );
 };
 
