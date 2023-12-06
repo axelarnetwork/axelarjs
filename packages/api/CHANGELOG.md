@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.9
+
+### Patch Changes
+
+- [`81e1156303ded74b1e20ee9e2bd638c04562591d`](https://github.com/axelarnetwork/axelarjs/commit/81e1156303ded74b1e20ee9e2bd638c04562591d) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: update BaseChainConfig type
+
 ## 0.3.8
 
 ### Patch Changes
