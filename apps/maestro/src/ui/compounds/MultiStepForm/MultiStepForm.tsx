@@ -10,29 +10,7 @@ import tw from "@axelarjs/ui/tw";
 import type { ComponentProps, FC } from "react";
 import type { FieldError } from "react-hook-form";
 
-const StyledButton = tw(Button)`gap-2`;
-
-export const NextButton: FC<ComponentProps<typeof Button>> = ({
-  children,
-  ...props
-}) => {
-  return (
-    <StyledButton {...props}>
-      {children} <ChevronRightIcon className={cn({ hidden: props.loading })} />
-    </StyledButton>
-  );
-};
-
-export const PrevButton: FC<ComponentProps<typeof Button>> = ({
-  children,
-  ...props
-}) => {
-  return (
-    <StyledButton {...props}>
-      <ArrowLeftIcon /> {children}
-    </StyledButton>
-  );
-};
+type ButtonProps = ComponentProps<typeof Button>;
 
 export const ModalFormInput = Object.assign({}, TextInput, {
   defaultProps: {
@@ -41,6 +19,20 @@ export const ModalFormInput = Object.assign({}, TextInput, {
     bordered: true,
   },
 }) as typeof TextInput;
+
+const StyledButton = tw(Button)`gap-2`;
+
+export const NextButton: FC<ButtonProps> = ({ children, ...props }) => (
+  <StyledButton {...props}>
+    {children} <ChevronRightIcon className={cn({ hidden: props.loading })} />
+  </StyledButton>
+);
+
+export const PrevButton: FC<ButtonProps> = ({ children, ...props }) => (
+  <StyledButton {...props}>
+    <ArrowLeftIcon /> {children}
+  </StyledButton>
+);
 
 export const StepLoading = () => (
   <div className="grid h-64 place-items-center">
@@ -55,7 +47,7 @@ export const StepLoading = () => (
   </div>
 );
 
-export const TriggerButton = (props: ComponentProps<typeof Button>) => (
+export const TriggerButton: FC<ButtonProps> = (props) => (
   <Button
     {...props}
     size="md"
@@ -66,7 +58,7 @@ export const TriggerButton = (props: ComponentProps<typeof Button>) => (
   </Button>
 );
 
-export const BackButton = (props: ComponentProps<typeof PrevButton>) => (
+export const BackButton: FC<ButtonProps> = (props) => (
   <PrevButton
     {...props}
     shape="square"
