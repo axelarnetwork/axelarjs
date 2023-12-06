@@ -1,37 +1,16 @@
 import { Dialog, FormControl, Label } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { useRef, type FC } from "react";
-import { FieldError, type SubmitHandler } from "react-hook-form";
+import { type FC } from "react";
+import { FieldError } from "react-hook-form";
 
-import {
-  useCanonicalTokenDeploymentStateContainer,
-  type TokenDetailsFormState,
-} from "~/features/CanonicalTokenDeployment";
+import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment";
 import ModalFormInput from "~/ui/components/ModalFormInput";
 import { NextButton } from "../shared";
 
 const TokenDetails: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
 
-  const { register, handleSubmit, formState } = state.tokenDetailsForm;
-
-  // this is only required because the form and actions are sibling elements
-  const formSubmitRef = useRef<HTMLButtonElement>(null);
-
-  const submitHandler: SubmitHandler<TokenDetailsFormState> = (data, e) => {
-    e?.preventDefault();
-
-    actions.setTokenDetails({
-      tokenName: data.tokenName,
-      tokenSymbol: data.tokenSymbol,
-      tokenDecimals: data.tokenDecimals,
-      originTokenSupply: data.originTokenSupply,
-      distributor: data.distributor,
-      salt: data.salt,
-    });
-
-    actions.nextStep();
-  };
+  const { register, formState } = state.tokenDetailsForm;
 
   const isReadonly = state.isPreExistingToken;
 
@@ -39,10 +18,7 @@ const TokenDetails: FC = () => {
 
   return (
     <>
-      <form
-        className="grid grid-cols-1 sm:gap-2"
-        onSubmit={handleSubmit(submitHandler)}
-      >
+      <form className="grid grid-cols-1 sm:gap-2">
         <FormControl>
           <Label>Token Name</Label>
           <ModalFormInput
@@ -75,16 +51,14 @@ const TokenDetails: FC = () => {
           />
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
-        <button type="submit" ref={formSubmitRef} />
       </form>
-
       <Dialog.Actions>
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
         </Dialog.CloseAction>
         <NextButton
           disabled={!formState.isValid}
-          onClick={() => formSubmitRef.current?.click()}
+          onClick={() => actions.nextStep()}
         >
           Register token
         </NextButton>
