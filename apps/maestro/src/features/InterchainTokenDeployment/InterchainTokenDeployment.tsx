@@ -8,6 +8,7 @@ import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import {
   BackButton,
   StepLoading,
+  StepsSummary,
   TriggerButton,
 } from "~/ui/compounds/MultiStepForm";
 import {
@@ -36,10 +37,6 @@ const Step3 = dynamic(
   {
     loading: StepLoading,
   }
-);
-
-const StepsSummary = dynamic(
-  () => import("~/features/InterchainTokenDeployment/steps/steps-summary")
 );
 
 const STEPS = [Step1, Step2, Step3];
