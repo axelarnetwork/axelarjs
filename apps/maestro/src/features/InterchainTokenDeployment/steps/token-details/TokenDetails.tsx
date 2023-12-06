@@ -10,7 +10,7 @@ import {
 } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useRef, useState, type FC } from "react";
-import { FieldError, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler } from "react-hook-form";
 
 import {
   useInterchainTokenDeploymentStateContainer,
@@ -20,7 +20,11 @@ import {
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
-import { ModalFormInput, NextButton } from "~/ui/compounds/MultiStepForm";
+import {
+  ModalFormInput,
+  NextButton,
+  ValidationError,
+} from "~/ui/compounds/MultiStepForm";
 
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
@@ -178,9 +182,3 @@ const TokenDetails: FC = () => {
 };
 
 export default TokenDetails;
-
-const ValidationError: FC<FieldError> = ({ message }) => (
-  <div role="alert" className="text-error p-1.5 text-xs">
-    {message}
-  </div>
-);

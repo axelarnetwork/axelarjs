@@ -8,6 +8,7 @@ import {
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import type { ComponentProps, FC } from "react";
+import type { FieldError } from "react-hook-form";
 
 const StyledButton = tw(Button)`gap-2`;
 
@@ -74,4 +75,10 @@ export const BackButton = (props: ComponentProps<typeof PrevButton>) => (
   >
     {props.children}
   </PrevButton>
+);
+
+export const ValidationError: FC<FieldError> = ({ message }) => (
+  <div role="alert" className="text-error p-1.5 text-xs">
+    {message}
+  </div>
 );
