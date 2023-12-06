@@ -202,12 +202,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         <div className="mx-auto w-full max-w-md">
           {address ? (
             <CanonicalTokenDeployment
-              address={props.tokenAddress}
-              chainName={interchainToken.chain?.name}
-              tokenName={props.tokenName}
-              tokenSymbol={props.tokenSymbol}
-              decimals={props.decimals}
-              onSuccess={refetchInterchainToken}
+              tokenDetails={{
+                tokenAddress: props.tokenAddress,
+                tokenName: props.tokenName,
+                tokenSymbol: props.tokenSymbol,
+                tokenDecimals: props.decimals,
+              }}
             />
           ) : (
             <ConnectWalletButton className="w-full" size="md">

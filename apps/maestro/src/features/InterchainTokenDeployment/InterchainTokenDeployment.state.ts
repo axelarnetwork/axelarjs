@@ -58,7 +58,7 @@ export const INITIAL_STATE = {
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
-  onDeployTxHash: (txHash: `0x${string}`) => {
+  onDeployTxHash(txHash: `0x${string}`) {
     logger.log("onDeployTxHash", txHash);
   },
 };
@@ -76,7 +76,7 @@ function useInterchainTokenDeploymentState(
   };
 
   const [state, setState] = useSessionStorageState(
-    "@maestro/add-erc20",
+    "@maestro/interchain-deployment",
     initialState
   );
 

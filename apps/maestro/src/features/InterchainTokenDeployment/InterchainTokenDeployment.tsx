@@ -57,7 +57,7 @@ type InterchainTokenDeploymentProps = {
   tokenDetails?: TokenDetails;
 };
 
-const InterchainTokenDeployment: FC<InterchainTokenDeploymentProps> = () => {
+const InterchainTokenDeployment = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
@@ -116,9 +116,9 @@ const InterchainTokenDeployment: FC<InterchainTokenDeploymentProps> = () => {
   );
 };
 
-const InterchainTokenDeploymentWithProvider = (
-  props: InterchainTokenDeploymentProps
-) => {
+const InterchainTokenDeploymentWithProvider: FC<
+  InterchainTokenDeploymentProps
+> = (props) => {
   return (
     <InterchainTokenDeploymentStateProvider
       initialState={
@@ -130,7 +130,7 @@ const InterchainTokenDeploymentWithProvider = (
           : undefined
       }
     >
-      <InterchainTokenDeployment {...props} />
+      <InterchainTokenDeployment />
     </InterchainTokenDeploymentStateProvider>
   );
 };

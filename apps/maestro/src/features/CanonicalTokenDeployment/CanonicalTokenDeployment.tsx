@@ -52,11 +52,7 @@ const StepsSummary = dynamic(
 
 const STEPS = [Step1, Step2, Step3];
 
-type CanonicalTokenDeploymentProps = {
-  tokenDetails?: TokenDetails;
-};
-
-const CanonicalTokenDeployment: FC<CanonicalTokenDeploymentProps> = () => {
+const CanonicalTokenDeployment: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
@@ -115,21 +111,24 @@ const CanonicalTokenDeployment: FC<CanonicalTokenDeploymentProps> = () => {
   );
 };
 
-const CanonicalTokenDeploymentWithProvider = (
-  props: CanonicalTokenDeploymentProps
-) => {
+type CanonicalTokenDeploymentProps = {
+  tokenDetails?: TokenDetails;
+};
+const CanonicalTokenDeploymentWithProvider: FC<
+  CanonicalTokenDeploymentProps
+> = (props) => {
   return (
     <CanonicalTokenDeploymentStateProvider
       initialState={
         props.tokenDetails
           ? {
               tokenDetails: props.tokenDetails,
-              step: 0,
+              step: 1,
             }
           : undefined
       }
     >
-      <CanonicalTokenDeployment {...props} />
+      <CanonicalTokenDeployment />
     </CanonicalTokenDeploymentStateProvider>
   );
 };
