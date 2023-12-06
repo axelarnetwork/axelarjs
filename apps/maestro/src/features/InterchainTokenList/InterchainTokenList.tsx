@@ -1,5 +1,7 @@
 import { Button, cn } from "@axelarjs/ui";
-import { useMemo, type FC, type ReactNode } from "react";
+import { useCallback, useMemo, type FC, type ReactNode } from "react";
+
+import { partition } from "rambda";
 
 import RegisteredInterchainTokenCard from "./RegisteredInterchainTokenCard";
 import type { TokenInfo } from "./types";
@@ -14,7 +16,10 @@ export type InterchainTokenListProps = {
   itemClassName?: string;
 };
 
-export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
+export const InterchainTokenList: FC<InterchainTokenListProps> = ({
+  onToggleSelection,
+  ...props
+}) => {
   const tokens = useMemo(
     () =>
       props.tokens
@@ -26,12 +31,31 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
     [props.tokens]
   );
 
+  const [selectedTokens, unselectedTokens] = partition(
+    (x) => Boolean(x.isSelected),
+    tokens
+  );
+
+  const handleToggleAll = useCallback(() => {
+    const hasPartialSelection =
+      selectedTokens.length > 0 && selectedTokens.length < tokens.length;
+
+    if (hasPartialSelection) {
+      // select the remaining tokens
+      unselectedTokens?.forEach((token, i) => {
+        setTimeout(() => onToggleSelection?.(token.chainId), i * 25);
+      });
+      return;
+    }
+    // toggle all tokens
+    tokens?.forEach((token, i) => {
+      setTimeout(() => onToggleSelection?.(token.chainId), i * 25);
+    });
+  }, [onToggleSelection, selectedTokens.length, tokens, unselectedTokens]);
+
   if (!tokens.length) {
     return null;
   }
-
-  const selectedTokens = tokens.filter((x) => x.isSelected);
-  const unselectedTokens = tokens.filter((x) => !x.isSelected);
 
   const originToken = tokens.find((x) => x.isOriginToken);
 
@@ -44,34 +68,8 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
             ({tokens.length})
           </span>
         </div>
-        {tokens.length > 0 && Boolean(props.onToggleSelection) && (
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={() => {
-              const hasPartialSelection =
-                selectedTokens.length > 0 &&
-                selectedTokens.length < tokens.length;
-
-              if (hasPartialSelection) {
-                // select the remaining tokens
-                unselectedTokens?.forEach((token, i) => {
-                  setTimeout(
-                    () => props.onToggleSelection?.(token.chainId),
-                    i * 25
-                  );
-                });
-                return;
-              }
-              // toggle all tokens
-              tokens?.forEach((token, i) => {
-                setTimeout(
-                  () => props.onToggleSelection?.(token.chainId),
-                  i * 25
-                );
-              });
-            }}
-          >
+        {tokens.length > 0 && Boolean(onToggleSelection) && (
+          <Button size="sm" variant="primary" onClick={handleToggleAll}>
             Toggle All
           </Button>
         )}
@@ -95,10 +93,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
             ) : (
               <UnregisteredInterchainTokenCard
                 key={token.chainId}
-                onToggleSelection={props.onToggleSelection?.bind(
-                  null,
-                  token.chainId
-                )}
+                onToggleSelection={onToggleSelection?.bind(null, token.chainId)}
                 {...token}
               />
             )
