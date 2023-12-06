@@ -52,6 +52,7 @@ const InterchainTokensPage: FC = () => {
           name={tokenDetails.name}
           symbol={tokenDetails.symbol}
           tokenId={interchainToken?.tokenId as `0x${string}`}
+          kind={interchainToken?.kind}
         />
       )}
       {routeChain && tokenDetails && (
