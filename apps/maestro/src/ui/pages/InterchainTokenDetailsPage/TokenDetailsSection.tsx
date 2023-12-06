@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import { type FC } from "react";
+import type { FC } from "react";
 
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
@@ -18,6 +18,7 @@ export type TokenDetailsSectionProps = {
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
   decimals: number;
+  kind?: "canonical" | "interchain" | "custom";
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
@@ -63,7 +64,9 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold">
-          <span className="hidden sm:inline">Interchain Token </span>
+          <span className="hidden sm:inline">
+            {props.kind === "canonical" && "Canonical"} Interchain Token{" "}
+          </span>
           {Boolean(props.name && props.symbol) && (
             <>
               <span className="hidden sm:inline">&middot;</span>
