@@ -1,12 +1,11 @@
 import { Dialog } from "@axelarjs/ui";
-import { useWindowSize } from "@axelarjs/ui/hooks";
 import { cn } from "@axelarjs/ui/utils";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import {
   BackButton,
+  ChainsDropdown,
   StepLoading,
   StepsSummary,
   TriggerButton,
@@ -17,27 +16,17 @@ import {
   type TokenDetails,
 } from "./InterchainTokenDeployment.state";
 
-const Step1 = dynamic(
-  () => import("~/features/InterchainTokenDeployment/steps/token-details"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step1 = dynamic(() => import("./steps/token-details"), {
+  loading: StepLoading,
+});
 
-const Step2 = dynamic(
-  () =>
-    import("~/features/InterchainTokenDeployment/steps/deploy-and-register"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step2 = dynamic(() => import("./steps/deploy-and-register"), {
+  loading: StepLoading,
+});
 
-const Step3 = dynamic(
-  () => import("~/features/InterchainTokenDeployment/steps/review"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step3 = dynamic(() => import("./steps/review"), {
+  loading: StepLoading,
+});
 
 const STEPS = [Step1, Step2, Step3];
 
@@ -55,8 +44,6 @@ const InterchainTokenDeployment = () => {
     [state.step]
   );
 
-  const { width } = useWindowSize();
-
   return (
     <Dialog
       onClose={actions.reset}
@@ -71,14 +58,9 @@ const InterchainTokenDeployment = () => {
           <span className={cn("-translate-y-2", { "ml-14": showBackButton })}>
             Register <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
-          <EVMChainsDropdown
-            compact
+          <ChainsDropdown
             disabled={state.isPreExistingToken}
-            triggerClassName="-translate-y-1.5"
-            hideLabel={width < 640}
-            contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
-              "translate-x-16 sm:translate-x-0": showBackButton,
-            })}
+            shift={showBackButton}
           />
         </Dialog.Title>
         <StepsSummary currentStep={state.step} />

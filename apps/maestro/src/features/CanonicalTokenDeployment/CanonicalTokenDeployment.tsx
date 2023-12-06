@@ -1,12 +1,11 @@
 import { Dialog } from "@axelarjs/ui";
-import { useWindowSize } from "@axelarjs/ui/hooks";
 import { cn } from "@axelarjs/ui/utils";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import {
   BackButton,
+  ChainsDropdown,
   StepLoading,
   StepsSummary,
   TriggerButton,
@@ -17,26 +16,17 @@ import {
   type TokenDetails,
 } from "./CanonicalTokenDeployment.state";
 
-const Step1 = dynamic(
-  () => import("~/features/CanonicalTokenDeployment/steps/token-details"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step1 = dynamic(() => import("./steps/token-details"), {
+  loading: StepLoading,
+});
 
-const Step2 = dynamic(
-  () => import("~/features/CanonicalTokenDeployment/steps/deploy-and-register"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step2 = dynamic(() => import("./steps/deploy-and-register"), {
+  loading: StepLoading,
+});
 
-const Step3 = dynamic(
-  () => import("~/features/CanonicalTokenDeployment/steps/review"),
-  {
-    loading: StepLoading,
-  }
-);
+const Step3 = dynamic(() => import("./steps/review"), {
+  loading: StepLoading,
+});
 
 const STEPS = [Step1, Step2, Step3];
 
@@ -49,8 +39,6 @@ const CanonicalTokenDeployment: FC = () => {
     () => state.step !== 0 && state.step !== 2,
     [state.step]
   );
-
-  const { width } = useWindowSize();
 
   return (
     <Dialog
@@ -66,15 +54,7 @@ const CanonicalTokenDeployment: FC = () => {
           <span className={cn("-translate-y-2", { "ml-14": showBackButton })}>
             Register <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
-          <EVMChainsDropdown
-            compact
-            disabled
-            triggerClassName="-translate-y-1.5"
-            hideLabel={width < 640}
-            contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
-              "translate-x-16 sm:translate-x-0": showBackButton,
-            })}
-          />
+          <ChainsDropdown disabled shift={showBackButton} />
         </Dialog.Title>
         <StepsSummary currentStep={state.step} />
         <CurrentStep />

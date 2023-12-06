@@ -6,10 +6,13 @@ import {
   LinkButton,
   Steps,
   TextInput,
+  useWindowSize,
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import type { ComponentProps, FC } from "react";
 import type { FieldError } from "react-hook-form";
+
+import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 
 type ButtonProps = ComponentProps<typeof Button>;
 
@@ -93,5 +96,22 @@ export const StepsSummary: FC<StepsSummaryProps> = (
         </Steps.Step>
       ))}
     </Steps>
+  );
+};
+
+export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
+  props
+) => {
+  const { width } = useWindowSize();
+  return (
+    <EVMChainsDropdown
+      compact
+      disabled={props.disabled}
+      triggerClassName="-translate-y-1.5"
+      hideLabel={width < 640}
+      contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
+        "translate-x-16 sm:translate-x-0": props.shift,
+      })}
+    />
   );
 };
