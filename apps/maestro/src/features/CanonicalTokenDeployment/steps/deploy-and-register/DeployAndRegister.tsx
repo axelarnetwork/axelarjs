@@ -17,7 +17,7 @@ import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/Can
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
-import { NextButton } from "../shared";
+import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {

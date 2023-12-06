@@ -1,20 +1,9 @@
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
-import { z } from "zod";
 
 import { logger } from "~/lib/logger";
-
-const TOKEN_DETAILS_FORM_SCHEMA = z.object({
-  tokenName: z.string().min(1).max(32),
-  tokenSymbol: z.string().min(1).max(11),
-  tokenDecimals: z.coerce.number().min(1).max(18),
-});
-
-export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -65,11 +54,6 @@ function useCanonicalTokenDeploymentState(
     initialState
   );
 
-  const tokenDetailsForm = useForm<TokenDetailsFormState>({
-    resolver: zodResolver(TOKEN_DETAILS_FORM_SCHEMA),
-    defaultValues: state.tokenDetails,
-  });
-
   /**
    * Update token details with partial initial state
    */
@@ -96,17 +80,12 @@ function useCanonicalTokenDeploymentState(
     state: {
       ...state,
       // computed state
-      isPreExistingToken: Boolean(state.tokenDetails.tokenAddress),
       selectedChains: uniq(state.selectedChains),
-      tokenDetailsForm,
     },
     actions: {
       reset: () => {
         setState((draft) => {
           Object.assign(draft, initialState);
-
-          // reset form
-          tokenDetailsForm.reset(initialState.tokenDetails);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {

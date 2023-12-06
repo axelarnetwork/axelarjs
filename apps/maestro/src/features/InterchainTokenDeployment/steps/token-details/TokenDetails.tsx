@@ -20,8 +20,7 @@ import {
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
-import ModalFormInput from "~/ui/components/ModalFormInput";
-import { NextButton } from "../shared";
+import { ModalFormInput, NextButton } from "~/ui/compounds/MultiStepForm";
 
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();

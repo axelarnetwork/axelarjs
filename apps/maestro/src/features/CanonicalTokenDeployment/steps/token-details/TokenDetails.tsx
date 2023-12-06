@@ -1,20 +1,11 @@
 import { Dialog, FormControl, Label } from "@axelarjs/ui";
-import { Maybe } from "@axelarjs/utils";
 import { type FC } from "react";
-import { FieldError } from "react-hook-form";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment";
-import ModalFormInput from "~/ui/components/ModalFormInput";
-import { NextButton } from "../shared";
+import { ModalFormInput, NextButton } from "~/ui/compounds/MultiStepForm";
 
 const TokenDetails: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
-
-  const { register, formState } = state.tokenDetailsForm;
-
-  const isReadonly = state.isPreExistingToken;
-
-  const { errors } = state.tokenDetailsForm.formState;
 
   return (
     <>
@@ -23,20 +14,17 @@ const TokenDetails: FC = () => {
           <Label>Token Name</Label>
           <ModalFormInput
             placeholder="Enter your token name"
-            disabled={isReadonly}
-            {...register("tokenName")}
+            disabled
+            defaultValue={state.tokenDetails.tokenName}
           />
-          {Maybe.of(errors.tokenName).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
           <Label>Token Symbol</Label>
           <ModalFormInput
             placeholder="Enter your token symbol"
-            maxLength={11}
-            disabled={isReadonly}
-            {...register("tokenSymbol")}
+            disabled
+            defaultValue={state.tokenDetails.tokenSymbol}
           />
-          {Maybe.of(errors.tokenSymbol).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
           <Label htmlFor="tokenDecimals">Token Decimals</Label>
@@ -44,33 +32,19 @@ const TokenDetails: FC = () => {
             id="tokenDecimals"
             type="number"
             placeholder="Enter your token decimals"
-            min={1}
-            max={18}
-            disabled={isReadonly}
-            {...register("tokenDecimals")}
+            disabled
+            defaultValue={state.tokenDetails.tokenDecimals}
           />
-          {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
       </form>
       <Dialog.Actions>
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
         </Dialog.CloseAction>
-        <NextButton
-          disabled={!formState.isValid}
-          onClick={() => actions.nextStep()}
-        >
-          Register token
-        </NextButton>
+        <NextButton onClick={actions.nextStep}>Register token</NextButton>
       </Dialog.Actions>
     </>
   );
 };
 
 export default TokenDetails;
-
-const ValidationError: FC<FieldError> = ({ message }) => (
-  <div role="alert" className="text-error p-1.5 text-xs">
-    {message}
-  </div>
-);

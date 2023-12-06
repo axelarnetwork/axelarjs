@@ -1,4 +1,4 @@
-import { Button, Dialog, LinkButton } from "@axelarjs/ui";
+import { Dialog } from "@axelarjs/ui";
 import { useWindowSize } from "@axelarjs/ui/hooks";
 import { cn } from "@axelarjs/ui/utils";
 import { useMemo, type FC } from "react";
@@ -6,24 +6,15 @@ import dynamic from "next/dynamic";
 
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import {
+  BackButton,
+  StepLoading,
+  TriggerButton,
+} from "~/ui/compounds/MultiStepForm";
+import {
   CanonicalTokenDeploymentStateProvider,
   useCanonicalTokenDeploymentStateContainer,
   type TokenDetails,
 } from "./CanonicalTokenDeployment.state";
-import { PrevButton } from "./steps/shared";
-
-const StepLoading = () => (
-  <div className="grid h-64 place-items-center">
-    <LinkButton
-      loading
-      variant="ghost"
-      length="block"
-      className="pointer-events-none"
-    >
-      Loading...
-    </LinkButton>
-  </div>
-);
 
 const Step1 = dynamic(
   () => import("~/features/CanonicalTokenDeployment/steps/token-details"),
@@ -68,33 +59,19 @@ const CanonicalTokenDeployment: FC = () => {
     <Dialog
       onClose={actions.reset}
       renderTrigger={(props) => (
-        <Button
-          {...props}
-          size="md"
-          className="w-full max-w-xs md:max-w-md"
-          variant="primary"
-        >
-          Register interchain token
-        </Button>
+        <TriggerButton {...props}>Register interchain token</TriggerButton>
       )}
     >
       <Dialog.Body $as="section">
         <Dialog.CornerCloseAction onClick={actions.reset} />
         <Dialog.Title className="flex items-center gap-1 sm:gap-2">
-          {showBackButton && (
-            <PrevButton
-              onClick={actions.prevStep}
-              shape="square"
-              size="lg"
-              className="absolute left-0 top-0 rounded-none rounded-br-2xl"
-            />
-          )}
+          {showBackButton && <BackButton onClick={actions.prevStep} />}
           <span className={cn("-translate-y-2", { "ml-14": showBackButton })}>
             Register <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
           <EVMChainsDropdown
             compact
-            disabled={state.isPreExistingToken}
+            disabled
             triggerClassName="-translate-y-1.5"
             hideLabel={width < 640}
             contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
@@ -102,9 +79,7 @@ const CanonicalTokenDeployment: FC = () => {
             })}
           />
         </Dialog.Title>
-
         <StepsSummary currentStep={state.step} />
-
         <CurrentStep />
       </Dialog.Body>
     </Dialog>
@@ -114,6 +89,7 @@ const CanonicalTokenDeployment: FC = () => {
 type CanonicalTokenDeploymentProps = {
   tokenDetails?: TokenDetails;
 };
+
 const CanonicalTokenDeploymentWithProvider: FC<
   CanonicalTokenDeploymentProps
 > = (props) => {

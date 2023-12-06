@@ -16,11 +16,10 @@ import { useAccount, useBalance, useChainId } from "wagmi";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { preventNonNumericInput } from "~/lib/utils/validation";
-import ModalFormInput from "~/ui/components/ModalFormInput";
 import ChainPicker from "~/ui/compounds/ChainPicker";
+import { ModalFormInput, NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
-import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
