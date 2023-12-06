@@ -31,6 +31,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
   }
 
   const selectedTokens = tokens.filter((x) => x.isSelected);
+  const unselectedTokens = tokens.filter((x) => !x.isSelected);
 
   const originToken = tokens.find((x) => x.isOriginToken);
 
@@ -47,15 +48,27 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = (props) => {
           <Button
             size="sm"
             variant="primary"
-            disabled={Boolean(
-              // disable if all tokens are selected or none are selected
-              selectedTokens.length && selectedTokens.length !== tokens.length
-            )}
             onClick={() => {
+              const hasPartialSelection =
+                selectedTokens.length > 0 &&
+                selectedTokens.length < tokens.length;
+
+              if (hasPartialSelection) {
+                // select the remaining tokens
+                unselectedTokens?.forEach((token, i) => {
+                  setTimeout(
+                    () => props.onToggleSelection?.(token.chainId),
+                    i * 25
+                  );
+                });
+                return;
+              }
+              // toggle all tokens
               tokens?.forEach((token, i) => {
-                setTimeout(() => {
-                  props.onToggleSelection?.(token.chainId);
-                }, i * 25);
+                setTimeout(
+                  () => props.onToggleSelection?.(token.chainId),
+                  i * 25
+                );
               });
             }}
           >

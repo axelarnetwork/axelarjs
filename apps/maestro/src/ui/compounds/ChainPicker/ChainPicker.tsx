@@ -1,6 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, Tooltip } from "@axelarjs/ui";
-import { useCallback, useMemo, type FC } from "react";
+import { useCallback, type FC } from "react";
 import Image from "next/image";
 
 export type ChainPickerProps = {
@@ -17,18 +17,27 @@ const ChainPicker: FC<ChainPickerProps> = ({
   disabled,
 }) => {
   const handleToggleAll = useCallback(() => {
+    const hasPartialSelection =
+      selectedChains.length > 0 &&
+      selectedChains.length < eligibleChains.length;
+
+    const unselectedChains = eligibleChains.filter(
+      (chain) => !selectedChains.includes(chain.id)
+    );
+
+    if (hasPartialSelection) {
+      // select the remaining chains
+      unselectedChains?.forEach((chain, i) => {
+        setTimeout(onChainClick.bind(null, chain.id), 16.6 * i);
+      });
+      return;
+    }
+
+    // toggle all tokens
     eligibleChains.forEach((chain, i) =>
       setTimeout(onChainClick.bind(null, chain.id), 16.6 * i)
     );
-  }, [eligibleChains, onChainClick]);
-
-  const isToggleAllDisabled = useMemo(
-    () =>
-      Boolean(
-        selectedChains.length && selectedChains.length !== eligibleChains.length
-      ),
-    [selectedChains, eligibleChains]
-  );
+  }, [eligibleChains, onChainClick, selectedChains]);
 
   return (
     <section className="space-y-4">
@@ -64,12 +73,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
         })}
       </div>
       <div className="grid place-content-center">
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={isToggleAllDisabled || disabled}
-          onClick={handleToggleAll}
-        >
+        <Button size="sm" variant="ghost" onClick={handleToggleAll}>
           toggle all
         </Button>
       </div>
