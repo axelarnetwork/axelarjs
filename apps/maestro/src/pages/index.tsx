@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
+import RecentTransactions from "~/features/RecentTransactions";
 import SearchInterchainToken, {
   TokenFoundResult,
 } from "~/features/SearchInterchainToken";
@@ -14,7 +14,7 @@ import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
 const InterchainTokenDeployment = dynamic(
-  () => import("~/features/InterchainTokenDeployment/InterchainTokenDeployment")
+  () => import("~/features/InterchainTokenDeployment")
 );
 
 export default function Home() {

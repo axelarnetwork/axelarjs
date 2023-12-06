@@ -11,10 +11,10 @@ import {
   TriggerButton,
 } from "~/ui/compounds/MultiStepForm";
 import {
-  InterchainTokenDeploymentStateProvider,
-  useInterchainTokenDeploymentStateContainer,
+  CanonicalTokenDeploymentStateProvider,
+  useCanonicalTokenDeploymentStateContainer,
   type TokenDetails,
-} from "./InterchainTokenDeployment.state";
+} from "./CanonicalTokenDeployment.state";
 
 const Step1 = dynamic(() => import("./steps/token-details"), {
   loading: StepLoading,
@@ -30,12 +30,8 @@ const Step3 = dynamic(() => import("./steps/review"), {
 
 const STEPS = [Step1, Step2, Step3];
 
-type InterchainTokenDeploymentProps = {
-  tokenDetails?: TokenDetails;
-};
-
-const InterchainTokenDeployment = () => {
-  const { state, actions } = useInterchainTokenDeploymentStateContainer();
+const CanonicalTokenDeployment: FC = () => {
+  const { state, actions } = useCanonicalTokenDeploymentStateContainer();
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
@@ -48,7 +44,7 @@ const InterchainTokenDeployment = () => {
     <Dialog
       onClose={actions.reset}
       renderTrigger={(props) => (
-        <TriggerButton {...props}>Deploy a new Interchain Token</TriggerButton>
+        <TriggerButton {...props}>Register interchain token</TriggerButton>
       )}
     >
       <Dialog.Body $as="section">
@@ -58,10 +54,7 @@ const InterchainTokenDeployment = () => {
           <span className={cn("-translate-y-2", { "ml-14": showBackButton })}>
             Register <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
-          <ChainsDropdown
-            disabled={state.isPreExistingToken}
-            shift={showBackButton}
-          />
+          <ChainsDropdown disabled shift={showBackButton} />
         </Dialog.Title>
         <StepsSummary currentStep={state.step} />
         <CurrentStep />
@@ -70,23 +63,27 @@ const InterchainTokenDeployment = () => {
   );
 };
 
-const InterchainTokenDeploymentWithProvider: FC<
-  InterchainTokenDeploymentProps
+type CanonicalTokenDeploymentProps = {
+  tokenDetails?: TokenDetails;
+};
+
+const CanonicalTokenDeploymentWithProvider: FC<
+  CanonicalTokenDeploymentProps
 > = (props) => {
   return (
-    <InterchainTokenDeploymentStateProvider
+    <CanonicalTokenDeploymentStateProvider
       initialState={
         props.tokenDetails
           ? {
               tokenDetails: props.tokenDetails,
-              step: 0,
+              step: 1,
             }
           : undefined
       }
     >
-      <InterchainTokenDeployment />
-    </InterchainTokenDeploymentStateProvider>
+      <CanonicalTokenDeployment />
+    </CanonicalTokenDeploymentStateProvider>
   );
 };
 
-export default InterchainTokenDeploymentWithProvider;
+export default CanonicalTokenDeploymentWithProvider;

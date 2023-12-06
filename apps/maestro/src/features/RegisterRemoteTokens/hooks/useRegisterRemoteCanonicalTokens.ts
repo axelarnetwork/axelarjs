@@ -70,9 +70,10 @@ export default function useRegisterRemoteCanonicalTokens(
   }, [destinationChainIds, gasFees, sourceChain?.chain_name, tokenDetails]);
 
   const totalGasFee = useMemo(
-    () => gasFees?.reduce((acc, gasFee) => acc + gasFee, 0n) ?? 0n,
+    () => gasFees?.reduce((a, b) => a + b, 0n) ?? 0n,
     [gasFees]
   );
+
   const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],

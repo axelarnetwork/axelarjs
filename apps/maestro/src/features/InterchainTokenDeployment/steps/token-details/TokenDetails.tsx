@@ -6,12 +6,11 @@ import {
   FormControl,
   HelpCircleIcon,
   Label,
-  TextInput,
   Tooltip,
 } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useRef, useState, type FC } from "react";
-import { FieldError, type SubmitHandler } from "react-hook-form";
+import { type SubmitHandler } from "react-hook-form";
 
 import {
   useInterchainTokenDeploymentStateContainer,
@@ -21,15 +20,11 @@ import {
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
-import { NextButton } from "../shared";
-
-const FormInput = Object.assign({}, TextInput, {
-  defaultProps: {
-    ...TextInput.defaultProps,
-    className: "bg-base-200",
-    bordered: true,
-  },
-}) as typeof TextInput;
+import {
+  ModalFormInput,
+  NextButton,
+  ValidationError,
+} from "~/ui/compounds/MultiStepForm";
 
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
@@ -68,7 +63,7 @@ const TokenDetails: FC = () => {
       >
         <FormControl>
           <Label>Token Name</Label>
-          <FormInput
+          <ModalFormInput
             placeholder="Enter your token name"
             disabled={isReadonly}
             {...register("tokenName")}
@@ -77,7 +72,7 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label>Token Symbol</Label>
-          <FormInput
+          <ModalFormInput
             placeholder="Enter your token symbol"
             maxLength={11}
             disabled={isReadonly}
@@ -87,7 +82,7 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label htmlFor="tokenDecimals">Token Decimals</Label>
-          <FormInput
+          <ModalFormInput
             id="tokenDecimals"
             type="number"
             placeholder="Enter your token decimals"
@@ -100,7 +95,7 @@ const TokenDetails: FC = () => {
         </FormControl>
         <FormControl>
           <Label htmlFor="originTokenSupply">Amount to mint</Label>
-          <FormInput
+          <ModalFormInput
             id="originTokenSupply"
             placeholder="Enter amount to mint"
             min={0}
@@ -144,7 +139,7 @@ const TokenDetails: FC = () => {
                     </Tooltip>
                   </Label.Text>
                 </Label>
-                <FormInput
+                <ModalFormInput
                   id="distributor"
                   placeholder="Enter token distributor address"
                   onKeyDown={preventNonHexInput}
@@ -157,7 +152,7 @@ const TokenDetails: FC = () => {
               </FormControl>
               <FormControl>
                 <Label htmlFor="salt">Salt</Label>
-                <FormInput
+                <ModalFormInput
                   id="salt"
                   onKeyDown={preventNonHexInput}
                   defaultValue={state.tokenDetailsForm.getValues("salt")}
@@ -187,9 +182,3 @@ const TokenDetails: FC = () => {
 };
 
 export default TokenDetails;
-
-const ValidationError: FC<FieldError> = ({ message }) => (
-  <div role="alert" className="text-error p-1.5 text-xs">
-    {message}
-  </div>
-);

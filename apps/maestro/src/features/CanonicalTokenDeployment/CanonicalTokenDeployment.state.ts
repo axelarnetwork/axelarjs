@@ -1,31 +1,9 @@
-import { generateRandomHash } from "@axelarjs/utils";
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect } from "react";
-import { unstable_batchedUpdates } from "react-dom";
-import { useForm } from "react-hook-form";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
-import { useAccount } from "wagmi";
-import { z } from "zod";
 
 import { logger } from "~/lib/logger";
-import {
-  hex64Literal,
-  numericString,
-  optionalHex40Literal,
-} from "~/lib/utils/validation";
-
-const TOKEN_DETAILS_FORM_SCHEMA = z.object({
-  tokenName: z.string().min(1).max(32),
-  tokenSymbol: z.string().min(1).max(11),
-  tokenDecimals: z.coerce.number().min(1).max(18),
-  originTokenSupply: numericString(),
-  distributor: optionalHex40Literal(),
-  salt: hex64Literal(),
-});
-
-export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -50,25 +28,21 @@ export const INITIAL_STATE = {
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
-    tokenAddress: undefined as `0x${string}` | undefined,
-    originTokenSupply: "0",
-    remoteTokenSupply: "0",
-    distributor: undefined as `0x${string}` | undefined,
-    salt: undefined as `0x${string}` | undefined,
+    tokenAddress: "0x" as `0x${string}`,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
-  onDeployTxHash(txHash: `0x${string}`) {
+  onDeployTxHash: (txHash: `0x${string}`) => {
     logger.log("onDeployTxHash", txHash);
   },
 };
 
-export type InterchainTokenDeploymentState = typeof INITIAL_STATE;
+export type CanonicalTokenDeploymentState = typeof INITIAL_STATE;
 
-export type TokenDetails = InterchainTokenDeploymentState["tokenDetails"];
+export type TokenDetails = CanonicalTokenDeploymentState["tokenDetails"];
 
-function useInterchainTokenDeploymentState(
-  partialInitialState: Partial<InterchainTokenDeploymentState> = INITIAL_STATE
+function useCanonicalTokenDeploymentState(
+  partialInitialState: Partial<CanonicalTokenDeploymentState> = INITIAL_STATE
 ) {
   const initialState = {
     ...INITIAL_STATE,
@@ -76,33 +50,8 @@ function useInterchainTokenDeploymentState(
   };
 
   const [state, setState] = useSessionStorageState(
-    "@maestro/interchain-deployment",
+    "@maestro/canonical-deployment",
     initialState
-  );
-
-  const tokenDetailsForm = useForm<TokenDetailsFormState>({
-    resolver: zodResolver(TOKEN_DETAILS_FORM_SCHEMA),
-    defaultValues: state.tokenDetails,
-  });
-
-  const { address } = useAccount();
-
-  /**
-   * Generate a random salt on first render
-   * and set it as the default value for the form
-   * also set the default value for distributor
-   */
-  useEffect(
-    () => {
-      const salt = generateRandomHash();
-
-      unstable_batchedUpdates(() => {
-        tokenDetailsForm.setValue("salt", salt);
-        tokenDetailsForm.setValue("distributor", address);
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [address]
   );
 
   /**
@@ -131,20 +80,12 @@ function useInterchainTokenDeploymentState(
     state: {
       ...state,
       // computed state
-      isPreExistingToken: Boolean(state.tokenDetails.tokenAddress),
       selectedChains: uniq(state.selectedChains),
-      tokenDetailsForm,
     },
     actions: {
       reset: () => {
         setState((draft) => {
           Object.assign(draft, initialState);
-
-          // reset form
-          tokenDetailsForm.reset(initialState.tokenDetails);
-
-          tokenDetailsForm.setValue("salt", generateRandomHash());
-          tokenDetailsForm.setValue("distributor", address);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {
@@ -153,11 +94,6 @@ function useInterchainTokenDeploymentState(
             ...draft.tokenDetails,
             ...detatils,
           };
-        });
-      },
-      setRemoteTokenSupply: (remoteTokenSupply: string) => {
-        setState((draft) => {
-          draft.tokenDetails.remoteTokenSupply = remoteTokenSupply;
         });
       },
       setTxState: (txState: DeployAndRegisterTransactionState) => {
@@ -194,6 +130,6 @@ function useInterchainTokenDeploymentState(
 }
 
 export const {
-  Provider: InterchainTokenDeploymentStateProvider,
-  useContainer: useInterchainTokenDeploymentStateContainer,
-} = createContainer(useInterchainTokenDeploymentState);
+  Provider: CanonicalTokenDeploymentStateProvider,
+  useContainer: useCanonicalTokenDeploymentStateContainer,
+} = createContainer(useCanonicalTokenDeploymentState);

@@ -26,6 +26,7 @@ export const COLLECTION_KEYS = {
   globalMessage: "messages:global" as const,
   accountMessage: (accountAddress: `0x${string}`) =>
     `messages:${accountAddress}` as const,
+  cached: (key: string) => `cached:${key}` as const,
 };
 
 export const messageSchema = z.object({
@@ -45,42 +46,42 @@ export class BaseMaestroKVClient {
 
 export default class MaestroKVClient extends BaseMaestroKVClient {
   async createAccount(accountAddress: `0x${string}`) {
-    await this.kv.set(COLLECTION_KEYS.accountNonce(accountAddress), 0);
+    const key = COLLECTION_KEYS.accountStatus(accountAddress);
+    await this.kv.set(key, 0);
   }
 
   async getAccountNonce(accountAddress: `0x${string}`) {
     const key = COLLECTION_KEYS.accountNonce(accountAddress);
-    const nonce = await this.kv.get<number>(key);
-
-    return nonce;
+    return await this.kv.get<number>(key);
   }
 
   async incrementAccountNonce(accountAddress: `0x${string}`) {
-    return await this.kv.incr(COLLECTION_KEYS.accountNonce(accountAddress));
+    const key = COLLECTION_KEYS.accountNonce(accountAddress);
+    return await this.kv.incr(key);
   }
 
   async getAccountStatus(accountAddress: `0x${string}`) {
     const key = COLLECTION_KEYS.accountStatus(accountAddress);
-    const status = await this.kv.get<AccountStatus>(key);
-
-    return status;
+    return await this.kv.get<AccountStatus>(key);
   }
 
   async getGlobalMessage() {
-    return await this.kv.hgetall<Message>(COLLECTION_KEYS.globalMessage);
+    const key = COLLECTION_KEYS.globalMessage;
+    return await this.kv.hgetall<Message>(key);
   }
 
   async getAccountMessage(accountAddresss: `0x${string}`) {
-    return await this.kv.hgetall<Message>(
-      COLLECTION_KEYS.accountMessage(accountAddresss)
-    );
+    const key = COLLECTION_KEYS.accountMessage(accountAddresss);
+    return await this.kv.hgetall<Message>(key);
   }
 
-  async setCached<T>(key: string, value: T, ttl = 3600) {
-    await this.kv.set(`cached:${key}`, value, { ex: ttl });
+  async setCached<T>(cacheKey: string, value: T, ttl = 3600) {
+    const key = COLLECTION_KEYS.cached(cacheKey);
+    return await this.kv.set(key, value, { ex: ttl });
   }
 
-  async getCached<T>(key: string) {
-    return await this.kv.get<T>(`cached:${key}`);
+  async getCached<T>(cacheKey: string) {
+    const key = COLLECTION_KEYS.cached(cacheKey);
+    return await this.kv.get<T>(key);
   }
 }
