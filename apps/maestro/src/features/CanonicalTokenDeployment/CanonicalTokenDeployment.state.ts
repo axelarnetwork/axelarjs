@@ -39,7 +39,7 @@ export const INITIAL_STATE = {
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
-    tokenAddress: undefined as `0x${string}` | undefined,
+    tokenAddress: "0x" as `0x${string}`,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],

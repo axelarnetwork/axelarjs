@@ -2,7 +2,6 @@ import { Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
-  ChangeEvent,
   useCallback,
   useMemo,
   useRef,
@@ -14,11 +13,9 @@ import { parseUnits } from "viem";
 import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
-import { useDeployAndRegisterRemoteInterchainTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
+import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { preventNonNumericInput } from "~/lib/utils/validation";
-import ModalFormInput from "~/ui/components/ModalFormInput";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "../shared";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
@@ -33,8 +30,8 @@ export const Step3: FC = () => {
 
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
-  const { writeAsync: deployInterchainTokenAsync } =
-    useDeployAndRegisterRemoteInterchainTokenMutation(
+  const { writeAsync: deployCanonicalTokenAsync } =
+    useDeployAndRegisterRemoteCanonicalTokenMutation(
       {
         onStatusUpdate(txState) {
           if (txState.type === "deployed") {
@@ -47,21 +44,13 @@ export const Step3: FC = () => {
         },
       },
       {
-        salt: rootState.tokenDetails.salt as `0x${string}`,
+        tokenAddress: rootState.tokenDetails.tokenAddress,
         tokenName: rootState.tokenDetails.tokenName,
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
         remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
-        remoteTransferGasFees: state.remoteTransferGasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
-        distributorAddress: rootState.tokenDetails.distributor,
-        originInitialSupply: Maybe.of(
-          rootState.tokenDetails.originTokenSupply
-        ).mapOrUndefined(BigInt),
-        remoteInitialSupply: Maybe.of(
-          rootState.tokenDetails.remoteTokenSupply
-        ).mapOrUndefined(BigInt),
       }
     );
 
@@ -74,7 +63,7 @@ export const Step3: FC = () => {
         state.hasGasFeesEstimationError ||
         !state.remoteDeploymentGasFees ||
         !state.evmChains ||
-        !deployInterchainTokenAsync
+        !deployCanonicalTokenAsync
       ) {
         console.warn("gas prices not loaded");
         return;
@@ -87,7 +76,7 @@ export const Step3: FC = () => {
         type: "pending_approval",
       });
 
-      const txPromise = deployInterchainTokenAsync();
+      const txPromise = deployCanonicalTokenAsync();
 
       await handleTransactionResult(txPromise, {
         onSuccess(tx) {
@@ -110,7 +99,7 @@ export const Step3: FC = () => {
       state.hasGasFeesEstimationError,
       state.remoteDeploymentGasFees,
       state.evmChains,
-      deployInterchainTokenAsync,
+      deployCanonicalTokenAsync,
       actions,
       sourceChain,
       rootActions,
@@ -164,14 +153,12 @@ export const Step3: FC = () => {
     return (
       <>
         Deploy{" "}
-        {!!state.remoteDeploymentGasFees?.length && (
+        {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull((length) => (
           <>
-            {state.remoteDeploymentGasFees?.length && <span>and register</span>}
-            {` on ${state.remoteDeploymentGasFees.length + 1} chain${
-              state.remoteDeploymentGasFees?.length + 1 > 1 ? "s" : ""
-            }`}
+            {length > 0 && <span>and register</span>}
+            {` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}
           </>
-        )}
+        ))}
       </>
     );
   }, [
@@ -181,24 +168,6 @@ export const Step3: FC = () => {
     state.remoteDeploymentGasFees,
     hasInsufficientGasBalance,
     nativeTokenSymbol,
-  ]);
-
-  const { totalSupply, totalSupplyBreakdown } = useMemo(() => {
-    const originTokenSupply = Number(rootState.tokenDetails.originTokenSupply);
-    const remoteTokenSupply = Number(rootState.tokenDetails.remoteTokenSupply);
-    const selectedChains = rootState.selectedChains.length;
-    const totalSupply = originTokenSupply + remoteTokenSupply * selectedChains;
-    const multiplierComment = selectedChains > 1 ? ` × ${selectedChains}` : "";
-    const formattedTotalSupply = totalSupply.toLocaleString();
-    const formattedOriginTokenSupply = originTokenSupply.toLocaleString();
-    const formattedRemoteTokenSupply = remoteTokenSupply.toLocaleString();
-    const totalSupplyBreakdown = `${formattedOriginTokenSupply} + ${formattedRemoteTokenSupply} ${multiplierComment}`;
-
-    return { totalSupply: formattedTotalSupply, totalSupplyBreakdown };
-  }, [
-    rootState.tokenDetails.originTokenSupply,
-    rootState.tokenDetails.remoteTokenSupply,
-    rootState.selectedChains.length,
   ]);
 
   return (
@@ -230,32 +199,6 @@ export const Step3: FC = () => {
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
-        {rootState.selectedChains.length > 0 && (
-          // remove the hidden class once the GMP race condition is fixed
-          <FormControl className="hidden">
-            <Label htmlFor="originTokenSupply">
-              Amount to mint on remote chains
-            </Label>
-            <ModalFormInput
-              id="remoteTokenSupply"
-              placeholder="Enter amount to mint"
-              min={0}
-              onKeyDown={preventNonNumericInput}
-              value={rootState.tokenDetails.remoteTokenSupply}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                rootActions.setRemoteTokenSupply(e.target.value);
-              }}
-            />
-            <small className="p-2 text-center">
-              Initial supply: <span className="font-bold">{totalSupply}</span>{" "}
-              {Number(rootState.tokenDetails.remoteTokenSupply) > 0 && (
-                <>
-                  (<span className="font-bold">{totalSupplyBreakdown}</span>)
-                </>
-              )}
-            </small>
-          </FormControl>
-        )}
       </form>
       <Dialog.Actions>
         <NextButton

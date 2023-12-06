@@ -164,14 +164,12 @@ export const Step3: FC = () => {
     return (
       <>
         Deploy{" "}
-        {!!state.remoteDeploymentGasFees?.length && (
+        {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull((length) => (
           <>
-            {state.remoteDeploymentGasFees?.length && <span>and register</span>}
-            {` on ${state.remoteDeploymentGasFees.length + 1} chain${
-              state.remoteDeploymentGasFees?.length + 1 > 1 ? "s" : ""
-            }`}
+            {length > 0 && <span>and register</span>}
+            {` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}
           </>
-        )}
+        ))}
       </>
     );
   }, [

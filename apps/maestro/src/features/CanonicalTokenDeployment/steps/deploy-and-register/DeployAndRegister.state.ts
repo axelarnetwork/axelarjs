@@ -1,14 +1,10 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
-import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
 import { useChainId } from "wagmi";
 
-import {
-  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
-  NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
-} from "~/config/env";
+import { NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT } from "~/config/env";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
@@ -40,25 +36,9 @@ export function useStep3ChainSelectionState() {
     gasMultipler: 2,
   });
 
-  const {
-    data: remoteTransferGasFees,
-    isLoading: isRemoteTransferGasFeeLoading,
-    isError: isRemoteTransferGasFeeError,
-  } = useEstimateGasFeeMultipleChainsQuery({
-    sourceChainId,
-    destinationChainIds: Maybe.of(rootState.tokenDetails.remoteTokenSupply)
-      .map(BigInt)
-      .mapOr([], (supply) => (supply > 0n ? rootState.selectedChains : [])),
-    gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT),
-    gasMultipler: 2,
-  });
-
   useEffect(
-    () =>
-      remoteDeploymentGasFees &&
-      remoteTransferGasFees &&
-      setTotalGasFee([...remoteDeploymentGasFees, ...remoteTransferGasFees]),
-    [remoteDeploymentGasFees, remoteTransferGasFees]
+    () => remoteDeploymentGasFees && setTotalGasFee(remoteDeploymentGasFees),
+    [remoteDeploymentGasFees]
   );
 
   const resetState = () => {
@@ -86,12 +66,9 @@ export function useStep3ChainSelectionState() {
       totalGasFee,
       sourceChainId,
       evmChains,
-      isEstimatingGasFees:
-        isRemoteDeploymentGasFeeLoading || isRemoteTransferGasFeeLoading,
-      hasGasFeesEstimationError:
-        isRemoteDeploymentGasFeeError || isRemoteTransferGasFeeError,
+      isEstimatingGasFees: isRemoteDeploymentGasFeeLoading,
+      hasGasFeesEstimationError: isRemoteDeploymentGasFeeError,
       remoteDeploymentGasFees,
-      remoteTransferGasFees,
     },
     actions: {
       resetState,
