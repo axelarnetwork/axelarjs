@@ -100,6 +100,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   return (
     <FormControl className="w-full max-w-xs md:max-w-md">
+      <div className="pb-2 text-center">Take your token interchain</div>
       <InputGroup
         className={cn("rounded-md transition-transform", {
           "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
