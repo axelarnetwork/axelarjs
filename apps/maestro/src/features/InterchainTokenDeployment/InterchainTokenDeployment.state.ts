@@ -21,7 +21,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
   originTokenSupply: numericString(),
-  distributor: optionalHex40Literal(),
+  minter: optionalHex40Literal(),
   salt: hex64Literal(),
 });
 
@@ -89,7 +89,7 @@ function useInterchainTokenDeploymentState(
   /**
    * Generate a random salt on first render
    * and set it as the default value for the form
-   * also set the default value for distributor
+   * also set the default value for minter
    */
   useEffect(
     () => {
@@ -97,7 +97,7 @@ function useInterchainTokenDeploymentState(
 
       unstable_batchedUpdates(() => {
         tokenDetailsForm.setValue("salt", salt);
-        tokenDetailsForm.setValue("distributor", address);
+        tokenDetailsForm.setValue("minter", address);
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,7 +143,7 @@ function useInterchainTokenDeploymentState(
           tokenDetailsForm.reset(initialState.tokenDetails);
 
           tokenDetailsForm.setValue("salt", generateRandomHash());
-          tokenDetailsForm.setValue("distributor", address);
+          tokenDetailsForm.setValue("minter", address);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {

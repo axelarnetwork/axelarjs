@@ -44,7 +44,7 @@ const TokenDetails: FC = () => {
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
       initialSupply: data.originTokenSupply,
-      minter: data.distributor,
+      minter: data.minter,
       salt: data.salt,
     });
 
@@ -127,28 +127,28 @@ const TokenDetails: FC = () => {
           {showAdvanced && (
             <>
               <FormControl>
-                <Label htmlFor="distributor">
+                <Label htmlFor="minter">
                   <Label.Text className="inline-flex items-center gap-1">
-                    Token Distributor
+                    Token Minter
                     <Tooltip
                       position="right"
                       variant="info"
-                      tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer distributorship."
+                      tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer mintership."
                     >
                       <HelpCircleIcon className="text-info mr-1 h-[1em]" />
                     </Tooltip>
                   </Label.Text>
                 </Label>
                 <ModalFormInput
-                  id="distributor"
-                  placeholder="Enter token distributor address"
+                  id="minter"
+                  placeholder="Enter token minter address"
                   onKeyDown={preventNonHexInput}
-                  defaultValue={state.tokenDetailsForm.getValues("distributor")}
-                  {...register("distributor", {
+                  defaultValue={state.tokenDetailsForm.getValues("minter")}
+                  {...register("minter", {
                     disabled: isReadonly,
                   })}
                 />
-                {Maybe.of(errors.distributor).mapOrNull(ValidationError)}
+                {Maybe.of(errors.minter).mapOrNull(ValidationError)}
               </FormControl>
               <FormControl>
                 <Label htmlFor="salt">Salt</Label>

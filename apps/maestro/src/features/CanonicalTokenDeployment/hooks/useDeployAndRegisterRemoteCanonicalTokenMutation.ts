@@ -152,7 +152,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
-        originalDistributorAddress: deployerAddress,
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },

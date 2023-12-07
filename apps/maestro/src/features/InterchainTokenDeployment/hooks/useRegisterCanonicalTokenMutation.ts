@@ -77,7 +77,6 @@ export function useRegisterCanonicalTokenMutation(
         tokenDecimals: input.decimals,
         deployerAddress: account.address as `0x${string}`,
         deploymentMessageId: `${multicall.data.hash}-0`,
-        originalDistributorAddress: account.address as `0x${string}`,
         destinationAxelarChainIds: [],
       });
 

@@ -187,7 +187,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
-        originalDistributorAddress: deployerAddress,
+        originalMinterAddress: input.minterAddress,
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },
