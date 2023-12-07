@@ -15,7 +15,7 @@ export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
   tokenAddress: `0x${string}`;
   originChainId: number;
-  deployerAddress: `0x${string}`;
+  minter: `0x${string}`;
 };
 
 export default function useRegisterRemoteInterchainTokens(
@@ -59,7 +59,7 @@ export default function useRegisterRemoteInterchainTokens(
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt as `0x${string}`,
         originalChainName: sourceChain?.chain_name ?? "",
-        distributor: input.deployerAddress,
+        minter: input.minter,
         destinationChain: chainId,
         gasValue: gasFees[i],
       })
@@ -67,7 +67,7 @@ export default function useRegisterRemoteInterchainTokens(
   }, [
     destinationChainIds,
     gasFees,
-    input.deployerAddress,
+    input.minter,
     sourceChain?.chain_name,
     tokenDeployment,
   ]);

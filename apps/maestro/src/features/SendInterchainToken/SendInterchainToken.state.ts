@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
-import { useTokenManagerSendTokenMutation } from "./hooks/useTokenManagerSendTokenMutation";
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
@@ -71,7 +71,7 @@ export function useSendInterchainTokenState(props: {
     isLoading: isTokenManagerSending,
     txState: tokenManagerTxState,
     reset: resetTokenManagerTxState,
-  } = useTokenManagerSendTokenMutation({
+  } = useInterchainTokenServiceTransferMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
     destinationChainName: selectedToChain?.chain_name,

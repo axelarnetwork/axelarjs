@@ -43,8 +43,8 @@ const TokenDetails: FC = () => {
       tokenName: data.tokenName,
       tokenSymbol: data.tokenSymbol,
       tokenDecimals: data.tokenDecimals,
-      originTokenSupply: data.originTokenSupply,
-      distributor: data.distributor,
+      initialSupply: data.originTokenSupply,
+      minter: data.distributor,
       salt: data.salt,
     });
 

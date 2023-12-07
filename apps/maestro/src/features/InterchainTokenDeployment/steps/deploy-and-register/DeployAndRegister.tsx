@@ -2,7 +2,6 @@ import { Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
-  ChangeEvent,
   useCallback,
   useMemo,
   useRef,
@@ -15,9 +14,8 @@ import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { preventNonNumericInput } from "~/lib/utils/validation";
 import ChainPicker from "~/ui/compounds/ChainPicker";
-import { ModalFormInput, NextButton } from "~/ui/compounds/MultiStepForm";
+import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
@@ -52,14 +50,10 @@ export const Step3: FC = () => {
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
         remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
-        remoteTransferGasFees: state.remoteTransferGasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
-        distributorAddress: rootState.tokenDetails.distributor,
-        originInitialSupply: Maybe.of(
-          rootState.tokenDetails.originTokenSupply
-        ).mapOrUndefined(BigInt),
-        remoteInitialSupply: Maybe.of(
-          rootState.tokenDetails.remoteTokenSupply
+        minterAddress: rootState.tokenDetails.minter,
+        initialSupply: Maybe.of(
+          rootState.tokenDetails.initialSupply
         ).mapOrUndefined(BigInt),
       }
     );
@@ -180,28 +174,6 @@ export const Step3: FC = () => {
     nativeTokenSymbol,
   ]);
 
-  const { totalSupply, totalSupplyBreakdown } = useMemo(() => {
-    const originTokenSupply = Number(rootState.tokenDetails.originTokenSupply);
-    const remoteTokenSupply = Number(rootState.tokenDetails.remoteTokenSupply);
-    const selectedChains = rootState.selectedChains.length;
-
-    const totalSupply = originTokenSupply + remoteTokenSupply * selectedChains;
-
-    const multiplierComment = selectedChains > 1 ? ` × ${selectedChains}` : "";
-
-    const formattedTotalSupply = totalSupply.toLocaleString();
-    const formattedOriginTokenSupply = originTokenSupply.toLocaleString();
-    const formattedRemoteTokenSupply = remoteTokenSupply.toLocaleString();
-
-    const totalSupplyBreakdown = `${formattedOriginTokenSupply} + ${formattedRemoteTokenSupply} ${multiplierComment}`;
-
-    return { totalSupply: formattedTotalSupply, totalSupplyBreakdown };
-  }, [
-    rootState.tokenDetails.originTokenSupply,
-    rootState.tokenDetails.remoteTokenSupply,
-    rootState.selectedChains.length,
-  ]);
-
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -231,32 +203,6 @@ export const Step3: FC = () => {
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
-        {rootState.selectedChains.length > 0 && (
-          // remove the hidden class once the GMP race condition is fixed
-          <FormControl className="hidden">
-            <Label htmlFor="originTokenSupply">
-              Amount to mint on remote chains
-            </Label>
-            <ModalFormInput
-              id="remoteTokenSupply"
-              placeholder="Enter amount to mint"
-              min={0}
-              onKeyDown={preventNonNumericInput}
-              value={rootState.tokenDetails.remoteTokenSupply}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                rootActions.setRemoteTokenSupply(e.target.value);
-              }}
-            />
-            <small className="p-2 text-center">
-              Initial supply: <span className="font-bold">{totalSupply}</span>{" "}
-              {Number(rootState.tokenDetails.remoteTokenSupply) > 0 && (
-                <>
-                  (<span className="font-bold">{totalSupplyBreakdown}</span>)
-                </>
-              )}
-            </small>
-          </FormControl>
-        )}
       </form>
       <Dialog.Actions>
         <NextButton

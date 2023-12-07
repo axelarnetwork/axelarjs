@@ -51,9 +51,8 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
-    originTokenSupply: "0",
-    remoteTokenSupply: "0",
-    distributor: undefined as `0x${string}` | undefined,
+    initialSupply: "0",
+    minter: undefined as `0x${string}` | undefined,
     salt: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
@@ -153,11 +152,6 @@ function useInterchainTokenDeploymentState(
             ...draft.tokenDetails,
             ...detatils,
           };
-        });
-      },
-      setRemoteTokenSupply: (remoteTokenSupply: string) => {
-        setState((draft) => {
-          draft.tokenDetails.remoteTokenSupply = remoteTokenSupply;
         });
       },
       setTxState: (txState: DeployAndRegisterTransactionState) => {

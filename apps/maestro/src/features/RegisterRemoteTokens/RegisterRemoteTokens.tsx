@@ -109,7 +109,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const { writeAsync: registerInterchainTokensAsync } =
     useRegisterRemoteInterchainTokens({
       chainIds: props.chainIds,
-      deployerAddress: deployerAddress as `0x${string}`,
+      minter: deployerAddress as `0x${string}`,
       tokenAddress: props.tokenAddress,
       originChainId: props.originChainId ?? -1,
     });
