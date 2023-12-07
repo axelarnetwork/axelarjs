@@ -121,6 +121,7 @@ export const Step3: FC = () => {
 
   const { data: balance } = useBalance({
     address,
+    watch: true,
   });
 
   const nativeTokenSymbol = getNativeToken(state.sourceChainId);
