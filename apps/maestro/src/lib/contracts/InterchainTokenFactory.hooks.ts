@@ -26,7 +26,7 @@ import ABI from "./InterchainTokenFactory.abi";
 export const interchainTokenFactoryABI = ABI.abi;
 
 export const interchainTokenFactoryAddress =
-  "0xe93462bc7Ef7692D763C4d4DbCE7B870c0958c59" as const;
+  "0x83a93500d23Fbc3e82B410aD07A6a9F7A0670D66" as const;
 
 export const interchainTokenFactoryConfig = {
   address: interchainTokenFactoryAddress,
@@ -567,42 +567,6 @@ export function useInterchainTokenFactoryDeployRemoteInterchainToken<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"interchainTransfer"`.
- */
-export function useInterchainTokenFactoryInterchainTransfer<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof interchainTokenFactoryABI,
-          "interchainTransfer"
-        >["request"]["abi"],
-        "interchainTransfer",
-        TMode
-      > & { functionName?: "interchainTransfer" }
-    : UseContractWriteConfig<
-        typeof interchainTokenFactoryABI,
-        "interchainTransfer",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "interchainTransfer";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof interchainTokenFactoryABI,
-    "interchainTransfer",
-    TMode
-  >({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "interchainTransfer",
-    ...config,
-  } as any);
-}
-
-/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"multicall"`.
  */
 export function useInterchainTokenFactoryMulticall<
@@ -736,78 +700,6 @@ export function useInterchainTokenFactorySetup<
     abi: interchainTokenFactoryABI,
     address: interchainTokenFactoryAddress,
     functionName: "setup",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"tokenApprove"`.
- */
-export function useInterchainTokenFactoryTokenApprove<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof interchainTokenFactoryABI,
-          "tokenApprove"
-        >["request"]["abi"],
-        "tokenApprove",
-        TMode
-      > & { functionName?: "tokenApprove" }
-    : UseContractWriteConfig<
-        typeof interchainTokenFactoryABI,
-        "tokenApprove",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "tokenApprove";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof interchainTokenFactoryABI,
-    "tokenApprove",
-    TMode
-  >({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "tokenApprove",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"tokenTransferFrom"`.
- */
-export function useInterchainTokenFactoryTokenTransferFrom<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof interchainTokenFactoryABI,
-          "tokenTransferFrom"
-        >["request"]["abi"],
-        "tokenTransferFrom",
-        TMode
-      > & { functionName?: "tokenTransferFrom" }
-    : UseContractWriteConfig<
-        typeof interchainTokenFactoryABI,
-        "tokenTransferFrom",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "tokenTransferFrom";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof interchainTokenFactoryABI,
-    "tokenTransferFrom",
-    TMode
-  >({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "tokenTransferFrom",
     ...config,
   } as any);
 }
@@ -982,26 +874,6 @@ export function usePrepareInterchainTokenFactoryDeployRemoteInterchainToken(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"interchainTransfer"`.
- */
-export function usePrepareInterchainTokenFactoryInterchainTransfer(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof interchainTokenFactoryABI,
-      "interchainTransfer"
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "interchainTransfer",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "interchainTransfer">);
-}
-
-/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"multicall"`.
  */
 export function usePrepareInterchainTokenFactoryMulticall(
@@ -1076,46 +948,6 @@ export function usePrepareInterchainTokenFactorySetup(
     functionName: "setup",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "setup">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"tokenApprove"`.
- */
-export function usePrepareInterchainTokenFactoryTokenApprove(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof interchainTokenFactoryABI,
-      "tokenApprove"
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "tokenApprove",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "tokenApprove">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"tokenTransferFrom"`.
- */
-export function usePrepareInterchainTokenFactoryTokenTransferFrom(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof interchainTokenFactoryABI,
-      "tokenTransferFrom"
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "tokenTransferFrom",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenFactoryABI, "tokenTransferFrom">);
 }
 
 /**

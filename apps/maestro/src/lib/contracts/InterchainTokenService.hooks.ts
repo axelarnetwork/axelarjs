@@ -26,7 +26,7 @@ import ABI from "./InterchainTokenService.abi";
 export const interchainTokenServiceABI = ABI.abi;
 
 export const interchainTokenServiceAddress =
-  "0xa4A9965149388c86E62CDDDd6C95EFe9c294005a" as const;
+  "0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C" as const;
 
 export const interchainTokenServiceConfig = {
   address: interchainTokenServiceAddress,
@@ -707,6 +707,60 @@ export function useInterchainTokenServicePendingOwner<
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
     functionName: "pendingOwner",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"tokenHandler"`.
+ */
+export function useInterchainTokenServiceTokenHandler<
+  TFunctionName extends "tokenHandler",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "tokenHandler",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"tokenManager"`.
+ */
+export function useInterchainTokenServiceTokenManager<
+  TFunctionName extends "tokenManager",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "tokenManager",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
@@ -2300,46 +2354,6 @@ export function useInterchainTokenServiceInterchainTransferReceivedEvent(
     eventName: "InterchainTransferReceived",
     ...config,
   } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTransferReceived">);
-}
-
-/**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTransferReceivedWithData"`.
- */
-export function useInterchainTokenServiceInterchainTransferReceivedWithDataEvent(
-  config: Omit<
-    UseContractEventConfig<
-      typeof interchainTokenServiceABI,
-      "InterchainTransferReceivedWithData"
-    >,
-    "abi" | "address" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    eventName: "InterchainTransferReceivedWithData",
-    ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTransferReceivedWithData">);
-}
-
-/**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTransferWithData"`.
- */
-export function useInterchainTokenServiceInterchainTransferWithDataEvent(
-  config: Omit<
-    UseContractEventConfig<
-      typeof interchainTokenServiceABI,
-      "InterchainTransferWithData"
-    >,
-    "abi" | "address" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    eventName: "InterchainTransferWithData",
-    ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTransferWithData">);
 }
 
 /**
