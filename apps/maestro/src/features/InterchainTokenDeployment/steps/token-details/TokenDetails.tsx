@@ -134,6 +134,7 @@ const TokenDetails: FC = () => {
               id="minter"
               placeholder="Enter token minter address"
               onKeyDown={preventNonHexInput}
+              defaultValue={state.tokenDetailsForm.getValues("minter")}
               {...register("minter", {
                 disabled: isReadonly,
               })}
@@ -145,6 +146,7 @@ const TokenDetails: FC = () => {
             <ModalFormInput
               id="salt"
               onKeyDown={preventNonHexInput}
+              defaultValue={state.tokenDetailsForm.getValues("salt")}
               {...register("salt", { disabled: isReadonly })}
             />
             {Maybe.of(errors.salt).mapOrNull(ValidationError)}
