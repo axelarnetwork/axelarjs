@@ -40,15 +40,7 @@ const TokenDetails: FC = () => {
   const submitHandler: SubmitHandler<TokenDetailsFormState> = (data, e) => {
     e?.preventDefault();
 
-    actions.setTokenDetails({
-      tokenName: data.tokenName,
-      tokenSymbol: data.tokenSymbol,
-      tokenDecimals: data.tokenDecimals,
-      initialSupply: data.initialSupply,
-      minter: data.minter,
-      salt: data.salt,
-    });
-
+    actions.setTokenDetails(data);
     actions.nextStep();
   };
 
