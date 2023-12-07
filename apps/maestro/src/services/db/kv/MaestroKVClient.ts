@@ -46,7 +46,7 @@ export class BaseMaestroKVClient {
 
 export default class MaestroKVClient extends BaseMaestroKVClient {
   async createAccount(accountAddress: `0x${string}`) {
-    const key = COLLECTION_KEYS.accountStatus(accountAddress);
+    const key = COLLECTION_KEYS.accountNonce(accountAddress);
     await this.kv.set(key, 0);
   }
 
