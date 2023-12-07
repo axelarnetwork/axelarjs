@@ -12,13 +12,24 @@ export default {
   contractName: "InterchainToken",
   abi: [
     {
-      inputs: [],
+      inputs: [
+        {
+          internalType: "address",
+          name: "interchainTokenServiceAddress",
+          type: "address",
+        },
+      ],
       stateMutability: "nonpayable",
       type: "constructor",
     },
     {
       inputs: [],
       name: "AlreadyInitialized",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "InterchainTokenServiceAddressZero",
       type: "error",
     },
     {
@@ -117,7 +128,7 @@ export default {
     },
     {
       inputs: [],
-      name: "TokenManagerAddressZero",
+      name: "TokenIdZero",
       type: "error",
     },
     {
@@ -255,11 +266,11 @@ export default {
       inputs: [
         {
           internalType: "address",
-          name: "fromDistributor",
+          name: "fromMinter",
           type: "address",
         },
       ],
-      name: "acceptDistributorship",
+      name: "acceptMintership",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -437,13 +448,13 @@ export default {
     {
       inputs: [
         {
-          internalType: "address",
-          name: "tokenManagerAddress",
-          type: "address",
+          internalType: "bytes32",
+          name: "tokenId_",
+          type: "bytes32",
         },
         {
           internalType: "address",
-          name: "distributor",
+          name: "minter",
           type: "address",
         },
         {
@@ -465,6 +476,32 @@ export default {
       name: "init",
       outputs: [],
       stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "interchainTokenId",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "interchainTokenService",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
     {
@@ -536,7 +573,7 @@ export default {
           type: "address",
         },
       ],
-      name: "isDistributor",
+      name: "isMinter",
       outputs: [
         {
           internalType: "bool",
@@ -657,11 +694,11 @@ export default {
       inputs: [
         {
           internalType: "address",
-          name: "distributor_",
+          name: "minter_",
           type: "address",
         },
       ],
-      name: "proposeDistributorship",
+      name: "proposeMintership",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -674,19 +711,6 @@ export default {
           internalType: "string",
           name: "",
           type: "string",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "tokenManager",
-      outputs: [
-        {
-          internalType: "address",
-          name: "",
-          type: "address",
         },
       ],
       stateMutability: "view",
@@ -733,19 +757,6 @@ export default {
       inputs: [
         {
           internalType: "address",
-          name: "distributor_",
-          type: "address",
-        },
-      ],
-      name: "transferDistributorship",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "address",
           name: "sender",
           type: "address",
         },
@@ -768,6 +779,19 @@ export default {
           type: "bool",
         },
       ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "minter_",
+          type: "address",
+        },
+      ],
+      name: "transferMintership",
+      outputs: [],
       stateMutability: "nonpayable",
       type: "function",
     },

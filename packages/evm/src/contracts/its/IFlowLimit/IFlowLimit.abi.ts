@@ -23,6 +23,11 @@ export default {
           name: "flowAmount",
           type: "uint256",
         },
+        {
+          internalType: "address",
+          name: "tokenManager",
+          type: "address",
+        },
       ],
       name: "FlowLimitExceeded",
       type: "error",

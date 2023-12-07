@@ -69,8 +69,8 @@ export type IInterchainTokenFactoryDeployInterchainTokenArgs = {
   name: string;
   symbol: string;
   decimals: number;
-  mintAmount: bigint;
-  distributor: `0x${string}`;
+  initialSupply: bigint;
+  minter: `0x${string}`;
 };
 
 /**
@@ -81,10 +81,10 @@ export const encodeIInterchainTokenFactoryDeployInterchainTokenArgs = ({
   name,
   symbol,
   decimals,
-  mintAmount,
-  distributor,
+  initialSupply,
+  minter,
 }: IInterchainTokenFactoryDeployInterchainTokenArgs) =>
-  [salt, name, symbol, decimals, mintAmount, distributor] as const;
+  [salt, name, symbol, decimals, initialSupply, minter] as const;
 
 /**
  * Encoder function for IInterchainTokenFactory.deployInterchainToken function data
@@ -94,13 +94,13 @@ export const encodeIInterchainTokenFactoryDeployInterchainTokenData = ({
   name,
   symbol,
   decimals,
-  mintAmount,
-  distributor,
+  initialSupply,
+  minter,
 }: IInterchainTokenFactoryDeployInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployInterchainToken",
     abi: ABI_FILE.abi,
-    args: [salt, name, symbol, decimals, mintAmount, distributor],
+    args: [salt, name, symbol, decimals, initialSupply, minter],
   });
 
 export type IInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs = {
@@ -141,7 +141,7 @@ export const encodeIInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenDa
 export type IInterchainTokenFactoryDeployRemoteInterchainTokenArgs = {
   originalChainName: string;
   salt: `0x${string}`;
-  distributor: `0x${string}`;
+  minter: `0x${string}`;
   destinationChain: string;
   gasValue: bigint;
 };
@@ -152,11 +152,11 @@ export type IInterchainTokenFactoryDeployRemoteInterchainTokenArgs = {
 export const encodeIInterchainTokenFactoryDeployRemoteInterchainTokenArgs = ({
   originalChainName,
   salt,
-  distributor,
+  minter,
   destinationChain,
   gasValue,
 }: IInterchainTokenFactoryDeployRemoteInterchainTokenArgs) =>
-  [originalChainName, salt, distributor, destinationChain, gasValue] as const;
+  [originalChainName, salt, minter, destinationChain, gasValue] as const;
 
 /**
  * Encoder function for IInterchainTokenFactory.deployRemoteInterchainToken function data
@@ -164,14 +164,14 @@ export const encodeIInterchainTokenFactoryDeployRemoteInterchainTokenArgs = ({
 export const encodeIInterchainTokenFactoryDeployRemoteInterchainTokenData = ({
   originalChainName,
   salt,
-  distributor,
+  minter,
   destinationChain,
   gasValue,
 }: IInterchainTokenFactoryDeployRemoteInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployRemoteInterchainToken",
     abi: ABI_FILE.abi,
-    args: [originalChainName, salt, distributor, destinationChain, gasValue],
+    args: [originalChainName, salt, minter, destinationChain, gasValue],
   });
 
 export type IInterchainTokenFactoryInterchainTokenAddressArgs = {
@@ -257,42 +257,6 @@ export const encodeIInterchainTokenFactoryInterchainTokenSaltData = ({
     args: [chainNameHash_, deployer, salt],
   });
 
-export type IInterchainTokenFactoryInterchainTransferArgs = {
-  tokenId: `0x${string}`;
-  destinationChain: string;
-  destinationAddress: `0x${string}`;
-  amount: bigint;
-  gasValue: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenFactory.interchainTransfer function args
- */
-export const encodeIInterchainTokenFactoryInterchainTransferArgs = ({
-  tokenId,
-  destinationChain,
-  destinationAddress,
-  amount,
-  gasValue,
-}: IInterchainTokenFactoryInterchainTransferArgs) =>
-  [tokenId, destinationChain, destinationAddress, amount, gasValue] as const;
-
-/**
- * Encoder function for IInterchainTokenFactory.interchainTransfer function data
- */
-export const encodeIInterchainTokenFactoryInterchainTransferData = ({
-  tokenId,
-  destinationChain,
-  destinationAddress,
-  amount,
-  gasValue,
-}: IInterchainTokenFactoryInterchainTransferArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "interchainTransfer",
-    abi: ABI_FILE.abi,
-    args: [tokenId, destinationChain, destinationAddress, amount, gasValue],
-  });
-
 export type IInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs = {
   tokenAddress: `0x${string}`;
 };
@@ -318,58 +282,6 @@ export const encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenData =
       abi: ABI_FILE.abi,
       args: [tokenAddress],
     });
-
-export type IInterchainTokenFactoryTokenApproveArgs = {
-  tokenId: `0x${string}`;
-  amount: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenFactory.tokenApprove function args
- */
-export const encodeIInterchainTokenFactoryTokenApproveArgs = ({
-  tokenId,
-  amount,
-}: IInterchainTokenFactoryTokenApproveArgs) => [tokenId, amount] as const;
-
-/**
- * Encoder function for IInterchainTokenFactory.tokenApprove function data
- */
-export const encodeIInterchainTokenFactoryTokenApproveData = ({
-  tokenId,
-  amount,
-}: IInterchainTokenFactoryTokenApproveArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "tokenApprove",
-    abi: ABI_FILE.abi,
-    args: [tokenId, amount],
-  });
-
-export type IInterchainTokenFactoryTokenTransferFromArgs = {
-  tokenId: `0x${string}`;
-  amount: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenFactory.tokenTransferFrom function args
- */
-export const encodeIInterchainTokenFactoryTokenTransferFromArgs = ({
-  tokenId,
-  amount,
-}: IInterchainTokenFactoryTokenTransferFromArgs) => [tokenId, amount] as const;
-
-/**
- * Encoder function for IInterchainTokenFactory.tokenTransferFrom function data
- */
-export const encodeIInterchainTokenFactoryTokenTransferFromData = ({
-  tokenId,
-  amount,
-}: IInterchainTokenFactoryTokenTransferFromArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "tokenTransferFrom",
-    abi: ABI_FILE.abi,
-    args: [tokenId, amount],
-  });
 
 export const IINTERCHAIN_TOKEN_FACTORY_ENCODERS = {
   canonicalInterchainTokenId: {
@@ -404,21 +316,9 @@ export const IINTERCHAIN_TOKEN_FACTORY_ENCODERS = {
     args: encodeIInterchainTokenFactoryInterchainTokenSaltArgs,
     data: encodeIInterchainTokenFactoryInterchainTokenSaltData,
   },
-  interchainTransfer: {
-    args: encodeIInterchainTokenFactoryInterchainTransferArgs,
-    data: encodeIInterchainTokenFactoryInterchainTransferData,
-  },
   registerCanonicalInterchainToken: {
     args: encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
     data: encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenData,
-  },
-  tokenApprove: {
-    args: encodeIInterchainTokenFactoryTokenApproveArgs,
-    data: encodeIInterchainTokenFactoryTokenApproveData,
-  },
-  tokenTransferFrom: {
-    args: encodeIInterchainTokenFactoryTokenTransferFromArgs,
-    data: encodeIInterchainTokenFactoryTokenTransferFromData,
   },
 };
 

@@ -23,11 +23,6 @@ export default {
       type: "constructor",
     },
     {
-      inputs: [],
-      name: "ApproveFailed",
-      type: "error",
-    },
-    {
       inputs: [
         {
           internalType: "address",
@@ -36,17 +31,6 @@ export default {
         },
       ],
       name: "GatewayToken",
-      type: "error",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes",
-          name: "bytesAddress",
-          type: "bytes",
-        },
-      ],
-      name: "InvalidBytesLength",
       type: "error",
     },
     {
@@ -80,19 +64,14 @@ export default {
       type: "error",
     },
     {
-      inputs: [],
-      name: "NonZeroMintAmount",
-      type: "error",
-    },
-    {
       inputs: [
         {
           internalType: "address",
-          name: "distributor",
+          name: "minter",
           type: "address",
         },
       ],
-      name: "NotDistributor",
+      name: "NotMinter",
       type: "error",
     },
     {
@@ -119,11 +98,6 @@ export default {
     {
       inputs: [],
       name: "SetupFailed",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "TokenTransferFailed",
       type: "error",
     },
     {
@@ -270,17 +244,23 @@ export default {
         },
         {
           internalType: "uint256",
-          name: "mintAmount",
+          name: "initialSupply",
           type: "uint256",
         },
         {
           internalType: "address",
-          name: "distributor",
+          name: "minter",
           type: "address",
         },
       ],
       name: "deployInterchainToken",
-      outputs: [],
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
       stateMutability: "payable",
       type: "function",
     },
@@ -308,7 +288,13 @@ export default {
         },
       ],
       name: "deployRemoteCanonicalInterchainToken",
-      outputs: [],
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
       stateMutability: "payable",
       type: "function",
     },
@@ -326,7 +312,7 @@ export default {
         },
         {
           internalType: "address",
-          name: "distributor",
+          name: "minter",
           type: "address",
         },
         {
@@ -341,7 +327,13 @@ export default {
         },
       ],
       name: "deployRemoteInterchainToken",
-      outputs: [],
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
       stateMutability: "payable",
       type: "function",
     },
@@ -451,39 +443,6 @@ export default {
     {
       inputs: [
         {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "destinationAddress",
-          type: "bytes",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          internalType: "uint256",
-          name: "gasValue",
-          type: "uint256",
-        },
-      ],
-      name: "interchainTransfer",
-      outputs: [],
-      stateMutability: "payable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
           internalType: "bytes[]",
           name: "data",
           type: "bytes[]",
@@ -582,42 +541,6 @@ export default {
       name: "setup",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "tokenApprove",
-      outputs: [],
-      stateMutability: "payable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "tokenTransferFrom",
-      outputs: [],
-      stateMutability: "payable",
       type: "function",
     },
     {

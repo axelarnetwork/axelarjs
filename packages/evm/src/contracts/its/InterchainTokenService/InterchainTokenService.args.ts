@@ -42,6 +42,7 @@ export type InterchainTokenServiceCallContractWithInterchainTokenArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
   data: `0x${string}`;
+  gasValue: bigint;
 };
 
 /**
@@ -54,8 +55,16 @@ export const encodeInterchainTokenServiceCallContractWithInterchainTokenArgs =
     destinationAddress,
     amount,
     data,
+    gasValue,
   }: InterchainTokenServiceCallContractWithInterchainTokenArgs) =>
-    [tokenId, destinationChain, destinationAddress, amount, data] as const;
+    [
+      tokenId,
+      destinationChain,
+      destinationAddress,
+      amount,
+      data,
+      gasValue,
+    ] as const;
 
 /**
  * Encoder function for InterchainTokenService.callContractWithInterchainToken function data
@@ -67,11 +76,19 @@ export const encodeInterchainTokenServiceCallContractWithInterchainTokenData =
     destinationAddress,
     amount,
     data,
+    gasValue,
   }: InterchainTokenServiceCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
-      args: [tokenId, destinationChain, destinationAddress, amount, data],
+      args: [
+        tokenId,
+        destinationChain,
+        destinationAddress,
+        amount,
+        data,
+        gasValue,
+      ],
     });
 
 export type InterchainTokenServiceContractCallValueArgs = {
@@ -110,7 +127,7 @@ export type InterchainTokenServiceDeployInterchainTokenArgs = {
   name: string;
   symbol: string;
   decimals: number;
-  distributor: `0x${string}`;
+  minter: `0x${string}`;
   gasValue: bigint;
 };
 
@@ -123,18 +140,10 @@ export const encodeInterchainTokenServiceDeployInterchainTokenArgs = ({
   name,
   symbol,
   decimals,
-  distributor,
+  minter,
   gasValue,
 }: InterchainTokenServiceDeployInterchainTokenArgs) =>
-  [
-    salt,
-    destinationChain,
-    name,
-    symbol,
-    decimals,
-    distributor,
-    gasValue,
-  ] as const;
+  [salt, destinationChain, name, symbol, decimals, minter, gasValue] as const;
 
 /**
  * Encoder function for InterchainTokenService.deployInterchainToken function data
@@ -145,21 +154,13 @@ export const encodeInterchainTokenServiceDeployInterchainTokenData = ({
   name,
   symbol,
   decimals,
-  distributor,
+  minter,
   gasValue,
 }: InterchainTokenServiceDeployInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployInterchainToken",
     abi: ABI_FILE.abi,
-    args: [
-      salt,
-      destinationChain,
-      name,
-      symbol,
-      decimals,
-      distributor,
-      gasValue,
-    ],
+    args: [salt, destinationChain, name, symbol, decimals, minter, gasValue],
   });
 
 export type InterchainTokenServiceDeployTokenManagerArgs = {
@@ -482,6 +483,7 @@ export type InterchainTokenServiceInterchainTransferArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
   metadata: `0x${string}`;
+  gasValue: bigint;
 };
 
 /**
@@ -493,8 +495,16 @@ export const encodeInterchainTokenServiceInterchainTransferArgs = ({
   destinationAddress,
   amount,
   metadata,
+  gasValue,
 }: InterchainTokenServiceInterchainTransferArgs) =>
-  [tokenId, destinationChain, destinationAddress, amount, metadata] as const;
+  [
+    tokenId,
+    destinationChain,
+    destinationAddress,
+    amount,
+    metadata,
+    gasValue,
+  ] as const;
 
 /**
  * Encoder function for InterchainTokenService.interchainTransfer function data
@@ -505,11 +515,19 @@ export const encodeInterchainTokenServiceInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
+  gasValue,
 }: InterchainTokenServiceInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
-    args: [tokenId, destinationChain, destinationAddress, amount, metadata],
+    args: [
+      tokenId,
+      destinationChain,
+      destinationAddress,
+      amount,
+      metadata,
+      gasValue,
+    ],
   });
 
 export type InterchainTokenServiceIsOperatorArgs = { addr: `0x${string}` };
@@ -762,30 +780,6 @@ export const encodeInterchainTokenServiceTokenManagerAddressData = ({
     functionName: "tokenManagerAddress",
     abi: ABI_FILE.abi,
     args: [tokenId],
-  });
-
-export type InterchainTokenServiceTokenManagerImplementationArgs = {
-  tokenManagerType: bigint;
-};
-
-/**
- * Factory function for InterchainTokenService.tokenManagerImplementation function args
- */
-export const encodeInterchainTokenServiceTokenManagerImplementationArgs = ({
-  tokenManagerType,
-}: InterchainTokenServiceTokenManagerImplementationArgs) =>
-  [tokenManagerType] as const;
-
-/**
- * Encoder function for InterchainTokenService.tokenManagerImplementation function data
- */
-export const encodeInterchainTokenServiceTokenManagerImplementationData = ({
-  tokenManagerType,
-}: InterchainTokenServiceTokenManagerImplementationArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "tokenManagerImplementation",
-    abi: ABI_FILE.abi,
-    args: [tokenManagerType],
   });
 
 export type InterchainTokenServiceTransferOperatorshipArgs = {
@@ -1114,10 +1108,6 @@ export const INTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     args: encodeInterchainTokenServiceTokenManagerAddressArgs,
     data: encodeInterchainTokenServiceTokenManagerAddressData,
   },
-  tokenManagerImplementation: {
-    args: encodeInterchainTokenServiceTokenManagerImplementationArgs,
-    data: encodeInterchainTokenServiceTokenManagerImplementationData,
-  },
   transferOperatorship: {
     args: encodeInterchainTokenServiceTransferOperatorshipArgs,
     data: encodeInterchainTokenServiceTransferOperatorshipData,
@@ -1245,17 +1235,6 @@ export function createInterchainTokenServiceReadClient(
       const encodedArgs = encoder.args(tokenManagerAddressArgs);
 
       return publicClient.read("tokenManagerAddress", { args: encodedArgs });
-    },
-    tokenManagerImplementation(
-      tokenManagerImplementationArgs: InterchainTokenServiceTokenManagerImplementationArgs
-    ) {
-      const encoder =
-        INTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerImplementation"];
-      const encodedArgs = encoder.args(tokenManagerImplementationArgs);
-
-      return publicClient.read("tokenManagerImplementation", {
-        args: encodedArgs,
-      });
     },
     trustedAddress(
       trustedAddressArgs: InterchainTokenServiceTrustedAddressArgs

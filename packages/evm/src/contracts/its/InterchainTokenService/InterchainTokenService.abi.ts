@@ -44,9 +44,14 @@ export default {
           type: "string",
         },
         {
-          internalType: "address[]",
-          name: "tokenManagerImplementations",
-          type: "address[]",
+          internalType: "address",
+          name: "tokenManagerImplementation_",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "tokenHandler_",
+          type: "address",
         },
       ],
       stateMutability: "nonpayable",
@@ -55,6 +60,11 @@ export default {
     {
       inputs: [],
       name: "AlreadyExecuted",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "EmptyData",
       type: "error",
     },
     {
@@ -92,6 +102,17 @@ export default {
     {
       inputs: [],
       name: "GatewayToken",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+      ],
+      name: "GiveTokenFailed",
       type: "error",
     },
     {
@@ -308,11 +329,11 @@ export default {
         },
         {
           internalType: "address",
-          name: "tokenManager",
+          name: "token",
           type: "address",
         },
       ],
-      name: "NotTokenManager",
+      name: "NotToken",
       type: "error",
     },
     {
@@ -323,6 +344,28 @@ export default {
     {
       inputs: [],
       name: "SetupFailed",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+      ],
+      name: "TakeTokenFailed",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+      ],
+      name: "TokenHandlerFailed",
       type: "error",
     },
     {
@@ -345,11 +388,6 @@ export default {
         },
       ],
       name: "TokenManagerDoesNotExist",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "TokenTransferFailed",
       type: "error",
     },
     {
@@ -557,7 +595,7 @@ export default {
         {
           indexed: true,
           internalType: "address",
-          name: "distributor",
+          name: "minter",
           type: "address",
         },
         {
@@ -612,7 +650,7 @@ export default {
         {
           indexed: false,
           internalType: "bytes",
-          name: "distributor",
+          name: "minter",
           type: "bytes",
         },
         {
@@ -660,6 +698,12 @@ export default {
           type: "bytes32",
         },
         {
+          indexed: true,
+          internalType: "address",
+          name: "sourceAddress",
+          type: "address",
+        },
+        {
           indexed: false,
           internalType: "string",
           name: "destinationChain",
@@ -672,10 +716,16 @@ export default {
           type: "bytes",
         },
         {
-          indexed: true,
+          indexed: false,
           internalType: "uint256",
           name: "amount",
           type: "uint256",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "dataHash",
+          type: "bytes32",
         },
       ],
       name: "InterchainTransfer",
@@ -687,6 +737,12 @@ export default {
         {
           indexed: true,
           internalType: "bytes32",
+          name: "commandId",
+          type: "bytes32",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
         },
@@ -709,93 +765,19 @@ export default {
           type: "address",
         },
         {
-          indexed: true,
+          indexed: false,
           internalType: "uint256",
           name: "amount",
           type: "uint256",
+        },
+        {
+          indexed: false,
+          internalType: "bytes32",
+          name: "dataHash",
+          type: "bytes32",
         },
       ],
       name: "InterchainTransferReceived",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          indexed: false,
-          internalType: "bytes",
-          name: "sourceAddress",
-          type: "bytes",
-        },
-        {
-          indexed: true,
-          internalType: "address",
-          name: "destinationAddress",
-          type: "address",
-        },
-        {
-          indexed: true,
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "InterchainTransferReceivedWithData",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          indexed: false,
-          internalType: "bytes",
-          name: "destinationAddress",
-          type: "bytes",
-        },
-        {
-          indexed: true,
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          indexed: true,
-          internalType: "address",
-          name: "sourceAddress",
-          type: "address",
-        },
-        {
-          indexed: false,
-          internalType: "bytes",
-          name: "data",
-          type: "bytes",
-        },
-      ],
-      name: "InterchainTransferWithData",
       type: "event",
     },
     {
@@ -1067,6 +1049,11 @@ export default {
           name: "data",
           type: "bytes",
         },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
       ],
       name: "callContractWithInterchainToken",
       outputs: [],
@@ -1219,7 +1206,7 @@ export default {
         },
         {
           internalType: "bytes",
-          name: "distributor",
+          name: "minter",
           type: "bytes",
         },
         {
@@ -1229,7 +1216,13 @@ export default {
         },
       ],
       name: "deployInterchainToken",
-      outputs: [],
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
       stateMutability: "payable",
       type: "function",
     },
@@ -1698,6 +1691,11 @@ export default {
           name: "metadata",
           type: "bytes",
         },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
       ],
       name: "interchainTransfer",
       outputs: [],
@@ -1907,6 +1905,32 @@ export default {
       type: "function",
     },
     {
+      inputs: [],
+      name: "tokenHandler",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "tokenManager",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       inputs: [
         {
           internalType: "bytes32",
@@ -1942,7 +1966,7 @@ export default {
       inputs: [
         {
           internalType: "uint256",
-          name: "tokenManagerType",
+          name: "",
           type: "uint256",
         },
       ],

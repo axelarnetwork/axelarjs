@@ -13,6 +13,7 @@ import { encodeFunctionData } from "viem";
 import ABI_FILE from "./IInterchainTokenExecutable.abi";
 
 export type IInterchainTokenExecutableExecuteWithInterchainTokenArgs = {
+  commandId: `0x${string}`;
   sourceChain: string;
   sourceAddress: `0x${string}`;
   data: `0x${string}`;
@@ -25,6 +26,7 @@ export type IInterchainTokenExecutableExecuteWithInterchainTokenArgs = {
  * Factory function for IInterchainTokenExecutable.executeWithInterchainToken function args
  */
 export const encodeIInterchainTokenExecutableExecuteWithInterchainTokenArgs = ({
+  commandId,
   sourceChain,
   sourceAddress,
   data,
@@ -32,12 +34,21 @@ export const encodeIInterchainTokenExecutableExecuteWithInterchainTokenArgs = ({
   token,
   amount,
 }: IInterchainTokenExecutableExecuteWithInterchainTokenArgs) =>
-  [sourceChain, sourceAddress, data, tokenId, token, amount] as const;
+  [
+    commandId,
+    sourceChain,
+    sourceAddress,
+    data,
+    tokenId,
+    token,
+    amount,
+  ] as const;
 
 /**
  * Encoder function for IInterchainTokenExecutable.executeWithInterchainToken function data
  */
 export const encodeIInterchainTokenExecutableExecuteWithInterchainTokenData = ({
+  commandId,
   sourceChain,
   sourceAddress,
   data,
@@ -48,7 +59,7 @@ export const encodeIInterchainTokenExecutableExecuteWithInterchainTokenData = ({
   encodeFunctionData({
     functionName: "executeWithInterchainToken",
     abi: ABI_FILE.abi,
-    args: [sourceChain, sourceAddress, data, tokenId, token, amount],
+    args: [commandId, sourceChain, sourceAddress, data, tokenId, token, amount],
   });
 
 export const IINTERCHAIN_TOKEN_EXECUTABLE_ENCODERS = {

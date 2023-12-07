@@ -13,6 +13,7 @@ import { encodeFunctionData } from "viem";
 import ABI_FILE from "./IInterchainTokenExpressExecutable.abi";
 
 export type IInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs = {
+  commandId: `0x${string}`;
   sourceChain: string;
   sourceAddress: `0x${string}`;
   data: `0x${string}`;
@@ -26,6 +27,7 @@ export type IInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs = {
  */
 export const encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs =
   ({
+    commandId,
     sourceChain,
     sourceAddress,
     data,
@@ -33,13 +35,22 @@ export const encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenAr
     token,
     amount,
   }: IInterchainTokenExpressExecutableExecuteWithInterchainTokenArgs) =>
-    [sourceChain, sourceAddress, data, tokenId, token, amount] as const;
+    [
+      commandId,
+      sourceChain,
+      sourceAddress,
+      data,
+      tokenId,
+      token,
+      amount,
+    ] as const;
 
 /**
  * Encoder function for IInterchainTokenExpressExecutable.executeWithInterchainToken function data
  */
 export const encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenData =
   ({
+    commandId,
     sourceChain,
     sourceAddress,
     data,
@@ -50,11 +61,20 @@ export const encodeIInterchainTokenExpressExecutableExecuteWithInterchainTokenDa
     encodeFunctionData({
       functionName: "executeWithInterchainToken",
       abi: ABI_FILE.abi,
-      args: [sourceChain, sourceAddress, data, tokenId, token, amount],
+      args: [
+        commandId,
+        sourceChain,
+        sourceAddress,
+        data,
+        tokenId,
+        token,
+        amount,
+      ],
     });
 
 export type IInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs =
   {
+    commandId: `0x${string}`;
     sourceChain: string;
     sourceAddress: `0x${string}`;
     data: `0x${string}`;
@@ -68,6 +88,7 @@ export type IInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenAr
  */
 export const encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs =
   ({
+    commandId,
     sourceChain,
     sourceAddress,
     data,
@@ -75,13 +96,22 @@ export const encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchain
     token,
     amount,
   }: IInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenArgs) =>
-    [sourceChain, sourceAddress, data, tokenId, token, amount] as const;
+    [
+      commandId,
+      sourceChain,
+      sourceAddress,
+      data,
+      tokenId,
+      token,
+      amount,
+    ] as const;
 
 /**
  * Encoder function for IInterchainTokenExpressExecutable.expressExecuteWithInterchainToken function data
  */
 export const encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchainTokenData =
   ({
+    commandId,
     sourceChain,
     sourceAddress,
     data,
@@ -92,7 +122,15 @@ export const encodeIInterchainTokenExpressExecutableExpressExecuteWithInterchain
     encodeFunctionData({
       functionName: "expressExecuteWithInterchainToken",
       abi: ABI_FILE.abi,
-      args: [sourceChain, sourceAddress, data, tokenId, token, amount],
+      args: [
+        commandId,
+        sourceChain,
+        sourceAddress,
+        data,
+        tokenId,
+        token,
+        amount,
+      ],
     });
 
 export const IINTERCHAIN_TOKEN_EXPRESS_EXECUTABLE_ENCODERS = {

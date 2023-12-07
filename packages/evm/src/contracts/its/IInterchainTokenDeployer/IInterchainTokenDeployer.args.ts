@@ -15,8 +15,8 @@ import ABI_FILE from "./IInterchainTokenDeployer.abi";
 
 export type IInterchainTokenDeployerDeployInterchainTokenArgs = {
   salt: `0x${string}`;
-  tokenManager: `0x${string}`;
-  distributor: `0x${string}`;
+  tokenId: `0x${string}`;
+  minter: `0x${string}`;
   name: string;
   symbol: string;
   decimals: number;
@@ -27,21 +27,21 @@ export type IInterchainTokenDeployerDeployInterchainTokenArgs = {
  */
 export const encodeIInterchainTokenDeployerDeployInterchainTokenArgs = ({
   salt,
-  tokenManager,
-  distributor,
+  tokenId,
+  minter,
   name,
   symbol,
   decimals,
 }: IInterchainTokenDeployerDeployInterchainTokenArgs) =>
-  [salt, tokenManager, distributor, name, symbol, decimals] as const;
+  [salt, tokenId, minter, name, symbol, decimals] as const;
 
 /**
  * Encoder function for IInterchainTokenDeployer.deployInterchainToken function data
  */
 export const encodeIInterchainTokenDeployerDeployInterchainTokenData = ({
   salt,
-  tokenManager,
-  distributor,
+  tokenId,
+  minter,
   name,
   symbol,
   decimals,
@@ -49,7 +49,7 @@ export const encodeIInterchainTokenDeployerDeployInterchainTokenData = ({
   encodeFunctionData({
     functionName: "deployInterchainToken",
     abi: ABI_FILE.abi,
-    args: [salt, tokenManager, distributor, name, symbol, decimals],
+    args: [salt, tokenId, minter, name, symbol, decimals],
   });
 
 export type IInterchainTokenDeployerDeployedAddressArgs = {

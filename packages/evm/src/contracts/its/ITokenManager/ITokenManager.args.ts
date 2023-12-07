@@ -36,6 +36,27 @@ export const encodeITokenManagerAcceptOperatorshipData = ({
     args: [fromOperator],
   });
 
+export type ITokenManagerAddFlowInArgs = { amount: bigint };
+
+/**
+ * Factory function for ITokenManager.addFlowIn function args
+ */
+export const encodeITokenManagerAddFlowInArgs = ({
+  amount,
+}: ITokenManagerAddFlowInArgs) => [amount] as const;
+
+/**
+ * Encoder function for ITokenManager.addFlowIn function data
+ */
+export const encodeITokenManagerAddFlowInData = ({
+  amount,
+}: ITokenManagerAddFlowInArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "addFlowIn",
+    abi: ABI_FILE.abi,
+    args: [amount],
+  });
+
 export type ITokenManagerAddFlowLimiterArgs = { flowLimiter: `0x${string}` };
 
 /**
@@ -57,37 +78,25 @@ export const encodeITokenManagerAddFlowLimiterData = ({
     args: [flowLimiter],
   });
 
-export type ITokenManagerCallContractWithInterchainTokenArgs = {
-  destinationChain: string;
-  destinationAddress: `0x${string}`;
-  amount: bigint;
-  data: `0x${string}`;
-};
+export type ITokenManagerAddFlowOutArgs = { amount: bigint };
 
 /**
- * Factory function for ITokenManager.callContractWithInterchainToken function args
+ * Factory function for ITokenManager.addFlowOut function args
  */
-export const encodeITokenManagerCallContractWithInterchainTokenArgs = ({
-  destinationChain,
-  destinationAddress,
+export const encodeITokenManagerAddFlowOutArgs = ({
   amount,
-  data,
-}: ITokenManagerCallContractWithInterchainTokenArgs) =>
-  [destinationChain, destinationAddress, amount, data] as const;
+}: ITokenManagerAddFlowOutArgs) => [amount] as const;
 
 /**
- * Encoder function for ITokenManager.callContractWithInterchainToken function data
+ * Encoder function for ITokenManager.addFlowOut function data
  */
-export const encodeITokenManagerCallContractWithInterchainTokenData = ({
-  destinationChain,
-  destinationAddress,
+export const encodeITokenManagerAddFlowOutData = ({
   amount,
-  data,
-}: ITokenManagerCallContractWithInterchainTokenArgs): `0x${string}` =>
+}: ITokenManagerAddFlowOutArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "callContractWithInterchainToken",
+    functionName: "addFlowOut",
     abi: ABI_FILE.abi,
-    args: [destinationChain, destinationAddress, amount, data],
+    args: [amount],
   });
 
 export type ITokenManagerGetTokenAddressFromParamsArgs = {
@@ -113,32 +122,6 @@ export const encodeITokenManagerGetTokenAddressFromParamsData = ({
     args: [params],
   });
 
-export type ITokenManagerGiveTokenArgs = {
-  destinationAddress: `0x${string}`;
-  amount: bigint;
-};
-
-/**
- * Factory function for ITokenManager.giveToken function args
- */
-export const encodeITokenManagerGiveTokenArgs = ({
-  destinationAddress,
-  amount,
-}: ITokenManagerGiveTokenArgs) => [destinationAddress, amount] as const;
-
-/**
- * Encoder function for ITokenManager.giveToken function data
- */
-export const encodeITokenManagerGiveTokenData = ({
-  destinationAddress,
-  amount,
-}: ITokenManagerGiveTokenArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "giveToken",
-    abi: ABI_FILE.abi,
-    args: [destinationAddress, amount],
-  });
-
 export type ITokenManagerHasRoleArgs = { account: `0x${string}`; role: number };
 
 /**
@@ -162,37 +145,25 @@ export const encodeITokenManagerHasRoleData = ({
     args: [account, role],
   });
 
-export type ITokenManagerInterchainTransferArgs = {
-  destinationChain: string;
-  destinationAddress: `0x${string}`;
-  amount: bigint;
-  metadata: `0x${string}`;
-};
+export type ITokenManagerIsFlowLimiterArgs = { addr: `0x${string}` };
 
 /**
- * Factory function for ITokenManager.interchainTransfer function args
+ * Factory function for ITokenManager.isFlowLimiter function args
  */
-export const encodeITokenManagerInterchainTransferArgs = ({
-  destinationChain,
-  destinationAddress,
-  amount,
-  metadata,
-}: ITokenManagerInterchainTransferArgs) =>
-  [destinationChain, destinationAddress, amount, metadata] as const;
+export const encodeITokenManagerIsFlowLimiterArgs = ({
+  addr,
+}: ITokenManagerIsFlowLimiterArgs) => [addr] as const;
 
 /**
- * Encoder function for ITokenManager.interchainTransfer function data
+ * Encoder function for ITokenManager.isFlowLimiter function data
  */
-export const encodeITokenManagerInterchainTransferData = ({
-  destinationChain,
-  destinationAddress,
-  amount,
-  metadata,
-}: ITokenManagerInterchainTransferArgs): `0x${string}` =>
+export const encodeITokenManagerIsFlowLimiterData = ({
+  addr,
+}: ITokenManagerIsFlowLimiterArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "interchainTransfer",
+    functionName: "isFlowLimiter",
     abi: ABI_FILE.abi,
-    args: [destinationChain, destinationAddress, amount, metadata],
+    args: [addr],
   });
 
 export type ITokenManagerIsOperatorArgs = { addr: `0x${string}` };
@@ -214,6 +185,32 @@ export const encodeITokenManagerIsOperatorData = ({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
     args: [addr],
+  });
+
+export type ITokenManagerParamsArgs = {
+  operator_: `0x${string}`;
+  tokenAddress_: `0x${string}`;
+};
+
+/**
+ * Factory function for ITokenManager.params function args
+ */
+export const encodeITokenManagerParamsArgs = ({
+  operator_,
+  tokenAddress_,
+}: ITokenManagerParamsArgs) => [operator_, tokenAddress_] as const;
+
+/**
+ * Encoder function for ITokenManager.params function data
+ */
+export const encodeITokenManagerParamsData = ({
+  operator_,
+  tokenAddress_,
+}: ITokenManagerParamsArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "params",
+    abi: ABI_FILE.abi,
+    args: [operator_, tokenAddress_],
   });
 
 export type ITokenManagerProposeOperatorshipArgs = { operator_: `0x${string}` };
@@ -300,32 +297,6 @@ export const encodeITokenManagerSetupData = ({
     args: [data],
   });
 
-export type ITokenManagerTakeTokenArgs = {
-  sourceAddress: `0x${string}`;
-  amount: bigint;
-};
-
-/**
- * Factory function for ITokenManager.takeToken function args
- */
-export const encodeITokenManagerTakeTokenArgs = ({
-  sourceAddress,
-  amount,
-}: ITokenManagerTakeTokenArgs) => [sourceAddress, amount] as const;
-
-/**
- * Encoder function for ITokenManager.takeToken function data
- */
-export const encodeITokenManagerTakeTokenData = ({
-  sourceAddress,
-  amount,
-}: ITokenManagerTakeTokenArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "takeToken",
-    abi: ABI_FILE.abi,
-    args: [sourceAddress, amount],
-  });
-
 export type ITokenManagerTransferOperatorshipArgs = {
   operator_: `0x${string}`;
 };
@@ -349,74 +320,42 @@ export const encodeITokenManagerTransferOperatorshipData = ({
     args: [operator_],
   });
 
-export type ITokenManagerTransmitInterchainTransferArgs = {
-  sender: `0x${string}`;
-  destinationChain: string;
-  destinationAddress: `0x${string}`;
-  amount: bigint;
-  metadata: `0x${string}`;
-};
-
-/**
- * Factory function for ITokenManager.transmitInterchainTransfer function args
- */
-export const encodeITokenManagerTransmitInterchainTransferArgs = ({
-  sender,
-  destinationChain,
-  destinationAddress,
-  amount,
-  metadata,
-}: ITokenManagerTransmitInterchainTransferArgs) =>
-  [sender, destinationChain, destinationAddress, amount, metadata] as const;
-
-/**
- * Encoder function for ITokenManager.transmitInterchainTransfer function data
- */
-export const encodeITokenManagerTransmitInterchainTransferData = ({
-  sender,
-  destinationChain,
-  destinationAddress,
-  amount,
-  metadata,
-}: ITokenManagerTransmitInterchainTransferArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "transmitInterchainTransfer",
-    abi: ABI_FILE.abi,
-    args: [sender, destinationChain, destinationAddress, amount, metadata],
-  });
-
 export const ITOKEN_MANAGER_ENCODERS = {
   acceptOperatorship: {
     args: encodeITokenManagerAcceptOperatorshipArgs,
     data: encodeITokenManagerAcceptOperatorshipData,
   },
+  addFlowIn: {
+    args: encodeITokenManagerAddFlowInArgs,
+    data: encodeITokenManagerAddFlowInData,
+  },
   addFlowLimiter: {
     args: encodeITokenManagerAddFlowLimiterArgs,
     data: encodeITokenManagerAddFlowLimiterData,
   },
-  callContractWithInterchainToken: {
-    args: encodeITokenManagerCallContractWithInterchainTokenArgs,
-    data: encodeITokenManagerCallContractWithInterchainTokenData,
+  addFlowOut: {
+    args: encodeITokenManagerAddFlowOutArgs,
+    data: encodeITokenManagerAddFlowOutData,
   },
   getTokenAddressFromParams: {
     args: encodeITokenManagerGetTokenAddressFromParamsArgs,
     data: encodeITokenManagerGetTokenAddressFromParamsData,
   },
-  giveToken: {
-    args: encodeITokenManagerGiveTokenArgs,
-    data: encodeITokenManagerGiveTokenData,
-  },
   hasRole: {
     args: encodeITokenManagerHasRoleArgs,
     data: encodeITokenManagerHasRoleData,
   },
-  interchainTransfer: {
-    args: encodeITokenManagerInterchainTransferArgs,
-    data: encodeITokenManagerInterchainTransferData,
+  isFlowLimiter: {
+    args: encodeITokenManagerIsFlowLimiterArgs,
+    data: encodeITokenManagerIsFlowLimiterData,
   },
   isOperator: {
     args: encodeITokenManagerIsOperatorArgs,
     data: encodeITokenManagerIsOperatorData,
+  },
+  params: {
+    args: encodeITokenManagerParamsArgs,
+    data: encodeITokenManagerParamsData,
   },
   proposeOperatorship: {
     args: encodeITokenManagerProposeOperatorshipArgs,
@@ -434,17 +373,9 @@ export const ITOKEN_MANAGER_ENCODERS = {
     args: encodeITokenManagerSetupArgs,
     data: encodeITokenManagerSetupData,
   },
-  takeToken: {
-    args: encodeITokenManagerTakeTokenArgs,
-    data: encodeITokenManagerTakeTokenData,
-  },
   transferOperatorship: {
     args: encodeITokenManagerTransferOperatorshipArgs,
     data: encodeITokenManagerTransferOperatorshipData,
-  },
-  transmitInterchainTransfer: {
-    args: encodeITokenManagerTransmitInterchainTransferArgs,
-    data: encodeITokenManagerTransmitInterchainTransferData,
   },
 };
 
@@ -468,11 +399,23 @@ export function createITokenManagerReadClient(
 
       return publicClient.read("hasRole", { args: encodedArgs });
     },
+    isFlowLimiter(isFlowLimiterArgs: ITokenManagerIsFlowLimiterArgs) {
+      const encoder = ITOKEN_MANAGER_ENCODERS["isFlowLimiter"];
+      const encodedArgs = encoder.args(isFlowLimiterArgs);
+
+      return publicClient.read("isFlowLimiter", { args: encodedArgs });
+    },
     isOperator(isOperatorArgs: ITokenManagerIsOperatorArgs) {
       const encoder = ITOKEN_MANAGER_ENCODERS["isOperator"];
       const encodedArgs = encoder.args(isOperatorArgs);
 
       return publicClient.read("isOperator", { args: encodedArgs });
+    },
+    params(paramsArgs: ITokenManagerParamsArgs) {
+      const encoder = ITOKEN_MANAGER_ENCODERS["params"];
+      const encodedArgs = encoder.args(paramsArgs);
+
+      return publicClient.read("params", { args: encodedArgs });
     },
   };
 }
