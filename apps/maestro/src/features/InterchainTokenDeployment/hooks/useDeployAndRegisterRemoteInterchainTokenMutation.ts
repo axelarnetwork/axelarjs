@@ -4,14 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
 import { parseUnits } from "viem";
-import {
-  useAccount,
-  useChainId,
-  useFeeData,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
-import { NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT } from "~/config/env";
 import {
   useInterchainTokenFactoryInterchainTokenAddress,
   useInterchainTokenFactoryInterchainTokenId,
@@ -35,11 +29,9 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   decimals: number;
   destinationChainIds: string[];
   remoteDeploymentGasFees: bigint[];
-  remoteTransferGasFees: bigint[];
-  originInitialSupply?: bigint;
-  remoteInitialSupply?: bigint;
+  initialSupply?: bigint;
   salt: `0x${string}`;
-  distributorAddress?: `0x${string}`;
+  minterAddress?: `0x${string}`;
 }
 
 export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
@@ -82,8 +74,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       enabled: Boolean(tokenId && input?.salt && deployerAddress),
     });
 
-  const { data: gasEstimate } = useFeeData();
-
   const { originalChainName, destinationChainNames } = useMemo(() => {
     const index = computed.indexedById;
     const originalChainName =
@@ -109,32 +99,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     [input?.decimals]
   );
 
-  const originTransferGas = input?.originInitialSupply
-    ? (gasEstimate?.gasPrice ?? 0n) *
-      BigInt(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT)
-    : 0n;
-
   const multicallArgs = useMemo(() => {
-    const distributor = input?.distributorAddress ?? deployerAddress;
+    const minter = input?.minterAddress ?? deployerAddress;
 
-    if (!input || !distributor || !tokenId) {
+    if (!input || !minter || !tokenId) {
       return [];
     }
 
-    const parsedOriginInitialSupply = Maybe.of(input.originInitialSupply).mapOr(
-      0n,
-      withDecimals
-    );
-
-    const parsedRemoteInitialSupply = Maybe.of(input.remoteInitialSupply).mapOr(
-      0n,
-      withDecimals
-    );
-
-    const totalRemoteSupply =
-      parsedRemoteInitialSupply * BigInt(input.destinationChainIds.length);
-
-    const totalInitialSupply = parsedOriginInitialSupply + totalRemoteSupply;
+    const initialSupply = Maybe.of(input.initialSupply).mapOr(0n, withDecimals);
 
     const baseArgs = {
       salt: input.salt,
@@ -146,25 +118,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...baseArgs,
-        mintAmount: totalInitialSupply,
-        distributor: distributor,
+        initialSupply,
+        minter,
       });
-
-    const transferTxData: `0x${string}`[] = !input.originInitialSupply
-      ? []
-      : [
-          INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
-            tokenId,
-            amount: parsedOriginInitialSupply,
-            destinationAddress: distributor,
-            destinationChain: "",
-            gasValue: originTransferGas,
-          }),
-        ];
 
     if (!input.destinationChainIds.length) {
       // early return case, no remote chains
-      return [deployTxData, ...transferTxData];
+      return [deployTxData];
     }
 
     const registerTxData = destinationChainNames.map((destinationChain, i) =>
@@ -172,32 +132,17 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         originalChainName,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees[i] ?? 0n,
-        distributor: distributor,
+        minter: minter,
         salt: input.salt,
       })
     );
 
-    if (input.remoteInitialSupply) {
-      transferTxData.push(
-        ...destinationChainNames.map((destinationChain, i) =>
-          INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTransfer.data({
-            amount: parsedRemoteInitialSupply,
-            destinationAddress: distributor,
-            destinationChain,
-            tokenId: tokenId,
-            gasValue: input.remoteTransferGasFees[i] ?? 0n,
-          })
-        )
-      );
-    }
-
-    return [deployTxData, ...registerTxData, ...transferTxData];
+    return [deployTxData, ...registerTxData];
   }, [
     input,
     deployerAddress,
     tokenId,
     withDecimals,
-    originTransferGas,
     destinationChainNames,
     originalChainName,
   ]);
@@ -208,19 +153,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       reduce((a, b) => a + b, 0n)
     );
 
-    const remoteTransfersGas = Maybe.of(input?.remoteTransferGasFees).mapOr(
-      0n,
-      reduce((a, b) => a + b, 0n)
-    );
-
     // the total gas fee is the sum of the remote deployments gas fee,
     // the remote transfers gas fee and the origin transfer gas fee
-    return remoteDeploymentsGas + remoteTransfersGas + originTransferGas;
-  }, [
-    input?.remoteDeploymentGasFees,
-    input?.remoteTransferGasFees,
-    originTransferGas,
-  ]);
+    return remoteDeploymentsGas;
+  }, [input?.remoteDeploymentGasFees]);
 
   const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
     chainId,
@@ -251,7 +187,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
-        originalDistributorAddress: deployerAddress,
+        originalMinterAddress: input.minterAddress,
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },

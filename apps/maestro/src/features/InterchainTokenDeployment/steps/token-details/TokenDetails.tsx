@@ -1,5 +1,6 @@
 import {
   Button,
+  cn,
   Dialog,
   EyeIcon,
   EyeOffIcon,
@@ -39,15 +40,7 @@ const TokenDetails: FC = () => {
   const submitHandler: SubmitHandler<TokenDetailsFormState> = (data, e) => {
     e?.preventDefault();
 
-    actions.setTokenDetails({
-      tokenName: data.tokenName,
-      tokenSymbol: data.tokenSymbol,
-      tokenDecimals: data.tokenDecimals,
-      originTokenSupply: data.originTokenSupply,
-      distributor: data.distributor,
-      salt: data.salt,
-    });
-
+    actions.setTokenDetails(data);
     actions.nextStep();
   };
 
@@ -94,13 +87,13 @@ const TokenDetails: FC = () => {
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
-          <Label htmlFor="originTokenSupply">Amount to mint</Label>
+          <Label htmlFor="initialSupply">Amount to mint</Label>
           <ModalFormInput
-            id="originTokenSupply"
+            id="initialSupply"
             placeholder="Enter amount to mint"
             min={0}
             onKeyDown={preventNonNumericInput}
-            {...register("originTokenSupply", {
+            {...register("initialSupply", {
               disabled: isReadonly,
               validate(value) {
                 if (!value || value === "0") {
@@ -111,7 +104,7 @@ const TokenDetails: FC = () => {
               },
             })}
           />
-          {Maybe.of(errors.originTokenSupply).mapOrNull(ValidationError)}
+          {Maybe.of(errors.initialSupply).mapOrNull(ValidationError)}
         </FormControl>
         <div className="grid place-content-center pt-4 md:place-content-end">
           <Button size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
@@ -123,49 +116,44 @@ const TokenDetails: FC = () => {
             )}
           </Button>
         </div>
-        <div>
-          {showAdvanced && (
-            <>
-              <FormControl>
-                <Label htmlFor="distributor">
-                  <Label.Text className="inline-flex items-center gap-1">
-                    Token Distributor
-                    <Tooltip
-                      position="right"
-                      variant="info"
-                      tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer distributorship."
-                    >
-                      <HelpCircleIcon className="text-info mr-1 h-[1em]" />
-                    </Tooltip>
-                  </Label.Text>
-                </Label>
-                <ModalFormInput
-                  id="distributor"
-                  placeholder="Enter token distributor address"
-                  onKeyDown={preventNonHexInput}
-                  defaultValue={state.tokenDetailsForm.getValues("distributor")}
-                  {...register("distributor", {
-                    disabled: isReadonly,
-                  })}
-                />
-                {Maybe.of(errors.distributor).mapOrNull(ValidationError)}
-              </FormControl>
-              <FormControl>
-                <Label htmlFor="salt">Salt</Label>
-                <ModalFormInput
-                  id="salt"
-                  onKeyDown={preventNonHexInput}
-                  defaultValue={state.tokenDetailsForm.getValues("salt")}
-                  {...register("salt", { disabled: isReadonly })}
-                />
-                {Maybe.of(errors.salt).mapOrNull(ValidationError)}
-              </FormControl>
-            </>
-          )}
+        <div className={cn({ hidden: !showAdvanced })}>
+          <FormControl>
+            <Label htmlFor="minter">
+              <Label.Text className="inline-flex items-center gap-1">
+                Token Minter
+                <Tooltip
+                  position="right"
+                  variant="info"
+                  tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer mintership."
+                >
+                  <HelpCircleIcon className="text-info mr-1 h-[1em]" />
+                </Tooltip>
+              </Label.Text>
+            </Label>
+            <ModalFormInput
+              id="minter"
+              placeholder="Enter token minter address"
+              onKeyDown={preventNonHexInput}
+              defaultValue={state.tokenDetailsForm.getValues("minter")}
+              {...register("minter", {
+                disabled: isReadonly,
+              })}
+            />
+            {Maybe.of(errors.minter).mapOrNull(ValidationError)}
+          </FormControl>
+          <FormControl>
+            <Label htmlFor="salt">Salt</Label>
+            <ModalFormInput
+              id="salt"
+              onKeyDown={preventNonHexInput}
+              defaultValue={state.tokenDetailsForm.getValues("salt")}
+              {...register("salt", { disabled: isReadonly })}
+            />
+            {Maybe.of(errors.salt).mapOrNull(ValidationError)}
+          </FormControl>
         </div>
         <button type="submit" ref={formSubmitRef} />
       </form>
-
       <Dialog.Actions>
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit

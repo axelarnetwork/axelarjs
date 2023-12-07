@@ -34,6 +34,11 @@ export default {
           name: "flowAmount",
           type: "uint256",
         },
+        {
+          internalType: "address",
+          name: "tokenManager",
+          type: "address",
+        },
       ],
       name: "FlowLimitExceeded",
       type: "error",
@@ -137,6 +142,11 @@ export default {
         },
       ],
       name: "NotService",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "NotSupported",
       type: "error",
     },
     {
@@ -269,6 +279,19 @@ export default {
     {
       inputs: [
         {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "addFlowIn",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "address",
           name: "flowLimiter",
           type: "address",
@@ -282,29 +305,21 @@ export default {
     {
       inputs: [
         {
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "destinationAddress",
-          type: "bytes",
-        },
-        {
           internalType: "uint256",
           name: "amount",
           type: "uint256",
         },
-        {
-          internalType: "bytes",
-          name: "data",
-          type: "bytes",
-        },
       ],
-      name: "callContractWithInterchainToken",
+      name: "addFlowOut",
       outputs: [],
-      stateMutability: "payable",
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "approveService",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
@@ -382,30 +397,6 @@ export default {
       inputs: [
         {
           internalType: "address",
-          name: "destinationAddress",
-          type: "address",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "giveToken",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "address",
           name: "account",
           type: "address",
         },
@@ -436,7 +427,7 @@ export default {
           type: "uint256",
         },
       ],
-      stateMutability: "pure",
+      stateMutability: "view",
       type: "function",
     },
     {
@@ -455,29 +446,20 @@ export default {
     {
       inputs: [
         {
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "destinationAddress",
-          type: "bytes",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          internalType: "bytes",
-          name: "metadata",
-          type: "bytes",
+          internalType: "address",
+          name: "addr",
+          type: "address",
         },
       ],
-      name: "interchainTransfer",
-      outputs: [],
-      stateMutability: "payable",
+      name: "isFlowLimiter",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
     {
@@ -497,6 +479,30 @@ export default {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "operator_",
+          type: "bytes",
+        },
+        {
+          internalType: "address",
+          name: "tokenAddress_",
+          type: "address",
+        },
+      ],
+      name: "params",
+      outputs: [
+        {
+          internalType: "bytes",
+          name: "params_",
+          type: "bytes",
+        },
+      ],
+      stateMutability: "pure",
       type: "function",
     },
     {
@@ -552,30 +558,6 @@ export default {
       type: "function",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "sourceAddress",
-          type: "address",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "takeToken",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
       inputs: [],
       name: "tokenAddress",
       outputs: [
@@ -599,39 +581,6 @@ export default {
       name: "transferOperatorship",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "address",
-          name: "sender",
-          type: "address",
-        },
-        {
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "destinationAddress",
-          type: "bytes",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          internalType: "bytes",
-          name: "metadata",
-          type: "bytes",
-        },
-      ],
-      name: "transmitInterchainTransfer",
-      outputs: [],
-      stateMutability: "payable",
       type: "function",
     },
   ],

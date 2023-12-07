@@ -13,27 +13,25 @@ import { encodeFunctionData } from "viem";
 import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainToken.abi";
 
-export type InterchainTokenAcceptDistributorshipArgs = {
-  fromDistributor: `0x${string}`;
-};
+export type InterchainTokenAcceptMintershipArgs = { fromMinter: `0x${string}` };
 
 /**
- * Factory function for InterchainToken.acceptDistributorship function args
+ * Factory function for InterchainToken.acceptMintership function args
  */
-export const encodeInterchainTokenAcceptDistributorshipArgs = ({
-  fromDistributor,
-}: InterchainTokenAcceptDistributorshipArgs) => [fromDistributor] as const;
+export const encodeInterchainTokenAcceptMintershipArgs = ({
+  fromMinter,
+}: InterchainTokenAcceptMintershipArgs) => [fromMinter] as const;
 
 /**
- * Encoder function for InterchainToken.acceptDistributorship function data
+ * Encoder function for InterchainToken.acceptMintership function data
  */
-export const encodeInterchainTokenAcceptDistributorshipData = ({
-  fromDistributor,
-}: InterchainTokenAcceptDistributorshipArgs): `0x${string}` =>
+export const encodeInterchainTokenAcceptMintershipData = ({
+  fromMinter,
+}: InterchainTokenAcceptMintershipArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "acceptDistributorship",
+    functionName: "acceptMintership",
     abi: ABI_FILE.abi,
-    args: [fromDistributor],
+    args: [fromMinter],
   });
 
 export type InterchainTokenApproveArgs = {
@@ -167,8 +165,8 @@ export const encodeInterchainTokenIncreaseAllowanceData = ({
   });
 
 export type InterchainTokenInitArgs = {
-  tokenManagerAddress: `0x${string}`;
-  distributor: `0x${string}`;
+  tokenId_: `0x${string}`;
+  minter: `0x${string}`;
   tokenName: string;
   tokenSymbol: string;
   tokenDecimals: number;
@@ -178,26 +176,20 @@ export type InterchainTokenInitArgs = {
  * Factory function for InterchainToken.init function args
  */
 export const encodeInterchainTokenInitArgs = ({
-  tokenManagerAddress,
-  distributor,
+  tokenId_,
+  minter,
   tokenName,
   tokenSymbol,
   tokenDecimals,
 }: InterchainTokenInitArgs) =>
-  [
-    tokenManagerAddress,
-    distributor,
-    tokenName,
-    tokenSymbol,
-    tokenDecimals,
-  ] as const;
+  [tokenId_, minter, tokenName, tokenSymbol, tokenDecimals] as const;
 
 /**
  * Encoder function for InterchainToken.init function data
  */
 export const encodeInterchainTokenInitData = ({
-  tokenManagerAddress,
-  distributor,
+  tokenId_,
+  minter,
   tokenName,
   tokenSymbol,
   tokenDecimals,
@@ -205,13 +197,7 @@ export const encodeInterchainTokenInitData = ({
   encodeFunctionData({
     functionName: "init",
     abi: ABI_FILE.abi,
-    args: [
-      tokenManagerAddress,
-      distributor,
-      tokenName,
-      tokenSymbol,
-      tokenDecimals,
-    ],
+    args: [tokenId_, minter, tokenName, tokenSymbol, tokenDecimals],
   });
 
 export type InterchainTokenInterchainTransferArgs = {
@@ -283,23 +269,23 @@ export const encodeInterchainTokenInterchainTransferFromData = ({
     args: [sender, destinationChain, recipient, amount, metadata],
   });
 
-export type InterchainTokenIsDistributorArgs = { addr: `0x${string}` };
+export type InterchainTokenIsMinterArgs = { addr: `0x${string}` };
 
 /**
- * Factory function for InterchainToken.isDistributor function args
+ * Factory function for InterchainToken.isMinter function args
  */
-export const encodeInterchainTokenIsDistributorArgs = ({
+export const encodeInterchainTokenIsMinterArgs = ({
   addr,
-}: InterchainTokenIsDistributorArgs) => [addr] as const;
+}: InterchainTokenIsMinterArgs) => [addr] as const;
 
 /**
- * Encoder function for InterchainToken.isDistributor function data
+ * Encoder function for InterchainToken.isMinter function data
  */
-export const encodeInterchainTokenIsDistributorData = ({
+export const encodeInterchainTokenIsMinterData = ({
   addr,
-}: InterchainTokenIsDistributorArgs): `0x${string}` =>
+}: InterchainTokenIsMinterArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "isDistributor",
+    functionName: "isMinter",
     abi: ABI_FILE.abi,
     args: [addr],
   });
@@ -372,27 +358,25 @@ export const encodeInterchainTokenPermitData = ({
     args: [issuer, spender, value, deadline, v, r, s],
   });
 
-export type InterchainTokenProposeDistributorshipArgs = {
-  distributor_: `0x${string}`;
-};
+export type InterchainTokenProposeMintershipArgs = { minter_: `0x${string}` };
 
 /**
- * Factory function for InterchainToken.proposeDistributorship function args
+ * Factory function for InterchainToken.proposeMintership function args
  */
-export const encodeInterchainTokenProposeDistributorshipArgs = ({
-  distributor_,
-}: InterchainTokenProposeDistributorshipArgs) => [distributor_] as const;
+export const encodeInterchainTokenProposeMintershipArgs = ({
+  minter_,
+}: InterchainTokenProposeMintershipArgs) => [minter_] as const;
 
 /**
- * Encoder function for InterchainToken.proposeDistributorship function data
+ * Encoder function for InterchainToken.proposeMintership function data
  */
-export const encodeInterchainTokenProposeDistributorshipData = ({
-  distributor_,
-}: InterchainTokenProposeDistributorshipArgs): `0x${string}` =>
+export const encodeInterchainTokenProposeMintershipData = ({
+  minter_,
+}: InterchainTokenProposeMintershipArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "proposeDistributorship",
+    functionName: "proposeMintership",
     abi: ABI_FILE.abi,
-    args: [distributor_],
+    args: [minter_],
   });
 
 export type InterchainTokenTransferArgs = {
@@ -419,29 +403,6 @@ export const encodeInterchainTokenTransferData = ({
     functionName: "transfer",
     abi: ABI_FILE.abi,
     args: [recipient, amount],
-  });
-
-export type InterchainTokenTransferDistributorshipArgs = {
-  distributor_: `0x${string}`;
-};
-
-/**
- * Factory function for InterchainToken.transferDistributorship function args
- */
-export const encodeInterchainTokenTransferDistributorshipArgs = ({
-  distributor_,
-}: InterchainTokenTransferDistributorshipArgs) => [distributor_] as const;
-
-/**
- * Encoder function for InterchainToken.transferDistributorship function data
- */
-export const encodeInterchainTokenTransferDistributorshipData = ({
-  distributor_,
-}: InterchainTokenTransferDistributorshipArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "transferDistributorship",
-    abi: ABI_FILE.abi,
-    args: [distributor_],
   });
 
 export type InterchainTokenTransferFromArgs = {
@@ -473,10 +434,31 @@ export const encodeInterchainTokenTransferFromData = ({
     args: [sender, recipient, amount],
   });
 
+export type InterchainTokenTransferMintershipArgs = { minter_: `0x${string}` };
+
+/**
+ * Factory function for InterchainToken.transferMintership function args
+ */
+export const encodeInterchainTokenTransferMintershipArgs = ({
+  minter_,
+}: InterchainTokenTransferMintershipArgs) => [minter_] as const;
+
+/**
+ * Encoder function for InterchainToken.transferMintership function data
+ */
+export const encodeInterchainTokenTransferMintershipData = ({
+  minter_,
+}: InterchainTokenTransferMintershipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "transferMintership",
+    abi: ABI_FILE.abi,
+    args: [minter_],
+  });
+
 export const INTERCHAIN_TOKEN_ENCODERS = {
-  acceptDistributorship: {
-    args: encodeInterchainTokenAcceptDistributorshipArgs,
-    data: encodeInterchainTokenAcceptDistributorshipData,
+  acceptMintership: {
+    args: encodeInterchainTokenAcceptMintershipArgs,
+    data: encodeInterchainTokenAcceptMintershipData,
   },
   approve: {
     args: encodeInterchainTokenApproveArgs,
@@ -510,9 +492,9 @@ export const INTERCHAIN_TOKEN_ENCODERS = {
     args: encodeInterchainTokenInterchainTransferFromArgs,
     data: encodeInterchainTokenInterchainTransferFromData,
   },
-  isDistributor: {
-    args: encodeInterchainTokenIsDistributorArgs,
-    data: encodeInterchainTokenIsDistributorData,
+  isMinter: {
+    args: encodeInterchainTokenIsMinterArgs,
+    data: encodeInterchainTokenIsMinterData,
   },
   mint: {
     args: encodeInterchainTokenMintArgs,
@@ -522,21 +504,21 @@ export const INTERCHAIN_TOKEN_ENCODERS = {
     args: encodeInterchainTokenPermitArgs,
     data: encodeInterchainTokenPermitData,
   },
-  proposeDistributorship: {
-    args: encodeInterchainTokenProposeDistributorshipArgs,
-    data: encodeInterchainTokenProposeDistributorshipData,
+  proposeMintership: {
+    args: encodeInterchainTokenProposeMintershipArgs,
+    data: encodeInterchainTokenProposeMintershipData,
   },
   transfer: {
     args: encodeInterchainTokenTransferArgs,
     data: encodeInterchainTokenTransferData,
   },
-  transferDistributorship: {
-    args: encodeInterchainTokenTransferDistributorshipArgs,
-    data: encodeInterchainTokenTransferDistributorshipData,
-  },
   transferFrom: {
     args: encodeInterchainTokenTransferFromArgs,
     data: encodeInterchainTokenTransferFromData,
+  },
+  transferMintership: {
+    args: encodeInterchainTokenTransferMintershipArgs,
+    data: encodeInterchainTokenTransferMintershipData,
   },
 };
 
@@ -550,11 +532,11 @@ export function createInterchainTokenReadClient(
 
       return publicClient.read("hasRole", { args: encodedArgs });
     },
-    isDistributor(isDistributorArgs: InterchainTokenIsDistributorArgs) {
-      const encoder = INTERCHAIN_TOKEN_ENCODERS["isDistributor"];
-      const encodedArgs = encoder.args(isDistributorArgs);
+    isMinter(isMinterArgs: InterchainTokenIsMinterArgs) {
+      const encoder = INTERCHAIN_TOKEN_ENCODERS["isMinter"];
+      const encodedArgs = encoder.args(isMinterArgs);
 
-      return publicClient.read("isDistributor", { args: encodedArgs });
+      return publicClient.read("isMinter", { args: encodedArgs });
     },
   };
 }

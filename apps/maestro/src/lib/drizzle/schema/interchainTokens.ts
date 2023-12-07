@@ -36,9 +36,9 @@ export const interchainTokens = pgTable("interchain_tokens", {
     length: ADDRESS_LENGTH,
   }).notNull(),
   tokenManagerAddress: tokenManagerAddress.notNull(),
-  originalDistributorAddress: varchar("original_distributor_address", {
+  originalMinterAddress: varchar("original_minter_address", {
     length: ADDRESS_LENGTH,
-  }).notNull(),
+  }),
   kind: tokenKindEnum("kind").notNull(),
   createdAt,
   updatedAt,

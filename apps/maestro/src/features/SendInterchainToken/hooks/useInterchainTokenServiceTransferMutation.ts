@@ -1,6 +1,6 @@
 import {
   INTERCHAIN_TOKEN_ENCODERS,
-  TOKEN_MANAGER_ENCODERS,
+  INTERCHAIN_TOKEN_SERVICE_ENCODERS,
 } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
@@ -13,8 +13,10 @@ import {
   useInterchainTokenApprove,
   useInterchainTokenDecimals,
 } from "~/lib/contracts/InterchainToken.hooks";
-import { useInterchainTokenServiceTokenManagerAddress } from "~/lib/contracts/InterchainTokenService.hooks";
-import { useTokenManagerInterchainTransfer } from "~/lib/contracts/TokenManager.hooks";
+import {
+  useInterchainTokenServiceInterchainTransfer,
+  useInterchainTokenServiceTokenManagerAddress,
+} from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -32,7 +34,7 @@ export type UseSendInterchainTokenInput = {
   amount: string;
 };
 
-export function useTokenManagerSendTokenMutation(
+export function useInterchainTokenServiceTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
@@ -63,7 +65,7 @@ export function useTokenManagerSendTokenMutation(
     });
 
   const { writeAsync: interchainTransferAsync, data: sendTokenData } =
-    useTokenManagerInterchainTransfer({
+    useInterchainTokenServiceInterchainTransfer({
       address: tokenManagerAddress,
       value: BigInt(gas ?? 0) * BigInt(2),
     });
@@ -86,11 +88,13 @@ export function useTokenManagerSendTokenMutation(
           invariant(address, "need address");
 
           const txResult = await interchainTransferAsync({
-            args: TOKEN_MANAGER_ENCODERS.interchainTransfer.args({
+            args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
+              tokenId: config.tokenId,
               destinationChain: config.destinationChainName,
-              amount: approvedAmountRef.current,
               destinationAddress: address,
+              amount: approvedAmountRef.current,
               metadata: "0x",
+              gasValue: gas ?? 0n,
             }),
           });
           if (txResult?.hash) {

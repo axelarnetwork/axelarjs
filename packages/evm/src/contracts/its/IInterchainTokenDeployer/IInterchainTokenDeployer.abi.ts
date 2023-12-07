@@ -29,13 +29,13 @@ export default {
           type: "bytes32",
         },
         {
-          internalType: "address",
-          name: "tokenManager",
-          type: "address",
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
         },
         {
           internalType: "address",
-          name: "distributor",
+          name: "minter",
           type: "address",
         },
         {

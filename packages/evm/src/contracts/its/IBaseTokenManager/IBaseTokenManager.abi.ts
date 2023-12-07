@@ -32,19 +32,6 @@ export default {
     },
     {
       inputs: [],
-      name: "implementationType",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "pure",
-      type: "function",
-    },
-    {
-      inputs: [],
       name: "interchainTokenId",
       outputs: [
         {

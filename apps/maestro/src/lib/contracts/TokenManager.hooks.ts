@@ -219,6 +219,25 @@ export function useTokenManagerInterchainTokenService<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"isFlowLimiter"`.
+ */
+export function useTokenManagerIsFlowLimiter<
+  TFunctionName extends "isFlowLimiter",
+  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: tokenManagerABI,
+    functionName: "isFlowLimiter",
+    ...config,
+  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"isOperator"`.
  */
 export function useTokenManagerIsOperator<
@@ -233,6 +252,25 @@ export function useTokenManagerIsOperator<
   return useContractRead({
     abi: tokenManagerABI,
     functionName: "isOperator",
+    ...config,
+  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"params"`.
+ */
+export function useTokenManagerParams<
+  TFunctionName extends "params",
+  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
+>(
+  config: Omit<
+    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: tokenManagerABI,
+    functionName: "params",
     ...config,
   } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
 }
@@ -314,6 +352,33 @@ export function useTokenManagerAcceptOperatorship<
 }
 
 /**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowIn"`.
+ */
+export function useTokenManagerAddFlowIn<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof tokenManagerABI,
+          "addFlowIn"
+        >["request"]["abi"],
+        "addFlowIn",
+        TMode
+      > & { functionName?: "addFlowIn" }
+    : UseContractWriteConfig<typeof tokenManagerABI, "addFlowIn", TMode> & {
+        abi?: never;
+        functionName?: "addFlowIn";
+      } = {} as any
+) {
+  return useContractWrite<typeof tokenManagerABI, "addFlowIn", TMode>({
+    abi: tokenManagerABI,
+    functionName: "addFlowIn",
+    ...config,
+  } as any);
+}
+
+/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowLimiter"`.
  */
 export function useTokenManagerAddFlowLimiter<
@@ -345,94 +410,59 @@ export function useTokenManagerAddFlowLimiter<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowOut"`.
  */
-export function useTokenManagerCallContractWithInterchainToken<
+export function useTokenManagerAddFlowOut<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof tokenManagerABI,
-          "callContractWithInterchainToken"
+          "addFlowOut"
         >["request"]["abi"],
-        "callContractWithInterchainToken",
+        "addFlowOut",
         TMode
-      > & { functionName?: "callContractWithInterchainToken" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "callContractWithInterchainToken",
-        TMode
-      > & {
+      > & { functionName?: "addFlowOut" }
+    : UseContractWriteConfig<typeof tokenManagerABI, "addFlowOut", TMode> & {
         abi?: never;
-        functionName?: "callContractWithInterchainToken";
+        functionName?: "addFlowOut";
       } = {} as any
 ) {
-  return useContractWrite<
-    typeof tokenManagerABI,
-    "callContractWithInterchainToken",
-    TMode
-  >({
+  return useContractWrite<typeof tokenManagerABI, "addFlowOut", TMode>({
     abi: tokenManagerABI,
-    functionName: "callContractWithInterchainToken",
+    functionName: "addFlowOut",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"giveToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"approveService"`.
  */
-export function useTokenManagerGiveToken<
+export function useTokenManagerApproveService<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof tokenManagerABI,
-          "giveToken"
+          "approveService"
         >["request"]["abi"],
-        "giveToken",
+        "approveService",
         TMode
-      > & { functionName?: "giveToken" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "giveToken", TMode> & {
-        abi?: never;
-        functionName?: "giveToken";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "giveToken", TMode>({
-    abi: tokenManagerABI,
-    functionName: "giveToken",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTransfer"`.
- */
-export function useTokenManagerInterchainTransfer<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "interchainTransfer"
-        >["request"]["abi"],
-        "interchainTransfer",
-        TMode
-      > & { functionName?: "interchainTransfer" }
+      > & { functionName?: "approveService" }
     : UseContractWriteConfig<
         typeof tokenManagerABI,
-        "interchainTransfer",
+        "approveService",
         TMode
       > & {
         abi?: never;
-        functionName?: "interchainTransfer";
+        functionName?: "approveService";
       } = {} as any
 ) {
-  return useContractWrite<typeof tokenManagerABI, "interchainTransfer", TMode>({
+  return useContractWrite<typeof tokenManagerABI, "approveService", TMode>({
     abi: tokenManagerABI,
-    functionName: "interchainTransfer",
+    functionName: "approveService",
     ...config,
   } as any);
 }
@@ -556,33 +586,6 @@ export function useTokenManagerSetup<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"takeToken"`.
- */
-export function useTokenManagerTakeToken<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "takeToken"
-        >["request"]["abi"],
-        "takeToken",
-        TMode
-      > & { functionName?: "takeToken" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "takeToken", TMode> & {
-        abi?: never;
-        functionName?: "takeToken";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "takeToken", TMode>({
-    abi: tokenManagerABI,
-    functionName: "takeToken",
-    ...config,
-  } as any);
-}
-
-/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transferOperatorship"`.
  */
 export function useTokenManagerTransferOperatorship<
@@ -613,41 +616,6 @@ export function useTokenManagerTransferOperatorship<
   >({
     abi: tokenManagerABI,
     functionName: "transferOperatorship",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
- */
-export function useTokenManagerTransmitInterchainTransfer<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "transmitInterchainTransfer"
-        >["request"]["abi"],
-        "transmitInterchainTransfer",
-        TMode
-      > & { functionName?: "transmitInterchainTransfer" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "transmitInterchainTransfer",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "transmitInterchainTransfer";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof tokenManagerABI,
-    "transmitInterchainTransfer",
-    TMode
-  >({
-    abi: tokenManagerABI,
-    functionName: "transmitInterchainTransfer",
     ...config,
   } as any);
 }
@@ -684,6 +652,22 @@ export function usePrepareTokenManagerAcceptOperatorship(
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowIn"`.
+ */
+export function usePrepareTokenManagerAddFlowIn(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowIn">,
+    "abi" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: tokenManagerABI,
+    functionName: "addFlowIn",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowIn">);
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowLimiter"`.
  */
 export function usePrepareTokenManagerAddFlowLimiter(
@@ -700,54 +684,35 @@ export function usePrepareTokenManagerAddFlowLimiter(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowOut"`.
  */
-export function usePrepareTokenManagerCallContractWithInterchainToken(
+export function usePrepareTokenManagerAddFlowOut(
   config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
-      "callContractWithInterchainToken"
-    >,
+    UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowOut">,
     "abi" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: tokenManagerABI,
-    functionName: "callContractWithInterchainToken",
+    functionName: "addFlowOut",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "callContractWithInterchainToken">);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowOut">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"giveToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"approveService"`.
  */
-export function usePrepareTokenManagerGiveToken(
+export function usePrepareTokenManagerApproveService(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "giveToken">,
+    UsePrepareContractWriteConfig<typeof tokenManagerABI, "approveService">,
     "abi" | "functionName"
   > = {} as any
 ) {
   return usePrepareContractWrite({
     abi: tokenManagerABI,
-    functionName: "giveToken",
+    functionName: "approveService",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "giveToken">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTransfer"`.
- */
-export function usePrepareTokenManagerInterchainTransfer(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "interchainTransfer">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "interchainTransfer",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "interchainTransfer">);
+  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "approveService">);
 }
 
 /**
@@ -818,22 +783,6 @@ export function usePrepareTokenManagerSetup(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"takeToken"`.
- */
-export function usePrepareTokenManagerTakeToken(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "takeToken">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "takeToken",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "takeToken">);
-}
-
-/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transferOperatorship"`.
  */
 export function usePrepareTokenManagerTransferOperatorship(
@@ -850,25 +799,6 @@ export function usePrepareTokenManagerTransferOperatorship(
     functionName: "transferOperatorship",
     ...config,
   } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "transferOperatorship">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
- */
-export function usePrepareTokenManagerTransmitInterchainTransfer(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
-      "transmitInterchainTransfer"
-    >,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "transmitInterchainTransfer",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "transmitInterchainTransfer">);
 }
 
 /**

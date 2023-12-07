@@ -19,6 +19,7 @@ export type IInterchainTokenServiceCallContractWithInterchainTokenArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
   data: `0x${string}`;
+  gasValue: bigint;
 };
 
 /**
@@ -31,8 +32,16 @@ export const encodeIInterchainTokenServiceCallContractWithInterchainTokenArgs =
     destinationAddress,
     amount,
     data,
+    gasValue,
   }: IInterchainTokenServiceCallContractWithInterchainTokenArgs) =>
-    [tokenId, destinationChain, destinationAddress, amount, data] as const;
+    [
+      tokenId,
+      destinationChain,
+      destinationAddress,
+      amount,
+      data,
+      gasValue,
+    ] as const;
 
 /**
  * Encoder function for IInterchainTokenService.callContractWithInterchainToken function data
@@ -44,11 +53,19 @@ export const encodeIInterchainTokenServiceCallContractWithInterchainTokenData =
     destinationAddress,
     amount,
     data,
+    gasValue,
   }: IInterchainTokenServiceCallContractWithInterchainTokenArgs): `0x${string}` =>
     encodeFunctionData({
       functionName: "callContractWithInterchainToken",
       abi: ABI_FILE.abi,
-      args: [tokenId, destinationChain, destinationAddress, amount, data],
+      args: [
+        tokenId,
+        destinationChain,
+        destinationAddress,
+        amount,
+        data,
+        gasValue,
+      ],
     });
 
 export type IInterchainTokenServiceContractCallValueArgs = {
@@ -123,7 +140,7 @@ export type IInterchainTokenServiceDeployInterchainTokenArgs = {
   name: string;
   symbol: string;
   decimals: number;
-  distributor: `0x${string}`;
+  minter: `0x${string}`;
   gasValue: bigint;
 };
 
@@ -136,18 +153,10 @@ export const encodeIInterchainTokenServiceDeployInterchainTokenArgs = ({
   name,
   symbol,
   decimals,
-  distributor,
+  minter,
   gasValue,
 }: IInterchainTokenServiceDeployInterchainTokenArgs) =>
-  [
-    salt,
-    destinationChain,
-    name,
-    symbol,
-    decimals,
-    distributor,
-    gasValue,
-  ] as const;
+  [salt, destinationChain, name, symbol, decimals, minter, gasValue] as const;
 
 /**
  * Encoder function for IInterchainTokenService.deployInterchainToken function data
@@ -158,21 +167,13 @@ export const encodeIInterchainTokenServiceDeployInterchainTokenData = ({
   name,
   symbol,
   decimals,
-  distributor,
+  minter,
   gasValue,
 }: IInterchainTokenServiceDeployInterchainTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployInterchainToken",
     abi: ABI_FILE.abi,
-    args: [
-      salt,
-      destinationChain,
-      name,
-      symbol,
-      decimals,
-      distributor,
-      gasValue,
-    ],
+    args: [salt, destinationChain, name, symbol, decimals, minter, gasValue],
   });
 
 export type IInterchainTokenServiceDeployTokenManagerArgs = {
@@ -556,6 +557,7 @@ export type IInterchainTokenServiceInterchainTransferArgs = {
   destinationAddress: `0x${string}`;
   amount: bigint;
   metadata: `0x${string}`;
+  gasValue: bigint;
 };
 
 /**
@@ -567,8 +569,16 @@ export const encodeIInterchainTokenServiceInterchainTransferArgs = ({
   destinationAddress,
   amount,
   metadata,
+  gasValue,
 }: IInterchainTokenServiceInterchainTransferArgs) =>
-  [tokenId, destinationChain, destinationAddress, amount, metadata] as const;
+  [
+    tokenId,
+    destinationChain,
+    destinationAddress,
+    amount,
+    metadata,
+    gasValue,
+  ] as const;
 
 /**
  * Encoder function for IInterchainTokenService.interchainTransfer function data
@@ -579,11 +589,19 @@ export const encodeIInterchainTokenServiceInterchainTransferData = ({
   destinationAddress,
   amount,
   metadata,
+  gasValue,
 }: IInterchainTokenServiceInterchainTransferArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "interchainTransfer",
     abi: ABI_FILE.abi,
-    args: [tokenId, destinationChain, destinationAddress, amount, metadata],
+    args: [
+      tokenId,
+      destinationChain,
+      destinationAddress,
+      amount,
+      metadata,
+      gasValue,
+    ],
   });
 
 export type IInterchainTokenServiceIsTrustedAddressArgs = {

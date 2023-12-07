@@ -20,8 +20,8 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
-  originTokenSupply: numericString(),
-  distributor: optionalHex40Literal(),
+  initialSupply: numericString(),
+  minter: optionalHex40Literal(),
   salt: hex64Literal(),
 });
 
@@ -51,9 +51,8 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
-    originTokenSupply: "0",
-    remoteTokenSupply: "0",
-    distributor: undefined as `0x${string}` | undefined,
+    initialSupply: "0",
+    minter: undefined as `0x${string}` | undefined,
     salt: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
@@ -90,7 +89,7 @@ function useInterchainTokenDeploymentState(
   /**
    * Generate a random salt on first render
    * and set it as the default value for the form
-   * also set the default value for distributor
+   * also set the default value for minter
    */
   useEffect(
     () => {
@@ -98,7 +97,7 @@ function useInterchainTokenDeploymentState(
 
       unstable_batchedUpdates(() => {
         tokenDetailsForm.setValue("salt", salt);
-        tokenDetailsForm.setValue("distributor", address);
+        tokenDetailsForm.setValue("minter", address);
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,7 +143,7 @@ function useInterchainTokenDeploymentState(
           tokenDetailsForm.reset(initialState.tokenDetails);
 
           tokenDetailsForm.setValue("salt", generateRandomHash());
-          tokenDetailsForm.setValue("distributor", address);
+          tokenDetailsForm.setValue("minter", address);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {
@@ -153,11 +152,6 @@ function useInterchainTokenDeploymentState(
             ...draft.tokenDetails,
             ...detatils,
           };
-        });
-      },
-      setRemoteTokenSupply: (remoteTokenSupply: string) => {
-        setState((draft) => {
-          draft.tokenDetails.remoteTokenSupply = remoteTokenSupply;
         });
       },
       setTxState: (txState: DeployAndRegisterTransactionState) => {

@@ -189,8 +189,8 @@ async function getInterchainToken(
         const isRegistered = !tokenClient
           ? false
           : await tokenClient
-              .read("tokenManager")
-              // attempt to read 'token.tokenManager'
+              .read("interchainTokenService")
+              // attempt to read 'token.interchainTokenService' which will throw if the token is not registered
               .then(() => true)
               // which will throw if the token is not registered
               .catch(() => false);

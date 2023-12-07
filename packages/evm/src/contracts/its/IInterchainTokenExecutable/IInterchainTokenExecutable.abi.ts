@@ -14,6 +14,11 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes32",
+          name: "commandId",
+          type: "bytes32",
+        },
+        {
           internalType: "string",
           name: "sourceChain",
           type: "string",
