@@ -1,5 +1,5 @@
 import { Tabs } from "@axelarjs/ui";
-import React, { useState } from "react";
+import { invert } from "@axelarjs/utils";
 
 import { useAccount } from "wagmi";
 
@@ -9,13 +9,25 @@ import {
   CONTRACT_METHODS,
   ContractMethod,
 } from "~/features/RecentTransactions/types";
+import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import Page from "~/ui/layouts/Page";
 
+const TAB_MAP = {
+  interchainTransfer: "InterchainTransfer",
+  tokenDeployment: "InterchainTokenDeploymentStarted",
+} as const;
+
+const REVERSE_TAB_MAP = invert(TAB_MAP);
+
 const RecentTransactionsPage = () => {
-  const [contractMethod, setContractMethod] =
-    useState<ContractMethod>("InterchainTransfer");
+  const [tab, setTab] = useQueryStringState<keyof typeof TAB_MAP>(
+    "tab",
+    "interchainTransfer"
+  );
 
   const { address } = useAccount();
+
+  const contractMethod = TAB_MAP[tab] as ContractMethod;
 
   return (
     <Page
@@ -30,7 +42,7 @@ const RecentTransactionsPage = () => {
               key={method}
               onClick={(e) => {
                 e.preventDefault();
-                setContractMethod(method);
+                setTab(REVERSE_TAB_MAP[method]);
               }}
               active={contractMethod === method}
             >
