@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.2.0
+
+### Minor Changes
+
+- [`464c9404d102314d0482eca0dccc34c1978b32ce`](https://github.com/axelarnetwork/axelarjs/commit/464c9404d102314d0482eca0dccc34c1978b32ce) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: integrate ITS contracts v1.0.0
+
 ## 0.1.20
 
 ### Patch Changes

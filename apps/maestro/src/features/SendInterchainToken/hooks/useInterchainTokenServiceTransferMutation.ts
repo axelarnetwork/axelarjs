@@ -9,14 +9,12 @@ import { useEffect, useRef } from "react";
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useAccount, useMutation, useWaitForTransaction } from "wagmi";
 
+import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
   useInterchainTokenApprove,
   useInterchainTokenDecimals,
 } from "~/lib/contracts/InterchainToken.hooks";
-import {
-  useInterchainTokenServiceInterchainTransfer,
-  useInterchainTokenServiceTokenManagerAddress,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+import { useInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -53,12 +51,6 @@ export function useInterchainTokenServiceTransferMutation(
     ),
   });
 
-  const { data: tokenManagerAddress } =
-    useInterchainTokenServiceTokenManagerAddress({
-      args: [config.tokenId],
-      enabled: Boolean(config.tokenId),
-    });
-
   const { writeAsync: approveInterchainTokenAsync, data: approveERC20Data } =
     useInterchainTokenApprove({
       address: config.tokenAddress,
@@ -66,7 +58,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { writeAsync: interchainTransferAsync, data: sendTokenData } =
     useInterchainTokenServiceInterchainTransfer({
-      address: tokenManagerAddress,
+      address: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
       value: BigInt(gas ?? 0) * BigInt(2),
     });
 
@@ -97,6 +89,7 @@ export function useInterchainTokenServiceTransferMutation(
               gasValue: gas ?? 0n,
             }),
           });
+
           if (txResult?.hash) {
             setTxState({
               status: "submitted",
@@ -151,8 +144,6 @@ export function useInterchainTokenServiceTransferMutation(
         return;
       }
 
-      invariant(tokenManagerAddress, "need token manager address");
-
       try {
         approvedAmountRef.current = parseUnits(amount, decimals);
 
@@ -163,7 +154,7 @@ export function useInterchainTokenServiceTransferMutation(
 
         await approveInterchainTokenAsync({
           args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-            spender: tokenManagerAddress,
+            spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
             amount: approvedAmountRef.current,
           }),
         });
