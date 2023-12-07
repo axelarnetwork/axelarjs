@@ -42,14 +42,32 @@ export const recordInterchainTokenDeployment = protectedProcedure
       return;
     }
 
-    const remoteTokens = input.destinationAxelarChainIds.map(
-      (axelarChainId) => ({
-        axelarChainId,
-        tokenId: input.tokenId,
-        tokenAddress: input.tokenAddress,
-        deployerAddress: ctx.session!.address,
-        deploymentMessageId: input.deploymentMessageId,
-        deploymentStatus: "pending" as const,
+    const remoteTokens = await Promise.all(
+      input.destinationAxelarChainIds.map(async (axelarChainId) => {
+        const chains = await ctx.configs.evmChains();
+        const configs = chains[axelarChainId];
+
+        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+          configs.wagmi
+        );
+        const [tokenManagerAddress, tokenAddress] = await Promise.all([
+          itsClient.reads.tokenManagerAddress({
+            tokenId: input.tokenId as `0x${string}`,
+          }),
+          itsClient.reads.interchainTokenAddress({
+            tokenId: input.tokenId as `0x${string}`,
+          }),
+        ]);
+
+        return {
+          tokenAddress,
+          axelarChainId,
+          tokenManagerAddress,
+          tokenId: input.tokenId,
+          deployerAddress: input.deployerAddress,
+          deploymentMessageId: input.deploymentMessageId,
+          deploymentStatus: "pending" as const,
+        };
       })
     );
 
