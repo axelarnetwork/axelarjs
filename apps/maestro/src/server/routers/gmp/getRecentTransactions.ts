@@ -1,6 +1,7 @@
 import type { ContractMethod, SearchGMPResponseData } from "@axelarjs/api";
 
 import { TRPCError } from "@trpc/server";
+import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
@@ -45,7 +46,9 @@ export const getRecentTransactions = publicProcedure
         contractMethod: input.contractMethod,
       });
 
-      return response.map(({ call, status, ...tx }) => ({
+      const deduped = uniqBy((tx) => tx.call.transactionHash, response);
+
+      return deduped.map(({ call, status, ...tx }) => ({
         status,
         hash: call.transactionHash,
         blockHash: call.blockHash,
