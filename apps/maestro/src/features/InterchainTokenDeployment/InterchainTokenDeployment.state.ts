@@ -20,7 +20,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
-  originTokenSupply: numericString(),
+  initialSupply: numericString(),
   minter: optionalHex40Literal(),
   salt: hex64Literal(),
 });
