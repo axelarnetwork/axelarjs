@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.1.20
+
+### Patch Changes
+
+- [`a7de397e453da4b6af58a05dda7cb5a0ce490ace`](https://github.com/axelarnetwork/axelarjs/commit/a7de397e453da4b6af58a05dda7cb5a0ce490ace) Thanks [@alanrsoares](https://github.com/alanrsoares)! - feat: upgrade ITS contracts
+
 ## 0.1.19
 
 ### Patch Changes
