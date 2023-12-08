@@ -128,7 +128,7 @@
     "tailwindcss-radix": "^2.8.0",
     "tsup": "^7.3.0",
     "tsx": "^3.14.0",
-    "typescript": "^5.3.2",
+    "typescript": "^5.3.3",
     "vite": "4.4.9",
     "vitest": "^0.34.6",
     "zx": "^7.2.3"
