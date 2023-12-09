@@ -11,7 +11,7 @@ import {
   useWindowSize,
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
-import type { ComponentProps, FC, PropsWithChildren } from "react";
+import type { ComponentProps, FC, PropsWithChildren, ReactNode } from "react";
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
@@ -87,16 +87,15 @@ export const ValidationError: FC<FieldError> = ({ message }) => (
 
 export type StepsSummaryProps = {
   currentStep: number;
+  steps: string[];
 };
-
-const STEPS = ["Token details", "Deploy & Register", "Review"];
 
 export const StepsSummary: FC<StepsSummaryProps> = (
   props: StepsSummaryProps
 ) => {
   return (
     <Steps className="my-6 h-20 w-full text-sm sm:my-10 sm:h-24">
-      {STEPS.map((step, index) => (
+      {props.steps.map((step, index) => (
         <Steps.Step key={step} active={props.currentStep >= index}>
           {step}
         </Steps.Step>
@@ -129,10 +128,13 @@ export type ProtectedDialogProps = PropsWithChildren<{
   step: number;
   triggerLabel?: string;
   onClose: DialogProps["onClose"];
+  steps: string[];
+  title?: ReactNode;
 }>;
 
 export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   triggerLabel,
+  steps,
   ...props
 }) => {
   const { status, data } = useSession();
@@ -153,19 +155,25 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     >
       <Dialog.Body $as="section">
         <Dialog.CornerCloseAction onClick={props.onClose} />
-        <Dialog.Title className="flex items-center gap-1 sm:gap-2">
-          {props.showBackButton && <BackButton onClick={props.onBackClick} />}
-          <span
-            className={cn("-translate-y-2", { "ml-14": props.showBackButton })}
-          >
-            Register <span className="hidden sm:inline">origin</span> token on:{" "}
-          </span>
-          <ChainsDropdown
-            disabled={props.disableChainsDropdown}
-            shift={props.showBackButton}
-          />
-        </Dialog.Title>
-        <StepsSummary currentStep={props.step} />
+
+        {props.title ?? (
+          <Dialog.Title className="flex items-center gap-1 sm:gap-2">
+            {props.showBackButton && <BackButton onClick={props.onBackClick} />}
+            <span
+              className={cn("-translate-y-2", {
+                "ml-14": props.showBackButton,
+              })}
+            >
+              Register <span className="hidden sm:inline">origin</span> token
+              on:{" "}
+            </span>
+            <ChainsDropdown
+              disabled={props.disableChainsDropdown}
+              shift={props.showBackButton}
+            />
+          </Dialog.Title>
+        )}
+        <StepsSummary currentStep={props.step} steps={steps} />
         {isSignedIn ? props.children : <ConnectWalletButton />}
       </Dialog.Body>
     </Dialog>

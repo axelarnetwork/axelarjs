@@ -35,6 +35,7 @@ const CanonicalTokenDeployment: FC = () => {
   return (
     <MultiStepDialog
       triggerLabel="Register interchain token"
+      steps={["Token details", "Register & Deploy", "Review"]}
       step={state.step}
       showBackButton={showBackButton}
       onBackClick={actions.prevStep}
