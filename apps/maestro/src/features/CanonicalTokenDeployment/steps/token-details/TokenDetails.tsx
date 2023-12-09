@@ -41,7 +41,7 @@ const TokenDetails: FC = () => {
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
         </Dialog.CloseAction>
-        <NextButton onClick={actions.nextStep}>Register token</NextButton>
+        <NextButton onClick={actions.nextStep}>Deploy & Register</NextButton>
       </Dialog.Actions>
     </>
   );

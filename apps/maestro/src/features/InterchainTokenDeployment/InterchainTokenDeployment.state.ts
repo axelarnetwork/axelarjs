@@ -1,7 +1,6 @@
 import { generateRandomHash } from "@axelarjs/utils";
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect } from "react";
-import { unstable_batchedUpdates } from "react-dom";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +20,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenSymbol: z.string().min(1).max(11),
   tokenDecimals: z.coerce.number().min(1).max(18),
   initialSupply: numericString(),
+  isMintable: z.boolean(),
   minter: optionalHex40Literal(),
   salt: hex64Literal(),
 });
@@ -52,7 +52,8 @@ export const INITIAL_STATE = {
     tokenDecimals: 18,
     tokenAddress: undefined as `0x${string}` | undefined,
     initialSupply: "0",
-    minter: undefined as `0x${string}` | undefined,
+    isMintable: false,
+    minter: "" as `0x${string}` | undefined,
     salt: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
@@ -95,10 +96,7 @@ function useInterchainTokenDeploymentState(
     () => {
       const salt = generateRandomHash();
 
-      unstable_batchedUpdates(() => {
-        tokenDetailsForm.setValue("salt", salt);
-        tokenDetailsForm.setValue("minter", address);
-      });
+      tokenDetailsForm.setValue("salt", salt);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [address]
@@ -130,7 +128,6 @@ function useInterchainTokenDeploymentState(
     state: {
       ...state,
       // computed state
-      isPreExistingToken: Boolean(state.tokenDetails.tokenAddress),
       selectedChains: uniq(state.selectedChains),
       tokenDetailsForm,
     },
@@ -143,7 +140,7 @@ function useInterchainTokenDeploymentState(
           tokenDetailsForm.reset(initialState.tokenDetails);
 
           tokenDetailsForm.setValue("salt", generateRandomHash());
-          tokenDetailsForm.setValue("minter", address);
+          // tokenDetailsForm.setValue("minter", address);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {
@@ -183,6 +180,31 @@ function useInterchainTokenDeploymentState(
       },
       nextStep: () => setState((draft) => draft.step++),
       prevStep: () => setState((draft) => draft.step--),
+      generateRandomSalt: () => {
+        setState((draft) => {
+          const salt = generateRandomHash();
+          draft.tokenDetails.salt = salt;
+          tokenDetailsForm.setValue("salt", salt);
+        });
+      },
+      setCurrentAddressAsMinter: () => {
+        setState((draft) => {
+          draft.tokenDetails.minter = address;
+          tokenDetailsForm.setValue("minter", address);
+        });
+      },
+      resetIsMintable: () => {
+        setState((draft) => {
+          draft.tokenDetails.isMintable = false;
+          tokenDetailsForm.setValue("isMintable", false);
+        });
+      },
+      resetMinter: () => {
+        setState((draft) => {
+          draft.tokenDetails.minter = "" as `0x${string}`;
+          tokenDetailsForm.setValue("minter", "" as `0x${string}`);
+        });
+      },
     },
   };
 }
