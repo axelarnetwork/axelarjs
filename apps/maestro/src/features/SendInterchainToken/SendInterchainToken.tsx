@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { formatUnits, parseUnits } from "viem";
@@ -12,6 +12,7 @@ import { preventNonNumericInput } from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
+import { useTransactionsContainer } from "../Transactions";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
@@ -44,6 +45,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     originTokenAddress: props.originTokenAddress,
     originTokenChainId: props.originTokenChainId,
   });
+
+  const [, { addTransaction }] = useTransactionsContainer();
 
   const {
     register,
@@ -120,15 +123,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [state.txState.status]
   );
 
+  useEffect(() => {
+    if (state.txState.status === "submitted") {
+      addTransaction({
+        status: "submitted",
+        hash: state.txState.hash,
+        chainId: props.sourceChain.chain_id,
+      });
+    }
+  }, [addTransaction, props.sourceChain, state.txState]);
+
   return (
     <Modal
       trigger={props.trigger}
       open={state.isModalOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          if (isFormDisabled) {
-            return;
-          }
           props.onClose?.();
           resetForm();
           actions.resetTxState();
