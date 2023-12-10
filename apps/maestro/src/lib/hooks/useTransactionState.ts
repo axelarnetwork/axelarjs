@@ -8,9 +8,26 @@ export type UnsubmittedTransactionState =
   | { status: "awaiting_approval" };
 
 export type SubmittedTransactionState<TError = Error> =
-  | { status: "submitted"; hash: `0x${string}` }
-  | { status: "confirmed"; receipt: TransactionReceipt; hash?: `0x${string}` }
-  | { status: "reverted"; error: TError; hash?: `0x${string}` };
+  | {
+      status: "submitted";
+      hash: `0x${string}`;
+      chainId: number;
+      isGMP?: boolean;
+    }
+  | {
+      status: "confirmed";
+      receipt: TransactionReceipt;
+      hash: `0x${string}`;
+      chainId: number;
+      isGMP?: boolean;
+    }
+  | {
+      status: "reverted";
+      error: TError;
+      hash: `0x${string}`;
+      chainId: number;
+      isGMP?: boolean;
+    };
 
 export type TransactionState<TError = Error> =
   | UnsubmittedTransactionState
