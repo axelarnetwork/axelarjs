@@ -56,8 +56,6 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       setTxState({
         status: "confirmed",
         receipt,
-        hash: acceptResult.hash,
-        chainId: props.sourceChain.chain_id,
       });
 
       toast.success("Successfully accepted token ownership");

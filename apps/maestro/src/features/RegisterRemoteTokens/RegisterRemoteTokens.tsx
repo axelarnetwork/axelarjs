@@ -94,8 +94,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       setTxState({
         status: "confirmed",
         receipt,
-        hash: receipt.transactionHash,
-        chainId: props.originChainId ?? -1,
       });
     },
   });

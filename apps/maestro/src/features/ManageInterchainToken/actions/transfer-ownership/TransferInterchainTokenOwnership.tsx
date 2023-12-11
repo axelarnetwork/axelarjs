@@ -68,8 +68,6 @@ export const TransferInterchainTokenOwnership: FC = () => {
       setTxState({
         status: "confirmed",
         receipt,
-        chainId,
-        hash: transferResult.hash,
       });
 
       toast.success("Successfully transferred token ownership");

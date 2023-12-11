@@ -18,7 +18,7 @@ export type SubmittedTransactionState<TError = Error> =
       status: "confirmed";
       receipt: TransactionReceipt;
       hash?: `0x${string}`;
-      chainId: number;
+      chainId?: number;
       isGMP?: boolean;
     }
   | {
