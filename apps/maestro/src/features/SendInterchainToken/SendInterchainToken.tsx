@@ -12,7 +12,6 @@ import { preventNonNumericInput } from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
-import { useTransactionsContainer } from "../Transactions";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
@@ -45,8 +44,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     originTokenAddress: props.originTokenAddress,
     originTokenChainId: props.originTokenChainId,
   });
-
-  const [, { addTransaction }] = useTransactionsContainer();
 
   const {
     register,
@@ -125,13 +122,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   useEffect(() => {
     if (state.txState.status === "submitted") {
-      addTransaction({
+      actions.addTransaction({
         status: "submitted",
         hash: state.txState.hash,
         chainId: props.sourceChain.chain_id,
       });
     }
-  }, [addTransaction, props.sourceChain, state.txState]);
+  }, [actions, props.sourceChain, state.txState]);
 
   return (
     <Modal
