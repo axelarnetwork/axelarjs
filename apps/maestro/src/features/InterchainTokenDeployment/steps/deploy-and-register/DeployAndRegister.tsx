@@ -36,7 +36,7 @@ export const Step3: FC = () => {
         onStatusUpdate(txState) {
           if (txState.type === "deployed") {
             rootActions.setTxState(txState);
-            rootActions.setStep(2);
+            rootActions.setStep(3);
             actions.setIsDeploying(false);
             return;
           }
