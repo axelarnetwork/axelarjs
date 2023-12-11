@@ -15,6 +15,8 @@ export const {
     if (!tx.hash) return;
 
     setTransactions((draft) => {
+      if (!tx.hash) return;
+
       const prev = draft[tx.hash];
 
       draft[tx.hash] = {

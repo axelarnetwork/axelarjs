@@ -53,6 +53,8 @@ export function useMintInterchainTokenState() {
       setTxState({
         status: "confirmed",
         receipt,
+        hash: mintResult.hash,
+        chainId,
       });
 
       toast.success("Successfully minted interchain tokens");

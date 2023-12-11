@@ -11,7 +11,7 @@ import { useCallback, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { isAddress, TransactionExecutionError } from "viem";
-import { useWaitForTransaction } from "wagmi";
+import { useChainId, useWaitForTransaction } from "wagmi";
 
 import { useInterchainTokenServiceTransferOperatorship } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
@@ -26,6 +26,7 @@ type FormState = {
 export const TransferInterchainTokenOwnership: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
+  const chainId = useChainId();
 
   const { register, handleSubmit, formState, getValues } = useForm<FormState>({
     defaultValues: {
@@ -67,6 +68,8 @@ export const TransferInterchainTokenOwnership: FC = () => {
       setTxState({
         status: "confirmed",
         receipt,
+        chainId,
+        hash: transferResult.hash,
       });
 
       toast.success("Successfully transferred token ownership");
@@ -89,7 +92,8 @@ export const TransferInterchainTokenOwnership: FC = () => {
         if (txResult?.hash) {
           setTxState({
             status: "submitted",
-            hash: txResult?.hash,
+            chainId,
+            hash: txResult.hash,
           });
         }
       } catch (error) {
@@ -113,7 +117,7 @@ export const TransferInterchainTokenOwnership: FC = () => {
         });
       }
     },
-    [setTxState, transferOwnershipAsync]
+    [chainId, setTxState, transferOwnershipAsync]
   );
 
   const buttonChildren = useMemo(() => {

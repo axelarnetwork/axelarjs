@@ -165,9 +165,14 @@ const Transactions = () => {
           <HourglassIcon size={16} />
         </div>
       )}
-      {state.pendingTransactions.map((tx) => (
-        <GMPTransaction key={tx.hash} txHash={tx.hash} chainId={tx.chainId} />
-      ))}
+      {state.pendingTransactions.map((tx) => {
+        if (!tx.hash || !tx.chainId) {
+          return null;
+        }
+        return (
+          <GMPTransaction key={tx.hash} txHash={tx.hash} chainId={tx.chainId} />
+        );
+      })}
     </>
   );
 };

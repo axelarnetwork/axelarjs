@@ -78,6 +78,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
         setTxState({
           status: "submitted",
           hash: tx.hash,
+          chainId: sourceChain.chain_id,
         });
       },
       onTransactionError(error) {

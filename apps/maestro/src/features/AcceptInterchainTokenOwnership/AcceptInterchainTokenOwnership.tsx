@@ -56,6 +56,8 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       setTxState({
         status: "confirmed",
         receipt,
+        hash: acceptResult.hash,
+        chainId: props.sourceChain.chain_id,
       });
 
       toast.success("Successfully accepted token ownership");
@@ -73,7 +75,8 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       if (txResult?.hash) {
         setTxState({
           status: "submitted",
-          hash: txResult?.hash,
+          hash: txResult.hash,
+          chainId: props.sourceChain.chain_id,
         });
       }
     } catch (error) {
@@ -90,7 +93,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
         error: error as Error,
       });
     }
-  }, [setTxState, acceptOwnershipAsync]);
+  }, [setTxState, acceptOwnershipAsync, props.sourceChain.chain_id]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
