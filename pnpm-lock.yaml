@@ -287,8 +287,8 @@ importers:
         specifier: ^3.3.5
         version: 3.3.5(ts-node@10.9.1)
       tsx:
-        specifier: ^3.14.0
-        version: 3.14.0
+        specifier: ^4.6.2
+        version: 4.6.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -789,8 +789,8 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0(postcss@8.4.31)(ts-node@10.9.1)(typescript@5.3.3)
       tsx:
-        specifier: ^3.14.0
-        version: 3.14.0
+        specifier: ^4.6.2
+        version: 4.6.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -19092,17 +19092,6 @@ packages:
       typescript: 5.3.3
     dev: true
 
-  /tsx@3.14.0:
-    resolution: {integrity: sha512-xHtFaKtHxM9LOklMmJdI3BEnQq/D5F73Of2E1GDrITi9sgoVkvIsrQUTY1G8FlmGtA+awCI4EBlTRRYxkL2sRg==}
-    hasBin: true
-    dependencies:
-      esbuild: 0.18.20
-      get-tsconfig: 4.7.2
-      source-map-support: 0.5.21
-    optionalDependencies:
-      fsevents: 2.3.3
-    dev: true
-
   /tsx@4.6.2:
     resolution: {integrity: sha512-QPpBdJo+ZDtqZgAnq86iY/PD2KYCUPSUGIunHdGwyII99GKH+f3z3FZ8XNFLSGQIA4I365ui8wnQpl8OKLqcsg==}
     engines: {node: '>=18.0.0'}
@@ -19112,7 +19101,6 @@ packages:
       get-tsconfig: 4.7.2
     optionalDependencies:
       fsevents: 2.3.3
-    dev: false
 
   /tty-table@4.2.1:
     resolution: {integrity: sha512-xz0uKo+KakCQ+Dxj1D/tKn2FSyreSYWzdkL/BYhgN6oMW808g8QRMuh1atAV9fjTPbWBjfbkKQpI/5rEcnAc7g==}
