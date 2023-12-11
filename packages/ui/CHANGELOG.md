@@ -1,5 +1,11 @@
 # @axelarjs/ui
 
+## 0.1.6
+
+### Patch Changes
+
+- [#103](https://github.com/axelarnetwork/axelarjs/pull/103) [`517734ae8d6643ee9d39f4ed53beda4434e4c193`](https://github.com/axelarnetwork/axelarjs/commit/517734ae8d6643ee9d39f4ed53beda4434e4c193) Thanks [@canhtrinh](https://github.com/canhtrinh)! - update tsx dependency
+
 ## 0.1.5
 
 ### Patch Changes
