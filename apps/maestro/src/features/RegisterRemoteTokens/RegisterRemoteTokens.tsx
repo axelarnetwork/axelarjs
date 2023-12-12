@@ -1,9 +1,8 @@
-import { Button, ExternalLinkIcon, LinkButton } from "@axelarjs/ui";
+import { Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 
 import {
   useTransactionState,
@@ -13,8 +12,6 @@ import { logger } from "~/lib/logger";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import { useTransactionsContainer } from "../Transactions";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
@@ -23,7 +20,6 @@ export type RegisterRemoteTokensProps = {
   chainIds: number[];
   originChainId?: number;
   onTxStateChange?: (status: TransactionState) => void;
-  existingTxHash?: `0x${string}` | null;
   deploymentKind: "canonical" | "interchain" | "custom";
 };
 
@@ -43,53 +39,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     trpc.interchainToken.recordRemoteTokensDeployment.useMutation();
 
   const { computed } = useEVMChainConfigsQuery();
-
-  const txHash = useMemo(() => {
-    if (txState.status === "submitted") {
-      return txState.hash;
-    }
-    return props.existingTxHash;
-  }, [txState, props.existingTxHash]);
-
-  const [, { addTransaction }] = useTransactionsContainer();
-
-  const chainId = useChainId();
-
-  useEffect(() => {
-    // track tx hash
-    if (!txHash) return;
-
-    addTransaction({
-      hash: txHash,
-      chainId,
-      status: "submitted",
-    });
-  }, [addTransaction, chainId, txHash]);
-
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash:
-      txState.status === "submitted"
-        ? txState.hash
-        : props.existingTxHash ?? undefined,
-  });
-
-  const pendingChains = useMemo(
-    () =>
-      statuses
-        ? props.chainIds.filter(
-            (chainId) => statuses[chainId]?.status !== "executed"
-          )
-        : undefined,
-    [props.chainIds, statuses]
-  );
-
-  const pendingChainsLength = pendingChains?.length ?? -1;
-
-  useEffect(() => {
-    if (pendingChainsLength === 0) {
-      toast.success("Remote tokens registered");
-    }
-  }, [pendingChainsLength]);
 
   useWaitForTransaction({
     hash: txState.status === "submitted" ? txState.hash : undefined,
@@ -187,32 +136,19 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         return "Confirm on wallet";
       case "submitted":
         return "Registering remote tokens";
+      default:
+        return txState.status;
     }
   }, [props.chainIds.length, txState.status]);
 
   return (
-    <>
-      {txHash ? (
-        <LinkButton
-          variant="accent"
-          outline
-          href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
-          className="flex items-center gap-2"
-          target="_blank"
-        >
-          View on Axelarscan {maskAddress(txHash)}{" "}
-          <ExternalLinkIcon className="h-4 w-4" />
-        </LinkButton>
-      ) : (
-        <Button
-          onClick={handleClick}
-          disabled={!registerTokensAsync}
-          variant="primary"
-          loading={txState.status === "awaiting_approval"}
-        >
-          {buttonChildren}
-        </Button>
-      )}
-    </>
+    <Button
+      onClick={handleClick}
+      disabled={!registerTokensAsync}
+      variant="primary"
+      loading={txState.status === "awaiting_approval"}
+    >
+      {buttonChildren}
+    </Button>
   );
 };

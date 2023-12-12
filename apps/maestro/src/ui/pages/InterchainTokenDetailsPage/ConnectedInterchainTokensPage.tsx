@@ -11,6 +11,7 @@ import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
+import { useTransactionsContainer } from "~/features/Transactions";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -233,7 +234,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const { switchNetworkAsync } = useSwitchNetwork();
 
-  const isReadOnly = !interchainToken.wasDeployedByAccount || !address;
+  const isReadOnly =
+    !interchainToken.wasDeployedByAccount ||
+    !address ||
+    isGasPriceQueryLoading ||
+    !hasFetchedStatuses;
 
   const shouldRenderFooter =
     !isReadOnly && sessionState.selectedChainIds.length > 0;
@@ -273,6 +278,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     ]
   );
 
+  const [, { addTransaction }] = useTransactionsContainer();
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -309,11 +316,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           isReadOnly
             ? undefined
             : (chainId) => {
-                if (sessionState.deployTokensTxHashes.length) {
-                  console.log("already deploying tokens");
-                  return;
-                }
-
                 setSessionState((draft) => {
                   draft.selectedChainIds = draft.selectedChainIds.includes(
                     chainId
@@ -358,14 +360,19 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   chainIds={sessionState.selectedChainIds}
                   tokenAddress={props.tokenAddress}
                   originChainId={originToken?.chainId}
-                  existingTxHash={sessionState.deployTokensTxHashes[0]}
                   onTxStateChange={(txState) => {
                     if (txState.status === "submitted") {
                       setSessionState((draft) => {
+                        draft.selectedChainIds = [];
                         draft.deployTokensTxHashes = uniq([
                           ...draft.deployTokensTxHashes,
                           txState.hash,
                         ]);
+                      });
+                      addTransaction({
+                        status: "submitted",
+                        hash: txState.hash,
+                        chainId: originToken.chainId,
                       });
                     }
                   }}
