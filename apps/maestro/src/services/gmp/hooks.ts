@@ -125,3 +125,62 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
     }, [data]),
   };
 }
+
+export function useGetTransactionsStatusesOnDestinationChainsQuery(
+  input: {
+    txHashes?: `0x${string}`[];
+  },
+  options?: {
+    enabled?: boolean;
+    refetchInterval?: number;
+  }
+) {
+  const { data, ...query } = useQuery(
+    ["gmp-get-transactions-statuses-on-destination-chains", input.txHashes],
+    async () => {
+      const results = await Promise.all(
+        input.txHashes?.map((txHash) => gmpClient.searchGMP({ txHash })) ?? []
+      );
+
+      return results.flat().reduce(
+        (acc, { call, status }) => ({
+          ...acc,
+          [call.returnValues.destinationChain.toLowerCase()]: {
+            status,
+            txHash: call.transactionHash,
+            logIndex: call.logIndex,
+            txId: call.id,
+          },
+        }),
+        {} as {
+          [chainId: string]: {
+            status: GMPTxStatus;
+            txHash: `0x${string}`;
+            logIndex: number;
+            txId?: string;
+          };
+        }
+      );
+    },
+    {
+      enabled: Boolean(
+        input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
+      ),
+      refetchInterval: 1000 * 10, // 10 seconds
+      ...options,
+    }
+  );
+
+  return {
+    ...query,
+    data: data ?? {},
+    computed: useMemo(() => {
+      const statuses = Object.values(data ?? {});
+
+      return {
+        chains: statuses.length,
+        executed: statuses.filter((x) => x.status === "executed").length,
+      };
+    }, [data]),
+  };
+}

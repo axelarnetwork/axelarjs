@@ -19,6 +19,10 @@ export const {
 
       const prev = draft[tx.hash];
 
+      const isSame = prev?.hash === tx.hash && prev?.status === tx.status;
+
+      if (isSame) return;
+
       draft[tx.hash] = {
         ...(prev ?? {}),
         ...tx,

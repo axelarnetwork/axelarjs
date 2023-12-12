@@ -83,11 +83,13 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     [props.chainIds, statuses]
   );
 
+  const pendingChainsLength = pendingChains?.length ?? -1;
+
   useEffect(() => {
-    if (pendingChains && pendingChains.length === 0) {
+    if (pendingChainsLength === 0) {
       toast.success("Remote tokens registered");
     }
-  }, [pendingChains]);
+  }, [pendingChainsLength]);
 
   useWaitForTransaction({
     hash: txState.status === "submitted" ? txState.hash : undefined,
@@ -188,25 +190,29 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     }
   }, [props.chainIds.length, txState.status]);
 
-  return txHash ? (
-    <LinkButton
-      variant="accent"
-      outline
-      href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
-      className="flex items-center gap-2"
-      target="_blank"
-    >
-      View on Axelarscan {maskAddress(txHash)}{" "}
-      <ExternalLinkIcon className="h-4 w-4" />
-    </LinkButton>
-  ) : (
-    <Button
-      onClick={handleClick}
-      disabled={!registerTokensAsync}
-      variant="primary"
-      loading={txState.status === "awaiting_approval"}
-    >
-      {buttonChildren}
-    </Button>
+  return (
+    <>
+      {txHash ? (
+        <LinkButton
+          variant="accent"
+          outline
+          href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+          className="flex items-center gap-2"
+          target="_blank"
+        >
+          View on Axelarscan {maskAddress(txHash)}{" "}
+          <ExternalLinkIcon className="h-4 w-4" />
+        </LinkButton>
+      ) : (
+        <Button
+          onClick={handleClick}
+          disabled={!registerTokensAsync}
+          variant="primary"
+          loading={txState.status === "awaiting_approval"}
+        >
+          {buttonChildren}
+        </Button>
+      )}
+    </>
   );
 };
