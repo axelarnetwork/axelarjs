@@ -37,8 +37,10 @@ type InterchainTokenDetailsPageSessionStorageProps = {
 };
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (
-  props: InterchainTokenDetailsPageSessionStorageProps
-) => `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}`;
+  props: InterchainTokenDetailsPageSessionStorageProps,
+  version = 1
+) =>
+  `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
 
 export type InterchainTokenDetailsPageState = {
   deployTokensTxHashes: `0x${string}`[];
