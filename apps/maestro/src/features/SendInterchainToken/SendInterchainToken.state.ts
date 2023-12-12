@@ -129,7 +129,7 @@ export function useSendInterchainTokenState(props: {
       sendTokenAsync,
       selectToChain,
       refetchBalances,
-      addTransaction,
+      trackTransaction: addTransaction,
     },
   ] as const;
 }

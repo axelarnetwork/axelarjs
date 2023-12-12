@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { DISABLED_CHAINS, IS_STAGING } from "~/config/app";
 import { publicProcedure } from "~/server/trpc";
 
 const evmChainConfigSchema = z.object({
@@ -70,10 +69,9 @@ export const getEVMChainConfigs = publicProcedure
   .output(z.array(evmChainConfigSchema))
   .query(async ({ ctx, input }) => {
     try {
-      const { evm } = await ctx.services.axelarscan.getChainConfigs({
-        disabledChains: DISABLED_CHAINS,
-        isStaging: IS_STAGING,
-      });
+      const chainsMap = await ctx.configs.evmChains();
+
+      const evm = Object.values(chainsMap).map((chain) => chain.info);
 
       return evm.filter(
         (chain) =>
