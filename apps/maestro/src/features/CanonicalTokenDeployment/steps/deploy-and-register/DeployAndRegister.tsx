@@ -14,6 +14,7 @@ import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
+import { useTransactionsContainer } from "~/features/Transactions";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
@@ -54,6 +55,8 @@ export const Step3: FC = () => {
       }
     );
 
+  const [, { addTransaction }] = useTransactionsContainer();
+
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (e) => {
       e.preventDefault();
@@ -84,6 +87,12 @@ export const Step3: FC = () => {
             type: "deploying",
             txHash: tx.hash,
           });
+
+          addTransaction({
+            status: "submitted",
+            hash: tx.hash,
+            chainId: sourceChain.chain_id,
+          });
         },
         onTransactionError(txError) {
           rootActions.setTxState({
@@ -103,6 +112,7 @@ export const Step3: FC = () => {
       actions,
       sourceChain,
       rootActions,
+      addTransaction,
     ]
   );
 

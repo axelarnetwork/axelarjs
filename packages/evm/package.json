@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/evm",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publishConfig": {
     "access": "public"
   },
@@ -46,8 +46,8 @@
   "dependencies": {
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
+    "tsx": "^4.6.2",
     "viem": "^1.19.11",
-    "tsx": "^3.14.0",
     "zx": "^7.2.3"
   },
   "devDependencies": {

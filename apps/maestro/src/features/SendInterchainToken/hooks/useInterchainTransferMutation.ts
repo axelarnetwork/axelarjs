@@ -2,7 +2,7 @@ import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useMutation } from "wagmi";
+import { useAccount, useChainId, useMutation } from "wagmi";
 
 import {
   useInterchainTokenDecimals,
@@ -31,6 +31,8 @@ export function useInterchainTransferMutation(
   const { data: decimals } = useInterchainTokenDecimals({
     address: config.tokenAddress,
   });
+
+  const chainId = useChainId();
 
   const { address } = useAccount();
 
@@ -72,6 +74,7 @@ export function useInterchainTransferMutation(
           setTxState({
             status: "submitted",
             hash: txResult.hash,
+            chainId,
           });
         }
       } catch (error) {

@@ -80,6 +80,7 @@ export default function useRegisterRemoteInterchainTokens(
   const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
+    enabled: multicallArgs.length > 0,
   });
 
   return useInterchainTokenFactoryMulticall(config);

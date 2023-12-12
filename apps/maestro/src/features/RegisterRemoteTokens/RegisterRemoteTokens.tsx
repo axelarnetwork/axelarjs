@@ -141,6 +141,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         setTxState({
           status: "submitted",
           hash: tx.hash,
+          chainId: props.originChainId ?? -1,
         });
       },
       onTransactionError(error) {

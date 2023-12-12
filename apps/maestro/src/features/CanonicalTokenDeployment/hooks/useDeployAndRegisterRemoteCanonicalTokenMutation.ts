@@ -128,6 +128,9 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     chainId,
     value: totalGasFee,
     args: [multicallArgs],
+    enabled:
+      multicallArgs.length > 0 &&
+      (totalGasFee === undefined || totalGasFee > 0n),
   });
 
   const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);

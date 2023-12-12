@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { formatUnits, parseUnits } from "viem";
@@ -120,15 +120,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [state.txState.status]
   );
 
+  useEffect(() => {
+    if (state.txState.status === "submitted") {
+      actions.addTransaction({
+        status: "submitted",
+        hash: state.txState.hash,
+        chainId: props.sourceChain.chain_id,
+      });
+    }
+  }, [actions, props.sourceChain, state.txState]);
+
   return (
     <Modal
       trigger={props.trigger}
       open={state.isModalOpen}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          if (isFormDisabled) {
-            return;
-          }
           props.onClose?.();
           resetForm();
           actions.resetTxState();

@@ -77,6 +77,7 @@ export default function useRegisterRemoteCanonicalTokens(
   const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
+    enabled: multicallArgs.length > 0 && totalGasFee > 0n,
   });
 
   return useInterchainTokenFactoryMulticall(config);

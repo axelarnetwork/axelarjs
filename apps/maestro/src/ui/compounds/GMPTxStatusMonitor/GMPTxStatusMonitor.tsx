@@ -4,6 +4,7 @@ import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
+import { clamp } from "rambda";
 import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
@@ -66,17 +67,23 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
 
   const expectedConfirmations = Number(chainInfo?.blockConfirmations ?? 1);
 
-  const progress = useMemo(
-    () =>
-      (elapsedBlocks / expectedConfirmations).toLocaleString(undefined, {
-        style: "percent",
-      }),
-    [elapsedBlocks, expectedConfirmations]
-  );
+  const { progress, progressRatio } = useMemo(() => {
+    const ratio = elapsedBlocks / expectedConfirmations;
+    const clampedRatio = clamp(0, 1, ratio);
+
+    const progress = clampedRatio.toLocaleString(undefined, {
+      style: "percent",
+    });
+    return {
+      progress,
+      progressRatio: clampedRatio * 100,
+    };
+  }, [elapsedBlocks, expectedConfirmations]);
 
   return {
     progress,
-    elapsedBlocks,
+    progressRatio,
+    elapsedBlocks: clamp(0, expectedConfirmations, elapsedBlocks),
     expectedConfirmations,
     isReady: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
     isConfirmed: elapsedBlocks >= expectedConfirmations,
@@ -190,6 +197,8 @@ export type ChainStatusItemProps = {
   txHash: `0x${string}`;
   logIndex: number;
   chain: EVMChainConfig;
+  className?: string;
+  compact?: boolean;
 };
 
 export const ChainStatusItem: FC<ChainStatusItemProps> = ({
@@ -197,11 +206,20 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   logIndex,
   status,
   txHash,
+  className,
+  compact,
 }) => {
   return (
-    <li className="flex items-center justify-between">
+    <li className={cn("flex items-center justify-between", className)}>
       <span className="flex items-center gap-2">
-        <ChainIcon src={chain.image} size="md" alt={chain.name} /> {chain.name}
+        <Tooltip tip={chain.name}>
+          <ChainIcon
+            src={chain.image}
+            size={compact ? "sm" : "md"}
+            alt={chain.name}
+          />
+        </Tooltip>{" "}
+        {!compact && chain.name}
       </span>
       <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
     </li>
