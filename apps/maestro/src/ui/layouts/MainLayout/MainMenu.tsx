@@ -1,4 +1,10 @@
-import { ArrowRightIcon, ExternalLinkIcon, Menu, Modal } from "@axelarjs/ui";
+import {
+  ArrowRightIcon,
+  Button,
+  ExternalLinkIcon,
+  Menu,
+  Modal,
+} from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import React, { type FC } from "react";
 import Link from "next/link";
@@ -142,6 +148,29 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
                 </Content.Paragraph>
                 <Content.ArrowIcon />
               </Link>
+            </Content.Main>
+          </Content.Article>
+          <Content.Article $as="li">
+            <Content.Header>Clear Your Cache</Content.Header>
+            <Content.Main>
+              <Content.Paragraph className="text-sm">
+                If you&apos;re experiencing issues with the Interchain Token
+                Service, try clearing your cache. This will log you out out of
+                the app, clear your local storage and session storage.
+                <br />
+                <Button
+                  className="mt-2"
+                  length="block"
+                  size="sm"
+                  onClick={() => {
+                    window.localStorage.clear();
+                    window.sessionStorage.clear();
+                    window.location.reload();
+                  }}
+                >
+                  Clear Cache
+                </Button>
+              </Content.Paragraph>
             </Content.Main>
           </Content.Article>
         </Content.Wrapper>
