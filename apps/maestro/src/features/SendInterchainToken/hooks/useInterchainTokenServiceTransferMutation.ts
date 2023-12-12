@@ -7,7 +7,12 @@ import { invariant } from "@axelarjs/utils";
 import { useEffect, useRef } from "react";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useMutation, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useChainId,
+  useMutation,
+  useWaitForTransaction,
+} from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
@@ -35,6 +40,7 @@ export type UseSendInterchainTokenInput = {
 export function useInterchainTokenServiceTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
+  const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
 
   const { data: decimals } = useInterchainTokenDecimals({
@@ -94,6 +100,7 @@ export function useInterchainTokenServiceTransferMutation(
             setTxState({
               status: "submitted",
               hash: txResult.hash,
+              chainId,
             });
           }
         } catch (error) {

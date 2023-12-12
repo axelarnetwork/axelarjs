@@ -92,7 +92,7 @@ const TokenSettings: FC = () => {
               <Tooltip
                 position="right"
                 variant="info"
-                tip="If true, the token minter will be able to mint new tokens."
+                tip="When active, the token minter will be able to mint new tokens."
               >
                 <HelpCircleIcon className="text-info mr-1 h-[1em]" />
               </Tooltip>

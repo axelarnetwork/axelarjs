@@ -55,6 +55,7 @@ export function useRegisterCanonicalTokenMutation(
 
   const prepared = usePrepareInterchainTokenFactoryMulticall({
     args: [multicallArgs],
+    enabled: multicallArgs.length > 0,
   });
 
   const multicall = useInterchainTokenFactoryMulticall(prepared.config);

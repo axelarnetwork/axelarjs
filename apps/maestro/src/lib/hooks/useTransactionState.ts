@@ -8,9 +8,26 @@ export type UnsubmittedTransactionState =
   | { status: "awaiting_approval" };
 
 export type SubmittedTransactionState<TError = Error> =
-  | { status: "submitted"; hash: `0x${string}` }
-  | { status: "confirmed"; receipt: TransactionReceipt; hash?: `0x${string}` }
-  | { status: "reverted"; error: TError; hash?: `0x${string}` };
+  | {
+      status: "submitted";
+      hash: `0x${string}`;
+      chainId: number;
+      isGMP?: boolean;
+    }
+  | {
+      status: "confirmed";
+      receipt: TransactionReceipt;
+      hash?: `0x${string}`;
+      chainId?: number;
+      isGMP?: boolean;
+    }
+  | {
+      status: "reverted";
+      error: TError;
+      hash?: `0x${string}`;
+      chainId?: number;
+      isGMP?: boolean;
+    };
 
 export type TransactionState<TError = Error> =
   | UnsubmittedTransactionState
@@ -34,8 +51,11 @@ export function useTransactionState<TError = Error>(
               return {
                 ...newState,
                 // retain the hash from the previous state if nil
-                hash: newState.hash ?? prevState.hash,
-              };
+                hash: "hash" in newState ? newState.hash : prevState.hash,
+                // retain the chainId from the previous state if nil
+                chainId:
+                  "chainId" in newState ? newState.chainId : prevState.chainId,
+              } as TransactionState<TError>;
             default:
               return newState;
           }

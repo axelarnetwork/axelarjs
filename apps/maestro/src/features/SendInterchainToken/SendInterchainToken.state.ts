@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
 
@@ -54,6 +55,8 @@ export function useSendInterchainTokenState(props: {
 
     [toChainId, eligibleTargetChains]
   );
+
+  const [, { addTransaction }] = useTransactionsContainer();
 
   const {
     mutateAsync: interchainTransferAsync,
@@ -126,6 +129,7 @@ export function useSendInterchainTokenState(props: {
       sendTokenAsync,
       selectToChain,
       refetchBalances,
+      addTransaction,
     },
   ] as const;
 }

@@ -162,6 +162,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     chainId,
     value: totalGasFee,
     args: [multicallArgs],
+    enabled: multicallArgs.length > 0 && totalGasFee > 0n,
   });
 
   const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);

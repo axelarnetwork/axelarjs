@@ -15,6 +15,7 @@ export {
   CheckCircleIcon,
   KeyIcon,
   XCircleIcon,
+  XIcon,
   ArrowRightIcon,
   CopyIcon,
   AlertTriangleIcon,
@@ -22,4 +23,5 @@ export {
   SunIcon,
   PlusIcon,
   RefreshCwIcon,
+  HourglassIcon,
 } from "lucide-react";

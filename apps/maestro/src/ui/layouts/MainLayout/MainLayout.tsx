@@ -25,6 +25,7 @@ import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 } from "~/config/env";
+import { TransactionsProvider } from "~/features/Transactions";
 import { trpc } from "~/lib/trpc";
 import Appbar from "./Appbar";
 import {
@@ -201,7 +202,9 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 const WithProvider: FC<PropsWithChildren> = (props) => (
   <ThemeProvider>
     <LayoutStateProvider>
-      <MainLayout {...props} />
+      <TransactionsProvider>
+        <MainLayout {...props} />
+      </TransactionsProvider>
     </LayoutStateProvider>
   </ThemeProvider>
 );
