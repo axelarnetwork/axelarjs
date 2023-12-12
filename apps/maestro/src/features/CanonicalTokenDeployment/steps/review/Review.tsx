@@ -7,7 +7,7 @@ import {
   LinkButton,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import { useState, type FC } from "react";
+import { useCallback, useEffect, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
 import { useNetwork } from "wagmi";
@@ -16,23 +16,8 @@ import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
-import { getInterchainTokenDetailsPageSessionStorageKey } from "~/ui/pages/InterchainTokenDetailsPage/ConnectedInterchainTokensPage";
+import { persistTokenDeploymentTxHash } from "~/ui/pages/InterchainTokenDetailsPage/ConnectedInterchainTokensPage";
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
-
-function setRemoteTokenDeploymentTxHash(
-  tokenAddress: `0x${string}`,
-  chainId: number,
-  deployTokensTxHash: `0x${string}`,
-  selectedChainIds: number[]
-) {
-  sessionStorage.setItem(
-    getInterchainTokenDetailsPageSessionStorageKey({ tokenAddress, chainId }),
-    JSON.stringify({
-      deployTokensTxHash,
-      selectedChainIds,
-    })
-  );
-}
 
 const Review: FC = () => {
   const router = useRouter();
@@ -52,6 +37,32 @@ const Review: FC = () => {
         }
       : {}
   );
+
+  // persist token deployment tx hash
+  useEffect(() => {
+    if (chain && state.txState.type === "deployed") {
+      persistTokenDeploymentTxHash(
+        state.txState.tokenAddress,
+        chain.id,
+        state.txState.txHash,
+        state.selectedChains.map(
+          (axelarChainId) => computed.indexedById[axelarChainId].chain_id
+        )
+      );
+    }
+  }, [chain, computed.indexedById, state.selectedChains, state.txState]);
+
+  const handleGoToTokenPage = useCallback(async () => {
+    if (chain && state.txState.type === "deployed") {
+      actions.reset();
+
+      const chainConfig = computed.indexedByChainId[chain.id];
+
+      await router.push(
+        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
+      );
+    }
+  }, [actions, chain, computed.indexedByChainId, router, state.txState]);
 
   return (
     <>
@@ -115,29 +126,7 @@ const Review: FC = () => {
             length="block"
             variant="primary"
             disabled={!chain?.name || state.txState.type !== "deployed"}
-            onClick={async () => {
-              if (chain && state.txState.type === "deployed") {
-                setRemoteTokenDeploymentTxHash(
-                  state.txState.tokenAddress,
-                  chain.id,
-                  state.txState.txHash,
-                  state.selectedChains.map(
-                    (axelarChainId) =>
-                      computed.indexedById[axelarChainId].chain_id
-                  )
-                );
-
-                actions.reset();
-
-                const chainConfig = computed.indexedByChainId[chain.id];
-
-                await router.push(
-                  `/${chainConfig.chain_name.toLowerCase()}/${
-                    state.txState.tokenAddress
-                  }`
-                );
-              }
-            }}
+            onClick={handleGoToTokenPage}
           >
             Go to token page!
           </Button>
