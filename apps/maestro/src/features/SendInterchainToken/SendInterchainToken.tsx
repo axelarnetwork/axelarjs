@@ -120,20 +120,23 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [state.txState.status]
   );
 
+  const txHash = useMemo(
+    () =>
+      state.txState.status === "submitted" ? state.txState.hash : undefined,
+    [state.txState]
+  );
+
   useEffect(() => {
-    if (state.txState.status === "submitted") {
-      actions.trackTransaction({
-        status: "submitted",
-        hash: state.txState.hash,
-        chainId: props.sourceChain.chain_id,
-      });
-    }
-  }, [actions, props.sourceChain, state.txState]);
+    if (!txHash) return;
+
+    actions.trackTransaction({
+      status: "submitted",
+      hash: txHash,
+      chainId: props.sourceChain.chain_id,
+    });
+  }, [actions, props.sourceChain, state.txState, txHash]);
 
   const handleAllChainsExecuted = useCallback(async () => {
-    const txHash =
-      state.txState.status === "submitted" ? state.txState.hash : "0x";
-
     await actions.refetchBalances();
     resetForm();
     actions.resetTxState();
@@ -142,12 +145,16 @@ export const SendInterchainToken: FC<Props> = (props) => {
       // use txHash as id to prevent duplicate toasts
       id: `token-sent:${txHash}`,
     });
-  }, [actions, resetForm, state.txState]);
+  }, [actions, resetForm, txHash]);
 
   return (
     <Modal
       trigger={props.trigger}
       open={state.isModalOpen}
+      disableCloseButton={
+        state.txState.status === "awaiting_approval" ||
+        state.txState.status === "awaiting_spend_approval"
+      }
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           props.onClose?.();
