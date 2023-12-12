@@ -3,7 +3,7 @@ import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import {
   useTransactionState,
@@ -14,6 +14,7 @@ import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
+import { useTransactionsContainer } from "../Transactions";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
@@ -49,6 +50,21 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     }
     return props.existingTxHash;
   }, [txState, props.existingTxHash]);
+
+  const [, { addTransaction }] = useTransactionsContainer();
+
+  const chainId = useChainId();
+
+  useEffect(() => {
+    // track tx hash
+    if (!txHash) return;
+
+    addTransaction({
+      hash: txHash,
+      chainId,
+      status: "submitted",
+    });
+  }, [addTransaction, chainId, txHash]);
 
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash:
@@ -154,7 +170,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         logger.error("Failed to register remote tokens", error.cause);
       },
     });
-  }, [setTxState, registerTokensAsync]);
+  }, [registerTokensAsync, setTxState, props.originChainId]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
