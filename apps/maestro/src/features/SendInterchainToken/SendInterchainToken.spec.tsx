@@ -79,7 +79,7 @@ vi.mock("./SendInterchainToken.state.ts", () => ({
       sendTokenAsync: mocks.sendTokenAsync,
       selectToChain: mocks.selectToChain,
       refetchBalances: mocks.refetchBalances,
-      addTransaction: mocks.addTransaction,
+      trackTransaction: mocks.addTransaction,
     } as Actions,
   ]),
 }));

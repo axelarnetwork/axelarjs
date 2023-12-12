@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useEffect, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { formatUnits, parseUnits } from "viem";
@@ -122,13 +122,27 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   useEffect(() => {
     if (state.txState.status === "submitted") {
-      actions.addTransaction({
+      actions.trackTransaction({
         status: "submitted",
         hash: state.txState.hash,
         chainId: props.sourceChain.chain_id,
       });
     }
   }, [actions, props.sourceChain, state.txState]);
+
+  const handleAllChainsExecuted = useCallback(async () => {
+    const txHash =
+      state.txState.status === "submitted" ? state.txState.hash : "0x";
+
+    await actions.refetchBalances();
+    resetForm();
+    actions.resetTxState();
+    actions.setIsModalOpen(false);
+    toast.success("Tokens sent successfully!", {
+      // use txHash as id to prevent duplicate toasts
+      id: `token-sent:${txHash}`,
+    });
+  }, [actions, resetForm, state.txState]);
 
   return (
     <Modal
@@ -242,13 +256,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           {state.txState.status === "submitted" && (
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
-              onAllChainsExecuted={async () => {
-                await actions.refetchBalances();
-                resetForm();
-                actions.resetTxState();
-                actions.setIsModalOpen(false);
-                toast.success("Tokens sent successfully!");
-              }}
+              onAllChainsExecuted={handleAllChainsExecuted}
             />
           )}
           <Button
