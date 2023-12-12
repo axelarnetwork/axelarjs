@@ -16,7 +16,7 @@ import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import {
-  useGetTransactionStatusOnDestinationChainsQuery,
+  useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -144,8 +144,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 
   const { data: statuses, isSuccess: hasFetchedStatuses } =
-    useGetTransactionStatusOnDestinationChainsQuery({
-      txHash: sessionState.deployTokensTxHashes[0],
+    useGetTransactionsStatusesOnDestinationChainsQuery({
+      txHashes: sessionState.deployTokensTxHashes,
     });
 
   const statusesByChain = useMemo(() => {
@@ -163,8 +163,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   // reset state when all txs are executed or errored
   useEffect(() => {
-    if (!hasFetchedStatuses || !statusesByChain || isEmpty(statusesByChain))
+    if (!hasFetchedStatuses || !statusesByChain || isEmpty(statusesByChain)) {
       return;
+    }
 
     if (
       Object.values(statusesByChain).every(
@@ -178,11 +179,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     }
   }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
 
-  const remoteChainsExecuted = useMemo(() => {
-    return Object.entries(statusesByChain)
-      .filter(([, { status }]) => status === "executed")
-      .map(([chainId]) => chainId);
-  }, [statusesByChain]);
+  const remoteChainsExecuted = useMemo(
+    () =>
+      Object.entries(statusesByChain)
+        .filter(([, { status }]) => status === "executed")
+        .map(([chainId]) => chainId),
+    [statusesByChain]
+  );
 
   useEffect(() => {
     if (
@@ -307,6 +310,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             ? undefined
             : (chainId) => {
                 if (sessionState.deployTokensTxHashes.length) {
+                  console.log("already deploying tokens");
                   return;
                 }
 
@@ -348,8 +352,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   </div>
                 </Tooltip>
               )}
-
-              {originToken?.chainId === chainId && originToken?.kind ? (
+              {originToken?.chainId === chainId ? (
                 <RegisterRemoteTokens
                   deploymentKind={originToken.kind}
                   chainIds={sessionState.selectedChainIds}
