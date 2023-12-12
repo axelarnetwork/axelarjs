@@ -59,6 +59,7 @@ const mocks = {
   sendTokenAsync: vi.fn(),
   selectToChain: vi.fn(),
   refetchBalances: vi.fn(),
+  addTransaction: vi.fn(),
 };
 
 vi.mock("./SendInterchainToken.state.ts", () => ({
@@ -78,6 +79,7 @@ vi.mock("./SendInterchainToken.state.ts", () => ({
       sendTokenAsync: mocks.sendTokenAsync,
       selectToChain: mocks.selectToChain,
       refetchBalances: mocks.refetchBalances,
+      trackTransaction: mocks.addTransaction,
     } as Actions,
   ]),
 }));
@@ -101,7 +103,7 @@ describe("SendInterchainToken", () => {
         }}
         isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
-        kind="standardized"
+        kind="interchain"
         tokenId="0x00"
         originTokenAddress="0x00"
         originTokenChainId={MOCK_EVM_CHAIN_CONFIG.chain_id}
@@ -139,7 +141,7 @@ describe("SendInterchainToken", () => {
         }}
         isOpen
         sourceChain={MOCK_EVM_CHAIN_CONFIG}
-        kind="standardized"
+        kind="interchain"
         tokenId="0x00"
         originTokenAddress="0x00"
         originTokenChainId={MOCK_EVM_CHAIN_CONFIG.chain_id}
@@ -159,7 +161,10 @@ describe("SendInterchainToken", () => {
       >
         Send 
         100
-         tokens to 
+         
+        tokens
+         to
+         
         Ethereum Mainnet
       </button>
     `);

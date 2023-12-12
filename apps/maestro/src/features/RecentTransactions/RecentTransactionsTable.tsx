@@ -1,10 +1,11 @@
-import { Button, ExternalLinkIcon, Table } from "@axelarjs/ui";
+import { Button, ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
 import { type Address } from "wagmi";
 
+import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import { CONTRACT_METHODS_LABELS } from "./RecentTransactions";
@@ -62,10 +63,6 @@ export const RecentTransactionsTable: FC<Props> = ({
     {
       label: "Hash",
       accessor: "hash",
-    },
-    {
-      label: "Block",
-      accessor: "blockNumber",
     },
     {
       label: "Timestamp",
@@ -135,8 +132,8 @@ export const RecentTransactionsTable: FC<Props> = ({
         </Table.Head>
         <Table.Body>
           {isLoading || !txns?.length ? (
-            <Table.Row className="grid min-h-[38px] place-items-center text-center">
-              <Table.Cell colSpan={2}>
+            <Table.Row className="grid min-h-[38px] place-items-center  text-center">
+              <Table.Cell colSpan={3}>
                 {isLoading
                   ? "Loading transactions..."
                   : "No transactions found"}
@@ -165,27 +162,34 @@ const TransactionRow: FC<{
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
-        {tx.event?.name}{" "}
-        <span className="opacity-75">({tx.event?.symbol})</span>
-      </Table.Cell>
-      <Table.Cell>
         <Link
-          href={`/recent-transactions/${tx.hash}`}
-          className="group flex items-center gap-2"
+          className="hover:text-primary hover:cursor-pointer"
+          href={`/interchain-tokens/${tx.event?.tokenId}`}
         >
-          <>
-            {maskAddress(tx.hash as `0x${string}`)}
-            <ExternalLinkIcon
-              size="16"
-              className="text-accent opacity-0 transition-opacity group-hover:opacity-100"
-            />
-          </>
+          {tx.event?.event === "InterchainTransfer"
+            ? tx.event?.name
+            : tx.event?.tokenName}{" "}
+          <span className="opacity-75">
+            (
+            {tx.event?.event === "InterchainTransfer"
+              ? tx.event?.symbol
+              : tx.event?.tokenSymbol}
+            )
+          </span>
         </Link>
       </Table.Cell>
       <Table.Cell>
-        <Link href={`/block/${tx.blockHash}`}>
-          {maskAddress(tx.blockHash as `0x${string}`)}
-        </Link>
+        <Tooltip tip="View on AxelarScan" position="bottom">
+          <Link
+            className="group inline-flex items-center text-sm font-semibold hover:underline"
+            href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {maskAddress(tx.hash)}{" "}
+            <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+          </Link>
+        </Tooltip>
       </Table.Cell>
       <Table.Cell>{new Date(tx.timestamp * 1000).toLocaleString()}</Table.Cell>
     </Table.Row>

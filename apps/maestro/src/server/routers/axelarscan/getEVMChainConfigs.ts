@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
+import { uniqBy } from "rambda";
 import { z } from "zod";
 
-import { DISABLED_CHAINS, IS_STAGING } from "~/config/app";
 import { publicProcedure } from "~/server/trpc";
 
 const evmChainConfigSchema = z.object({
@@ -70,12 +70,11 @@ export const getEVMChainConfigs = publicProcedure
   .output(z.array(evmChainConfigSchema))
   .query(async ({ ctx, input }) => {
     try {
-      const { evm } = await ctx.services.axelarscan.getChainConfigs({
-        disabledChains: DISABLED_CHAINS,
-        isStaging: IS_STAGING,
-      });
+      const chainsMap = await ctx.configs.evmChains();
+      const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
+      const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
 
-      return evm.filter(
+      return uniqueChainInfos.filter(
         (chain) =>
           !chain.deprecated &&
           // filter also by axelarChainId if provided

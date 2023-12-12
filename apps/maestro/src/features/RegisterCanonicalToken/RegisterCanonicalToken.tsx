@@ -5,12 +5,12 @@ import { useCallback, useMemo, type FC } from "react";
 
 import { useChainId } from "wagmi";
 
-import { useInterchainTokenServiceGetCanonicalTokenId } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useInterchainTokenFactoryCanonicalInterchainTokenId } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useRegisterCanonicalTokenMutation } from "../AddErc20/hooks/useRegisterCanonicalTokenMutation";
+import { useRegisterCanonicalTokenMutation } from "../InterchainTokenDeployment/hooks/useRegisterCanonicalTokenMutation";
 
 type Props = {
   address?: `0x${string}`;
@@ -40,7 +40,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
   );
 
   const { data: expectedTokenId } =
-    useInterchainTokenServiceGetCanonicalTokenId({
+    useInterchainTokenFactoryCanonicalInterchainTokenId({
       args: [address],
     });
 
@@ -78,6 +78,7 @@ export const RegisterCanonicalToken: FC<Props> = ({
         setTxState({
           status: "submitted",
           hash: tx.hash,
+          chainId: sourceChain.chain_id,
         });
       },
       onTransactionError(error) {

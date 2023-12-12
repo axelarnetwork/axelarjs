@@ -1,10 +1,13 @@
+import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useMutation } from "wagmi";
+import { useAccount, useChainId, useMutation } from "wagmi";
 
-import { useIerc20BurnableMintableDecimals } from "~/lib/contracts/IERC20BurnableMintable.hooks";
-import { useInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
+import {
+  useInterchainTokenDecimals,
+  useInterchainTokenInterchainTransfer,
+} from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -12,8 +15,8 @@ import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
-  sourceChainId: string;
-  destinationChainId: string;
+  sourceChainName: string;
+  destinationChainName: string;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -25,16 +28,20 @@ export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
-  const { data: decimals } = useIerc20BurnableMintableDecimals({
+  const { data: decimals } = useInterchainTokenDecimals({
     address: config.tokenAddress,
   });
+
+  const chainId = useChainId();
 
   const { address } = useAccount();
 
   const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: config.sourceChainId,
-    destinationChainId: config.destinationChainId,
-    sourceChainTokenSymbol: getNativeToken(config.sourceChainId.toLowerCase()),
+    sourceChainId: config.sourceChainName,
+    destinationChainId: config.destinationChainName,
+    sourceChainTokenSymbol: getNativeToken(
+      config.sourceChainName.toLowerCase()
+    ),
   });
 
   const { writeAsync: transferAsync } = useInterchainTokenInterchainTransfer({
@@ -56,12 +63,18 @@ export function useInterchainTransferMutation(
         });
 
         const txResult = await transferAsync({
-          args: [config.destinationChainId, address, bnAmount, `0x`],
+          args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
+            destinationChain: config.destinationChainName,
+            recipient: address,
+            amount: bnAmount,
+            metadata: "0x",
+          }),
         });
         if (txResult?.hash) {
           setTxState({
             status: "submitted",
             hash: txResult.hash,
+            chainId,
           });
         }
       } catch (error) {

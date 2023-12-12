@@ -5,6 +5,7 @@ import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { TransactionExecutionError } from "viem";
+import { useChainId } from "wagmi";
 
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
@@ -24,6 +25,8 @@ export const MintInterchainToken: FC = () => {
     reValidateMode: "onChange",
   });
 
+  const chainId = useChainId();
+
   const [
     { txState, accountAddress, erc20Details, isMinting },
     { setTxState, mintTokenAsync },
@@ -32,7 +35,7 @@ export const MintInterchainToken: FC = () => {
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
-    const decimalAdjustment = BigInt(10 ** (erc20Details?.decimals ?? 18));
+    const decimalAdjustment = 10n ** BigInt(erc20Details?.decimals ?? 18n);
     const adjustedAmount = BigInt(data.amountToMint) * decimalAdjustment;
 
     setTxState({
@@ -50,6 +53,7 @@ export const MintInterchainToken: FC = () => {
         setTxState({
           status: "submitted",
           hash: txResult?.hash,
+          chainId,
         });
       }
     } catch (error) {

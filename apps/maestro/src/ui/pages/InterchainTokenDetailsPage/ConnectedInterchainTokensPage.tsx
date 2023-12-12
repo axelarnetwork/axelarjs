@@ -4,12 +4,12 @@ import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
 
-import { isEmpty, partition, without } from "rambda";
+import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 
+import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
-import { RegisterCanonicalToken } from "~/features/RegisterCanonicalToken/RegisterCanonicalToken";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -37,17 +37,53 @@ type InterchainTokenDetailsPageSessionStorageProps = {
 };
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (
-  props: InterchainTokenDetailsPageSessionStorageProps
-) => `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}`;
+  props: InterchainTokenDetailsPageSessionStorageProps,
+  version = 1
+) =>
+  `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
+
+export type InterchainTokenDetailsPageState = {
+  deployTokensTxHashes: `0x${string}`[];
+  selectedChainIds: number[];
+};
+
+export function persistTokenDeploymentTxHash(
+  tokenAddress: `0x${string}`,
+  chainId: number,
+  deployTokensTxHash: `0x${string}`,
+  selectedChainIds: number[]
+) {
+  const key = getInterchainTokenDetailsPageSessionStorageKey({
+    tokenAddress,
+    chainId,
+  });
+
+  const currentState = Maybe.of(sessionStorage.getItem(key)).mapOr(
+    {},
+    JSON.parse
+  ) as Partial<InterchainTokenDetailsPageState>;
+
+  const nextDeployTokensTxHashes = [deployTokensTxHash];
+
+  const nextState: InterchainTokenDetailsPageState = {
+    ...currentState,
+    selectedChainIds: Maybe.of(currentState.selectedChainIds)
+      .map(concat(selectedChainIds))
+      .mapOr(selectedChainIds, uniq),
+    deployTokensTxHashes: Maybe.of(currentState.deployTokensTxHashes)
+      .map(concat(nextDeployTokensTxHashes))
+      .mapOr(nextDeployTokensTxHashes, uniq),
+  };
+
+  sessionStorage.setItem(key, JSON.stringify(nextState));
+}
 
 export function useInterchainTokenDetailsPageState(
   props: InterchainTokenDetailsPageSessionStorageProps
 ) {
-  return useSessionStorageState<{
-    deployTokensTxHash: `0x${string}` | null;
-    selectedChainIds: number[];
-  }>(getInterchainTokenDetailsPageSessionStorageKey(props), {
-    deployTokensTxHash: null,
+  const key = getInterchainTokenDetailsPageSessionStorageKey(props);
+  return useSessionStorageState<InterchainTokenDetailsPageState>(key, {
+    deployTokensTxHashes: [],
     selectedChainIds: [],
   });
 }
@@ -78,37 +114,44 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress,
   });
 
-  const [registered, unregistered] = Maybe.of(
-    interchainToken?.matchingTokens?.map((x) => ({
-      ...x,
-      decimals: Number(tokenDetails?.decimals),
-      tokenId: x.tokenId as `0x${string}`,
-      tokenAddress: x.tokenAddress as `0x${string}`,
-    }))
-  ).mapOr(
-    [[], []],
-    partition((x) => x.isRegistered)
-  );
-
-  const targetDeploymentChains = useMemo(() => {
-    return sessionState.selectedChainIds
-      .map(
-        (x) =>
-          (interchainToken?.matchingTokens ?? []).find((y) => y.chainId === x)
-            ?.chain.id
+  const [registered, unregistered] = Maybe.of(interchainToken?.matchingTokens)
+    .map(
+      map(
+        (token) =>
+          ({
+            ...token,
+            decimals: Number(tokenDetails?.decimals),
+            tokenId: token.tokenId as `0x${string}`,
+            tokenAddress: token.tokenAddress as `0x${string}`,
+          } as TokenInfo)
       )
-      .filter(Boolean) as string[];
-  }, [interchainToken?.matchingTokens, sessionState.selectedChainIds]);
+    )
+    .mapOr(
+      [[], []],
+      partition((x) => x.isRegistered)
+    );
+
+  const destinationChainIds = useMemo(
+    () =>
+      sessionState.selectedChainIds
+        .map(
+          (x) =>
+            (interchainToken?.matchingTokens ?? []).find((y) => y.chainId === x)
+              ?.chain.id
+        )
+        .filter(Boolean) as string[],
+    [interchainToken?.matchingTokens, sessionState.selectedChainIds]
+  );
 
   const { data: statuses, isSuccess: hasFetchedStatuses } =
     useGetTransactionStatusOnDestinationChainsQuery({
-      txHash: sessionState.deployTokensTxHash ?? undefined,
+      txHash: sessionState.deployTokensTxHashes[0],
     });
 
   const statusesByChain = useMemo(() => {
     return (
       statuses ??
-      targetDeploymentChains.reduce(
+      destinationChainIds.reduce(
         (acc, chainId) => ({
           ...acc,
           [chainId]: "pending" as const,
@@ -116,7 +159,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         {} as Record<string, "pending" | GMPTxStatus>
       )
     );
-  }, [statuses, targetDeploymentChains]);
+  }, [statuses, destinationChainIds]);
 
   // reset state when all txs are executed or errored
   useEffect(() => {
@@ -129,7 +172,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )
     ) {
       setSessionState((draft) => {
-        draft.deployTokensTxHash = null;
+        draft.deployTokensTxHashes = [];
         draft.selectedChainIds = [];
       });
     }
@@ -143,16 +186,16 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   useEffect(() => {
     if (
-      targetDeploymentChains.length === 0 ||
+      destinationChainIds.length === 0 ||
       remoteChainsExecuted.length === 0 ||
       isInterchainTokenLoading
     ) {
       return;
     }
 
-    if (remoteChainsExecuted.length === targetDeploymentChains.length) {
+    if (remoteChainsExecuted.length === destinationChainIds.length) {
       setSessionState((draft) => {
-        draft.deployTokensTxHash = null;
+        draft.deployTokensTxHashes = [];
         draft.selectedChainIds = [];
       });
     }
@@ -163,7 +206,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   }, [
     address,
     remoteChainsExecuted,
-    targetDeploymentChains,
+    destinationChainIds,
     interchainToken.tokenId,
     props.chainId,
     props.tokenAddress,
@@ -175,7 +218,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
-      destinationChainIds: targetDeploymentChains,
+      destinationChainIds,
       gasLimit: 1_000_000,
       gasMultipler: 3,
     });
@@ -192,6 +235,41 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const shouldRenderFooter =
     !isReadOnly && sessionState.selectedChainIds.length > 0;
 
+  const unregisteredTokens = useMemo(
+    () =>
+      unregistered
+        .filter(
+          (x) =>
+            // filter out tokens that are already registered on the current chain
+            x.chain && !remoteChainsExecuted.includes(x.chain.id)
+        )
+        .map((token) => {
+          const gmpInfo = token.chain?.id
+            ? statusesByChain[token.chain.id]
+            : undefined;
+
+          const isSelected = sessionState.selectedChainIds.includes(
+            token.chainId ?? 0
+          );
+
+          return {
+            ...token,
+            isSelected,
+            isRegistered: false,
+            deploymentStatus: gmpInfo?.status,
+            deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
+              ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
+            ),
+          } as TokenInfo;
+        }),
+    [
+      unregistered,
+      remoteChainsExecuted,
+      statusesByChain,
+      sessionState.selectedChainIds,
+    ]
+  );
+
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
@@ -201,13 +279,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
-            <RegisterCanonicalToken
-              address={props.tokenAddress}
-              chainName={interchainToken.chain?.name}
-              tokenName={props.tokenName}
-              tokenSymbol={props.tokenSymbol}
-              decimals={props.decimals}
-              onSuccess={refetchInterchainToken}
+            <CanonicalTokenDeployment
+              tokenDetails={{
+                tokenAddress: props.tokenAddress,
+                tokenName: props.tokenName,
+                tokenSymbol: props.tokenSymbol,
+                tokenDecimals: props.decimals,
+              }}
             />
           ) : (
             <ConnectWalletButton className="w-full" size="md">
@@ -218,36 +296,17 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )}
       <InterchainTokenList
         title="Registered interchain tokens"
-        tokens={registered as TokenInfo[]}
+        tokens={registered}
       />
       <InterchainTokenList
         title="Unregistered interchain tokens"
         listClassName="grid-cols-2 sm:grid-cols-3"
-        tokens={unregistered
-          .filter((x) => {
-            // filter out tokens that are already registered on the current chain
-            return x.chain && !remoteChainsExecuted.includes(x.chain.id);
-          })
-          .map((token) => {
-            const gmpInfo = token.chain?.id
-              ? statusesByChain[token.chain.id]
-              : undefined;
-
-            return {
-              ...token,
-              isSelected: sessionState.selectedChainIds.includes(token.chainId),
-              isRegistered: false,
-              deploymentStatus: gmpInfo?.status,
-              deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
-                ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
-              ),
-            } as TokenInfo;
-          })}
+        tokens={unregisteredTokens}
         onToggleSelection={
           isReadOnly
             ? undefined
             : (chainId) => {
-                if (sessionState.deployTokensTxHash) {
+                if (sessionState.deployTokensTxHashes.length) {
                   return;
                 }
 
@@ -296,11 +355,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   chainIds={sessionState.selectedChainIds}
                   tokenAddress={props.tokenAddress}
                   originChainId={originToken?.chainId}
-                  existingTxHash={sessionState.deployTokensTxHash}
+                  existingTxHash={sessionState.deployTokensTxHashes[0]}
                   onTxStateChange={(txState) => {
                     if (txState.status === "submitted") {
                       setSessionState((draft) => {
-                        draft.deployTokensTxHash = txState.hash;
+                        draft.deployTokensTxHashes = uniq([
+                          ...draft.deployTokensTxHashes,
+                          txState.hash,
+                        ]);
                       });
                     }
                   }}

@@ -23,6 +23,7 @@ import { useRouter } from "next/router";
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import { APP_NAME } from "~/config/app";
+import Transactions from "~/features/Transactions/Transactions";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
 import { useLayoutStateContainer } from "./MainLayout.state";
@@ -190,6 +191,8 @@ const Appbar: FC<AppbarProps> = (props) => {
             <ConnectWalletButton />
           )}
           <ThemeSwitcher />
+
+          <Transactions />
         </div>
       </Navbar.End>
     </Navbar>

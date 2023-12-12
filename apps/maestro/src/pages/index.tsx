@@ -1,5 +1,4 @@
 import { Alert, Dialog } from "@axelarjs/ui";
-import { sluggify } from "@axelarjs/utils";
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -7,12 +6,16 @@ import { useRouter } from "next/router";
 import { useNetwork } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
-import SearchInterchainToken from "~/features/SearchInterchainToken";
+import RecentTransactions from "~/features/RecentTransactions";
+import SearchInterchainToken, {
+  TokenFoundResult,
+} from "~/features/SearchInterchainToken";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
-const AddErc20 = dynamic(() => import("~/features/AddErc20/AddErc20"));
+const InterchainTokenDeployment = dynamic(
+  () => import("~/features/InterchainTokenDeployment")
+);
 
 export default function Home() {
   const router = useRouter();
@@ -20,11 +23,14 @@ export default function Home() {
   const [layoutState, layoutActions] = useLayoutStateContainer();
 
   const handleTokenFound = useCallback(
-    async (result: { tokenAddress: string; tokenId?: string }) => {
+    async (result: TokenFoundResult) => {
       if (!chain) {
         return;
       }
-      await router.push(`/${sluggify(chain.name)}/${result?.tokenAddress}`);
+
+      await router.push(
+        `/${result.chainName?.toLowerCase() ?? ""}/${result?.tokenAddress}`
+      );
     },
     [chain, router]
   );
@@ -65,7 +71,7 @@ export default function Home() {
           <div className="bg-base-100 grid w-full place-items-center rounded-2xl p-4">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
             <div className="divider w-full">OR</div>
-            <AddErc20 />
+            <InterchainTokenDeployment />
           </div>
           <div className="mt-4">
             <section className="my-10 space-y-4">

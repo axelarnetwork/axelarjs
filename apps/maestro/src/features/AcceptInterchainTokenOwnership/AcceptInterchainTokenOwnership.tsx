@@ -31,7 +31,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     address: props.tokenAddress,
   });
 
-  const trpcContext = trpc.useContext();
+  const trpcContext = trpc.useUtils();
 
   useWaitForTransaction({
     hash: acceptResult?.hash,
@@ -73,7 +73,8 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       if (txResult?.hash) {
         setTxState({
           status: "submitted",
-          hash: txResult?.hash,
+          hash: txResult.hash,
+          chainId: props.sourceChain.chain_id,
         });
       }
     } catch (error) {
@@ -90,7 +91,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
         error: error as Error,
       });
     }
-  }, [setTxState, acceptOwnershipAsync]);
+  }, [setTxState, acceptOwnershipAsync, props.sourceChain.chain_id]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {

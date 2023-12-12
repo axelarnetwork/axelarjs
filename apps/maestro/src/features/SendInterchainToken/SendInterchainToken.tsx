@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { formatUnits, parseUnits } from "viem";
@@ -22,7 +22,7 @@ type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  kind: "canonical" | "standardized";
+  kind: "canonical" | "interchain";
   sourceChain: EVMChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
@@ -30,7 +30,7 @@ type Props = {
   originTokenChainId?: number;
   balance: {
     tokenBalance: string;
-    decimals: string | number | null;
+    decimals: string | number | bigint | null;
   };
 };
 
@@ -82,6 +82,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
   };
 
   const buttonChildren = useMemo(() => {
+    const pluralized = `token${Number(amountToSend) > 1 ? "s" : ""}`;
+
     switch (state.txState?.status) {
       case "awaiting_spend_approval":
         return "Approve spend on wallet";
@@ -90,7 +92,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       case "submitted":
         return (
           <>
-            Sending {amountToSend} tokens to {state.selectedToChain?.name}
+            Sending {amountToSend} {pluralized} to {state.selectedToChain?.name}
           </>
         );
       default:
@@ -99,7 +101,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
         }
         return (
           <>
-            Send {amountToSend || 0} tokens to {state.selectedToChain?.name}
+            Send {amountToSend || 0} {pluralized} to{" "}
+            {state.selectedToChain?.name}
           </>
         );
     }
@@ -117,16 +120,43 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [state.txState.status]
   );
 
+  const txHash = useMemo(
+    () =>
+      state.txState.status === "submitted" ? state.txState.hash : undefined,
+    [state.txState]
+  );
+
+  useEffect(() => {
+    if (!txHash) return;
+
+    actions.trackTransaction({
+      status: "submitted",
+      hash: txHash,
+      chainId: props.sourceChain.chain_id,
+    });
+  }, [actions, props.sourceChain, state.txState, txHash]);
+
+  const handleAllChainsExecuted = useCallback(async () => {
+    await actions.refetchBalances();
+    resetForm();
+    actions.resetTxState();
+    actions.setIsModalOpen(false);
+    toast.success("Tokens sent successfully!", {
+      // use txHash as id to prevent duplicate toasts
+      id: `token-sent:${txHash}`,
+    });
+  }, [actions, resetForm, txHash]);
+
   return (
     <Modal
       trigger={props.trigger}
-      disableCloseButton={isFormDisabled}
       open={state.isModalOpen}
+      disableCloseButton={
+        state.txState.status === "awaiting_approval" ||
+        state.txState.status === "awaiting_spend_approval"
+      }
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          if (isFormDisabled) {
-            return;
-          }
           props.onClose?.();
           resetForm();
           actions.resetTxState();
@@ -135,7 +165,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       }}
     >
       <Modal.Body className="flex h-96 flex-col">
-        <Modal.Title>Send interchain token</Modal.Title>
+        <Modal.Title>Interchain Transfer</Modal.Title>
         <div className="my-4 grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
@@ -147,9 +177,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
               chainIconClassName="-translate-x-1.5"
               triggerClassName="w-full md:w-auto rounded-full"
             />
-            <span className="-translate-x-2 text-sm font-semibold">
-              {props.sourceChain?.chain_name}
-            </span>
           </div>
           <div className="flex items-center gap-2">
             <label className="text-md align-top">To:</label>
@@ -236,13 +263,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           {state.txState.status === "submitted" && (
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
-              onAllChainsExecuted={async () => {
-                await actions.refetchBalances();
-                resetForm();
-                actions.resetTxState();
-                actions.setIsModalOpen(false);
-                toast.success("Tokens sent successfully!");
-              }}
+              onAllChainsExecuted={handleAllChainsExecuted}
             />
           )}
           <Button

@@ -1,0 +1,2 @@
+ALTER TABLE "interchain_tokens" RENAME COLUMN "original_distributor_address" TO "original_minter_address";--> statement-breakpoint
+ALTER TABLE "interchain_tokens" ALTER COLUMN "original_minter_address" DROP NOT NULL;

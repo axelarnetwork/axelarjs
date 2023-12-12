@@ -29,3 +29,8 @@ export function pluralizeKeys<T extends AnyRecord>(obj: T) {
 
   return Object.fromEntries(nextEntries) as PluralizeKeys<T>;
 }
+
+export const invert = <T extends Record<string, string>>(obj: T) =>
+  Object.fromEntries(Object.entries(obj).map(([k, v]) => [v, k])) as {
+    [K in keyof T as T[K]]: K;
+  };

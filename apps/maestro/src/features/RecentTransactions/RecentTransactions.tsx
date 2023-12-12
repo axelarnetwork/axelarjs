@@ -8,8 +8,8 @@ import { CONTRACT_METHODS, type ContractMethod } from "./types";
 
 export const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> =
   {
-    sendToken: "Send Token",
-    StandardizedTokenDeployed: "Token Deployed",
+    InterchainTransfer: "Interchain Transfer",
+    InterchainTokenDeploymentStarted: "Token Deployment",
   };
 
 type Props = {
@@ -18,7 +18,7 @@ type Props = {
 
 const RecentTransactionsTabs: FC<Props> = ({ maxTransactions = 10 }) => {
   const [contractMethod, setContractMethod] =
-    useState<ContractMethod>("sendToken");
+    useState<ContractMethod>("InterchainTransfer");
 
   const { address } = useAccount();
 
@@ -44,13 +44,13 @@ const RecentTransactionsTabs: FC<Props> = ({ maxTransactions = 10 }) => {
           </Card.Title>
           <div className="hidden w-[90vw] min-w-max max-w-4xl grid-cols-2 gap-4 md:grid">
             <RecentTransactionsList
-              contractMethod="sendToken"
+              contractMethod="InterchainTransfer"
               senderAddress={address}
               title="Transfers"
               maxTransactions={maxTransactions}
             />
             <RecentTransactionsList
-              contractMethod="StandardizedTokenDeployed"
+              contractMethod="InterchainTokenDeploymentStarted"
               senderAddress={address}
               title="Token Deployments"
               maxTransactions={maxTransactions}

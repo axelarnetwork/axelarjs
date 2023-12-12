@@ -1,11 +1,11 @@
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
-import { maskAddress, Maybe, sluggify } from "@axelarjs/utils";
+import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import Link from "next/link";
 
-import { filter, map, sortBy } from "rambda";
+import { filter, map } from "rambda";
 
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -14,11 +14,11 @@ import Page from "~/ui/layouts/Page";
 const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
-const getChainNameSlug = (chainId: number) => {
-  const chain = EVM_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
+function getChainNameSlug(chainId: number) {
+  const chain = WAGMI_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
 
-  return sluggify(chain?.name ?? "");
-};
+  return chain?.axelarChainName.toLowerCase() ?? "";
+}
 
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
@@ -43,16 +43,14 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, computed.indexedByChainId[token.chainId]] as const
+              [token, computed.indexedById[token.axelarChainId]] as const
           )
         )
-        .map(filter(([token, chain]) => Boolean(token) && Boolean(chain)))
-        .map(sortBy(([token]) => token.tokenAddress))
         .mapOr(
           [],
-          sortBy(([, chain]) => chain.id)
+          filter(([token, chain]) => Boolean(token) && Boolean(chain))
         ),
-    [computed.indexedByChainId, data]
+    [computed.indexedById, data]
   );
 
   return (
@@ -67,7 +65,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
       </Page.Title>
       <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {filteredTokens.map(([token, chain]) => {
-          const href = `/${getChainNameSlug(token.chainId)}/${
+          const href = `/${getChainNameSlug(chain.chain_id)}/${
             token.tokenAddress
           }`;
           return (
@@ -91,7 +89,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
                         size="sm"
                         className="bg-base-300 dark:bg-base-100"
                       >
-                        {maskAddress(token.tokenAddress, {
+                        {maskAddress(token.tokenAddress as `0x${string}`, {
                           segmentA: 10,
                           segmentB: -10,
                         })}

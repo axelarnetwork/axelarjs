@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.3.7",
+  "version": "0.3.9",
   "publishConfig": {
     "access": "public"
   },
@@ -80,14 +80,14 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@types/node": "^20.8.10",
-    "fast-check": "^3.13.2",
+    "@types/node": "^20.10.1",
+    "fast-check": "^3.14.0",
     "happy-dom": "^9.20.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
-    "typescript": "^5.2.2",
+    "typescript": "^5.3.3",
     "vite": "4.4.9",
     "vitest": "^0.34.6"
   },
@@ -97,7 +97,7 @@
   "dependencies": {
     "@axelarjs/core": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
-    "rambda": "^8.5.0",
-    "viem": "~1.18.5"
+    "rambda": "^8.6.0",
+    "viem": "^1.19.11"
   }
 }

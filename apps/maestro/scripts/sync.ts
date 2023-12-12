@@ -27,12 +27,21 @@ const contractsDir = path.join(
   "packages",
   "evm",
   "src",
-  "contracts"
+  "contracts",
+  "its"
 );
+
+const WHITELISTED_CONTRACTS = [
+  "IERC20MintableBurnable",
+  "InterchainTokenService",
+  "InterchainTokenFactory",
+  "InterchainToken",
+  "TokenManager",
+];
 
 const contractFolders = await fs
   .readdir(contractsDir)
-  .then((xs) => xs.filter((x) => /^[a-z-0-9]+$/.test(x)));
+  .then((xs) => xs.filter((x) => WHITELISTED_CONTRACTS.includes(x)));
 
 const destFolder = path.join(process.cwd(), "src", "lib", "contracts");
 
@@ -45,13 +54,21 @@ await Promise.all(
   )
 );
 
-const toConstantName = (contract = "") =>
-  contract.toUpperCase().replace(/\-/g, "_");
+const pascalToConstName = (contract = "") =>
+  contract
+    .replace(/([A-Z])/g, "_$1")
+    .replace(/-/g, "_")
+    .replace(/^_/, "")
+    .toUpperCase()
+    // handle ERC*, IERC* and Interface* names
+    .replace(/^E_R_C/, "ERC")
+    .replace(/^I_E_R_C/, "IERC")
+    .replace(/^I_/, "I");
 
 const contractConfigs = `export const contracts = [
     ${contractFolders
       .map((folder) => {
-        const constName = toConstantName(folder);
+        const constName = pascalToConstName(folder);
         const envKey = `NEXT_PUBLIC_${constName}_ADDRESS`;
         const contractAddress = process.env[envKey];
         const abiConstName = `${constName}_ABI`;
@@ -80,7 +97,8 @@ const contractConfigs = `export const contracts = [
 
 const content = contractFolders
   .map(
-    (folder) => `import  ${toConstantName(folder)}_ABI from "./${folder}.abi";`
+    (folder) =>
+      `import  ${pascalToConstName(folder)}_ABI from "./${folder}.abi";`
   )
   .join("\n")
   .concat("\n\n", contractConfigs);

@@ -1,5 +1,4 @@
 import { Alert } from "@axelarjs/ui";
-import { unSluggify } from "@axelarjs/utils";
 import type { FC } from "react";
 import { useRouter } from "next/router";
 
@@ -13,7 +12,7 @@ import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
 
 const InterchainTokensPage: FC = () => {
-  const { chainName, tokenAddress } = useRouter().query as {
+  const { tokenAddress } = useRouter().query as {
     chainName: string;
     tokenAddress: `0x${string}`;
   };
@@ -40,7 +39,7 @@ const InterchainTokensPage: FC = () => {
 
   return (
     <Page
-      pageTitle={`Interchain Tokens - ${unSluggify(chainName)}`}
+      pageTitle={`Interchain Tokens - ${routeChain?.name}`}
       className="!flex flex-1 flex-col gap-12 md:gap-16"
       isLoading={isLoading && !isError}
       loadingMessage="loading interchain token..."
@@ -53,6 +52,7 @@ const InterchainTokensPage: FC = () => {
           name={tokenDetails.name}
           symbol={tokenDetails.symbol}
           tokenId={interchainToken?.tokenId as `0x${string}`}
+          kind={interchainToken?.kind}
         />
       )}
       {routeChain && tokenDetails && (

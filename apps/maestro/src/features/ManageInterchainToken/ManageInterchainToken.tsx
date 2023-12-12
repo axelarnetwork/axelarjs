@@ -82,7 +82,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
     //   label: "Interchain Transfer",
     //   value: "interchainTransfer",
     //   icon: <SendIcon className="h-7 w-7 md:h-8 md:w-8" />,
-    //   criteria: (props) => props.balance > BigInt(0),
+    //   criteria: (props) => props.balance > 0n,
     // },
     {
       label: "Transfer Ownership",

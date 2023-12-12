@@ -4,6 +4,7 @@ import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
+import { clamp } from "rambda";
 import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
@@ -14,7 +15,7 @@ import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
-  called: "Called",
+  called: "Initiated",
   approvable: "Approvable",
   approving: "Approving",
   approved: "Approved",
@@ -39,9 +40,87 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
+export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
+  const { computed } = useEVMChainConfigsQuery();
+  const { data: txInfo } = useTransaction({
+    hash: txHash,
+    chainId,
+  });
+
+  const { data: chainInfo } = useChainInfoQuery({
+    axelarChainId: computed.indexedByChainId[chainId]?.id,
+  });
+
+  const { data: currentBlockNumber } = useBlockNumber({
+    chainId,
+    watch: true,
+    enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+  });
+
+  const elapsedBlocks = useMemo(
+    () =>
+      currentBlockNumber && txInfo?.blockNumber
+        ? Number(currentBlockNumber - txInfo.blockNumber)
+        : 0,
+    [currentBlockNumber, txInfo?.blockNumber]
+  );
+
+  const expectedConfirmations = Number(chainInfo?.blockConfirmations ?? 1);
+
+  const { progress, progressRatio } = useMemo(() => {
+    const ratio = elapsedBlocks / expectedConfirmations;
+    const clampedRatio = clamp(0, 1, ratio);
+
+    const progress = clampedRatio.toLocaleString(undefined, {
+      style: "percent",
+    });
+    return {
+      progress,
+      progressRatio: clampedRatio * 100,
+    };
+  }, [elapsedBlocks, expectedConfirmations]);
+
+  return {
+    progress,
+    progressRatio,
+    elapsedBlocks: clamp(0, expectedConfirmations, elapsedBlocks),
+    expectedConfirmations,
+    isReady: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+    isConfirmed: elapsedBlocks >= expectedConfirmations,
+  };
+}
+
 type Props = {
   txHash: `0x${string}`;
   onAllChainsExecuted?: () => void;
+};
+
+const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
+  txHash,
+  chainId,
+}) => {
+  const { progress, elapsedBlocks, expectedConfirmations } = useGMPTxProgress(
+    txHash,
+    chainId
+  );
+
+  if (elapsedBlocks >= expectedConfirmations) {
+    return null;
+  }
+
+  return (
+    <div className="grid place-items-center gap-2 px-8">
+      <span className="text-base-content-secondary text-center text-sm">
+        {elapsedBlocks.toLocaleString()} of {expectedConfirmations.toString()}{" "}
+        block confirmations ({progress})
+      </span>
+      <progress
+        className="progress progress-accent w-full"
+        value={elapsedBlocks}
+        max={expectedConfirmations}
+      />
+    </div>
+  );
 };
 
 const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
@@ -51,43 +130,9 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({ txHash });
 
-  const { computed } = useEVMChainConfigsQuery();
-
   const chainId = useChainId();
 
-  const { data: txInfo } = useTransaction({
-    chainId,
-    hash: txHash,
-  });
-
-  const { data: currentBlock } = useBlockNumber({
-    chainId,
-  });
-
-  const { data: chainInfo } = useChainInfoQuery({
-    axelarChainId: computed.indexedByChainId[chainId]?.id,
-  });
-
-  const expectedBlockConfirmations = BigInt(chainInfo?.blockConfirmations ?? 0);
-
-  const elapsedBlocks = useMemo(
-    () =>
-      txInfo?.blockNumber && currentBlock
-        ? currentBlock - txInfo.blockNumber
-        : BigInt(0),
-    [txInfo, currentBlock]
-  );
-
-  const progress = useMemo(
-    () =>
-      (expectedBlockConfirmations > BigInt(0)
-        ? Number(elapsedBlocks) / Number(expectedBlockConfirmations)
-        : 0
-      ).toLocaleString("en", {
-        style: "percent",
-      }),
-    [elapsedBlocks, expectedBlockConfirmations]
-  );
+  const { computed } = useEVMChainConfigsQuery();
 
   const statusList = Object.values(statuses ?? {});
 
@@ -112,10 +157,6 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     );
   }
 
-  const shouldRenderBlockConfirmations =
-    expectedBlockConfirmations > BigInt(0) &&
-    elapsedBlocks <= expectedBlockConfirmations;
-
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
@@ -127,20 +168,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
           </span>
         )}
       </div>
-      {shouldRenderBlockConfirmations && (
-        <div className="grid place-items-center gap-2 px-8">
-          <span className="text-base-content-secondary text-center text-sm">
-            {elapsedBlocks.toLocaleString()} of{" "}
-            {expectedBlockConfirmations.toString()} block confirmations (
-            {progress.toString()})
-          </span>
-          <progress
-            className="progress progress-accent w-full"
-            value={elapsedBlocks.toString()}
-            max={expectedBlockConfirmations.toString()}
-          />
-        </div>
-      )}
+      <TxFinalityProgress txHash={txHash} chainId={chainId} />
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
@@ -169,6 +197,8 @@ export type ChainStatusItemProps = {
   txHash: `0x${string}`;
   logIndex: number;
   chain: EVMChainConfig;
+  className?: string;
+  compact?: boolean;
 };
 
 export const ChainStatusItem: FC<ChainStatusItemProps> = ({
@@ -176,12 +206,20 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   logIndex,
   status,
   txHash,
+  className,
+  compact,
 }) => {
   return (
-    <li className="flex items-center justify-between">
+    <li className={cn("flex items-center justify-between", className)}>
       <span className="flex items-center gap-2">
-        <ChainIcon src={chain.image} size="md" alt={chain.chain_name} />{" "}
-        {chain.chain_name}
+        <Tooltip tip={chain.name}>
+          <ChainIcon
+            src={chain.image}
+            size={compact ? "sm" : "md"}
+            alt={chain.name}
+          />
+        </Tooltip>{" "}
+        {!compact && chain.name}
       </span>
       <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
     </li>

@@ -1,11 +1,11 @@
-import type { ERC20Client } from "@axelarjs/evm";
+import type { IERC20BurnableMintableClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { EVM_CHAIN_CONFIGS } from "~/config/wagmi";
+import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
@@ -18,19 +18,21 @@ export const getERC20TokenDetails = publicProcedure
   )
   .query(async ({ input, ctx }) => {
     try {
-      const chainConfig = EVM_CHAIN_CONFIGS.find(
+      const { wagmiChainConfigs: chainConfigs } = ctx.configs;
+
+      const chainConfig = chainConfigs.find(
         (chain) => chain.id === input.chainId
       );
 
       if (!chainConfig) {
-        for (const config of EVM_CHAIN_CONFIGS) {
+        for (const config of chainConfigs) {
           const client = ctx.contracts.createERC20Client(
             config,
             input.tokenAddress
           );
 
           try {
-            const details = await getTokenPublicDetails(client);
+            const details = await getTokenPublicDetails(client, config);
 
             if (details) {
               return details;
@@ -53,7 +55,7 @@ export const getERC20TokenDetails = publicProcedure
         input.tokenAddress
       );
 
-      return getTokenPublicDetails(client);
+      return getTokenPublicDetails(client, chainConfig);
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -67,7 +69,10 @@ export const getERC20TokenDetails = publicProcedure
     }
   });
 
-async function getTokenPublicDetails(client: ERC20Client) {
+async function getTokenPublicDetails(
+  client: IERC20BurnableMintableClient,
+  chainConfig: ExtendedWagmiChainConfig
+) {
   invariant(client.chain, "client.chain must be defined");
 
   const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
@@ -81,6 +86,8 @@ async function getTokenPublicDetails(client: ERC20Client) {
   return {
     chainId: client.chain.id,
     chainName: client.chain.name,
+    axelarChainId: chainConfig.axelarChainId,
+    axelarChainName: chainConfig.axelarChainName,
     name,
     symbol,
     decimals,

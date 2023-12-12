@@ -2,1130 +2,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
+  useContractEvent,
+  UseContractEventConfig,
   useContractRead,
   UseContractReadConfig,
   useContractWrite,
   UseContractWriteConfig,
   usePrepareContractWrite,
   UsePrepareContractWriteConfig,
-  useContractEvent,
-  UseContractEventConfig,
 } from "wagmi";
 import {
+  PrepareWriteContractResult,
   ReadContractResult,
   WriteContractMode,
-  PrepareWriteContractResult,
 } from "wagmi/actions";
+
+import ABI from "./InterchainTokenService.abi";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // InterchainTokenService
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const interchainTokenServiceABI = [
-  {
-    stateMutability: "nonpayable",
-    type: "constructor",
-    inputs: [
-      {
-        name: "tokenManagerDeployer_",
-        internalType: "address",
-        type: "address",
-      },
-      {
-        name: "standardizedTokenDeployer_",
-        internalType: "address",
-        type: "address",
-      },
-      { name: "gateway_", internalType: "address", type: "address" },
-      { name: "gasService_", internalType: "address", type: "address" },
-      {
-        name: "remoteAddressValidator_",
-        internalType: "address",
-        type: "address",
-      },
-      {
-        name: "tokenManagerImplementations",
-        internalType: "address[]",
-        type: "address[]",
-      },
-      { name: "chainName_", internalType: "string", type: "string" },
-    ],
-  },
-  {
-    type: "error",
-    inputs: [{ name: "commandId", internalType: "bytes32", type: "bytes32" }],
-    name: "AlreadyExecuted",
-  },
-  { type: "error", inputs: [], name: "AlreadyExpressCalled" },
-  {
-    type: "error",
-    inputs: [
-      { name: "contractAddress", internalType: "address", type: "address" },
-    ],
-    name: "DoesNotAcceptExpressExecute",
-  },
-  {
-    type: "error",
-    inputs: [
-      { name: "contractAddress", internalType: "address", type: "address" },
-    ],
-    name: "ExecuteWithInterchainTokenFailed",
-  },
-  { type: "error", inputs: [], name: "GatewayToken" },
-  { type: "error", inputs: [], name: "InvalidAddress" },
-  {
-    type: "error",
-    inputs: [{ name: "bytesAddress", internalType: "bytes", type: "bytes" }],
-    name: "InvalidBytesLength",
-  },
-  { type: "error", inputs: [], name: "InvalidCodeHash" },
-  { type: "error", inputs: [], name: "InvalidImplementation" },
-  {
-    type: "error",
-    inputs: [{ name: "version", internalType: "uint32", type: "uint32" }],
-    name: "InvalidMetadataVersion",
-  },
-  { type: "error", inputs: [], name: "InvalidOwner" },
-  { type: "error", inputs: [], name: "InvalidStringLength" },
-  { type: "error", inputs: [], name: "InvalidTokenManagerImplementation" },
-  { type: "error", inputs: [], name: "LengthMismatch" },
-  {
-    type: "error",
-    inputs: [{ name: "err", internalType: "bytes", type: "bytes" }],
-    name: "MulticallFailed",
-  },
-  { type: "error", inputs: [], name: "NotApprovedByGateway" },
-  { type: "error", inputs: [], name: "NotCanonicalTokenManager" },
-  { type: "error", inputs: [], name: "NotOperator" },
-  { type: "error", inputs: [], name: "NotOwner" },
-  { type: "error", inputs: [], name: "NotProxy" },
-  { type: "error", inputs: [], name: "NotRemoteService" },
-  { type: "error", inputs: [], name: "NotTokenManager" },
-  { type: "error", inputs: [], name: "Paused" },
-  { type: "error", inputs: [], name: "SameDestinationAsCaller" },
-  { type: "error", inputs: [], name: "SelectorUnknown" },
-  { type: "error", inputs: [], name: "SetupFailed" },
-  { type: "error", inputs: [], name: "StandardizedTokenDeploymentFailed" },
-  { type: "error", inputs: [], name: "TokenManagerDeploymentFailed" },
-  {
-    type: "error",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "TokenManagerDoesNotExist",
-  },
-  { type: "error", inputs: [], name: "TokenTransferFailed" },
-  { type: "error", inputs: [], name: "ZeroAddress" },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "deployer",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      { name: "salt", internalType: "bytes32", type: "bytes32", indexed: true },
-    ],
-    name: "CustomTokenIdClaimed",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      {
-        name: "sendHash",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "expressCaller",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-    ],
-    name: "ExpressExecutionFulfilled",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "sourceChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "sourceAddress",
-        internalType: "bytes",
-        type: "bytes",
-        indexed: false,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      { name: "data", internalType: "bytes", type: "bytes", indexed: false },
-      {
-        name: "sendHash",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "expressCaller",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-    ],
-    name: "ExpressExecutionWithDataFulfilled",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      {
-        name: "sendHash",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "expressCaller",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-    ],
-    name: "ExpressReceive",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "sourceChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "sourceAddress",
-        internalType: "bytes",
-        type: "bytes",
-        indexed: false,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      { name: "data", internalType: "bytes", type: "bytes", indexed: false },
-      {
-        name: "sendHash",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "expressCaller",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-    ],
-    name: "ExpressReceiveWithData",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "operator",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-    ],
-    name: "OperatorChanged",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "newOwner",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-    ],
-    name: "OwnershipTransferStarted",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "newOwner",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-    ],
-    name: "OwnershipTransferred",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      { name: "paused", internalType: "bool", type: "bool", indexed: false },
-    ],
-    name: "PausedSet",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "tokenName",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "tokenSymbol",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "tokenDecimals",
-        internalType: "uint8",
-        type: "uint8",
-        indexed: false,
-      },
-      {
-        name: "distributor",
-        internalType: "bytes",
-        type: "bytes",
-        indexed: false,
-      },
-      { name: "operator", internalType: "bytes", type: "bytes", indexed: true },
-      {
-        name: "destinationChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "gasValue",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-    ],
-    name: "RemoteStandardizedTokenAndManagerDeploymentInitialized",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "destinationChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "gasValue",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-      {
-        name: "tokenManagerType",
-        internalType: "enum ITokenManagerType.TokenManagerType",
-        type: "uint8",
-        indexed: true,
-      },
-      { name: "params", internalType: "bytes", type: "bytes", indexed: false },
-    ],
-    name: "RemoteTokenManagerDeploymentInitialized",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      { name: "name", internalType: "string", type: "string", indexed: false },
-      {
-        name: "symbol",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "decimals",
-        internalType: "uint8",
-        type: "uint8",
-        indexed: false,
-      },
-      {
-        name: "mintAmount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      {
-        name: "mintTo",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-    ],
-    name: "StandardizedTokenDeployed",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "tokenManagerType",
-        internalType: "enum ITokenManagerType.TokenManagerType",
-        type: "uint8",
-        indexed: true,
-      },
-      { name: "params", internalType: "bytes", type: "bytes", indexed: false },
-    ],
-    name: "TokenManagerDeployed",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "sourceChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-    ],
-    name: "TokenReceived",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "sourceChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-      {
-        name: "sourceAddress",
-        internalType: "bytes",
-        type: "bytes",
-        indexed: false,
-      },
-      { name: "data", internalType: "bytes", type: "bytes", indexed: false },
-    ],
-    name: "TokenReceivedWithData",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: false,
-      },
-      {
-        name: "destinationChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "bytes",
-        type: "bytes",
-        indexed: false,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-    ],
-    name: "TokenSent",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: false,
-      },
-      {
-        name: "destinationChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "destinationAddress",
-        internalType: "bytes",
-        type: "bytes",
-        indexed: false,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-      {
-        name: "sourceAddress",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      { name: "data", internalType: "bytes", type: "bytes", indexed: false },
-    ],
-    name: "TokenSentWithData",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "newImplementation",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-    ],
-    name: "Upgraded",
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [],
-    name: "acceptOwnership",
-    outputs: [],
-  },
-  {
-    stateMutability: "pure",
-    type: "function",
-    inputs: [],
-    name: "contractId",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "salt", internalType: "bytes32", type: "bytes32" },
-      { name: "name", internalType: "string", type: "string" },
-      { name: "symbol", internalType: "string", type: "string" },
-      { name: "decimals", internalType: "uint8", type: "uint8" },
-      { name: "distributor", internalType: "bytes", type: "bytes" },
-      { name: "operator", internalType: "bytes", type: "bytes" },
-      { name: "destinationChain", internalType: "string", type: "string" },
-      { name: "gasValue", internalType: "uint256", type: "uint256" },
-    ],
-    name: "deployAndRegisterRemoteStandardizedToken",
-    outputs: [],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "salt", internalType: "bytes32", type: "bytes32" },
-      { name: "name", internalType: "string", type: "string" },
-      { name: "symbol", internalType: "string", type: "string" },
-      { name: "decimals", internalType: "uint8", type: "uint8" },
-      { name: "mintAmount", internalType: "uint256", type: "uint256" },
-      { name: "distributor", internalType: "address", type: "address" },
-    ],
-    name: "deployAndRegisterStandardizedToken",
-    outputs: [],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "salt", internalType: "bytes32", type: "bytes32" },
-      {
-        name: "tokenManagerType",
-        internalType: "enum ITokenManagerType.TokenManagerType",
-        type: "uint8",
-      },
-      { name: "params", internalType: "bytes", type: "bytes" },
-    ],
-    name: "deployCustomTokenManager",
-    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
-      { name: "destinationChain", internalType: "string", type: "string" },
-      { name: "gasValue", internalType: "uint256", type: "uint256" },
-    ],
-    name: "deployRemoteCanonicalToken",
-    outputs: [],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "salt", internalType: "bytes32", type: "bytes32" },
-      { name: "destinationChain", internalType: "string", type: "string" },
-      {
-        name: "tokenManagerType",
-        internalType: "enum ITokenManagerType.TokenManagerType",
-        type: "uint8",
-      },
-      { name: "params", internalType: "bytes", type: "bytes" },
-      { name: "gasValue", internalType: "uint256", type: "uint256" },
-    ],
-    name: "deployRemoteCustomTokenManager",
-    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-      { name: "sourceChain", internalType: "string", type: "string" },
-      { name: "sourceAddress", internalType: "string", type: "string" },
-      { name: "payload", internalType: "bytes", type: "bytes" },
-    ],
-    name: "execute",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-      { name: "sourceChain", internalType: "string", type: "string" },
-      { name: "sourceAddress", internalType: "string", type: "string" },
-      { name: "payload", internalType: "bytes", type: "bytes" },
-      { name: "tokenSymbol", internalType: "string", type: "string" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-    ],
-    name: "executeWithToken",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
-      { name: "destinationAddress", internalType: "address", type: "address" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "expressReceiveToken",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
-      { name: "sourceChain", internalType: "string", type: "string" },
-      { name: "sourceAddress", internalType: "bytes", type: "bytes" },
-      { name: "destinationAddress", internalType: "address", type: "address" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "data", internalType: "bytes", type: "bytes" },
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "expressReceiveTokenWithData",
-    outputs: [],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "gasService",
-    outputs: [
-      { name: "", internalType: "contract IAxelarGasService", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "gateway",
-    outputs: [
-      { name: "", internalType: "contract IAxelarGateway", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-    name: "getCanonicalTokenId",
-    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "getChainName",
-    outputs: [{ name: "name", internalType: "string", type: "string" }],
-  },
-  {
-    stateMutability: "pure",
-    type: "function",
-    inputs: [
-      { name: "sender", internalType: "address", type: "address" },
-      { name: "salt", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "getCustomTokenId",
-    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [
-      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
-      { name: "destinationAddress", internalType: "address", type: "address" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "getExpressReceiveToken",
-    outputs: [
-      { name: "expressCaller", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [
-      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
-      { name: "sourceChain", internalType: "string", type: "string" },
-      { name: "sourceAddress", internalType: "bytes", type: "bytes" },
-      { name: "destinationAddress", internalType: "address", type: "address" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "data", internalType: "bytes", type: "bytes" },
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "getExpressReceiveTokenWithData",
-    outputs: [
-      { name: "expressCaller", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getFlowInAmount",
-    outputs: [
-      { name: "flowInAmount", internalType: "uint256", type: "uint256" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getFlowLimit",
-    outputs: [{ name: "flowLimit", internalType: "uint256", type: "uint256" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getFlowOutAmount",
-    outputs: [
-      { name: "flowOutAmount", internalType: "uint256", type: "uint256" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [
-      { name: "tokenManagerType", internalType: "uint256", type: "uint256" },
-    ],
-    name: "getImplementation",
-    outputs: [
-      { name: "tokenManagerAddress", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "pure",
-    type: "function",
-    inputs: [
-      { name: "operator", internalType: "bytes", type: "bytes" },
-      { name: "tokenAddress", internalType: "address", type: "address" },
-      {
-        name: "liquidityPoolAddress",
-        internalType: "address",
-        type: "address",
-      },
-    ],
-    name: "getParamsLiquidityPool",
-    outputs: [{ name: "params", internalType: "bytes", type: "bytes" }],
-  },
-  {
-    stateMutability: "pure",
-    type: "function",
-    inputs: [
-      { name: "operator", internalType: "bytes", type: "bytes" },
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-    name: "getParamsLockUnlock",
-    outputs: [{ name: "params", internalType: "bytes", type: "bytes" }],
-  },
-  {
-    stateMutability: "pure",
-    type: "function",
-    inputs: [
-      { name: "operator", internalType: "bytes", type: "bytes" },
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-    name: "getParamsMintBurn",
-    outputs: [{ name: "params", internalType: "bytes", type: "bytes" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getStandardizedTokenAddress",
-    outputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getTokenAddress",
-    outputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getTokenManagerAddress",
-    outputs: [
-      { name: "tokenManagerAddress", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "getValidTokenManagerAddress",
-    outputs: [
-      { name: "tokenManagerAddress", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "implementation",
-    outputs: [
-      { name: "implementation_", internalType: "address", type: "address" },
-    ],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "isPaused",
-    outputs: [{ name: "paused", internalType: "bool", type: "bool" }],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
-    name: "multicall",
-    outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "operator",
-    outputs: [{ name: "operator_", internalType: "address", type: "address" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "owner",
-    outputs: [{ name: "owner_", internalType: "address", type: "address" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "pendingOwner",
-    outputs: [{ name: "owner_", internalType: "address", type: "address" }],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
-    name: "proposeOwnership",
-    outputs: [],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-    name: "registerCanonicalToken",
-    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "remoteAddressValidator",
-    outputs: [
-      {
-        name: "",
-        internalType: "contract IRemoteAddressValidator",
-        type: "address",
-      },
-    ],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "tokenIds", internalType: "bytes32[]", type: "bytes32[]" },
-      { name: "flowLimits", internalType: "uint256[]", type: "uint256[]" },
-    ],
-    name: "setFlowLimit",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [{ name: "operator_", internalType: "address", type: "address" }],
-    name: "setOperator",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [{ name: "paused", internalType: "bool", type: "bool" }],
-    name: "setPaused",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
-    name: "setup",
-    outputs: [],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "standardizedTokenDeployer",
-    outputs: [{ name: "", internalType: "address", type: "address" }],
-  },
-  {
-    stateMutability: "view",
-    type: "function",
-    inputs: [],
-    name: "tokenManagerDeployer",
-    outputs: [{ name: "", internalType: "address", type: "address" }],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
-    name: "transferOwnership",
-    outputs: [],
-  },
-  {
-    stateMutability: "payable",
-    type: "function",
-    inputs: [
-      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
-      { name: "sourceAddress", internalType: "address", type: "address" },
-      { name: "destinationChain", internalType: "string", type: "string" },
-      { name: "destinationAddress", internalType: "bytes", type: "bytes" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
-      { name: "metadata", internalType: "bytes", type: "bytes" },
-    ],
-    name: "transmitSendToken",
-    outputs: [],
-  },
-  {
-    stateMutability: "nonpayable",
-    type: "function",
-    inputs: [
-      { name: "newImplementation", internalType: "address", type: "address" },
-      {
-        name: "newImplementationCodeHash",
-        internalType: "bytes32",
-        type: "bytes32",
-      },
-      { name: "params", internalType: "bytes", type: "bytes" },
-    ],
-    name: "upgrade",
-    outputs: [],
-  },
-] as const;
+export const interchainTokenServiceABI = ABI.abi;
 
 export const interchainTokenServiceAddress =
-  "0xF786e21509A9D50a9aFD033B5940A2b7D872C208" as const;
+  "0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C" as const;
 
 export const interchainTokenServiceConfig = {
   address: interchainTokenServiceAddress,
@@ -1163,6 +64,114 @@ export function useInterchainTokenServiceRead<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"chainName"`.
+ */
+export function useInterchainTokenServiceChainName<
+  TFunctionName extends "chainName",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "chainName",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"chainNameHash"`.
+ */
+export function useInterchainTokenServiceChainNameHash<
+  TFunctionName extends "chainNameHash",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "chainNameHash",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"contractCallValue"`.
+ */
+export function useInterchainTokenServiceContractCallValue<
+  TFunctionName extends "contractCallValue",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "contractCallValue",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"contractCallWithTokenValue"`.
+ */
+export function useInterchainTokenServiceContractCallWithTokenValue<
+  TFunctionName extends "contractCallWithTokenValue",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "contractCallWithTokenValue",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"contractId"`.
  */
 export function useInterchainTokenServiceContractId<
@@ -1185,6 +194,114 @@ export function useInterchainTokenServiceContractId<
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
     functionName: "contractId",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"executeWithToken"`.
+ */
+export function useInterchainTokenServiceExecuteWithToken<
+  TFunctionName extends "executeWithToken",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "executeWithToken",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"flowInAmount"`.
+ */
+export function useInterchainTokenServiceFlowInAmount<
+  TFunctionName extends "flowInAmount",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "flowInAmount",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"flowLimit"`.
+ */
+export function useInterchainTokenServiceFlowLimit<
+  TFunctionName extends "flowLimit",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "flowLimit",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"flowOutAmount"`.
+ */
+export function useInterchainTokenServiceFlowOutAmount<
+  TFunctionName extends "flowOutAmount",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "flowOutAmount",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
@@ -1244,10 +361,10 @@ export function useInterchainTokenServiceGateway<
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getCanonicalTokenId"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getExpressExecutor"`.
  */
-export function useInterchainTokenServiceGetCanonicalTokenId<
-  TFunctionName extends "getCanonicalTokenId",
+export function useInterchainTokenServiceGetExpressExecutor<
+  TFunctionName extends "getExpressExecutor",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1265,16 +382,16 @@ export function useInterchainTokenServiceGetCanonicalTokenId<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "getCanonicalTokenId",
+    functionName: "getExpressExecutor",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getChainName"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getExpressExecutorWithToken"`.
  */
-export function useInterchainTokenServiceGetChainName<
-  TFunctionName extends "getChainName",
+export function useInterchainTokenServiceGetExpressExecutorWithToken<
+  TFunctionName extends "getExpressExecutorWithToken",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1292,16 +409,16 @@ export function useInterchainTokenServiceGetChainName<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "getChainName",
+    functionName: "getExpressExecutorWithToken",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getCustomTokenId"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"hasRole"`.
  */
-export function useInterchainTokenServiceGetCustomTokenId<
-  TFunctionName extends "getCustomTokenId",
+export function useInterchainTokenServiceHasRole<
+  TFunctionName extends "hasRole",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1319,358 +436,7 @@ export function useInterchainTokenServiceGetCustomTokenId<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "getCustomTokenId",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getExpressReceiveToken"`.
- */
-export function useInterchainTokenServiceGetExpressReceiveToken<
-  TFunctionName extends "getExpressReceiveToken",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getExpressReceiveToken",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getExpressReceiveTokenWithData"`.
- */
-export function useInterchainTokenServiceGetExpressReceiveTokenWithData<
-  TFunctionName extends "getExpressReceiveTokenWithData",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getExpressReceiveTokenWithData",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getFlowInAmount"`.
- */
-export function useInterchainTokenServiceGetFlowInAmount<
-  TFunctionName extends "getFlowInAmount",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getFlowInAmount",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getFlowLimit"`.
- */
-export function useInterchainTokenServiceGetFlowLimit<
-  TFunctionName extends "getFlowLimit",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getFlowLimit",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getFlowOutAmount"`.
- */
-export function useInterchainTokenServiceGetFlowOutAmount<
-  TFunctionName extends "getFlowOutAmount",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getFlowOutAmount",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getImplementation"`.
- */
-export function useInterchainTokenServiceGetImplementation<
-  TFunctionName extends "getImplementation",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getImplementation",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getParamsLiquidityPool"`.
- */
-export function useInterchainTokenServiceGetParamsLiquidityPool<
-  TFunctionName extends "getParamsLiquidityPool",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getParamsLiquidityPool",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getParamsLockUnlock"`.
- */
-export function useInterchainTokenServiceGetParamsLockUnlock<
-  TFunctionName extends "getParamsLockUnlock",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getParamsLockUnlock",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getParamsMintBurn"`.
- */
-export function useInterchainTokenServiceGetParamsMintBurn<
-  TFunctionName extends "getParamsMintBurn",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getParamsMintBurn",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getStandardizedTokenAddress"`.
- */
-export function useInterchainTokenServiceGetStandardizedTokenAddress<
-  TFunctionName extends "getStandardizedTokenAddress",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getStandardizedTokenAddress",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getTokenAddress"`.
- */
-export function useInterchainTokenServiceGetTokenAddress<
-  TFunctionName extends "getTokenAddress",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getTokenAddress",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getTokenManagerAddress"`.
- */
-export function useInterchainTokenServiceGetTokenManagerAddress<
-  TFunctionName extends "getTokenManagerAddress",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getTokenManagerAddress",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"getValidTokenManagerAddress"`.
- */
-export function useInterchainTokenServiceGetValidTokenManagerAddress<
-  TFunctionName extends "getValidTokenManagerAddress",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenServiceABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenServiceABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "getValidTokenManagerAddress",
+    functionName: "hasRole",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
@@ -1703,10 +469,10 @@ export function useInterchainTokenServiceImplementation<
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"isPaused"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"interchainTokenAddress"`.
  */
-export function useInterchainTokenServiceIsPaused<
-  TFunctionName extends "isPaused",
+export function useInterchainTokenServiceInterchainTokenAddress<
+  TFunctionName extends "interchainTokenAddress",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1724,16 +490,16 @@ export function useInterchainTokenServiceIsPaused<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "isPaused",
+    functionName: "interchainTokenAddress",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"operator"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"interchainTokenDeployer"`.
  */
-export function useInterchainTokenServiceOperator<
-  TFunctionName extends "operator",
+export function useInterchainTokenServiceInterchainTokenDeployer<
+  TFunctionName extends "interchainTokenDeployer",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1751,7 +517,115 @@ export function useInterchainTokenServiceOperator<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "operator",
+    functionName: "interchainTokenDeployer",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"interchainTokenFactory"`.
+ */
+export function useInterchainTokenServiceInterchainTokenFactory<
+  TFunctionName extends "interchainTokenFactory",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "interchainTokenFactory",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"interchainTokenId"`.
+ */
+export function useInterchainTokenServiceInterchainTokenId<
+  TFunctionName extends "interchainTokenId",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "interchainTokenId",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"isOperator"`.
+ */
+export function useInterchainTokenServiceIsOperator<
+  TFunctionName extends "isOperator",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "isOperator",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"isTrustedAddress"`.
+ */
+export function useInterchainTokenServiceIsTrustedAddress<
+  TFunctionName extends "isTrustedAddress",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "isTrustedAddress",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
@@ -1784,6 +658,33 @@ export function useInterchainTokenServiceOwner<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"paused"`.
+ */
+export function useInterchainTokenServicePaused<
+  TFunctionName extends "paused",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "paused",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"pendingOwner"`.
  */
 export function useInterchainTokenServicePendingOwner<
@@ -1811,10 +712,10 @@ export function useInterchainTokenServicePendingOwner<
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"remoteAddressValidator"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"tokenHandler"`.
  */
-export function useInterchainTokenServiceRemoteAddressValidator<
-  TFunctionName extends "remoteAddressValidator",
+export function useInterchainTokenServiceTokenHandler<
+  TFunctionName extends "tokenHandler",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1832,16 +733,16 @@ export function useInterchainTokenServiceRemoteAddressValidator<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "remoteAddressValidator",
+    functionName: "tokenHandler",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"standardizedTokenDeployer"`.
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"tokenManager"`.
  */
-export function useInterchainTokenServiceStandardizedTokenDeployer<
-  TFunctionName extends "standardizedTokenDeployer",
+export function useInterchainTokenServiceTokenManager<
+  TFunctionName extends "tokenManager",
   TSelectData = ReadContractResult<
     typeof interchainTokenServiceABI,
     TFunctionName
@@ -1859,7 +760,34 @@ export function useInterchainTokenServiceStandardizedTokenDeployer<
   return useContractRead({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "standardizedTokenDeployer",
+    functionName: "tokenManager",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"tokenManagerAddress"`.
+ */
+export function useInterchainTokenServiceTokenManagerAddress<
+  TFunctionName extends "tokenManagerAddress",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "tokenManagerAddress",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
@@ -1887,6 +815,141 @@ export function useInterchainTokenServiceTokenManagerDeployer<
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
     functionName: "tokenManagerDeployer",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"tokenManagerImplementation"`.
+ */
+export function useInterchainTokenServiceTokenManagerImplementation<
+  TFunctionName extends "tokenManagerImplementation",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "tokenManagerImplementation",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"trustedAddress"`.
+ */
+export function useInterchainTokenServiceTrustedAddress<
+  TFunctionName extends "trustedAddress",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "trustedAddress",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"trustedAddressHash"`.
+ */
+export function useInterchainTokenServiceTrustedAddressHash<
+  TFunctionName extends "trustedAddressHash",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "trustedAddressHash",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"validTokenAddress"`.
+ */
+export function useInterchainTokenServiceValidTokenAddress<
+  TFunctionName extends "validTokenAddress",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "validTokenAddress",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"validTokenManagerAddress"`.
+ */
+export function useInterchainTokenServiceValidTokenManagerAddress<
+  TFunctionName extends "validTokenManagerAddress",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenServiceABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenServiceABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "validTokenManagerAddress",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenServiceABI, TFunctionName, TSelectData>);
 }
@@ -1922,6 +985,42 @@ export function useInterchainTokenServiceWrite<
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"acceptOperatorship"`.
+ */
+export function useInterchainTokenServiceAcceptOperatorship<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenServiceABI,
+          "acceptOperatorship"
+        >["request"]["abi"],
+        "acceptOperatorship",
+        TMode
+      > & { functionName?: "acceptOperatorship" }
+    : UseContractWriteConfig<
+        typeof interchainTokenServiceABI,
+        "acceptOperatorship",
+        TMode
+      > & {
+        abi?: never;
+        functionName?: "acceptOperatorship";
+      } = {} as any
+) {
+  return useContractWrite<
+    typeof interchainTokenServiceABI,
+    "acceptOperatorship",
+    TMode
+  >({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "acceptOperatorship",
     ...config,
   } as any);
 }
@@ -1963,181 +1062,109 @@ export function useInterchainTokenServiceAcceptOwnership<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployAndRegisterRemoteStandardizedToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
  */
-export function useInterchainTokenServiceDeployAndRegisterRemoteStandardizedToken<
+export function useInterchainTokenServiceCallContractWithInterchainToken<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "deployAndRegisterRemoteStandardizedToken"
+          "callContractWithInterchainToken"
         >["request"]["abi"],
-        "deployAndRegisterRemoteStandardizedToken",
+        "callContractWithInterchainToken",
         TMode
-      > & { functionName?: "deployAndRegisterRemoteStandardizedToken" }
+      > & { functionName?: "callContractWithInterchainToken" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "deployAndRegisterRemoteStandardizedToken",
+        "callContractWithInterchainToken",
         TMode
       > & {
         abi?: never;
-        functionName?: "deployAndRegisterRemoteStandardizedToken";
+        functionName?: "callContractWithInterchainToken";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "deployAndRegisterRemoteStandardizedToken",
+    "callContractWithInterchainToken",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "deployAndRegisterRemoteStandardizedToken",
+    functionName: "callContractWithInterchainToken",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployAndRegisterStandardizedToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployInterchainToken"`.
  */
-export function useInterchainTokenServiceDeployAndRegisterStandardizedToken<
+export function useInterchainTokenServiceDeployInterchainToken<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "deployAndRegisterStandardizedToken"
+          "deployInterchainToken"
         >["request"]["abi"],
-        "deployAndRegisterStandardizedToken",
+        "deployInterchainToken",
         TMode
-      > & { functionName?: "deployAndRegisterStandardizedToken" }
+      > & { functionName?: "deployInterchainToken" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "deployAndRegisterStandardizedToken",
+        "deployInterchainToken",
         TMode
       > & {
         abi?: never;
-        functionName?: "deployAndRegisterStandardizedToken";
+        functionName?: "deployInterchainToken";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "deployAndRegisterStandardizedToken",
+    "deployInterchainToken",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "deployAndRegisterStandardizedToken",
+    functionName: "deployInterchainToken",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployCustomTokenManager"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployTokenManager"`.
  */
-export function useInterchainTokenServiceDeployCustomTokenManager<
+export function useInterchainTokenServiceDeployTokenManager<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "deployCustomTokenManager"
+          "deployTokenManager"
         >["request"]["abi"],
-        "deployCustomTokenManager",
+        "deployTokenManager",
         TMode
-      > & { functionName?: "deployCustomTokenManager" }
+      > & { functionName?: "deployTokenManager" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "deployCustomTokenManager",
+        "deployTokenManager",
         TMode
       > & {
         abi?: never;
-        functionName?: "deployCustomTokenManager";
+        functionName?: "deployTokenManager";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "deployCustomTokenManager",
+    "deployTokenManager",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "deployCustomTokenManager",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployRemoteCanonicalToken"`.
- */
-export function useInterchainTokenServiceDeployRemoteCanonicalToken<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof interchainTokenServiceABI,
-          "deployRemoteCanonicalToken"
-        >["request"]["abi"],
-        "deployRemoteCanonicalToken",
-        TMode
-      > & { functionName?: "deployRemoteCanonicalToken" }
-    : UseContractWriteConfig<
-        typeof interchainTokenServiceABI,
-        "deployRemoteCanonicalToken",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "deployRemoteCanonicalToken";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof interchainTokenServiceABI,
-    "deployRemoteCanonicalToken",
-    TMode
-  >({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "deployRemoteCanonicalToken",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployRemoteCustomTokenManager"`.
- */
-export function useInterchainTokenServiceDeployRemoteCustomTokenManager<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof interchainTokenServiceABI,
-          "deployRemoteCustomTokenManager"
-        >["request"]["abi"],
-        "deployRemoteCustomTokenManager",
-        TMode
-      > & { functionName?: "deployRemoteCustomTokenManager" }
-    : UseContractWriteConfig<
-        typeof interchainTokenServiceABI,
-        "deployRemoteCustomTokenManager",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "deployRemoteCustomTokenManager";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof interchainTokenServiceABI,
-    "deployRemoteCustomTokenManager",
-    TMode
-  >({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "deployRemoteCustomTokenManager",
+    functionName: "deployTokenManager",
     ...config,
   } as any);
 }
@@ -2175,109 +1202,109 @@ export function useInterchainTokenServiceExecute<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"executeWithToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressExecute"`.
  */
-export function useInterchainTokenServiceExecuteWithToken<
+export function useInterchainTokenServiceExpressExecute<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "executeWithToken"
+          "expressExecute"
         >["request"]["abi"],
-        "executeWithToken",
+        "expressExecute",
         TMode
-      > & { functionName?: "executeWithToken" }
+      > & { functionName?: "expressExecute" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "executeWithToken",
+        "expressExecute",
         TMode
       > & {
         abi?: never;
-        functionName?: "executeWithToken";
+        functionName?: "expressExecute";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "executeWithToken",
+    "expressExecute",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "executeWithToken",
+    functionName: "expressExecute",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressReceiveToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressExecuteWithToken"`.
  */
-export function useInterchainTokenServiceExpressReceiveToken<
+export function useInterchainTokenServiceExpressExecuteWithToken<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "expressReceiveToken"
+          "expressExecuteWithToken"
         >["request"]["abi"],
-        "expressReceiveToken",
+        "expressExecuteWithToken",
         TMode
-      > & { functionName?: "expressReceiveToken" }
+      > & { functionName?: "expressExecuteWithToken" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "expressReceiveToken",
+        "expressExecuteWithToken",
         TMode
       > & {
         abi?: never;
-        functionName?: "expressReceiveToken";
+        functionName?: "expressExecuteWithToken";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "expressReceiveToken",
+    "expressExecuteWithToken",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "expressReceiveToken",
+    functionName: "expressExecuteWithToken",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressReceiveTokenWithData"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"interchainTransfer"`.
  */
-export function useInterchainTokenServiceExpressReceiveTokenWithData<
+export function useInterchainTokenServiceInterchainTransfer<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "expressReceiveTokenWithData"
+          "interchainTransfer"
         >["request"]["abi"],
-        "expressReceiveTokenWithData",
+        "interchainTransfer",
         TMode
-      > & { functionName?: "expressReceiveTokenWithData" }
+      > & { functionName?: "interchainTransfer" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "expressReceiveTokenWithData",
+        "interchainTransfer",
         TMode
       > & {
         abi?: never;
-        functionName?: "expressReceiveTokenWithData";
+        functionName?: "interchainTransfer";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "expressReceiveTokenWithData",
+    "interchainTransfer",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "expressReceiveTokenWithData",
+    functionName: "interchainTransfer",
     ...config,
   } as any);
 }
@@ -2317,6 +1344,42 @@ export function useInterchainTokenServiceMulticall<
 }
 
 /**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"proposeOperatorship"`.
+ */
+export function useInterchainTokenServiceProposeOperatorship<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenServiceABI,
+          "proposeOperatorship"
+        >["request"]["abi"],
+        "proposeOperatorship",
+        TMode
+      > & { functionName?: "proposeOperatorship" }
+    : UseContractWriteConfig<
+        typeof interchainTokenServiceABI,
+        "proposeOperatorship",
+        TMode
+      > & {
+        abi?: never;
+        functionName?: "proposeOperatorship";
+      } = {} as any
+) {
+  return useContractWrite<
+    typeof interchainTokenServiceABI,
+    "proposeOperatorship",
+    TMode
+  >({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "proposeOperatorship",
+    ...config,
+  } as any);
+}
+
+/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"proposeOwnership"`.
  */
 export function useInterchainTokenServiceProposeOwnership<
@@ -2353,145 +1416,147 @@ export function useInterchainTokenServiceProposeOwnership<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"registerCanonicalToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"removeTrustedAddress"`.
  */
-export function useInterchainTokenServiceRegisterCanonicalToken<
+export function useInterchainTokenServiceRemoveTrustedAddress<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "registerCanonicalToken"
+          "removeTrustedAddress"
         >["request"]["abi"],
-        "registerCanonicalToken",
+        "removeTrustedAddress",
         TMode
-      > & { functionName?: "registerCanonicalToken" }
+      > & { functionName?: "removeTrustedAddress" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "registerCanonicalToken",
+        "removeTrustedAddress",
         TMode
       > & {
         abi?: never;
-        functionName?: "registerCanonicalToken";
+        functionName?: "removeTrustedAddress";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "registerCanonicalToken",
+    "removeTrustedAddress",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "registerCanonicalToken",
+    functionName: "removeTrustedAddress",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setFlowLimit"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setFlowLimits"`.
  */
-export function useInterchainTokenServiceSetFlowLimit<
+export function useInterchainTokenServiceSetFlowLimits<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "setFlowLimit"
+          "setFlowLimits"
         >["request"]["abi"],
-        "setFlowLimit",
+        "setFlowLimits",
         TMode
-      > & { functionName?: "setFlowLimit" }
+      > & { functionName?: "setFlowLimits" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "setFlowLimit",
+        "setFlowLimits",
         TMode
       > & {
         abi?: never;
-        functionName?: "setFlowLimit";
+        functionName?: "setFlowLimits";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "setFlowLimit",
+    "setFlowLimits",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "setFlowLimit",
+    functionName: "setFlowLimits",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setOperator"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setPauseStatus"`.
  */
-export function useInterchainTokenServiceSetOperator<
+export function useInterchainTokenServiceSetPauseStatus<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "setOperator"
+          "setPauseStatus"
         >["request"]["abi"],
-        "setOperator",
+        "setPauseStatus",
         TMode
-      > & { functionName?: "setOperator" }
+      > & { functionName?: "setPauseStatus" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "setOperator",
+        "setPauseStatus",
         TMode
       > & {
         abi?: never;
-        functionName?: "setOperator";
+        functionName?: "setPauseStatus";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "setOperator",
+    "setPauseStatus",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "setOperator",
+    functionName: "setPauseStatus",
     ...config,
   } as any);
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setPaused"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setTrustedAddress"`.
  */
-export function useInterchainTokenServiceSetPaused<
+export function useInterchainTokenServiceSetTrustedAddress<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "setPaused"
+          "setTrustedAddress"
         >["request"]["abi"],
-        "setPaused",
+        "setTrustedAddress",
         TMode
-      > & { functionName?: "setPaused" }
+      > & { functionName?: "setTrustedAddress" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "setPaused",
+        "setTrustedAddress",
         TMode
       > & {
         abi?: never;
-        functionName?: "setPaused";
+        functionName?: "setTrustedAddress";
       } = {} as any
 ) {
-  return useContractWrite<typeof interchainTokenServiceABI, "setPaused", TMode>(
-    {
-      abi: interchainTokenServiceABI,
-      address: interchainTokenServiceAddress,
-      functionName: "setPaused",
-      ...config,
-    } as any
-  );
+  return useContractWrite<
+    typeof interchainTokenServiceABI,
+    "setTrustedAddress",
+    TMode
+  >({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "setTrustedAddress",
+    ...config,
+  } as any);
 }
 
 /**
@@ -2522,6 +1587,42 @@ export function useInterchainTokenServiceSetup<
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
     functionName: "setup",
+    ...config,
+  } as any);
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"transferOperatorship"`.
+ */
+export function useInterchainTokenServiceTransferOperatorship<
+  TMode extends WriteContractMode = undefined
+>(
+  config: TMode extends "prepared"
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof interchainTokenServiceABI,
+          "transferOperatorship"
+        >["request"]["abi"],
+        "transferOperatorship",
+        TMode
+      > & { functionName?: "transferOperatorship" }
+    : UseContractWriteConfig<
+        typeof interchainTokenServiceABI,
+        "transferOperatorship",
+        TMode
+      > & {
+        abi?: never;
+        functionName?: "transferOperatorship";
+      } = {} as any
+) {
+  return useContractWrite<
+    typeof interchainTokenServiceABI,
+    "transferOperatorship",
+    TMode
+  >({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "transferOperatorship",
     ...config,
   } as any);
 }
@@ -2563,37 +1664,37 @@ export function useInterchainTokenServiceTransferOwnership<
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"transmitSendToken"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
  */
-export function useInterchainTokenServiceTransmitSendToken<
+export function useInterchainTokenServiceTransmitInterchainTransfer<
   TMode extends WriteContractMode = undefined
 >(
   config: TMode extends "prepared"
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof interchainTokenServiceABI,
-          "transmitSendToken"
+          "transmitInterchainTransfer"
         >["request"]["abi"],
-        "transmitSendToken",
+        "transmitInterchainTransfer",
         TMode
-      > & { functionName?: "transmitSendToken" }
+      > & { functionName?: "transmitInterchainTransfer" }
     : UseContractWriteConfig<
         typeof interchainTokenServiceABI,
-        "transmitSendToken",
+        "transmitInterchainTransfer",
         TMode
       > & {
         abi?: never;
-        functionName?: "transmitSendToken";
+        functionName?: "transmitInterchainTransfer";
       } = {} as any
 ) {
   return useContractWrite<
     typeof interchainTokenServiceABI,
-    "transmitSendToken",
+    "transmitInterchainTransfer",
     TMode
   >({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "transmitSendToken",
+    functionName: "transmitInterchainTransfer",
     ...config,
   } as any);
 }
@@ -2652,6 +1753,26 @@ export function usePrepareInterchainTokenServiceWrite<
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"acceptOperatorship"`.
+ */
+export function usePrepareInterchainTokenServiceAcceptOperatorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof interchainTokenServiceABI,
+      "acceptOperatorship"
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "acceptOperatorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "acceptOperatorship">);
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"acceptOwnership"`.
  */
 export function usePrepareInterchainTokenServiceAcceptOwnership(
@@ -2672,13 +1793,13 @@ export function usePrepareInterchainTokenServiceAcceptOwnership(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployAndRegisterRemoteStandardizedToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"callContractWithInterchainToken"`.
  */
-export function usePrepareInterchainTokenServiceDeployAndRegisterRemoteStandardizedToken(
+export function usePrepareInterchainTokenServiceCallContractWithInterchainToken(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "deployAndRegisterRemoteStandardizedToken"
+      "callContractWithInterchainToken"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2686,19 +1807,19 @@ export function usePrepareInterchainTokenServiceDeployAndRegisterRemoteStandardi
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "deployAndRegisterRemoteStandardizedToken",
+    functionName: "callContractWithInterchainToken",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployAndRegisterRemoteStandardizedToken">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "callContractWithInterchainToken">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployAndRegisterStandardizedToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployInterchainToken"`.
  */
-export function usePrepareInterchainTokenServiceDeployAndRegisterStandardizedToken(
+export function usePrepareInterchainTokenServiceDeployInterchainToken(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "deployAndRegisterStandardizedToken"
+      "deployInterchainToken"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2706,19 +1827,19 @@ export function usePrepareInterchainTokenServiceDeployAndRegisterStandardizedTok
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "deployAndRegisterStandardizedToken",
+    functionName: "deployInterchainToken",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployAndRegisterStandardizedToken">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployInterchainToken">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployCustomTokenManager"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployTokenManager"`.
  */
-export function usePrepareInterchainTokenServiceDeployCustomTokenManager(
+export function usePrepareInterchainTokenServiceDeployTokenManager(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "deployCustomTokenManager"
+      "deployTokenManager"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2726,49 +1847,9 @@ export function usePrepareInterchainTokenServiceDeployCustomTokenManager(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "deployCustomTokenManager",
+    functionName: "deployTokenManager",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployCustomTokenManager">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployRemoteCanonicalToken"`.
- */
-export function usePrepareInterchainTokenServiceDeployRemoteCanonicalToken(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof interchainTokenServiceABI,
-      "deployRemoteCanonicalToken"
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "deployRemoteCanonicalToken",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployRemoteCanonicalToken">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"deployRemoteCustomTokenManager"`.
- */
-export function usePrepareInterchainTokenServiceDeployRemoteCustomTokenManager(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof interchainTokenServiceABI,
-      "deployRemoteCustomTokenManager"
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    functionName: "deployRemoteCustomTokenManager",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployRemoteCustomTokenManager">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "deployTokenManager">);
 }
 
 /**
@@ -2789,13 +1870,13 @@ export function usePrepareInterchainTokenServiceExecute(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"executeWithToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressExecute"`.
  */
-export function usePrepareInterchainTokenServiceExecuteWithToken(
+export function usePrepareInterchainTokenServiceExpressExecute(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "executeWithToken"
+      "expressExecute"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2803,19 +1884,19 @@ export function usePrepareInterchainTokenServiceExecuteWithToken(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "executeWithToken",
+    functionName: "expressExecute",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "executeWithToken">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "expressExecute">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressReceiveToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressExecuteWithToken"`.
  */
-export function usePrepareInterchainTokenServiceExpressReceiveToken(
+export function usePrepareInterchainTokenServiceExpressExecuteWithToken(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "expressReceiveToken"
+      "expressExecuteWithToken"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2823,19 +1904,19 @@ export function usePrepareInterchainTokenServiceExpressReceiveToken(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "expressReceiveToken",
+    functionName: "expressExecuteWithToken",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "expressReceiveToken">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "expressExecuteWithToken">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"expressReceiveTokenWithData"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"interchainTransfer"`.
  */
-export function usePrepareInterchainTokenServiceExpressReceiveTokenWithData(
+export function usePrepareInterchainTokenServiceInterchainTransfer(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "expressReceiveTokenWithData"
+      "interchainTransfer"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2843,9 +1924,9 @@ export function usePrepareInterchainTokenServiceExpressReceiveTokenWithData(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "expressReceiveTokenWithData",
+    functionName: "interchainTransfer",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "expressReceiveTokenWithData">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "interchainTransfer">);
 }
 
 /**
@@ -2869,6 +1950,26 @@ export function usePrepareInterchainTokenServiceMulticall(
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"proposeOperatorship"`.
+ */
+export function usePrepareInterchainTokenServiceProposeOperatorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof interchainTokenServiceABI,
+      "proposeOperatorship"
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "proposeOperatorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "proposeOperatorship">);
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"proposeOwnership"`.
  */
 export function usePrepareInterchainTokenServiceProposeOwnership(
@@ -2889,13 +1990,13 @@ export function usePrepareInterchainTokenServiceProposeOwnership(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"registerCanonicalToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"removeTrustedAddress"`.
  */
-export function usePrepareInterchainTokenServiceRegisterCanonicalToken(
+export function usePrepareInterchainTokenServiceRemoveTrustedAddress(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "registerCanonicalToken"
+      "removeTrustedAddress"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2903,19 +2004,19 @@ export function usePrepareInterchainTokenServiceRegisterCanonicalToken(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "registerCanonicalToken",
+    functionName: "removeTrustedAddress",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "registerCanonicalToken">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "removeTrustedAddress">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setFlowLimit"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setFlowLimits"`.
  */
-export function usePrepareInterchainTokenServiceSetFlowLimit(
+export function usePrepareInterchainTokenServiceSetFlowLimits(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "setFlowLimit"
+      "setFlowLimits"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2923,19 +2024,19 @@ export function usePrepareInterchainTokenServiceSetFlowLimit(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "setFlowLimit",
+    functionName: "setFlowLimits",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setFlowLimit">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setFlowLimits">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setOperator"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setPauseStatus"`.
  */
-export function usePrepareInterchainTokenServiceSetOperator(
+export function usePrepareInterchainTokenServiceSetPauseStatus(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "setOperator"
+      "setPauseStatus"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2943,19 +2044,19 @@ export function usePrepareInterchainTokenServiceSetOperator(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "setOperator",
+    functionName: "setPauseStatus",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setOperator">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setPauseStatus">);
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setPaused"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"setTrustedAddress"`.
  */
-export function usePrepareInterchainTokenServiceSetPaused(
+export function usePrepareInterchainTokenServiceSetTrustedAddress(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "setPaused"
+      "setTrustedAddress"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -2963,9 +2064,9 @@ export function usePrepareInterchainTokenServiceSetPaused(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "setPaused",
+    functionName: "setTrustedAddress",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setPaused">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setTrustedAddress">);
 }
 
 /**
@@ -2983,6 +2084,26 @@ export function usePrepareInterchainTokenServiceSetup(
     functionName: "setup",
     ...config,
   } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "setup">);
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"transferOperatorship"`.
+ */
+export function usePrepareInterchainTokenServiceTransferOperatorship(
+  config: Omit<
+    UsePrepareContractWriteConfig<
+      typeof interchainTokenServiceABI,
+      "transferOperatorship"
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return usePrepareContractWrite({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    functionName: "transferOperatorship",
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "transferOperatorship">);
 }
 
 /**
@@ -3006,13 +2127,13 @@ export function usePrepareInterchainTokenServiceTransferOwnership(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"transmitSendToken"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `functionName` set to `"transmitInterchainTransfer"`.
  */
-export function usePrepareInterchainTokenServiceTransmitSendToken(
+export function usePrepareInterchainTokenServiceTransmitInterchainTransfer(
   config: Omit<
     UsePrepareContractWriteConfig<
       typeof interchainTokenServiceABI,
-      "transmitSendToken"
+      "transmitInterchainTransfer"
     >,
     "abi" | "address" | "functionName"
   > = {} as any
@@ -3020,9 +2141,9 @@ export function usePrepareInterchainTokenServiceTransmitSendToken(
   return usePrepareContractWrite({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    functionName: "transmitSendToken",
+    functionName: "transmitInterchainTransfer",
     ...config,
-  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "transmitSendToken">);
+  } as UsePrepareContractWriteConfig<typeof interchainTokenServiceABI, "transmitInterchainTransfer">);
 }
 
 /**
@@ -3059,13 +2180,30 @@ export function useInterchainTokenServiceEvent<TEventName extends string>(
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"CustomTokenIdClaimed"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"ExpressExecuted"`.
  */
-export function useInterchainTokenServiceCustomTokenIdClaimedEvent(
+export function useInterchainTokenServiceExpressExecutedEvent(
+  config: Omit<
+    UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressExecuted">,
+    "abi" | "address" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    eventName: "ExpressExecuted",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressExecuted">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"ExpressExecutedWithToken"`.
+ */
+export function useInterchainTokenServiceExpressExecutedWithTokenEvent(
   config: Omit<
     UseContractEventConfig<
       typeof interchainTokenServiceABI,
-      "CustomTokenIdClaimed"
+      "ExpressExecutedWithToken"
     >,
     "abi" | "address" | "eventName"
   > = {} as any
@@ -3073,9 +2211,9 @@ export function useInterchainTokenServiceCustomTokenIdClaimedEvent(
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "CustomTokenIdClaimed",
+    eventName: "ExpressExecutedWithToken",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "CustomTokenIdClaimed">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressExecutedWithToken">);
 }
 
 /**
@@ -3099,13 +2237,13 @@ export function useInterchainTokenServiceExpressExecutionFulfilledEvent(
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"ExpressExecutionWithDataFulfilled"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"ExpressExecutionWithTokenFulfilled"`.
  */
-export function useInterchainTokenServiceExpressExecutionWithDataFulfilledEvent(
+export function useInterchainTokenServiceExpressExecutionWithTokenFulfilledEvent(
   config: Omit<
     UseContractEventConfig<
       typeof interchainTokenServiceABI,
-      "ExpressExecutionWithDataFulfilled"
+      "ExpressExecutionWithTokenFulfilled"
     >,
     "abi" | "address" | "eventName"
   > = {} as any
@@ -3113,36 +2251,19 @@ export function useInterchainTokenServiceExpressExecutionWithDataFulfilledEvent(
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "ExpressExecutionWithDataFulfilled",
+    eventName: "ExpressExecutionWithTokenFulfilled",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressExecutionWithDataFulfilled">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressExecutionWithTokenFulfilled">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"ExpressReceive"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTokenDeployed"`.
  */
-export function useInterchainTokenServiceExpressReceiveEvent(
-  config: Omit<
-    UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressReceive">,
-    "abi" | "address" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    eventName: "ExpressReceive",
-    ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressReceive">);
-}
-
-/**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"ExpressReceiveWithData"`.
- */
-export function useInterchainTokenServiceExpressReceiveWithDataEvent(
+export function useInterchainTokenServiceInterchainTokenDeployedEvent(
   config: Omit<
     UseContractEventConfig<
       typeof interchainTokenServiceABI,
-      "ExpressReceiveWithData"
+      "InterchainTokenDeployed"
     >,
     "abi" | "address" | "eventName"
   > = {} as any
@@ -3150,26 +2271,89 @@ export function useInterchainTokenServiceExpressReceiveWithDataEvent(
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "ExpressReceiveWithData",
+    eventName: "InterchainTokenDeployed",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "ExpressReceiveWithData">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTokenDeployed">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"OperatorChanged"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTokenDeploymentStarted"`.
  */
-export function useInterchainTokenServiceOperatorChangedEvent(
+export function useInterchainTokenServiceInterchainTokenDeploymentStartedEvent(
   config: Omit<
-    UseContractEventConfig<typeof interchainTokenServiceABI, "OperatorChanged">,
+    UseContractEventConfig<
+      typeof interchainTokenServiceABI,
+      "InterchainTokenDeploymentStarted"
+    >,
     "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "OperatorChanged",
+    eventName: "InterchainTokenDeploymentStarted",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "OperatorChanged">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTokenDeploymentStarted">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTokenIdClaimed"`.
+ */
+export function useInterchainTokenServiceInterchainTokenIdClaimedEvent(
+  config: Omit<
+    UseContractEventConfig<
+      typeof interchainTokenServiceABI,
+      "InterchainTokenIdClaimed"
+    >,
+    "abi" | "address" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    eventName: "InterchainTokenIdClaimed",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTokenIdClaimed">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTransfer"`.
+ */
+export function useInterchainTokenServiceInterchainTransferEvent(
+  config: Omit<
+    UseContractEventConfig<
+      typeof interchainTokenServiceABI,
+      "InterchainTransfer"
+    >,
+    "abi" | "address" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    eventName: "InterchainTransfer",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTransfer">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"InterchainTransferReceived"`.
+ */
+export function useInterchainTokenServiceInterchainTransferReceivedEvent(
+  config: Omit<
+    UseContractEventConfig<
+      typeof interchainTokenServiceABI,
+      "InterchainTransferReceived"
+    >,
+    "abi" | "address" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    eventName: "InterchainTransferReceived",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "InterchainTransferReceived">);
 }
 
 /**
@@ -3213,80 +2397,71 @@ export function useInterchainTokenServiceOwnershipTransferredEvent(
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"PausedSet"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"Paused"`.
  */
-export function useInterchainTokenServicePausedSetEvent(
+export function useInterchainTokenServicePausedEvent(
   config: Omit<
-    UseContractEventConfig<typeof interchainTokenServiceABI, "PausedSet">,
+    UseContractEventConfig<typeof interchainTokenServiceABI, "Paused">,
     "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "PausedSet",
+    eventName: "Paused",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "PausedSet">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "Paused">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"RemoteStandardizedTokenAndManagerDeploymentInitialized"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"RolesAdded"`.
  */
-export function useInterchainTokenServiceRemoteStandardizedTokenAndManagerDeploymentInitializedEvent(
+export function useInterchainTokenServiceRolesAddedEvent(
   config: Omit<
-    UseContractEventConfig<
-      typeof interchainTokenServiceABI,
-      "RemoteStandardizedTokenAndManagerDeploymentInitialized"
-    >,
+    UseContractEventConfig<typeof interchainTokenServiceABI, "RolesAdded">,
     "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "RemoteStandardizedTokenAndManagerDeploymentInitialized",
+    eventName: "RolesAdded",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "RemoteStandardizedTokenAndManagerDeploymentInitialized">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "RolesAdded">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"RemoteTokenManagerDeploymentInitialized"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"RolesProposed"`.
  */
-export function useInterchainTokenServiceRemoteTokenManagerDeploymentInitializedEvent(
+export function useInterchainTokenServiceRolesProposedEvent(
   config: Omit<
-    UseContractEventConfig<
-      typeof interchainTokenServiceABI,
-      "RemoteTokenManagerDeploymentInitialized"
-    >,
+    UseContractEventConfig<typeof interchainTokenServiceABI, "RolesProposed">,
     "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "RemoteTokenManagerDeploymentInitialized",
+    eventName: "RolesProposed",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "RemoteTokenManagerDeploymentInitialized">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "RolesProposed">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"StandardizedTokenDeployed"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"RolesRemoved"`.
  */
-export function useInterchainTokenServiceStandardizedTokenDeployedEvent(
+export function useInterchainTokenServiceRolesRemovedEvent(
   config: Omit<
-    UseContractEventConfig<
-      typeof interchainTokenServiceABI,
-      "StandardizedTokenDeployed"
-    >,
+    UseContractEventConfig<typeof interchainTokenServiceABI, "RolesRemoved">,
     "abi" | "address" | "eventName"
   > = {} as any
 ) {
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "StandardizedTokenDeployed",
+    eventName: "RolesRemoved",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "StandardizedTokenDeployed">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "RolesRemoved">);
 }
 
 /**
@@ -3310,30 +2485,13 @@ export function useInterchainTokenServiceTokenManagerDeployedEvent(
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TokenReceived"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TokenManagerDeploymentStarted"`.
  */
-export function useInterchainTokenServiceTokenReceivedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof interchainTokenServiceABI, "TokenReceived">,
-    "abi" | "address" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    eventName: "TokenReceived",
-    ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TokenReceived">);
-}
-
-/**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TokenReceivedWithData"`.
- */
-export function useInterchainTokenServiceTokenReceivedWithDataEvent(
+export function useInterchainTokenServiceTokenManagerDeploymentStartedEvent(
   config: Omit<
     UseContractEventConfig<
       typeof interchainTokenServiceABI,
-      "TokenReceivedWithData"
+      "TokenManagerDeploymentStarted"
     >,
     "abi" | "address" | "eventName"
   > = {} as any
@@ -3341,36 +2499,19 @@ export function useInterchainTokenServiceTokenReceivedWithDataEvent(
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "TokenReceivedWithData",
+    eventName: "TokenManagerDeploymentStarted",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TokenReceivedWithData">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TokenManagerDeploymentStarted">);
 }
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TokenSent"`.
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TrustedAddressRemoved"`.
  */
-export function useInterchainTokenServiceTokenSentEvent(
-  config: Omit<
-    UseContractEventConfig<typeof interchainTokenServiceABI, "TokenSent">,
-    "abi" | "address" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: interchainTokenServiceABI,
-    address: interchainTokenServiceAddress,
-    eventName: "TokenSent",
-    ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TokenSent">);
-}
-
-/**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TokenSentWithData"`.
- */
-export function useInterchainTokenServiceTokenSentWithDataEvent(
+export function useInterchainTokenServiceTrustedAddressRemovedEvent(
   config: Omit<
     UseContractEventConfig<
       typeof interchainTokenServiceABI,
-      "TokenSentWithData"
+      "TrustedAddressRemoved"
     >,
     "abi" | "address" | "eventName"
   > = {} as any
@@ -3378,9 +2519,46 @@ export function useInterchainTokenServiceTokenSentWithDataEvent(
   return useContractEvent({
     abi: interchainTokenServiceABI,
     address: interchainTokenServiceAddress,
-    eventName: "TokenSentWithData",
+    eventName: "TrustedAddressRemoved",
     ...config,
-  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TokenSentWithData">);
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TrustedAddressRemoved">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"TrustedAddressSet"`.
+ */
+export function useInterchainTokenServiceTrustedAddressSetEvent(
+  config: Omit<
+    UseContractEventConfig<
+      typeof interchainTokenServiceABI,
+      "TrustedAddressSet"
+    >,
+    "abi" | "address" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    eventName: "TrustedAddressSet",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "TrustedAddressSet">);
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link interchainTokenServiceABI}__ and `eventName` set to `"Unpaused"`.
+ */
+export function useInterchainTokenServiceUnpausedEvent(
+  config: Omit<
+    UseContractEventConfig<typeof interchainTokenServiceABI, "Unpaused">,
+    "abi" | "address" | "eventName"
+  > = {} as any
+) {
+  return useContractEvent({
+    abi: interchainTokenServiceABI,
+    address: interchainTokenServiceAddress,
+    eventName: "Unpaused",
+    ...config,
+  } as UseContractEventConfig<typeof interchainTokenServiceABI, "Unpaused">);
 }
 
 /**

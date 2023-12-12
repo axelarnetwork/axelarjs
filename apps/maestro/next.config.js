@@ -1,17 +1,15 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 
+const HOSTNAMES = ["testnet.axelar.network", "testnet.axelarscan.io"];
+
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        hostname: "testnet.axelar.network",
-      },
-    ],
+    remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
 };
 
