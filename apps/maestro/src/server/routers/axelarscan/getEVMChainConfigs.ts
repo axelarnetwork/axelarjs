@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
@@ -70,10 +71,10 @@ export const getEVMChainConfigs = publicProcedure
   .query(async ({ ctx, input }) => {
     try {
       const chainsMap = await ctx.configs.evmChains();
+      const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
+      const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
 
-      const evm = Object.values(chainsMap).map((chain) => chain.info);
-
-      return evm.filter(
+      return uniqueChainInfos.filter(
         (chain) =>
           !chain.deprecated &&
           // filter also by axelarChainId if provided
