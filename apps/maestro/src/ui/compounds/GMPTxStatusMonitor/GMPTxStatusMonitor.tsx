@@ -208,7 +208,7 @@ export type ChainStatusItemsProps = Omit<
   chains: EVMChainConfig[];
 };
 
-export const ChainStatusItems: FC<ChainStatusItemsProps> = ({
+export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
   chains,
   status,
   txHash,
@@ -234,6 +234,7 @@ export const ChainStatusItems: FC<ChainStatusItemsProps> = ({
       null;
     }
   };
+
   return (
     <li className={cn("flex flex-1 items-center justify-between", className)}>
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />

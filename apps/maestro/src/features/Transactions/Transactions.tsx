@@ -11,7 +11,7 @@ import {
 } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import {
-  ChainStatusItems,
+  CollapsedChainStatusItems,
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
@@ -116,7 +116,7 @@ const ToastElement: FC<{
       {hasStatus ? (
         <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
           {statusEntriesGroup.initialized.length > 0 ? (
-            <ChainStatusItems
+            <CollapsedChainStatusItems
               compact
               key={`initialized`}
               chains={statusEntriesGroup.initialized.map(
@@ -132,7 +132,7 @@ const ToastElement: FC<{
           ) : (
             <div>
               {statusEntriesGroup.confirmed.length > 0 && (
-                <ChainStatusItems
+                <CollapsedChainStatusItems
                   compact
                   key={`confirmed`}
                   chains={statusEntriesGroup.confirmed.map(
@@ -148,7 +148,7 @@ const ToastElement: FC<{
               )}
 
               {statusEntriesGroup.executed.length > 0 && (
-                <ChainStatusItems
+                <CollapsedChainStatusItems
                   compact
                   key={`executed`}
                   chains={statusEntriesGroup.executed.map(
