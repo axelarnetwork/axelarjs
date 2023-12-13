@@ -35,7 +35,6 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
   useWaitForTransaction({
     hash: acceptResult?.hash,
-    confirmations: 8,
     async onSuccess(receipt) {
       if (!acceptResult) {
         return;

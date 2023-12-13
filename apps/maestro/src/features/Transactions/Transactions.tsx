@@ -166,25 +166,27 @@ const GMPTransaction: FC<{
 
   const intervalRef = useRef<number>();
 
-  const watchTxToCompletion = useCallback(async () => {
-    return new Promise((resolve) => {
-      intervalRef.current = window.setInterval(() => {
-        if (isLoading) {
-          return;
-        }
+  const watchTxToCompletion = useCallback(
+    async () =>
+      new Promise((resolve) => {
+        intervalRef.current = window.setInterval(() => {
+          if (isLoading) {
+            return;
+          }
 
-        if (executed >= total) {
-          window.clearInterval(intervalRef.current);
+          if (total > 0 && executed >= total) {
+            window.clearInterval(intervalRef.current);
 
-          resolve({
-            status: "success",
-            executed,
-            total,
-          });
-        }
-      }, 1000);
-    });
-  }, [executed, isLoading, total]);
+            resolve({
+              status: "success",
+              executed,
+              total,
+            });
+          }
+        }, 5000);
+      }),
+    [executed, isLoading, total]
+  );
 
   useEffect(() => {
     async function task(toastId: string) {

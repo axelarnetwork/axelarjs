@@ -42,7 +42,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
 
   useWaitForTransaction({
     hash: txState.status === "submitted" ? txState.hash : undefined,
-    confirmations: 8,
     async onSuccess(receipt) {
       await recordRemoteTokenDeployment({
         tokenAddress: props.tokenAddress,

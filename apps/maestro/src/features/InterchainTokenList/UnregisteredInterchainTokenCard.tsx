@@ -68,7 +68,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
             {props.deploymentStatus && props.deploymentTxHash && (
               <Indicator.Item
                 $as="div"
-                className="-translate-y-3 translate-x-3"
+                className="-translate-y-2 translate-x-0"
               >
                 <GMPStatusIndicator
                   txHash={props.deploymentTxHash}

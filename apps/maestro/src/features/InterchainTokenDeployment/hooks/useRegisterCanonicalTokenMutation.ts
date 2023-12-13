@@ -62,7 +62,6 @@ export function useRegisterCanonicalTokenMutation(
 
   useWaitForTransaction({
     hash: multicall.data?.hash,
-    confirmations: 8,
     onSuccess() {
       if (!multicall.data) {
         console.error(
