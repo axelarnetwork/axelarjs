@@ -3,7 +3,11 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useRef, type FC } from "react";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
+import {
+  useGetTransactionStatusOnDestinationChainsQuery,
+  useGetTransactionType,
+} from "~/services/gmp/hooks";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import {
   ChainStatusItem,
   useGMPTxProgress,
@@ -20,6 +24,9 @@ const ToastElement: FC<{
   );
 
   const { computed } = useEVMChainConfigsQuery();
+  const { data: isInterchainTokenDeployment } = useGetTransactionType({
+    txHash,
+  });
 
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash,
@@ -42,15 +49,32 @@ const ToastElement: FC<{
 
   const hasStatus = statusEntries.length > 0;
 
+  const txTypeText =
+    isInterchainTokenDeployment === "INTERCHAIN_DEPLOYMENT"
+      ? "Interchain Deployment"
+      : isInterchainTokenDeployment === "INTERCHAIN_TRANSFER"
+      ? "Interchain Transfer"
+      : "Loading...";
+
   const content = (
     <>
       {elapsedBlocks < expectedConfirmations && (
-        <div className="mx-auto">
-          <div className="text-sm">
-            {elapsedBlocks} / {expectedConfirmations} blocks{" "}
-            <span className="text-sm opacity-75">({progress})</span>
+        <>
+          <div className="flex items-center">
+            <ChainIcon
+              src={computed.indexedByChainId[chainId]?.image}
+              size={"md"}
+              alt={"Arbitrum"}
+            />
+            <div className="mx-2">
+              <span className="text-sm">{txTypeText}</span>
+              <div className="text-xs">
+                {elapsedBlocks} / {expectedConfirmations} blocks{" "}
+                <span className="opacity-75">({progress})</span>
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}{" "}
       {hasStatus ? (
         <ul className="rounded-box grid gap-2 p-4">
