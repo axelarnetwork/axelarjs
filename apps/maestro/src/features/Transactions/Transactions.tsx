@@ -78,41 +78,39 @@ const ToastElement: FC<{
 
   const content = (
     <>
-      <>
-        <div className="flex items-center">
-          <Tooltip tip="View on Axelarscan" position="left">
-            <Link
-              href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
-              target="_blank"
-              rel="noopener noreferrer"
+      <div className="flex items-center">
+        <Tooltip tip="View on Axelarscan" position="left">
+          <Link
+            href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ChainIcon
+              src={computed.indexedByChainId[chainId]?.image}
+              size={"md"}
+              alt={"Arbitrum"}
+            />
+          </Link>
+        </Tooltip>
+        <div className="mx-2 flex flex-col items-start">
+          <span className="text-sm">{txTypeText}</span>
+          {elapsedBlocks < expectedConfirmations ? (
+            <Tooltip
+              tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
+              position="top"
             >
-              <ChainIcon
-                src={computed.indexedByChainId[chainId]?.image}
-                size={"md"}
-                alt={"Arbitrum"}
-              />
-            </Link>
-          </Tooltip>
-          <div className="mx-2 flex flex-col items-start">
-            <span className="text-sm">{txTypeText}</span>
-            {elapsedBlocks < expectedConfirmations ? (
-              <Tooltip
-                tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
-                position="top"
-              >
-                <div className="text-xs">
-                  {elapsedBlocks} / {expectedConfirmations} blocks{" "}
-                  <span className="opacity-75">({progress})</span>
-                </div>
-              </Tooltip>
-            ) : (
-              <Tooltip tip={`Waiting for approval on Axelar`} position="top">
-                <div className="text-xs">Finality Blocks Reached</div>
-              </Tooltip>
-            )}
-          </div>
+              <div className="text-xs">
+                {elapsedBlocks} / {expectedConfirmations} blocks{" "}
+                <span className="opacity-75">({progress})</span>
+              </div>
+            </Tooltip>
+          ) : (
+            <Tooltip tip={`Waiting for approval on Axelar`} position="top">
+              <div className="text-xs">Finality Blocks Reached</div>
+            </Tooltip>
+          )}
         </div>
-      </>{" "}
+      </div>{" "}
       {hasStatus ? (
         <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
           {statusEntriesGroup.initialized.length > 0 ? (
