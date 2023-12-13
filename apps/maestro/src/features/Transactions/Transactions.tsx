@@ -74,19 +74,29 @@ const ToastElement: FC<{
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
+  const chainConfig = computed.indexedByChainId[chainId];
+
+  const wagmiChain = useMemo(
+    () => computed.wagmiChains.find((wagmiChain) => wagmiChain.id === chainId),
+    [computed.wagmiChains, chainId]
+  );
+
   const content = (
     <>
       <div className="flex items-center">
-        <Tooltip tip="View on Axelarscan" position="left">
+        <Tooltip
+          tip={`View on ${wagmiChain?.blockExplorers?.default.name}`}
+          position="left"
+        >
           <Link
-            href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+            href={`${wagmiChain?.blockExplorers?.default.url}/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <ChainIcon
-              src={computed.indexedByChainId[chainId]?.image}
-              size={"md"}
-              alt={"Arbitrum"}
+              src={chainConfig.image}
+              alt={chainConfig.name}
+              size="md"
             />
           </Link>
         </Tooltip>
@@ -104,7 +114,9 @@ const ToastElement: FC<{
             </Tooltip>
           ) : (
             <Tooltip tip={`Waiting for approval on Axelar`} position="top">
-              <div className="text-xs">Finality Blocks Reached</div>
+              <div className="flex items-center gap-1 text-xs">
+                Finality blocks reached <span className="text-success">✓</span>
+              </div>
             </Tooltip>
           )}
         </div>
@@ -112,7 +124,7 @@ const ToastElement: FC<{
       {!hasStatus ? (
         <div className="p-4 text-sm">Loading tx status...</div>
       ) : (
-        <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
+        <ul className="mt-1 grid gap-2 pb-2 pl-3">
           {groupedStatusesProps.map((props) => (
             <CollapsedChainStatusItems key={props.status} {...props} />
           ))}

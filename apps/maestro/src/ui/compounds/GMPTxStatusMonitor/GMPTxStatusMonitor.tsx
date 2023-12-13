@@ -2,10 +2,12 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
+import Link from "next/link";
 
-import { clamp } from "rambda";
+import { clamp, splitAt } from "rambda";
 import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
+import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
@@ -229,28 +231,37 @@ const CollapsedChains: FC<{
 
 export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
   chains,
+  logIndexes,
   status,
   txHash,
   className,
   compact,
   offset = 3,
 }) => {
+  const [leading, trailing] = splitAt(offset, chains);
+
   return (
     <li className={cn("flex flex-1 items-center justify-between", className)}>
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />
-      <div className="ml-2 flex items-center">
-        {chains.slice(0, Math.min(chains.length, offset)).map((chain) => (
+      <div className="flex translate-x-5 items-center">
+        {leading.map((chain, i) => (
           <span key={chain.id} className="-ml-2 flex items-center">
-            <Tooltip tip={chain.name}>
-              <ChainIcon
-                src={chain.image}
-                size={compact ? "sm" : "md"}
-                alt={chain.name}
-              />
+            <Tooltip tip={`${chain.name} - view tx on Axelarscan`}>
+              <Link
+                href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}:${logIndexes[i]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ChainIcon
+                  src={chain.image}
+                  size={compact ? "sm" : "md"}
+                  alt={chain.name}
+                />
+              </Link>
             </Tooltip>{" "}
           </span>
         ))}
-        {chains.length > offset && (
+        {trailing.length > 0 && (
           <CollapsedChains chains={chains} offset={offset} />
         )}
       </div>
