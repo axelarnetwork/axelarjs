@@ -2,7 +2,6 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
-import Link from "next/link";
 
 import { clamp } from "rambda";
 import { useBlockNumber, useChainId, useTransaction } from "wagmi";
@@ -12,10 +11,10 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
-type ExtendedGMPTxStatus = GMPTxStatus | "pending";
+export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
-  called: "Initiated",
+  called: "Initialized",
   approvable: "Approvable",
   approving: "Approving",
   approved: "Approved",
@@ -34,7 +33,7 @@ const STATUS_COLORS: Partial<
 > = {
   error: "error",
   executed: "success",
-  called: "accent",
+  called: "warning",
   confirmed: "info",
   executing: "warning",
   pending: "neutral",
@@ -162,9 +161,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <div className="flex items-center justify-between">
         {total > 1 && (
           <span>
-            <>
-              Executed in {executed} of {total} chains
-            </>
+            Executed in {executed} of {total} chains
           </span>
         )}
       </div>
@@ -199,6 +196,66 @@ export type ChainStatusItemProps = {
   chain: EVMChainConfig;
   className?: string;
   compact?: boolean;
+  offset?: number;
+};
+
+export type ChainStatusItemsProps = Omit<
+  ChainStatusItemProps,
+  "chain" | "logIndex"
+> & {
+  logIndexes: number[];
+  chains: EVMChainConfig[];
+};
+
+const CollapsedChains: FC<{
+  chains: EVMChainConfig[];
+  offset: number;
+}> = ({ chains, offset }) => {
+  if (chains.length > offset) {
+    const collapsedChainNames = chains
+      .slice(offset)
+      .map((chain) => chain.name)
+      .join(", ");
+    return (
+      <Tooltip tip={collapsedChainNames} position="left">
+        <span className="bg-info text-info-content -ml-2 flex h-6 w-6 items-center justify-center rounded-full">
+          +{chains.length - offset}
+        </span>
+      </Tooltip>
+    );
+  }
+  return null;
+};
+
+export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
+  chains,
+  status,
+  txHash,
+  className,
+  compact,
+  offset = 3,
+}) => {
+  return (
+    <li className={cn("flex flex-1 items-center justify-between", className)}>
+      <GMPStatusIndicator txHash={`${txHash}`} status={status} />
+      <div className="ml-2 flex items-center">
+        {chains.slice(0, Math.min(chains.length, offset)).map((chain) => (
+          <span key={chain.id} className="-ml-2 flex items-center">
+            <Tooltip tip={chain.name}>
+              <ChainIcon
+                src={chain.image}
+                size={compact ? "sm" : "md"}
+                alt={chain.name}
+              />
+            </Tooltip>{" "}
+          </span>
+        ))}
+        {chains.length > offset && (
+          <CollapsedChains chains={chains} offset={offset} />
+        )}
+      </div>
+    </li>
+  );
 };
 
 export const ChainStatusItem: FC<ChainStatusItemProps> = ({
@@ -231,30 +288,19 @@ export type StatusIndicatorProps = {
   status: ExtendedGMPTxStatus;
 };
 
-export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
-  txHash,
-  status,
-}) => {
+export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({ status }) => {
   return (
-    <Tooltip tip="View on Axelarscan" position="left">
-      <Link
-        href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Badge className="flex items-center">
-          <Badge
-            className={cn("-translate-x-1.5 text-xs", {
-              "animate-pulse": !["error", "executed"].includes(status),
-            })}
-            variant={STATUS_COLORS[status]}
-            size="xs"
-            aria-label={`status: ${STATUS_LABELS[status]}`}
-          />
+    <div className="text-md flex items-center">
+      <Badge
+        className={cn("-translate-x-1.5 text-xs", {
+          "animate-pulse": !["error", "executed"].includes(status),
+        })}
+        variant={STATUS_COLORS[status]}
+        size="xs"
+        aria-label={`status: ${STATUS_LABELS[status]}`}
+      />
 
-          {STATUS_LABELS[status]}
-        </Badge>
-      </Link>
-    </Tooltip>
+      {STATUS_LABELS[status]}
+    </div>
   );
 };
