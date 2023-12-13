@@ -30,29 +30,28 @@ function useGroupedStatuses(txHash: `0x${string}`) {
 
   const { computed } = useEVMChainConfigsQuery();
 
-  const statuesValues = useMemo(
-    () =>
-      Object.entries(statuses ?? {}).map(([axelarChainId, entry]) => ({
+  return useMemo(() => {
+    const statusValues = Object.entries(statuses ?? {}).map(
+      ([axelarChainId, entry]) => ({
         ...entry,
         chain: computed.indexedById[axelarChainId],
-      })),
-    [computed.indexedById, statuses]
-  );
+      })
+    );
 
-  const groupedStatusesProps = useMemo(
-    () =>
-      Object.entries(groupBy((x) => x.status, statuesValues)).map(
-        ([status, entries]) => ({
-          status: status as ExtendedGMPTxStatus,
-          chains: entries.map((entry) => entry.chain),
-          logIndexes: entries.map((entry) => entry.logIndex),
-          txHash,
-        })
-      ),
-    [statuesValues, txHash]
-  );
+    const groupedStatusesProps = Object.entries(
+      groupBy((x) => x.status, statusValues)
+    ).map(([status, entries]) => ({
+      status: status as ExtendedGMPTxStatus,
+      chains: entries.map((entry) => entry.chain),
+      logIndexes: entries.map((entry) => entry.logIndex),
+      txHash,
+    }));
 
-  return { groupedStatusesProps, hasStatus: statuesValues.length > 0 };
+    return {
+      groupedStatusesProps,
+      hasStatus: statusValues.length > 0,
+    };
+  }, [computed.indexedById, statuses, txHash]);
 }
 
 const ToastElement: FC<{
