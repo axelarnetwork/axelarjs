@@ -240,8 +240,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isGasPriceQueryLoading ||
     !hasFetchedStatuses;
 
-  const shouldRenderFooter =
-    !isReadOnly && sessionState.selectedChainIds.length > 0;
+  const statusesChainIds = Object.keys(statusesByChain).map(Number);
+
+  const nonRunningChainIds = sessionState.selectedChainIds.filter(
+    (x) => !statusesChainIds.includes(x)
+  );
+  const shouldRenderFooter = !isReadOnly && !isEmpty(nonRunningChainIds);
 
   const unregisteredTokens = useMemo(
     () =>
