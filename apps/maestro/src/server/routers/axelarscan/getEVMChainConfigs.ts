@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
+import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
 import { publicProcedure } from "~/server/trpc";
 
 const evmChainConfigSchema = z.object({
@@ -80,7 +81,9 @@ export const getEVMChainConfigs = publicProcedure
           // filter also by axelarChainId if provided
           (!input?.axelarChainId || chain.id === input?.axelarChainId) &&
           // filter also by chainId if provided
-          (!input?.chainId || chain.chain_id === input?.chainId)
+          (!input?.chainId || chain.chain_id === input?.chainId) &&
+          // filter out disabled chains
+          !NEXT_PUBLIC_DISABLED_CHAINS.includes(chain.id)
       );
     } catch (error) {
       // If we get a TRPC error, we throw it
