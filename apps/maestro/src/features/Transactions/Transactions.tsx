@@ -126,7 +126,7 @@ const ToastElement: FC<{
               status={"called"}
               txHash={txHash}
               logIndexes={statusEntriesGroup.initialized.map(
-                ([, entry]) => entry.logIndexes
+                ([, entry]) => entry.logIndex
               )}
               className="gap-3 text-sm"
             />
@@ -142,7 +142,7 @@ const ToastElement: FC<{
                   txHash={txHash}
                   status={"confirmed"}
                   logIndexes={statusEntriesGroup.confirmed.map(
-                    ([, entry]) => entry.logIndexes
+                    ([, entry]) => entry.logIndex
                   )}
                   className="gap-3 text-sm"
                 />
@@ -158,7 +158,7 @@ const ToastElement: FC<{
                   status={"executed"}
                   txHash={txHash}
                   logIndexes={statusEntriesGroup.executed.map(
-                    ([, entry]) => entry.logIndexes
+                    ([, entry]) => entry.logIndex
                   )}
                   className="gap-3 text-sm"
                 />
