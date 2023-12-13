@@ -40,7 +40,18 @@ export const getERC20TokenBalanceForOwner = publicProcedure
         client.read("pendingOwner").catch(always(null)),
       ]);
 
+      const itClient = ctx.contracts.createInterchainTokenClient(
+        chainConfig,
+        input.tokenAddress
+      );
+      const isTokenMinter = await itClient.reads
+        .isMinter({
+          addr: input.owner,
+        })
+        .catch(always(false));
+
       return {
+        isTokenMinter,
         tokenBalance: tokenBalance.toString(),
         decimals,
         isTokenOwner: owner === input.owner,
