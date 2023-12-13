@@ -4,9 +4,9 @@ import type { TransactionState } from "~/lib/hooks/useTransactionState";
 
 export type InterchainTokenAction =
   | "mint"
-  //| "interchainTransfer"
-  | "transferOwnership";
-//  | "acceptOwnership";
+  | "transferOwnership"
+  | "transferOperatorship"
+  | "acceptOwnership";
 
 export const INITIAL_STATE = {
   selectedAction: null as InterchainTokenAction | null,

@@ -5,6 +5,7 @@ import {
   GiftIcon,
   LinkButton,
   Modal,
+  PackageCheckIcon,
 } from "@axelarjs/ui";
 import { useMemo, type ComponentType, type FC } from "react";
 import dynamic from "next/dynamic";
@@ -43,11 +44,19 @@ const TransferOwnership = dynamic(
   }
 );
 
+const TransferOperatorship = dynamic(
+  () =>
+    import("~/features/ManageInterchainToken/actions/transfer-operatorship"),
+  {
+    loading: StepLoading,
+  }
+);
+
 const ACTIONS: Record<InterchainTokenAction, ComponentType<any>> = {
   mint: MintInterchainToken,
   transferOwnership: TransferOwnership,
-  // acceptOwnership: TransferOwnership,
-  //interchainTransfer: StepLoading,
+  transferOperatorship: TransferOperatorship,
+  acceptOwnership: TransferOwnership,
 };
 
 type Props = {
@@ -55,6 +64,7 @@ type Props = {
   balance: bigint;
   tokenAddress: `0x${string}`;
   isTokenOwner: boolean;
+  isTokenMinter: boolean;
   isTokenPendingOnwer: boolean;
   hasPendingOwner: boolean;
   onClose?: () => void;
@@ -76,19 +86,19 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Mint",
       value: "mint",
       icon: <CoinsIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      isVisible: (props) => props.isTokenOwner,
+      isVisible: (props) => props.isTokenMinter,
     },
-    // {
-    //   label: "Interchain Transfer",
-    //   value: "interchainTransfer",
-    //   icon: <SendIcon className="h-7 w-7 md:h-8 md:w-8" />,
-    //   criteria: (props) => props.balance > 0n,
-    // },
     {
       label: "Transfer Ownership",
       value: "transferOwnership",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenOwner && !props.hasPendingOwner,
+    },
+    {
+      label: "Transfer Operatorship",
+      value: "transferOperatorship",
+      icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
+      isVisible: (props) => props.isTokenMinter && !props.hasPendingOwner,
     },
     {
       label: "Ownnership Pending Approval",
@@ -97,12 +107,12 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       disabled: true,
       isVisible: (props) => props.isTokenOwner && props.hasPendingOwner,
     },
-    // {
-    //   label: "Accept Ownership",
-    //   value: "acceptOwnership",
-    //   icon: <PackageCheckIcon className="h-7 w-7 md:h-8 md:w-8" />,
-    //   criteria: (props) => props.isTokenPendingOnwer,
-    // },
+    {
+      label: "Accept Ownership",
+      value: "acceptOwnership",
+      icon: <PackageCheckIcon className="h-7 w-7 md:h-8 md:w-8" />,
+      isVisible: (props) => props.isTokenPendingOnwer,
+    },
   ];
 
   const CurrentStep = useMemo(
