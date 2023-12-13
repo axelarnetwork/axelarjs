@@ -72,16 +72,25 @@ export function useGetTransactionType(input: { txHash?: `0x${string}` }) {
     async () => {
       const response = await gmpClient.searchGMP({
         txHash: input.txHash,
+        size: 1,
       });
 
-      if (response.length) {
-        if (response[0]["interchain_token_deployment_started"])
-          return "INTERCHAIN_DEPLOYMENT" as const;
-        if (response[0]["interchain_transfer"])
-          return "INTERCHAIN_TRANSFER" as const;
+      if (!response.length) {
+        return null;
+      }
+
+      if ("interchain_token_deployment_started" in response[0]) {
+        return "INTERCHAIN_DEPLOYMENT" as const;
+      }
+
+      if ("interchain_transfer" in response[0]) {
+        return "INTERCHAIN_TRANSFER" as const;
       }
 
       return null;
+    },
+    {
+      enabled: Boolean(input.txHash?.match(/^(0x)?[0-9a-f]{64}/i)),
     }
   );
 
@@ -107,28 +116,29 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
         txHash: input.txHash,
       });
 
-      if (responseData.length) {
-        return responseData.reduce(
-          (acc, { call, status }) => ({
-            ...acc,
-            [call.returnValues.destinationChain.toLowerCase()]: {
-              status,
-              txHash: call.transactionHash,
-              logIndex: call.logIndex,
-              txId: call.id,
-            },
-          }),
-          {} as {
-            [chainId: string]: {
-              status: GMPTxStatus;
-              txHash: `0x${string}`;
-              logIndex: number;
-              txId?: string;
-            };
-          }
-        );
+      if (!responseData.length) {
+        return {};
       }
-      return {};
+
+      return responseData.reduce(
+        (acc, { call, status }) => ({
+          ...acc,
+          [call.returnValues.destinationChain.toLowerCase()]: {
+            status,
+            txHash: call.transactionHash,
+            logIndex: call.logIndex,
+            txId: call.id,
+          },
+        }),
+        {} as {
+          [chainId: string]: {
+            status: GMPTxStatus;
+            txHash: `0x${string}`;
+            logIndex: number;
+            txId?: string;
+          };
+        }
+      );
     },
     {
       enabled: Boolean(input.txHash?.match(/^(0x)?[0-9a-f]{64}/i)),

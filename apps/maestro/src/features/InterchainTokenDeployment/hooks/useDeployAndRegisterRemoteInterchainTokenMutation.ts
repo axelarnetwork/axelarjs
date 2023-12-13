@@ -169,7 +169,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
   useWaitForTransaction({
     hash: multicall?.data?.hash,
-    confirmations: 8,
     onSuccess: () => {
       const txHash = multicall?.data?.hash;
 

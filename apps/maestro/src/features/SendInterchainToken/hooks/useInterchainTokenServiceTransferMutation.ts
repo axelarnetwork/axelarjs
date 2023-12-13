@@ -70,7 +70,6 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { data: approveERC20Recepit } = useWaitForTransaction({
     hash: approveERC20Data?.hash,
-    confirmations: 1,
   });
 
   const approvedAmountRef = useRef(0n);
