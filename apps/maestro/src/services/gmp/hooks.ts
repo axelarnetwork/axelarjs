@@ -66,6 +66,32 @@ export function useInterchainTokensQuery(input: {
   };
 }
 
+export function useGetTransactionType(input: { txHash?: `0x${string}` }) {
+  const { data, ...query } = useQuery(
+    ["gmp-get-transaction-type", input.txHash],
+    async () => {
+      const response = await gmpClient.searchGMP({
+        txHash: input.txHash,
+      });
+
+      if (response.length) {
+        const txType = response[0]["interchain_token_deployment_started"]
+          ? "INTERCHAIN_DEPLOYMENT"
+          : "INTERCHAIN_TRANSFER";
+
+        return txType;
+      }
+
+      return null;
+    }
+  );
+
+  return {
+    ...query,
+    data,
+  };
+}
+
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
     txHash?: `0x${string}`;
