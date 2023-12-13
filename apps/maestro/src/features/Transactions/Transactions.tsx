@@ -77,8 +77,6 @@ const ToastElement: FC<{
     failed: statusEntries.filter(onlyStatuses(failedStatus)),
   };
 
-  console.log("statusEntriesGroup", statusEntriesGroup);
-
   const content = (
     <>
       <>
