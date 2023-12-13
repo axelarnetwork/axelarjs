@@ -13,7 +13,7 @@ import {
 } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import {
-  CollapsedChainStatusItems,
+  CollapsedChainStatusGroup,
   ExtendedGMPTxStatus,
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
@@ -127,7 +127,7 @@ const ToastElement: FC<{
       ) : (
         <ul className="mt-1 grid gap-2 pb-2 pl-3">
           {groupedStatusesProps.map((props) => (
-            <CollapsedChainStatusItems key={props.status} {...props} />
+            <CollapsedChainStatusGroup key={props.status} {...props} />
           ))}
         </ul>
       )}

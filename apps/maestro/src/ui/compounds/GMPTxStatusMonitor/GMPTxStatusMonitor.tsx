@@ -229,10 +229,10 @@ const CollapsedChains: FC<{
   return null;
 };
 
-export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
+export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
+  status,
   chains,
   logIndexes,
-  status,
   txHash,
   className,
   compact,
@@ -246,7 +246,10 @@ export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
       <div className="flex translate-x-5 items-center">
         {leading.map((chain, i) => (
           <span key={chain.id} className="-ml-2 flex items-center">
-            <Tooltip tip={`${chain.name} - view tx on Axelarscan`}>
+            <Tooltip
+              tip={`${chain.name} - view tx on Axelarscan`}
+              position="left"
+            >
               <Link
                 href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}:${logIndexes[i]}`}
                 target="_blank"
