@@ -290,7 +290,7 @@ export type StatusIndicatorProps = {
 
 export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({ status }) => {
   return (
-    <div className="text-md flex items-center">
+    <div className="flex items-center text-sm">
       <Badge
         className={cn("-translate-x-1.5 text-xs", {
           "animate-pulse": !["error", "executed"].includes(status),
