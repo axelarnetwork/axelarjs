@@ -1,6 +1,6 @@
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { useCallback, useEffect, useRef, type FC } from "react";
+import { useCallback, useEffect, useMemo, useRef, type FC } from "react";
 import Link from "next/link";
 
 import { groupBy } from "rambda";
@@ -18,6 +18,43 @@ import {
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
 
+const TX_LABEL_MAP = {
+  INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
+  INTERCHAIN_TRANSFER: "Interchain Transfer",
+} as const;
+
+function useGroupedStatuses(txHash: `0x${string}`) {
+  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
+    txHash,
+  });
+
+  const { computed } = useEVMChainConfigsQuery();
+
+  const statuesValues = useMemo(
+    () =>
+      Object.entries(statuses ?? {}).map(([axelarChainId, entry]) => ({
+        ...entry,
+        chain: computed.indexedById[axelarChainId],
+      })),
+    [computed.indexedById, statuses]
+  );
+
+  const groupedStatusesProps = useMemo(
+    () =>
+      Object.entries(groupBy((x) => x.status, statuesValues)).map(
+        ([status, entries]) => ({
+          status: status as ExtendedGMPTxStatus,
+          chains: entries.map((entry) => entry.chain),
+          logIndexes: entries.map((entry) => entry.logIndex),
+          txHash,
+        })
+      ),
+    [statuesValues, txHash]
+  );
+
+  return { groupedStatusesProps, hasStatus: statuesValues.length > 0 };
+}
+
 const ToastElement: FC<{
   txHash: `0x${string}`;
   chainId: number;
@@ -32,41 +69,11 @@ const ToastElement: FC<{
     txHash,
   });
 
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
-    txHash,
-  });
-
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
-  const statusEntries = Object.entries(statuses ?? {})
-    .map(
-      ([axelarChainId, entry]) =>
-        [
-          axelarChainId,
-          {
-            ...entry,
-            chain: computed.indexedById[axelarChainId],
-          },
-        ] as const
-    )
-    .filter(([, entry]) => entry.chain);
+  const txTypeText = txType ? TX_LABEL_MAP[txType] : "Loading...";
 
-  const hasStatus = statusEntries.length > 0;
-
-  const txTypeMap = {
-    INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
-    INTERCHAIN_TRANSFER: "Interchain Transfer",
-  };
-  const txTypeText = txType ? txTypeMap[txType] : "Loading...";
-
-  const statuesValues = Object.entries(statuses ?? {}).map(
-    ([axelarChainId, entry]) => ({
-      ...entry,
-      chain: computed.indexedById[axelarChainId],
-    })
-  );
-
-  const groupedByStatus = groupBy((x) => x.status, statuesValues);
+  const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
   const content = (
     <>
@@ -107,14 +114,8 @@ const ToastElement: FC<{
         <div className="p-4 text-sm">Loading tx status...</div>
       ) : (
         <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
-          {Object.entries(groupedByStatus).map(([status, entries]) => (
-            <CollapsedChainStatusItems
-              key={status}
-              status={status as ExtendedGMPTxStatus}
-              chains={entries.map((entry) => entry.chain)}
-              logIndexes={entries.map((entry) => entry.logIndex)}
-              txHash={txHash}
-            />
+          {groupedStatusesProps.map((props) => (
+            <CollapsedChainStatusItems key={props.status} {...props} />
           ))}
         </ul>
       )}
