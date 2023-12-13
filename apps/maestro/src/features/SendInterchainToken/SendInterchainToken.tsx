@@ -251,7 +251,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     Number(props.balance.decimals)
                   );
 
-                  if (BigInt(value) > bnBalance) {
+                  const bnValue = parseUnits(
+                    value as `${number}`,
+                    Number(props.balance.decimals)
+                  );
+
+                  if (bnValue > bnBalance) {
                     return "Insufficient balance";
                   }
 

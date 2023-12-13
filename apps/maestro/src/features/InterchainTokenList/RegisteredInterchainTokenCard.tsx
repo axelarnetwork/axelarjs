@@ -129,7 +129,8 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               </Link>
             </Tooltip>
           )}
-          {props.isOriginToken && balance?.isTokenOwner ? (
+          {props.isOriginToken &&
+          (balance?.isTokenMinter || balance?.isTokenOwner) ? (
             <ManageInterchainToken
               trigger={
                 <Button
@@ -146,6 +147,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               balance={BigInt(balance.tokenBalance)}
               isTokenOwner={balance.isTokenOwner}
               isTokenPendingOnwer={balance.isTokenPendingOwner}
+              isTokenMinter={balance.isTokenMinter}
               hasPendingOwner={balance.hasPendingOwner}
             />
           ) : (

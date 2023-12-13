@@ -115,7 +115,7 @@ const TokenSettings: FC = () => {
                 <Tooltip
                   position="right"
                   variant="info"
-                  tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer mintership."
+                  tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer operatorship."
                 >
                   <HelpCircleIcon className="text-info mr-1 h-[1em]" />
                 </Tooltip>
