@@ -1,5 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 
+import { map, split, trim } from "rambda";
+
 export const NEXT_PUBLIC_E2E_ENABLED =
   process.env.NEXT_PUBLIC_E2E_ENABLED === "true";
 
@@ -55,3 +57,9 @@ export const NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT = Maybe.of(
 export const NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT = Maybe.of(
   process.env.NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT
 ).mapOr("1000000", String);
+
+export const NEXT_PUBLIC_DISABLED_CHAINS = Maybe.of(
+  process.env.NEXT_PUBLIC_DISABLED_CHAINS
+)
+  .map(split(","))
+  .mapOr([], map(trim));
