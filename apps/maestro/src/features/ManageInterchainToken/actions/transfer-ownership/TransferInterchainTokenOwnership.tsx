@@ -49,7 +49,6 @@ export const TransferInterchainTokenOwnership: FC = () => {
 
   useWaitForTransaction({
     hash: transferResult?.hash,
-    confirmations: 8,
     async onSuccess(receipt) {
       if (!transferResult) {
         return;

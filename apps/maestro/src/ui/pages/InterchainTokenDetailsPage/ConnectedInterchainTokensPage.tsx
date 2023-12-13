@@ -242,10 +242,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const statusesChainIds = Object.keys(statusesByChain).map(Number);
 
-  const nonRunningChainIds = sessionState.selectedChainIds.filter(
+  const nonRunningSelectedChainIds = sessionState.selectedChainIds.filter(
     (x) => !statusesChainIds.includes(x)
   );
-  const shouldRenderFooter = !isReadOnly && !isEmpty(nonRunningChainIds);
+
+  const shouldRenderFooter =
+    !isReadOnly && !isEmpty(nonRunningSelectedChainIds);
 
   const unregisteredTokens = useMemo(
     () =>

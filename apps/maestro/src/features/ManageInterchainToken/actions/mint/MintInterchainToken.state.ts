@@ -37,7 +37,6 @@ export function useMintInterchainTokenState() {
 
   useWaitForTransaction({
     hash: mintResult?.hash,
-    confirmations: 8,
     async onSuccess(receipt) {
       if (!mintResult) {
         return;
