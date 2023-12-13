@@ -142,6 +142,10 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       const txHash = multicall?.data?.hash;
 
       if (!txHash || !tokenId || !deployerAddress || !input) {
+        console.error(
+          "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to setRecordDeploymentArgs",
+          { txHash, tokenId, deployerAddress, input }
+        );
         return;
       }
 
@@ -174,7 +178,11 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
               txHash: tx.hash,
             });
           })
-          .catch(() => {
+          .catch((e) => {
+            console.error(
+              "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
+              e
+            );
             onStatusUpdate({
               type: "idle",
             });
