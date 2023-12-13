@@ -1,14 +1,59 @@
-import { Button, HourglassIcon, XIcon } from "@axelarjs/ui";
+import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { useCallback, useEffect, useRef, type FC } from "react";
+import { Maybe } from "@axelarjs/utils";
+import { useCallback, useEffect, useMemo, useRef, type FC } from "react";
+import Link from "next/link";
+
+import { groupBy } from "rambda";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import {
-  ChainStatusItem,
+  useGetTransactionStatusOnDestinationChainsQuery,
+  useGetTransactionType,
+} from "~/services/gmp/hooks";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import {
+  CollapsedChainStatusGroup,
+  ExtendedGMPTxStatus,
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
+
+const TX_LABEL_MAP = {
+  INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
+  INTERCHAIN_TRANSFER: "Interchain Transfer",
+} as const;
+
+function useGroupedStatuses(txHash: `0x${string}`) {
+  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
+    txHash,
+  });
+
+  const { computed } = useEVMChainConfigsQuery();
+
+  return useMemo(() => {
+    const statusValues = Object.entries(statuses ?? {}).map(
+      ([axelarChainId, entry]) => ({
+        ...entry,
+        chain: computed.indexedById[axelarChainId],
+      })
+    );
+
+    const groupedStatusesProps = Object.entries(
+      groupBy((x) => x.status, statusValues)
+    ).map(([status, entries]) => ({
+      status: status as ExtendedGMPTxStatus,
+      chains: entries.map((entry) => entry.chain),
+      logIndexes: entries.map((entry) => entry.logIndex),
+      txHash,
+    }));
+
+    return {
+      groupedStatusesProps,
+      hasStatus: statusValues.length > 0,
+    };
+  }, [computed.indexedById, statuses, txHash]);
+}
 
 const ToastElement: FC<{
   txHash: `0x${string}`;
@@ -20,54 +65,71 @@ const ToastElement: FC<{
   );
 
   const { computed } = useEVMChainConfigsQuery();
-
-  const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
+  const { data: txType } = useGetTransactionType({
     txHash,
   });
 
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
-  const statusEntries = Object.entries(statuses ?? {})
-    .map(
-      ([axelarChainId, entry]) =>
-        [
-          axelarChainId,
-          {
-            ...entry,
-            chain: computed.indexedById[axelarChainId],
-          },
-        ] as const
-    )
-    .filter(([, entry]) => entry.chain);
+  const txTypeText = txType ? TX_LABEL_MAP[txType] : "Loading...";
 
-  const hasStatus = statusEntries.length > 0;
+  const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
+
+  const chainConfig = Maybe.of(computed.indexedByChainId[chainId]);
+
+  const wagmiChain = useMemo(
+    () => computed.wagmiChains.find((wagmiChain) => wagmiChain.id === chainId),
+    [computed.wagmiChains, chainId]
+  );
 
   const content = (
     <>
-      {elapsedBlocks < expectedConfirmations && (
-        <div className="mx-auto">
-          <div className="text-sm">
-            {elapsedBlocks} / {expectedConfirmations} blocks{" "}
-            <span className="text-sm opacity-75">({progress})</span>
-          </div>
-        </div>
-      )}{" "}
-      {hasStatus ? (
-        <ul className="rounded-box grid gap-2 p-4">
-          {statusEntries.map(([axelarChainId, { status, logIndex, chain }]) => (
-            <ChainStatusItem
-              compact
-              key={`chain-status-${axelarChainId}`}
-              chain={chain}
-              status={status}
-              txHash={txHash}
-              logIndex={logIndex}
-              className="gap-3 text-sm"
+      <div className="flex items-center">
+        <Tooltip
+          tip={`View on ${wagmiChain?.blockExplorers?.default.name}`}
+          position="left"
+        >
+          <Link
+            href={`${wagmiChain?.blockExplorers?.default.url}/tx/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ChainIcon
+              src={chainConfig.mapOr("", (config) => config.image)}
+              alt={chainConfig.mapOr("", (config) => config.name)}
+              size="md"
             />
+          </Link>
+        </Tooltip>
+        <div className="mx-2 flex flex-col items-start">
+          <span className="text-sm">{txTypeText}</span>
+          {elapsedBlocks < expectedConfirmations ? (
+            <Tooltip
+              tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
+              position="top"
+            >
+              <div className="text-xs">
+                {elapsedBlocks} / {expectedConfirmations} blocks{" "}
+                <span className="opacity-75">({progress})</span>
+              </div>
+            </Tooltip>
+          ) : (
+            <Tooltip tip={`Waiting for approval on Axelar`} position="top">
+              <div className="flex items-center gap-1 text-xs">
+                Finality blocks reached <span className="text-success">✓</span>
+              </div>
+            </Tooltip>
+          )}
+        </div>
+      </div>{" "}
+      {!hasStatus ? (
+        <div className="p-4 text-sm">Loading tx status...</div>
+      ) : (
+        <ul className="mt-1 grid gap-2 pb-2 pl-3">
+          {groupedStatusesProps.map((props) => (
+            <CollapsedChainStatusGroup key={props.status} {...props} />
           ))}
         </ul>
-      ) : (
-        <div className="p-4 text-sm">Loading tx status...</div>
       )}
     </>
   );
