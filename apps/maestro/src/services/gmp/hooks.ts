@@ -75,11 +75,10 @@ export function useGetTransactionType(input: { txHash?: `0x${string}` }) {
       });
 
       if (response.length) {
-        const txType = response[0]["interchain_token_deployment_started"]
-          ? "INTERCHAIN_DEPLOYMENT"
-          : "INTERCHAIN_TRANSFER";
-
-        return txType;
+        if (response[0]["interchain_token_deployment_started"])
+          return "INTERCHAIN_DEPLOYMENT" as const;
+        if (response[0]["interchain_transfer"])
+          return "INTERCHAIN_TRANSFER" as const;
       }
 
       return null;

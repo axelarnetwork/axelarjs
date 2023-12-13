@@ -26,7 +26,7 @@ const ToastElement: FC<{
   );
 
   const { computed } = useEVMChainConfigsQuery();
-  const { data: isInterchainTokenDeployment } = useGetTransactionType({
+  const { data: txType } = useGetTransactionType({
     txHash,
   });
 
@@ -51,12 +51,11 @@ const ToastElement: FC<{
 
   const hasStatus = statusEntries.length > 0;
 
-  const txTypeText =
-    isInterchainTokenDeployment === "INTERCHAIN_DEPLOYMENT"
-      ? "Interchain Deployment"
-      : isInterchainTokenDeployment === "INTERCHAIN_TRANSFER"
-      ? "Interchain Transfer"
-      : "Loading...";
+  const txTypeMap = {
+    INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
+    INTERCHAIN_TRANSFER: "Interchain Transfer",
+  };
+  const txTypeText = txType ? txTypeMap[txType] : "Loading...";
 
   const initializedStatus: GMPTxStatus[] = ["called", "confirming"];
   const executedStatus: GMPTxStatus[] = ["executed"];
