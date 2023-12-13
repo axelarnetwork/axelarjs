@@ -65,6 +65,12 @@ export function useRegisterCanonicalTokenMutation(
     confirmations: 8,
     onSuccess() {
       if (!multicall.data) {
+        console.error(
+          "useRegisterCanonicalTokenMutation: unable to setRecordDeploymentArgs",
+          {
+            multicall,
+          }
+        );
         return;
       }
 
@@ -100,7 +106,11 @@ export function useRegisterCanonicalTokenMutation(
               txHash,
             });
           })
-          .catch(() => {
+          .catch((e) => {
+            console.error(
+              "useRegisterCanonicalTokenMutation: unable to record tx",
+              e
+            );
             onStatusUpdate({
               type: "idle",
             });

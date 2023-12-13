@@ -174,6 +174,16 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       const txHash = multicall?.data?.hash;
 
       if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
+        console.error(
+          "useDeployAndRegisterRemoteInterchainTokenMutation: unable to setRecordDeploymentArgs",
+          {
+            txHash,
+            tokenAddress,
+            tokenId,
+            deployerAddress,
+            input,
+          }
+        );
         return;
       }
 
@@ -208,7 +218,11 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
               txHash: tx.hash,
             });
           })
-          .catch(() => {
+          .catch((e) => {
+            console.error(
+              "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
+              e
+            );
             onStatusUpdate({
               type: "idle",
             });
