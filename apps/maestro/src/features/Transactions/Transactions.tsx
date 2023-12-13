@@ -74,19 +74,29 @@ const ToastElement: FC<{
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
+  const chainConfig = computed.indexedByChainId[chainId];
+
+  const wagmiChain = useMemo(
+    () => computed.wagmiChains.find((wagmiChain) => wagmiChain.id === chainId),
+    [computed.wagmiChains, chainId]
+  );
+
   const content = (
     <>
       <div className="flex items-center">
-        <Tooltip tip="View on Axelarscan" position="left">
+        <Tooltip
+          tip={`View on ${wagmiChain?.blockExplorers?.default.name}`}
+          position="left"
+        >
           <Link
-            href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+            href={`${wagmiChain?.blockExplorers?.default.url}/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <ChainIcon
-              src={computed.indexedByChainId[chainId]?.image}
-              size={"md"}
-              alt={"Arbitrum"}
+              src={chainConfig.image}
+              alt={chainConfig.name}
+              size="md"
             />
           </Link>
         </Tooltip>
