@@ -238,7 +238,7 @@ export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
   return (
     <li className={cn("flex flex-1 items-center justify-between", className)}>
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />
-      <div className="ml-2 flex items-center">
+      <div className="flex translate-x-5 items-center">
         {chains.slice(0, Math.min(chains.length, offset)).map((chain) => (
           <span key={chain.id} className="-ml-2 flex items-center">
             <Tooltip tip={chain.name}>
