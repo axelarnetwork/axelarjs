@@ -1,11 +1,19 @@
-import { Button, HourglassIcon, XIcon } from "@axelarjs/ui";
+import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useRef, type FC } from "react";
+import Link from "next/link";
+
+import { groupBy } from "rambda";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import {
-  ChainStatusItem,
+  useGetTransactionStatusOnDestinationChainsQuery,
+  useGetTransactionType,
+} from "~/services/gmp/hooks";
+import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import {
+  CollapsedChainStatusItems,
+  ExtendedGMPTxStatus,
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
@@ -20,6 +28,9 @@ const ToastElement: FC<{
   );
 
   const { computed } = useEVMChainConfigsQuery();
+  const { data: txType } = useGetTransactionType({
+    txHash,
+  });
 
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash,
@@ -42,32 +53,70 @@ const ToastElement: FC<{
 
   const hasStatus = statusEntries.length > 0;
 
+  const txTypeMap = {
+    INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
+    INTERCHAIN_TRANSFER: "Interchain Transfer",
+  };
+  const txTypeText = txType ? txTypeMap[txType] : "Loading...";
+
+  const statuesValues = Object.entries(statuses ?? {}).map(
+    ([axelarChainId, entry]) => ({
+      ...entry,
+      chain: computed.indexedById[axelarChainId],
+    })
+  );
+
+  const groupedByStatus = groupBy((x) => x.status, statuesValues);
+
   const content = (
     <>
-      {elapsedBlocks < expectedConfirmations && (
-        <div className="mx-auto">
-          <div className="text-sm">
-            {elapsedBlocks} / {expectedConfirmations} blocks{" "}
-            <span className="text-sm opacity-75">({progress})</span>
-          </div>
+      <div className="flex items-center">
+        <Tooltip tip="View on Axelarscan" position="left">
+          <Link
+            href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ChainIcon
+              src={computed.indexedByChainId[chainId]?.image}
+              size={"md"}
+              alt={"Arbitrum"}
+            />
+          </Link>
+        </Tooltip>
+        <div className="mx-2 flex flex-col items-start">
+          <span className="text-sm">{txTypeText}</span>
+          {elapsedBlocks < expectedConfirmations ? (
+            <Tooltip
+              tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
+              position="top"
+            >
+              <div className="text-xs">
+                {elapsedBlocks} / {expectedConfirmations} blocks{" "}
+                <span className="opacity-75">({progress})</span>
+              </div>
+            </Tooltip>
+          ) : (
+            <Tooltip tip={`Waiting for approval on Axelar`} position="top">
+              <div className="text-xs">Finality Blocks Reached</div>
+            </Tooltip>
+          )}
         </div>
-      )}{" "}
-      {hasStatus ? (
-        <ul className="rounded-box grid gap-2 p-4">
-          {statusEntries.map(([axelarChainId, { status, logIndex, chain }]) => (
-            <ChainStatusItem
-              compact
-              key={`chain-status-${axelarChainId}`}
-              chain={chain}
-              status={status}
+      </div>{" "}
+      {!hasStatus ? (
+        <div className="p-4 text-sm">Loading tx status...</div>
+      ) : (
+        <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
+          {Object.entries(groupedByStatus).map(([status, entries]) => (
+            <CollapsedChainStatusItems
+              key={status}
+              status={status as ExtendedGMPTxStatus}
+              chains={entries.map((entry) => entry.chain)}
+              logIndexes={entries.map((entry) => entry.logIndex)}
               txHash={txHash}
-              logIndex={logIndex}
-              className="gap-3 text-sm"
             />
           ))}
         </ul>
-      ) : (
-        <div className="p-4 text-sm">Loading tx status...</div>
       )}
     </>
   );
