@@ -1,5 +1,6 @@
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
+import { Maybe } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useRef, type FC } from "react";
 import Link from "next/link";
 
@@ -74,7 +75,7 @@ const ToastElement: FC<{
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
-  const chainConfig = computed.indexedByChainId[chainId];
+  const chainConfig = Maybe.of(computed.indexedByChainId[chainId]);
 
   const wagmiChain = useMemo(
     () => computed.wagmiChains.find((wagmiChain) => wagmiChain.id === chainId),
@@ -94,8 +95,8 @@ const ToastElement: FC<{
             rel="noopener noreferrer"
           >
             <ChainIcon
-              src={chainConfig.image}
-              alt={chainConfig.name}
+              src={chainConfig.mapOr("", (config) => config.image)}
+              alt={chainConfig.mapOr("", (config) => config.name)}
               size="md"
             />
           </Link>
