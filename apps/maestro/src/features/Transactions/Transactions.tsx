@@ -1,6 +1,8 @@
-import { Button, HourglassIcon, XIcon } from "@axelarjs/ui";
+import type { GMPTxStatus } from "@axelarjs/api/gmp";
+import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useRef, type FC } from "react";
+import Link from "next/link";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
@@ -9,7 +11,7 @@ import {
 } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import {
-  ChainStatusItem,
+  ChainStatusItems,
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
@@ -56,39 +58,115 @@ const ToastElement: FC<{
       ? "Interchain Transfer"
       : "Loading...";
 
+  const initializedStatus: GMPTxStatus[] = ["called", "confirming"];
+  const executedStatus: GMPTxStatus[] = ["executed"];
+  const failedStatus: GMPTxStatus[] = ["error", "insufficient_fee"];
+  const confirmedStatus: GMPTxStatus[] = [
+    "confirmed",
+    "approving",
+    "approved",
+    "executing",
+  ];
+  const onlyStatuses = (statuses: GMPTxStatus[]) => (entries: any) =>
+    statuses.includes(entries[1].status);
+
+  const statusEntriesGroup = {
+    initialized: statusEntries.filter(onlyStatuses(initializedStatus)),
+    executed: statusEntries.filter(onlyStatuses(executedStatus)),
+    confirmed: statusEntries.filter(onlyStatuses(confirmedStatus)),
+    failed: statusEntries.filter(onlyStatuses(failedStatus)),
+  };
+
+  console.log("statusEntriesGroup", statusEntriesGroup);
+
   const content = (
     <>
-      {elapsedBlocks < expectedConfirmations && (
-        <>
-          <div className="flex items-center">
-            <ChainIcon
-              src={computed.indexedByChainId[chainId]?.image}
-              size={"md"}
-              alt={"Arbitrum"}
-            />
-            <div className="mx-2">
-              <span className="text-sm">{txTypeText}</span>
-              <div className="text-xs">
-                {elapsedBlocks} / {expectedConfirmations} blocks{" "}
-                <span className="opacity-75">({progress})</span>
-              </div>
-            </div>
+      <>
+        <div className="flex items-center">
+          <Tooltip tip="View on Axelarscan" position="left">
+            <Link
+              href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ChainIcon
+                src={computed.indexedByChainId[chainId]?.image}
+                size={"md"}
+                alt={"Arbitrum"}
+              />
+            </Link>
+          </Tooltip>
+          <div className="mx-2 flex flex-col items-start">
+            <span className="text-sm">{txTypeText}</span>
+            {elapsedBlocks < expectedConfirmations ? (
+              <Tooltip
+                tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
+                position="top"
+              >
+                <div className="text-xs">
+                  {elapsedBlocks} / {expectedConfirmations} blocks{" "}
+                  <span className="opacity-75">({progress})</span>
+                </div>
+              </Tooltip>
+            ) : (
+              <Tooltip tip={`Waiting for approval on Axelar`} position="top">
+                <div className="text-xs">Finality Blocks Reached</div>
+              </Tooltip>
+            )}
           </div>
-        </>
-      )}{" "}
+        </div>
+      </>{" "}
       {hasStatus ? (
-        <ul className="rounded-box grid gap-2 p-4">
-          {statusEntries.map(([axelarChainId, { status, logIndex, chain }]) => (
-            <ChainStatusItem
+        <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
+          {statusEntriesGroup.initialized.length > 0 ? (
+            <ChainStatusItems
               compact
-              key={`chain-status-${axelarChainId}`}
-              chain={chain}
-              status={status}
+              key={`initialized`}
+              chains={statusEntriesGroup.initialized.map(
+                ([, entry]) => entry.chain
+              )}
+              status={"called"}
               txHash={txHash}
-              logIndex={logIndex}
+              logIndexes={statusEntriesGroup.initialized.map(
+                ([, entry]) => entry.logIndexes
+              )}
               className="gap-3 text-sm"
             />
-          ))}
+          ) : (
+            <div>
+              {statusEntriesGroup.confirmed.length > 0 && (
+                <ChainStatusItems
+                  compact
+                  key={`confirmed`}
+                  chains={statusEntriesGroup.confirmed.map(
+                    ([, entry]) => entry.chain
+                  )}
+                  txHash={txHash}
+                  status={"confirmed"}
+                  logIndexes={statusEntriesGroup.confirmed.map(
+                    ([, entry]) => entry.logIndexes
+                  )}
+                  className="gap-3 text-sm"
+                />
+              )}
+
+              {statusEntriesGroup.executed.length > 0 && (
+                <ChainStatusItems
+                  compact
+                  key={`executed`}
+                  chains={statusEntriesGroup.executed.map(
+                    ([, entry]) => entry.chain
+                  )}
+                  status={"executed"}
+                  txHash={txHash}
+                  logIndexes={statusEntriesGroup.executed.map(
+                    ([, entry]) => entry.logIndexes
+                  )}
+                  className="gap-3 text-sm"
+                />
+              )}
+            </div>
+          )}
         </ul>
       ) : (
         <div className="p-4 text-sm">Loading tx status...</div>
