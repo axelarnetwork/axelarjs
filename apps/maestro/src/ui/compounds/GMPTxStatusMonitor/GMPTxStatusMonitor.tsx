@@ -11,7 +11,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
-type ExtendedGMPTxStatus = GMPTxStatus | "pending";
+export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
   called: "Initialized",
@@ -161,9 +161,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <div className="flex items-center justify-between">
         {total > 1 && (
           <span>
-            <>
-              Executed in {executed} of {total} chains
-            </>
+            Executed in {executed} of {total} chains
           </span>
         )}
       </div>
@@ -198,6 +196,7 @@ export type ChainStatusItemProps = {
   chain: EVMChainConfig;
   className?: string;
   compact?: boolean;
+  offset?: number;
 };
 
 export type ChainStatusItemsProps = Omit<
@@ -208,38 +207,39 @@ export type ChainStatusItemsProps = Omit<
   chains: EVMChainConfig[];
 };
 
+const CollapsedChains: FC<{
+  chains: EVMChainConfig[];
+  offset: number;
+}> = ({ chains, offset }) => {
+  if (chains.length > offset) {
+    const collapsedChainNames = chains
+      .slice(offset)
+      .map((chain) => chain.name)
+      .join(", ");
+    return (
+      <Tooltip tip={collapsedChainNames} position="left">
+        <span className="bg-info text-info-content -ml-2 flex h-6 w-6 items-center justify-center rounded-full">
+          +{chains.length - offset}
+        </span>
+      </Tooltip>
+    );
+  }
+  return null;
+};
+
 export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
   chains,
   status,
   txHash,
   className,
   compact,
+  offset = 3,
 }) => {
-  const renderCollapsedChains = () => {
-    if (chains.length > 3) {
-      const collapsedChainNames = chains
-        .slice(3)
-        .map((chain) => chain.name)
-        .join("\n");
-      return (
-        <span className="-ml-2">
-          <Tooltip tip={collapsedChainNames}>
-            <span className="bg-base-100 flex h-6 w-6 items-center justify-center rounded-full">
-              +{chains.length - 3}
-            </span>
-          </Tooltip>
-        </span>
-      );
-    } else {
-      null;
-    }
-  };
-
   return (
     <li className={cn("flex flex-1 items-center justify-between", className)}>
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />
       <div className="ml-2 flex items-center">
-        {chains.slice(0, Math.min(chains.length, 3)).map((chain) => (
+        {chains.slice(0, Math.min(chains.length, offset)).map((chain) => (
           <span key={chain.id} className="-ml-2 flex items-center">
             <Tooltip tip={chain.name}>
               <ChainIcon
@@ -250,7 +250,9 @@ export const CollapsedChainStatusItems: FC<ChainStatusItemsProps> = ({
             </Tooltip>{" "}
           </span>
         ))}
-        {chains.length > 3 && renderCollapsedChains()}
+        {chains.length > offset && (
+          <CollapsedChains chains={chains} offset={offset} />
+        )}
       </div>
     </li>
   );

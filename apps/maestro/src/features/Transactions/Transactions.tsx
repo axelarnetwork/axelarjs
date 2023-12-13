@@ -1,8 +1,9 @@
-import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useRef, type FC } from "react";
 import Link from "next/link";
+
+import { groupBy } from "rambda";
 
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
@@ -12,6 +13,7 @@ import {
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import {
   CollapsedChainStatusItems,
+  ExtendedGMPTxStatus,
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
@@ -57,24 +59,14 @@ const ToastElement: FC<{
   };
   const txTypeText = txType ? txTypeMap[txType] : "Loading...";
 
-  const initializedStatus: GMPTxStatus[] = ["called", "confirming"];
-  const executedStatus: GMPTxStatus[] = ["executed"];
-  const failedStatus: GMPTxStatus[] = ["error", "insufficient_fee"];
-  const confirmedStatus: GMPTxStatus[] = [
-    "confirmed",
-    "approving",
-    "approved",
-    "executing",
-  ];
-  const onlyStatuses = (statuses: GMPTxStatus[]) => (entries: any) =>
-    statuses.includes(entries[1].status);
+  const statuesValues = Object.entries(statuses ?? {}).map(
+    ([axelarChainId, entry]) => ({
+      ...entry,
+      chain: computed.indexedById[axelarChainId],
+    })
+  );
 
-  const statusEntriesGroup = {
-    initialized: statusEntries.filter(onlyStatuses(initializedStatus)),
-    executed: statusEntries.filter(onlyStatuses(executedStatus)),
-    confirmed: statusEntries.filter(onlyStatuses(confirmedStatus)),
-    failed: statusEntries.filter(onlyStatuses(failedStatus)),
-  };
+  const groupedByStatus = groupBy((x) => x.status, statuesValues);
 
   const content = (
     <>
@@ -111,60 +103,20 @@ const ToastElement: FC<{
           )}
         </div>
       </div>{" "}
-      {hasStatus ? (
-        <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
-          {statusEntriesGroup.initialized.length > 0 ? (
-            <CollapsedChainStatusItems
-              compact
-              key={`initialized`}
-              chains={statusEntriesGroup.initialized.map(
-                ([, entry]) => entry.chain
-              )}
-              status={"called"}
-              txHash={txHash}
-              logIndexes={statusEntriesGroup.initialized.map(
-                ([, entry]) => entry.logIndex
-              )}
-              className="gap-3 text-sm"
-            />
-          ) : (
-            <div>
-              {statusEntriesGroup.confirmed.length > 0 && (
-                <CollapsedChainStatusItems
-                  compact
-                  key={`confirmed`}
-                  chains={statusEntriesGroup.confirmed.map(
-                    ([, entry]) => entry.chain
-                  )}
-                  txHash={txHash}
-                  status={"confirmed"}
-                  logIndexes={statusEntriesGroup.confirmed.map(
-                    ([, entry]) => entry.logIndex
-                  )}
-                  className="gap-3 text-sm"
-                />
-              )}
-
-              {statusEntriesGroup.executed.length > 0 && (
-                <CollapsedChainStatusItems
-                  compact
-                  key={`executed`}
-                  chains={statusEntriesGroup.executed.map(
-                    ([, entry]) => entry.chain
-                  )}
-                  status={"executed"}
-                  txHash={txHash}
-                  logIndexes={statusEntriesGroup.executed.map(
-                    ([, entry]) => entry.logIndex
-                  )}
-                  className="gap-3 text-sm"
-                />
-              )}
-            </div>
-          )}
-        </ul>
-      ) : (
+      {!hasStatus ? (
         <div className="p-4 text-sm">Loading tx status...</div>
+      ) : (
+        <ul className="rounded-box mt-1 grid gap-2 pb-2 pl-3">
+          {Object.entries(groupedByStatus).map(([status, entries]) => (
+            <CollapsedChainStatusItems
+              key={status}
+              status={status as ExtendedGMPTxStatus}
+              chains={entries.map((entry) => entry.chain)}
+              logIndexes={entries.map((entry) => entry.logIndex)}
+              txHash={txHash}
+            />
+          ))}
+        </ul>
       )}
     </>
   );
