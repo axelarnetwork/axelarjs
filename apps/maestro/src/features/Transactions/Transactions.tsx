@@ -71,7 +71,10 @@ const ToastElement: FC<{
 
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
-  const txTypeText = txType ? TX_LABEL_MAP[txType] : "Loading...";
+  const txTypeText = useMemo(
+    () => (txType ? TX_LABEL_MAP[txType] : "Loading..."),
+    [txType]
+  );
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
