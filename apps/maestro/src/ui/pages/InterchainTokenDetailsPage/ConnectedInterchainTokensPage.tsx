@@ -16,6 +16,7 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
@@ -149,6 +150,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       txHashes: sessionState.deployTokensTxHashes,
     });
 
+  const { computed } = useEVMChainConfigsQuery();
+  const { switchNetworkAsync } = useSwitchNetwork();
+
   const statusesByChain = useMemo(() => {
     return (
       statuses ??
@@ -232,7 +236,17 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [interchainToken]
   );
 
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const runninChainIds = useMemo(
+    () =>
+      Object.entries(statusesByChain).map(
+        ([axelarChainId]) => computed.indexedById[axelarChainId]?.chain_id
+      ),
+    [computed.indexedById, statusesByChain]
+  );
+
+  const nonRunningSelectedChainIds = sessionState.selectedChainIds.filter(
+    (x) => !runninChainIds.includes(x)
+  );
 
   const isReadOnly =
     !interchainToken.wasDeployedByAccount ||
@@ -240,14 +254,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isGasPriceQueryLoading ||
     !hasFetchedStatuses;
 
-  const statusesChainIds = Object.keys(statusesByChain).map(Number);
-
-  const nonRunningSelectedChainIds = sessionState.selectedChainIds.filter(
-    (x) => !statusesChainIds.includes(x)
-  );
-
   const shouldRenderFooter =
-    !isReadOnly && !isEmpty(nonRunningSelectedChainIds);
+    !isReadOnly && nonRunningSelectedChainIds.length > 0;
 
   const unregisteredTokens = useMemo(
     () =>
@@ -262,7 +270,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             ? statusesByChain[token.chain.id]
             : undefined;
 
-          const isSelected = sessionState.selectedChainIds.includes(
+          const isSelected = nonRunningSelectedChainIds.includes(
             token.chainId ?? 0
           );
 
@@ -280,11 +288,84 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       unregistered,
       remoteChainsExecuted,
       statusesByChain,
-      sessionState.selectedChainIds,
+      nonRunningSelectedChainIds,
     ]
   );
 
   const [, { addTransaction }] = useTransactionsContainer();
+
+  const footerContent = (
+    <>
+      {shouldRenderFooter && (
+        <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
+          {isGasPriceQueryLoading && (
+            <span className="md:ml-2">estimating gas fee... </span>
+          )}
+          {gasFees && interchainToken.chain && (
+            <Tooltip
+              tip={`Estimated gas fee for deploying token on ${
+                sessionState.selectedChainIds.length
+              } additional chain${
+                sessionState.selectedChainIds.length > 1 ? "s" : ""
+              }`}
+            >
+              <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
+                ≈{" "}
+                <BigNumberText
+                  decimals={18}
+                  localeOptions={{
+                    style: "decimal",
+                    maximumFractionDigits: 4,
+                  }}
+                >
+                  {gasFees.reduce((a, b) => a + b)}
+                </BigNumberText>{" "}
+                {getNativeToken(interchainToken.chain.id)}
+              </div>
+            </Tooltip>
+          )}
+          {originToken?.chainId === chainId ? (
+            <RegisterRemoteTokens
+              deploymentKind={originToken.kind}
+              chainIds={nonRunningSelectedChainIds}
+              tokenAddress={props.tokenAddress}
+              originChainId={originToken?.chainId}
+              onTxStateChange={(txState) => {
+                if (txState.status === "submitted") {
+                  setSessionState((draft) => {
+                    draft.selectedChainIds = [];
+                    draft.deployTokensTxHashes = uniq([
+                      ...draft.deployTokensTxHashes,
+                      txState.hash,
+                    ]);
+                  });
+                  addTransaction({
+                    status: "submitted",
+                    hash: txState.hash,
+                    chainId: originToken.chainId,
+                  });
+                }
+              }}
+            />
+          ) : (
+            <Button
+              variant="accent"
+              onClick={() => {
+                if (originToken) {
+                  switchNetworkAsync?.(originToken.chainId).catch(() => {
+                    logger.error("Failed to switch network");
+                  });
+                }
+              }}
+            >
+              Switch to {originToken?.chain.name} to register token
+              {sessionState.selectedChainIds.length > 1 ? "s" : ""}
+            </Button>
+          )}
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div className="flex flex-col gap-8 md:relative">
@@ -331,76 +412,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                 });
               }
         }
-        footer={
-          shouldRenderFooter && (
-            <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
-              {isGasPriceQueryLoading && (
-                <span className="md:ml-2">estimating gas fee... </span>
-              )}
-              {gasFees && interchainToken.chain && (
-                <Tooltip
-                  tip={`Estimated gas fee for deploying token on ${
-                    sessionState.selectedChainIds.length
-                  } additional chain${
-                    sessionState.selectedChainIds.length > 1 ? "s" : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
-                    ≈{" "}
-                    <BigNumberText
-                      decimals={18}
-                      localeOptions={{
-                        style: "decimal",
-                        maximumFractionDigits: 4,
-                      }}
-                    >
-                      {gasFees.reduce((a, b) => a + b)}
-                    </BigNumberText>{" "}
-                    {getNativeToken(interchainToken.chain.id)}
-                  </div>
-                </Tooltip>
-              )}
-              {originToken?.chainId === chainId ? (
-                <RegisterRemoteTokens
-                  deploymentKind={originToken.kind}
-                  chainIds={sessionState.selectedChainIds}
-                  tokenAddress={props.tokenAddress}
-                  originChainId={originToken?.chainId}
-                  onTxStateChange={(txState) => {
-                    if (txState.status === "submitted") {
-                      setSessionState((draft) => {
-                        draft.selectedChainIds = [];
-                        draft.deployTokensTxHashes = uniq([
-                          ...draft.deployTokensTxHashes,
-                          txState.hash,
-                        ]);
-                      });
-                      addTransaction({
-                        status: "submitted",
-                        hash: txState.hash,
-                        chainId: originToken.chainId,
-                      });
-                    }
-                  }}
-                />
-              ) : (
-                <Button
-                  variant="accent"
-                  onClick={() => {
-                    if (originToken) {
-                      switchNetworkAsync?.(originToken.chainId).catch(() => {
-                        logger.error("Failed to switch network");
-                      });
-                    }
-                  }}
-                >
-                  Switch to {originToken?.chain.name} to register token
-                  {sessionState.selectedChainIds.length > 1 ? "s" : ""}
-                </Button>
-              )}
-            </div>
-          )
-        }
+        footer={footerContent}
       />
     </div>
   );

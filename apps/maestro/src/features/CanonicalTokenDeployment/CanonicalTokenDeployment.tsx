@@ -41,6 +41,9 @@ const CanonicalTokenDeployment: FC = () => {
       onBackClick={actions.prevStep}
       onClose={actions.reset}
       disableChainsDropdown
+      disableClose={
+        state.txState.type !== "idle" && state.txState.type !== "deployed"
+      }
     >
       <CurrentStep />
     </MultiStepDialog>
