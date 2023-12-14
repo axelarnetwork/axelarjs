@@ -45,5 +45,4 @@ export const WEB3_MODAL = createWeb3Modal({
     coinbaseWallet:
       "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
   },
-  defaultChain: WAGMI_CHAIN_CONFIGS[0],
 });
