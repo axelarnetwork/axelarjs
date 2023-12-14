@@ -47,7 +47,7 @@
     "@trpc/server": "^10.44.1",
     "@vercel/kv": "^1.0.0",
     "@vercel/postgres": "^0.5.1",
-    "@web3modal/wagmi": "^3.4.0",
+    "@web3modal/wagmi": "^3.5.0",
     "drizzle-orm": "^0.29.1",
     "lucide-react": "^0.265.0",
     "next": "^14.0.4",
