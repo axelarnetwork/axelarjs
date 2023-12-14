@@ -1,4 +1,5 @@
 import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
+import { useEffect } from "react";
 
 import type { TransactionState } from "~/lib/hooks/useTransactionState";
 
@@ -21,6 +22,17 @@ function useManageInterchainTokenState(initialState = INITIAL_STATE) {
   const [state, setState] = useSessionStorageState(
     "@maestro/manage-interchain-token",
     initialState
+  );
+
+  // Reset state when token address changes
+  useEffect(
+    () => {
+      if (state.tokenAddress !== initialState.tokenAddress) {
+        setState(initialState);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [initialState, state.tokenAddress]
   );
 
   const actions = {

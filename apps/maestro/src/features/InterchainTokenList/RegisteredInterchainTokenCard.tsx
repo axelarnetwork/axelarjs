@@ -57,6 +57,12 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     owner: address,
   });
 
+  console.log({
+    chainId: props.chainId,
+    tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
+    owner: address,
+  });
+
   const { explorerUrl, explorerName } = useMemo(() => {
     if (!props.tokenAddress || !props.chain) {
       return {

@@ -8,3 +8,4 @@ export * from "./useSyncedRef";
 export * from "./useWindowSize";
 export * from "./useTheme";
 export * from "./useIsSticky";
+export * from "./useConfirmOnPageLeave";
