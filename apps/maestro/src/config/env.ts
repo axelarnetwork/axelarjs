@@ -63,3 +63,9 @@ export const NEXT_PUBLIC_DISABLED_CHAINS = Maybe.of(
 )
   .map(split(","))
   .mapOr([], map(trim));
+
+export const NEXT_PUBLIC_DISABLED_WALLET_IDS = Maybe.of(
+  process.env.NEXT_PUBLIC_DISABLED_WALLET_IDS
+)
+  .map(split(","))
+  .mapOr([], map(trim));
