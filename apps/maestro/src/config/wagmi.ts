@@ -4,6 +4,7 @@ import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 import { logger } from "~/lib/logger";
 import { APP_NAME, APP_TITLE } from "./app";
 import {
+  NEXT_PUBLIC_DISABLED_WALLET_IDS,
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "./env";
@@ -45,5 +46,5 @@ export const WEB3_MODAL = createWeb3Modal({
     coinbaseWallet:
       "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
   },
-  defaultChain: WAGMI_CHAIN_CONFIGS[0],
+  excludeWalletIds: [...NEXT_PUBLIC_DISABLED_WALLET_IDS],
 });
