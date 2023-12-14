@@ -67,6 +67,10 @@ const InterchainTokenDeployment = () => {
       showBackButton={showBackButton}
       onBackClick={actions.prevStep}
       onClose={actions.reset}
+      disableChainsDropdown={state.txState.type !== "idle"}
+      disableClose={
+        state.txState.type !== "idle" && state.txState.type !== "deployed"
+      }
     >
       <CurrentStep />
     </MultiStepDialog>

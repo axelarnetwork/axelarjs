@@ -11,7 +11,13 @@ import {
   useWindowSize,
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
-import type { ComponentProps, FC, PropsWithChildren, ReactNode } from "react";
+import {
+  useCallback,
+  type ComponentProps,
+  type FC,
+  type PropsWithChildren,
+  type ReactNode,
+} from "react";
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
@@ -123,18 +129,22 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
 
 export type ProtectedDialogProps = PropsWithChildren<{
   showBackButton?: boolean;
-  onBackClick?: () => void;
   disableChainsDropdown?: boolean;
+  disableClose?: boolean;
   step: number;
   triggerLabel?: string;
-  onClose: DialogProps["onClose"];
   steps: string[];
   title?: ReactNode;
+  onClose: DialogProps["onClose"];
+  onBackClick?: () => void;
 }>;
 
 export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   triggerLabel,
   steps,
+  onClose,
+  disableClose,
+  disableChainsDropdown,
   ...props
 }) => {
   const { status, data } = useSession();
@@ -146,15 +156,25 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     data?.address &&
     data.address.toLowerCase() === address.toLowerCase();
 
+  const handleClose = useCallback(() => {
+    if (disableClose || !onClose) {
+      return;
+    }
+    onClose();
+  }, [onClose, disableClose]);
+
   return (
     <Dialog
-      onClose={props.onClose}
+      onClose={handleClose}
       renderTrigger={(props) => (
         <TriggerButton {...props}>{triggerLabel}</TriggerButton>
       )}
     >
       <Dialog.Body $as="section">
-        <Dialog.CornerCloseAction onClick={props.onClose} />
+        <Dialog.CornerCloseAction
+          onClick={handleClose}
+          disabled={disableClose}
+        />
 
         {props.title ?? (
           <Dialog.Title className="flex items-center gap-1 sm:gap-2">
@@ -168,7 +188,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
               on:{" "}
             </span>
             <ChainsDropdown
-              disabled={props.disableChainsDropdown}
+              disabled={disableChainsDropdown}
               shift={props.showBackButton}
             />
           </Dialog.Title>

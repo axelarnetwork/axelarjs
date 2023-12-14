@@ -57,7 +57,7 @@ export default function useRegisterRemoteInterchainTokens(
 
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
-        salt: tokenDeployment.salt as `0x${string}`,
+        salt: tokenDeployment.salt,
         originalChainName: sourceChain?.chain_name ?? "",
         minter: input.minter,
         destinationChain: chainId,
