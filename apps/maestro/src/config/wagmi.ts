@@ -33,11 +33,6 @@ export const wagmiConfig = defaultWagmiConfig({
   },
 });
 
-const EXCLUDED_WALLET_IDS = {
-  ledger_live:
-    "19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927",
-};
-
 export const WEB3_MODAL = createWeb3Modal({
   wagmiConfig,
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
@@ -51,8 +46,5 @@ export const WEB3_MODAL = createWeb3Modal({
     coinbaseWallet:
       "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
   },
-  excludeWalletIds: [
-    ...Object.values(EXCLUDED_WALLET_IDS),
-    ...NEXT_PUBLIC_DISABLED_WALLET_IDS,
-  ],
+  excludeWalletIds: [...NEXT_PUBLIC_DISABLED_WALLET_IDS],
 });
