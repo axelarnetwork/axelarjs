@@ -1,10 +1,51 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/validation";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
+const remoteTokenSchema = z.object({
+  id: z.string(),
+  tokenId: z.string(),
+  axelarChainId: z.string(),
+  tokenAddress: hex40Literal(),
+  tokenManagerAddress: hex40Literal().nullable(),
+  deploymentMessageId: z.string(),
+  deploymentStatus: z.string().nullable(),
+  createdAt: z.date().nullable(),
+  updatedAt: z.date().nullable(),
+});
+
+const outputSchema = z.object({
+  tokenId: z.string(),
+  tokenAddress: hex40Literal(),
+  axelarChainId: z.string(),
+  tokenName: z.string(),
+  tokenSymbol: z.string(),
+  tokenDecimals: z.number(),
+  deploymentMessageId: z.string(),
+  deployerAddress: hex40Literal(),
+  tokenManagerAddress: hex40Literal().nullable(),
+  originalMinterAddress: hex40Literal().nullable(),
+  kind: z.string(),
+  createdAt: z.date().nullable(),
+  updatedAt: z.date().nullable(),
+  salt: hex64Literal(),
+  remoteTokens: z.array(remoteTokenSchema),
+});
+
 export const getInterchainTokenDetails = publicProcedure
+  .meta({
+    openapi: {
+      summary: "Get token details for an interchain token",
+      description:
+        "Get the details for an interchain token by address and chain ID",
+      method: "GET",
+      path: "/interchain-token/details",
+      tags: ["interchain-token"],
+    },
+  })
+  .output(outputSchema)
   .input(
     z.object({
       chainId: z.number(),
