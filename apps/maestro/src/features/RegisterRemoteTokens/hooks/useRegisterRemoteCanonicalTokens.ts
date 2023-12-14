@@ -61,7 +61,7 @@ export default function useRegisterRemoteCanonicalTokens(
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
           originalChain: sourceChain?.chain_name ?? "0x",
-          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
+          originalTokenAddress: tokenDetails.tokenAddress,
           destinationChain: axelarChainId,
           gasValue,
         }
