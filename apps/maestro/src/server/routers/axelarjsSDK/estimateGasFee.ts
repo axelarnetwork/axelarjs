@@ -1,5 +1,3 @@
-import type { GasTokenKind } from "@axelarjs/evm";
-
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -24,7 +22,7 @@ export const estimateGasFee = publicProcedure
       const response = await ctx.services.axelarjsSDK.estimateGasFee({
         destinationChainId: input.destinationChainId,
         sourceChainId: input.sourceChainId,
-        sourceChainTokenSymbol: input.sourceChainTokenSymbol as GasTokenKind,
+        sourceChainTokenSymbol: input.sourceChainTokenSymbol,
         gasLimit: input.gasLimit,
         gasMultipler: input.gasMultipler,
         isGMPExpressTransaction: input.isGMPExpressTransaction,
