@@ -1,27 +1,20 @@
-import { GAS_TOKENS, type GasTokenKind } from "@axelarjs/evm";
+import { memoize } from "@axelarjs/utils";
 
-const GAS_TOKEN_MAP: Record<string, GasTokenKind> = {
-  avalanche: GAS_TOKENS.AVAX,
-  "ethereum-2": GAS_TOKENS.ETH,
-  ethereum: GAS_TOKENS.ETH,
-  moonbeam: GAS_TOKENS.GLMR,
-  fantom: GAS_TOKENS.FTM,
-  polygon: GAS_TOKENS.MATIC,
-  aurora: GAS_TOKENS.AURORA,
-  binance: GAS_TOKENS.BINANCE,
-  celo: GAS_TOKENS.CELO,
-  kava: GAS_TOKENS.KAVA,
-  base: GAS_TOKENS.BASE,
-  arbitrum: GAS_TOKENS.ARBITRUM,
-  linea: GAS_TOKENS.LINEA,
-  "filecoin-2": GAS_TOKENS.FILECOIN,
-  "polygon-zkevm": GAS_TOKENS.POLYGON_ZKEVM,
-};
+import { WAGMI_CHAIN_CONFIGS } from "~/config/evm-chains";
 
-export function getNativeToken(chainId: string) {
-  if (!GAS_TOKEN_MAP[chainId?.toLowerCase()]) {
-    throw `getNativeToken(): chain ${chainId} does not exist`;
+/**
+ * Returns the native token symbol for a given axelar chain identifier
+ *
+ * @param axelarChainId axerlar internal chain identifier
+ */
+export const getNativeToken = memoize((axelarChainId: string) => {
+  const chainConfig = WAGMI_CHAIN_CONFIGS.find(
+    (chain) => chain.axelarChainId === axelarChainId
+  );
+
+  if (!chainConfig) {
+    throw new Error(`getNativeToken(): chain ${axelarChainId} does not exist`);
   }
 
-  return GAS_TOKEN_MAP[chainId?.toLowerCase()];
-}
+  return chainConfig.nativeCurrency.symbol;
+});
