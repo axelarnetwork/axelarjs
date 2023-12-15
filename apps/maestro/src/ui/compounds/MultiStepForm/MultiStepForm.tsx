@@ -8,6 +8,7 @@ import {
   LinkButton,
   Steps,
   TextInput,
+  useConfirmOnPageLeave,
   useWindowSize,
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
@@ -163,6 +164,13 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     onClose();
   }, [onClose, disableClose]);
 
+  useConfirmOnPageLeave(
+    "You seem to have work in progress. Are you sure you'd like to leave this page?",
+    {
+      enabled: disableClose,
+    }
+  );
+
   return (
     <Dialog
       onClose={handleClose}
@@ -175,7 +183,6 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
           onClick={handleClose}
           disabled={disableClose}
         />
-
         {props.title ?? (
           <Dialog.Title className="flex items-center gap-1 sm:gap-2">
             {props.showBackButton && <BackButton onClick={props.onBackClick} />}
