@@ -1,6 +1,7 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
+import { zeroAddress } from "viem";
 import { useChainId } from "wagmi";
 
 import {
@@ -15,7 +16,6 @@ export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
   tokenAddress: `0x${string}`;
   originChainId: number;
-  minter: `0x${string}`;
 };
 
 export default function useRegisterRemoteInterchainTokens(
@@ -59,18 +59,12 @@ export default function useRegisterRemoteInterchainTokens(
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
         originalChainName: sourceChain?.chain_name ?? "",
-        minter: input.minter,
+        minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
         destinationChain: chainId,
         gasValue: gasFees[i],
       })
     );
-  }, [
-    destinationChainIds,
-    gasFees,
-    input.minter,
-    sourceChain?.chain_name,
-    tokenDeployment,
-  ]);
+  }, [destinationChainIds, gasFees, sourceChain?.chain_name, tokenDeployment]);
 
   const totalGasFee = useMemo(
     () => gasFees?.reduce((a, b) => a + b, 0n) ?? 0n,

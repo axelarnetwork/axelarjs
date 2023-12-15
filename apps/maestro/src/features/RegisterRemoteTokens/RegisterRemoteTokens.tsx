@@ -32,7 +32,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       props.onTxStateChange?.(txState);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [txState]
+    [txState.status]
   );
 
   const { mutateAsync: recordRemoteTokenDeployment } =
@@ -48,8 +48,8 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         chainId: props.originChainId ?? -1,
         deploymentMessageId: `${receipt.transactionHash}-0`,
         remoteTokens: props.chainIds.map((chainId) => ({
-          address: props.tokenAddress,
           chainId,
+          address: props.tokenAddress,
           tokenAddress: props.tokenAddress,
           deploymentStatus: "pending",
           deploymentTxHash: receipt.transactionHash,
@@ -75,7 +75,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const { writeAsync: registerInterchainTokensAsync } =
     useRegisterRemoteInterchainTokens({
       chainIds: props.chainIds,
-      minter: deployerAddress as `0x${string}`,
       tokenAddress: props.tokenAddress,
       originChainId: props.originChainId ?? -1,
     });
