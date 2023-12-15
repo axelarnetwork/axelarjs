@@ -3,7 +3,7 @@ import { Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
-import { parseUnits } from "viem";
+import { parseUnits, zeroAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import {
@@ -100,9 +100,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const multicallArgs = useMemo(() => {
-    const minter = input?.minterAddress ?? deployerAddress;
-
-    if (!input || !minter || !tokenId) {
+    if (!input || !tokenId) {
       return [];
     }
 
@@ -114,6 +112,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       symbol: input.tokenSymbol,
       decimals: input.decimals,
     };
+
+    const minter = input?.minterAddress ?? zeroAddress;
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
@@ -138,14 +138,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     );
 
     return [deployTxData, ...registerTxData];
-  }, [
-    input,
-    deployerAddress,
-    tokenId,
-    withDecimals,
-    destinationChainNames,
-    originalChainName,
-  ]);
+  }, [input, tokenId, withDecimals, destinationChainNames, originalChainName]);
 
   const totalGasFee = useMemo(() => {
     const remoteDeploymentsGas = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
