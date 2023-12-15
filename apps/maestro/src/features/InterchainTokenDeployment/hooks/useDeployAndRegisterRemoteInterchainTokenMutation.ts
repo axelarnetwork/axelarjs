@@ -106,20 +106,18 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     const initialSupply = Maybe.of(input.initialSupply).mapOr(0n, withDecimals);
 
-    const baseArgs = {
+    const commonArgs = {
+      minter: input?.minterAddress ?? zeroAddress,
       salt: input.salt,
-      name: input.tokenName,
-      symbol: input.tokenSymbol,
-      decimals: input.decimals,
     };
-
-    const minter = input?.minterAddress ?? zeroAddress;
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
-        ...baseArgs,
+        ...commonArgs,
         initialSupply,
-        minter,
+        name: input.tokenName,
+        symbol: input.tokenSymbol,
+        decimals: input.decimals,
       });
 
     if (!input.destinationChainIds.length) {
@@ -129,11 +127,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     const registerTxData = destinationChainNames.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+        ...commonArgs,
         originalChainName,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees[i] ?? 0n,
-        minter: minter,
-        salt: input.salt,
       })
     );
 
