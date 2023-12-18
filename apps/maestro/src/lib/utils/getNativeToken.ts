@@ -9,7 +9,8 @@ import { WAGMI_CHAIN_CONFIGS } from "~/config/evm-chains";
  */
 export const getNativeToken = memoize((axelarChainId: string) => {
   const chainConfig = WAGMI_CHAIN_CONFIGS.find(
-    (chain) => chain.axelarChainId === axelarChainId
+    (chain) =>
+      chain.axelarChainId?.toLowerCase() === axelarChainId?.toLowerCase()
   );
 
   if (!chainConfig) {
