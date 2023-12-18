@@ -10,6 +10,7 @@ import React, { type FC } from "react";
 import Link from "next/link";
 
 import {
+  NEXT_PUBLIC_AXELAR_CONFIGS_URL,
   NEXT_PUBLIC_EXPLORER_URL,
   NEXT_PUBLIC_FILE_BUG_REPORT_URL,
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
@@ -115,6 +116,24 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
     ModalContent: () => (
       <>
         <Content.Wrapper $as="ul">
+          <Content.Article $as="li">
+            <Content.Header>Add your token to Squid!</Content.Header>
+            <Content.Main>
+              <Link
+                href={NEXT_PUBLIC_AXELAR_CONFIGS_URL}
+                className="hover:text-primary flex gap-4"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Content.Paragraph className="text-sm">
+                  Create a pull request to this shared config repository. Once
+                  approved, your tokens will automatically be shown on and
+                  bridgeable on Squid!
+                </Content.Paragraph>
+                <Content.ArrowIcon />
+              </Link>
+            </Content.Main>
+          </Content.Article>
           <Content.Article $as="li">
             <Content.Header>Transaction History</Content.Header>
             <Content.Main>
