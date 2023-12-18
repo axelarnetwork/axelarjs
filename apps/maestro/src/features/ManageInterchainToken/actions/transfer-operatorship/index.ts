@@ -1,2 +1,2 @@
-export * from "./TransferInterchainTokenOpoeratorship";
-export { default } from "./TransferInterchainTokenOpoeratorship";
+export * from "./TransferInterchainTokenOperatorship";
+export { default } from "./TransferInterchainTokenOperatorship";

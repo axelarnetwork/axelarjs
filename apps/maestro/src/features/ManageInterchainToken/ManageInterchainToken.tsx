@@ -52,10 +52,18 @@ const TransferOperatorship = dynamic(
   }
 );
 
+const TransferMintership = dynamic(
+  () => import("~/features/ManageInterchainToken/actions/transfer-mintership"),
+  {
+    loading: StepLoading,
+  }
+);
+
 const ACTIONS: Record<InterchainTokenAction, ComponentType<any>> = {
   mint: MintInterchainToken,
   transferOwnership: TransferOwnership,
   transferOperatorship: TransferOperatorship,
+  transferMintership: TransferMintership,
   acceptOwnership: TransferOwnership,
 };
 
@@ -99,6 +107,12 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       value: "transferOperatorship",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter && !props.hasPendingOwner,
+    },
+    {
+      label: "Transfer Mintership",
+      value: "transferMintership",
+      icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
+      isVisible: () => false,
     },
     {
       label: "Ownnership Pending Approval",

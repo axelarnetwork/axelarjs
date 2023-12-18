@@ -7,6 +7,7 @@ export type InterchainTokenAction =
   | "mint"
   | "transferOwnership"
   | "transferOperatorship"
+  | "transferMintership"
   | "acceptOwnership";
 
 export const INITIAL_STATE = {
