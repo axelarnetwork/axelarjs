@@ -13,6 +13,13 @@ export const NEXT_PUBLIC_NETWORK_ENV = String(
   process.env.NEXT_PUBLIC_NETWORK_ENV ?? "testnet"
 ) as "mainnet" | "testnet";
 
+export const NEXT_PUBLIC_AXELAR_CONFIGS_URL = Maybe.of(
+  process.env.NEXT_PUBLIC_AXELAR_CONFIGS_URL
+).mapOr(
+  "https://github.com/axelarnetwork/axelar-configs/blob/main/cli/wizard/commands/list-squid-token/README.md",
+  String
+);
+
 export const NEXT_PUBLIC_EXPLORER_API_URL = Maybe.of(
   process.env.NEXT_PUBLIC_EXPLORER_API_URL
 ).mapOr("", String);
