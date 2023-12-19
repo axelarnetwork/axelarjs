@@ -57,9 +57,9 @@ export default function Home() {
                 <Dialog.CornerCloseAction onClick={handleDismissBanner} />
                 <Alert status="warning">
                   <span className="font-semibold">
-                    You are using the Interchain Token Service Beta in testnet.
-                    The app is in active development; further updates and
-                    improvements to come!
+                    You are using the Interchain Token Service Beta. The app is
+                    in active development; further updates and improvements to
+                    come!
                   </span>
                 </Alert>
               </Dialog.Body>
