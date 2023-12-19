@@ -1,7 +1,12 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 
-const HOSTNAMES = ["testnet.axelar.network", "testnet.axelarscan.io"];
+const HOSTNAMES = [
+  "testnet.axelar.network",
+  "testnet.axelarscan.io",
+  "axelar.network",
+  "axelarscan.io",
+];
 
 /**
  * @type {import('next').NextConfig}
