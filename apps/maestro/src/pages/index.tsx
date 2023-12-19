@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 
 import { useNetwork } from "wagmi";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import RecentTransactions from "~/features/RecentTransactions";
 import SearchInterchainToken, {
   TokenFoundResult,
@@ -38,9 +37,7 @@ export default function Home() {
   const handleDismissBanner = layoutActions.dismissDisclaimerBanner;
 
   const shouldRenderTestnetBanner =
-    NEXT_PUBLIC_NETWORK_ENV === "testnet" &&
-    !layoutState.isSignInModalOpen &&
-    !layoutState.isBetaBannerDismissed;
+    !layoutState.isSignInModalOpen && !layoutState.isBetaBannerDismissed;
 
   return (
     <>
