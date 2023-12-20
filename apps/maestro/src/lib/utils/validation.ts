@@ -81,6 +81,11 @@ export const hex40 = () =>
 export const hex64 = () =>
   z.string().regex(/^0x[0-9a-fA-F]{64}$/, "Invalid hash");
 
+/**
+ * Zod schema to validate a 0x hex entry
+ */
+export const hex0x = () => z.string().startsWith("0x").max(2);
+
 export const hex40Literal = () => hex40().transform(asHexLiteral);
 
 export const hex64Literal = () => hex64().transform(asHexLiteral);

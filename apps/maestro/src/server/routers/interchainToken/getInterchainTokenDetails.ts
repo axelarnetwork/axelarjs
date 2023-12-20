@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
+import { hex0x, hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const remoteTokenSchema = z.object({
@@ -30,7 +30,7 @@ const outputSchema = z.object({
   kind: z.string(),
   createdAt: z.date().nullable(),
   updatedAt: z.date().nullable(),
-  salt: hex64Literal(),
+  salt: hex64Literal().or(hex0x()),
   remoteTokens: z.array(remoteTokenSchema),
 });
 
