@@ -7,6 +7,7 @@ import {
   auroraTestnet,
   avalanche,
   avalancheFuji,
+  base,
   baseGoerli,
   bsc,
   bscTestnet,
@@ -220,6 +221,12 @@ export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
     ...filecoin,
     axelarChainId: "filecoin",
     axelarChainName: "filecoin",
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...base,
+    axelarChainId: "base",
+    axelarChainName: "base",
     environment: ENVIRONMENTS.mainnet,
   },
   {
