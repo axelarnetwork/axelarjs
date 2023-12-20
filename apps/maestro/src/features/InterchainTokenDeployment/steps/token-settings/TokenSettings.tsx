@@ -115,7 +115,7 @@ const TokenSettings: FC = () => {
                 <Tooltip
                   position="right"
                   variant="info"
-                  tip="This address will receive the minted tokens. It will also be able to mint, burn tokens and transfer operatorship."
+                  tip="Ensure that you choose a secure minter address. This address will be able to mint the token on any chain."
                 >
                   <HelpCircleIcon className="text-info mr-1 h-[1em]" />
                 </Tooltip>
@@ -131,7 +131,7 @@ const TokenSettings: FC = () => {
             </Label>
             <ModalFormInput
               id="minter"
-              placeholder="Enter token minter address"
+              placeholder="Enter a secure minter address"
               onKeyDown={preventNonHexInput}
               {...register("minter")}
             />
@@ -140,7 +140,9 @@ const TokenSettings: FC = () => {
         )}
         <FormControl>
           <Label htmlFor="initialSupply">
-            Enter {isMintable ? "initial" : "total"} supply
+            {isMintable
+              ? "Enter initial supply"
+              : "Enter total supply - This will be a fixed supply for the token"}
           </Label>
           <ModalFormInput
             id="initialSupply"
