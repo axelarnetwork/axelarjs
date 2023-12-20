@@ -1,5 +1,7 @@
 import {
+  AxelarConfigClient,
   AxelarscanClient,
+  createAxelarConfigClient,
   createAxelarQueryClient,
   EVMChainConfig,
 } from "@axelarjs/api";
@@ -53,6 +55,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
 
   const axelarQueryClient = createAxelarQueryClient(NEXT_PUBLIC_NETWORK_ENV);
 
+  const axelarConfigClient = createAxelarConfigClient(NEXT_PUBLIC_NETWORK_ENV);
+
   return {
     req,
     res,
@@ -73,6 +77,12 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         maestroKVClient,
         axelarscanClient,
         "evmChains" as const
+      ),
+      axelarConfigs: axelarConfigs.bind(
+        null,
+        maestroKVClient,
+        axelarConfigClient,
+        "axelarConfigs" as const
       ),
       wagmiChainConfigs: WAGMI_CHAIN_CONFIGS,
     },
@@ -185,4 +195,25 @@ async function evmChains<TCacheKey extends string>(
   await kvClient.setCached<EVMChainsMap>(cacheKey, evmChainsMap, 3600);
 
   return evmChainsMap;
+}
+
+async function axelarConfigs<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarConfigClient: AxelarConfigClient,
+  cacheKey: TCacheKey
+): Promise<any> {
+  const chainConfigs = await axelarConfigClient.getChainConfigs(
+    NEXT_PUBLIC_NETWORK_ENV
+  );
+
+  const cached = await kvClient.getCached<any>(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  // cache for 1 hour
+  await kvClient.setCached<any>(cacheKey, chainConfigs, 3600);
+
+  return chainConfigs;
 }

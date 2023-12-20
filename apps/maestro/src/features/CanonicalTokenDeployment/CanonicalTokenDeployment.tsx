@@ -1,6 +1,9 @@
+import { Alert, InfoIcon } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
+import { useChainFromRoute } from "~/lib/hooks";
+import { useGetChainsConfig } from "~/services/axelarConfigs/hooks";
 import { MultiStepDialog, StepLoading } from "~/ui/compounds/MultiStepForm";
 import {
   CanonicalTokenDeploymentStateProvider,
@@ -24,6 +27,20 @@ const STEPS = [Step1, Step2, Step3];
 
 const CanonicalTokenDeployment: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
+  const routeChain = useChainFromRoute();
+  const { data: tokenInfo } = useGetChainsConfig({
+    axelarChainId: routeChain?.axelarChainId,
+  });
+
+  const isGatewayToken = useMemo(
+    () =>
+      (
+        tokenInfo?.assets.map((asset: any) =>
+          asset.tokenAddress.toLowerCase()
+        ) || []
+      ).includes(state.tokenDetails.tokenAddress.toLowerCase()),
+    [tokenInfo, state.tokenDetails.tokenAddress]
+  );
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
@@ -31,6 +48,14 @@ const CanonicalTokenDeployment: FC = () => {
     () => state.step !== 0 && state.step !== 2,
     [state.step]
   );
+
+  if (isGatewayToken)
+    return (
+      <Alert status="warning" icon={<InfoIcon className="h-6 w-6" />}>
+        This token is supported directly on Axelar and cannot be registered in
+        ITS.
+      </Alert>
+    );
 
   return (
     <MultiStepDialog
