@@ -86,6 +86,8 @@ export const hex64 = () =>
  */
 export const hex0x = () => z.string().startsWith("0x").max(2);
 
+export const hex0xLiteral = () => hex0x().transform(asHexLiteral);
+
 export const hex40Literal = () => hex40().transform(asHexLiteral);
 
 export const hex64Literal = () => hex64().transform(asHexLiteral);
