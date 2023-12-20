@@ -1,5 +1,6 @@
 import { publicProcedure, router } from "~/server/trpc";
 import { authRouter } from "./auth";
+import { axelarConfigsRouter } from "./axelarConfigs";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
 import { axelarscanRouter } from "./axelarscan";
 import { erc20Router } from "./erc20";
@@ -16,6 +17,7 @@ export const appRouter = router({
   axelarscan: axelarscanRouter,
   erc20: erc20Router,
   axelarjsSDK: axelarjsSDKRouter,
+  axelarConfigs: axelarConfigsRouter,
   interchainToken: interchainTokenRouter,
   auth: authRouter,
   openai: openaiRouter,
