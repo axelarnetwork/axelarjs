@@ -121,32 +121,34 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     });
   }, [registerTokensAsync, setTxState, props.originChainId]);
 
-  const buttonChildren = useMemo(() => {
-    switch (txState.status) {
-      case "idle":
-        return (
-          <>
-            Register token on {props.chainIds.length} additional chain
-            {props.chainIds.length > 1 ? "s" : ""}
-          </>
-        );
-      case "awaiting_approval":
-        return "Confirm on wallet";
-      case "submitted":
-        return "Registering remote tokens";
-      default:
-        return txState.status;
-    }
-  }, [props.chainIds.length, txState.status]);
+  // const buttonChildren = useMemo(() => {
+  //   switch (txState.status) {
+  //     case "idle":
+  //       return (
+  //         <>
+  //           Register token on {props.chainIds.length} additional chain
+  //           {props.chainIds.length > 1 ? "s" : ""}
+  //         </>
+  //       );
+  //     case "awaiting_approval":
+  //       return "Confirm on wallet";
+  //     case "submitted":
+  //       return "Registering remote tokens";
+  //     default:
+  //       return txState.status;
+  //   }
+  // }, [props.chainIds.length, txState.status]);
 
   return (
     <Button
       onClick={handleClick}
-      disabled={!registerTokensAsync}
+      disabled={true}
+      // disabled={!registerTokensAsync}
       variant="primary"
       loading={txState.status === "awaiting_approval"}
     >
-      {buttonChildren}
+      Disabling registering additional chains for now (theres a bug)
+      {/* {buttonChildren} */}
     </Button>
   );
 };
