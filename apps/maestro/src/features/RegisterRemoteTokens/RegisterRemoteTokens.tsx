@@ -147,7 +147,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       variant="primary"
       loading={txState.status === "awaiting_approval"}
     >
-      Disabling registering additional chains for now (theres a bug)
+      Disabling registering additional chains for now (theres a UI bug)
       {/* {buttonChildren} */}
     </Button>
   );
