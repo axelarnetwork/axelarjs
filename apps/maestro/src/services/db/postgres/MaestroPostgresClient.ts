@@ -1,5 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
-import type { Address } from "viem";
+import { type Address } from "viem";
 import { z } from "zod";
 
 import type { DBClient } from "~/lib/drizzle/client";
@@ -104,7 +104,7 @@ export default class MaestroPostgresClient {
    */
   async getInterchainTokenByTokenId(tokenId: string) {
     const query = this.db.query.interchainTokens.findFirst({
-      where: (table, { eq }) => eq(table.tokenId, tokenId),
+      where: (table, { ilike }) => ilike(table.tokenId, tokenId),
       with: {
         remoteTokens: true,
       },
@@ -122,10 +122,10 @@ export default class MaestroPostgresClient {
     tokenAddress: Address
   ) {
     const query = this.db.query.interchainTokens.findFirst({
-      where: (table, { eq, and }) =>
+      where: (table, { ilike, and }) =>
         and(
           eq(table.axelarChainId, axelarChainId),
-          eq(table.tokenAddress, tokenAddress)
+          ilike(table.tokenAddress, tokenAddress)
         ),
       with: {
         remoteTokens: true,
@@ -140,7 +140,7 @@ export default class MaestroPostgresClient {
    */
   async getInterchainTokensByDeployerAddress(deployerAddress: Address) {
     const query = this.db.query.interchainTokens.findMany({
-      where: (table, { eq }) => eq(table.deployerAddress, deployerAddress),
+      where: (table, { ilike }) => ilike(table.tokenAddress, deployerAddress),
     });
 
     return await query;
