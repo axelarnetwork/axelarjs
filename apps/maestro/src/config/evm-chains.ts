@@ -50,7 +50,7 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
+export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
     axelarChainId: "ethereum",
@@ -265,4 +265,7 @@ export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "scroll",
     environment: ENVIRONMENTS.testnet,
   },
-].filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
+];
+
+export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] =
+  ALL_CHAINS.filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
