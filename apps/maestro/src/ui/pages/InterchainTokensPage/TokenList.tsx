@@ -60,10 +60,11 @@ const Pagination: FC<PaginationProps> = ({
   </div>
 );
 
+const PAGE_LIMIT = 12;
+
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
 };
-const PAGE_LIMIT = 12;
 
 const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   const [pageIndex, setPageIndex] = useState(0);
