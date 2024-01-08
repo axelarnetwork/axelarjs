@@ -116,12 +116,12 @@ describe("SendInterchainToken", () => {
       })
     ).toMatchInlineSnapshot(`
       <span
-        aria-label="set max balance to send"
+        aria-label="set max balance to transfer"
         class="label-text-alt"
         role="button"
       >
         Balance:
-         
+
         100,000,000
       </span>
     `);
@@ -150,21 +150,22 @@ describe("SendInterchainToken", () => {
 
     // type in an amount
     await user.type(
-      screen.getByPlaceholderText("Enter your amount to send"),
+      screen.getByPlaceholderText("Enter your amount to transfer"),
       "100"
     );
 
-    expect(screen.getByRole("button", { name: /Send/ })).toMatchInlineSnapshot(`
+    expect(screen.getByRole("button", { name: /Transfer/ }))
+      .toMatchInlineSnapshot(`
       <button
         class="btn btn-primary"
         type="submit"
       >
-        Send 
+        Transfer
         100
-         
+
         tokens
          to
-         
+
         Ethereum Mainnet
       </button>
     `);

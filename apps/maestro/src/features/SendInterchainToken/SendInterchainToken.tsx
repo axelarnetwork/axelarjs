@@ -15,7 +15,7 @@ import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
-  amountToSend: string;
+  amountToTransfer: string;
 };
 
 type Props = {
@@ -57,7 +57,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     reValidateMode: "onChange",
   });
 
-  const amountToSend = watch("amountToSend");
+  const amountToTransfer = watch("amountToTransfer");
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
@@ -67,13 +67,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
     await actions.sendTokenAsync(
       {
         tokenAddress: props.tokenAddress,
-        amount: data.amountToSend,
+        amount: data.amountToTransfer,
       },
       {
         // handles unhandled errors in the mutation
         onError(error) {
           if (error instanceof Error) {
-            toast.error("Failed to send token. Please try again.");
+            toast.error("Failed to transfer token. Please try again.");
             logger.always.error(error);
           }
         },
@@ -82,7 +82,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   };
 
   const buttonChildren = useMemo(() => {
-    const pluralized = `token${Number(amountToSend) > 1 ? "s" : ""}`;
+    const pluralized = `token${Number(amountToTransfer) > 1 ? "s" : ""}`;
 
     switch (state.txState?.status) {
       case "awaiting_spend_approval":
@@ -92,23 +92,26 @@ export const SendInterchainToken: FC<Props> = (props) => {
       case "submitted":
         return (
           <>
-            Sending {amountToSend} {pluralized} to {state.selectedToChain?.name}
+            Transferring {amountToTransfer} {pluralized} to{" "}
+            {state.selectedToChain?.name}
           </>
         );
       default:
         if (!formState.isValid) {
-          return formState.errors.amountToSend?.message ?? "Amount is required";
+          return (
+            formState.errors.amountToTransfer?.message ?? "Amount is required"
+          );
         }
         return (
           <>
-            Send {amountToSend || 0} {pluralized} to{" "}
+            Transfer {amountToTransfer || 0} {pluralized} to{" "}
             {state.selectedToChain?.name}
           </>
         );
     }
   }, [
-    amountToSend,
-    formState.errors.amountToSend?.message,
+    amountToTransfer,
+    formState.errors.amountToTransfer?.message,
     formState.isValid,
     state.selectedToChain?.name,
     state.txState?.status,
@@ -204,14 +207,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
           onSubmit={handleSubmit(submitHandler)}
         >
           <FormControl>
-            <Label htmlFor="amountToSend">
-              <Label.Text>Amount to send</Label.Text>
+            <Label htmlFor="amountToTransfer">
+              <Label.Text>Amount to transfer</Label.Text>
               <Label.AltText
                 role="button"
-                aria-label="set max balance to send"
+                aria-label="set max balance to transfer"
                 onClick={() => {
                   setValue(
-                    "amountToSend",
+                    "amountToTransfer",
                     formatUnits(
                       BigInt(props.balance.tokenBalance),
                       Number(props.balance.decimals)
@@ -233,13 +236,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
               </Label.AltText>
             </Label>
             <TextInput
-              id="amountToSend"
+              id="amountToTransfer"
               bordered
-              placeholder="Enter your amount to send"
+              placeholder="Enter your amount to transfer"
               className="bg-base-200"
               min={0}
               onKeyDown={preventNonNumericInput}
-              {...register("amountToSend", {
+              {...register("amountToTransfer", {
                 disabled: isFormDisabled,
                 validate(value) {
                   if (!value || value === "0") {
