@@ -140,7 +140,8 @@ export default class MaestroPostgresClient {
    */
   async getInterchainTokensByDeployerAddress(deployerAddress: Address) {
     const query = this.db.query.interchainTokens.findMany({
-      where: (table, { ilike }) => ilike(table.tokenAddress, deployerAddress),
+      where: (table, { ilike }) =>
+        ilike(table.deployerAddress, deployerAddress),
     });
 
     return await query;
