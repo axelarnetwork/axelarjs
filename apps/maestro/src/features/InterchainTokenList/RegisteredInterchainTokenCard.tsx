@@ -135,11 +135,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 <Button
                   size="xs"
                   aria-label="manage interchain token"
-                  className="group px-2 py-1"
+                  className="group absolute right-4 top-4 px-2 py-1"
                   variant="primary"
                 >
                   Manage Token
-                  {/* <SettingsIcon className="text-success/75 group-hover:text-success h-5 w-5" /> */}
                 </Button>
               }
               tokenAddress={props.tokenAddress}
