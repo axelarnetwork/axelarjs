@@ -61,7 +61,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   );
 
   return (
-    <section className="grid gap-6">
+    <section className="z-[-1] grid gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold">
           <span className="hidden sm:inline">

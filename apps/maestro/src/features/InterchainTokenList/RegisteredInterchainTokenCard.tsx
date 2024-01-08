@@ -5,7 +5,6 @@ import {
   Card,
   cn,
   CopyToClipboardButton,
-  SettingsIcon,
   SpinnerIcon,
   Tooltip,
 } from "@axelarjs/ui";
@@ -136,11 +135,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 <Button
                   size="xs"
                   aria-label="manage interchain token"
-                  className="group absolute right-2 top-2"
-                  shape="circle"
-                  variant="ghost"
+                  className="group absolute right-4 top-4 px-2 py-1"
+                  variant="primary"
                 >
-                  <SettingsIcon className="text-success/75 group-hover:text-success h-5 w-5" />
+                  Manage Token
                 </Button>
               }
               tokenAddress={props.tokenAddress}
@@ -234,7 +232,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                             className="absolute right-6"
                             disabled={!props.hasRemoteTokens}
                           >
-                            send
+                            Transfer
                           </Button>
                         }
                         tokenAddress={props.tokenAddress}
