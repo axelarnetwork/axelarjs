@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
 
+import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
@@ -128,25 +129,30 @@ const Page = ({
         ) : (
           children
         );
-      case "unsupported-network":
+      case "unsupported-network": {
+        const selectedChain = ALL_CHAINS.find((t) => t.id === chain?.id);
         return (
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">
               <div className="grid gap-1 text-center text-xl font-semibold">
                 <div>
-                  You&apos;re connected to chain <Badge>{chain?.id}</Badge>{" "}
+                  You&apos;re connected to{" "}
+                  <Badge>
+                    {selectedChain?.name} ({selectedChain?.environment})
+                  </Badge>
                   which is not a supported{" "}
                   <Badge>{process.env.NEXT_PUBLIC_NETWORK_ENV}</Badge> network.
                 </div>
                 <div>
                   Select a valid{" "}
                   <Badge>{process.env.NEXT_PUBLIC_NETWORK_ENV}</Badge> network
-                  in your wallet.
+                  in the chain switcher above.
                 </div>
               </div>
             </div>
           </div>
         );
+      }
       case "network-mismatch":
         return !evmChain ? null : (
           <div className="grid w-full flex-1 place-items-center">
