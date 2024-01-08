@@ -234,7 +234,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                             className="absolute right-6"
                             disabled={!props.hasRemoteTokens}
                           >
-                            send
+                            Transfer
                           </Button>
                         }
                         tokenAddress={props.tokenAddress}
