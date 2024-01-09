@@ -10,9 +10,12 @@ export const getMyInterchainTokens = protectedProcedure
     z.object({
       // only for cache invalidation on account change
       sessionAddress: hex40Literal(),
+      // pagination
+      limit: z.number().optional().default(10),
+      offset: z.number().optional().default(0),
     })
   )
-  .query(async ({ ctx }) => {
+  .query(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "Missing session address");
 
     const tokenRecords =
@@ -20,8 +23,20 @@ export const getMyInterchainTokens = protectedProcedure
         ctx.session?.address
       );
 
-    return tokenRecords.sort(
+    const sorted = tokenRecords.sort(
       // sort by creation date newest to oldest
       (a, b) => Number(b.createdAt?.getTime()) - Number(a.createdAt?.getTime())
     );
+
+    const totalPages = Math.ceil(sorted.length / input.limit);
+    const pageIndex = Math.floor(input.offset / input.limit);
+
+    // return paginated results
+    const page = sorted.slice(input.offset, input.offset + input.limit);
+
+    return {
+      items: page,
+      totalPages,
+      pageIndex,
+    };
   });

@@ -169,7 +169,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     >
       <Modal.Body className="flex h-96 flex-col">
         <Modal.Title>Interchain Transfer</Modal.Title>
-        <div className="my-4 grid grid-cols-2 gap-4 p-1">
+        <div className="grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
             <EVMChainsDropdown
@@ -208,7 +208,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
         >
           <FormControl>
             <Label htmlFor="amountToTransfer">
-              <Label.Text>Amount to transfer</Label.Text>
+              <Label.Text>
+                Amount to Transfer{" "}
+                <span className="text-info">{state?.tokenSymbol}</span>
+              </Label.Text>
               <Label.AltText
                 role="button"
                 aria-label="set max balance to transfer"
