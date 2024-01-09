@@ -45,7 +45,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             {maskAddress(tokenId)}
           </CopyToClipboardButton>
           <Tooltip
-            tip="TokeId is a common key used to identify an interchain token across all chains"
+            tip="TokenId is a common key used to identify an interchain token across all chains"
             variant="info"
             position="bottom"
           >

@@ -1,6 +1,6 @@
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
 import { filter, map } from "rambda";
@@ -9,6 +9,7 @@ import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import Pagination from "~/ui/components/Pagination";
 import Page from "~/ui/layouts/Page";
 
 const useGetMyInterchainTokensQuery =
@@ -20,14 +21,21 @@ function getChainNameSlug(chainId: number) {
   return chain?.axelarChainName.toLowerCase() ?? "";
 }
 
+const PAGE_LIMIT = 12;
+
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
 };
 
 const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
+  const [pageIndex, setPageIndex] = useState(0);
+  const offset = pageIndex * PAGE_LIMIT;
+
   const { data } = useGetMyInterchainTokensQuery(
     {
       sessionAddress: sessionAddress as `0x${string}`,
+      limit: PAGE_LIMIT,
+      offset,
     },
     {
       suspense: true,
@@ -37,9 +45,13 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
 
   const { computed } = useEVMChainConfigsQuery();
 
+  const maybeTokens = Maybe.of(data).map((data) => data.items);
+
+  const totalPages = Maybe.of(data).mapOr(0, (data) => data.totalPages);
+
   const filteredTokens = useMemo(
     () =>
-      Maybe.of(data)
+      maybeTokens
         .map(
           map(
             (token) =>
@@ -50,7 +62,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
           [],
           filter(([token, chain]) => Boolean(token) && Boolean(chain))
         ),
-    [computed.indexedById, data]
+    [computed.indexedById, maybeTokens]
   );
 
   return (
@@ -102,6 +114,12 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
           );
         })}
       </ul>
+      <Pagination
+        page={pageIndex}
+        onPageChange={setPageIndex}
+        hasNextPage={pageIndex < totalPages - 1}
+        hasPrevPage={pageIndex > 0}
+      />
     </>
   );
 };
