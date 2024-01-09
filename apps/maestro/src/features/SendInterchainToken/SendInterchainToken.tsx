@@ -9,6 +9,7 @@ import { formatUnits, parseUnits } from "viem";
 
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
+import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import BigNumberText from "~/ui/components/BigNumberText";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -43,6 +44,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
     kind: props.kind,
     originTokenAddress: props.originTokenAddress,
     originTokenChainId: props.originTokenChainId,
+  });
+
+  const { data: tokenDetails } = useERC20TokenDetailsQuery({
+    chainId: props.sourceChain.chain_id,
+    tokenAddress: props.tokenAddress,
   });
 
   const {
@@ -169,7 +175,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     >
       <Modal.Body className="flex h-96 flex-col">
         <Modal.Title>Interchain Transfer</Modal.Title>
-        <div className="my-4 grid grid-cols-2 gap-4 p-1">
+        <div className="grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
             <EVMChainsDropdown
@@ -208,7 +214,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
         >
           <FormControl>
             <Label htmlFor="amountToTransfer">
-              <Label.Text>Amount to transfer</Label.Text>
+              <Label.Text>
+                Amount to Transfer{" "}
+                <span className="text-info">{tokenDetails?.symbol}</span>
+              </Label.Text>
               <Label.AltText
                 role="button"
                 aria-label="set max balance to transfer"
