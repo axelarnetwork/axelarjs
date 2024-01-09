@@ -25,4 +25,5 @@ export {
   PlusIcon,
   RefreshCwIcon,
   HourglassIcon,
+  JoystickIcon,
 } from "lucide-react";
