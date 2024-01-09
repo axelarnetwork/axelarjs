@@ -2,6 +2,7 @@ import { Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
+  ComponentRef,
   useCallback,
   useMemo,
   useRef,
@@ -125,7 +126,7 @@ export const Step3: FC = () => {
     [state.evmChains, chainId]
   );
 
-  const formSubmitRef = useRef<HTMLButtonElement>(null);
+  const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const { address } = useAccount();
 

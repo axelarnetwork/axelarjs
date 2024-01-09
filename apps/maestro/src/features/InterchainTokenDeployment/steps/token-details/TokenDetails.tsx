@@ -1,6 +1,6 @@
 import { Dialog, FormControl, Label } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { useRef, type FC } from "react";
+import { ComponentRef, useRef, type FC } from "react";
 import { type SubmitHandler } from "react-hook-form";
 
 import {
@@ -19,7 +19,7 @@ const TokenDetails: FC = () => {
   const { register, handleSubmit, formState } = state.tokenDetailsForm;
 
   // this is only required because the form and actions are sibling elements
-  const formSubmitRef = useRef<HTMLButtonElement>(null);
+  const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const submitHandler: SubmitHandler<TokenDetailsFormState> = (data, e) => {
     e?.preventDefault();
