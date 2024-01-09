@@ -103,7 +103,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       isVisible: (props) => props.isTokenOwner && !props.hasPendingOwner,
     },
     {
-      label: "Transfer Operatorship",
+      label: "Transfer Rate Limit Manager",
       value: "transferOperatorship",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter && !props.hasPendingOwner,
