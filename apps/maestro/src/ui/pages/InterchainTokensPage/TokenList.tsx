@@ -1,4 +1,4 @@
-import { Button, Card, CopyToClipboardButton } from "@axelarjs/ui";
+import { Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import Pagination from "~/ui/components/Pagination";
 import Page from "~/ui/layouts/Page";
 
 const useGetMyInterchainTokensQuery =
@@ -19,46 +20,6 @@ function getChainNameSlug(chainId: number) {
 
   return chain?.axelarChainName.toLowerCase() ?? "";
 }
-
-type PaginationProps = {
-  page: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-  onPageChange: (page: number) => void;
-};
-
-const Pagination: FC<PaginationProps> = ({
-  page,
-  onPageChange,
-  hasNextPage,
-  hasPrevPage,
-}) => (
-  <div>
-    <div className="join flex items-center justify-center">
-      <Button
-        aria-label="previous page"
-        size="sm"
-        disabled={!hasPrevPage}
-        onClick={onPageChange.bind(null, page - 1)}
-        className="join-item disabled:opacity-50"
-      >
-        «
-      </Button>
-      <Button size="sm" className="join-item">
-        Page {page + 1}
-      </Button>
-      <Button
-        aria-label="next page"
-        size="sm"
-        disabled={!hasNextPage}
-        onClick={onPageChange.bind(null, page + 1)}
-        className="join-item disabled:opacity-50"
-      >
-        »
-      </Button>
-    </div>
-  </div>
-);
 
 const PAGE_LIMIT = 12;
 
