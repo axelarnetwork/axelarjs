@@ -72,6 +72,7 @@ vi.mock("./SendInterchainToken.state.ts", () => ({
       isSending: false,
       selectedToChain: MOCK_EVM_CHAIN_CONFIG,
       eligibleTargetChains: [MOCK_EVM_CHAIN_CONFIG],
+      tokenSymbol: "ETH",
     } as State,
     {
       setIsModalOpen: mocks.setIsModalOpen,

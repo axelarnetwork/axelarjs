@@ -391,12 +391,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           )}
         </div>
       )}
+      <InterchainTokenList title="Registered Chains" tokens={registered} />
       <InterchainTokenList
-        title="Registered interchain tokens"
-        tokens={registered}
-      />
-      <InterchainTokenList
-        title="Unregistered interchain tokens"
+        title="Unregistered Chains"
         listClassName="grid-cols-2 sm:grid-cols-3"
         tokens={unregisteredTokens}
         onToggleSelection={

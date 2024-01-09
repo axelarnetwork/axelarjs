@@ -1,6 +1,6 @@
 import { Maybe } from "@axelarjs/utils";
 
-import { map, split, trim } from "rambda";
+import { map, split, trim, uniq } from "rambda";
 
 export const NEXT_PUBLIC_E2E_ENABLED =
   process.env.NEXT_PUBLIC_E2E_ENABLED === "true";
@@ -69,6 +69,7 @@ export const NEXT_PUBLIC_DISABLED_CHAINS = Maybe.of(
   process.env.NEXT_PUBLIC_DISABLED_CHAINS
 )
   .map(split(","))
+  .map(uniq)
   .mapOr([], map(trim));
 
 export const NEXT_PUBLIC_DISABLED_WALLET_IDS = Maybe.of(
