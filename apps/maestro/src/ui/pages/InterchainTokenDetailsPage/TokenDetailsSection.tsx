@@ -83,8 +83,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           size="sm"
         >
           <ChainIcon src={props.chain.image} alt={props.chain.name} size="sm" />
-          View token
-          <span className="hidden sm:inline">
+          <span>View token</span>
+          <span className="hidden sm:ml-[-4px] sm:block">
             on {props.chain.explorer.name}
           </span>
           <ExternalLinkIcon className="h-4 w-4 translate-x-1" />
