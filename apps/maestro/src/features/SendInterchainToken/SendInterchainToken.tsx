@@ -9,7 +9,6 @@ import { formatUnits, parseUnits } from "viem";
 
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
-import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import BigNumberText from "~/ui/components/BigNumberText";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -44,11 +43,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     kind: props.kind,
     originTokenAddress: props.originTokenAddress,
     originTokenChainId: props.originTokenChainId,
-  });
-
-  const { data: tokenDetails } = useERC20TokenDetailsQuery({
-    chainId: props.sourceChain.chain_id,
-    tokenAddress: props.tokenAddress,
   });
 
   const {
@@ -216,7 +210,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <Label htmlFor="amountToTransfer">
               <Label.Text>
                 Amount to Transfer{" "}
-                <span className="text-info">{tokenDetails?.symbol}</span>
+                <span className="text-info">{state?.tokenSymbol}</span>
               </Label.Text>
               <Label.AltText
                 role="button"
