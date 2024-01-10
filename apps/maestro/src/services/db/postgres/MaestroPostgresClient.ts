@@ -4,6 +4,9 @@ import { z } from "zod";
 
 import type { DBClient } from "~/lib/drizzle/client";
 import {
+  AuditLogEvent,
+  AuditLogEventKind,
+  auditLogs,
   interchainTokens,
   interchainTokensZodSchemas,
   remoteInterchainTokens,
@@ -142,6 +145,33 @@ export default class MaestroPostgresClient {
     const query = this.db.query.interchainTokens.findMany({
       where: (table, { ilike }) =>
         ilike(table.deployerAddress, deployerAddress),
+    });
+
+    return await query;
+  }
+
+  async recordAuditLogEvent<T extends AuditLogEventKind>(
+    event: AuditLogEvent<T>
+  ) {
+    await this.db.insert(auditLogs).values({
+      id: `${event.kind}:${Date.now()}`,
+      eventKind: event.kind,
+      payload: JSON.stringify(event.payload),
+    });
+  }
+
+  async getAuditLogs() {
+    const query = this.db.query.auditLogs.findMany({
+      orderBy: ({ timestamp }, { desc }) => desc(timestamp),
+    });
+
+    return await query;
+  }
+
+  async getAuditLogsByEventKind(eventKind: AuditLogEventKind) {
+    const query = this.db.query.auditLogs.findMany({
+      where: (table, { eq }) => eq(table.eventKind, eventKind),
+      orderBy: ({ timestamp }, { desc }) => desc(timestamp),
     });
 
     return await query;

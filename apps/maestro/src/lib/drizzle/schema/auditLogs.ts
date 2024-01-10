@@ -10,7 +10,7 @@ export const AUDIT_EVENT_KINDS = [
   // add more event kinds here
 ] as const;
 
-export type EventKind = (typeof AUDIT_EVENT_KINDS)[number];
+export type AuditLogEventKind = (typeof AUDIT_EVENT_KINDS)[number];
 
 export type EVENT_KIND_MAP = {
   unauthorized_access_attempt: {
@@ -21,7 +21,7 @@ export type EVENT_KIND_MAP = {
   // add more event types here
 };
 
-export type AuditLogEvent<K extends EventKind> = {
+export type AuditLogEvent<K extends AuditLogEventKind> = {
   kind: K;
   payload: EVENT_KIND_MAP[K];
 };
