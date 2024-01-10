@@ -40,21 +40,34 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
 
   const { computed } = useEVMChainConfigsQuery();
 
+  const baseRemoteTokens = props.chainIds.map((chainId) => ({
+    chainId,
+    address: props.tokenAddress,
+    tokenAddress: props.tokenAddress,
+    deploymentStatus: "pending",
+    deploymentTxHash: "0x",
+    axelarChainId: computed.indexedByChainId[chainId].id,
+  }));
+
   useWaitForTransaction({
     hash: txState.status === "submitted" ? txState.hash : undefined,
-    async onSuccess(receipt) {
+    enabled: txState.status === "submitted" && Boolean(txState.hash),
+    onSuccess: async (receipt) => {
+      const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
+        ...remoteToken,
+        deploymentTxHash: receipt.transactionHash,
+      }));
+
+      console.log("recordRemoteTokenDeployment", {
+        remoteTokens,
+        length: remoteTokens.length,
+      });
+
       await recordRemoteTokenDeployment({
         tokenAddress: props.tokenAddress,
         chainId: props.originChainId ?? -1,
         deploymentMessageId: `${receipt.transactionHash}-0`,
-        remoteTokens: props.chainIds.map((chainId) => ({
-          chainId,
-          address: props.tokenAddress,
-          tokenAddress: props.tokenAddress,
-          deploymentStatus: "pending",
-          deploymentTxHash: receipt.transactionHash,
-          axelarChainId: computed.indexedByChainId[chainId].id,
-        })),
+        remoteTokens,
       });
 
       setTxState({
@@ -121,34 +134,32 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     });
   }, [registerTokensAsync, setTxState, props.originChainId]);
 
-  // const buttonChildren = useMemo(() => {
-  //   switch (txState.status) {
-  //     case "idle":
-  //       return (
-  //         <>
-  //           Register token on {props.chainIds.length} additional chain
-  //           {props.chainIds.length > 1 ? "s" : ""}
-  //         </>
-  //       );
-  //     case "awaiting_approval":
-  //       return "Confirm on wallet";
-  //     case "submitted":
-  //       return "Registering remote tokens";
-  //     default:
-  //       return txState.status;
-  //   }
-  // }, [props.chainIds.length, txState.status]);
+  const buttonChildren = useMemo(() => {
+    switch (txState.status) {
+      case "idle":
+        return (
+          <>
+            Register token on {props.chainIds.length} additional chain
+            {props.chainIds.length > 1 ? "s" : ""}
+          </>
+        );
+      case "awaiting_approval":
+        return "Confirm on wallet";
+      case "submitted":
+        return "Registering remote tokens";
+      default:
+        return txState.status;
+    }
+  }, [props.chainIds.length, txState.status]);
 
   return (
     <Button
       onClick={handleClick}
-      disabled={true}
-      // disabled={!registerTokensAsync}
+      disabled={!registerTokensAsync}
       variant="primary"
       loading={txState.status === "awaiting_approval"}
     >
-      Disabling registering additional chains for now (theres a UI bug)
-      {/* {buttonChildren} */}
+      {buttonChildren}
     </Button>
   );
 };
