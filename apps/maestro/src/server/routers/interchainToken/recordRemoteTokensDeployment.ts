@@ -77,8 +77,6 @@ export const recordRemoteTokensDeployment = protectedProcedure
       })
     );
 
-    console.log("persisting remote tokens", { remoteTokens });
-
     return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
       remoteTokens
     );

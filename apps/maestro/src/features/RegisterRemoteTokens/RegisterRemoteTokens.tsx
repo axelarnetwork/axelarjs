@@ -58,11 +58,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         deploymentTxHash: receipt.transactionHash,
       }));
 
-      console.log("recordRemoteTokenDeployment", {
-        remoteTokens,
-        length: remoteTokens.length,
-      });
-
       await recordRemoteTokenDeployment({
         tokenAddress: props.tokenAddress,
         chainId: props.originChainId ?? -1,
@@ -155,7 +150,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   return (
     <Button
       onClick={handleClick}
-      disabled={!registerTokensAsync}
+      disabled={!registerTokensAsync || txState.status !== "idle"}
       variant="primary"
       loading={txState.status === "awaiting_approval"}
     >
