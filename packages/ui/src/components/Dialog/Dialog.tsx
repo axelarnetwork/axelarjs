@@ -1,5 +1,6 @@
 import {
   ComponentProps,
+  ComponentRef,
   FC,
   ReactNode,
   useEffect,
@@ -34,7 +35,7 @@ interface BaseDialogProps extends ComponentProps<typeof StyledDialog> {
 export type DialogProps = BaseDialogProps & DialogTriggerProps;
 
 const DialogRoot: FC<DialogProps> = (props) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const dialogRef = useRef<ComponentRef<"dialog">>(null);
 
   const [state, actions] = useDialogStateContiner();
 

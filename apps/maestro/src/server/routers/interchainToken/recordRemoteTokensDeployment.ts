@@ -41,6 +41,13 @@ export const recordRemoteTokensDeployment = protectedProcedure
       });
     }
 
+    if (!input.remoteTokens.length) {
+      console.warn(
+        `No remote tokens provided for ${input.tokenAddress} on chain ${input.chainId}`
+      );
+      return;
+    }
+
     const remoteTokens = await Promise.all(
       input.remoteTokens.map(async (remoteToken) => {
         const chains = await ctx.configs.evmChains();

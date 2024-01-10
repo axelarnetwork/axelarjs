@@ -21,7 +21,7 @@ function getChainNameSlug(chainId: number) {
   return chain?.axelarChainName.toLowerCase() ?? "";
 }
 
-const PAGE_LIMIT = 12;
+const PAGE_LIMIT = 15;
 
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
@@ -46,7 +46,6 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   const { computed } = useEVMChainConfigsQuery();
 
   const maybeTokens = Maybe.of(data).map((data) => data.items);
-
   const totalPages = Maybe.of(data).mapOr(0, (data) => data.totalPages);
 
   const filteredTokens = useMemo(
@@ -65,13 +64,23 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
     [computed.indexedById, maybeTokens]
   );
 
+  const totalTokens = Maybe.of(data).mapOr(0, (data) => data.totalItems);
+
   return (
     <>
       <Page.Title className="flex items-center gap-2">
         My Interchain Tokens
         {Boolean(filteredTokens?.length) && (
           <span className="text-base-content-secondary font-mono text-base">
-            ({filteredTokens?.length})
+            (
+            {totalPages > 1 ? (
+              <>
+                {offset + 1}-{offset + filteredTokens.length} of {totalTokens}
+              </>
+            ) : (
+              totalTokens
+            )}
+            )
           </span>
         )}
       </Page.Title>
