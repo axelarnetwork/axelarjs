@@ -154,7 +154,6 @@ export default class MaestroPostgresClient {
     event: AuditLogEvent<T>
   ) {
     await this.db.insert(auditLogs).values({
-      id: `${event.kind}:${Date.now()}`,
       eventKind: event.kind,
       payload: JSON.stringify(event.payload),
     });

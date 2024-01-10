@@ -1,9 +1,7 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgEnum, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { Address } from "viem";
-
-import { HASH_LENGTH } from "./common";
 
 export const AUDIT_EVENT_KINDS = [
   "unauthorized_access_attempt",
@@ -15,7 +13,7 @@ export type AuditLogEventKind = (typeof AUDIT_EVENT_KINDS)[number];
 export type EVENT_KIND_MAP = {
   unauthorized_access_attempt: {
     accountAddress: Address;
-    axelarChainId: string;
+    ip: string;
     userAgent: string;
   };
   // add more event types here
@@ -37,7 +35,7 @@ export const auditLogEventKind = pgEnum(
  * This table is used to store audit logs.
  */
 export const auditLogs = pgTable("audit_logs", {
-  id: varchar("id", { length: HASH_LENGTH }).primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   eventKind: auditLogEventKind("event_kind").notNull(),
   payload: varchar("payload", { length: 2048 }).notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
