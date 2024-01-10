@@ -1,12 +1,31 @@
 import { Maybe } from "@axelarjs/utils";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Limit middleware pathname config
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
+};
+
 export function middleware(req: NextRequest) {
   // Extract country
   const country = Maybe.of(req.geo?.country).valueOr("US");
 
+  console.info(`Country: ${country}`, req.nextUrl.pathname);
+
   // Specify the correct pathname
-  if (BLOCKED_COUNTRIES.includes(country)) {
+  if (
+    BLOCKED_COUNTRIES.includes(country) &&
+    req.nextUrl.pathname !== "/restricted"
+  ) {
     req.nextUrl.pathname = "/restricted";
   }
 
