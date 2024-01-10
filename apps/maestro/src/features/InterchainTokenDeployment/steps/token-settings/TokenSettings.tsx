@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { useMemo, useRef, type FC } from "react";
+import { ComponentRef, useMemo, useRef, type FC } from "react";
 import { FieldError, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -32,7 +32,7 @@ const TokenSettings: FC = () => {
   const { register, handleSubmit, formState, watch } = state.tokenDetailsForm;
 
   // this is only required because the form and actions are sibling elements
-  const formSubmitRef = useRef<HTMLButtonElement>(null);
+  const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const isMintable = watch("isMintable");
   const minter = watch("minter");

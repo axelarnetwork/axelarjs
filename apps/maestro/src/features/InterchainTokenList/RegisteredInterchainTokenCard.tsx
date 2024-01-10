@@ -5,6 +5,7 @@ import {
   Card,
   cn,
   CopyToClipboardButton,
+  SettingsIcon,
   SpinnerIcon,
   Tooltip,
 } from "@axelarjs/ui";
@@ -137,7 +138,9 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                   aria-label="manage interchain token"
                   className="group absolute right-4 top-4 px-2 py-1"
                   variant="primary"
+                  outline
                 >
+                  <SettingsIcon className="-mr-4 h-[1em] -translate-x-2" />
                   Manage Token
                 </Button>
               }
