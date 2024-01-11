@@ -1,7 +1,4 @@
-import { Maybe } from "@axelarjs/utils";
 import { NextResponse, type NextRequest } from "next/server";
-
-import { logger } from "~/lib/logger";
 
 // Limit middleware pathname config
 export const config = {
@@ -19,7 +16,7 @@ export const config = {
 
 export function middleware(req: NextRequest) {
   // Extract country
-  const country = Maybe.of(req.geo?.country).valueOr("US");
+  const country = req.geo?.country ?? "US";
 
   const isBlocked = BLOCKED_COUNTRIES.includes(country);
 
@@ -29,7 +26,7 @@ export function middleware(req: NextRequest) {
   }
 
   if (isBlocked) {
-    logger.always.info("unauthorized_access_attempt:", {
+    console.info("unauthorized_access_attempt:", {
       ...(req.geo ?? {}),
       ip: req.ip,
       userAgent: req.headers.get("user-agent"),
