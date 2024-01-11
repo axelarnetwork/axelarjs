@@ -47,7 +47,7 @@
     "@trpc/server": "^10.45.0",
     "@vercel/kv": "^1.0.1",
     "@vercel/postgres": "^0.5.1",
-    "@web3modal/wagmi": "^3.5.3",
+    "@web3modal/wagmi": "^3.5.5",
     "drizzle-orm": "^0.29.3",
     "lucide-react": "^0.265.0",
     "next": "^14.0.4",
@@ -69,7 +69,7 @@
     "trpc-openapi": "^1.2.0",
     "unfetch": "^4.2.0",
     "viem": "1.21.4",
-    "wagmi": "1.4.7",
+    "wagmi": "1.4.13",
     "zod": "^3.22.4"
   },
   "devDependencies": {

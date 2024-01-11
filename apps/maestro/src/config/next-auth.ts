@@ -1,17 +1,21 @@
+import { Maybe } from "@axelarjs/utils";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { kv } from "@vercel/kv";
 import { getAddress, verifyMessage } from "viem";
 
+import db from "~/lib/drizzle/client";
 import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
 import MaestroKVClient from "~/services/db/kv";
+import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient";
 
 export type Web3Session = {
   address: `0x${string}`;
 };
 
 const kvClient = new MaestroKVClient(kv);
+const pgClient = new MaestroPostgresClient(db);
 
 // augments the default session type
 declare module "next-auth" {
@@ -35,7 +39,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           placeholder: "0x0",
         },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (
           !credentials?.address ||
           !getAddress(credentials?.address) ||
@@ -53,6 +57,25 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
         ]);
 
         if (accountNonce === null || accountStatus === "disabled") {
+          if (accountStatus === "disabled") {
+            const { ip, userAgent } = Maybe.of(req.headers).mapOr(
+              { ip: "", userAgent: "" },
+              (headers) => ({
+                ip: headers["x-real-ip"],
+                userAgent: headers["user-agent"],
+              })
+            );
+
+            // record unauthorized access attempt event to audit logs
+            await pgClient.recordAuditLogEvent({
+              kind: "unauthorized_access_attempt",
+              payload: {
+                ip,
+                userAgent,
+                accountAddress: address,
+              },
+            });
+          }
           return null;
         }
 
