@@ -66,13 +66,13 @@ export const Step3: FC = () => {
     async (e) => {
       e.preventDefault();
 
-      if (
-        state.isEstimatingGasFees ||
-        state.hasGasFeesEstimationError ||
-        !state.remoteDeploymentGasFees ||
-        !state.evmChains ||
-        !deployInterchainTokenAsync
-      ) {
+      const hasGasfees =
+        !rootState.selectedChains.length ||
+        (state.totalGasFee &&
+          !state.isEstimatingGasFees &&
+          !state.hasGasFeesEstimationError);
+
+      if (!deployInterchainTokenAsync || !hasGasfees) {
         console.warn("gas prices not loaded");
         return;
       }
@@ -109,10 +109,10 @@ export const Step3: FC = () => {
       });
     },
     [
+      rootState.selectedChains.length,
+      state.totalGasFee,
       state.isEstimatingGasFees,
       state.hasGasFeesEstimationError,
-      state.remoteDeploymentGasFees,
-      state.evmChains,
       deployInterchainTokenAsync,
       actions,
       sourceChain,
