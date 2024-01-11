@@ -1,6 +1,8 @@
 import { Maybe } from "@axelarjs/utils";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { logger } from "~/lib/logger";
+
 // Limit middleware pathname config
 export const config = {
   matcher: [
@@ -11,7 +13,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|logos|_next/static|_next/image|favicon.ico).*)",
   ],
 };
 
@@ -19,11 +21,20 @@ export function middleware(req: NextRequest) {
   // Extract country
   const country = Maybe.of(req.geo?.country).valueOr("US");
 
-  // Specify the correct pathname
-  if (
-    BLOCKED_COUNTRIES.includes(country) &&
-    req.nextUrl.pathname !== "/restricted"
-  ) {
+  const isBlocked = BLOCKED_COUNTRIES.includes(country);
+
+  if (!isBlocked && req.nextUrl.pathname === "/restricted") {
+    req.nextUrl.pathname = "/";
+    return NextResponse.redirect(req.nextUrl);
+  }
+
+  if (isBlocked) {
+    logger.always.info("unauthorized_access_attempt:", {
+      ...(req.geo ?? {}),
+      ip: req.ip,
+      userAgent: req.headers.get("user-agent"),
+    });
+
     req.nextUrl.pathname = "/restricted";
   }
 
@@ -53,5 +64,5 @@ const BLOCKED_COUNTRIES: string[] = [
   "SD", // Sudan
   "VE", // Venezuela
   "YE", // Yemen
-  "ZW", // Zimbabwe
+  "ZW", // Zimbabwe,
 ];
