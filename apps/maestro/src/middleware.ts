@@ -19,8 +19,6 @@ export function middleware(req: NextRequest) {
   // Extract country
   const country = Maybe.of(req.geo?.country).valueOr("US");
 
-  console.info(`Country: ${country}`, req.nextUrl.pathname);
-
   // Specify the correct pathname
   if (
     BLOCKED_COUNTRIES.includes(country) &&
