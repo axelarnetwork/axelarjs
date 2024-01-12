@@ -20,6 +20,13 @@ export const tokenAddress = varchar("token_address", {
 });
 
 /**
+ * This is the address of the account. Format: `0x${string}`
+ */
+export const accountAddress = varchar("account_address", {
+  length: ADDRESS_LENGTH,
+});
+
+/**
  * This is the address of the token manager contract. Format: `0x${string}`
  */
 export const tokenManagerAddress = varchar("token_manager_address", {

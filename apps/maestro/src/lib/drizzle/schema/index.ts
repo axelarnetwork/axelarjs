@@ -8,6 +8,7 @@ export * from "./utils";
 
 export * from "./interchainTokens";
 export * from "./remoteInterchainTokens";
+export * from "./auditLogs";
 
 /**
  * Table Relations

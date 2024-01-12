@@ -2,6 +2,7 @@ import { Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
+  ComponentRef,
   useCallback,
   useMemo,
   useRef,
@@ -65,13 +66,13 @@ export const Step3: FC = () => {
     async (e) => {
       e.preventDefault();
 
-      if (
-        state.isEstimatingGasFees ||
-        state.hasGasFeesEstimationError ||
-        !state.remoteDeploymentGasFees ||
-        !state.evmChains ||
-        !deployInterchainTokenAsync
-      ) {
+      const hasGasfees =
+        !rootState.selectedChains.length ||
+        (state.totalGasFee &&
+          !state.isEstimatingGasFees &&
+          !state.hasGasFeesEstimationError);
+
+      if (!deployInterchainTokenAsync || !hasGasfees) {
         console.warn("gas prices not loaded");
         return;
       }
@@ -108,10 +109,10 @@ export const Step3: FC = () => {
       });
     },
     [
+      rootState.selectedChains.length,
+      state.totalGasFee,
       state.isEstimatingGasFees,
       state.hasGasFeesEstimationError,
-      state.remoteDeploymentGasFees,
-      state.evmChains,
       deployInterchainTokenAsync,
       actions,
       sourceChain,
@@ -125,7 +126,7 @@ export const Step3: FC = () => {
     [state.evmChains, chainId]
   );
 
-  const formSubmitRef = useRef<HTMLButtonElement>(null);
+  const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const { address } = useAccount();
 

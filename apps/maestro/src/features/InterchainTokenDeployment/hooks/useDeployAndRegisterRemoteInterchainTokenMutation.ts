@@ -138,10 +138,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [input, tokenId, withDecimals, destinationChainNames, originalChainName]);
 
   const totalGasFee = useMemo(() => {
-    const remoteDeploymentsGas = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
-      0n,
-      reduce((a, b) => a + b, 0n)
-    );
+    const remoteDeploymentsGas = Maybe.of(
+      input?.remoteDeploymentGasFees
+    ).mapOrUndefined(reduce((a, b) => a + b, 0n));
 
     // the total gas fee is the sum of the remote deployments gas fee,
     // the remote transfers gas fee and the origin transfer gas fee
@@ -152,7 +151,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     chainId,
     value: totalGasFee,
     args: [multicallArgs],
-    enabled: multicallArgs.length > 0 && totalGasFee > 0n,
+    enabled:
+      multicallArgs.length > 0 &&
+      (totalGasFee === undefined || totalGasFee > 0n),
   });
 
   const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);

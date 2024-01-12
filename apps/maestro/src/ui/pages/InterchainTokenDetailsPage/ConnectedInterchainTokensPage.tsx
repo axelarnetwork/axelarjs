@@ -1,5 +1,5 @@
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
-import { Alert, Button, Tooltip } from "@axelarjs/ui";
+import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
@@ -296,8 +296,15 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const footerContent = (
     <>
-      {shouldRenderFooter && (
-        <div className="bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2">
+      {
+        <div
+          className={cn(
+            "bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2",
+            {
+              "pointer-events-none opacity-0": !shouldRenderFooter,
+            }
+          )}
+        >
           {isGasPriceQueryLoading && (
             <span className="md:ml-2">estimating gas fee... </span>
           )}
@@ -318,7 +325,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                     maximumFractionDigits: 4,
                   }}
                 >
-                  {gasFees.reduce((a, b) => a + b)}
+                  {gasFees.reduce((a, b) => a + b, 0n)}
                 </BigNumberText>{" "}
                 {getNativeToken(interchainToken.chain.id)}
               </div>
@@ -331,19 +338,30 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               tokenAddress={props.tokenAddress}
               originChainId={originToken?.chainId}
               onTxStateChange={(txState) => {
-                if (txState.status === "submitted") {
-                  setSessionState((draft) => {
-                    draft.selectedChainIds = [];
-                    draft.deployTokensTxHashes = uniq([
-                      ...draft.deployTokensTxHashes,
-                      txState.hash,
-                    ]);
-                  });
-                  addTransaction({
-                    status: "submitted",
-                    hash: txState.hash,
-                    chainId: originToken.chainId,
-                  });
+                switch (txState.status) {
+                  case "submitted":
+                    setSessionState((draft) => {
+                      draft.deployTokensTxHashes = uniq([
+                        ...draft.deployTokensTxHashes,
+                        txState.hash,
+                      ]);
+                    });
+                    addTransaction({
+                      status: "submitted",
+                      hash: txState.hash,
+                      chainId: originToken.chainId,
+                    });
+                    break;
+                  case "confirmed":
+                    setSessionState((draft) => {
+                      draft.selectedChainIds = without(
+                        [txState.chainId],
+                        draft.selectedChainIds
+                      ) as number[];
+                    });
+                    break;
+                  default:
+                    break;
                 }
               }}
             />
@@ -363,7 +381,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             </Button>
           )}
         </div>
-      )}
+      }
     </>
   );
 

@@ -16,6 +16,7 @@ import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
+import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { persistTokenDeploymentTxHash } from "~/ui/pages/InterchainTokenDetailsPage/ConnectedInterchainTokensPage";
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
 
@@ -68,21 +69,28 @@ const Review: FC = () => {
     <>
       <div className="grid gap-4">
         {state.txState.type === "deployed" && (
-          <Alert status="success">
-            <div className="flex justify-center font-semibold md:justify-start">
-              Origin token deployed successfully!
-            </div>
-            <div className="flex items-center justify-center md:justify-start">
-              Address:
-              <CopyToClipboardButton
-                copyText={state.txState.tokenAddress}
-                size="sm"
-                variant="ghost"
-              >
-                {maskAddress(state.txState.tokenAddress)}
-              </CopyToClipboardButton>
-            </div>
-          </Alert>
+          <>
+            <Alert status="success">
+              <div className="flex justify-center font-semibold md:justify-start">
+                Origin token deployed successfully!
+              </div>
+              <div className="flex items-center justify-center md:justify-start">
+                Address:
+                <CopyToClipboardButton
+                  copyText={state.txState.tokenAddress}
+                  size="sm"
+                  variant="ghost"
+                >
+                  {maskAddress(state.txState.tokenAddress)}
+                </CopyToClipboardButton>
+              </div>
+            </Alert>
+            <ShareHaikuButton
+              additionalChainNames={state.selectedChains}
+              originChainName={chain?.name ?? ""}
+              tokenName={state.tokenDetails.tokenName}
+            />
+          </>
         )}
         {(state.txState.type === "deployed" ||
           state.txState.type === "deploying") && (

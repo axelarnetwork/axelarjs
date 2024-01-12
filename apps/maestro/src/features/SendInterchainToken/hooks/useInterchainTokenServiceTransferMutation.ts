@@ -138,6 +138,7 @@ export function useInterchainTokenServiceTransferMutation(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       address,
+      sendTokenData?.hash,
       approveERC20Recepit,
       config.destinationChainName,
       interchainTransferAsync,

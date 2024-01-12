@@ -32,11 +32,15 @@ export const getMyInterchainTokens = protectedProcedure
     const pageIndex = Math.floor(input.offset / input.limit);
 
     // return paginated results
-    const page = sorted.slice(input.offset, input.offset + input.limit);
+    const items = sorted.slice(input.offset, input.offset + input.limit);
+
+    const totalItems = sorted.length;
 
     return {
-      items: page,
+      items,
+      totalItems,
       totalPages,
       pageIndex,
+      pageSize: input.limit,
     };
   });
