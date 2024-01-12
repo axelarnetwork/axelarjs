@@ -62,13 +62,13 @@ export const Step3: FC = () => {
     async (e) => {
       e.preventDefault();
 
-      if (
-        state.isEstimatingGasFees ||
-        state.hasGasFeesEstimationError ||
-        !state.remoteDeploymentGasFees ||
-        !state.evmChains ||
-        !deployCanonicalTokenAsync
-      ) {
+      const hasGasfees =
+        !rootState.selectedChains.length ||
+        (state.totalGasFee &&
+          !state.isEstimatingGasFees &&
+          !state.hasGasFeesEstimationError);
+
+      if (!deployCanonicalTokenAsync || !hasGasfees) {
         console.warn("gas prices not loaded");
         return;
       }
