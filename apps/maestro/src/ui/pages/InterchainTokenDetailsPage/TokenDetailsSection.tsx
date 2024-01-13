@@ -64,9 +64,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold">
-          <span className="hidden sm:inline">
-            {props.kind === "canonical" && "Canonical"} Interchain Token{" "}
-          </span>
+          <span className="hidden sm:inline">Interchain Token </span>
           {Boolean(props.name && props.symbol) && (
             <>
               <span className="hidden sm:inline">&middot;</span>
@@ -90,6 +88,13 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           <ExternalLinkIcon className="h-4 w-4 translate-x-1" />
         </LinkButton>
       </div>
+
+      {props.kind === "canonical" && (
+        <div className="italic">
+          {" "}
+          This is a wrapped token deployed via ITS, powered by Axelar
+        </div>
+      )}
       <ul className="grid gap-1.5">
         {sanitizedTokenDetails.map(([label, value]) => (
           <li key={String(label)} className="flex items-center gap-2 text-sm">
