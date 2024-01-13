@@ -9,6 +9,13 @@ import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
+//TODO: migrate to kv store?
+const overrides: Record<`0x${string}`, Record<string, string>> = {
+  "0x4200000000000000000000000000000000000042": {
+    symbol: "axlOP",
+  },
+};
+
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
@@ -32,7 +39,11 @@ export const getERC20TokenDetails = publicProcedure
           );
 
           try {
-            const details = await getTokenPublicDetails(client, config);
+            const details = await getTokenPublicDetails(
+              client,
+              config,
+              input.tokenAddress
+            );
 
             if (details) {
               return details;
@@ -55,7 +66,7 @@ export const getERC20TokenDetails = publicProcedure
         input.tokenAddress
       );
 
-      return getTokenPublicDetails(client, chainConfig);
+      return getTokenPublicDetails(client, chainConfig, input.tokenAddress);
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
@@ -71,7 +82,8 @@ export const getERC20TokenDetails = publicProcedure
 
 async function getTokenPublicDetails(
   client: IERC20BurnableMintableClient,
-  chainConfig: ExtendedWagmiChainConfig
+  chainConfig: ExtendedWagmiChainConfig,
+  tokenAddress: `0x${string}`
 ) {
   invariant(client.chain, "client.chain must be defined");
 
@@ -83,13 +95,15 @@ async function getTokenPublicDetails(
     client.read("pendingOwner").catch(always(null)),
   ]);
 
+  const override = overrides[tokenAddress];
+
   return {
     chainId: client.chain.id,
     chainName: client.chain.name,
     axelarChainId: chainConfig.axelarChainId,
     axelarChainName: chainConfig.axelarChainName,
     name,
-    symbol,
+    symbol: override?.symbol ?? symbol,
     decimals,
     owner,
     pendingOwner,
