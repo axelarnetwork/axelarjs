@@ -17,6 +17,7 @@ import Link from "next/link";
 import { TransactionExecutionError } from "viem";
 import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
 
+import { shouldDisableSend } from "~/config/env";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -233,7 +234,13 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                             size="xs"
                             variant="primary"
                             className="absolute right-6"
-                            disabled={!props.hasRemoteTokens}
+                            disabled={
+                              !props.hasRemoteTokens ||
+                              shouldDisableSend(
+                                props.axelarChainId,
+                                props.tokenAddress
+                              )
+                            }
                           >
                             Transfer
                           </Button>
