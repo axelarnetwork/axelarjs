@@ -136,6 +136,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       status: "submitted",
       hash: txHash,
       chainId: props.sourceChain.chain_id,
+      txType: "INTERCHAIN_TRANSFER",
     });
   }, [actions, props.sourceChain, state.txState, txHash]);
 

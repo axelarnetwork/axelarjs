@@ -66,7 +66,12 @@ export function useInterchainTokensQuery(input: {
   };
 }
 
-export function useGetTransactionType(input: { txHash?: `0x${string}` }) {
+export function useGetTransactionType(
+  input: { txHash?: `0x${string}` },
+  options: {
+    enabled?: boolean;
+  }
+) {
   const { data, ...query } = useQuery(
     ["gmp-get-transaction-type", input.txHash],
     async () => {
@@ -90,7 +95,9 @@ export function useGetTransactionType(input: { txHash?: `0x${string}` }) {
       return null;
     },
     {
-      enabled: Boolean(input.txHash?.match(/^(0x)?[0-9a-f]{64}/i)),
+      enabled: Boolean(
+        input.txHash?.match(/^(0x)?[0-9a-f]{64}/i) && options.enabled
+      ),
     }
   );
 

@@ -93,6 +93,7 @@ export const Step3: FC = () => {
             status: "submitted",
             hash: tx.hash,
             chainId: sourceChain.chain_id,
+            txType: "INTERCHAIN_DEPLOYMENT",
           });
         },
         onTransactionError(txError) {
@@ -105,10 +106,10 @@ export const Step3: FC = () => {
       });
     },
     [
+      rootState.selectedChains.length,
+      state.totalGasFee,
       state.isEstimatingGasFees,
       state.hasGasFeesEstimationError,
-      state.remoteDeploymentGasFees,
-      state.evmChains,
       deployCanonicalTokenAsync,
       actions,
       sourceChain,

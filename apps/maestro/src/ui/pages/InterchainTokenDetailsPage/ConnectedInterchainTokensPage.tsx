@@ -350,6 +350,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                       status: "submitted",
                       hash: txState.hash,
                       chainId: originToken.chainId,
+                      txType: "INTERCHAIN_DEPLOYMENT",
                     });
                     break;
                   case "confirmed":
