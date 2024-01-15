@@ -2,6 +2,8 @@ import { zeroAddress } from "viem";
 
 import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type {
+  DepositAddressNativeUnwrapParams,
+  DepositAddressNativeUnwrapResponse,
   DepositAddressNativeWrapParams,
   DepositAddressNativeWrapResponse,
 } from "./types";
@@ -28,6 +30,25 @@ export class DepositServiceClient extends RestService {
         },
       })
       .json<DepositAddressNativeWrapResponse>();
+
+    return response;
+  }
+
+  async getDepositAddressForNativeUnwrap(
+    params: DepositAddressNativeUnwrapParams
+  ) {
+    const endpoint = `/deposit/unwrap`;
+    const response = await this.client
+      .post(endpoint, {
+        json: {
+          source_chain: params.fromChain,
+          destination_chain: params.toChain,
+          destination_address: params.destinationAddress,
+          refund_address: params.refundAddress,
+          token_symbol: zeroAddress,
+        },
+      })
+      .json<DepositAddressNativeUnwrapResponse>();
 
     return response;
   }
