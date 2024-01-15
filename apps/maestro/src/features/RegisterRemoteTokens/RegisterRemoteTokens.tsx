@@ -115,6 +115,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
           status: "submitted",
           hash: tx.hash,
           chainId: props.originChainId ?? -1,
+          txType: "INTERCHAIN_DEPLOYMENT",
         });
       },
       onTransactionError(error) {

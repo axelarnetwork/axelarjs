@@ -97,6 +97,7 @@ export const Step3: FC = () => {
             status: "submitted",
             hash: tx.hash,
             chainId: sourceChain.chain_id,
+            txType: "INTERCHAIN_DEPLOYMENT",
           });
         },
         onTransactionError(txError) {
