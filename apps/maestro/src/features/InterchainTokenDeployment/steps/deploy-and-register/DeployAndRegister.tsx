@@ -93,12 +93,14 @@ export const Step3: FC = () => {
             txHash: tx.hash,
           });
 
-          addTransaction({
-            status: "submitted",
-            hash: tx.hash,
-            chainId: sourceChain.chain_id,
-            txType: "INTERCHAIN_DEPLOYMENT",
-          });
+          if (rootState.selectedChains.length > 0) {
+            addTransaction({
+              status: "submitted",
+              hash: tx.hash,
+              chainId: sourceChain.chain_id,
+              txType: "INTERCHAIN_DEPLOYMENT",
+            });
+          }
         },
         onTransactionError(txError) {
           rootActions.setTxState({
