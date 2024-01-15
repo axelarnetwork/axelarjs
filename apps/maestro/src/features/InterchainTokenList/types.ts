@@ -5,6 +5,7 @@ import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
 type Kind = "canonical" | "interchain";
 
 export type TokenInfo = {
+  axelarChainId: string;
   chainId: number;
   isRegistered: boolean;
   isOriginToken: boolean;
