@@ -34,4 +34,8 @@ describe("getDepositAddress - node", () => {
     expect(res?.sourceChain?.toLowerCase()).toEqual("axelarnet");
     expect(res?.depositAddress?.startsWith("axelar")).toBeTruthy();
   });
+
+  test("get native deposit address", async () => {
+    // console.log()
+  });
 });

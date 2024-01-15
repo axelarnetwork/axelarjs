@@ -30,4 +30,6 @@ export class DepositAddressClient extends RestService {
       })
       .json<DepositAddressResponse>();
   }
+
+  // async requestDepositAddressForNativeWrap()
 }

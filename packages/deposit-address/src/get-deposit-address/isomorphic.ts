@@ -32,3 +32,17 @@ export async function getDepositAddress(
 
   return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);
 }
+
+export async function getNativeDepositAddress(
+  params: SendOptions,
+  dependencies: GetDepositAddressDependencies
+) {
+  const chainConfigs = await dependencies.configClient.getChainConfigs(
+    params.environment
+  );
+
+  /**
+   * input validation
+   */
+  validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
+}
