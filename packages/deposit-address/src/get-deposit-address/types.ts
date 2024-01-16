@@ -32,7 +32,7 @@ export type DepositNativeWrapOptions = {
   destinationChain: string;
   destinationAddress: string;
   refundAddress: string;
-  salt: string;
+  salt?: string | undefined;
   environment: Environment;
 };
 

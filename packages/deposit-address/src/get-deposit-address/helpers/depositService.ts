@@ -1,5 +1,7 @@
 import { ChainConfigsResponse } from "@axelarjs/api";
 
+import { encodeAbiParameters, keccak256 } from "viem";
+
 export function unwrappable(
   destinationChain: string,
   asset: string,
@@ -19,4 +21,22 @@ export function unwrappable(
   }
 
   return false;
+}
+
+export function generateRandomSalt(destinationAddress: string) {
+  return keccak256(
+    encodeAbiParameters(
+      [
+        {
+          type: "uint256",
+          name: "timestamp",
+        },
+        {
+          type: "string",
+          name: "destinationAddress",
+        },
+      ],
+      [BigInt(new Date().getTime()), destinationAddress]
+    )
+  );
 }

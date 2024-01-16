@@ -1,7 +1,7 @@
 import type { ChainConfig } from "@axelarjs/api";
-import { generateRandomHash } from "@axelarjs/utils";
 
 import {
+  generateRandomSalt,
   getDepositAddressFromAxelarNetwork,
   unwrappable,
   validateAddress,
@@ -43,7 +43,7 @@ export async function getDepositAddress(
         sourceChain,
         destinationChain,
         environment,
-        salt: params.options?.salt || generateRandomHash(),
+        salt: params.options?.salt,
         refundAddress: params.options?.refundAddress || destinationAddress,
       },
       dependencies
@@ -69,7 +69,7 @@ export async function getDepositAddress(
           asset,
         },
         dependencies
-      );
+      ).then((res) => res?.depositAddress);
 
     if (shouldUnwrapToken) {
       // the token is unwrappable, we need to get the native unwrap deposit address first.
@@ -85,10 +85,10 @@ export async function getDepositAddress(
         dependencies
       );
 
-      // then, we need to get the linked deposit address based on the unwrapped deposit address
+      // then, we need to get the linked deposit address based on the unwrapped deposit address and return it
       return _getLinkedDepositAddress(unwrappedDepositAddress);
     } else {
-      // the token is not unwrappable, we can get the linked deposit address directly
+      // the token is not unwrappable, we can get the linked deposit address directly and return it
       return _getLinkedDepositAddress(params.destinationAddress);
     }
   }
@@ -139,7 +139,7 @@ export async function getNativeWrapDepositAddress(
       destinationAddress: params.destinationAddress,
       fromChain: params.sourceChain,
       toChain: params.destinationChain,
-      salt: params.salt,
+      salt: params.salt || generateRandomSalt(params.destinationAddress),
     });
 
   return address;
