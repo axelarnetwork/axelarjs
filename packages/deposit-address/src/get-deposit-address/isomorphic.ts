@@ -1,7 +1,9 @@
-import type { /* AxelarEVMChainConfig, */ ChainConfig } from "@axelarjs/api";
+import type { ChainConfig } from "@axelarjs/api";
+import { generateRandomHash } from "@axelarjs/utils";
 
 import {
   getDepositAddressFromAxelarNetwork,
+  unwrappable,
   validateAddress,
   validateAsset,
   validateChainIds,
@@ -20,48 +22,76 @@ export async function getDepositAddress(
   params: DepositAddressOptions,
   dependencies: GetDepositAddressDependencies
 ) {
+  const {
+    asset,
+    sourceChain,
+    destinationChain,
+    environment,
+    destinationAddress,
+  } = params;
+
   const chainConfigs = await dependencies.configClient.getChainConfigs(
     params.environment
   );
 
-  console.log("==== The following chains has native wrapped asset =====");
-  for (const [k, v] of Object.entries(chainConfigs.chains)) {
-    const nativeWrappedAsset = v.assets.find(
-      (asset) => asset.module === "evm" && asset.isERC20WrappedNativeGasToken
+  // we consider undefined asset as a native token asset
+  if (!asset) {
+    // returns the native wrap deposit address
+    return getNativeWrapDepositAddress(
+      {
+        destinationAddress,
+        sourceChain,
+        destinationChain,
+        environment,
+        salt: params.options?.salt || generateRandomHash(),
+        refundAddress: params.options?.refundAddress || destinationAddress,
+      },
+      dependencies
     );
-    if (nativeWrappedAsset) {
-      console.log(k);
+  } else {
+    // this is an erc20 token, we need to check if it is unwrappable at the destination chain
+    const shouldUnwrapToken = unwrappable(
+      destinationChain,
+      asset,
+      chainConfigs
+    );
+
+    // define a function to get the linked deposit address based on the destination address, where:
+    // - if the token is unwrappable, we need to get the native unwrap deposit address
+    // - otherwise, we need to get the linked deposit address
+    const _getLinkedDepositAddress = (destinationAddress: string) =>
+      getLinkedDepositAddress(
+        {
+          destinationAddress,
+          sourceChain,
+          destinationChain,
+          environment,
+          asset,
+        },
+        dependencies
+      );
+
+    if (shouldUnwrapToken) {
+      // the token is unwrappable, we need to get the native unwrap deposit address first.
+      const unwrappedDepositAddress = await getNativeUnwrapDepositAddress(
+        {
+          destinationAddress,
+          sourceChain,
+          destinationChain,
+          environment,
+          refundAddress:
+            params.options?.refundAddress || params.destinationAddress,
+        },
+        dependencies
+      );
+
+      // then, we need to get the linked deposit address based on the unwrapped deposit address
+      return _getLinkedDepositAddress(unwrappedDepositAddress);
+    } else {
+      // the token is not unwrappable, we can get the linked deposit address directly
+      return _getLinkedDepositAddress(params.destinationAddress);
     }
   }
-
-  const { asset, sourceChain, destinationChain } = params;
-
-  // const destChainConfig = chainConfigs.chains[
-  //   destinationChain.toLowerCase()
-  // ] as ChainConfig;
-
-  // const srcChainConfig = chainConfigs.chains["arbitrum"] as ChainConfig;
-
-  // if (srcChainConfig.module === "evm" && destChainConfig.module === "evm") {
-  //   const srcEvmChainConfig = srcChainConfig as unknown as AxelarEVMChainConfig;
-  //   const wrappedNativeAsset = srcEvmChainConfig.assets.find((asset) => {
-  //     if (asset.module === "evm" && asset.isERC20WrappedNativeGasToken) {
-  //       return asset;
-  //     }
-  //   });
-  //   if (wrappedNativeAsset) {
-  //     console.log(wrappedNativeAsset);
-  //   } else {
-  //     console.log("not found");
-  //     console.log(srcEvmChainConfig.assets);
-  //   }
-  // }
-
-  if (asset) {
-    validateAsset([sourceChain, destinationChain], asset, chainConfigs);
-  }
-
-  // chainConfigs.chains
 }
 
 export async function getLinkedDepositAddress(
