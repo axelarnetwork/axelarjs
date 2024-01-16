@@ -3,7 +3,7 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 import { encodeAbiParameters, keccak256, parseAbiParameters } from "viem";
 
 import {
-  getDepositAddress,
+  getLinkedDepositAddress,
   getNativeUnwrapDepositAddress,
   getNativeWrapDepositAddress,
 } from "./client";
@@ -22,7 +22,7 @@ describe("getDepositAddress - node", () => {
       destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       environment: ENVIRONMENTS.testnet,
     };
-    const res = await getDepositAddress(params);
+    const res = await getLinkedDepositAddress(params);
 
     expect(res?.depositAddress).toBeTruthy();
     expect(res?.sourceChain?.toLowerCase()).toEqual(
@@ -39,7 +39,7 @@ describe("getDepositAddress - node", () => {
       destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       environment: ENVIRONMENTS.testnet,
     };
-    const res = await getDepositAddress(params);
+    const res = await getLinkedDepositAddress(params);
 
     expect(res?.depositAddress).toBeTruthy();
     expect(res?.sourceChain?.toLowerCase()).toEqual("axelarnet");

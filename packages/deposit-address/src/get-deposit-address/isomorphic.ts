@@ -9,14 +9,16 @@ import {
 import type {
   DepositNativeUnwrapOptions,
   DepositNativeWrapOptions,
-  GetDepositAddressDependencies,
   GetDepositServiceDependencies,
+  GetLinkedDepositAddressDependencies,
   SendOptions,
 } from "./types";
 
-export async function getDepositAddress(
+export async function getDepositAddress() {}
+
+export async function getLinkedDepositAddress(
   params: SendOptions,
-  dependencies: GetDepositAddressDependencies
+  dependencies: GetLinkedDepositAddressDependencies
 ) {
   const chainConfigs = await dependencies.configClient.getChainConfigs(
     params.environment
