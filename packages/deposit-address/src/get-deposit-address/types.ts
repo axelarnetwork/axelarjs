@@ -19,12 +19,12 @@ export type DepositAddressOptions = {
   sourceChain: string;
   destinationChain: string;
   destinationAddress: string;
-  asset: string;
-  options: {
+  environment: Environment;
+  asset?: string; // if not specified, it is the native asset
+  options?: {
     salt?: string;
     refundAddress?: string;
   };
-  environment: Environment;
 };
 
 export type DepositNativeWrapOptions = {
@@ -44,6 +44,11 @@ export type GetLinkedDepositAddressDependencies = {
   configClient: AxelarConfigClient;
   axelarscanClient: AxelarscanClient;
 };
+
+export type GetDepositAddressDependencies =
+  GetLinkedDepositAddressDependencies & {
+    depositServiceClient: DepositServiceClient;
+  };
 
 export type GetDepositServiceDependencies = {
   gmpClient: GMPClient;

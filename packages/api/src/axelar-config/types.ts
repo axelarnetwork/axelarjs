@@ -2,9 +2,11 @@ export interface BaseAssetConfig {
   id: string;
   prettySymbol: string;
   symbol: string;
-  sourceChainId_internal: string;
-  sourceChainId_external: string | number;
-  registrationType: "network_asset" | "interchain_token";
+  originChainId: {
+    internal: string;
+    external: string;
+  };
+  registration: "network_asset" | "interchain_token";
   name: string;
   decimals: number;
   svg: string;
@@ -20,6 +22,7 @@ export interface ComosAssetConfig extends BaseAssetConfig {
 export interface EVMAssetConfig extends BaseAssetConfig {
   module: "evm";
   tokenAddress: string;
+  isERC20WrappedNativeGasToken?: boolean;
 }
 
 export type Asset = ComosAssetConfig | EVMAssetConfig;

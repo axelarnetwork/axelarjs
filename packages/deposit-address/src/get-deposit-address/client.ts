@@ -5,17 +5,29 @@ import { createDepositAddressApiClient } from "@axelarjs/api/deposit-address";
 import { createGMPClient } from "@axelarjs/api/gmp";
 
 import {
+  getDepositAddress as baseGetDepositAddress,
   getLinkedDepositAddress as baseGetLinkedDepositAddress,
   getNativeWrapDepositAddress as baseGetNativeDepositAddress,
   getNativeUnwrapDepositAddress as baseGetNativeUnwrapDepositAddress,
 } from "./isomorphic";
 import type {
+  DepositAddressOptions,
   DepositNativeUnwrapOptions,
   DepositNativeWrapOptions,
   SendOptions,
 } from "./types";
 
-export function getDepositAddress() {}
+export function getDepositAddress(params: DepositAddressOptions) {
+  const { environment } = params;
+
+  return baseGetDepositAddress(params, {
+    configClient: createAxelarConfigClient(environment),
+    gmpClient: createGMPClient(environment),
+    depositAddressClient: createDepositAddressApiClient(environment),
+    axelarscanClient: createAxelarscanClient(environment),
+    depositServiceClient: createDepositServiceApiClient(environment),
+  });
+}
 
 export function getLinkedDepositAddress(params: SendOptions) {
   const { environment } = params;

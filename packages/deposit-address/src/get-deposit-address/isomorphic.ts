@@ -1,4 +1,4 @@
-import type { ChainConfig } from "@axelarjs/api";
+import type { /* AxelarEVMChainConfig, */ ChainConfig } from "@axelarjs/api";
 
 import {
   getDepositAddressFromAxelarNetwork,
@@ -7,14 +7,62 @@ import {
   validateChainIds,
 } from "./helpers";
 import type {
+  DepositAddressOptions,
   DepositNativeUnwrapOptions,
   DepositNativeWrapOptions,
+  GetDepositAddressDependencies,
   GetDepositServiceDependencies,
   GetLinkedDepositAddressDependencies,
   SendOptions,
 } from "./types";
 
-export async function getDepositAddress() {}
+export async function getDepositAddress(
+  params: DepositAddressOptions,
+  dependencies: GetDepositAddressDependencies
+) {
+  const chainConfigs = await dependencies.configClient.getChainConfigs(
+    params.environment
+  );
+
+  console.log("==== The following chains has native wrapped asset =====");
+  for (const [k, v] of Object.entries(chainConfigs.chains)) {
+    const nativeWrappedAsset = v.assets.find(
+      (asset) => asset.module === "evm" && asset.isERC20WrappedNativeGasToken
+    );
+    if (nativeWrappedAsset) {
+      console.log(k);
+    }
+  }
+
+  const { asset, sourceChain, destinationChain } = params;
+
+  // const destChainConfig = chainConfigs.chains[
+  //   destinationChain.toLowerCase()
+  // ] as ChainConfig;
+
+  // const srcChainConfig = chainConfigs.chains["arbitrum"] as ChainConfig;
+
+  // if (srcChainConfig.module === "evm" && destChainConfig.module === "evm") {
+  //   const srcEvmChainConfig = srcChainConfig as unknown as AxelarEVMChainConfig;
+  //   const wrappedNativeAsset = srcEvmChainConfig.assets.find((asset) => {
+  //     if (asset.module === "evm" && asset.isERC20WrappedNativeGasToken) {
+  //       return asset;
+  //     }
+  //   });
+  //   if (wrappedNativeAsset) {
+  //     console.log(wrappedNativeAsset);
+  //   } else {
+  //     console.log("not found");
+  //     console.log(srcEvmChainConfig.assets);
+  //   }
+  // }
+
+  if (asset) {
+    validateAsset([sourceChain, destinationChain], asset, chainConfigs);
+  }
+
+  // chainConfigs.chains
+}
 
 export async function getLinkedDepositAddress(
   params: SendOptions,
