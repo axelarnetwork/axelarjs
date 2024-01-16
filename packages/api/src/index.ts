@@ -8,3 +8,5 @@ export * from "./axelar-query";
 export * from "./axelar-config";
 // deposit-address
 export * from "./deposit-address";
+// deposit-service
+export * from "./deposit-service";

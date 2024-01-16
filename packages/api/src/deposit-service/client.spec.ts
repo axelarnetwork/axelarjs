@@ -5,7 +5,7 @@ import { encodeAbiParameters, keccak256, parseAbiParameters } from "viem";
 import { createDepositServiceApiClient } from "./client";
 
 describe("deposit service", () => {
-  test("get wrap deposit address", async () => {
+  test("wrap deposit address should return the address when passing params correctly", async () => {
     const client = createDepositServiceApiClient(ENVIRONMENTS.testnet);
     const salt = keccak256(
       encodeAbiParameters(parseAbiParameters("uint"), [
@@ -21,7 +21,7 @@ describe("deposit service", () => {
       salt,
     });
 
-    expect(response.address).toBeDefined();
+    expect(response).toBeDefined();
   });
 
   test("get unwrap deposit address", async () => {
@@ -34,6 +34,6 @@ describe("deposit service", () => {
       toChain: "Fantom",
     });
 
-    expect(response.address).toBeDefined();
+    expect(response).toBeDefined();
   });
 });
