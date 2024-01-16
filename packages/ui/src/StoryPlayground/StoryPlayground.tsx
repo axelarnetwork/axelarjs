@@ -5,6 +5,7 @@ import { ComponentProps, FC, ReactNode, useState } from "react";
 import type { StoryFn } from "@storybook/react";
 
 import { Card } from "../components/Card";
+import { Radio } from "../components/Radio";
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { cn } from "../utils";
 
@@ -104,16 +105,18 @@ const Variants = <
   return (
     <div className="relative inline-block p-14">
       <section className="absolute right-2 top-2 flex items-center gap-2 p-2.5">
-        <div className="btn-group">
+        <div className="join">
           {VIEW_OPTIONS.map((device) => (
-            <input
-              key={device}
-              type="radio"
-              name="viewports"
-              data-title={device.split("-").join(" ")}
-              className="btn btn-sm"
-              onClick={setView.bind(null, device)}
-            />
+            <label key={device} className="btn btn-sm join-item">
+              <span>{device.split("-").join(" ")}</span>
+              <Radio
+                key={device}
+                name="viewports"
+                onClick={setView.bind(null, device)}
+                value={device}
+                className="hidden"
+              />
+            </label>
           ))}
         </div>
         <ThemeSwitcher />
@@ -129,7 +132,6 @@ const Variants = <
               </small>
             ))}
           </Card.Title>
-
           <div
             className={cn(
               "artboard artboard-demo bg-base-300 mx-auto p-4 transition-all duration-300",
