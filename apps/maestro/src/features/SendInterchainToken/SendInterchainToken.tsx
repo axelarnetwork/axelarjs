@@ -125,6 +125,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     amountToTransfer,
     formState.errors.amountToTransfer?.message,
     formState.isValid,
+    state.hasInsufficientGasBalance,
+    state.nativeTokenSymbol,
     state.selectedToChain?.name,
     state.txState?.status,
   ]);
