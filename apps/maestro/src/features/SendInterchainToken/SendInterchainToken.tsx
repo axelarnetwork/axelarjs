@@ -1,5 +1,12 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import { Button, FormControl, Label, Modal, TextInput } from "@axelarjs/ui";
+import {
+  Button,
+  FormControl,
+  Label,
+  Modal,
+  TextInput,
+  Tooltip,
+} from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
@@ -102,6 +109,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
             formState.errors.amountToTransfer?.message ?? "Amount is required"
           );
         }
+
+        if (state.hasInsufficientGasBalance) {
+          return `Insufficient ${state.nativeTokenSymbol} for gas fees`;
+        }
+
         return (
           <>
             Transfer {amountToTransfer || 0} {pluralized} to{" "}
@@ -260,7 +272,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
                   const bnValue = parseUnits(
                     value as `${number}`,
-                    Number(props.balance.decimals)
+                    Number(props.balance.decimals) * 2
                   );
 
                   if (bnValue > bnBalance) {
@@ -278,14 +290,29 @@ export const SendInterchainToken: FC<Props> = (props) => {
               onAllChainsExecuted={handleAllChainsExecuted}
             />
           )}
-          <Button
-            variant="primary"
-            type="submit"
-            disabled={!formState.isValid || isFormDisabled}
-            loading={state.isSending}
-          >
-            {buttonChildren}
-          </Button>
+
+          <div className="grid w-full">
+            <Label>
+              <Label.Text />
+              {Boolean(state.gasFee) && (
+                <Label.AltText>
+                  <Tooltip tip="Approximate gas cost">
+                    <span className="ml-2 whitespace-nowrap text-xs">
+                      (≈ {state.gasFee} {state.nativeTokenSymbol} in fees)
+                    </span>
+                  </Tooltip>
+                </Label.AltText>
+              )}
+            </Label>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={!formState.isValid || isFormDisabled}
+              loading={state.isSending}
+            >
+              {buttonChildren}
+            </Button>
+          </div>
         </form>
       </Modal.Body>
     </Modal>
