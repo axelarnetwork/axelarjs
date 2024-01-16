@@ -3,22 +3,22 @@ import { forwardRef } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-const inputVariance = cva("checkbox", {
+const inputVariance = cva("radio", {
   variants: {
     variant: {
-      primary: "checkbox-primary",
-      secondary: "checkbox-secondary",
-      accent: "checkbox-accent",
-      success: "checkbox-success",
-      warning: "checkbox-warning",
-      error: "checkbox-error",
-      info: "checkbox-info",
+      primary: "radio-primary",
+      secondary: "radio-secondary",
+      accent: "radio-accent",
+      success: "radio-success",
+      warning: "radio-warning",
+      error: "radio-error",
+      info: "radio-info",
     },
     inputSize: {
-      xs: "checkbox-xs",
-      sm: "checkbox-sm",
-      md: "checkbox-md",
-      lg: "checkbox-lg",
+      xs: "radio-xs",
+      sm: "radio-sm",
+      md: "radio-md",
+      lg: "radio-lg",
     },
   },
 });
@@ -27,19 +27,19 @@ type VProps = VariantProps<typeof inputVariance>;
 
 type InputElement = Omit<JSX.IntrinsicElements["input"], "type" | "color">;
 
-export interface CheckboxProps extends InputElement, VProps {
+export interface RadioProps extends InputElement, VProps {
   type?: never;
   placeholder?: never;
 }
 
 /**
- * A checkbox input component
+ * A radio input component
  */
-export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
+export const Radio = forwardRef<HTMLInputElement, RadioProps>(
   ({ variant, inputSize, className, ...props }, ref) => (
     <input
       ref={ref}
-      type="checkbox"
+      type="radio"
       className={twMerge(
         inputVariance({
           variant,
@@ -52,4 +52,4 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   )
 );
 
-Checkbox.displayName = "Checkbox";
+Radio.displayName = "Radio";
