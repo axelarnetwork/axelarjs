@@ -16,7 +16,7 @@ describe("deposit service", () => {
     const response = await client.getDepositAddressForNativeWrap({
       refundAddress: "0xdeadbeef29292929192939494959594933929292",
       destinationAddress: "0xdeadbeef29292929192939494959594933929292",
-      fromChain: "Ethereum",
+      fromChain: "Avalanche",
       toChain: "Fantom",
       salt,
     });
@@ -30,7 +30,7 @@ describe("deposit service", () => {
     const response = await client.getDepositAddressForNativeUnwrap({
       refundAddress: "0xdeadbeef29292929192939494959594933929292",
       destinationAddress: "0xdeadbeef29292929192939494959594933929292",
-      fromChain: "Ethereum",
+      fromChain: "Avalanche",
       toChain: "Fantom",
     });
 
