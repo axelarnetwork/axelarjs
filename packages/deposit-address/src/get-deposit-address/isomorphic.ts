@@ -53,8 +53,6 @@ export async function getNativeWrapDepositAddress(
     chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
   );
 
-  console.log("params", params);
-
   const { address } =
     await dependencies.depositServiceClient.getDepositAddressForNativeWrap({
       refundAddress: params.refundAddress,
