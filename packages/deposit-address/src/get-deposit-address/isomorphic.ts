@@ -1,4 +1,4 @@
-import type { ChainConfig } from "@axelarjs/api/axelar-config/types";
+import type { ChainConfig } from "@axelarjs/api";
 
 import {
   getDepositAddressFromAxelarNetwork,
@@ -6,7 +6,13 @@ import {
   validateAsset,
   validateChainIds,
 } from "./helpers";
-import type { GetDepositAddressDependencies, SendOptions } from "./types";
+import type {
+  DepositNativeUnwrapOptions,
+  DepositNativeWrapOptions,
+  GetDepositAddressDependencies,
+  GetDepositServiceDependencies,
+  SendOptions,
+} from "./types";
 
 export async function getDepositAddress(
   params: SendOptions,
@@ -33,16 +39,55 @@ export async function getDepositAddress(
   return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);
 }
 
-export async function getNativeDepositAddress(
-  params: SendOptions,
-  dependencies: GetDepositAddressDependencies
+export async function getNativeWrapDepositAddress(
+  params: DepositNativeWrapOptions,
+  dependencies: GetDepositServiceDependencies
 ) {
   const chainConfigs = await dependencies.configClient.getChainConfigs(
     params.environment
   );
 
-  /**
-   * input validation
-   */
   validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
+  validateAddress(
+    params.destinationAddress,
+    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
+  );
+
+  console.log("params", params);
+
+  const { address } =
+    await dependencies.depositServiceClient.getDepositAddressForNativeWrap({
+      refundAddress: params.refundAddress,
+      destinationAddress: params.destinationAddress,
+      fromChain: params.sourceChain,
+      toChain: params.destinationChain,
+      salt: params.salt,
+    });
+
+  return address;
+}
+
+export async function getNativeUnwrapDepositAddress(
+  params: DepositNativeUnwrapOptions,
+  dependencies: GetDepositServiceDependencies
+) {
+  const chainConfigs = await dependencies.configClient.getChainConfigs(
+    params.environment
+  );
+
+  validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
+  validateAddress(
+    params.destinationAddress,
+    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
+  );
+
+  const { address } =
+    await dependencies.depositServiceClient.getDepositAddressForNativeUnwrap({
+      refundAddress: params.refundAddress,
+      destinationAddress: params.destinationAddress,
+      fromChain: params.sourceChain,
+      toChain: params.destinationChain,
+    });
+
+  return address;
 }

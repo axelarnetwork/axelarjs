@@ -6,12 +6,10 @@ export type DepositAddressNativeWrapParams = {
   salt: string; // hex string
 };
 
-export type DepositAddressNativeUnwrapParams = {
-  fromChain: string;
-  toChain: string;
-  destinationAddress: string;
-  refundAddress: string;
-};
+export type DepositAddressNativeUnwrapParams = Omit<
+  DepositAddressNativeWrapParams,
+  "salt"
+>;
 
 export type DepositAddressNativeWrapResponse = {
   address: `0x${string}`;
