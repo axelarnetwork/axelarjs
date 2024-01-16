@@ -355,10 +355,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                     break;
                   case "confirmed":
                     setSessionState((draft) => {
-                      draft.selectedChainIds = without(
-                        [txState.chainId],
-                        draft.selectedChainIds
-                      ) as number[];
+                      draft.selectedChainIds = [];
                     });
                     break;
                   default:
