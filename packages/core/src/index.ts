@@ -48,6 +48,6 @@ export const DEPOSIT_ADDRESS_API_URLS = {
 export type DepositAddressAPIUrl = keyof typeof DEPOSIT_ADDRESS_API_URLS;
 
 export const DEPOSIT_SERVICE_API_URLS = {
-  testnet: "https://deposit-service-devnet-release.devnet.axelar.dev",
+  testnet: "https://deposit-service.testnet.axelar.dev",
   mainnet: "https://deposit-service.mainnet.axelar.dev",
 } as const;
