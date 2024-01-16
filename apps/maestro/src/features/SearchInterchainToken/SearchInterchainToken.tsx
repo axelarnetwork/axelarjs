@@ -1,11 +1,4 @@
-import {
-  cn,
-  FormControl,
-  InputGroup,
-  SpinnerIcon,
-  TextInput,
-  Tooltip,
-} from "@axelarjs/ui";
+import { cn, FormControl, SpinnerIcon, TextInput, Tooltip } from "@axelarjs/ui";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
@@ -101,8 +94,8 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   return (
     <FormControl className="w-full max-w-xs md:max-w-md">
       <div className="pb-2 text-center">Take your token interchain</div>
-      <InputGroup
-        className={cn("rounded-md transition-transform", {
+      <div
+        className={cn("join rounded-md transition-transform", {
           "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
             shouldRenderError,
           "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
@@ -120,11 +113,11 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
-          className="bg-base-200 flex-1 focus:outline-none focus:ring-0"
+          className="bg-base-200 join-item flex-1 focus:outline-none focus:ring-0"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <span>
+        <div className="btn join-item bg-base-300">
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
@@ -133,7 +126,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
               className="tooltip-left md:tooltip-top"
             >
               <EVMChainsDropdown
-                triggerClassName="btn-sm btn-circle"
+                triggerClassName="btn btn-sm btn-circle"
                 contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
                 compact
                 hideLabel
@@ -149,8 +142,8 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
               />
             </Tooltip>
           )}
-        </span>
-      </InputGroup>
+        </div>
+      </div>
       {shouldRenderError && (
         <div
           role="alert"
