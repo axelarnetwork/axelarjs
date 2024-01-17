@@ -65,13 +65,15 @@ function useCanonicalTokenDeploymentState(
       }
 
       setState((draft) => {
-        if (
+        const shouldUpdateStep =
           (partialInitialState.step !== undefined && !draft.step) ||
           partialInitialState.tokenDetails?.tokenAddress !==
-            draft.tokenDetails.tokenAddress
-        ) {
+            draft.tokenDetails.tokenAddress;
+
+        if (shouldUpdateStep) {
           draft.step = partialInitialState.step ?? draft.step;
         }
+
         draft.tokenDetails = {
           ...draft.tokenDetails,
           ...partialInitialState.tokenDetails,
