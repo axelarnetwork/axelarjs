@@ -24,6 +24,7 @@ export type DepositAddressOptions = {
   options?: {
     salt?: string;
     refundAddress?: string;
+    skipUnwrap?: boolean;
   };
 };
 

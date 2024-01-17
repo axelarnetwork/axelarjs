@@ -72,7 +72,7 @@ export async function getDepositAddress(
         dependencies
       ).then((res) => res?.depositAddress);
 
-    if (shouldUnwrapToken) {
+    if (shouldUnwrapToken && !params.options?.skipUnwrap) {
       // the token is unwrappable, we need to get the native unwrap deposit address first.
       const unwrappedDepositAddress = await getNativeUnwrapDepositAddress(
         {
