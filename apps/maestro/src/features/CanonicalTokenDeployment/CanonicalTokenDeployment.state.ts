@@ -65,8 +65,12 @@ function useCanonicalTokenDeploymentState(
       }
 
       setState((draft) => {
-        if (partialInitialState.step !== undefined && !draft.step) {
-          draft.step = partialInitialState.step;
+        if (
+          (partialInitialState.step !== undefined && !draft.step) ||
+          partialInitialState.tokenDetails?.tokenAddress !==
+            draft.tokenDetails.tokenAddress
+        ) {
+          draft.step = partialInitialState.step ?? draft.step;
         }
         draft.tokenDetails = {
           ...draft.tokenDetails,
