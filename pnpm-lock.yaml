@@ -475,8 +475,11 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@axelarjs/cosmos':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../cosmos
+      '@axelarjs/proto':
+        specifier: workspace:*
+        version: link:../proto
       '@axelarjs/utils':
         specifier: workspace:*
         version: link:../utils

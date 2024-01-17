@@ -1,10 +1,9 @@
 import { ChainConfigsResponse } from "@axelarjs/api";
 import { AXELAR_RPC_URLS, Environment } from "@axelarjs/core";
 import { createAxelarQueryClient } from "@axelarjs/cosmos";
+import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
 
 import { encodeAbiParameters, keccak256 } from "viem";
-
-import { ChainStatus } from "../../../../proto/build/module/axelar/nexus/v1beta1/query";
 
 export function unwrappable(
   destinationChain: string,
