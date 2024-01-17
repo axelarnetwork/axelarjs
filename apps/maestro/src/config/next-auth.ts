@@ -57,11 +57,6 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           kvClient.getAccountStatus(address),
         ]);
 
-        console.log({
-          accountStatus,
-          accountNonce,
-        });
-
         if (accountNonce === null || accountStatus === "disabled") {
           if (accountStatus === "disabled") {
             const { ip, userAgent } = Maybe.of(req.headers).mapOr(
