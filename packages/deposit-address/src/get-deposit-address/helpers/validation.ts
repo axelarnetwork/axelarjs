@@ -2,9 +2,29 @@ import type {
   ChainConfig,
   ChainConfigsResponse,
 } from "@axelarjs/api/axelar-config/types";
+import { Environment } from "@axelarjs/core";
 
 import { bech32 } from "bech32";
 import { isAddress } from "viem";
+
+import { getActiveChains } from "./depositService";
+
+export async function validateAddressAndChains(
+  sourceChain: string,
+  destinationChain: string,
+  destinationAddress: string,
+  chainConfigs: ChainConfigsResponse,
+  environment: Environment
+) {
+  validateAddress(
+    destinationAddress,
+    chainConfigs.chains[destinationChain.toLowerCase()] as ChainConfig
+  );
+  validateChainIds([sourceChain, destinationChain], chainConfigs);
+
+  const activeChains = await getActiveChains(environment);
+  validateActiveChains([sourceChain, destinationChain], activeChains);
+}
 
 export function validateAddress(
   destinationAddress: string,

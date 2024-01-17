@@ -1,13 +1,8 @@
-import type { ChainConfig } from "@axelarjs/api";
-
 import {
-  getActiveChains,
   getDepositAddressFromAxelarNetwork,
   unwrappable,
-  validateActiveChains,
-  validateAddress,
+  validateAddressAndChains,
   validateAsset,
-  validateChainIds,
 } from "./helpers";
 import type {
   DepositAddressOptions,
@@ -106,15 +101,18 @@ export async function getLinkedDepositAddress(
   /**
    * input validation
    */
-  validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
+
   validateAsset(
     [params.sourceChain, params.destinationChain],
     params.asset,
     chainConfigs
   );
-  validateAddress(
+  await validateAddressAndChains(
+    params.sourceChain,
+    params.destinationChain,
     params.destinationAddress,
-    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
+    chainConfigs,
+    params.environment
   );
 
   return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);
@@ -128,16 +126,12 @@ export async function getNativeWrapDepositAddress(
     params.environment
   );
 
-  validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
-  validateAddress(
+  await validateAddressAndChains(
+    params.sourceChain,
+    params.destinationChain,
     params.destinationAddress,
-    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
-  );
-
-  const activeChains = await getActiveChains(params.environment);
-  validateActiveChains(
-    [params.sourceChain, params.destinationChain],
-    activeChains
+    chainConfigs,
+    params.environment
   );
 
   const { address } =
@@ -160,16 +154,12 @@ export async function getNativeUnwrapDepositAddress(
     params.environment
   );
 
-  validateChainIds([params.sourceChain, params.destinationChain], chainConfigs);
-  validateAddress(
+  await validateAddressAndChains(
+    params.sourceChain,
+    params.destinationChain,
     params.destinationAddress,
-    chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
-  );
-
-  const activeChains = await getActiveChains(params.environment);
-  validateActiveChains(
-    [params.sourceChain, params.destinationChain],
-    activeChains
+    chainConfigs,
+    params.environment
   );
 
   const { address } =
