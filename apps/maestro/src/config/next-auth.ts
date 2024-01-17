@@ -67,7 +67,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
             const { ip, userAgent } = Maybe.of(req.headers).mapOr(
               { ip: "", userAgent: "" },
               (headers) => ({
-                ip: headers["x-real-ip"],
+                ip: headers["x-real-ip"] ?? headers["x-forwarded-for"],
                 userAgent: headers["user-agent"],
               })
             );
