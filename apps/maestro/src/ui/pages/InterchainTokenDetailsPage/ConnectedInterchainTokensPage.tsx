@@ -350,14 +350,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                       status: "submitted",
                       hash: txState.hash,
                       chainId: originToken.chainId,
+                      txType: "INTERCHAIN_DEPLOYMENT",
                     });
                     break;
                   case "confirmed":
                     setSessionState((draft) => {
-                      draft.selectedChainIds = without(
-                        [txState.chainId],
-                        draft.selectedChainIds
-                      ) as number[];
+                      draft.selectedChainIds = [];
                     });
                     break;
                   default:

@@ -1,13 +1,25 @@
 import type { EVMChainConfig } from "@axelarjs/api";
+import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
+import { formatEther } from "viem";
+import { useAccount, useBalance } from "wagmi";
+
 import { trpc } from "~/lib/trpc";
+import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
+
+const toNumericString = (num: bigint) =>
+  Number(formatEther(num)).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  });
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
@@ -77,6 +89,30 @@ export function useSendInterchainTokenState(props: {
     sourceChainName: props.sourceChain.chain_name,
   });
 
+  const { address } = useAccount();
+
+  const { data: balance } = useBalance({
+    address,
+    watch: true,
+  });
+
+  const nativeTokenSymbol = getNativeToken(
+    props.sourceChain.chain_name.toLowerCase()
+  );
+  const { data: gas } = useEstimateGasFeeQuery({
+    sourceChainId: props.sourceChain.chain_name,
+    destinationChainId: selectedToChain?.chain_name,
+    sourceChainTokenSymbol: nativeTokenSymbol,
+  });
+
+  const hasInsufficientGasBalance = useMemo(() => {
+    if (!balance || !gas) {
+      return false;
+    }
+
+    return gas > balance.value;
+  }, [balance, gas]);
+
   const {
     mutateAsync: tokenManagerSendTokenAsync,
     isLoading: isTokenManagerSending,
@@ -87,6 +123,7 @@ export function useSendInterchainTokenState(props: {
     tokenId: props.tokenId,
     destinationChainName: selectedToChain?.chain_name,
     sourceChainName: props.sourceChain.chain_name,
+    gas,
   });
 
   const trpcContext = trpc.useUtils();
@@ -131,6 +168,9 @@ export function useSendInterchainTokenState(props: {
       selectedToChain,
       eligibleTargetChains,
       tokenSymbol,
+      gasFee: Maybe.of(gas).mapOrUndefined(toNumericString),
+      nativeTokenSymbol,
+      hasInsufficientGasBalance,
     },
     {
       setIsModalOpen,

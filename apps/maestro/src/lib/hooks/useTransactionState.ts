@@ -7,10 +7,12 @@ export type UnsubmittedTransactionState =
   | { status: "awaiting_spend_approval"; amount: bigint }
   | { status: "awaiting_approval" };
 
+export type TxType = "INTERCHAIN_DEPLOYMENT" | "INTERCHAIN_TRANSFER";
 export type SubmittedTransactionState<TError = Error> =
   | {
       status: "submitted";
       hash: `0x${string}`;
+      txType?: TxType;
       chainId: number;
       isGMP?: boolean;
     }
@@ -18,6 +20,7 @@ export type SubmittedTransactionState<TError = Error> =
       status: "confirmed";
       receipt: TransactionReceipt;
       hash?: `0x${string}`;
+      txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
     }
@@ -25,6 +28,7 @@ export type SubmittedTransactionState<TError = Error> =
       status: "reverted";
       error: TError;
       hash?: `0x${string}`;
+      txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
     };
@@ -55,6 +59,9 @@ export function useTransactionState<TError = Error>(
                 // retain the chainId from the previous state if nil
                 chainId:
                   "chainId" in newState ? newState.chainId : prevState.chainId,
+                // retain the txType from the previous state if nil
+                txType:
+                  "txType" in newState ? newState.txType : prevState.txType,
               } as TransactionState<TError>;
             default:
               return newState;

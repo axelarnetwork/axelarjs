@@ -7,11 +7,12 @@ import { getAddress, verifyMessage } from "viem";
 
 import db from "~/lib/drizzle/client";
 import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
-import MaestroKVClient from "~/services/db/kv";
+import MaestroKVClient, { AccountStatus } from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient";
 
 export type Web3Session = {
   address: `0x${string}`;
+  accountStatus: AccountStatus;
 };
 
 const kvClient = new MaestroKVClient(kv);
@@ -55,6 +56,11 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           kvClient.getAccountNonce(address),
           kvClient.getAccountStatus(address),
         ]);
+
+        console.log({
+          accountStatus,
+          accountNonce,
+        });
 
         if (accountNonce === null || accountStatus === "disabled") {
           if (accountStatus === "disabled") {
@@ -108,8 +114,14 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
     secret: process.env.JWT_SECRET,
   },
   callbacks: {
-    session({ session, token }) {
-      session.address = token.sub as `0x${string}`;
+    async session({ session, token }) {
+      const address = getAddress(token.sub ?? "");
+
+      session.address = address;
+      session.accountStatus = await kvClient
+        .getAccountStatus(address)
+        .then((x) => x ?? "enabled");
+
       return session;
     },
     jwt({ token, user }) {

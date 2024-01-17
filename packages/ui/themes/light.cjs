@@ -1,4 +1,7 @@
-const lightTheme = require("daisyui/src/theming/themes")["[data-theme=light]"];
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+const lightTheme = require("daisyui/src/theming/themes")["light"];
 
 const base = require("./base.cjs");
 
