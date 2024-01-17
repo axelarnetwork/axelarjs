@@ -24,7 +24,7 @@ describe("depositService - helper", () => {
   });
 
   describe("getActiveChains", () => {
-    test.only("should return a list of active chains", async () => {
+    test("should return a list of active chains", async () => {
       const env = ENVIRONMENTS.testnet;
       const activeChains = await getActiveChains(env);
       expect(activeChains.length).toBeGreaterThan(0);
