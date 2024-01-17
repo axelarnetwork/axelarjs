@@ -1,13 +1,19 @@
 import type { ComponentType } from "react";
 
-import { useRouteProtection } from "./useRouteProtection";
+import {
+  useRouteProtection,
+  UseRouteProtectionProps,
+} from "./useRouteProtection";
 
 export function withRouteProtection<TProps = any>(
   PageComponent: ComponentType<TProps>,
-  redirectTo = "/"
+  config = {
+    redirectTo: "/",
+    accountStatuses: ["enabled", "privileged"],
+  } as UseRouteProtectionProps
 ) {
   const Wrapped = (props: JSX.IntrinsicAttributes & TProps) => {
-    useRouteProtection({ redirectTo });
+    useRouteProtection(config);
 
     return <PageComponent {...props} />;
   };
