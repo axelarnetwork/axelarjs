@@ -19,17 +19,10 @@ export function unwrappable(
     ({ id }) => id === asset
   );
 
-  if (destAsset?.module === "evm" && destAsset.isERC20WrappedNativeGasToken) {
-    return true;
-  }
-
-  return false;
+  return destAsset?.module === "evm" && destAsset.isERC20WrappedNativeGasToken;
 }
 
-export async function getActiveChains(
-  environment: Environment
-  // chainConfigs: ChainConfig[]
-) {
+export async function getActiveChains(environment: Environment) {
   const axelarQueryClient = await createAxelarQueryClient(
     AXELAR_RPC_URLS[environment]
   );
