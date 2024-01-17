@@ -6,7 +6,7 @@ import {
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress } from "@axelarjs/utils";
+import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useCallback, useEffect, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
@@ -53,17 +53,19 @@ const Review: FC = () => {
     }
   }, [chain, computed.indexedById, state.selectedChains, state.txState]);
 
-  const handleGoToTokenPage = useCallback(async () => {
-    if (chain && state.txState.type === "deployed") {
-      actions.reset();
+  const chainConfig = Maybe.of(chain).mapOrUndefined(
+    (chain) => computed.indexedByChainId[chain.id]
+  );
 
-      const chainConfig = computed.indexedByChainId[chain.id];
+  const handleGoToTokenPage = useCallback(async () => {
+    if (chainConfig && state.txState.type === "deployed") {
+      actions.reset();
 
       await router.push(
         `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
       );
     }
-  }, [actions, chain, computed.indexedByChainId, router, state.txState]);
+  }, [actions, chainConfig, router, state.txState]);
 
   return (
     <>
@@ -85,11 +87,15 @@ const Review: FC = () => {
                 </CopyToClipboardButton>
               </div>
             </Alert>
-            <ShareHaikuButton
-              additionalChainNames={state.selectedChains}
-              originChainName={chain?.name ?? ""}
-              tokenName={state.tokenDetails.tokenName}
-            />
+            {chainConfig && (
+              <ShareHaikuButton
+                additionalChainNames={state.selectedChains}
+                originChainName={chainConfig.name}
+                tokenName={state.tokenDetails.tokenName}
+                originAxelarChainId={chainConfig.id}
+                tokenAddress={state.txState.tokenAddress}
+              />
+            )}
           </>
         )}
         {(state.txState.type === "deployed" ||
