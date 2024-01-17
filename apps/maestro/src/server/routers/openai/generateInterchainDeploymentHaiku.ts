@@ -29,10 +29,11 @@ export const generateInterchainDeploymentHaiku = protectedProcedure
   .output(OUTPUT_SCHEMA)
   .mutation(async ({ input, ctx }) => {
     const { openai } = ctx.services;
+    const prompt = createPrompt(input);
 
     const completion = await openai.completions.create({
+      prompt,
       model: "gpt-3.5-turbo-instruct",
-      prompt: createPrompt(input),
       stream: false,
       best_of: 1,
       max_tokens: 64,
@@ -47,15 +48,16 @@ function formatChainReference(additionalChains: string[]): string {
   if (!additionalChains.length) {
     return "";
   }
+
   return additionalChains.length === 1
-    ? `to ${additionalChains[0]}`
-    : "across multiple chains";
+    ? ` to ${additionalChains[0]}`
+    : " across multiple chains";
 }
 
 function createPrompt(input: HaikuInput): string {
   const chainReference = formatChainReference(input.additionalChainNames);
 
-  return `Create an original haiku celebrating the ${input.tokenName} token, originating from ${input.originChainName} and expanding ${chainReference}. 
+  return `Create an original haiku celebrating the "${input.tokenName}" token, originating from "${input.originChainName}" and expanding${chainReference}. 
      Use natural or mystical imagery, avoiding technical jargon. 
      The haiku should not contain financial advice.
      It should also not contain any profanity or offensive language.`
