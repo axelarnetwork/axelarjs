@@ -116,21 +116,21 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainNames, originalChainName]);
 
-  const totalGasFee = useMemo(
-    () =>
-      Maybe.of(input?.remoteDeploymentGasFees).mapOrUndefined(
-        reduce((a, b) => a + b, 0n)
-      ),
-    [input?.remoteDeploymentGasFees]
+  const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
+    0n,
+    reduce((a, b) => a + b, 0n)
   );
+
+  const isMutationReady =
+    multicallArgs.length > 0 &&
+    // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
+    (!destinationChainNames.length || totalGasFee > 0n);
 
   const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
     chainId,
     value: totalGasFee,
     args: [multicallArgs],
-    enabled:
-      multicallArgs.length > 0 &&
-      (totalGasFee === undefined || totalGasFee > 0n),
+    enabled: isMutationReady,
   });
 
   const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);

@@ -27,14 +27,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const { address: deployerAddress } = useAccount();
   const [txState, setTxState] = useTransactionState();
 
-  useEffect(
-    () => {
-      props.onTxStateChange?.(txState);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [txState.status]
-  );
-
   const { mutateAsync: recordRemoteTokenDeployment } =
     trpc.interchainToken.recordRemoteTokensDeployment.useMutation();
 
@@ -72,7 +64,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     },
   });
 
-  const { writeAsync: registerCanonicalTokensAsync } =
+  const { writeAsync: registerCanonicalTokensAsync, reset: resetCanonical } =
     useRegisterRemoteCanonicalTokens({
       chainIds: props.chainIds,
       deployerAddress: deployerAddress as `0x${string}`,
@@ -80,12 +72,27 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       originChainId: props.originChainId ?? -1,
     });
 
-  const { writeAsync: registerInterchainTokensAsync } =
+  const { writeAsync: registerInterchainTokensAsync, reset: resetInterchain } =
     useRegisterRemoteInterchainTokens({
       chainIds: props.chainIds,
       tokenAddress: props.tokenAddress,
       originChainId: props.originChainId ?? -1,
     });
+
+  useEffect(
+    () => {
+      props.onTxStateChange?.(txState);
+
+      if (txState.status === "confirmed") {
+        // reset muations & tx state
+        resetCanonical();
+        resetInterchain();
+        setTxState({ status: "idle" });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [txState.status]
+  );
 
   const registerTokensAsync = useMemo(() => {
     switch (props.deploymentKind) {
@@ -115,6 +122,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
           status: "submitted",
           hash: tx.hash,
           chainId: props.originChainId ?? -1,
+          txType: "INTERCHAIN_DEPLOYMENT",
         });
       },
       onTransactionError(error) {

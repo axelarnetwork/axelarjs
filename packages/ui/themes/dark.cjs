@@ -1,4 +1,8 @@
-const darkTheme = require("daisyui/src/theming/themes")["[data-theme=dark]"];
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+const darkTheme = require("daisyui/src/theming/themes")["dark"];
+
 const base = require("./base.cjs");
 
 /** @type {import('daisyui').CustomTheme} */

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /** @type {import('daisyui').CustomTheme} */
 module.exports = {
   "--btn-text-case": "none",

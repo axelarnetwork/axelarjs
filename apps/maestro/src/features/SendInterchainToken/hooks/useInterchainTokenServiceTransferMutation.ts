@@ -22,14 +22,13 @@ import {
 import { useInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
-import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   sourceChainName: string;
   destinationChainName: string;
+  gas?: bigint;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -49,14 +48,6 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { address } = useAccount();
 
-  const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: config.sourceChainName,
-    destinationChainId: config.destinationChainName,
-    sourceChainTokenSymbol: getNativeToken(
-      config.sourceChainName.toLowerCase()
-    ),
-  });
-
   const { writeAsync: approveInterchainTokenAsync, data: approveERC20Data } =
     useInterchainTokenApprove({
       address: config.tokenAddress,
@@ -65,7 +56,7 @@ export function useInterchainTokenServiceTransferMutation(
   const { writeAsync: interchainTransferAsync, data: sendTokenData } =
     useInterchainTokenServiceInterchainTransfer({
       address: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-      value: BigInt(gas ?? 0) * BigInt(2),
+      value: BigInt(config.gas ?? 0) * BigInt(2),
     });
 
   const { data: approveERC20Recepit } = useWaitForTransaction({
@@ -91,7 +82,7 @@ export function useInterchainTokenServiceTransferMutation(
               destinationAddress: address,
               amount: approvedAmountRef.current,
               metadata: "0x",
-              gasValue: gas ?? 0n,
+              gasValue: config.gas ?? 0n,
             }),
           });
 
@@ -147,7 +138,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
     async ({ amount }) => {
-      if (!(decimals && address && gas)) {
+      if (!(decimals && address && config.gas)) {
         return;
       }
 

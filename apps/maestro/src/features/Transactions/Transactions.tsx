@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { groupBy } from "rambda";
 
+import type { TxType } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useGetTransactionStatusOnDestinationChainsQuery,
@@ -19,7 +20,7 @@ import {
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
 
-const TX_LABEL_MAP = {
+const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
   INTERCHAIN_TRANSFER: "Interchain Transfer",
 } as const;
@@ -58,22 +59,28 @@ function useGroupedStatuses(txHash: `0x${string}`) {
 const ToastElement: FC<{
   txHash: `0x${string}`;
   chainId: number;
-}> = ({ txHash, chainId }) => {
+  txType?: TxType;
+}> = ({ txHash, chainId, txType }) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
     chainId
   );
 
   const { computed } = useEVMChainConfigsQuery();
-  const { data: txType } = useGetTransactionType({
-    txHash,
-  });
+  const { data: parsedTxType } = useGetTransactionType(
+    {
+      txHash,
+    },
+    {
+      // only fetch if txType is not provided
+      enabled: !txType,
+    }
+  );
 
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
-  const txTypeText = useMemo(
-    () => (txType ? TX_LABEL_MAP[txType] : "Loading..."),
-    [txType]
+  const txTypeText = Maybe.of(parsedTxType ?? txType).mapOrNull(
+    (txType) => TX_LABEL_MAP[txType]
   );
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
@@ -159,6 +166,7 @@ const ToastElement: FC<{
 const GMPTransaction: FC<{
   txHash: `0x${string}`;
   chainId: number;
+  txType?: keyof typeof TX_LABEL_MAP;
 }> = (props) => {
   const {
     computed: { chains: total, executed },
@@ -198,13 +206,10 @@ const GMPTransaction: FC<{
       actions.removeTransaction(props.txHash);
     }
 
-    toast.custom(
-      <ToastElement txHash={props.txHash} chainId={props.chainId} />,
-      {
-        id: props.txHash,
-        duration: Infinity,
-      }
-    );
+    toast.custom(<ToastElement {...props} />, {
+      id: props.txHash,
+      duration: Infinity,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     task(props.txHash);
@@ -212,7 +217,7 @@ const GMPTransaction: FC<{
     return () => {
       window.clearInterval(intervalRef.current);
     };
-  }, [actions, props.chainId, props.txHash, watchTxToCompletion]);
+  }, [actions, props, watchTxToCompletion]);
 
   return <></>;
 };
@@ -237,7 +242,12 @@ const Transactions = () => {
           return null;
         }
         return (
-          <GMPTransaction key={tx.hash} txHash={tx.hash} chainId={tx.chainId} />
+          <GMPTransaction
+            key={tx.hash}
+            txHash={tx.hash}
+            chainId={tx.chainId}
+            txType={tx.txType}
+          />
         );
       })}
     </>
