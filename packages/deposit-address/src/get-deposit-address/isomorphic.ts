@@ -1,7 +1,6 @@
 import type { ChainConfig } from "@axelarjs/api";
 
 import {
-  generateRandomSalt,
   getActiveChains,
   getDepositAddressFromAxelarNetwork,
   unwrappable,
@@ -147,7 +146,7 @@ export async function getNativeWrapDepositAddress(
       destinationAddress: params.destinationAddress,
       fromChain: params.sourceChain,
       toChain: params.destinationChain,
-      salt: params.salt || generateRandomSalt(params.destinationAddress),
+      salt: params.salt || "0x", // we would like to re-used the same salt to utilize the same deposit address
     });
 
   return address;
