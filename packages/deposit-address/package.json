@@ -52,6 +52,7 @@
   "dependencies": {
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
+    "@axelarjs/cosmos": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "bech32": "^2.0.0",
     "viem": "1.21.4"

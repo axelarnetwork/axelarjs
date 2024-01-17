@@ -1,6 +1,10 @@
 import { ChainConfigsResponse } from "@axelarjs/api";
+import { AXELAR_RPC_URLS, Environment } from "@axelarjs/core";
+import { createAxelarQueryClient } from "@axelarjs/cosmos";
 
 import { encodeAbiParameters, keccak256 } from "viem";
+
+import { ChainStatus } from "../../../../proto/build/module/axelar/nexus/v1beta1/query";
 
 export function unwrappable(
   destinationChain: string,
@@ -21,6 +25,19 @@ export function unwrappable(
   }
 
   return false;
+}
+
+export async function getActiveChains(
+  environment: Environment
+  // chainConfigs: ChainConfig[]
+) {
+  const axelarQueryClient = await createAxelarQueryClient(
+    AXELAR_RPC_URLS[environment]
+  );
+
+  return axelarQueryClient.nexus
+    .chains({ status: ChainStatus.CHAIN_STATUS_ACTIVATED })
+    .then(({ chains }) => chains.map((chain) => chain.toLowerCase()));
 }
 
 export function generateRandomSalt(destinationAddress: string) {

@@ -1,7 +1,7 @@
 import { createAxelarConfigClient } from "@axelarjs/api";
 import { ENVIRONMENTS } from "@axelarjs/core";
 
-import { unwrappable } from "./depositService";
+import { getActiveChains, unwrappable } from "./depositService";
 
 describe("depositService - helper", () => {
   describe("unwrappable", () => {
@@ -20,6 +20,14 @@ describe("depositService - helper", () => {
           }
         });
       });
+    });
+  });
+
+  describe("getActiveChains", () => {
+    test.only("should return a list of active chains", async () => {
+      const env = ENVIRONMENTS.testnet;
+      const activeChains = await getActiveChains(env);
+      expect(activeChains.length).toBeGreaterThan(0);
     });
   });
 });

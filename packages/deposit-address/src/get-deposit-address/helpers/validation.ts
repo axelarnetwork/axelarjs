@@ -37,6 +37,16 @@ export function validateChainIds(
   });
 }
 
+export function validateActiveChains(
+  chainIds: string[],
+  activeChains: string[]
+) {
+  chainIds.forEach((chainId) => {
+    if (!activeChains.includes(chainId.toLowerCase()))
+      throw new Error(`chain ID ${chainId} is not active`);
+  });
+}
+
 export function validateAsset(
   chainIds: string[],
   assetId: string,

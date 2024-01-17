@@ -2,8 +2,10 @@ import type { ChainConfig } from "@axelarjs/api";
 
 import {
   generateRandomSalt,
+  getActiveChains,
   getDepositAddressFromAxelarNetwork,
   unwrappable,
+  validateActiveChains,
   validateAddress,
   validateAsset,
   validateChainIds,
@@ -133,6 +135,12 @@ export async function getNativeWrapDepositAddress(
     chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
   );
 
+  const activeChains = await getActiveChains(params.environment);
+  validateActiveChains(
+    [params.sourceChain, params.destinationChain],
+    activeChains
+  );
+
   const { address } =
     await dependencies.depositServiceClient.getDepositAddressForNativeWrap({
       refundAddress: params.refundAddress,
@@ -157,6 +165,12 @@ export async function getNativeUnwrapDepositAddress(
   validateAddress(
     params.destinationAddress,
     chainConfigs.chains[params.destinationChain.toLowerCase()] as ChainConfig
+  );
+
+  const activeChains = await getActiveChains(params.environment);
+  validateActiveChains(
+    [params.sourceChain, params.destinationChain],
+    activeChains
   );
 
   const { address } =

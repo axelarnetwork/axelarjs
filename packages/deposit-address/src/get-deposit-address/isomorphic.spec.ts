@@ -146,6 +146,18 @@ describe("Deposit Address", () => {
       expect(depositAddress).toBeDefined();
     });
 
+    test("should get inactive chain error", async () => {
+      const params: DepositNativeWrapOptions = {
+        sourceChain: "terra",
+        destinationChain: "Fantom",
+        destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        refundAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        environment: ENVIRONMENTS.testnet,
+      };
+
+      await expect(getNativeWrapDepositAddress(params)).rejects.toThrowError();
+    });
+
     test("should throw error when passing invalid source chain or dest chain to wrap deposit address", async () => {
       const invalidSourceParams: DepositNativeWrapOptions = {
         sourceChain: "Avax",
