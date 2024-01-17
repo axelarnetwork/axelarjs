@@ -158,7 +158,11 @@ function useInterchainTokenDeploymentState(
             txState.type === "deployed"
           ) {
             // retain txHash from deploying state
-            txState.txHash = draft.txState.txHash;
+            draft.txState = {
+              ...txState,
+              txHash: draft.txState.txHash,
+            };
+            return;
           }
 
           draft.txState = txState;

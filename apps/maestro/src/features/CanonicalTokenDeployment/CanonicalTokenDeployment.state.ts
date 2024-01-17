@@ -65,7 +65,13 @@ function useCanonicalTokenDeploymentState(
       }
 
       setState((draft) => {
-        draft.step = partialInitialState.step ?? draft.step;
+        if (
+          (partialInitialState.step !== undefined && !draft.step) ||
+          partialInitialState.tokenDetails?.tokenAddress !==
+            draft.tokenDetails.tokenAddress
+        ) {
+          draft.step = partialInitialState.step ?? draft.step;
+        }
         draft.tokenDetails = {
           ...draft.tokenDetails,
           ...partialInitialState.tokenDetails,
@@ -84,11 +90,13 @@ function useCanonicalTokenDeploymentState(
     },
     actions: {
       reset: () => {
+        console.log("reset");
         setState((draft) => {
           Object.assign(draft, initialState);
         });
       },
       setTokenDetails: (detatils: Partial<TokenDetails>) => {
+        console.log("setTokenDetails", detatils);
         setState((draft) => {
           draft.tokenDetails = {
             ...draft.tokenDetails,
@@ -103,7 +111,11 @@ function useCanonicalTokenDeploymentState(
             txState.type === "deployed"
           ) {
             // retain txHash from deploying state
-            txState.txHash = draft.txState.txHash;
+            draft.txState = {
+              ...txState,
+              txHash: draft.txState.txHash,
+            };
+            return;
           }
 
           draft.txState = txState;
