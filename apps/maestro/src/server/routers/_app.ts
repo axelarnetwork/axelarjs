@@ -1,4 +1,5 @@
 import { publicProcedure, router } from "~/server/trpc";
+import { accountsRouter } from "./accounts";
 import { authRouter } from "./auth";
 import { axelarConfigsRouter } from "./axelarConfigs";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
@@ -22,6 +23,7 @@ export const appRouter = router({
   auth: authRouter,
   openai: openaiRouter,
   messages: messagesRouter,
+  accounts: accountsRouter,
 });
 
 export type AppRouter = typeof appRouter;
