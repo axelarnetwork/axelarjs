@@ -1,16 +1,21 @@
 import { Card, Tabs } from "@axelarjs/ui";
-import { FC, useState } from "react";
+import { useState, type FC, type ReactNode } from "react";
 
 import { useAccount } from "wagmi";
 
 import RecentTransactionsList from "./RecentTransactionsList";
 import { CONTRACT_METHODS, type ContractMethod } from "./types";
 
-export const CONTRACT_METHODS_LABELS: Partial<Record<ContractMethod, string>> =
-  {
-    InterchainTransfer: "Interchain Transfer",
-    InterchainTokenDeploymentStarted: "Token Deployment",
-  };
+export const CONTRACT_METHODS_LABELS: Partial<
+  Record<ContractMethod, ReactNode>
+> = {
+  InterchainTransfer: "Interchain Transfer",
+  InterchainTokenDeploymentStarted: (
+    <>
+      Interchain <span className="mx-1 hidden md:block">Token</span> Deployment
+    </>
+  ),
+};
 
 type Props = {
   maxTransactions?: number;

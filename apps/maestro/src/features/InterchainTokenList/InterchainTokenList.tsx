@@ -42,7 +42,11 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
 
     if (hasPartialSelection) {
       // select the remaining tokens
-      unselectedTokens?.forEach((token, i) => {
+      const partialTokens =
+        unselectedTokens.length > selectedTokens.length
+          ? unselectedTokens
+          : selectedTokens;
+      partialTokens?.forEach((token, i) => {
         setTimeout(() => onToggleSelection?.(token.chainId), i * 25);
       });
       return;
@@ -51,7 +55,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
     tokens?.forEach((token, i) => {
       setTimeout(() => onToggleSelection?.(token.chainId), i * 25);
     });
-  }, [onToggleSelection, selectedTokens.length, tokens, unselectedTokens]);
+  }, [onToggleSelection, selectedTokens, tokens, unselectedTokens]);
 
   if (!tokens.length) {
     return null;

@@ -61,7 +61,8 @@ export function useSendInterchainTokenState(props: {
   const eligibleTargetChains = useMemo(() => {
     return (referenceToken?.matchingTokens ?? [])
       .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
-      .map((x) => computed.indexedByChainId[x.chainId ?? 0]);
+      .map((x) => computed.indexedByChainId[x.chainId ?? 0])
+      .filter(Boolean);
   }, [
     referenceToken?.matchingTokens,
     props.sourceChain.chain_id,
