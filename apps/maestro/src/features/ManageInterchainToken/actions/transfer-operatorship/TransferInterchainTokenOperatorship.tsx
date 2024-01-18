@@ -37,7 +37,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   });
 
   const {
-    writeAsync: transferOwnershipAsync,
+    writeAsync: transferOperatorshipAsync,
     isLoading: isTransfering,
     data: transferResult,
   } = useInterchainTokenServiceTransferOperatorship({
@@ -83,7 +83,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       });
 
       try {
-        const txResult = await transferOwnershipAsync({
+        const txResult = await transferOperatorshipAsync({
           args: [data.recipientAddress],
         });
 
@@ -97,10 +97,10 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
-            `Failed to transfer token ownership: ${error.cause.shortMessage}`
+            `Failed to transfer rate limit manager: ${error.cause.shortMessage}`
           );
           logger.error(
-            `Failed to transfer token ownership: ${error.cause.message}`
+            `Failed to transfer rate limit manager: ${error.cause.message}`
           );
 
           setTxState({
@@ -115,14 +115,14 @@ export const TransferInterchainTokenOperatorship: FC = () => {
         });
       }
     },
-    [chainId, setTxState, transferOwnershipAsync]
+    [chainId, setTxState, transferOperatorshipAsync]
   );
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
       case "idle":
       case "confirmed":
-        return "Transfer token ownership";
+        return "Transfer rate limit manager";
       case "awaiting_approval":
         return "Confirm on wallet";
       case "submitted":
@@ -135,7 +135,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   return (
     <>
       <Dialog.Title className="flex">
-        <span>Transfer token ownership</span>
+        <span>Transfer rate limit manager</span>
       </Dialog.Title>
       {txState.status === "confirmed" ? (
         <Alert status="success">
