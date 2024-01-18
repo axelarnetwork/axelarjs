@@ -11,7 +11,7 @@ import { useCallback, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { isAddress, TransactionExecutionError } from "viem";
-import { useChainId, useWaitForTransaction } from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import { useInterchainTokenTransferMintership } from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
@@ -27,8 +27,9 @@ export const TransferInterchainTokenMintership: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
   const chainId = useChainId();
+  const account = useAccount();
 
-  const { register, handleSubmit, formState, getValues } = useForm<FormState>({
+  const { register, handleSubmit, formState } = useForm<FormState>({
     defaultValues: {
       recipientAddress: undefined,
     },
@@ -42,7 +43,7 @@ export const TransferInterchainTokenMintership: FC = () => {
     data: transferResult,
   } = useInterchainTokenTransferMintership({
     address: state.tokenAddress,
-    account: getValues("recipientAddress"),
+    account: account.address,
   });
 
   const trpcContext = trpc.useUtils();
@@ -139,8 +140,7 @@ export const TransferInterchainTokenMintership: FC = () => {
       </Dialog.Title>
       {txState.status === "confirmed" ? (
         <Alert status="success">
-          Token mintership has been successfully transferred. The recipient now
-          must accept the mintership transfer.
+          Token mintership has been successfully transferred.
         </Alert>
       ) : (
         <form
