@@ -12,7 +12,8 @@ export const CONTRACT_METHODS_LABELS: Partial<
   InterchainTransfer: "Interchain Transfer",
   InterchainTokenDeploymentStarted: (
     <>
-      Interchain <span className="mx-1 hidden md:block">Token</span> Deployment
+      Interchain <span className="mx-1 hidden md:inline-block">Token</span>{" "}
+      Deployment
     </>
   ),
 };
