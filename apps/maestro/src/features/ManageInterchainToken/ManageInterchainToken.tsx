@@ -112,7 +112,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Transfer Mintership",
       value: "transferMintership",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      isVisible: () => false,
+      isVisible: (props) => props.isTokenMinter,
     },
     {
       label: "Ownnership Pending Approval",
