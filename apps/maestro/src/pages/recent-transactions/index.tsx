@@ -1,5 +1,6 @@
 import { Tabs } from "@axelarjs/ui";
 import { invert } from "@axelarjs/utils";
+import { Suspense } from "react";
 
 import { useAccount } from "wagmi";
 
@@ -36,25 +37,31 @@ const RecentTransactionsPage = () => {
     >
       <Page.Title>My Recent Transactions</Page.Title>
       <div className="flex-1 space-y-4">
-        <Tabs boxed>
-          {CONTRACT_METHODS.map((method) => (
-            <Tabs.Tab
-              key={method}
-              onClick={(e) => {
-                e.preventDefault();
-                setTab(REVERSE_TAB_MAP[method]);
-              }}
-              active={contractMethod === method}
-            >
-              {CONTRACT_METHODS_LABELS[method]}
-            </Tabs.Tab>
-          ))}
-        </Tabs>
-        <RecentTransactionsTable
-          contractMethod={contractMethod}
-          senderAddress={address}
-          maxTransactions={20}
-        />
+        <Suspense
+          fallback={
+            <Page.FullScreenLoading loadingMessage="loading recent transactions..." />
+          }
+        >
+          <Tabs boxed>
+            {CONTRACT_METHODS.map((method) => (
+              <Tabs.Tab
+                key={method}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTab(REVERSE_TAB_MAP[method]);
+                }}
+                active={contractMethod === method}
+              >
+                {CONTRACT_METHODS_LABELS[method]}
+              </Tabs.Tab>
+            ))}
+          </Tabs>
+          <RecentTransactionsTable
+            contractMethod={contractMethod}
+            senderAddress={address}
+            maxTransactions={20}
+          />
+        </Suspense>
       </div>
     </Page>
   );

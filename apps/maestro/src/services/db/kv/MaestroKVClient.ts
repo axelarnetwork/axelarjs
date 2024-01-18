@@ -65,9 +65,26 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     return await this.kv.get<AccountStatus>(key);
   }
 
+  async getAccounStatuses() {
+    const match = COLLECTION_KEYS.accountStatus("*" as `0x${string}`);
+    const [, keys] = await this.kv.scan(0, { match });
+    const values = await this.kv.mget<AccountStatus[]>(keys);
+
+    return keys.map((key, i) => ({
+      // extract account address from key (e.g. "accounts:0x1234:status" -> "0x1234")
+      accountAddress: key.split(":")[1] as `0x${string}`,
+      status: values[i],
+    }));
+  }
+
   async getGlobalMessage() {
     const key = COLLECTION_KEYS.globalMessage;
     return await this.kv.hgetall<Message>(key);
+  }
+
+  async setGlobalMessage(message: Message) {
+    const key = COLLECTION_KEYS.globalMessage;
+    return await this.kv.hset(key, message);
   }
 
   async getAccountMessage(accountAddresss: `0x${string}`) {
