@@ -10,7 +10,11 @@ const InterchainTokensPage = () => {
   return (
     <Page pageTitle="My Interchain Tokens">
       <div className="flex flex-col gap-4">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <Page.FullScreenLoading loadingMessage="loading interchain tokens..." />
+          }
+        >
           <TokenList sessionAddress={session?.address} />
         </Suspense>
       </div>

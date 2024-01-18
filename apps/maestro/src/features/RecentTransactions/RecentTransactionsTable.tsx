@@ -30,19 +30,29 @@ export const RecentTransactionsTable: FC<Props> = ({
     setPage(0);
   }, [contractMethod]);
 
-  const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery({
-    contractMethod,
-    senderAddress,
-    pageSize: maxTransactions,
-    page,
-  });
+  const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery(
+    {
+      contractMethod,
+      senderAddress,
+      pageSize: maxTransactions,
+      page,
+    },
+    {
+      suspense: true,
+    }
+  );
 
-  const { data: prevPageTxns } = trpc.gmp.getRecentTransactions.useQuery({
-    contractMethod,
-    senderAddress,
-    pageSize: maxTransactions,
-    page: page > 0 ? page - 1 : 0,
-  });
+  const { data: prevPageTxns } = trpc.gmp.getRecentTransactions.useQuery(
+    {
+      contractMethod,
+      senderAddress,
+      pageSize: maxTransactions,
+      page: page > 0 ? page - 1 : 0,
+    },
+    {
+      suspense: true,
+    }
+  );
 
   const { data: nextPageTxns } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,

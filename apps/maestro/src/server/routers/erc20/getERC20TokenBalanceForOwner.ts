@@ -44,11 +44,13 @@ export const getERC20TokenBalanceForOwner = publicProcedure
         chainConfig,
         input.tokenAddress
       );
-      const isTokenMinter = await itClient.reads
-        .isMinter({
-          addr: input.owner,
-        })
-        .catch(always(false));
+      const [isTokenMinter] = await Promise.all([
+        itClient.reads
+          .isMinter({
+            addr: input.owner,
+          })
+          .catch(always(false)),
+      ]);
 
       return {
         isTokenMinter,

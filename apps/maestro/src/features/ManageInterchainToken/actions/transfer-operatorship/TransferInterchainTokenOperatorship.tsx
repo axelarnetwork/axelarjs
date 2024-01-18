@@ -11,7 +11,7 @@ import { useCallback, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { isAddress, TransactionExecutionError } from "viem";
-import { useChainId, useWaitForTransaction } from "wagmi";
+import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import { useInterchainTokenServiceTransferOperatorship } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
@@ -27,8 +27,9 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
   const chainId = useChainId();
+  const account = useAccount();
 
-  const { register, handleSubmit, formState, getValues } = useForm<FormState>({
+  const { register, handleSubmit, formState } = useForm<FormState>({
     defaultValues: {
       recipientAddress: undefined,
     },
@@ -37,12 +38,12 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   });
 
   const {
-    writeAsync: transferOwnershipAsync,
+    writeAsync: transferOperatorshipAsync,
     isLoading: isTransfering,
     data: transferResult,
   } = useInterchainTokenServiceTransferOperatorship({
     address: state.tokenAddress,
-    account: getValues("recipientAddress"),
+    account: account.address,
   });
 
   const trpcContext = trpc.useUtils();
@@ -70,7 +71,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
         receipt,
       });
 
-      toast.success("Successfully transferred token ownership");
+      toast.success("Successfully transferred token operatorship");
     },
   });
 
@@ -83,7 +84,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       });
 
       try {
-        const txResult = await transferOwnershipAsync({
+        const txResult = await transferOperatorshipAsync({
           args: [data.recipientAddress],
         });
 
@@ -97,10 +98,10 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
-            `Failed to transfer token ownership: ${error.cause.shortMessage}`
+            `Failed to transfer token operatorship: ${error.cause.shortMessage}`
           );
           logger.error(
-            `Failed to transfer token ownership: ${error.cause.message}`
+            `Failed to transfer token operatorship: ${error.cause.message}`
           );
 
           setTxState({
@@ -115,32 +116,31 @@ export const TransferInterchainTokenOperatorship: FC = () => {
         });
       }
     },
-    [chainId, setTxState, transferOwnershipAsync]
+    [chainId, setTxState, transferOperatorshipAsync]
   );
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {
       case "idle":
       case "confirmed":
-        return "Transfer token ownership";
+        return "Transfer token operatorship";
       case "awaiting_approval":
         return "Confirm on wallet";
       case "submitted":
-        return "Transfering token ownership";
+        return "Transfering token operatorship";
       case "reverted":
-        return "Failed to transfer ownership";
+        return "Failed to transfer operatorship";
     }
   }, [txState]);
 
   return (
     <>
       <Dialog.Title className="flex">
-        <span>Transfer token ownership</span>
+        <span>Transfer rate-limit manager</span>
       </Dialog.Title>
       {txState.status === "confirmed" ? (
         <Alert status="success">
-          Token ownership has been successfully transferred. The recipient now
-          must accept the ownership transfer.
+          Token operatorship has been successfully transferred.
         </Alert>
       ) : (
         <form
