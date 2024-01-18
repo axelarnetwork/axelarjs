@@ -144,13 +144,28 @@ const ToastElement: FC<{
     </>
   );
 
+  const [, actions] = useTransactionsContainer();
+
+  const handleDismiss = useCallback(() => {
+    toast.dismiss(txHash);
+
+    // dismiss permanently if tx status is error or insufficient_fee
+    if (
+      groupedStatusesProps.some(
+        (x) => x.status === "error" || x.status === "insufficient_fee"
+      )
+    ) {
+      actions.removeTransaction(txHash);
+    }
+  }, [actions, groupedStatusesProps, txHash]);
+
   return (
     <div className="bg-base-300 border-base-200 relative grid gap-2 rounded-md p-2 pl-4 pr-8 shadow-md shadow-black/10">
       <Button
         className="absolute right-2 top-2"
         size="xs"
         shape="circle"
-        onClick={toast.dismiss.bind(null, txHash)}
+        onClick={handleDismiss}
       >
         <XIcon size={12} />
       </Button>
@@ -163,11 +178,13 @@ const ToastElement: FC<{
   );
 };
 
-const GMPTransaction: FC<{
+type GMPTxStatusProps = {
   txHash: `0x${string}`;
   chainId: number;
   txType?: keyof typeof TX_LABEL_MAP;
-}> = (props) => {
+};
+
+const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const {
     computed: { chains: total, executed },
     isLoading,

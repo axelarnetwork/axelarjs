@@ -229,8 +229,8 @@ const TestnetBanner = ({ onClose = () => {} }) => (
       </Button>
       <Card.Title>New to the Interchain Token Service?</Card.Title>
       <p>
-        Run a few flows in our testnet (with test tokens) and experiment here
-        with small amounts first.
+        We encourage you to experiment with{" "}
+        <a href={process.env.NEXT_PUBLIC_TESTNET_URL}>testnet</a> first!
       </p>
       <Card.Actions className="justify-end">
         <LinkButton
