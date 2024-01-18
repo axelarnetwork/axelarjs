@@ -218,21 +218,25 @@ const Page = ({
       >
         {pageContent}
       </Clamp>
-      {isLoading && (
-        <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
-          <div className="grid place-items-center gap-12 text-center">
-            <GridLoader
-              color="var(--primary)"
-              className="animate-pulse [animation-duration:3s]"
-            />
-            <span>{loadingMessage || "loading page data..."}</span>
-          </div>
-        </div>
-      )}
+      {isLoading && <FullScreenLoading loadingMessage={loadingMessage} />}
     </>
   );
 };
 
+export const FullScreenLoading = ({ loadingMessage = "" }) => (
+  <div className="absolute inset-0 grid place-items-center bg-black/20 backdrop-blur-sm">
+    <div className="grid place-items-center gap-12 text-center">
+      <GridLoader
+        color="var(--primary)"
+        className="animate-pulse [animation-duration:3s]"
+      />
+      <span>{loadingMessage || "loading page data..."}</span>
+    </div>
+  </div>
+);
+
 export default Object.assign(Page, {
   Title: tw.h1`text-2xl font-bold`,
+  Content: tw.div`flex-1 grid`,
+  FullScreenLoading,
 });
