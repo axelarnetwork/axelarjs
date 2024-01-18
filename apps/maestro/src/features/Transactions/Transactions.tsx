@@ -56,11 +56,19 @@ function useGroupedStatuses(txHash: `0x${string}`) {
   }, [computed.indexedById, statuses, txHash]);
 }
 
-const ToastElement: FC<{
+type ToastElementProps = {
   txHash: `0x${string}`;
   chainId: number;
   txType?: TxType;
-}> = ({ txHash, chainId, txType }) => {
+  onRemoveTx?: (txHash: `0x${string}`) => void;
+};
+
+const ToastElement: FC<ToastElementProps> = ({
+  txHash,
+  chainId,
+  txType,
+  onRemoveTx,
+}) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
     chainId
@@ -144,8 +152,6 @@ const ToastElement: FC<{
     </>
   );
 
-  const [, actions] = useTransactionsContainer();
-
   const handleDismiss = useCallback(() => {
     toast.dismiss(txHash);
 
@@ -155,9 +161,9 @@ const ToastElement: FC<{
         (x) => x.status === "error" || x.status === "insufficient_fee"
       )
     ) {
-      actions.removeTransaction(txHash);
+      onRemoveTx?.(txHash);
     }
-  }, [actions, groupedStatusesProps, txHash]);
+  }, [groupedStatusesProps, onRemoveTx, txHash]);
 
   return (
     <div className="bg-base-300 border-base-200 relative grid gap-2 rounded-md p-2 pl-4 pr-8 shadow-md shadow-black/10">
@@ -223,10 +229,13 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
       actions.removeTransaction(props.txHash);
     }
 
-    toast.custom(<ToastElement {...props} />, {
-      id: props.txHash,
-      duration: Infinity,
-    });
+    toast.custom(
+      <ToastElement {...props} onRemoveTx={actions.removeTransaction} />,
+      {
+        id: props.txHash,
+        duration: Infinity,
+      }
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     task(props.txHash);
