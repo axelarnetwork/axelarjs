@@ -76,7 +76,7 @@
     "@babel/core": "^7.23.7",
     "@next/bundle-analyzer": "^14.1.0",
     "@playwright/test": "^1.41.1",
-    "@sentry/cli": "^2.25.3",
+    "@sentry/cli": "^2.26.0",
     "@tanstack/react-query-devtools": "^4.36.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.1.2",
