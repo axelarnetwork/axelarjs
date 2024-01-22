@@ -35,10 +35,14 @@ export async function addGas(
   { autocalculateGasOptions, sendOptions, ...params }: AddGasParams,
   dependencies: AddGasDependencies
 ): Promise<AddGasResponse> {
-  const chainConfig = await dependencies.configClient
-    .getChainConfigs(sendOptions.environment)
-    .then((res) => res.chains[params.chain] as AxelarCosmosChainConfig)
-    .catch(() => undefined);
+  const { chains } = await dependencies.configClient.getChainConfigs(
+    sendOptions.environment
+  );
+
+  const chainConfig =
+    params.chain in chains && chains[params.chain]?.module === "axelarnet"
+      ? (chains[params.chain] as AxelarCosmosChainConfig)
+      : undefined;
 
   if (!chainConfig) {
     throw new Error(`chain ID ${params.chain} not found`);
