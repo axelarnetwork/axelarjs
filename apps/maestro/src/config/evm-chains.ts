@@ -20,6 +20,7 @@ import {
   goerli,
   kava,
   kavaTestnet,
+  linea,
   lineaTestnet,
   mainnet,
   mantle,
@@ -240,6 +241,12 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "linea",
     axelarChainName: "linea",
     environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...linea,
+    axelarChainId: "linea",
+    axelarChainName: "linea",
+    environment: ENVIRONMENTS.mainnet,
   },
   {
     ...mantle,

@@ -26,7 +26,7 @@ import ABI from "./InterchainTokenFactory.abi";
 export const interchainTokenFactoryABI = ABI.abi;
 
 export const interchainTokenFactoryAddress =
-  "0x83a93500d23Fbc3e82B410aD07A6a9F7A0670D66" as const;
+  "0xe93462bc7Ef7692D763C4d4DbCE7B870c0958c59" as const;
 
 export const interchainTokenFactoryConfig = {
   address: interchainTokenFactoryAddress,

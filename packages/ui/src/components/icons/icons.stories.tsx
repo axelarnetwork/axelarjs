@@ -2,19 +2,21 @@ import type { Meta, StoryFn } from "@storybook/react";
 
 import type { IconType } from ".";
 import { Tooltip } from "../Tooltip";
-import * as icons from "./svgr";
+import * as lucideIcons from "./lucide";
+import * as svgrIcons from "./svgr";
+
+const iconset = Object.entries({ ...svgrIcons, ...lucideIcons });
 
 export default {
   title: "components/Icons",
-  component: icons.AxelarIcon,
-} as Meta<typeof icons.AxelarIcon>;
+  component: svgrIcons.AxelarIcon,
+} as Meta<typeof svgrIcons.AxelarIcon>;
 
 const Template: StoryFn<IconType> = () => {
-  const iconComponents = Object.keys(icons).map(
-    (key) => icons[key as keyof typeof icons]
-  );
+  const iconComponents = iconset.map(([, value]) => value);
+
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex max-w-4xl flex-wrap gap-2">
       {iconComponents.map((Icon) => (
         <>
           <Tooltip tip={Icon.name}>
