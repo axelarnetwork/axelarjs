@@ -14,6 +14,17 @@ import type {
   SendOptions,
 } from "./types";
 
+/**
+ * Get the deposit address for a given asset, where:
+ * - if the asset is undefined, this function will return deposit address for the native token
+ * - if the asset is defined, this function will return the linked deposit address for the asset
+ * - if the asset is defined and unwrappable at the destination chain, this function will return the linked deposit address
+ * where the asset is unwrapped first at the destination chain before sending to the destination address.
+ * Note: You can skip the unwrap step by setting the `skipUnwrap` option to true.
+ * @param params
+ * @param dependencies
+ * @returns
+ */
 export async function getDepositAddress(
   params: DepositAddressOptions,
   dependencies: GetDepositAddressDependencies
