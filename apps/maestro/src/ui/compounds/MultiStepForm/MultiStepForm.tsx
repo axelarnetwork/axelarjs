@@ -258,8 +258,8 @@ export const ShareHaikuButton: FC<{
       onClick={handleShareHaiku}
       loading={isLoading}
       disabled={isLoading || isSuccess}
-      className="bg-black"
-      aria-label="Share my token deployment on X"
+      className="mt-2 w-full bg-black"
+      aria-label="Share an interchain token haiku on X"
     >
       <svg
         height="1em"
@@ -272,7 +272,7 @@ export const ShareHaikuButton: FC<{
           fill="white"
         />
       </svg>
-      {isSuccess ? "Done!" : "Share my token deployment"}
+      {isSuccess ? "Done!" : "Share a haiku on X 🎉"}
     </Button>
   );
 };
