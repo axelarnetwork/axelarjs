@@ -19,7 +19,7 @@ import { useTransactionsContainer } from "~/features/Transactions";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
-import { NextButton } from "~/ui/compounds/MultiStepForm";
+import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
 export const Step3: FC = () => {
@@ -214,6 +214,7 @@ export const Step3: FC = () => {
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
       </form>
+      <TokenNameAlert />
       <Dialog.Actions>
         <NextButton
           length="block"
