@@ -1,4 +1,5 @@
 import {
+  AlertCircleIcon,
   ArrowLeftIcon,
   Button,
   ChevronRightIcon,
@@ -8,6 +9,7 @@ import {
   LinkButton,
   Steps,
   TextInput,
+  Tooltip,
   useConfirmOnPageLeave,
   useWindowSize,
 } from "@axelarjs/ui";
@@ -274,3 +276,13 @@ export const ShareHaikuButton: FC<{
     </Button>
   );
 };
+
+export const TokenNameTooltip = () => (
+  <Tooltip
+    position="right"
+    variant="warning"
+    tip="Make sure you consider all relevant stakeholders before deploying a token through ITS. Creating a simple token using the ITS Portal will give the token the same name and symbol on all chains. If you need your token to have different names or symbols on different chains, you'll have to build a custom token."
+  >
+    <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
+  </Tooltip>
+);
