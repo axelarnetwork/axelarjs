@@ -139,8 +139,8 @@ importers:
         specifier: ^8.11.3
         version: 8.11.3
       rambda:
-        specifier: ^8.6.0
-        version: 8.6.0
+        specifier: ^9.0.1
+        version: 9.0.1
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -357,8 +357,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       rambda:
-        specifier: ^8.6.0
-        version: 8.6.0
+        specifier: ^9.0.1
+        version: 9.0.1
       unfetch:
         specifier: <=4.2
         version: 4.2.0
@@ -457,8 +457,8 @@ importers:
         specifier: ^16.3.2
         version: 16.3.2
       rambda:
-        specifier: ^8.6.0
-        version: 8.6.0
+        specifier: ^9.0.1
+        version: 9.0.1
       rimraf:
         specifier: ^5.0.5
         version: 5.0.5
@@ -647,8 +647,8 @@ importers:
         specifier: ^0.272.0
         version: 0.272.0(react@18.2.0)
       rambda:
-        specifier: ^8.6.0
-        version: 8.6.0
+        specifier: ^9.0.1
+        version: 9.0.1
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -877,8 +877,8 @@ importers:
         specifier: link:@testing-library/jest-dom/matchers
         version: link:@testing-library/jest-dom/matchers
       rambda:
-        specifier: ^8.6.0
-        version: 8.6.0
+        specifier: ^9.0.1
+        version: 9.0.1
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -16911,8 +16911,8 @@ packages:
   /radix3@1.1.0:
     resolution: {integrity: sha512-pNsHDxbGORSvuSScqNJ+3Km6QAVqk8CfsCBIEoDgpqLrkD2f3QM4I7d1ozJJ172OmIcoUcerZaNWqtLkRXTV3A==}
 
-  /rambda@8.6.0:
-    resolution: {integrity: sha512-Ax+/bAcV2h4wINXx6wm0792G5uXZAl78rzhei+FqmHezg45vbeTUyDAmDNbSdjNOL6LGN8AUEvzaYD7oO5eYrw==}
+  /rambda@9.0.1:
+    resolution: {integrity: sha512-Su5spknJIBhYUDHNyfEYknOmZTHxbT+kOGRuzLtxF+gjI7YBm7lX0DE/7qnQ6zszve62AJFuLC+7gXD/VSiwRQ==}
 
   /ramda-adjunct@4.1.1(ramda@0.29.1):
     resolution: {integrity: sha512-BnCGsZybQZMDGram9y7RiryoRHS5uwx8YeGuUeDKuZuvK38XO6JJfmK85BwRWAKFA6pZ5nZBO/HBFtExVaf31w==}
