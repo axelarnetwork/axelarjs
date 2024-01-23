@@ -20,6 +20,7 @@ export {
   ArrowRightIcon,
   CopyIcon,
   AlertTriangleIcon,
+  AlertCircleIcon,
   MoonIcon,
   SunIcon,
   PlusIcon,
