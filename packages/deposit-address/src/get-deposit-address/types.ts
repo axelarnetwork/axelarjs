@@ -20,7 +20,7 @@ export type DepositAddressOptions = {
   destinationChain: string;
   destinationAddress: string;
   environment: Environment;
-  asset: string; // if not specified, it is the native asset
+  asset: string; // "native" for native token or other identifiers for non-native token e.g. "uusdc", "wavax-wei"
   options?: {
     salt?: string;
     refundAddress?: string;
