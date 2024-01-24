@@ -38,6 +38,7 @@ export const estimateGasFeesMultipleChains = publicProcedure
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to estimate gas fees on multiple chains",
+        cause: error,
       });
     }
   });
