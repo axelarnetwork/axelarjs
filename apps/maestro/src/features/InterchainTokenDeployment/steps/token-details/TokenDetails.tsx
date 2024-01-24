@@ -10,6 +10,7 @@ import {
 import {
   ModalFormInput,
   NextButton,
+  TokenNameTooltip,
   ValidationError,
 } from "~/ui/compounds/MultiStepForm";
 
@@ -37,7 +38,11 @@ const TokenDetails: FC = () => {
         onSubmit={handleSubmit(submitHandler)}
       >
         <FormControl>
-          <Label>Token Name</Label>
+          <Label>
+            <Label.Text>
+              Token Name <TokenNameTooltip />
+            </Label.Text>
+          </Label>
           <ModalFormInput
             placeholder="Enter your token name"
             {...register("tokenName")}

@@ -78,6 +78,10 @@ export const NEXT_PUBLIC_DISABLED_WALLET_IDS = Maybe.of(
   .map(split(","))
   .mapOr([], map(trim));
 
+export const NEXT_PUBLIC_GIT_BRANCH = Maybe.of(
+  process.env.NEXT_PUBLIC_GIT_BRANCH
+).mapOr("main", String);
+
 export const shouldDisableSend = (
   axelarChainId: string,
   tokenAddress: `0x${string}`

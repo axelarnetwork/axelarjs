@@ -18,14 +18,14 @@ export function middleware(req: NextRequest) {
   // Extract country
   const country = req.geo?.country ?? "US";
 
-  const isBlocked = BLOCKED_COUNTRIES.includes(country);
+  const isRestricted = RESTRICTED_COUNTRIES.includes(country);
 
-  if (!isBlocked && req.nextUrl.pathname === "/restricted") {
+  if (!isRestricted && req.nextUrl.pathname === "/restricted") {
     req.nextUrl.pathname = "/";
     return NextResponse.redirect(req.nextUrl);
   }
 
-  if (isBlocked) {
+  if (isRestricted) {
     console.info("unauthorized_access_attempt:", {
       ...(req.geo ?? {}),
       ip: req.ip,
@@ -40,26 +40,39 @@ export function middleware(req: NextRequest) {
 }
 
 /**
- * Blocked sanctioned or embargoed countries
- * based on https://orpa.princeton.edu/export-controls/sanctioned-countries
+ * Sanctioned or embargoed regions
  */
-const BLOCKED_COUNTRIES: string[] = [
+const RESTRICTED_COUNTRIES: string[] = [
+  "AL", // Albania
+  "BY", // Belarus
+  "BJ", // Benin
+  "BG", // Bulgaria
+  "BI", // Burundi
+  "CF", // Central African Republic
   "CU", // Cuba
   "IR", // Iran
+  "IQ", // Iraq
+  "XK", // Kosovo (Note: 'XK' is a user-assigned code, not officially assigned)
+  "LA", // Laos
+  "LB", // Lebanon
+  "LY", // Libya
+  "ML", // Mali
+  "MT", // Malta
+  "MZ", // Mozambique
+  "NI", // Nicaragua
   "KP", // North Korea
-  "RU", // Russia
+  "CG", // Republic of Congo
+  "RU", // Russian Federation
+  "RS", // Serbia
+  "SO", // Somalia
+  "SS", // South Sudan
+  "SD", // Sudan
   "SY", // Syria
+  "TZ", // Tanzania
   "UA-CR", // Crimea (Ukraine)
   "UA-DN", // Donetsk (Ukraine)
   "UA-LU", // Luhansk (Ukraine)
-  "BA", // Balkans
-  "BY", // Belarus
-  "MM", // Burma (Myanmar)
-  "CD", // Congo, Dem. Rep. of
-  "ET", // Ethiopia
-  "HK", // Hong Kong
-  "SD", // Sudan
   "VE", // Venezuela
   "YE", // Yemen
-  "ZW", // Zimbabwe,
+  "ZW", // Zimbabwe
 ];

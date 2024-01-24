@@ -288,7 +288,7 @@ const FAQ_ITEMS = [
 export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
   <>
     {items.map((item, index) => (
-      <Menu.Item key={index}>
+      <li key={index}>
         {item.kind === "link" ? (
           <Link
             href={item.href}
@@ -313,17 +313,15 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
             </Modal.Body>
           </Modal>
         )}
-      </Menu.Item>
+      </li>
     ))}
   </>
 );
 
-export default function MainMenu(
-  props: Partial<React.ComponentProps<typeof Menu>>
-) {
-  return (
-    <Menu {...props}>
-      <MenuItems />
-    </Menu>
-  );
-}
+const MainMenu: FC<Partial<React.ComponentProps<typeof Menu>>> = (props) => (
+  <Menu {...props}>
+    <MenuItems />
+  </Menu>
+);
+
+export default MainMenu;
