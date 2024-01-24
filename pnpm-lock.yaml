@@ -451,6 +451,9 @@ importers:
         specifier: ^5.2.3
         version: 5.2.3
     devDependencies:
+      '@axelarjs/core':
+        specifier: workspace:*
+        version: link:../core
       '@tsconfig/strictest':
         specifier: ^2.0.2
         version: 2.0.2
@@ -481,6 +484,12 @@ importers:
       '@axelarjs/core':
         specifier: workspace:*
         version: link:../core
+      '@axelarjs/cosmos':
+        specifier: workspace:*
+        version: link:../cosmos
+      '@axelarjs/proto':
+        specifier: workspace:*
+        version: link:../proto
       '@axelarjs/utils':
         specifier: workspace:*
         version: link:../utils

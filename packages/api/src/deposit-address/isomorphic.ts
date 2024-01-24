@@ -10,7 +10,7 @@ export class DepositAddressClient extends RestService {
   static init(options: RestServiceOptions) {
     return new DepositAddressClient(options, {
       name: "DepositAddressClient",
-      version: "0.0.1",
+      version: "0.1.0",
     });
   }
 

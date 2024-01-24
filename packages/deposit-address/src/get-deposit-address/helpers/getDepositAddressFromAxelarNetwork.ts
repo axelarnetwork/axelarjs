@@ -6,7 +6,10 @@ import type {
 } from "@axelarjs/api";
 import { caseInsensitiveEqual, poll } from "@axelarjs/utils";
 
-import type { GetDepositAddressDependencies, SendOptions } from "../types";
+import type {
+  GetLinkedDepositAddressDependencies,
+  SendOptions,
+} from "../types";
 import { createDummyAccount, signOtc } from "./account";
 
 export type ListenerParams = {
@@ -19,7 +22,7 @@ export type ListenerParams = {
 export async function getDepositAddressFromAxelarNetwork(
   params: SendOptions,
   chainConfigs: ChainConfigsResponse,
-  dependencies: GetDepositAddressDependencies
+  dependencies: GetLinkedDepositAddressDependencies
 ) {
   /**
    * invoke API to get deposit address

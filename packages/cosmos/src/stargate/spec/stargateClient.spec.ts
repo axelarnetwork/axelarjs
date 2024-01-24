@@ -1,3 +1,5 @@
+import { AXELAR_RPC_URLS } from "@axelarjs/core";
+
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
@@ -6,7 +8,6 @@ import {
   createAxelarSigningClient,
   getAxelarSigningClientOptions,
 } from "../stargateClient";
-import { AXELAR_RPC_URL } from "./constants";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("stargate client", () => {
@@ -28,7 +29,7 @@ describe("stargate client", () => {
     );
 
     const client = await createAxelarSigningClient(
-      AXELAR_RPC_URL,
+      AXELAR_RPC_URLS.testnet,
       offlineSigner
     );
 
@@ -66,7 +67,7 @@ describe("stargate client", () => {
     );
 
     const client = await createAxelarSigningClient(
-      AXELAR_RPC_URL,
+      AXELAR_RPC_URLS.testnet,
       offlineSigner
     );
 
