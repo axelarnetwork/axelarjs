@@ -20,7 +20,7 @@ export type DepositAddressOptions = {
   destinationChain: string;
   destinationAddress: string;
   environment: Environment;
-  asset?: string; // if not specified, it is the native asset
+  asset: string; // if not specified, it is the native asset
   options?: {
     salt?: string;
     refundAddress?: string;

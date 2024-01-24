@@ -15,11 +15,12 @@ import type {
 
 describe("Deposit Address", () => {
   describe("getDepositAddress", () => {
-    test("should get the deposit address if the asset is undefined", async () => {
+    test("should get the deposit address if the asset is 'native'", async () => {
       const params: DepositAddressOptions = {
         sourceChain: "Avalanche",
         destinationChain: "Fantom",
         destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        asset: "native",
         environment: ENVIRONMENTS.testnet,
       };
 

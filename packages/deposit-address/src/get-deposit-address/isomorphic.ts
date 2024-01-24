@@ -16,9 +16,9 @@ import type {
 
 /**
  * Get the deposit address for a given asset, where:
- * - if the asset is undefined, this function will return deposit address for the native token
- * - if the asset is defined, this function will return the linked deposit address for the asset
- * - if the asset is defined and unwrappable at the destination chain, this function will return the linked deposit address
+ * - if the asset is "native", this function will return deposit address for the native token
+ * - if the asset is not "native" (e.g. "uusdc"), this function will return the linked deposit address for the asset
+ * - if the asset is not "native" (e.g. "uusdc") and unwrappable at the destination chain, this function will return the linked deposit address
  * where the asset is unwrapped first at the destination chain before sending to the destination address.
  * Note: You can skip the unwrap step by setting the `skipUnwrap` option to true.
  * @param params
@@ -42,7 +42,7 @@ export async function getDepositAddress(
   );
 
   // we consider undefined asset as a native token asset
-  if (!asset) {
+  if (asset === "native") {
     // returns the native wrap deposit address
     return getNativeWrapDepositAddress(
       {
