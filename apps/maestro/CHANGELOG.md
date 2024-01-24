@@ -1,5 +1,14 @@
 # @axelarjs/maestro
 
+## 0.2.2
+
+### Patch Changes
+
+- [`843bdbcfadd989dea5350267a12a4625ddbec6a3`](https://github.com/axelarnetwork/axelarjs/commit/843bdbcfadd989dea5350267a12a4625ddbec6a3) Thanks [@alanrsoares](https://github.com/alanrsoares)! - 
+  - Add token name disclaimers to Interchain and Canonical token deployment flows
+  - Tweak haiku sharing ux
+  - Upgrade nextjs to v14.1
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertCircleIcon,
   ArrowLeftIcon,
   Button,
   ChevronRightIcon,
@@ -8,13 +10,16 @@ import {
   LinkButton,
   Steps,
   TextInput,
+  Tooltip,
   useConfirmOnPageLeave,
   useWindowSize,
+  XIcon,
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import {
   useCallback,
   useMemo,
+  useState,
   type ComponentProps,
   type FC,
   type PropsWithChildren,
@@ -256,8 +261,8 @@ export const ShareHaikuButton: FC<{
       onClick={handleShareHaiku}
       loading={isLoading}
       disabled={isLoading || isSuccess}
-      className="bg-black"
-      aria-label="Share my token deployment on X"
+      className="mt-2 w-full bg-black"
+      aria-label="Share an interchain token haiku on X"
     >
       <svg
         height="1em"
@@ -270,7 +275,40 @@ export const ShareHaikuButton: FC<{
           fill="white"
         />
       </svg>
-      {isSuccess ? "Done!" : "Share my token deployment"}
+      {isSuccess ? "Done!" : "Share a haiku on X 🎉"}
     </Button>
+  );
+};
+
+const TOKEN_NAME_DISCLAIMER =
+  "Make sure you consider all relevant stakeholders before deploying a token through ITS. Creating a simple token using the ITS Portal will give the token the same name and symbol on all chains. If you need your token to have different names or symbols on different chains, you'll have to build a custom token.";
+
+export const TokenNameTooltip = () => (
+  <Tooltip position="right" variant="warning" tip={TOKEN_NAME_DISCLAIMER}>
+    <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
+  </Tooltip>
+);
+
+export const TokenNameAlert = () => {
+  const [show, setShow] = useState(true);
+
+  if (!show) {
+    return null;
+  }
+
+  return (
+    <Alert status="warning" className="relative">
+      <Button
+        size="sm"
+        variant="ghost"
+        className="absolute right-1 top-1"
+        aria-label="Close"
+        onClick={() => setShow(false)}
+      >
+        <XIcon className="h-4 w-4" />
+      </Button>
+
+      {TOKEN_NAME_DISCLAIMER}
+    </Alert>
   );
 };

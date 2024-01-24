@@ -22,6 +22,7 @@ import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
 
 import pkgJson from "~/../package.json";
 import {
+  NEXT_PUBLIC_GIT_BRANCH,
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 } from "~/config/env";
@@ -157,27 +158,51 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 Axelar Network
               </Link>
             </div>
-            <div className="text-accent flex items-center gap-2 text-right">
-              <Badge className="hover:text-primary text-xs">
-                <Link
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  href={`https://github.com/axelarnetwork/axelarjs/commit/${
-                    NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
-                  }`}
-                >
-                  app @ v{pkgJson.version}
-                </Link>
-              </Badge>
-              <Badge className="hover:text-primary text-xs">
-                <Link
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  href={`https://github.com/axelarnetwork/axelarjs-sdk/tree/v${sdkPkg.version}`}
-                >
-                  sdk @ v{sdkPkg.version}
-                </Link>
-              </Badge>
+            <div className="text-accent flex items-center gap-1 text-right">
+              <div className="join">
+                <Badge className="hover:text-primary join-item gap-2 text-xs">
+                  <Link
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href={`https://github.com/axelarnetwork/axelarjs/commit/${
+                      NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
+                    }`}
+                    className="join-item"
+                  >
+                    app @ v{pkgJson.version}
+                  </Link>
+                </Badge>
+                <Badge className="hover:text-primary join-item gap-2 text-xs">
+                  <Link
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href={`https://github.com/axelarnetwork/axelarjs/blob/${NEXT_PUBLIC_GIT_BRANCH}/apps/maestro/CHANGELOG.md`}
+                    className="join-item"
+                  >
+                    changelog
+                  </Link>
+                </Badge>
+              </div>
+              <div className="join">
+                <Badge className="join-item hover:text-primary text-xs">
+                  <Link
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href={`https://github.com/axelarnetwork/axelarjs-sdk/tree/v${sdkPkg.version}`}
+                  >
+                    sdk @ v{sdkPkg.version}
+                  </Link>
+                </Badge>
+                <Badge className="join-item hover:text-primary text-xs">
+                  <Link
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href={`https://github.com/axelarnetwork/axelarjs-sdk/blob/main/CHANGELOG.md`}
+                  >
+                    changelog
+                  </Link>
+                </Badge>
+              </div>
             </div>
           </Footer>
 

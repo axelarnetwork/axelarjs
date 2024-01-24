@@ -86,16 +86,16 @@ const Review: FC = () => {
                   {maskAddress(state.txState.tokenAddress)}
                 </CopyToClipboardButton>
               </div>
+              {chainConfig && (
+                <ShareHaikuButton
+                  additionalChainNames={state.selectedChains}
+                  originChainName={chainConfig.name}
+                  tokenName={state.tokenDetails.tokenName}
+                  originAxelarChainId={chainConfig.id}
+                  tokenAddress={state.txState.tokenAddress}
+                />
+              )}
             </Alert>
-            {chainConfig && (
-              <ShareHaikuButton
-                additionalChainNames={state.selectedChains}
-                originChainName={chainConfig.name}
-                tokenName={state.tokenDetails.tokenName}
-                originAxelarChainId={chainConfig.id}
-                tokenAddress={state.txState.tokenAddress}
-              />
-            )}
           </>
         )}
         {(state.txState.type === "deployed" ||

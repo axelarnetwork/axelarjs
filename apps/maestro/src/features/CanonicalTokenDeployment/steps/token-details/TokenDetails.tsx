@@ -2,7 +2,11 @@ import { Dialog, FormControl, Label } from "@axelarjs/ui";
 import { type FC } from "react";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment";
-import { ModalFormInput, NextButton } from "~/ui/compounds/MultiStepForm";
+import {
+  ModalFormInput,
+  NextButton,
+  TokenNameTooltip,
+} from "~/ui/compounds/MultiStepForm";
 
 const TokenDetails: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
@@ -11,7 +15,11 @@ const TokenDetails: FC = () => {
     <>
       <form className="grid grid-cols-1 sm:gap-2">
         <FormControl>
-          <Label>Token Name</Label>
+          <Label>
+            <Label.Text>
+              Token Name <TokenNameTooltip />
+            </Label.Text>
+          </Label>
           <ModalFormInput
             placeholder="Enter your token name"
             disabled
