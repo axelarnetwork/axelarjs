@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.10
+
+### Patch Changes
+
+- [`8af9be960271e3f668495db662583d545b69e502`](https://github.com/axelarnetwork/axelarjs/commit/8af9be960271e3f668495db662583d545b69e502) Thanks [@canhtrinh](https://github.com/canhtrinh)! - add native asset support for deposit address package
+
 ## 0.3.9
 
 ### Patch Changes
