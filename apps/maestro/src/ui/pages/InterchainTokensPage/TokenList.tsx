@@ -1,9 +1,11 @@
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
 import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import { filter, map } from "rambda";
+import tw from "tailwind-styled-components";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
@@ -21,7 +23,15 @@ function getChainNameSlug(chainId: number) {
   return chain?.axelarChainName.toLowerCase() ?? "";
 }
 
+const InterchainTokenDeployment = dynamic(
+  () => import("~/features/InterchainTokenDeployment")
+);
+
 const PAGE_LIMIT = 15;
+
+const PAGE_TITLE = "My Interchain Tokens";
+
+const PageTitle = tw(Page.Title)`flex items-center gap-2`;
 
 type TokenListProps = {
   sessionAddress?: `0x${string}`;
@@ -31,7 +41,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   const [pageIndex, setPageIndex] = useState(0);
   const offset = pageIndex * PAGE_LIMIT;
 
-  const { data } = useGetMyInterchainTokensQuery(
+  const { data, isFetched } = useGetMyInterchainTokensQuery(
     {
       sessionAddress: sessionAddress as `0x${string}`,
       limit: PAGE_LIMIT,
@@ -66,10 +76,14 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
 
   const totalTokens = Maybe.of(data).mapOr(0, (data) => data.totalItems);
 
+  if (isFetched && !totalTokens) {
+    return <EmptyState />;
+  }
+
   return (
     <>
-      <Page.Title className="flex items-center gap-2">
-        My Interchain Tokens
+      <PageTitle>
+        {PAGE_TITLE}
         {Boolean(filteredTokens?.length) && (
           <span className="text-base-content-secondary font-mono text-base">
             (
@@ -83,7 +97,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
             )
           </span>
         )}
-      </Page.Title>
+      </PageTitle>
       <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {filteredTokens.map(([token, chain]) => {
           const href = `/${getChainNameSlug(chain.chain_id)}/${
@@ -101,7 +115,6 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
                       <ChainIcon src={chain.image} size="sm" alt={chain.name} />{" "}
                       {token.tokenName}
                     </Card.Title>
-
                     <Card.Actions className="justify-between">
                       <CopyToClipboardButton
                         copyText={token.tokenAddress}
@@ -132,5 +145,24 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
     </>
   );
 };
+
+const EmptyState = () => (
+  <>
+    <PageTitle>
+      {PAGE_TITLE}
+      <span className="text-base-content-secondary font-mono text-base">
+        (0)
+      </span>
+    </PageTitle>
+    <Card className="grid flex-1 place-items-center" compact>
+      <Card.Body className="borde grid place-items-center gap-4">
+        <Card.Title className="text-center">
+          {"Looks like you haven't deployed any token yet"}
+        </Card.Title>
+        <InterchainTokenDeployment />
+      </Card.Body>
+    </Card>
+  </>
+);
 
 export default TokenList;
