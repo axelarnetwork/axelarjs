@@ -1,1 +1,1 @@
-npx rimraf build rpc-client stargate index.js
+npx rimraf build rpc stargate constants.js index.js
