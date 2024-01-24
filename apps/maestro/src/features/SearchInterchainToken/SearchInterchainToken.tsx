@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 import { isAddress } from "viem";
 import { useNetwork } from "wagmi";
 
+import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -21,7 +22,7 @@ export type SearchInterchainTokenProps = {
 };
 
 const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
-  const [search, setSearch] = useState<string>("");
+  const [search, setSearch] = useQueryStringState<string>("search", "");
 
   const { chain: connectedChain } = useNetwork();
 

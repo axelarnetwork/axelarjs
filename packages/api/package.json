@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "publishConfig": {
     "access": "public"
   },
@@ -16,6 +16,7 @@
     "./axelar-query",
     "./gmp",
     "./deposit-address",
+    "./deposit-service",
     "./axelar-config",
     "./index.js",
     "./index.d.ts"
