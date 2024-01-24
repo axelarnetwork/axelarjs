@@ -5,7 +5,7 @@ import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalT
 import {
   ModalFormInput,
   NextButton,
-  TokenNameTooltip,
+  TokenNameLabelWithTooltip,
 } from "~/ui/compounds/MultiStepForm";
 
 const TokenDetails: FC = () => {
@@ -16,9 +16,7 @@ const TokenDetails: FC = () => {
       <form className="grid grid-cols-1 sm:gap-2">
         <FormControl>
           <Label>
-            <Label.Text>
-              Token Name <TokenNameTooltip />
-            </Label.Text>
+            <TokenNameLabelWithTooltip />
           </Label>
           <ModalFormInput
             placeholder="Enter your token name"

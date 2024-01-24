@@ -1,10 +1,17 @@
 # @axelarjs/maestro
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`8af9be960271e3f668495db662583d545b69e502`](https://github.com/axelarnetwork/axelarjs/commit/8af9be960271e3f668495db662583d545b69e502)]:
+  - @axelarjs/api@0.3.10
+
 ## 0.2.2
 
 ### Patch Changes
 
-- [`843bdbcfadd989dea5350267a12a4625ddbec6a3`](https://github.com/axelarnetwork/axelarjs/commit/843bdbcfadd989dea5350267a12a4625ddbec6a3) Thanks [@alanrsoares](https://github.com/alanrsoares)! - 
+- [`843bdbcfadd989dea5350267a12a4625ddbec6a3`](https://github.com/axelarnetwork/axelarjs/commit/843bdbcfadd989dea5350267a12a4625ddbec6a3) Thanks [@alanrsoares](https://github.com/alanrsoares)! -
   - Add token name disclaimers to Interchain and Canonical token deployment flows
   - Tweak haiku sharing ux
   - Upgrade nextjs to v14.1

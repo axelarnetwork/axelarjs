@@ -7,6 +7,7 @@ import {
   cn,
   Dialog,
   DialogProps,
+  Label,
   LinkButton,
   Steps,
   TextInput,
@@ -283,10 +284,13 @@ export const ShareHaikuButton: FC<{
 const TOKEN_NAME_DISCLAIMER =
   "Make sure you consider all relevant stakeholders before deploying a token through ITS. Creating a simple token using the ITS Portal will give the token the same name and symbol on all chains. If you need your token to have different names or symbols on different chains, you'll have to build a custom token.";
 
-export const TokenNameTooltip = () => (
-  <Tooltip position="right" variant="warning" tip={TOKEN_NAME_DISCLAIMER}>
-    <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
-  </Tooltip>
+export const TokenNameLabelWithTooltip = ({ label = "Token Name" }) => (
+  <Label.Text className="inline-flex items-center gap-1">
+    {label}
+    <Tooltip position="right" variant="warning" tip={TOKEN_NAME_DISCLAIMER}>
+      <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
+    </Tooltip>
+  </Label.Text>
 );
 
 export const TokenNameAlert = () => {
