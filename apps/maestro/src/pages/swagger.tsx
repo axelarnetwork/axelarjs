@@ -19,7 +19,7 @@ const SwaggerUI = dynamic(() => import("swagger-ui-react"), {
 const SwaggerPage: NextPage = () => {
   // Serve Swagger UI with our OpenAPI schema
   return (
-    <div className="absolute inset-0 min-h-[100dvh] overflow-y-scroll bg-white">
+    <div className="absolute inset-0 z-10 min-h-[100dvh] overflow-y-scroll bg-white">
       <div className="container mx-auto">
         <SwaggerUI url="/api/openapi.json" />
       </div>
