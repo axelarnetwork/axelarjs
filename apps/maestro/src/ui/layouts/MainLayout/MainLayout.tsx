@@ -19,6 +19,7 @@ import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
+import tw from "tailwind-styled-components";
 
 import pkgJson from "~/../package.json";
 import {
@@ -103,108 +104,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
           {children}
 
-          <Footer
-            className="bg-neutral text-neutral-content footer p-6 md:p-8 xl:p-10"
-            center={true}
-          >
-            <div className="w-full max-w-4xl items-center justify-evenly md:flex">
-              {BOTTOM_MENU_ITEMS.map((item, index) => (
-                <nav key={index}>
-                  <header className="footer-title">
-                    {item.kind === "link" ? (
-                      <Link
-                        href={item.href}
-                        className="hover:text-accent inline-flex hover:underline lg:uppercase"
-                        rel={item.external ? "noopener noreferrer" : undefined}
-                        target={item.external ? "_blank" : undefined}
-                      >
-                        {item.label}{" "}
-                        {item.external && (
-                          <ExternalLinkIcon className="h-[1em] w-[1em]" />
-                        )}
-                      </Link>
-                    ) : (
-                      <>
-                        <Modal
-                          trigger={
-                            <a
-                              role="button"
-                              className="hover:text-accent cursor-pointer hover:underline lg:uppercase"
-                              onClick={(e) => e.preventDefault()}
-                            >
-                              {item.label}
-                            </a>
-                          }
-                        >
-                          <Modal.Title>{item.label}</Modal.Title>
-                          <Modal.Body>
-                            {item.ModalContent && <item.ModalContent />}
-                          </Modal.Body>
-                        </Modal>
-                      </>
-                    )}
-                  </header>
-                </nav>
-              ))}
-            </div>
-            <div className="flex items-center text-sm">
-              &copy;{new Date().getFullYear()} <span>&middot;</span>
-              <Link
-                rel="noopener noreferrer"
-                href="https://axelar.network"
-                target="_blank"
-                className="text-accent"
-              >
-                Axelar Network
-              </Link>
-            </div>
-            <div className="text-accent flex items-center gap-1 text-right">
-              <div className="join">
-                <Badge className="hover:text-primary join-item gap-2 text-xs">
-                  <Link
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={`https://github.com/axelarnetwork/axelarjs/commit/${
-                      NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
-                    }`}
-                    className="join-item"
-                  >
-                    app @ v{pkgJson.version}
-                  </Link>
-                </Badge>
-                <Badge className="hover:text-primary join-item gap-2 text-xs">
-                  <Link
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={`https://github.com/axelarnetwork/axelarjs/blob/${NEXT_PUBLIC_GIT_BRANCH}/apps/maestro/CHANGELOG.md`}
-                    className="join-item"
-                  >
-                    changelog
-                  </Link>
-                </Badge>
-              </div>
-              <div className="join">
-                <Badge className="join-item hover:text-primary text-xs">
-                  <Link
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={`https://github.com/axelarnetwork/axelarjs-sdk/tree/v${sdkPkg.version}`}
-                  >
-                    sdk @ v{sdkPkg.version}
-                  </Link>
-                </Badge>
-                <Badge className="join-item hover:text-primary text-xs">
-                  <Link
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={`https://github.com/axelarnetwork/axelarjs-sdk/blob/main/CHANGELOG.md`}
-                  >
-                    changelog
-                  </Link>
-                </Badge>
-              </div>
-            </div>
-          </Footer>
+          <LayoutFooter />
 
           {shouldRenderTestnetBanner && (
             <TestnetBanner onClose={actions.dismissTestnetBanner} />
@@ -223,6 +123,105 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     </>
   );
 };
+
+const VersionBadge = tw(Badge)`join-item hover:text-primary text-xs`;
+
+const PackageVersionItem = ({
+  name = "",
+  version = "",
+  changelogUrl = "",
+  tagUrl = "",
+}) => (
+  <div className="join text-accent">
+    <VersionBadge>
+      <Link rel="noopener noreferrer" target="_blank" href={tagUrl}>
+        {name} @ v{version}
+      </Link>
+    </VersionBadge>
+    {changelogUrl && (
+      <VersionBadge>
+        <Link rel="noopener noreferrer" target="_blank" href={changelogUrl}>
+          changelog
+        </Link>
+      </VersionBadge>
+    )}
+  </div>
+);
+
+const LayoutFooter = () => (
+  <Footer
+    className="bg-neutral text-neutral-content footer p-6 md:p-8 xl:p-10"
+    center={true}
+  >
+    <div className="w-full max-w-4xl items-center justify-evenly md:flex">
+      {BOTTOM_MENU_ITEMS.map((item, index) => (
+        <nav key={index}>
+          <header className="footer-title">
+            {item.kind === "link" ? (
+              <Link
+                href={item.href}
+                className="hover:text-accent inline-flex hover:underline lg:uppercase"
+                rel={item.external ? "noopener noreferrer" : undefined}
+                target={item.external ? "_blank" : undefined}
+              >
+                {item.label}{" "}
+                {item.external && (
+                  <ExternalLinkIcon className="h-[1em] w-[1em]" />
+                )}
+              </Link>
+            ) : (
+              <>
+                <Modal
+                  trigger={
+                    <a
+                      role="button"
+                      className="hover:text-accent cursor-pointer hover:underline lg:uppercase"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      {item.label}
+                    </a>
+                  }
+                >
+                  <Modal.Title>{item.label}</Modal.Title>
+                  <Modal.Body>
+                    {item.ModalContent && <item.ModalContent />}
+                  </Modal.Body>
+                </Modal>
+              </>
+            )}
+          </header>
+        </nav>
+      ))}
+    </div>
+    <div className="flex items-center text-sm">
+      &copy;{new Date().getFullYear()} <span>&middot;</span>
+      <Link
+        rel="noopener noreferrer"
+        href="https://axelar.network"
+        target="_blank"
+        className="text-accent"
+      >
+        Axelar Network
+      </Link>
+    </div>
+    <div className="flex items-center gap-1 text-right">
+      <PackageVersionItem
+        name="app"
+        version={pkgJson.version}
+        tagUrl={`https://github.com/axelarnetwork/axelarjs/commit/${
+          NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "main"
+        }`}
+        changelogUrl={`https://github.com/axelarnetwork/axelarjs/blob/${NEXT_PUBLIC_GIT_BRANCH}/apps/maestro/CHANGELOG.md`}
+      />
+      <PackageVersionItem
+        name="sdk"
+        version={sdkPkg.version}
+        tagUrl={`https://github.com/axelarnetwork/axelarjs-sdk/tree/v${sdkPkg.version}`}
+        changelogUrl={`https://github.com/axelarnetwork/axelarjs-sdk/blob/main/CHANGELOG.md`}
+      />
+    </div>
+  </Footer>
+);
 
 const WithProvider: FC<PropsWithChildren> = (props) => (
   <ThemeProvider>
