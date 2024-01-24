@@ -4,7 +4,8 @@
 
 ### Patch Changes
 
-- [`843bdbcfadd989dea5350267a12a4625ddbec6a3`](https://github.com/axelarnetwork/axelarjs/commit/843bdbcfadd989dea5350267a12a4625ddbec6a3) Thanks [@alanrsoares](https://github.com/alanrsoares)! - - Add token name disclaimers to Interchain and Canonical token deployment flows
+- [`843bdbcfadd989dea5350267a12a4625ddbec6a3`](https://github.com/axelarnetwork/axelarjs/commit/843bdbcfadd989dea5350267a12a4625ddbec6a3) Thanks [@alanrsoares](https://github.com/alanrsoares)! - 
+  - Add token name disclaimers to Interchain and Canonical token deployment flows
   - Tweak haiku sharing ux
   - Upgrade nextjs to v14.1
 
