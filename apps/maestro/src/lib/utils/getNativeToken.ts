@@ -2,9 +2,10 @@ import { memoize } from "@axelarjs/utils";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/evm-chains";
 
-export const NATIVE_TOKEN_OVERRIDE: Record<string, string> = {
+export const NATIVE_TOKEN_OVERRIDES: Record<string, string> = {
   // ethereum-sepolia actual symbol is SEP under the wagmi chain config
   "ethereum-sepolia": "ETH",
+  "filecoin-2": "FIL",
 };
 
 /**
@@ -14,13 +15,12 @@ export const NATIVE_TOKEN_OVERRIDE: Record<string, string> = {
  */
 export const getNativeToken = memoize((axelarChainId: string) => {
   // If we have an override, we use that
-  if (axelarChainId in NATIVE_TOKEN_OVERRIDE) {
-    return NATIVE_TOKEN_OVERRIDE[axelarChainId];
+  if (axelarChainId in NATIVE_TOKEN_OVERRIDES) {
+    return NATIVE_TOKEN_OVERRIDES[axelarChainId];
   }
 
   const chainConfig = WAGMI_CHAIN_CONFIGS.find(
-    (chain) =>
-      chain.axelarChainId?.toLowerCase() === axelarChainId?.toLowerCase()
+    (chain) => chain.axelarChainId.toLowerCase() === axelarChainId.toLowerCase()
   );
 
   if (!chainConfig) {
