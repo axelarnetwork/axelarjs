@@ -8,15 +8,10 @@ export const COLLECTIONS = {
 /**
  * Account status
  * - enabled: account is enabled (default)
- * - limited:{comma-separated-features}: account cannot use certain features
  * - disabled: account is disabled (e.g. banned)
  * - privileged: account is privileged (e.g. admin)
  */
-export type AccountStatus =
-  | "enabled"
-  | `limited:${string}`
-  | "disabled"
-  | "privileged";
+export type AccountStatus = "enabled" | "disabled" | "privileged";
 
 export const COLLECTION_KEYS = {
   accountNonce: (accountAddress: `0x${string}`) =>
@@ -63,6 +58,28 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   async getAccountStatus(accountAddress: `0x${string}`) {
     const key = COLLECTION_KEYS.accountStatus(accountAddress);
     return await this.kv.get<AccountStatus>(key);
+  }
+
+  async setAccountStatus(
+    accountAddress: `0x${string}`,
+    newStatus: AccountStatus
+  ) {
+    const oldStatus = await this.getAccountStatus(accountAddress);
+
+    if (oldStatus === "privileged") {
+      throw new Error("Cannot set status of privileged account");
+    }
+
+    const key = COLLECTION_KEYS.accountStatus(accountAddress);
+
+    if (oldStatus === "disabled" && newStatus === "enabled") {
+      // delete account status if it's disabled and we're enabling it
+      await this.kv.del(key);
+      return newStatus;
+    }
+
+    await this.kv.set(key, newStatus);
+    return newStatus;
   }
 
   async getAccounStatuses() {

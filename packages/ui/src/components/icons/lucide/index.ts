@@ -24,6 +24,7 @@ export {
   MoonIcon,
   SunIcon,
   PlusIcon,
+  MinusIcon,
   RefreshCwIcon,
   HourglassIcon,
   JoystickIcon,
