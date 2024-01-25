@@ -110,7 +110,7 @@ const Page = ({
   const pageContent = useMemo(() => {
     switch (pageState) {
       case "loading":
-        return <div>Loading...</div>;
+        return <FullScreenLoading loadingMessage={loadingMessage} />;
       case "disconnected":
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">

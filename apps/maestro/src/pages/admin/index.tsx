@@ -12,7 +12,7 @@ import {
   XIcon,
 } from "@axelarjs/ui";
 import { capitalize } from "@axelarjs/utils";
-import { ChangeEvent, FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, Suspense, useEffect, useState } from "react";
 
 import { isAddress } from "viem";
 
@@ -24,11 +24,13 @@ import Page from "~/ui/layouts/Page";
 const AdminIndexPage = () => {
   return (
     <Page title="Admin" className="flex flex-1 flex-col gap-4" mustBeConnected>
-      <Page.Title>Admin Panel</Page.Title>
-      <Page.Content className="gap-4">
-        <GlobalMessageManager />
-        <AccountStatuses />
-      </Page.Content>
+      <Suspense fallback={<Page.FullScreenLoading />}>
+        <Page.Title>Admin Panel</Page.Title>
+        <Page.Content className="gap-4">
+          <GlobalMessageManager />
+          <AccountStatuses />
+        </Page.Content>
+      </Suspense>
     </Page>
   );
 };
@@ -39,7 +41,10 @@ export default withRouteProtection(AdminIndexPage, {
 });
 
 const GlobalMessageManager = () => {
-  const { data: globalMessage } = trpc.messages.getGlobalMessage.useQuery();
+  const { data: globalMessage } = trpc.messages.getGlobalMessage.useQuery(
+    undefined,
+    { suspense: true }
+  );
   const { mutateAsync: saveGlobalMessage, isLoading: isSavingGlobalMessage } =
     trpc.messages.setGlobalMessage.useMutation();
 
@@ -87,7 +92,9 @@ const AccountStatuses = () => {
   >("viewing");
 
   const { data: accountStatuses, refetch } =
-    trpc.accounts.getAccountStatuses.useQuery();
+    trpc.accounts.getAccountStatuses.useQuery(undefined, {
+      suspense: true,
+    });
   const { mutateAsync: setAccountStatus } =
     trpc.accounts.setAccountStatus.useMutation();
 
