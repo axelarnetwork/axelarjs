@@ -183,13 +183,14 @@ const Page = ({
     }
   }, [
     pageState,
+    loadingMessage,
     mustBeConnected,
     handleTokenFound,
     children,
-    chain?.id,
     evmChain,
     evmChainFromRoute?.name,
     evmChainFromRoute?.chain_id,
+    chain?.id,
     switchNetworkAsync,
   ]);
 
