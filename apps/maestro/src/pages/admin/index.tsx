@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 
+import { AccountStatusesManager } from "~/features/AdminPanel/AccountStatuses";
+import { GlobalMessageManager } from "~/features/AdminPanel/GlobalMessage";
 import { withRouteProtection } from "~/lib/auth";
 import Page from "~/ui/layouts/Page";
-import { AccountStatusesManager } from "./AccountStatuses";
-import { GlobalMessageManager } from "./GlobalMessage";
 
 const AdminIndexPage = () => {
   return (
