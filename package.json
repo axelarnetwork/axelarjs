@@ -54,7 +54,7 @@
     "@typescript-eslint/parser": "^6.19.1",
     "eslint": "^8.56.0",
     "husky": "^8.0.3",
-    "lint-staged": "^14.0.1",
+    "lint-staged": "^15.2.0",
     "package-json": "^8.1.1",
     "prettier": "^2.8.8",
     "pretty-quick": "^3.3.1",
