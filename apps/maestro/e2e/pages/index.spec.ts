@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("Index page", async () => {
+test.describe("Index page", () => {
   test("Connect/Disconnect wallet", async ({ page }) => {
     await page.goto("/");
 
@@ -19,7 +19,7 @@ test.describe("Index page", async () => {
     if (isAutoConnected) {
       await expect(connectedWalletDropdownTrigger).toBeEnabled();
 
-      connectedWalletDropdownTrigger.click();
+      await connectedWalletDropdownTrigger.click();
 
       const disconnectButton = page
         .locator("button", {
@@ -35,10 +35,10 @@ test.describe("Index page", async () => {
     }
 
     // clear local storage
-    await page.evaluate(() => {
+    await page.evaluate(async () => {
       window.localStorage.clear();
       window.sessionStorage.clear();
-      window.caches.delete("walletconnect");
+      await window.caches.delete("walletconnect");
     });
   });
 });
