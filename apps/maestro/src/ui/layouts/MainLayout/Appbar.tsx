@@ -11,6 +11,7 @@ import {
   MenuIcon,
   Navbar,
   ThemeSwitcher,
+  Tooltip,
 } from "@axelarjs/ui";
 import { useIsSticky } from "@axelarjs/ui/hooks";
 import { cn } from "@axelarjs/ui/utils";
@@ -54,16 +55,18 @@ const Appbar: FC<AppbarProps> = (props) => {
         <Identicon seed={jsNumberForAddress(address)} diameter={18} />{" "}
         {maskAddress(address)}
       </CopyToClipboardButton>
-      <LinkButton
-        size="sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={`${chain?.blockExplorers?.default.url}/address/${address}`}
-        className="flex flex-nowrap items-center gap-1"
-      >
-        View on {chain?.blockExplorers?.default.name}{" "}
-        <ExternalLinkIcon className="h-[1em] w-[1em]" />
-      </LinkButton>
+      <Tooltip tip={`View account on ${chain?.blockExplorers?.default.name}`}>
+        <LinkButton
+          size="sm"
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`${chain?.blockExplorers?.default.url}address/${address}`}
+          className="flex flex-nowrap items-center gap-1"
+        >
+          View on explorer
+          <ExternalLinkIcon className="h-[1em] w-[1em]" />
+        </LinkButton>
+      </Tooltip>
 
       <Link
         href="/interchain-tokens"

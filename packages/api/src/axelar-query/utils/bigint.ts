@@ -23,14 +23,16 @@ export function gasToWei(
   decimals: number
 ): bigint {
   // Split the gasPrice into integer and fractional parts
-  const [integerPart, fractionalPart = ""] = gasPrice.split(".");
+  const fractionalPart = gasPrice.split(".")[1] || "";
 
-  // Adjust the gasPrice to the desired precision using a ternary operation
-  const adjustedGasPrice =
-    fractionalPart.length <= decimals
-      ? gasPrice
-      : `${integerPart}.${fractionalPart.substring(0, decimals)}`;
-
-  // Calculate the total cost in wei
-  return gasLimit * BigInt(parseUnits(adjustedGasPrice, decimals));
+  if (fractionalPart.length <= decimals) {
+    return gasLimit * BigInt(parseUnits(gasPrice, decimals));
+  } else {
+    const multiplier = Math.pow(10, decimals);
+    const multipliedGasPrice = Number(gasPrice) * multiplier;
+    return (
+      (gasLimit * parseUnits(multipliedGasPrice.toFixed(decimals), decimals)) /
+      BigInt(multiplier)
+    );
+  }
 }
