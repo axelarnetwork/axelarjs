@@ -71,7 +71,7 @@
     "@axelarjs/core": "workspace:*",
     "@tsconfig/strictest": "^2.0.2",
     "cosmjs-types": "^0.8.0",
-    "dotenv": "^16.3.2",
+    "dotenv": "^16.4.1",
     "rambda": "^9.0.1",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
