@@ -1,7 +1,7 @@
-import { NEXT_PUBLIC_VERCEL_URL } from "./env";
+import { NEXT_PUBLIC_SITE_URL } from "./env";
 
-export const TERMS_OF_USE_PARAGRAPHS = `
-Please read these Terms of Use (these “Terms”) carefully because they govern your use of the website located at ${NEXT_PUBLIC_VERCEL_URL} (the “Site”). The Site, made available by Axelar Foundation (the “Foundation” or “Site Operator” or “we” or “us”), acts as an information hub for and a front-end to various open-sourced protocols that operate using blockchain technology, including the Interchain Token Service (the “Protocol”). To make these Terms easier to read, the Site and our services are collectively called the “Interface.
+export const TERMS_OF_USE_COPY = `
+Please read these Terms of Use (these “Terms”) carefully because they govern your use of the website located at [${NEXT_PUBLIC_SITE_URL}](${NEXT_PUBLIC_SITE_URL}) (the “Site”). The Site, made available by Axelar Foundation (the “Foundation” or “Site Operator” or “we” or “us”), acts as an information hub for and a front-end to various open-sourced protocols that operate using blockchain technology, including the Interchain Token Service (the “Protocol”). To make these Terms easier to read, the Site and our services are collectively called the “Interface.
 
 NOTICE ON PROHIBITED USE – RESTRICTED PERSONS: THE INTERFACE AND ANY RELATED SERVICES ARE NOT OFFERED TO AND MAY NOT BE USED BY:
 
@@ -21,22 +21,22 @@ Transactions in digital assets performed via the Protocol may be irreversible, a
 
 You may use the Interface only if you are at least 18 years of age (or such other minimum age at which you can provide consent to data processing under the laws of your territory), and not otherwise barred from using the Interface under applicable law. In order to protect the integrity of the Interface, we reserve the right, at any time, in our sole discretion, to block access to the Interface from certain IP addresses and unique device identifiers. For the purposes of the Terms, “Restricted Territory” means of Algeria, Bangladesh, Bolivia, Belarus, Burundi, Burma (Myanmar), Cote D'Ivoire (Ivory Coast), Crimea and Sevastopol, Cuba, Democratic Republic of Congo, Ecuador, Iran, Iraq, Liberia, Libya, Mali, Morocco, Nepal, North Korea, Somalia, Sudan, Syria, Venezuela, Yemen, Zimbabwe or any other country to which Canada, Panama, the United States, the United Kingdom or the European Union embargoes goods or imposes similar sanctions.
 
-You agree not to do any of the following: 
-    • Use, display, mirror or frame the Interface or any individual element within the Interface, The Site Operator’s name, any Site Operator trademark, logo or other proprietary information, or the layout and design of any page or form contained on a page, without the Site Operator’s express written consent; 
-    • Access, tamper with, or use non-public areas of the Interface, Site Operator’s computer systems, or the technical delivery systems of Site Operator’s providers; 
-    • Attempt to probe, scan or test the vulnerability of any Site Operator system or network or breach any security or authentication measures; 
-    • Avoid, bypass, remove, deactivate, impair, descramble or otherwise circumvent any technological measure implemented by the Site Operator or any of the Site Operator’s providers or any other third party (including another user) to protect the Interface; 
-    • Attempt to access or search the Interface or download content from the Interface using any engine, software, tool, agent, device or mechanism (including spiders, robots, crawlers, data mining tools or the like) other than the software and/or search agents provided by the Site Operator or other generally available third-party web browsers; 
-    • Use any meta tags or other hidden text or metadata utilizing Site Operator trademark, logo URL or product name without the Site Operator’s express written consent; 
-    • Use the Interface, or any portion thereof, for any commercial purpose or for the benefit of any third party or in any manner not permitted by these Terms; 
-    • Forge any TCP/IP packet header or any part of the header information in any email or newsgroup posting, or in any way use the Interface to send altered, deceptive or false source-identifying information; 
-    • Attempt to decipher, decompile, disassemble or reverse engineer any of the software used to provide the Interface; 
-    • Interfere with, or attempt to interfere with, the access of any user, host or network, including, without limitation, sending a virus, overloading, flooding, spamming, or mail-bombing the Interface; 
-    • Collect or store any personally identifiable information from the Interface from other users of the Interface without their express permission; 
-    • Impersonate or misrepresent your affiliation with any person or entity; 
-    • Violate any applicable law, rule, or regulation concerning the integrity of trading markets, including (but not limited to) the manipulative tactics commonly known as spoofing and wash trading;
-    • Violate any applicable law or regulation; or
-    • Encourage or enable any other individual to do any of the foregoing.
+You agree not to do any of the following:
+  - Use, display, mirror or frame the Interface or any individual element within the Interface, The Site Operator’s name, any Site Operator trademark, logo or other proprietary information, or the layout and design of any page or form contained on a page, without the Site Operator’s express written consent; 
+  - Access, tamper with, or use non-public areas of the Interface, Site Operator’s computer systems, or the technical delivery systems of Site Operator’s providers; 
+  - Attempt to probe, scan or test the vulnerability of any Site Operator system or network or breach any security or authentication measures; 
+  - Avoid, bypass, remove, deactivate, impair, descramble or otherwise circumvent any technological measure implemented by the Site Operator or any of the Site Operator’s providers or any other third party (including another user) to protect the Interface; 
+  - Attempt to access or search the Interface or download content from the Interface using any engine, software, tool, agent, device or mechanism (including spiders, robots, crawlers, data mining tools or the like) other than the software and/or search agents provided by the Site Operator or other generally available third-party web browsers; 
+  - Use any meta tags or other hidden text or metadata utilizing Site Operator trademark, logo URL or product name without the Site Operator’s express written consent; 
+  - Use the Interface, or any portion thereof, for any commercial purpose or for the benefit of any third party or in any manner not permitted by these Terms; 
+  - Forge any TCP/IP packet header or any part of the header information in any email or newsgroup posting, or in any way use the Interface to send altered, deceptive or false source-identifying information; 
+  - Attempt to decipher, decompile, disassemble or reverse engineer any of the software used to provide the Interface; 
+  - Interfere with, or attempt to interfere with, the access of any user, host or network, including, without limitation, sending a virus, overloading, flooding, spamming, or mail-bombing the Interface; 
+  - Collect or store any personally identifiable information from the Interface from other users of the Interface without their express permission; 
+  - Impersonate or misrepresent your affiliation with any person or entity; 
+  - Violate any applicable law, rule, or regulation concerning the integrity of trading markets, including (but not limited to) the manipulative tactics commonly known as spoofing and wash trading;
+  - Violate any applicable law or regulation; or
+  - Encourage or enable any other individual to do any of the foregoing.
 
 The Site Operator is not obligated to monitor access to or use of the Interface or to review or edit any content. However, we have the right to do so for the purpose of operating the Interface, to ensure compliance with these Terms and to comply with applicable law or other legal requirements. We reserve the right, but are not obligated, to remove or disable access to any content at any time and without notice, including, but not limited to, if we, at our sole discretion, consider it objectionable or in violation of these Terms.  We have the right to investigate violations of these Terms or conduct that affects the Interface. We may also consult and cooperate with law enforcement authorities to prosecute users who violate the law.
 
@@ -54,4 +54,5 @@ Any dispute, claim, suit, action, cause of action, demand or proceeding arising 
   // sanitize paragraphs
   .map((p) => p.trim())
   // remove empty paragraphs
-  .filter((p) => p.length);
+  .filter((p) => p.length > 0)
+  .join("\n\n");

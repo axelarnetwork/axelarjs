@@ -7,6 +7,7 @@ import {
 } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import React, { type FC } from "react";
+import Markdown from "react-markdown";
 import Link from "next/link";
 
 import {
@@ -15,7 +16,7 @@ import {
   NEXT_PUBLIC_FILE_BUG_REPORT_URL,
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
 } from "~/config/env";
-import { TERMS_OF_USE_PARAGRAPHS } from "~/config/terms-of-use";
+import { TERMS_OF_USE_COPY } from "~/config/terms-of-use";
 
 export type Menuitem =
   | {
@@ -201,11 +202,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
     label: "Terms of Use",
     ModalContent: () => (
       <article className="prose dark:prose-invert max-h-[70dvh] overflow-y-scroll">
-        {TERMS_OF_USE_PARAGRAPHS.map((paragraph, index) => (
-          <p className="text-sm" key={index}>
-            {paragraph}
-          </p>
-        ))}
+        <Markdown>{TERMS_OF_USE_COPY}</Markdown>
       </article>
     ),
   },
