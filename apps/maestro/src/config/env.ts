@@ -2,6 +2,10 @@ import { Maybe } from "@axelarjs/utils";
 
 import { map, split, trim, uniq } from "rambda";
 
+export const NEXT_PUBLIC_SITE_URL = Maybe.of(
+  process.env.NEXT_PUBLIC_SITE_URL
+).mapOr("http://localhost:3000", String);
+
 export const NEXT_PUBLIC_E2E_ENABLED =
   process.env.NEXT_PUBLIC_E2E_ENABLED === "true";
 
