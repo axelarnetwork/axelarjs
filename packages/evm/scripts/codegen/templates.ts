@@ -50,6 +50,14 @@ export const INDEX_FILE = ({
     }
   }`;
 
+function getDefaultArgName(functionName: string, argIndex: number) {
+  if (functionName === "allowance") {
+    return ["owner", "spender"][argIndex];
+  }
+
+  return `${functionName}Arg${argIndex}`;
+}
+
 export const ARGS_FILE = ({
   pascalName = "",
   abiFns = [] as ABIItem[],
@@ -59,10 +67,17 @@ export const ARGS_FILE = ({
   clientPath = "",
 }) => {
   const toABIFnEncoder = ({ name, inputs }: ABIItem) => {
-    const argNames = inputs.map(({ name = "" }) => name).join(", ");
+    const argNames = inputs
+      .map((input, i) => input.name || getDefaultArgName(name, i))
+      .join(", ");
 
     const argsType = inputs
-      .map((input) => `${input.name}: ${parseInputType(input)}`)
+      .map(
+        (input, i) =>
+          `${input.name || getDefaultArgName(name, i)}: ${parseInputType(
+            input
+          )}`
+      )
       .join("; ");
 
     const fnName = capitalize(name);
@@ -92,13 +107,18 @@ export const ARGS_FILE = ({
       ) {
         return {
           ${readFns
-            .map(
-              ({ name }) =>
-                `"${name}"(${name}Args: ${pascalName}${capitalize(name)}Args) {
+            .map(({ name, inputs }) =>
+              inputs.length > 0
+                ? `"${name}"(${name}Args: ${pascalName}${capitalize(
+                    name
+                  )}Args) {
                   const encoder = ${constantName}_ENCODERS["${name}"];
                   const encodedArgs = encoder.args(${name}Args);
 
                   return publicClient.read("${name}", { args: encodedArgs });
+                }`
+                : `"${name}"() {
+                  return publicClient.read("${name}");
                 }`
             )
             .join(",\n")}
@@ -106,8 +126,12 @@ export const ARGS_FILE = ({
       }`
     : "";
 
+  const abiFnsWithInputs = abiFns.filter((x) => x.inputs.length > 0);
+
   return `
-    import { encodeFunctionData } from "viem";
+    ${
+      abiFnsWithInputs.length ? `import { encodeFunctionData } from "viem"` : ""
+    };
     
     ${
       readFns.length > 0
@@ -120,10 +144,10 @@ export const ARGS_FILE = ({
     }
     import ABI_FILE from "./${fileName}.abi";
 
-    ${abiFns.map(toABIFnEncoder).join("\n\n")}
+    ${abiFnsWithInputs.map(toABIFnEncoder).join("\n\n")}
       
     export const ${constantName}_ENCODERS = {
-      ${abiFns
+      ${abiFnsWithInputs
         .map(
           ({ name }) =>
             `"${name}": {

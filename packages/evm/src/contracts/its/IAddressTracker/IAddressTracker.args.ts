@@ -155,6 +155,9 @@ export function createIAddressTrackerReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    chainName() {
+      return publicClient.read("chainName");
+    },
     isTrustedAddress(
       isTrustedAddressArgs: IAddressTrackerIsTrustedAddressArgs
     ) {

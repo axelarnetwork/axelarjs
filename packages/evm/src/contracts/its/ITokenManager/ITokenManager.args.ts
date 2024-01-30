@@ -383,6 +383,18 @@ export function createITokenManagerReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    contractId() {
+      return publicClient.read("contractId");
+    },
+    flowInAmount() {
+      return publicClient.read("flowInAmount");
+    },
+    flowLimit() {
+      return publicClient.read("flowLimit");
+    },
+    flowOutAmount() {
+      return publicClient.read("flowOutAmount");
+    },
     getTokenAddressFromParams(
       getTokenAddressFromParamsArgs: ITokenManagerGetTokenAddressFromParamsArgs
     ) {
@@ -398,6 +410,12 @@ export function createITokenManagerReadClient(
       const encodedArgs = encoder.args(hasRoleArgs);
 
       return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    implementationType() {
+      return publicClient.read("implementationType");
+    },
+    interchainTokenId() {
+      return publicClient.read("interchainTokenId");
     },
     isFlowLimiter(isFlowLimiterArgs: ITokenManagerIsFlowLimiterArgs) {
       const encoder = ITOKEN_MANAGER_ENCODERS["isFlowLimiter"];
@@ -416,6 +434,9 @@ export function createITokenManagerReadClient(
       const encodedArgs = encoder.args(paramsArgs);
 
       return publicClient.read("params", { args: encodedArgs });
+    },
+    tokenAddress() {
+      return publicClient.read("tokenAddress");
     },
   };
 }

@@ -12,6 +12,9 @@ import { Chain } from "viem";
 
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ERC20.abi";
+import { createERC20ReadClient } from "./ERC20.args";
+
+const createReadClient = createERC20ReadClient;
 
 export * from "./ERC20.args";
 
@@ -21,11 +24,15 @@ export class ERC20Client extends PublicContractClient<typeof ABI_FILE.abi> {
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
 
+  public readonly reads: ReturnType<typeof createReadClient>;
+
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
       abi: ERC20_ABI,
       address: options.address,
       chain: options.chain,
     });
+
+    this.reads = createReadClient(this);
   }
 }

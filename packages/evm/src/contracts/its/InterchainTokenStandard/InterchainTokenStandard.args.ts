@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainTokenStandard.abi";
 
 export type InterchainTokenStandardInterchainTransferArgs = {
@@ -91,3 +92,16 @@ export const INTERCHAIN_TOKEN_STANDARD_ENCODERS = {
     data: encodeInterchainTokenStandardInterchainTransferFromData,
   },
 };
+
+export function createInterchainTokenStandardReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    interchainTokenId() {
+      return publicClient.read("interchainTokenId");
+    },
+    interchainTokenService() {
+      return publicClient.read("interchainTokenService");
+    },
+  };
+}

@@ -10,7 +10,34 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ERC20.abi";
+
+export type ERC20AllowanceArgs = {
+  owner: `0x${string}`;
+  spender: `0x${string}`;
+};
+
+/**
+ * Factory function for ERC20.allowance function args
+ */
+export const encodeERC20AllowanceArgs = ({
+  owner,
+  spender,
+}: ERC20AllowanceArgs) => [owner, spender] as const;
+
+/**
+ * Encoder function for ERC20.allowance function data
+ */
+export const encodeERC20AllowanceData = ({
+  owner,
+  spender,
+}: ERC20AllowanceArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "allowance",
+    abi: ABI_FILE.abi,
+    args: [owner, spender],
+  });
 
 export type ERC20ApproveArgs = { spender: `0x${string}`; amount: bigint };
 
@@ -31,6 +58,27 @@ export const encodeERC20ApproveData = ({
     functionName: "approve",
     abi: ABI_FILE.abi,
     args: [spender, amount],
+  });
+
+export type ERC20BalanceOfArgs = { balanceOfArg0: `0x${string}` };
+
+/**
+ * Factory function for ERC20.balanceOf function args
+ */
+export const encodeERC20BalanceOfArgs = ({
+  balanceOfArg0,
+}: ERC20BalanceOfArgs) => [balanceOfArg0] as const;
+
+/**
+ * Encoder function for ERC20.balanceOf function data
+ */
+export const encodeERC20BalanceOfData = ({
+  balanceOfArg0,
+}: ERC20BalanceOfArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "balanceOf",
+    abi: ABI_FILE.abi,
+    args: [balanceOfArg0],
   });
 
 export type ERC20DecreaseAllowanceArgs = {
@@ -138,9 +186,17 @@ export const encodeERC20TransferFromData = ({
   });
 
 export const ERC20_ENCODERS = {
+  allowance: {
+    args: encodeERC20AllowanceArgs,
+    data: encodeERC20AllowanceData,
+  },
   approve: {
     args: encodeERC20ApproveArgs,
     data: encodeERC20ApproveData,
+  },
+  balanceOf: {
+    args: encodeERC20BalanceOfArgs,
+    data: encodeERC20BalanceOfData,
   },
   decreaseAllowance: {
     args: encodeERC20DecreaseAllowanceArgs,
@@ -159,3 +215,25 @@ export const ERC20_ENCODERS = {
     data: encodeERC20TransferFromData,
   },
 };
+
+export function createERC20ReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    allowance(allowanceArgs: ERC20AllowanceArgs) {
+      const encoder = ERC20_ENCODERS["allowance"];
+      const encodedArgs = encoder.args(allowanceArgs);
+
+      return publicClient.read("allowance", { args: encodedArgs });
+    },
+    balanceOf(balanceOfArgs: ERC20BalanceOfArgs) {
+      const encoder = ERC20_ENCODERS["balanceOf"];
+      const encodedArgs = encoder.args(balanceOfArgs);
+
+      return publicClient.read("balanceOf", { args: encodedArgs });
+    },
+    totalSupply() {
+      return publicClient.read("totalSupply");
+    },
+  };
+}

@@ -15,7 +15,7 @@ export default {
       inputs: [
         {
           internalType: "address",
-          name: "interchainTokenServiceAddress",
+          name: "interchainTokenService_",
           type: "address",
         },
       ],
@@ -441,6 +441,19 @@ export default {
       type: "function",
     },
     {
+      inputs: [],
+      name: "interchainTokenService",
+      outputs: [
+        {
+          internalType: "contract IInterchainTokenService",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       inputs: [
         {
           internalType: "bytes[]",
@@ -515,19 +528,6 @@ export default {
         },
       ],
       stateMutability: "payable",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "service",
-      outputs: [
-        {
-          internalType: "contract IInterchainTokenService",
-          name: "",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
       type: "function",
     },
     {

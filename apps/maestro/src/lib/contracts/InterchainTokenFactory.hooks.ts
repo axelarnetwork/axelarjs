@@ -307,6 +307,33 @@ export function useInterchainTokenFactoryInterchainTokenSalt<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"interchainTokenService"`.
+ */
+export function useInterchainTokenFactoryInterchainTokenService<
+  TFunctionName extends "interchainTokenService",
+  TSelectData = ReadContractResult<
+    typeof interchainTokenFactoryABI,
+    TFunctionName
+  >
+>(
+  config: Omit<
+    UseContractReadConfig<
+      typeof interchainTokenFactoryABI,
+      TFunctionName,
+      TSelectData
+    >,
+    "abi" | "address" | "functionName"
+  > = {} as any
+) {
+  return useContractRead({
+    abi: interchainTokenFactoryABI,
+    address: interchainTokenFactoryAddress,
+    functionName: "interchainTokenService",
+    ...config,
+  } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"owner"`.
  */
 export function useInterchainTokenFactoryOwner<
@@ -356,33 +383,6 @@ export function useInterchainTokenFactoryPendingOwner<
     abi: interchainTokenFactoryABI,
     address: interchainTokenFactoryAddress,
     functionName: "pendingOwner",
-    ...config,
-  } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
-}
-
-/**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link interchainTokenFactoryABI}__ and `functionName` set to `"service"`.
- */
-export function useInterchainTokenFactoryService<
-  TFunctionName extends "service",
-  TSelectData = ReadContractResult<
-    typeof interchainTokenFactoryABI,
-    TFunctionName
-  >
->(
-  config: Omit<
-    UseContractReadConfig<
-      typeof interchainTokenFactoryABI,
-      TFunctionName,
-      TSelectData
-    >,
-    "abi" | "address" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: interchainTokenFactoryABI,
-    address: interchainTokenFactoryAddress,
-    functionName: "service",
     ...config,
   } as UseContractReadConfig<typeof interchainTokenFactoryABI, TFunctionName, TSelectData>);
 }

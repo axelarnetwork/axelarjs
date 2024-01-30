@@ -57,5 +57,11 @@ export function createIBaseTokenManagerReadClient(
         args: encodedArgs,
       });
     },
+    interchainTokenId() {
+      return publicClient.read("interchainTokenId");
+    },
+    tokenAddress() {
+      return publicClient.read("tokenAddress");
+    },
   };
 }
