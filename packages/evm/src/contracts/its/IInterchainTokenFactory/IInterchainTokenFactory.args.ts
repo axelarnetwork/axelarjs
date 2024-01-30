@@ -257,6 +257,50 @@ export const encodeIInterchainTokenFactoryInterchainTokenSaltData = ({
     args: [chainNameHash_, deployer, salt],
   });
 
+export type IInterchainTokenFactoryMulticallArgs = { data: any };
+
+/**
+ * Factory function for IInterchainTokenFactory.multicall function args
+ */
+export const encodeIInterchainTokenFactoryMulticallArgs = ({
+  data,
+}: IInterchainTokenFactoryMulticallArgs) => [data] as const;
+
+/**
+ * Encoder function for IInterchainTokenFactory.multicall function data
+ */
+export const encodeIInterchainTokenFactoryMulticallData = ({
+  data,
+}: IInterchainTokenFactoryMulticallArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "multicall",
+    abi: ABI_FILE.abi,
+    args: [data],
+  });
+
+export type IInterchainTokenFactoryProposeOwnershipArgs = {
+  newOwner: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenFactory.proposeOwnership function args
+ */
+export const encodeIInterchainTokenFactoryProposeOwnershipArgs = ({
+  newOwner,
+}: IInterchainTokenFactoryProposeOwnershipArgs) => [newOwner] as const;
+
+/**
+ * Encoder function for IInterchainTokenFactory.proposeOwnership function data
+ */
+export const encodeIInterchainTokenFactoryProposeOwnershipData = ({
+  newOwner,
+}: IInterchainTokenFactoryProposeOwnershipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "proposeOwnership",
+    abi: ABI_FILE.abi,
+    args: [newOwner],
+  });
+
 export type IInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs = {
   tokenAddress: `0x${string}`;
 };
@@ -282,6 +326,80 @@ export const encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenData =
       abi: ABI_FILE.abi,
       args: [tokenAddress],
     });
+
+export type IInterchainTokenFactorySetupArgs = { data: `0x${string}` };
+
+/**
+ * Factory function for IInterchainTokenFactory.setup function args
+ */
+export const encodeIInterchainTokenFactorySetupArgs = ({
+  data,
+}: IInterchainTokenFactorySetupArgs) => [data] as const;
+
+/**
+ * Encoder function for IInterchainTokenFactory.setup function data
+ */
+export const encodeIInterchainTokenFactorySetupData = ({
+  data,
+}: IInterchainTokenFactorySetupArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "setup",
+    abi: ABI_FILE.abi,
+    args: [data],
+  });
+
+export type IInterchainTokenFactoryTransferOwnershipArgs = {
+  newOwner: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenFactory.transferOwnership function args
+ */
+export const encodeIInterchainTokenFactoryTransferOwnershipArgs = ({
+  newOwner,
+}: IInterchainTokenFactoryTransferOwnershipArgs) => [newOwner] as const;
+
+/**
+ * Encoder function for IInterchainTokenFactory.transferOwnership function data
+ */
+export const encodeIInterchainTokenFactoryTransferOwnershipData = ({
+  newOwner,
+}: IInterchainTokenFactoryTransferOwnershipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "transferOwnership",
+    abi: ABI_FILE.abi,
+    args: [newOwner],
+  });
+
+export type IInterchainTokenFactoryUpgradeArgs = {
+  newImplementation: `0x${string}`;
+  newImplementationCodeHash: `0x${string}`;
+  params: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenFactory.upgrade function args
+ */
+export const encodeIInterchainTokenFactoryUpgradeArgs = ({
+  newImplementation,
+  newImplementationCodeHash,
+  params,
+}: IInterchainTokenFactoryUpgradeArgs) =>
+  [newImplementation, newImplementationCodeHash, params] as const;
+
+/**
+ * Encoder function for IInterchainTokenFactory.upgrade function data
+ */
+export const encodeIInterchainTokenFactoryUpgradeData = ({
+  newImplementation,
+  newImplementationCodeHash,
+  params,
+}: IInterchainTokenFactoryUpgradeArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "upgrade",
+    abi: ABI_FILE.abi,
+    args: [newImplementation, newImplementationCodeHash, params],
+  });
 
 export const IINTERCHAIN_TOKEN_FACTORY_ENCODERS = {
   canonicalInterchainTokenId: {
@@ -316,9 +434,29 @@ export const IINTERCHAIN_TOKEN_FACTORY_ENCODERS = {
     args: encodeIInterchainTokenFactoryInterchainTokenSaltArgs,
     data: encodeIInterchainTokenFactoryInterchainTokenSaltData,
   },
+  multicall: {
+    args: encodeIInterchainTokenFactoryMulticallArgs,
+    data: encodeIInterchainTokenFactoryMulticallData,
+  },
+  proposeOwnership: {
+    args: encodeIInterchainTokenFactoryProposeOwnershipArgs,
+    data: encodeIInterchainTokenFactoryProposeOwnershipData,
+  },
   registerCanonicalInterchainToken: {
     args: encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
     data: encodeIInterchainTokenFactoryRegisterCanonicalInterchainTokenData,
+  },
+  setup: {
+    args: encodeIInterchainTokenFactorySetupArgs,
+    data: encodeIInterchainTokenFactorySetupData,
+  },
+  transferOwnership: {
+    args: encodeIInterchainTokenFactoryTransferOwnershipArgs,
+    data: encodeIInterchainTokenFactoryTransferOwnershipData,
+  },
+  upgrade: {
+    args: encodeIInterchainTokenFactoryUpgradeArgs,
+    data: encodeIInterchainTokenFactoryUpgradeData,
   },
 };
 
@@ -348,6 +486,15 @@ export function createIInterchainTokenFactoryReadClient(
         args: encodedArgs,
       });
     },
+    chainNameHash() {
+      return publicClient.read("chainNameHash");
+    },
+    contractId() {
+      return publicClient.read("contractId");
+    },
+    implementation() {
+      return publicClient.read("implementation");
+    },
     interchainTokenAddress(
       interchainTokenAddressArgs: IInterchainTokenFactoryInterchainTokenAddressArgs
     ) {
@@ -372,6 +519,15 @@ export function createIInterchainTokenFactoryReadClient(
       const encodedArgs = encoder.args(interchainTokenSaltArgs);
 
       return publicClient.read("interchainTokenSalt", { args: encodedArgs });
+    },
+    interchainTokenService() {
+      return publicClient.read("interchainTokenService");
+    },
+    owner() {
+      return publicClient.read("owner");
+    },
+    pendingOwner() {
+      return publicClient.read("pendingOwner");
     },
   };
 }

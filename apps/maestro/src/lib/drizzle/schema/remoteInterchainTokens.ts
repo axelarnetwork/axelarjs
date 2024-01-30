@@ -9,6 +9,7 @@ import {
   deploymentMessageId,
   HASH_LENGTH,
   tokenAddress,
+  tokenManagerTypeEnum,
   updatedAt,
 } from "./common";
 import { interchainTokens } from "./interchainTokens";
@@ -39,6 +40,7 @@ export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
   tokenManagerAddress: varchar("token_manager_address", {
     length: ADDRESS_LENGTH,
   }),
+  tokenManagerType: tokenManagerTypeEnum("token_manager_type"),
   deploymentMessageId: deploymentMessageId.notNull(),
   deploymentStatus: deplymentStatusEnum("deployment_status").default("pending"),
   createdAt,

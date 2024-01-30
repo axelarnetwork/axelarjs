@@ -34,6 +34,32 @@ export const encodeInterchainTokenAcceptMintershipData = ({
     args: [fromMinter],
   });
 
+export type InterchainTokenAllowanceArgs = {
+  owner: `0x${string}`;
+  spender: `0x${string}`;
+};
+
+/**
+ * Factory function for InterchainToken.allowance function args
+ */
+export const encodeInterchainTokenAllowanceArgs = ({
+  owner,
+  spender,
+}: InterchainTokenAllowanceArgs) => [owner, spender] as const;
+
+/**
+ * Encoder function for InterchainToken.allowance function data
+ */
+export const encodeInterchainTokenAllowanceData = ({
+  owner,
+  spender,
+}: InterchainTokenAllowanceArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "allowance",
+    abi: ABI_FILE.abi,
+    args: [owner, spender],
+  });
+
 export type InterchainTokenApproveArgs = {
   spender: `0x${string}`;
   amount: bigint;
@@ -58,6 +84,27 @@ export const encodeInterchainTokenApproveData = ({
     functionName: "approve",
     abi: ABI_FILE.abi,
     args: [spender, amount],
+  });
+
+export type InterchainTokenBalanceOfArgs = { balanceOfArg0: `0x${string}` };
+
+/**
+ * Factory function for InterchainToken.balanceOf function args
+ */
+export const encodeInterchainTokenBalanceOfArgs = ({
+  balanceOfArg0,
+}: InterchainTokenBalanceOfArgs) => [balanceOfArg0] as const;
+
+/**
+ * Encoder function for InterchainToken.balanceOf function data
+ */
+export const encodeInterchainTokenBalanceOfData = ({
+  balanceOfArg0,
+}: InterchainTokenBalanceOfArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "balanceOf",
+    abi: ABI_FILE.abi,
+    args: [balanceOfArg0],
   });
 
 export type InterchainTokenBurnArgs = {
@@ -316,6 +363,27 @@ export const encodeInterchainTokenMintData = ({
     args: [account, amount],
   });
 
+export type InterchainTokenNoncesArgs = { noncesArg0: `0x${string}` };
+
+/**
+ * Factory function for InterchainToken.nonces function args
+ */
+export const encodeInterchainTokenNoncesArgs = ({
+  noncesArg0,
+}: InterchainTokenNoncesArgs) => [noncesArg0] as const;
+
+/**
+ * Encoder function for InterchainToken.nonces function data
+ */
+export const encodeInterchainTokenNoncesData = ({
+  noncesArg0,
+}: InterchainTokenNoncesArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "nonces",
+    abi: ABI_FILE.abi,
+    args: [noncesArg0],
+  });
+
 export type InterchainTokenPermitArgs = {
   issuer: `0x${string}`;
   spender: `0x${string}`;
@@ -460,9 +528,17 @@ export const INTERCHAIN_TOKEN_ENCODERS = {
     args: encodeInterchainTokenAcceptMintershipArgs,
     data: encodeInterchainTokenAcceptMintershipData,
   },
+  allowance: {
+    args: encodeInterchainTokenAllowanceArgs,
+    data: encodeInterchainTokenAllowanceData,
+  },
   approve: {
     args: encodeInterchainTokenApproveArgs,
     data: encodeInterchainTokenApproveData,
+  },
+  balanceOf: {
+    args: encodeInterchainTokenBalanceOfArgs,
+    data: encodeInterchainTokenBalanceOfData,
   },
   burn: {
     args: encodeInterchainTokenBurnArgs,
@@ -500,6 +576,10 @@ export const INTERCHAIN_TOKEN_ENCODERS = {
     args: encodeInterchainTokenMintArgs,
     data: encodeInterchainTokenMintData,
   },
+  nonces: {
+    args: encodeInterchainTokenNoncesArgs,
+    data: encodeInterchainTokenNoncesData,
+  },
   permit: {
     args: encodeInterchainTokenPermitArgs,
     data: encodeInterchainTokenPermitData,
@@ -526,17 +606,59 @@ export function createInterchainTokenReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    DOMAIN_SEPARATOR() {
+      return publicClient.read("DOMAIN_SEPARATOR");
+    },
+    allowance(allowanceArgs: InterchainTokenAllowanceArgs) {
+      const encoder = INTERCHAIN_TOKEN_ENCODERS["allowance"];
+      const encodedArgs = encoder.args(allowanceArgs);
+
+      return publicClient.read("allowance", { args: encodedArgs });
+    },
+    balanceOf(balanceOfArgs: InterchainTokenBalanceOfArgs) {
+      const encoder = INTERCHAIN_TOKEN_ENCODERS["balanceOf"];
+      const encodedArgs = encoder.args(balanceOfArgs);
+
+      return publicClient.read("balanceOf", { args: encodedArgs });
+    },
+    decimals() {
+      return publicClient.read("decimals");
+    },
     hasRole(hasRoleArgs: InterchainTokenHasRoleArgs) {
       const encoder = INTERCHAIN_TOKEN_ENCODERS["hasRole"];
       const encodedArgs = encoder.args(hasRoleArgs);
 
       return publicClient.read("hasRole", { args: encodedArgs });
     },
+    interchainTokenId() {
+      return publicClient.read("interchainTokenId");
+    },
+    interchainTokenService() {
+      return publicClient.read("interchainTokenService");
+    },
     isMinter(isMinterArgs: InterchainTokenIsMinterArgs) {
       const encoder = INTERCHAIN_TOKEN_ENCODERS["isMinter"];
       const encodedArgs = encoder.args(isMinterArgs);
 
       return publicClient.read("isMinter", { args: encodedArgs });
+    },
+    name() {
+      return publicClient.read("name");
+    },
+    nameHash() {
+      return publicClient.read("nameHash");
+    },
+    nonces(noncesArgs: InterchainTokenNoncesArgs) {
+      const encoder = INTERCHAIN_TOKEN_ENCODERS["nonces"];
+      const encodedArgs = encoder.args(noncesArgs);
+
+      return publicClient.read("nonces", { args: encodedArgs });
+    },
+    symbol() {
+      return publicClient.read("symbol");
+    },
+    totalSupply() {
+      return publicClient.read("totalSupply");
     },
   };
 }

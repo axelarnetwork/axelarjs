@@ -98,5 +98,8 @@ export function createIInterchainTokenDeployerReadClient(
 
       return publicClient.read("deployedAddress", { args: encodedArgs });
     },
+    implementationAddress() {
+      return publicClient.read("implementationAddress");
+    },
   };
 }

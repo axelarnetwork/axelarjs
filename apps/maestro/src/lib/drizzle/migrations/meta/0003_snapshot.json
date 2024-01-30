@@ -1,0 +1,273 @@
+{
+  "id": "b7b7ddb8-db8c-45de-baf9-bb607bb91ed7",
+  "prevId": "10d8d21d-e5ff-4162-924e-e03bcc3dd483",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "audit_logs": {
+      "name": "audit_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "event_kind": {
+          "name": "event_kind",
+          "type": "audit_log_event_kind",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "varchar(2048)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "interchain_tokens": {
+      "name": "interchain_tokens",
+      "schema": "",
+      "columns": {
+        "token_id": {
+          "name": "token_id",
+          "type": "varchar(66)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "token_address": {
+          "name": "token_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "axelar_chain_id": {
+          "name": "axelar_chain_id",
+          "type": "varchar(66)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_name": {
+          "name": "token_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_symbol": {
+          "name": "token_symbol",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_decimals": {
+          "name": "token_decimals",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deployment_message_id": {
+          "name": "deployment_message_id",
+          "type": "varchar(71)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deployer_address": {
+          "name": "deployer_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_manager_address": {
+          "name": "token_manager_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_manager_type": {
+          "name": "token_manager_type",
+          "type": "token_manager_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "original_minter_address": {
+          "name": "original_minter_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "token_kind",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "salt": {
+          "name": "salt",
+          "type": "varchar(66)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0x'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "remote_interchain_tokens": {
+      "name": "remote_interchain_tokens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(128)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "token_id": {
+          "name": "token_id",
+          "type": "varchar(66)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "axelar_chain_id": {
+          "name": "axelar_chain_id",
+          "type": "varchar(66)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_address": {
+          "name": "token_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_manager_address": {
+          "name": "token_manager_address",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "token_manager_type": {
+          "name": "token_manager_type",
+          "type": "token_manager_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deployment_message_id": {
+          "name": "deployment_message_id",
+          "type": "varchar(71)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deployment_status": {
+          "name": "deployment_status",
+          "type": "deployment_status",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "remote_interchain_tokens_token_id_interchain_tokens_token_id_fk": {
+          "name": "remote_interchain_tokens_token_id_interchain_tokens_token_id_fk",
+          "tableFrom": "remote_interchain_tokens",
+          "tableTo": "interchain_tokens",
+          "columnsFrom": [
+            "token_id"
+          ],
+          "columnsTo": [
+            "token_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "audit_log_event_kind": {
+      "name": "audit_log_event_kind",
+      "values": {
+        "unauthorized_access_attempt": "unauthorized_access_attempt"
+      }
+    },
+    "token_manager_type": {
+      "name": "token_manager_type",
+      "values": {
+        "MIN_BURN": "MIN_BURN",
+        "MINT_BURN_FROM": "MINT_BURN_FROM",
+        "LOCK_UNLOCK": "LOCK_UNLOCK",
+        "LOCK_UNLOCK_FEE": "LOCK_UNLOCK_FEE",
+        "GATEWAY": "GATEWAY"
+      }
+    },
+    "token_kind": {
+      "name": "token_kind",
+      "values": {
+        "canonical": "canonical",
+        "interchain": "interchain",
+        "custom": "custom"
+      }
+    },
+    "deployment_status": {
+      "name": "deployment_status",
+      "values": {
+        "confirmed": "confirmed",
+        "pending": "pending"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -1,7 +1,8 @@
-import { invariant } from "@axelarjs/utils";
+import { invariant, Maybe } from "@axelarjs/utils";
 
 import { z } from "zod";
 
+import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
 import { newInterchainTokenSchema } from "~/services/db/postgres";
 
@@ -33,6 +34,15 @@ export const recordInterchainTokenDeployment = protectedProcedure
         tokenId: input.tokenId as `0x${string}`,
       });
 
+    const tokenManagerClient = ctx.contracts.createTokenManagerClient(
+      configs.wagmi,
+      tokenManagerAddress
+    );
+
+    const tokenManagerType = await tokenManagerClient.reads
+      .implementationType()
+      .catch(() => null);
+
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
       tokenManagerAddress,
@@ -63,6 +73,9 @@ export const recordInterchainTokenDeployment = protectedProcedure
           tokenAddress,
           axelarChainId,
           tokenManagerAddress,
+          tokenManagerType: Maybe.of(tokenManagerType).mapOrNull(
+            getTokenManagerTypeFromBigInt
+          ),
           tokenId: input.tokenId,
           deployerAddress: input.deployerAddress,
           deploymentMessageId: input.deploymentMessageId,
