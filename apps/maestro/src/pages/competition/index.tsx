@@ -8,7 +8,7 @@ import Page from "~/ui/layouts/Page";
 const CompetitionPage = () => {
   const { data, isLoading } = trpc.gmp.getTopTransactions.useQuery({
     contractMethod: "InterchainTransfer",
-    pageSize: 10_000,
+    pageSize: 1000,
   });
 
   return (

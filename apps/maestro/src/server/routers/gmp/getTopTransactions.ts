@@ -1,5 +1,3 @@
-import type { SearchGMPResponseData } from "@axelarjs/api";
-
 import { TRPCError } from "@trpc/server";
 import { groupBy } from "rambda";
 import { z } from "zod";
@@ -19,16 +17,6 @@ const INPUT_SCHEMA = z.object({
 });
 
 export type RecentTransactionsInput = z.infer<typeof INPUT_SCHEMA>;
-
-export type RecentTransactionsOutput = {
-  hash: `0x${string}`;
-  blockHash: `0x${string}`;
-  status: string;
-  timestamp: number;
-  event?:
-    | NonNullable<SearchGMPResponseData["interchain_transfer"]>
-    | NonNullable<SearchGMPResponseData["interchain_token_deployment_started"]>;
-}[];
 
 /**
  * Get the top transactions by token address
@@ -60,7 +48,9 @@ export const getTopTransactions = publicProcedure
           tokenId: tokenId as `0x${string}`,
           name: txs[0].interchain_transfer?.name ?? "",
           symbol: txs[0].interchain_transfer?.symbol ?? "",
-          address: txs[0].interchain_transfer?.contract_address ?? "",
+          address:
+            txs[0].interchain_transfer?.contract_address ??
+            ("" as `0x${string}`),
           count: txs.length,
         }))
         .sort((a, b) => b.count - a.count);
@@ -75,3 +65,7 @@ export const getTopTransactions = publicProcedure
       });
     }
   });
+
+// infer the output type from the procedure
+export type GetTopTransactionsOutput =
+  typeof getTopTransactions._def._output_out;
