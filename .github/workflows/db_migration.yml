@@ -1,11 +1,11 @@
-name: Run postgres migration
+name: Run database migration
 
 on:
   workflow_dispatch:
     inputs:
       environment:
         type: choice
-        description: Select the deployment environment
+        description: Select the db environment
         options:
           - testnet
           - mainnet
@@ -26,5 +26,5 @@ jobs:
       - name: Run migration
         run: pnpm -C ./apps/maestro run drizzle:push
         env:
-          # select the postgres url based on the environment
+          # select the database connection string based on the environment
           POSTGRES_URL: ${{ github.event.inputs.environment == 'mainnet' && secrets.POSTGRES_URL_MAINNET || secrets.POSTGRES_URL_TESTNET }}
