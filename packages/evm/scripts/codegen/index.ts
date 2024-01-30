@@ -60,12 +60,7 @@ async function codegenContract({
   const abiJsonFile = `${JSON.stringify({ contractName, abi }, null, 2)}`;
 
   // only generate args file if there are functions with inputs
-  const abiFns = abi.filter(
-    (x) =>
-      x.type === "function" &&
-      x.inputs.length &&
-      x.inputs.every((input) => input.name)
-  );
+  const abiFns = abi.filter((x) => x.type === "function");
 
   // replace ERC* with erc* and EIP* with eip* to avoid inconsistent casing
   const sanitizedPascalName = pascalName.replace(

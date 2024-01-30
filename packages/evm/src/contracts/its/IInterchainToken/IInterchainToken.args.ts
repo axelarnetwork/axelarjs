@@ -483,17 +483,35 @@ export function createIInterchainTokenReadClient(
 
       return publicClient.read("balanceOf", { args: encodedArgs });
     },
+    decimals() {
+      return publicClient.read("decimals");
+    },
     hasRole(hasRoleArgs: IInterchainTokenHasRoleArgs) {
       const encoder = IINTERCHAIN_TOKEN_ENCODERS["hasRole"];
       const encodedArgs = encoder.args(hasRoleArgs);
 
       return publicClient.read("hasRole", { args: encodedArgs });
     },
+    interchainTokenId() {
+      return publicClient.read("interchainTokenId");
+    },
+    interchainTokenService() {
+      return publicClient.read("interchainTokenService");
+    },
     isMinter(isMinterArgs: IInterchainTokenIsMinterArgs) {
       const encoder = IINTERCHAIN_TOKEN_ENCODERS["isMinter"];
       const encodedArgs = encoder.args(isMinterArgs);
 
       return publicClient.read("isMinter", { args: encodedArgs });
+    },
+    name() {
+      return publicClient.read("name");
+    },
+    symbol() {
+      return publicClient.read("symbol");
+    },
+    totalSupply() {
+      return publicClient.read("totalSupply");
     },
   };
 }

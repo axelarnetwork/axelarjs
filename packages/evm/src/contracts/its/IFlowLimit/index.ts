@@ -12,6 +12,11 @@ import { Chain } from "viem";
 
 import { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IFlowLimit.abi";
+import { createIFlowLimitReadClient } from "./IFlowLimit.args";
+
+const createReadClient = createIFlowLimitReadClient;
+
+export * from "./IFlowLimit.args";
 
 export const IFLOW_LIMIT_ABI = ABI_FILE.abi;
 
@@ -21,11 +26,15 @@ export class IFlowLimitClient extends PublicContractClient<
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
 
+  public readonly reads: ReturnType<typeof createReadClient>;
+
   constructor(options: { chain: Chain; address: `0x${string}` }) {
     super({
       abi: IFLOW_LIMIT_ABI,
       address: options.address,
       chain: options.chain,
     });
+
+    this.reads = createReadClient(this);
   }
 }

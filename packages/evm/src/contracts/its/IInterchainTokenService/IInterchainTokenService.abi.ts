@@ -96,6 +96,11 @@ export default {
       type: "error",
     },
     {
+      inputs: [],
+      name: "InvalidCodeHash",
+      type: "error",
+    },
+    {
       inputs: [
         {
           internalType: "uint256",
@@ -104,6 +109,11 @@ export default {
         },
       ],
       name: "InvalidExpressMessageType",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "InvalidImplementation",
       type: "error",
     },
     {
@@ -129,6 +139,37 @@ export default {
       type: "error",
     },
     {
+      inputs: [],
+      name: "InvalidOwner",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "InvalidOwnerAddress",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "fromAccount",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "toAccount",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "accountRoles",
+          type: "uint256",
+        },
+      ],
+      name: "InvalidProposedRoles",
+      type: "error",
+    },
+    {
       inputs: [
         {
           internalType: "address",
@@ -145,6 +186,54 @@ export default {
       type: "error",
     },
     {
+      inputs: [
+        {
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "accountRoles",
+          type: "uint256",
+        },
+      ],
+      name: "MissingAllRoles",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "accountRoles",
+          type: "uint256",
+        },
+      ],
+      name: "MissingAnyOfRoles",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+        {
+          internalType: "uint8",
+          name: "role",
+          type: "uint8",
+        },
+      ],
+      name: "MissingRole",
+      type: "error",
+    },
+    {
       inputs: [],
       name: "MulticallFailed",
       type: "error",
@@ -156,7 +245,17 @@ export default {
     },
     {
       inputs: [],
+      name: "NotOwner",
+      type: "error",
+    },
+    {
+      inputs: [],
       name: "NotPaused",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "NotProxy",
       type: "error",
     },
     {
@@ -183,6 +282,11 @@ export default {
     {
       inputs: [],
       name: "Pause",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "SetupFailed",
       type: "error",
     },
     {
@@ -625,11 +729,100 @@ export default {
         {
           indexed: true,
           internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "OwnershipTransferStarted",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "OwnershipTransferred",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
           name: "account",
           type: "address",
         },
       ],
       name: "Paused",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "accountRoles",
+          type: "uint256",
+        },
+      ],
+      name: "RolesAdded",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "fromAccount",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "toAccount",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "accountRoles",
+          type: "uint256",
+        },
+      ],
+      name: "RolesProposed",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "accountRoles",
+          type: "uint256",
+        },
+      ],
+      name: "RolesRemoved",
       type: "event",
     },
     {
@@ -738,6 +931,39 @@ export default {
       ],
       name: "Unpaused",
       type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "newImplementation",
+          type: "address",
+        },
+      ],
+      name: "Upgraded",
+      type: "event",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "fromOperator",
+          type: "address",
+        },
+      ],
+      name: "acceptOperatorship",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "acceptOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
     },
     {
       inputs: [
@@ -1265,6 +1491,43 @@ export default {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+        {
+          internalType: "uint8",
+          name: "role",
+          type: "uint8",
+        },
+      ],
+      name: "hasRole",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "implementation",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
@@ -1288,6 +1551,19 @@ export default {
         {
           internalType: "address",
           name: "interchainTokenDeployerAddress",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "interchainTokenFactory",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
           type: "address",
         },
       ],
@@ -1359,6 +1635,25 @@ export default {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "addr",
+          type: "address",
+        },
+      ],
+      name: "isOperator",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "string",
           name: "chain",
           type: "string",
@@ -1401,6 +1696,19 @@ export default {
     },
     {
       inputs: [],
+      name: "owner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
       name: "paused",
       outputs: [
         {
@@ -1410,6 +1718,45 @@ export default {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "pendingOwner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "operator_",
+          type: "address",
+        },
+      ],
+      name: "proposeOperatorship",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "proposeOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
@@ -1470,6 +1817,19 @@ export default {
         },
       ],
       name: "setTrustedAddress",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+      ],
+      name: "setup",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -1554,6 +1914,32 @@ export default {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "operator_",
+          type: "address",
+        },
+      ],
+      name: "transferOperatorship",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "transferOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
@@ -1625,6 +2011,29 @@ export default {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "newImplementation",
+          type: "address",
+        },
+        {
+          internalType: "bytes32",
+          name: "newImplementationCodeHash",
+          type: "bytes32",
+        },
+        {
+          internalType: "bytes",
+          name: "params",
+          type: "bytes",
+        },
+      ],
+      name: "upgrade",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {

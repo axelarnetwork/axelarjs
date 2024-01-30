@@ -13,6 +13,29 @@ import { encodeFunctionData } from "viem";
 import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./IInterchainTokenService.abi";
 
+export type IInterchainTokenServiceAcceptOperatorshipArgs = {
+  fromOperator: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.acceptOperatorship function args
+ */
+export const encodeIInterchainTokenServiceAcceptOperatorshipArgs = ({
+  fromOperator,
+}: IInterchainTokenServiceAcceptOperatorshipArgs) => [fromOperator] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.acceptOperatorship function data
+ */
+export const encodeIInterchainTokenServiceAcceptOperatorshipData = ({
+  fromOperator,
+}: IInterchainTokenServiceAcceptOperatorshipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "acceptOperatorship",
+    abi: ABI_FILE.abi,
+    args: [fromOperator],
+  });
+
 export type IInterchainTokenServiceCallContractWithInterchainTokenArgs = {
   tokenId: `0x${string}`;
   destinationChain: string;
@@ -502,6 +525,32 @@ export const encodeIInterchainTokenServiceGetExpressExecutorWithTokenData = ({
     args: [commandId, sourceChain, sourceAddress, payloadHash, symbol, amount],
   });
 
+export type IInterchainTokenServiceHasRoleArgs = {
+  account: `0x${string}`;
+  role: number;
+};
+
+/**
+ * Factory function for IInterchainTokenService.hasRole function args
+ */
+export const encodeIInterchainTokenServiceHasRoleArgs = ({
+  account,
+  role,
+}: IInterchainTokenServiceHasRoleArgs) => [account, role] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.hasRole function data
+ */
+export const encodeIInterchainTokenServiceHasRoleData = ({
+  account,
+  role,
+}: IInterchainTokenServiceHasRoleArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "hasRole",
+    abi: ABI_FILE.abi,
+    args: [account, role],
+  });
+
 export type IInterchainTokenServiceInterchainTokenAddressArgs = {
   tokenId: `0x${string}`;
 };
@@ -604,6 +653,27 @@ export const encodeIInterchainTokenServiceInterchainTransferData = ({
     ],
   });
 
+export type IInterchainTokenServiceIsOperatorArgs = { addr: `0x${string}` };
+
+/**
+ * Factory function for IInterchainTokenService.isOperator function args
+ */
+export const encodeIInterchainTokenServiceIsOperatorArgs = ({
+  addr,
+}: IInterchainTokenServiceIsOperatorArgs) => [addr] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.isOperator function data
+ */
+export const encodeIInterchainTokenServiceIsOperatorData = ({
+  addr,
+}: IInterchainTokenServiceIsOperatorArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "isOperator",
+    abi: ABI_FILE.abi,
+    args: [addr],
+  });
+
 export type IInterchainTokenServiceIsTrustedAddressArgs = {
   chain: string;
   address_: string;
@@ -649,6 +719,52 @@ export const encodeIInterchainTokenServiceMulticallData = ({
     functionName: "multicall",
     abi: ABI_FILE.abi,
     args: [data],
+  });
+
+export type IInterchainTokenServiceProposeOperatorshipArgs = {
+  operator_: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.proposeOperatorship function args
+ */
+export const encodeIInterchainTokenServiceProposeOperatorshipArgs = ({
+  operator_,
+}: IInterchainTokenServiceProposeOperatorshipArgs) => [operator_] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.proposeOperatorship function data
+ */
+export const encodeIInterchainTokenServiceProposeOperatorshipData = ({
+  operator_,
+}: IInterchainTokenServiceProposeOperatorshipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "proposeOperatorship",
+    abi: ABI_FILE.abi,
+    args: [operator_],
+  });
+
+export type IInterchainTokenServiceProposeOwnershipArgs = {
+  newOwner: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.proposeOwnership function args
+ */
+export const encodeIInterchainTokenServiceProposeOwnershipArgs = ({
+  newOwner,
+}: IInterchainTokenServiceProposeOwnershipArgs) => [newOwner] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.proposeOwnership function data
+ */
+export const encodeIInterchainTokenServiceProposeOwnershipData = ({
+  newOwner,
+}: IInterchainTokenServiceProposeOwnershipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "proposeOwnership",
+    abi: ABI_FILE.abi,
+    args: [newOwner],
   });
 
 export type IInterchainTokenServiceRemoveTrustedAddressArgs = { chain: string };
@@ -745,6 +861,27 @@ export const encodeIInterchainTokenServiceSetTrustedAddressData = ({
     args: [chain, address_],
   });
 
+export type IInterchainTokenServiceSetupArgs = { data: `0x${string}` };
+
+/**
+ * Factory function for IInterchainTokenService.setup function args
+ */
+export const encodeIInterchainTokenServiceSetupArgs = ({
+  data,
+}: IInterchainTokenServiceSetupArgs) => [data] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.setup function data
+ */
+export const encodeIInterchainTokenServiceSetupData = ({
+  data,
+}: IInterchainTokenServiceSetupArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "setup",
+    abi: ABI_FILE.abi,
+    args: [data],
+  });
+
 export type IInterchainTokenServiceTokenManagerAddressArgs = {
   tokenId: `0x${string}`;
 };
@@ -790,6 +927,52 @@ export const encodeIInterchainTokenServiceTokenManagerImplementationData = ({
     functionName: "tokenManagerImplementation",
     abi: ABI_FILE.abi,
     args: [tokenManagerType],
+  });
+
+export type IInterchainTokenServiceTransferOperatorshipArgs = {
+  operator_: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.transferOperatorship function args
+ */
+export const encodeIInterchainTokenServiceTransferOperatorshipArgs = ({
+  operator_,
+}: IInterchainTokenServiceTransferOperatorshipArgs) => [operator_] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.transferOperatorship function data
+ */
+export const encodeIInterchainTokenServiceTransferOperatorshipData = ({
+  operator_,
+}: IInterchainTokenServiceTransferOperatorshipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "transferOperatorship",
+    abi: ABI_FILE.abi,
+    args: [operator_],
+  });
+
+export type IInterchainTokenServiceTransferOwnershipArgs = {
+  newOwner: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.transferOwnership function args
+ */
+export const encodeIInterchainTokenServiceTransferOwnershipArgs = ({
+  newOwner,
+}: IInterchainTokenServiceTransferOwnershipArgs) => [newOwner] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.transferOwnership function data
+ */
+export const encodeIInterchainTokenServiceTransferOwnershipData = ({
+  newOwner,
+}: IInterchainTokenServiceTransferOwnershipArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "transferOwnership",
+    abi: ABI_FILE.abi,
+    args: [newOwner],
   });
 
 export type IInterchainTokenServiceTransmitInterchainTransferArgs = {
@@ -887,6 +1070,36 @@ export const encodeIInterchainTokenServiceTrustedAddressHashData = ({
     args: [chain],
   });
 
+export type IInterchainTokenServiceUpgradeArgs = {
+  newImplementation: `0x${string}`;
+  newImplementationCodeHash: `0x${string}`;
+  params: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.upgrade function args
+ */
+export const encodeIInterchainTokenServiceUpgradeArgs = ({
+  newImplementation,
+  newImplementationCodeHash,
+  params,
+}: IInterchainTokenServiceUpgradeArgs) =>
+  [newImplementation, newImplementationCodeHash, params] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.upgrade function data
+ */
+export const encodeIInterchainTokenServiceUpgradeData = ({
+  newImplementation,
+  newImplementationCodeHash,
+  params,
+}: IInterchainTokenServiceUpgradeArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "upgrade",
+    abi: ABI_FILE.abi,
+    args: [newImplementation, newImplementationCodeHash, params],
+  });
+
 export type IInterchainTokenServiceValidTokenAddressArgs = {
   tokenId: `0x${string}`;
 };
@@ -934,6 +1147,10 @@ export const encodeIInterchainTokenServiceValidTokenManagerAddressData = ({
   });
 
 export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
+  acceptOperatorship: {
+    args: encodeIInterchainTokenServiceAcceptOperatorshipArgs,
+    data: encodeIInterchainTokenServiceAcceptOperatorshipData,
+  },
   callContractWithInterchainToken: {
     args: encodeIInterchainTokenServiceCallContractWithInterchainTokenArgs,
     data: encodeIInterchainTokenServiceCallContractWithInterchainTokenData,
@@ -990,6 +1207,10 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     args: encodeIInterchainTokenServiceGetExpressExecutorWithTokenArgs,
     data: encodeIInterchainTokenServiceGetExpressExecutorWithTokenData,
   },
+  hasRole: {
+    args: encodeIInterchainTokenServiceHasRoleArgs,
+    data: encodeIInterchainTokenServiceHasRoleData,
+  },
   interchainTokenAddress: {
     args: encodeIInterchainTokenServiceInterchainTokenAddressArgs,
     data: encodeIInterchainTokenServiceInterchainTokenAddressData,
@@ -1002,6 +1223,10 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     args: encodeIInterchainTokenServiceInterchainTransferArgs,
     data: encodeIInterchainTokenServiceInterchainTransferData,
   },
+  isOperator: {
+    args: encodeIInterchainTokenServiceIsOperatorArgs,
+    data: encodeIInterchainTokenServiceIsOperatorData,
+  },
   isTrustedAddress: {
     args: encodeIInterchainTokenServiceIsTrustedAddressArgs,
     data: encodeIInterchainTokenServiceIsTrustedAddressData,
@@ -1009,6 +1234,14 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
   multicall: {
     args: encodeIInterchainTokenServiceMulticallArgs,
     data: encodeIInterchainTokenServiceMulticallData,
+  },
+  proposeOperatorship: {
+    args: encodeIInterchainTokenServiceProposeOperatorshipArgs,
+    data: encodeIInterchainTokenServiceProposeOperatorshipData,
+  },
+  proposeOwnership: {
+    args: encodeIInterchainTokenServiceProposeOwnershipArgs,
+    data: encodeIInterchainTokenServiceProposeOwnershipData,
   },
   removeTrustedAddress: {
     args: encodeIInterchainTokenServiceRemoveTrustedAddressArgs,
@@ -1026,6 +1259,10 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     args: encodeIInterchainTokenServiceSetTrustedAddressArgs,
     data: encodeIInterchainTokenServiceSetTrustedAddressData,
   },
+  setup: {
+    args: encodeIInterchainTokenServiceSetupArgs,
+    data: encodeIInterchainTokenServiceSetupData,
+  },
   tokenManagerAddress: {
     args: encodeIInterchainTokenServiceTokenManagerAddressArgs,
     data: encodeIInterchainTokenServiceTokenManagerAddressData,
@@ -1033,6 +1270,14 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
   tokenManagerImplementation: {
     args: encodeIInterchainTokenServiceTokenManagerImplementationArgs,
     data: encodeIInterchainTokenServiceTokenManagerImplementationData,
+  },
+  transferOperatorship: {
+    args: encodeIInterchainTokenServiceTransferOperatorshipArgs,
+    data: encodeIInterchainTokenServiceTransferOperatorshipData,
+  },
+  transferOwnership: {
+    args: encodeIInterchainTokenServiceTransferOwnershipArgs,
+    data: encodeIInterchainTokenServiceTransferOwnershipData,
   },
   transmitInterchainTransfer: {
     args: encodeIInterchainTokenServiceTransmitInterchainTransferArgs,
@@ -1045,6 +1290,10 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
   trustedAddressHash: {
     args: encodeIInterchainTokenServiceTrustedAddressHashArgs,
     data: encodeIInterchainTokenServiceTrustedAddressHashData,
+  },
+  upgrade: {
+    args: encodeIInterchainTokenServiceUpgradeArgs,
+    data: encodeIInterchainTokenServiceUpgradeData,
   },
   validTokenAddress: {
     args: encodeIInterchainTokenServiceValidTokenAddressArgs,
@@ -1060,6 +1309,12 @@ export function createIInterchainTokenServiceReadClient(
   publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
+    chainName() {
+      return publicClient.read("chainName");
+    },
+    chainNameHash() {
+      return publicClient.read("chainNameHash");
+    },
     contractCallValue(
       contractCallValueArgs: IInterchainTokenServiceContractCallValueArgs
     ) {
@@ -1079,6 +1334,9 @@ export function createIInterchainTokenServiceReadClient(
         args: encodedArgs,
       });
     },
+    contractId() {
+      return publicClient.read("contractId");
+    },
     flowInAmount(flowInAmountArgs: IInterchainTokenServiceFlowInAmountArgs) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["flowInAmount"];
       const encodedArgs = encoder.args(flowInAmountArgs);
@@ -1096,6 +1354,9 @@ export function createIInterchainTokenServiceReadClient(
       const encodedArgs = encoder.args(flowOutAmountArgs);
 
       return publicClient.read("flowOutAmount", { args: encodedArgs });
+    },
+    gateway() {
+      return publicClient.read("gateway");
     },
     getExpressExecutor(
       getExpressExecutorArgs: IInterchainTokenServiceGetExpressExecutorArgs
@@ -1116,6 +1377,15 @@ export function createIInterchainTokenServiceReadClient(
         args: encodedArgs,
       });
     },
+    hasRole(hasRoleArgs: IInterchainTokenServiceHasRoleArgs) {
+      const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["hasRole"];
+      const encodedArgs = encoder.args(hasRoleArgs);
+
+      return publicClient.read("hasRole", { args: encodedArgs });
+    },
+    implementation() {
+      return publicClient.read("implementation");
+    },
     interchainTokenAddress(
       interchainTokenAddressArgs: IInterchainTokenServiceInterchainTokenAddressArgs
     ) {
@@ -1125,6 +1395,12 @@ export function createIInterchainTokenServiceReadClient(
 
       return publicClient.read("interchainTokenAddress", { args: encodedArgs });
     },
+    interchainTokenDeployer() {
+      return publicClient.read("interchainTokenDeployer");
+    },
+    interchainTokenFactory() {
+      return publicClient.read("interchainTokenFactory");
+    },
     interchainTokenId(
       interchainTokenIdArgs: IInterchainTokenServiceInterchainTokenIdArgs
     ) {
@@ -1132,6 +1408,12 @@ export function createIInterchainTokenServiceReadClient(
       const encodedArgs = encoder.args(interchainTokenIdArgs);
 
       return publicClient.read("interchainTokenId", { args: encodedArgs });
+    },
+    isOperator(isOperatorArgs: IInterchainTokenServiceIsOperatorArgs) {
+      const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["isOperator"];
+      const encodedArgs = encoder.args(isOperatorArgs);
+
+      return publicClient.read("isOperator", { args: encodedArgs });
     },
     isTrustedAddress(
       isTrustedAddressArgs: IInterchainTokenServiceIsTrustedAddressArgs
@@ -1141,6 +1423,21 @@ export function createIInterchainTokenServiceReadClient(
 
       return publicClient.read("isTrustedAddress", { args: encodedArgs });
     },
+    owner() {
+      return publicClient.read("owner");
+    },
+    paused() {
+      return publicClient.read("paused");
+    },
+    pendingOwner() {
+      return publicClient.read("pendingOwner");
+    },
+    tokenHandler() {
+      return publicClient.read("tokenHandler");
+    },
+    tokenManager() {
+      return publicClient.read("tokenManager");
+    },
     tokenManagerAddress(
       tokenManagerAddressArgs: IInterchainTokenServiceTokenManagerAddressArgs
     ) {
@@ -1148,6 +1445,9 @@ export function createIInterchainTokenServiceReadClient(
       const encodedArgs = encoder.args(tokenManagerAddressArgs);
 
       return publicClient.read("tokenManagerAddress", { args: encodedArgs });
+    },
+    tokenManagerDeployer() {
+      return publicClient.read("tokenManagerDeployer");
     },
     tokenManagerImplementation(
       tokenManagerImplementationArgs: IInterchainTokenServiceTokenManagerImplementationArgs

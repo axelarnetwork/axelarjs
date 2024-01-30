@@ -486,6 +486,18 @@ export function createInterchainTokenFactoryReadClient(
         args: encodedArgs,
       });
     },
+    chainNameHash() {
+      return publicClient.read("chainNameHash");
+    },
+    contractId() {
+      return publicClient.read("contractId");
+    },
+    gateway() {
+      return publicClient.read("gateway");
+    },
+    implementation() {
+      return publicClient.read("implementation");
+    },
     interchainTokenAddress(
       interchainTokenAddressArgs: InterchainTokenFactoryInterchainTokenAddressArgs
     ) {
@@ -510,6 +522,15 @@ export function createInterchainTokenFactoryReadClient(
       const encodedArgs = encoder.args(interchainTokenSaltArgs);
 
       return publicClient.read("interchainTokenSalt", { args: encodedArgs });
+    },
+    interchainTokenService() {
+      return publicClient.read("interchainTokenService");
+    },
+    owner() {
+      return publicClient.read("owner");
+    },
+    pendingOwner() {
+      return publicClient.read("pendingOwner");
     },
   };
 }

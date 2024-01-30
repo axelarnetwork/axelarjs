@@ -177,5 +177,17 @@ export function createIERC20NamedReadClient(
 
       return publicClient.read("balanceOf", { args: encodedArgs });
     },
+    decimals() {
+      return publicClient.read("decimals");
+    },
+    name() {
+      return publicClient.read("name");
+    },
+    symbol() {
+      return publicClient.read("symbol");
+    },
+    totalSupply() {
+      return publicClient.read("totalSupply");
+    },
   };
 }

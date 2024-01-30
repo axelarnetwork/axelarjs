@@ -137,6 +137,11 @@ export default {
       type: "error",
     },
     {
+      inputs: [],
+      name: "TokenSymbolEmpty",
+      type: "error",
+    },
+    {
       anonymous: false,
       inputs: [
         {
