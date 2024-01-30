@@ -1,4 +1,4 @@
-import { ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
+import { Card, ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
@@ -99,51 +99,53 @@ export const RecentTransactionsTable: FC<Props> = ({
   );
 
   return (
-    <section className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
-      <Table className="relative space-y-4" zebra>
-        <Table.Head>
-          <Table.Row>
-            <Table.Column
-              colSpan={columns.length}
-              className="text-center text-base"
-            >
-              Recent{" "}
-              <span className="text-accent">
-                {CONTRACT_METHODS_LABELS[contractMethod]}
-              </span>{" "}
-              Transactions
-            </Table.Column>
-          </Table.Row>
-          <Table.Row>
-            {columns.map((column) => (
-              <Table.Column key={column.label} className={column.className}>
-                {column.label}
+    <Card className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
+      <Card.Body>
+        <Table className="relative space-y-4" zebra>
+          <Table.Head>
+            <Table.Row>
+              <Table.Column
+                colSpan={columns.length}
+                className="text-center text-base"
+              >
+                Recent{" "}
+                <span className="text-accent">
+                  {CONTRACT_METHODS_LABELS[contractMethod]}
+                </span>{" "}
+                Transactions
               </Table.Column>
-            ))}
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {isLoading || !txns?.length ? (
-            <Table.Row className="grid min-h-[38px] place-items-center  text-center">
-              <Table.Cell colSpan={3}>
-                {isLoading
-                  ? "Loading transactions..."
-                  : "No transactions found"}
-              </Table.Cell>
             </Table.Row>
-          ) : (
-            txns.map((tx, i) => (
-              <TransactionRow
-                key={`${tx.hash}-${i}`}
-                tx={tx}
-                contractMethod={contractMethod}
-              />
-            ))
-          )}
-          {paginationBlock}
-        </Table.Body>
-      </Table>
-    </section>
+            <Table.Row>
+              {columns.map((column) => (
+                <Table.Column key={column.label} className={column.className}>
+                  {column.label}
+                </Table.Column>
+              ))}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {isLoading || !txns?.length ? (
+              <Table.Row className="grid min-h-[38px] place-items-center  text-center">
+                <Table.Cell colSpan={3}>
+                  {isLoading
+                    ? "Loading transactions..."
+                    : "No transactions found"}
+                </Table.Cell>
+              </Table.Row>
+            ) : (
+              txns.map((tx, i) => (
+                <TransactionRow
+                  key={`${tx.hash}-${i}`}
+                  tx={tx}
+                  contractMethod={contractMethod}
+                />
+              ))
+            )}
+            {paginationBlock}
+          </Table.Body>
+        </Table>
+      </Card.Body>
+    </Card>
   );
 };
 
