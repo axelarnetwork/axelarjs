@@ -1,0 +1,30 @@
+name: Run postgres migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Select the deployment environment
+        options:
+          - testnet
+          - mainnet
+        required: true
+
+jobs:
+  migration:
+    name: Run migration on testnet DB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Run migration
+        run: pnpm -C ./apps/maestro run drizzle:push
+        env:
+          # select the postgres url based on the environment
+          POSTGRES_URL: ${{ github.event.inputs.environment == 'mainnet' && secrets.POSTGRES_URL_MAINNET || secrets.POSTGRES_URL_TESTNET }}
