@@ -1,4 +1,4 @@
-import { timestamp, varchar } from "drizzle-orm/pg-core";
+import { PgEnum, pgEnum, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const ADDRESS_LENGTH = 42;
 export const HASH_LENGTH = 66;
@@ -43,3 +43,30 @@ export const axelarChainId = varchar("axelar_chain_id", {
 export const createdAt = timestamp("created_at").defaultNow();
 
 export const updatedAt = timestamp("updated_at").defaultNow();
+
+const TOKEN_MANAGER_TYPES = [
+  "MIN_BURN",
+  "MINT_BURN_FROM",
+  "LOCK_UNLOCK",
+  "LOCK_UNLOCK_FEE",
+  "GATEWAY",
+] as const;
+
+export const getTokenManagerType = (tokenManagerType: TokenManagerType) =>
+  BigInt(TOKEN_MANAGER_TYPES.indexOf(tokenManagerType));
+
+export const getTokenManagerTypeFromBigInt = (tokenManagerType: bigint) =>
+  TOKEN_MANAGER_TYPES[Number(tokenManagerType)];
+
+export const tokenManagerTypeEnum = pgEnum(
+  "token_manager_type",
+  TOKEN_MANAGER_TYPES
+);
+
+export type TokenManagerType = typeof tokenManagerTypeEnum extends PgEnum<
+  infer T
+>
+  ? T extends any[]
+    ? T[number]
+    : never
+  : never;
