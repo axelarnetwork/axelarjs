@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.2.2
+
+### Patch Changes
+
+- [#152](https://github.com/axelarnetwork/axelarjs/pull/152) [`ff123516679e503597caeb94353f05e361102714`](https://github.com/axelarnetwork/axelarjs/commit/ff123516679e503597caeb94353f05e361102714) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Upgrade evm clients with missing read functions
+
 ## 0.2.1
 
 ### Patch Changes
