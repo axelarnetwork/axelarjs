@@ -29,6 +29,13 @@
       "when": 1706584136912,
       "tag": "0003_clumsy_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1706596474172,
+      "tag": "0004_amazing_king_bedlam",
+      "breakpoints": true
     }
   ]
 }

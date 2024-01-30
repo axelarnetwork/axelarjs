@@ -45,11 +45,11 @@ export const createdAt = timestamp("created_at").defaultNow();
 export const updatedAt = timestamp("updated_at").defaultNow();
 
 const TOKEN_MANAGER_TYPES = [
-  "MIN_BURN",
-  "MINT_BURN_FROM",
-  "LOCK_UNLOCK",
-  "LOCK_UNLOCK_FEE",
-  "GATEWAY",
+  "mint_burn",
+  "mint_burn_from",
+  "lock_unlock",
+  "lock_unlock_fee",
+  "gateway",
 ] as const;
 
 export const getTokenManagerType = (tokenManagerType: TokenManagerType) =>
