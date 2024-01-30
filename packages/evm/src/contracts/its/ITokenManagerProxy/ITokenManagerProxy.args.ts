@@ -10,6 +10,7 @@
 
 import { encodeFunctionData } from "viem";
 
+import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./ITokenManagerProxy.abi";
 
 export type ITokenManagerProxySetupArgs = { setupParams: `0x${string}` };
@@ -39,3 +40,25 @@ export const ITOKEN_MANAGER_PROXY_ENCODERS = {
     data: encodeITokenManagerProxySetupData,
   },
 };
+
+export function createITokenManagerProxyReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+) {
+  return {
+    getImplementationTypeAndTokenAddress() {
+      return publicClient.read("getImplementationTypeAndTokenAddress");
+    },
+    implementation() {
+      return publicClient.read("implementation");
+    },
+    implementationType() {
+      return publicClient.read("implementationType");
+    },
+    interchainTokenId() {
+      return publicClient.read("interchainTokenId");
+    },
+    tokenAddress() {
+      return publicClient.read("tokenAddress");
+    },
+  };
+}

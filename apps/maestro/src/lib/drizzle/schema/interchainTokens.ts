@@ -10,6 +10,7 @@ import {
   HASH_LENGTH,
   tokenAddress,
   tokenManagerAddress,
+  tokenManagerTypeEnum,
   updatedAt,
 } from "./common";
 
@@ -36,6 +37,7 @@ export const interchainTokens = pgTable("interchain_tokens", {
     length: ADDRESS_LENGTH,
   }).notNull(),
   tokenManagerAddress: tokenManagerAddress.notNull(),
+  tokenManagerType: tokenManagerTypeEnum("token_manager_type"),
   originalMinterAddress: varchar("original_minter_address", {
     length: ADDRESS_LENGTH,
   }),

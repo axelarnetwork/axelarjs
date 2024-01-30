@@ -1,6 +1,9 @@
+import { Maybe } from "@axelarjs/utils";
+
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
 
@@ -66,8 +69,20 @@ export const recordRemoteTokensDeployment = protectedProcedure
           }),
         ]);
 
+        const tokenManagerClient = ctx.contracts.createTokenManagerClient(
+          configs.wagmi,
+          tokenManagerAddress
+        );
+
+        const tokenManagerType = await tokenManagerClient.reads
+          .implementationType()
+          .catch(() => null);
+
         return {
           tokenManagerAddress,
+          tokenManagerType: Maybe.of(tokenManagerType).mapOrNull(
+            getTokenManagerTypeFromBigInt
+          ),
           tokenAddress,
           tokenId: originToken.tokenId,
           axelarChainId: remoteToken.axelarChainId,

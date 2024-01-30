@@ -475,7 +475,7 @@ export default {
       name: "interchainTokenService",
       outputs: [
         {
-          internalType: "contract IInterchainTokenService",
+          internalType: "address",
           name: "",
           type: "address",
         },
