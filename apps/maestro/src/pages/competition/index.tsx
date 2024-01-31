@@ -5,12 +5,16 @@ import Link from "next/link";
 import { trpc } from "~/lib/trpc";
 import Page from "~/ui/layouts/Page";
 
+const daysAgo = (days: number) =>
+  Math.floor((Date.now() - 1000 * 60 * 60 * 24 * days) / 1000);
+
 const CompetitionPage = () => {
   const { data, isLoading } = trpc.gmp.getTopTransactions.useQuery({
     contractMethod: "InterchainTransfer",
     sampleSize: 220,
     minTxCount: 2,
     top: 10,
+    fromTime: daysAgo(14),
   });
 
   return (

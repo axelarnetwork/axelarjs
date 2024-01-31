@@ -33,8 +33,7 @@ export const getTopTransactions = publicProcedure
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         size: input.sampleSize,
         contractMethod: input.contractMethod,
-        fromTime:
-          input.fromTime ?? (Date.now() - 1000 * 60 * 60 * 24 * 30) / 1000, // 30 days
+        fromTime: input.fromTime,
       });
 
       const grouped = groupBy(
