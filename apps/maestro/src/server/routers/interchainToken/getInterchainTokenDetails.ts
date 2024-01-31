@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import {
   hex0xLiteral,
   hex40Literal,
@@ -14,7 +15,7 @@ const remoteTokenSchema = z.object({
   axelarChainId: z.string(),
   tokenAddress: hex40Literal(),
   tokenManagerAddress: hex40Literal().nullable(),
-  tokenManagerType: z.string(),
+  tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   deploymentMessageId: z.string(),
   deploymentStatus: z.string().nullable(),
   createdAt: z.date().nullable(),
@@ -31,7 +32,7 @@ const outputSchema = z.object({
   deploymentMessageId: z.string(),
   deployerAddress: hex40Literal(),
   tokenManagerAddress: hex40Literal().nullable(),
-  tokenManagerType: z.string().nullable(),
+  tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   originalMinterAddress: hex40Literal().nullable(),
   kind: z.string(),
   createdAt: z.date().nullable(),
