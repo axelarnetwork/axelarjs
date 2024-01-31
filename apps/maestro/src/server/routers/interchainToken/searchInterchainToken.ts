@@ -154,6 +154,9 @@ async function getInterchainToken(
 
         let tokenClient: InterchainTokenClient | undefined;
 
+        const itsClient =
+          ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+
         switch (tokenDetails.kind) {
           case "interchain":
             tokenClient = ctx.contracts.createInterchainTokenClient(
@@ -163,10 +166,6 @@ async function getInterchainToken(
             break;
           case "canonical":
             {
-              // for canonical tokens, we need to get the remote token address from the interchain token service
-              const itsClient =
-                ctx.contracts.createInterchainTokenServiceClient(chainConfig);
-
               const remoteTokenAddress = await itsClient.reads
                 .interchainTokenAddress({
                   tokenId: tokenDetails.tokenId as `0x${string}`,
@@ -188,10 +187,10 @@ async function getInterchainToken(
 
         const isRegistered = !tokenClient
           ? false
-          : await tokenClient
-              .read("interchainTokenService")
+          : await tokenClient.reads
+              .symbol()
               // attempt to read 'token.interchainTokenService' which will throw if the token is not registered
-              .then(() => true)
+              .then((symbol) => symbol === tokenDetails.tokenSymbol)
               // which will throw if the token is not registered
               .catch(() => false);
 
