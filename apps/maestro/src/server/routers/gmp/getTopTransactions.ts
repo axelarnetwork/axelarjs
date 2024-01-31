@@ -15,6 +15,7 @@ const INPUT_SCHEMA = z.object({
     z.literal("InterchainTransfer"),
     z.literal("InterchainTokenDeploymentStarted"),
   ]),
+  fromTime: z.number().optional(),
 });
 
 export type RecentTransactionsInput = z.infer<typeof INPUT_SCHEMA>;
@@ -32,6 +33,8 @@ export const getTopTransactions = publicProcedure
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         size: input.sampleSize,
         contractMethod: input.contractMethod,
+        fromTime:
+          input.fromTime ?? (Date.now() - 1000 * 60 * 60 * 24 * 30) / 1000, // 30 days
       });
 
       const grouped = groupBy(
