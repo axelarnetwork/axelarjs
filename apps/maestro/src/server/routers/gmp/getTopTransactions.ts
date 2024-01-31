@@ -7,9 +7,10 @@ import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
-  pageSize: z.number().optional().default(20),
-  page: z.number().optional().default(0),
+  sampleSize: z.number().optional().default(20),
   senderAddress: hex40Literal().optional(),
+  top: z.number().optional().default(10),
+  minTxCount: z.number().optional().default(2),
   contractMethod: z.union([
     z.literal("InterchainTransfer"),
     z.literal("InterchainTokenDeploymentStarted"),
@@ -19,7 +20,7 @@ const INPUT_SCHEMA = z.object({
 export type RecentTransactionsInput = z.infer<typeof INPUT_SCHEMA>;
 
 /**
- * Get the top transactions by token address
+ * Get the top transactions by token id
  */
 export const getTopTransactions = publicProcedure
   .input(INPUT_SCHEMA)
@@ -29,8 +30,7 @@ export const getTopTransactions = publicProcedure
         senderAddress: input.senderAddress,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-        size: input.pageSize,
-        from: input.page * input.pageSize,
+        size: input.sampleSize,
         contractMethod: input.contractMethod,
       });
 
@@ -53,7 +53,9 @@ export const getTopTransactions = publicProcedure
             ("" as `0x${string}`),
           count: txs.length,
         }))
-        .sort((a, b) => b.count - a.count);
+        .filter((token) => token.count >= input.minTxCount)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, input.top);
     } catch (error) {
       if (error instanceof TRPCError) {
         throw error;
