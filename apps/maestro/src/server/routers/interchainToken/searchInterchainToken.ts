@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
+import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hex40Literal, hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
@@ -18,6 +19,8 @@ const tokenDetailsSchema = z.object({
   // nullable fields
   tokenId: hexLiteral().nullable(),
   tokenAddress: hex40Literal().nullable(),
+  tokenManagerAddress: hex40Literal().optional().nullable(),
+  tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   isOriginToken: z.boolean().nullable(),
   isRegistered: z.boolean(),
   kind: z.enum(["interchain", "canonical", "custom"]),
@@ -105,6 +108,8 @@ async function getInterchainToken(
   const lookupToken = {
     tokenId: tokenDetails.tokenId,
     tokenAddress: tokenDetails.tokenAddress,
+    tokenManagerAddress: tokenDetails.tokenManagerAddress,
+    tokenManagerType: tokenDetails.tokenManagerType,
     isOriginToken: tokenDetails.axelarChainId === chainConfig?.axelarChainId,
     isRegistered: true,
     chainId: chainConfig.id,
@@ -137,6 +142,8 @@ async function getInterchainToken(
         const remoteTokenDetails = {
           tokenId: tokenDetails.tokenId,
           tokenAddress: remoteToken.tokenAddress,
+          tokeManagerAddress: remoteToken.tokenManagerAddress,
+          tokenManagerType: remoteToken.tokenManagerType,
           isOriginToken: false,
           isRegistered: remoteToken.deploymentStatus === "confirmed",
           chainId: chainConfig.id,
@@ -215,6 +222,8 @@ async function getInterchainToken(
           ? {
               ...match,
               tokenAddress: registeredToken.tokenAddress ?? "0x",
+              tokenManagerAddress: registeredToken.tokeManagerAddress ?? "0x",
+              tokenManagerType: registeredToken.tokenManagerType,
               deploymentStatus: "confirmed",
             }
           : null;
@@ -247,6 +256,8 @@ async function getInterchainToken(
       chainName: chain.name,
       tokenId: null,
       tokenAddress: null,
+      tokenManagerAddress: null,
+      tokenManagerType: null,
       isOriginToken: false,
       isRegistered: false,
       wasDeployedByAccount: false,
