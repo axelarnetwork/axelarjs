@@ -76,13 +76,5 @@ export const getInterchainTokenDetails = publicProcedure
       });
     }
 
-    if (tokenRecord.deployerAddress !== ctx.session?.address) {
-      return {
-        ...tokenRecord,
-        // salt is not returned if the caller is not the deployer
-        salt: "0x".concat("0".repeat(64)),
-      };
-    }
-
     return tokenRecord;
   });
