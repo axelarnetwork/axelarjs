@@ -74,15 +74,17 @@ export const recordRemoteTokensDeployment = protectedProcedure
           tokenManagerAddress
         );
 
-        const tokenManagerType = await tokenManagerClient.reads
+        const tokenManagerTypeCode = await tokenManagerClient.reads
           .implementationType()
           .catch(() => null);
 
+        const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOrNull(
+          getTokenManagerTypeFromBigInt
+        );
+
         return {
           tokenManagerAddress,
-          tokenManagerType: Maybe.of(tokenManagerType).mapOrNull(
-            getTokenManagerTypeFromBigInt
-          ),
+          tokenManagerType,
           tokenAddress,
           tokenId: originToken.tokenId,
           axelarChainId: remoteToken.axelarChainId,

@@ -39,13 +39,18 @@ export const recordInterchainTokenDeployment = protectedProcedure
       tokenManagerAddress
     );
 
-    const tokenManagerType = await tokenManagerClient.reads
+    const tokenManagerTypeCode = await tokenManagerClient.reads
       .implementationType()
       .catch(() => null);
+
+    const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOrNull(
+      getTokenManagerTypeFromBigInt
+    );
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
       tokenManagerAddress,
+      tokenManagerType,
     });
 
     if (!input.destinationAxelarChainIds.length) {
@@ -73,9 +78,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
           tokenAddress,
           axelarChainId,
           tokenManagerAddress,
-          tokenManagerType: Maybe.of(tokenManagerType).mapOrNull(
-            getTokenManagerTypeFromBigInt
-          ),
+          tokenManagerType,
           tokenId: input.tokenId,
           deployerAddress: input.deployerAddress,
           deploymentMessageId: input.deploymentMessageId,

@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import {
   hex0xLiteral,
   hex40Literal,
@@ -14,6 +15,7 @@ const remoteTokenSchema = z.object({
   axelarChainId: z.string(),
   tokenAddress: hex40Literal(),
   tokenManagerAddress: hex40Literal().nullable(),
+  tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   deploymentMessageId: z.string(),
   deploymentStatus: z.string().nullable(),
   createdAt: z.date().nullable(),
@@ -30,6 +32,7 @@ const outputSchema = z.object({
   deploymentMessageId: z.string(),
   deployerAddress: hex40Literal(),
   tokenManagerAddress: hex40Literal().nullable(),
+  tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   originalMinterAddress: hex40Literal().nullable(),
   kind: z.string(),
   createdAt: z.date().nullable(),
@@ -71,14 +74,6 @@ export const getInterchainTokenDetails = publicProcedure
         code: "NOT_FOUND",
         message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
       });
-    }
-
-    if (tokenRecord.deployerAddress !== ctx.session?.address) {
-      return {
-        ...tokenRecord,
-        // salt is not returned if the caller is not the deployer
-        salt: "0x".concat("0".repeat(64)),
-      };
     }
 
     return tokenRecord;
