@@ -5,6 +5,8 @@ import Link from "next/link";
 import { trpc } from "~/lib/trpc";
 import Page from "~/ui/layouts/Page";
 
+const TROPHY_EMOJIS = ["🏆", "🥈", "🥉"];
+
 const daysAgo = (days: number) =>
   Math.floor((Date.now() - 1000 * 60 * 60 * 24 * days) / 1000);
 
@@ -47,7 +49,14 @@ const CompetitionPage = () => {
                   </Table.Cell>
                   <Table.Cell>{item.name}</Table.Cell>
                   <Table.Cell>{item.symbol}</Table.Cell>
-                  <Table.Cell className="text-right">{item.count}</Table.Cell>
+                  <Table.Cell className="text-right">
+                    {item.count}
+                    {index < TROPHY_EMOJIS.length && (
+                      <span className="absolute translate-x-2">
+                        {TROPHY_EMOJIS[index]}
+                      </span>
+                    )}
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
