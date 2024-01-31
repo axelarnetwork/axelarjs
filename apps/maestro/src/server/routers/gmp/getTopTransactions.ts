@@ -16,6 +16,7 @@ const INPUT_SCHEMA = z.object({
     z.literal("InterchainTokenDeploymentStarted"),
   ]),
   fromTime: z.number().optional(),
+  toTime: z.number().optional(),
 });
 
 export type RecentTransactionsInput = z.infer<typeof INPUT_SCHEMA>;
@@ -34,6 +35,7 @@ export const getTopTransactions = publicProcedure
         size: input.sampleSize,
         contractMethod: input.contractMethod,
         fromTime: input.fromTime,
+        toTime: input.toTime,
       });
 
       const grouped = groupBy(

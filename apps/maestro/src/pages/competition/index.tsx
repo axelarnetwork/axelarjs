@@ -17,6 +17,7 @@ const CompetitionPage = () => {
     minTxCount: 2,
     top: 10,
     fromTime: daysAgo(14),
+    toTime: daysAgo(0),
   });
 
   return (
