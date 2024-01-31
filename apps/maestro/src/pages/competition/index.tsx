@@ -1,4 +1,12 @@
-import { Alert, Card, FormControl, Label, Table, Tooltip } from "@axelarjs/ui";
+import {
+  Alert,
+  Card,
+  FormControl,
+  Label,
+  Progress,
+  Table,
+  Tooltip,
+} from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -100,11 +108,11 @@ const CompetitionPage = () => {
                 <Label className="w-full">
                   <span className="text-sm">({progressPercent})</span>
                 </Label>
-                <progress
-                  className="progress progress-accent"
+                <Progress
+                  variant="accent"
                   value={timeElapsed}
                   max={totalTime}
-                />{" "}
+                />
               </FormControl>
             </Tooltip>
           </Card.Title>
