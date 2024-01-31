@@ -1,6 +1,6 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
-import { Badge, cn, Tooltip, type BadgeProps } from "@axelarjs/ui";
+import { Badge, cn, Progress, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
@@ -115,8 +115,9 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
         {elapsedBlocks.toLocaleString()} of {expectedConfirmations.toString()}{" "}
         block confirmations ({progress})
       </span>
-      <progress
-        className="progress progress-accent w-full"
+      <Progress
+        variant="accent"
+        className="w-full"
         value={elapsedBlocks}
         max={expectedConfirmations}
       />

@@ -44,7 +44,7 @@ export const createdAt = timestamp("created_at").defaultNow();
 
 export const updatedAt = timestamp("updated_at").defaultNow();
 
-const TOKEN_MANAGER_TYPES = [
+export const TOKEN_MANAGER_TYPES = [
   "mint_burn",
   "mint_burn_from",
   "lock_unlock",

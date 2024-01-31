@@ -17,6 +17,7 @@ export * from "./Loading";
 export * from "./Menu";
 export * from "./Modal";
 export * from "./Navbar";
+export * from "./Progress";
 export * from "./Radio";
 export * from "./Steps";
 export * from "./Table";

@@ -54,6 +54,7 @@ export class AxelarQueryAPIClient extends RestService {
   async estimateGasFee({
     sourceChain,
     destinationChain,
+    gasLimit,
     sourceTokenSymbol,
     sourceContractAddress,
     sourceTokenAddress,
@@ -61,10 +62,13 @@ export class AxelarQueryAPIClient extends RestService {
     amount,
     amountInUnits,
     minGasPrice = "0",
-    gasLimit = 1_000_000n,
     gasMultiplier = 1.0,
     showDetailedFees = false,
   }: EstimateGasFeeParams): Promise<EstimateGasFeeResponse | string> {
+    if (gasLimit < 21000) {
+      throw new Error("Gas limit is too low.");
+    }
+
     const response = await this.gmpClient.getFees({
       sourceChain,
       destinationChain,

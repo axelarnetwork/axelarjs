@@ -90,6 +90,14 @@ export const NEXT_PUBLIC_GIT_BRANCH = Maybe.of(
   process.env.NEXT_PUBLIC_GIT_BRANCH
 ).mapOr("main", String);
 
+export const NEXT_PUBLIC_COMPETITION_START_TIMESTAMP = Maybe.of(
+  process.env.NEXT_PUBLIC_COMPETITION_START_TIMESTAMP
+).mapOr("", String);
+
+export const NEXT_PUBLIC_COMPETITION_END_TIMESTAMP = Maybe.of(
+  process.env.NEXT_PUBLIC_COMPETITION_END_TIMESTAMP
+).mapOr("", String);
+
 export const shouldDisableSend = (
   axelarChainId: string,
   tokenAddress: `0x${string}`
