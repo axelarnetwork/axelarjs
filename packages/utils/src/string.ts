@@ -48,3 +48,11 @@ export function caseInsensitiveEqual(
 ) {
   return a?.toLowerCase() === b?.toLowerCase();
 }
+
+/**
+ * Locale compare two strings. a.localeCompare(b)
+ * @param a string
+ * @param b string
+ * @returns number
+ */
+export const localeCompare = (a: string, b: string) => a.localeCompare(b);
