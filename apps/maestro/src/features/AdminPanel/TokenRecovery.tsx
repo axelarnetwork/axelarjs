@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CopyToClipboardButton,
   DropdownMenu,
@@ -7,8 +8,8 @@ import {
   Table,
   TextInput,
 } from "@axelarjs/ui";
-import { maskAddress, Maybe } from "@axelarjs/utils";
-import { ChangeEvent, useMemo, useState } from "react";
+import { localeCompare, maskAddress, Maybe } from "@axelarjs/utils";
+import { useMemo, useState } from "react";
 
 import { trpc } from "~/lib/trpc";
 import { hex64 } from "~/lib/utils/validation";
@@ -26,7 +27,7 @@ const EXCLUDED_COLUMNS = [
 
 export const TokenRecovery = () => {
   const [searchBy, setSearchBy] = useState<SearchByOption>("token_address");
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<`0x${string}`>("0x");
 
   const isEnabled =
     searchBy === "token_id" && hex64().safeParse(searchValue).success;
@@ -41,22 +42,34 @@ export const TokenRecovery = () => {
       }
     );
 
-  const columns = Maybe.of(data)
-    .mapOr([], (data) => Object.keys(data[0]))
-    .filter((column) => !EXCLUDED_COLUMNS.includes(column))
-    .sort((a, b) => a.localeCompare(b));
-
   const resultSection = useMemo(() => {
-    if (isLoading && isEnabled) {
+    if (isLoading && isEnabled && !data) {
       return (
         <div className="p-4 text-center">
-          Scanning all chains for token {searchValue}...
+          Scanning all chains for token {maskAddress(searchValue)}...
         </div>
       );
     }
 
-    if (data?.length) {
+    if (!data?.length) {
       return (
+        <>
+          {isEnabled && (
+            <div className="p-4 text-center">
+              No token with {searchBy} {maskAddress(searchValue)} found
+            </div>
+          )}
+        </>
+      );
+    }
+
+    const columns = Maybe.of(data)
+      .mapOr([], (data) => Object.keys(data[0]))
+      .filter((column) => !EXCLUDED_COLUMNS.includes(column))
+      .sort(localeCompare);
+
+    return (
+      <>
         <div className="grid">
           <Card>
             <Card.Body>
@@ -123,50 +136,49 @@ export const TokenRecovery = () => {
             </Card.Body>
           </Card>
         </div>
-      );
-    }
-  }, [columns, data, isEnabled, isLoading, searchValue]);
+        <Card.Actions className="justify-end">
+          <Button variant="primary">Restore interchain token data</Button>
+        </Card.Actions>
+      </>
+    );
+  }, [data, isEnabled, isLoading, searchBy, searchValue]);
 
   return (
     <Card className="bg-base-200">
       <Card.Body>
-        <Card.Title className="justify-between">
-          <span>Token Recovery</span>
-        </Card.Title>
-        <Card $as="form" className="bg-base-300 relative">
-          <Card.Body>
-            <FormControl>
-              <Label>
-                <Label.Text>Search token by</Label.Text>
-                <DropdownMenu>
-                  <DropdownMenu.Trigger variant="primary" size="sm">
-                    {searchBy}
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Content className="bg-base-200 rounded-xl">
-                    {SEARCH_BY_OPTIONS.map((option) => (
-                      <DropdownMenu.Item
-                        key={option}
-                        onClick={setSearchBy.bind(null, option)}
-                      >
-                        <a>{option}</a>
-                      </DropdownMenu.Item>
-                    ))}
-                  </DropdownMenu.Content>
-                </DropdownMenu>
-              </Label>
-              <TextInput
-                type="search"
-                value={searchValue}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  setSearchValue(event.target.value)
-                }
-                placeholder={`Enter ${searchBy}`}
-              />
-            </FormControl>
+        <Card.Title className="justify-between">Token Recovery</Card.Title>
+        <section>
+          <FormControl>
+            <Label>
+              <Label.Text>Search token by</Label.Text>
+              <DropdownMenu>
+                <DropdownMenu.Trigger variant="primary" size="sm">
+                  {searchBy}
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content className="bg-base-300 rounded-xl">
+                  {SEARCH_BY_OPTIONS.map((option) => (
+                    <DropdownMenu.Item
+                      key={option}
+                      onClick={setSearchBy.bind(null, option)}
+                    >
+                      <a>{option}</a>
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu>
+            </Label>
+            <TextInput
+              type="search"
+              value={searchValue}
+              onChange={(event) =>
+                setSearchValue(event.target.value as `0x${string}`)
+              }
+              placeholder={`Enter ${searchBy}`}
+            />
+          </FormControl>
 
-            {resultSection}
-          </Card.Body>
-        </Card>
+          {resultSection}
+        </section>
       </Card.Body>
     </Card>
   );
