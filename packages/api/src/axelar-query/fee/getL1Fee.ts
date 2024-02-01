@@ -6,8 +6,8 @@ import { createPublicClient, http, parseAbi, PublicClient } from "viem";
 import {
   EstimateL1FeeParams,
   L2Chain,
-  MAINNET_L1_CHAINS,
-  TESTNET_L1_CHAINS,
+  MAINNET_L2_CHAINS,
+  TESTNET_L2_CHAINS,
 } from "./types";
 
 /**
@@ -22,7 +22,7 @@ export function getL1FeeForL2(
   chain: L2Chain,
   params: EstimateL1FeeParams
 ): Promise<bigint> {
-  const chains = env === "mainnet" ? MAINNET_L1_CHAINS : TESTNET_L1_CHAINS;
+  const chains = env === "mainnet" ? MAINNET_L2_CHAINS : TESTNET_L2_CHAINS;
   const publicClient = createPublicClient({
     chain: chains[chain],
     transport: http(),

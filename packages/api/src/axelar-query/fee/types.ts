@@ -15,7 +15,7 @@ import { TokenUnit } from "../../gmp";
 
 export type L2Chain = "optimism" | "arbitrum" | "mantle" | "base" | "scroll";
 
-export const MAINNET_L1_CHAINS = {
+export const MAINNET_L2_CHAINS = {
   arbitrum,
   base,
   optimism,
@@ -23,7 +23,7 @@ export const MAINNET_L1_CHAINS = {
   mantle,
 } as const;
 
-export const TESTNET_L1_CHAINS = {
+export const TESTNET_L2_CHAINS = {
   arbitrum: arbitrumGoerli,
   base: baseGoerli,
   optimism: optimismGoerli,
