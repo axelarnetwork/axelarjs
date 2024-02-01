@@ -49,6 +49,7 @@ export class AxelarQueryAPIClient extends RestService {
    * @param sourceTokenSymbol (Optional) the token symbol on the source chain
    * @param sourceContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
    * @param sourceTokenAddress (Optional) the contract address of the token symbol on the source chain
+   * @param executeData (Optional) the transaction data to be executed on the destination chain. Required if the destination chain is L2.
    * @param destinationContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
    * @param amount (Optional) the amount of assets transferred in terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
    * @param amountInUnits (Optional) the amount of assets transferred in terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
