@@ -81,7 +81,6 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "@axelarjs/utils": "workspace:*",
-    "@axelarjs/evm": "workspace:*",
     "@types/node": "^20.11.6",
     "dotenv": "^16.4.1",
     "fast-check": "^3.15.0",

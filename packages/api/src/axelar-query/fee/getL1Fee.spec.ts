@@ -1,5 +1,6 @@
 import { createGMPClient, GMPClient } from "../..";
-import { EstimateL1FeeParams, getL1FeeForL2 } from "./getL1Fee";
+import { getL1FeeForL2 } from "./getL1Fee";
+import { EstimateL1FeeParams } from "./types";
 
 describe.only("getL1Fee", () => {
   const env = "mainnet";

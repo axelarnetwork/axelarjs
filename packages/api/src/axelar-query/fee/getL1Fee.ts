@@ -2,52 +2,20 @@
 import { Environment } from "@axelarjs/core";
 
 import { createPublicClient, http, parseAbi, PublicClient } from "viem";
+
 import {
-  arbitrum,
-  arbitrumGoerli,
-  base,
-  baseGoerli,
-  mantle,
-  mantleTestnet,
-  optimism,
-  optimismGoerli,
-  scroll,
-  scrollSepolia,
-} from "viem/chains";
-
-import { TokenUnit } from "../../gmp";
-import { L2Chain } from "./types";
-
-const MAINNET_CHAINS = {
-  arbitrum,
-  base,
-  optimism,
-  scroll,
-  mantle,
-} as const;
-
-const TESTNET_CHAINS = {
-  arbitrum: arbitrumGoerli,
-  base: baseGoerli,
-  optimism: optimismGoerli,
-  scroll: scrollSepolia,
-  mantle: mantleTestnet,
-} as const;
-
-export type SupportedMainnetL2Chain = keyof typeof MAINNET_CHAINS;
-export type SupportedTestnetL2Chain = keyof typeof TESTNET_CHAINS;
-export type EstimateL1FeeParams = {
-  destinationContractAddress?: `0x${string}` | undefined;
-  executeData: `0x${string}`;
-  l1GasPrice: TokenUnit;
-};
+  EstimateL1FeeParams,
+  L2Chain,
+  MAINNET_L1_CHAINS,
+  TESTNET_L1_CHAINS,
+} from "./types";
 
 export function getL1FeeForL2(
   env: Environment,
   chain: L2Chain,
   params: EstimateL1FeeParams
 ): Promise<bigint> {
-  const chains = env === "mainnet" ? MAINNET_CHAINS : TESTNET_CHAINS;
+  const chains = env === "mainnet" ? MAINNET_L1_CHAINS : TESTNET_L1_CHAINS;
   const publicClient = createPublicClient({
     chain: chains[chain],
     transport: http(),
