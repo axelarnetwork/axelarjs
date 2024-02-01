@@ -10,6 +10,13 @@ import {
   TESTNET_L1_CHAINS,
 } from "./types";
 
+/**
+ * Get the estimated L1 fee for a given L2 chain.
+ * @param env The environment to use. Either "mainnet" or "testnet".
+ * @param chain The destination L2 chain.
+ * @param params The parameters to use for the estimation.
+ * @returns
+ */
 export function getL1FeeForL2(
   env: Environment,
   chain: L2Chain,
@@ -33,7 +40,7 @@ export function getL1FeeForL2(
   return Promise.resolve(0n);
 }
 
-export async function getOptimismL1Fee(
+async function getOptimismL1Fee(
   publicClient: PublicClient,
   estimateL1FeeParams: EstimateL1FeeParams
 ) {
@@ -83,30 +90,31 @@ export async function getOptimismL1Fee(
   return totalGasUsed * gasPrice;
 }
 
-export async function getArbitrumL1Fee(
-  publicClient: PublicClient,
-  destinationContractAddress: string,
-  executeData: string
-) {
-  // Arbitrum NodeInterface contract address
-  const contractAddress = "0x00000000000000000000000000000000000000C8";
+// TODO: Not used for now because the gas estimation is already included the L1 fee by default.
+// async function getArbitrumL1Fee(
+//   publicClient: PublicClient,
+//   destinationContractAddress: string,
+//   executeData: string
+// ) {
+//   // Arbitrum NodeInterface contract address
+//   const contractAddress = "0x00000000000000000000000000000000000000C8";
 
-  // https://github.com/OffchainLabs/nitro-contracts/blob/0a149d2af9aee566c4abf493479ec15e5fc32d98/src/node-interface/NodeInterface.sol#L112
-  const abi = parseAbi([
-    "function gasEstimateL1Component(address to, bool contractCreation, bytes calldata data) external payable returns (uint64,uint256,uint256)",
-  ]);
+//   // https://github.com/OffchainLabs/nitro-contracts/blob/0a149d2af9aee566c4abf493479ec15e5fc32d98/src/node-interface/NodeInterface.sol#L112
+//   const abi = parseAbi([
+//     "function gasEstimateL1Component(address to, bool contractCreation, bytes calldata data) external payable returns (uint64,uint256,uint256)",
+//   ]);
 
-  const fee = (await publicClient.readContract({
-    address: contractAddress,
-    abi,
-    functionName: "gasEstimateL1Component" as never,
-    args: [destinationContractAddress, false, executeData],
-  })) as [bigint, bigint, bigint];
+//   const fee = (await publicClient.readContract({
+//     address: contractAddress,
+//     abi,
+//     functionName: "gasEstimateL1Component" as never,
+//     args: [destinationContractAddress, false, executeData],
+//   })) as [bigint, bigint, bigint];
 
-  return fee[0];
-}
+//   return fee[0];
+// }
 
-export async function getMantleL1Fee(
+async function getMantleL1Fee(
   publicClient: PublicClient,
   estimateL1FeeParams: EstimateL1FeeParams
 ) {
