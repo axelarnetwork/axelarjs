@@ -1,6 +1,6 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
-import { formatEther } from "viem";
+import { formatEther, pad } from "viem";
 
 import type {
   AxelarQueryAPIClient,
@@ -37,6 +37,55 @@ describe("axelar-query (node client)", () => {
       expect(fees).toBeTruthy();
       expect(
         Number(formatEther(BigInt(fees as string))) - Number("0.0000001") > 0
+      );
+    });
+
+    test("It should include the L1 gas fee", async () => {
+      const l2RequestParams: EstimateGasFeeParams = {
+        sourceChain: "avalanche",
+        destinationChain: "optimism",
+        gasLimit: 700_000n,
+        gasMultiplier: 1.1,
+        executeData: pad("0x1234", { size: 5000 }),
+        amount: 1,
+        amountInUnits: "1000000",
+      };
+
+      const fees = (await api.estimateGasFee({
+        ...l2RequestParams,
+        showDetailedFees: true,
+      })) as EstimateGasFeeResponse;
+
+      const l1ExecutionFeeWithMultiplier = parseInt(
+        fees.l1ExecutionFeeWithMultiplier
+      );
+      const executionFeeWithMultiplier = parseInt(
+        fees.executionFeeWithMultiplier
+      );
+
+      expect(fees).toBeTruthy();
+      expect(l1ExecutionFeeWithMultiplier).toBeGreaterThan(
+        executionFeeWithMultiplier
+      );
+    });
+
+    test("it should throw an error if the destination chain is L2 but not specified the executeData", async () => {
+      const l2RequestParams: EstimateGasFeeParams = {
+        sourceChain: "ethereum-2",
+        destinationChain: "optimism",
+        gasLimit: 700_000n,
+        gasMultiplier: 1.1,
+        amount: 1,
+        amountInUnits: "1000000",
+      };
+
+      await expect(
+        api.estimateGasFee({
+          ...l2RequestParams,
+          showDetailedFees: true,
+        })
+      ).rejects.toThrowError(
+        "executeData is required to calculate the L1 execution fee for optimism"
       );
     });
 

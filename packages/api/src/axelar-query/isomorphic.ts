@@ -128,11 +128,19 @@ export class AxelarQueryAPIClient extends RestService {
     let l1ExecutionFeeWithMultiplier = 0;
 
     // If the destination chain is L2, calculate the L1 execution fee
-    if (
-      isL2Chain(destinationChain) &&
-      executeData &&
-      destination_native_token.l1_gas_price_in_units
-    ) {
+    if (isL2Chain(destinationChain)) {
+      if (!executeData) {
+        throw new Error(
+          `executeData is required to calculate the L1 execution fee for ${destinationChain}`
+        );
+      }
+
+      if (!destination_native_token.l1_gas_price_in_units) {
+        throw new Error(
+          `Could not find L1 gas price for ${destinationChain}. Please try again later.`
+        );
+      }
+
       // Calculate the L1 execution fee. This value is in ETH.
       l1ExecutionFee = await getL1FeeForL2(this.env, destinationChain, {
         destinationContractAddress,
@@ -171,6 +179,7 @@ export class AxelarQueryAPIClient extends RestService {
       executionFeeWithMultiplier:
         excludedL1ExecutionFeeWithMultiplier.toString(),
       l1ExecutionFeeWithMultiplier: l1ExecutionFeeWithMultiplier.toString(),
+      l1ExecutionFee: l1ExecutionFee.toString(),
       gasLimit,
       gasMultiplier,
       minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
