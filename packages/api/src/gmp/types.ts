@@ -391,6 +391,12 @@ type GetBaseFeesResult = {
     name: string;
     symbol: string;
   };
+  ethereum_token: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    token_price: TokenPrice;
+  };
   axelar_token: {
     name: string;
     symbol: string;
