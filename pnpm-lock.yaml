@@ -373,6 +373,9 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
+      '@axelarjs/evm':
+        specifier: workspace:*
+        version: link:../evm
       '@axelarjs/utils':
         specifier: workspace:*
         version: link:../utils

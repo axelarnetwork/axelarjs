@@ -1,3 +1,5 @@
+import { Environment } from "@axelarjs/core";
+
 import { parseUnits } from "viem";
 
 import type { GMPClient } from "../gmp/isomorphic";
@@ -6,6 +8,7 @@ import {
   type ClientMeta,
   type RestServiceOptions,
 } from "../lib/rest-service";
+import { getL1FeeForL2, isL2Chain } from "./fee";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 import { gasToWei } from "./utils/bigint";
 
@@ -15,21 +18,25 @@ type AxelarscanClientDependencies = {
 
 export class AxelarQueryAPIClient extends RestService {
   protected gmpClient: GMPClient;
+  protected env: Environment;
 
   public constructor(
     options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
+    env: Environment,
     meta?: ClientMeta
   ) {
     super(options, meta);
     this.gmpClient = dependencies.gmpClient;
+    this.env = env;
   }
 
   static init(
     options: RestServiceOptions,
-    dependencies: AxelarscanClientDependencies
+    dependencies: AxelarscanClientDependencies,
+    env: Environment
   ) {
-    return new AxelarQueryAPIClient(options, dependencies, {
+    return new AxelarQueryAPIClient(options, dependencies, env, {
       name: "AxelarQueryAPI",
       version: "0.0.11",
     });
@@ -60,6 +67,7 @@ export class AxelarQueryAPIClient extends RestService {
     destinationContractAddress,
     amount,
     amountInUnits,
+    executeData,
     minGasPrice = "0",
     gasLimit = 1_000_000n,
     gasMultiplier = 1.0,
@@ -103,28 +111,55 @@ export class AxelarQueryAPIClient extends RestService {
       source_token.decimals
     );
 
-    const executionFee =
+    const excludedL1ExecutionFee =
       destGasFeeWei > minDestGasFeeWei
         ? srcGasFeeWei
         : (srcGasFeeWei * minDestGasFeeWei) / destGasFeeWei;
-    const executionFeeWithMultiplier =
+
+    const excludedL1ExecutionFeeWithMultiplier =
       gasMultiplier > 1
-        ? Math.floor(Number(executionFee) * Number(gasMultiplier))
-        : executionFee;
+        ? Math.floor(Number(excludedL1ExecutionFee) * Number(gasMultiplier))
+        : excludedL1ExecutionFee;
 
     const baseFee = parseUnits(base_fee.toString(), source_token.decimals);
-    return showDetailedFees
-      ? {
-          baseFee,
-          expressFee: express_fee_string,
-          executionFee: executionFee.toString(),
-          executionFeeWithMultiplier: executionFeeWithMultiplier.toString(),
-          gasLimit,
-          gasMultiplier,
-          minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
-          apiResponse: JSON.stringify(response),
-          isExpressSupported: express_supported,
-        }
-      : (BigInt(executionFeeWithMultiplier) + BigInt(baseFee)).toString();
+
+    let l1ExecutionFee = 0n;
+    let l1ExecutionFeeWithMultiplier = 0;
+    if (
+      isL2Chain(destinationChain) &&
+      executeData &&
+      destination_native_token.l1_gas_price_in_units
+    ) {
+      l1ExecutionFee = await getL1FeeForL2(this.env, destinationChain, {
+        destinationContractAddress,
+        executeData,
+        l1GasPrice: destination_native_token.l1_gas_price_in_units,
+      });
+      l1ExecutionFeeWithMultiplier = Math.floor(
+        Number(l1ExecutionFee) * Number(gasMultiplier)
+      );
+    }
+
+    // If showDetailedFees is false, return the total fee amount
+    if (!showDetailedFees) {
+      return (
+        BigInt(excludedL1ExecutionFeeWithMultiplier) +
+        BigInt(l1ExecutionFeeWithMultiplier) +
+        BigInt(baseFee)
+      ).toString();
+    }
+
+    return {
+      baseFee,
+      expressFee: express_fee_string,
+      executionFee: excludedL1ExecutionFee.toString(),
+      executionFeeWithMultiplier:
+        excludedL1ExecutionFeeWithMultiplier.toString(),
+      gasLimit,
+      gasMultiplier,
+      minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
+      apiResponse: JSON.stringify(response),
+      isExpressSupported: express_supported,
+    };
   }
 }

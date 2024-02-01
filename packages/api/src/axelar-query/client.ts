@@ -17,5 +17,6 @@ export const createAxelarQueryClient = (
     },
     {
       gmpClient: createGMPClient(env),
-    }
+    },
+    env
   );

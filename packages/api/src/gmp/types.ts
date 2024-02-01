@@ -329,6 +329,7 @@ export type GetFeesParams = {
   sourceChain: string;
   destinationChain: string;
   sourceTokenSymbol?: string | undefined;
+  executeData?: `0x${string}` | undefined;
   sourceTokenAddress?: `0x${string}` | undefined;
   destinationContractAddress?: `0x${string}` | undefined;
   sourceContractAddress?: `0x${string}` | undefined;
@@ -350,13 +351,21 @@ type TokenPrice = {
   usd: number;
 };
 
-type Token = {
+export type TokenUnit = {
+  value: string;
+  decimals: number;
+};
+
+export type Token = {
   contract_address: string;
   symbol: string;
   name: string;
   decimals: number;
   token_price: TokenPrice;
   gas_price: string;
+  gas_price_in_units: TokenUnit;
+  l1_gas_price?: string;
+  l1_gas_price_in_units?: TokenUnit;
   gas_price_gwei: string;
 };
 
