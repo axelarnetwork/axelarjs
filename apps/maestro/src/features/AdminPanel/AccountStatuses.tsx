@@ -138,7 +138,7 @@ const AccountStatusDropdown: FC<{
       <DropdownMenu.Trigger variant="primary" size="sm">
         {capitalize(selectedStatus)}
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content className="bg-base-300">
+      <DropdownMenu.Content className="bg-base-300 rounded-xl">
         {unselectedStatuses.map((status) => (
           <DropdownMenu.Item key={status}>
             <a onClick={onChange.bind(null, status)}>{capitalize(status)}</a>
@@ -221,7 +221,7 @@ const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
     !accountAddress || !selectedStatus || !isAddress(accountAddress);
 
   return (
-    <Card as="form" className="bg-base-300 relative">
+    <Card $as="form" className="bg-base-300 relative">
       <Card.Body>
         <Card.Title className="justify-between">
           <span>Add Account Status</span>
