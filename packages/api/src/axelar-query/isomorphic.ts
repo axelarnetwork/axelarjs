@@ -133,13 +133,14 @@ export class AxelarQueryAPIClient extends RestService {
       executeData &&
       destination_native_token.l1_gas_price_in_units
     ) {
-      // Calculate the L1 execution fee
+      // Calculate the L1 execution fee. This value is in ETH.
       l1ExecutionFee = await getL1FeeForL2(this.env, destinationChain, {
         destinationContractAddress,
         executeData,
         l1GasPrice: destination_native_token.l1_gas_price_in_units,
       });
 
+      // Convert the L1 execution fee to the source token
       const srcTokenPrice = Number(source_token.token_price.usd);
       const ethTokenPrice = Number(ethereum_token.token_price.usd);
       const ethToSrcTokenPriceRatio = ethTokenPrice / srcTokenPrice;
@@ -148,6 +149,7 @@ export class AxelarQueryAPIClient extends RestService {
         Math.ceil(Number(l1ExecutionFee) * ethToSrcTokenPriceRatio)
       );
 
+      // Calculate the L1 execution fee with the gas multiplier
       l1ExecutionFeeWithMultiplier = Math.floor(
         Number(l1ExecutionFee) * Number(gasMultiplier)
       );
@@ -168,6 +170,7 @@ export class AxelarQueryAPIClient extends RestService {
       executionFee: excludedL1ExecutionFee.toString(),
       executionFeeWithMultiplier:
         excludedL1ExecutionFeeWithMultiplier.toString(),
+      l1ExecutionFeeWithMultiplier: l1ExecutionFeeWithMultiplier.toString(),
       gasLimit,
       gasMultiplier,
       minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
