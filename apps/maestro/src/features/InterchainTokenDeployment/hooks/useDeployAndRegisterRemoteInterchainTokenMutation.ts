@@ -158,9 +158,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
   useWaitForTransaction({
     hash: multicall?.data?.hash,
-    onSuccess: () => {
-      const txHash = multicall?.data?.hash;
-
+    onSuccess: ({ transactionHash: txHash, transactionIndex: txIndex }) => {
       if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
         console.error(
           "useDeployAndRegisterRemoteInterchainTokenMutation: unable to setRecordDeploymentArgs",
@@ -177,11 +175,11 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
       setRecordDeploymentArgs({
         kind: "interchain",
-        salt: input.salt,
+        deploymentMessageId: `${txHash}-${txIndex}`,
         tokenId,
         tokenAddress,
         deployerAddress,
-        deploymentMessageId: `${txHash}-0`,
+        salt: input.salt,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
@@ -221,5 +219,58 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     [recordDeploymentArgs]
   );
 
-  return multicall;
+  const recordDeploymentDraft = useCallback(async () => {
+    if (!input || !tokenId || !deployerAddress || !tokenAddress) {
+      return;
+    }
+
+    return await recordDeploymentAsync({
+      kind: "interchain",
+      tokenId,
+      deployerAddress,
+      tokenAddress,
+      tokenName: input.tokenName,
+      tokenSymbol: input.tokenSymbol,
+      tokenDecimals: input.decimals,
+      axelarChainId: input.sourceChainId,
+      salt: input.salt,
+      originalMinterAddress: input.minterAddress,
+      destinationAxelarChainIds: input.destinationChainIds,
+      deploymentMessageId: "",
+    });
+  }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
+
+  const writeAsync = useCallback(async () => {
+    if (!multicall.writeAsync) {
+      throw new Error(
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
+      );
+    }
+
+    await recordDeploymentDraft();
+
+    return await multicall.writeAsync();
+  }, [multicall, recordDeploymentDraft]);
+
+  const write = useCallback(() => {
+    if (!multicall.write) {
+      throw new Error(
+        "useDeployAndRegisterRemoteInterchainTokenMutation: multicall.write is not defined"
+      );
+    }
+
+    recordDeploymentDraft()
+      .then(multicall.write)
+      .catch((e) => {
+        console.error(
+          "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
+          e
+        );
+        onStatusUpdate({
+          type: "idle",
+        });
+      });
+  }, [multicall, onStatusUpdate, recordDeploymentDraft]);
+
+  return { ...multicall, writeAsync, write };
 }

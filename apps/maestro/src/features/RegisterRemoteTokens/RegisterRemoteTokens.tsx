@@ -45,15 +45,17 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     hash: txState.status === "submitted" ? txState.hash : undefined,
     enabled: txState.status === "submitted" && Boolean(txState.hash),
     onSuccess: async (receipt) => {
+      const { transactionHash: txHash, transactionIndex: txIndex } = receipt;
+
       const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
         ...remoteToken,
-        deploymentTxHash: receipt.transactionHash,
+        deploymentTxHash: txHash,
       }));
 
       await recordRemoteTokenDeployment({
         tokenAddress: props.tokenAddress,
         chainId: props.originChainId ?? -1,
-        deploymentMessageId: `${receipt.transactionHash}-0`,
+        deploymentMessageId: `${txHash}-${txIndex}`,
         remoteTokens,
       });
 
