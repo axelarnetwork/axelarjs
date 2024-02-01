@@ -29,7 +29,7 @@ export function getL1FeeForL2(
   });
 
   if (chain === "arbitrum") {
-    // Most of the ethereum clients are already included L1 fee in the gas estimation.
+    // Most of the ethereum clients are already included L1 fee in the gas estimation for Arbitrum.
     return Promise.resolve(0n);
   } else if (chain === "mantle") {
     return getMantleL1Fee(publicClient, params);
