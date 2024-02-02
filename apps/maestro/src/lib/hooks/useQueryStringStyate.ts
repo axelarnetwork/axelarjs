@@ -17,8 +17,19 @@ export default function useQueryStringState<TState extends string>(
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    url.searchParams.set(key, state);
-    window.history.pushState({}, "", url);
+
+    if (state.length) {
+      url.searchParams.set(key, state);
+      window.history.pushState({}, "", url);
+      return;
+    }
+
+    const isKeyInSearchParams = searchParams.has(key);
+
+    if (isKeyInSearchParams) {
+      url.searchParams.delete(key);
+      window.history.pushState({}, "", url);
+    }
   }, [state, key, searchParams]);
 
   return [state, setState] as const;

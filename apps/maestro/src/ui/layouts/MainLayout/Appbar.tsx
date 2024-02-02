@@ -24,6 +24,7 @@ import { useRouter } from "next/router";
 import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import { APP_NAME } from "~/config/app";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
@@ -152,14 +153,23 @@ const Appbar: FC<AppbarProps> = (props) => {
           <AxelarIcon className="h-6 w-6 dark:invert" />
           <Indicator>
             <span>{APP_NAME}</span>
-            {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+            {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" ? (
               <Indicator.Item
                 size="xs"
                 variant="success"
                 position="bottom"
                 className="translate-x-2 translate-y-2 lowercase"
               >
-                {process.env.NEXT_PUBLIC_NETWORK_ENV}
+                {NEXT_PUBLIC_NETWORK_ENV}
+              </Indicator.Item>
+            ) : (
+              <Indicator.Item
+                size="xs"
+                variant="primary"
+                position="bottom"
+                className="translate-x-2 translate-y-2 lowercase"
+              >
+                beta
               </Indicator.Item>
             )}
           </Indicator>
