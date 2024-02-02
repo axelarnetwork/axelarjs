@@ -8,6 +8,7 @@ import { getMyInterchainTokens } from "./getMyInterchainTokens";
 import { getTokenManagerABI } from "./getTokenManagerABI";
 import { recordInterchainTokenDeployment } from "./recordInterchainTokenDeployment";
 import { recordRemoteTokensDeployment } from "./recordRemoteTokensDeployment";
+import { recoverCanonicalTokenByTokenId } from "./recoverCanonicalTokenByTokenId";
 import { searchInterchainToken } from "./searchInterchainToken";
 
 export const interchainTokenRouter = router({
@@ -21,6 +22,7 @@ export const interchainTokenRouter = router({
   recordInterchainTokenDeployment,
   recordRemoteTokensDeployment,
   findInterchainTokenByTokenId,
+  recoverCanonicalTokenByTokenId,
 });
 
 // export type definition of API

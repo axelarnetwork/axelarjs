@@ -7,7 +7,14 @@ import { hex64Literal } from "~/lib/utils/validation";
 import { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
-export async function scrapeInterchainToken(
+/**
+ * Scans all chains for the given token id and returns the results
+ *
+ * @param tokenId
+ * @param ctx
+ * @returns a list of results
+ */
+export async function scanInterchainTokenOnChainByTokenId(
   tokenId: `0x${string}`,
   ctx: Context
 ) {
@@ -60,22 +67,40 @@ export async function scrapeInterchainToken(
         originTokenAddress ?? tokenAddress
       );
 
-      const [name, symbol, decimals] = await Promise.all([
+      const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([
         erc20Client.reads.name().catch(() => null),
         erc20Client.reads.symbol().catch(() => null),
         erc20Client.reads.decimals().catch(() => null),
       ]);
+
+      const definitiveTokenAddress = originTokenAddress ?? tokenAddress;
+
+      if (!tokenName || !tokenSymbol || !tokenDecimals) {
+        return {
+          status: "error" as const,
+          statusMessage: "not a valid erc20 token",
+          // metadata
+          tokenName,
+          tokenSymbol,
+          tokenDecimals,
+          tokenId,
+          tokenAddress: definitiveTokenAddress,
+          axelarChainId: config.axelarChainId,
+          tokenManagerAddress,
+          tokenManagerType,
+        };
+      }
 
       if (!tokenManagerType) {
         return {
           status: "error" as const,
           statusMessage: "token manager type not found",
           // metadata
-          name,
-          symbol,
-          decimals,
+          tokenName,
+          tokenSymbol,
+          tokenDecimals,
           tokenId,
-          tokenAddress: originTokenAddress ?? tokenAddress,
+          tokenAddress: definitiveTokenAddress,
           axelarChainId: config.axelarChainId,
           tokenManagerAddress,
         };
@@ -85,11 +110,11 @@ export async function scrapeInterchainToken(
         status: "success" as const,
         statusMessage: "token found",
         // metadata
-        name,
-        symbol,
-        decimals,
+        tokenName,
+        tokenSymbol,
+        tokenDecimals,
         tokenId,
-        tokenAddress: originTokenAddress ?? tokenAddress,
+        tokenAddress: definitiveTokenAddress,
         axelarChainId: config.axelarChainId,
         tokenManagerAddress,
         tokenManagerType,
@@ -106,33 +131,9 @@ export const findInterchainTokenByTokenId = publicProcedure
       tokenId: hex64Literal(),
     })
   )
-  .query(async ({ ctx, input }) => {
-    // first check if the token exists in the database
-    const existingToken =
-      await ctx.persistence.postgres.getInterchainTokenByTokenId(input.tokenId);
-
-    if (!existingToken) {
-      // we need to scrape the token from the chains
-      return await scrapeInterchainToken(input.tokenId, ctx);
-    }
-
-    return [
-      {
-        status: "success" as const,
-        statusMessage: "token found in database",
-        // metadata
-        name: existingToken.tokenName,
-        symbol: existingToken.tokenSymbol,
-        decimals: existingToken.tokenDecimals,
-        tokenId: existingToken.tokenId,
-        tokenAddress: existingToken.tokenAddress,
-        axelarChainId: existingToken.axelarChainId,
-        tokenManagerAddress: existingToken.tokenManagerAddress,
-        tokenManagerType: existingToken.tokenManagerType,
-        deployerAddress: existingToken.deployerAddress,
-      },
-    ];
-  });
+  .query(async ({ ctx, input }) =>
+    scanInterchainTokenOnChainByTokenId(input.tokenId, ctx)
+  );
 
 export type FindInterchainTokenByTokenIdOutput =
   typeof findInterchainTokenByTokenId._def._output_out;
