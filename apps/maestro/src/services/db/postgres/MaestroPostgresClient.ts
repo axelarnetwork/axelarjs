@@ -25,6 +25,12 @@ export const newInterchainTokenSchema = interchainTokensZodSchemas.insert.omit({
   updatedAt: true,
 });
 
+const sanitizeObject = <
+  const T extends Record<string, any> = Record<string, any>
+>(
+  obj: T
+) => Object.fromEntries(Object.entries(obj).filter(([, v]) => Boolean(v)));
+
 export type NewRemoteInterchainTokenInput = z.infer<
   typeof newRemoteInterchainTokenSchema
 >;
@@ -41,6 +47,23 @@ export default class MaestroPostgresClient {
    * @returns
    */
   async recordInterchainTokenDeployment(value: NewInterchainTokenInput) {
+    const existingToken = await this.db.query.interchainTokens.findFirst({
+      where: (table, { eq }) => eq(table.tokenId, value.tokenId),
+    });
+
+    if (existingToken) {
+      await this.db
+        .update(interchainTokens)
+        .set({
+          deploymentMessageId: value.deploymentMessageId,
+          tokenManagerType: value.tokenManagerType,
+          updatedAt: new Date(),
+        })
+        .where(eq(interchainTokens.tokenId, existingToken.tokenId));
+
+      return;
+    }
+
     await this.db
       .insert(interchainTokens)
       .values({ ...value, createdAt: new Date(), updatedAt: new Date() });
@@ -70,10 +93,51 @@ export default class MaestroPostgresClient {
    * @returns
    */
   async recordRemoteInterchainTokenDeployments(
-    value: NewRemoteInterchainTokenInput[]
+    values: NewRemoteInterchainTokenInput[]
   ) {
+    const existingTokens = await this.db.query.remoteInterchainTokens.findMany({
+      where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
+    });
+
+    const updateValues = existingTokens
+      .map(
+        (t) =>
+          [
+            t,
+            sanitizeObject(values.find((v) => v.tokenId === t.tokenId) ?? {}),
+          ] as const
+      )
+      .filter(([, v]) => Boolean(v));
+
+    const insertValues = values.filter((v) => {
+      const id = `${v.axelarChainId}:${v.tokenAddress}`;
+      return !existingTokens.some((t) => t.id === id);
+    });
+
+    if (updateValues.length > 0) {
+      await Promise.all(
+        updateValues.map(
+          async ([existingToken, updateValue]) =>
+            await this.db
+              .update(remoteInterchainTokens)
+              .set({
+                tokenManagerAddress: updateValue.tokenManagerAddress,
+                deploymentMessageId: updateValue.deploymentMessageId,
+                deploymentStatus: updateValue.deploymentStatus,
+                tokenManagerType: updateValue.tokenManagerType,
+                updatedAt: new Date(),
+              })
+              .where(eq(remoteInterchainTokens.id, existingToken.id))
+        )
+      );
+    }
+
+    if (!insertValues.length) {
+      return;
+    }
+
     await this.db.insert(remoteInterchainTokens).values(
-      value.map((v) => ({
+      insertValues.map((v) => ({
         ...v,
         id: `${v.axelarChainId}:${v.tokenAddress}`,
         createdAt: new Date(),
@@ -92,7 +156,7 @@ export default class MaestroPostgresClient {
   ) {
     await this.db
       .update(remoteInterchainTokens)
-      .set({ deploymentStatus })
+      .set({ deploymentStatus, updatedAt: new Date() })
       .where(
         and(
           eq(remoteInterchainTokens.tokenId, tokenId),
