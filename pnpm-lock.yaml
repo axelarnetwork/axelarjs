@@ -65,8 +65,8 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5
       turbo:
-        specifier: ^1.12.1
-        version: 1.12.1
+        specifier: ^1.12.2
+        version: 1.12.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -116,14 +116,14 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       '@vercel/postgres':
-        specifier: ^0.5.1
-        version: 0.5.1
+        specifier: ^0.7.2
+        version: 0.7.2
       '@web3modal/wagmi':
         specifier: ^3.5.7
         version: 3.5.7(@types/react@18.2.21)(@wagmi/core@1.4.13)(typescript@5.3.3)(viem@1.21.4)
       drizzle-orm:
         specifier: ^0.29.3
-        version: 0.29.3(@types/react@18.2.21)(@vercel/postgres@0.5.1)(pg@8.11.3)(react@18.2.0)
+        version: 0.29.3(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.11.3)(react@18.2.0)
       lucide-react:
         specifier: ^0.265.0
         version: 0.265.0(react@18.2.0)
@@ -264,8 +264,8 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0
       drizzle-kit:
-        specifier: ^0.20.13
-        version: 0.20.13
+        specifier: ^0.20.14
+        version: 0.20.14
       drizzle-zod:
         specifier: ^0.5.1
         version: 0.5.1(drizzle-orm@0.29.3)(zod@3.22.4)
@@ -651,8 +651,8 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
       class-variance-authority:
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: 0.4.0
+        version: 0.4.0(typescript@5.3.3)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -4448,8 +4448,8 @@ packages:
       tar-fs: 2.1.1
     dev: true
 
-  /@neondatabase/serverless@0.6.0:
-    resolution: {integrity: sha512-qXxBRYN0m2v8kVQBfMxbzNGn2xFAhTXFibzQlE++NfJ56Shz3m7+MyBBtXDlEH+3Wfa6lToDXf1MElocY4sJ3w==}
+  /@neondatabase/serverless@0.7.2:
+    resolution: {integrity: sha512-wU3WA2uTyNO7wjPs3Mg0G01jztAxUxzd9/mskMmtPwPTjf7JKWi9AW5/puOGXLxmZ9PVgRFeBVRVYq5nBPhsCg==}
     dependencies:
       '@types/pg': 8.6.6
 
@@ -8241,11 +8241,11 @@ packages:
     dependencies:
       '@upstash/redis': 1.25.1
 
-  /@vercel/postgres@0.5.1:
-    resolution: {integrity: sha512-JKl8QOBIDnifhkxAhIKtY0A5Tb8oWBf2nzZhm0OH7Ffjsl0hGVnDL2w1/FCfpX8xna3JAWM034NGuhZfTFdmiw==}
+  /@vercel/postgres@0.7.2:
+    resolution: {integrity: sha512-IqR/ZAvoPGcPaXl9eWWB5KaA+w/81RzZa/18P4izQRHpNBkTGt9HwGfYi9+wut5UgxNq4QSX9A7HIQR6QDvX2Q==}
     engines: {node: '>=14.6'}
     dependencies:
-      '@neondatabase/serverless': 0.6.0
+      '@neondatabase/serverless': 0.7.2
       bufferutil: 4.0.8
       utf-8-validate: 6.0.3
       ws: 8.14.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -10156,10 +10156,15 @@ packages:
     dependencies:
       consola: 3.2.3
 
-  /class-variance-authority@0.7.0:
-    resolution: {integrity: sha512-jFI8IQw4hczaL4ALINxqLEXQbWcNjoSkloa4IaufXCJr6QawJyw7tuRysRsrE8w2p/4gGaxKIt/hX3qz/IbD1A==}
+  /class-variance-authority@0.4.0(typescript@5.3.3):
+    resolution: {integrity: sha512-74enNN8O9ZNieycac/y8FxqgyzZhZbxmCitAtAeUrLPlxjSd5zA7LfpprmxEcOmQBnaGs5hYhiSGnJ0mqrtBLQ==}
+    peerDependencies:
+      typescript: '>= 4.5.5 < 5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     dependencies:
-      clsx: 2.0.0
+      typescript: 5.3.3
     dev: false
 
   /classnames@2.3.2:
@@ -10274,11 +10279,6 @@ packages:
   /clsx@1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
-
-  /clsx@2.0.0:
-    resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
-    engines: {node: '>=6'}
-    dev: false
 
   /clsx@2.1.0:
     resolution: {integrity: sha512-m3iNNWpd9rl3jvvcBnu70ylMdrXt8Vlq4HYadnU5fwcOtvkSQWPmj7amUcDT2qYI7risszBjI5AUIUox9D16pg==}
@@ -11171,8 +11171,8 @@ packages:
       wordwrap: 1.0.0
     dev: true
 
-  /drizzle-kit@0.20.13:
-    resolution: {integrity: sha512-j9oZSQXNWG+KBJm0Sg3S/zJpncHGKnpqNfFuM4NUxUMGTcihDHhP9SW6Jncqwb5vsP1Xm0a8JLm3PZUIspC/oA==}
+  /drizzle-kit@0.20.14:
+    resolution: {integrity: sha512-0fHv3YIEaUcSVPSGyaaBfOi9bmpajjhbJNdPsRMIUvYdLVxBu9eGjH8mRc3Qk7HVmEidFc/lhG1YyJhoXrn5yA==}
     hasBin: true
     dependencies:
       '@drizzle-team/studio': 0.0.39
@@ -11193,7 +11193,7 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm@0.29.3(@types/react@18.2.21)(@vercel/postgres@0.5.1)(pg@8.11.3)(react@18.2.0):
+  /drizzle-orm@0.29.3(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.11.3)(react@18.2.0):
     resolution: {integrity: sha512-uSE027csliGSGYD0pqtM+SAQATMREb3eSM/U8s6r+Y0RFwTKwftnwwSkqx3oS65UBgqDOM0gMTl5UGNpt6lW0A==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -11265,7 +11265,7 @@ packages:
         optional: true
     dependencies:
       '@types/react': 18.2.21
-      '@vercel/postgres': 0.5.1
+      '@vercel/postgres': 0.7.2
       pg: 8.11.3
       react: 18.2.0
 
@@ -11275,7 +11275,7 @@ packages:
       drizzle-orm: '>=0.23.13'
       zod: '*'
     dependencies:
-      drizzle-orm: 0.29.3(@types/react@18.2.21)(@vercel/postgres@0.5.1)(pg@8.11.3)(react@18.2.0)
+      drizzle-orm: 0.29.3(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.11.3)(react@18.2.0)
       zod: 3.22.4
     dev: true
 
@@ -18973,64 +18973,64 @@ packages:
     dev: false
     optional: true
 
-  /turbo-darwin-64@1.12.1:
-    resolution: {integrity: sha512-Cq760v0vJH5vQbK0uJZS8msqzYuZZXYdcpFeqBqrdIT5Kfd7tHjo94d9L1lZLP4eoSyXs4CUVnOw7MqD8dHnfQ==}
+  /turbo-darwin-64@1.12.2:
+    resolution: {integrity: sha512-Aq/ePQ5KNx6XGwlZWTVTqpQYfysm1vkwkI6kAYgrX5DjMWn+tUXrSgNx4YNte0F+V4DQ7PtuWX+jRG0h0ZNg0A==}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-darwin-arm64@1.12.1:
-    resolution: {integrity: sha512-RlKegAYEvHBa1K+fl9d4iz0jFUw7LdEsTXlg1ppFIrl234bQ5y3ON8LBhLsf9M2ADzNzgT7Io33H0Cju0zneMg==}
+  /turbo-darwin-arm64@1.12.2:
+    resolution: {integrity: sha512-wTr+dqkwJo/eXE+4SPTSeNBKyyfQJhI6I9sKVlCSBmtaNEqoGNgdVzgMUdqrg9AIFzLIiKO+zhfskNaSWpVFow==}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-linux-64@1.12.1:
-    resolution: {integrity: sha512-S6bvCEEkJvPxH7hMcGDDJFCFWk4/lpDGsQun6vzcj0gqbj5BMqw3xNrpPQDhg18+9oRQJG5F6M48pSgim7XZDg==}
+  /turbo-linux-64@1.12.2:
+    resolution: {integrity: sha512-BggBKrLojGarDaa2zBo+kUR3fmjpd6bLA8Unm3Aa2oJw0UvEi3Brd+w9lNsPZHXXQYBUzNUY2gCdxf3RteWb0g==}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-linux-arm64@1.12.1:
-    resolution: {integrity: sha512-QLy+Q3rIHXbTT1m49Sv7FO+z0TqH8L2Q18UlUu3TULm5bWzv5DVnvOebvFtTOHF3nAdr1CK0QiqhMrEPn++IKg==}
+  /turbo-linux-arm64@1.12.2:
+    resolution: {integrity: sha512-v/apSRvVuwYjq1D9MJFsHv2EpGd1S4VoSdZvVfW6FaM06L8CFZa92urNR1svdGYN28YVKwK9Ikc9qudC6t/d5A==}
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-windows-64@1.12.1:
-    resolution: {integrity: sha512-Ih7SP/jJ1rlNbti7RTvdV3u9GeM91mOaAtZssShBrncqV5Mzb+MDqF4aAv1prDVo56ME0GXEd6tFNrQRFYjgEA==}
+  /turbo-windows-64@1.12.2:
+    resolution: {integrity: sha512-3uDdwXcRGkgopYFdPDpxQiuQjfQ12Fxq0fhj+iGymav0eWA4W4wzYwSdlUp6rT22qOBIzaEsrIspRwx1DsMkNg==}
     cpu: [x64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo-windows-arm64@1.12.1:
-    resolution: {integrity: sha512-jzUMzaBsGHq2NHotAT/jRaoxetdohmDNEt2WjiN1B8AM6wNKcufGVHk0GMoDbm1pcSi4HZOSf1gN+AlII6l3Dg==}
+  /turbo-windows-arm64@1.12.2:
+    resolution: {integrity: sha512-zNIHnwtQfJSjFi7movwhPQh2rfrcKZ7Xv609EN1yX0gEp9GxooCUi2yNnBQ8wTqFjioA2M5hZtGJQ0RrKaEm/Q==}
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
-  /turbo@1.12.1:
-    resolution: {integrity: sha512-7e+BYijfIuVtv6kfBl/KKOsu67JVdsHK3FNI4++NTYe/Ju+DAKQDKoPJ8wqthZo1QzUzeabvc/WCL41pwY7xug==}
+  /turbo@1.12.2:
+    resolution: {integrity: sha512-BcoQjBZ+LJCMdjzWhzQflOinUjek28rWXj07aaaAQ8T3Ehs0JFSjIsXOm4qIbo52G4xk3gFVcUtJhh/QRADl7g==}
     hasBin: true
     optionalDependencies:
-      turbo-darwin-64: 1.12.1
-      turbo-darwin-arm64: 1.12.1
-      turbo-linux-64: 1.12.1
-      turbo-linux-arm64: 1.12.1
-      turbo-windows-64: 1.12.1
-      turbo-windows-arm64: 1.12.1
+      turbo-darwin-64: 1.12.2
+      turbo-darwin-arm64: 1.12.2
+      turbo-linux-64: 1.12.2
+      turbo-linux-arm64: 1.12.2
+      turbo-windows-64: 1.12.2
+      turbo-windows-arm64: 1.12.2
     dev: true
 
   /type-check@0.4.0:

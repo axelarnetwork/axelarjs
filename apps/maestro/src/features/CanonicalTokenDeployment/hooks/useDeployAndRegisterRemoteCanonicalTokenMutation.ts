@@ -1,6 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { Maybe, throttle } from "@axelarjs/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
@@ -137,9 +137,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   useWaitForTransaction({
     hash: multicall?.data?.hash,
-    onSuccess: () => {
-      const txHash = multicall?.data?.hash;
-
+    onSuccess: ({ transactionHash: txHash, transactionIndex: txIndex }) => {
       if (!txHash || !tokenId || !deployerAddress || !input) {
         console.error(
           "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to setRecordDeploymentArgs",
@@ -150,10 +148,10 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
       setRecordDeploymentArgs({
         kind: "canonical",
+        deploymentMessageId: `${txHash}-${txIndex}`,
         tokenId,
         tokenAddress: input.tokenAddress,
         deployerAddress,
-        deploymentMessageId: `${txHash}-0`,
         tokenName: input.tokenName,
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
@@ -165,32 +163,85 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   useEffect(
     () => {
-      if (recordDeploymentArgs) {
-        recordDeploymentAsync(recordDeploymentArgs)
-          .then(() => {
-            const tx = decodeDeploymentMessageId(
-              recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
-            );
-            onStatusUpdate({
-              type: "deployed",
-              tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
-              txHash: tx.hash,
-            });
-          })
-          .catch((e) => {
-            console.error(
-              "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
-              e
-            );
-            onStatusUpdate({
-              type: "idle",
-            });
-          });
+      if (!recordDeploymentArgs) {
+        return;
       }
+
+      recordDeploymentAsync(recordDeploymentArgs)
+        .then(() => {
+          const tx = decodeDeploymentMessageId(
+            recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
+          );
+          onStatusUpdate({
+            type: "deployed",
+            tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
+            txHash: tx.hash,
+          });
+        })
+        .catch((e) => {
+          console.error(
+            "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
+            e
+          );
+          onStatusUpdate({
+            type: "idle",
+          });
+        });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [recordDeploymentArgs]
   );
 
-  return multicall;
+  const recordDeploymentDraft = useCallback(async () => {
+    if (!input || !tokenId || !deployerAddress) {
+      return;
+    }
+
+    return await recordDeploymentAsync({
+      kind: "canonical",
+      tokenId,
+      deployerAddress,
+      tokenName: input.tokenName,
+      tokenSymbol: input.tokenSymbol,
+      tokenDecimals: input.decimals,
+      axelarChainId: input.sourceChainId,
+      tokenAddress: input.tokenAddress,
+      destinationAxelarChainIds: input.destinationChainIds,
+      deploymentMessageId: "",
+    });
+  }, [deployerAddress, input, recordDeploymentAsync, tokenId]);
+
+  const writeAsync = useCallback(async () => {
+    if (!multicall.writeAsync) {
+      throw new Error(
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
+      );
+    }
+
+    await recordDeploymentDraft();
+
+    return await multicall.writeAsync();
+  }, [multicall, recordDeploymentDraft]);
+
+  const write = useCallback(() => {
+    if (!multicall.write) {
+      throw new Error(
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.write is not defined"
+      );
+    }
+
+    recordDeploymentDraft()
+      .then(multicall.write)
+      .catch((e) => {
+        console.error(
+          "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
+          e
+        );
+        onStatusUpdate({
+          type: "idle",
+        });
+      });
+  }, [multicall, onStatusUpdate, recordDeploymentDraft]);
+
+  return { ...multicall, writeAsync, write };
 }
