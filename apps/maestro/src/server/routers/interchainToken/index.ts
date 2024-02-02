@@ -1,4 +1,5 @@
 import { router } from "~/server/trpc";
+import { findInterchainTokenByTokenId } from "./findInterchainTokenByTokenId";
 import { getInterchainTokenABI } from "./getInterchainTokenABI";
 import { getInterchainTokenByTokenId } from "./getInterchainTokenByTokenId";
 import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
@@ -7,6 +8,7 @@ import { getMyInterchainTokens } from "./getMyInterchainTokens";
 import { getTokenManagerABI } from "./getTokenManagerABI";
 import { recordInterchainTokenDeployment } from "./recordInterchainTokenDeployment";
 import { recordRemoteTokensDeployment } from "./recordRemoteTokensDeployment";
+import { recoverCanonicalTokenByTokenId } from "./recoverCanonicalTokenByTokenId";
 import { searchInterchainToken } from "./searchInterchainToken";
 
 export const interchainTokenRouter = router({
@@ -19,6 +21,8 @@ export const interchainTokenRouter = router({
   searchInterchainToken,
   recordInterchainTokenDeployment,
   recordRemoteTokensDeployment,
+  findInterchainTokenByTokenId,
+  recoverCanonicalTokenByTokenId,
 });
 
 // export type definition of API
