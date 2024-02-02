@@ -14,6 +14,7 @@ import {
   Tooltip,
   XIcon,
 } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { capitalize } from "@axelarjs/utils";
 import { ChangeEvent, FC, useState } from "react";
 
@@ -43,8 +44,16 @@ export const AccountStatusesManager = () => {
     trpc.accounts.getAccountStatuses.useQuery(undefined, {
       suspense: true,
     });
+
   const { mutateAsync: setAccountStatus, isLoading: isSettingAccountStatus } =
-    trpc.accounts.setAccountStatus.useMutation();
+    trpc.accounts.setAccountStatus.useMutation({
+      onSuccess() {
+        toast.success("Account status saved");
+      },
+      onError(err) {
+        toast.error(err.message);
+      },
+    });
 
   return (
     <Card className="bg-base-200">

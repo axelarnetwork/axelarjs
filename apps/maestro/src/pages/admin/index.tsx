@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
 import { AccountStatusesManager } from "~/features/AdminPanel/AccountStatuses";
+import { CanonicalTokenRecovery } from "~/features/AdminPanel/CanonicalTokenRecovery";
 import { GlobalMessageManager } from "~/features/AdminPanel/GlobalMessage";
-import { TokenRecovery } from "~/features/AdminPanel/TokenRecovery";
 import { withRouteProtection } from "~/lib/auth";
 import Page from "~/ui/layouts/Page";
 
@@ -14,7 +14,7 @@ const AdminIndexPage = () => {
         <Page.Content className="gap-4">
           <GlobalMessageManager />
           <AccountStatusesManager />
-          <TokenRecovery />
+          <CanonicalTokenRecovery />
         </Page.Content>
       </Suspense>
     </Page>
