@@ -49,6 +49,10 @@ export const recoverCanonicalTokenByTokenId = protectedProcedure
 
     // persist remote tokens
 
+    if (!remoteTokens.length) {
+      return;
+    }
+
     const insertData = remoteTokens
       .filter((token) => token.status === "success")
       .map((token) => {

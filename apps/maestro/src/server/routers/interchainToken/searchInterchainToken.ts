@@ -1,4 +1,3 @@
-import { type InterchainTokenClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
@@ -159,52 +158,34 @@ async function getInterchainToken(
 
         invariant(chainConfig, "Chain config not found");
 
-        let tokenClient: InterchainTokenClient | undefined;
-
         const itsClient =
           ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-        switch (tokenDetails.kind) {
-          case "interchain":
-            tokenClient = ctx.contracts.createInterchainTokenClient(
-              chainConfig,
-              tokenDetails.tokenAddress as `0x${string}`
-            );
-            break;
-          case "canonical":
-            {
-              const remoteTokenAddress = await itsClient.reads
-                .interchainTokenAddress({
-                  tokenId: tokenDetails.tokenId as `0x${string}`,
-                })
-                .catch(() => null);
+        let tokenAddress = tokenDetails.tokenAddress as `0x${string}`;
 
-              if (remoteTokenAddress) {
-                tokenClient = ctx.contracts.createInterchainTokenClient(
-                  chainConfig,
-                  remoteTokenAddress
-                );
-              }
-            }
-            break;
+        if (tokenDetails.kind === "canonical") {
+          const remoteTokenAddress = await itsClient.reads
+            .interchainTokenAddress({
+              tokenId: tokenDetails.tokenId as `0x${string}`,
+            })
+            .catch(() => null);
+
+          if (remoteTokenAddress) {
+            tokenAddress = remoteTokenAddress;
+          }
         }
 
-        // TODO: use InterchainTokenService.validTokenManagerAddress to check if the token is registered
-        // alternatively, we can use InterchainTokenService.validTokenAddress to check if the token is registered
-
-        const isRegistered = !tokenClient
-          ? false
-          : await tokenClient.reads
-              .symbol()
-              // attempt to read 'token.interchainTokenService' which will throw if the token is not registered
-              .then((symbol) => symbol === tokenDetails.tokenSymbol)
-              // which will throw if the token is not registered
-              .catch(() => false);
+        const isRegistered = await itsClient.reads
+          .validTokenAddress({
+            tokenId: tokenDetails.tokenId as `0x${string}`,
+          })
+          .then(() => true)
+          .catch(() => false);
 
         return {
           ...remoteTokenDetails,
           // derive the token address from the interchain token contract client
-          tokenAddress: tokenClient?.address ?? null,
+          tokenAddress,
           isRegistered,
         };
       })
