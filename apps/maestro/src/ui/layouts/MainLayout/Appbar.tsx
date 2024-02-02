@@ -153,7 +153,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           <AxelarIcon className="h-6 w-6 dark:invert" />
           <Indicator>
             <span>{APP_NAME}</span>
-            {NEXT_PUBLIC_NETWORK_ENV == "mainnet" ? (
+            {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" ? (
               <Indicator.Item
                 size="xs"
                 variant="success"
