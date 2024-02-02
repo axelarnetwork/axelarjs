@@ -14,6 +14,7 @@ import {
   Tooltip,
   XIcon,
 } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { capitalize } from "@axelarjs/utils";
 import { ChangeEvent, FC, useState } from "react";
 
@@ -43,8 +44,16 @@ export const AccountStatusesManager = () => {
     trpc.accounts.getAccountStatuses.useQuery(undefined, {
       suspense: true,
     });
+
   const { mutateAsync: setAccountStatus, isLoading: isSettingAccountStatus } =
-    trpc.accounts.setAccountStatus.useMutation();
+    trpc.accounts.setAccountStatus.useMutation({
+      onSuccess() {
+        toast.success("Account status saved");
+      },
+      onError(err) {
+        toast.error(err.message);
+      },
+    });
 
   return (
     <Card className="bg-base-200">
@@ -138,7 +147,7 @@ const AccountStatusDropdown: FC<{
       <DropdownMenu.Trigger variant="primary" size="sm">
         {capitalize(selectedStatus)}
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content className="bg-base-300">
+      <DropdownMenu.Content className="bg-base-300 rounded-xl">
         {unselectedStatuses.map((status) => (
           <DropdownMenu.Item key={status}>
             <a onClick={onChange.bind(null, status)}>{capitalize(status)}</a>
@@ -221,7 +230,7 @@ const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
     !accountAddress || !selectedStatus || !isAddress(accountAddress);
 
   return (
-    <Card as="form" className="bg-base-300 relative">
+    <Card $as="form" className="bg-base-300 relative">
       <Card.Body>
         <Card.Title className="justify-between">
           <span>Add Account Status</span>

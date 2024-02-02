@@ -1,4 +1,5 @@
 import { Button, Card, Tabs } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { capitalize } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -15,7 +16,14 @@ export const GlobalMessageManager = () => {
     { suspense: true }
   );
   const { mutateAsync: saveGlobalMessage, isLoading: isSavingGlobalMessage } =
-    trpc.messages.setGlobalMessage.useMutation();
+    trpc.messages.setGlobalMessage.useMutation({
+      onSuccess() {
+        toast.success("Global message saved");
+      },
+      onError(err) {
+        toast.error(err.message);
+      },
+    });
 
   const [newMessage, setNewMessage] = useState(globalMessage?.content || "");
 

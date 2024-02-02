@@ -151,10 +151,12 @@ async function evmChains<TCacheKey extends string>(
 ): Promise<EVMChainsMap> {
   const chainConfigs = await axelarscanClient.getChainConfigs();
 
-  const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
 
-  if (cached) {
-    return cached;
+    if (cached) {
+      return cached;
+    }
   }
 
   const eligibleChains = chainConfigs.evm.filter((chain) =>

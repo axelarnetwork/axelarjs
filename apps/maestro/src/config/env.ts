@@ -24,10 +24,6 @@ export const NEXT_PUBLIC_AXELAR_CONFIGS_URL = Maybe.of(
   String
 );
 
-export const NEXT_PUBLIC_EXPLORER_API_URL = Maybe.of(
-  process.env.NEXT_PUBLIC_EXPLORER_API_URL
-).mapOr("", String);
-
 export const NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS = Maybe.of(
   process.env.NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
 ).mapOr("0x", String) as `0x${string}`;
