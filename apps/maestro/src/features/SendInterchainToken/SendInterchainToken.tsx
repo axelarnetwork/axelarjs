@@ -1,6 +1,8 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import {
+  Alert,
   Button,
+  CurrentHourClockIcon,
   FormControl,
   Label,
   Modal,
@@ -184,6 +186,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     >
       <Modal.Body className="flex h-96 flex-col">
         <Modal.Title>Interchain Transfer</Modal.Title>
+
         <div className="grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
@@ -286,6 +289,15 @@ export const SendInterchainToken: FC<Props> = (props) => {
               })}
             />
           </FormControl>
+
+          {state.txState.status === "idle" &&
+            state.estimatedWaitTimeInMinutes > 2 && (
+              <Alert icon={<CurrentHourClockIcon />}>
+                This transfer may take ≈{state.estimatedWaitTimeInMinutes}{" "}
+                minutes to confirmation
+              </Alert>
+            )}
+
           {state.txState.status === "submitted" && (
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
