@@ -46,6 +46,13 @@ const InterchainTokenDeployment = () => {
     [state.step]
   );
 
+  const disableChainDropdown = useMemo(
+    () =>
+      state.txState.type !== "idle" ||
+      (state.step > 1 && state.selectedChains.length > 0),
+    [state]
+  );
+
   return (
     <MultiStepDialog
       triggerLabel="Deploy a new Interchain Token"
@@ -59,7 +66,10 @@ const InterchainTokenDeployment = () => {
           >
             Deploy <span className="hidden sm:inline">origin</span> token on:{" "}
           </span>
-          <ChainsDropdown shift={showBackButton} />
+          <ChainsDropdown
+            shift={showBackButton}
+            disabled={disableChainDropdown}
+          />
         </Dialog.Title>
       }
       steps={["Token details", "Token Settings", "Register & Deploy", "Review"]}
@@ -67,7 +77,7 @@ const InterchainTokenDeployment = () => {
       showBackButton={showBackButton}
       onBackClick={actions.prevStep}
       onClose={actions.reset}
-      disableChainsDropdown={state.txState.type !== "idle"}
+      disableChainsDropdown={disableChainDropdown}
       disableClose={
         state.txState.type !== "idle" && state.txState.type !== "deployed"
       }

@@ -128,7 +128,9 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
     <EVMChainsDropdown
       compact
       disabled={props.disabled}
-      triggerClassName="-translate-y-1.5"
+      triggerClassName={cn("-translate-y-1.5", {
+        "btn-outline btn-primary": !props.disabled,
+      })}
       hideLabel={width < 640}
       contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
         "translate-x-16 sm:translate-x-0": props.shift,
