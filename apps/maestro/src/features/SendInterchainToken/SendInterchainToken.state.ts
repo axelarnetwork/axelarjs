@@ -11,7 +11,10 @@ import {
 } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
+import {
+  useChainInfoQuery,
+  useEstimateGasFeeQuery,
+} from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -61,6 +64,10 @@ export function useSendInterchainTokenState(props: {
   const [toChainId, selectToChain] = useState(5);
 
   const tokenSymbol = tokenDetails?.symbol;
+
+  const { data: sourceChainInfo } = useChainInfoQuery({
+    axelarChainId: props.sourceChain.id,
+  });
 
   const eligibleTargetChains = useMemo(() => {
     return (referenceToken?.matchingTokens ?? [])
@@ -178,6 +185,10 @@ export function useSendInterchainTokenState(props: {
       gasFee: Maybe.of(gas).mapOrUndefined(toNumericString),
       nativeTokenSymbol,
       hasInsufficientGasBalance,
+      estimatedWaitTimeInMinutes: Maybe.of(sourceChainInfo).mapOr(
+        0,
+        (x) => x.estimatedWaitTimeInMinutes
+      ),
     },
     {
       setIsModalOpen,
