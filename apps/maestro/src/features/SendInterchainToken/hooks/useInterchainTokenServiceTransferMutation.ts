@@ -4,7 +4,7 @@ import {
 } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { parseUnits, TransactionExecutionError } from "viem";
 import {
@@ -16,6 +16,7 @@ import {
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
+  useInterchainTokenAllowance,
   useInterchainTokenApprove,
   useInterchainTokenDecimals,
 } from "~/lib/contracts/InterchainToken.hooks";
@@ -48,6 +49,14 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { address } = useAccount();
 
+  const { data: tokenAllowance } = useInterchainTokenAllowance({
+    address: config.tokenAddress,
+    args: INTERCHAIN_TOKEN_ENCODERS.allowance.args({
+      owner: address ?? "0x",
+      spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+    }),
+  });
+
   const { writeAsync: approveInterchainTokenAsync, data: approveERC20Data } =
     useInterchainTokenApprove({
       address: config.tokenAddress,
@@ -65,61 +74,72 @@ export function useInterchainTokenServiceTransferMutation(
 
   const approvedAmountRef = useRef(0n);
 
-  useEffect(
-    () => {
-      async function sendToken() {
-        try {
+  const sendToken = useCallback(
+    async function sendToken() {
+      try {
+        setTxState({
+          status: "awaiting_approval",
+        });
+
+        invariant(address, "need address");
+
+        const txResult = await interchainTransferAsync({
+          args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
+            tokenId: config.tokenId,
+            destinationChain: config.destinationChainName,
+            destinationAddress: address,
+            amount: approvedAmountRef.current,
+            metadata: "0x",
+            gasValue: config.gas ?? 0n,
+          }),
+        });
+
+        if (txResult?.hash) {
           setTxState({
-            status: "awaiting_approval",
+            status: "submitted",
+            hash: txResult.hash,
+            chainId,
           });
+        }
+      } catch (error) {
+        if (error instanceof TransactionExecutionError) {
+          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+          logger.error("Faied to transfer token:", error.cause);
 
-          invariant(address, "need address");
-
-          const txResult = await interchainTransferAsync({
-            args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
-              tokenId: config.tokenId,
-              destinationChain: config.destinationChainName,
-              destinationAddress: address,
-              amount: approvedAmountRef.current,
-              metadata: "0x",
-              gasValue: config.gas ?? 0n,
-            }),
+          setTxState({
+            status: "idle",
           });
-
-          if (txResult?.hash) {
-            setTxState({
-              status: "submitted",
-              hash: txResult.hash,
-              chainId,
-            });
-          }
-        } catch (error) {
-          if (error instanceof TransactionExecutionError) {
-            toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-            logger.error("Faied to transfer token:", error.cause);
-
-            setTxState({
-              status: "idle",
-            });
-            return;
-          }
-
-          if (error instanceof Error) {
-            setTxState({
-              status: "reverted",
-              error: error,
-            });
-          } else {
-            setTxState({
-              status: "reverted",
-              error: new Error("failed to transfer token"),
-            });
-          }
-
           return;
         }
-      }
 
+        if (error instanceof Error) {
+          setTxState({
+            status: "reverted",
+            error: error,
+          });
+        } else {
+          setTxState({
+            status: "reverted",
+            error: new Error("failed to transfer token"),
+          });
+        }
+
+        return;
+      }
+    },
+    [
+      address,
+      chainId,
+      config.destinationChainName,
+      config.gas,
+      config.tokenId,
+      interchainTransferAsync,
+      setTxState,
+    ]
+  );
+
+  useEffect(
+    () => {
       if (approveERC20Recepit && !sendTokenData?.hash) {
         sendToken().catch((error) => {
           logger.error("Failed to send token:", error);
@@ -150,12 +170,18 @@ export function useInterchainTokenServiceTransferMutation(
           amount: approvedAmountRef.current,
         });
 
-        await approveInterchainTokenAsync({
-          args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-            spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-            amount: approvedAmountRef.current,
-          }),
-        });
+        // only request spend approval if the allowance is not enough
+
+        if (!tokenAllowance || tokenAllowance < approvedAmountRef.current) {
+          await approveInterchainTokenAsync({
+            args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
+              spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+              amount: approvedAmountRef.current,
+            }),
+          });
+        } else {
+          await sendToken();
+        }
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
