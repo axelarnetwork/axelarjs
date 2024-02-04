@@ -95,30 +95,30 @@ export default class MaestroPostgresClient {
   async recordRemoteInterchainTokenDeployments(
     values: NewRemoteInterchainTokenInput[]
   ) {
-    const existingTokens = await this.db.query.remoteInterchainTokens.findMany({
-      where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
-    });
+    await this.db.transaction(async (tx) => {
+      const existingTokens = await tx.query.remoteInterchainTokens.findMany({
+        where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
+      });
 
-    const updateValues = existingTokens
-      .map(
-        (t) =>
-          [
-            t,
-            sanitizeObject(values.find((v) => v.tokenId === t.tokenId) ?? {}),
-          ] as const
-      )
-      .filter(([, v]) => Boolean(v));
+      const updateValues = existingTokens
+        .map(
+          (t) =>
+            [
+              t,
+              sanitizeObject(values.find((v) => v.tokenId === t.tokenId) ?? {}),
+            ] as const
+        )
+        .filter(([, v]) => Boolean(v));
 
-    const insertValues = values.filter((v) => {
-      const id = `${v.axelarChainId}:${v.tokenAddress}`;
-      return !existingTokens.some((t) => t.id === id);
-    });
+      const insertValues = values.filter((v) => {
+        const id = `${v.axelarChainId}:${v.tokenAddress}`;
+        return !existingTokens.some((t) => t.id === id);
+      });
 
-    if (updateValues.length > 0) {
-      await Promise.all(
-        updateValues.map(
-          async ([existingToken, updateValue]) =>
-            await this.db
+      if (updateValues.length > 0) {
+        await Promise.all(
+          updateValues.map(([existingToken, updateValue]) =>
+            tx
               .update(remoteInterchainTokens)
               .set({
                 tokenManagerAddress: updateValue.tokenManagerAddress,
@@ -128,22 +128,23 @@ export default class MaestroPostgresClient {
                 updatedAt: new Date(),
               })
               .where(eq(remoteInterchainTokens.id, existingToken.id))
-        )
+          )
+        );
+      }
+
+      if (!insertValues.length) {
+        return;
+      }
+
+      await tx.insert(remoteInterchainTokens).values(
+        insertValues.map((v) => ({
+          ...v,
+          id: `${v.axelarChainId}:${v.tokenAddress}`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }))
       );
-    }
-
-    if (!insertValues.length) {
-      return;
-    }
-
-    await this.db.insert(remoteInterchainTokens).values(
-      insertValues.map((v) => ({
-        ...v,
-        id: `${v.axelarChainId}:${v.tokenAddress}`,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }))
-    );
+    });
   }
 
   /**
