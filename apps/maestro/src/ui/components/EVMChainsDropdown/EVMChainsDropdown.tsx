@@ -3,7 +3,7 @@ import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
-import { useMemo, useState, type FC } from "react";
+import { useMemo, type FC } from "react";
 import Image from "next/image";
 
 import { find, propEq } from "rambda";
@@ -17,7 +17,7 @@ import {
   withEVMChainsDropdownProvider,
 } from "./EVMChainsDropdown.state";
 
-const iconSizes = {
+const ICON_SIZES = {
   xs: 14,
   sm: 18,
   md: 24,
@@ -25,12 +25,12 @@ const iconSizes = {
 };
 
 export const ChainIcon: FC<{
-  size: keyof typeof iconSizes;
+  size: keyof typeof ICON_SIZES;
   src: string;
   alt: string;
   className?: string;
 }> = (props) => {
-  const iconSize = iconSizes[props.size];
+  const iconSize = ICON_SIZES[props.size];
 
   return (
     <div
@@ -111,8 +111,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     }
   };
 
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <Dropdown align="end">
       {props.renderTrigger?.() ?? (
@@ -128,9 +126,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
             props.triggerClassName
           )}
           tabIndex={props.compact ? -1 : 0}
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
         >
           {/* if both selectedChain and onSelectedChain exist, 
               operate in controlled mode 
