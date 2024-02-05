@@ -39,6 +39,7 @@ export const estimateGasFee = publicProcedure
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to estimate gas fee",
+        cause: error,
       });
     }
   });
