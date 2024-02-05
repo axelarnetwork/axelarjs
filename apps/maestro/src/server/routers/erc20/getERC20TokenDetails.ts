@@ -88,24 +88,24 @@ async function getTokenPublicDetails(
   invariant(client.chain, "client.chain must be defined");
 
   const [name, symbol, decimals, owner, pendingOwner] = await Promise.all([
-    client.read("name"),
-    client.read("symbol"),
-    client.read("decimals"),
-    client.read("owner").catch(always(null)),
-    client.read("pendingOwner").catch(always(null)),
+    client.reads.name(),
+    client.reads.symbol(),
+    client.reads.decimals(),
+    client.reads.owner().catch(always(null)),
+    client.reads.pendingOwner().catch(always(null)),
   ]);
 
   const override = overrides[tokenAddress];
 
   return {
+    name,
+    decimals,
+    owner,
+    pendingOwner,
     chainId: client.chain.id,
     chainName: client.chain.name,
     axelarChainId: chainConfig.axelarChainId,
     axelarChainName: chainConfig.axelarChainName,
-    name,
     symbol: override?.symbol ?? symbol,
-    decimals,
-    owner,
-    pendingOwner,
   };
 }
