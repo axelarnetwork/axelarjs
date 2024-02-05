@@ -195,16 +195,8 @@ const LayoutFooter = () => (
     </div>
     <div className="text-sm opacity-90">
       <p>
-        Copyright © {new Date().getFullYear()}{" "}
-        <Link
-          rel="noopener noreferrer"
-          href="https://axelar.foundation"
-          target="_blank"
-          className="text-accent"
-        >
-          Axelar Foundation
-        </Link>
-        . All Rights Reserved.
+        Copyright © {new Date().getFullYear()} Axelar Foundation. All Rights
+        Reserved.
       </p>
     </div>
     <div className="flex items-center gap-1 text-right">
