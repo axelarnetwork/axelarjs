@@ -128,10 +128,10 @@ export function useSendInterchainTokenState(props: {
   }, [balance, gas]);
 
   const {
-    mutateAsync: tokenManagerSendTokenAsync,
-    isLoading: isTokenManagerSending,
-    txState: tokenManagerTxState,
-    reset: resetTokenManagerTxState,
+    mutateAsync: tokenServiceSendTokenAsync,
+    isLoading: isTokenServiceTransfering,
+    txState: tokenServiceTxState,
+    reset: resetTokenServiceTxState,
   } = useInterchainTokenServiceTransferMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
@@ -147,16 +147,16 @@ export function useSendInterchainTokenState(props: {
 
   const resetTxState = () => {
     resetInterchainTransferTxState();
-    resetTokenManagerTxState();
+    resetTokenServiceTxState();
   };
 
   const { sendTokenAsync, isSending, txState } = useMemo(
     () =>
       props.kind === "canonical"
         ? {
-            sendTokenAsync: tokenManagerSendTokenAsync,
-            isSending: isTokenManagerSending,
-            txState: tokenManagerTxState,
+            sendTokenAsync: tokenServiceSendTokenAsync,
+            isSending: isTokenServiceTransfering,
+            txState: tokenServiceTxState,
           }
         : {
             sendTokenAsync: interchainTransferAsync,
@@ -165,9 +165,9 @@ export function useSendInterchainTokenState(props: {
           },
     [
       props.kind,
-      tokenManagerSendTokenAsync,
-      isTokenManagerSending,
-      tokenManagerTxState,
+      tokenServiceSendTokenAsync,
+      isTokenServiceTransfering,
+      tokenServiceTxState,
       interchainTransferAsync,
       interchainTransferTxState,
       isInterchainTransferSending,
