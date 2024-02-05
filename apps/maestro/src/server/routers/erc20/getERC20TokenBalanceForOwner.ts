@@ -32,12 +32,10 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       );
 
       const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
-        client.read("balanceOf", {
-          args: [input.owner],
-        }),
-        client.read("decimals"),
-        client.read("owner").catch(always(null)),
-        client.read("pendingOwner").catch(always(null)),
+        client.reads.balanceOf({ account: input.owner }),
+        client.reads.decimals(),
+        client.reads.owner().catch(always(null)),
+        client.reads.pendingOwner().catch(always(null)),
       ]);
 
       const itClient = ctx.contracts.createInterchainTokenClient(
@@ -52,11 +50,13 @@ export const getERC20TokenBalanceForOwner = publicProcedure
           .catch(always(false)),
       ]);
 
+      const isTokenOwner = owner === input.owner;
+
       return {
-        isTokenMinter,
+        isTokenOwner,
+        isTokenMinter: isTokenMinter || isTokenOwner,
         tokenBalance: tokenBalance.toString(),
         decimals,
-        isTokenOwner: owner === input.owner,
         isTokenPendingOwner: pendingOwner === input.owner,
         hasPendingOwner: pendingOwner !== null,
       };
