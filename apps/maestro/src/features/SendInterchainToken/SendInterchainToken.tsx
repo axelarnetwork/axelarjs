@@ -321,7 +321,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <Button
               variant="primary"
               type="submit"
-              disabled={!formState.isValid || isFormDisabled}
+              disabled={
+                !formState.isValid ||
+                isFormDisabled ||
+                state.hasInsufficientGasBalance
+              }
               loading={state.isSending}
             >
               {buttonChildren}
