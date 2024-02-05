@@ -28,16 +28,17 @@ export function getL1FeeForL2(
     transport: http(),
   });
 
-  if (chain === "arbitrum") {
+  switch (chain) {
     // Most of the ethereum clients are already included L1 fee in the gas estimation for Arbitrum.
-    return Promise.resolve(0n);
-  } else if (chain === "mantle") {
-    return getMantleL1Fee(publicClient, params);
-  } else if (chain === "optimism" || chain === "scroll" || chain === "base") {
-    return getOptimismL1Fee(publicClient, params);
+    case "arbitrum":
+      return Promise.resolve(0n);
+    case "optimism":
+    case "scroll":
+    case "base":
+      return getOptimismL1Fee(publicClient, params);
+    case "mantle":
+      return getMantleL1Fee(publicClient, params);
   }
-
-  return Promise.resolve(0n);
 }
 
 async function getOptimismL1Fee(
@@ -76,11 +77,8 @@ async function getOptimismL1Fee(
     ],
   });
 
-  const results = multicallResponse.flatMap((r) => r.result);
-
-  // Convert BigInt numbers to regular numbers
-  const [gasUsed, dynamicOverhead, fixedOverhead] = results.map(
-    (bigintNumber) => bigintNumber
+  const [gasUsed, dynamicOverhead, fixedOverhead] = multicallResponse.flatMap(
+    (r) => r.result
   ) as [bigint, bigint, bigint];
 
   const totalGasUsed =
@@ -143,11 +141,8 @@ async function getMantleL1Fee(
     ],
   });
 
-  const results = multicallResponse.flatMap((r) => r.result);
-
-  // Convert BigInt numbers to regular numbers
-  const [fixedOverhead, dynamicOverhead] = results.map(
-    (bigintNumber) => bigintNumber
+  const [fixedOverhead, dynamicOverhead] = multicallResponse.flatMap(
+    (r) => r.result
   ) as [bigint, bigint];
 
   const totalGasUsed = (fixedOverhead * dynamicOverhead) / 1_000_000n;
