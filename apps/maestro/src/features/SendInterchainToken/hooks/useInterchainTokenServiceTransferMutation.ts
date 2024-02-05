@@ -74,74 +74,61 @@ export function useInterchainTokenServiceTransferMutation(
 
   const approvedAmountRef = useRef(0n);
 
-  const sendToken = useCallback(
-    async function sendToken() {
-      try {
+  const handleInterchainTransfer = useCallback(async () => {
+    try {
+      setTxState({
+        status: "awaiting_approval",
+      });
+
+      invariant(address, "need address");
+
+      const txResult = await interchainTransferAsync({
+        args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
+          tokenId: config.tokenId,
+          destinationChain: config.destinationChainName,
+          destinationAddress: address,
+          amount: approvedAmountRef.current,
+          metadata: "0x",
+          gasValue: config.gas ?? 0n,
+        }),
+      });
+
+      if (txResult?.hash) {
         setTxState({
-          status: "awaiting_approval",
+          status: "submitted",
+          hash: txResult.hash,
+          chainId,
         });
+      }
+    } catch (error) {
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+        logger.error("Faied to transfer token:", error.cause);
 
-        invariant(address, "need address");
-
-        const txResult = await interchainTransferAsync({
-          args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
-            tokenId: config.tokenId,
-            destinationChain: config.destinationChainName,
-            destinationAddress: address,
-            amount: approvedAmountRef.current,
-            metadata: "0x",
-            gasValue: config.gas ?? 0n,
-          }),
+        setTxState({
+          status: "idle",
         });
-
-        if (txResult?.hash) {
-          setTxState({
-            status: "submitted",
-            hash: txResult.hash,
-            chainId,
-          });
-        }
-      } catch (error) {
-        if (error instanceof TransactionExecutionError) {
-          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-          logger.error("Faied to transfer token:", error.cause);
-
-          setTxState({
-            status: "idle",
-          });
-          return;
-        }
-
-        if (error instanceof Error) {
-          setTxState({
-            status: "reverted",
-            error: error,
-          });
-        } else {
-          setTxState({
-            status: "reverted",
-            error: new Error("failed to transfer token"),
-          });
-        }
-
         return;
       }
-    },
-    [
-      address,
-      chainId,
-      config.destinationChainName,
-      config.gas,
-      config.tokenId,
-      interchainTransferAsync,
-      setTxState,
-    ]
-  );
+
+      if (error instanceof Error) {
+        setTxState({
+          status: "reverted",
+          error: error,
+        });
+      } else {
+        setTxState({
+          status: "reverted",
+          error: new Error("failed to transfer token"),
+        });
+      }
+    }
+  }, [address, chainId, config, interchainTransferAsync, setTxState]);
 
   useEffect(
     () => {
       if (approveERC20Recepit && !sendTokenData?.hash) {
-        sendToken().catch((error) => {
+        handleInterchainTransfer().catch((error) => {
           logger.error("Failed to send token:", error);
         });
       }
@@ -171,7 +158,6 @@ export function useInterchainTokenServiceTransferMutation(
         });
 
         // only request spend approval if the allowance is not enough
-
         if (!tokenAllowance || tokenAllowance < approvedAmountRef.current) {
           await approveInterchainTokenAsync({
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
@@ -179,9 +165,10 @@ export function useInterchainTokenServiceTransferMutation(
               amount: approvedAmountRef.current,
             }),
           });
-        } else {
-          await sendToken();
+          return;
         }
+
+        await handleInterchainTransfer();
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
