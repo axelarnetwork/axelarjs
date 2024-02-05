@@ -9,11 +9,11 @@ import { CONTRACT_METHODS, type ContractMethod } from "./types";
 export const CONTRACT_METHODS_LABELS: Partial<
   Record<ContractMethod, ReactNode>
 > = {
-  InterchainTransfer: "Interchain Transfer",
+  InterchainTransfer: "Interchain Transfers",
   InterchainTokenDeploymentStarted: (
     <>
-      Interchain <span className="mx-1 hidden md:inline-block">Token</span>{" "}
-      Deployment
+      <span className="mx-1 hidden sm:inline-block">Interchain Token</span>{" "}
+      Deployments
     </>
   ),
 };
@@ -62,7 +62,7 @@ const RecentTransactionsTabs: FC<Props> = ({ maxTransactions = 10 }) => {
               maxTransactions={maxTransactions}
             />
           </div>
-          <div className="md:hidden">
+          <div className="max-w-[83vw] sm:max-w-sm md:hidden">
             <RecentTransactionsList
               contractMethod={contractMethod}
               senderAddress={address}
