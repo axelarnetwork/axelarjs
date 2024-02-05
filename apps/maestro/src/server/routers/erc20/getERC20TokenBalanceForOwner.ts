@@ -54,7 +54,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
 
       return {
         isTokenOwner,
-        isTokenMinter: isTokenMinter || isTokenOwner,
+        isTokenMinter,
         tokenBalance: tokenBalance.toString(),
         decimals,
         isTokenPendingOwner: pendingOwner === input.owner,
