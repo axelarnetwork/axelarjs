@@ -193,16 +193,11 @@ const LayoutFooter = () => (
         </nav>
       ))}
     </div>
-    <div className="flex items-center text-sm">
-      &copy;{new Date().getFullYear()} <span>&middot;</span>
-      <Link
-        rel="noopener noreferrer"
-        href="https://axelar.network"
-        target="_blank"
-        className="text-accent"
-      >
-        Axelar Network
-      </Link>
+    <div className="text-sm opacity-90">
+      <p>
+        Copyright © {new Date().getFullYear()} Axelar Foundation. All Rights
+        Reserved.
+      </p>
     </div>
     <div className="flex items-center gap-1 text-right">
       <PackageVersionItem

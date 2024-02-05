@@ -4,7 +4,7 @@ import { invariant } from "@axelarjs/utils";
 import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { TransactionExecutionError } from "viem";
+import { parseUnits, TransactionExecutionError } from "viem";
 import { useChainId } from "wagmi";
 
 import { logger } from "~/lib/logger";
@@ -35,8 +35,10 @@ export const MintInterchainToken: FC = () => {
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
-    const decimalAdjustment = 10n ** BigInt(erc20Details?.decimals ?? 18n);
-    const adjustedAmount = BigInt(data.amountToMint) * decimalAdjustment;
+    const adjustedAmount = parseUnits(
+      data.amountToMint,
+      erc20Details?.decimals || 18
+    );
 
     setTxState({
       status: "awaiting_approval",
