@@ -13,7 +13,9 @@ import RecentTransactions from "~/features/RecentTransactions/RecentTransactions
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import EVMChainsDropdown, {
+  ChainIcon,
+} from "~/ui/components/EVMChainsDropdown";
 import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
 
 type PageState =
@@ -135,20 +137,27 @@ const Page = ({
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">
               <div className="grid gap-1 text-center text-xl font-semibold">
-                <div>
+                <div className="flex items-center gap-2">
                   You&apos;re connected to{" "}
-                  <Badge>
+                  <Badge variant="info">
                     {selectedChain?.name} ({selectedChain?.environment})
                   </Badge>
                   which is not a supported{" "}
-                  <Badge>{process.env.NEXT_PUBLIC_NETWORK_ENV}</Badge> network.
-                </div>
-                <div>
-                  Select a valid{" "}
-                  <Badge>{process.env.NEXT_PUBLIC_NETWORK_ENV}</Badge> network
-                  in the chain switcher above.
+                  <Badge variant="info">
+                    {process.env.NEXT_PUBLIC_NETWORK_ENV}
+                  </Badge>{" "}
+                  network.
                 </div>
               </div>
+              <EVMChainsDropdown
+                renderTrigger={() => (
+                  <Button variant="primary">
+                    Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}
+                    network
+                  </Button>
+                )}
+                contentClassName="-translate-y-[25dvh] translate-x-[25%]"
+              />
             </div>
           </div>
         );
