@@ -55,18 +55,25 @@ export function useInterchainTokenServiceTransferMutation(
       owner: address ?? "0x",
       spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
     }),
+    watch: true,
   });
 
-  const { writeAsync: approveInterchainTokenAsync, data: approveERC20Data } =
-    useInterchainTokenApprove({
-      address: config.tokenAddress,
-    });
+  const {
+    writeAsync: approveInterchainTokenAsync,
+    data: approveERC20Data,
+    reset: resetApproveMutation,
+  } = useInterchainTokenApprove({
+    address: config.tokenAddress,
+  });
 
-  const { writeAsync: interchainTransferAsync, data: sendTokenData } =
-    useInterchainTokenServiceInterchainTransfer({
-      address: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-      value: BigInt(config.gas ?? 0) * BigInt(2),
-    });
+  const {
+    writeAsync: interchainTransferAsync,
+    data: sendTokenData,
+    reset: resetInterchainTransferMutation,
+  } = useInterchainTokenServiceInterchainTransfer({
+    address: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+    value: BigInt(config.gas ?? 0) * BigInt(2),
+  });
 
   const { data: approveERC20Recepit } = useWaitForTransaction({
     hash: approveERC20Data?.hash,
@@ -187,6 +194,10 @@ export function useInterchainTokenServiceTransferMutation(
     txState,
     reset: () => {
       setTxState({ status: "idle" });
+
+      resetApproveMutation();
+      resetInterchainTransferMutation();
+
       mutation.reset();
     },
   };
