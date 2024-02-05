@@ -6,6 +6,7 @@ export const NATIVE_TOKEN_OVERRIDES: Record<string, string> = {
   // ethereum-sepolia actual symbol is SEP under the wagmi chain config
   "ethereum-sepolia": "ETH",
   "filecoin-2": "FIL",
+  celo: "CELO",
 };
 
 /**
