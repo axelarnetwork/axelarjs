@@ -94,7 +94,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Mint",
       value: "mint",
       icon: <CoinsIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      isVisible: (props) => props.isTokenMinter,
+      isVisible: (props) => props.isTokenMinter || props.isTokenOwner,
     },
     {
       label: "Transfer Ownership",
