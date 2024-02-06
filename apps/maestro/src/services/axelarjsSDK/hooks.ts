@@ -8,6 +8,7 @@ import type {
 const staleTime = 1000 * 60 * 2; // 2 minutes
 
 export function useEstimateGasFeeQuery(input: EstimateGasFeeInput) {
+  console.log("input", input);
   return trpc.axelarjsSDK.estimateGasFee.useQuery(input, {
     staleTime,
     enabled:

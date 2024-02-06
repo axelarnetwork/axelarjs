@@ -55,11 +55,18 @@ export function useInterchainTransferMutation(
         return;
       }
 
-      const bnAmount = parseUnits(`${Number(amount)}`, decimals);
+      const bnAmount = parseUnits(amount, decimals);
+      console.log("amount yooo", amount, decimals, bnAmount.toString());
 
       try {
         setTxState({
           status: "awaiting_approval",
+        });
+        console.log("txResult", {
+          destinationChain: config.destinationChainName,
+          recipient: address,
+          amount: bnAmount,
+          metadata: "0x",
         });
 
         const txResult = await transferAsync({
@@ -80,7 +87,7 @@ export function useInterchainTransferMutation(
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-          logger.error("Faied to transfer token:", error.cause);
+          logger.error("Failed to transfer token:", error.cause);
 
           setTxState({
             status: "idle",
