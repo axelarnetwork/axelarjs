@@ -186,6 +186,23 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [actions, resetForm, txHash]);
 
+  const handleSetMaxBalance = useCallback(() => {
+    const value = formatUnits(
+      BigInt(props.balance.tokenBalance),
+      Number(props.balance.decimals)
+    ).replace(/,/gi, "");
+
+    const [integerPart, decimalPart] = value.split(".") as [string, string];
+
+    const sanitizedValue = decimalPart
+      ? `${integerPart}.${decimalPart.slice(0, 8)}`
+      : integerPart;
+
+    setValue("amountToTransfer", sanitizedValue, {
+      shouldValidate: true,
+    });
+  }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
+
   return (
     <Modal
       trigger={props.trigger}
@@ -252,15 +269,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               <Label.AltText
                 role="button"
                 aria-label="set max balance to transfer"
-                onClick={() => {
-                  setValue(
-                    "amountToTransfer",
-                    formatUnits(
-                      BigInt(props.balance.tokenBalance),
-                      Number(props.balance.decimals)
-                    ).replace(/,/gi, "")
-                  );
-                }}
+                onClick={handleSetMaxBalance}
               >
                 Balance:{" "}
                 <BigNumberText
@@ -268,7 +277,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   localeOptions={{
                     style: "decimal",
                     minimumFractionDigits: 0,
-                    maximumFractionDigits: 4,
+                    maximumFractionDigits: 6,
                   }}
                 >
                   {BigInt(props.balance.tokenBalance)}
@@ -289,14 +298,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Amount must be greater than 0";
                   }
 
-                  const bnBalance = parseUnits(
-                    `${props.balance.tokenBalance}` as `${number}`,
-                    Number(props.balance.decimals)
-                  );
-
                   const bnValue = parseUnits(
                     value as `${number}`,
                     Number(props.balance.decimals) * 2
+                  );
+
+                  const bnBalance = parseUnits(
+                    props.balance.tokenBalance,
+                    Number(props.balance.decimals)
                   );
 
                   if (bnValue > bnBalance) {
