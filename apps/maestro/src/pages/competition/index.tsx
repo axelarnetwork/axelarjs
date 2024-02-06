@@ -20,6 +20,12 @@ import {
 import { trpc } from "~/lib/trpc";
 import Page from "~/ui/layouts/Page";
 
+const PRIZES = [
+  { place: "1st", amount: 10101 },
+  { place: "2nd", amount: 6900 },
+  { place: "3rd", amount: 4200 },
+];
+
 const TROPHY_EMOJIS = ["🏆", "🥈", "🥉"];
 
 const COMPETITION_START_TS = Date.parse(
@@ -185,9 +191,12 @@ const CompetitionPage = () => {
               projects with the highest transaction counts will be rewarded with
               AXL tokens:
               <ul className="list-disc space-y-1 pl-5">
-                <li>1st Place: 10,101 AXL</li>
-                <li>2nd Place: 6,900 AXL</li>
-                <li>3rd Place: 4,200 AXL</li>
+                {PRIZES.map(({ place, amount }) => (
+                  <li key={place}>
+                    <strong>{place} Place</strong>: {amount.toLocaleString()}{" "}
+                    AXL
+                  </li>
+                ))}
               </ul>
             </li>
             <li>
