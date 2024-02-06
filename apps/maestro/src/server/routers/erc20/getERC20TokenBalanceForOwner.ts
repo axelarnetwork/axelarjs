@@ -5,6 +5,12 @@ import { z } from "zod";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
+const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
+
+const getENUMIndex = (role: (typeof ROLES_ENUM)[number]) => {
+  return ROLES_ENUM.indexOf(role);
+};
+
 export const getERC20TokenBalanceForOwner = publicProcedure
   .input(
     z.object({
@@ -42,13 +48,30 @@ export const getERC20TokenBalanceForOwner = publicProcedure
         chainConfig,
         input.tokenAddress
       );
-      const [isTokenMinter] = await Promise.all([
-        itClient.reads
-          .isMinter({
+      const [
+        isTokenMinter,
+        hasMinterRole,
+        hasOperatorRole,
+        hasFlowLimiterRole,
+      ] = await Promise.all(
+        [
+          itClient.reads.isMinter({
             addr: input.owner,
-          })
-          .catch(always(false)),
-      ]);
+          }),
+          itClient.reads.hasRole({
+            role: getENUMIndex("MINTER"),
+            account: input.owner,
+          }),
+          itClient.reads.hasRole({
+            role: getENUMIndex("OPERATOR"),
+            account: input.owner,
+          }),
+          itClient.reads.hasRole({
+            role: getENUMIndex("FLOW_LIMITER"),
+            account: input.owner,
+          }),
+        ].map((p) => p.catch(always(false)))
+      );
 
       const isTokenOwner = owner === input.owner;
 
@@ -59,6 +82,9 @@ export const getERC20TokenBalanceForOwner = publicProcedure
         decimals,
         isTokenPendingOwner: pendingOwner === input.owner,
         hasPendingOwner: pendingOwner !== null,
+        hasMinterRole,
+        hasOperatorRole,
+        hasFlowLimiterRole,
       };
     } catch (error) {
       // If we get a TRPC error, we throw it

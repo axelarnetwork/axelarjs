@@ -12,6 +12,8 @@ export type EstimateGasFeeResponse = {
   expressFee: string;
   executionFee: string;
   executionFeeWithMultiplier: string;
+  l1ExecutionFee: string;
+  l1ExecutionFeeWithMultiplier: string;
   gasLimit: bigint;
   gasMultiplier: number;
   minGasPrice: string;

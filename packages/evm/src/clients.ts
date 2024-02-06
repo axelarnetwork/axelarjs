@@ -10,6 +10,7 @@ import {
   auroraTestnet,
   avalanche,
   avalancheFuji,
+  base,
   baseGoerli,
   celo,
   celoAlfajores,
@@ -19,6 +20,12 @@ import {
   filecoinHyperspace,
   goerli,
   mainnet,
+  mantle,
+  mantleTestnet,
+  optimism,
+  optimismGoerli,
+  scroll,
+  scrollSepolia,
 } from "viem/chains";
 
 const MAINNET_CHAINS = {
@@ -30,6 +37,11 @@ const MAINNET_CHAINS = {
   aurora,
   avalanche,
   celo,
+  mantle,
+  optimism,
+  scroll,
+  base,
+  baseGoerli,
 } as const;
 
 const TESTNET_CHAINS = {
@@ -41,6 +53,9 @@ const TESTNET_CHAINS = {
   auroraTestnet,
   avalancheFuji,
   celoAlfajores,
+  mantleTestnet,
+  optimismGoerli,
+  scrollSepolia,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;

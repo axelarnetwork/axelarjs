@@ -61,6 +61,10 @@ export type SearchGMPParams = BaseGMPParams & {
   sort?: Record<string, SortOrder>;
   sourceContractAddress?: `0x${string}`;
   destinationContractAddress?: `0x${string}`;
+  _source?: {
+    includes?: string[];
+    excludes?: string[];
+  };
 };
 
 type HexAmount = {
@@ -329,6 +333,7 @@ export type GetFeesParams = {
   sourceChain: string;
   destinationChain: string;
   sourceTokenSymbol?: string | undefined;
+  executeData?: `0x${string}` | undefined;
   sourceTokenAddress?: `0x${string}` | undefined;
   destinationContractAddress?: `0x${string}` | undefined;
   sourceContractAddress?: `0x${string}` | undefined;
@@ -350,13 +355,21 @@ type TokenPrice = {
   usd: number;
 };
 
-type Token = {
+export type TokenUnit = {
+  value: string;
+  decimals: number;
+};
+
+export type Token = {
   contract_address: string;
   symbol: string;
   name: string;
   decimals: number;
   token_price: TokenPrice;
   gas_price: string;
+  gas_price_in_units: TokenUnit;
+  l1_gas_price?: string;
+  l1_gas_price_in_units?: TokenUnit;
   gas_price_gwei: string;
 };
 
@@ -381,6 +394,12 @@ type GetBaseFeesResult = {
   destination_native_token: Token & {
     name: string;
     symbol: string;
+  };
+  ethereum_token: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    token_price: TokenPrice;
   };
   axelar_token: {
     name: string;

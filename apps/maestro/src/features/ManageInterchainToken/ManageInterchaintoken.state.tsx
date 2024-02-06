@@ -5,10 +5,8 @@ import type { TransactionState } from "~/lib/hooks/useTransactionState";
 
 export type InterchainTokenAction =
   | "mint"
-  | "transferOwnership"
   | "transferOperatorship"
-  | "transferMintership"
-  | "acceptOwnership";
+  | "transferMintership";
 
 export const INITIAL_STATE = {
   selectedAction: null as InterchainTokenAction | null,
@@ -17,6 +15,7 @@ export const INITIAL_STATE = {
     status: "idle",
   } as TransactionState,
   tokenAddress: `0x` as `0x${string}`,
+  tokenId: `0x` as `0x${string}`,
 };
 
 function useManageInterchainTokenState(initialState = INITIAL_STATE) {
@@ -28,12 +27,15 @@ function useManageInterchainTokenState(initialState = INITIAL_STATE) {
   // Reset state when token address changes
   useEffect(
     () => {
-      if (state.tokenAddress !== initialState.tokenAddress) {
+      if (
+        state.tokenAddress !== initialState.tokenAddress ||
+        state.tokenId !== initialState.tokenId
+      ) {
         setState(initialState);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [initialState, state.tokenAddress]
+    [initialState, state.tokenAddress, state.tokenId]
   );
 
   const actions = {

@@ -100,6 +100,10 @@ const ToastElement: FC<ToastElementProps> = ({
     [computed.wagmiChains, chainId]
   );
 
+  const showFinalityProgressBar =
+    groupedStatusesProps.some((group) => group.status === "called") &&
+    elapsedBlocks < expectedConfirmations;
+
   const content = (
     <>
       <div className="flex items-center">
@@ -121,7 +125,7 @@ const ToastElement: FC<ToastElementProps> = ({
         </Tooltip>
         <div className="mx-2 flex flex-col items-start">
           <span className="text-sm">{txTypeText}</span>
-          {elapsedBlocks < expectedConfirmations ? (
+          {showFinalityProgressBar ? (
             <Tooltip
               tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
               position="top"

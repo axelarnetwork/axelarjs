@@ -1,3 +1,5 @@
+import { Environment } from "@axelarjs/core";
+
 import { parseUnits } from "viem";
 
 import type { GMPClient } from "../gmp/isomorphic";
@@ -6,6 +8,7 @@ import {
   type ClientMeta,
   type RestServiceOptions,
 } from "../lib/rest-service";
+import { getL1FeeForL2, isL2Chain } from "./fee";
 import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 import { gasToWei } from "./utils/bigint";
 
@@ -15,21 +18,25 @@ type AxelarscanClientDependencies = {
 
 export class AxelarQueryAPIClient extends RestService {
   protected gmpClient: GMPClient;
+  protected env: Environment;
 
   public constructor(
     options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
+    env: Environment,
     meta?: ClientMeta
   ) {
     super(options, meta);
     this.gmpClient = dependencies.gmpClient;
+    this.env = env;
   }
 
   static init(
     options: RestServiceOptions,
-    dependencies: AxelarscanClientDependencies
+    dependencies: AxelarscanClientDependencies,
+    env: Environment
   ) {
-    return new AxelarQueryAPIClient(options, dependencies, {
+    return new AxelarQueryAPIClient(options, dependencies, env, {
       name: "AxelarQueryAPI",
       version: "0.0.11",
     });
@@ -42,6 +49,7 @@ export class AxelarQueryAPIClient extends RestService {
    * @param sourceTokenSymbol (Optional) the token symbol on the source chain
    * @param sourceContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
    * @param sourceTokenAddress (Optional) the contract address of the token symbol on the source chain
+   * @param executeData (Optional) the transaction data to be executed on the destination chain. Required if the destination chain is L2.
    * @param destinationContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
    * @param amount (Optional) the amount of assets transferred in terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
    * @param amountInUnits (Optional) the amount of assets transferred in terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
@@ -61,6 +69,7 @@ export class AxelarQueryAPIClient extends RestService {
     destinationContractAddress,
     amount,
     amountInUnits,
+    executeData,
     minGasPrice = "0",
     gasMultiplier = 1.0,
     showDetailedFees = false,
@@ -85,6 +94,7 @@ export class AxelarQueryAPIClient extends RestService {
       express_fee_string,
       source_token,
       destination_native_token,
+      ethereum_token,
       express_supported,
     } = response;
 
@@ -107,28 +117,79 @@ export class AxelarQueryAPIClient extends RestService {
       source_token.decimals
     );
 
-    const executionFee =
+    const excludedL1ExecutionFee =
       destGasFeeWei > minDestGasFeeWei
         ? srcGasFeeWei
         : (srcGasFeeWei * minDestGasFeeWei) / destGasFeeWei;
-    const executionFeeWithMultiplier =
+
+    const excludedL1ExecutionFeeWithMultiplier =
       gasMultiplier > 1
-        ? Math.floor(Number(executionFee) * Number(gasMultiplier))
-        : executionFee;
+        ? Math.floor(Number(excludedL1ExecutionFee) * Number(gasMultiplier))
+        : excludedL1ExecutionFee;
 
     const baseFee = parseUnits(base_fee.toString(), source_token.decimals);
-    return showDetailedFees
-      ? {
-          baseFee,
-          expressFee: express_fee_string,
-          executionFee: executionFee.toString(),
-          executionFeeWithMultiplier: executionFeeWithMultiplier.toString(),
-          gasLimit,
-          gasMultiplier,
-          minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
-          apiResponse: JSON.stringify(response),
-          isExpressSupported: express_supported,
-        }
-      : (BigInt(executionFeeWithMultiplier) + BigInt(baseFee)).toString();
+
+    let l1ExecutionFee = 0n;
+    let l1ExecutionFeeWithMultiplier = 0;
+
+    // If the destination chain is L2, calculate the L1 execution fee
+    if (isL2Chain(destinationChain)) {
+      if (!executeData) {
+        throw new Error(
+          `executeData is required to calculate the L1 execution fee for ${destinationChain}`
+        );
+      }
+
+      if (!destination_native_token.l1_gas_price_in_units) {
+        throw new Error(
+          `Could not find L1 gas price for ${destinationChain}. Please try again later.`
+        );
+      }
+
+      // Calculate the L1 execution fee. This value is in ETH.
+      l1ExecutionFee = await getL1FeeForL2(this.env, destinationChain, {
+        destinationContractAddress,
+        executeData,
+        l1GasPrice: destination_native_token.l1_gas_price_in_units,
+      });
+
+      // Convert the L1 execution fee to the source token
+      const srcTokenPrice = Number(source_token.token_price.usd);
+      const ethTokenPrice = Number(ethereum_token.token_price.usd);
+      const ethToSrcTokenPriceRatio = ethTokenPrice / srcTokenPrice;
+
+      l1ExecutionFee = BigInt(
+        Math.ceil(Number(l1ExecutionFee) * ethToSrcTokenPriceRatio)
+      );
+
+      // Calculate the L1 execution fee with the gas multiplier
+      l1ExecutionFeeWithMultiplier = Math.floor(
+        Number(l1ExecutionFee) * Number(gasMultiplier)
+      );
+    }
+
+    // If showDetailedFees is false, return the total fee amount
+    if (!showDetailedFees) {
+      return (
+        BigInt(excludedL1ExecutionFeeWithMultiplier) +
+        BigInt(l1ExecutionFeeWithMultiplier) +
+        BigInt(baseFee)
+      ).toString();
+    }
+
+    return {
+      baseFee,
+      expressFee: express_fee_string,
+      executionFee: excludedL1ExecutionFee.toString(),
+      executionFeeWithMultiplier:
+        excludedL1ExecutionFeeWithMultiplier.toString(),
+      l1ExecutionFeeWithMultiplier: l1ExecutionFeeWithMultiplier.toString(),
+      l1ExecutionFee: l1ExecutionFee.toString(),
+      gasLimit,
+      gasMultiplier,
+      minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
+      apiResponse: JSON.stringify(response),
+      isExpressSupported: express_supported,
+    };
   }
 }

@@ -228,7 +228,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       sourceChainId: interchainToken?.chain?.id ?? "",
       destinationChainIds,
       gasLimit: 1_000_000,
-      gasMultipler: 3,
+      gasMultipler: 1.5,
     });
 
   const originToken = useMemo(
