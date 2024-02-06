@@ -36,6 +36,7 @@ const TokenSettings: FC = () => {
 
   const isMintable = watch("isMintable");
   const minter = watch("minter");
+  const supply = watch("initialSupply");
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
@@ -57,13 +58,26 @@ const TokenSettings: FC = () => {
     }
   }, [isMintable, minter]);
 
+  const initialSupplyErrorMessage = useMemo<FieldError | undefined>(() => {
+    if (isMintable) {
+      return;
+    }
+
+    if (["0", ""].includes(supply) && !minter) {
+      return {
+        type: "required",
+        message: "Fixed supply token requires an initial balance",
+      };
+    }
+  }, [isMintable, minter, supply]);
+
   const isFormValid = useMemo(() => {
-    if (minterErrorMessage) {
+    if (minterErrorMessage || initialSupplyErrorMessage) {
       return false;
     }
 
     return formState.isValid;
-  }, [minterErrorMessage, formState.isValid]);
+  }, [minterErrorMessage, formState.isValid, initialSupplyErrorMessage]);
 
   const submitHandler: SubmitHandler<TokenDetailsFormState> = (data, e) => {
     e?.preventDefault();
@@ -159,7 +173,7 @@ const TokenSettings: FC = () => {
               },
             })}
           />
-          {Maybe.of(formState.errors.initialSupply).mapOrNull(ValidationError)}
+          {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
           <Label htmlFor="salt">
