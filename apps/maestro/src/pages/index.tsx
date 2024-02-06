@@ -16,7 +16,7 @@ const InterchainTokenDeployment = dynamic(
   () => import("~/features/InterchainTokenDeployment")
 );
 
-export default function Home() {
+export default function HomePage() {
   const router = useRouter();
   const { chain } = useNetwork();
   const [layoutState, layoutActions] = useLayoutStateContainer();

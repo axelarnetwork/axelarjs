@@ -1,8 +1,11 @@
 import {
+  Alert,
   Badge,
   Button,
   Card,
+  Clamp,
   cn,
+  CopyToClipboardButton,
   Drawer,
   ExternalLinkIcon,
   Footer,
@@ -13,11 +16,12 @@ import {
   useTheme,
   XCircleIcon,
 } from "@axelarjs/ui";
-import { useEffect, type FC, type PropsWithChildren } from "react";
+import React, { useEffect, type FC, type PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
+import { ErrorBoundary } from "@sentry/nextjs";
 import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
 import tw from "tailwind-styled-components";
 
@@ -102,7 +106,47 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           )}
           <Appbar />
 
-          {children}
+          <ErrorBoundary
+            fallback={({ error }) => (
+              <div className="grid flex-1 place-items-center">
+                <Clamp className="max-w-2xl">
+                  <Alert>
+                    <div className="grid gap-2">
+                      <div className="text-lg">
+                        OK, looks like something didn&apos;t work quite as
+                        expected. We&apos;re on it!
+                      </div>
+                      <div className="opacity-80">
+                        In the meantime, you can try refreshing the page or
+                        checking the support link at the bottom of the page.
+                      </div>
+
+                      {Boolean(error.stack ?? error.message) && (
+                        <CopyToClipboardButton
+                          className="bg-base-100"
+                          copyText={error.stack ?? error.message}
+                        >
+                          Copy error to clipboard
+                        </CopyToClipboardButton>
+                      )}
+
+                      {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+                        <div className="p-2">
+                          <div className="mockup-code">
+                            <pre className="max-w-xs overflow-x-scroll md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
+                              {error.stack}
+                            </pre>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Alert>
+                </Clamp>
+              </div>
+            )}
+          >
+            {children}
+          </ErrorBoundary>
 
           <LayoutFooter />
 
