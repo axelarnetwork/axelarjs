@@ -253,8 +253,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     (x) => !runninChainIds.includes(x)
   );
 
+  const isRestrictedToDeployer =
+    interchainToken.kind === "interchain" &&
+    !interchainToken.wasDeployedByAccount;
+
   const isReadOnly =
-    !interchainToken.wasDeployedByAccount ||
+    isRestrictedToDeployer ||
     !address ||
     isGasPriceQueryLoading ||
     !hasFetchedStatuses;
