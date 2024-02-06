@@ -337,7 +337,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
               )}
             </Label>
             {buttonStatus === "error" ? (
-              <Alert status="error">{buttonChildren}</Alert>
+              <Alert role="alert" status="error">
+                {buttonChildren}
+              </Alert>
             ) : (
               <Button
                 variant="primary"
