@@ -224,6 +224,7 @@ export const ShareHaikuButton: FC<{
   additionalChainNames: string[];
   originAxelarChainId: string;
   tokenAddress: `0x${string}`;
+  haikuType: "deployment" | "send";
 }> = (props) => {
   const { mutateAsync, isLoading, isSuccess } =
     trpc.openai.generateInterchainDeploymentHaiku.useMutation();
@@ -239,14 +240,18 @@ export const ShareHaikuButton: FC<{
 
   const handleShareHaiku = useCallback(async () => {
     try {
-      const { value } = await mutateAsync({ ...props, additionalChainNames });
+      const { value } = await mutateAsync({
+        ...props,
+        additionalChainNames,
+        haikuType: props.haikuType,
+      });
 
       const tokenDetailsUrl =
-        `${window.location.href}/${props.originAxelarChainId}/${props.tokenAddress}`
+        `${window.location.origin}/${props.originAxelarChainId}/${props.tokenAddress}`
           // repplace // with / to avoid double slash in url
           .replace(/([^:]\/)\/+/g, "$1");
 
-      const tweet = `${value.trim()}\n\nCheck out my Interchain Token:\n${tokenDetailsUrl}`;
+      const tweet = `${value.trim()}\n\nCheck out my Interchain Token:\n${tokenDetailsUrl}\n\n#interchaintokens`;
 
       // redirect to twitter with haiku
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
