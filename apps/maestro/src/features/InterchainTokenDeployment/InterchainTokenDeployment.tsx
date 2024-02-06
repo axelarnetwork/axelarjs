@@ -64,7 +64,7 @@ const InterchainTokenDeployment = () => {
               "ml-14": showBackButton,
             })}
           >
-            Deploy <span className="hidden sm:inline">origin</span> token on:{" "}
+            Deploy token on:{" "}
           </span>
           <ChainsDropdown
             shift={showBackButton}
