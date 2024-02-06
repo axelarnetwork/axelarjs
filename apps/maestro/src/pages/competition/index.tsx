@@ -160,6 +160,42 @@ const CompetitionPage = () => {
       loadingMessage="Loading transactions..."
     >
       <Page.Title>Interchain Leaderboard</Page.Title>
+      <div className="mx-auto max-w-4xl rounded-lg bg-gray-800 p-5 shadow-lg">
+        <h2 className="mb-4 text-xl font-bold text-white">
+          Welcome to the ITS Legend Interchain Competition!
+        </h2>
+        <p className="mb-4 text-gray-300">
+          To celebrate the mainnet launch of Interchain Token Service, we are
+          launching the ITS Legend Interchain Competition!
+        </p>
+        <ul className="list-inside list-disc list-none space-y-2 text-gray-400">
+          <li>
+            <strong className="text-white">Objective:</strong> Mint new
+            Interchain Tokens and drive as many transactions as possible with
+            them.
+          </li>
+          <li>
+            <strong className="text-white">Duration:</strong> The competition
+            kicks off at 1pm EST on Feb 7 and concludes at 1pm EST on Feb 21,
+            spanning a thrilling two weeks.
+          </li>
+          <li>
+            <strong className="text-white">Prizes:</strong> The top three
+            projects with the highest transaction counts will be rewarded with
+            AXL tokens:
+            <ul className="list-disc space-y-1 pl-5">
+              <li className="text-gray-400">1st Place: 10,101 AXL</li>
+              <li className="text-gray-400">2nd Place: 6,900 AXL</li>
+              <li className="text-gray-400">3rd Place: 4,200 AXL</li>
+            </ul>
+          </li>
+          <li>
+            <strong className="text-white">Eligibility:</strong> Only tokens
+            minted after the competition starts are eligible.
+          </li>
+        </ul>
+      </div>
+
       {content}
     </Page>
   );
