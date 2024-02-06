@@ -144,7 +144,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   return (
     <>
       <Dialog.Title className="flex">
-        <span>Transfer rate-limit manager</span>
+        <span>Transfer rate limit operator</span>
       </Dialog.Title>
       {txState.status === "confirmed" ? (
         <Alert status="success">
