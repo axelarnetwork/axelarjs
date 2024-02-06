@@ -3,7 +3,7 @@ import { Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
-import { parseUnits, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
 import {
@@ -94,17 +94,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     input?.sourceChainId,
   ]);
 
-  const withDecimals = useCallback(
-    (value: bigint) => parseUnits(String(value), input?.decimals ?? 0),
-    [input?.decimals]
-  );
-
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {
       return [];
     }
-
-    const initialSupply = Maybe.of(input.initialSupply).mapOr(0n, withDecimals);
 
     const commonArgs = {
       minter: input?.minterAddress ?? zeroAddress,
@@ -114,7 +107,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...commonArgs,
-        initialSupply,
+        initialSupply: input.initialSupply || 0n,
         name: input.tokenName,
         symbol: input.tokenSymbol,
         decimals: input.decimals,
@@ -135,7 +128,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, withDecimals, destinationChainNames, originalChainName]);
+  }, [input, tokenId, destinationChainNames, originalChainName]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
