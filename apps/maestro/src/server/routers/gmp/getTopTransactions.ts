@@ -36,6 +36,9 @@ export const getTopTransactions = publicProcedure
         contractMethod: input.contractMethod,
         fromTime: input.fromTime,
         toTime: input.toTime,
+        _source: {
+          includes: ["interchain_transfer"],
+        },
       });
 
       const grouped = groupBy(

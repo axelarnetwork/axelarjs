@@ -36,7 +36,7 @@ const CompetitionPage = () => {
   const { data, isLoading } = trpc.gmp.getTopTransactions.useQuery(
     {
       contractMethod: "InterchainTransfer",
-      sampleSize: 220,
+      sampleSize: 99000,
       minTxCount: 2,
       top: TOP_TOKEN_COUNT,
       fromTime: COMPETITION_START_TS / 1000,
