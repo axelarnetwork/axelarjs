@@ -1,5 +1,5 @@
 import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
-import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
+import { Badge, Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
@@ -157,13 +157,9 @@ const EVMChainsDropdown: FC<Props> = (props) => {
               {!props.hideLabel && <span>{selectedChain.name}</span>}
             </>
           ) : (
-            <HelpCircleIcon
-              size="24"
-              className={cn(
-                { "-translate-x-1.5": !props.hideLabel },
-                props.chainIconClassName
-              )}
-            />
+            <Badge variant="primary" size="md">
+              Switch Chain
+            </Badge>
           )}
         </Dropdown.Trigger>
       )}
