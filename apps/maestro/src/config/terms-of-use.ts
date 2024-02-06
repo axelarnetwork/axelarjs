@@ -1,7 +1,6 @@
 import { NEXT_PUBLIC_SITE_URL } from "./env";
 
 export const TERMS_OF_USE_COPY = `
-Please read these Terms of Use (these “Terms”) carefully because they govern your use of the website located at  (the “Site”). 
 Please read these Terms of Use (these “Terms”) carefully because they govern your use of the website located at ${NEXT_PUBLIC_SITE_URL} (the “Site”). The Site, made available by Axelar Foundation (the “Foundation” or “Site Operator” or “we” or “us”), acts as an information hub for and a front-end to various open-sourced protocols that operate using blockchain technology, including the Interchain Token Service (the “Protocol”). To make these Terms easier to read, the Site and our services are collectively called the “Interface.”
 
  
