@@ -1,8 +1,10 @@
-import { Button } from "@axelarjs/ui";
+import { EVMChainConfig } from "@axelarjs/api";
+import { Alert, Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { useAccount, useWaitForTransaction } from "wagmi";
+import { FetchBalanceResult } from "wagmi/actions";
 
 import {
   useTransactionState,
@@ -19,6 +21,9 @@ export type RegisterRemoteTokensProps = {
   tokenAddress: `0x${string}`;
   chainIds: number[];
   originChainId?: number;
+  originChain?: EVMChainConfig;
+  userGasBalance: FetchBalanceResult | undefined;
+  gasFees: bigint[] | undefined;
   onTxStateChange?: (status: TransactionState) => void;
   deploymentKind: "canonical" | "interchain" | "custom";
 };
@@ -139,7 +144,17 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     });
   }, [registerTokensAsync, setTxState, props.originChainId]);
 
+  const hasEnoughGasBalance = useMemo(() => {
+    const { gasFees, userGasBalance } = props;
+    if (!userGasBalance || !gasFees) return false;
+    return userGasBalance.value > gasFees.reduce((a, b) => a + b, 0n);
+  }, [props.userGasBalance, props.gasFees]);
+
   const buttonChildren = useMemo(() => {
+    if (!hasEnoughGasBalance)
+      return `Insufficient ${
+        props.originChain?.native_token?.symbol ?? ""
+      } balance for gas fees`;
     switch (txState.status) {
       case "idle":
         return (
@@ -155,9 +170,14 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       default:
         return txState.status;
     }
-  }, [props.chainIds.length, txState.status]);
+  }, [
+    props.chainIds.length,
+    txState.status,
+    hasEnoughGasBalance,
+    props.originChain,
+  ]);
 
-  return (
+  return hasEnoughGasBalance ? (
     <Button
       onClick={handleClick}
       disabled={!registerTokensAsync || txState.status !== "idle"}
@@ -166,5 +186,9 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     >
       {buttonChildren}
     </Button>
+  ) : (
+    <Alert status={"error"} className="max-w-96">
+      {buttonChildren}
+    </Alert>
   );
 };
