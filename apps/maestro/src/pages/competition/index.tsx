@@ -164,11 +164,11 @@ const CompetitionPage = () => {
         <h2 className="mb-4 text-xl font-bold text-white">
           Welcome to the ITS Legend Interchain Competition!
         </h2>
-        <p className="mb-4 text-gray-300">
+        <p className="mb-4 text-gray-400">
           To celebrate the mainnet launch of Interchain Token Service, we are
           launching the ITS Legend Interchain Competition!
         </p>
-        <ul className="list-inside list-disc list-none space-y-2 text-gray-400">
+        <ul className="list-inside list-none space-y-2 text-gray-400">
           <li>
             <strong className="text-white">Objective:</strong> Mint new
             Interchain Tokens and drive as many transactions as possible with
