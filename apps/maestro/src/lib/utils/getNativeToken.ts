@@ -2,11 +2,14 @@ import { memoize } from "@axelarjs/utils";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/evm-chains";
 
+/**
+ * Overrides for native tokens that have a symbol mismatch with the gas estimation API
+ */
 export const NATIVE_TOKEN_OVERRIDES: Record<string, string> = {
-  // ethereum-sepolia actual symbol is SEP under the wagmi chain config
   "ethereum-sepolia": "ETH",
   "filecoin-2": "FIL",
   celo: "CELO",
+  binance: "BNB",
 };
 
 /**
@@ -28,8 +31,5 @@ export const getNativeToken = memoize((axelarChainId: string) => {
     throw new Error(`getNativeToken(): chain ${axelarChainId} does not exist`);
   }
 
-  //TODO: HACK
-  if (chainConfig.nativeCurrency.symbol === "tBNB") {
-    return "BNB";
-  } else return chainConfig.nativeCurrency.symbol;
+  return chainConfig.nativeCurrency.symbol;
 });
