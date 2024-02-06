@@ -55,7 +55,7 @@ export function useInterchainTransferMutation(
         return;
       }
 
-      const bnAmount = parseUnits(`${Number(amount)}`, decimals);
+      const bnAmount = parseUnits(amount, decimals);
 
       try {
         setTxState({
@@ -80,7 +80,7 @@ export function useInterchainTransferMutation(
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-          logger.error("Faied to transfer token:", error.cause);
+          logger.error("Failed to transfer token:", error.cause);
 
           setTxState({
             status: "idle",

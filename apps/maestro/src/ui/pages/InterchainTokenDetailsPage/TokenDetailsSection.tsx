@@ -30,7 +30,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       "Token Address",
       <CopyToClipboardButton
         key="token-address"
-        size="xs"
+        size="sm"
         variant="ghost"
         copyText={props.tokenAddress}
       >
@@ -41,7 +41,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       [
         "Token ID",
         <div key="token-id" className="flex items-center">
-          <CopyToClipboardButton size="xs" variant="ghost" copyText={tokenId}>
+          <CopyToClipboardButton size="sm" variant="ghost" copyText={tokenId}>
             {maskAddress(tokenId)}
           </CopyToClipboardButton>
           <Tooltip
@@ -68,13 +68,13 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           {Boolean(props.name && props.symbol) && (
             <>
               <span className="hidden sm:inline">&middot;</span>
-              <span className="text-primary text-base">{props.name}</span>{" "}
-              <span className="text-base opacity-50">({props.symbol})</span>
+              <span className="text-primary text-xl">{props.name}</span>{" "}
+              <span className="text-xl opacity-50">({props.symbol})</span>
             </>
           )}
         </div>
         <LinkButton
-          className="flex items-center gap-2 text-base"
+          className="flex items-center gap-2 text-xl"
           href={`${props.chain.explorer.url}/token/${props.tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -98,7 +98,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       )}
       <ul className="grid gap-1.5">
         {sanitizedTokenDetails.map(([label, value]) => (
-          <li key={String(label)} className="flex items-center gap-2 text-sm">
+          <li key={String(label)} className="flex items-center gap-2 text-xl">
             <span className="font-semibold">{label}: </span>
             <span className="opacity-60">{value}</span>
           </li>
