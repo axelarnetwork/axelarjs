@@ -5,7 +5,6 @@ import {
   GiftIcon,
   LinkButton,
   Modal,
-  PackageCheckIcon,
 } from "@axelarjs/ui";
 import { useMemo, type ComponentType, type FC } from "react";
 import dynamic from "next/dynamic";
@@ -37,12 +36,12 @@ const MintInterchainToken = dynamic(
   }
 );
 
-const TransferOwnership = dynamic(
-  () => import("~/features/ManageInterchainToken/actions/transfer-ownership"),
-  {
-    loading: StepLoading,
-  }
-);
+// const TransferOwnership = dynamic(
+//   () => import("~/features/ManageInterchainToken/actions/transfer-ownership"),
+//   {
+//     loading: StepLoading,
+//   }
+// );
 
 const TransferOperatorship = dynamic(
   () =>
@@ -61,10 +60,10 @@ const TransferMintership = dynamic(
 
 const ACTIONS: Record<InterchainTokenAction, ComponentType<any>> = {
   mint: MintInterchainToken,
-  transferOwnership: TransferOwnership,
+  // transferOwnership: TransferOwnership,
   transferOperatorship: TransferOperatorship,
   transferMintership: TransferMintership,
-  acceptOwnership: TransferOwnership,
+  // acceptOwnership: TransferOwnership,
 };
 
 type Props = {
@@ -96,12 +95,12 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       icon: <CoinsIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter || props.isTokenOwner,
     },
-    {
-      label: "Transfer Ownership",
-      value: "transferOwnership",
-      icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      isVisible: (props) => props.isTokenOwner && !props.hasPendingOwner,
-    },
+    // {
+    //   label: "Transfer Ownership",
+    //   value: "transferOwnership",
+    //   icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
+    //   isVisible: (props) => props.isTokenOwner && !props.hasPendingOwner,
+    // },
     {
       label: "Transfer Rate Limit Manager",
       value: "transferOperatorship",
@@ -114,19 +113,19 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter,
     },
-    {
-      label: "Ownnership Pending Approval",
-      value: "transferOwnership",
-      icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      disabled: true,
-      isVisible: (props) => props.isTokenOwner && props.hasPendingOwner,
-    },
-    {
-      label: "Accept Ownership",
-      value: "acceptOwnership",
-      icon: <PackageCheckIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      isVisible: (props) => props.isTokenPendingOnwer,
-    },
+    // {
+    //   label: "Ownnership Pending Approval",
+    //   value: "transferOwnership",
+    //   icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
+    //   disabled: true,
+    //   isVisible: (props) => props.isTokenOwner && props.hasPendingOwner,
+    // },
+    // {
+    //   label: "Accept Ownership",
+    //   value: "acceptOwnership",
+    //   icon: <PackageCheckIcon className="h-7 w-7 md:h-8 md:w-8" />,
+    //   isVisible: (props) => props.isTokenPendingOnwer,
+    // },
   ];
 
   const CurrentStep = useMemo(

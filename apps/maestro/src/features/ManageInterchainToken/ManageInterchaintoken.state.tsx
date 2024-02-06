@@ -5,10 +5,10 @@ import type { TransactionState } from "~/lib/hooks/useTransactionState";
 
 export type InterchainTokenAction =
   | "mint"
-  | "transferOwnership"
+  // | "transferOwnership"
   | "transferOperatorship"
-  | "transferMintership"
-  | "acceptOwnership";
+  | "transferMintership";
+// | "acceptOwnership";
 
 export const INITIAL_STATE = {
   selectedAction: null as InterchainTokenAction | null,

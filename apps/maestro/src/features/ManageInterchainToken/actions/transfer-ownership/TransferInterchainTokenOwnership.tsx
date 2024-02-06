@@ -13,7 +13,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { isAddress, TransactionExecutionError } from "viem";
 import { useChainId, useWaitForTransaction } from "wagmi";
 
-import { useInterchainTokenServiceTransferOperatorship } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useInterchainTokenServiceTransferOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -40,7 +40,7 @@ export const TransferInterchainTokenOwnership: FC = () => {
     writeAsync: transferOwnershipAsync,
     isLoading: isTransfering,
     data: transferResult,
-  } = useInterchainTokenServiceTransferOperatorship({
+  } = useInterchainTokenServiceTransferOwnership({
     address: state.tokenAddress,
     account: getValues("recipientAddress"),
   });
