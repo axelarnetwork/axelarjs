@@ -1,4 +1,4 @@
-import { Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
@@ -145,36 +145,51 @@ export const Step3: FC = () => {
     return gasFeeBn > balance.value;
   }, [balance, state.remoteDeploymentGasFees, state.totalGasFee]);
 
-  const buttonChildren = useMemo(() => {
+  const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
-      return "Check your wallet";
+      return { children: "Check your wallet", status: "loading" as const };
     }
     if (rootState.txState.type === "deploying") {
-      return "Deploying interchain token";
+      return {
+        children: "Deploying interchain token",
+        status: "loading" as const,
+      };
     }
 
     if (state.isEstimatingGasFees) {
-      return "Loading gas fees";
+      return { children: "Estimating gas fees", status: "loading" as const };
     }
+
     if (state.hasGasFeesEstimationError) {
-      return "Failed to load gas prices";
+      return {
+        children: "Failed to load gas prices",
+        status: "error" as const,
+      };
     }
 
     if (hasInsufficientGasBalance) {
-      return `Insufficient ${nativeTokenSymbol} for gas fees`;
+      return {
+        children: `Insufficient ${nativeTokenSymbol} for gas fees`,
+        status: "error" as const,
+      };
     }
 
-    return (
-      <>
-        Register{" "}
-        {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull((length) => (
-          <>
-            {length > 0 && <span>& deploy</span>}
-            {` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}
-          </>
-        ))}
-      </>
-    );
+    return {
+      children: (
+        <>
+          Register{" "}
+          {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull(
+            (length) => (
+              <>
+                {length > 0 && <span>& deploy</span>}
+                {` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}
+              </>
+            )
+          )}
+        </>
+      ),
+      status: "idle" as const,
+    };
   }, [
     rootState.txState.type,
     state.isEstimatingGasFees,
@@ -216,21 +231,25 @@ export const Step3: FC = () => {
       </form>
       <TokenNameAlert />
       <Dialog.Actions>
-        <NextButton
-          length="block"
-          loading={
-            rootState.txState.type === "pending_approval" ||
-            rootState.txState.type === "deploying"
-          }
-          disabled={
-            state.isEstimatingGasFees ||
-            state.hasGasFeesEstimationError ||
-            hasInsufficientGasBalance
-          }
-          onClick={() => formSubmitRef.current?.click()}
-        >
-          <span>{buttonChildren}</span>
-        </NextButton>
+        {buttonStatus === "error" ? (
+          <Alert status="error">{buttonChildren}</Alert>
+        ) : (
+          <NextButton
+            length="block"
+            loading={
+              rootState.txState.type === "pending_approval" ||
+              rootState.txState.type === "deploying"
+            }
+            disabled={
+              state.isEstimatingGasFees ||
+              state.hasGasFeesEstimationError ||
+              hasInsufficientGasBalance
+            }
+            onClick={() => formSubmitRef.current?.click()}
+          >
+            <span>{buttonChildren}</span>
+          </NextButton>
+        )}
       </Dialog.Actions>
     </>
   );
