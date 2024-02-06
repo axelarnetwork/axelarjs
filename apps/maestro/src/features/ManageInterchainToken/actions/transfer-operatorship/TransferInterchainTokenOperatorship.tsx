@@ -1,4 +1,3 @@
-import { INTERCHAIN_TOKEN_SERVICE_ENCODERS } from "@axelarjs/evm";
 import {
   Alert,
   Button,
@@ -14,10 +13,11 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { isAddress, TransactionExecutionError } from "viem";
 import { useChainId, useWaitForTransaction } from "wagmi";
 
-import { useInterchainTokenServiceTransferOperatorship } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 
 type FormState = {
   recipientAddress: `0x${string}`;
@@ -25,7 +25,18 @@ type FormState = {
 
 export const TransferInterchainTokenOperatorship: FC = () => {
   const [txState, setTxState] = useTransactionState();
+  const [state] = useManageInterchainTokenContainer();
   const chainId = useChainId();
+
+  const { data: tokenDetails } =
+    trpc.interchainToken.getInterchainTokenByTokenId.useQuery(
+      {
+        tokenId: state.tokenId,
+      },
+      {
+        enabled: !!state.tokenId,
+      }
+    );
 
   const { register, handleSubmit, formState } = useForm<FormState>({
     defaultValues: {
@@ -39,12 +50,15 @@ export const TransferInterchainTokenOperatorship: FC = () => {
     writeAsync: transferOperatorshipAsync,
     isLoading: isTransfering,
     data: transferResult,
-  } = useInterchainTokenServiceTransferOperatorship();
+  } = useTokenManagerTransferOperatorship({
+    address: tokenDetails?.tokenManagerAddress as `0x${string}`,
+  });
 
   const trpcContext = trpc.useUtils();
 
   useWaitForTransaction({
     hash: transferResult?.hash,
+    confirmations: 8,
     async onSuccess(receipt) {
       if (!transferResult) {
         return;
@@ -79,9 +93,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
 
       try {
         const txResult = await transferOperatorshipAsync({
-          args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.transferOperatorship.args({
-            operator: data.recipientAddress,
-          }),
+          args: [data.recipientAddress],
         });
 
         if (txResult?.hash) {
