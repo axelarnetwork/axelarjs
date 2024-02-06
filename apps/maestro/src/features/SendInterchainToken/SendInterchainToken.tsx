@@ -21,6 +21,7 @@ import { preventNonNumericInput } from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
+import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
@@ -297,6 +298,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 minutes to confirmation
               </Alert>
             )}
+
+          {state.txState.status === "submitted" && (
+            <ShareHaikuButton
+              additionalChainNames={[state.selectedToChain.id]}
+              originChainName={props.sourceChain.chain_name}
+              tokenName={state.tokenSymbol ?? ""}
+              originAxelarChainId={props.sourceChain.chain_name}
+              tokenAddress={props.tokenAddress}
+              haikuType="send"
+            />
+          )}
 
           {state.txState.status === "submitted" && (
             <GMPTxStatusMonitor
