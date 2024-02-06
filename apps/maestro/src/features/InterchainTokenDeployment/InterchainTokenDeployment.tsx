@@ -57,7 +57,7 @@ const InterchainTokenDeployment = () => {
     <MultiStepDialog
       triggerLabel="Deploy a new Interchain Token"
       title={
-        <Dialog.Title className="flex items-center gap-1 sm:gap-2">
+        <Dialog.Title className="flex items-center justify-center gap-1 sm:gap-2">
           {showBackButton && <BackButton onClick={actions.prevStep} />}
           <span
             className={cn("-translate-y-2", {
