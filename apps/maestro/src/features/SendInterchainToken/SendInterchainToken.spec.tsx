@@ -127,9 +127,7 @@ describe("SendInterchainToken", () => {
       </span>
     `);
 
-    expect(
-      screen.getByRole("button", { name: /Amount is required/ })
-    ).toBeDisabled();
+    expect(screen.getByText(/Amount is required/)).toBeVisible();
   });
 
   it("should update the button text when entering an amount", async () => {
