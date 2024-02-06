@@ -6,6 +6,7 @@ const INPPUT_SCHEMA = z.object({
   tokenName: z.string(),
   originChainName: z.string(),
   additionalChainNames: z.array(z.string()),
+  haikuType: z.enum(["deployment", "send"]),
 });
 
 const OUTPUT_SCHEMA = z.object({
@@ -57,7 +58,12 @@ function formatChainReference(additionalChains: string[]): string {
 function createPrompt(input: HaikuInput): string {
   const chainReference = formatChainReference(input.additionalChainNames);
 
-  return `Create an original haiku celebrating the "${input.tokenName}" token, originating from "${input.originChainName}" and expanding${chainReference}. 
+  const baseRequest =
+    input.haikuType === "deployment"
+      ? `Create an original haiku celebrating the "${input.tokenName}" token, originating from "${input.originChainName}" and expanding ${chainReference}`
+      : `Create an original haiku celebrating that we just sent "${input.tokenName}" token from "${input.originChainName}" to "${chainReference}"`;
+
+  return `${baseRequest}. 
      Use natural or mystical imagery, avoiding technical jargon. 
      The haiku should not contain financial advice.
      It should also not contain any profanity or offensive language.`

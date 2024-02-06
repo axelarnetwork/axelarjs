@@ -1,4 +1,4 @@
-import { Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
+import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
@@ -150,33 +150,44 @@ export const Step3: FC = () => {
     return gasFeeBn > balance.value;
   }, [balance, state.remoteDeploymentGasFees, state.totalGasFee]);
 
-  const buttonChildren = useMemo(() => {
+  const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
-      return "Check your wallet";
+      return { children: "Check your wallet", status: "loading" };
     }
     if (rootState.txState.type === "deploying") {
-      return "Deploying interchain token";
+      return { children: "Deploying interchain token", status: "loading" };
     }
 
     if (state.isEstimatingGasFees) {
-      return "Loading gas fees";
+      return { children: "Loading gas fees", status: "loading" };
     }
     if (state.hasGasFeesEstimationError) {
-      return "Failed to load gas prices";
+      return {
+        children: "Failed to load gas prices",
+        status: "error",
+      };
     }
 
     if (hasInsufficientGasBalance) {
-      return `Insufficient ${nativeTokenSymbol} for gas fees`;
+      return {
+        children: `Insufficient ${nativeTokenSymbol} for gas fees`,
+        status: "error",
+      };
     }
 
-    return (
-      <>
-        Deploy{" "}
-        {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull((length) => (
-          <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
-        ))}
-      </>
-    );
+    return {
+      children: (
+        <>
+          Deploy{" "}
+          {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull(
+            (length) => (
+              <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
+            )
+          )}
+        </>
+      ),
+      status: "idle",
+    };
   }, [
     rootState.txState.type,
     state.isEstimatingGasFees,
@@ -186,13 +197,18 @@ export const Step3: FC = () => {
     nativeTokenSymbol,
   ]);
 
+  const isCTADisabled =
+    state.isEstimatingGasFees ||
+    state.hasGasFeesEstimationError ||
+    hasInsufficientGasBalance ||
+    rootState.txState.type === "pending_approval";
+
   return (
     <>
       <form onSubmit={handleSubmit}>
         <FormControl>
           <Label>
             <Label.Text>Additional chains (optional):</Label.Text>
-
             {Boolean(state.remoteDeploymentGasFees?.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
@@ -217,21 +233,23 @@ export const Step3: FC = () => {
         <button type="submit" ref={formSubmitRef} />
       </form>
       <Dialog.Actions>
-        <NextButton
-          length="block"
-          loading={
-            rootState.txState.type === "pending_approval" ||
-            rootState.txState.type === "deploying"
-          }
-          disabled={
-            state.isEstimatingGasFees ||
-            state.hasGasFeesEstimationError ||
-            hasInsufficientGasBalance
-          }
-          onClick={() => formSubmitRef.current?.click()}
-        >
-          <span>{buttonChildren}</span>
-        </NextButton>
+        {buttonStatus === "error" ? (
+          <Alert status="error">{buttonChildren}</Alert>
+        ) : (
+          <NextButton
+            length="block"
+            loading={
+              rootState.txState.type === "pending_approval" ||
+              rootState.txState.type === "deploying"
+            }
+            disabled={isCTADisabled}
+            onClick={() => {
+              formSubmitRef.current?.click();
+            }}
+          >
+            {buttonChildren}
+          </NextButton>
+        )}
       </Dialog.Actions>
     </>
   );

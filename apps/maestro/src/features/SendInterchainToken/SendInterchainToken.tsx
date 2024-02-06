@@ -21,6 +21,7 @@ import { preventNonNumericInput } from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
+import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
@@ -90,38 +91,56 @@ export const SendInterchainToken: FC<Props> = (props) => {
     );
   };
 
-  const buttonChildren = useMemo(() => {
+  const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     const pluralized = `token${Number(amountToTransfer) > 1 ? "s" : ""}`;
 
     switch (state.txState?.status) {
       case "awaiting_spend_approval":
-        return "Approve spend on wallet";
+        return {
+          children: "Approve spend on wallet",
+          status: "loading",
+        };
       case "awaiting_approval":
-        return "Confirm on wallet";
+        return {
+          children: "Confirm on wallet",
+          status: "loading",
+        };
       case "submitted":
-        return (
-          <>
-            Transferring {amountToTransfer} {pluralized} to{" "}
-            {state.selectedToChain?.name}
-          </>
-        );
+        return {
+          children: (
+            <>
+              Transferring {amountToTransfer} {pluralized} to{" "}
+              {state.selectedToChain?.name}
+            </>
+          ),
+          status: "loading",
+        };
       default:
         if (!formState.isValid) {
-          return (
-            formState.errors.amountToTransfer?.message ?? "Amount is required"
-          );
+          return {
+            children:
+              formState.errors.amountToTransfer?.message ??
+              "Amount is required",
+            status: "error",
+          };
         }
 
         if (state.hasInsufficientGasBalance) {
-          return `Insufficient ${state.nativeTokenSymbol} for gas fees`;
+          return {
+            children: `Insufficient ${state.nativeTokenSymbol} for gas fees`,
+            status: "error",
+          };
         }
 
-        return (
-          <>
-            Transfer {amountToTransfer || 0} {pluralized} to{" "}
-            {state.selectedToChain?.name}
-          </>
-        );
+        return {
+          children: (
+            <>
+              Transfer {amountToTransfer || 0} {pluralized} to{" "}
+              {state.selectedToChain?.name}
+            </>
+          ),
+          status: "idle",
+        };
     }
   }, [
     amountToTransfer,
@@ -299,6 +318,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
             )}
 
           {state.txState.status === "submitted" && (
+            <ShareHaikuButton
+              additionalChainNames={[state.selectedToChain.id]}
+              originChainName={props.sourceChain.chain_name}
+              tokenName={state.tokenSymbol ?? ""}
+              originAxelarChainId={props.sourceChain.chain_name}
+              tokenAddress={props.tokenAddress}
+              haikuType="send"
+            />
+          )}
+
+          {state.txState.status === "submitted" && (
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
               onAllChainsExecuted={handleAllChainsExecuted}
@@ -318,18 +348,24 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 </Label.AltText>
               )}
             </Label>
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={
-                !formState.isValid ||
-                isFormDisabled ||
-                state.hasInsufficientGasBalance
-              }
-              loading={state.isSending}
-            >
-              {buttonChildren}
-            </Button>
+            {buttonStatus === "error" ? (
+              <Alert role="alert" status="error">
+                {buttonChildren}
+              </Alert>
+            ) : (
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={
+                  !formState.isValid ||
+                  isFormDisabled ||
+                  state.hasInsufficientGasBalance
+                }
+                loading={state.isSending}
+              >
+                {buttonChildren}
+              </Button>
+            )}
           </div>
         </form>
       </Modal.Body>

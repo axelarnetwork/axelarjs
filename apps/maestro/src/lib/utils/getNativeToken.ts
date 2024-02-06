@@ -28,5 +28,8 @@ export const getNativeToken = memoize((axelarChainId: string) => {
     throw new Error(`getNativeToken(): chain ${axelarChainId} does not exist`);
   }
 
-  return chainConfig.nativeCurrency.symbol;
+  //TODO: HACK
+  if (chainConfig.nativeCurrency.symbol === "tBNB") {
+    return "BNB";
+  } else return chainConfig.nativeCurrency.symbol;
 });

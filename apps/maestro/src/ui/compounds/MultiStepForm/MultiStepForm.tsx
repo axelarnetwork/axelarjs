@@ -224,6 +224,7 @@ export const ShareHaikuButton: FC<{
   additionalChainNames: string[];
   originAxelarChainId: string;
   tokenAddress: `0x${string}`;
+  haikuType: "deployment" | "send";
 }> = (props) => {
   const { mutateAsync, isLoading, isSuccess } =
     trpc.openai.generateInterchainDeploymentHaiku.useMutation();
@@ -239,14 +240,18 @@ export const ShareHaikuButton: FC<{
 
   const handleShareHaiku = useCallback(async () => {
     try {
-      const { value } = await mutateAsync({ ...props, additionalChainNames });
+      const { value } = await mutateAsync({
+        ...props,
+        additionalChainNames,
+        haikuType: props.haikuType,
+      });
 
       const tokenDetailsUrl =
-        `${window.location.href}/${props.originAxelarChainId}/${props.tokenAddress}`
+        `${window.location.origin}/${props.originAxelarChainId}/${props.tokenAddress}`
           // repplace // with / to avoid double slash in url
           .replace(/([^:]\/)\/+/g, "$1");
 
-      const tweet = `${value.trim()}\n\nCheck out my Interchain Token:\n${tokenDetailsUrl}`;
+      const tweet = `${value.trim()}\n\nCheck out my Interchain Token:\n${tokenDetailsUrl}\n\n#interchaintokens`;
 
       // redirect to twitter with haiku
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -284,12 +289,12 @@ export const ShareHaikuButton: FC<{
 };
 
 const TOKEN_NAME_DISCLAIMER =
-  "Make sure you consider all relevant stakeholders before deploying a token through ITS. Creating a simple token using the ITS Portal will give the token the same name and symbol on all chains. If you need your token to have different names or symbols on different chains, you'll have to build a custom token.";
+  "Tokens created on the portal will have the same name and symbol on all chains. Build a custom token if you need different names or symbols on different chains.";
 
 export const TokenNameLabelWithTooltip = ({ label = "Token Name" }) => (
   <Label.Text className="inline-flex items-center gap-1">
     {label}
-    <Tooltip position="right" variant="warning" tip={TOKEN_NAME_DISCLAIMER}>
+    <Tooltip position="right" variant="info" tip={TOKEN_NAME_DISCLAIMER}>
       <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
     </Tooltip>
   </Label.Text>
@@ -303,7 +308,7 @@ export const TokenNameAlert = () => {
   }
 
   return (
-    <Alert status="warning" className="relative">
+    <Alert status="info" className="relative">
       <Button
         size="sm"
         variant="ghost"
