@@ -56,17 +56,10 @@ export function useInterchainTransferMutation(
       }
 
       const bnAmount = parseUnits(amount, decimals);
-      console.log("amount yooo", amount, decimals, bnAmount.toString());
 
       try {
         setTxState({
           status: "awaiting_approval",
-        });
-        console.log("txResult", {
-          destinationChain: config.destinationChainName,
-          recipient: address,
-          amount: bnAmount,
-          metadata: "0x",
         });
 
         const txResult = await transferAsync({
