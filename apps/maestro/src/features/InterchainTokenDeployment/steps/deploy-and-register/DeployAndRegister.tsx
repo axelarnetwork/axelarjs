@@ -54,9 +54,10 @@ export const Step3: FC = () => {
         remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
         sourceChainId: sourceChain?.id ?? "",
         minterAddress: rootState.tokenDetails.minter,
-        initialSupply: Maybe.of(
-          rootState.tokenDetails.initialSupply
-        ).mapOrUndefined(BigInt),
+        initialSupply: parseUnits(
+          rootState.tokenDetails.initialSupply,
+          rootState.tokenDetails.tokenDecimals || 0
+        ),
       }
     );
 
