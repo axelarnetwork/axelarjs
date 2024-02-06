@@ -1,6 +1,7 @@
 import {
   Alert,
   Card,
+  cn,
   FormControl,
   Label,
   Progress,
@@ -155,40 +156,50 @@ const CompetitionPage = () => {
           <Card.Title>
             Welcome to the ITS Legend Interchain Competition!
           </Card.Title>
-          <p>
-            To celebrate the mainnet launch of Interchain Token Service, we are
-            launching the ITS Legend Interchain Competition!
-          </p>
-          <ul className="list-inside list-none space-y-2">
-            <li>
-              <strong className="text-primary">Objective:</strong> Mint new
-              Interchain Tokens and drive as many transactions as possible with
-              them.
-            </li>
-            <li>
-              <strong className="text-primary">Duration:</strong> The
-              competition kicks off at 1pm EST on Feb 7 and concludes at 1pm EST
-              on Feb 21, spanning a thrilling two weeks.
-            </li>
-            <li>
-              <strong className="text-primary">Prizes:</strong> The top three
-              projects with the highest transaction counts will be rewarded with
-              AXL tokens:
-              <ul className="list-disc space-y-1 pl-5">
-                {PRIZES.map(({ place, amount }) => (
-                  <li key={place}>
-                    <strong>{place} Place</strong>: {amount.toLocaleString()}{" "}
-                    AXL
-                  </li>
-                ))}
-              </ul>
-            </li>
-            <li>
-              ve those states where you c
-              <strong className="text-primary">Eligibility:</strong> Only tokens
-              minted after the competition starts are eligible.
-            </li>
-          </ul>
+          <div className="prose">
+            <p>
+              To celebrate the mainnet launch of Interchain Token Service, we
+              are launching the ITS Legend Interchain Competition!
+            </p>
+            <ul className="list-inside list-none">
+              <li>
+                <strong className="text-primary">Objective:</strong> Mint new
+                Interchain Tokens and drive as many transactions as possible
+                with them.
+              </li>
+              <li>
+                <strong className="text-primary">Duration:</strong> The
+                competition kicks off at 1pm EST on Feb 7 and concludes at 1pm
+                EST on Feb 21, spanning a thrilling two weeks.
+              </li>
+              <li>
+                <strong className="text-primary">Prizes:</strong> The top three
+                projects with the highest transaction counts will be rewarded
+                with AXL tokens:
+                <ul className="max-w-56">
+                  {PRIZES.map(({ place, amount }, i) => (
+                    <li
+                      key={place}
+                      className={cn("pl-4", {
+                        "list-['🏆']": i === 0,
+                        "list-['🥈']": i === 1,
+                        "list-['🥉']": i === 2,
+                      })}
+                    >
+                      <div className="flex items-center justify-between">
+                        <strong>{place} Place</strong>
+                        <div>{amount.toLocaleString()} AXL</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+              <li>
+                <strong className="text-primary">Eligibility:</strong> Only
+                tokens minted after the competition starts are eligible.
+              </li>
+            </ul>
+          </div>
         </Card.Body>
       </Card>
 
