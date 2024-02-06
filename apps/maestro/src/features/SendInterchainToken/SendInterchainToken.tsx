@@ -164,12 +164,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [state.txState]
   );
 
-  console.log("txHash", txHash);
-  console.log("isFormDisabled", isFormDisabled);
-
   useEffect(() => {
     if (!txHash) return;
-    console.log("Yooo");
 
     actions.trackTransaction({
       status: "submitted",
