@@ -61,6 +61,10 @@ export type SearchGMPParams = BaseGMPParams & {
   sort?: Record<string, SortOrder>;
   sourceContractAddress?: `0x${string}`;
   destinationContractAddress?: `0x${string}`;
+  _source?: {
+    includes?: string[];
+    excludes?: string[];
+  };
 };
 
 type HexAmount = {
