@@ -20,6 +20,12 @@ import {
 import { trpc } from "~/lib/trpc";
 import Page from "~/ui/layouts/Page";
 
+const PRIZES = [
+  { place: "1st", amount: 10101 },
+  { place: "2nd", amount: 6900 },
+  { place: "3rd", amount: 4200 },
+];
+
 const TROPHY_EMOJIS = ["🏆", "🥈", "🥉"];
 
 const COMPETITION_START_TS = Date.parse(
@@ -160,41 +166,46 @@ const CompetitionPage = () => {
       loadingMessage="Loading transactions..."
     >
       <Page.Title>Interchain Leaderboard</Page.Title>
-      <div className="bg-base-200 mx-auto max-w-4xl rounded-lg p-5 shadow-lg">
-        <h2 className="mb-4 text-xl font-bold text-neutral-300">
-          Welcome to the ITS Legend Interchain Competition!
-        </h2>
-        <p className="text-neutral-content mb-4">
-          To celebrate the mainnet launch of Interchain Token Service, we are
-          launching the ITS Legend Interchain Competition!
-        </p>
-        <ul className="text-neutral-content list-inside list-none space-y-2">
-          <li>
-            <strong className="text-neutral-300">Objective:</strong> Mint new
-            Interchain Tokens and drive as many transactions as possible with
-            them.
-          </li>
-          <li>
-            <strong className="text-neutral-300">Duration:</strong> The
-            competition kicks off at 1pm EST on Feb 7 and concludes at 1pm EST
-            on Feb 21, spanning a thrilling two weeks.
-          </li>
-          <li>
-            <strong className="text-neutral-300">Prizes:</strong> The top three
-            projects with the highest transaction counts will be rewarded with
-            AXL tokens:
-            <ul className="text-neutral-content list-disc space-y-1 pl-5">
-              <li>1st Place: 10,101 AXL</li>
-              <li>2nd Place: 6,900 AXL</li>
-              <li>3rd Place: 4,200 AXL</li>
-            </ul>
-          </li>
-          <li>
-            <strong className="text-neutral-300">Eligibility:</strong> Only
-            tokens minted after the competition starts are eligible.
-          </li>
-        </ul>
-      </div>
+      <Card className="bg-base-200">
+        <Card.Body>
+          <Card.Title>
+            Welcome to the ITS Legend Interchain Competition!
+          </Card.Title>
+          <p>
+            To celebrate the mainnet launch of Interchain Token Service, we are
+            launching the ITS Legend Interchain Competition!
+          </p>
+          <ul className="list-inside list-none space-y-2">
+            <li>
+              <strong className="text-primary">Objective:</strong> Mint new
+              Interchain Tokens and drive as many transactions as possible with
+              them.
+            </li>
+            <li>
+              <strong className="text-primary">Duration:</strong> The
+              competition kicks off at 1pm EST on Feb 7 and concludes at 1pm EST
+              on Feb 21, spanning a thrilling two weeks.
+            </li>
+            <li>
+              <strong className="text-primary">Prizes:</strong> The top three
+              projects with the highest transaction counts will be rewarded with
+              AXL tokens:
+              <ul className="list-disc space-y-1 pl-5">
+                {PRIZES.map(({ place, amount }) => (
+                  <li key={place}>
+                    <strong>{place} Place</strong>: {amount.toLocaleString()}{" "}
+                    AXL
+                  </li>
+                ))}
+              </ul>
+            </li>
+            <li>
+              <strong className="text-primary">Eligibility:</strong> Only tokens
+              minted after the competition starts are eligible.
+            </li>
+          </ul>
+        </Card.Body>
+      </Card>
 
       {content}
     </Page>

@@ -37,7 +37,10 @@ export const recordRemoteTokensDeployment = protectedProcedure
       });
     }
 
-    if (originToken.deployerAddress !== ctx.session?.address) {
+    if (
+      originToken.kind === "interchain" &&
+      originToken.deployerAddress !== ctx.session?.address
+    ) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: `Only the deployer of the token can record remote tokens`,
