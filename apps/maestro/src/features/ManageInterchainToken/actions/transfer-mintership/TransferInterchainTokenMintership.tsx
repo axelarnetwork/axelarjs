@@ -149,12 +149,12 @@ export const TransferInterchainTokenMintership: FC = () => {
         >
           <FormControl>
             <Label htmlFor="recipientAddress">
-              <Label.Text>Recipient address</Label.Text>
+              <Label.Text>New minter</Label.Text>
             </Label>
             <TextInput
               id="recipientAddress"
               bordered
-              placeholder="Enter recipient address"
+              placeholder="Enter new minter"
               className="bg-base-200"
               min={0}
               {...register("recipientAddress", {

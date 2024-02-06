@@ -97,7 +97,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       label: "Transfer Mintership",
       value: "transferMintership",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
-      isVisible: (props) => props.isTokenMinter,
+      isVisible: (props) => props.isTokenMinter && false, //TODO: See note (A) below
     },
   ];
 
@@ -168,3 +168,14 @@ const WithManageInterchainTokenProvider: FC<Props> = (props) => (
 );
 
 export default WithManageInterchainTokenProvider;
+
+/**
+ * Note A:
+ *
+ * After mintership is transferred to another address, additional deployments
+ * need to make use of the new minter address in the args, while the deployer
+ * address remains the same. We don’t support this atm via the portal (additional
+ * tokens can’t be deployed after a transfer).
+ *
+ * Disabling this option for now
+ */

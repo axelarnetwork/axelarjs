@@ -144,7 +144,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   return (
     <>
       <Dialog.Title className="flex">
-        <span>Transfer rate-limit manager</span>
+        <span>Transfer rate limit operator</span>
       </Dialog.Title>
       {txState.status === "confirmed" ? (
         <Alert status="success">
@@ -157,12 +157,12 @@ export const TransferInterchainTokenOperatorship: FC = () => {
         >
           <FormControl>
             <Label htmlFor="recipientAddress">
-              <Label.Text>Recipient address</Label.Text>
+              <Label.Text>New operator address</Label.Text>
             </Label>
             <TextInput
               id="recipientAddress"
               bordered
-              placeholder="Enter recipient address"
+              placeholder="Enter new operator address"
               className="bg-base-200"
               min={0}
               {...register("recipientAddress", {

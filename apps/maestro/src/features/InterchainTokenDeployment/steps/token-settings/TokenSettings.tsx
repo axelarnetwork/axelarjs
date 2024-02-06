@@ -115,7 +115,7 @@ const TokenSettings: FC = () => {
                 <Tooltip
                   position="right"
                   variant="info"
-                  tip="Ensure that you choose a secure minter address. This address will be able to mint the token on any chain."
+                  tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
                 >
                   <HelpCircleIcon className="text-info mr-1 h-[1em]" />
                 </Tooltip>
