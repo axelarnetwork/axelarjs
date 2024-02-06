@@ -2,7 +2,7 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Button,
-  CurrentHourClockIcon,
+  EyeIcon,
   FormControl,
   Label,
   Modal,
@@ -311,7 +311,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
           {state.txState.status === "idle" &&
             state.estimatedWaitTimeInMinutes > 2 && (
-              <Alert icon={<CurrentHourClockIcon />}>
+              <Alert icon={<EyeIcon />}>
                 This transfer may take ≈{state.estimatedWaitTimeInMinutes}{" "}
                 minutes to confirmation
               </Alert>
