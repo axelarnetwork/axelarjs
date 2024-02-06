@@ -171,7 +171,9 @@ export const Step3: FC = () => {
 
     if (hasInsufficientGasBalance) {
       return {
-        children: `Insufficient ${nativeTokenSymbol} for gas fees`,
+        children: sourceChain?.native_token.decimals
+          ? `Insufficient ${nativeTokenSymbol} balance for gas fees (${state.totalGasFee})`
+          : `Insufficient ${nativeTokenSymbol} balance for gas fees`,
         status: "error",
       };
     }
@@ -196,6 +198,7 @@ export const Step3: FC = () => {
     state.remoteDeploymentGasFees,
     hasInsufficientGasBalance,
     nativeTokenSymbol,
+    sourceChain,
   ]);
 
   const isCTADisabled =
