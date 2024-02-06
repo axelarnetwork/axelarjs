@@ -159,6 +159,10 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
     );
   }
 
+  const showFinalityProgressBar = statusList.some(
+    (chain) => chain.status === "called"
+  );
+
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
@@ -168,7 +172,9 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
           </span>
         )}
       </div>
-      <TxFinalityProgress txHash={txHash} chainId={chainId} />
+      {showFinalityProgressBar && (
+        <TxFinalityProgress txHash={txHash} chainId={chainId} />
+      )}
       <ul className="bg-base-300 rounded-box grid gap-2 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {

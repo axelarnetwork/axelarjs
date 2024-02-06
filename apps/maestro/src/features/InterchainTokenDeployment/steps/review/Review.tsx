@@ -93,6 +93,7 @@ const Review: FC = () => {
                   tokenName={state.tokenDetails.tokenName}
                   originAxelarChainId={chainConfig.id}
                   tokenAddress={state.txState.tokenAddress}
+                  haikuType="deployment"
                 />
               )}
             </Alert>

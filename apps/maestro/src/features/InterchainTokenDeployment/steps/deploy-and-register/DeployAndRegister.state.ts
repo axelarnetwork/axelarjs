@@ -43,7 +43,7 @@ export function useStep3ChainSelectionState() {
     sourceChainId,
     destinationChainIds: rootState.selectedChains,
     gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT),
-    gasMultipler: 2,
+    gasMultipler: 1.5,
   });
 
   useEffect(() => {

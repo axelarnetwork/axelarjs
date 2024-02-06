@@ -92,7 +92,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       {props.kind === "canonical" && (
         <div className="italic">
           {" "}
-          This is a wrapped token deployed via ITS, powered by Axelar
+          This is a pre-existing token on {props.chain.name} that was registered
+          on ITS, powered by Axelar
         </div>
       )}
       <ul className="grid gap-1.5">
