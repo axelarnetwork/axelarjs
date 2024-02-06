@@ -1,6 +1,7 @@
 import { Alert, InfoIcon } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 import { useChainFromRoute } from "~/lib/hooks";
 import { useGetChainsConfig } from "~/services/axelarConfigs/hooks";
@@ -52,8 +53,19 @@ const CanonicalTokenDeployment: FC = () => {
   if (isGatewayToken)
     return (
       <Alert status="warning" icon={<InfoIcon className="h-6 w-6" />}>
-        This token is supported directly on Axelar and cannot be registered in
-        ITS.
+        This token is registered natively on Axelar and will be supported by ITS
+        in the near future. You can use{" "}
+        {
+          <Link
+            className="font-semibold hover:underline"
+            href={"https://app.squidrouter.com/"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Squid
+          </Link>
+        }{" "}
+        to transfer this token.
       </Alert>
     );
 

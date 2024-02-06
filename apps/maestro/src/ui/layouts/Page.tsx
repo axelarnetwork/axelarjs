@@ -137,17 +137,27 @@ const Page = ({
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">
               <div className="grid gap-1 text-center text-xl font-semibold">
-                <div className="flex items-center gap-2">
-                  You&apos;re connected to{" "}
-                  <Badge variant="info">
-                    {selectedChain?.name} ({selectedChain?.environment})
-                  </Badge>
-                  which is not a supported{" "}
-                  <Badge variant="info">
-                    {process.env.NEXT_PUBLIC_NETWORK_ENV}
-                  </Badge>{" "}
-                  network.
-                </div>
+                {selectedChain ? (
+                  <div className="flex items-center gap-2">
+                    You&apos;re connected to{" "}
+                    <Badge variant="info">
+                      {selectedChain?.name} ({selectedChain?.environment})
+                    </Badge>
+                    which is not a supported{" "}
+                    <Badge variant="info">
+                      {process.env.NEXT_PUBLIC_NETWORK_ENV}
+                    </Badge>{" "}
+                    network.
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    You are not connected to a supported
+                    <Badge variant="info">
+                      {process.env.NEXT_PUBLIC_NETWORK_ENV}
+                    </Badge>{" "}
+                    network.
+                  </div>
+                )}
               </div>
               <EVMChainsDropdown
                 renderTrigger={() => (
