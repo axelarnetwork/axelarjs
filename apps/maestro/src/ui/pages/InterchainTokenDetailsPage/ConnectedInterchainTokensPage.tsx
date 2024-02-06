@@ -5,7 +5,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
+import { useAccount, useBalance, useChainId, useSwitchNetwork } from "wagmi";
 
 import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
@@ -223,6 +223,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     setSessionState,
   ]);
 
+  const { data: userGasBalance } = useBalance({
+    address,
+    watch: true,
+  });
+
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
@@ -248,8 +253,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     (x) => !runninChainIds.includes(x)
   );
 
+  const isRestrictedToDeployer =
+    interchainToken.kind === "interchain" &&
+    !interchainToken.wasDeployedByAccount;
+
   const isReadOnly =
-    !interchainToken.wasDeployedByAccount ||
+    isRestrictedToDeployer ||
     !address ||
     isGasPriceQueryLoading ||
     !hasFetchedStatuses;
@@ -336,7 +345,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               deploymentKind={originToken.kind}
               chainIds={nonRunningSelectedChainIds}
               tokenAddress={props.tokenAddress}
+              userGasBalance={userGasBalance}
+              gasFees={gasFees}
               originChainId={originToken?.chainId}
+              originChain={originToken.chain}
               onTxStateChange={(txState) => {
                 switch (txState.status) {
                   case "submitted":
