@@ -37,7 +37,12 @@ export const getTopTransactions = publicProcedure
         fromTime: input.fromTime,
         toTime: input.toTime,
         _source: {
-          includes: ["interchain_transfer"],
+          includes: [
+            "interchain_transfer.name",
+            "interchain_transfer.symbol",
+            "interchain_transfer.contract_address",
+            "interchain_transfer.tokenId",
+          ],
         },
       });
 

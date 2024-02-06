@@ -18,6 +18,7 @@ import {
   NEXT_PUBLIC_COMPETITION_START_TIMESTAMP,
 } from "~/config/env";
 import { trpc } from "~/lib/trpc";
+import type { GetTopTransactionsOutput } from "~/server/routers/gmp/getTopTransactions";
 import Page from "~/ui/layouts/Page";
 
 const PRIZES = [
@@ -132,24 +133,7 @@ const CompetitionPage = () => {
             </Table.Head>
             <Table.Body>
               {data?.map((item, index) => (
-                <Table.Row key={item.tokenId}>
-                  <Table.Cell className="text-right">{index + 1}</Table.Cell>
-                  <Table.Cell>
-                    <Link href={`/interchain-tokens/${item.tokenId}`}>
-                      {maskAddress(item.tokenId)}
-                    </Link>
-                  </Table.Cell>
-                  <Table.Cell>{item.name}</Table.Cell>
-                  <Table.Cell>{item.symbol}</Table.Cell>
-                  <Table.Cell className="text-right">
-                    {item.count}
-                    {index < TROPHY_EMOJIS.length && (
-                      <span className="absolute translate-x-2">
-                        {TROPHY_EMOJIS[index]}
-                      </span>
-                    )}
-                  </Table.Cell>
-                </Table.Row>
+                <RowItem key={item.tokenId} {...{ item, index }} />
               ))}
             </Table.Body>
           </Table>
@@ -200,6 +184,7 @@ const CompetitionPage = () => {
               </ul>
             </li>
             <li>
+              ve those states where you c
               <strong className="text-primary">Eligibility:</strong> Only tokens
               minted after the competition starts are eligible.
             </li>
@@ -211,5 +196,29 @@ const CompetitionPage = () => {
     </Page>
   );
 };
+
+const RowItem = (props: {
+  item: GetTopTransactionsOutput[number];
+  index: number;
+}) => (
+  <Table.Row key={props.item.tokenId}>
+    <Table.Cell className="text-right">{props.index + 1}</Table.Cell>
+    <Table.Cell>
+      <Link href={`/interchain-tokens/${props.item.tokenId}`}>
+        {maskAddress(props.item.tokenId)}
+      </Link>
+    </Table.Cell>
+    <Table.Cell>{props.item.name}</Table.Cell>
+    <Table.Cell>{props.item.symbol}</Table.Cell>
+    <Table.Cell className="text-right">
+      {props.item.count}
+      {props.index < TROPHY_EMOJIS.length && (
+        <span className="absolute translate-x-2">
+          {TROPHY_EMOJIS[props.index]}
+        </span>
+      )}
+    </Table.Cell>
+  </Table.Row>
+);
 
 export default CompetitionPage;
