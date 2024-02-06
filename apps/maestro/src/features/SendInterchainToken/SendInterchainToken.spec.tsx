@@ -93,6 +93,10 @@ vi.mock("~/ui/components/EVMChainsDropdown/index.ts", () => ({
   default: () => <div>EVMChainsDropdown</div>,
 }));
 
+vi.mock("~/ui/compounds/MultiStepForm/index.ts", () => ({
+  ShareHaikuButton: () => <div>ShareHaikuButton</div>,
+}));
+
 describe("SendInterchainToken", () => {
   it("should render correctly", () => {
     const { ...screen } = render(
