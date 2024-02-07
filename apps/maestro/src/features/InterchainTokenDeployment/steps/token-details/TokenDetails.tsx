@@ -62,7 +62,7 @@ const TokenDetails: FC = () => {
             id="tokenDecimals"
             type="number"
             placeholder="Enter your token decimals"
-            min={1}
+            min={0}
             max={18}
             {...register("tokenDecimals")}
           />

@@ -16,6 +16,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import EVMChainsDropdown, {
   ChainIcon,
 } from "~/ui/components/EVMChainsDropdown";
+import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
 import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
 
 type PageState =
@@ -116,6 +117,9 @@ const Page = ({
       case "disconnected":
         return mustBeConnected ? (
           <div className="grid w-full flex-1 place-items-center">
+            <div className="mb-20 w-full">
+              <ConditionalRenderInterchainBanner />
+            </div>
             <div className="grid w-full flex-1 place-items-center">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>

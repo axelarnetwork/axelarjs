@@ -78,7 +78,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
             )}
           </Card.Title>
         </Indicator>
-        <div className="mx-auto">Remote token not registered</div>
+        <div className="mx-auto">Interchain token not registered</div>
       </Card.Body>
     </Card>
   );

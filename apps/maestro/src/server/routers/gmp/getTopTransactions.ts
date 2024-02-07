@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { groupBy } from "rambda";
+import { groupBy, reduce } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
@@ -28,27 +28,53 @@ export const getTopTransactions = publicProcedure
   .input(INPUT_SCHEMA)
   .query(async ({ input, ctx }) => {
     try {
-      const response = await ctx.services.gmp.searchGMP({
-        senderAddress: input.senderAddress,
-        destinationContractAddress:
-          NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-        size: input.sampleSize,
-        contractMethod: input.contractMethod,
-        fromTime: input.fromTime,
-        toTime: input.toTime,
-        _source: {
-          includes: [
-            "interchain_transfer.name",
-            "interchain_transfer.symbol",
-            "interchain_transfer.contract_address",
-            "interchain_transfer.tokenId",
-          ],
-        },
-      });
+      const [tokenDeployments, interchainTransfers] = await Promise.all([
+        ctx.services.gmp.searchGMP({
+          senderAddress: input.senderAddress,
+          destinationContractAddress:
+            NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+          size: input.sampleSize,
+          contractMethod: "InterchainTokenDeploymentStarted",
+          fromTime: input.fromTime,
+          toTime: input.toTime,
+          _source: {
+            includes: [
+              "interchain_token_deployment_started.tokenName",
+              "interchain_token_deployment_started.tokenSymbol",
+              "interchain_token_deployment_started.tokenId",
+            ],
+          },
+        }),
+        ctx.services.gmp.searchGMP({
+          senderAddress: input.senderAddress,
+          destinationContractAddress:
+            NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+          size: input.sampleSize,
+          contractMethod: input.contractMethod,
+          fromTime: input.fromTime,
+          toTime: input.toTime,
+          _source: {
+            includes: [
+              "interchain_transfer.name",
+              "interchain_transfer.symbol",
+              "interchain_transfer.contract_address",
+              "interchain_transfer.tokenId",
+            ],
+          },
+        }),
+      ]);
+
+      const txMap = reduce(
+        (acc, obj) => acc.add(obj.interchain_token_deployment_started?.tokenId),
+        new Set(),
+        tokenDeployments
+      );
 
       const grouped = groupBy(
         (tx) => tx.interchain_transfer?.tokenId ?? "",
-        response
+        interchainTransfers.filter((transfer) =>
+          txMap.has(transfer.interchain_transfer?.tokenId)
+        )
       );
 
       const filtered = Object.entries(grouped).filter(([tokenId]) =>

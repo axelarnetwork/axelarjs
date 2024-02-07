@@ -78,6 +78,12 @@ export function useGetTransactionType(
       const response = await gmpClient.searchGMP({
         txHash: input.txHash,
         size: 1,
+        _source: {
+          includes: [
+            "interchain_transfer",
+            "interchain_token_deployment_started",
+          ],
+        },
       });
 
       if (!response.length) {
@@ -121,6 +127,15 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
     async () => {
       const responseData = await gmpClient.searchGMP({
         txHash: input.txHash,
+        // _source: {
+        //   includes: [
+        //     "call.returnValues.destinationChain",
+        //     "call.transactionHash",
+        //     "call.logIndex",
+        //     "call.id",
+        //     "status",
+        //   ],
+        // },
       });
 
       if (!responseData.length) {
@@ -181,7 +196,20 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
     ["gmp-get-transactions-statuses-on-destination-chains", input.txHashes],
     async () => {
       const results = await Promise.all(
-        input.txHashes?.map((txHash) => gmpClient.searchGMP({ txHash })) ?? []
+        input.txHashes?.map((txHash) =>
+          gmpClient.searchGMP({
+            txHash,
+            // _source: {
+            //   includes: [
+            //     "call.returnValues.destinationChain",
+            //     "call.transactionHash",
+            //     "call.logIndex",
+            //     "call.id",
+            //     "status",
+            //   ],
+            // },
+          })
+        ) ?? []
       );
 
       return results.flat().reduce(
