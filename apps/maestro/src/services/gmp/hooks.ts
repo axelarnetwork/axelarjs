@@ -127,15 +127,15 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
     async () => {
       const responseData = await gmpClient.searchGMP({
         txHash: input.txHash,
-        // _source: {
-        //   includes: [
-        //     "call.returnValues.destinationChain",
-        //     "call.transactionHash",
-        //     "call.logIndex",
-        //     "call.id",
-        //     "status",
-        //   ],
-        // },
+        _source: {
+          includes: [
+            "call.returnValues.destinationChain",
+            "call.transactionHash",
+            "call.logIndex",
+            "call.id",
+            "status",
+          ],
+        },
       });
 
       if (!responseData.length) {
@@ -199,15 +199,15 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
         input.txHashes?.map((txHash) =>
           gmpClient.searchGMP({
             txHash,
-            // _source: {
-            //   includes: [
-            //     "call.returnValues.destinationChain",
-            //     "call.transactionHash",
-            //     "call.logIndex",
-            //     "call.id",
-            //     "status",
-            //   ],
-            // },
+            _source: {
+              includes: [
+                "call.returnValues.destinationChain",
+                "call.transactionHash",
+                "call.logIndex",
+                "call.id",
+                "status",
+              ],
+            },
           })
         ) ?? []
       );
