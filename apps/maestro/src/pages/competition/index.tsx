@@ -170,6 +170,7 @@ const CompetitionPage = () => {
               ))}
             </Table.Body>
           </Table>
+          <span className="text-xs italic">Source: Axelarscan</span>
         </Card.Body>
       </Card>
     );
