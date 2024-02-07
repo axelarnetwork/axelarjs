@@ -18,7 +18,7 @@ import {
 const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),
   tokenSymbol: z.string().min(1).max(11),
-  tokenDecimals: z.coerce.number().min(1).max(18),
+  tokenDecimals: z.coerce.number().min(0).max(18),
   initialSupply: numericString(),
   isMintable: z.boolean(),
   minter: optionalHex40Literal(),
