@@ -186,13 +186,16 @@ const Appbar: FC<AppbarProps> = (props) => {
               <Dropdown align="end">
                 <Dropdown.Trigger>
                   <button
-                    className="grid h-6 w-6 place-items-center rounded-full hover:ring focus:ring"
+                    className="grid place-items-center rounded-full hover:ring focus:ring"
                     aria-label="connected wallet dropdown trigger"
                   >
-                    <Identicon
-                      seed={jsNumberForAddress(address)}
-                      diameter={18}
-                    />
+                    <div className="flex items-center rounded-lg p-2">
+                      <Identicon
+                        seed={jsNumberForAddress(address)}
+                        diameter={18}
+                      />
+                      <p className="ml-2 text-sm">{maskAddress(address)}</p>
+                    </div>
                   </button>
                 </Dropdown.Trigger>
                 <Dropdown.Content className="bg-base-100 dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-2 p-3 md:w-48">
