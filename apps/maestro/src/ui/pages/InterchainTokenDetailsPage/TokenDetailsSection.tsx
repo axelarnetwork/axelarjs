@@ -196,7 +196,7 @@ const ManageTokenIcon: FC<{
 
   if (isOperator) {
     return (
-      <Tooltip tip="You are an operator of this token" position="bottom">
+      <Tooltip tip="Manage token icon" position="bottom">
         <Modal
           trigger={
             <button className="group relative grid h-9 w-9 place-items-center">
