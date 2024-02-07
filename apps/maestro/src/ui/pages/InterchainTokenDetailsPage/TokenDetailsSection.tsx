@@ -188,6 +188,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
     mutate: persistIconUrl,
     isLoading: isPersistingIconUrl,
     error: persistError,
+    reset: resetPersistError,
   } = trpc.interchainToken.setInterchainTokenIconUrl.useMutation({
     onError() {
       toast.error("Failed to save token icon");
@@ -267,7 +268,11 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               defaultValue={sanitizedUrl}
               className="bg-base-200"
               placeholder="Enter a url for a valid png, jpg, or svg icon"
-              onChange={(e) => setIconUrl(e.target.value)}
+              readOnly={isPersistingIconUrl}
+              onChange={(e) => {
+                resetPersistError();
+                setIconUrl(e.target.value);
+              }}
             />
           </FormControl>
           {isReadyForPreview && (
@@ -298,7 +303,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               length="block"
               variant="primary"
               loading={isPersistingIconUrl}
-              disabled={Boolean(formValidationMessage)}
+              disabled={Boolean(formValidationMessage) || Boolean(persistError)}
               onClick={() => {
                 if (iconUrl) {
                   persistIconUrl({ iconUrl, tokenId });
