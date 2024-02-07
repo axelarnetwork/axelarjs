@@ -185,7 +185,7 @@ const CompetitionPage = () => {
     >
       <Page.Title>Interchain Leaderboard</Page.Title>
       <Card className="bg-base-200">
-        <Card.Body>
+        <Card.Body className="spcae-y-4 xl:space-y-8">
           <InterchainBanner />
           <Card.Title>
             Welcome to the ITS Legend Interchain Competition!
