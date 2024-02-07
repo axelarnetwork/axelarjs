@@ -53,11 +53,10 @@ const MONTHS = [
   "Dec",
 ];
 
-const shortTime = (date: Date) =>
-  date
-    .toLocaleTimeString()
-    .toLowerCase()
-    .replace(/(:00)+ /, "");
+const shortTime = (date: Date) => {
+  const h = date.getUTCHours();
+  return h > 12 ? `${h - 12}pm` : `${h}am`;
+};
 
 const CompetitionPage = () => {
   const [now, setNow] = useState(Date.now());
@@ -171,8 +170,8 @@ const CompetitionPage = () => {
   const startMonth = MONTHS[competitionStart.getMonth()];
   const endMonth = MONTHS[competitionEnd.getMonth()];
 
-  const startDay = competitionStart.getDate();
-  const endDay = competitionEnd.getDate();
+  const startDay = competitionStart.getUTCDate();
+  const endDay = competitionEnd.getUTCDate();
 
   const startTime = shortTime(competitionStart);
   const endTime = shortTime(competitionEnd);
@@ -200,19 +199,20 @@ const CompetitionPage = () => {
             <ul className="list-inside list-none">
               <li>
                 <strong className="text-primary">Objective:</strong> Objective:
-                Mint new Interchain Tokens and attain drive as many transactions
-                as possible with them.
+                Mint new Interchain Tokens and attain as many transactions as
+                possible with them.
               </li>
               <li>
                 <strong className="text-primary">Duration:</strong> The
                 competition starts {startTime} UTC on {startMonth} {startDay}{" "}
-                and concludes at {endTime} UTC on {endMonth} {endDay}, spannin a
-                thrilling two weeks.
+                and concludes at {endTime} UTC on {endMonth} {endDay}, spanning
+                a thrilling two weeks.
               </li>
               <li>
                 <strong className="text-primary">Prizes:</strong> The top three
-                projects with the highest transaction counts will be rewarded
-                with AXL tokens:
+                projects with the highest transaction counts attained before{" "}
+                {endTime} UTC on {endMonth} {endDay} will be awarded with AXL
+                tokens:
                 <ul className="max-w-56">
                   {PRIZES.map(({ place, amount }, i) => (
                     <li
@@ -236,6 +236,17 @@ const CompetitionPage = () => {
                 tokens minted after the competition starts are eligible.
               </li>
             </ul>
+            <Alert className="prose-sm bg-base-100">
+              By participating in this competition, you understand that you may
+              spend tokens of value for fees (e.g. gas fees) for which you will
+              not be reimbursed. All winners acknowledge and agree that: (i) the
+              award of each prize is subject to the satisfaction of Axelar
+              Foundation’s KYC process, (ii) each winner may be required to
+              enter into further terms and conditions with the Axelar
+              Foundation, and (iii) to comply with regulations, each prize of
+              AXL may be substituted with another token or fiat of equivalent
+              value.
+            </Alert>
           </div>
         </Card.Body>
       </Card>
