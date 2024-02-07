@@ -1,6 +1,7 @@
 import {
   Alert,
   Card,
+  cn,
   FormControl,
   Label,
   Progress,
@@ -9,6 +10,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { intlFormatDistance } from "date-fns";
@@ -18,6 +20,7 @@ import {
   NEXT_PUBLIC_COMPETITION_START_TIMESTAMP,
 } from "~/config/env";
 import { trpc } from "~/lib/trpc";
+import type { GetTopTransactionsOutput } from "~/server/routers/gmp/getTopTransactions";
 import Page from "~/ui/layouts/Page";
 
 const PRIZES = [
@@ -34,6 +37,27 @@ const COMPETITION_START_TS = Date.parse(
 const COMPETITION_END_TS = Date.parse(NEXT_PUBLIC_COMPETITION_END_TIMESTAMP);
 
 const TOP_TOKEN_COUNT = 10;
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const shortTime = (date: Date) =>
+  date
+    .toLocaleTimeString()
+    .toLowerCase()
+    .replace(/(:00)+ /, "");
 
 const CompetitionPage = () => {
   const [now, setNow] = useState(Date.now());
@@ -132,24 +156,7 @@ const CompetitionPage = () => {
             </Table.Head>
             <Table.Body>
               {data?.map((item, index) => (
-                <Table.Row key={item.tokenId}>
-                  <Table.Cell className="text-right">{index + 1}</Table.Cell>
-                  <Table.Cell>
-                    <Link href={`/interchain-tokens/${item.tokenId}`}>
-                      {maskAddress(item.tokenId)}
-                    </Link>
-                  </Table.Cell>
-                  <Table.Cell>{item.name}</Table.Cell>
-                  <Table.Cell>{item.symbol}</Table.Cell>
-                  <Table.Cell className="text-right">
-                    {item.count}
-                    {index < TROPHY_EMOJIS.length && (
-                      <span className="absolute translate-x-2">
-                        {TROPHY_EMOJIS[index]}
-                      </span>
-                    )}
-                  </Table.Cell>
-                </Table.Row>
+                <RowItem key={item.tokenId} {...{ item, index }} />
               ))}
             </Table.Body>
           </Table>
@@ -157,6 +164,18 @@ const CompetitionPage = () => {
       </Card>
     );
   }, [data, endDateDistance, now, startDateDistance]);
+
+  const competitionEnd = new Date(COMPETITION_END_TS);
+  const competitionStart = new Date(COMPETITION_START_TS);
+
+  const startMonth = MONTHS[competitionStart.getMonth()];
+  const endMonth = MONTHS[competitionEnd.getMonth()];
+
+  const startDay = competitionStart.getDate();
+  const endDay = competitionEnd.getDate();
+
+  const startTime = shortTime(competitionStart);
+  const endTime = shortTime(competitionEnd);
 
   return (
     <Page
@@ -168,48 +187,95 @@ const CompetitionPage = () => {
       <Page.Title>Interchain Leaderboard</Page.Title>
       <Card className="bg-base-200">
         <Card.Body>
+          <InterchainBanner />
           <Card.Title>
             Welcome to the ITS Legend Interchain Competition!
           </Card.Title>
-          <p>
-            To celebrate the mainnet launch of Interchain Token Service, we are
-            launching the ITS Legend Interchain Competition!
-          </p>
-          <ul className="list-inside list-none space-y-2">
-            <li>
-              <strong className="text-primary">Objective:</strong> Mint new
-              Interchain Tokens and drive as many transactions as possible with
-              them.
-            </li>
-            <li>
-              <strong className="text-primary">Duration:</strong> The
-              competition kicks off at 1pm EST on Feb 7 and concludes at 1pm EST
-              on Feb 21, spanning a thrilling two weeks.
-            </li>
-            <li>
-              <strong className="text-primary">Prizes:</strong> The top three
-              projects with the highest transaction counts will be rewarded with
-              AXL tokens:
-              <ul className="list-disc space-y-1 pl-5">
-                {PRIZES.map(({ place, amount }) => (
-                  <li key={place}>
-                    <strong>{place} Place</strong>: {amount.toLocaleString()}{" "}
-                    AXL
-                  </li>
-                ))}
-              </ul>
-            </li>
-            <li>
-              <strong className="text-primary">Eligibility:</strong> Only tokens
-              minted after the competition starts are eligible.
-            </li>
-          </ul>
+          <div className="prose">
+            <p>
+              To celebrate the mainnet launch of Interchain Token Service,
+              Axelar Foundation is launching the ITS Legend of Interchain
+              Competition!
+            </p>
+            <ul className="list-inside list-none">
+              <li>
+                <strong className="text-primary">Objective:</strong> Objective:
+                Mint new Interchain Tokens and attain drive as many transactions
+                as possible with them.
+              </li>
+              <li>
+                <strong className="text-primary">Duration:</strong> The
+                competition starts {startTime} UTC on {startMonth} {startDay}{" "}
+                and concludes at {endTime} UTC on {endMonth} {endDay}, spannin a
+                thrilling two weeks.
+              </li>
+              <li>
+                <strong className="text-primary">Prizes:</strong> The top three
+                projects with the highest transaction counts will be rewarded
+                with AXL tokens:
+                <ul className="max-w-56">
+                  {PRIZES.map(({ place, amount }, i) => (
+                    <li
+                      key={place}
+                      className={cn("pl-4", {
+                        "list-['🏆']": i === 0,
+                        "list-['🥈']": i === 1,
+                        "list-['🥉']": i === 2,
+                      })}
+                    >
+                      <div className="flex items-center justify-between">
+                        <strong>{place} Place</strong>
+                        <div>{amount.toLocaleString()} AXL</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+              <li>
+                <strong className="text-primary">Eligibility:</strong> Only
+                tokens minted after the competition starts are eligible.
+              </li>
+            </ul>
+          </div>
         </Card.Body>
       </Card>
-
       {content}
     </Page>
   );
 };
+
+const InterchainBanner = () => (
+  <div className="relative h-28 sm:h-32 md:h-40 lg:h-48 xl:h-56">
+    <Image
+      src="/ilustrations/interchain-competition.jpg"
+      alt="Interchain Competition Banner"
+      fill
+    />
+  </div>
+);
+
+const RowItem = (props: {
+  item: GetTopTransactionsOutput[number];
+  index: number;
+}) => (
+  <Table.Row key={props.item.tokenId}>
+    <Table.Cell className="text-right">{props.index + 1}</Table.Cell>
+    <Table.Cell>
+      <Link href={`/interchain-tokens/${props.item.tokenId}`}>
+        {maskAddress(props.item.tokenId)}
+      </Link>
+    </Table.Cell>
+    <Table.Cell>{props.item.name}</Table.Cell>
+    <Table.Cell>{props.item.symbol}</Table.Cell>
+    <Table.Cell className="text-right">
+      {props.item.count}
+      {props.index < TROPHY_EMOJIS.length && (
+        <span className="absolute translate-x-2">
+          {TROPHY_EMOJIS[props.index]}
+        </span>
+      )}
+    </Table.Cell>
+  </Table.Row>
+);
 
 export default CompetitionPage;
