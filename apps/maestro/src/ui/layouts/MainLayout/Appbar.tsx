@@ -189,7 +189,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                     className="grid place-items-center rounded-full hover:ring focus:ring"
                     aria-label="connected wallet dropdown trigger"
                   >
-                    <div className="flex items-center rounded-lg p-2">
+                    <div className="flex items-center p-2">
                       <Identicon
                         seed={jsNumberForAddress(address)}
                         diameter={18}
