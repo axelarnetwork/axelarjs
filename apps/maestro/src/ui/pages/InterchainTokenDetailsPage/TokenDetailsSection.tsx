@@ -125,23 +125,14 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   );
 };
 
-const ManageTokenIcon: FC<{
+type ManageTokenIconProps = {
   tokenId: `0x${string}`;
-}> = ({ tokenId }) => {
+};
+
+const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
   const { data: meta, refetch } =
     trpc.interchainToken.getInterchainTokenMeta.useQuery({
       tokenId,
-    });
-
-  const { mutateAsync: persistIconUrl, isLoading: isPersistingIconUrl } =
-    trpc.interchainToken.setInterchainTokenIconUrl.useMutation({
-      onError: () => {
-        toast.error("Failed to save token icon");
-      },
-      onSuccess: async () => {
-        toast.success("Token icon saved");
-        await refetch();
-      },
     });
 
   const { address } = useAccount();
@@ -166,7 +157,48 @@ const ManageTokenIcon: FC<{
     <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
   );
 
-  const [iconUrl, setIconUrl] = useState(meta?.iconUrl);
+  if (!isOperator) {
+    return icon;
+  }
+
+  return (
+    <UpdateTokenIcon
+      tokenId={tokenId}
+      onUpdated={refetch}
+      existingIconUrl={meta?.iconUrl}
+      icon={icon}
+    />
+  );
+};
+
+type UpdateTokenIconProps = {
+  tokenId: `0x${string}`;
+  existingIconUrl?: string;
+  onUpdated?: () => void;
+  icon?: JSX.Element;
+};
+
+const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
+  tokenId,
+  existingIconUrl,
+  icon,
+  onUpdated,
+}) => {
+  const {
+    mutate: persistIconUrl,
+    isLoading: isPersistingIconUrl,
+    error: persistError,
+  } = trpc.interchainToken.setInterchainTokenIconUrl.useMutation({
+    onError() {
+      toast.error("Failed to save token icon");
+    },
+    onSuccess() {
+      toast.success("Token icon saved");
+      onUpdated?.();
+    },
+  });
+
+  const [iconUrl, setIconUrl] = useState(() => existingIconUrl);
 
   const formValidationMessage = useMemo(() => {
     if (!iconUrl) {
@@ -195,11 +227,15 @@ const ManageTokenIcon: FC<{
   }, [iconUrl]);
 
   const isReadyForPreview =
-    Boolean(iconUrl) && iconUrl !== meta?.iconUrl && !formValidationMessage;
+    Boolean(iconUrl) && iconUrl !== existingIconUrl && !formValidationMessage;
 
-  if (!isOperator) {
-    return icon;
-  }
+  const sanitizedUrl = Maybe.of(iconUrl).mapOr("", (url) => {
+    try {
+      return new URL(url).href;
+    } catch (error) {
+      return "";
+    }
+  });
 
   return (
     <Tooltip tip="Manage token icon" position="bottom">
@@ -228,7 +264,7 @@ const ManageTokenIcon: FC<{
               </Tooltip>
             </Label>
             <TextInput
-              defaultValue={iconUrl}
+              defaultValue={sanitizedUrl}
               className="bg-base-200"
               placeholder="Enter a url for a valid png, jpg, or svg icon"
               onChange={(e) => setIconUrl(e.target.value)}
@@ -240,13 +276,18 @@ const ManageTokenIcon: FC<{
               <div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={iconUrl}
+                  src={sanitizedUrl}
                   alt="token icon"
                   className="size-14 rounded-full"
                 />
               </div>
               <div>Does this look good?</div>
             </div>
+          )}
+          {persistError && (
+            <Alert status="error">
+              {persistError.message || "Failed to save token icon"}
+            </Alert>
           )}
         </Modal.Body>
         <Modal.Actions className="">
@@ -258,9 +299,9 @@ const ManageTokenIcon: FC<{
               variant="primary"
               loading={isPersistingIconUrl}
               disabled={Boolean(formValidationMessage)}
-              onClick={async () => {
+              onClick={() => {
                 if (iconUrl) {
-                  await persistIconUrl({ iconUrl, tokenId });
+                  persistIconUrl({ iconUrl, tokenId });
                 }
               }}
             >
