@@ -6,9 +6,11 @@ import Link from "next/link";
 import { formatDuration, intervalToDuration } from "date-fns";
 import { type Address } from "wagmi";
 
-import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
+import {
+  NEXT_PUBLIC_EXPLORER_URL,
+  NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+} from "~/config/env";
 import { trpc } from "~/lib/trpc";
-import { REVERSE_TAB_MAP } from "~/pages/recent-transactions";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import { type ContractMethod } from "./types";
 
@@ -67,10 +69,23 @@ export const RecentTransactionsList: FC<Props> = ({
         {title && (
           <Card.Title className="grid place-items-center">
             <Link
-              href={`/recent-transactions?tab=${REVERSE_TAB_MAP[contractMethod]}`}
               className="hover:text-accent group flex items-center gap-1 hover:underline"
+              href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?contractAddress=${NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS}&contractMethod=${contractMethod}${
+                senderAddress ? `&senderAddress=${senderAddress}` : ``
+              }`}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {title}{" "}
+              <Tooltip
+                position={"bottom"}
+                tip={`See all ${senderAddress ? `my` : ``} ${
+                  contractMethod === "InterchainTransfer"
+                    ? `transfers`
+                    : `token deployments`
+                } on Axelarscan`}
+              >
+                {title}{" "}
+              </Tooltip>
             </Link>
           </Card.Title>
         )}
