@@ -13,12 +13,12 @@ import {
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import Page from "~/ui/layouts/Page";
 
-const TAB_MAP = {
+export const TAB_MAP = {
   interchainTransfer: "InterchainTransfer",
   tokenDeployment: "InterchainTokenDeploymentStarted",
 } as const;
 
-const REVERSE_TAB_MAP = invert(TAB_MAP);
+export const REVERSE_TAB_MAP = invert(TAB_MAP);
 
 const RecentTransactionsPage = () => {
   const [tab, setTab] = useQueryStringState<keyof typeof TAB_MAP>(
@@ -32,10 +32,12 @@ const RecentTransactionsPage = () => {
 
   return (
     <Page
-      title="My Recent Interchain Transactions"
+      title={`${address ? "My" : ""} Recent Interchain Transactions `}
       className="flex flex-col space-y-4"
     >
-      <Page.Title>My Recent Transactions</Page.Title>
+      <Page.Title>
+        {`${address ? "My" : ""} Recent Interchain Transactions`}
+      </Page.Title>
       <div className="flex-1 space-y-4">
         <Suspense
           fallback={

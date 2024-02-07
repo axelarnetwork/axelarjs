@@ -53,9 +53,20 @@ const MONTHS = [
   "Dec",
 ];
 
-const shortTime = (date: Date) => {
+const getShortTime = (date: Date) => {
   const h = date.getUTCHours();
   return h > 12 ? `${h - 12}pm` : `${h}am`;
+};
+
+const getDateMeta = (imestamp: number) => {
+  const date = new Date(imestamp);
+  const month = MONTHS[date.getUTCMonth()];
+
+  return {
+    month,
+    day: `${month} ${date.getUTCDate()}`,
+    time: getShortTime(date),
+  };
 };
 
 const CompetitionPage = () => {
@@ -164,17 +175,8 @@ const CompetitionPage = () => {
     );
   }, [data, endDateDistance, now, startDateDistance]);
 
-  const competitionEnd = new Date(COMPETITION_END_TS);
-  const competitionStart = new Date(COMPETITION_START_TS);
-
-  const startMonth = MONTHS[competitionStart.getMonth()];
-  const endMonth = MONTHS[competitionEnd.getMonth()];
-
-  const startDay = competitionStart.getUTCDate();
-  const endDay = competitionEnd.getUTCDate();
-
-  const startTime = shortTime(competitionStart);
-  const endTime = shortTime(competitionEnd);
+  const compStart = getDateMeta(COMPETITION_END_TS);
+  const compEnd = getDateMeta(COMPETITION_START_TS);
 
   return (
     <Page
@@ -198,20 +200,20 @@ const CompetitionPage = () => {
             </p>
             <ul className="list-inside list-none">
               <li>
-                <strong className="text-primary">Objective:</strong> Objective:
-                Mint new Interchain Tokens and attain as many transactions as
-                possible with them.
+                <strong className="text-primary">Objective:</strong> Mint new
+                Interchain Tokens and attain as many transactions as possible
+                with them.
               </li>
               <li>
                 <strong className="text-primary">Duration:</strong> The
-                competition starts {startTime} UTC on {startMonth} {startDay}{" "}
-                and concludes at {endTime} UTC on {endMonth} {endDay}, spanning
-                a thrilling two weeks.
+                competition starts {compEnd.time} UTC on {compEnd.day} and
+                concludes at {compStart.time} UTC on {compStart.day}, spanning a
+                thrilling two weeks.
               </li>
               <li>
                 <strong className="text-primary">Prizes:</strong> The top three
                 projects with the highest transaction counts attained before{" "}
-                {endTime} UTC on {endMonth} {endDay} will be awarded with AXL
+                {compStart.time} UTC on {compStart.day} will be awarded with AXL
                 tokens:
                 <ul className="max-w-56">
                   {PRIZES.map(({ place, amount }, i) => (

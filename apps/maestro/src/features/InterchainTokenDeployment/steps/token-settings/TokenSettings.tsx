@@ -139,7 +139,7 @@ const TokenSettings: FC = () => {
                   type="button"
                   onClick={actions.setCurrentAddressAsMinter}
                 >
-                  use current address
+                  Use current address
                 </button>
               </Label.AltText>
             </Label>

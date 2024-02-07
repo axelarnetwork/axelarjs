@@ -88,13 +88,13 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       isVisible: (props) => props.isTokenMinter || props.isTokenOwner,
     },
     {
-      label: "Transfer Rate Limit Manager",
+      label: "Transfer Rate Limit Operator",
       value: "transferOperatorship",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter && !props.hasPendingOwner,
     },
     {
-      label: "Transfer Mintership",
+      label: "Transfer Mint Permission",
       value: "transferMintership",
       icon: <GiftIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter && false, //TODO: See note (A) below

@@ -74,7 +74,7 @@ const Review: FC = () => {
           <>
             <Alert status="success">
               <div className="flex justify-center font-semibold md:justify-start">
-                Origin token deployed successfully!
+                Token deployed successfully!
               </div>
               <div className="flex items-center justify-center md:justify-start">
                 Address:

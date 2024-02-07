@@ -3,33 +3,37 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/validation";
+import { hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 /**
- * Get the status of an interchain token deployment
+ * Get the status of an GMP transaction on destination chains
  */
 export const getTransactionStatusOnDestinationChains = publicProcedure
-  // a procedure must have a schema for input validation, we use zod for this: https://zod.dev/
   .input(
     z.object({
-      txHash: hex40Literal(),
+      txHash: hex64Literal(),
     })
   )
-  // a procedure can either be a query or a mutation
-  // a query is a read-only operation, a mutation is a write operation
   .query(async ({ input, ctx }) => {
     try {
-      const data = await ctx.services.gmp.searchGMP({ txHash: input.txHash });
+      const data = await ctx.services.gmp.searchGMP({
+        txHash: input.txHash,
+        _source: {
+          includes: ["call.returnValues.destinationChain", "status"],
+        },
+      });
 
       if (data.length) {
-        return data.reduce(
+        const result = data.reduce(
           (acc, { call, status }) => ({
             ...acc,
             [call.returnValues.destinationChain.toLowerCase()]: status,
           }),
           {} as { [chainId: string]: GMPTxStatus }
         );
+
+        return result;
       }
 
       // If we don't find the transaction, we throw a 404 error
