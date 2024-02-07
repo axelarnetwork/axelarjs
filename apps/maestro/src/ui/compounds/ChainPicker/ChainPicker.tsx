@@ -74,7 +74,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
       </div>
       <div className="grid place-content-center">
         <Button size="sm" variant="ghost" onClick={handleToggleAll}>
-          toggle all
+          Toggle All
         </Button>
       </div>
     </section>
