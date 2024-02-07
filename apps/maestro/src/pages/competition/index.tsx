@@ -200,7 +200,7 @@ const CompetitionPage = () => {
             </p>
             <ul className="list-inside list-none">
               <li>
-                <strong className="text-primary">Objective:</strong> Objective:
+                <strong className="text-primary">Objective:</strong>
                 Mint new Interchain Tokens and attain as many transactions as
                 possible with them.
               </li>
