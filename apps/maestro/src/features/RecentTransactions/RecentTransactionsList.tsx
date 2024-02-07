@@ -8,6 +8,7 @@ import { type Address } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { trpc } from "~/lib/trpc";
+import { REVERSE_TAB_MAP } from "~/pages/recent-transactions";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import { type ContractMethod } from "./types";
 
@@ -64,7 +65,14 @@ export const RecentTransactionsList: FC<Props> = ({
     <Card className="bg-base-100 overflow-hidden rounded-xl">
       <Card.Body className="to-base-200/90 dark:to-base-300/90 bg-base-100 bg-gradient-to-b from-transparent">
         {title && (
-          <Card.Title className="grid place-items-center">{title}</Card.Title>
+          <Card.Title className="grid place-items-center">
+            <Link
+              href={`/recent-transactions?tab=${REVERSE_TAB_MAP[contractMethod]}`}
+              className="hover:text-accent group flex items-center gap-1 hover:underline"
+            >
+              {title}{" "}
+            </Link>
+          </Card.Title>
         )}
         <div className="w-[80vw] space-y-4 md:w-auto">
           <ul className="no-scrollbar relative max-h-64 min-w-[256px] space-y-4 overflow-y-scroll md:max-h-96">
