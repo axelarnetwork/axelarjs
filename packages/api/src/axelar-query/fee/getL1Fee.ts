@@ -77,9 +77,12 @@ async function getOptimismL1Fee(
     ],
   });
 
-  const [gasUsed, dynamicOverhead, fixedOverhead] = multicallResponse.flatMap(
+  const [gasUsed, _dynamicOverhead, _fixedOverhead] = multicallResponse.flatMap(
     (r) => r.result
   ) as [bigint, bigint, bigint];
+
+  const dynamicOverhead = _dynamicOverhead || 684000n;
+  const fixedOverhead = _fixedOverhead || 2100n;
 
   const totalGasUsed =
     ((gasUsed + fixedOverhead) * dynamicOverhead) / 1_000_000n;
