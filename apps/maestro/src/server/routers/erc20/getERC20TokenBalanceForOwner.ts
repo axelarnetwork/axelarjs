@@ -5,11 +5,12 @@ import { z } from "zod";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
-const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
+export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
 
-const getENUMIndex = (role: (typeof ROLES_ENUM)[number]) => {
-  return ROLES_ENUM.indexOf(role);
-};
+export type TokenRole = (typeof ROLES_ENUM)[number];
+
+export const getRoleIndex = (role: (typeof ROLES_ENUM)[number]) =>
+  ROLES_ENUM.indexOf(role);
 
 export const getERC20TokenBalanceForOwner = publicProcedure
   .input(
@@ -48,6 +49,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
         chainConfig,
         input.tokenAddress
       );
+
       const [
         isTokenMinter,
         hasMinterRole,
@@ -59,15 +61,15 @@ export const getERC20TokenBalanceForOwner = publicProcedure
             addr: input.owner,
           }),
           itClient.reads.hasRole({
-            role: getENUMIndex("MINTER"),
+            role: getRoleIndex("MINTER"),
             account: input.owner,
           }),
           itClient.reads.hasRole({
-            role: getENUMIndex("OPERATOR"),
+            role: getRoleIndex("OPERATOR"),
             account: input.owner,
           }),
           itClient.reads.hasRole({
-            role: getENUMIndex("FLOW_LIMITER"),
+            role: getRoleIndex("FLOW_LIMITER"),
             account: input.owner,
           }),
         ].map((p) => p.catch(always(false)))

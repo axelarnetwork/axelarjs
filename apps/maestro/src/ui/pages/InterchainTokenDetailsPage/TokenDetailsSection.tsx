@@ -1,14 +1,28 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import {
+  Alert,
+  Badge,
+  Button,
   CopyToClipboardButton,
+  Edit2Icon,
   ExternalLinkIcon,
+  FormControl,
   InfoIcon,
+  Label,
   LinkButton,
+  Modal,
+  TextInput,
   Tooltip,
 } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import type { FC } from "react";
+import { useMemo, useState, type FC } from "react";
+import Identicon, { jsNumberForAddress } from "react-jazzicon";
 
+import { useAccount } from "wagmi";
+import { z } from "zod";
+
+import { trpc } from "~/lib/trpc";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
 export type TokenDetailsSectionProps = {
@@ -63,7 +77,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   return (
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-2 text-2xl font-bold">
+        <div className="flex flex-wrap items-center gap-2 text-2xl font-bold md:gap-3">
+          {props.tokenId && <ManageTokenIcon tokenId={props.tokenId} />}
           <span className="hidden sm:inline">Interchain Token </span>
           {Boolean(props.name && props.symbol) && (
             <>
@@ -74,13 +89,13 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           )}
         </div>
         <LinkButton
-          className="flex items-center gap-2 text-xl"
+          className="flex items-center gap-2 text-lg"
           href={`${props.chain.explorer.url}/token/${props.tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
           size="sm"
         >
-          <ChainIcon src={props.chain.image} alt={props.chain.name} size="sm" />
+          <ChainIcon src={props.chain.image} alt={props.chain.name} size="md" />
           <span>View token</span>
           <span className="hidden sm:ml-[-4px] sm:block">
             on {props.chain.explorer.name}
@@ -91,20 +106,216 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
       {props.kind === "canonical" && (
         <div className="italic">
-          {" "}
           This is a pre-existing token on {props.chain.name} that was registered
           on ITS, powered by Axelar
         </div>
       )}
       <ul className="grid gap-1.5">
         {sanitizedTokenDetails.map(([label, value]) => (
-          <li key={String(label)} className="flex items-center gap-2 text-xl">
+          <li
+            key={String(label)}
+            className="md:text-md flex items-center gap-2 text-sm lg:text-lg"
+          >
             <span className="font-semibold">{label}: </span>
             <span className="opacity-60">{value}</span>
           </li>
         ))}
       </ul>
     </section>
+  );
+};
+
+type ManageTokenIconProps = {
+  tokenId: `0x${string}`;
+};
+
+const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
+  const { data: meta, refetch } =
+    trpc.interchainToken.getInterchainTokenMeta.useQuery({
+      tokenId,
+    });
+
+  const { address } = useAccount();
+
+  const { data: roles } =
+    trpc.interchainToken.getInterchainTokenRolesForAccount.useQuery(
+      {
+        tokenId,
+        accountAddress: address as `0x${string}`,
+      },
+      {
+        enabled: Boolean(address),
+      }
+    );
+
+  const isOperator = roles?.tokenManager?.includes("OPERATOR");
+
+  const icon = meta?.iconUrl ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={meta.iconUrl} alt="token icon" className="h-9 w-9 rounded-full" />
+  ) : (
+    <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+  );
+
+  if (!isOperator) {
+    return icon;
+  }
+
+  return (
+    <UpdateTokenIcon
+      tokenId={tokenId}
+      onUpdated={refetch}
+      existingIconUrl={meta?.iconUrl}
+      icon={icon}
+    />
+  );
+};
+
+type UpdateTokenIconProps = {
+  tokenId: `0x${string}`;
+  existingIconUrl?: string;
+  onUpdated?: () => void;
+  icon?: JSX.Element;
+};
+
+const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
+  tokenId,
+  existingIconUrl,
+  icon,
+  onUpdated,
+}) => {
+  const {
+    mutate: persistIconUrl,
+    isLoading: isPersistingIconUrl,
+    error: persistError,
+    reset: resetPersistError,
+  } = trpc.interchainToken.setInterchainTokenIconUrl.useMutation({
+    onError() {
+      toast.error("Failed to save token icon");
+    },
+    onSuccess() {
+      toast.success("Token icon saved");
+      onUpdated?.();
+    },
+  });
+
+  const [iconUrl, setIconUrl] = useState(() => existingIconUrl);
+
+  const formValidationMessage = useMemo(() => {
+    if (!iconUrl) {
+      return "Please provide a valid URL";
+    }
+
+    if (!iconUrl.startsWith("https://")) {
+      return "URL must be secure (https)";
+    }
+
+    if (!z.string().url().safeParse(iconUrl).success) {
+      return "URL is not valid";
+    }
+
+    if ([".png", ".jpg", ".svg"].every((ext) => !iconUrl.endsWith(ext))) {
+      return (
+        <>
+          URL must end with <Badge variant="neutral">.png</Badge>,{" "}
+          <Badge variant="neutral">.jpg</Badge>, or{" "}
+          <Badge variant="neutral">.svg</Badge>
+        </>
+      );
+    }
+
+    return null;
+  }, [iconUrl]);
+
+  const isReadyForPreview =
+    Boolean(iconUrl) && iconUrl !== existingIconUrl && !formValidationMessage;
+
+  const sanitizedUrl = Maybe.of(iconUrl).mapOr("", (url) => {
+    try {
+      return new URL(url).href;
+    } catch (error) {
+      return "";
+    }
+  });
+
+  return (
+    <Tooltip tip="Manage token icon" position="bottom">
+      <Modal
+        trigger={
+          <button className="group relative grid h-9 w-9 place-items-center">
+            <div className="transition-opacity group-hover:opacity-50">
+              {icon}
+            </div>
+            <Edit2Icon className="absolute h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+          </button>
+        }
+      >
+        <Modal.Title>
+          <span className="text-xl font-bold">Manage token icon</span>
+        </Modal.Title>
+        <Modal.Body>
+          <FormControl>
+            <Label className="flex items-center justify-start gap-2">
+              Token Icon UR{" "}
+              <Tooltip
+                tip="Provide a URL to an image to use as the token icon"
+                position="right"
+              >
+                <InfoIcon className="text-info h-[1em]" />
+              </Tooltip>
+            </Label>
+            <TextInput
+              defaultValue={sanitizedUrl}
+              className="bg-base-200"
+              placeholder="Enter a url for a valid png, jpg, or svg icon"
+              readOnly={isPersistingIconUrl}
+              onChange={(e) => {
+                resetPersistError();
+                setIconUrl(e.target.value);
+              }}
+            />
+          </FormControl>
+          {isReadyForPreview && (
+            <div className="grid place-items-center gap-4 p-4">
+              <div>Icon preview</div>
+              <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sanitizedUrl}
+                  alt="token icon"
+                  className="size-14 rounded-full"
+                />
+              </div>
+              <div>Does this look good?</div>
+            </div>
+          )}
+          {persistError && (
+            <Alert status="error">
+              {persistError.message || "Failed to save token icon"}
+            </Alert>
+          )}
+        </Modal.Body>
+        <Modal.Actions className="">
+          {formValidationMessage ? (
+            <Alert status="error">{formValidationMessage}</Alert>
+          ) : (
+            <Button
+              length="block"
+              variant="primary"
+              loading={isPersistingIconUrl}
+              disabled={Boolean(formValidationMessage) || Boolean(persistError)}
+              onClick={() => {
+                if (iconUrl) {
+                  persistIconUrl({ iconUrl, tokenId });
+                }
+              }}
+            >
+              Save icon url
+            </Button>
+          )}
+        </Modal.Actions>
+      </Modal>
+    </Tooltip>
   );
 };
 
