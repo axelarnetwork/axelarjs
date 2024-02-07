@@ -42,7 +42,7 @@ export default function HomePage() {
   return (
     <>
       <Page
-        pageTitle="Axelar Interchain Token Service"
+        pageTitle="Interchain Token Service"
         pageDescription="Interchain orchestration powered by Axelar"
         className="place-items-center"
         mustBeConnected
