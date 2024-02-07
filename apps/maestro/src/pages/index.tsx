@@ -9,6 +9,7 @@ import RecentTransactions from "~/features/RecentTransactions";
 import SearchInterchainToken, {
   TokenFoundResult,
 } from "~/features/SearchInterchainToken";
+import { ConditionalRenderInterchainBanner } from "~/ui/components/InterchainBanner";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
@@ -47,6 +48,10 @@ export default function HomePage() {
         className="place-items-center"
         mustBeConnected
       >
+        <div className="w-full">
+          <ConditionalRenderInterchainBanner />
+        </div>
+
         <div
           className="flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
           id="main-content"
