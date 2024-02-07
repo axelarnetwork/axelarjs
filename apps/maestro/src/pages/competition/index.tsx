@@ -10,7 +10,6 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { intlFormatDistance } from "date-fns";
@@ -21,6 +20,7 @@ import {
 } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import type { GetTopTransactionsOutput } from "~/server/routers/gmp/getTopTransactions";
+import { InterchainBanner } from "~/ui/components/InterchainBanner";
 import Page from "~/ui/layouts/Page";
 
 const PRIZES = [
@@ -256,16 +256,6 @@ const CompetitionPage = () => {
     </Page>
   );
 };
-
-const InterchainBanner = () => (
-  <div className="relative h-28 sm:h-32 md:h-40 lg:h-48 xl:h-56">
-    <Image
-      src="/ilustrations/interchain-competition.jpg"
-      alt="Interchain Competition Banner"
-      fill
-    />
-  </div>
-);
 
 const RowItem = (props: {
   item: GetTopTransactionsOutput[number];
