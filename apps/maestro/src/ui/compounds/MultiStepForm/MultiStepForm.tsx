@@ -202,8 +202,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
                 "ml-14": props.showBackButton,
               })}
             >
-              Register <span className="hidden sm:inline">origin</span> token
-              on:{" "}
+              Register token on:{" "}
             </span>
             <ChainsDropdown
               disabled={disableChainsDropdown}

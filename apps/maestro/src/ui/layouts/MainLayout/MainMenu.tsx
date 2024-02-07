@@ -92,9 +92,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
           </Content.Main>
         </Content.Article>
         <Content.Article>
-          <Content.Header>
-            WHAT IS INTERCHAIN INTERCHAIN TOKEN SERVICE?
-          </Content.Header>
+          <Content.Header>WHAT IS INTERCHAIN TOKEN SERVICE?</Content.Header>
           <Content.Main>
             <Content.Paragraph>
               Axelar introduces Interchain Token Service (ITS), supporting
