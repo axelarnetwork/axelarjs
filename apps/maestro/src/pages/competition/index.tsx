@@ -10,6 +10,7 @@ import {
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { intlFormatDistance } from "date-fns";
@@ -36,6 +37,27 @@ const COMPETITION_START_TS = Date.parse(
 const COMPETITION_END_TS = Date.parse(NEXT_PUBLIC_COMPETITION_END_TIMESTAMP);
 
 const TOP_TOKEN_COUNT = 10;
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const shortTime = (date: Date) =>
+  date
+    .toLocaleTimeString()
+    .toLowerCase()
+    .replace(/(:00)+ /, "");
 
 const CompetitionPage = () => {
   const [now, setNow] = useState(Date.now());
@@ -143,6 +165,18 @@ const CompetitionPage = () => {
     );
   }, [data, endDateDistance, now, startDateDistance]);
 
+  const competitionEnd = new Date(COMPETITION_END_TS);
+  const competitionStart = new Date(COMPETITION_START_TS);
+
+  const startMonth = MONTHS[competitionStart.getMonth()];
+  const endMonth = MONTHS[competitionEnd.getMonth()];
+
+  const startDay = competitionStart.getDate();
+  const endDay = competitionEnd.getDate();
+
+  const startTime = shortTime(competitionStart);
+  const endTime = shortTime(competitionEnd);
+
   return (
     <Page
       title="Competition"
@@ -153,24 +187,27 @@ const CompetitionPage = () => {
       <Page.Title>Interchain Leaderboard</Page.Title>
       <Card className="bg-base-200">
         <Card.Body>
+          <InterchainBanner />
           <Card.Title>
             Welcome to the ITS Legend Interchain Competition!
           </Card.Title>
           <div className="prose">
             <p>
-              To celebrate the mainnet launch of Interchain Token Service, we
-              are launching the ITS Legend Interchain Competition!
+              To celebrate the mainnet launch of Interchain Token Service,
+              Axelar Foundation is launching the ITS Legend of Interchain
+              Competition!
             </p>
             <ul className="list-inside list-none">
               <li>
-                <strong className="text-primary">Objective:</strong> Mint new
-                Interchain Tokens and drive as many transactions as possible
-                with them.
+                <strong className="text-primary">Objective:</strong> Objective:
+                Mint new Interchain Tokens and attain drive as many transactions
+                as possible with them.
               </li>
               <li>
                 <strong className="text-primary">Duration:</strong> The
-                competition kicks off at 1pm EST on Feb 7 and concludes at 1pm
-                EST on Feb 21, spanning a thrilling two weeks.
+                competition starts {startTime} UTC on {startMonth} {startDay}{" "}
+                and concludes at {endTime} UTC on {endMonth} {endDay}, spannin a
+                thrilling two weeks.
               </li>
               <li>
                 <strong className="text-primary">Prizes:</strong> The top three
@@ -202,11 +239,20 @@ const CompetitionPage = () => {
           </div>
         </Card.Body>
       </Card>
-
       {content}
     </Page>
   );
 };
+
+const InterchainBanner = () => (
+  <div className="relative h-28 sm:h-32 md:h-40 lg:h-48 xl:h-56">
+    <Image
+      src="/ilustrations/interchain-competition.jpg"
+      alt="Interchain Competition Banner"
+      fill
+    />
+  </div>
+);
 
 const RowItem = (props: {
   item: GetTopTransactionsOutput[number];
