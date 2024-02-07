@@ -59,7 +59,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             {maskAddress(tokenId)}
           </CopyToClipboardButton>
           <Tooltip
-            tip="TokenId is the unique identifier used to identify an interchain token across all chains"
+            tip="TokenId is a common key used to identify an interchain token across all chains"
             variant="info"
             position="bottom"
           >
@@ -184,22 +184,30 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   icon,
   onUpdated,
 }) => {
-  const {
-    mutate: persistIconUrl,
-    isLoading: isPersistingIconUrl,
-    error: persistError,
-    reset: resetPersistError,
-  } = trpc.interchainToken.setInterchainTokenIconUrl.useMutation({
-    onError() {
-      toast.error("Failed to save token icon");
-    },
-    onSuccess() {
-      toast.success("Token icon saved");
-      onUpdated?.();
-    },
-  });
-
   const [iconUrl, setIconUrl] = useState(() => existingIconUrl);
+
+  const [invalidatedImageUrls, setInvalidatedImageUrls] = useState<{
+    [url: string]: string;
+  }>({});
+
+  const { mutate, isLoading, error, reset } =
+    trpc.interchainToken.setInterchainTokenIconUrl.useMutation({
+      onError(error) {
+        toast.error("Failed to save token icon");
+
+        if (iconUrl) {
+          setInvalidatedImageUrls((prev) => ({
+            ...prev,
+            [iconUrl]: error.message || "Failed to save token icon",
+          }));
+        }
+      },
+      onSuccess() {
+        toast.success("Token icon saved");
+        onUpdated?.();
+        reset();
+      },
+    });
 
   const formValidationMessage = useMemo(() => {
     if (!iconUrl) {
@@ -224,8 +232,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
       );
     }
 
+    if (iconUrl in invalidatedImageUrls) {
+      return invalidatedImageUrls[iconUrl];
+    }
+
     return null;
-  }, [iconUrl]);
+  }, [iconUrl, invalidatedImageUrls]);
 
   const isReadyForPreview =
     Boolean(iconUrl) && iconUrl !== existingIconUrl && !formValidationMessage;
@@ -268,9 +280,9 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               defaultValue={sanitizedUrl}
               className="bg-base-200"
               placeholder="Enter a url for a valid png, jpg, or svg icon"
-              readOnly={isPersistingIconUrl}
+              readOnly={isLoading}
               onChange={(e) => {
-                resetPersistError();
+                reset();
                 setIconUrl(e.target.value);
               }}
             />
@@ -289,9 +301,9 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               <div>Does this look good?</div>
             </div>
           )}
-          {persistError && (
+          {error && (
             <Alert status="error">
-              {persistError.message || "Failed to save token icon"}
+              {error.message || "Failed to save token icon"}
             </Alert>
           )}
         </Modal.Body>
@@ -302,11 +314,11 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
             <Button
               length="block"
               variant="primary"
-              loading={isPersistingIconUrl}
-              disabled={Boolean(formValidationMessage) || Boolean(persistError)}
+              loading={isLoading}
+              disabled={Boolean(formValidationMessage) || Boolean(error)}
               onClick={() => {
                 if (iconUrl) {
-                  persistIconUrl({ iconUrl, tokenId });
+                  mutate({ iconUrl, tokenId });
                 }
               }}
             >
