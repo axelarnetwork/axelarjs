@@ -19,6 +19,9 @@ export const getTransactionStatus = publicProcedure
     try {
       const response = await ctx.services.gmp.searchGMP({
         txHash: input.txHash,
+        _source: {
+          includes: ["status"],
+        },
       });
 
       if (response.length) {
