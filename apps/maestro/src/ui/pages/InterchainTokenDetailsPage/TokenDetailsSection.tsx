@@ -194,80 +194,83 @@ const ManageTokenIcon: FC<{
     return null;
   }, [iconUrl]);
 
-  if (isOperator) {
-    return (
-      <Tooltip tip="Manage token icon" position="bottom">
-        <Modal
-          trigger={
-            <button className="group relative grid h-9 w-9 place-items-center">
-              <div className="transition-opacity group-hover:opacity-50">
-                {icon}
-              </div>
-              <Edit2Icon className="absolute h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
-            </button>
-          }
-        >
-          <Modal.Title>
-            <span className="text-xl font-bold">Manage Token</span>
-          </Modal.Title>
-          <Modal.Body>
-            <FormControl>
-              <Label className="flex items-center justify-start gap-2">
-                Token Icon UR{" "}
-                <Tooltip
-                  tip="Provide a URL to an image to use as the token icon"
-                  position="right"
-                >
-                  <InfoIcon className="text-info h-[1em]" />
-                </Tooltip>
-              </Label>
-              <TextInput
-                defaultValue={iconUrl}
-                className="bg-base-200"
-                placeholder="Enter a url for a valid png, jpg, or svg icon"
-                onChange={(e) => setIconUrl(e.target.value)}
-              />
-            </FormControl>
-            {Boolean(iconUrl) && iconUrl !== meta?.iconUrl && (
-              <div className="grid place-items-center gap-4 p-4">
-                <div>Icon preview</div>
-                <div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={iconUrl}
-                    alt="token icon"
-                    className="size-14 rounded-full"
-                  />
-                </div>
-                <div>Does this look good?</div>
-              </div>
-            )}
-          </Modal.Body>
-          <Modal.Actions className="">
-            {formValidationMessage ? (
-              <Alert status="error">{formValidationMessage}</Alert>
-            ) : (
-              <Button
-                length="block"
-                variant="primary"
-                loading={isPersistingIconUrl}
-                disabled={Boolean(formValidationMessage)}
-                onClick={async () => {
-                  if (iconUrl) {
-                    await persistIconUrl({ iconUrl, tokenId });
-                  }
-                }}
-              >
-                Save icon url
-              </Button>
-            )}
-          </Modal.Actions>
-        </Modal>
-      </Tooltip>
-    );
+  const isReadyForPreview =
+    Boolean(iconUrl) && iconUrl !== meta?.iconUrl && !formValidationMessage;
+
+  if (!isOperator) {
+    return icon;
   }
 
-  return icon;
+  return (
+    <Tooltip tip="Manage token icon" position="bottom">
+      <Modal
+        trigger={
+          <button className="group relative grid h-9 w-9 place-items-center">
+            <div className="transition-opacity group-hover:opacity-50">
+              {icon}
+            </div>
+            <Edit2Icon className="absolute h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+          </button>
+        }
+      >
+        <Modal.Title>
+          <span className="text-xl font-bold">Manage token icon</span>
+        </Modal.Title>
+        <Modal.Body>
+          <FormControl>
+            <Label className="flex items-center justify-start gap-2">
+              Token Icon UR{" "}
+              <Tooltip
+                tip="Provide a URL to an image to use as the token icon"
+                position="right"
+              >
+                <InfoIcon className="text-info h-[1em]" />
+              </Tooltip>
+            </Label>
+            <TextInput
+              defaultValue={iconUrl}
+              className="bg-base-200"
+              placeholder="Enter a url for a valid png, jpg, or svg icon"
+              onChange={(e) => setIconUrl(e.target.value)}
+            />
+          </FormControl>
+          {isReadyForPreview && (
+            <div className="grid place-items-center gap-4 p-4">
+              <div>Icon preview</div>
+              <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={iconUrl}
+                  alt="token icon"
+                  className="size-14 rounded-full"
+                />
+              </div>
+              <div>Does this look good?</div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Actions className="">
+          {formValidationMessage ? (
+            <Alert status="error">{formValidationMessage}</Alert>
+          ) : (
+            <Button
+              length="block"
+              variant="primary"
+              loading={isPersistingIconUrl}
+              disabled={Boolean(formValidationMessage)}
+              onClick={async () => {
+                if (iconUrl) {
+                  await persistIconUrl({ iconUrl, tokenId });
+                }
+              }}
+            >
+              Save icon url
+            </Button>
+          )}
+        </Modal.Actions>
+      </Modal>
+    </Tooltip>
+  );
 };
 
 export default TokenDetailsSection;
