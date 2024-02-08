@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { groupBy, reduce } from "rambda";
+import { groupBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
@@ -28,15 +28,18 @@ export const getTopTransactions = publicProcedure
   .input(INPUT_SCHEMA)
   .query(async ({ input, ctx }) => {
     try {
+      const commonParams = {
+        senderAddress: input.senderAddress,
+        destinationContractAddress:
+          NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+        size: input.sampleSize,
+        fromTime: input.fromTime,
+        toTime: input.toTime,
+      };
       const [tokenDeployments, interchainTransfers] = await Promise.all([
         ctx.services.gmp.searchGMP({
-          senderAddress: input.senderAddress,
-          destinationContractAddress:
-            NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-          size: input.sampleSize,
+          ...commonParams,
           contractMethod: "InterchainTokenDeploymentStarted",
-          fromTime: input.fromTime,
-          toTime: input.toTime,
           _source: {
             includes: [
               "interchain_token_deployment_started.tokenName",
@@ -46,13 +49,8 @@ export const getTopTransactions = publicProcedure
           },
         }),
         ctx.services.gmp.searchGMP({
-          senderAddress: input.senderAddress,
-          destinationContractAddress:
-            NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-          size: input.sampleSize,
+          ...commonParams,
           contractMethod: input.contractMethod,
-          fromTime: input.fromTime,
-          toTime: input.toTime,
           _source: {
             includes: [
               "interchain_transfer.name",
@@ -64,22 +62,22 @@ export const getTopTransactions = publicProcedure
         }),
       ]);
 
-      const txMap = reduce(
-        (acc, obj) => acc.add(obj.interchain_token_deployment_started?.tokenId),
-        new Set(),
+      const eligibleTokenIds = new Set(
         tokenDeployments
+          .map((tx) => tx.interchain_token_deployment_started?.tokenId)
+          .filter(Boolean)
+      );
+
+      const eligibleTransfers = interchainTransfers.filter((transfer) =>
+        eligibleTokenIds.has(transfer.interchain_transfer?.tokenId)
       );
 
       const grouped = groupBy(
         (tx) => tx.interchain_transfer?.tokenId ?? "",
-        interchainTransfers.filter((transfer) =>
-          txMap.has(transfer.interchain_transfer?.tokenId)
-        )
+        eligibleTransfers
       );
 
-      const filtered = Object.entries(grouped).filter(([tokenId]) =>
-        Boolean(tokenId)
-      );
+      const filtered = Object.entries(grouped);
 
       return filtered
         .map(([tokenId, txs]) => ({
