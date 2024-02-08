@@ -19,9 +19,9 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
     try {
       const data = await ctx.services.gmp.searchGMP({
         txHash: input.txHash,
-        _source: {
-          includes: ["call.returnValues.destinationChain", "status"],
-        },
+        // _source: {
+        //   includes: ["call.returnValues.destinationChain", "status"],
+        // },
       });
 
       if (data.length) {
