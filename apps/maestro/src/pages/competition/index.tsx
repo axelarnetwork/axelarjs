@@ -134,7 +134,7 @@ const CompetitionPage = () => {
     });
 
     return (
-      <Card className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
+      <Card className="bg-base-200/95 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
         <Card.Body>
           <Card.Title>
             <div className="flex-1">
@@ -182,12 +182,13 @@ const CompetitionPage = () => {
   return (
     <Page
       title="Competition"
-      className="flex flex-col space-y-4"
+      contentClassName="flex flex-col space-y-4"
       isLoading={isLoading && isEnabled}
       loadingMessage="Loading transactions..."
+      className="bg-cover bg-fixed bg-center bg-no-repeat pb-16"
     >
       <Page.Title>Interchain Leaderboard</Page.Title>
-      <Card className="bg-base-200">
+      <Card className="bg-base-200/95">
         <Card.Body className="spcae-y-4 xl:space-y-8">
           <InterchainBanner />
           <Card.Title>

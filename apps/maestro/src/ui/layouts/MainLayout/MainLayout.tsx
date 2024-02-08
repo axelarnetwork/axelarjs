@@ -21,7 +21,7 @@ import Markdown from "react-markdown";
 import Link from "next/link";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
-import { ErrorBoundary } from "@sentry/nextjs";
+import { ErrorBoundary, type FallbackRender } from "@sentry/nextjs";
 import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
 import tw from "tailwind-styled-components";
 
@@ -56,13 +56,13 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   const [
     {
-      isSignedIn,
-      signInError,
-      isDrawerOpen,
-      isSignInModalOpen,
       DrawerSideContent,
-      isTestnetBannerDismissed,
+      isDrawerOpen,
       isGlobalBannerDismissed,
+      isSignedIn,
+      isSignInModalOpen,
+      isTestnetBannerDismissed,
+      signInError,
     },
     actions,
   ] = useLayoutStateContainer();
@@ -80,7 +80,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         />
         <Drawer.Content
           className={cn(
-            "flex min-h-[100dvh] flex-1 flex-col gap-4 lg:min-h-screen",
+            "flex min-h-[100dvh] flex-1 flex-col gap-4 bg-[url('/illustrations/bg.svg')] lg:min-h-screen",
             {
               "pointer-events-none": isSignInModalOpen,
             }
@@ -106,45 +106,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           )}
           <Appbar />
 
-          <ErrorBoundary
-            fallback={({ error }) => (
-              <div className="grid flex-1 place-items-center">
-                <Clamp className="max-w-2xl">
-                  <Alert>
-                    <div className="grid gap-2">
-                      <div className="text-lg">
-                        OK, looks like something didn&apos;t work quite as
-                        expected. We&apos;re on it!
-                      </div>
-                      <div className="opacity-80">
-                        In the meantime, you can try refreshing the page or
-                        checking the support link at the bottom of the page.
-                      </div>
-
-                      {Boolean(error.stack ?? error.message) && (
-                        <CopyToClipboardButton
-                          className="bg-base-100"
-                          copyText={error.stack ?? error.message}
-                        >
-                          Copy error to clipboard
-                        </CopyToClipboardButton>
-                      )}
-
-                      {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-                        <div className="p-2">
-                          <div className="mockup-code">
-                            <pre className="max-w-xs overflow-x-scroll md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
-                              {error.stack}
-                            </pre>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </Alert>
-                </Clamp>
-              </div>
-            )}
-          >
+          <ErrorBoundary fallback={ErrorBoundaryFallback}>
             {children}
           </ErrorBoundary>
 
@@ -167,6 +129,20 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     </>
   );
 };
+
+const WithProvider: FC<PropsWithChildren> = (props) => (
+  <ThemeProvider>
+    <LayoutStateProvider>
+      <TransactionsProvider>
+        <MainLayout {...props} />
+      </TransactionsProvider>
+    </LayoutStateProvider>
+  </ThemeProvider>
+);
+
+WithProvider.displayName = "MainLayout";
+
+export default WithProvider;
 
 const VersionBadge = tw(Badge)`join-item hover:text-primary text-xs`;
 
@@ -262,20 +238,6 @@ const LayoutFooter = () => (
   </Footer>
 );
 
-const WithProvider: FC<PropsWithChildren> = (props) => (
-  <ThemeProvider>
-    <LayoutStateProvider>
-      <TransactionsProvider>
-        <MainLayout {...props} />
-      </TransactionsProvider>
-    </LayoutStateProvider>
-  </ThemeProvider>
-);
-
-WithProvider.displayName = "MainLayout";
-
-export default WithProvider;
-
 const TestnetBanner = ({ onClose = () => {} }) => (
   <Card
     className="bg-base-200 fixed bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
@@ -306,4 +268,42 @@ const TestnetBanner = ({ onClose = () => {} }) => (
       </Card.Actions>
     </Card.Body>
   </Card>
+);
+
+const ErrorBoundaryFallback: FallbackRender = ({ error }) => (
+  <div className="grid flex-1 place-items-center">
+    <Clamp className="max-w-2xl">
+      <Alert>
+        <div className="grid gap-2">
+          <div className="text-lg">
+            OK, looks like something didn&apos;t work quite as expected.
+            We&apos;re on it!
+          </div>
+          <div className="opacity-80">
+            In the meantime, you can try refreshing the page or checking the
+            support link at the bottom of the page.
+          </div>
+
+          {Boolean(error.stack ?? error.message) && (
+            <CopyToClipboardButton
+              className="bg-base-100"
+              copyText={error.stack ?? error.message}
+            >
+              Copy error to clipboard
+            </CopyToClipboardButton>
+          )}
+
+          {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+            <div className="p-2">
+              <div className="mockup-code">
+                <pre className="max-w-xs overflow-x-scroll md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
+                  {error.stack}
+                </pre>
+              </div>
+            </div>
+          )}
+        </div>
+      </Alert>
+    </Clamp>
+  </div>
 );

@@ -40,7 +40,7 @@ const InterchainTokensPage: FC = () => {
   return (
     <Page
       pageTitle={`Interchain Tokens - ${routeChain?.name}`}
-      className="!flex flex-1 flex-col gap-12 md:gap-16"
+      contentClassName="!flex flex-1 flex-col gap-12 md:gap-16"
       isLoading={isLoading && !isError}
       loadingMessage="loading interchain token..."
     >
