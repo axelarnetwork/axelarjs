@@ -45,7 +45,7 @@ export default function HomePage() {
       <Page
         pageTitle="Interchain Token Service"
         pageDescription="Interchain orchestration powered by Axelar"
-        className="place-items-center"
+        contentClassName="place-items-center"
         mustBeConnected
       >
         <div className="w-full">

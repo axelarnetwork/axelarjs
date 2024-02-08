@@ -33,7 +33,7 @@ const RecentTransactionsPage = () => {
   return (
     <Page
       title={`${address ? "My" : ""} Recent Interchain Transactions `}
-      className="flex flex-col space-y-4"
+      contentClassName="flex flex-col space-y-4"
     >
       <Page.Title>
         {`${address ? "My" : ""} Recent Interchain Transactions`}
