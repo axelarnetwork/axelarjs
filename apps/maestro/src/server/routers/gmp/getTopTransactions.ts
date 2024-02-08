@@ -11,10 +11,6 @@ const INPUT_SCHEMA = z.object({
   senderAddress: hex40Literal().optional(),
   top: z.number().optional().default(10),
   minTxCount: z.number().optional().default(2),
-  contractMethod: z.union([
-    z.literal("InterchainTransfer"),
-    z.literal("InterchainTokenDeploymentStarted"),
-  ]),
   fromTime: z.number().optional(),
   toTime: z.number().optional(),
 });
@@ -50,7 +46,7 @@ export const getTopTransactions = publicProcedure
         }),
         ctx.services.gmp.searchGMP({
           ...commonParams,
-          contractMethod: input.contractMethod,
+          contractMethod: "InterchainTransfer",
           _source: {
             includes: [
               "interchain_transfer.name",
