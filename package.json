@@ -59,7 +59,7 @@
     "prettier": "^2.8.8",
     "pretty-quick": "^3.3.1",
     "rimraf": "^5.0.5",
-    "turbo": "^1.12.2",
+    "turbo": "^1.12.3",
     "typescript": "^5.3.3"
   },
   "pnpm": {
