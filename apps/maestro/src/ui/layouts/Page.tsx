@@ -133,7 +133,7 @@ const Page: FC<Props> = ({
               <div className="text-center text-xl font-bold">
                 RECENT INTERCHAIN TRANSACTIONS
               </div>
-              <RecentTransactions />
+              <RecentTransactions maxTransactions={50} />
             </section>
           </div>
         ) : (
