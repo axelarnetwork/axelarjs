@@ -1,8 +1,7 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
-import { Maybe, throttle } from "@axelarjs/utils";
+import { throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { reduce } from "rambda";
 import { zeroAddress } from "viem";
 import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
 
@@ -18,6 +17,7 @@ import {
 } from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
+import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
@@ -28,7 +28,7 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   tokenSymbol: string;
   decimals: number;
   destinationChainIds: string[];
-  remoteDeploymentGasFees: bigint[];
+  remoteDeploymentGasFees?: EstimateGasFeeMultipleChainsOutput;
   initialSupply?: bigint;
   salt: `0x${string}`;
   minterAddress?: `0x${string}`;
@@ -123,17 +123,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         ...commonArgs,
         originalChainName,
         destinationChain,
-        gasValue: input.remoteDeploymentGasFees?.[i] ?? 0n,
+        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })
     );
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainNames, originalChainName]);
 
-  const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
-    0n,
-    reduce((a, b) => a + b, 0n)
-  );
+  const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
 
   const isMutationReady =
     multicallArgs.length > 0 &&
@@ -236,7 +233,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const writeAsync = useCallback(async () => {
     if (!multicall.writeAsync) {
       throw new Error(
-        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
+        "useDeployAndRegisterRemoteInterchainTokenMutation: multicall.writeAsync is not defined"
       );
     }
 

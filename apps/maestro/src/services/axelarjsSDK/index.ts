@@ -32,16 +32,29 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
 
 async function estimateGasFeeMultipleChains(
   params: EstimateGasFeeMultipleChainsInput
-): Promise<bigint[]> {
-  return await Promise.all([
+) {
+  const results = await Promise.all([
     ...params.destinationChainIds.map((destinationChainId) =>
       estimateGasFee({
         ...params,
         destinationChainId,
         sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
       })
+        .then((fee) => ({ status: "success" as const, fee }))
+        .catch((error) => ({
+          status: "error" as const,
+          error: error instanceof Error ? error.message : "Unknown error",
+          fee: 0n,
+        }))
     ),
   ]);
+
+  const totalGasFee = results.reduce((acc, x) => acc + x.fee, 0n);
+
+  return {
+    totalGasFee,
+    gasFees: results,
+  };
 }
 
 async function getChainInfo(params: GetChainInfoInput) {

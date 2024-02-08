@@ -28,9 +28,21 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
         const result = data.reduce(
           (acc, { call, status }) => ({
             ...acc,
-            [call.returnValues.destinationChain.toLowerCase()]: status,
+            [call.returnValues.destinationChain.toLowerCase()]: {
+              status,
+              txHash: call.transactionHash,
+              logIndex: call.logIndex,
+              txId: call.id,
+            },
           }),
-          {} as { [chainId: string]: GMPTxStatus }
+          {} as {
+            [chainId: string]: {
+              status: GMPTxStatus;
+              txHash: `0x${string}`;
+              txId: string;
+              logIndex: number;
+            };
+          }
         );
 
         return result;

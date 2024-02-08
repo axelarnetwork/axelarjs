@@ -51,7 +51,7 @@ export const Step3: FC = () => {
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
-        remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
+        remoteDeploymentGasFees: state.remoteDeploymentGasFees,
         sourceChainId: sourceChain?.id ?? "",
         minterAddress: rootState.tokenDetails.minter,
         initialSupply: parseUnits(
@@ -182,7 +182,7 @@ export const Step3: FC = () => {
       children: (
         <>
           Deploy{" "}
-          {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull(
+          {Maybe.of(state.remoteDeploymentGasFees?.gasFees.length).mapOrNull(
             (length) => (
               <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
             )
@@ -195,10 +195,11 @@ export const Step3: FC = () => {
     rootState.txState.type,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
-    state.remoteDeploymentGasFees,
+    state.remoteDeploymentGasFees?.gasFees.length,
+    state.totalGasFee,
     hasInsufficientGasBalance,
+    sourceChain?.native_token.decimals,
     nativeTokenSymbol,
-    sourceChain,
   ]);
 
   const isCTADisabled =
@@ -213,7 +214,7 @@ export const Step3: FC = () => {
         <FormControl>
           <Label>
             <Label.Text>Additional chains (optional):</Label.Text>
-            {Boolean(state.remoteDeploymentGasFees?.length) && (
+            {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
                   <span className="ml-2 whitespace-nowrap text-xs">

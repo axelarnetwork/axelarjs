@@ -51,7 +51,8 @@ export const Step3: FC = () => {
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
         destinationChainIds: Array.from(rootState.selectedChains),
-        remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
+        remoteDeploymentGasFees:
+          state.remoteDeploymentGasFees?.gasFees.map((x) => x.fee) ?? [],
         sourceChainId: sourceChain?.id ?? "",
       }
     );
@@ -178,7 +179,7 @@ export const Step3: FC = () => {
       children: (
         <>
           Register{" "}
-          {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull(
+          {Maybe.of(state.remoteDeploymentGasFees?.gasFees.length).mapOrNull(
             (length) => (
               <>
                 {length > 0 && <span>& deploy</span>}
@@ -206,7 +207,7 @@ export const Step3: FC = () => {
           <Label>
             <Label.Text>Additional chains (optional):</Label.Text>
 
-            {Boolean(state.remoteDeploymentGasFees?.length) && (
+            {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
                   <span className="ml-2 whitespace-nowrap text-xs">
