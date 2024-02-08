@@ -77,19 +77,22 @@ export const getTopTransactions = publicProcedure
         eligibleTransfers
       );
 
-      const filtered = Object.entries(grouped);
+      const filtered = Object.entries(grouped).filter(
+        ([, txs]) => txs.length >= input.minTxCount
+      );
 
       return filtered
-        .map(([tokenId, txs]) => ({
-          tokenId: tokenId as `0x${string}`,
-          name: txs[0].interchain_transfer?.name ?? "",
-          symbol: txs[0].interchain_transfer?.symbol ?? "",
-          address:
-            txs[0].interchain_transfer?.contract_address ??
-            ("" as `0x${string}`),
-          count: txs.length,
-        }))
-        .filter((token) => token.count >= input.minTxCount)
+        .map(([tokenId, [tx, ...txs]]) => {
+          const transfer = tx.interchain_transfer;
+
+          return {
+            tokenId: tokenId as `0x${string}`,
+            name: transfer?.name ?? "",
+            symbol: transfer?.symbol ?? "",
+            address: transfer?.contract_address ?? ("" as `0x${string}`),
+            count: txs.length + 1,
+          };
+        })
         .sort((a, b) => b.count - a.count)
         .slice(0, input.top);
     } catch (error) {
