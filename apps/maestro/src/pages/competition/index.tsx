@@ -75,8 +75,7 @@ const CompetitionPage = () => {
 
   const { data, isLoading } = trpc.gmp.getTopTransactions.useQuery(
     {
-      sampleSize: 99000,
-      minTxCount: 2,
+      minTxCount: 1,
       top: TOP_TOKEN_COUNT,
       fromTime: COMPETITION_START_TS / 1000,
       toTime: COMPETITION_END_TS / 1000,

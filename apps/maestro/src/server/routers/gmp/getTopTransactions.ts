@@ -28,7 +28,6 @@ export const getTopTransactions = publicProcedure
         senderAddress: input.senderAddress,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-        size: input.sampleSize,
         fromTime: input.fromTime,
         toTime: input.toTime,
       };
@@ -36,25 +35,27 @@ export const getTopTransactions = publicProcedure
         ctx.services.gmp.searchGMP({
           ...commonParams,
           contractMethod: "InterchainTokenDeploymentStarted",
-          _source: {
-            includes: [
-              "interchain_token_deployment_started.tokenName",
-              "interchain_token_deployment_started.tokenSymbol",
-              "interchain_token_deployment_started.tokenId",
-            ],
-          },
+          size: 100,
+          // _source: {
+          //   includes: [
+          //     "interchain_token_deployment_started.tokenName",
+          //     "interchain_token_deployment_started.tokenSymbol",
+          //     "interchain_token_deployment_started.tokenId",
+          //   ],
+          // },
         }),
         ctx.services.gmp.searchGMP({
           ...commonParams,
           contractMethod: "InterchainTransfer",
-          _source: {
-            includes: [
-              "interchain_transfer.name",
-              "interchain_transfer.symbol",
-              "interchain_transfer.contract_address",
-              "interchain_transfer.tokenId",
-            ],
-          },
+          size: 500,
+          // _source: {
+          //   includes: [
+          //     "interchain_transfer.name",
+          //     "interchain_transfer.symbol",
+          //     "interchain_transfer.contract_address",
+          //     "interchain_transfer.tokenId",
+          //   ],
+          // },
         }),
       ]);
 
@@ -76,7 +77,6 @@ export const getTopTransactions = publicProcedure
       const filtered = Object.entries(grouped).filter(
         ([, txs]) => txs.length >= input.minTxCount
       );
-
       return filtered
         .map(([tokenId, [tx, ...txs]]) => {
           const transfer = tx.interchain_transfer;
