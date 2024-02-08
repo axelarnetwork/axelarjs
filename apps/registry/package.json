@@ -21,9 +21,9 @@
     "tailwind-styled-components": "^2.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.14",
+    "@types/node": "^20.11.16",
     "@types/react": "18.2.21",
-    "@types/react-dom": "^18.2.18",
+    "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.17",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.1.0",
