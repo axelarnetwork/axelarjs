@@ -76,6 +76,18 @@ async function isImageSafeToBeUsed(
   imageUrl: string,
   ctx: Context
 ): Promise<boolean> {
+  const promptText = `
+    Is this image safe to be used as a token icon?.
+    image must:
+    - not contain nudity, violence, or other inappropriate content.
+    - not contain offensive symbols or gestures.
+    - not contain text.
+
+    Please respond with 'safe' or 'unsafe'
+  `
+    .replace(/\s+/g, " ")
+    .trim();
+
   const response = await ctx.services.openai.chat.completions.create({
     model: "gpt-4-vision-preview",
     messages: [
@@ -84,7 +96,7 @@ async function isImageSafeToBeUsed(
         content: [
           {
             type: "text",
-            text: "Is this image safe to be used as a token icon? Please respond with 'safe' or 'unsafe'.",
+            text: promptText,
           },
           {
             type: "image_url",
