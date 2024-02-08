@@ -1,7 +1,7 @@
 import { Badge, Button, Clamp } from "@axelarjs/ui";
 import tw from "@axelarjs/ui/tw";
 import { cn } from "@axelarjs/ui/utils";
-import { useCallback, useMemo, type ComponentProps } from "react";
+import { useCallback, useMemo, type ComponentProps, type FC } from "react";
 import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -32,18 +32,22 @@ interface Props extends ComponentProps<typeof Clamp> {
   mustBeConnected?: boolean;
   isLoading?: boolean;
   loadingMessage?: string;
+  contentClassName?: string;
+  className?: string;
 }
 
-const Page = ({
+const Page: FC<Props> = ({
   pageTitle,
   pageDescription,
   mustBeConnected,
+  contentClassName,
   className,
   children,
   isLoading,
   loadingMessage,
+  style,
   ...props
-}: Props) => {
+}) => {
   const { isConnected } = useAccount();
   const { chain } = useNetwork();
   const chainFromRoute = useChainFromRoute();
@@ -227,21 +231,23 @@ const Page = ({
           <meta name="description" content={pageDescription} />
         )}
       </Head>
-      <Clamp
-        $as="section"
-        // id needed for the hero cta smooth scroll
-        id="main-content"
-        className={cn(
-          "mt-20 grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
-          {
-            "place-items-center": isExceptionalState,
-          },
-          className
-        )}
-        {...props}
-      >
-        {pageContent}
-      </Clamp>
+      <div className={className} style={style}>
+        <Clamp
+          $as="section"
+          // id needed for the hero cta smooth scroll
+          id="main-content"
+          className={cn(
+            "mt-20 grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
+            {
+              "place-items-center": isExceptionalState,
+            },
+            contentClassName
+          )}
+          {...props}
+        >
+          {pageContent}
+        </Clamp>
+      </div>
       {isLoading && <FullScreenLoading loadingMessage={loadingMessage} />}
     </>
   );

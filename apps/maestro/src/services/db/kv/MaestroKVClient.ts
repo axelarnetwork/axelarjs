@@ -21,6 +21,7 @@ export const COLLECTION_KEYS = {
   globalMessage: "messages:global" as const,
   accountMessage: (accountAddress: `0x${string}`) =>
     `messages:${accountAddress}` as const,
+  tokenMeta: (tokenId: `0x${string}`) => `tokens:${tokenId}:meta` as const,
   cached: (key: string) => `cached:${key}` as const,
 };
 
@@ -34,6 +35,10 @@ export const messageSchema = z.object({
 export type Message = z.infer<typeof messageSchema>;
 
 export type MessageKind = Message["kind"];
+
+export type TokenMeta = {
+  iconUrl: string;
+};
 
 export class BaseMaestroKVClient {
   constructor(protected kv: VercelKV) {}
@@ -117,5 +122,15 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   async getCached<T>(cacheKey: string) {
     const key = COLLECTION_KEYS.cached(cacheKey);
     return await this.kv.get<T>(key);
+  }
+
+  async setTokenIconUrl(tokenId: `0x${string}`, iconUrl: string) {
+    const key = COLLECTION_KEYS.tokenMeta(tokenId);
+    return await this.kv.hset(key, { iconUrl });
+  }
+
+  async getTokenMeta(tokenId: `0x${string}`) {
+    const key = COLLECTION_KEYS.tokenMeta(tokenId);
+    return await this.kv.hgetall<TokenMeta>(key);
   }
 }
