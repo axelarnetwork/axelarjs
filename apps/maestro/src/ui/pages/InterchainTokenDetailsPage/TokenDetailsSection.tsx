@@ -301,11 +301,6 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               <div>Does this look good?</div>
             </div>
           )}
-          {error && (
-            <Alert status="error">
-              {error.message || "Failed to save token icon"}
-            </Alert>
-          )}
         </Modal.Body>
         <Modal.Actions className="">
           {formValidationMessage ? (
