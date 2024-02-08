@@ -94,6 +94,10 @@ export const NEXT_PUBLIC_COMPETITION_END_TIMESTAMP = Maybe.of(
   process.env.NEXT_PUBLIC_COMPETITION_END_TIMESTAMP
 ).mapOr("", String);
 
+export const NEXT_PUBLIC_ENABLED_FEATURES = Maybe.of(
+  process.env.NEXT_PUBLIC_ENABLES_FEATURES
+).mapOr([], (val) => String(val).split(","));
+
 export const shouldDisableSend = (
   axelarChainId: string,
   tokenAddress: `0x${string}`

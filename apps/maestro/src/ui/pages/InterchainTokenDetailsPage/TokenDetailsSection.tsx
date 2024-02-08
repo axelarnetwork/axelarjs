@@ -22,6 +22,7 @@ import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
+import { NEXT_PUBLIC_ENABLED_FEATURES } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
@@ -157,7 +158,10 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
     <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
   );
 
-  if (!isOperator) {
+  if (
+    !isOperator ||
+    !NEXT_PUBLIC_ENABLED_FEATURES.includes("MANAGE_TOKEN_ICON")
+  ) {
     return icon;
   }
 
