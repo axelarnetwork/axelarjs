@@ -37,7 +37,6 @@ export const getRecentTransactions = publicProcedure
   .input(INPUT_SCHEMA)
   .query(async ({ input, ctx }) => {
     try {
-      console.log({ input });
       const response = await ctx.services.gmp.searchGMP({
         senderAddress: input.senderAddress,
         destinationContractAddress:

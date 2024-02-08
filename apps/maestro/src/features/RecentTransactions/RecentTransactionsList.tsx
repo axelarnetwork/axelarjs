@@ -57,7 +57,6 @@ export const RecentTransactionsList: FC<Props> = ({
   title,
   maxTransactions = 10,
 }) => {
-  console.log("canh", { maxTransactions });
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
     senderAddress,
