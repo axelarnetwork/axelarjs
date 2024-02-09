@@ -44,15 +44,15 @@ export const getRecentTransactions = publicProcedure
         size: input.pageSize,
         from: input.page * input.pageSize,
         contractMethod: input.contractMethod,
-        // _source: {
-        //   includes: [
-        //     "call.transactionHash",
-        //     "call.blockHash",
-        //     "call.block_timestamp",
-        //     "interchain_transfer",
-        //     "interchain_token_deployment_started",
-        //   ],
-        // },
+        _source: {
+          includes: [
+            "call.transactionHash",
+            "call.blockHash",
+            "call.block_timestamp",
+            "interchain_transfer",
+            "interchain_token_deployment_started",
+          ],
+        },
       });
 
       const deduped = uniqBy((tx) => tx.call.transactionHash, response);
