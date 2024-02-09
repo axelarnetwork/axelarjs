@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 import RecentTransactions from "~/features/RecentTransactions";
 import SearchInterchainToken, {
@@ -19,7 +19,7 @@ const InterchainTokenDeployment = dynamic(
 
 export default function HomePage() {
   const router = useRouter();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const [layoutState, layoutActions] = useLayoutStateContainer();
 
   const handleTokenFound = useCallback(

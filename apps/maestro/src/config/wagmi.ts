@@ -1,5 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
+import { createConfig, http } from "wagmi";
+import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
 import { logger } from "~/lib/logger";
 import { APP_NAME, APP_TITLE } from "./app";
@@ -23,28 +25,38 @@ export { WAGMI_CHAIN_CONFIGS as EVM_CHAIN_CONFIGS };
 
 export const queryClient = new QueryClient();
 
-export const wagmiConfig = defaultWagmiConfig({
+const metadata = {
+  name: APP_NAME,
+  description: APP_TITLE,
+  icons: ["/icons/favicon-32x32.png"],
+  url: "",
+};
+
+export const wagmiConfig = createConfig({
   chains: WAGMI_CHAIN_CONFIGS,
-  projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  metadata: {
-    name: APP_NAME,
-    description: APP_TITLE,
-    icons: ["/icons/favicon-32x32.png"],
-  },
+  connectors: [
+    walletConnect({
+      projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+      metadata,
+    }),
+    coinbaseWallet({
+      appName: metadata.name,
+      appLogoUrl: metadata.icons[0],
+    }),
+    injected(),
+  ],
+  transports: Object.fromEntries(
+    WAGMI_CHAIN_CONFIGS.map((chain) => [chain.id, http()])
+  ),
 });
 
 export const WEB3_MODAL = createWeb3Modal({
   wagmiConfig,
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  chains: WAGMI_CHAIN_CONFIGS,
   themeVariables: {
     "--w3m-font-family": "var(--font-sans)",
     "--w3m-accent": "var(--primary)",
     "--w3m-color-mix": "var(--primary)",
-  },
-  connectorImages: {
-    coinbaseWallet:
-      "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
   },
   excludeWalletIds: [...NEXT_PUBLIC_DISABLED_WALLET_IDS],
 });

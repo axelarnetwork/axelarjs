@@ -3,19 +3,19 @@ import { Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import type { TransactionReceipt } from "viem";
+import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
 
 import {
-  useInterchainTokenFactoryCanonicalInterchainTokenId,
-  useInterchainTokenFactoryMulticall,
-  usePrepareInterchainTokenFactoryMulticall,
+  useReadInterchainTokenFactoryCanonicalInterchainTokenId,
+  useSimulateInterchainTokenFactoryMulticall,
+  useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
-import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
@@ -52,14 +52,12 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<RecordInterchainTokenDeploymentInput>();
 
-  const { data: tokenId } = useInterchainTokenFactoryCanonicalInterchainTokenId(
-    {
+  const { data: tokenId } =
+    useReadInterchainTokenFactoryCanonicalInterchainTokenId({
       args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.canonicalInterchainTokenId.args({
         tokenAddress: input?.tokenAddress as `0x${string}`,
       }),
-      enabled: input?.tokenAddress && isValidEVMAddress(input?.tokenAddress),
-    }
-  );
+    });
 
   const { originalChainName, destinationChainNames } = useMemo(() => {
     const index = computed.indexedById;
@@ -121,34 +119,33 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     reduce((a, b) => a + b, 0n)
   );
 
-  const isMutationReady =
-    multicallArgs.length > 0 &&
-    // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-    (!destinationChainNames.length || totalGasFee > 0n);
-
-  const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
+  const { data } = useSimulateInterchainTokenFactoryMulticall({
     chainId,
     value: totalGasFee,
     args: [multicallArgs],
-    enabled: isMutationReady,
   });
 
-  const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);
+  const multicall = useWriteInterchainTokenFactoryMulticall();
 
-  useWaitForTransaction({
-    hash: multicall?.data?.hash,
-    onSuccess: ({ transactionHash: txHash, transactionIndex: txIndex }) => {
-      if (!txHash || !tokenId || !deployerAddress || !input) {
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: multicall?.data,
+  });
+
+  useEffect(() => {
+    const onReceipt = (receipt: TransactionReceipt) => {
+      const { transactionHash, transactionIndex } = receipt;
+
+      if (!transactionHash || !tokenId || !deployerAddress || !input) {
         console.error(
           "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to setRecordDeploymentArgs",
-          { txHash, tokenId, deployerAddress, input }
+          { transactionHash, tokenId, deployerAddress, input }
         );
         return;
       }
 
       setRecordDeploymentArgs({
         kind: "canonical",
-        deploymentMessageId: `${txHash}-${txIndex}`,
+        deploymentMessageId: `${transactionHash}-${transactionIndex}`,
         tokenId,
         tokenAddress: input.tokenAddress,
         deployerAddress,
@@ -158,8 +155,12 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         axelarChainId: input.sourceChainId,
         destinationAxelarChainIds: input.destinationChainIds,
       });
-    },
-  });
+    };
+
+    if (receipt) {
+      onReceipt(receipt);
+    }
+  }, [deployerAddress, input, receipt, tokenId]);
 
   useEffect(
     () => {
@@ -212,7 +213,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   }, [deployerAddress, input, recordDeploymentAsync, tokenId]);
 
   const writeAsync = useCallback(async () => {
-    if (!multicall.writeAsync) {
+    if (!multicall.writeContractAsync || !data) {
       throw new Error(
         "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
       );
@@ -220,18 +221,18 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
     await recordDeploymentDraft();
 
-    return await multicall.writeAsync();
-  }, [multicall, recordDeploymentDraft]);
+    return await multicall.writeContractAsync(data.request);
+  }, [data, multicall, recordDeploymentDraft]);
 
   const write = useCallback(() => {
-    if (!multicall.write) {
+    if (!multicall.writeContract || !data) {
       throw new Error(
         "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.write is not defined"
       );
     }
 
     recordDeploymentDraft()
-      .then(multicall.write)
+      .then(() => data && multicall.writeContract(data.request))
       .catch((e) => {
         console.error(
           "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
@@ -241,7 +242,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
           type: "idle",
         });
       });
-  }, [multicall, onStatusUpdate, recordDeploymentDraft]);
+  }, [data, multicall, onStatusUpdate, recordDeploymentDraft]);
 
   return { ...multicall, writeAsync, write };
 }

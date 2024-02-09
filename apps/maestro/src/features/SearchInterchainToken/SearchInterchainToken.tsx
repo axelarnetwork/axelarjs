@@ -3,7 +3,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
 import { isAddress } from "viem";
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -24,7 +24,7 @@ export type SearchInterchainTokenProps = {
 const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   const [search, setSearch] = useQueryStringState<string>("search", "");
 
-  const { chain: connectedChain } = useNetwork();
+  const { chain: connectedChain } = useAccount();
 
   const { computed } = useEVMChainConfigsQuery();
 

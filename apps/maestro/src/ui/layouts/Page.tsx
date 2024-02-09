@@ -6,7 +6,7 @@ import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 
 import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
@@ -49,9 +49,9 @@ const Page: FC<Props> = ({
   ...props
 }) => {
   const { isConnected } = useAccount();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const chainFromRoute = useChainFromRoute();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChain } = useSwitchChain();
   const { data: evmChains } = useEVMChainConfigsQuery();
 
   const evmChain = useMemo(
@@ -192,16 +192,20 @@ const Page: FC<Props> = ({
                   alt={evmChain.name}
                 />
               </div>
-              <Button
-                variant="primary"
-                length="block"
-                className="max-w-md"
-                onClick={() =>
-                  switchNetworkAsync?.(evmChainFromRoute?.chain_id)
-                }
-              >
-                Switch to {evmChainFromRoute?.name}
-              </Button>
+              {evmChainFromRoute && (
+                <Button
+                  variant="primary"
+                  length="block"
+                  className="max-w-md"
+                  onClick={() =>
+                    switchChain?.({
+                      chainId: evmChainFromRoute.chain_id,
+                    })
+                  }
+                >
+                  Switch to {evmChainFromRoute.name}
+                </Button>
+              )}
             </div>
           </div>
         );
@@ -215,10 +219,9 @@ const Page: FC<Props> = ({
     handleTokenFound,
     children,
     evmChain,
-    evmChainFromRoute?.name,
-    evmChainFromRoute?.chain_id,
+    evmChainFromRoute,
     chain?.id,
-    switchNetworkAsync,
+    switchChain,
   ]);
 
   const isExceptionalState = pageState !== "connected";
