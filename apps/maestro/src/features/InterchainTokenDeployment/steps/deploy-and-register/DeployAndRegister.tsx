@@ -32,6 +32,14 @@ export const Step3: FC = () => {
 
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
+  const validDestinationChains = useMemo(
+    () =>
+      state.remoteDeploymentGasFees?.gasFees
+        .filter((x) => x.status === "success")
+        .map((x) => x.destinationChainId) ?? [],
+    [state.remoteDeploymentGasFees?.gasFees]
+  );
+
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteInterchainTokenMutation(
       {
@@ -50,7 +58,7 @@ export const Step3: FC = () => {
         tokenName: rootState.tokenDetails.tokenName,
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
-        destinationChainIds: Array.from(rootState.selectedChains),
+        destinationChainIds: validDestinationChains,
         remoteDeploymentGasFees: state.remoteDeploymentGasFees,
         sourceChainId: sourceChain?.id ?? "",
         minterAddress: rootState.tokenDetails.minter,
@@ -182,11 +190,9 @@ export const Step3: FC = () => {
       children: (
         <>
           Deploy{" "}
-          {Maybe.of(state.remoteDeploymentGasFees?.gasFees.length).mapOrNull(
-            (length) => (
-              <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
-            )
-          )}
+          {Maybe.of(validDestinationChains.length).mapOrNull((length) => (
+            <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
+          ))}
         </>
       ),
       status: "idle",
@@ -195,9 +201,9 @@ export const Step3: FC = () => {
     rootState.txState.type,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
-    state.remoteDeploymentGasFees?.gasFees.length,
     state.totalGasFee,
     hasInsufficientGasBalance,
+    validDestinationChains.length,
     sourceChain?.native_token.decimals,
     nativeTokenSymbol,
   ]);
@@ -207,6 +213,14 @@ export const Step3: FC = () => {
     state.hasGasFeesEstimationError ||
     hasInsufficientGasBalance ||
     rootState.txState.type === "pending_approval";
+
+  const erroredChainIds = useMemo(() => {
+    const failed = state.remoteDeploymentGasFees?.gasFees.filter(
+      (x) => x.status === "error"
+    );
+
+    return failed?.map((x) => x.destinationChainId) ?? [];
+  }, [state.remoteDeploymentGasFees]);
 
   return (
     <>
@@ -233,6 +247,8 @@ export const Step3: FC = () => {
               rootState.txState.type === "pending_approval" ||
               rootState.txState.type === "deploying"
             }
+            erroredChains={erroredChainIds}
+            loading={state.isEstimatingGasFees}
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />

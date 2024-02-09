@@ -1,20 +1,24 @@
 import type { EVMChainConfig } from "@axelarjs/api";
-import { Button, Tooltip } from "@axelarjs/ui";
+import { Button, cn, Loading, Tooltip } from "@axelarjs/ui";
 import { useCallback, type FC } from "react";
 import Image from "next/image";
 
 export type ChainPickerProps = {
   eligibleChains: EVMChainConfig[];
   selectedChains: string[];
+  erroredChains?: string[];
   onChainClick: (chainId: string) => void;
   disabled?: boolean;
+  loading?: boolean;
 };
 
 const ChainPicker: FC<ChainPickerProps> = ({
   eligibleChains,
   selectedChains,
+  erroredChains,
   onChainClick,
   disabled,
+  loading,
 }) => {
   const handleToggleAll = useCallback(() => {
     const hasPartialSelection =
@@ -45,6 +49,12 @@ const ChainPicker: FC<ChainPickerProps> = ({
         {eligibleChains?.map((chain) => {
           const isSelected = selectedChains.includes(chain.id);
 
+          const buttonVariant = isSelected
+            ? erroredChains?.includes(chain.id)
+              ? "error"
+              : "success"
+            : undefined;
+
           return (
             <Tooltip
               tip={`Deploy on ${chain.name}`}
@@ -56,15 +66,26 @@ const ChainPicker: FC<ChainPickerProps> = ({
                 className="w-full rounded-2xl hover:ring"
                 size="sm"
                 role="button"
-                variant={isSelected ? "success" : undefined}
+                variant={buttonVariant}
                 onClick={onChainClick.bind(null, chain.id)}
               >
                 <Image
-                  className="pointer-events-none absolute left-3 -translate-x-2 rounded-full"
+                  className={cn(
+                    "pointer-events-none absolute left-3 -translate-x-2 rounded-full",
+                    {
+                      hidden: isSelected && loading,
+                    }
+                  )}
                   src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
                   width={24}
                   height={24}
                   alt={`${chain.name} logo`}
+                />
+                <Loading
+                  className={cn("absolute left-3 -translate-x-2 rounded-full", {
+                    hidden: !isSelected || !loading,
+                  })}
+                  size="sm"
                 />
                 <span className="ml-4">{chain.name}</span>
               </Button>

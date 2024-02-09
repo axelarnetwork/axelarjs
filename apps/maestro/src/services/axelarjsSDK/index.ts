@@ -40,11 +40,18 @@ async function estimateGasFeeMultipleChains(
         destinationChainId,
         sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
       })
-        .then((fee) => ({ status: "success" as const, fee }))
+        .then((fee) => ({
+          status: "success" as const,
+          fee,
+          sourceChainId: params.sourceChainId,
+          destinationChainId,
+        }))
         .catch((error) => ({
           status: "error" as const,
           error: error instanceof Error ? error.message : "Unknown error",
           fee: 0n,
+          sourceChainId: params.sourceChainId,
+          destinationChainId,
         }))
     ),
   ]);
