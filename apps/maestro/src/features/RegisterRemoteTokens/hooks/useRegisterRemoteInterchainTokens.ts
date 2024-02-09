@@ -46,13 +46,17 @@ export default function useRegisterRemoteInterchainTokens(
     tokenAddress: input.tokenAddress,
   });
 
-  const { data: gasFees } = useEstimateGasFeeMultipleChainsQuery({
+  const { data: gasFeesData } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
     sourceChainId: sourceChain?.id ?? "0",
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDeployment || !gasFees || tokenDeployment.kind !== "interchain")
+    if (
+      !tokenDeployment ||
+      !gasFeesData ||
+      tokenDeployment.kind !== "interchain"
+    )
       return [];
 
     return destinationChainIds.map((chainId, i) =>
@@ -61,15 +65,17 @@ export default function useRegisterRemoteInterchainTokens(
         originalChainName: sourceChain?.chain_name ?? "",
         minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
         destinationChain: chainId,
-        gasValue: gasFees[i],
+        gasValue: gasFeesData.gasFees[i].fee,
       })
     );
-  }, [destinationChainIds, gasFees, sourceChain?.chain_name, tokenDeployment]);
+  }, [
+    destinationChainIds,
+    gasFeesData,
+    sourceChain?.chain_name,
+    tokenDeployment,
+  ]);
 
-  const totalGasFee = useMemo(
-    () => gasFees?.reduce((a, b) => a + b, 0n) ?? 0n,
-    [gasFees]
-  );
+  const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
   const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,

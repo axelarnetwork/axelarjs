@@ -32,6 +32,18 @@ export const Step3: FC = () => {
 
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
+  const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
+    () =>
+      (state.remoteDeploymentGasFees?.gasFees ?? []).reduce(
+        ([succeeded, errored], x): [string[], string[]] =>
+          x.status === "success"
+            ? [[...succeeded, x.destinationChainId], errored]
+            : [succeeded, [...errored, x.destinationChainId]],
+        [[], []] as [string[], string[]]
+      ),
+    [state.remoteDeploymentGasFees?.gasFees]
+  );
+
   const { writeAsync: deployInterchainTokenAsync } =
     useDeployAndRegisterRemoteInterchainTokenMutation(
       {
@@ -39,6 +51,8 @@ export const Step3: FC = () => {
           if (txState.type === "deployed") {
             rootActions.setTxState(txState);
             rootActions.setStep(3);
+            rootActions.setSelectedChains(validDestinationChainIds);
+
             actions.setIsDeploying(false);
             return;
           }
@@ -50,8 +64,8 @@ export const Step3: FC = () => {
         tokenName: rootState.tokenDetails.tokenName,
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
-        destinationChainIds: Array.from(rootState.selectedChains),
-        remoteDeploymentGasFees: state.remoteDeploymentGasFees ?? [],
+        destinationChainIds: validDestinationChainIds,
+        remoteDeploymentGasFees: state.remoteDeploymentGasFees,
         sourceChainId: sourceChain?.id ?? "",
         minterAddress: rootState.tokenDetails.minter,
         initialSupply: parseUnits(
@@ -182,11 +196,9 @@ export const Step3: FC = () => {
       children: (
         <>
           Deploy{" "}
-          {Maybe.of(state.remoteDeploymentGasFees?.length).mapOrNull(
-            (length) => (
-              <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
-            )
-          )}
+          {Maybe.of(validDestinationChainIds.length).mapOrNull((length) => (
+            <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
+          ))}
         </>
       ),
       status: "idle",
@@ -195,10 +207,11 @@ export const Step3: FC = () => {
     rootState.txState.type,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
-    state.remoteDeploymentGasFees,
+    state.totalGasFee,
     hasInsufficientGasBalance,
+    validDestinationChainIds.length,
+    sourceChain?.native_token.decimals,
     nativeTokenSymbol,
-    sourceChain,
   ]);
 
   const isCTADisabled =
@@ -213,7 +226,7 @@ export const Step3: FC = () => {
         <FormControl>
           <Label>
             <Label.Text>Additional chains (optional):</Label.Text>
-            {Boolean(state.remoteDeploymentGasFees?.length) && (
+            {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
               <Label.AltText>
                 <Tooltip tip="Approximate gas cost">
                   <span className="ml-2 whitespace-nowrap text-xs">
@@ -232,6 +245,8 @@ export const Step3: FC = () => {
               rootState.txState.type === "pending_approval" ||
               rootState.txState.type === "deploying"
             }
+            erroredChains={erroredDestinationChainIds}
+            loading={state.isEstimatingGasFees}
           />
         </FormControl>
         <button type="submit" ref={formSubmitRef} />

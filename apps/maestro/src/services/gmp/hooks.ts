@@ -1,4 +1,4 @@
-import type { GMPTxStatus, SearchGMPParams } from "@axelarjs/api/gmp";
+import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
@@ -6,19 +6,9 @@ import { isAddress } from "viem";
 import { useQuery } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
+import { hex64 } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
 import gmpClient from "./index";
-
-export function useSearchGMPQuery(params: SearchGMPParams) {
-  return useQuery(
-    ["gmp-search", params],
-    gmpClient.searchGMP.bind(null, params)
-  );
-}
-
-export function useContractsQuery() {
-  return useQuery(["gmp-contracts"], gmpClient.getContracts.bind(null));
-}
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
@@ -66,53 +56,6 @@ export function useInterchainTokensQuery(input: {
   };
 }
 
-export function useGetTransactionType(
-  input: { txHash?: `0x${string}` },
-  options: {
-    enabled?: boolean;
-  }
-) {
-  const { data, ...query } = useQuery(
-    ["gmp-get-transaction-type", input.txHash],
-    async () => {
-      const response = await gmpClient.searchGMP({
-        txHash: input.txHash,
-        size: 1,
-        // _source: {
-        //   includes: [
-        //     "interchain_transfer",
-        //     "interchain_token_deployment_started",
-        //   ],
-        // },
-      });
-
-      if (!response.length) {
-        return null;
-      }
-
-      if ("interchain_token_deployment_started" in response[0]) {
-        return "INTERCHAIN_DEPLOYMENT" as const;
-      }
-
-      if ("interchain_transfer" in response[0]) {
-        return "INTERCHAIN_TRANSFER" as const;
-      }
-
-      return null;
-    },
-    {
-      enabled: Boolean(
-        input.txHash?.match(/^(0x)?[0-9a-f]{64}/i) && options.enabled
-      ),
-    }
-  );
-
-  return {
-    ...query,
-    data,
-  };
-}
-
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
     txHash?: `0x${string}`;
@@ -122,11 +65,10 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
     refetchInterval?: number;
   }
 ) {
-  const { data, ...query } = useQuery(
-    ["gmp-get-transaction-status-on-destination-chains", input.txHash],
-    async () => {
-      const responseData = await gmpClient.searchGMP({
-        txHash: input.txHash,
+  const { data, ...query } =
+    trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
+      {
+        txHash: input.txHash as `0x${string}`,
         // _source: {
         //   includes: [
         //     "call.returnValues.destinationChain",
@@ -136,38 +78,16 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
         //     "status",
         //   ],
         // },
-      });
-
-      if (!responseData.length) {
-        return {};
+      },
+      {
+        refetchInterval: 1000 * 10, // 10 seconds
+        enabled:
+          input.txHash &&
+          hex64().safeParse(input.txHash).success &&
+          // apply the default value if the option is not provided
+          Maybe.of(options?.enabled).mapOr(true, Boolean),
       }
-
-      return responseData.reduce(
-        (acc, { call, status }) => ({
-          ...acc,
-          [call.returnValues.destinationChain.toLowerCase()]: {
-            status,
-            txHash: call.transactionHash,
-            logIndex: call.logIndex,
-            txId: call.id,
-          },
-        }),
-        {} as {
-          [chainId: string]: {
-            status: GMPTxStatus;
-            txHash: `0x${string}`;
-            logIndex: number;
-            txId?: string;
-          };
-        }
-      );
-    },
-    {
-      enabled: Boolean(input.txHash?.match(/^(0x)?[0-9a-f]{64}/i)),
-      refetchInterval: 1000 * 10, // 10 seconds
-      ...options,
-    }
-  );
+    );
 
   return {
     ...query,
