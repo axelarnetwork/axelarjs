@@ -57,7 +57,12 @@ const ChainPicker: FC<ChainPickerProps> = ({
 
           return (
             <Tooltip
-              tip={`Deploy on ${chain.name}`}
+              tip={
+                buttonVariant !== "error"
+                  ? `Deploy on ${chain.name}`
+                  : "Failed to estimate gas fees"
+              }
+              variant={buttonVariant === "error" ? "warning" : undefined}
               key={chain.chain_name}
               position="top"
             >
