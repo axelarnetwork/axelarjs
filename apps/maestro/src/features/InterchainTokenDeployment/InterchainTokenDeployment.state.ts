@@ -185,6 +185,11 @@ function useInterchainTokenDeploymentState(
           }
         });
       },
+      setSelectedChains: (chains: string[]) => {
+        setState((draft) => {
+          draft.selectedChains = chains;
+        });
+      },
       setStep: (step: number) => {
         setState((draft) => {
           draft.step = step;

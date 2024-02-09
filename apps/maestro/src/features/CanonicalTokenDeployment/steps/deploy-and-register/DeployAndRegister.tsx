@@ -51,6 +51,7 @@ export const Step3: FC = () => {
           if (txState.type === "deployed") {
             rootActions.setTxState(txState);
             rootActions.setStep(2);
+            rootActions.setSelectedChains(validDestinationChainIds);
             actions.setIsDeploying(false);
             return;
           }
