@@ -32,11 +32,15 @@ export const Step3: FC = () => {
 
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
-  const validDestinationChains = useMemo(
+  const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
-      state.remoteDeploymentGasFees?.gasFees
-        .filter((x) => x.status === "success")
-        .map((x) => x.destinationChainId) ?? [],
+      (state.remoteDeploymentGasFees?.gasFees ?? []).reduce(
+        ([succeeded, errored], x): [string[], string[]] =>
+          x.status === "success"
+            ? [[...succeeded, x.destinationChainId], errored]
+            : [succeeded, [...errored, x.destinationChainId]],
+        [[], []] as [string[], string[]]
+      ),
     [state.remoteDeploymentGasFees?.gasFees]
   );
 
@@ -58,7 +62,7 @@ export const Step3: FC = () => {
         tokenName: rootState.tokenDetails.tokenName,
         tokenSymbol: rootState.tokenDetails.tokenSymbol,
         decimals: rootState.tokenDetails.tokenDecimals,
-        destinationChainIds: validDestinationChains,
+        destinationChainIds: validDestinationChainIds,
         remoteDeploymentGasFees: state.remoteDeploymentGasFees,
         sourceChainId: sourceChain?.id ?? "",
         minterAddress: rootState.tokenDetails.minter,
@@ -190,7 +194,7 @@ export const Step3: FC = () => {
       children: (
         <>
           Deploy{" "}
-          {Maybe.of(validDestinationChains.length).mapOrNull((length) => (
+          {Maybe.of(validDestinationChainIds.length).mapOrNull((length) => (
             <>{` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}</>
           ))}
         </>
@@ -203,7 +207,7 @@ export const Step3: FC = () => {
     state.hasGasFeesEstimationError,
     state.totalGasFee,
     hasInsufficientGasBalance,
-    validDestinationChains.length,
+    validDestinationChainIds.length,
     sourceChain?.native_token.decimals,
     nativeTokenSymbol,
   ]);
@@ -213,14 +217,6 @@ export const Step3: FC = () => {
     state.hasGasFeesEstimationError ||
     hasInsufficientGasBalance ||
     rootState.txState.type === "pending_approval";
-
-  const erroredChainIds = useMemo(() => {
-    const failed = state.remoteDeploymentGasFees?.gasFees.filter(
-      (x) => x.status === "error"
-    );
-
-    return failed?.map((x) => x.destinationChainId) ?? [];
-  }, [state.remoteDeploymentGasFees]);
 
   return (
     <>
@@ -247,7 +243,7 @@ export const Step3: FC = () => {
               rootState.txState.type === "pending_approval" ||
               rootState.txState.type === "deploying"
             }
-            erroredChains={erroredChainIds}
+            erroredChains={erroredDestinationChainIds}
             loading={state.isEstimatingGasFees}
           />
         </FormControl>
