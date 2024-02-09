@@ -82,7 +82,7 @@ export default function HomePage() {
                 <span className="hidden sm:inline-block">INTERCHAIN</span>{" "}
                 TRANSACTIONS
               </div>
-              <RecentTransactions maxTransactions={50} />
+              <RecentTransactions maxTransactions={250} />
             </section>
           </div>
         </div>
