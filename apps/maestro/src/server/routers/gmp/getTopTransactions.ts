@@ -26,6 +26,7 @@ export const getTopTransactions = publicProcedure
     try {
       const commonParams = {
         senderAddress: input.senderAddress,
+        size: 99000,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         fromTime: input.fromTime,
@@ -35,27 +36,25 @@ export const getTopTransactions = publicProcedure
         ctx.services.gmp.searchGMP({
           ...commonParams,
           contractMethod: "InterchainTokenDeploymentStarted",
-          size: 100,
-          // _source: {
-          //   includes: [
-          //     "interchain_token_deployment_started.tokenName",
-          //     "interchain_token_deployment_started.tokenSymbol",
-          //     "interchain_token_deployment_started.tokenId",
-          //   ],
-          // },
+          _source: {
+            includes: [
+              "interchain_token_deployment_started.tokenName",
+              "interchain_token_deployment_started.tokenSymbol",
+              "interchain_token_deployment_started.tokenId",
+            ],
+          },
         }),
         ctx.services.gmp.searchGMP({
           ...commonParams,
           contractMethod: "InterchainTransfer",
-          size: 500,
-          // _source: {
-          //   includes: [
-          //     "interchain_transfer.name",
-          //     "interchain_transfer.symbol",
-          //     "interchain_transfer.contract_address",
-          //     "interchain_transfer.tokenId",
-          //   ],
-          // },
+          _source: {
+            includes: [
+              "interchain_transfer.name",
+              "interchain_transfer.symbol",
+              "interchain_transfer.contract_address",
+              "interchain_transfer.tokenId",
+            ],
+          },
         }),
       ]);
 
