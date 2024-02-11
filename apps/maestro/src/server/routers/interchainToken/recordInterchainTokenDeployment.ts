@@ -43,7 +43,10 @@ export const recordInterchainTokenDeployment = protectedProcedure
       .implementationType()
       .catch(() => null);
 
-    const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOrNull(
+    const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOr(
+      // default to mint_burn for interchain tokens
+      // and lock_unlock for canonical tokens
+      input.kind === "canonical" ? "lock_unlock" : "mint_burn",
       getTokenManagerTypeFromBigInt
     );
 
@@ -65,6 +68,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         const itsClient = ctx.contracts.createInterchainTokenServiceClient(
           configs.wagmi
         );
+
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
           itsClient.reads.tokenManagerAddress({
             tokenId: input.tokenId as `0x${string}`,
