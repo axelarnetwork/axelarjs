@@ -37,7 +37,9 @@ export function useStep3ChainSelectionState() {
   });
 
   useEffect(
-    () => remoteDeploymentGasFees && setTotalGasFee(remoteDeploymentGasFees),
+    () =>
+      remoteDeploymentGasFees &&
+      setTotalGasFee(remoteDeploymentGasFees.totalGasFee),
     [remoteDeploymentGasFees]
   );
 
@@ -46,8 +48,8 @@ export function useStep3ChainSelectionState() {
     $setTotalGasFee(formatEther(0n));
   };
 
-  const setTotalGasFee = (fees: bigint[]) => {
-    const num = Number(formatEther(fees.reduce((a, b) => a + b, 0n)));
+  const setTotalGasFee = (total: bigint) => {
+    const num = Number(formatEther(total));
     $setTotalGasFee(num.toFixed(4));
   };
 

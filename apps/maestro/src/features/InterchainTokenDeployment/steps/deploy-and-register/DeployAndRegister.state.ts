@@ -2,7 +2,6 @@ import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
-import { reduce } from "rambda";
 import { formatEther } from "viem";
 import { useChainId } from "wagmi";
 
@@ -10,8 +9,6 @@ import { NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT } from "~/config/env";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
-
-const toSum = reduce<bigint, bigint>((a, b) => a + b, 0n);
 
 const toNumericString = (num: bigint) =>
   Number(formatEther(num)).toLocaleString(undefined, {
@@ -47,8 +44,7 @@ export function useStep3ChainSelectionState() {
   });
 
   useEffect(() => {
-    Maybe.of(remoteDeploymentGasFees)
-      .map(toSum)
+    Maybe.of(remoteDeploymentGasFees?.totalGasFee)
       .map(toNumericString)
       .map(setTotalGasFee);
   }, [remoteDeploymentGasFees, setTotalGasFee]);

@@ -32,16 +32,39 @@ export const getTopTransactions = publicProcedure
         fromTime: input.fromTime,
         toTime: input.toTime,
       };
+      const excludedGMPFields = [
+        "refunded",
+        "to_refund",
+        "fees",
+        "gas",
+        "time_spent",
+        "executed",
+        "call",
+        "confirm",
+        "gas_price_rate",
+        "gas_paid",
+        "approved",
+        "executing_at",
+        "command_id",
+        "is_not_enough_gas",
+        "is_call_from_relayer",
+        "is_insufficient_fee",
+        "not_enough_gas_to_execute",
+        "status",
+        "simplified_status",
+        "gas_status",
+        "is_two_way",
+        "is_execute_from_relayer",
+        "not_to_refund",
+        "no_gas_remain",
+      ];
       const [tokenDeployments, interchainTransfers] = await Promise.all([
         ctx.services.gmp.searchGMP({
           ...commonParams,
           contractMethod: "InterchainTokenDeploymentStarted",
           _source: {
-            includes: [
-              "interchain_token_deployment_started.tokenName",
-              "interchain_token_deployment_started.tokenSymbol",
-              "interchain_token_deployment_started.tokenId",
-            ],
+            includes: ["interchain_token_deployment_started.tokenId"],
+            excludes: excludedGMPFields,
           },
         }),
         ctx.services.gmp.searchGMP({
@@ -54,6 +77,7 @@ export const getTopTransactions = publicProcedure
               "interchain_transfer.contract_address",
               "interchain_transfer.tokenId",
             ],
+            excludes: excludedGMPFields,
           },
         }),
       ]);
