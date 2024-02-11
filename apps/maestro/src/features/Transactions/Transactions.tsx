@@ -8,10 +8,7 @@ import { groupBy } from "rambda";
 
 import type { TxType } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import {
-  useGetTransactionStatusOnDestinationChainsQuery,
-  useGetTransactionType,
-} from "~/services/gmp/hooks";
+import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 import {
   CollapsedChainStatusGroup,
@@ -59,7 +56,7 @@ function useGroupedStatuses(txHash: `0x${string}`) {
 type ToastElementProps = {
   txHash: `0x${string}`;
   chainId: number;
-  txType?: TxType;
+  txType: TxType;
   onRemoveTx?: (txHash: `0x${string}`) => void;
 };
 
@@ -75,19 +72,10 @@ const ToastElement: FC<ToastElementProps> = ({
   );
 
   const { computed } = useEVMChainConfigsQuery();
-  const { data: parsedTxType } = useGetTransactionType(
-    {
-      txHash,
-    },
-    {
-      // only fetch if txType is not provided
-      enabled: !txType,
-    }
-  );
 
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
-  const txTypeText = Maybe.of(parsedTxType ?? txType).mapOrNull(
+  const txTypeText = Maybe.of(txType).mapOrNull(
     (txType) => TX_LABEL_MAP[txType]
   );
 
@@ -191,7 +179,7 @@ const ToastElement: FC<ToastElementProps> = ({
 type GMPTxStatusProps = {
   txHash: `0x${string}`;
   chainId: number;
-  txType?: keyof typeof TX_LABEL_MAP;
+  txType: keyof typeof TX_LABEL_MAP;
 };
 
 const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
@@ -268,7 +256,7 @@ const Transactions = () => {
         </div>
       )}
       {state.pendingTransactions.map((tx) => {
-        if (!tx.hash || !tx.chainId) {
+        if (!tx.hash || !tx.chainId || !tx.txType) {
           return null;
         }
         return (

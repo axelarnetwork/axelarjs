@@ -334,7 +334,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                     maximumFractionDigits: 4,
                   }}
                 >
-                  {gasFees.reduce((a, b) => a + b, 0n)}
+                  {gasFees.totalGasFee}
                 </BigNumberText>{" "}
                 {getNativeToken(interchainToken.chain.id)}
               </div>
@@ -346,7 +346,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               chainIds={nonRunningSelectedChainIds}
               tokenAddress={props.tokenAddress}
               userGasBalance={userGasBalance}
-              gasFees={gasFees}
+              gasFees={gasFees?.gasFees.map((x) => x.fee) ?? []}
               originChainId={originToken?.chainId}
               originChain={originToken.chain}
               onTxStateChange={(txState) => {

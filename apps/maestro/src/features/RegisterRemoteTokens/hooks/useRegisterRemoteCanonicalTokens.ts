@@ -46,17 +46,17 @@ export default function useRegisterRemoteCanonicalTokens(
     tokenAddress: input.tokenAddress,
   });
 
-  const { data: gasFees } = useEstimateGasFeeMultipleChainsQuery({
+  const { data: gasFeesData } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
     sourceChainId: sourceChain?.id ?? "0",
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDetails || !gasFees || tokenDetails.kind !== "canonical")
+    if (!tokenDetails || !gasFeesData || tokenDetails.kind !== "canonical")
       return [];
 
     return destinationChainIds.map((axelarChainId, i) => {
-      const gasValue = gasFees[i];
+      const gasValue = gasFeesData.gasFees[i].fee;
 
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
@@ -67,12 +67,9 @@ export default function useRegisterRemoteCanonicalTokens(
         }
       );
     });
-  }, [destinationChainIds, gasFees, sourceChain?.chain_name, tokenDetails]);
+  }, [destinationChainIds, gasFeesData, sourceChain?.chain_name, tokenDetails]);
 
-  const totalGasFee = useMemo(
-    () => gasFees?.reduce((a, b) => a + b, 0n) ?? 0n,
-    [gasFees]
-  );
+  const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
   const { config } = usePrepareInterchainTokenFactoryMulticall({
     value: totalGasFee,

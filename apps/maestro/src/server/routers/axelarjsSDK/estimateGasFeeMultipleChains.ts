@@ -42,3 +42,6 @@ export const estimateGasFeesMultipleChains = publicProcedure
       });
     }
   });
+
+export type EstimateGasFeeMultipleChainsOutput =
+  typeof estimateGasFeesMultipleChains._def._output_out;
