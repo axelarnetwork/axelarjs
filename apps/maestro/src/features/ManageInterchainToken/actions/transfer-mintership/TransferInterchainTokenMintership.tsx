@@ -81,16 +81,14 @@ export const TransferInterchainTokenMintership: FC = () => {
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: transferTxHash,
-    confirmations: 8,
   });
 
   useEffect(
     () => {
-      if (receipt) {
-        onReceipt(receipt).catch((error) => {
-          logger.error("Failed to process receipt", error);
-        });
-      }
+      if (!receipt) return;
+      onReceipt(receipt).catch((error) => {
+        logger.error("Failed to process receipt", error);
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [receipt]

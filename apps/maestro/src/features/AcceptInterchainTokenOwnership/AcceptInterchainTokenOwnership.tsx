@@ -35,37 +35,29 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     hash: acceptTxHash,
   });
 
-  useEffect(() => {
-    const onSuccess = async () => {
-      if (!acceptTxHash || !receipt) {
-        return;
-      }
-
-      await Promise.all([
-        trpcContext.interchainToken.searchInterchainToken.invalidate(),
-        trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
-      ]);
-
-      await Promise.all([
-        trpcContext.interchainToken.searchInterchainToken.refetch(),
-        trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
-      ]);
-
-      setTxState({
-        status: "confirmed",
-        receipt,
-      });
-
-      toast.success("Successfully accepted token ownership");
-    };
-
-    if (receipt) {
-      onSuccess().catch((error) => {
-        console.error("Error while updating token ownership", error);
-      });
+  const onReceipt = useCallback(async () => {
+    if (!acceptTxHash || !receipt) {
+      return;
     }
+
+    await Promise.all([
+      trpcContext.interchainToken.searchInterchainToken.invalidate(),
+      trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
+      trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
+    ]);
+
+    await Promise.all([
+      trpcContext.interchainToken.searchInterchainToken.refetch(),
+      trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
+      trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
+    ]);
+
+    setTxState({
+      status: "confirmed",
+      receipt,
+    });
+
+    toast.success("Successfully accepted token ownership");
   }, [
     acceptTxHash,
     receipt,
@@ -74,6 +66,17 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     trpcContext.interchainToken.getInterchainTokenDetails,
     trpcContext.interchainToken.searchInterchainToken,
   ]);
+
+  useEffect(
+    () => {
+      if (!receipt) return;
+      onReceipt().catch((error) => {
+        console.error("Error while updating token ownership", error);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   const handleSubmit = useCallback(async () => {
     setTxState({

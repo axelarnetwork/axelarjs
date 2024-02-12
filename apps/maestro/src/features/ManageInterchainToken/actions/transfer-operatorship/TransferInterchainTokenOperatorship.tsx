@@ -93,7 +93,6 @@ export const TransferInterchainTokenOperatorship: FC = () => {
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: transferTxHash,
-    confirmations: 8,
   });
 
   useEffect(

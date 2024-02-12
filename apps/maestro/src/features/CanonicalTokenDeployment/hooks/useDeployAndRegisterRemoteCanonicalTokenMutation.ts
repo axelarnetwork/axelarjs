@@ -143,8 +143,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     hash: multicall?.data,
   });
 
-  useEffect(() => {
-    const onReceipt = (receipt: TransactionReceipt) => {
+  const onReceipt = useCallback(
+    (receipt: TransactionReceipt) => {
       const { transactionHash, transactionIndex } = receipt;
 
       if (!transactionHash || !tokenId || !deployerAddress || !input) {
@@ -167,12 +167,18 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         axelarChainId: input.sourceChainId,
         destinationAxelarChainIds: input.destinationChainIds,
       });
-    };
+    },
+    [deployerAddress, input, tokenId]
+  );
 
-    if (receipt) {
+  useEffect(
+    () => {
+      if (!receipt) return;
       onReceipt(receipt);
-    }
-  }, [deployerAddress, input, receipt, tokenId]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   useEffect(
     () => {

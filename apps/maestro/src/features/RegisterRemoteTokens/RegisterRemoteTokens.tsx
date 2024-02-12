@@ -79,17 +79,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: txState.status === "submitted" ? txState.hash : undefined,
-    query: { enabled: txState.status === "submitted" && Boolean(txState.hash) },
   });
 
   useEffect(
     () => {
-      if (receipt) {
-        onReceipt(receipt).catch((error) => {
-          logger.error("Failed to record remote token deployment", error);
-          toast.error("Failed to record remote token deployment");
-        });
-      }
+      if (!receipt) return;
+      onReceipt(receipt).catch((error) => {
+        logger.error("Failed to record remote token deployment", error);
+        toast.error("Failed to record remote token deployment");
+      });
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [receipt]
   );

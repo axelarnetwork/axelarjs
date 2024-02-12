@@ -154,6 +154,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: multicall?.data,
+  });
+
   const onReceipt = useCallback(
     ({
       transactionHash: txHash,
@@ -190,10 +194,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     },
     [deployerAddress, input, tokenAddress, tokenId]
   );
-
-  const { data: receipt } = useWaitForTransactionReceipt({
-    hash: multicall?.data,
-  });
 
   useEffect(
     () => {

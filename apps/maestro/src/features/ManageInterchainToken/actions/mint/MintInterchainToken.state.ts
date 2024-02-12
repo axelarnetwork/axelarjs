@@ -72,11 +72,10 @@ export function useMintInterchainTokenState() {
 
   useEffect(
     () => {
-      if (receipt) {
-        onReceipt(receipt).catch((err) => {
-          console.error("useMintInterchainTokenState: onReceipt", err);
-        });
-      }
+      if (!receipt) return;
+      onReceipt(receipt).catch((err) => {
+        console.error("useMintInterchainTokenState: onReceipt", err);
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [receipt]
