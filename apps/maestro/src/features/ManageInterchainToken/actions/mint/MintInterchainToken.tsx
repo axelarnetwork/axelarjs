@@ -28,7 +28,7 @@ export const MintInterchainToken: FC = () => {
   const chainId = useChainId();
 
   const [
-    { txState, accountAddress, erc20Details, isMinting },
+    { txState, accountAddress, erc20Details, isMinting, tokenAddress },
     { setTxState, mintTokenAsync },
   ] = useMintInterchainTokenState();
 
@@ -47,14 +47,15 @@ export const MintInterchainToken: FC = () => {
     invariant(accountAddress, "Account address is required");
 
     try {
-      const txResult = await mintTokenAsync({
+      const txHash = await mintTokenAsync({
+        address: tokenAddress,
         args: [accountAddress, adjustedAmount],
       });
 
-      if (txResult?.hash) {
+      if (txHash) {
         setTxState({
           status: "submitted",
-          hash: txResult?.hash,
+          hash: txHash,
           chainId,
         });
       }
