@@ -90,7 +90,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
           tokenAddress,
           axelarChainId,
           tokenManagerAddress,
-          tokenManagerType,
+          tokenManagerType: "mint_burn" as const,
           tokenId: input.tokenId,
           deployerAddress: input.deployerAddress,
           deploymentMessageId: input.deploymentMessageId,

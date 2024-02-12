@@ -127,6 +127,7 @@ export default class MaestroPostgresClient {
                 deploymentMessageId: updateValue.deploymentMessageId,
                 deploymentStatus: updateValue.deploymentStatus,
                 tokenManagerType: updateValue.tokenManagerType,
+                tokenAddress: updateValue.tokenAddress,
                 updatedAt: new Date(),
               })
               .where(eq(remoteInterchainTokens.id, existingToken.id))
