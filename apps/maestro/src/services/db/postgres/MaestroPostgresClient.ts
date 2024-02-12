@@ -123,11 +123,21 @@ export default class MaestroPostgresClient {
             tx
               .update(remoteInterchainTokens)
               .set({
-                tokenManagerAddress: updateValue.tokenManagerAddress,
-                deploymentMessageId: updateValue.deploymentMessageId,
-                deploymentStatus: updateValue.deploymentStatus,
-                tokenManagerType: updateValue.tokenManagerType,
-                tokenAddress: updateValue.tokenAddress,
+                id: updateValue.id ?? existingToken.id,
+                tokenManagerAddress:
+                  updateValue.tokenManagerAddress ??
+                  existingToken.tokenManagerAddress,
+                deploymentMessageId:
+                  updateValue.deploymentMessageId ??
+                  existingToken.deploymentMessageId,
+                deploymentStatus:
+                  updateValue.deploymentStatus ??
+                  existingToken.deploymentStatus,
+                tokenManagerType:
+                  updateValue.tokenManagerType ??
+                  existingToken.tokenManagerType,
+                tokenAddress:
+                  updateValue.tokenAddress ?? existingToken.tokenAddress,
                 updatedAt: new Date(),
               })
               .where(eq(remoteInterchainTokens.id, existingToken.id))

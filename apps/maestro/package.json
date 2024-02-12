@@ -47,7 +47,7 @@
     "@trpc/server": "11.0.0-next-beta.274",
     "@vercel/kv": "^1.0.1",
     "@vercel/postgres": "^0.7.2",
-    "@web3modal/wagmi": "^4.0.1",
+    "@web3modal/wagmi": "^4.0.3",
     "drizzle-orm": "^0.29.3",
     "lucide-react": "^0.265.0",
     "next": "^14.1.0",
@@ -69,7 +69,7 @@
     "trpc-openapi": "^1.2.0",
     "unfetch": "^4.2.0",
     "viem": "^2.7.8",
-    "wagmi": "^2.5.6",
+    "wagmi": "^2.5.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -91,7 +91,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-v8": "^1.2.2",
-    "@wagmi/cli": "^2.1.0",
+    "@wagmi/cli": "^2.1.1",
     "autoprefixer": "^10.4.17",
     "concurrently": "^8.2.2",
     "date-fns": "^2.30.0",
