@@ -112,7 +112,6 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
     refetchInterval?: number;
   }
 ) {
-  console.log({ txHashes: input.txHashes });
   const { data, ...query } = useQuery({
     queryKey: [
       "gmp-get-transactions-statuses-on-destination-chains",
