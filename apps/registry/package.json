@@ -21,7 +21,7 @@
     "tailwind-styled-components": "^2.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.16",
+    "@types/node": "^20.11.17",
     "@types/react": "18.2.21",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.17",

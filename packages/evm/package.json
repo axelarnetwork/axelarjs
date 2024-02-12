@@ -46,14 +46,14 @@
   "dependencies": {
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
-    "tsx": "^4.7.0",
+    "tsx": "^4.7.1",
     "viem": "^2.7.8",
     "zx": "^7.2.3"
   },
   "devDependencies": {
     "@axelar-network/interchain-token-service": "^1.2.1",
     "@axelarjs/config": "workspace:*",
-    "@types/node": "^20.11.16",
+    "@types/node": "^20.11.17",
     "@types/prettier": "^2.7.3",
     "commander": "^11.1.0",
     "prettier": "^2.8.8",

@@ -69,10 +69,10 @@
   },
   "devDependencies": {
     "@axelarjs/core": "workspace:*",
-    "@tsconfig/strictest": "^2.0.2",
+    "@tsconfig/strictest": "^2.0.3",
     "cosmjs-types": "^0.8.0",
-    "dotenv": "^16.4.1",
-    "rambda": "^9.0.1",
+    "dotenv": "^16.4.2",
+    "rambda": "^9.1.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
