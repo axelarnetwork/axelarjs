@@ -16,6 +16,7 @@ import {
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
+import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
@@ -57,6 +58,9 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.canonicalInterchainTokenId.args({
         tokenAddress: input?.tokenAddress as `0x${string}`,
       }),
+      query: {
+        enabled: Maybe.of(input?.tokenAddress).mapOr(false, isValidEVMAddress),
+      },
     });
 
   const { originalChainName, destinationChainNames } = useMemo(() => {
@@ -119,10 +123,18 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     reduce((a, b) => a + b, 0n)
   );
 
+  const isMutationReady =
+    multicallArgs.length > 0 &&
+    // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
+    (!destinationChainNames.length || totalGasFee > 0n);
+
   const { data } = useSimulateInterchainTokenFactoryMulticall({
     chainId,
     value: totalGasFee,
     args: [multicallArgs],
+    query: {
+      enabled: isMutationReady,
+    },
   });
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
