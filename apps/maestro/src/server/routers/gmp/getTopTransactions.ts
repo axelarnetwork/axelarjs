@@ -64,7 +64,7 @@ export const getTopTransactions = publicProcedure
       );
 
       const eligibleTransfers = uniqBy(
-        (x) => x.call.transactionHash,
+        ({ call }) => `${call.transactionHash}:${call._logIndex}`,
         interchainTransfers.filter((transfer) =>
           eligibleTokenIds.has(transfer.interchain_transfer?.tokenId)
         )

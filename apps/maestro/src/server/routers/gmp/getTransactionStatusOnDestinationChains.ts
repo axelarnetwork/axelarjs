@@ -31,7 +31,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             [call.returnValues.destinationChain.toLowerCase()]: {
               status,
               txHash: call.transactionHash,
-              logIndex: call.logIndex,
+              logIndex: call._logIndex,
               txId: call.id,
             },
           }),

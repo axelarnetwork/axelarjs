@@ -82,7 +82,7 @@ type SearchGMPCall = {
   data: unknown;
   topics: `0x${string}`[];
   transactionHash: `0x${string}`;
-  logIndex: number;
+  _logIndex: number;
   event: string;
   eventSignature: string;
   id: string;
