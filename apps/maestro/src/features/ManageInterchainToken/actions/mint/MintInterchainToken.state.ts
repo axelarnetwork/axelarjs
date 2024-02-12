@@ -29,7 +29,7 @@ export function useMintInterchainTokenState() {
   const {
     writeContractAsync: mintTokenAsync,
     isPending: isMinting,
-    data: mintResult,
+    data: mintTxHash,
   } = useWriteIerc20MintableBurnableMint({
     // address: managerState.tokenAddress,
   });
@@ -38,7 +38,7 @@ export function useMintInterchainTokenState() {
 
   const onReceipt = useCallback(
     async function (receipt: TransactionReceipt) {
-      if (!mintResult) {
+      if (!mintTxHash) {
         return;
       }
 
@@ -57,7 +57,7 @@ export function useMintInterchainTokenState() {
       toast.success("Successfully minted interchain tokens");
     },
     [
-      mintResult,
+      mintTxHash,
       trpcContext.erc20.getERC20TokenBalanceForOwner,
       chainId,
       managerState.tokenAddress,
@@ -67,7 +67,7 @@ export function useMintInterchainTokenState() {
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
-    hash: mintResult,
+    hash: mintTxHash,
   });
 
   useEffect(
