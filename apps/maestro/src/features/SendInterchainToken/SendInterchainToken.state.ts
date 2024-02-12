@@ -92,7 +92,7 @@ export function useSendInterchainTokenState(props: {
 
   const {
     mutateAsync: interchainTransferAsync,
-    isLoading: isInterchainTransferSending,
+    isPending: isInterchainTransferSending,
     txState: interchainTransferTxState,
     reset: resetInterchainTransferTxState,
   } = useInterchainTransferMutation({
@@ -103,10 +103,7 @@ export function useSendInterchainTokenState(props: {
 
   const { address } = useAccount();
 
-  const { data: balance } = useBalance({
-    address,
-    watch: true,
-  });
+  const { data: balance } = useBalance({ address });
 
   const nativeTokenSymbol = getNativeToken(
     props.sourceChain.chain_name.toLowerCase()
@@ -129,7 +126,7 @@ export function useSendInterchainTokenState(props: {
 
   const {
     mutateAsync: tokenServiceSendTokenAsync,
-    isLoading: isTokenServiceTransfering,
+    isPending: isTokenServiceTransfering,
     txState: tokenServiceTxState,
     reset: resetTokenServiceTxState,
   } = useInterchainTokenServiceTransferMutation({

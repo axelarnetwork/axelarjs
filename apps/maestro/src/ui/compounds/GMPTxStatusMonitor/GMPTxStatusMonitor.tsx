@@ -55,7 +55,9 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
   const { data: currentBlockNumber } = useBlockNumber({
     chainId,
     watch: true,
-    enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+    query: {
+      enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+    },
   });
 
   const elapsedBlocks = useMemo(

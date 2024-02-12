@@ -94,20 +94,24 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     [receipt]
   );
 
-  const { writeAsync: registerCanonicalTokensAsync, reset: resetCanonical } =
-    useRegisterRemoteCanonicalTokens({
-      chainIds: props.chainIds,
-      deployerAddress: deployerAddress as `0x${string}`,
-      tokenAddress: props.tokenAddress,
-      originChainId: props.originChainId ?? -1,
-    });
+  const {
+    writeContractAsync: registerCanonicalTokensAsync,
+    reset: resetCanonical,
+  } = useRegisterRemoteCanonicalTokens({
+    chainIds: props.chainIds,
+    deployerAddress: deployerAddress as `0x${string}`,
+    tokenAddress: props.tokenAddress,
+    originChainId: props.originChainId ?? -1,
+  });
 
-  const { writeAsync: registerInterchainTokensAsync, reset: resetInterchain } =
-    useRegisterRemoteInterchainTokens({
-      chainIds: props.chainIds,
-      tokenAddress: props.tokenAddress,
-      originChainId: props.originChainId ?? -1,
-    });
+  const {
+    writeContractAsync: registerInterchainTokensAsync,
+    reset: resetInterchain,
+  } = useRegisterRemoteInterchainTokens({
+    chainIds: props.chainIds,
+    tokenAddress: props.tokenAddress,
+    originChainId: props.originChainId ?? -1,
+  });
 
   useEffect(
     () => {
@@ -147,10 +151,10 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     const txPromise = registerTokensAsync();
 
     await handleTransactionResult(txPromise, {
-      onSuccess(tx) {
+      onSuccess(txHash) {
         setTxState({
           status: "submitted",
-          hash: tx.hash,
+          hash: txHash,
           chainId: props.originChainId ?? -1,
           txType: "INTERCHAIN_DEPLOYMENT",
         });

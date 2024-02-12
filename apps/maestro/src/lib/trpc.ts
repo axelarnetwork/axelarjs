@@ -38,7 +38,6 @@ export const trpc = createTRPCNext<AppRouter>({
     }
     return {
       queryClient, // use shared queryClient
-      transformer: superjson, // optional - adds superjson serialization
       links: [
         httpBatchLink({
           transformer: superjson, // optional - adds superjson serialization
@@ -70,4 +69,5 @@ export const trpc = createTRPCNext<AppRouter>({
   },
   ssr: true,
   ssrPrepass,
+  transformer: superjson,
 });
