@@ -1,7 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { createConfig, http } from "wagmi";
-import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
+import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { logger } from "~/lib/logger";
 import { APP_NAME, APP_TITLE } from "./app";
@@ -32,22 +31,10 @@ const metadata = {
   url: "",
 };
 
-export const wagmiConfig = createConfig({
+export const wagmiConfig = defaultWagmiConfig({
+  projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
   chains: WAGMI_CHAIN_CONFIGS,
-  connectors: [
-    walletConnect({
-      projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-      metadata,
-    }),
-    coinbaseWallet({
-      appName: metadata.name,
-      appLogoUrl: metadata.icons[0],
-    }),
-    injected(),
-  ],
-  transports: Object.fromEntries(
-    WAGMI_CHAIN_CONFIGS.map((chain) => [chain.id, http()])
-  ),
+  metadata,
 });
 
 export const WEB3_MODAL = createWeb3Modal({
