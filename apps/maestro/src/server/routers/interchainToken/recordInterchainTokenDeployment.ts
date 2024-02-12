@@ -94,12 +94,28 @@ export const recordInterchainTokenDeployment = protectedProcedure
           tokenId: input.tokenId,
           deployerAddress: input.deployerAddress,
           deploymentMessageId: input.deploymentMessageId,
+          originalMinterAddress: input.originalMinterAddress,
           deploymentStatus: "pending" as const,
         };
       })
     );
 
+    const validTokens = remoteTokens.filter(
+      (token) => token.tokenAddress !== "0x"
+    );
+
+    if (validTokens.length === remoteTokens.length) {
+      console.log(
+        "recordInterchainTokenDeployment: some tokens are not valid",
+        {
+          invalidTokens: remoteTokens.filter(
+            (token) => token.tokenAddress === "0x"
+          ),
+        }
+      );
+    }
+
     await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      remoteTokens
+      validTokens
     );
   });
