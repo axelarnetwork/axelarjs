@@ -335,7 +335,7 @@ importers:
         version: 18.2.19
       autoprefixer:
         specifier: ^10.4.17
-        version: 10.4.17(postcss@8.4.31)
+        version: 10.4.17(postcss@8.4.35)
       eslint:
         specifier: ^8.56.0
         version: 8.56.0
@@ -343,8 +343,8 @@ importers:
         specifier: ^14.1.0
         version: 14.1.0(eslint@8.56.0)(typescript@5.3.3)
       postcss:
-        specifier: '>=8.4.31'
-        version: 8.4.31
+        specifier: ^8.4.35
+        version: 8.4.35
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1(ts-node@10.9.1)
@@ -10228,22 +10228,6 @@ packages:
     dependencies:
       tslib: 2.6.2
     dev: false
-
-  /autoprefixer@10.4.17(postcss@8.4.31):
-    resolution: {integrity: sha512-/cpVNRLSfhOtcGflT13P2794gVSgmPgTR+erw5ifnMLZb0UnSlkK4tquLmkd3BhA+nLo5tX8Cu0upUsGKvKbmg==}
-    engines: {node: ^10 || ^12 || >=14}
-    hasBin: true
-    peerDependencies:
-      postcss: '>=8.4.31'
-    dependencies:
-      browserslist: 4.22.2
-      caniuse-lite: 1.0.30001579
-      fraction.js: 4.3.7
-      normalize-range: 0.1.2
-      picocolors: 1.0.0
-      postcss: 8.4.31
-      postcss-value-parser: 4.2.0
-    dev: true
 
   /autoprefixer@10.4.17(postcss@8.4.35):
     resolution: {integrity: sha512-/cpVNRLSfhOtcGflT13P2794gVSgmPgTR+erw5ifnMLZb0UnSlkK4tquLmkd3BhA+nLo5tX8Cu0upUsGKvKbmg==}

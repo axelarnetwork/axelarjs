@@ -1,9 +1,6 @@
-import { Maybe } from "@axelarjs/utils";
-
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
 
@@ -72,22 +69,9 @@ export const recordRemoteTokensDeployment = protectedProcedure
           }),
         ]);
 
-        const tokenManagerClient = ctx.contracts.createTokenManagerClient(
-          configs.wagmi,
-          tokenManagerAddress
-        );
-
-        const tokenManagerTypeCode = await tokenManagerClient.reads
-          .implementationType()
-          .catch(() => null);
-
-        const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOrNull(
-          getTokenManagerTypeFromBigInt
-        );
-
         return {
           tokenManagerAddress,
-          tokenManagerType,
+          tokenManagerType: "mint_burn" as const,
           tokenAddress,
           tokenId: originToken.tokenId,
           axelarChainId: remoteToken.axelarChainId,
