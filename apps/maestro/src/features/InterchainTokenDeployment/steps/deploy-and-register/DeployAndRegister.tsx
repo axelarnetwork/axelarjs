@@ -102,16 +102,16 @@ export const Step3: FC = () => {
       const txPromise = deployInterchainTokenAsync();
 
       await handleTransactionResult(txPromise, {
-        onSuccess(tx) {
+        onSuccess(txHash) {
           rootActions.setTxState({
             type: "deploying",
-            txHash: tx.hash,
+            txHash: txHash,
           });
 
           if (rootState.selectedChains.length > 0) {
             addTransaction({
               status: "submitted",
-              hash: tx.hash,
+              hash: txHash,
               chainId: sourceChain.chain_id,
               txType: "INTERCHAIN_DEPLOYMENT",
             });
@@ -148,10 +148,7 @@ export const Step3: FC = () => {
 
   const { address } = useAccount();
 
-  const { data: balance } = useBalance({
-    address,
-    watch: true,
-  });
+  const { data: balance } = useBalance({ address });
 
   const nativeTokenSymbol = getNativeToken(state.sourceChainId);
 

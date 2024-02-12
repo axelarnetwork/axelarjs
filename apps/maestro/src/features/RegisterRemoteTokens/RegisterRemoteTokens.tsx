@@ -3,8 +3,9 @@ import { Alert, Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import { useAccount, useWaitForTransaction } from "wagmi";
-import { FetchBalanceResult } from "wagmi/actions";
+import type { TransactionReceipt } from "viem";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { GetBalanceReturnType } from "wagmi/actions";
 
 import {
   useTransactionState,
@@ -22,7 +23,7 @@ export type RegisterRemoteTokensProps = {
   chainIds: number[];
   originChainId?: number;
   originChain?: EVMChainConfig;
-  userGasBalance: FetchBalanceResult | undefined;
+  userGasBalance: GetBalanceReturnType | undefined;
   gasFees: bigint[] | undefined;
   onTxStateChange?: (status: TransactionState) => void;
   deploymentKind: "canonical" | "interchain" | "custom";
@@ -46,10 +47,8 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     axelarChainId: computed.indexedByChainId[chainId].id,
   }));
 
-  useWaitForTransaction({
-    hash: txState.status === "submitted" ? txState.hash : undefined,
-    enabled: txState.status === "submitted" && Boolean(txState.hash),
-    onSuccess: async (receipt) => {
+  const onReceipt = useCallback(
+    async (receipt: TransactionReceipt) => {
       const { transactionHash: txHash, transactionIndex: txIndex } = receipt;
 
       const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
@@ -69,7 +68,31 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         receipt,
       });
     },
+    [
+      baseRemoteTokens,
+      props.originChainId,
+      props.tokenAddress,
+      recordRemoteTokenDeployment,
+      setTxState,
+    ]
+  );
+
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: txState.status === "submitted" ? txState.hash : undefined,
+    query: { enabled: txState.status === "submitted" && Boolean(txState.hash) },
   });
+
+  useEffect(
+    () => {
+      if (receipt) {
+        onReceipt(receipt).catch((error) => {
+          logger.error("Failed to record remote token deployment", error);
+          toast.error("Failed to record remote token deployment");
+        });
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   const { writeAsync: registerCanonicalTokensAsync, reset: resetCanonical } =
     useRegisterRemoteCanonicalTokens({
@@ -148,7 +171,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     const { gasFees, userGasBalance } = props;
     if (!userGasBalance || !gasFees) return false;
     return userGasBalance.value > gasFees.reduce((a, b) => a + b, 0n);
-  }, [props.userGasBalance, props.gasFees]);
+  }, [props]);
 
   const buttonChildren = useMemo(() => {
     if (!hasEnoughGasBalance)

@@ -5,8 +5,8 @@ import { zeroAddress } from "viem";
 import { useChainId } from "wagmi";
 
 import {
-  useInterchainTokenFactoryMulticall,
-  usePrepareInterchainTokenFactoryMulticall,
+  useSimulateInterchainTokenFactoryMulticall,
+  useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -77,11 +77,27 @@ export default function useRegisterRemoteInterchainTokens(
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
-  const { config } = usePrepareInterchainTokenFactoryMulticall({
+  const { data: config } = useSimulateInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
-    enabled: multicallArgs.length > 0,
+    query: {
+      enabled: multicallArgs.length > 0,
+    },
   });
 
-  return useInterchainTokenFactoryMulticall(config);
+  const mutation = useWriteInterchainTokenFactoryMulticall();
+
+  return {
+    ...mutation,
+    writeContract: () => {
+      if (!config) return;
+
+      return mutation.writeContract(config.request);
+    },
+    writeContractAsync: async () => {
+      if (!config) return;
+
+      return mutation.writeContractAsync(config.request);
+    },
+  };
 }

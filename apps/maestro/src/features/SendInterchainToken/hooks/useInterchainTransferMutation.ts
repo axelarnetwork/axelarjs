@@ -1,12 +1,13 @@
 import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
+import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useMutation } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 
 import {
-  useInterchainTokenDecimals,
-  useInterchainTokenInterchainTransfer,
+  useReadInterchainTokenDecimals,
+  useWriteInterchainTokenInterchainTransfer,
 } from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
@@ -28,7 +29,7 @@ export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
-  const { data: decimals } = useInterchainTokenDecimals({
+  const { data: decimals } = useReadInterchainTokenDecimals({
     address: config.tokenAddress,
   });
 
@@ -44,13 +45,11 @@ export function useInterchainTransferMutation(
     ),
   });
 
-  const { writeAsync: transferAsync } = useInterchainTokenInterchainTransfer({
-    address: config.tokenAddress,
-    value: BigInt(gas ?? 0) * BigInt(2),
-  });
+  const { writeContractAsync: transferAsync } =
+    useWriteInterchainTokenInterchainTransfer();
 
-  const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
-    async ({ amount }) => {
+  const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
+    mutationFn: async ({ amount }) => {
       if (!(decimals && address && gas)) {
         return;
       }
@@ -62,7 +61,9 @@ export function useInterchainTransferMutation(
           status: "awaiting_approval",
         });
 
-        const txResult = await transferAsync({
+        const txHash = await transferAsync({
+          address: config.tokenAddress,
+          value: BigInt(gas ?? 0) * BigInt(2),
           args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
             destinationChain: config.destinationChainName,
             recipient: address,
@@ -70,10 +71,10 @@ export function useInterchainTransferMutation(
             metadata: "0x",
           }),
         });
-        if (txResult?.hash) {
+        if (txHash) {
           setTxState({
             status: "submitted",
-            hash: txResult.hash,
+            hash: txHash,
             chainId,
           });
         }
@@ -102,8 +103,8 @@ export function useInterchainTransferMutation(
 
         return;
       }
-    }
-  );
+    },
+  });
 
   return {
     ...mutation,

@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { useChainId } from "wagmi";
 
 import {
-  useInterchainTokenFactoryMulticall,
-  usePrepareInterchainTokenFactoryMulticall,
+  useSimulateInterchainTokenFactoryMulticall,
+  useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -71,11 +71,25 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
-  const { config } = usePrepareInterchainTokenFactoryMulticall({
+  const { data: config } = useSimulateInterchainTokenFactoryMulticall({
     value: totalGasFee,
     args: [multicallArgs],
-    enabled: multicallArgs.length > 0 && totalGasFee > 0n,
+    query: {
+      enabled: multicallArgs.length > 0 && totalGasFee > 0n,
+    },
   });
 
-  return useInterchainTokenFactoryMulticall(config);
+  const mutation = useWriteInterchainTokenFactoryMulticall();
+
+  return {
+    ...mutation,
+    writeContract: () => {
+      if (!config) return;
+      return mutation.writeContract(config.request);
+    },
+    writeContractAsync: async () => {
+      if (!config) return;
+      return mutation.writeContractAsync(config.request);
+    },
+  };
 }
