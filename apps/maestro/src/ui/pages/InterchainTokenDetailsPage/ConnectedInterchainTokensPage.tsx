@@ -5,7 +5,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useAccount, useBalance, useChainId, useSwitchNetwork } from "wagmi";
+import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
 
 import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
@@ -151,7 +151,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     });
 
   const { computed } = useEVMChainConfigsQuery();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
 
   const statusesByChain = useMemo(() => {
     return (
@@ -223,10 +223,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     setSessionState,
   ]);
 
-  const { data: userGasBalance } = useBalance({
-    address,
-    watch: true,
-  });
+  const { data: userGasBalance } = useBalance({ address });
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
@@ -380,9 +377,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               variant="accent"
               onClick={() => {
                 if (originToken) {
-                  switchNetworkAsync?.(originToken.chainId).catch(() => {
-                    logger.error("Failed to switch network");
-                  });
+                  switchChainAsync?.({ chainId: originToken.chainId }).catch(
+                    () => {
+                      logger.error("Failed to switch network");
+                    }
+                  );
                 }
               }}
             >

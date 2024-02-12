@@ -15,7 +15,7 @@ import { useCallback, useMemo, type FC } from "react";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useSwitchNetwork } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { shouldDisableSend } from "~/config/env";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
@@ -73,17 +73,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     };
   }, [props.chain, props.tokenAddress]);
 
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
 
   const handleSwitchChain = useCallback(async () => {
     try {
-      await switchNetworkAsync?.(props.chainId);
+      await switchChainAsync?.({ chainId: props.chainId });
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Failed to switch chain: ${error.cause.shortMessage}`);
       }
     }
-  }, [props.chainId, switchNetworkAsync]);
+  }, [props.chainId, switchChainAsync]);
 
   const isSourceChain = chainId === props.chainId;
 
