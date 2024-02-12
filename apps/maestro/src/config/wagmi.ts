@@ -46,4 +46,8 @@ export const WEB3_MODAL = createWeb3Modal({
     "--w3m-color-mix": "var(--primary)",
   },
   excludeWalletIds: [...NEXT_PUBLIC_DISABLED_WALLET_IDS],
+  connectorImages: {
+    coinbaseWallet:
+      "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",
+  },
 });
