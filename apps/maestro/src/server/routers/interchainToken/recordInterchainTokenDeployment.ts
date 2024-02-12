@@ -1,5 +1,6 @@
 import { invariant, Maybe } from "@axelarjs/utils";
 
+import { always } from "rambda";
 import { z } from "zod";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
@@ -29,19 +30,22 @@ export const recordInterchainTokenDeployment = protectedProcedure
     const originChainServiceClient =
       ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
 
-    const tokenManagerAddress =
-      await originChainServiceClient.reads.tokenManagerAddress({
+    const tokenManagerAddress = await originChainServiceClient.reads
+      .tokenManagerAddress({
         tokenId: input.tokenId as `0x${string}`,
-      });
-
-    const tokenManagerClient = ctx.contracts.createTokenManagerClient(
-      configs.wagmi,
-      tokenManagerAddress
-    );
-
-    const tokenManagerTypeCode = await tokenManagerClient.reads
-      .implementationType()
+      })
       .catch(() => null);
+
+    const tokenManagerClient = !tokenManagerAddress
+      ? null
+      : ctx.contracts.createTokenManagerClient(
+          configs.wagmi,
+          tokenManagerAddress
+        );
+
+    const tokenManagerTypeCode = !tokenManagerClient
+      ? null
+      : await tokenManagerClient.reads.implementationType().catch(() => null);
 
     const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOr(
       // default to mint_burn for interchain tokens
@@ -52,7 +56,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
-      tokenManagerAddress,
+      tokenManagerAddress: tokenManagerAddress as `0x${string}`,
       tokenManagerType,
     });
 
@@ -70,12 +74,16 @@ export const recordInterchainTokenDeployment = protectedProcedure
         );
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
-          itsClient.reads.tokenManagerAddress({
-            tokenId: input.tokenId as `0x${string}`,
-          }),
-          itsClient.reads.interchainTokenAddress({
-            tokenId: input.tokenId as `0x${string}`,
-          }),
+          itsClient.reads
+            .tokenManagerAddress({
+              tokenId: input.tokenId as `0x${string}`,
+            })
+            .catch(always("0x")),
+          itsClient.reads
+            .interchainTokenAddress({
+              tokenId: input.tokenId as `0x${string}`,
+            })
+            .catch(always("0x")),
         ]);
 
         return {

@@ -57,6 +57,8 @@ export default class MaestroPostgresClient {
         .set({
           deploymentMessageId: value.deploymentMessageId,
           tokenManagerType: value.tokenManagerType,
+          tokenManagerAddress:
+            value.tokenManagerAddress ?? existingToken.tokenManagerAddress,
           updatedAt: new Date(),
         })
         .where(eq(interchainTokens.tokenId, existingToken.tokenId));
