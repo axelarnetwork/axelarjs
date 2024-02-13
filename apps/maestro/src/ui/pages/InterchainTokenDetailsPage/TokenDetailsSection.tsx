@@ -29,11 +29,12 @@ import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
-  tokenId?: `0x${string}`;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
   wasDeployedByAccount?: boolean;
   decimals: number;
+  tokenId?: `0x${string}` | null | undefined;
+  tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
 };
 
@@ -81,6 +82,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             Claim
           </LinkButton>
         ),
+      ],
+    ]),
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
+      [
+        "Token Manager",
+        <CopyToClipboardButton
+          key="token-manager"
+          size="sm"
+          variant="ghost"
+          copyText={tokenManagerAddress}
+        >
+          {maskAddress(tokenManagerAddress)}
+        </CopyToClipboardButton>,
       ],
     ]),
   ];
