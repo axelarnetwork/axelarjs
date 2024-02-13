@@ -32,6 +32,7 @@ export type TokenDetailsSectionProps = {
   tokenId?: `0x${string}`;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
+  wasDeployedByAccount?: boolean;
   decimals: number;
   kind?: "canonical" | "interchain" | "custom";
 };
@@ -67,6 +68,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             <InfoIcon className="text-info h-[1em] w-[1em]" />
           </Tooltip>
         </div>,
+      ],
+      [
+        "Token Ownership Claim Request",
+        props.wasDeployedByAccount && (
+          <LinkButton
+            target="_blank"
+            className="ml-[-10px]"
+            variant="link"
+            href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
+          >
+            Claim
+          </LinkButton>
+        ),
       ],
     ]),
   ];
@@ -134,7 +148,6 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
     trpc.interchainToken.getInterchainTokenMeta.useQuery({
       tokenId,
     });
-
   const { address } = useAccount();
 
   const { data: roles } =
