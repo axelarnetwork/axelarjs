@@ -264,11 +264,26 @@ async function scanChains(
   ctx: Context
 ) {
   for (const chainConfig of chainConfigs) {
-    const tokenDetails =
+    let tokenDetails =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         chainConfig.axelarChainId,
         tokenAddress
       );
+
+    if (!tokenDetails) {
+      const remoteTokenDetails =
+        await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
+          chainConfig.axelarChainId,
+          tokenAddress
+        );
+
+      if (remoteTokenDetails) {
+        tokenDetails =
+          await ctx.persistence.postgres.getInterchainTokenByTokenId(
+            remoteTokenDetails.tokenId
+          );
+      }
+    }
 
     if (tokenDetails) {
       return await getInterchainToken(
