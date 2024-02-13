@@ -24,18 +24,16 @@ export { WAGMI_CHAIN_CONFIGS as EVM_CHAIN_CONFIGS };
 
 export const queryClient = new QueryClient();
 
-const metadata = {
-  name: APP_NAME,
-  description: APP_TITLE,
-  icons: ["/icons/favicon-32x32.png"],
-  url: "",
-};
-
 export const wagmiConfig = defaultWagmiConfig({
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
   chains: WAGMI_CHAIN_CONFIGS,
-  metadata,
   ssr: true,
+  metadata: {
+    name: APP_NAME,
+    description: APP_TITLE,
+    icons: ["/icons/favicon-32x32.png"],
+    url: "",
+  },
 });
 
 export const WEB3_MODAL = createWeb3Modal({
