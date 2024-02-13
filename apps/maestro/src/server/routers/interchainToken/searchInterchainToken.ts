@@ -264,11 +264,7 @@ async function scanChains(
   ctx: Context
 ) {
   for (const chainConfig of chainConfigs) {
-    const tokenDetails =
-      await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-        chainConfig.axelarChainId,
-        tokenAddress
-      );
+    const tokenDetails = await getTokenDetails(chainConfig, tokenAddress, ctx);
 
     if (tokenDetails) {
       return await getInterchainToken(
@@ -278,6 +274,34 @@ async function scanChains(
         ctx
       );
     }
+  }
+
+  return null;
+}
+
+async function getTokenDetails(
+  chainConfig: ExtendedWagmiChainConfig,
+  tokenAddress: `0x${string}`,
+  ctx: Context
+) {
+  const tokenDetails =
+    await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+      chainConfig.axelarChainId,
+      tokenAddress
+    );
+
+  if (tokenDetails) return tokenDetails;
+
+  const remoteTokenDetails =
+    await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
+      chainConfig.axelarChainId,
+      tokenAddress
+    );
+
+  if (remoteTokenDetails) {
+    return ctx.persistence.postgres.getInterchainTokenByTokenId(
+      remoteTokenDetails.tokenId
+    );
   }
 
   return null;
