@@ -29,10 +29,11 @@ import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
-  tokenId?: `0x${string}`;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
   decimals: number;
+  tokenId?: `0x${string}` | null;
+  tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
 };
 
@@ -67,6 +68,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             <InfoIcon className="text-info h-[1em] w-[1em]" />
           </Tooltip>
         </div>,
+      ],
+    ]),
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
+      [
+        "Token Manager",
+        <CopyToClipboardButton
+          key="token-manager"
+          size="sm"
+          variant="ghost"
+          copyText={tokenManagerAddress}
+        >
+          {maskAddress(tokenManagerAddress)}
+        </CopyToClipboardButton>,
       ],
     ]),
   ];
