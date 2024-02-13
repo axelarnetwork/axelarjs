@@ -35,6 +35,7 @@ export const wagmiConfig = defaultWagmiConfig({
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
   chains: WAGMI_CHAIN_CONFIGS,
   metadata,
+  ssr: true,
 });
 
 export const WEB3_MODAL = createWeb3Modal({
