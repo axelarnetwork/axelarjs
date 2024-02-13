@@ -34,6 +34,7 @@ export const wagmiConfig = defaultWagmiConfig({
     icons: ["/icons/favicon-32x32.png"],
     url: "",
   },
+  enableCoinbase: true,
 });
 
 export const WEB3_MODAL = createWeb3Modal({

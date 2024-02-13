@@ -28,6 +28,7 @@ export const trpc = createTRPCNext<AppRouter>({
     if (typeof window !== "undefined") {
       // during client requests
       return {
+        queryClient,
         links: [
           httpBatchLink({
             transformer: superjson, // optional - adds superjson serialization
