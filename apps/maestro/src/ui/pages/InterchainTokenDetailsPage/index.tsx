@@ -51,6 +51,7 @@ const InterchainTokensPage: FC = () => {
           decimals={tokenDetails.decimals}
           name={tokenDetails.name}
           symbol={tokenDetails.symbol}
+          wasDeployedByAccount={interchainToken.wasDeployedByAccount}
           tokenId={interchainToken?.tokenId}
           tokenManagerAddress={interchainToken?.tokenManagerAddress}
           kind={interchainToken?.kind}
