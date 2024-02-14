@@ -53,6 +53,18 @@ const MONTHS = [
   "Dec",
 ];
 
+const NUMBERS = [
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+];
+
 const getShortTime = (date: Date) => {
   const h = date.getUTCHours();
   return h > 12 ? `${h - 12}pm` : `${h}am`;
@@ -177,6 +189,10 @@ const CompetitionPage = () => {
   const compStart = getDateMeta(COMPETITION_END_TS);
   const compEnd = getDateMeta(COMPETITION_START_TS);
 
+  const durationInWeeks = Math.floor(
+    (COMPETITION_END_TS - COMPETITION_START_TS) / (1000 * 60 * 60 * 24 * 7)
+  );
+
   return (
     <Page
       title="Competition"
@@ -206,9 +222,11 @@ const CompetitionPage = () => {
               </li>
               <li>
                 <strong className="text-primary">Duration:</strong> The
-                competition starts {compEnd.time} UTC on {compEnd.day} and
-                concludes at {compStart.time} UTC on {compStart.day}, spanning a
-                thrilling two weeks.
+                competition starts {compEnd.time} UTC on {compEnd.day} and has
+                been extended to conclude at {compStart.time} UTC on{" "}
+                {compStart.day}, spanning a thrilling{" "}
+                {NUMBERS[durationInWeeks - 1]} week
+                {durationInWeeks > 1 && "s"}.
               </li>
               <li>
                 <strong className="text-primary">Prizes:</strong> The top three
