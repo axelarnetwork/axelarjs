@@ -222,9 +222,10 @@ const CompetitionPage = () => {
               </li>
               <li>
                 <strong className="text-primary">Duration:</strong> The
-                competition starts {compEnd.time} UTC on {compEnd.day} and
-                concludes at {compStart.time} UTC on {compStart.day}, spanning a
-                thrilling {NUMBERS[durationInWeeks - 1]} week
+                competition starts {compEnd.time} UTC on {compEnd.day} and has
+                been extended to conclude at {compStart.time} UTC on{" "}
+                {compStart.day}, spanning a thrilling{" "}
+                {NUMBERS[durationInWeeks - 1]} week
                 {durationInWeeks > 1 && "s"}.
               </li>
               <li>
