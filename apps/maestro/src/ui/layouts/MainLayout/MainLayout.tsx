@@ -270,40 +270,58 @@ const TestnetBanner = ({ onClose = () => {} }) => (
   </Card>
 );
 
-const ErrorBoundaryFallback: FallbackRender = ({ error }) => (
-  <div className="grid flex-1 place-items-center">
-    <Clamp className="max-w-2xl">
-      <Alert>
-        <div className="grid gap-2">
-          <div className="text-lg">
-            OK, looks like something didn&apos;t work quite as expected.
-            We&apos;re on it!
-          </div>
-          <div className="opacity-80">
-            In the meantime, you can try refreshing the page or checking the
-            support link at the bottom of the page.
-          </div>
+const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
+  const stringified = JSON.stringify(
+    {
+      message: error.message,
+      stack: error.stack?.split("\n"),
+      cause: error.cause,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      locale: navigator.language,
+      isRTL: document.documentElement.getAttribute("dir") === "rtl",
+    },
+    null,
+    2
+  );
 
-          {Boolean(error.stack ?? error.message) && (
-            <CopyToClipboardButton
-              className="bg-base-100"
-              copyText={error.stack ?? error.message}
-            >
-              Copy error to clipboard
-            </CopyToClipboardButton>
-          )}
+  const errorContent = `\n\`\`\`\n${stringified}\n\`\`\``;
 
-          {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-            <div className="p-2">
-              <div className="mockup-code">
-                <pre className="max-w-xs overflow-x-scroll md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
-                  {error.stack}
-                </pre>
-              </div>
+  return (
+    <div className="grid flex-1 place-items-center">
+      <Clamp className="max-w-2xl">
+        <Alert>
+          <div className="grid gap-2">
+            <div className="text-lg">
+              OK, looks like something didn&apos;t work quite as expected.
+              We&apos;re on it!
             </div>
-          )}
-        </div>
-      </Alert>
-    </Clamp>
-  </div>
-);
+            <div className="opacity-80">
+              In the meantime, you can try refreshing the page or checking the
+              support link at the bottom of the page.
+            </div>
+
+            {Boolean(error.stack ?? error.message) && (
+              <CopyToClipboardButton
+                className="bg-base-100"
+                copyText={errorContent}
+              >
+                Copy error to clipboard
+              </CopyToClipboardButton>
+            )}
+
+            {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+              <div className="p-2">
+                <div className="mockup-code bg-base-300 text-success/95">
+                  <pre className="max-w-xs overflow-x-scroll md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
+                    {errorContent}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        </Alert>
+      </Clamp>
+    </div>
+  );
+};
