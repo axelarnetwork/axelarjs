@@ -312,8 +312,8 @@ const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
 
             {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
               <div className="p-2">
-                <div className="mockup-code bg-base-300 text-success/95">
-                  <pre className="max-w-xs overflow-x-scroll md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
+                <div className="mockup-code dark:bg-base-300 text-success/95">
+                  <pre className="max-w-xs overflow-x-scroll px-4 md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
                     {errorContent}
                   </pre>
                 </div>
