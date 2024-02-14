@@ -22,10 +22,6 @@ export default function HomePage() {
   const { chain } = useNetwork();
   const [layoutState, layoutActions] = useLayoutStateContainer();
 
-  if (Date.now() > 1633084800000) {
-    throw new Error("The Interchain Token Service is not yet available.");
-  }
-
   const handleTokenFound = useCallback(
     async (result: TokenFoundResult) => {
       if (!chain) {
