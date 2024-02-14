@@ -29,10 +29,11 @@ import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
-  tokenId?: `0x${string}`;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
   decimals: number;
+  tokenId?: `0x${string}` | null;
+  tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
 };
 
@@ -69,6 +70,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         </div>,
       ],
     ]),
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
+      [
+        "Token Manager",
+        <CopyToClipboardButton
+          key="token-manager"
+          size="sm"
+          variant="ghost"
+          copyText={tokenManagerAddress}
+        >
+          {maskAddress(tokenManagerAddress)}
+        </CopyToClipboardButton>,
+      ],
+    ]),
   ];
 
   const sanitizedTokenDetails = tokenDetails.filter(([, value]) =>
@@ -80,13 +94,12 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold md:gap-3">
           {props.tokenId && <ManageTokenIcon tokenId={props.tokenId} />}
-          <span className="hidden sm:inline">Interchain Token </span>
+
           {Boolean(props.name && props.symbol) && (
-            <>
-              <span className="hidden sm:inline">&middot;</span>
-              <span className="text-primary text-xl">{props.name}</span>{" "}
-              <span className="text-xl opacity-50">({props.symbol})</span>
-            </>
+            <div className="grid -space-y-1">
+              <span className="text-primary text-lg">{props.symbol}</span>{" "}
+              <span className="text-base opacity-50">{props.name}</span>
+            </div>
           )}
         </div>
         <LinkButton
@@ -151,11 +164,15 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
 
   const isOperator = roles?.tokenManager?.includes("OPERATOR");
 
-  const icon = meta?.iconUrl ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={meta.iconUrl} alt="token icon" className="h-9 w-9 rounded-full" />
-  ) : (
-    <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+  const icon = (
+    <div className="outline-base-content/50 relative grid h-9 w-9 place-items-start rounded-full outline">
+      {meta?.iconUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
+      ) : (
+        <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+      )}
+    </div>
   );
 
   if (

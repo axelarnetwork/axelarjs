@@ -217,6 +217,24 @@ export default class MaestroPostgresClient {
   }
 
   /**
+   * Returns the interchain token on the remote tokens table with the given `chainId` and `tokenAddress`.
+   */
+  async getRemoteInterchainTokenByChainIdAndTokenAddress(
+    axelarChainId: string,
+    tokenAddress: Address
+  ) {
+    const query = this.db.query.remoteInterchainTokens.findFirst({
+      where: (table, { ilike, and }) =>
+        and(
+          eq(table.axelarChainId, axelarChainId),
+          ilike(table.tokenAddress, tokenAddress)
+        ),
+    });
+
+    return await query;
+  }
+
+  /**
    * Returns the interchain tokens deployed by the given `deployerAddress`,
    */
   async getInterchainTokensByDeployerAddress(deployerAddress: Address) {
