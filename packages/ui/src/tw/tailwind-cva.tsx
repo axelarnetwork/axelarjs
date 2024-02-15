@@ -6,10 +6,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, type FC } from "react";
 
+import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
+import { cn } from "../utils";
 import domElements from "./domElements";
 
 const isTwElement = Symbol("isTwElement?");
@@ -330,3 +332,46 @@ const tw: TailwindInterface = Object.assign(
 );
 
 export default tw;
+
+type ElementKey = keyof TailwindInterface;
+
+type CVA<T = unknown> = typeof cva<T>;
+
+export type TailwindCVA = TailwindInterface & {
+  [K in ElementKey]: TailwindInterface[K] & {
+    cva: <T>(
+      ...args: Parameters<CVA<T>>
+    ) => FC<JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>>>;
+  };
+};
+
+export function createTailwindCVA() {
+  const twCVA = Object.fromEntries(
+    Object.entries(tw).map(([key, value]) => {
+      console.log(key, value);
+      return [
+        key as ElementKey,
+        Object.assign(value, {
+          cva: (...args: Parameters<typeof cva>) => {
+            const variance = cva(...args);
+
+            type Props = VariantProps<typeof variance> & {
+              className?: string;
+            };
+
+            const Component = value`` as FC<Props>;
+
+            return ({ className, ...props }: Props) => (
+              <Component
+                className={cn(variance({ ...props, className }), className)}
+                {...props}
+              />
+            );
+          },
+        }),
+      ] as const;
+    })
+  ) as TailwindCVA;
+
+  return Object.assign(tw, twCVA);
+}
