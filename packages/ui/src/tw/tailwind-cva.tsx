@@ -347,30 +347,27 @@ export type TailwindCVA = TailwindInterface & {
 
 export function createTailwindCVA() {
   const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, value]) => {
-      console.log(key, value);
-      return [
-        key as ElementKey,
-        Object.assign(value, {
-          cva: (...args: Parameters<typeof cva>) => {
-            const variance = cva(...args);
+    Object.entries(tw).map(([key, value]) => [
+      key,
+      Object.assign(value, {
+        cva: (...args: Parameters<typeof cva>) => {
+          const variance = cva(...args);
 
-            type Props = VariantProps<typeof variance> & {
-              className?: string;
-            };
+          type Props = VariantProps<typeof variance> & {
+            className?: string;
+          };
 
-            const Component = value`` as FC<Props>;
+          const Component = value`` as FC<Props>;
 
-            return ({ className, ...props }: Props) => (
-              <Component
-                className={cn(variance({ ...props, className }), className)}
-                {...props}
-              />
-            );
-          },
-        }),
-      ] as const;
-    })
+          return ({ className, ...props }: Props) => (
+            <Component
+              className={cn(variance({ ...props, className }), className)}
+              {...props}
+            />
+          );
+        },
+      }),
+    ])
   ) as TailwindCVA;
 
   return Object.assign(tw, twCVA);
