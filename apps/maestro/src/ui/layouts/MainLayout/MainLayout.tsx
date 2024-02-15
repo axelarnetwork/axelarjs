@@ -289,7 +289,7 @@ const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
 
   return (
     <div className="grid flex-1 place-items-center">
-      <Clamp className="max-w-2xl">
+      <Clamp className="grid max-w-2xl gap-4">
         <Alert>
           <div className="grid gap-2">
             <div className="text-lg">
@@ -309,18 +309,15 @@ const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
                 Copy error to clipboard
               </CopyToClipboardButton>
             )}
-
-            {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-              <div className="p-2">
-                <div className="mockup-code dark:bg-base-300 text-success/95">
-                  <pre className="max-w-xs overflow-x-scroll px-4 md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
-                    {errorContent}
-                  </pre>
-                </div>
-              </div>
-            )}
           </div>
         </Alert>
+        {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
+          <div className="mockup-code dark:bg-base-300 text-success/95">
+            <pre className="max-w-xs overflow-x-scroll px-4 md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
+              {errorContent}
+            </pre>
+          </div>
+        )}
       </Clamp>
     </div>
   );
