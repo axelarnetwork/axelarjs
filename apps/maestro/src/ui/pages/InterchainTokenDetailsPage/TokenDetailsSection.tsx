@@ -31,8 +31,9 @@ export type TokenDetailsSectionProps = {
   symbol: string;
   chain: EVMChainConfig;
   tokenAddress: `0x${string}`;
+  wasDeployedByAccount?: boolean;
   decimals: number;
-  tokenId?: `0x${string}` | null;
+  tokenId?: `0x${string}` | null | undefined;
   tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
 };
@@ -68,6 +69,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             <InfoIcon className="text-info h-[1em] w-[1em]" />
           </Tooltip>
         </div>,
+      ],
+      [
+        "Token Ownership Claim Request",
+        props.wasDeployedByAccount && (
+          <LinkButton
+            target="_blank"
+            className="ml-[-10px]"
+            variant="link"
+            href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
+          >
+            Claim
+          </LinkButton>
+        ),
       ],
     ]),
     ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
@@ -148,7 +162,6 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
     trpc.interchainToken.getInterchainTokenMeta.useQuery({
       tokenId,
     });
-
   const { address } = useAccount();
 
   const { data: roles } =
@@ -165,7 +178,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
   const isOperator = roles?.tokenManager?.includes("OPERATOR");
 
   const icon = (
-    <div className="outline-base-content/50 relative grid h-9 w-9 place-items-start rounded-full outline">
+    <div className="ring-primary/50 ring-offset-base-100 relative grid h-9 w-9 place-items-start rounded-full ring-2 ring-offset-2">
       {meta?.iconUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
