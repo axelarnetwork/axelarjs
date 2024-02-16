@@ -72,7 +72,7 @@ export function useInterchainTokenServiceTransferMutation(
     reset: resetInterchainTransferMutation,
   } = useInterchainTokenServiceInterchainTransfer({
     address: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-    value: BigInt(config.gas ?? 0) * BigInt(2),
+    value: config.gas ?? 0n,
   });
 
   const { data: approveERC20Recepit } = useWaitForTransaction({
