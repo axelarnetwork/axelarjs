@@ -10,13 +10,12 @@ import {
 } from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
-import { getNativeToken } from "~/lib/utils/getNativeToken";
-import { useEstimateGasFeeQuery } from "~/services/axelarjsSDK/hooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: `0x${string}`;
   sourceChainName: string;
   destinationChainName: string;
+  gas?: bigint;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -36,22 +35,14 @@ export function useInterchainTransferMutation(
 
   const { address } = useAccount();
 
-  const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: config.sourceChainName,
-    destinationChainId: config.destinationChainName,
-    sourceChainTokenSymbol: getNativeToken(
-      config.sourceChainName.toLowerCase()
-    ),
-  });
-
   const { writeAsync: transferAsync } = useInterchainTokenInterchainTransfer({
     address: config.tokenAddress,
-    value: BigInt(gas ?? 0) * BigInt(2),
+    value: config.gas ?? 0n,
   });
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
     async ({ amount }) => {
-      if (!(decimals && address && gas)) {
+      if (!(decimals && address && config.gas)) {
         return;
       }
 
