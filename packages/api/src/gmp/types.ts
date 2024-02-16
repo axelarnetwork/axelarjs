@@ -386,6 +386,7 @@ type GetBaseFeesResult = {
   express_fee: number;
   express_fee_string: string;
   express_fee_usd: number;
+  execute_gas_multiplier: number;
   express_execute_gas_limit_adjustment: number;
   express_execute_gas_limit_adjustment_with_multiplier: number;
   source_express_fee: ExpressFee;
