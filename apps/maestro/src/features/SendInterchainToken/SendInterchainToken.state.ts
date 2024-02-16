@@ -138,6 +138,7 @@ export function useSendInterchainTokenState(props: {
     tokenAddress: props.tokenAddress,
     destinationChainName: selectedToChain?.chain_name,
     sourceChainName: props.sourceChain.chain_name,
+    gas,
   });
 
   const trpcContext = trpc.useUtils();
