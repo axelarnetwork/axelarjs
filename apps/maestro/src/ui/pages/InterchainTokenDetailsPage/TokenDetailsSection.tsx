@@ -178,7 +178,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
   const isOperator = roles?.tokenManager?.includes("OPERATOR");
 
   const icon = (
-    <div className="outline-base-content/50 relative grid h-9 w-9 place-items-start rounded-full outline">
+    <div className="ring-primary/50 ring-offset-base-100 relative grid h-9 w-9 place-items-start rounded-full ring-2 ring-offset-2">
       {meta?.iconUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
