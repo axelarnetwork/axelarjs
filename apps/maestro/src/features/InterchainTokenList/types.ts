@@ -16,8 +16,6 @@ export type TokenInfo = {
   isSelected?: boolean;
   chain?: EVMChainConfig;
   wagmiConfig?: ExtendedWagmiChainConfig;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   deploymentStatus?: "pending" | GMPTxStatus;
-  deploymentTxHash?: `0x${string}:${number}` | `0x${string}`;
+  deploymentTxHash?: `0x${string}:${number}`;
 };

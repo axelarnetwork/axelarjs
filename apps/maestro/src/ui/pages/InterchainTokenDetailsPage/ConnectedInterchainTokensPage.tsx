@@ -272,13 +272,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             x.chain && !remoteChainsExecuted.includes(x.chain.id)
         )
         .map((token) => {
-          const gmpInfo = token.chain?.id
-            ? statusesByChain[token.chain.id]
-            : undefined;
-
-          const isSelected = nonRunningSelectedChainIds.includes(
-            token.chainId ?? 0
+          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
+            (id) => statusesByChain[id]
           );
+
+          const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
 
           return {
             ...token,
@@ -296,6 +294,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       statusesByChain,
       nonRunningSelectedChainIds,
     ]
+  );
+
+  const [idleUnregisteredTokens, pendingUnregisteredTokens] = partition(
+    (x) => !x.deploymentStatus,
+    unregisteredTokens
   );
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -419,25 +422,34 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         </div>
       )}
       <InterchainTokenList title="Registered Chains" tokens={registered} />
-      <InterchainTokenList
-        title="Unregistered Chains"
-        listClassName="grid-cols-2 sm:grid-cols-3"
-        tokens={unregisteredTokens}
-        onToggleSelection={
-          isReadOnly
-            ? undefined
-            : (chainId) => {
-                setSessionState((draft) => {
-                  draft.selectedChainIds = draft.selectedChainIds.includes(
-                    chainId
-                  )
-                    ? without([chainId], draft.selectedChainIds)
-                    : draft.selectedChainIds.concat(chainId);
-                });
-              }
-        }
-        footer={footerContent}
-      />
+      {pendingUnregisteredTokens.length > 0 && (
+        <InterchainTokenList
+          title="Pending Chains"
+          listClassName="grid-cols-2 sm:grid-cols-3"
+          tokens={pendingUnregisteredTokens}
+        />
+      )}
+      {idleUnregisteredTokens.length > 0 && (
+        <InterchainTokenList
+          title="Unregistered Chains"
+          listClassName="grid-cols-2 sm:grid-cols-3"
+          tokens={idleUnregisteredTokens}
+          onToggleSelection={
+            isReadOnly
+              ? undefined
+              : (chainId) => {
+                  setSessionState((draft) => {
+                    draft.selectedChainIds = draft.selectedChainIds.includes(
+                      chainId
+                    )
+                      ? without([chainId], draft.selectedChainIds)
+                      : draft.selectedChainIds.concat(chainId);
+                  });
+                }
+          }
+          footer={footerContent}
+        />
+      )}
     </div>
   );
 };
