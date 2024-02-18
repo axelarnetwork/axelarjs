@@ -104,7 +104,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
       (token) => token.tokenAddress !== "0x"
     );
 
-    if (validTokens.length === remoteTokens.length) {
+    if (validTokens.length !== remoteTokens.length) {
       console.log(
         "recordInterchainTokenDeployment: some tokens are not valid",
         {
