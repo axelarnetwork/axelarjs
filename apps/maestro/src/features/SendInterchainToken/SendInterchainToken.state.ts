@@ -90,17 +90,6 @@ export function useSendInterchainTokenState(props: {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
-  const {
-    mutateAsync: interchainTransferAsync,
-    isPending: isInterchainTransferSending,
-    txState: interchainTransferTxState,
-    reset: resetInterchainTransferTxState,
-  } = useInterchainTransferMutation({
-    tokenAddress: props.tokenAddress,
-    destinationChainName: selectedToChain?.chain_name,
-    sourceChainName: props.sourceChain.chain_name,
-  });
-
   const { address } = useAccount();
 
   const { data: balance } = useBalance({ address });
@@ -123,6 +112,18 @@ export function useSendInterchainTokenState(props: {
 
     return gas > balance.value;
   }, [balance, gas]);
+
+  const {
+    mutateAsync: interchainTransferAsync,
+    isPending: isInterchainTransferSending,
+    txState: interchainTransferTxState,
+    reset: resetInterchainTransferTxState,
+  } = useInterchainTransferMutation({
+    tokenAddress: props.tokenAddress,
+    destinationChainName: selectedToChain?.chain_name,
+    sourceChainName: props.sourceChain.chain_name,
+    gas,
+  });
 
   const {
     mutateAsync: tokenServiceSendTokenAsync,

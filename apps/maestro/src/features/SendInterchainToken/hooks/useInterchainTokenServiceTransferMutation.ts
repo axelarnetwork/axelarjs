@@ -63,9 +63,7 @@ export function useInterchainTokenServiceTransferMutation(
     writeContractAsync: interchainTransferAsync,
     data: sendTokenData,
     reset: resetInterchainTransferMutation,
-  } = useWriteInterchainTokenServiceInterchainTransfer({
-    // value: BigInt(config.gas ?? 0) * BigInt(2),
-  });
+  } = useWriteInterchainTokenServiceInterchainTransfer();
 
   const { data: approveERC20Recepit } = useWaitForTransactionReceipt({
     hash: approveERC20TxHash,
