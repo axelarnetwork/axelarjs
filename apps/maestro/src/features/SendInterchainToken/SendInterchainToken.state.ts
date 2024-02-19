@@ -102,7 +102,7 @@ export function useSendInterchainTokenState(props: {
     destinationChainId: selectedToChain?.chain_name,
     sourceChainTokenSymbol: nativeTokenSymbol,
     gasMultiplier: "auto",
-    gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT),
+    gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
   });
 
   const hasInsufficientGasBalance = useMemo(() => {
