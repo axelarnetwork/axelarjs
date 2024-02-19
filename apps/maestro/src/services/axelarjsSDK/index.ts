@@ -21,7 +21,7 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
     params.destinationChainId,
     params.sourceChainTokenSymbol,
     params.gasLimit,
-    params.gasMultipler,
+    params.gasMultiplier,
     params.minGasPrice
   );
 
