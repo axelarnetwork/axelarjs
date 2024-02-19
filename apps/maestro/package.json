@@ -32,7 +32,7 @@
     "drizzle:studio": "pnpm drizzle-kit studio"
   },
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "^0.13.9",
+    "@axelar-network/axelarjs-sdk": "^0.14.1",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
