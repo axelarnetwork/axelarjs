@@ -5,10 +5,7 @@ import { useMemo, useState } from "react";
 import { formatEther } from "viem";
 import { useAccount, useBalance } from "wagmi";
 
-import {
-  NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
-  NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_MULTIPLIER,
-} from "~/config/env";
+import { NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import {
@@ -101,8 +98,8 @@ export function useSendInterchainTokenState(props: {
     sourceChainId: props.sourceChain.chain_name,
     destinationChainId: selectedToChain?.chain_name,
     sourceChainTokenSymbol: nativeTokenSymbol,
-    gasMultipler: Number(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_MULTIPLIER),
-    gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT),
+    gasMultiplier: "auto",
+    gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
   });
 
   const hasInsufficientGasBalance = useMemo(() => {
