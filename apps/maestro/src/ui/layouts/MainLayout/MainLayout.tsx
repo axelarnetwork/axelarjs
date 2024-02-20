@@ -16,6 +16,7 @@ import {
   useTheme,
   XCircleIcon,
 } from "@axelarjs/ui";
+import tw from "@axelarjs/ui/tw";
 import React, { useEffect, type FC, type PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import Link from "next/link";
@@ -23,7 +24,6 @@ import Link from "next/link";
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { ErrorBoundary, type FallbackRender } from "@sentry/nextjs";
 import { useWeb3ModalTheme } from "@web3modal/wagmi/react";
-import tw from "tailwind-styled-components";
 
 import pkgJson from "~/../package.json";
 import {

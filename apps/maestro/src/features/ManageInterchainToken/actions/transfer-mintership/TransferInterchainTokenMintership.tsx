@@ -7,13 +7,17 @@ import {
   TextInput,
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { useCallback, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { isAddress, TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import {
+  isAddress,
+  TransactionExecutionError,
+  type TransactionReceipt,
+} from "viem";
+import { useChainId, useWaitForTransactionReceipt } from "wagmi";
 
-import { useInterchainTokenTransferMintership } from "~/lib/contracts/InterchainToken.hooks";
+import { useWriteInterchainTokenTransferMintership } from "~/lib/contracts/InterchainToken.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -27,7 +31,6 @@ export const TransferInterchainTokenMintership: FC = () => {
   const [txState, setTxState] = useTransactionState();
   const [state] = useManageInterchainTokenContainer();
   const chainId = useChainId();
-  const account = useAccount();
 
   const { register, handleSubmit, formState } = useForm<FormState>({
     defaultValues: {
@@ -38,21 +41,16 @@ export const TransferInterchainTokenMintership: FC = () => {
   });
 
   const {
-    writeAsync: transferMintershipAsync,
-    isLoading: isTransfering,
-    data: transferResult,
-  } = useInterchainTokenTransferMintership({
-    address: state.tokenAddress,
-    account: account.address,
-  });
+    writeContractAsync: transferMintershipAsync,
+    isPending: isTransfering,
+    data: transferTxHash,
+  } = useWriteInterchainTokenTransferMintership();
 
   const trpcContext = trpc.useUtils();
 
-  useWaitForTransaction({
-    hash: transferResult?.hash,
-    confirmations: 8,
-    async onSuccess(receipt) {
-      if (!transferResult) {
+  const onReceipt = useCallback(
+    async (receipt: TransactionReceipt) => {
+      if (!transferTxHash) {
         return;
       }
 
@@ -73,7 +71,28 @@ export const TransferInterchainTokenMintership: FC = () => {
 
       toast.success("Successfully transferred token mintership");
     },
+    [
+      setTxState,
+      transferTxHash,
+      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      trpcContext.interchainToken.searchInterchainToken,
+    ]
+  );
+
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: transferTxHash,
   });
+
+  useEffect(
+    () => {
+      if (!receipt) return;
+      onReceipt(receipt).catch((error) => {
+        logger.error("Failed to process receipt", error);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(
     async (data, e) => {
@@ -84,15 +103,16 @@ export const TransferInterchainTokenMintership: FC = () => {
       });
 
       try {
-        const txResult = await transferMintershipAsync({
+        const txHash = await transferMintershipAsync({
+          address: state.tokenAddress,
           args: [data.recipientAddress],
         });
 
-        if (txResult?.hash) {
+        if (txHash) {
           setTxState({
             status: "submitted",
             chainId,
-            hash: txResult.hash,
+            hash: txHash,
           });
         }
       } catch (error) {
@@ -116,7 +136,7 @@ export const TransferInterchainTokenMintership: FC = () => {
         });
       }
     },
-    [chainId, setTxState, transferMintershipAsync]
+    [chainId, setTxState, state.tokenAddress, transferMintershipAsync]
   );
 
   const buttonChildren = useMemo(() => {

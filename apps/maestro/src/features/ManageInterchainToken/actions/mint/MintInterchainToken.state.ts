@@ -1,9 +1,10 @@
 import { toast } from "@axelarjs/ui/toaster";
+import { useCallback, useEffect } from "react";
 
-import { isAddress } from "viem";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import { isAddress, type TransactionReceipt } from "viem";
+import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
 
-import { useIerc20MintableBurnableMint } from "~/lib/contracts/IERC20MintableBurnable.hooks";
+import { useWriteIerc20MintableBurnableMint } from "~/lib/contracts/IERC20MintableBurnable.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
@@ -26,19 +27,18 @@ export function useMintInterchainTokenState() {
   );
 
   const {
-    writeAsync: mintTokenAsync,
-    isLoading: isMinting,
-    data: mintResult,
-  } = useIerc20MintableBurnableMint({
-    address: managerState.tokenAddress,
+    writeContractAsync: mintTokenAsync,
+    isPending: isMinting,
+    data: mintTxHash,
+  } = useWriteIerc20MintableBurnableMint({
+    // address: managerState.tokenAddress,
   });
 
   const trpcContext = trpc.useUtils();
 
-  useWaitForTransaction({
-    hash: mintResult?.hash,
-    async onSuccess(receipt) {
-      if (!mintResult) {
+  const onReceipt = useCallback(
+    async function (receipt: TransactionReceipt) {
+      if (!mintTxHash) {
         return;
       }
 
@@ -56,13 +56,37 @@ export function useMintInterchainTokenState() {
 
       toast.success("Successfully minted interchain tokens");
     },
+    [
+      mintTxHash,
+      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      chainId,
+      managerState.tokenAddress,
+      accountAddress,
+      setTxState,
+    ]
+  );
+
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: mintTxHash,
   });
+
+  useEffect(
+    () => {
+      if (!receipt) return;
+      onReceipt(receipt).catch((err) => {
+        console.error("useMintInterchainTokenState: onReceipt", err);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   const state = {
     txState,
     accountAddress,
     erc20Details,
     isMinting,
+    tokenAddress: managerState.tokenAddress,
   };
 
   const actions = {

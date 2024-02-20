@@ -225,7 +225,7 @@ export const ShareHaikuButton: FC<{
   tokenAddress: `0x${string}`;
   haikuType: "deployment" | "send";
 }> = (props) => {
-  const { mutateAsync, isLoading, isSuccess } =
+  const { mutateAsync, isPending, isSuccess } =
     trpc.openai.generateInterchainDeploymentHaiku.useMutation();
 
   const { computed } = useEVMChainConfigsQuery();
@@ -266,8 +266,8 @@ export const ShareHaikuButton: FC<{
   return (
     <Button
       onClick={handleShareHaiku}
-      loading={isLoading}
-      disabled={isLoading || isSuccess}
+      loading={isPending}
+      disabled={isPending || isSuccess}
       className="mt-2 w-full bg-black"
       aria-label="Share an interchain token haiku on X"
     >

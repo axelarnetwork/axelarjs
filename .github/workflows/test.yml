@@ -1,7 +1,6 @@
 name: Test (unit)
 
 on:
-  - push
   - pull_request
 
 concurrency:

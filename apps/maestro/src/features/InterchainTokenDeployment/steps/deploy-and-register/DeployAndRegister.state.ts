@@ -6,15 +6,10 @@ import { formatEther } from "viem";
 import { useChainId } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT } from "~/config/env";
+import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
-
-const toNumericString = (num: bigint) =>
-  Number(formatEther(num)).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  });
 
 export type UseStep3ChainSelectionStateProps = {
   selectedChains: Set<string>;

@@ -79,7 +79,7 @@ export const CanonicalTokenRecovery = () => {
       }
     );
 
-  const { mutateAsync, isLoading: isMutating } =
+  const { mutateAsync, isPending: isMutating } =
     trpc.interchainToken.recoverCanonicalTokenByTokenId.useMutation({
       onError(error) {
         toast.error(error.message);
@@ -151,7 +151,7 @@ export const CanonicalTokenRecovery = () => {
           )
           .map(([key, value]) => (
             <li key={key}>
-              <span className="mr-1 font-semibold opacity-85">{key} </span>
+              <span className="opacity-85 mr-1 font-semibold">{key} </span>
               <span>{value}</span>
             </li>
           ))}

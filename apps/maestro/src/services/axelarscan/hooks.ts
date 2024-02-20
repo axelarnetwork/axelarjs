@@ -1,8 +1,8 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import { useMemo } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { indexBy, partition, prop } from "rambda";
-import { useQuery } from "wagmi";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
@@ -22,8 +22,12 @@ export function useEVMChainConfigsQuery() {
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID, data ?? []),
-    [data?.sort((a, b) => (a.name > b.name ? 1 : -1))]
+    () =>
+      partition(
+        (x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID,
+        data?.sort((a, b) => (a.name > b.name ? 1 : -1)) ?? []
+      ),
+    [data]
   );
 
   if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
@@ -64,20 +68,20 @@ export function useCosmosChainConfigsQuery() {
 }
 
 export function useAssetsQuery(denoms: string[] = []) {
-  return useQuery(
-    ["axelarscan-assets", denoms],
-    axelarscanClient.getAssets.bind(
+  return useQuery({
+    queryKey: ["axelarscan-assets", denoms],
+    queryFn: axelarscanClient.getAssets.bind(
       null,
       denoms?.length ? { denoms } : undefined
-    )
-  );
+    ),
+  });
 }
 
 export function useAssetPricesQuery(denoms: string[] = []) {
-  return useQuery(
-    ["axelarscan-asset-prices", denoms],
-    axelarscanClient.getAssetPrices.bind(null, { denoms })
-  );
+  return useQuery({
+    queryKey: ["axelarscan-asset-prices", denoms],
+    queryFn: axelarscanClient.getAssetPrices.bind(null, { denoms }),
+  });
 }
 
 export function useAssetQuery(denom: string) {

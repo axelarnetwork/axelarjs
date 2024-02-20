@@ -3,7 +3,7 @@ import {
   createWalletClient,
   http,
   type Chain,
-  type ContractFunctionResult,
+  type ContractFunctionReturnType,
   type ReadContractParameters,
   type WalletClient,
   type WriteContractParameters,
@@ -50,7 +50,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     > & {
       address?: `0x${string}`;
     }
-  ): Promise<ContractFunctionResult<TAbi, TFunctionName>> {
+  ): Promise<ContractFunctionReturnType<TAbi, "view", TFunctionName>> {
     const address = params?.address ?? this.address;
 
     if (!address) {
@@ -91,7 +91,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
       address,
       abi: this.abi,
       functionName: functionName,
-    } as WriteContractParameters<TAbi, TFunctionName, undefined>;
+    } as WriteContractParameters<TAbi, TFunctionName>;
 
     if (params?.args) {
       contractParams["args"] = params.args;

@@ -1,15 +1,15 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
-import { throttle } from "@axelarjs/utils";
+import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { zeroAddress } from "viem";
-import { useAccount, useChainId, useWaitForTransaction } from "wagmi";
+import { zeroAddress, type TransactionReceipt } from "viem";
+import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
 
 import {
-  useInterchainTokenFactoryInterchainTokenAddress,
-  useInterchainTokenFactoryInterchainTokenId,
-  useInterchainTokenFactoryMulticall,
-  usePrepareInterchainTokenFactoryMulticall,
+  useReadInterchainTokenFactoryInterchainTokenAddress,
+  useReadInterchainTokenFactoryInterchainTokenId,
+  useSimulateInterchainTokenFactoryMulticall,
+  useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import {
   decodeDeploymentMessageId,
@@ -56,22 +56,26 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<RecordInterchainTokenDeploymentInput>();
 
-  const { data: tokenId } = useInterchainTokenFactoryInterchainTokenId({
+  const { data: tokenId } = useReadInterchainTokenFactoryInterchainTokenId({
     args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
       salt: input?.salt as `0x${string}`,
       deployer: deployerAddress as `0x${string}`,
     }),
-    enabled:
-      input?.salt && deployerAddress && isValidEVMAddress(deployerAddress),
+    query: {
+      enabled:
+        input?.salt && deployerAddress && isValidEVMAddress(deployerAddress),
+    },
   });
 
   const { data: tokenAddress } =
-    useInterchainTokenFactoryInterchainTokenAddress({
+    useReadInterchainTokenFactoryInterchainTokenAddress({
       args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenAddress.args({
         salt: input?.salt as `0x${string}`,
         deployer: deployerAddress as `0x${string}`,
       }),
-      enabled: Boolean(tokenId && input?.salt && deployerAddress),
+      query: {
+        enabled: Boolean(tokenId && input?.salt && deployerAddress),
+      },
     });
 
   const { originalChainName, destinationChainNames } = useMemo(() => {
@@ -137,18 +141,28 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
     (!destinationChainNames.length || totalGasFee > 0n);
 
-  const prepareMulticall = usePrepareInterchainTokenFactoryMulticall({
-    chainId,
-    value: totalGasFee,
-    args: [multicallArgs],
-    enabled: isMutationReady,
+  const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
+    {
+      chainId,
+      value: totalGasFee,
+      args: [multicallArgs],
+      query: {
+        enabled: isMutationReady,
+      },
+    }
+  );
+
+  const multicall = useWriteInterchainTokenFactoryMulticall();
+
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: multicall?.data,
   });
 
-  const multicall = useInterchainTokenFactoryMulticall(prepareMulticall.config);
-
-  useWaitForTransaction({
-    hash: multicall?.data?.hash,
-    onSuccess: ({ transactionHash: txHash, transactionIndex: txIndex }) => {
+  const onReceipt = useCallback(
+    ({
+      transactionHash: txHash,
+      transactionIndex: txIndex,
+    }: TransactionReceipt) => {
       if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
         console.error(
           "useDeployAndRegisterRemoteInterchainTokenMutation: unable to setRecordDeploymentArgs",
@@ -178,7 +192,18 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },
-  });
+    [deployerAddress, input, tokenAddress, tokenId]
+  );
+
+  useEffect(
+    () => {
+      if (receipt) {
+        onReceipt(receipt);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   useEffect(
     () => {
@@ -231,26 +256,24 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
   const writeAsync = useCallback(async () => {
-    if (!multicall.writeAsync) {
-      throw new Error(
-        "useDeployAndRegisterRemoteInterchainTokenMutation: multicall.writeAsync is not defined"
-      );
-    }
+    invariant(
+      prepareMulticall?.request !== undefined,
+      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+    );
 
     await recordDeploymentDraft();
 
-    return await multicall.writeAsync();
-  }, [multicall, recordDeploymentDraft]);
+    return await multicall.writeContractAsync(prepareMulticall.request);
+  }, [multicall, prepareMulticall?.request, recordDeploymentDraft]);
 
   const write = useCallback(() => {
-    if (!multicall.write) {
-      throw new Error(
-        "useDeployAndRegisterRemoteInterchainTokenMutation: multicall.write is not defined"
-      );
-    }
+    invariant(
+      prepareMulticall?.request !== undefined,
+      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+    );
 
     recordDeploymentDraft()
-      .then(multicall.write)
+      .then(() => multicall.writeContract(prepareMulticall.request))
       .catch((e) => {
         console.error(
           "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
@@ -260,7 +283,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           type: "idle",
         });
       });
-  }, [multicall, onStatusUpdate, recordDeploymentDraft]);
+  }, [
+    multicall,
+    onStatusUpdate,
+    prepareMulticall?.request,
+    recordDeploymentDraft,
+  ]);
 
   return { ...multicall, writeAsync, write };
 }
