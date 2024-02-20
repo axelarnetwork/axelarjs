@@ -2,11 +2,11 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
-import { formatEther } from "viem";
 import { useAccount, useBalance } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT } from "~/config/env";
 import { trpc } from "~/lib/trpc";
+import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import {
   useChainInfoQuery,
@@ -18,12 +18,6 @@ import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
-
-const toNumericString = (num: bigint) =>
-  Number(formatEther(num)).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  });
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
