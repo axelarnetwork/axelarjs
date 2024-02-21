@@ -9,11 +9,12 @@ import { inputSchema } from "~/server/routers/interchainToken/searchInterchainTo
 const handler: NextApiHandler = async (req, res) => {
   const trpc = await createCaller({ req, res });
 
-  const { chainId, tokenAddress } = req.query;
+  const { chainId, tokenAddress, strict } = req.query;
 
   const parsedInput = inputSchema.safeParse({
-    chainId: Maybe.of(chainId).mapOrUndefined(Number),
     tokenAddress,
+    chainId: Maybe.of(chainId).mapOrUndefined(Number),
+    strict: Maybe.of(strict).mapOrUndefined((x) => x === "true"),
   });
 
   if (parsedInput.success === false) {
