@@ -1,0 +1,75 @@
+diff --git a/node_modules/trpc-openapi/dist/adapters/node-http/core.js b/node_modules/trpc-openapi/dist/adapters/node-http/core.js
+index ad1b3e5..5256384 100644
+--- a/node_modules/trpc-openapi/dist/adapters/node-http/core.js
++++ b/node_modules/trpc-openapi/dist/adapters/node-http/core.js
+@@ -109,7 +109,7 @@ const createOpenApiNodeHttpHandler = (opts) => {
+                 data: [data],
+                 errors: [error],
+             });
+-            const errorShape = router.getErrorShape({
++            const errorShape = router._def.errorFormatter({
+                 error,
+                 type: (_f = procedure === null || procedure === void 0 ? void 0 : procedure.type) !== null && _f !== void 0 ? _f : 'unknown',
+                 path: procedure === null || procedure === void 0 ? void 0 : procedure.path,
+diff --git a/node_modules/trpc-openapi/dist/adapters/node-http/procedures.js b/node_modules/trpc-openapi/dist/adapters/node-http/procedures.js
+index a785c0b..717cb84 100644
+--- a/node_modules/trpc-openapi/dist/adapters/node-http/procedures.js
++++ b/node_modules/trpc-openapi/dist/adapters/node-http/procedures.js
+@@ -5,8 +5,7 @@ const path_1 = require("../../utils/path");
+ const procedure_1 = require("../../utils/procedure");
+ const createProcedureCache = (router) => {
+     const procedureCache = new Map();
+-    const { queries, mutations } = router._def;
+-    (0, procedure_1.forEachOpenApiProcedure)(queries, ({ path: queryPath, procedure, openapi }) => {
++    (0, procedure_1.forEachOpenApiProcedure)(router._def.procedures, ({ path: queryPath, procedure, openapi }) => {
+         const { method } = openapi;
+         if (!procedureCache.has(method)) {
+             procedureCache.set(method, new Map());
+@@ -14,24 +13,12 @@ const createProcedureCache = (router) => {
+         const path = (0, path_1.normalizePath)(openapi.path);
+         const pathRegExp = (0, path_1.getPathRegExp)(path);
+         procedureCache.get(method).set(pathRegExp, {
+-            type: 'query',
++            type: procedure._def.type,
+             path: queryPath,
+             procedure,
+         });
+     });
+-    (0, procedure_1.forEachOpenApiProcedure)(mutations, ({ path: mutationPath, procedure, openapi }) => {
+-        const { method } = openapi;
+-        if (!procedureCache.has(method)) {
+-            procedureCache.set(method, new Map());
+-        }
+-        const path = (0, path_1.normalizePath)(openapi.path);
+-        const pathRegExp = (0, path_1.getPathRegExp)(path);
+-        procedureCache.get(method).set(pathRegExp, {
+-            type: 'mutation',
+-            path: mutationPath,
+-            procedure,
+-        });
+-    });
++
+     return (method, path) => {
+         var _a, _b;
+         const procedureMethodCache = procedureCache.get(method);
+diff --git a/node_modules/trpc-openapi/dist/utils/procedure.js b/node_modules/trpc-openapi/dist/utils/procedure.js
+index c838521..8e47181 100644
+--- a/node_modules/trpc-openapi/dist/utils/procedure.js
++++ b/node_modules/trpc-openapi/dist/utils/procedure.js
+@@ -16,15 +16,7 @@ const getInputOutputParsers = (procedure) => {
+     };
+ };
+ exports.getInputOutputParsers = getInputOutputParsers;
+-const getProcedureType = (procedure) => {
+-    if (procedure._def.query)
+-        return 'query';
+-    if (procedure._def.mutation)
+-        return 'mutation';
+-    if (procedure._def.subscription)
+-        return 'subscription';
+-    throw new Error('Unknown procedure type');
+-};
++const getProcedureType = (procedure) => procedure._def.type;
+ const forEachOpenApiProcedure = (procedureRecord, callback) => {
+     var _a;
+     for (const [path, procedure] of Object.entries(procedureRecord)) {
