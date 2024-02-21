@@ -75,3 +75,5 @@ export const middleware = t.middleware;
  * @see https://trpc.io/docs/v10/merging-routers
  */
 export const mergeRouters = t.mergeRouters;
+
+export const createCallerFactory = t.createCallerFactory;
