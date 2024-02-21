@@ -32,7 +32,9 @@ const handler: NextApiHandler = async (req, res) => {
   } catch (error) {
     if (error instanceof TRPCError) {
       res.status(500).json({ error: error.message, cause: error.cause });
+      return;
     }
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
