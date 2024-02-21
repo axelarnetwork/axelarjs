@@ -10,12 +10,12 @@
 
 ### Minor Changes
 
-- [#211](https://github.com/axelarnetwork/axelarjs/pull/211) [`f4ef92e88669fc0cad487d63d70cda3fa5c69e80`](https://github.com/axelarnetwork/axelarjs/commit/f4ef92e88669fc0cad487d63d70cda3fa5c69e80) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Major upgrade of dependencies:
-
-  - react-query v5.x
-  - wagmi v2.x
-  - web3modal v4.x
-  - tprc v11.x
+- [#211](https://github.com/axelarnetwork/axelarjs/pull/211) [`f4ef92e88669fc0cad487d63d70cda3fa5c69e80`](https://github.com/axelarnetwork/axelarjs/commit/f4ef92e88669fc0cad487d63d70cda3fa5c69e80) Thanks [@alanrsoares](https://github.com/alanrsoares)!
+  - Major dependency upgrades:
+    - react-query v5.x
+    - wagmi v2.x
+    - web3modal v4.x
+    - tprc v11.x
 
   Bugfixes:
 
