@@ -1,4 +1,4 @@
-import { publicProcedure, router } from "~/server/trpc";
+import { createCallerFactory, publicProcedure, router } from "~/server/trpc";
 import { createContext } from "../context";
 import { accountsRouter } from "./accounts";
 import { authRouter } from "./auth";
@@ -32,6 +32,7 @@ export type AppRouter = typeof appRouter;
 export const createCaller = async (
   ...args: Parameters<typeof createContext>
 ) => {
+  const fn = createCallerFactory(appRouter);
   const ctx = await createContext(...args);
-  return appRouter.createCaller(ctx);
+  return fn(ctx);
 };
