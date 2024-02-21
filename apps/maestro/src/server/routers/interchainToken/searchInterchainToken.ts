@@ -143,7 +143,7 @@ async function getInterchainToken(
         const remoteTokenDetails = {
           tokenId: tokenDetails.tokenId,
           tokenAddress: remoteToken.tokenAddress,
-          tokeManagerAddress: remoteToken.tokenManagerAddress,
+          tokenManagerAddress: remoteToken.tokenManagerAddress,
           tokenManagerType: remoteToken.tokenManagerType,
           isOriginToken: false,
           isRegistered: remoteToken.deploymentStatus === "confirmed",
@@ -205,7 +205,7 @@ async function getInterchainToken(
           ? {
               ...match,
               tokenAddress: registeredToken.tokenAddress ?? "0x",
-              tokenManagerAddress: registeredToken.tokeManagerAddress ?? "0x",
+              tokenManagerAddress: registeredToken.tokenManagerAddress ?? "0x",
               tokenManagerType: registeredToken.tokenManagerType,
               deploymentStatus: "confirmed",
             }

@@ -10,6 +10,7 @@ export type TokenInfo = {
   isRegistered: boolean;
   isOriginToken: boolean;
   tokenAddress: `0x${string}`;
+  tokenManagerAddress: `0x${string}`;
   tokenId: `0x${string}`;
   decimals: number;
   kind: Kind;
