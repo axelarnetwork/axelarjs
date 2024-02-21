@@ -5,6 +5,7 @@ import {
   Card,
   cn,
   CopyToClipboardButton,
+  InfoIcon,
   SettingsIcon,
   SpinnerIcon,
   Tooltip,
@@ -263,7 +264,34 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             )}
           </div>
         )}
+        {props.tokenManagerAddress && (
+          <Card.Actions className="justify-between">
+            <Tooltip
+              tip="Contract responsible for managing tokens"
+              variant="info"
+              position="top"
+              className="flex w-full items-center space-x-2"
+            >
+              <span>Token Manager Address</span>
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+
+            <CopyToClipboardButton
+              copyText={props.tokenManagerAddress}
+              variant="ghost"
+              length="block"
+              size="sm"
+              className="bg-base-300 dark:bg-base-100"
+            >
+              {maskAddress(props.tokenManagerAddress, {
+                segmentA: 10,
+                segmentB: -10,
+              })}
+            </CopyToClipboardButton>
+          </Card.Actions>
+        )}
         <Card.Actions className="justify-between">
+          Token Address
           <CopyToClipboardButton
             copyText={props.tokenAddress}
             variant="ghost"
