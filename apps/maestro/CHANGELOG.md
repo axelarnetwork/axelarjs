@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.1
+
+### Patch Changes
+
+- [#213](https://github.com/axelarnetwork/axelarjs/pull/213) [`00968627b77307b3ad5787eab23c10ee5ea8d00d`](https://github.com/axelarnetwork/axelarjs/commit/00968627b77307b3ad5787eab23c10ee5ea8d00d) Thanks [@alanrsoares](https://github.com/alanrsoares)! - patch trpc-openapi@1.2.0 to fix integration with trpc@11.x
+
 ## 0.3.0
 
 ### Minor Changes
