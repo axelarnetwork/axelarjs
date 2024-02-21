@@ -32,7 +32,7 @@ export type AppRouter = typeof appRouter;
 export const createCaller = async (
   ...args: Parameters<typeof createContext>
 ) => {
-  const fn = createCallerFactory(appRouter);
+  const createCallerInner = createCallerFactory(appRouter);
   const ctx = await createContext(...args);
-  return fn(ctx);
+  return createCallerInner(ctx);
 };
