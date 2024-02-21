@@ -47,6 +47,7 @@ export const VALID_CONTRACT_METHODS = [
   "callContractWithToken",
   "InterchainTransfer",
   "InterchainTokenDeploymentStarted",
+  "TokenManagerDeploymentStarted",
 ] as const;
 
 export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
@@ -212,6 +213,14 @@ type InterchainTokenDeploymentStartedEvent = {
   distributor: `0x${string}`;
 };
 
+type TokenManagerDeploymentStartedEvent = {
+  event: "TokenManagerDeploymentStarted";
+  tokenId: `0x${string}`;
+  tokenManagerType: number;
+  destinationChain: string;
+  params: `0x${string}`;
+};
+
 export type SearchGMPResponseData = {
   call: SearchGMPCall;
   fees: SearchGMPFees;
@@ -222,6 +231,7 @@ export type SearchGMPResponseData = {
   is_invalid_call: boolean;
   interchain_transfer?: InterchainTransferEvent;
   interchain_token_deployment_started?: InterchainTokenDeploymentStartedEvent;
+  token_manager_deployment_started?: TokenManagerDeploymentStartedEvent;
 };
 
 export type SearchGMPResponse = BaseGMPResponse<{
