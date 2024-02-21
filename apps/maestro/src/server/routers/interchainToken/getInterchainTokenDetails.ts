@@ -22,6 +22,11 @@ const remoteTokenSchema = z.object({
   updatedAt: z.date().nullable(),
 });
 
+export const inputSchema = z.object({
+  chainId: z.number(),
+  tokenAddress: hex40Literal(),
+});
+
 const outputSchema = z.object({
   tokenId: z.string(),
   tokenAddress: hex40Literal(),
@@ -53,12 +58,7 @@ export const getInterchainTokenDetails = publicProcedure
     },
   })
   .output(outputSchema)
-  .input(
-    z.object({
-      chainId: z.number(),
-      tokenAddress: hex40Literal(),
-    })
-  )
+  .input(inputSchema)
   .query(async ({ input, ctx }) => {
     const chains = await ctx.configs.evmChains();
     const configs = chains[input.chainId];

@@ -25,7 +25,7 @@ const tokenDetailsSchema = z.object({
   kind: z.enum(["interchain", "canonical", "custom"]),
 });
 
-const inputSchema = z.object({
+export const inputSchema = z.object({
   chainId: z.number().optional(),
   tokenAddress: hex40Literal(),
   strict: z.boolean().optional(),

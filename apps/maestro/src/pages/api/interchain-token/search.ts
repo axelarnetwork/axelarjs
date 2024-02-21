@@ -1,24 +1,39 @@
+import { Maybe } from "@axelarjs/utils";
 import type { NextApiHandler } from "next";
 
-import { hex40Literal } from "~/lib/utils/validation";
+import { TRPCError } from "@trpc/server";
+
 import { createCaller } from "~/server/routers/_app";
+import { inputSchema } from "~/server/routers/interchainToken/searchInterchainToken";
 
 const handler: NextApiHandler = async (req, res) => {
   const trpc = await createCaller({ req, res });
 
   const { chainId, tokenAddress } = req.query;
 
-  const parsedTokenAddress = hex40Literal().safeParse(tokenAddress);
+  const parsedInput = inputSchema.safeParse({
+    chainId: Maybe.of(chainId).mapOrUndefined(Number),
+    tokenAddress,
+  });
 
-  if (isNaN(Number(chainId)) || parsedTokenAddress.success === false) {
-    res.status(400).json({ error: "Invalid chainId or tokenAddress" });
+  if (parsedInput.success === false) {
+    res
+      .status(400)
+      .json({ error: "Invalid input", details: parsedInput.error });
     return;
   }
 
-  return await trpc.interchainToken.searchInterchainToken({
-    chainId: Number(chainId),
-    tokenAddress: parsedTokenAddress.data,
-  });
+  try {
+    const result = await trpc.interchainToken.searchInterchainToken(
+      parsedInput.data
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof TRPCError) {
+      res.status(500).json({ error: error.message, cause: error.cause });
+    }
+  }
 };
 
 export default handler;
