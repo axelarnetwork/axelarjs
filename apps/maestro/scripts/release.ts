@@ -80,7 +80,7 @@ async function main() {
   console.log(`✅  Release tag ${TAG} created`);
 
   // create a release on GitHub
-  await $`gh release create ${TAG} -F -`;
+  await $`gh release create ${TAG} --notes-from-tag `;
 
   console.log(`✅  Release ${TAG} created on GitHub`);
 }
