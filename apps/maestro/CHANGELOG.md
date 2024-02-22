@@ -28,6 +28,7 @@
   - Interhcain token page: new pending section for remote interchain tokens being deployed
   - [#210](https://github.com/axelarnetwork/axelarjs/pull/210) Token manager address for each registered token now appears in the card on the token details page
   - [#209](https://github.com/axelarnetwork/axelarjs/pull/209) Indexing custom token deployments now appears in leaderboard
+  - [#203](https://github.com/axelarnetwork/axelarjs/issues/203) Enable feature for users to add their own logos
 
 ## 0.2.4
 
