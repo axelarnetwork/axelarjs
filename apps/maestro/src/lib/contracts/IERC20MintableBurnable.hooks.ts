@@ -2,166 +2,85 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
-  useContractWrite,
-  UseContractWriteConfig,
-  usePrepareContractWrite,
-  UsePrepareContractWriteConfig,
-} from "wagmi";
-import { PrepareWriteContractResult, WriteContractMode } from "wagmi/actions";
-
-import ABI from "./IERC20MintableBurnable.abi";
+  createUseWriteContract,
+  createUseSimulateContract,
+} from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC20MintableBurnable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const ierc20MintableBurnableABI = ABI.abi;
+export const ierc20MintableBurnableAbi = [
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "from", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "burn",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "mint",
+    outputs: [],
+  },
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link ierc20MintableBurnableABI}__.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MintableBurnableAbi}__
  */
-export function useIerc20MintableBurnableWrite<
-  TFunctionName extends string,
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof ierc20MintableBurnableABI,
-          string
-        >["request"]["abi"],
-        TFunctionName,
-        TMode
-      >
-    : UseContractWriteConfig<
-        typeof ierc20MintableBurnableABI,
-        TFunctionName,
-        TMode
-      > & {
-        abi?: never;
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof ierc20MintableBurnableABI,
-    TFunctionName,
-    TMode
-  >({ abi: ierc20MintableBurnableABI, ...config } as any);
-}
+export const useWriteIerc20MintableBurnable =
+  /*#__PURE__*/ createUseWriteContract({ abi: ierc20MintableBurnableAbi });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link ierc20MintableBurnableABI}__ and `functionName` set to `"burn"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MintableBurnableAbi}__ and `functionName` set to `"burn"`
  */
-export function useIerc20MintableBurnableBurn<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof ierc20MintableBurnableABI,
-          "burn"
-        >["request"]["abi"],
-        "burn",
-        TMode
-      > & { functionName?: "burn" }
-    : UseContractWriteConfig<
-        typeof ierc20MintableBurnableABI,
-        "burn",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "burn";
-      } = {} as any
-) {
-  return useContractWrite<typeof ierc20MintableBurnableABI, "burn", TMode>({
-    abi: ierc20MintableBurnableABI,
+export const useWriteIerc20MintableBurnableBurn =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20MintableBurnableAbi,
     functionName: "burn",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link ierc20MintableBurnableABI}__ and `functionName` set to `"mint"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MintableBurnableAbi}__ and `functionName` set to `"mint"`
  */
-export function useIerc20MintableBurnableMint<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof ierc20MintableBurnableABI,
-          "mint"
-        >["request"]["abi"],
-        "mint",
-        TMode
-      > & { functionName?: "mint" }
-    : UseContractWriteConfig<
-        typeof ierc20MintableBurnableABI,
-        "mint",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "mint";
-      } = {} as any
-) {
-  return useContractWrite<typeof ierc20MintableBurnableABI, "mint", TMode>({
-    abi: ierc20MintableBurnableABI,
+export const useWriteIerc20MintableBurnableMint =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20MintableBurnableAbi,
     functionName: "mint",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link ierc20MintableBurnableABI}__.
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MintableBurnableAbi}__
  */
-export function usePrepareIerc20MintableBurnableWrite<
-  TFunctionName extends string
->(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof ierc20MintableBurnableABI,
-      TFunctionName
-    >,
-    "abi"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: ierc20MintableBurnableABI,
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof ierc20MintableBurnableABI, TFunctionName>);
-}
+export const useSimulateIerc20MintableBurnable =
+  /*#__PURE__*/ createUseSimulateContract({ abi: ierc20MintableBurnableAbi });
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link ierc20MintableBurnableABI}__ and `functionName` set to `"burn"`.
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MintableBurnableAbi}__ and `functionName` set to `"burn"`
  */
-export function usePrepareIerc20MintableBurnableBurn(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof ierc20MintableBurnableABI, "burn">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: ierc20MintableBurnableABI,
+export const useSimulateIerc20MintableBurnableBurn =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20MintableBurnableAbi,
     functionName: "burn",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof ierc20MintableBurnableABI, "burn">);
-}
+  });
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link ierc20MintableBurnableABI}__ and `functionName` set to `"mint"`.
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MintableBurnableAbi}__ and `functionName` set to `"mint"`
  */
-export function usePrepareIerc20MintableBurnableMint(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof ierc20MintableBurnableABI, "mint">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: ierc20MintableBurnableABI,
+export const useSimulateIerc20MintableBurnableMint =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20MintableBurnableAbi,
     functionName: "mint",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof ierc20MintableBurnableABI, "mint">);
-}
+  });

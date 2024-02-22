@@ -2,7 +2,7 @@ import type { GetFeesParams } from "..";
 
 export type EstimateGasFeeParams = GetFeesParams & {
   gasLimit: bigint;
-  gasMultiplier?: number;
+  gasMultiplier: number | "auto";
   minGasPrice?: string;
   showDetailedFees?: boolean;
 };

@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { always } from "rambda";
 import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
@@ -61,12 +62,16 @@ export const recordRemoteTokensDeployment = protectedProcedure
         );
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
-          itsClient.reads.tokenManagerAddress({
-            tokenId: originToken.tokenId as `0x${string}`,
-          }),
-          itsClient.reads.interchainTokenAddress({
-            tokenId: originToken.tokenId as `0x${string}`,
-          }),
+          itsClient.reads
+            .tokenManagerAddress({
+              tokenId: originToken.tokenId as `0x${string}`,
+            })
+            .catch(always("0x")),
+          itsClient.reads
+            .interchainTokenAddress({
+              tokenId: originToken.tokenId as `0x${string}`,
+            })
+            .catch(always("0x")),
         ]);
 
         return {

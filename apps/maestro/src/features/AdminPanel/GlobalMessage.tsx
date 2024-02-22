@@ -15,7 +15,7 @@ export const GlobalMessageManager = () => {
     undefined,
     { suspense: true }
   );
-  const { mutateAsync: saveGlobalMessage, isLoading: isSavingGlobalMessage } =
+  const { mutateAsync: saveGlobalMessage, isPending: isSavingGlobalMessage } =
     trpc.messages.setGlobalMessage.useMutation({
       onSuccess() {
         toast.success("Global message saved");

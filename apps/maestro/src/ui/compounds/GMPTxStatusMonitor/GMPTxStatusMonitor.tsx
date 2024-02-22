@@ -55,7 +55,9 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
   const { data: currentBlockNumber } = useBlockNumber({
     chainId,
     watch: true,
-    enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+    query: {
+      enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+    },
   });
 
   const elapsedBlocks = useMemo(
@@ -309,19 +311,30 @@ export type StatusIndicatorProps = {
   status: ExtendedGMPTxStatus;
 };
 
-export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({ status }) => {
+export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
+  status,
+  txHash,
+}) => {
   return (
-    <div className="flex items-center text-sm">
-      <Badge
-        className={cn("-translate-x-1.5 text-xs", {
-          "animate-pulse": !["error", "executed"].includes(status),
-        })}
-        variant={STATUS_COLORS[status]}
-        size="xs"
-        aria-label={`status: ${STATUS_LABELS[status]}`}
-      />
+    <Tooltip tip="View on Axelarscan" position="left">
+      <Link
+        href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div className="flex items-center text-sm">
+          <Badge
+            className={cn("-translate-x-1.5 text-xs", {
+              "animate-pulse": !["error", "executed"].includes(status),
+            })}
+            variant={STATUS_COLORS[status]}
+            size="xs"
+            aria-label={`status: ${STATUS_LABELS[status]}`}
+          />
 
-      {STATUS_LABELS[status]}
-    </div>
+          {STATUS_LABELS[status]}
+        </div>
+      </Link>
+    </Tooltip>
   );
 };

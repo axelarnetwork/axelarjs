@@ -10,7 +10,7 @@ import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useCallback, useEffect, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -23,7 +23,7 @@ import { useInterchainTokenDeploymentStateContainer } from "../../InterchainToke
 const Review: FC = () => {
   const router = useRouter();
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
   const routeChain = useChainFromRoute();
 
   const { computed } = useEVMChainConfigsQuery();

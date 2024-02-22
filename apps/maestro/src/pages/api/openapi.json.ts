@@ -1,10 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiHandler } from "next";
 
 import { openApiDocument } from "~/server/openapi";
 
-// Respond with our OpenAPI schema
-const handler = (_req: NextApiRequest, res: NextApiResponse) => {
+const handler: NextApiHandler = (_req, res) =>
   res.status(200).send(openApiDocument);
-};
 
 export default handler;

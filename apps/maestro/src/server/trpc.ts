@@ -11,6 +11,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { OpenApiMeta } from "trpc-openapi";
+import { ZodError } from "zod";
 
 import type { Context } from "~/server/context";
 
@@ -25,8 +26,17 @@ const t = initTRPC
     /**
      * @see https://trpc.io/docs/v10/error-formatting
      */
-    errorFormatter({ shape }) {
-      return shape;
+    errorFormatter({ shape, error }) {
+      return {
+        ...shape,
+        data: {
+          ...shape.data,
+          zodError:
+            error.code === "BAD_REQUEST" && error.cause instanceof ZodError
+              ? error.cause.flatten()
+              : null,
+        },
+      };
     },
   });
 
@@ -65,3 +75,5 @@ export const middleware = t.middleware;
  * @see https://trpc.io/docs/v10/merging-routers
  */
 export const mergeRouters = t.mergeRouters;
+
+export const createCallerFactory = t.createCallerFactory;

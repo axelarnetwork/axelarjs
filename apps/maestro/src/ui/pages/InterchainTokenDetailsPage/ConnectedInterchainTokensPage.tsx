@@ -5,7 +5,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useAccount, useBalance, useChainId, useSwitchNetwork } from "wagmi";
+import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
 
 import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
@@ -151,7 +151,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     });
 
   const { computed } = useEVMChainConfigsQuery();
-  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchChainAsync } = useSwitchChain();
 
   const statusesByChain = useMemo(() => {
     return (
@@ -223,17 +223,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     setSessionState,
   ]);
 
-  const { data: userGasBalance } = useBalance({
-    address,
-    watch: true,
-  });
+  const { data: userGasBalance } = useBalance({ address });
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
       destinationChainIds,
       gasLimit: 1_000_000,
-      gasMultipler: 1.5,
+      gasMultiplier: "auto",
     });
 
   const originToken = useMemo(
@@ -275,13 +272,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             x.chain && !remoteChainsExecuted.includes(x.chain.id)
         )
         .map((token) => {
-          const gmpInfo = token.chain?.id
-            ? statusesByChain[token.chain.id]
-            : undefined;
-
-          const isSelected = nonRunningSelectedChainIds.includes(
-            token.chainId ?? 0
+          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
+            (id) => statusesByChain[id]
           );
+
+          const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
 
           return {
             ...token,
@@ -299,6 +294,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       statusesByChain,
       nonRunningSelectedChainIds,
     ]
+  );
+
+  const [idleUnregisteredTokens, pendingUnregisteredTokens] = partition(
+    (x) => !x.deploymentStatus,
+    unregisteredTokens
   );
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -380,9 +380,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               variant="accent"
               onClick={() => {
                 if (originToken) {
-                  switchNetworkAsync?.(originToken.chainId).catch(() => {
-                    logger.error("Failed to switch network");
-                  });
+                  switchChainAsync?.({ chainId: originToken.chainId }).catch(
+                    () => {
+                      logger.error("Failed to switch network");
+                    }
+                  );
                 }
               }}
             >
@@ -420,25 +422,34 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         </div>
       )}
       <InterchainTokenList title="Registered Chains" tokens={registered} />
-      <InterchainTokenList
-        title="Unregistered Chains"
-        listClassName="grid-cols-2 sm:grid-cols-3"
-        tokens={unregisteredTokens}
-        onToggleSelection={
-          isReadOnly
-            ? undefined
-            : (chainId) => {
-                setSessionState((draft) => {
-                  draft.selectedChainIds = draft.selectedChainIds.includes(
-                    chainId
-                  )
-                    ? without([chainId], draft.selectedChainIds)
-                    : draft.selectedChainIds.concat(chainId);
-                });
-              }
-        }
-        footer={footerContent}
-      />
+      {pendingUnregisteredTokens.length > 0 && (
+        <InterchainTokenList
+          title="Pending Chains"
+          listClassName="grid-cols-2 sm:grid-cols-3"
+          tokens={pendingUnregisteredTokens}
+        />
+      )}
+      {idleUnregisteredTokens.length > 0 && (
+        <InterchainTokenList
+          title="Unregistered Chains"
+          listClassName="grid-cols-2 sm:grid-cols-3"
+          tokens={idleUnregisteredTokens}
+          onToggleSelection={
+            isReadOnly
+              ? undefined
+              : (chainId) => {
+                  setSessionState((draft) => {
+                    draft.selectedChainIds = draft.selectedChainIds.includes(
+                      chainId
+                    )
+                      ? without([chainId], draft.selectedChainIds)
+                      : draft.selectedChainIds.concat(chainId);
+                  });
+                }
+          }
+          footer={footerContent}
+        />
+      )}
     </div>
   );
 };

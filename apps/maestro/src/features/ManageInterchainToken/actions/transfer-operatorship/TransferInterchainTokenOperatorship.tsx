@@ -7,13 +7,17 @@ import {
   TextInput,
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { useCallback, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { isAddress, TransactionExecutionError } from "viem";
-import { useChainId, useWaitForTransaction } from "wagmi";
+import {
+  isAddress,
+  TransactionExecutionError,
+  type TransactionReceipt,
+} from "viem";
+import { useChainId, useWaitForTransactionReceipt } from "wagmi";
 
-import { useTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
+import { useWriteTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
@@ -47,20 +51,18 @@ export const TransferInterchainTokenOperatorship: FC = () => {
   });
 
   const {
-    writeAsync: transferOperatorshipAsync,
-    isLoading: isTransfering,
-    data: transferResult,
-  } = useTokenManagerTransferOperatorship({
-    address: tokenDetails?.tokenManagerAddress as `0x${string}`,
+    writeContractAsync: transferOperatorshipAsync,
+    isPending: isTransfering,
+    data: transferTxHash,
+  } = useWriteTokenManagerTransferOperatorship({
+    // address: tokenDetails?.tokenManagerAddress as `0x${string}`,
   });
 
   const trpcContext = trpc.useUtils();
 
-  useWaitForTransaction({
-    hash: transferResult?.hash,
-    confirmations: 8,
-    async onSuccess(receipt) {
-      if (!transferResult) {
+  const onReceipt = useCallback(
+    async (receipt: TransactionReceipt) => {
+      if (!transferTxHash) {
         return;
       }
 
@@ -81,7 +83,29 @@ export const TransferInterchainTokenOperatorship: FC = () => {
 
       toast.success("Successfully transferred token operatorship");
     },
+    [
+      setTxState,
+      transferTxHash,
+      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      trpcContext.interchainToken.searchInterchainToken,
+    ]
+  );
+
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: transferTxHash,
   });
+
+  useEffect(
+    () => {
+      if (receipt) {
+        onReceipt(receipt).catch((error) => {
+          logger.error("Failed to process receipt", error);
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(
     async (data, e) => {
@@ -92,15 +116,16 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       });
 
       try {
-        const txResult = await transferOperatorshipAsync({
+        const txHash = await transferOperatorshipAsync({
+          address: tokenDetails?.tokenManagerAddress as `0x${string}`,
           args: [data.recipientAddress],
         });
 
-        if (txResult?.hash) {
+        if (txHash) {
           setTxState({
             status: "submitted",
             chainId,
-            hash: txResult.hash,
+            hash: txHash,
           });
         }
       } catch (error) {
@@ -124,7 +149,12 @@ export const TransferInterchainTokenOperatorship: FC = () => {
         });
       }
     },
-    [chainId, setTxState, transferOperatorshipAsync]
+    [
+      chainId,
+      setTxState,
+      tokenDetails?.tokenManagerAddress,
+      transferOperatorshipAsync,
+    ]
   );
 
   const buttonChildren = useMemo(() => {

@@ -6,7 +6,7 @@ import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
 import Script from "next/script";
 
-import { Hydrate, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
@@ -46,19 +46,17 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 
       <QueryClientProvider client={queryClient}>
         <SessionProvider session={pageProps.session}>
-          <Hydrate state={pageProps.dehydratedState}>
-            <ThemeProvider>
-              <WagmiConfigPropvider>
-                {!isSSR && (
-                  <MainLayout>
-                    <Component {...pageProps} />
-                  </MainLayout>
-                )}
-                <ReactQueryDevtools />
-                <Toaster />
-              </WagmiConfigPropvider>
-            </ThemeProvider>
-          </Hydrate>
+          <ThemeProvider>
+            <WagmiConfigPropvider>
+              {!isSSR && (
+                <MainLayout>
+                  <Component {...pageProps} />
+                </MainLayout>
+              )}
+              <ReactQueryDevtools />
+              <Toaster />
+            </WagmiConfigPropvider>
+          </ThemeProvider>
         </SessionProvider>
       </QueryClientProvider>
     </>

@@ -12,10 +12,9 @@ import {
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession, type AuthOptions } from "next-auth";
 
-import type { inferAsyncReturnType } from "@trpc/server";
 import { kv } from "@vercel/kv";
 import OpenAI from "openai";
-import type { Chain } from "wagmi";
+import type { Chain } from "viem";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS,
@@ -131,4 +130,4 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
  */
 export const createContext = createContextInner;
 
-export type Context = inferAsyncReturnType<typeof createContextInner>;
+export type Context = Awaited<ReturnType<typeof createContextInner>>;

@@ -25,6 +25,14 @@ const tokenDetailsSchema = z.object({
   kind: z.enum(["interchain", "canonical", "custom"]),
 });
 
+export const inputSchema = z.object({
+  chainId: z.number().optional(),
+  tokenAddress: hex40Literal(),
+  strict: z.boolean().optional(),
+});
+
+export type SearchInterchainTokenInput = z.infer<typeof inputSchema>;
+
 const outputSchema = tokenDetailsSchema.extend({
   wasDeployedByAccount: z.boolean(),
   matchingTokens: z.array(tokenDetailsSchema),
@@ -41,13 +49,7 @@ export const searchInterchainToken = publicProcedure
       tags: ["interchain-token"],
     },
   })
-  .input(
-    z.object({
-      chainId: z.number().optional(),
-      tokenAddress: hex40Literal(),
-      strict: z.boolean().optional(),
-    })
-  )
+  .input(inputSchema)
   .output(outputSchema)
   .query(async ({ input, ctx }) => {
     try {
@@ -141,7 +143,7 @@ async function getInterchainToken(
         const remoteTokenDetails = {
           tokenId: tokenDetails.tokenId,
           tokenAddress: remoteToken.tokenAddress,
-          tokeManagerAddress: remoteToken.tokenManagerAddress,
+          tokenManagerAddress: remoteToken.tokenManagerAddress,
           tokenManagerType: remoteToken.tokenManagerType,
           isOriginToken: false,
           isRegistered: remoteToken.deploymentStatus === "confirmed",
@@ -203,7 +205,7 @@ async function getInterchainToken(
           ? {
               ...match,
               tokenAddress: registeredToken.tokenAddress ?? "0x",
-              tokenManagerAddress: registeredToken.tokeManagerAddress ?? "0x",
+              tokenManagerAddress: registeredToken.tokenManagerAddress ?? "0x",
               tokenManagerType: registeredToken.tokenManagerType,
               deploymentStatus: "confirmed",
             }

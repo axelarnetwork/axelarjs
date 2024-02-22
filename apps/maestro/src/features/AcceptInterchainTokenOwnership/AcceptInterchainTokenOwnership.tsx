@@ -1,12 +1,12 @@
 import type { EVMChainConfig } from "@axelarjs/api";
 import { Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { useCallback, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { TransactionExecutionError } from "viem";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
-import { useInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useWriteInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 
@@ -24,42 +24,59 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
   const [txState, setTxState] = useTransactionState();
 
   const {
-    writeAsync: acceptOwnershipAsync,
-    isLoading: isAccepting,
-    data: acceptResult,
-  } = useInterchainTokenServiceAcceptOwnership({
-    address: props.tokenAddress,
-  });
+    writeContractAsync: acceptOwnershipAsync,
+    isPending: isAccepting,
+    data: acceptTxHash,
+  } = useWriteInterchainTokenServiceAcceptOwnership();
 
   const trpcContext = trpc.useUtils();
 
-  useWaitForTransaction({
-    hash: acceptResult?.hash,
-    async onSuccess(receipt) {
-      if (!acceptResult) {
-        return;
-      }
-
-      await Promise.all([
-        trpcContext.interchainToken.searchInterchainToken.invalidate(),
-        trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
-      ]);
-
-      await Promise.all([
-        trpcContext.interchainToken.searchInterchainToken.refetch(),
-        trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
-      ]);
-
-      setTxState({
-        status: "confirmed",
-        receipt,
-      });
-
-      toast.success("Successfully accepted token ownership");
-    },
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: acceptTxHash,
   });
+
+  const onReceipt = useCallback(async () => {
+    if (!acceptTxHash || !receipt) {
+      return;
+    }
+
+    await Promise.all([
+      trpcContext.interchainToken.searchInterchainToken.invalidate(),
+      trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
+      trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
+    ]);
+
+    await Promise.all([
+      trpcContext.interchainToken.searchInterchainToken.refetch(),
+      trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
+      trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
+    ]);
+
+    setTxState({
+      status: "confirmed",
+      receipt,
+    });
+
+    toast.success("Successfully accepted token ownership");
+  }, [
+    acceptTxHash,
+    receipt,
+    setTxState,
+    trpcContext.erc20.getERC20TokenBalanceForOwner,
+    trpcContext.interchainToken.getInterchainTokenDetails,
+    trpcContext.interchainToken.searchInterchainToken,
+  ]);
+
+  useEffect(
+    () => {
+      if (!receipt) return;
+      onReceipt().catch((error) => {
+        console.error("Error while updating token ownership", error);
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [receipt]
+  );
 
   const handleSubmit = useCallback(async () => {
     setTxState({
@@ -67,15 +84,13 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     });
 
     try {
-      const txResult = await acceptOwnershipAsync();
+      const txHash = await acceptOwnershipAsync({});
 
-      if (txResult?.hash) {
-        setTxState({
-          status: "submitted",
-          hash: txResult.hash,
-          chainId: props.sourceChain.chain_id,
-        });
-      }
+      setTxState({
+        status: "submitted",
+        hash: txHash,
+        chainId: props.sourceChain.chain_id,
+      });
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction failed: ${error.cause.shortMessage}`);

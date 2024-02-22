@@ -272,7 +272,8 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "scroll",
     environment: ENVIRONMENTS.testnet,
   },
-];
+] as const;
 
-export const WAGMI_CHAIN_CONFIGS: ExtendedWagmiChainConfig[] =
-  ALL_CHAINS.filter((chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV);
+export const WAGMI_CHAIN_CONFIGS = ALL_CHAINS.filter(
+  (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
+) as [ExtendedWagmiChainConfig, ...ExtendedWagmiChainConfig[]];

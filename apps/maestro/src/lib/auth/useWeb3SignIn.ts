@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useDisconnect, useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
+import { wagmiConfig } from "~/config/wagmi";
 import { trpc } from "../trpc";
 
 export type UseWeb3SignInOptions = {
@@ -55,41 +56,43 @@ export function useWeb3SignIn({
     mutate: signInWithWeb3,
     error,
     ...mutation
-  } = useMutation(async (address?: `0x${string}` | null) => {
-    try {
-      invariant(address, "Address is required");
+  } = useMutation({
+    mutationFn: async (address?: `0x${string}` | null) => {
+      try {
+        invariant(address, "Address is required");
 
-      signInAddressRef.current = address;
-      isSigningInRef.current = true;
+        signInAddressRef.current = address;
+        isSigningInRef.current = true;
 
-      const { message } = await createSignInMessage({ address });
+        const { message } = await createSignInMessage({ address });
 
-      onSignInStart?.(address);
-      const signature = await signMessageAsync({ message });
-      const response = await signIn("credentials", { address, signature });
+        onSignInStart?.(address);
+        const signature = await signMessageAsync({ message });
+        const response = await signIn("credentials", { address, signature });
 
-      if (response?.error) {
-        throw new Error(response.error);
-      }
+        if (response?.error) {
+          throw new Error(response.error);
+        }
 
-      onSignInSuccess?.(response);
+        onSignInSuccess?.(response);
 
-      isSigningInRef.current = false;
-    } catch (error) {
-      if (error instanceof Error) {
-        await disconnectAsync();
-        await signOut();
-
-        signInAddressRef.current = null;
         isSigningInRef.current = false;
+      } catch (error) {
+        if (error instanceof Error) {
+          await disconnectAsync();
+          await signOut();
 
-        throw error;
+          signInAddressRef.current = null;
+          isSigningInRef.current = false;
+
+          throw error;
+        }
       }
-    }
+    },
   });
 
-  const unwatch = watchAccount(
-    debounce(async ({ address }) => {
+  const unwatch = watchAccount(wagmiConfig, {
+    onChange: debounce(async ({ address }) => {
       if (
         enabled === false ||
         isSigningInRef.current ||
@@ -109,15 +112,15 @@ export function useWeb3SignIn({
 
       unwatch();
       await signInWithWeb3Async(address);
-    }, 150)
-  );
+    }, 150),
+  });
 
   return {
     retryAsync: signInWithWeb3Async.bind(null, signInAddressRef.current),
     retry: signInWithWeb3.bind(null, signInAddressRef.current),
     signIn: signInWithWeb3,
     signInAsync: signInWithWeb3Async,
-    error: error as Error | null,
+    error: error,
     ...mutation,
   };
 }
