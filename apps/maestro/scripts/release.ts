@@ -1,6 +1,9 @@
+import { confirm } from "@inquirer/prompts";
 import { $ } from "zx";
 
 import { name, version } from "../package.json";
+
+$.verbose = false;
 
 const TAG = `${name}@${version}`;
 
@@ -12,6 +15,26 @@ async function main() {
 
   if (tagExists.stdout) {
     console.log(`❌  Tag ${TAG} already exists`);
+    return;
+  }
+
+  // check if gh is installed
+  try {
+    await $`gh --version`;
+  } catch (e) {
+    console.error(
+      `❌  gh is not installed. Please install it from https://cli.github.com/`
+    );
+    return;
+  }
+
+  // check if the user is logged in
+  try {
+    await $`gh auth status`;
+  } catch (e) {
+    console.error(
+      `❌  You are not logged in to GitHub. Please run 'gh auth login'`
+    );
     return;
   }
 
@@ -34,6 +57,19 @@ async function main() {
     .join("\n");
 
   const changelog = `Release ${TAG}\n\n${changelogContent}`;
+
+  // confirm the changelog
+
+  console.log(changelog);
+
+  const answer = await confirm({ message: "Is the changelog correct?" });
+
+  if (!answer) {
+    console.log("❌  Aborted");
+    return;
+  }
+
+  console.log("Creating release tag...");
 
   // create tag
   await $`git tag -a ${TAG} -m ${changelog}`;

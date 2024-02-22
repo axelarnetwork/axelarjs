@@ -188,6 +188,9 @@ importers:
       '@babel/core':
         specifier: ^7.23.9
         version: 7.23.9
+      '@inquirer/prompts':
+        specifier: ^3.3.2
+        version: 3.3.2
       '@next/bundle-analyzer':
         specifier: ^14.1.0
         version: 14.1.0
