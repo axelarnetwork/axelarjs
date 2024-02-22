@@ -22,11 +22,7 @@ export function useEVMChainConfigsQuery() {
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () =>
-      partition(
-        (x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID,
-        data?.sort((a, b) => (a.name > b.name ? 1 : -1)) ?? []
-      ),
+    () => partition((x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID, data ?? []),
     [data]
   );
 
