@@ -45,7 +45,7 @@ export const AccountStatusesManager = () => {
       suspense: true,
     });
 
-  const { mutateAsync: setAccountStatus, isLoading: isSettingAccountStatus } =
+  const { mutateAsync: setAccountStatus, isPending: isSettingAccountStatus } =
     trpc.accounts.setAccountStatus.useMutation({
       onSuccess() {
         toast.success("Account status saved");

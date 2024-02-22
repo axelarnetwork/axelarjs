@@ -220,7 +220,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         actions.setIsModalOpen(isOpen);
       }}
     >
-      <Modal.Body className="flex h-96 flex-col">
+      <Modal.Body className="flex min-h-96 flex-col">
         <Modal.Title>Interchain Transfer</Modal.Title>
 
         <div className="grid grid-cols-2 gap-4 p-1">

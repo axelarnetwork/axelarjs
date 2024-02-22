@@ -1,4 +1,6 @@
-const elementsArray: (keyof JSX.IntrinsicElements)[] = [
+export type ElementKey = keyof JSX.IntrinsicElements;
+
+const elementsArray: ElementKey[] = [
   "a",
   "abbr",
   "address",

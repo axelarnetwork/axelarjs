@@ -6,21 +6,17 @@ import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import { useCallback, useEffect, useRef } from "react";
 
+import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
-import {
-  useAccount,
-  useChainId,
-  useMutation,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
-  useInterchainTokenAllowance,
-  useInterchainTokenApprove,
-  useInterchainTokenDecimals,
+  useReadInterchainTokenAllowance,
+  useReadInterchainTokenDecimals,
+  useWriteInterchainTokenApprove,
 } from "~/lib/contracts/InterchainToken.hooks";
-import { useInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 
@@ -43,40 +39,34 @@ export function useInterchainTokenServiceTransferMutation(
   const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
 
-  const { data: decimals } = useInterchainTokenDecimals({
+  const { data: decimals } = useReadInterchainTokenDecimals({
     address: config.tokenAddress,
   });
 
   const { address } = useAccount();
 
-  const { data: tokenAllowance } = useInterchainTokenAllowance({
+  const { data: tokenAllowance } = useReadInterchainTokenAllowance({
     address: config.tokenAddress,
     args: INTERCHAIN_TOKEN_ENCODERS.allowance.args({
       owner: address ?? "0x",
       spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
     }),
-    watch: true,
   });
 
   const {
-    writeAsync: approveInterchainTokenAsync,
-    data: approveERC20Data,
+    writeContractAsync: approveInterchainTokenAsync,
+    data: approveERC20TxHash,
     reset: resetApproveMutation,
-  } = useInterchainTokenApprove({
-    address: config.tokenAddress,
-  });
+  } = useWriteInterchainTokenApprove();
 
   const {
-    writeAsync: interchainTransferAsync,
+    writeContractAsync: interchainTransferAsync,
     data: sendTokenData,
     reset: resetInterchainTransferMutation,
-  } = useInterchainTokenServiceInterchainTransfer({
-    address: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-    value: config.gas ?? 0n,
-  });
+  } = useWriteInterchainTokenServiceInterchainTransfer();
 
-  const { data: approveERC20Recepit } = useWaitForTransaction({
-    hash: approveERC20Data?.hash,
+  const { data: approveERC20Recepit } = useWaitForTransactionReceipt({
+    hash: approveERC20TxHash,
   });
 
   const approvedAmountRef = useRef(0n);
@@ -89,7 +79,7 @@ export function useInterchainTokenServiceTransferMutation(
 
       invariant(address, "need address");
 
-      const txResult = await interchainTransferAsync({
+      const txHash = await interchainTransferAsync({
         args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
           tokenId: config.tokenId,
           destinationChain: config.destinationChainName,
@@ -100,10 +90,10 @@ export function useInterchainTokenServiceTransferMutation(
         }),
       });
 
-      if (txResult?.hash) {
+      if (txHash) {
         setTxState({
           status: "submitted",
-          hash: txResult.hash,
+          hash: txHash,
           chainId,
         });
       }
@@ -134,7 +124,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   useEffect(
     () => {
-      if (approveERC20Recepit && !sendTokenData?.hash) {
+      if (approveERC20Recepit && !sendTokenData) {
         handleInterchainTransfer().catch((error) => {
           logger.error("Failed to send token:", error);
         });
@@ -143,15 +133,15 @@ export function useInterchainTokenServiceTransferMutation(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       address,
-      sendTokenData?.hash,
+      sendTokenData,
       approveERC20Recepit,
       config.destinationChainName,
       interchainTransferAsync,
     ]
   );
 
-  const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>(
-    async ({ amount }) => {
+  const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
+    mutationFn: async ({ amount }) => {
       if (!(decimals && address && config.gas)) {
         return;
       }
@@ -167,6 +157,7 @@ export function useInterchainTokenServiceTransferMutation(
         // only request spend approval if the allowance is not enough
         if (!tokenAllowance || tokenAllowance < approvedAmountRef.current) {
           await approveInterchainTokenAsync({
+            address: config.tokenAddress,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
               spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
               amount: approvedAmountRef.current,
@@ -186,8 +177,8 @@ export function useInterchainTokenServiceTransferMutation(
           setTxState({ status: "idle" });
         }
       }
-    }
-  );
+    },
+  });
 
   return {
     ...mutation,

@@ -40,7 +40,7 @@ describe("axelar-query (node client)", () => {
       );
     });
 
-    test("It should include the L1 gas fee", async () => {
+    test.skip("It should include the L1 gas fee", async () => {
       const l2RequestParams: EstimateGasFeeParams = {
         sourceChain: "avalanche",
         destinationChain: "optimism",

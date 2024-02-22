@@ -1,12 +1,12 @@
 import { toast } from "@axelarjs/ui/toaster";
 
 import { TransactionExecutionError } from "viem";
-import type { WriteContractResult } from "wagmi/actions";
+import type { WriteContractData } from "wagmi/query";
 
 import { logger } from "~/lib/logger";
 
 type TransactionResultHooks = {
-  onSuccess?: (tx: WriteContractResult) => void;
+  onSuccess?: (tx: WriteContractData) => void;
   onTransactionError?: (error: TransactionExecutionError) => void;
   onUnknownError?: (error: Error) => void;
 };
@@ -20,7 +20,7 @@ const DEFAULT_HOOKS: TransactionResultHooks = {
 /**
  * Handles the outcome of a wagmi contract write transaction by invoking specified callback hooks.
  *
- * @param {Promise<WriteContractResult>} tx - A Promise resolving to the transaction result.
+ * @param {Promise<WriteContractData | undefined>} txPromise - A Promise resolving to the transaction result.
  * @param {TransactionResultHooks} [hooks] - Optional hooks for handling transaction outcomes.
  * @param {Function} [hooks.onSuccess] - Called upon successful transaction. Receives the transaction result.
  * @param {Function} [hooks.onTransactionError] - Called when a `TransactionExecutionError` occurs. Receives the error object.
@@ -36,7 +36,7 @@ const DEFAULT_HOOKS: TransactionResultHooks = {
  * ```
  */
 export async function handleTransactionResult(
-  tx: Promise<WriteContractResult>,
+  txPromise: Promise<WriteContractData | undefined>,
   hooks: TransactionResultHooks
 ): Promise<void> {
   const handleSuccess = hooks.onSuccess ?? DEFAULT_HOOKS.onSuccess;
@@ -46,9 +46,11 @@ export async function handleTransactionResult(
     hooks.onUnknownError ?? DEFAULT_HOOKS.onUnknownError;
 
   try {
-    const result = await tx;
+    const result = await txPromise;
 
-    handleSuccess?.(result);
+    if (result) {
+      handleSuccess?.(result);
+    }
   } catch (error) {
     if (error instanceof TransactionExecutionError) {
       handleTransactionError?.(error);

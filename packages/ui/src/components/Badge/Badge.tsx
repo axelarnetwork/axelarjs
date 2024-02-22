@@ -1,13 +1,8 @@
-import type { ComponentProps, FC } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import type { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-const StyledBadge = tw.span`pb-0.5`;
-
-const badgeVariance = cva("badge", {
+export const Badge = tw.span.cva("badge", {
   variants: {
     variant: {
       primary: "badge-primary",
@@ -31,23 +26,4 @@ const badgeVariance = cva("badge", {
   },
 });
 
-type BaseBadgeProps = Omit<ComponentProps<typeof StyledBadge>, "color">;
-
-export interface BadgeProps
-  extends BaseBadgeProps,
-    VariantProps<typeof badgeVariance> {}
-
-export const Badge: FC<BadgeProps> = ({
-  outline,
-  size,
-  className,
-  variant,
-  ...props
-}) => {
-  return (
-    <StyledBadge
-      className={twMerge(badgeVariance({ outline, size, variant }), className)}
-      {...props}
-    />
-  );
-};
+export type BadgeProps = ComponentProps<typeof Badge>;

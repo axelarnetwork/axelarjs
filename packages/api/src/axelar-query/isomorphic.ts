@@ -71,7 +71,7 @@ export class AxelarQueryAPIClient extends RestService {
     amountInUnits,
     executeData,
     minGasPrice = "0",
-    gasMultiplier = 1.0,
+    gasMultiplier = "auto",
     showDetailedFees = false,
   }: EstimateGasFeeParams): Promise<EstimateGasFeeResponse | string> {
     if (gasLimit < 21000) {
@@ -94,6 +94,7 @@ export class AxelarQueryAPIClient extends RestService {
       express_fee_string,
       source_token,
       destination_native_token,
+      execute_gas_multiplier,
       ethereum_token,
       express_supported,
     } = response;
@@ -122,9 +123,16 @@ export class AxelarQueryAPIClient extends RestService {
         ? srcGasFeeWei
         : (srcGasFeeWei * minDestGasFeeWei) / destGasFeeWei;
 
+    const actualGasMultiplier =
+      gasMultiplier === "auto"
+        ? parseFloat(execute_gas_multiplier.toFixed(2))
+        : gasMultiplier;
+
     const excludedL1ExecutionFeeWithMultiplier =
-      gasMultiplier > 1
-        ? Math.floor(Number(excludedL1ExecutionFee) * Number(gasMultiplier))
+      actualGasMultiplier > 1
+        ? Math.floor(
+            Number(excludedL1ExecutionFee) * Number(actualGasMultiplier)
+          )
         : excludedL1ExecutionFee;
 
     const baseFee = parseUnits(base_fee.toString(), source_token.decimals);
@@ -164,7 +172,7 @@ export class AxelarQueryAPIClient extends RestService {
 
       // Calculate the L1 execution fee with the gas multiplier
       l1ExecutionFeeWithMultiplier = Math.floor(
-        Number(l1ExecutionFee) * Number(gasMultiplier)
+        Number(l1ExecutionFee) * Number(actualGasMultiplier)
       );
     }
 
@@ -186,7 +194,7 @@ export class AxelarQueryAPIClient extends RestService {
       l1ExecutionFeeWithMultiplier: l1ExecutionFeeWithMultiplier.toString(),
       l1ExecutionFee: l1ExecutionFee.toString(),
       gasLimit,
-      gasMultiplier,
+      gasMultiplier: actualGasMultiplier,
       minGasPrice: minGasPrice === "0" ? "NA" : minGasPrice,
       apiResponse: JSON.stringify(response),
       isExpressSupported: express_supported,

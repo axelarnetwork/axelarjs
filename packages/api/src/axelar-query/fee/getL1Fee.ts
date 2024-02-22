@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Environment } from "@axelarjs/core";
 
-import { createPublicClient, http, parseAbi, PublicClient } from "viem";
+import {
+  createPublicClient,
+  http,
+  parseAbi,
+  PublicClient,
+  type Chain,
+  type HttpTransport,
+} from "viem";
 
 import {
   EstimateL1FeeParams,
@@ -41,8 +48,8 @@ export function getL1FeeForL2(
   }
 }
 
-async function getOptimismL1Fee(
-  publicClient: PublicClient,
+async function getOptimismL1Fee<T extends Chain>(
+  publicClient: PublicClient<HttpTransport, T>,
   estimateL1FeeParams: EstimateL1FeeParams
 ) {
   const { l1GasPrice, executeData } = estimateL1FeeParams;
@@ -78,7 +85,7 @@ async function getOptimismL1Fee(
   });
 
   const [gasUsed, _dynamicOverhead, _fixedOverhead] = multicallResponse.flatMap(
-    (r) => r.result
+    (r) => r.result ?? 0n
   ) as [bigint, bigint, bigint];
 
   const dynamicOverhead = _dynamicOverhead || 684000n;
@@ -115,8 +122,8 @@ async function getOptimismL1Fee(
 //   return fee[0];
 // }
 
-async function getMantleL1Fee(
-  publicClient: PublicClient,
+async function getMantleL1Fee<T extends Chain>(
+  publicClient: PublicClient<HttpTransport, T>,
   estimateL1FeeParams: EstimateL1FeeParams
 ) {
   const contractAddress = "0x420000000000000000000000000000000000000F";
@@ -145,7 +152,7 @@ async function getMantleL1Fee(
   });
 
   const [fixedOverhead, dynamicOverhead] = multicallResponse.flatMap(
-    (r) => r.result
+    (r) => r.result ?? 0n
   ) as [bigint, bigint];
 
   const totalGasUsed = (fixedOverhead * dynamicOverhead) / 1_000_000n;

@@ -1,6 +1,7 @@
 import {
   createPublicClient as _createPublicClient,
   http,
+  type HttpTransport,
   type PublicClient,
 } from "viem";
 import {
@@ -63,7 +64,7 @@ export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
 
 export function createPublicClient(
   chainName: SupportedMainnetChain
-): PublicClient {
+): PublicClient<HttpTransport, (typeof MAINNET_CHAINS)[typeof chainName]> {
   const chain = MAINNET_CHAINS[chainName];
 
   const client = _createPublicClient({
@@ -75,7 +76,7 @@ export function createPublicClient(
 
 export function createPublicTestnetClient(
   chainName: SupportedTestnetChain
-): PublicClient {
+): PublicClient<HttpTransport, (typeof TESTNET_CHAINS)[typeof chainName]> {
   const chain = TESTNET_CHAINS[chainName];
 
   const client = _createPublicClient({

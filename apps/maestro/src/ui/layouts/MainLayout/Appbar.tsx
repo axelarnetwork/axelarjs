@@ -21,7 +21,7 @@ import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { useAccount, useDisconnect, useNetwork } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 
 import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -38,7 +38,7 @@ export type AppbarProps = {
 const Appbar: FC<AppbarProps> = (props) => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
-  const { chain } = useNetwork();
+  const { chain } = useAccount();
 
   const router = useRouter();
 

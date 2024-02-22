@@ -3,7 +3,7 @@ import { maskAddress } from "@axelarjs/utils";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
-import { type Address } from "wagmi";
+import type { Address } from "viem";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { trpc } from "~/lib/trpc";

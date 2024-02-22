@@ -35,9 +35,14 @@ export const getTopTransactions = publicProcedure
       const [tokenDeployments, interchainTransfers] = await Promise.all([
         ctx.services.gmp.searchGMP({
           ...commonParams,
-          contractMethod: "InterchainTokenDeploymentStarted",
+          // @ts-expect-error because contractMethod is typed to one or the other, the underlying api can accept multiple csv
+          contractMethod:
+            "InterchainTokenDeploymentStarted,TokenManagerDeploymentStarted",
           _source: {
-            includes: ["interchain_token_deployment_started.tokenId"],
+            includes: [
+              "interchain_token_deployment_started.tokenId",
+              "token_manager_deployment_started.tokenId",
+            ],
             excludes: EXCLUDED_RESPONSE_FIELDS,
           },
         }),
@@ -59,7 +64,11 @@ export const getTopTransactions = publicProcedure
 
       const eligibleTokenIds = new Set(
         tokenDeployments
-          .map((tx) => tx.interchain_token_deployment_started?.tokenId)
+          .map(
+            (tx) =>
+              tx.interchain_token_deployment_started?.tokenId ||
+              tx.token_manager_deployment_started?.tokenId
+          )
           .filter(Boolean)
       );
 

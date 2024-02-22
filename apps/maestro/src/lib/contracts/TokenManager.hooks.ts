@@ -2,880 +2,722 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
-  useContractEvent,
-  UseContractEventConfig,
-  useContractRead,
-  UseContractReadConfig,
-  useContractWrite,
-  UseContractWriteConfig,
-  usePrepareContractWrite,
-  UsePrepareContractWriteConfig,
-} from "wagmi";
-import {
-  PrepareWriteContractResult,
-  ReadContractResult,
-  WriteContractMode,
-} from "wagmi/actions";
-
-import ABI from "./TokenManager.abi";
+  createUseReadContract,
+  createUseSimulateContract,
+  createUseWatchContractEvent,
+  createUseWriteContract,
+} from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TokenManager
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const tokenManagerABI = ABI.abi;
+export const tokenManagerAbi = [
+  {
+    stateMutability: "nonpayable",
+    type: "constructor",
+    inputs: [
+      {
+        name: "interchainTokenService_",
+        internalType: "address",
+        type: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
+    name: "AlreadyFlowLimiter",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "limit", internalType: "uint256", type: "uint256" },
+      { name: "flowAmount", internalType: "uint256", type: "uint256" },
+      { name: "tokenManager", internalType: "address", type: "address" },
+    ],
+    name: "FlowLimitExceeded",
+  },
+  { type: "error", inputs: [], name: "GiveTokenFailed" },
+  {
+    type: "error",
+    inputs: [{ name: "bytesAddress", internalType: "bytes", type: "bytes" }],
+    name: "InvalidBytesLength",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "fromAccount", internalType: "address", type: "address" },
+      { name: "toAccount", internalType: "address", type: "address" },
+      { name: "accountRoles", internalType: "uint256", type: "uint256" },
+    ],
+    name: "InvalidProposedRoles",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "accountRoles", internalType: "uint256", type: "uint256" },
+    ],
+    name: "MissingAllRoles",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "accountRoles", internalType: "uint256", type: "uint256" },
+    ],
+    name: "MissingAnyOfRoles",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "role", internalType: "uint8", type: "uint8" },
+    ],
+    name: "MissingRole",
+  },
+  {
+    type: "error",
+    inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
+    name: "NotFlowLimiter",
+  },
+  { type: "error", inputs: [], name: "NotProxy" },
+  {
+    type: "error",
+    inputs: [{ name: "caller", internalType: "address", type: "address" }],
+    name: "NotService",
+  },
+  { type: "error", inputs: [], name: "NotSupported" },
+  {
+    type: "error",
+    inputs: [{ name: "caller", internalType: "address", type: "address" }],
+    name: "NotToken",
+  },
+  { type: "error", inputs: [], name: "TakeTokenFailed" },
+  { type: "error", inputs: [], name: "TokenLinkerZeroAddress" },
+  { type: "error", inputs: [], name: "TokenTransferFailed" },
+  { type: "error", inputs: [], name: "ZeroAddress" },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "tokenId",
+        internalType: "bytes32",
+        type: "bytes32",
+        indexed: true,
+      },
+      {
+        name: "operator",
+        internalType: "address",
+        type: "address",
+        indexed: false,
+      },
+      {
+        name: "flowLimit_",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "FlowLimitSet",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "account",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "accountRoles",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "RolesAdded",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "fromAccount",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "toAccount",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "accountRoles",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "RolesProposed",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "account",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "accountRoles",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+    ],
+    name: "RolesRemoved",
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "fromOperator", internalType: "address", type: "address" },
+    ],
+    name: "acceptOperatorship",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
+    name: "addFlowIn",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
+    name: "addFlowLimiter",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
+    name: "addFlowOut",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [],
+    name: "approveService",
+    outputs: [],
+  },
+  {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [],
+    name: "contractId",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "flowInAmount",
+    outputs: [
+      { name: "flowInAmount_", internalType: "uint256", type: "uint256" },
+    ],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "flowLimit",
+    outputs: [{ name: "flowLimit_", internalType: "uint256", type: "uint256" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "flowOutAmount",
+    outputs: [
+      { name: "flowOutAmount_", internalType: "uint256", type: "uint256" },
+    ],
+  },
+  {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
+    name: "getTokenAddressFromParams",
+    outputs: [
+      { name: "tokenAddress_", internalType: "address", type: "address" },
+    ],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "role", internalType: "uint8", type: "uint8" },
+    ],
+    name: "hasRole",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+  },
+  {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [],
+    name: "implementationType",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+  },
+  {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [],
+    name: "interchainTokenId",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "interchainTokenService",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "addr", internalType: "address", type: "address" }],
+    name: "isFlowLimiter",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [{ name: "addr", internalType: "address", type: "address" }],
+    name: "isOperator",
+    outputs: [{ name: "", internalType: "bool", type: "bool" }],
+  },
+  {
+    stateMutability: "pure",
+    type: "function",
+    inputs: [
+      { name: "operator_", internalType: "bytes", type: "bytes" },
+      { name: "tokenAddress_", internalType: "address", type: "address" },
+    ],
+    name: "params",
+    outputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "operator", internalType: "address", type: "address" }],
+    name: "proposeOperatorship",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
+    name: "removeFlowLimiter",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "flowLimit_", internalType: "uint256", type: "uint256" }],
+    name: "setFlowLimit",
+    outputs: [],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
+    name: "setup",
+    outputs: [],
+  },
+  {
+    stateMutability: "view",
+    type: "function",
+    inputs: [],
+    name: "tokenAddress",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [{ name: "operator", internalType: "address", type: "address" }],
+    name: "transferOperatorship",
+    outputs: [],
+  },
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__
  */
-export function useTokenManagerRead<
-  TFunctionName extends string,
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+export const useReadTokenManager = /*#__PURE__*/ createUseReadContract({
+  abi: tokenManagerAbi,
+});
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"contractId"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"contractId"`
  */
-export function useTokenManagerContractId<
-  TFunctionName extends "contractId",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerContractId =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "contractId",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"flowInAmount"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"flowInAmount"`
  */
-export function useTokenManagerFlowInAmount<
-  TFunctionName extends "flowInAmount",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerFlowInAmount =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "flowInAmount",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"flowLimit"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"flowLimit"`
  */
-export function useTokenManagerFlowLimit<
-  TFunctionName extends "flowLimit",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
-    functionName: "flowLimit",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+export const useReadTokenManagerFlowLimit = /*#__PURE__*/ createUseReadContract(
+  { abi: tokenManagerAbi, functionName: "flowLimit" }
+);
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"flowOutAmount"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"flowOutAmount"`
  */
-export function useTokenManagerFlowOutAmount<
-  TFunctionName extends "flowOutAmount",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerFlowOutAmount =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "flowOutAmount",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"getTokenAddressFromParams"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"getTokenAddressFromParams"`
  */
-export function useTokenManagerGetTokenAddressFromParams<
-  TFunctionName extends "getTokenAddressFromParams",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerGetTokenAddressFromParams =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "getTokenAddressFromParams",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"hasRole"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"hasRole"`
  */
-export function useTokenManagerHasRole<
-  TFunctionName extends "hasRole",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
-    functionName: "hasRole",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+export const useReadTokenManagerHasRole = /*#__PURE__*/ createUseReadContract({
+  abi: tokenManagerAbi,
+  functionName: "hasRole",
+});
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"implementationType"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"implementationType"`
  */
-export function useTokenManagerImplementationType<
-  TFunctionName extends "implementationType",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerImplementationType =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "implementationType",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTokenId"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"interchainTokenId"`
  */
-export function useTokenManagerInterchainTokenId<
-  TFunctionName extends "interchainTokenId",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerInterchainTokenId =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "interchainTokenId",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"interchainTokenService"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"interchainTokenService"`
  */
-export function useTokenManagerInterchainTokenService<
-  TFunctionName extends "interchainTokenService",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerInterchainTokenService =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "interchainTokenService",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"isFlowLimiter"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"isFlowLimiter"`
  */
-export function useTokenManagerIsFlowLimiter<
-  TFunctionName extends "isFlowLimiter",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerIsFlowLimiter =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "isFlowLimiter",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"isOperator"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"isOperator"`
  */
-export function useTokenManagerIsOperator<
-  TFunctionName extends "isOperator",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerIsOperator =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "isOperator",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"params"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"params"`
  */
-export function useTokenManagerParams<
-  TFunctionName extends "params",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
-    functionName: "params",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+export const useReadTokenManagerParams = /*#__PURE__*/ createUseReadContract({
+  abi: tokenManagerAbi,
+  functionName: "params",
+});
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"tokenAddress"`.
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"tokenAddress"`
  */
-export function useTokenManagerTokenAddress<
-  TFunctionName extends "tokenAddress",
-  TSelectData = ReadContractResult<typeof tokenManagerABI, TFunctionName>
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return useContractRead({
-    abi: tokenManagerABI,
+export const useReadTokenManagerTokenAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: tokenManagerAbi,
     functionName: "tokenAddress",
-    ...config,
-  } as UseContractReadConfig<typeof tokenManagerABI, TFunctionName, TSelectData>);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__
  */
-export function useTokenManagerWrite<
-  TFunctionName extends string,
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          string
-        >["request"]["abi"],
-        TFunctionName,
-        TMode
-      >
-    : UseContractWriteConfig<typeof tokenManagerABI, TFunctionName, TMode> & {
-        abi?: never;
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, TFunctionName, TMode>({
-    abi: tokenManagerABI,
-    ...config,
-  } as any);
-}
+export const useWriteTokenManager = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenManagerAbi,
+});
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"acceptOperatorship"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"acceptOperatorship"`
  */
-export function useTokenManagerAcceptOperatorship<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "acceptOperatorship"
-        >["request"]["abi"],
-        "acceptOperatorship",
-        TMode
-      > & { functionName?: "acceptOperatorship" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "acceptOperatorship",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "acceptOperatorship";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "acceptOperatorship", TMode>({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerAcceptOperatorship =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "acceptOperatorship",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowIn"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"addFlowIn"`
  */
-export function useTokenManagerAddFlowIn<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "addFlowIn"
-        >["request"]["abi"],
-        "addFlowIn",
-        TMode
-      > & { functionName?: "addFlowIn" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "addFlowIn", TMode> & {
-        abi?: never;
-        functionName?: "addFlowIn";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "addFlowIn", TMode>({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerAddFlowIn =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "addFlowIn",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowLimiter"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"addFlowLimiter"`
  */
-export function useTokenManagerAddFlowLimiter<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "addFlowLimiter"
-        >["request"]["abi"],
-        "addFlowLimiter",
-        TMode
-      > & { functionName?: "addFlowLimiter" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "addFlowLimiter",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "addFlowLimiter";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "addFlowLimiter", TMode>({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerAddFlowLimiter =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "addFlowLimiter",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowOut"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"addFlowOut"`
  */
-export function useTokenManagerAddFlowOut<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "addFlowOut"
-        >["request"]["abi"],
-        "addFlowOut",
-        TMode
-      > & { functionName?: "addFlowOut" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "addFlowOut", TMode> & {
-        abi?: never;
-        functionName?: "addFlowOut";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "addFlowOut", TMode>({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerAddFlowOut =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "addFlowOut",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"approveService"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"approveService"`
  */
-export function useTokenManagerApproveService<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "approveService"
-        >["request"]["abi"],
-        "approveService",
-        TMode
-      > & { functionName?: "approveService" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "approveService",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "approveService";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "approveService", TMode>({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerApproveService =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "approveService",
-    ...config,
-  } as any);
-}
+  });
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"proposeOperatorship"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
  */
-export function useTokenManagerProposeOperatorship<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "proposeOperatorship"
-        >["request"]["abi"],
-        "proposeOperatorship",
-        TMode
-      > & { functionName?: "proposeOperatorship" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "proposeOperatorship",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "proposeOperatorship";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "proposeOperatorship", TMode>(
-    {
-      abi: tokenManagerABI,
-      functionName: "proposeOperatorship",
-      ...config,
-    } as any
-  );
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"removeFlowLimiter"`.
- */
-export function useTokenManagerRemoveFlowLimiter<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "removeFlowLimiter"
-        >["request"]["abi"],
-        "removeFlowLimiter",
-        TMode
-      > & { functionName?: "removeFlowLimiter" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "removeFlowLimiter",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "removeFlowLimiter";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "removeFlowLimiter", TMode>({
-    abi: tokenManagerABI,
-    functionName: "removeFlowLimiter",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setFlowLimit"`.
- */
-export function useTokenManagerSetFlowLimit<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "setFlowLimit"
-        >["request"]["abi"],
-        "setFlowLimit",
-        TMode
-      > & { functionName?: "setFlowLimit" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "setFlowLimit", TMode> & {
-        abi?: never;
-        functionName?: "setFlowLimit";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "setFlowLimit", TMode>({
-    abi: tokenManagerABI,
-    functionName: "setFlowLimit",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setup"`.
- */
-export function useTokenManagerSetup<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "setup"
-        >["request"]["abi"],
-        "setup",
-        TMode
-      > & { functionName?: "setup" }
-    : UseContractWriteConfig<typeof tokenManagerABI, "setup", TMode> & {
-        abi?: never;
-        functionName?: "setup";
-      } = {} as any
-) {
-  return useContractWrite<typeof tokenManagerABI, "setup", TMode>({
-    abi: tokenManagerABI,
-    functionName: "setup",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transferOperatorship"`.
- */
-export function useTokenManagerTransferOperatorship<
-  TMode extends WriteContractMode = undefined
->(
-  config: TMode extends "prepared"
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenManagerABI,
-          "transferOperatorship"
-        >["request"]["abi"],
-        "transferOperatorship",
-        TMode
-      > & { functionName?: "transferOperatorship" }
-    : UseContractWriteConfig<
-        typeof tokenManagerABI,
-        "transferOperatorship",
-        TMode
-      > & {
-        abi?: never;
-        functionName?: "transferOperatorship";
-      } = {} as any
-) {
-  return useContractWrite<
-    typeof tokenManagerABI,
-    "transferOperatorship",
-    TMode
-  >({
-    abi: tokenManagerABI,
-    functionName: "transferOperatorship",
-    ...config,
-  } as any);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__.
- */
-export function usePrepareTokenManagerWrite<TFunctionName extends string>(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, TFunctionName>,
-    "abi"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, TFunctionName>);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"acceptOperatorship"`.
- */
-export function usePrepareTokenManagerAcceptOperatorship(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "acceptOperatorship">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "acceptOperatorship",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "acceptOperatorship">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowIn"`.
- */
-export function usePrepareTokenManagerAddFlowIn(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowIn">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "addFlowIn",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowIn">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowLimiter"`.
- */
-export function usePrepareTokenManagerAddFlowLimiter(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowLimiter">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "addFlowLimiter",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowLimiter">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"addFlowOut"`.
- */
-export function usePrepareTokenManagerAddFlowOut(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowOut">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "addFlowOut",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "addFlowOut">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"approveService"`.
- */
-export function usePrepareTokenManagerApproveService(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "approveService">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "approveService",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "approveService">);
-}
-
-/**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"proposeOperatorship"`.
- */
-export function usePrepareTokenManagerProposeOperatorship(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
-      "proposeOperatorship"
-    >,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerProposeOperatorship =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "proposeOperatorship",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "proposeOperatorship">);
-}
+  });
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"removeFlowLimiter"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"removeFlowLimiter"`
  */
-export function usePrepareTokenManagerRemoveFlowLimiter(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "removeFlowLimiter">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerRemoveFlowLimiter =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "removeFlowLimiter",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "removeFlowLimiter">);
-}
+  });
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setFlowLimit"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"setFlowLimit"`
  */
-export function usePrepareTokenManagerSetFlowLimit(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "setFlowLimit">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerSetFlowLimit =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "setFlowLimit",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "setFlowLimit">);
-}
+  });
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"setup"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"setup"`
  */
-export function usePrepareTokenManagerSetup(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenManagerABI, "setup">,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
-    functionName: "setup",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "setup">);
-}
+export const useWriteTokenManagerSetup = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenManagerAbi,
+  functionName: "setup",
+});
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenManagerABI}__ and `functionName` set to `"transferOperatorship"`.
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferOperatorship"`
  */
-export function usePrepareTokenManagerTransferOperatorship(
-  config: Omit<
-    UsePrepareContractWriteConfig<
-      typeof tokenManagerABI,
-      "transferOperatorship"
-    >,
-    "abi" | "functionName"
-  > = {} as any
-) {
-  return usePrepareContractWrite({
-    abi: tokenManagerABI,
+export const useWriteTokenManagerTransferOperatorship =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
     functionName: "transferOperatorship",
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenManagerABI, "transferOperatorship">);
-}
+  });
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__.
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__
  */
-export function useTokenManagerEvent<TEventName extends string>(
-  config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, TEventName>,
-    "abi"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: tokenManagerABI,
-    ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, TEventName>);
-}
+export const useSimulateTokenManager = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenManagerAbi,
+});
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"FlowLimitSet"`.
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"acceptOperatorship"`
  */
-export function useTokenManagerFlowLimitSetEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "FlowLimitSet">,
-    "abi" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: tokenManagerABI,
+export const useSimulateTokenManagerAcceptOperatorship =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "acceptOperatorship",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"addFlowIn"`
+ */
+export const useSimulateTokenManagerAddFlowIn =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "addFlowIn",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"addFlowLimiter"`
+ */
+export const useSimulateTokenManagerAddFlowLimiter =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "addFlowLimiter",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"addFlowOut"`
+ */
+export const useSimulateTokenManagerAddFlowOut =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "addFlowOut",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"approveService"`
+ */
+export const useSimulateTokenManagerApproveService =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "approveService",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
+ */
+export const useSimulateTokenManagerProposeOperatorship =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "proposeOperatorship",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"removeFlowLimiter"`
+ */
+export const useSimulateTokenManagerRemoveFlowLimiter =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "removeFlowLimiter",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"setFlowLimit"`
+ */
+export const useSimulateTokenManagerSetFlowLimit =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "setFlowLimit",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"setup"`
+ */
+export const useSimulateTokenManagerSetup =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "setup",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferOperatorship"`
+ */
+export const useSimulateTokenManagerTransferOperatorship =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "transferOperatorship",
+  });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenManagerAbi}__
+ */
+export const useWatchTokenManagerEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: tokenManagerAbi });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenManagerAbi}__ and `eventName` set to `"FlowLimitSet"`
+ */
+export const useWatchTokenManagerFlowLimitSetEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenManagerAbi,
     eventName: "FlowLimitSet",
-    ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "FlowLimitSet">);
-}
+  });
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"RolesAdded"`.
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenManagerAbi}__ and `eventName` set to `"RolesAdded"`
  */
-export function useTokenManagerRolesAddedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "RolesAdded">,
-    "abi" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: tokenManagerABI,
+export const useWatchTokenManagerRolesAddedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenManagerAbi,
     eventName: "RolesAdded",
-    ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "RolesAdded">);
-}
+  });
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"RolesProposed"`.
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenManagerAbi}__ and `eventName` set to `"RolesProposed"`
  */
-export function useTokenManagerRolesProposedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "RolesProposed">,
-    "abi" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: tokenManagerABI,
+export const useWatchTokenManagerRolesProposedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenManagerAbi,
     eventName: "RolesProposed",
-    ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "RolesProposed">);
-}
+  });
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenManagerABI}__ and `eventName` set to `"RolesRemoved"`.
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenManagerAbi}__ and `eventName` set to `"RolesRemoved"`
  */
-export function useTokenManagerRolesRemovedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenManagerABI, "RolesRemoved">,
-    "abi" | "eventName"
-  > = {} as any
-) {
-  return useContractEvent({
-    abi: tokenManagerABI,
+export const useWatchTokenManagerRolesRemovedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenManagerAbi,
     eventName: "RolesRemoved",
-    ...config,
-  } as UseContractEventConfig<typeof tokenManagerABI, "RolesRemoved">);
-}
+  });

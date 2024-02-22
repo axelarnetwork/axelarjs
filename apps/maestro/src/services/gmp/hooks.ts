@@ -2,8 +2,8 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { isAddress } from "viem";
-import { useQuery } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
 import { hex64 } from "~/lib/utils/validation";
@@ -112,9 +112,12 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
     refetchInterval?: number;
   }
 ) {
-  const { data, ...query } = useQuery(
-    ["gmp-get-transactions-statuses-on-destination-chains", input.txHashes],
-    async () => {
+  const { data, ...query } = useQuery({
+    queryKey: [
+      "gmp-get-transactions-statuses-on-destination-chains",
+      input.txHashes,
+    ],
+    queryFn: async () => {
       const results = await Promise.all(
         input.txHashes?.map((txHash) =>
           gmpClient.searchGMP({
@@ -152,14 +155,12 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
         }
       );
     },
-    {
-      enabled: Boolean(
-        input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
-      ),
-      refetchInterval: 1000 * 10, // 10 seconds
-      ...options,
-    }
-  );
+    enabled: Boolean(
+      input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
+    ),
+    refetchInterval: 1000 * 10, // 10 seconds
+    ...options,
+  });
 
   return {
     ...query,

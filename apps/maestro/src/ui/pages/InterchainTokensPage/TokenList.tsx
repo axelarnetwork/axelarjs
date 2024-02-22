@@ -1,11 +1,11 @@
 import { Card, CopyToClipboardButton } from "@axelarjs/ui";
+import tw from "@axelarjs/ui/tw";
 import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, useState, type FC } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import { filter, map } from "rambda";
-import tw from "tailwind-styled-components";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
