@@ -601,12 +601,18 @@ importers:
       '@axelarjs/cosmos':
         specifier: workspace:*
         version: link:../cosmos
+      '@axelarjs/evm':
+        specifier: workspace:*
+        version: link:../evm
       '@cosmjs/proto-signing':
         specifier: ^0.31.3
         version: 0.31.3
       '@cosmjs/stargate':
         specifier: ^0.31.3
         version: 0.31.3
+      viem:
+        specifier: ^2.7.10
+        version: 2.7.10(typescript@5.3.3)(zod@3.22.4)
     devDependencies:
       '@axelarjs/config':
         specifier: workspace:*
@@ -7726,6 +7732,7 @@ packages:
 
   /@swagger-api/apidom-ns-json-schema-draft-4@0.92.0:
     resolution: {integrity: sha512-7s2EKjCQwRXbK4Y4AGpVkyn1AANCxOUFSHebo1h2katyVeAopV0LJmbXH5yQedTltV0k3BIjnd7hS+7dI846Pw==}
+    requiresBuild: true
     dependencies:
       '@babel/runtime-corejs3': 7.23.9
       '@swagger-api/apidom-ast': 0.92.0

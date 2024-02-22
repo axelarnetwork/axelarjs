@@ -4,6 +4,7 @@ import type {
   SearchGMPResponseData,
 } from "@axelarjs/api";
 import type { Environment } from "@axelarjs/core";
+import { SupportedMainnetChain, SupportedTestnetChain } from "@axelarjs/evm";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
 import type { Coin, DeliverTxResponse, StdFee } from "@cosmjs/stargate";
@@ -26,6 +27,30 @@ export type AddGasParams = {
   token: Coin | "autocalculate";
   sendOptions: SendOptions;
   autocalculateGasOptions?: AutocalculateGasOptions;
+};
+
+export type EvmAddNativeGasParams = {
+  txHash: string;
+  chain: SupportedMainnetChain | SupportedTestnetChain;
+  estimatedGasUsed: number;
+  evmSendOptions: EvmSendOptions;
+};
+
+export type EvmSendOptions = {
+  environment: Environment;
+  amount?: string;
+  refundAddress?: string;
+  gasMultipler?: number;
+  logIndex?: number;
+  destChain?: string;
+  evmWalletDetails?: EvmWalletDetails;
+};
+
+export type EvmWalletDetails = {
+  privateKey?: string;
+  useWindowEthereum?: boolean;
+  rpcUrl?: string;
+  gasLimitBuffer?: number;
 };
 
 export type AddGasResponse = {
