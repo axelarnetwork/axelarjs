@@ -14,10 +14,11 @@ import {
   Modal,
   TextInput,
   Tooltip,
+  useIsElementInViewport,
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import { useEffect, useMemo, useRef, useState, type FC } from "react";
+import { useMemo, useRef, useState, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 
 import { useAccount } from "wagmi";
@@ -160,31 +161,6 @@ export default TokenDetailsSection;
 type ManageTokenIconProps = {
   tokenId: `0x${string}`;
 };
-
-function useIsElementInViewport(ref: React.RefObject<HTMLElement>) {
-  const [isElementInViewport, setIsElementInViewport] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsElementInViewport(entry.isIntersecting);
-      },
-      { threshold: 0.5 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
-    };
-  }, [ref]);
-
-  return isElementInViewport;
-}
 
 const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
   const { data: meta, refetch } =
