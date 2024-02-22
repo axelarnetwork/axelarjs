@@ -91,7 +91,7 @@ export default function useRegisterRemoteCanonicalTokens(
     },
     writeContractAsync: async () => {
       if (!config) return;
-      return mutation.writeContractAsync(config.request);
+      return await mutation.writeContractAsync(config.request);
     },
   };
 }
