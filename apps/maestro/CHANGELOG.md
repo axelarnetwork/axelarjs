@@ -11,6 +11,7 @@
 ### Minor Changes
 
 - [#211](https://github.com/axelarnetwork/axelarjs/pull/211) [`f4ef92e88669fc0cad487d63d70cda3fa5c69e80`](https://github.com/axelarnetwork/axelarjs/commit/f4ef92e88669fc0cad487d63d70cda3fa5c69e80) Thanks [@alanrsoares](https://github.com/alanrsoares)!
+
   - Major dependency upgrades:
     - react-query v5.x
     - wagmi v2.x
@@ -19,12 +20,14 @@
 
   Bugfixes:
 
-  - locale related bigint parse issue on token deployment and interchain transfer flows
-  - use 'auto' flag for gas multiplier to allow for dynamic multiplier when retrieving gas quotes
+  - [#206](https://github.com/axelarnetwork/axelarjs/issues/206) locale related bigint parse issue on token deployment and interchain transfer flows -
+  - [#204](https://github.com/axelarnetwork/axelarjs/pull/204) use 'auto' flag for gas multiplier to allow for dynamic multiplier when retrieving gas quotes
 
   UX:
 
   - Interhcain token page: new pending section for remote interchain tokens being deployed
+  - [#210](https://github.com/axelarnetwork/axelarjs/pull/210) Token manager address for each registered token now appears in the card on the token details page
+  - [#209](https://github.com/axelarnetwork/axelarjs/pull/209) Indexing custom token deployments now appears in leaderboard
 
 ## 0.2.4
 
