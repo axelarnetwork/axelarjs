@@ -6,9 +6,14 @@ import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
 import { useCallback, useEffect, useRef } from "react";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useBlockNumber,
+  useChainId,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
@@ -45,13 +50,10 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { address } = useAccount();
 
-  const { data: tokenAllowance } = useReadInterchainTokenAllowance({
-    address: config.tokenAddress,
-    args: INTERCHAIN_TOKEN_ENCODERS.allowance.args({
-      owner: address ?? "0x",
-      spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-    }),
-  });
+  const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
+    config.tokenAddress,
+    NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
+  );
 
   const {
     writeContractAsync: approveInterchainTokenAsync,
@@ -61,7 +63,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const {
     writeContractAsync: interchainTransferAsync,
-    data: sendTokenData,
+    data: interchainTransferTxHash,
     reset: resetInterchainTransferMutation,
   } = useWriteInterchainTokenServiceInterchainTransfer();
 
@@ -124,7 +126,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   useEffect(
     () => {
-      if (approveERC20Recepit && !sendTokenData) {
+      if (approveERC20Recepit && !interchainTransferTxHash) {
         handleInterchainTransfer().catch((error) => {
           logger.error("Failed to send token:", error);
         });
@@ -133,7 +135,7 @@ export function useInterchainTokenServiceTransferMutation(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       address,
-      sendTokenData,
+      interchainTransferTxHash,
       approveERC20Recepit,
       config.destinationChainName,
       interchainTransferAsync,
@@ -192,4 +194,44 @@ export function useInterchainTokenServiceTransferMutation(
       mutation.reset();
     },
   };
+}
+
+/**
+ * Wrapper around useReadInterchainTokenAllowance to invalidate the query when the block number changes
+ *
+ * ref: https://wagmi.sh/react/guides/migrate-from-v1-to-v2#removed-watch-property
+ *
+ * @param tokenAddress {`0x${string}`}
+ * @param spender {`0x${string}`}
+ */
+function useWatchInterchainTokenAllowance(
+  tokenAddress: `0x${string}`,
+  spender: `0x${string}`
+) {
+  const { queryKey, ...query } = useReadInterchainTokenAllowance({
+    address: tokenAddress,
+    args: INTERCHAIN_TOKEN_ENCODERS.allowance.args({
+      owner: useAccount().address ?? "0x",
+      spender,
+    }),
+  });
+
+  const { data: block } = useBlockNumber();
+
+  const queryClient = useQueryClient();
+
+  useEffect(
+    () => {
+      if (block) {
+        queryClient.invalidateQueries({ queryKey }).catch((error) => {
+          logger.error("Failed to invalidate token allowance query:", error);
+        });
+        logger.info("Invalidating token allowance query");
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [block]
+  );
+
+  return { ...query, queryKey };
 }
