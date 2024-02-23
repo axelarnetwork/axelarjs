@@ -54,11 +54,8 @@ export function useSendInterchainTokenState(props: {
   );
 
   const referenceToken = useMemo(
-    () =>
-      props.kind === "canonical" && isApprovalRequired
-        ? originInterchainToken
-        : interchainToken,
-    [interchainToken, isApprovalRequired, originInterchainToken, props.kind]
+    () => (isApprovalRequired ? originInterchainToken : interchainToken),
+    [interchainToken, isApprovalRequired, originInterchainToken]
   );
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
