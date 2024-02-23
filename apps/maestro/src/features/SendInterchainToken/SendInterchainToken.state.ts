@@ -45,6 +45,14 @@ export function useSendInterchainTokenState(props: {
     chainId: props.originTokenChainId,
   });
 
+  const isApprovalRequired = useMemo(
+    () =>
+      props.kind === "canonical" &&
+      interchainToken.chainId !== undefined &&
+      interchainToken.chainId === props.originTokenChainId,
+    [interchainToken.chainId, props.kind, props.originTokenChainId]
+  );
+
   const referenceToken = useMemo(
     () =>
       props.kind === "canonical" ? originInterchainToken : interchainToken,
@@ -141,7 +149,7 @@ export function useSendInterchainTokenState(props: {
 
   const { sendTokenAsync, isSending, txState } = useMemo(
     () =>
-      props.kind === "canonical"
+      isApprovalRequired
         ? {
             sendTokenAsync: tokenServiceSendTokenAsync,
             isSending: isTokenServiceTransfering,
@@ -153,13 +161,13 @@ export function useSendInterchainTokenState(props: {
             txState: interchainTransferTxState,
           },
     [
-      props.kind,
+      isApprovalRequired,
       tokenServiceSendTokenAsync,
       isTokenServiceTransfering,
       tokenServiceTxState,
       interchainTransferAsync,
-      interchainTransferTxState,
       isInterchainTransferSending,
+      interchainTransferTxState,
     ]
   );
 

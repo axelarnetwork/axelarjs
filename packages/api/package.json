@@ -100,6 +100,6 @@
     "@axelarjs/core": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.0",
-    "viem": "^2.7.10"
+    "viem": "^2.7.13"
   }
 }

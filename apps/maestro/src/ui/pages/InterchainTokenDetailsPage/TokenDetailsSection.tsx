@@ -3,6 +3,7 @@ import {
   Alert,
   Badge,
   Button,
+  cn,
   CopyToClipboardButton,
   Edit2Icon,
   ExternalLinkIcon,
@@ -13,10 +14,11 @@ import {
   Modal,
   TextInput,
   Tooltip,
+  useIsElementInViewport,
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import { useMemo, useState, type FC } from "react";
+import { useMemo, useRef, useState, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 
 import { useAccount } from "wagmi";
@@ -24,6 +26,7 @@ import { z } from "zod";
 
 import { NEXT_PUBLIC_ENABLED_FEATURES } from "~/config/env";
 import { trpc } from "~/lib/trpc";
+import { hex64Literal } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
 
 export type TokenDetailsSectionProps = {
@@ -153,6 +156,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   );
 };
 
+export default TokenDetailsSection;
+
 type ManageTokenIconProps = {
   tokenId: `0x${string}`;
 };
@@ -177,16 +182,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
 
   const isOperator = roles?.tokenManager?.includes("OPERATOR");
 
-  const icon = (
-    <div className="ring-primary/50 ring-offset-base-100 relative grid h-9 w-9 place-items-start rounded-full ring-2 ring-offset-2">
-      {meta?.iconUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
-      ) : (
-        <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
-      )}
-    </div>
-  );
+  const icon = <TokenIcon tokenId={tokenId} />;
 
   if (
     !isOperator ||
@@ -202,6 +198,39 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
       existingIconUrl={meta?.iconUrl}
       icon={icon}
     />
+  );
+};
+
+export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInViewport = useIsElementInViewport(containerRef);
+  const { data: meta, isLoading } =
+    trpc.interchainToken.getInterchainTokenMeta.useQuery(
+      {
+        tokenId,
+      },
+      {
+        enabled: isInViewport && hex64Literal().safeParse(tokenId).success,
+      }
+    );
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        "ring-primary/50 ring-offset-base-100 relative grid h-9 w-9 place-items-start overflow-hidden rounded-full ring-2 ring-offset-2",
+        {
+          "animate-pulse": isLoading,
+        }
+      )}
+    >
+      {meta?.iconUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
+      ) : (
+        <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+      )}
+    </div>
   );
 };
 
@@ -359,5 +388,3 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
     </Tooltip>
   );
 };
-
-export default TokenDetailsSection;
