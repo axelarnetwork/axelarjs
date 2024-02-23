@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.2.3
+
+### Patch Changes
+
+- [`aaa737d71de784ef3cc0dbbfea723a08be85360c`](https://github.com/axelarnetwork/axelarjs/commit/aaa737d71de784ef3cc0dbbfea723a08be85360c) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: canonical interchain transfer transaction
+
 ## 0.2.2
 
 ### Patch Changes
