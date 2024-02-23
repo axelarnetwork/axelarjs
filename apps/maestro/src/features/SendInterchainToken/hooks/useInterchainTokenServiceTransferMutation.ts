@@ -90,6 +90,7 @@ export function useInterchainTokenServiceTransferMutation(
           metadata: "0x",
           gasValue: config.gas ?? 0n,
         }),
+        value: config.gas,
       });
 
       if (txHash) {
@@ -100,6 +101,9 @@ export function useInterchainTokenServiceTransferMutation(
         });
       }
     } catch (error) {
+      logger.error("Failed to send token:", {
+        error,
+      });
       if (error instanceof TransactionExecutionError) {
         toast.error(`Transaction failed: ${error.cause.shortMessage}`);
         logger.error("Faied to transfer token:", error.cause);
@@ -122,7 +126,15 @@ export function useInterchainTokenServiceTransferMutation(
         });
       }
     }
-  }, [address, chainId, config, interchainTransferAsync, setTxState]);
+  }, [
+    address,
+    chainId,
+    config.destinationChainName,
+    config.gas,
+    config.tokenId,
+    interchainTransferAsync,
+    setTxState,
+  ]);
 
   useEffect(
     () => {
