@@ -71,7 +71,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
   }
 
   public write<
-    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
+    TFunctionName extends WriteContractParameters<TAbi>["functionName"]
   >(
     functionName: TFunctionName,
     params?: Omit<
@@ -89,12 +89,16 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
 
     const contractParams = {
       address,
+      functionName,
       abi: this.abi,
-      functionName: functionName,
     } as WriteContractParameters<TAbi, TFunctionName>;
 
     if (params?.args) {
       contractParams["args"] = params.args;
+    }
+
+    if (params?.account) {
+      contractParams["account"] = params.account;
     }
 
     return this.provider.writeContract(contractParams);

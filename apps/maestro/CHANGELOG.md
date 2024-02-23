@@ -1,5 +1,14 @@
 # @axelarjs/maestro
 
+## 0.3.2
+
+### Patch Changes
+
+- [`aaa737d71de784ef3cc0dbbfea723a08be85360c`](https://github.com/axelarnetwork/axelarjs/commit/aaa737d71de784ef3cc0dbbfea723a08be85360c) Thanks [@alanrsoares](https://github.com/alanrsoares)! - fix: canonical interchain transfer transaction
+
+- Updated dependencies [[`aaa737d71de784ef3cc0dbbfea723a08be85360c`](https://github.com/axelarnetwork/axelarjs/commit/aaa737d71de784ef3cc0dbbfea723a08be85360c)]:
+  - @axelarjs/evm@0.2.3
+
 ## 0.3.1
 
 ### Patch Changes

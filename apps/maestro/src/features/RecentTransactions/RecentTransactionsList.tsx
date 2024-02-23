@@ -12,6 +12,7 @@ import {
 } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
+import { TokenIcon } from "~/ui/pages/InterchainTokenDetailsPage/TokenDetailsSection";
 import { type ContractMethod } from "./types";
 
 function useHumanizedElapsedTime(timestamp: number) {
@@ -119,18 +120,15 @@ export const RecentTransactionsList: FC<Props> = ({
 const TransactionItem: FC<{
   tx: RecentTransactionsOutput[number];
   contractMethod: ContractMethod;
-}> = ({ tx, contractMethod }) => {
+}> = ({ tx }) => {
   const humanizedElapsedTime = useHumanizedElapsedTime(tx.timestamp);
 
   return (
-    <li className="flex items-center gap-2">
-      <div className="avatar placeholder">
-        <div className="bg-neutral-focus text-neutral-content w-12 rounded-full">
-          <span className="text-xl">
-            {contractMethod === "InterchainTransfer" ? "IT" : "TD"}
-          </span>
-        </div>
-      </div>
+    <li className="flex items-center gap-2 pl-2">
+      {(tx.event?.event === "InterchainTransfer" ||
+        tx.event?.event === "InterchainTokenDeploymentStarted") && (
+        <TokenIcon tokenId={tx.event.tokenId} />
+      )}
       <div>
         <div>
           <Tooltip tip="View on AxelarScan" position="bottom">
