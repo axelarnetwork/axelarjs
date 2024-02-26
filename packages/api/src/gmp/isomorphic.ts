@@ -37,7 +37,13 @@ export class GMPClient extends RestService {
   async searchGMP(params: SearchGMPParams): Promise<SearchGMPResponse["data"]> {
     return await this.client
       .post("", {
-        json: { ...params, method: "searchGMP" },
+        json: {
+          ...params,
+          contractMethod: Array.isArray(params.contractMethod)
+            ? params.contractMethod.join(",")
+            : params.contractMethod,
+          method: "searchGMP",
+        },
       })
       .json<SearchGMPResponse>()
       .catch(always({ data: [] as SearchGMPResponse["data"] }))
