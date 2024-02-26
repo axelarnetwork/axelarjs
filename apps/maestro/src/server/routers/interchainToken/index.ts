@@ -6,11 +6,13 @@ import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
 import { getInterchainTokenMeta } from "./getInterchainTokenMeta";
 import { getInterchainTokenRolesForAccount } from "./getInterchainTokenRolesForAccount";
 import { getInterchainTokenServiceABI } from "./getInterchainTokenServiceABI";
+import { getInterchainTokensMissingDeploymentMessageId } from "./getInterchainTokensMissingDeploymentMessageId";
 import { getMyInterchainTokens } from "./getMyInterchainTokens";
 import { getTokenManagerABI } from "./getTokenManagerABI";
 import { recordInterchainTokenDeployment } from "./recordInterchainTokenDeployment";
 import { recordRemoteTokensDeployment } from "./recordRemoteTokensDeployment";
 import { recoverCanonicalTokenByTokenId } from "./recoverCanonicalTokenByTokenId";
+import { recoverDeploymentMessageIdByTokenId } from "./recoverDeploymentMessageIdByTokenId";
 import { searchInterchainToken } from "./searchInterchainToken";
 import { setInterchainTokenIconUrl } from "./setInterchainTokenIconUrl";
 
@@ -21,6 +23,7 @@ export const interchainTokenRouter = router({
   getInterchainTokenByTokenId,
   getInterchainTokenMeta,
   getInterchainTokenRolesForAccount,
+  getInterchainTokensMissingDeploymentMessageId,
   getTokenManagerABI,
   getMyInterchainTokens,
   searchInterchainToken,
@@ -28,6 +31,7 @@ export const interchainTokenRouter = router({
   recordRemoteTokensDeployment,
   findInterchainTokenByTokenId,
   recoverCanonicalTokenByTokenId,
+  recoverDeploymentMessageIdByTokenId,
   setInterchainTokenIconUrl,
 });
 

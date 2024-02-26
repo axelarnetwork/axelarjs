@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { AccountStatusesManager } from "~/features/AdminPanel/AccountStatuses";
 import { CanonicalTokenRecovery } from "~/features/AdminPanel/CanonicalTokenRecovery";
+import { DeploymentMessageIdRecovery } from "~/features/AdminPanel/DeploymentMessageIdRecovery";
 import { GlobalMessageManager } from "~/features/AdminPanel/GlobalMessage";
 import { withRouteProtection } from "~/lib/auth";
 import Page from "~/ui/layouts/Page";
@@ -19,6 +20,7 @@ const AdminIndexPage = () => {
           <GlobalMessageManager />
           <AccountStatusesManager />
           <CanonicalTokenRecovery />
+          <DeploymentMessageIdRecovery />
         </Page.Content>
       </Suspense>
     </Page>
