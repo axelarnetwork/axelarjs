@@ -29,6 +29,7 @@
   },
   "include": [
     "next-env.d.ts",
+    "augmentations.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/**/*.tsx",
