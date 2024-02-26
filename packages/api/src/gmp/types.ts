@@ -52,8 +52,8 @@ export const VALID_CONTRACT_METHODS = [
 
 export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
 
-export type SearchGMPParams = BaseGMPParams & {
-  contractMethod?: ContractMethod;
+export type SearchGMPParams = Omit<BaseGMPParams, "contractMethod"> & {
+  contractMethod?: ContractMethod[] | ContractMethod;
   txHash?: `0x${string}`;
   txLogIndex?: number;
   status?: GMPTxStatus;
@@ -83,7 +83,8 @@ type SearchGMPCall = {
   data: unknown;
   topics: `0x${string}`[];
   transactionHash: `0x${string}`;
-  _logIndex: number;
+  _logIndex?: number;
+  logIndex?: number;
   event: string;
   eventSignature: string;
   id: string;
@@ -100,6 +101,42 @@ type SearchGMPCall = {
     symbol: string;
     amount: HexAmount;
   };
+};
+
+type SearchGMPPReceipt = {
+  gasUsed: string;
+  blockNumber: number;
+  from: `0x${string}`;
+  transactionHash: `0x${string}`;
+  status: number;
+};
+
+type SearchGMPTransaction = {
+  gasLimit: string;
+  blockNumber: number;
+  from: string;
+  hash: string;
+};
+
+type SearchGMPExecuted = {
+  chain: string;
+  sourceTransactionIndex: number;
+  sourceChain: string;
+  chain_type: ChainType;
+  sourceTransactionLogIndex: number;
+  transactionIndex: number;
+  contract_address: `0x${string}`;
+  transactionHash: `0x${string}`;
+  blockNumber: number;
+  block_timestamp: number;
+  from: `0x${string}`;
+  receipt: SearchGMPPReceipt;
+  sourceTransactionHash: `0x${string}`;
+  id: string;
+  event: "execute";
+  transaction: SearchGMPTransaction;
+  relayerAddress: `0x${string}`;
+  _id: string;
 };
 
 type GMPTokenInfo = {
@@ -154,7 +191,6 @@ export type SearchGMPGasPaid = {
     quarter: number;
   };
   transactionHash: string;
-
   returnValues: {
     refundAddress: string;
     amount: string;
@@ -171,22 +207,11 @@ export type SearchGMPGasPaid = {
   };
   blockNumber: number;
   block_timestamp: number;
-  receipt: {
-    gasUsed: string;
-    blockNumber: number;
-    from: string;
-    transactionHash: string;
-    status: number;
-  };
+  receipt: SearchGMPPReceipt;
   _id: string;
   id: string;
   event: string;
-  transaction: {
-    gasLimit: string;
-    blockNumber: number;
-    from: string;
-    hash: string;
-  };
+  transaction: SearchGMPTransaction;
   destination_chain_type: string;
 };
 
@@ -225,6 +250,7 @@ export type SearchGMPResponseData = {
   call: SearchGMPCall;
   fees: SearchGMPFees;
   status: GMPTxStatus;
+  executed?: SearchGMPExecuted;
   gas_paid: SearchGMPGasPaid;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
