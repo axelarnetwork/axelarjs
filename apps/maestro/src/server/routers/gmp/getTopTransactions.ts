@@ -35,9 +35,10 @@ export const getTopTransactions = publicProcedure
       const [tokenDeployments, interchainTransfers] = await Promise.all([
         ctx.services.gmp.searchGMP({
           ...commonParams,
-          // @ts-expect-error because contractMethod is typed to one or the other, the underlying api can accept multiple csv
-          contractMethod:
-            "InterchainTokenDeploymentStarted,TokenManagerDeploymentStarted",
+          contractMethod: [
+            "InterchainTokenDeploymentStarted",
+            "TokenManagerDeploymentStarted",
+          ],
           _source: {
             includes: [
               "interchain_token_deployment_started.tokenId",

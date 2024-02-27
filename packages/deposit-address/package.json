@@ -44,7 +44,7 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "dotenv": "^16.4.4",
+    "dotenv": "^16.4.5",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vitest": "1.2.1"
@@ -56,6 +56,6 @@
     "@axelarjs/utils": "workspace:*",
     "@axelarjs/proto": "workspace:*",
     "bech32": "^2.0.0",
-    "viem": "^2.7.13"
+    "viem": "^2.7.15"
   }
 }
