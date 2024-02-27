@@ -6,48 +6,50 @@ import { z } from "zod";
 import { hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
+export const SEARCHGMP_SOURCE = {
+  includes: [
+    "call.returnValues.destinationChain",
+    "status",
+    "approved",
+    "confirm",
+    "executed",
+  ],
+  excludes: [
+    "call.transaction",
+    "fees",
+    "gas",
+    "gas_price_rate",
+    "gas_paid",
+    "approved.receipt",
+    "confirm.receipt",
+    "executed.receipt",
+    "approved.topics",
+    "approved.returnValues",
+    "confirm.returnValues",
+    "executed.returnValues",
+    "approved.transaction",
+    "confirm.transaction",
+    "executed.transaction",
+    "approved.created_at",
+    "confirm.created_at",
+    "executed.created_at",
+  ],
+};
+
+const INPUT_SCHEMA = z.object({
+  txHash: hex64Literal(),
+});
+
 /**
  * Get the status of an GMP transaction on destination chains
  */
 export const getTransactionStatusOnDestinationChains = publicProcedure
-  .input(
-    z.object({
-      txHash: hex64Literal(),
-    })
-  )
+  .input(INPUT_SCHEMA)
   .query(async ({ input, ctx }) => {
     try {
       const data = await ctx.services.gmp.searchGMP({
         txHash: input.txHash,
-        _source: {
-          includes: [
-            "call.returnValues.destinationChain",
-            "status",
-            "approved",
-            "confirm",
-            "executed",
-          ],
-          excludes: [
-            "call.transaction",
-            "fees",
-            "gas",
-            "gas_price_rate",
-            "gas_paid",
-            "approved.receipt",
-            "confirm.receipt",
-            "executed.receipt",
-            "approved.topics",
-            "approved.returnValues",
-            "confirm.returnValues",
-            "executed.returnValues",
-            "approved.transaction",
-            "confirm.transaction",
-            "executed.transaction",
-            "approved.created_at",
-            "confirm.created_at",
-            "executed.created_at",
-          ],
-        },
+        _source: SEARCHGMP_SOURCE,
       });
 
       if (data.length) {
@@ -57,7 +59,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             [call.returnValues.destinationChain.toLowerCase()]: {
               status,
               txHash: call.transactionHash,
-              logIndex: call._logIndex,
+              logIndex: call.logIndex ?? call._logIndex ?? 0,
               txId: call.id,
             },
           }),
