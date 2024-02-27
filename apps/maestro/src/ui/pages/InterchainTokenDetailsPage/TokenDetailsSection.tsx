@@ -145,7 +145,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {sanitizedTokenDetails.map(([label, value]) => (
           <li
             key={String(label)}
-            className="md:text-md flex items-center gap-2 text-sm lg:text-lg"
+            className="md:text-md flex h-8 items-center gap-2 text-sm lg:text-lg"
           >
             <span className="font-semibold">{label}: </span>
             <span className="opacity-60">{value}</span>
