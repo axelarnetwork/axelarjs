@@ -106,15 +106,21 @@ async function getInterchainToken(
   remainingChainConfigs: ExtendedWagmiChainConfig[],
   ctx: Context
 ) {
+  const originChain =
+    tokenDetails.axelarChainId === chainConfig?.axelarChainId
+      ? chainConfig
+      : remainingChainConfigs.find(
+          (chain) => chain.axelarChainId === tokenDetails.axelarChainId
+        );
   const lookupToken = {
     tokenId: tokenDetails.tokenId,
     tokenAddress: tokenDetails.tokenAddress,
     tokenManagerAddress: tokenDetails.tokenManagerAddress,
     tokenManagerType: tokenDetails.tokenManagerType,
-    isOriginToken: tokenDetails.axelarChainId === chainConfig?.axelarChainId,
+    isOriginToken: true,
     isRegistered: true,
-    chainId: chainConfig.id,
-    chainName: chainConfig.name,
+    chainId: originChain?.id,
+    chainName: originChain?.name,
     axelarChainId: tokenDetails.axelarChainId,
     kind: tokenDetails.kind,
   };
