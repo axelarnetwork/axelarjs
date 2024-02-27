@@ -1,5 +1,14 @@
 # @axelarjs/maestro
 
+## 0.3.3
+
+### Patch Changes
+
+- [`e4e1664fc4a6616f30b2a6749a35a0c30746908b`](https://github.com/axelarnetwork/axelarjs/commit/e4e1664fc4a6616f30b2a6749a35a0c30746908b) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Bug fixes:
+
+  - fix: polyfill BigInt.prototype.toJSON
+  - fix: eligible target chains state derivation
+
 ## 0.3.2
 
 ### Patch Changes
