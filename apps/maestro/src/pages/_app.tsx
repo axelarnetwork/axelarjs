@@ -11,6 +11,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
+import "~/lib/polyfills";
 import "~/styles/globals.css";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
