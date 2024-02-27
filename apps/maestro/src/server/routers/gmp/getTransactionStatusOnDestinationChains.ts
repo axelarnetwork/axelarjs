@@ -19,9 +19,34 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
     try {
       const data = await ctx.services.gmp.searchGMP({
         txHash: input.txHash,
-        // _source: {
-        //   includes: ["call.returnValues.destinationChain", "status"],
-        // },
+        _source: {
+          includes: [
+            "call.returnValues.destinationChain",
+            "status",
+            "approved",
+            "confirm",
+            "executed",
+          ],
+          excludes: [
+            "call.transaction",
+            "fees",
+            "gas",
+            "gas_price_rate",
+            "gas_paid",
+            "approved.receipt",
+            "confirm.receipt",
+            "executed.receipt",
+            "approved.returnValues",
+            "confirm.returnValues",
+            "executed.returnValues",
+            "approved.transaction",
+            "confirm.transaction",
+            "executed.transaction",
+            "approved.created_at",
+            "confirm.created_at",
+            "executed.created_at",
+          ],
+        },
       });
 
       if (data.length) {
