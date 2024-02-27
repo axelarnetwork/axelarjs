@@ -47,16 +47,11 @@ export function useSendInterchainTokenState(props: {
 
   const isApprovalRequired = useMemo(
     () =>
+      // is canonical token && origin token
       props.kind === "canonical" &&
       interchainToken.chainId !== undefined &&
       interchainToken.chainId === props.originTokenChainId,
     [interchainToken.chainId, props.kind, props.originTokenChainId]
-  );
-
-  const referenceToken = useMemo(
-    () =>
-      props.kind === "canonical" ? originInterchainToken : interchainToken,
-    [interchainToken, originInterchainToken, props.kind]
   );
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
@@ -69,12 +64,14 @@ export function useSendInterchainTokenState(props: {
   });
 
   const eligibleTargetChains = useMemo(() => {
-    return (referenceToken?.matchingTokens ?? [])
+    const matchingTokens = originInterchainToken?.matchingTokens ?? [];
+
+    return matchingTokens
       .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
       .map((x) => computed.indexedByChainId[x.chainId ?? 0])
       .filter(Boolean);
   }, [
-    referenceToken?.matchingTokens,
+    originInterchainToken?.matchingTokens,
     props.sourceChain.chain_id,
     computed.indexedByChainId,
   ]);
