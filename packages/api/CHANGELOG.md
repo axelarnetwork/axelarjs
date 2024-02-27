@@ -1,5 +1,21 @@
 # @axelarjs/api
 
+## 0.3.11
+
+### Patch Changes
+
+- [`2011bbf4ee3200f1799752bc65147cd2f5325e11`](https://github.com/axelarnetwork/axelarjs/commit/2011bbf4ee3200f1799752bc65147cd2f5325e11) Thanks [@alanrsoares](https://github.com/alanrsoares)! - apps/maestro:
+
+  - optimize searchGMP calls
+  - fix token details line height
+  - fix search results to center lookup token to origin token
+  - move direct calls to searchGMP to trpc queries
+  - upgrade dependencies
+
+  packages/api:
+
+  - update searchGMP params to support array of contract methods
+
 ## 0.3.10
 
 ### Patch Changes
