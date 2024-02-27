@@ -36,6 +36,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             "approved.receipt",
             "confirm.receipt",
             "executed.receipt",
+            "approved.topics",
             "approved.returnValues",
             "confirm.returnValues",
             "executed.returnValues",
