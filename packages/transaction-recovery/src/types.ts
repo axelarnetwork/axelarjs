@@ -4,10 +4,15 @@ import type {
   SearchGMPResponseData,
 } from "@axelarjs/api";
 import type { Environment } from "@axelarjs/core";
-import { SupportedMainnetChain, SupportedTestnetChain } from "@axelarjs/evm";
+import {
+  SupportedMainnetChain,
+  SupportedTestnetChain,
+  type createPublicTestnetClient,
+} from "@axelarjs/evm";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
 import type { Coin, DeliverTxResponse, StdFee } from "@cosmjs/stargate";
+import type { DecodeEventLogReturnType } from "viem";
 
 export type SendOptions = {
   txFee: StdFee;
@@ -16,6 +21,15 @@ export type SendOptions = {
   rpcUrl?: string;
   timeoutTimestamp?: number;
 };
+
+export type EventLog = {
+  signature: string;
+  eventLog: DecodeEventLogReturnType;
+  logIndex: number;
+  eventIndex: number;
+};
+
+export type EvmClient = ReturnType<typeof createPublicTestnetClient>;
 
 export type AutocalculateGasOptions = {
   gasLimit?: bigint;
@@ -66,3 +80,10 @@ export type GetFullFeeOptions = {
   axelarQueryClient: AxelarQueryAPIClient;
   environment: Environment;
 };
+
+export interface QueryGasFeeOptions {
+  provider?: EvmClient;
+  gasTokenSymbol?: string;
+  gasMultipler?: number;
+  shouldSubtractBaseFee?: boolean;
+}
