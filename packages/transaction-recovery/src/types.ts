@@ -4,11 +4,6 @@ import type {
   SearchGMPResponseData,
 } from "@axelarjs/api";
 import type { Environment } from "@axelarjs/core";
-import {
-  SupportedMainnetChain,
-  SupportedTestnetChain,
-  type createPublicTestnetClient,
-} from "@axelarjs/evm";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
 import type { Coin, DeliverTxResponse, StdFee } from "@cosmjs/stargate";
@@ -29,8 +24,6 @@ export type EventLog = {
   eventIndex: number;
 };
 
-export type EvmClient = ReturnType<typeof createPublicTestnetClient>;
-
 export type AutocalculateGasOptions = {
   gasLimit?: bigint;
   gasMultipler?: number;
@@ -44,8 +37,8 @@ export type AddGasParams = {
 };
 
 export type EvmAddNativeGasParams = {
-  txHash: string;
-  chain: SupportedMainnetChain | SupportedTestnetChain;
+  txHash: `0x${string}`;
+  chain: string;
   estimatedGasUsed: number;
   evmSendOptions: EvmSendOptions;
 };
@@ -82,7 +75,6 @@ export type GetFullFeeOptions = {
 };
 
 export interface QueryGasFeeOptions {
-  provider?: EvmClient;
   gasTokenSymbol?: string;
   gasMultipler?: number;
   shouldSubtractBaseFee?: boolean;
