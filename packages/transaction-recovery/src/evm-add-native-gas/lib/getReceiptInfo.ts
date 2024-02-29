@@ -108,16 +108,12 @@ export function getDestinationChainFromTxReceipt(receipt: TransactionReceipt) {
     logs: receipt.logs,
   });
 
-  return logs?.[0]?.args?.destinationChain;
+  return logs?.[0]?.args?.destinationChain || undefined;
 }
 
 export function extractReceiptInfoForNativeGasPaid(
   receipt: TransactionReceipt
-): {
-  paidFee: bigint;
-  destChain: string;
-  logIndex: number;
-} {
+) {
   const paidFee = getNativeGasAmountFromTxReceipt(receipt);
   const destChain = getDestinationChainFromTxReceipt(receipt);
   const logIndex = getLogIndexFromTxReceipt(receipt);

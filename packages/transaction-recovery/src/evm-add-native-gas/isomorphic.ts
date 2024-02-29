@@ -1,24 +1,15 @@
 import type {
   AxelarConfigClient,
-  AxelarEVMChainConfig,
   AxelarQueryAPIClient,
   AxelarscanClient,
-  ChainConfig,
   GMPClient,
 } from "@axelarjs/api";
 
-import { createPublicClient, formatEther, getContract, http } from "viem";
+import { createPublicClient, formatEther, http } from "viem";
 
 import { EvmAddNativeGasParams } from "../types";
 import { extractReceiptInfoForNativeGasPaid } from "./lib/getReceiptInfo";
-import {
-  getDestinationChainFromTxReceipt,
-  getGasServiceAddressFromChainConfig,
-  getLogIndexFromTxReceipt,
-  getNativeGasAmountFromTxReceipt,
-  getNativeGasPaidForContractCallEvent,
-  getNativeGasPaidForContractCallWithTokenEvent,
-} from "./lib/helper";
+import { calculateNativeGasFee } from "./lib/helper";
 
 export type EvmAddNativeGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;
@@ -27,34 +18,14 @@ export type EvmAddNativeGasDependencies = {
   gmpClient: GMPClient;
 };
 
-// async function calculateNativeGasFee(
-//   txHash: Hash,
-//   sourceChain: string,
-//   destinationChain: string,
-//   estimatedGasUsed: number,
-//   dependencies: EvmAddNativeGasDependencies,
-//   options: QueryGasFeeOptions
-// ): Promise<string> {
-//   // await throwIfInvalidChainIds(
-//   //   [sourceChain, destinationChain],
-//   //   this.environment
-//   // );
-//   // console.log("addNativeGas", params, dependencies);
-//   // const { evmClient, axelarscanClient } = dependencies;
-//   // // const chainConfigs = await axelarscanClient.getChainConfigs();
-//   // const receipt = await evmClient.getTransactionReceipt({
-//   //   hash: txHash,
-//   // });
-// }
-
 // TODO: addNativeGas is not implemented
 export async function addNativeGas(
   params: EvmAddNativeGasParams,
   dependencies: EvmAddNativeGasDependencies
 ) {
   // const { chain, txHash, evmSendOptions, estimatedGasUsed } = params;
-  const { axelarscanClient, configClient } = dependencies;
-  const { evmSendOptions } = params;
+  const { axelarscanClient } = dependencies;
+  // const { evmSendOptions } = params;
 
   // 1. Find config for the chain with rpc url
   const chainConfigs = await axelarscanClient.getChainConfigs();
@@ -85,13 +56,21 @@ export async function addNativeGas(
     throw new Error("Invalid GMP Tx");
   }
 
-  const gasServiceAddress = await getGasServiceAddressFromChainConfig(
-    configClient,
-    evmSendOptions.environment,
-    destChain
+  // const gasServiceAddress = await getGasServiceAddressFromChainConfig(
+  //   configClient,
+  //   evmSendOptions.environment,
+  //   destChain
+  // );
+
+  const gasToAdd = await calculateNativeGasFee(
+    receipt,
+    params.chain,
+    destChain,
+    params.estimatedGasUsed,
+    dependencies
   );
 
-  console.log(gasServiceAddress);
+  console.log("Gas To Add", gasToAdd);
 
   // const contract = getContract({
   //   abi: parseAbi([
