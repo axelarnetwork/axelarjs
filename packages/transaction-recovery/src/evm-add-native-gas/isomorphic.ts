@@ -7,16 +7,18 @@ import type {
   GMPClient,
 } from "@axelarjs/api";
 
-import { createPublicClient, getContract, http, parseAbi } from "viem";
+import { createPublicClient, formatEther, getContract, http } from "viem";
 
 import { EvmAddNativeGasParams } from "../types";
+import { extractReceiptInfoForNativeGasPaid } from "./lib/getReceiptInfo";
 import {
   getDestinationChainFromTxReceipt,
   getGasServiceAddressFromChainConfig,
   getLogIndexFromTxReceipt,
+  getNativeGasAmountFromTxReceipt,
   getNativeGasPaidForContractCallEvent,
   getNativeGasPaidForContractCallWithTokenEvent,
-} from "./helper";
+} from "./lib/helper";
 
 export type EvmAddNativeGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;
@@ -74,8 +76,10 @@ export async function addNativeGas(
     hash: params.txHash,
   });
 
-  const destChain = getDestinationChainFromTxReceipt(receipt);
-  const logIndex = getLogIndexFromTxReceipt(receipt);
+  const { paidFee, destChain, logIndex } =
+    extractReceiptInfoForNativeGasPaid(receipt);
+
+  console.log(formatEther(paidFee) + " ETH", destChain, logIndex);
 
   if (!destChain) {
     throw new Error("Invalid GMP Tx");

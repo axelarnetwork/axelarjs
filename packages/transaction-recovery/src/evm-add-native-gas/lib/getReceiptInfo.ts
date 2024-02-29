@@ -1,6 +1,3 @@
-import { AxelarConfigClient, AxelarEVMChainConfig } from "@axelarjs/api";
-import { Environment } from "@axelarjs/core";
-
 import { parseAbi, parseEventLogs, type TransactionReceipt } from "viem";
 
 export function isContractCallWithToken(receipt: TransactionReceipt): boolean {
@@ -8,12 +5,14 @@ export function isContractCallWithToken(receipt: TransactionReceipt): boolean {
 }
 
 export function getContractCallEvent(receipt: TransactionReceipt) {
-  return parseEventLogs({
+  const logs = parseEventLogs({
     abi: parseAbi([
       "event ContractCall(address indexed sender,string destinationChain,string destinationContractAddress,bytes32 indexed payloadHash,bytes payload)",
     ]),
     logs: receipt.logs,
-  })[0];
+  });
+
+  return logs?.[0];
 }
 
 export function getContractCallWithTokenEvent(receipt: TransactionReceipt) {
@@ -24,7 +23,7 @@ export function getContractCallWithTokenEvent(receipt: TransactionReceipt) {
     logs: receipt.logs,
   });
 
-  return logs[0];
+  return logs?.[0];
 }
 
 export function getNativeGasPaidForContractCallEvent(
@@ -40,48 +39,8 @@ export function getNativeGasPaidForContractCallEvent(
     eventName: "NativeGasPaidForContractCall",
   });
 
-  return logs[0];
+  return logs?.[0];
 }
-
-// export function findContractEvent<
-//   TSignature extends `0x${string}`,
-//   TAbi extends Abi
-// >(
-//   receipt: TransactionReceipt,
-//   eventSignatures: TSignature[],
-//   eventName: string,
-//   abi: TAbi
-// ) {
-//   // const logs = parseEventLogs({
-//   //   abi,
-//   //   logs: receipt.logs,
-
-//   // });
-//   // logs.forEach((log) => {
-//   //   log.args?
-//   // })
-//   for (const [index, log] of receipt.logs.entries()) {
-//     // const _log = log a
-//     const eventTopic = log.topics[0].slice(0, 10);
-//     if (!eventTopic) continue;
-
-//     const eventIndex = eventSignatures.indexOf(eventTopic);
-//     if (eventIndex > -1) {
-//       const eventLog = decodeEventLog({
-//         abi,
-//         data: log.data,
-//         topics: log.topics,
-//       });
-
-//       return {
-//         signature: eventSignatures[eventIndex],
-//         eventLog,
-//         logIndex: log.logIndex,
-//         eventIndex: index,
-//       };
-//     }
-//   }
-// }
 
 export function getNativeGasPaidForContractCallWithTokenEvent(
   receipt: TransactionReceipt
@@ -96,7 +55,7 @@ export function getNativeGasPaidForContractCallWithTokenEvent(
     eventName: "NativeGasPaidForContractCallWithToken",
   });
 
-  return logs[0];
+  return logs?.[0];
 }
 
 export function getLogIndexFromTxReceipt(receipt: TransactionReceipt): number {
@@ -116,7 +75,7 @@ export function getLogIndexFromTxReceipt(receipt: TransactionReceipt): number {
 
 export function getNativeGasAmountFromTxReceipt(
   receipt: TransactionReceipt
-): string {
+): bigint {
   const typeContractCallWithToken = isContractCallWithToken(receipt);
   if (typeContractCallWithToken) {
     const gasReceiverEvent =
@@ -124,18 +83,18 @@ export function getNativeGasAmountFromTxReceipt(
     const gatewayEvent = getContractCallWithTokenEvent(receipt);
 
     if (gasReceiverEvent && gatewayEvent) {
-      return gasReceiverEvent.args.gasFeeAmount.toString();
+      return gasReceiverEvent.args.gasFeeAmount;
     } else {
-      return "0";
+      return 0n;
     }
   } else {
     const gasReceiverEvent = getNativeGasPaidForContractCallEvent(receipt);
     const gatewayEvent = getContractCallEvent(receipt);
 
     if (gasReceiverEvent && gatewayEvent) {
-      return gasReceiverEvent.args.gasFeeAmount.toString();
+      return gasReceiverEvent.args.gasFeeAmount;
     } else {
-      return "0";
+      return 0n;
     }
   }
 }
@@ -149,27 +108,23 @@ export function getDestinationChainFromTxReceipt(receipt: TransactionReceipt) {
     logs: receipt.logs,
   });
 
-  return logs[0].args.destinationChain;
+  return logs?.[0]?.args?.destinationChain;
 }
 
-export async function getGasServiceAddressFromChainConfig(
-  chainConfig: AxelarConfigClient,
-  env: Environment,
-  chain: string
-) {
-  const _chainConfigs = await chainConfig.getChainConfigs(env);
-  const mapEvmChains = Object.entries(_chainConfigs.chains)
-    .filter(([, v]) => {
-      return v.module === "evm";
-    })
-    .reduce((acc, [k, v]) => {
-      acc[k] = v;
-      return acc;
-    }, {});
+export function extractReceiptInfoForNativeGasPaid(
+  receipt: TransactionReceipt
+): {
+  paidFee: bigint;
+  destChain: string;
+  logIndex: number;
+} {
+  const paidFee = getNativeGasAmountFromTxReceipt(receipt);
+  const destChain = getDestinationChainFromTxReceipt(receipt);
+  const logIndex = getLogIndexFromTxReceipt(receipt);
 
-  const srcChainConfig = mapEvmChains[
-    chain.toLowerCase()
-  ] as AxelarEVMChainConfig;
-
-  return srcChainConfig.evmConfigs.contracts.gasService;
+  return {
+    paidFee,
+    destChain,
+    logIndex,
+  };
 }
