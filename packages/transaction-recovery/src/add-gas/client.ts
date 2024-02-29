@@ -1,6 +1,6 @@
 import { createAxelarConfigClient } from "@axelarjs/api/axelar-config";
 import { createAxelarQueryClient } from "@axelarjs/api/axelar-query";
-import { createGMPClient } from "@axelarjs/api/gmp/";
+import { createGMPClient } from "@axelarjs/api/gmp";
 import { createAxelarSigningClient } from "@axelarjs/cosmos";
 
 import type { AddGasParams } from "../types";

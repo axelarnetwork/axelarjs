@@ -80,27 +80,27 @@ export async function isInsufficientFeeTx(
 
   const gmpTx = gmpTxs[0];
 
-  return gmpTx?.status === "insufficient_fee";
+  return gmpTx?.gas_status === "gas_paid_not_enough_gas";
 }
 
 export function getWalletClient(
   rpcUrl: string,
   privateKey?: `0x${string}`
 ): WalletClient {
-  if (!window.ethereum || !privateKey) {
+  if (!privateKey && !window.ethereum) {
     throw new Error(
       "Either 'window.ethereum' or 'evmWalletDetails.privateKey' must be provided"
     );
   }
 
-  if (window.ethereum) {
-    return createWalletClient({
-      transport: custom(window.ethereum),
-    }).extend(publicActions);
-  } else {
+  if (privateKey) {
     return createWalletClient({
       account: privateKeyToAccount(privateKey),
       transport: http(rpcUrl),
+    }).extend(publicActions);
+  } else {
+    return createWalletClient({
+      transport: custom(window.ethereum!),
     }).extend(publicActions);
   }
 }

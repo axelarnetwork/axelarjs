@@ -12,6 +12,7 @@
   "files": [
     "./build",
     "./add-gas",
+    "./evm-add-native-gas/",
     "./index.js",
     "./index.d.ts",
     "./types.d.ts",
@@ -33,6 +34,14 @@
     "./add-gas/*": {
       "import": "./build/module/add-gas/*.js",
       "require": "./build/commonjs/add-gas/*.js"
+    },
+    "./evm-add-native-gas": {
+      "import": "./build/module/evm-add-native-gas/index.js",
+      "require": "./build/commonjs/evm-add-native-gas/index.js"
+    },
+    "./evm-add-native-gas/*": {
+      "import": "./build/module/evm-add-native-gas/*.js",
+      "require": "./build/commonjs/evm-add-native-gas/*.js"
     }
   },
   "scripts": {
