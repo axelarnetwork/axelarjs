@@ -110,7 +110,7 @@ async function getInterchainToken(
     tokenDetails.axelarChainId === chainConfig.axelarChainId
       ? chainConfig
       : remainingChainConfigs.find(
-          propEq("axelarChainId", tokenDetails.axelarChainId)
+          propEq(tokenDetails.axelarChainId, "axelarChainId")
         );
 
   if (!originChainConfig) {
