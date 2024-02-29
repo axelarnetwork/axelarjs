@@ -1,7 +1,7 @@
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
-import { partition, pluck } from "rambda";
+import { partition, pluck, propEq } from "rambda";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
@@ -106,15 +106,26 @@ async function getInterchainToken(
   remainingChainConfigs: ExtendedWagmiChainConfig[],
   ctx: Context
 ) {
+  const originChainConfig =
+    tokenDetails.axelarChainId === chainConfig.axelarChainId
+      ? chainConfig
+      : remainingChainConfigs.find(
+          propEq(tokenDetails.axelarChainId, "axelarChainId")
+        );
+
+  if (!originChainConfig) {
+    return null;
+  }
+
   const lookupToken = {
     tokenId: tokenDetails.tokenId,
     tokenAddress: tokenDetails.tokenAddress,
     tokenManagerAddress: tokenDetails.tokenManagerAddress,
     tokenManagerType: tokenDetails.tokenManagerType,
-    isOriginToken: tokenDetails.axelarChainId === chainConfig?.axelarChainId,
+    isOriginToken: true,
     isRegistered: true,
-    chainId: chainConfig.id,
-    chainName: chainConfig.name,
+    chainId: originChainConfig.id,
+    chainName: originChainConfig.name,
     axelarChainId: tokenDetails.axelarChainId,
     kind: tokenDetails.kind,
   };
@@ -269,12 +280,16 @@ async function scanChains(
     const tokenDetails = await getTokenDetails(chainConfig, tokenAddress, ctx);
 
     if (tokenDetails) {
-      return await getInterchainToken(
+      const result = getInterchainToken(
         tokenDetails,
         chainConfig,
         chainConfigs,
         ctx
       );
+
+      if (result) {
+        return result;
+      }
     }
   }
 
@@ -292,7 +307,9 @@ async function getTokenDetails(
       tokenAddress
     );
 
-  if (tokenDetails) return tokenDetails;
+  if (tokenDetails) {
+    return tokenDetails;
+  }
 
   const remoteTokenDetails =
     await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(

@@ -21,7 +21,7 @@ export function useEstimateGasFeeMultipleChainsQuery(
 ) {
   return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(input, {
     staleTime,
-    enabled: Boolean(input.destinationChainIds),
+    enabled: Boolean(input.destinationChainIds?.length),
   });
 }
 
