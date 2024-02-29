@@ -1,5 +1,6 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
+import * as mod from "../get-deposit-address/helpers/depositService";
 import {
   getDepositAddress,
   getLinkedDepositAddress,
@@ -183,6 +184,28 @@ describe("Deposit Address", () => {
       await expect(
         getNativeWrapDepositAddress(invalidDestParams)
       ).rejects.toThrowError();
+    });
+  });
+});
+
+describe("requestConfigs", () => {
+  test("should allow users to customize an RPC endpoint", async () => {
+    vi.spyOn(mod, "getActiveChains");
+    const axelarRpcUrl = "https://axelar-testnet-rpc.qubelabs.io:443";
+    const params: SendOptions = {
+      sourceChain: "osmosis-7",
+      destinationChain: "ethereum-2",
+      asset: "uaxl",
+      destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+      environment: ENVIRONMENTS.testnet,
+      requestConfig: { axelarRpcUrl },
+    };
+
+    const res = await getLinkedDepositAddress(params);
+
+    expect(res?.depositAddress).toBeTruthy();
+    expect(mod.getActiveChains).toHaveBeenCalledWith("testnet", {
+      axelarRpcUrl,
     });
   });
 });
