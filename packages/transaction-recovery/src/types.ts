@@ -46,18 +46,16 @@ export type EvmAddNativeGasParams = {
 export type EvmSendOptions = {
   environment: Environment;
   amount?: string;
-  refundAddress?: string;
-  gasMultipler?: number;
+  refundAddress?: `0x${string}`;
+  gasMultiplier?: number;
   logIndex?: number;
   destChain?: string;
   evmWalletDetails?: EvmWalletDetails;
 };
 
 export type EvmWalletDetails = {
-  privateKey?: string;
-  useWindowEthereum?: boolean;
+  privateKey?: `0x${string}`;
   rpcUrl?: string;
-  gasLimitBuffer?: number;
 };
 
 export type AddGasResponse = {

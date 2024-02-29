@@ -5,11 +5,16 @@ import type {
   GMPClient,
 } from "@axelarjs/api";
 
-import { createPublicClient, formatEther, http } from "viem";
+import { createPublicClient, getContract, http, parseAbi } from "viem";
 
 import { EvmAddNativeGasParams } from "../types";
 import { extractReceiptInfoForNativeGasPaid } from "./lib/getReceiptInfo";
-import { calculateNativeGasFee } from "./lib/helper";
+import {
+  calculateNativeGasFee,
+  getGasServiceAddressFromChainConfig,
+  getWalletClient,
+  isInsufficientFeeTx,
+} from "./lib/helper";
 
 export type EvmAddNativeGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;
@@ -18,50 +23,61 @@ export type EvmAddNativeGasDependencies = {
   gmpClient: GMPClient;
 };
 
-// TODO: addNativeGas is not implemented
 export async function addNativeGas(
   params: EvmAddNativeGasParams,
   dependencies: EvmAddNativeGasDependencies
 ) {
-  // const { chain, txHash, evmSendOptions, estimatedGasUsed } = params;
-  const { axelarscanClient } = dependencies;
-  // const { evmSendOptions } = params;
+  const { evmSendOptions } = params;
+  const { axelarscanClient, gmpClient, configClient } = dependencies;
 
-  // 1. Find config for the chain with rpc url
   const chainConfigs = await axelarscanClient.getChainConfigs();
+
   const evmChainConfigs = chainConfigs.evm;
+
   const chainConfig = evmChainConfigs.find(
     (config) => config.id.toLowerCase() === params.chain.toLowerCase()
   );
 
-  if (!chainConfig) {
-    // TODO: Should also allow for custom rpc urls
-    throw new Error(`RPC not found for ${params.chain}`);
+  // Use the public RPC endpoint if it is not provided in the chain config
+  const rpcUrl =
+    chainConfig?.endpoints?.rpc?.[0] || evmSendOptions.evmWalletDetails?.rpcUrl;
+
+  // Throw an error if the RPC endpoint is not found
+  if (!rpcUrl || !chainConfig) {
+    throw new Error(`Config not found for ${params.chain}`);
   }
 
+  const chainId = chainConfig.chain_id;
+  const nativeToken = chainConfig.native_token;
+
   const client = createPublicClient({
-    transport: http(chainConfig.endpoints.rpc[0]),
+    transport: http(rpcUrl),
   });
 
   const receipt = await client.getTransactionReceipt({
     hash: params.txHash,
   });
 
-  const { paidFee, destChain, logIndex } =
-    extractReceiptInfoForNativeGasPaid(receipt);
+  const { destChain, logIndex } = extractReceiptInfoForNativeGasPaid(receipt);
 
-  console.log(formatEther(paidFee) + " ETH", destChain, logIndex);
-
+  // Throw an error if the destination chain is not found from the GMP event details.
   if (!destChain) {
     throw new Error("Invalid GMP Tx");
   }
 
-  // const gasServiceAddress = await getGasServiceAddressFromChainConfig(
-  //   configClient,
-  //   evmSendOptions.environment,
-  //   destChain
-  // );
+  // Check if the transaction requires native gas to be paid.
+  const shouldAddNativeGas = await isInsufficientFeeTx(
+    gmpClient,
+    params.txHash,
+    logIndex
+  );
 
+  // Throw an error if the transaction does not require native gas to be paid.
+  if (!shouldAddNativeGas) {
+    throw new Error("This transaction does not require native gas paid.");
+  }
+
+  // Calculate the amount of native gas to be paid.
   const gasToAdd = await calculateNativeGasFee(
     receipt,
     params.chain,
@@ -70,35 +86,62 @@ export async function addNativeGas(
     dependencies
   );
 
-  console.log("Gas To Add", gasToAdd);
+  // Throw an error if the amount of native gas to be paid is 0.
+  if (gasToAdd === BigInt(0)) {
+    throw new Error("Gas paid was sufficient. No need to add gas.");
+  }
 
-  // const contract = getContract({
-  //   abi: parseAbi([
-  //     "function addNativeGas(bytes32 txHash,uint256 logIndex,address refundAddress) external payable",
-  //   ]),
-  //   address: gasServiceAddress,
-  //   client,
-  // });
+  const gasServiceAddress = await getGasServiceAddressFromChainConfig(
+    configClient,
+    evmSendOptions.environment,
+    destChain
+  );
 
-  // const contract = new ethers.Contract(
-  //   gasReceiverAddress,
-  //   [
-  //     "function addNativeGas(bytes32 txHash,uint256 logIndex,address refundAddress) external payable",
-  //   ],
-  //   signer
-  // );
-  // return contract
-  //   .addNativeGas(txHash, logIndex, refundAddress, {
-  //     value: gasFeeToAdd,
-  //   })
+  if (!gasServiceAddress) {
+    throw new Error(`Gas service address not found for ${destChain}`);
+  }
 
-  // const logs = getNativeGasPaidForContractCallWithTokenEvent(receipt);
+  const walletClient = getWalletClient(
+    rpcUrl,
+    evmSendOptions.evmWalletDetails?.privateKey
+  );
 
-  // 1. get tx receipt
-  // 2. check if it's already executed
-  // 3. get native gas fee
-  // 4. get signer from options
-  // 5. call addNativeGas to the gas receiver contract
+  const contract = getContract({
+    abi: parseAbi([
+      "function addNativeGas(bytes32 txHash,uint256 logIndex,address refundAddress) external payable",
+    ]),
+    address: gasServiceAddress,
+    client: {
+      wallet: walletClient,
+    },
+  });
 
-  await Promise.resolve();
+  const refundAddress =
+    evmSendOptions.refundAddress || walletClient.account?.address;
+
+  if (!refundAddress) {
+    throw new Error("Refund address not found");
+  }
+
+  if (!walletClient.account?.address) {
+    throw new Error("Account address not found");
+  }
+
+  return contract.write.addNativeGas(
+    [params.txHash, BigInt(logIndex), refundAddress],
+    {
+      account: walletClient.account.address,
+      chain: {
+        id: chainId,
+        name: params.chain,
+        nativeCurrency: nativeToken,
+        rpcUrls: {
+          default: {
+            http: [rpcUrl],
+          },
+        },
+      },
+      value: gasToAdd,
+    }
+  );
 }

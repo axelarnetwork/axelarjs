@@ -608,8 +608,8 @@ importers:
         specifier: ^0.31.3
         version: 0.31.3
       viem:
-        specifier: ^2.7.10
-        version: 2.7.10(typescript@5.3.3)
+        specifier: ^2.7.16
+        version: 2.7.16(typescript@5.3.3)
     devDependencies:
       '@axelarjs/config':
         specifier: workspace:*
@@ -9737,20 +9737,6 @@ packages:
     dependencies:
       typescript: 5.3.3
       zod: 3.22.4
-
-  /abitype@1.0.0(typescript@5.3.3):
-    resolution: {integrity: sha512-NMeMah//6bJ56H5XRj8QCV4AwuW6hB6zqz2LnhhLdcWVQOsXki6/Pn3APeqxCma62nXIcmZWdu1DlHWS74umVQ==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3 >=3.22.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-    dependencies:
-      typescript: 5.3.3
-    dev: false
 
   /abitype@1.0.0(typescript@5.3.3)(zod@3.22.4):
     resolution: {integrity: sha512-NMeMah//6bJ56H5XRj8QCV4AwuW6hB6zqz2LnhhLdcWVQOsXki6/Pn3APeqxCma62nXIcmZWdu1DlHWS74umVQ==}
@@ -20672,6 +20658,7 @@ packages:
       - bufferutil
       - utf-8-validate
       - zod
+    dev: false
 
   /vite-node@1.2.1(@types/node@20.11.20):
     resolution: {integrity: sha512-fNzHmQUSOY+y30naohBvSW7pPn/xn3Ib/uqm+5wAJQJiqQsU0NBR78XdRJb04l4bOFKjpTWld0XAfkKlrDbySg==}

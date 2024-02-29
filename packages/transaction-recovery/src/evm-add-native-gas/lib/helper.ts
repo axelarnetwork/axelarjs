@@ -1,7 +1,22 @@
-import { AxelarConfigClient, AxelarEVMChainConfig } from "@axelarjs/api";
+import {
+  AxelarConfigClient,
+  AxelarEVMChainConfig,
+  GMPClient,
+} from "@axelarjs/api";
 import { Environment } from "@axelarjs/core";
 
-import { TransactionReceipt } from "viem";
+import "viem/window";
+
+import {
+  createWalletClient,
+  custom,
+  Hash,
+  http,
+  publicActions,
+  TransactionReceipt,
+  WalletClient,
+} from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 import { EvmAddNativeGasDependencies } from "../isomorphic";
 import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
@@ -28,6 +43,8 @@ export async function getGasServiceAddressFromChainConfig(
   return srcChainConfig?.evmConfigs?.contracts?.gasService;
 }
 
+// Calculate the amount of native gas to be paid. If the amount is 0, then no native gas needs to be paid.
+// Otherwise, the amount of native gas to be paid is the difference between the total amount of gas to be paid and the amount of gas already paid.
 export async function calculateNativeGasFee(
   receipt: TransactionReceipt,
   sourceChain: string,
@@ -36,14 +53,54 @@ export async function calculateNativeGasFee(
   dependencies: EvmAddNativeGasDependencies
 ): Promise<bigint> {
   const { axelarQueryClient } = dependencies;
-  const totalAmount = (await axelarQueryClient.estimateGasFee({
+  const _totalAmount = (await axelarQueryClient.estimateGasFee({
     sourceChain,
     destinationChain,
     gasLimit: BigInt(estimatedGasUsed),
     gasMultiplier: "auto",
   })) as string;
 
+  const totalAmount = BigInt(_totalAmount);
+
   const { paidFee } = extractReceiptInfoForNativeGasPaid(receipt);
 
-  return BigInt(totalAmount) - paidFee;
+  return paidFee >= totalAmount ? BigInt(0) : totalAmount - paidFee;
+}
+
+export async function isInsufficientFeeTx(
+  client: GMPClient,
+  txHash: Hash,
+  logIndex: number
+) {
+  const gmpTxs = await client.searchGMP({
+    txHash: txHash,
+    txLogIndex: logIndex,
+    size: 1,
+  });
+
+  const gmpTx = gmpTxs[0];
+
+  return gmpTx?.status === "insufficient_fee";
+}
+
+export function getWalletClient(
+  rpcUrl: string,
+  privateKey?: `0x${string}`
+): WalletClient {
+  if (!window.ethereum || !privateKey) {
+    throw new Error(
+      "Either 'window.ethereum' or 'evmWalletDetails.privateKey' must be provided"
+    );
+  }
+
+  if (window.ethereum) {
+    return createWalletClient({
+      transport: custom(window.ethereum),
+    }).extend(publicActions);
+  } else {
+    return createWalletClient({
+      account: privateKeyToAccount(privateKey),
+      transport: http(rpcUrl),
+    }).extend(publicActions);
+  }
 }

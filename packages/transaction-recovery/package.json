@@ -59,6 +59,6 @@
     "@axelarjs/cosmos": "workspace:*",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
-    "viem": "^2.7.10"
+    "viem": "^2.7.16"
   }
 }
