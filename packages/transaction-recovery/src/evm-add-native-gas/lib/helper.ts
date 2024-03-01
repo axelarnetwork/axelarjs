@@ -18,6 +18,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
+import { EvmAddNativeGasError } from "../error";
 import { EvmAddNativeGasDependencies } from "../isomorphic";
 import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
 
@@ -88,9 +89,7 @@ export function getWalletClient(
   privateKey?: `0x${string}`
 ): WalletClient {
   if (!privateKey && !window.ethereum) {
-    throw new Error(
-      "Either 'window.ethereum' or 'evmWalletDetails.privateKey' must be provided"
-    );
+    throw EvmAddNativeGasError.WALLET_CLIENT_NOT_FOUND;
   }
 
   if (privateKey) {
