@@ -1,6 +1,7 @@
 import {
   AxelarConfigClient,
   AxelarEVMChainConfig,
+  AxelarQueryAPIClient,
   GMPClient,
 } from "@axelarjs/api";
 import { Environment } from "@axelarjs/core";
@@ -19,7 +20,6 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 
 import { EvmAddNativeGasError } from "../error";
-import { EvmAddNativeGasDependencies } from "../isomorphic";
 import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
 
 export async function getGasServiceAddressFromChainConfig(
@@ -51,21 +51,21 @@ export async function calculateNativeGasFee(
   sourceChain: string,
   destinationChain: string,
   estimatedGasUsed: number,
-  dependencies: EvmAddNativeGasDependencies
+  axelarQueryClient: AxelarQueryAPIClient,
+  gasMultiplier?: number
 ): Promise<bigint> {
-  const { axelarQueryClient } = dependencies;
-  const _totalAmount = (await axelarQueryClient.estimateGasFee({
+  const stringTotalAmount = (await axelarQueryClient.estimateGasFee({
     sourceChain,
     destinationChain,
     gasLimit: BigInt(estimatedGasUsed),
-    gasMultiplier: "auto",
+    gasMultiplier: gasMultiplier || "auto",
   })) as string;
 
-  const totalAmount = BigInt(_totalAmount);
+  const bigIntTotalAmount = BigInt(stringTotalAmount);
 
   const { paidFee } = extractReceiptInfoForNativeGasPaid(receipt);
 
-  return paidFee >= totalAmount ? BigInt(0) : totalAmount - paidFee;
+  return paidFee >= bigIntTotalAmount ? BigInt(0) : bigIntTotalAmount - paidFee;
 }
 
 export async function isInsufficientFeeTx(

@@ -28,7 +28,8 @@ export async function addNativeGas(
   params: EvmAddNativeGasParams,
   dependencies: EvmAddNativeGasDependencies
 ) {
-  const { environment, evmSendOptions } = params;
+  const { environment, evmSendOptions, estimatedGasUsed, srcChain, txHash } =
+    params;
   const { axelarscanClient, gmpClient, configClient } = dependencies;
   const { amount, gasMultiplier, privateKey, refundAddress, rpcUrl } =
     evmSendOptions;
@@ -55,7 +56,7 @@ export async function addNativeGas(
   });
 
   const srcTxReceipt = await client.getTransactionReceipt({
-    hash: params.txHash,
+    hash: txHash,
   });
 
   const { destChain, logIndex } =
@@ -78,14 +79,20 @@ export async function addNativeGas(
     throw EvmAddNativeGasError.ENOUGH_PAID;
   }
 
-  // Calculate the amount of native gas to be paid.
-  const gasToAdd = await calculateNativeGasFee(
-    srcTxReceipt,
-    params.srcChain,
-    destChain,
-    params.estimatedGasUsed,
-    dependencies
-  );
+  const bigIntAmount = BigInt(amount || "0");
+
+  // Calculate the amount of native gas to be paid. Skip the calculation if the amount is provided.
+  const gasToAdd =
+    bigIntAmount > 0n
+      ? bigIntAmount
+      : await calculateNativeGasFee(
+          srcTxReceipt,
+          srcChain,
+          destChain,
+          estimatedGasUsed,
+          dependencies.axelarQueryClient,
+          gasMultiplier
+        );
 
   // Throw an error if the amount of native gas to be paid is 0.
   if (gasToAdd === BigInt(0)) {
@@ -102,10 +109,7 @@ export async function addNativeGas(
     throw new Error(`Gas service address not found for ${destChain}`);
   }
 
-  const walletClient = getWalletClient(
-    srcChainRpcUrl,
-    evmSendOptions?.privateKey
-  );
+  const walletClient = getWalletClient(srcChainRpcUrl, privateKey);
 
   const [senderAddress] = await walletClient.requestAddresses();
 
