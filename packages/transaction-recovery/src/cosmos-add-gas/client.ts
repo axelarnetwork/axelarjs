@@ -6,7 +6,7 @@ import { createAxelarSigningClient } from "@axelarjs/cosmos";
 import { addGas as baseAddGas } from "./isomorphic";
 import type { AddGasParams } from "./types";
 
-export function AddGasCosmos(params: AddGasParams) {
+export function addGasCosmos(params: AddGasParams) {
   const { environment } = params.sendOptions;
 
   return baseAddGas(params, {
@@ -17,4 +17,4 @@ export function AddGasCosmos(params: AddGasParams) {
   });
 }
 
-export default AddGasCosmos;
+export default addGasCosmos;
