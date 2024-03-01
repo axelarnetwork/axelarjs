@@ -7,7 +7,6 @@ import type { Environment } from "@axelarjs/core";
 
 import type { OfflineSigner } from "@cosmjs/proto-signing";
 import type { Coin, DeliverTxResponse, StdFee } from "@cosmjs/stargate";
-import type { DecodeEventLogReturnType } from "viem";
 
 export type SendOptions = {
   txFee: StdFee;
@@ -15,13 +14,6 @@ export type SendOptions = {
   offlineSigner: OfflineSigner;
   rpcUrl?: string;
   timeoutTimestamp?: number;
-};
-
-export type EventLog = {
-  signature: string;
-  eventLog: DecodeEventLogReturnType;
-  logIndex: number;
-  eventIndex: number;
 };
 
 export type AutocalculateGasOptions = {
@@ -49,9 +41,3 @@ export type GetFullFeeOptions = {
   axelarQueryClient: AxelarQueryAPIClient;
   environment: Environment;
 };
-
-export interface QueryGasFeeOptions {
-  gasTokenSymbol?: string;
-  gasMultipler?: number;
-  shouldSubtractBaseFee?: boolean;
-}
