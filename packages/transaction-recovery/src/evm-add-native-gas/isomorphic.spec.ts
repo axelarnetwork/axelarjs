@@ -1,8 +1,8 @@
-import { evmAddNativeGas } from "./client";
+import { addNativeGasEvm } from "./client";
 
 describe("EVM - addNativeGas - (isomorphic)", () => {
   it("should add native gas to a transaction", async () => {
-    await evmAddNativeGas({
+    await addNativeGasEvm({
       srcChain: "linea",
       estimatedGasUsed: 100000,
       txHash:

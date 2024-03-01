@@ -7,7 +7,6 @@ import type {
 
 import { createPublicClient, getContract, http, parseAbi } from "viem";
 
-import { EvmAddNativeGasParams } from "../types";
 import { EvmAddNativeGasError } from "./error";
 import { extractReceiptInfoForNativeGasPaid } from "./lib/getReceiptInfo";
 import {
@@ -16,6 +15,7 @@ import {
   getWalletClient,
   isInsufficientFeeTx,
 } from "./lib/helper";
+import { EvmAddNativeGasParams } from "./types";
 
 export type EvmAddNativeGasDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;

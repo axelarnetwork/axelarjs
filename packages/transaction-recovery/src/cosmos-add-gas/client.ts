@@ -3,10 +3,10 @@ import { createAxelarQueryClient } from "@axelarjs/api/axelar-query";
 import { createGMPClient } from "@axelarjs/api/gmp";
 import { createAxelarSigningClient } from "@axelarjs/cosmos";
 
-import type { AddGasParams } from "../types";
 import { addGas as baseAddGas } from "./isomorphic";
+import type { AddGasParams } from "./types";
 
-export function addGas(params: AddGasParams) {
+export function AddGasCosmos(params: AddGasParams) {
   const { environment } = params.sendOptions;
 
   return baseAddGas(params, {
@@ -17,4 +17,4 @@ export function addGas(params: AddGasParams) {
   });
 }
 
-export default addGas;
+export default AddGasCosmos;
