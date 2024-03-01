@@ -1,5 +1,6 @@
 // import { addNativeGasEvm } from "./client";
 
+// TODO: add tests for addNativeGasEvm
 describe("addNativeGasEvm", () => {
   // it("should add native gas to a transaction", async () => {
   //   await addNativeGasEvm({
