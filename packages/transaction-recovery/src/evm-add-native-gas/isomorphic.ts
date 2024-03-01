@@ -28,24 +28,23 @@ export async function addNativeGas(
   params: EvmAddNativeGasParams,
   dependencies: EvmAddNativeGasDependencies
 ) {
-  const { evmSendOptions } = params;
+  const { environment, evmSendOptions } = params;
   const { axelarscanClient, gmpClient, configClient } = dependencies;
+  const { amount, gasMultiplier, privateKey, refundAddress, rpcUrl } =
+    evmSendOptions;
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
-
   const evmChainConfigs = chainConfigs.evm;
-
   const chainConfig = evmChainConfigs.find(
-    (config) => config.id.toLowerCase() === params.chain.toLowerCase()
+    (config) => config.id.toLowerCase() === params.srcChain.toLowerCase()
   );
 
   // Use the public RPC endpoint if it is not provided in the chain config
-  const srcChainRpcUrl =
-    chainConfig?.endpoints?.rpc?.[0] || evmSendOptions?.rpcUrl;
+  const srcChainRpcUrl = chainConfig?.endpoints?.rpc?.[0] || rpcUrl;
 
   // Throw an error if the RPC endpoint is not found
   if (!srcChainRpcUrl || !chainConfig) {
-    throw EvmAddNativeGasError.CHAIN_CONFIG_NOT_FOUND(params.chain);
+    throw EvmAddNativeGasError.CHAIN_CONFIG_NOT_FOUND(params.srcChain);
   }
 
   const chainId = chainConfig.chain_id;
@@ -82,7 +81,7 @@ export async function addNativeGas(
   // Calculate the amount of native gas to be paid.
   const gasToAdd = await calculateNativeGasFee(
     srcTxReceipt,
-    params.chain,
+    params.srcChain,
     destChain,
     params.estimatedGasUsed,
     dependencies
@@ -95,7 +94,7 @@ export async function addNativeGas(
 
   const gasServiceAddress = await getGasServiceAddressFromChainConfig(
     configClient,
-    evmSendOptions.environment,
+    environment,
     destChain
   );
 
@@ -110,9 +109,9 @@ export async function addNativeGas(
 
   const [senderAddress] = await walletClient.requestAddresses();
 
-  const refundAddress = evmSendOptions.refundAddress || senderAddress;
+  const actualRefundAddress = refundAddress || senderAddress;
 
-  if (!refundAddress) {
+  if (!actualRefundAddress) {
     throw EvmAddNativeGasError.REFUND_ADDRESS_NOT_FOUND;
   }
 
@@ -131,12 +130,12 @@ export async function addNativeGas(
   });
 
   return contract.write.addNativeGas(
-    [params.txHash, BigInt(logIndex), refundAddress],
+    [params.txHash, BigInt(logIndex), actualRefundAddress],
     {
       account: senderAddress!,
       chain: {
         id: chainId,
-        name: params.chain,
+        name: params.srcChain,
         nativeCurrency: nativeToken,
         rpcUrls: {
           default: {

@@ -37,20 +37,19 @@ export type AddGasParams = {
 };
 
 export type EvmAddNativeGasParams = {
+  environment: Environment;
   txHash: `0x${string}`;
-  chain: string;
+  srcChain: string;
   estimatedGasUsed: number;
   evmSendOptions: EvmSendOptions;
 };
 
 export type EvmSendOptions = {
-  environment: Environment;
-  amount?: string;
-  refundAddress?: `0x${string}`;
-  gasMultiplier?: number;
-  destChain?: string;
-  privateKey?: `0x${string}`;
   rpcUrl?: string;
+  amount?: string;
+  gasMultiplier?: number;
+  refundAddress?: `0x${string}`;
+  privateKey?: `0x${string}`;
 };
 
 export type AddGasResponse = {

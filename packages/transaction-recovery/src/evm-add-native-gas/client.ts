@@ -17,7 +17,7 @@ import { addNativeGas as baseAddNativeGas } from "./isomorphic";
  * @returns The native gas payment transaction.
  */
 export function evmAddNativeGas(params: EvmAddNativeGasParams) {
-  const { environment } = params.evmSendOptions;
+  const { environment } = params;
 
   return baseAddNativeGas(params, {
     axelarscanClient: createAxelarscanClient(environment),
