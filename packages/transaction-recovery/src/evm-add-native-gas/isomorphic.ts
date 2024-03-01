@@ -118,46 +118,6 @@ export async function addNativeGas(
     throw new Error("Account address not found");
   }
 
-  console.log({
-    address: gasServiceAddress,
-    account: accountAddress,
-    chain: {
-      id: chainId,
-      name: params.chain,
-      nativeCurrency: nativeToken,
-      rpcUrls: {
-        default: {
-          http: [rpcUrl],
-        },
-      },
-    },
-    value: gasToAdd,
-    args: [params.txHash, BigInt(logIndex), refundAddress],
-  });
-
-  // return walletClient.writeContract({
-  //   abi: parseAbi([
-  //     "function addNativeGas(bytes32 txHash,uint256 logIndex,address refundAddress) external payable",
-  //   ]),
-  //   address: gasServiceAddress,
-  //   account: walletClient.account.address,
-  //   chain: {
-  //     id: chainId,
-  //     name: params.chain,
-  //     nativeCurrency: nativeToken,
-  //     rpcUrls: {
-  //       default: {
-  //         http: [rpcUrl],
-  //       },
-  //     },
-  //   },
-  //   functionName: "addNativeGas",
-  //   value: 1n,
-  //   args: [params.txHash, BigInt(logIndex), refundAddress],
-  // });
-
-  console.log("contract addr", gasServiceAddress);
-
   const contract = getContract({
     abi: parseAbi([
       "function addNativeGas(bytes32 txHash,uint256 logIndex,address refundAddress) external payable",
@@ -167,8 +127,6 @@ export async function addNativeGas(
       wallet: walletClient,
     },
   });
-
-  console.log([params.txHash, BigInt(logIndex), refundAddress]);
 
   return contract.write.addNativeGas(
     [params.txHash, BigInt(logIndex), refundAddress],
