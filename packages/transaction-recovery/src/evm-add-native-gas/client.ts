@@ -14,7 +14,7 @@ import type { EvmAddNativeGasParams } from "./types";
  * - `txHash`: The hash of the source transaction.
  * - `chain`: The source chain of the transaction.
  * - `estimatedGasUsed`: The estimated gas used to execute transaction on the destination chain.
- * - `evmSendOptions` (Optional): The options to send the transaction. The options are:
+ * - `addNativeGasOptions` (Optional): The options to send the transaction. The options are:
  *  - `amount` (Optional): The amount of native gas to be paid. If not provided, the amount will be calculated based on the estimated gas used and the gas multiplier.
  *  - `gasMultiplier` (Optional): The multiplier to calculate the amount of native gas to be paid. If not provided, the api will use the pre-calculated value.
  *  - `privateKey` (Optional): The private key of the sender. If not provided, the api will use the connected sender on browser-based wallet.

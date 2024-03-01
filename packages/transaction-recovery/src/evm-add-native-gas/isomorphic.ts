@@ -28,11 +28,16 @@ export async function addNativeGas(
   params: EvmAddNativeGasParams,
   dependencies: EvmAddNativeGasDependencies
 ) {
-  const { environment, evmSendOptions, estimatedGasUsed, srcChain, txHash } =
-    params;
+  const {
+    environment,
+    addNativeGasOptions,
+    estimatedGasUsed,
+    srcChain,
+    txHash,
+  } = params;
   const { axelarscanClient, gmpClient, configClient } = dependencies;
   const { amount, gasMultiplier, privateKey, refundAddress, rpcUrl } =
-    evmSendOptions || {};
+    addNativeGasOptions || {};
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
   const evmChainConfigs = chainConfigs.evm;
