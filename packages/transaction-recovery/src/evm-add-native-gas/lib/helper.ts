@@ -22,6 +22,13 @@ import { privateKeyToAccount } from "viem/accounts";
 import { EvmAddNativeGasError } from "../error";
 import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
 
+/**
+ * Get the address of the gas service contract from the chain config.
+ * @param chainConfig  The chain config client.
+ * @param env The environment. The environment can be "mainnet" or "testnet".
+ * @param chain the source chain.
+ * @returns The address of the gas service contract.
+ */
 export async function getGasServiceAddressFromChainConfig(
   chainConfig: AxelarConfigClient,
   env: Environment,
@@ -84,6 +91,12 @@ export async function isInsufficientFeeTx(
   return gmpTx?.gas_status === "gas_paid_not_enough_gas";
 }
 
+/**
+ * Get the wallet client to send the native gas payment transaction. If the private key is not provided, then the browser-based wallet (window.ethereum) will be used.
+ * @param rpcUrl - The RPC URL of the source chain.
+ * @param privateKey - The private key of the sender.
+ * @returns The wallet client to send the native gas payment transaction.
+ */
 export function getWalletClient(
   rpcUrl: string,
   privateKey?: `0x${string}`

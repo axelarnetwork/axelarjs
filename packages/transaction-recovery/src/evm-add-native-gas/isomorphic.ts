@@ -32,7 +32,7 @@ export async function addNativeGas(
     params;
   const { axelarscanClient, gmpClient, configClient } = dependencies;
   const { amount, gasMultiplier, privateKey, refundAddress, rpcUrl } =
-    evmSendOptions;
+    evmSendOptions || {};
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
   const evmChainConfigs = chainConfigs.evm;
@@ -46,6 +46,19 @@ export async function addNativeGas(
   // Throw an error if the RPC endpoint is not found
   if (!srcChainRpcUrl || !chainConfig) {
     throw EvmAddNativeGasError.CHAIN_CONFIG_NOT_FOUND(params.srcChain);
+  }
+
+  // Get the wallet client for sending the native gas payment transaction
+  const walletClient = getWalletClient(srcChainRpcUrl, privateKey);
+
+  const [senderAddress] = await walletClient.requestAddresses();
+
+  // Use the refund address if it is provided. Otherwise, use the sender address as the refund address.
+  const actualRefundAddress = refundAddress || senderAddress;
+
+  // Throw an error if the refund address is not found
+  if (!actualRefundAddress) {
+    throw EvmAddNativeGasError.REFUND_ADDRESS_NOT_FOUND;
   }
 
   const chainId = chainConfig.chain_id;
@@ -106,21 +119,7 @@ export async function addNativeGas(
   );
 
   if (!gasServiceAddress) {
-    throw new Error(`Gas service address not found for ${destChain}`);
-  }
-
-  const walletClient = getWalletClient(srcChainRpcUrl, privateKey);
-
-  const [senderAddress] = await walletClient.requestAddresses();
-
-  const actualRefundAddress = refundAddress || senderAddress;
-
-  if (!actualRefundAddress) {
-    throw EvmAddNativeGasError.REFUND_ADDRESS_NOT_FOUND;
-  }
-
-  if (!senderAddress) {
-    throw EvmAddNativeGasError.SENDER_ADDRESS_NOT_FOUND;
+    throw EvmAddNativeGasError.GAS_SERVICE_ADDRESS_NOT_FOUND;
   }
 
   const contract = getContract({

@@ -13,5 +13,5 @@ export type EvmAddNativeGasParams = {
   txHash: `0x${string}`;
   srcChain: string;
   estimatedGasUsed: number;
-  evmSendOptions: EvmSendOptions;
+  evmSendOptions?: EvmSendOptions;
 };
