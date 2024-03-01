@@ -53,7 +53,6 @@ export async function addNativeGas(
     throw EvmAddNativeGasError.CHAIN_CONFIG_NOT_FOUND(params.srcChain);
   }
 
-  // Get the wallet client for sending the native gas payment transaction
   const walletClient = getWalletClient(srcChainRpcUrl, privateKey);
 
   const [senderAddress] = await walletClient.requestAddresses();
