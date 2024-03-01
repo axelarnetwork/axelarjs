@@ -41,7 +41,7 @@ export async function addNativeGas(
 
   // Use the public RPC endpoint if it is not provided in the chain config
   const srcChainRpcUrl =
-    chainConfig?.endpoints?.rpc?.[0] || evmSendOptions.evmWalletDetails?.rpcUrl;
+    chainConfig?.endpoints?.rpc?.[0] || evmSendOptions?.rpcUrl;
 
   // Throw an error if the RPC endpoint is not found
   if (!srcChainRpcUrl || !chainConfig) {
@@ -105,7 +105,7 @@ export async function addNativeGas(
 
   const walletClient = getWalletClient(
     srcChainRpcUrl,
-    evmSendOptions.evmWalletDetails?.privateKey
+    evmSendOptions?.privateKey
   );
 
   const [senderAddress] = await walletClient.requestAddresses();

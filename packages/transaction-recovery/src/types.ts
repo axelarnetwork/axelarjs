@@ -48,12 +48,7 @@ export type EvmSendOptions = {
   amount?: string;
   refundAddress?: `0x${string}`;
   gasMultiplier?: number;
-  logIndex?: number;
   destChain?: string;
-  evmWalletDetails?: EvmWalletDetails;
-};
-
-export type EvmWalletDetails = {
   privateKey?: `0x${string}`;
   rpcUrl?: string;
 };
