@@ -106,20 +106,21 @@ export async function addNativeGas(
     evmSendOptions.evmWalletDetails?.privateKey
   );
 
-  const refundAddress =
-    evmSendOptions.refundAddress || walletClient.account?.address;
+  const [accountAddress] = await walletClient.requestAddresses();
+
+  const refundAddress = evmSendOptions.refundAddress || accountAddress;
 
   if (!refundAddress) {
     throw new Error("Refund address not found");
   }
 
-  if (!walletClient.account?.address) {
+  if (!accountAddress) {
     throw new Error("Account address not found");
   }
 
   console.log({
     address: gasServiceAddress,
-    account: walletClient.account.address,
+    account: accountAddress,
     chain: {
       id: chainId,
       name: params.chain,
@@ -172,7 +173,7 @@ export async function addNativeGas(
   return contract.write.addNativeGas(
     [params.txHash, BigInt(logIndex), refundAddress],
     {
-      account: walletClient.account.address,
+      account: accountAddress!,
       chain: {
         id: chainId,
         name: params.chain,
