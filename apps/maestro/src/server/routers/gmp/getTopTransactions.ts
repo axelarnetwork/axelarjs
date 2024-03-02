@@ -74,7 +74,6 @@ export const getTopTransactions = publicProcedure
         ...tokenDeploymentsSinceFeb28,
       ];
       const interchainTransfers = [
-        // @ts-expect-error iterator issue
         ...CACHED_TRANSFERS,
         ...interchainTransfersSinceFeb28,
       ];
