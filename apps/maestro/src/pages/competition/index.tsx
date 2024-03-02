@@ -180,6 +180,10 @@ const CompetitionPage = () => {
               ))}
             </Table.Body>
           </Table>
+          <span className="text-xs italic">
+            Note: These results are preliminary. Final results will be available
+            after March 6
+          </span>
           <span className="text-xs italic">Source: Axelarscan</span>
         </Card.Body>
       </Card>
