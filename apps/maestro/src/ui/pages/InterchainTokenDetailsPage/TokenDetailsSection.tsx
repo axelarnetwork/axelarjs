@@ -20,6 +20,7 @@ import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, useRef, useState, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
+import Image from "next/image";
 
 import { useAccount } from "wagmi";
 import { z } from "zod";
@@ -225,8 +226,11 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
       )}
     >
       {meta?.iconUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
+        <Image
+          src={`/api/avatar?tokenId=${tokenId}`}
+          alt="token icon"
+          layout="fill"
+        />
       ) : (
         <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
       )}
@@ -240,6 +244,8 @@ type UpdateTokenIconProps = {
   onUpdated?: () => void;
   icon?: JSX.Element;
 };
+
+const VALID_IMAGE_FORMATS = [".png", ".jpg", ".webp"];
 
 const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   tokenId,
@@ -285,12 +291,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
       return "URL is not valid";
     }
 
-    if ([".png", ".jpg", ".svg"].every((ext) => !iconUrl.endsWith(ext))) {
+    if (VALID_IMAGE_FORMATS.every((ext) => !iconUrl.endsWith(ext))) {
       return (
         <>
           URL must end with <Badge variant="neutral">.png</Badge>,{" "}
           <Badge variant="neutral">.jpg</Badge>, or{" "}
-          <Badge variant="neutral">.svg</Badge>
+          <Badge variant="neutral">.webp</Badge>
         </>
       );
     }
