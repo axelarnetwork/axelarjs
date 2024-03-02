@@ -5,6 +5,8 @@ import { z } from "zod";
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
+import { DEPLOYMENTS_THROUGH_FEB28 } from "./data/deployments_through_feb28";
+import { TRANSFERS_THROUGH_FEB28 } from "./data/transfers_through_feb28";
 
 const INPUT_SCHEMA = z.object({
   sampleSize: z.number().optional().default(20),
@@ -26,42 +28,55 @@ export const getTopTransactions = publicProcedure
     try {
       const commonParams = {
         senderAddress: input.senderAddress,
-        size: 99000,
+        size: 25000,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-        fromTime: input.fromTime,
-        toTime: input.toTime,
       };
-      const [tokenDeployments, interchainTransfers] = await Promise.all([
-        ctx.services.gmp.searchGMP({
-          ...commonParams,
-          contractMethod: [
-            "InterchainTokenDeploymentStarted",
-            "TokenManagerDeploymentStarted",
-          ],
-          _source: {
-            includes: [
-              "interchain_token_deployment_started.tokenId",
-              "token_manager_deployment_started.tokenId",
+
+      const [tokenDeploymentsSinceFeb28, interchainTransfersSinceFeb28] =
+        await Promise.all([
+          ctx.services.gmp.searchGMP({
+            ...commonParams,
+            fromTime: 1709096401, //feb 28
+            toTime: input.toTime,
+            contractMethod: [
+              "InterchainTokenDeploymentStarted",
+              "TokenManagerDeploymentStarted",
             ],
-            excludes: EXCLUDED_RESPONSE_FIELDS,
-          },
-        }),
-        ctx.services.gmp.searchGMP({
-          ...commonParams,
-          contractMethod: "InterchainTransfer",
-          _source: {
-            includes: [
-              "interchain_transfer.name",
-              "interchain_transfer.symbol",
-              "interchain_transfer.contract_address",
-              "interchain_transfer.tokenId",
-              "call.transactionHash",
-            ],
-            excludes: EXCLUDED_RESPONSE_FIELDS,
-          },
-        }),
-      ]);
+            _source: {
+              includes: [
+                "interchain_token_deployment_started.tokenId",
+                "token_manager_deployment_started.tokenId",
+              ],
+              excludes: EXCLUDED_RESPONSE_FIELDS,
+            },
+          }),
+          ctx.services.gmp.searchGMP({
+            ...commonParams,
+            fromTime: 1709096401, //feb 28
+            toTime: input.toTime,
+            contractMethod: "InterchainTransfer",
+            _source: {
+              includes: [
+                "interchain_transfer.name",
+                "interchain_transfer.symbol",
+                "interchain_transfer.contract_address",
+                "interchain_transfer.tokenId",
+                "call.transactionHash",
+              ],
+              excludes: EXCLUDED_RESPONSE_FIELDS,
+            },
+          }),
+        ]);
+
+      const tokenDeployments = [
+        ...DEPLOYMENTS_THROUGH_FEB28,
+        ...tokenDeploymentsSinceFeb28,
+      ];
+      const interchainTransfers = [
+        ...TRANSFERS_THROUGH_FEB28,
+        ...interchainTransfersSinceFeb28,
+      ];
 
       const eligibleTokenIds = new Set(
         tokenDeployments
