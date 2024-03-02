@@ -5,8 +5,8 @@ import { z } from "zod";
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
-import { DEPLOYMENTS_THROUGH_FEB28 } from "./data/deployments_through_feb28";
-import { TRANSFERS_THROUGH_FEB28 } from "./data/transfers_through_feb28";
+import CACHED_DEPLOYMENTS from "./data/cachedDeployments";
+import CACHED_TRANSFERS from "./data/cachedTransfers";
 
 const INPUT_SCHEMA = z.object({
   sampleSize: z.number().optional().default(20),
@@ -37,7 +37,7 @@ export const getTopTransactions = publicProcedure
         await Promise.all([
           ctx.services.gmp.searchGMP({
             ...commonParams,
-            fromTime: 1709096401, //feb 28
+            fromTime: 1709337600, //last day run
             toTime: input.toTime,
             contractMethod: [
               "InterchainTokenDeploymentStarted",
@@ -53,7 +53,7 @@ export const getTopTransactions = publicProcedure
           }),
           ctx.services.gmp.searchGMP({
             ...commonParams,
-            fromTime: 1709096401, //feb 28
+            fromTime: 1709337600, //last day run
             toTime: input.toTime,
             contractMethod: "InterchainTransfer",
             _source: {
@@ -70,11 +70,11 @@ export const getTopTransactions = publicProcedure
         ]);
 
       const tokenDeployments = [
-        ...DEPLOYMENTS_THROUGH_FEB28,
+        ...CACHED_DEPLOYMENTS,
         ...tokenDeploymentsSinceFeb28,
       ];
       const interchainTransfers = [
-        ...TRANSFERS_THROUGH_FEB28,
+        ...CACHED_TRANSFERS,
         ...interchainTransfersSinceFeb28,
       ];
 
