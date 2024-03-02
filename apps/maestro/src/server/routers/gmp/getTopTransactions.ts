@@ -4,9 +4,9 @@ import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal } from "~/lib/utils/validation";
+import CACHED_DEPLOYMENTS from "~/server/routers/gmp/data/cachedDeployments.json";
+import CACHED_TRANSFERS from "~/server/routers/gmp/data/cachedTransfers.json";
 import { publicProcedure } from "~/server/trpc";
-import CACHED_DEPLOYMENTS from "./data/cachedDeployments";
-import CACHED_TRANSFERS from "./data/cachedTransfers";
 
 const INPUT_SCHEMA = z.object({
   sampleSize: z.number().optional().default(20),
@@ -74,6 +74,7 @@ export const getTopTransactions = publicProcedure
         ...tokenDeploymentsSinceFeb28,
       ];
       const interchainTransfers = [
+        // @ts-expect-error iterator issue
         ...CACHED_TRANSFERS,
         ...interchainTransfersSinceFeb28,
       ];
