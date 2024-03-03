@@ -35,51 +35,54 @@ export const getTopTransactions = publicProcedure
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
       };
 
-      const [tokenDeploymentsSinceFeb28, interchainTransfersSinceFeb28] =
-        await Promise.all([
-          ctx.services.gmp.searchGMP({
-            ...commonParams,
-            fromTime: 1709424000, // last day run
-            toTime: input.toTime,
-            contractMethod: [
-              "InterchainTokenDeploymentStarted",
-              "TokenManagerDeploymentStarted",
+      const [uncachedTokenDeployments, uncachedTransfers] = await Promise.all([
+        ctx.services.gmp.searchGMP({
+          ...commonParams,
+          fromTime: 1709424000, // last day run
+          toTime: input.toTime,
+          contractMethod: [
+            "InterchainTokenDeploymentStarted",
+            "TokenManagerDeploymentStarted",
+          ],
+          _source: {
+            includes: [
+              "interchain_token_deployment_started.tokenId",
+              "token_manager_deployment_started.tokenId",
             ],
-            _source: {
-              includes: [
-                "interchain_token_deployment_started.tokenId",
-                "token_manager_deployment_started.tokenId",
-              ],
-              excludes: EXCLUDED_RESPONSE_FIELDS,
-            },
-          }),
-          ctx.services.gmp.searchGMP({
-            ...commonParams,
-            fromTime: 1709424000, //last day run
-            toTime: input.toTime,
-            contractMethod: "InterchainTransfer",
-            _source: {
-              includes: [
-                "interchain_transfer.name",
-                "interchain_transfer.symbol",
-                "interchain_transfer.contract_address",
-                "interchain_transfer.tokenId",
-                "call.transactionHash",
-              ],
-              excludes: EXCLUDED_RESPONSE_FIELDS,
-            },
-          }),
-        ]);
+            excludes: EXCLUDED_RESPONSE_FIELDS,
+          },
+        }),
+        ctx.services.gmp.searchGMP({
+          ...commonParams,
+          fromTime: 1709424000, //last day run
+          toTime: input.toTime,
+          contractMethod: "InterchainTransfer",
+          _source: {
+            includes: [
+              "interchain_transfer.name",
+              "interchain_transfer.symbol",
+              "interchain_transfer.contract_address",
+              "interchain_transfer.tokenId",
+              "call.transactionHash",
+            ],
+            excludes: EXCLUDED_RESPONSE_FIELDS,
+          },
+        }),
+      ]);
 
       const tokenDeployments = [
         ...CACHED_DEPLOYMENTS,
         ...CACHED_DEPLOYMENTS_HOURLY_1,
-        ...tokenDeploymentsSinceFeb28,
+        ...uncachedTokenDeployments.filter(
+          (deployment) => deployment.status === "executed"
+        ),
       ];
       const interchainTransfers = [
         ...CACHED_TRANSFERS,
         ...CACHED_TRANSFERS_HOURLY_1,
-        ...interchainTransfersSinceFeb28,
+        ...uncachedTransfers.filter(
+          (transfer) => transfer.status === "executed"
+        ),
       ];
 
       const eligibleTokenIds = new Set(
