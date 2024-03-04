@@ -1,9 +1,6 @@
 import type { ComponentProps, FC, ReactNode } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-
 import tw from "../../tw";
-import { cn } from "../../utils";
 import {
   AlertTriangleIcon,
   CheckCircleIcon,
@@ -11,9 +8,7 @@ import {
   XCircleIcon,
 } from "../icons/lucide";
 
-const StyledAlert = tw.div``;
-
-const alertVariance = cva("alert", {
+const StyledAlert = tw.div.cva("alert", {
   variants: {
     status: {
       info: "alert-info",
@@ -24,9 +19,7 @@ const alertVariance = cva("alert", {
   },
 });
 
-export interface AlertProps
-  extends ComponentProps<typeof StyledAlert>,
-    VariantProps<typeof alertVariance> {
+export interface AlertProps extends ComponentProps<typeof StyledAlert> {
   icon?: ReactNode;
 }
 
@@ -60,10 +53,7 @@ export const Alert: FC<AlertProps> = ({
   ...props
 }) => {
   return (
-    <StyledAlert
-      className={cn(alertVariance({ status }), className)}
-      {...props}
-    >
+    <StyledAlert status={status} className={className} {...props}>
       <div className={!status ? "text-info" : ""}>
         {icon ?? ICON_MAP[status ?? "info"]}
       </div>
