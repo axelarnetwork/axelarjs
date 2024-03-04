@@ -2,7 +2,7 @@ import { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-const CardContainer = tw.div.cva("card", {
+const StyledCard = tw.div.cva("card", {
   variants: {
     bordered: {
       true: "card-bordered",
@@ -16,11 +16,9 @@ const CardContainer = tw.div.cva("card", {
   },
 });
 
-type CardBaseProps = ComponentProps<typeof CardContainer>;
+export type CardProps = ComponentProps<typeof StyledCard>;
 
-export interface CardProps extends CardBaseProps {}
-
-export const Card = Object.assign(CardContainer, {
+export const Card = Object.assign(StyledCard, {
   Title: tw.div`card-title`,
   Body: tw.div`card-body`,
   Actions: tw.div`card-actions`,
