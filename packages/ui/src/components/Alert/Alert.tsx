@@ -48,12 +48,12 @@ const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
 export const Alert: FC<AlertProps> = ({
   status,
   icon,
-  className,
+
   children,
   ...props
 }) => {
   return (
-    <StyledAlert status={status} className={className} {...props}>
+    <StyledAlert status={status} {...props}>
       <div className={!status ? "text-info" : ""}>
         {icon ?? ICON_MAP[status ?? "info"]}
       </div>

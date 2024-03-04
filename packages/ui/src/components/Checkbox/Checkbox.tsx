@@ -1,9 +1,8 @@
-import { forwardRef } from "react";
+import { forwardRef, type ComponentProps } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import tw from "../../tw";
 
-const inputVariance = cva("checkbox", {
+const StyledInput = tw.input.cva("checkbox", {
   variants: {
     variant: {
       primary: "checkbox-primary",
@@ -23,11 +22,9 @@ const inputVariance = cva("checkbox", {
   },
 });
 
-type VProps = VariantProps<typeof inputVariance>;
+type InputElement = Omit<ComponentProps<typeof StyledInput>, "type" | "color">;
 
-type InputElement = Omit<JSX.IntrinsicElements["input"], "type" | "color">;
-
-export interface CheckboxProps extends InputElement, VProps {
+export interface CheckboxProps extends InputElement {
   type?: never;
   placeholder?: never;
 }
@@ -36,17 +33,12 @@ export interface CheckboxProps extends InputElement, VProps {
  * A checkbox input component
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ variant, inputSize, className, ...props }, ref) => (
-    <input
+  ({ variant, inputSize, ...props }, ref) => (
+    <StyledInput
       ref={ref}
       type="checkbox"
-      className={twMerge(
-        inputVariance({
-          variant,
-          inputSize,
-        }),
-        className
-      )}
+      variant={variant}
+      inputSize={inputSize}
       {...props}
     />
   )
