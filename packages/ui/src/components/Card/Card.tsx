@@ -1,11 +1,8 @@
 import { ComponentProps } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
-
 import tw from "../../tw";
 
-const cardVariance = cva("card", {
+const CardContainer = tw.div.cva("card", {
   variants: {
     bordered: {
       true: "card-bordered",
@@ -19,32 +16,9 @@ const cardVariance = cva("card", {
   },
 });
 
-const StyledCard = tw.div``;
+type CardBaseProps = ComponentProps<typeof CardContainer>;
 
-type CardBaseProps = VariantProps<typeof cardVariance>;
-
-export interface CardProps
-  extends ComponentProps<typeof StyledCard>,
-    CardBaseProps {}
-
-const CardContainer = ({
-  bordered,
-  compact,
-  normal,
-  className,
-  ...props
-}: CardProps) => {
-  return (
-    <StyledCard
-      className={twMerge(
-        cardVariance({ bordered, compact, normal }),
-        className,
-        "card"
-      )}
-      {...props}
-    />
-  );
-};
+export interface CardProps extends CardBaseProps {}
 
 export const Card = Object.assign(CardContainer, {
   Title: tw.div`card-title`,
