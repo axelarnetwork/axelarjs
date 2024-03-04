@@ -1,7 +1,14 @@
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { Maybe } from "@axelarjs/utils";
-import { useCallback, useEffect, useMemo, useRef, type FC } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FC,
+} from "react";
 import Link from "next/link";
 
 import { groupBy } from "rambda";
@@ -243,17 +250,29 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
 const Transactions = () => {
   const [state] = useTransactionsContainer();
 
+  // hack to trigger re-render of <GMPTransaction /> components
+  // this is necessary because the toast isn't re-rendered unless GMPTransaction mounts again
+  const [, setRenderCount] = useState(0);
+
   const hasPendingTransactions = state.pendingTransactions.length > 0;
+
+  const triggerRender = useCallback(
+    () => setRenderCount((renderCount) => renderCount + 1),
+    []
+  );
 
   return (
     <>
       {hasPendingTransactions && (
-        <div className="indicator bg-base-300 rounded-full p-2">
+        <button
+          className="indicator bg-base-300 rounded-full p-2"
+          onClick={triggerRender}
+        >
           <span className="indicator-item badge badge-info badge-sm">
             {state.pendingTransactions.length}
           </span>
           <HourglassIcon size={16} />
-        </div>
+        </button>
       )}
       {state.pendingTransactions.map((tx) => {
         if (!tx.hash || !tx.chainId || !tx.txType) {
