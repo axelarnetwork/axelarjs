@@ -1,0 +1,232 @@
+[
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 295
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 290
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 285
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 280
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 275
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 270
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 265
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 260
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 255
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 250
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 245
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3327fb7c98085866de1ee4c5dc7c5010e4be7cb22d443cd5d53f8db48c691285",
+      "_logIndex": 240
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x70d8726eeff4119c30b290dfb92aa63f73f313dbd0e209123949334211185f98"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7ae5544ec63cc3fb4fccb40bb7d12dbef6520ffc58476c3898360a9487bc9827",
+      "_logIndex": 228
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x01eae3aff2bad9b4f88c8d5b9400fa92ee3e0247e07725ce84dc85a397e74991"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x4589cda6591a3bd852bb93b747eeffadcf9abeb77cce7c24d6d9f5afead618b7",
+      "_logIndex": 413
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xf4a4630bca197d632cf509f7358550832d04752cbbd9d2bcc6277d94924fe508"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3ef93cf104bf0c967e95f8549115f8dce24d73de6291862b150921bb34948746",
+      "_logIndex": 96
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x33efe0c7623cf4a3384ef70c201d0ae02a67d7a15b8efddff4e1d533466d24ed"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x3ef93cf104bf0c967e95f8549115f8dce24d73de6291862b150921bb34948746",
+      "_logIndex": 93
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x33efe0c7623cf4a3384ef70c201d0ae02a67d7a15b8efddff4e1d533466d24ed"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x2440185f8fb1e139bb7428b61aaeed0323426a3b3138b9a9782acb99637a0813",
+      "_logIndex": 245
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x3a78371da01eed4de5d9fa972b6ab345847832ab5157aefcc6df247414b0a58c"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x336b326b92a91cab232d43756a813b683cf46189fef898c4bf554f34ed453212",
+      "_logIndex": 13
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xfea30beb17bde60c46f626db1cf7c73d33e16ad69c3c8daba637511249f6b32f"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x336b326b92a91cab232d43756a813b683cf46189fef898c4bf554f34ed453212",
+      "_logIndex": 10
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xfea30beb17bde60c46f626db1cf7c73d33e16ad69c3c8daba637511249f6b32f"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x336b326b92a91cab232d43756a813b683cf46189fef898c4bf554f34ed453212",
+      "_logIndex": 7
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xfea30beb17bde60c46f626db1cf7c73d33e16ad69c3c8daba637511249f6b32f"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xc179e607621b79a562c4e2937863ba679fcf81b475b9313b2b0497ae994acd51",
+      "_logIndex": 32
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x051853b60c48942e30f6a629ba17a8a554e986d159ade96192610205c0d04c7c"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xc179e607621b79a562c4e2937863ba679fcf81b475b9313b2b0497ae994acd51",
+      "_logIndex": 29
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x051853b60c48942e30f6a629ba17a8a554e986d159ade96192610205c0d04c7c"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xc179e607621b79a562c4e2937863ba679fcf81b475b9313b2b0497ae994acd51",
+      "_logIndex": 26
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x051853b60c48942e30f6a629ba17a8a554e986d159ade96192610205c0d04c7c"
+    },
+    "token_manager_deployment_started": null
+  }
+]

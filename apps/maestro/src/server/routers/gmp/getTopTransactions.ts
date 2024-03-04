@@ -5,8 +5,10 @@ import { z } from "zod";
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal } from "~/lib/utils/validation";
 import CACHED_DEPLOYMENTS_HOURLY_1 from "~/server/routers/gmp/data/cachedDeployments_through_1709424000.json";
+import CACHED_DEPLOYMENTS_HOURLY_2 from "~/server/routers/gmp/data/cachedDeployments_through_1709568000.json";
 import CACHED_DEPLOYMENTS from "~/server/routers/gmp/data/cachedDeployments.json";
 import CACHED_TRANSFERS_HOURLY_1 from "~/server/routers/gmp/data/cachedTransfers_through_1709424000.json";
+import CACHED_TRANSFERS_HOURLY_2 from "~/server/routers/gmp/data/cachedTransfers_through_1709568000.json";
 import CACHED_TRANSFERS from "~/server/routers/gmp/data/cachedTransfers.json";
 import { publicProcedure } from "~/server/trpc";
 
@@ -38,7 +40,7 @@ export const getTopTransactions = publicProcedure
       const [uncachedTokenDeployments, uncachedTransfers] = await Promise.all([
         ctx.services.gmp.searchGMP({
           ...commonParams,
-          fromTime: 1709424000, // last day run
+          fromTime: 1709568000, // last day run
           toTime: input.toTime,
           contractMethod: [
             "InterchainTokenDeploymentStarted",
@@ -54,7 +56,7 @@ export const getTopTransactions = publicProcedure
         }),
         ctx.services.gmp.searchGMP({
           ...commonParams,
-          fromTime: 1709424000, //last day run
+          fromTime: 1709568000, //last day run
           toTime: input.toTime,
           contractMethod: "InterchainTransfer",
           _source: {
@@ -73,6 +75,7 @@ export const getTopTransactions = publicProcedure
       const tokenDeployments = [
         ...CACHED_DEPLOYMENTS,
         ...CACHED_DEPLOYMENTS_HOURLY_1,
+        ...CACHED_DEPLOYMENTS_HOURLY_2,
         ...uncachedTokenDeployments.filter(
           (deployment) => deployment.status === "executed"
         ),
@@ -80,6 +83,7 @@ export const getTopTransactions = publicProcedure
       const interchainTransfers = [
         ...CACHED_TRANSFERS,
         ...CACHED_TRANSFERS_HOURLY_1,
+        ...CACHED_TRANSFERS_HOURLY_2,
         ...uncachedTransfers.filter(
           (transfer) => transfer.status === "executed"
         ),
