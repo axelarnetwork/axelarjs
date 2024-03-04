@@ -101,7 +101,10 @@ export function getWalletClient(
   rpcUrl: string,
   privateKey?: `0x${string}`
 ): WalletClient {
-  if (!privateKey && !window.ethereum) {
+  if (typeof window !== "undefined" && !window.ethereum) {
+    throw EvmAddNativeGasError.WALLET_CLIENT_NOT_FOUND;
+  }
+  if (!privateKey) {
     throw EvmAddNativeGasError.WALLET_CLIENT_NOT_FOUND;
   }
 
