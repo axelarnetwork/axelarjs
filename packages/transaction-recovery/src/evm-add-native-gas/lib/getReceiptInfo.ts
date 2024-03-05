@@ -1,10 +1,24 @@
 import { parseAbi, parseEventLogs, type TransactionReceipt } from "viem";
 
-export function isContractCallWithToken(receipt: TransactionReceipt): boolean {
+export function extractReceiptInfoForNativeGasPaid(
+  receipt: TransactionReceipt
+) {
+  const paidFee = getNativeGasAmountFromTxReceipt(receipt);
+  const destChain = getDestinationChainFromTxReceipt(receipt);
+  const logIndex = getLogIndexFromTxReceipt(receipt);
+
+  return {
+    paidFee,
+    destChain,
+    logIndex,
+  };
+}
+
+function isContractCallWithToken(receipt: TransactionReceipt): boolean {
   return !!getContractCallWithTokenEvent(receipt);
 }
 
-export function getContractCallEvent(receipt: TransactionReceipt) {
+function getContractCallEvent(receipt: TransactionReceipt) {
   const logs = parseEventLogs({
     abi: parseAbi([
       "event ContractCall(address indexed sender,string destinationChain,string destinationContractAddress,bytes32 indexed payloadHash,bytes payload)",
@@ -15,7 +29,7 @@ export function getContractCallEvent(receipt: TransactionReceipt) {
   return logs?.[0];
 }
 
-export function getContractCallWithTokenEvent(receipt: TransactionReceipt) {
+function getContractCallWithTokenEvent(receipt: TransactionReceipt) {
   const logs = parseEventLogs({
     abi: parseAbi([
       "event ContractCallWithToken(address indexed sender, string destinationChain, string destinationContractAddress, bytes32 indexed payloadHash, bytes payload, string symbol, uint256 amount)",
@@ -26,9 +40,7 @@ export function getContractCallWithTokenEvent(receipt: TransactionReceipt) {
   return logs?.[0];
 }
 
-export function getNativeGasPaidForContractCallEvent(
-  receipt: TransactionReceipt
-) {
+function getNativeGasPaidForContractCallEvent(receipt: TransactionReceipt) {
   const abi = parseAbi([
     "event NativeGasPaidForContractCall(address indexed sourceAddress,string destinationChain,string destinationAddress,bytes32 indexed payloadHash,uint256 gasFeeAmount,address refundAddress)",
   ] as const);
@@ -42,7 +54,7 @@ export function getNativeGasPaidForContractCallEvent(
   return logs?.[0];
 }
 
-export function getNativeGasPaidForContractCallWithTokenEvent(
+function getNativeGasPaidForContractCallWithTokenEvent(
   receipt: TransactionReceipt
 ) {
   const abi = parseAbi([
@@ -58,7 +70,7 @@ export function getNativeGasPaidForContractCallWithTokenEvent(
   return logs?.[0];
 }
 
-export function getLogIndexFromTxReceipt(receipt: TransactionReceipt): number {
+function getLogIndexFromTxReceipt(receipt: TransactionReceipt): number {
   const contractCallEvent = getContractCallEvent(receipt);
   const contractCallWithTokenEvent = getContractCallWithTokenEvent(receipt);
 
@@ -73,9 +85,7 @@ export function getLogIndexFromTxReceipt(receipt: TransactionReceipt): number {
   throw new Error("Log index not found");
 }
 
-export function getNativeGasAmountFromTxReceipt(
-  receipt: TransactionReceipt
-): bigint {
+function getNativeGasAmountFromTxReceipt(receipt: TransactionReceipt): bigint {
   const typeContractCallWithToken = isContractCallWithToken(receipt);
   if (typeContractCallWithToken) {
     const gasReceiverEvent =
@@ -99,7 +109,7 @@ export function getNativeGasAmountFromTxReceipt(
   }
 }
 
-export function getDestinationChainFromTxReceipt(receipt: TransactionReceipt) {
+function getDestinationChainFromTxReceipt(receipt: TransactionReceipt) {
   const logs = parseEventLogs({
     abi: parseAbi([
       "event ContractCallWithToken(address indexed sender, string destinationChain, string destinationContractAddress, bytes32 indexed payloadHash, bytes payload, string symbol, uint256 amount)",
@@ -109,18 +119,4 @@ export function getDestinationChainFromTxReceipt(receipt: TransactionReceipt) {
   });
 
   return logs?.[0]?.args?.destinationChain || undefined;
-}
-
-export function extractReceiptInfoForNativeGasPaid(
-  receipt: TransactionReceipt
-) {
-  const paidFee = getNativeGasAmountFromTxReceipt(receipt);
-  const destChain = getDestinationChainFromTxReceipt(receipt);
-  const logIndex = getLogIndexFromTxReceipt(receipt);
-
-  return {
-    paidFee,
-    destChain,
-    logIndex,
-  };
 }
