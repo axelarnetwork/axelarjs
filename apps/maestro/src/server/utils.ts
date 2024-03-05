@@ -34,9 +34,11 @@ export async function evmChains<TCacheKey extends string>(
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
 
+  const configuredIDs = WAGMI_CHAIN_CONFIGS.map((chain) => chain.id);
+
   const eligibleChains = chainConfigs.evm.filter((chain) =>
     // filter out chains that are do not have a wagmi config
-    WAGMI_CHAIN_CONFIGS.some((config) => config.id === chain.chain_id)
+    configuredIDs.includes(chain.chain_id)
   );
 
   const evmChainsMap = eligibleChains.reduce(
@@ -79,15 +81,17 @@ export async function axelarConfigs<TCacheKey extends string>(
   axelarConfigClient: AxelarConfigClient,
   cacheKey: TCacheKey
 ): Promise<any> {
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<any>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
   const chainConfigs = await axelarConfigClient.getChainConfigs(
     NEXT_PUBLIC_NETWORK_ENV
   );
-
-  const cached = await kvClient.getCached<any>(cacheKey);
-
-  if (cached) {
-    return cached;
-  }
 
   // cache for 1 hour
   await kvClient.setCached<any>(cacheKey, chainConfigs, 3600);
