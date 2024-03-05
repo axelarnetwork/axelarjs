@@ -24,8 +24,6 @@ export async function evmChains<TCacheKey extends string>(
   axelarscanClient: AxelarscanClient,
   cacheKey: TCacheKey
 ): Promise<EVMChainsMap> {
-  const chainConfigs = await axelarscanClient.getChainConfigs();
-
   if (process.env.DISABLE_CACHE !== "true") {
     const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
 
@@ -33,6 +31,8 @@ export async function evmChains<TCacheKey extends string>(
       return cached;
     }
   }
+
+  const chainConfigs = await axelarscanClient.getChainConfigs();
 
   const eligibleChains = chainConfigs.evm.filter((chain) =>
     // filter out chains that are do not have a wagmi config
