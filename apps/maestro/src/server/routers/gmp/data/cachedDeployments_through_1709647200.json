@@ -1,0 +1,92 @@
+[
+  {
+    "call": {
+      "transactionHash": "0x5263edbd8d1fa5d0c1ea5115093ef810cbdf4fab74208843dcf71ba2b69fa0ae",
+      "_logIndex": 344
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa450004692192faf6c5f10994e48026240659bcf466994e3a77df2dd9ce814b1"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xaef61637e90a43a032ef0010e54ad3473d7dbc495e1aa3da55e9f05f40bae28f",
+      "_logIndex": 2
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x051853b60c48942e30f6a629ba17a8a554e986d159ade96192610205c0d04c7c"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xaef61637e90a43a032ef0010e54ad3473d7dbc495e1aa3da55e9f05f40bae28f",
+      "_logIndex": 2
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x051853b60c48942e30f6a629ba17a8a554e986d159ade96192610205c0d04c7c"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xf2a27bbd3bc08418c1c66dcf582d3989b174eed33ae76ec23181e2f1277d98ba",
+      "_logIndex": 273
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x844adb100a995bb23b4cb0a2fef6e6c5f0cfe9462ee088feaa6bf2c285c6e1ee"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x194a1b0125e2c9c37d5a9d5bb4512302df9ec0c09377b423155afa0d6b83e11a",
+      "_logIndex": 349
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x82ec249ffd6f71d4068488e17736d41b1750efe02dcd8ab58f1fcd3dc268607e"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xa31b8204ad8a959ef5f44661e6d882088f0f53f2d0c3dbc519ce3822e4dc5d19",
+      "_logIndex": 590
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x4275a668a36284ed1a901a8b3bbc60c06d7a19218cc0d494d34cd18aa517daa2"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xa31b8204ad8a959ef5f44661e6d882088f0f53f2d0c3dbc519ce3822e4dc5d19",
+      "_logIndex": 587
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x4275a668a36284ed1a901a8b3bbc60c06d7a19218cc0d494d34cd18aa517daa2"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xa31b8204ad8a959ef5f44661e6d882088f0f53f2d0c3dbc519ce3822e4dc5d19",
+      "_logIndex": 584
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x4275a668a36284ed1a901a8b3bbc60c06d7a19218cc0d494d34cd18aa517daa2"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xa31b8204ad8a959ef5f44661e6d882088f0f53f2d0c3dbc519ce3822e4dc5d19",
+      "_logIndex": 581
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x4275a668a36284ed1a901a8b3bbc60c06d7a19218cc0d494d34cd18aa517daa2"
+    },
+    "token_manager_deployment_started": null
+  }
+]
