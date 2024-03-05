@@ -188,3 +188,8 @@ export type LinkRequestResponse = {
   tokenAddress?: string | undefined;
   timestamp?: number;
 };
+
+export type BaseChainConfigsResponse = {
+  evm: EVMChainConfig[];
+  cosmos: CosmosChainConfig[];
+};
