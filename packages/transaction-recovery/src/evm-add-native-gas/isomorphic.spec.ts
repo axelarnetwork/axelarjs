@@ -90,7 +90,7 @@ describe("addNativeGasEvm", () => {
     );
   });
 
-  it.only("should call addNativeGas function with the correct parameters", async () => {
+  it("should call addNativeGas function with the correct parameters", async () => {
     mockRequestAccounts();
     mockGasStatus("gas_paid_not_enough_gas");
     // Mock estimated gas fee to be unreasonably high so that it doesn't throw an error
