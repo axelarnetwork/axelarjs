@@ -73,7 +73,7 @@ const transformTransfers = async (start: number, end: number) => {
 };
 
 const run = async () => {
-  const ranges = getUnixTimestampRanges(1709337600);
+  const ranges = getUnixTimestampRanges(1709568000);
 
   const res = await Promise.all(
     ranges.map(async (range) => await transformTransfers(range[0], range[1]))
