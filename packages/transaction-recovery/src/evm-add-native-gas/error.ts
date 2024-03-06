@@ -1,5 +1,4 @@
 export const EvmAddNativeGasError = {
-  NO_PAYMENT_REQUIRED: new Error("This transaction does not require gas paid"),
   ENOUGH_PAID: new Error("This transaction already has paid enough gas"),
   INVALID_GMP_TX: new Error("Invalid GMP Tx"),
   REFUND_ADDRESS_NOT_FOUND: "Refund address not found",
