@@ -35,6 +35,7 @@ export async function getDepositAddress(
     destinationChain,
     environment,
     destinationAddress,
+    requestConfig,
   } = params;
 
   const chainConfigs = await dependencies.configClient.getChainConfigs(
@@ -74,6 +75,7 @@ export async function getDepositAddress(
           destinationChain,
           environment,
           asset,
+          requestConfig,
         },
         dependencies
       ).then((res) => res?.depositAddress);
@@ -123,7 +125,8 @@ export async function getLinkedDepositAddress(
     params.destinationChain,
     params.destinationAddress,
     chainConfigs,
-    params.environment
+    params.environment,
+    params.requestConfig
   );
 
   return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);

@@ -7,8 +7,8 @@ import { ENVIRONMENTS } from "@axelarjs/core";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { vi } from "vitest";
 
-import { type AutocalculateGasOptions, type SendOptions } from "../types";
 import { addGas, type AddGasDependencies } from "./isomorphic";
+import { type AutocalculateGasOptions, type SendOptions } from "./types";
 
 const MOCK_ADD_GAS_RESPONSE = {
   code: 0,

@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "publishConfig": {
     "access": "public"
   },
@@ -12,6 +12,7 @@
   "files": [
     "./build",
     "./add-gas",
+    "./evm-add-native-gas/",
     "./index.js",
     "./index.d.ts",
     "./types.d.ts",
@@ -33,6 +34,14 @@
     "./add-gas/*": {
       "import": "./build/module/add-gas/*.js",
       "require": "./build/commonjs/add-gas/*.js"
+    },
+    "./evm-add-native-gas": {
+      "import": "./build/module/evm-add-native-gas/index.js",
+      "require": "./build/commonjs/evm-add-native-gas/index.js"
+    },
+    "./evm-add-native-gas/*": {
+      "import": "./build/module/evm-add-native-gas/*.js",
+      "require": "./build/commonjs/evm-add-native-gas/*.js"
     }
   },
   "scripts": {
@@ -58,6 +67,7 @@
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
     "@cosmjs/proto-signing": "^0.31.3",
-    "@cosmjs/stargate": "^0.31.3"
+    "@cosmjs/stargate": "^0.31.3",
+    "viem": "^2.7.16"
   }
 }
