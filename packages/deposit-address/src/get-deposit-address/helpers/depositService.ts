@@ -3,6 +3,8 @@ import { AXELAR_RPC_URLS, Environment } from "@axelarjs/core";
 import { createAxelarQueryClient } from "@axelarjs/cosmos";
 import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
 
+import { DepositAddressRequestConfig } from "../types";
+
 export function unwrappable(
   destinationChain: string,
   asset: string,
@@ -20,9 +22,12 @@ export function unwrappable(
   return destAsset?.module === "evm" && destAsset.isERC20WrappedNativeGasToken;
 }
 
-export async function getActiveChains(environment: Environment) {
+export async function getActiveChains(
+  environment: Environment,
+  requestConfig?: DepositAddressRequestConfig
+) {
   const axelarQueryClient = await createAxelarQueryClient(
-    AXELAR_RPC_URLS[environment]
+    requestConfig?.axelarRpcUrl ?? AXELAR_RPC_URLS[environment]
   );
 
   return axelarQueryClient.nexus

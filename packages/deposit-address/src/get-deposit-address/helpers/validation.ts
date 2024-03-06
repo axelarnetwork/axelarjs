@@ -7,6 +7,7 @@ import { Environment } from "@axelarjs/core";
 import { bech32 } from "bech32";
 import { isAddress } from "viem";
 
+import { DepositAddressRequestConfig } from "../types";
 import { getActiveChains } from "./depositService";
 
 export async function validateAddressAndChains(
@@ -14,7 +15,8 @@ export async function validateAddressAndChains(
   destinationChain: string,
   destinationAddress: string,
   chainConfigs: ChainConfigsResponse,
-  environment: Environment
+  environment: Environment,
+  requestConfig?: DepositAddressRequestConfig
 ) {
   validateAddress(
     destinationAddress,
@@ -22,7 +24,7 @@ export async function validateAddressAndChains(
   );
   validateChainIds([sourceChain, destinationChain], chainConfigs);
 
-  const activeChains = await getActiveChains(environment);
+  const activeChains = await getActiveChains(environment, requestConfig);
   validateActiveChains([sourceChain, destinationChain], activeChains);
 }
 

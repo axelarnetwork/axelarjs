@@ -13,6 +13,7 @@ export type SendOptions = {
   destinationAddress: string;
   asset: string;
   environment: Environment;
+  requestConfig?: DepositAddressRequestConfig;
 };
 
 export type DepositAddressOptions = {
@@ -26,6 +27,7 @@ export type DepositAddressOptions = {
     refundAddress?: string;
     skipUnwrap?: boolean;
   };
+  requestConfig?: DepositAddressRequestConfig;
 };
 
 export type DepositNativeWrapOptions = {
@@ -56,3 +58,9 @@ export type GetDepositServiceDependencies = {
   configClient: AxelarConfigClient;
   depositServiceClient: DepositServiceClient;
 };
+export type DepositAddressRequestConfig =
+  | {
+      axelarRpcUrl?: string;
+      axelarLcdUrl?: string;
+    }
+  | undefined;
