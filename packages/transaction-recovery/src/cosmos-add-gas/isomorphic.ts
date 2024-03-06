@@ -11,7 +11,7 @@ import type { OfflineSigner } from "@cosmjs/proto-signing";
 import { assertIsDeliverTxSuccess, type Coin } from "@cosmjs/stargate";
 import { longify } from "@cosmjs/stargate/build/queryclient";
 
-import type { AddGasParams, AddGasResponse, GetFullFeeOptions } from "../types";
+import type { AddGasParams, AddGasResponse, GetFullFeeOptions } from "./types";
 
 const getDefaultTimeoutTimestamp = (now = Date.now()) => (now + 90_000) * 1e6; // 90 seconds from now
 
