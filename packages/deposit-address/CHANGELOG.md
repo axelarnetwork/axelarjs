@@ -1,5 +1,16 @@
 # @axelarjs/deposit-address
 
+## 0.1.13
+
+### Patch Changes
+
+- [#257](https://github.com/axelarnetwork/axelarjs/pull/257) [`a5e1a286dd12260d9a9ae09610dd2c5fd6a16e14`](https://github.com/axelarnetwork/axelarjs/commit/a5e1a286dd12260d9a9ae09610dd2c5fd6a16e14) Thanks [@npty](https://github.com/npty)! - update core rpc config and add optional rpc parameter for deposit addr module
+
+- Updated dependencies [[`a5e1a286dd12260d9a9ae09610dd2c5fd6a16e14`](https://github.com/axelarnetwork/axelarjs/commit/a5e1a286dd12260d9a9ae09610dd2c5fd6a16e14)]:
+  - @axelarjs/core@0.2.10
+  - @axelarjs/api@0.3.12
+  - @axelarjs/cosmos@0.2.11
+
 ## 0.1.12
 
 ### Patch Changes
