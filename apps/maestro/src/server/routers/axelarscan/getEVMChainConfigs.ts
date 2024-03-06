@@ -32,7 +32,7 @@ const evmChainConfigSchema = z.object({
     block_path: z.string(),
     address_path: z.string(),
     contract_path: z.string(),
-    contract_0_path: z.string(),
+    contract_0_path: z.string().optional(),
     transaction_path: z.string(),
   }),
   provider_params: z.array(
@@ -75,7 +75,11 @@ export const getEVMChainConfigs = publicProcedure
       const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
       const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
 
-      return uniqueChainInfos
+      const validChainInfos = uniqueChainInfos.filter(
+        (chain) => evmChainConfigSchema.safeParse(chain).success
+      );
+
+      return validChainInfos
         .filter(
           (chain) =>
             !chain.deprecated &&
