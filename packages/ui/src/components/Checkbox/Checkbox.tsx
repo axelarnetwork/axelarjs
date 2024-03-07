@@ -1,8 +1,10 @@
-import { forwardRef, type ComponentProps } from "react";
+import { forwardRef } from "react";
 
-import tw from "../../tw";
+import { cva, VariantProps } from "class-variance-authority";
 
-const StyledInput = tw.input.cva("checkbox", {
+import { cn } from "../../utils";
+
+const inputVariance = cva("checkbox", {
   variants: {
     variant: {
       primary: "checkbox-primary",
@@ -22,26 +24,31 @@ const StyledInput = tw.input.cva("checkbox", {
   },
 });
 
-type InputElement = Omit<ComponentProps<typeof StyledInput>, "type" | "color">;
+type VProps = VariantProps<typeof inputVariance>;
 
-export interface CheckboxProps extends InputElement {
+type InputElement = Omit<JSX.IntrinsicElements["input"], "type" | "color">;
+
+export interface CheckboxProps extends InputElement, VProps {
   type?: never;
   placeholder?: never;
 }
-
 /**
  * A checkbox input component
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ variant, inputSize, ...props }, ref) => (
-    <StyledInput
+  ({ variant, inputSize, className, ...props }, ref) => (
+    <input
       ref={ref}
       type="checkbox"
-      variant={variant}
-      inputSize={inputSize}
+      className={cn(
+        inputVariance({
+          variant,
+          inputSize,
+          className,
+        })
+      )}
       {...props}
     />
   )
 );
-
 Checkbox.displayName = "Checkbox";
