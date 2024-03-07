@@ -1,9 +1,11 @@
-import { forwardRef } from "react";
+import type { ComponentProps } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import tw from "../../tw";
 
-const inputVariance = cva("input", {
+/**
+ * A text input component
+ */
+export const TextInput = tw.input.cva("input", {
   variants: {
     variant: {
       primary: "input-primary",
@@ -32,45 +34,12 @@ const inputVariance = cva("input", {
   },
 });
 
-type VProps = VariantProps<typeof inputVariance>;
-
-type BaseTextInputProps = Omit<
-  JSX.IntrinsicElements["input"],
-  "type" | "color"
->;
-
-export interface TextInputProps extends BaseTextInputProps, VProps {
-  type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
-  disabled?: boolean;
-}
-
-/**
- * A text input component
- */
-export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  (
-    { variant, inputSize, ghost, bordered, className, disabled, ...props },
-    ref
-  ) => (
-    <input
-      className={twMerge(
-        inputVariance({
-          bordered,
-          variant,
-          inputSize,
-          ghost,
-          disabled,
-        }),
-        className
-      )}
-      disabled={Boolean(disabled)}
-      {...props}
-      ref={ref}
-    />
-  )
-);
-
 TextInput.displayName = "TextInput";
 TextInput.defaultProps = {
   type: "text",
 };
+
+export interface TextInputProps extends ComponentProps<typeof TextInput> {
+  type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
+  disabled?: boolean;
+}
