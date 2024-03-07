@@ -23,10 +23,6 @@ const StyledToggle = tw.input.cva("toggle", {
   },
 });
 
-StyledToggle.defaultProps = {
-  type: "checkbox",
-};
-
 type BaseToggleProps = ComponentProps<typeof StyledToggle>;
 
 export interface ToggleProps extends BaseToggleProps {
