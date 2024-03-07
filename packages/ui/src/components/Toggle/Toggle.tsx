@@ -23,9 +23,9 @@ const StyledToggle = tw.input.cva("toggle", {
   },
 });
 
-type BaseToggleProps = ComponentProps<typeof StyledToggle>;
+type StyledToggleProps = ComponentProps<typeof StyledToggle>;
 
-export interface ToggleProps extends BaseToggleProps {
+export interface ToggleProps extends StyledToggleProps {
   indeterminate?: boolean;
 }
 
