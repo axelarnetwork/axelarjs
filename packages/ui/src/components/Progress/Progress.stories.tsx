@@ -1,5 +1,9 @@
+import { pluralizeKeys } from "@axelarjs/utils";
+
 import type { Meta, StoryFn } from "@storybook/react";
 
+import { configurePlayground } from "../../StoryPlayground";
+import { COLOR_VARIANTS } from "../../theme";
 import { Progress } from "./Progress";
 
 export default {
@@ -19,3 +23,14 @@ const Template: StoryFn<typeof Progress> = (args) => {
 export const Default = Template.bind({});
 
 Default.args = {};
+
+const { Variants } = pluralizeKeys(
+  configurePlayground(Progress, {
+    variant: {
+      values: COLOR_VARIANTS,
+      noChildren: true,
+    },
+  })
+);
+
+export { Variants };
