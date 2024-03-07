@@ -280,7 +280,7 @@ async function scanChains(
     const tokenDetails = await getTokenDetails(chainConfig, tokenAddress, ctx);
 
     if (tokenDetails) {
-      const result = getInterchainToken(
+      const result = await getInterchainToken(
         tokenDetails,
         chainConfig,
         chainConfigs,
