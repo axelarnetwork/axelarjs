@@ -6,7 +6,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { CSSProperties, type ComponentType, type FC } from "react";
+import React, {
+  CSSProperties,
+  forwardRef,
+  type ComponentType,
+  type FC,
+} from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
@@ -363,15 +368,19 @@ export function createTailwindCVA() {
 
           type Props = VariantProps<typeof variance> & {
             className?: string;
+            ref?: React.Ref<HTMLElement>;
           } & StyledExtension;
 
           const StyledComponent = styledFn`` as FC<Props>;
 
-          return ({ className, ...props }: Props) => (
-            <StyledComponent
-              className={cn(variance({ ...props, className }), className)}
-              {...props}
-            />
+          return forwardRef<HTMLElement, Props>(
+            ({ className, ...props }, ref) => (
+              <StyledComponent
+                className={cn(variance({ ...props, className }), className)}
+                {...props}
+                ref={ref}
+              />
+            )
           );
         },
       }),
