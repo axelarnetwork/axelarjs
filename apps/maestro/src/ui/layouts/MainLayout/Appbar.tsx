@@ -61,7 +61,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           size="sm"
           target="_blank"
           rel="noopener noreferrer"
-          href={`${chain?.blockExplorers?.default.url}address/${address}`}
+          href={`${chain?.blockExplorers?.default.url}/address/${address}`}
           className="flex flex-nowrap items-center gap-1"
         >
           View on explorer
