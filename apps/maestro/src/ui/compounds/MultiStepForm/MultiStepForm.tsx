@@ -38,13 +38,11 @@ import ConnectWalletButton from "../ConnectWalletButton";
 
 type ButtonProps = ComponentProps<typeof Button>;
 
-export const ModalFormInput = Object.assign({}, TextInput, {
-  defaultProps: {
-    ...TextInput.defaultProps,
-    className: "bg-base-200",
-    bordered: true,
-  },
-}) as typeof TextInput;
+export const ModalFormInput = tw(TextInput)`bg-base-200`;
+
+ModalFormInput.defaultProps = {
+  bordered: true,
+};
 
 const StyledButton = tw(Button)`gap-2`;
 
