@@ -20659,8 +20659,6 @@ packages:
       - utf-8-validate
       - zod
 
-<<<<<<< HEAD
-=======
   /viem@2.7.16(typescript@5.3.3):
     resolution: {integrity: sha512-yOPa9yaoJUm44m0Qe3ugHnkHol3QQlFxN3jT+bq+lQip7X7cWdPfmguyfLWX2viCXcmYZUDiQdeFbkPW9lw11Q==}
     peerDependencies:
@@ -20684,7 +20682,6 @@ packages:
       - zod
     dev: false
 
->>>>>>> main
   /vite-node@1.2.1(@types/node@20.11.20):
     resolution: {integrity: sha512-fNzHmQUSOY+y30naohBvSW7pPn/xn3Ib/uqm+5wAJQJiqQsU0NBR78XdRJb04l4bOFKjpTWld0XAfkKlrDbySg==}
     engines: {node: ^18.0.0 || >=20.0.0}
