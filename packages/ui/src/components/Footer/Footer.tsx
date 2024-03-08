@@ -1,10 +1,8 @@
-import type { FC } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
+import type { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-const footerVariants = cva("footer", {
+const StyledFooter = tw.footer.cva("footer", {
   variants: {
     center: {
       true: "footer-center",
@@ -12,16 +10,8 @@ const footerVariants = cva("footer", {
   },
 });
 
-type VProps = VariantProps<typeof footerVariants>;
+export type FooterProps = ComponentProps<typeof StyledFooter>;
 
-type FooterElement = JSX.IntrinsicElements["footer"];
-
-export interface FooterProps extends FooterElement, VProps {}
-
-const BaseFooter: FC<FooterProps> = ({ className, center, ...props }) => (
-  <footer className={footerVariants({ center, className })} {...props} />
-);
-
-export const Footer = Object.assign(tw(BaseFooter)``, {
+export const Footer = Object.assign(StyledFooter, {
   Title: tw.div`footer-title`,
 });

@@ -1,13 +1,10 @@
-import type { ComponentProps, FC } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import type { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-const StyledMenu = tw.ul`menu`;
+export type MenuProps = ComponentProps<typeof MenuRoot>;
 
-export const menuVariance = cva("menu", {
+const MenuRoot = tw.ul.cva("menu", {
   variants: {
     direction: {
       vertical: "menu-vertical",
@@ -23,7 +20,7 @@ export const menuVariance = cva("menu", {
   },
 });
 
-export const menuItemVariance = cva("menu-item", {
+const MenuItem = tw.li.cva("menu-item", {
   variants: {
     active: {
       true: "active",
@@ -38,47 +35,7 @@ export const menuItemVariance = cva("menu-item", {
   },
 });
 
-export interface MenuProps
-  extends ComponentProps<typeof StyledMenu>,
-    VariantProps<typeof menuVariance> {}
-
-const MenuRoot: FC<MenuProps> = ({
-  direction,
-  size,
-  rounded,
-  className,
-  ...props
-}) => (
-  <StyledMenu
-    className={twMerge(
-      menuVariance({ direction, size, rounded, className }),
-      className
-    )}
-    {...props}
-  />
-);
-
-const StyledMenuItem = tw.li``;
-
-export interface MenuItemProps
-  extends ComponentProps<typeof StyledMenuItem>,
-    VariantProps<typeof menuItemVariance> {}
-
-const MenuItem: FC<MenuItemProps> = ({
-  active,
-  bordered,
-  disabled,
-  className,
-  ...props
-}) => (
-  <StyledMenuItem
-    className={twMerge(
-      menuItemVariance({ active, bordered, disabled }),
-      className
-    )}
-    {...props}
-  />
-);
+export type MenuItemProps = ComponentProps<typeof MenuItem>;
 
 export const Menu = Object.assign(MenuRoot, {
   Item: MenuItem,

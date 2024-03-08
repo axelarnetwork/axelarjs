@@ -175,7 +175,11 @@ type SearchGMPFees = {
     express_gas_overhead_fee: number;
   };
 };
-
+export type SearchGMPGasStatus =
+  | "gas_paid"
+  | "gas_paid_not_enough_gas"
+  | "gas_unpaid"
+  | "gas_paid_enough_gas";
 export type SearchGMPGasPaid = {
   axelarTransactionHash: string;
   chain: string;
@@ -252,6 +256,7 @@ export type SearchGMPResponseData = {
   status: GMPTxStatus;
   executed?: SearchGMPExecuted;
   gas_paid: SearchGMPGasPaid;
+  gas_status: SearchGMPGasStatus;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;

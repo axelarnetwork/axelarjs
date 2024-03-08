@@ -1,18 +1,9 @@
-import { forwardRef, useEffect } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import { forwardRef, useEffect, type ComponentProps } from "react";
 
 import { useSyncedRef } from "../../hooks";
 import tw from "../../tw";
 
-const StyledToggle = tw.input``;
-
-StyledToggle.defaultProps = {
-  type: "checkbox",
-};
-
-const toggleVariance = cva("toggle", {
+const StyledToggle = tw.input.cva("toggle", {
   variants: {
     variant: {
       primary: "toggle-primary",
@@ -23,7 +14,7 @@ const toggleVariance = cva("toggle", {
       warning: "toggle-warning",
       error: "toggle-error",
     },
-    size: {
+    inputSize: {
       xs: "toggle-xs",
       sm: "toggle-sm",
       md: "toggle-md",
@@ -32,19 +23,14 @@ const toggleVariance = cva("toggle", {
   },
 });
 
-type VProps = VariantProps<typeof toggleVariance>;
+type StyledToggleProps = ComponentProps<typeof StyledToggle>;
 
-type BaseToggleProps = Omit<
-  JSX.IntrinsicElements["input"],
-  "type" | "size" | "color"
->;
-
-export interface ToggleProps extends BaseToggleProps, VProps {
+export interface ToggleProps extends StyledToggleProps {
   indeterminate?: boolean;
 }
 
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
-  ({ variant, size, className, indeterminate, ...props }, ref) => {
+  ({ indeterminate, ...props }, ref) => {
     const innerRef = useSyncedRef(ref);
 
     useEffect(() => {
@@ -53,13 +39,6 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       }
     }, [indeterminate]);
 
-    return (
-      <input
-        ref={innerRef}
-        type="checkbox"
-        className={twMerge(toggleVariance({ variant, size }), className)}
-        {...props}
-      />
-    );
+    return <StyledToggle ref={innerRef} type="checkbox" {...props} />;
   }
 );

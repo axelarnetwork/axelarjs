@@ -1,0 +1,182 @@
+[
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 614
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 609
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 604
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 599
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 594
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 589
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 584
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x9ab38c9c9fd1f4ddd1a6ac357e1a8b7fa6ff97b17283c4b145da781d2061c343",
+      "_logIndex": 302
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x12b5cf89ab77c5d6d3aa2582a94e6b6ca992a126105afaad03bbe3636278c824"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 614
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 609
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 604
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 599
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 594
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 589
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x7c5872fb016c2ee37ded9c6ac031cdeacb72ea6047979d2e10620dad07fd47d4",
+      "_logIndex": 584
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xa4e92693f9a62c9ec4d67f135e5cb2a6e0ec704a3b536372a42a6159982f5257"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xfbd2bead86570a5b63471a1bb48570bd6069da7f75582711a2512ffaf6ba2247",
+      "_logIndex": 16
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xd0ee0f5d7d2b208e9a464c1ab35b42a0d322100e3f35b949175cc1744feb25ae"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0xfbd2bead86570a5b63471a1bb48570bd6069da7f75582711a2512ffaf6ba2247",
+      "_logIndex": 16
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0xd0ee0f5d7d2b208e9a464c1ab35b42a0d322100e3f35b949175cc1744feb25ae"
+    },
+    "token_manager_deployment_started": null
+  },
+  {
+    "call": {
+      "transactionHash": "0x76343a74bed5a0ff236814f546eabe64ceb6046865ea932e0762dac2b367d4f2",
+      "_logIndex": 21
+    },
+    "interchain_token_deployment_started": {
+      "tokenId": "0x9bd1eee02c82345f7d97d5a2eef907a4f5b3be2222225b36b2fd9e929b54a47d"
+    },
+    "token_manager_deployment_started": null
+  }
+]

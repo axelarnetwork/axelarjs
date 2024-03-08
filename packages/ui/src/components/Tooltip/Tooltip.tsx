@@ -1,10 +1,8 @@
 import { ComponentProps, FC } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-
 import tw from "../../tw";
 
-const variance = cva("tooltip", {
+const StyledTooltip = tw.div.cva("tooltip", {
   variants: {
     position: {
       top: "tooltip-top",
@@ -26,29 +24,12 @@ const variance = cva("tooltip", {
   },
 });
 
-const StyledTooltip = tw.div``;
+type BaseTooltipProps = ComponentProps<typeof StyledTooltip>;
 
-type BaseTooltipProps = Omit<ComponentProps<typeof StyledTooltip>, "color">;
-type VProps = VariantProps<typeof variance>;
-
-export interface TooltipProps extends BaseTooltipProps, VProps {
+export interface TooltipProps extends BaseTooltipProps {
   tip: string;
 }
 
-export const Tooltip: FC<TooltipProps> = ({
-  tip,
-  className,
-  children,
-  position,
-  variant,
-  open,
-  ...props
-}) => (
-  <StyledTooltip
-    {...props}
-    className={variance({ className, position, variant, open })}
-    data-tip={tip}
-  >
-    {children}
-  </StyledTooltip>
+export const Tooltip: FC<TooltipProps> = ({ tip, ...props }) => (
+  <StyledTooltip {...props} data-tip={tip} />
 );

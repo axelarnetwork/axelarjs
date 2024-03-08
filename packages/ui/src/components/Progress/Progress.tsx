@@ -1,9 +1,18 @@
-import { forwardRef } from "react";
+import type { ComponentProps } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import tw from "../../tw";
 
-export const progressVariance = cva("progress", {
+/**
+ * A progress component
+ *
+ * @param {ProgressProps} props
+ * @returns {JSX.Element}
+ *
+ * @example
+ 
+ * <Progress variant="accent" value={10} max={25} />
+ */
+export const Progress = tw.progress.cva("progress", {
   variants: {
     variant: {
       primary: "progress-primary",
@@ -17,37 +26,4 @@ export const progressVariance = cva("progress", {
   },
 });
 
-type VProps = VariantProps<typeof progressVariance>;
-
-type ProgressElement = JSX.IntrinsicElements["progress"];
-
-export interface ProgressProps extends ProgressElement, VProps {}
-
-/**
- * A progress component
- *
- * @param {ProgressProps} props
- * @returns {JSX.Element}
- *
- * @example
- 
- * <Progress variant="accent" value={10} max={25} />
- */
-export const Progress = forwardRef<HTMLProgressElement, ProgressProps>(
-  ({ className, ...props }, ref) => {
-    return (
-      <progress
-        className={twMerge(
-          progressVariance({
-            variant: props.variant,
-          }),
-          className
-        )}
-        {...props}
-        ref={ref}
-      />
-    );
-  }
-);
-
-Progress.displayName = "Button";
+export type ProgressProps = ComponentProps<typeof Progress>;

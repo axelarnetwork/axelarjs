@@ -8,6 +8,7 @@ import {
   Edit2Icon,
   ExternalLinkIcon,
   FormControl,
+  Indicator,
   InfoIcon,
   Label,
   LinkButton,
@@ -25,7 +26,6 @@ import Image from "next/image";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_ENABLED_FEATURES } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -111,7 +111,12 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold md:gap-3">
-          {props.tokenId && <ManageTokenIcon tokenId={props.tokenId} />}
+          {props.tokenId && (
+            <ManageTokenIcon
+              tokenId={props.tokenId}
+              wasDeployedByAccount={props.wasDeployedByAccount}
+            />
+          )}
 
           {Boolean(props.name && props.symbol) && (
             <div className="grid -space-y-1">
@@ -161,9 +166,13 @@ export default TokenDetailsSection;
 
 type ManageTokenIconProps = {
   tokenId: `0x${string}`;
+  wasDeployedByAccount?: boolean;
 };
 
-const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
+const ManageTokenIcon: FC<ManageTokenIconProps> = ({
+  tokenId,
+  wasDeployedByAccount,
+}) => {
   const { data: meta, refetch } =
     trpc.interchainToken.getInterchainTokenMeta.useQuery({
       tokenId,
@@ -185,10 +194,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
 
   const icon = <TokenIcon tokenId={tokenId} />;
 
-  if (
-    !isOperator ||
-    !NEXT_PUBLIC_ENABLED_FEATURES.includes("MANAGE_TOKEN_ICON")
-  ) {
+  if (!isOperator && !wasDeployedByAccount) {
     return icon;
   }
 
@@ -320,7 +326,16 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   });
 
   return (
-    <Tooltip tip="Manage token icon" position="bottom">
+    <Tooltip $as={Indicator} position="bottom" tip="Update token icon">
+      {!existingIconUrl && (
+        <Indicator.Item
+          $as={Badge}
+          variant="accent"
+          size="xs"
+          className="animate-pulse"
+          position="start"
+        />
+      )}
       <Modal
         trigger={
           <button className="group relative grid h-9 w-9 place-items-center">
@@ -331,9 +346,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
           </button>
         }
       >
-        <Modal.Title>
-          <span className="text-xl font-bold">Manage token icon</span>
-        </Modal.Title>
+        <Modal.Title>Update token icon</Modal.Title>
         <Modal.Body>
           <FormControl>
             <Label className="flex items-center justify-start gap-2">

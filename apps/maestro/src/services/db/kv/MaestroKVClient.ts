@@ -124,6 +124,11 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     return await this.kv.get<T>(key);
   }
 
+  async invalidateCache(cacheKey: string) {
+    const key = COLLECTION_KEYS.cached(cacheKey);
+    return await this.kv.del(key);
+  }
+
   async setTokenIconUrl(tokenId: `0x${string}`, iconUrl: string) {
     const key = COLLECTION_KEYS.tokenMeta(tokenId);
     return await this.kv.hset(key, { iconUrl });

@@ -4,7 +4,13 @@ import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal } from "~/lib/utils/validation";
+import CACHED_DEPLOYMENTS_HOURLY_1 from "~/server/routers/gmp/data/cachedDeployments_through_1709424000.json";
+import CACHED_DEPLOYMENTS_HOURLY_2 from "~/server/routers/gmp/data/cachedDeployments_through_1709568000.json";
+import CACHED_DEPLOYMENTS_HOURLY_3 from "~/server/routers/gmp/data/cachedDeployments_through_1709647200.json";
 import CACHED_DEPLOYMENTS from "~/server/routers/gmp/data/cachedDeployments.json";
+import CACHED_TRANSFERS_HOURLY_1 from "~/server/routers/gmp/data/cachedTransfers_through_1709424000.json";
+import CACHED_TRANSFERS_HOURLY_2 from "~/server/routers/gmp/data/cachedTransfers_through_1709568000.json";
+import CACHED_TRANSFERS_HOURLY_3 from "~/server/routers/gmp/data/cachedTransfers_through_1709647200.json";
 import CACHED_TRANSFERS from "~/server/routers/gmp/data/cachedTransfers.json";
 import { publicProcedure } from "~/server/trpc";
 
@@ -33,49 +39,58 @@ export const getTopTransactions = publicProcedure
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
       };
 
-      const [tokenDeploymentsSinceFeb28, interchainTransfersSinceFeb28] =
-        await Promise.all([
-          ctx.services.gmp.searchGMP({
-            ...commonParams,
-            fromTime: 1709337600, //last day run
-            toTime: input.toTime,
-            contractMethod: [
-              "InterchainTokenDeploymentStarted",
-              "TokenManagerDeploymentStarted",
+      const [uncachedTokenDeployments, uncachedTransfers] = await Promise.all([
+        ctx.services.gmp.searchGMP({
+          ...commonParams,
+          fromTime: 1709647200, // last day run
+          toTime: input.toTime,
+          contractMethod: [
+            "InterchainTokenDeploymentStarted",
+            "TokenManagerDeploymentStarted",
+          ],
+          _source: {
+            includes: [
+              "interchain_token_deployment_started.tokenId",
+              "token_manager_deployment_started.tokenId",
             ],
-            _source: {
-              includes: [
-                "interchain_token_deployment_started.tokenId",
-                "token_manager_deployment_started.tokenId",
-              ],
-              excludes: EXCLUDED_RESPONSE_FIELDS,
-            },
-          }),
-          ctx.services.gmp.searchGMP({
-            ...commonParams,
-            fromTime: 1709337600, //last day run
-            toTime: input.toTime,
-            contractMethod: "InterchainTransfer",
-            _source: {
-              includes: [
-                "interchain_transfer.name",
-                "interchain_transfer.symbol",
-                "interchain_transfer.contract_address",
-                "interchain_transfer.tokenId",
-                "call.transactionHash",
-              ],
-              excludes: EXCLUDED_RESPONSE_FIELDS,
-            },
-          }),
-        ]);
+            excludes: EXCLUDED_RESPONSE_FIELDS,
+          },
+        }),
+        ctx.services.gmp.searchGMP({
+          ...commonParams,
+          fromTime: 1709647200, //last day run
+          toTime: input.toTime,
+          contractMethod: "InterchainTransfer",
+          _source: {
+            includes: [
+              "interchain_transfer.name",
+              "interchain_transfer.symbol",
+              "interchain_transfer.contract_address",
+              "interchain_transfer.tokenId",
+              "call.transactionHash",
+            ],
+            excludes: EXCLUDED_RESPONSE_FIELDS,
+          },
+        }),
+      ]);
 
       const tokenDeployments = [
         ...CACHED_DEPLOYMENTS,
-        ...tokenDeploymentsSinceFeb28,
+        ...CACHED_DEPLOYMENTS_HOURLY_1,
+        ...CACHED_DEPLOYMENTS_HOURLY_2,
+        ...CACHED_DEPLOYMENTS_HOURLY_3,
+        ...uncachedTokenDeployments.filter(
+          (deployment) => deployment.status === "executed"
+        ),
       ];
       const interchainTransfers = [
         ...CACHED_TRANSFERS,
-        ...interchainTransfersSinceFeb28,
+        ...CACHED_TRANSFERS_HOURLY_1,
+        ...CACHED_TRANSFERS_HOURLY_2,
+        ...CACHED_TRANSFERS_HOURLY_3,
+        ...uncachedTransfers.filter(
+          (transfer) => transfer.status === "executed"
+        ),
       ];
 
       const eligibleTokenIds = new Set(
@@ -152,7 +167,6 @@ const EXCLUDED_RESPONSE_FIELDS = [
   "fees",
   "gas",
   "time_spent",
-  "executed",
   "confirm",
   "gas_price_rate",
   "gas_paid",
@@ -163,7 +177,6 @@ const EXCLUDED_RESPONSE_FIELDS = [
   "is_call_from_relayer",
   "is_insufficient_fee",
   "not_enough_gas_to_execute",
-  "status",
   "simplified_status",
   "gas_status",
   "is_two_way",

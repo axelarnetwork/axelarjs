@@ -18,4 +18,19 @@ const Template: StoryFn<typeof Menu> = (args) => {
 
 export const Default = Template.bind({});
 
-Default.args = {};
+Default.args = {
+  children: (
+    <>
+      <Menu.Title>Menu Title</Menu.Title>
+      <Menu.Item>
+        <a>Item 1</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a>Item 2</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a>Item 3</a>
+      </Menu.Item>
+    </>
+  ),
+};

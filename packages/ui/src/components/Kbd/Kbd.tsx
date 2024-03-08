@@ -1,13 +1,8 @@
-import type { ComponentProps, FC } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import type { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-const StyledKbd = tw.kbd``;
-
-const kbdVariance = cva("kbd", {
+export const Kbd = tw.kbd.cva("kbd", {
   variants: {
     size: {
       xs: "kbd-xs",
@@ -18,15 +13,4 @@ const kbdVariance = cva("kbd", {
   },
 });
 
-export interface KbdProps
-  extends ComponentProps<typeof StyledKbd>,
-    VariantProps<typeof kbdVariance> {}
-
-export const Kbd: FC<KbdProps> = ({ size, className, ...props }) => {
-  return (
-    <StyledKbd
-      className={twMerge(kbdVariance({ size }), className)}
-      {...props}
-    />
-  );
-};
+export type KbdProps = ComponentProps<typeof Kbd>;
