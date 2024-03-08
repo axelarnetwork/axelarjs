@@ -83,7 +83,6 @@ const getDateMeta = (imestamp: number) => {
 
 const CompetitionPage = () => {
   const [now, setNow] = useState(Date.now());
-  const isEnabled = now > COMPETITION_START_TS && now < COMPETITION_END_TS;
 
   const { data, isLoading } = trpc.gmp.getTopTransactions.useQuery(
     {
@@ -93,7 +92,7 @@ const CompetitionPage = () => {
       toTime: COMPETITION_END_TS / 1000,
     },
     {
-      enabled: isEnabled,
+      enabled: true,
     }
   );
 
@@ -107,35 +106,6 @@ const CompetitionPage = () => {
   const startDateDistance = intlFormatDistance(COMPETITION_START_TS, now);
 
   const content = useMemo(() => {
-    const hasEnded = now > COMPETITION_END_TS;
-    const hasStarted = now > COMPETITION_START_TS && !hasEnded;
-
-    if (hasEnded) {
-      return (
-        <Card className="grid flex-1 place-items-center">
-          <Card.Body>
-            <Alert status="warning" className="text-center">
-              The competition has ended {endDateDistance}
-            </Alert>
-          </Card.Body>
-        </Card>
-      );
-    }
-
-    if (!hasStarted) {
-      return (
-        <Card className="grid flex-1 place-items-center">
-          <Card.Body>
-            <Alert status="info" className="text-center">
-              <p className="text-lg">
-                The competition starts {startDateDistance}
-              </p>
-            </Alert>
-          </Card.Body>
-        </Card>
-      );
-    }
-
     const totalTime = COMPETITION_END_TS - COMPETITION_START_TS;
     const timeElapsed = now - COMPETITION_START_TS;
     const progress = timeElapsed / totalTime;
@@ -197,7 +167,7 @@ const CompetitionPage = () => {
     <Page
       title="Competition"
       contentClassName="flex flex-col space-y-4"
-      isLoading={isLoading && isEnabled}
+      isLoading={isLoading}
       loadingMessage="Loading transactions..."
       className="bg-cover bg-fixed bg-center bg-no-repeat pb-16"
     >

@@ -8,6 +8,7 @@ import {
   Edit2Icon,
   ExternalLinkIcon,
   FormControl,
+  Indicator,
   InfoIcon,
   Label,
   LinkButton,
@@ -20,11 +21,11 @@ import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useMemo, useRef, useState, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
+import Image from "next/image";
 
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_ENABLED_FEATURES } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -110,7 +111,12 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold md:gap-3">
-          {props.tokenId && <ManageTokenIcon tokenId={props.tokenId} />}
+          {props.tokenId && (
+            <ManageTokenIcon
+              tokenId={props.tokenId}
+              wasDeployedByAccount={props.wasDeployedByAccount}
+            />
+          )}
 
           {Boolean(props.name && props.symbol) && (
             <div className="grid -space-y-1">
@@ -160,9 +166,13 @@ export default TokenDetailsSection;
 
 type ManageTokenIconProps = {
   tokenId: `0x${string}`;
+  wasDeployedByAccount?: boolean;
 };
 
-const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
+const ManageTokenIcon: FC<ManageTokenIconProps> = ({
+  tokenId,
+  wasDeployedByAccount,
+}) => {
   const { data: meta, refetch } =
     trpc.interchainToken.getInterchainTokenMeta.useQuery({
       tokenId,
@@ -184,10 +194,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({ tokenId }) => {
 
   const icon = <TokenIcon tokenId={tokenId} />;
 
-  if (
-    !isOperator ||
-    !NEXT_PUBLIC_ENABLED_FEATURES.includes("MANAGE_TOKEN_ICON")
-  ) {
+  if (!isOperator && !wasDeployedByAccount) {
     return icon;
   }
 
@@ -225,8 +232,11 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
       )}
     >
       {meta?.iconUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={meta.iconUrl} alt="token icon" className="h-9 w-9" />
+        <Image
+          src={`/api/avatar?tokenId=${tokenId}`}
+          alt="token icon"
+          layout="fill"
+        />
       ) : (
         <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
       )}
@@ -240,6 +250,8 @@ type UpdateTokenIconProps = {
   onUpdated?: () => void;
   icon?: JSX.Element;
 };
+
+const VALID_IMAGE_FORMATS = [".png", ".jpg", ".webp"];
 
 const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   tokenId,
@@ -285,12 +297,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
       return "URL is not valid";
     }
 
-    if ([".png", ".jpg", ".svg"].every((ext) => !iconUrl.endsWith(ext))) {
+    if (VALID_IMAGE_FORMATS.every((ext) => !iconUrl.endsWith(ext))) {
       return (
         <>
           URL must end with <Badge variant="neutral">.png</Badge>,{" "}
           <Badge variant="neutral">.jpg</Badge>, or{" "}
-          <Badge variant="neutral">.svg</Badge>
+          <Badge variant="neutral">.webp</Badge>
         </>
       );
     }
@@ -314,7 +326,16 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   });
 
   return (
-    <Tooltip tip="Manage token icon" position="bottom">
+    <Tooltip $as={Indicator} position="bottom" tip="Update token icon">
+      {!existingIconUrl && (
+        <Indicator.Item
+          $as={Badge}
+          variant="accent"
+          size="xs"
+          className="animate-pulse"
+          position="start"
+        />
+      )}
       <Modal
         trigger={
           <button className="group relative grid h-9 w-9 place-items-center">
@@ -325,9 +346,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
           </button>
         }
       >
-        <Modal.Title>
-          <span className="text-xl font-bold">Manage token icon</span>
-        </Modal.Title>
+        <Modal.Title>Update token icon</Modal.Title>
         <Modal.Body>
           <FormControl>
             <Label className="flex items-center justify-start gap-2">

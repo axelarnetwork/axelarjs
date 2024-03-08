@@ -1,11 +1,8 @@
-import { ComponentProps, FC } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-export const loadingVariance = cva("loading", {
+export const Loading = tw.span.cva("loading", {
   variants: {
     /**
      * The size of the loading indicator
@@ -43,26 +40,7 @@ export const loadingVariance = cva("loading", {
   },
 });
 
-const StyledLoading = tw.span``;
-
-type BaseLoadingProps = Omit<ComponentProps<typeof StyledLoading>, "color">;
-
-export interface LoadingProps
-  extends BaseLoadingProps,
-    VariantProps<typeof loadingVariance> {}
-
-export const Loading: FC<LoadingProps> = ({
-  shape,
-  size,
-  variant,
-  className,
-  ...props
-}) => (
-  <StyledLoading
-    className={twMerge(loadingVariance({ shape, variant, size }), className)}
-    {...props}
-  />
-);
+export type LoadingProps = ComponentProps<typeof Loading>;
 
 Loading.defaultProps = {
   shape: "spinner",

@@ -115,7 +115,7 @@ const TokenSettings: FC = () => {
               <Toggle
                 id="isMintable"
                 variant="primary"
-                size="sm"
+                inputSize="sm"
                 {...register("isMintable")}
               />
             </Label.AltText>

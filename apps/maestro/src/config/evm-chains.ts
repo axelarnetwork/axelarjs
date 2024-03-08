@@ -1,3 +1,4 @@
+import { defineChain } from "viem";
 import { Chain } from "viem/chains";
 import {
   arbitrum,
@@ -271,6 +272,50 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "scroll",
     axelarChainName: "scroll",
     environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...defineChain({
+      id: 252,
+      name: "Fraxtal",
+      nativeCurrency: { name: "Frax Ether", symbol: "frxETH", decimals: 18 },
+      rpcUrls: {
+        default: {
+          http: ["https://rpc.frax.com"],
+        },
+      },
+      blockExplorers: {
+        default: {
+          name: "Fraxscan",
+          url: "https://fraxscan.com",
+          apiUrl: "https://api.fraxscan.com/api",
+        },
+      },
+    }),
+    axelarChainId: "fraxtal",
+    axelarChainName: "Fraxtal",
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...defineChain({
+      id: 81457,
+      name: "Blast",
+      nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+      rpcUrls: {
+        default: {
+          http: ["https://rpc.blast.io"],
+        },
+      },
+      blockExplorers: {
+        default: {
+          name: "Blastscan",
+          url: "https://blastscan.io",
+          apiUrl: "https://api.blastscan.io/api",
+        },
+      },
+    }),
+    axelarChainId: "blast",
+    axelarChainName: "Blast",
+    environment: ENVIRONMENTS.mainnet,
   },
 ] as const;
 

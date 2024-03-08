@@ -1,9 +1,11 @@
-import { forwardRef } from "react";
+import { type ComponentProps } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import tw from "../../tw";
 
-const inputVariance = cva("radio", {
+/**
+ * A radio input component
+ */
+export const Radio = tw.input.cva("radio", {
   variants: {
     variant: {
       primary: "radio-primary",
@@ -23,33 +25,11 @@ const inputVariance = cva("radio", {
   },
 });
 
-type VProps = VariantProps<typeof inputVariance>;
+Radio.defaultProps = {
+  type: "radio",
+};
 
-type InputElement = Omit<JSX.IntrinsicElements["input"], "type" | "color">;
-
-export interface RadioProps extends InputElement, VProps {
-  type?: never;
-  placeholder?: never;
+export interface RadioProps extends ComponentProps<typeof Radio> {
+  type: never;
+  placeholder: never;
 }
-
-/**
- * A radio input component
- */
-export const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  ({ variant, inputSize, className, ...props }, ref) => (
-    <input
-      ref={ref}
-      type="radio"
-      className={twMerge(
-        inputVariance({
-          variant,
-          inputSize,
-        }),
-        className
-      )}
-      {...props}
-    />
-  )
-);
-
-Radio.displayName = "Radio";

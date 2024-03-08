@@ -1,6 +1,7 @@
 node_modules/
 build/
-/add-gas
+/cosmos-add-gas
+/evm-add-native-gas
 
 *.d.ts
 *.js

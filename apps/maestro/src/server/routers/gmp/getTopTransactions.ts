@@ -1,9 +1,19 @@
+import type { SearchGMPResponseData } from "@axelarjs/api";
+
 import { TRPCError } from "@trpc/server";
 import { groupBy, uniqBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal } from "~/lib/utils/validation";
+import CACHED_DEPLOYMENTS_HOURLY_1 from "~/server/routers/gmp/data/cachedDeployments_through_1709424000.json";
+import CACHED_DEPLOYMENTS_HOURLY_2 from "~/server/routers/gmp/data/cachedDeployments_through_1709568000.json";
+import CACHED_DEPLOYMENTS_HOURLY_3 from "~/server/routers/gmp/data/cachedDeployments_through_1709647200.json";
+import CACHED_DEPLOYMENTS from "~/server/routers/gmp/data/cachedDeployments.json";
+import CACHED_TRANSFERS_HOURLY_1 from "~/server/routers/gmp/data/cachedTransfers_through_1709424000.json";
+import CACHED_TRANSFERS_HOURLY_2 from "~/server/routers/gmp/data/cachedTransfers_through_1709568000.json";
+import CACHED_TRANSFERS_HOURLY_3 from "~/server/routers/gmp/data/cachedTransfers_through_1709647200.json";
+import CACHED_TRANSFERS from "~/server/routers/gmp/data/cachedTransfers.json";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
@@ -26,15 +36,16 @@ export const getTopTransactions = publicProcedure
     try {
       const commonParams = {
         senderAddress: input.senderAddress,
-        size: 99000,
+        size: 25000,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-        fromTime: input.fromTime,
-        toTime: input.toTime,
       };
-      const [tokenDeployments, interchainTransfers] = await Promise.all([
+
+      const [uncachedTokenDeployments, uncachedTransfers] = await Promise.all([
         ctx.services.gmp.searchGMP({
           ...commonParams,
+          fromTime: 1709647200, // last day run
+          toTime: input.toTime,
           contractMethod: [
             "InterchainTokenDeploymentStarted",
             "TokenManagerDeploymentStarted",
@@ -49,6 +60,8 @@ export const getTopTransactions = publicProcedure
         }),
         ctx.services.gmp.searchGMP({
           ...commonParams,
+          fromTime: 1709647200, //last day run
+          toTime: input.toTime,
           contractMethod: "InterchainTransfer",
           _source: {
             includes: [
@@ -62,6 +75,25 @@ export const getTopTransactions = publicProcedure
           },
         }),
       ]);
+
+      const tokenDeployments = [
+        ...CACHED_DEPLOYMENTS,
+        ...CACHED_DEPLOYMENTS_HOURLY_1,
+        ...CACHED_DEPLOYMENTS_HOURLY_2,
+        ...CACHED_DEPLOYMENTS_HOURLY_3,
+        ...uncachedTokenDeployments.filter(
+          (deployment) => deployment.status === "executed"
+        ),
+      ];
+      const interchainTransfers = [
+        ...CACHED_TRANSFERS,
+        ...CACHED_TRANSFERS_HOURLY_1,
+        ...CACHED_TRANSFERS_HOURLY_2,
+        ...CACHED_TRANSFERS_HOURLY_3,
+        ...uncachedTransfers.filter(
+          (transfer) => transfer.status === "executed"
+        ),
+      ] as SearchGMPResponseData[];
 
       const eligibleTokenIds = new Set(
         tokenDeployments
@@ -137,7 +169,6 @@ const EXCLUDED_RESPONSE_FIELDS = [
   "fees",
   "gas",
   "time_spent",
-  "executed",
   "confirm",
   "gas_price_rate",
   "gas_paid",
@@ -148,7 +179,6 @@ const EXCLUDED_RESPONSE_FIELDS = [
   "is_call_from_relayer",
   "is_insufficient_fee",
   "not_enough_gas_to_execute",
-  "status",
   "simplified_status",
   "gas_status",
   "is_two_way",

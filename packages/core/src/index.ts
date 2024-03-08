@@ -55,8 +55,8 @@ export const DEPOSIT_SERVICE_API_URLS = {
 export type DepositServiceAPIUrl = keyof typeof DEPOSIT_SERVICE_API_URLS;
 
 export const AXELAR_RPC_URLS = {
-  testnet: "https://axelartest-rpc.quickapi.com",
-  mainnet: "https://axelar-rpc.quickapi.com",
+  testnet: "https://rpc-axelar-testnet.imperator.co",
+  mainnet: "https://rpc-axelar.imperator.co",
 } as const;
 
 export type AxelarRPCUrl = keyof typeof AXELAR_RPC_URLS;

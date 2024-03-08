@@ -22,7 +22,9 @@ const Template: StoryFn<typeof Kbd> = (args) => {
 
 export const Default = Template.bind({});
 
-Default.args = {};
+Default.args = {
+  children: "Ctrl",
+};
 
 const { Sizes } = pluralizeKeys(
   configurePlayground(Kbd, {

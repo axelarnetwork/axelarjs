@@ -6,7 +6,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { CSSProperties, type FC } from "react";
+import React, {
+  CSSProperties,
+  forwardRef,
+  type ComponentType,
+  type FC,
+} from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
@@ -337,33 +342,45 @@ type ElementKey = keyof TailwindInterface;
 
 type CVA<T = unknown> = typeof cva<T>;
 
+type StyledExtension = {
+  $as?: ElementKey | ComponentType<any>;
+};
+
 export type TailwindCVA = TailwindInterface & {
   [K in ElementKey]: TailwindInterface[K] & {
     cva: <T>(
       ...args: Parameters<CVA<T>>
-    ) => FC<JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>>>;
+    ) => FC<
+      JSX.IntrinsicElements[K] &
+        VariantProps<ReturnType<CVA<T>>> &
+        StyledExtension
+    >;
   };
 };
 
 export function createTailwindCVA() {
   const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, value]) => [
+    Object.entries(tw).map(([key, styledFn]) => [
       key,
-      Object.assign(value, {
+      Object.assign(styledFn, {
         cva: (...args: Parameters<typeof cva>) => {
           const variance = cva(...args);
 
           type Props = VariantProps<typeof variance> & {
             className?: string;
-          };
+            ref?: React.Ref<HTMLElement>;
+          } & StyledExtension;
 
-          const Component = value`` as FC<Props>;
+          const StyledComponent = styledFn`` as FC<Props>;
 
-          return ({ className, ...props }: Props) => (
-            <Component
-              className={cn(variance({ ...props, className }), className)}
-              {...props}
-            />
+          return forwardRef<HTMLElement, Props>(
+            ({ className, ...props }, ref) => (
+              <StyledComponent
+                className={cn(variance({ ...props, className }), className)}
+                {...props}
+                ref={ref}
+              />
+            )
           );
         },
       }),

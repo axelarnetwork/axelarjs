@@ -1,9 +1,11 @@
-import { forwardRef } from "react";
+import { forwardRef, type ComponentProps } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import tw from "../../tw";
 
-const inputVariance = cva("input", {
+/**
+ * A text input component
+ */
+const StyledTextInput = tw.input.cva("input", {
   variants: {
     variant: {
       primary: "input-primary",
@@ -32,53 +34,17 @@ const inputVariance = cva("input", {
   },
 });
 
-type VProps = VariantProps<typeof inputVariance>;
+StyledTextInput.displayName = "TextInput";
+StyledTextInput.defaultProps = {
+  type: "text",
+};
 
-type BaseTextInputProps = Omit<
-  JSX.IntrinsicElements["input"],
-  "type" | "color"
->;
-
-export interface TextInputProps extends BaseTextInputProps, VProps {
+export interface TextInputProps extends ComponentProps<typeof StyledTextInput> {
   type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
   disabled?: boolean;
 }
 
-/**
- * A text input component
- */
+// this is only forwarded so the `type` prop can is restricted to the types we want
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  (
-    {
-      variant: color,
-      inputSize,
-      ghost,
-      bordered,
-      className,
-      disabled,
-      ...props
-    },
-    ref
-  ) => (
-    <input
-      className={twMerge(
-        inputVariance({
-          bordered,
-          variant: color,
-          inputSize,
-          ghost,
-          disabled,
-        }),
-        className
-      )}
-      disabled={Boolean(disabled)}
-      {...props}
-      ref={ref}
-    />
-  )
+  (props, ref) => <StyledTextInput {...props} ref={ref} />
 );
-
-TextInput.displayName = "TextInput";
-TextInput.defaultProps = {
-  type: "text",
-};

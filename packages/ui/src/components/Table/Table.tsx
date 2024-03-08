@@ -1,11 +1,8 @@
-import { ComponentProps } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
-import { twMerge } from "tailwind-merge";
+import type { ComponentProps } from "react";
 
 import tw from "../../tw";
 
-const tableVariance = cva("table", {
+const StyledTable = tw.table.cva("table", {
   variants: {
     zebra: {
       true: "table-zebra",
@@ -25,34 +22,9 @@ const tableVariance = cva("table", {
   },
 });
 
-const StyledTable = tw.table``;
+export type TableProps = ComponentProps<typeof StyledTable>;
 
-type TableBaseProps = VariantProps<typeof tableVariance>;
-
-export interface TableProps
-  extends ComponentProps<typeof StyledTable>,
-    TableBaseProps {}
-
-const TableRoot = ({
-  zebra,
-  pinRows,
-  pinCols,
-  size,
-  className,
-  ...props
-}: TableProps) => {
-  return (
-    <StyledTable
-      className={twMerge(
-        tableVariance({ zebra, pinRows, pinCols, size }),
-        className
-      )}
-      {...props}
-    />
-  );
-};
-
-export const Table = Object.assign(TableRoot, {
+export const Table = Object.assign(StyledTable, {
   Head: tw.thead``,
   Column: tw.th``,
   Body: tw.tbody``,
