@@ -1,24 +1,25 @@
-import { defineChain } from "viem";
-import { Chain } from "viem/chains";
 import {
   arbitrum,
-  arbitrumGoerli,
   arbitrumSepolia,
   aurora,
   auroraTestnet,
   avalanche,
   avalancheFuji,
   base,
-  baseGoerli,
+  baseSepolia,
+  blast,
+  blastSepolia,
   bsc,
   bscTestnet,
   celo,
   celoAlfajores,
+  Chain,
   fantom,
   fantomTestnet,
   filecoin,
   filecoinCalibration,
-  goerli,
+  fraxtal,
+  fraxtalTestnet,
   kava,
   kavaTestnet,
   linea,
@@ -29,7 +30,7 @@ import {
   moonbaseAlpha,
   moonbeam,
   optimism,
-  optimismGoerli,
+  optimismSepolia,
   polygon,
   polygonMumbai,
   polygonZkEvm,
@@ -37,7 +38,7 @@ import {
   scroll,
   scrollSepolia,
   sepolia,
-} from "wagmi/chains";
+} from "viem/chains";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
 
@@ -58,12 +59,6 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "ethereum",
     axelarChainName: "ethereum",
     environment: ENVIRONMENTS.mainnet,
-  },
-  {
-    ...goerli,
-    axelarChainId: "ethereum-2",
-    axelarChainName: "ethereum-2",
-    environment: ENVIRONMENTS.testnet,
   },
   {
     ...sepolia,
@@ -154,12 +149,6 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.mainnet,
   },
   {
-    ...arbitrumGoerli,
-    axelarChainId: "arbitrum",
-    axelarChainName: "arbitrum",
-    environment: ENVIRONMENTS.testnet,
-  },
-  {
     ...arbitrumSepolia,
     axelarChainId: "arbitrum-sepolia",
     axelarChainName: "arbitrum-sepolia",
@@ -196,9 +185,9 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.mainnet,
   },
   {
-    ...optimismGoerli,
-    axelarChainId: "optimism",
-    axelarChainName: "optimism",
+    ...optimismSepolia,
+    axelarChainId: "optimism-sepolia",
+    axelarChainName: "optimism-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
@@ -232,9 +221,9 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.mainnet,
   },
   {
-    ...baseGoerli,
-    axelarChainId: "base",
-    axelarChainName: "base",
+    ...baseSepolia,
+    axelarChainId: "base-sepolia",
+    axelarChainName: "base-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
@@ -274,48 +263,28 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.testnet,
   },
   {
-    ...defineChain({
-      id: 252,
-      name: "Fraxtal",
-      nativeCurrency: { name: "Frax Ether", symbol: "frxETH", decimals: 18 },
-      rpcUrls: {
-        default: {
-          http: ["https://rpc.frax.com"],
-        },
-      },
-      blockExplorers: {
-        default: {
-          name: "Fraxscan",
-          url: "https://fraxscan.com",
-          apiUrl: "https://api.fraxscan.com/api",
-        },
-      },
-    }),
+    ...fraxtal,
     axelarChainId: "fraxtal",
-    axelarChainName: "Fraxtal",
+    axelarChainName: "fraxtal",
     environment: ENVIRONMENTS.mainnet,
   },
   {
-    ...defineChain({
-      id: 81457,
-      name: "Blast",
-      nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-      rpcUrls: {
-        default: {
-          http: ["https://rpc.blast.io"],
-        },
-      },
-      blockExplorers: {
-        default: {
-          name: "Blastscan",
-          url: "https://blastscan.io",
-          apiUrl: "https://api.blastscan.io/api",
-        },
-      },
-    }),
+    ...fraxtalTestnet,
+    axelarChainId: "fraxtal",
+    axelarChainName: "fraxtal",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...blast,
     axelarChainId: "blast",
-    axelarChainName: "Blast",
+    axelarChainName: "blast",
     environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...blastSepolia,
+    axelarChainId: "blast-sepolia",
+    axelarChainName: "blast-sepolia",
+    environment: ENVIRONMENTS.testnet,
   },
 ] as const;
 

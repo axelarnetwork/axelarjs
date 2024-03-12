@@ -1,12 +1,13 @@
+import type { Chain } from "viem";
 import {
   arbitrum,
-  arbitrumGoerli,
+  arbitrumSepolia,
   base,
-  baseGoerli,
+  baseSepolia,
   mantle,
   mantleTestnet,
   optimism,
-  optimismGoerli,
+  optimismSepolia,
   scroll,
   scrollSepolia,
 } from "viem/chains";
@@ -21,15 +22,15 @@ export const MAINNET_L2_CHAINS = {
   optimism,
   scroll,
   mantle,
-} as const;
+} as Record<L2Chain, Chain>;
 
 export const TESTNET_L2_CHAINS = {
-  arbitrum: arbitrumGoerli,
-  base: baseGoerli,
-  optimism: optimismGoerli,
+  arbitrum: arbitrumSepolia,
+  base: baseSepolia,
+  optimism: optimismSepolia,
   scroll: scrollSepolia,
   mantle: mantleTestnet,
-} as const;
+} as Record<L2Chain, Chain>;
 
 export type EstimateL1FeeParams = {
   destinationContractAddress?: `0x${string}` | undefined;
