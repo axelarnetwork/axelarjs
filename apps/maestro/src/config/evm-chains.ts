@@ -186,8 +186,8 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...optimismSepolia,
-    axelarChainId: "optimism",
-    axelarChainName: "optimism",
+    axelarChainId: "optimism-sepolia",
+    axelarChainName: "optimism-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
@@ -222,8 +222,8 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...baseSepolia,
-    axelarChainId: "base",
-    axelarChainName: "base",
+    axelarChainId: "base-sepolia",
+    axelarChainName: "base-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
@@ -265,25 +265,25 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...fraxtal,
     axelarChainId: "fraxtal",
-    axelarChainName: "Fraxtal",
+    axelarChainName: "fraxtal",
     environment: ENVIRONMENTS.mainnet,
   },
   {
     ...fraxtalTestnet,
     axelarChainId: "fraxtal",
-    axelarChainName: "Fraxtal",
+    axelarChainName: "fraxtal",
     environment: ENVIRONMENTS.testnet,
   },
   {
     ...blast,
     axelarChainId: "blast",
-    axelarChainName: "Blast",
+    axelarChainName: "blast",
     environment: ENVIRONMENTS.mainnet,
   },
   {
     ...blastSepolia,
-    axelarChainId: "blast",
-    axelarChainName: "Blast",
+    axelarChainId: "blast-sepolia",
+    axelarChainName: "blast-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
 ] as const;
