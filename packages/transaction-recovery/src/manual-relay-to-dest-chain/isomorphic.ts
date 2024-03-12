@@ -11,7 +11,7 @@ import {
   getRouteDir,
   mapSearchGMPResponse,
 } from "./lib/helper";
-import { ManualRelayToDestChainParams } from "./types";
+import { ManualRelayToDestChainParams, RouteDir } from "./types";
 
 export type ManualRelayToDestChainDependencies = {
   axelarQueryClient: AxelarQueryAPIClient;
@@ -50,7 +50,33 @@ export async function manualRelayToDestChain(
     throw ManualRelayToDestChainError.TX_NOT_FOUND;
   }
 
-  const routeDir = getRouteDir(srcChainInfo, destChainInfo);
+  const dir = getRouteDir(srcChainInfo, destChainInfo);
 
-  console.log(routeDir);
+  if (dir === RouteDir.EVM_TO_EVM) {
+    // recoverEVMToEVM()
+  } else if (dir === RouteDir.COSMOS_TO_EVM) {
+    // recoverEVMToIBC()
+  } else if (dir === RouteDir.EVM_TO_COSMOS) {
+    // recoverIBCToEVM()
+  }
+
+  // return recover(routeDir);
 }
+
+function recover(dir: RouteDir) {
+  if (dir === RouteDir.EVM_TO_EVM) {
+    // recoverEVMToEVM()
+  } else if (dir === RouteDir.COSMOS_TO_EVM) {
+    // recoverEVMToIBC()
+  } else if (dir === RouteDir.EVM_TO_COSMOS) {
+    // recoverIBCToEVM()
+  }
+}
+
+function recoverEVMToEVM(
+  srcChain: string,
+  destChain: string,
+  txHash: `0x${string}`,
+  txEventIndex: number,
+  escapeAfterConfirm: boolean
+) {}
