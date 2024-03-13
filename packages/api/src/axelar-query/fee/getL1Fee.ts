@@ -5,16 +5,16 @@ import {
   createPublicClient,
   http,
   parseAbi,
-  PublicClient,
   type Chain,
   type HttpTransport,
+  type PublicClient,
 } from "viem";
 
 import {
-  EstimateL1FeeParams,
-  L2Chain,
   MAINNET_L2_CHAINS,
   TESTNET_L2_CHAINS,
+  type EstimateL1FeeParams,
+  type L2Chain,
 } from "./types";
 
 /**
@@ -30,6 +30,7 @@ export function getL1FeeForL2(
   params: EstimateL1FeeParams
 ): Promise<bigint> {
   const chains = env === "mainnet" ? MAINNET_L2_CHAINS : TESTNET_L2_CHAINS;
+
   const publicClient = createPublicClient({
     chain: chains[chain],
     transport: http(),
