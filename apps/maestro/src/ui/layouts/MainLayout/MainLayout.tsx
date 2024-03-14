@@ -96,7 +96,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               <Tooltip
                 tip="Dismiss this messages"
                 className="text-error absolute right-4 top-4"
-                position="left"
+                $position="left"
               >
                 <button onClick={actions.dismissGlobalBanner}>
                   <XCircleIcon />

@@ -104,7 +104,7 @@ const ToastElement: FC<ToastElementProps> = ({
       <div className="flex items-center">
         <Tooltip
           tip={`View on ${wagmiChain?.blockExplorers?.default.name}`}
-          position="left"
+          $position="left"
         >
           <Link
             href={`${wagmiChain?.blockExplorers?.default.url}/tx/${txHash}`}
@@ -123,7 +123,7 @@ const ToastElement: FC<ToastElementProps> = ({
           {showFinalityProgressBar ? (
             <Tooltip
               tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
-              position="top"
+              $position="top"
             >
               <div className="text-xs">
                 {elapsedBlocks} / {expectedConfirmations} blocks{" "}
@@ -131,7 +131,7 @@ const ToastElement: FC<ToastElementProps> = ({
               </div>
             </Tooltip>
           ) : (
-            <Tooltip tip={`Waiting for approval on Axelar`} position="top">
+            <Tooltip tip={`Waiting for approval on Axelar`} $position="top">
               <div className="flex items-center gap-1 text-xs">
                 Finality blocks reached <span className="text-success">✓</span>
               </div>

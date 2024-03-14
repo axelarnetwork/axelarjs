@@ -42,19 +42,19 @@ export const WithClassName = withProps({
 
 export const WithCustomPosition = withProps({
   tip: "This is a tooltip with a custom position",
-  position: "bottom",
+  $position: "bottom",
   children: "Hover me for a tooltip",
 });
 
 export const WithCustomVariant = withProps({
   tip: "This is a tooltip with a custom variant",
-  variant: "accent",
+  $variant: "accent",
   children: "Hover me for a tooltip",
 });
 
 export const WithIconAndRightPosition = withProps({
   tip: "This is a tooltip with an icon and a custom position",
-  position: "right",
+  $position: "right",
   children: (
     <Button $size="sm">
       <PlusIcon className="h-4 w-4" />

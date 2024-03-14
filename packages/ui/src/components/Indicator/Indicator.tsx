@@ -8,7 +8,7 @@ import { Badge } from "../Badge";
 
 const StyledIndicator = tw.div`indicator`;
 
-const indicatorItemVariance = cva("indicator", {
+const indicatorItemVariance = cva("indicator-item", {
   variants: {
     $position: {
       top: "indicator-top",
@@ -24,10 +24,8 @@ const indicatorItemVariance = cva("indicator", {
 export interface IndicatorProps
   extends ComponentProps<typeof StyledIndicator> {}
 
-const StyledIndicatorItem = tw(Badge)`indicator-item`;
-
 export interface IndicatorItemProps
-  extends ComponentProps<typeof StyledIndicatorItem>,
+  extends ComponentProps<typeof Badge>,
     VariantProps<typeof indicatorItemVariance> {}
 
 const IndicatorItem: FC<IndicatorItemProps> = ({
@@ -35,8 +33,8 @@ const IndicatorItem: FC<IndicatorItemProps> = ({
   className,
   ...props
 }) => (
-  <StyledIndicatorItem
-    className={cn(indicatorItemVariance({ $position }), className)}
+  <Badge
+    className={cn(indicatorItemVariance({ $position, className }))}
     {...props}
   />
 );
