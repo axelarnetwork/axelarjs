@@ -1,9 +1,10 @@
 import type {
   AxelarConfigClient,
   AxelarQueryAPIClient,
+  ChainConfig,
+  ChainCosmosSubconfig,
   GMPClient,
 } from "@axelarjs/api";
-import type { AxelarCosmosChainConfig } from "@axelarjs/api/axelar-config/types";
 import { COSMOS_GAS_RECEIVER_OPTIONS, type Environment } from "@axelarjs/core";
 import { AxelarSigningStargateClient } from "@axelarjs/cosmos";
 
@@ -35,20 +36,20 @@ export async function addGas(
   { autocalculateGasOptions, sendOptions, ...params }: AddGasParams,
   dependencies: AddGasDependencies
 ): Promise<AddGasResponse> {
-  const { chains } = await dependencies.configClient.getChainConfigs(
+  const { chains } = await dependencies.configClient.getAxelarConfigs(
     sendOptions.environment
   );
 
   const chainConfig =
-    params.chain in chains && chains[params.chain]?.module === "axelarnet"
-      ? (chains[params.chain] as AxelarCosmosChainConfig)
+    params.chain in chains && chains[params.chain]?.chainType === "axelarnet"
+      ? chains[params.chain]
       : undefined;
 
   if (!chainConfig) {
     throw new Error(`chain ID ${params.chain} not found`);
   }
 
-  const { rpc, channelIdToAxelar } = chainConfig.cosmosConfigs;
+  const { rpc, ibc } = chainConfig.config as ChainCosmosSubconfig;
 
   const [tx] = await dependencies.gmpClient
     .searchGMP({ txHash: params.txHash as `0x${string}` })
@@ -66,6 +67,8 @@ export async function addGas(
     sendOptions.environment,
     chainConfig
   );
+
+  if (!denomOnSrcChain) throw new Error("could not find denomOnSrcChain");
 
   if (!matchesOriginalTokenPayment(params.token, denomOnSrcChain)) {
     return {
@@ -120,7 +123,7 @@ export async function addGas(
       sender,
       {
         sourcePort: "transfer",
-        sourceChannel: channelIdToAxelar,
+        sourceChannel: String(ibc?.toAxelar.channelId),
         token: coin,
         sender,
         receiver: COSMOS_GAS_RECEIVER_OPTIONS[sendOptions.environment],
@@ -162,6 +165,8 @@ async function getFullFee({
     chainConfig
   );
 
+  if (!denom) throw new Error("could not find denom");
+
   return {
     denom,
     amount: typeof amount === "string" ? amount : amount.executionFee,
@@ -178,8 +183,12 @@ function matchesOriginalTokenPayment(
 function getIBCDenomOnSrcChain(
   denomOnAxelar: string | undefined,
   env: Environment,
-  chain: AxelarCosmosChainConfig
+  chain: ChainConfig
 ) {
+  if (chain.chainType !== "axelarnet") {
+    throw new Error("cannot find token that matches original gas payment");
+  }
+
   /**
    * take the denom that is fetched from the original tx details in the index;
    * if that does not exist, default to USDC
@@ -187,15 +196,5 @@ function getIBCDenomOnSrcChain(
    */
   const denom = denomOnAxelar ?? (env === "mainnet" ? "uusdc" : "uausdc");
 
-  const asset = chain.assets?.find(
-    (config) =>
-      config.module === "axelarnet" &&
-      (config.id === denom || config.ibcDenom === denom)
-  );
-
-  if (asset?.module !== "axelarnet") {
-    throw new Error("cannot find token that matches original gas payment");
-  }
-
-  return asset.ibcDenom;
+  return chain.assets[denom];
 }

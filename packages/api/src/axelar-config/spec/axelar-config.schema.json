@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string"
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "staticAssetHost": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["staticAssetHost"]
+    },
+    "chains": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "chainType": {
+            "type": "string"
+          },
+          "externalChainId": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "nativeCurrency": {
+            "type": ["object", "null"],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "symbol": {
+                "type": ["string", "null"]
+              },
+              "decimals": {
+                "type": ["integer", "null"]
+              },
+              "iconUrl": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "iconUrl"]
+          },
+          "blockExplorers": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": ["name", "url"]
+            }
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "contracts": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["address"]
+                }
+              },
+              "approxFinalityHeight": {
+                "type": "integer"
+              },
+              "rpc": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "required": ["rpc"]
+          },
+          "assets": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "displayName",
+          "chainType",
+          "externalChainId",
+          "iconUrl",
+          "config"
+        ]
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "prettySymbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": ["string", "null"]
+          },
+          "decimals": {
+            "type": "integer"
+          },
+          "originAxelarChainId": {
+            "type": "string"
+          },
+          "coingeckoId": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          },
+          "chains": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "tokenAddress": {
+                  "type": "string"
+                },
+                "prettySymbol": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": ["string", "null"]
+                },
+                "tokenManager": {
+                  "type": "string"
+                },
+                "tokenManagerType": {
+                  "type": "string"
+                }
+              },
+              "required": ["tokenAddress", "symbol", "name"]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "prettySymbol",
+          "decimals",
+          "originAxelarChainId",
+          "iconUrl",
+          "type",
+          "chains"
+        ]
+      }
+    },
+    "tokenAddressToAsset": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "version",
+    "environment",
+    "resources",
+    "chains",
+    "assets",
+    "tokenAddressToAsset"
+  ]
+}

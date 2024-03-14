@@ -1,4 +1,4 @@
-import { ChainConfigsResponse } from "@axelarjs/api";
+import { AxelarConfigsResponse } from "@axelarjs/api";
 import { AXELAR_RPC_URLS, Environment } from "@axelarjs/core";
 import { createAxelarQueryClient } from "@axelarjs/cosmos";
 import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
@@ -8,18 +8,25 @@ import { DepositAddressRequestConfig } from "../types";
 export function unwrappable(
   destinationChain: string,
   asset: string,
-  chainConfigs: ChainConfigsResponse
-) {
+  chainConfigs: AxelarConfigsResponse
+): boolean {
   const destinationChainConfig =
     chainConfigs.chains[destinationChain.toLowerCase()];
 
   if (!destinationChainConfig) return false;
 
-  const destAsset = destinationChainConfig.assets.find(
-    ({ id }) => id === asset
+  const destAsset = Object.entries(chainConfigs.assets)
+    .map((tuple) => tuple[1])
+    .find(({ id }) => id === asset);
+
+  const chainForDestAsset = Object.entries(destAsset?.chains ?? []).find(
+    (tuple) => tuple[0] === destinationChain
   );
 
-  return destAsset?.module === "evm" && destAsset.isERC20WrappedNativeGasToken;
+  if (chainForDestAsset) {
+    return Boolean(chainForDestAsset[1]?.isERC20WrappedNativeGasToken);
+  }
+  return false;
 }
 
 export async function getActiveChains(

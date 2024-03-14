@@ -1,6 +1,6 @@
 import type {
+  AxelarConfigsResponse,
   AxelarscanClient,
-  ChainConfigsResponse,
   DepositAddressClient,
   LinkRequestResponse,
 } from "@axelarjs/api";
@@ -21,7 +21,7 @@ export type ListenerParams = {
 
 export async function getDepositAddressFromAxelarNetwork(
   params: SendOptions,
-  chainConfigs: ChainConfigsResponse,
+  chainConfigs: AxelarConfigsResponse,
   dependencies: GetLinkedDepositAddressDependencies
 ) {
   /**
@@ -77,17 +77,17 @@ function findLinkRequest(
 
 async function waitForDepositAddress(
   params: ListenerParams,
-  chainConfigs: ChainConfigsResponse,
+  chainConfigs: AxelarConfigsResponse,
   axelarscanClient: AxelarscanClient
 ) {
   const srcChainConfig = chainConfigs.chains[params.sourceChain.toLowerCase()];
   return findLinkRequest(
     params,
-    srcChainConfig?.module,
+    srcChainConfig?.chainType,
     await poll(
       () => axelarscanClient.getRecentLinkTransactions({ size: 10 }),
       (res: LinkRequestResponse[]) =>
-        !findLinkRequest(params, srcChainConfig?.module, res),
+        !findLinkRequest(params, srcChainConfig?.chainType, res),
       5_000,
       5
     )
