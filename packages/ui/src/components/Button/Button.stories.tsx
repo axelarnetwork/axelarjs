@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -29,25 +27,31 @@ Loading.args = {
   loading: true,
 };
 
-// creates stories for variansts (color, size, shape)
-const { Variants, Sizes, Shapes } = pluralizeKeys(
-  configurePlayground(Button, {
-    variant: {
-      values: COLOR_VARIANTS,
-    },
-    size: {
-      values: SIZE_VARIANTS,
-    },
-    shape: {
-      values: ["circle", "square"],
-      getChildren: (value) =>
-        value === "circle" ? (
-          <AxelarBlueIcon className="h-6 w-6" />
-        ) : (
-          <AxelarIcon className="h-6 w-6 dark:invert" />
-        ),
-    },
-  })
-);
+export const Disabled = Template.bind({});
 
-export { Variants, Sizes, Shapes };
+Disabled.args = {
+  disabled: true,
+};
+
+// creates stories for variansts (color, size, shape)
+const stories = configurePlayground(Button, {
+  $variant: {
+    values: COLOR_VARIANTS,
+  },
+  $size: {
+    values: SIZE_VARIANTS,
+  },
+  $shape: {
+    values: ["circle", "square"],
+    getChildren: (value) =>
+      value === "circle" ? (
+        <AxelarBlueIcon className="h-6 w-6" />
+      ) : (
+        <AxelarIcon className="h-6 w-6 dark:invert" />
+      ),
+  },
+});
+
+export const Variants = stories.$variant;
+export const Sizes = stories.$size;
+export const Shapes = stories.$shape;

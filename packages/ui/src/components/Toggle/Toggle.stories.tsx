@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import { Meta } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -21,17 +19,16 @@ Toggle.defaultProps = {
 };
 
 // creates stories for variansts (color, size, shape)
-const { Variants, Sizes } = pluralizeKeys(
-  configurePlayground(Toggle, {
-    variant: {
-      values: COLOR_VARIANTS,
-      noChildren: true,
-    },
-    size: {
-      values: SIZE_VARIANTS,
-      noChildren: true,
-    },
-  })
-);
+const stories = configurePlayground(Toggle, {
+  $variant: {
+    values: COLOR_VARIANTS,
+    noChildren: true,
+  },
+  $size: {
+    values: SIZE_VARIANTS,
+    noChildren: true,
+  },
+});
 
-export { Variants, Sizes };
+export const Variants = stories.$variant;
+export const Sizes = stories.$size;
