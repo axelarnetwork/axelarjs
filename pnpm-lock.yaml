@@ -677,6 +677,9 @@ importers:
       react-jazzicon:
         specifier: ^1.0.4
         version: 1.0.4(react-dom@18.2.0)(react@18.2.0)
+      styled-cva:
+        specifier: ^0.1.4
+        version: 0.1.4(typescript@5.4.2)
       tailwind-merge:
         specifier: ^1.14.0
         version: 1.14.0
@@ -10324,7 +10327,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.23.3(@babel/core@7.24.0)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.0
-      vite: 5.1.6(@types/node@20.11.20)
+      vite: 5.1.6(@types/node@20.11.27)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -21074,6 +21077,15 @@ packages:
       inline-style-parser: 0.1.1
     dev: false
 
+  /styled-cva@0.1.4(typescript@5.4.2):
+    resolution: {integrity: sha512-HFeTBDw38a4otsIX9UYK4dyXE4ZtHZQLyjpdsSzw94nHI/5U5N4om5ivPyp55i/igldiKnoAlJ2PVjVG51fF7g==}
+    peerDependencies:
+      typescript: ^5.0.0
+    dependencies:
+      clsx: 2.1.0
+      typescript: 5.4.2
+    dev: false
+
   /styled-jsx@5.1.1(@babel/core@7.23.2)(react@18.2.0):
     resolution: {integrity: sha512-pW7uC1l4mBZ8ugbiZrcIsiIvVx1UmTfw7UkC3Um2tmfUq9Bhk8IiyEIPl6F8agHgjzku6j0xQEZbfA5uSgSaCw==}
     engines: {node: '>= 12.0.0'}
@@ -22431,7 +22443,7 @@ packages:
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
-      pathe: 1.1.1
+      pathe: 1.1.2
       picocolors: 1.0.0
       vite: 5.1.6(@types/node@20.11.20)
     transitivePeerDependencies:
