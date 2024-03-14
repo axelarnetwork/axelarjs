@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -23,15 +21,14 @@ const Template: StoryFn<typeof Badge> = (args) => {
 export const Default = Template.bind({});
 
 // creates stories for variansts (color, size, shape)
-const { Variants, Sizes } = pluralizeKeys(
-  configurePlayground(Badge, {
-    variant: {
-      values: COLOR_VARIANTS,
-    },
-    size: {
-      values: SIZE_VARIANTS,
-    },
-  })
-);
+const stories = configurePlayground(Badge, {
+  $variant: {
+    values: COLOR_VARIANTS,
+  },
+  $size: {
+    values: SIZE_VARIANTS,
+  },
+});
 
-export { Variants, Sizes };
+export const Variants = stories.$variant;
+export const Sizes = stories.$size;

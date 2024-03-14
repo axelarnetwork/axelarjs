@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -24,23 +22,22 @@ export const Default = Template.bind({});
 
 Default.args = {};
 
-const { InputSizes, Variants } = pluralizeKeys(
-  configurePlayground(
-    Radio,
-    {
-      inputSize: {
-        values: SIZE_VARIANTS,
-        noChildren: true,
-      },
-      variant: {
-        values: COLOR_VARIANTS,
-        noChildren: true,
-      },
+const stories = configurePlayground(
+  Radio,
+  {
+    $size: {
+      values: SIZE_VARIANTS,
+      noChildren: true,
     },
-    {
-      defaultChecked: true,
-    }
-  )
+    $variant: {
+      values: COLOR_VARIANTS,
+      noChildren: true,
+    },
+  },
+  {
+    defaultChecked: true,
+  }
 );
 
-export { InputSizes, Variants };
+export const Sizes = stories.$size;
+export const Variants = stories.$variant;

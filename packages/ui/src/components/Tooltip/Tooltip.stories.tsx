@@ -56,7 +56,7 @@ export const WithIconAndRightPosition = withProps({
   tip: "This is a tooltip with an icon and a custom position",
   position: "right",
   children: (
-    <Button size="sm">
+    <Button $size="sm">
       <PlusIcon className="h-4 w-4" />
     </Button>
   ),

@@ -23,10 +23,10 @@ Default.args = {
   children: "Default Alert",
 };
 
-const { Status } = configurePlayground(Alert, {
-  status: {
+const stories = configurePlayground(Alert, {
+  $status: {
     values: ["info", "success", "warning", "error"],
   },
 });
 
-export { Status };
+export const Status = stories.$status;
