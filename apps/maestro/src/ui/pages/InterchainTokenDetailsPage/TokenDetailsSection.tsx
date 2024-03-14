@@ -67,8 +67,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           </CopyToClipboardButton>
           <Tooltip
             tip="TokenId is a common key used to identify an interchain token across all chains"
-            variant="info"
-            position="bottom"
+            $variant="info"
+            $position="bottom"
           >
             <InfoIcon className="text-info h-[1em] w-[1em]" />
           </Tooltip>
@@ -326,7 +326,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   });
 
   return (
-    <Tooltip $as={Indicator} position="bottom" tip="Update token icon">
+    <Tooltip $as={Indicator} $position="bottom" tip="Update token icon">
       {!existingIconUrl && (
         <Indicator.Item
           $as={Badge}
@@ -353,7 +353,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               Token Icon UR{" "}
               <Tooltip
                 tip="Provide a URL to an image to use as the token icon"
-                position="right"
+                $position="right"
               >
                 <InfoIcon className="text-info h-[1em]" />
               </Tooltip>

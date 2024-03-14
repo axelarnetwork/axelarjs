@@ -37,7 +37,7 @@ const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
   const tip = props.isOriginToken ? "origin token" : "registered";
 
   return (
-    <Tooltip tip={tip} aria-label={tip} position="left">
+    <Tooltip tip={tip} aria-label={tip} $position="left">
       <Badge $size="sm" $variant={props.isOriginToken ? "success" : "info"} />
     </Tooltip>
   );
@@ -115,7 +115,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
       <Card.Body className="w-full">
         <Card.Title className="justify-between">
           {props.chain && (
-            <Tooltip tip={`View on ${explorerName}`} position="bottom">
+            <Tooltip tip={`View on ${explorerName}`} $position="bottom">
               <Link
                 className="flex items-center gap-2"
                 href={explorerUrl}
@@ -268,9 +268,9 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           <Card.Actions className="justify-between">
             <Tooltip
               tip="Contract responsible for managing tokens"
-              variant="info"
-              position="top"
               className="flex w-full items-center space-x-2"
+              $variant="info"
+              $position="top"
             >
               <span>Token Manager Address</span>
               <InfoIcon className="text-info h-[1em] w-[1em]" />

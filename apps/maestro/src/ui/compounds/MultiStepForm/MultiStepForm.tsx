@@ -291,7 +291,7 @@ const TOKEN_NAME_DISCLAIMER =
 export const TokenNameLabelWithTooltip = ({ label = "Token Name" }) => (
   <Label.Text className="inline-flex items-center gap-1">
     {label}
-    <Tooltip position="right" variant="info" tip={TOKEN_NAME_DISCLAIMER}>
+    <Tooltip $position="right" $variant="info" tip={TOKEN_NAME_DISCLAIMER}>
       <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
     </Tooltip>
   </Label.Text>

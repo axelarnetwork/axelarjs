@@ -31,8 +31,8 @@ Default.args = {
 export const Vertical = Template.bind({});
 
 Vertical.args = {
-  direction: "vertical",
-  variant: "primary",
+  $direction: "vertical",
+  $variant: "primary",
   children: (
     <>
       <Steps.Step active>Step 1</Steps.Step>
@@ -45,8 +45,8 @@ Vertical.args = {
 export const CustomContent = Template.bind({});
 
 CustomContent.args = {
-  direction: "vertical",
-  variant: "primary",
+  $direction: "vertical",
+  $variant: "primary",
   children: (
     <>
       <Steps.Step active content="?">

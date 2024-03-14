@@ -104,8 +104,8 @@ const TokenSettings: FC = () => {
             <Label.Text className="inline-flex items-center gap-1">
               Is Mintable?
               <Tooltip
-                position="right"
-                variant="info"
+                $position="right"
+                $variant="info"
                 tip="When active, the token minter will be able to mint new tokens."
               >
                 <HelpCircleIcon className="text-info mr-1 h-[1em]" />
@@ -127,8 +127,8 @@ const TokenSettings: FC = () => {
               <Label.Text className="inline-flex items-center gap-1">
                 Token Minter
                 <Tooltip
-                  position="right"
-                  variant="info"
+                  $position="right"
+                  $variant="info"
                   tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
                 >
                   <HelpCircleIcon className="text-info mr-1 h-[1em]" />
@@ -179,7 +179,7 @@ const TokenSettings: FC = () => {
           <Label htmlFor="salt">
             <Label.Text>Salt</Label.Text>
             <Label.AltText>
-              <Tooltip tip="Generate random salt" position="left">
+              <Tooltip tip="Generate random salt" $position="left">
                 <button
                   type="button"
                   onClick={() => actions.generateRandomSalt()}

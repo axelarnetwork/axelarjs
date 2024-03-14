@@ -122,7 +122,7 @@ const CompetitionPage = () => {
             </div>
             <Tooltip
               tip={`The competition started ${startDateDistance}. It ends ${endDateDistance}.`}
-              position="left"
+              $position="left"
             >
               <FormControl>
                 <Label className="w-full">

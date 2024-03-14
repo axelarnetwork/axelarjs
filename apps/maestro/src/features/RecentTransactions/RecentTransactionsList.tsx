@@ -78,7 +78,7 @@ export const RecentTransactionsList: FC<Props> = ({
               rel="noopener noreferrer"
             >
               <Tooltip
-                position={"bottom"}
+                $position={"bottom"}
                 tip={`See all ${senderAddress ? `my` : ``} ${
                   contractMethod === "InterchainTransfer"
                     ? `transfers`
@@ -131,7 +131,7 @@ const TransactionItem: FC<{
       )}
       <div>
         <div>
-          <Tooltip tip="View on AxelarScan" position="bottom">
+          <Tooltip tip="View on AxelarScan" $position="bottom">
             <Link
               className="group inline-flex items-center text-sm font-semibold hover:underline"
               href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}

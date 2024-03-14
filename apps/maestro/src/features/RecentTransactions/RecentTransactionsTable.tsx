@@ -173,7 +173,7 @@ const TransactionRow: FC<{
         </Link>
       </Table.Cell>
       <Table.Cell>
-        <Tooltip tip="View on AxelarScan" position="bottom">
+        <Tooltip tip="View on AxelarScan" $position="bottom">
           <Link
             className="group inline-flex items-center text-sm font-semibold hover:underline"
             href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
