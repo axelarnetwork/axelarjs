@@ -1,4 +1,4 @@
-import { createTailwindCVA } from "./tailwind-cva";
+import { createTailwindCVA } from "styled-cva";
 
 const tw = createTailwindCVA();
 

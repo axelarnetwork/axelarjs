@@ -6,6 +6,7 @@
 /axelar-query
 /axelar-config
 /deposit-address
+/deposit-service
 *.d.ts
 *.js
 .turbo/

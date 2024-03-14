@@ -129,14 +129,14 @@ const CompetitionPage = () => {
                   <span className="text-sm">({progressPercent})</span>
                 </Label>
                 <Progress
-                  variant="accent"
+                  $variant="accent"
                   value={timeElapsed}
                   max={totalTime}
                 />
               </FormControl>
             </Tooltip>
           </Card.Title>
-          <Table zebra>
+          <Table $zebra>
             <Table.Head>
               <Table.Column className="text-right">Rank</Table.Column>
               <Table.Column>Token Id</Table.Column>

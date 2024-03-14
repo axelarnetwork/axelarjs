@@ -49,7 +49,7 @@ const Appbar: FC<AppbarProps> = (props) => {
   const connectedAccountDetails = address ? (
     <>
       <CopyToClipboardButton
-        size="sm"
+        $size="sm"
         copyText={address}
         className="flex items-center gap-1"
       >
@@ -58,7 +58,7 @@ const Appbar: FC<AppbarProps> = (props) => {
       </CopyToClipboardButton>
       <Tooltip tip={`View account on ${chain?.blockExplorers?.default.name}`}>
         <LinkButton
-          size="sm"
+          $size="sm"
           target="_blank"
           rel="noopener noreferrer"
           href={`${chain?.blockExplorers?.default.url}/address/${address}`}
@@ -77,13 +77,13 @@ const Appbar: FC<AppbarProps> = (props) => {
           My Interchain Tokens
           <Indicator.Item
             $as={Badge}
-            variant="info"
-            size="xs"
+            $variant="info"
+            $size="xs"
             className="origin-center translate-x-4 animate-pulse"
           />
         </Indicator>
       </Link>
-      <Button size="sm" variant="error" onClick={() => disconnect()}>
+      <Button $size="sm" $variant="error" onClick={() => disconnect()}>
         Disconnect
       </Button>
     </>
@@ -104,7 +104,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                   contentClassName="max-h-[70dvh] w-[300px] translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
-                <Card className="bg-base-200" compact>
+                <Card className="bg-base-200" $compact>
                   <Card.Body>{connectedAccountDetails}</Card.Body>
                 </Card>
               </>
@@ -137,10 +137,10 @@ const Appbar: FC<AppbarProps> = (props) => {
     >
       <Navbar.Start>
         <Button
-          shape="square"
+          $shape="square"
           onClick={actions.toggleDrawer}
           aria-label="Toggle Drawer"
-          size="sm"
+          $size="sm"
           className="hover:bg-base-300/50 active:bg-base-300 rounded-lg transition-all md:hidden"
         >
           <MenuIcon className="h-6 w-6" />
@@ -148,25 +148,25 @@ const Appbar: FC<AppbarProps> = (props) => {
         <LinkButton
           className="flex items-center gap-2 text-lg font-bold uppercase"
           onClick={() => router.push("/")}
-          variant="ghost"
+          $variant="ghost"
         >
           <AxelarIcon className="h-6 w-6 dark:invert" />
           <Indicator>
             <span>{APP_NAME}</span>
             {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" ? (
               <Indicator.Item
-                size="xs"
-                variant="success"
-                position="bottom"
+                $size="xs"
+                $variant="success"
+                $position="bottom"
                 className="translate-x-2 translate-y-2 lowercase"
               >
                 {NEXT_PUBLIC_NETWORK_ENV}
               </Indicator.Item>
             ) : (
               <Indicator.Item
-                size="xs"
-                variant="primary"
-                position="bottom"
+                $size="xs"
+                $variant="primary"
+                $position="bottom"
                 className="translate-x-2 translate-y-2 lowercase"
               >
                 beta
@@ -176,14 +176,14 @@ const Appbar: FC<AppbarProps> = (props) => {
         </LinkButton>
       </Navbar.Start>
       <div className="hidden flex-none md:block">
-        {isConnected && <MainMenu direction="horizontal" />}
+        {isConnected && <MainMenu $direction="horizontal" />}
       </div>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
               <EVMChainsDropdown />
-              <Dropdown align="end">
+              <Dropdown $align="end">
                 <Dropdown.Trigger>
                   <button
                     className="grid place-items-center rounded-full hover:ring focus:ring"

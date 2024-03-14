@@ -13,7 +13,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
       {children}
       <Footer
         className="bg-neutral text-neutral-content p-6 md:p-8 xl:p-10"
-        center={true}
+        $center={true}
       >
         <div className="flex items-center text-sm">
           &copy;{new Date().getFullYear()} <span>&middot;</span>

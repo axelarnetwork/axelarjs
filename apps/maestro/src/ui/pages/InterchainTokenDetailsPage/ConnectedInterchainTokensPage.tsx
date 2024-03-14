@@ -377,7 +377,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             />
           ) : (
             <Button
-              variant="accent"
+              $variant="accent"
               onClick={() => {
                 if (originToken) {
                   switchChainAsync?.({ chainId: originToken.chainId }).catch(
@@ -400,7 +400,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   return (
     <div className="flex flex-col gap-8 md:relative">
       {interchainTokenError && tokenDetailsError && (
-        <Alert status="error">{tokenDetailsError.message}</Alert>
+        <Alert $status="error">{tokenDetailsError.message}</Alert>
       )}
 
       {interchainTokenError && tokenDetails && (
@@ -415,7 +415,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               }}
             />
           ) : (
-            <ConnectWalletButton className="w-full" size="md">
+            <ConnectWalletButton className="w-full" $size="md">
               Connect wallet to register this token
             </ConnectWalletButton>
           )}

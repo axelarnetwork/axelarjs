@@ -10,7 +10,7 @@ const StyledIndicator = tw.div`indicator`;
 
 const indicatorItemVariance = cva("indicator", {
   variants: {
-    position: {
+    $position: {
       top: "indicator-top",
       bottom: "indicator-bottom",
       center: "indicator-center",
@@ -31,12 +31,12 @@ export interface IndicatorItemProps
     VariantProps<typeof indicatorItemVariance> {}
 
 const IndicatorItem: FC<IndicatorItemProps> = ({
-  position,
+  $position,
   className,
   ...props
 }) => (
   <StyledIndicatorItem
-    className={cn(indicatorItemVariance({ position }), className)}
+    className={cn(indicatorItemVariance({ $position }), className)}
     {...props}
   />
 );

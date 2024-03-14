@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -24,19 +22,19 @@ export const Default = Template.bind({});
 
 Default.args = {};
 
-const { Variants, Sizes, Shapes } = pluralizeKeys(
-  configurePlayground(Loading, {
-    variant: {
-      values: COLOR_VARIANTS,
-    },
-    size: {
-      values: SIZE_VARIANTS,
-    },
-    shape: {
-      values: ["spinner", "dots", "ring", "infinity", "bars", "ball"],
-      getChildren: (value) => (value === "circle" ? "🔵" : "🟢"),
-    },
-  })
-);
+const stories = configurePlayground(Loading, {
+  $variant: {
+    values: COLOR_VARIANTS,
+  },
+  $size: {
+    values: SIZE_VARIANTS,
+  },
+  $shape: {
+    values: ["spinner", "dots", "ring", "infinity", "bars", "ball"],
+    getChildren: (value) => (value === "circle" ? "🔵" : "🟢"),
+  },
+});
 
-export { Variants, Sizes, Shapes };
+export const Variants = stories.$variant;
+export const Sizes = stories.$size;
+export const Shapes = stories.$shape;

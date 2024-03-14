@@ -23,8 +23,8 @@ const Template: StoryFn<typeof Modal> = (args) => {
         <p>Modal body</p>
       </Modal.Body>
       <Modal.Actions>
-        <Modal.CloseAction variant="error">Cancel</Modal.CloseAction>
-        <Modal.CloseAction variant="primary">Confirm</Modal.CloseAction>
+        <Modal.CloseAction $variant="error">Cancel</Modal.CloseAction>
+        <Modal.CloseAction $variant="primary">Confirm</Modal.CloseAction>
       </Modal.Actions>
     </Modal>
   );

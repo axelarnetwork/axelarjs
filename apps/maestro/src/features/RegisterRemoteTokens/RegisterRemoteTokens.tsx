@@ -204,15 +204,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
 
   return hasEnoughGasBalance ? (
     <Button
+      $variant="primary"
       onClick={handleClick}
       disabled={!registerTokensAsync || txState.status !== "idle"}
-      variant="primary"
-      loading={txState.status === "awaiting_approval"}
+      $loading={txState.status === "awaiting_approval"}
     >
       {buttonChildren}
     </Button>
   ) : (
-    <Alert status={"error"} className="max-w-96">
+    <Alert $status={"error"} className="max-w-96">
       {buttonChildren}
     </Alert>
   );

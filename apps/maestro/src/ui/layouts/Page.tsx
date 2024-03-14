@@ -127,7 +127,7 @@ const Page: FC<Props> = ({
             <div className="grid w-full flex-1 place-items-center">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>
-              <ConnectWalletButton className="w-full max-w-md" size="md" />
+              <ConnectWalletButton className="w-full max-w-md" $size="md" />
             </div>
             <section className="my-10 space-y-4">
               <div className="text-center text-xl font-bold">
@@ -148,11 +148,11 @@ const Page: FC<Props> = ({
                 {selectedChain ? (
                   <div className="flex items-center gap-2">
                     You&apos;re connected to{" "}
-                    <Badge variant="info">
+                    <Badge $variant="info">
                       {selectedChain?.name} ({selectedChain?.environment})
                     </Badge>
                     which is not a supported{" "}
-                    <Badge variant="info">
+                    <Badge $variant="info">
                       {process.env.NEXT_PUBLIC_NETWORK_ENV}
                     </Badge>{" "}
                     network.
@@ -160,7 +160,7 @@ const Page: FC<Props> = ({
                 ) : (
                   <div className="flex items-center gap-2">
                     You are not connected to a supported
-                    <Badge variant="info">
+                    <Badge $variant="info">
                       {process.env.NEXT_PUBLIC_NETWORK_ENV}
                     </Badge>{" "}
                     network.
@@ -169,7 +169,7 @@ const Page: FC<Props> = ({
               </div>
               <EVMChainsDropdown
                 renderTrigger={() => (
-                  <Button variant="primary">
+                  <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}
                     network
                   </Button>
@@ -194,8 +194,8 @@ const Page: FC<Props> = ({
               </div>
               {evmChainFromRoute && (
                 <Button
-                  variant="primary"
-                  length="block"
+                  $variant="primary"
+                  $length="block"
                   className="max-w-md"
                   onClick={() =>
                     switchChain?.({

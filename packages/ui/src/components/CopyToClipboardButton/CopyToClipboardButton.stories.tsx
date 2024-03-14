@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -27,15 +25,14 @@ Default.args = {
   copyText: "Copy me!",
 };
 
-const { Sizes, Variants } = pluralizeKeys(
-  configurePlayground(CopyToClipboardButton, {
-    variant: {
-      values: COLOR_VARIANTS,
-    },
-    size: {
-      values: SIZE_VARIANTS,
-    },
-  })
-);
+const stories = configurePlayground(CopyToClipboardButton, {
+  $variant: {
+    values: COLOR_VARIANTS,
+  },
+  $size: {
+    values: SIZE_VARIANTS,
+  },
+});
 
-export { Sizes, Variants };
+export const Variants = stories.$variant;
+export const Sizes = stories.$size;

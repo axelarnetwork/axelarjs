@@ -107,7 +107,7 @@ export const MintInterchainToken: FC = () => {
           </Label>
           <TextInput
             id="amountToMint"
-            bordered
+            $bordered
             placeholder="Enter your amount to mint"
             min={0}
             className="bg-base-200"
@@ -126,10 +126,10 @@ export const MintInterchainToken: FC = () => {
         </FormControl>
 
         <Button
-          variant="primary"
           type="submit"
           disabled={!formState.isValid || isMinting}
-          loading={
+          $variant="primary"
+          $loading={
             txState.status === "awaiting_approval" ||
             txState.status === "submitted"
           }

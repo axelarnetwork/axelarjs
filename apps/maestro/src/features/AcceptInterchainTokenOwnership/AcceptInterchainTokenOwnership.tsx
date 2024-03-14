@@ -121,10 +121,10 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
   return (
     <Button
-      variant="primary"
       type="submit"
-      size="xs"
-      loading={
+      $variant="primary"
+      $size="xs"
+      $loading={
         txState.status === "awaiting_approval" ||
         txState.status === "submitted" ||
         isAccepting

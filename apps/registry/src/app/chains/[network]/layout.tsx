@@ -48,7 +48,7 @@ const ChainsLayout: FC<Props> = (props) => {
       <div className="bg-base-300 mx-auto flex items-center gap-2 rounded-2xl p-1.5">
         <div>
           <TextInput
-            inputSize="sm"
+            $size="sm"
             placeholder="Search chain"
             type="search"
             className="h-9"
@@ -56,7 +56,7 @@ const ChainsLayout: FC<Props> = (props) => {
             onChange={handleSeachChange}
           />
         </div>
-        <Tabs boxed>
+        <Tabs $boxed>
           {CHAIN_TABS.map((tab) => (
             <Tabs.Tab
               active={tab.value === props.params.network}

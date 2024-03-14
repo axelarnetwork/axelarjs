@@ -106,8 +106,8 @@ const ModalRoot: FC<ModalProps> = ({
             {!hideCloseButton && (
               <Dialog.Close asChild>
                 <Button
-                  size="sm"
-                  shape="circle"
+                  $size="sm"
+                  $shape="circle"
                   className="absolute right-2 top-2"
                   disabled={disableCloseButton}
                 >
