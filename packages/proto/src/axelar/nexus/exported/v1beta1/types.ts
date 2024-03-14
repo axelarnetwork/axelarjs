@@ -58,8 +58,8 @@ export function transferStateToJSON(object: TransferState): string {
 
 export enum TransferDirection {
   TRANSFER_DIRECTION_UNSPECIFIED = 0,
-  TRANSFER_DIRECTION_INCOMING = 1,
-  TRANSFER_DIRECTION_OUTGOING = 2,
+  TRANSFER_DIRECTION_FROM = 1,
+  TRANSFER_DIRECTION_TO = 2,
   UNRECOGNIZED = -1,
 }
 
@@ -69,11 +69,11 @@ export function transferDirectionFromJSON(object: any): TransferDirection {
     case "TRANSFER_DIRECTION_UNSPECIFIED":
       return TransferDirection.TRANSFER_DIRECTION_UNSPECIFIED;
     case 1:
-    case "TRANSFER_DIRECTION_INCOMING":
-      return TransferDirection.TRANSFER_DIRECTION_INCOMING;
+    case "TRANSFER_DIRECTION_FROM":
+      return TransferDirection.TRANSFER_DIRECTION_FROM;
     case 2:
-    case "TRANSFER_DIRECTION_OUTGOING":
-      return TransferDirection.TRANSFER_DIRECTION_OUTGOING;
+    case "TRANSFER_DIRECTION_TO":
+      return TransferDirection.TRANSFER_DIRECTION_TO;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -85,10 +85,10 @@ export function transferDirectionToJSON(object: TransferDirection): string {
   switch (object) {
     case TransferDirection.TRANSFER_DIRECTION_UNSPECIFIED:
       return "TRANSFER_DIRECTION_UNSPECIFIED";
-    case TransferDirection.TRANSFER_DIRECTION_INCOMING:
-      return "TRANSFER_DIRECTION_INCOMING";
-    case TransferDirection.TRANSFER_DIRECTION_OUTGOING:
-      return "TRANSFER_DIRECTION_OUTGOING";
+    case TransferDirection.TRANSFER_DIRECTION_FROM:
+      return "TRANSFER_DIRECTION_FROM";
+    case TransferDirection.TRANSFER_DIRECTION_TO:
+      return "TRANSFER_DIRECTION_TO";
     case TransferDirection.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -212,6 +212,7 @@ export interface WasmMessage {
   payloadHash: Uint8Array;
   sourceTxId: Uint8Array;
   sourceTxIndex: Long;
+  sender: Uint8Array;
 }
 
 function createBaseChain(): Chain {
@@ -1031,6 +1032,7 @@ function createBaseWasmMessage(): WasmMessage {
     payloadHash: new Uint8Array(0),
     sourceTxId: new Uint8Array(0),
     sourceTxIndex: Long.UZERO,
+    sender: new Uint8Array(0),
   };
 }
 
@@ -1059,6 +1061,9 @@ export const WasmMessage = {
     }
     if (!message.sourceTxIndex.isZero()) {
       writer.uint32(56).uint64(message.sourceTxIndex);
+    }
+    if (message.sender.length !== 0) {
+      writer.uint32(66).bytes(message.sender);
     }
     return writer;
   },
@@ -1120,6 +1125,13 @@ export const WasmMessage = {
 
           message.sourceTxIndex = reader.uint64() as Long;
           continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.sender = reader.bytes();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1152,6 +1164,9 @@ export const WasmMessage = {
       sourceTxIndex: isSet(object.sourceTxIndex)
         ? Long.fromValue(object.sourceTxIndex)
         : Long.UZERO,
+      sender: isSet(object.sender)
+        ? bytesFromBase64(object.sender)
+        : new Uint8Array(0),
     };
   },
 
@@ -1178,6 +1193,9 @@ export const WasmMessage = {
     if (!message.sourceTxIndex.isZero()) {
       obj.sourceTxIndex = (message.sourceTxIndex || Long.UZERO).toString();
     }
+    if (message.sender.length !== 0) {
+      obj.sender = base64FromBytes(message.sender);
+    }
     return obj;
   },
 
@@ -1198,12 +1216,13 @@ export const WasmMessage = {
       object.sourceTxIndex !== undefined && object.sourceTxIndex !== null
         ? Long.fromValue(object.sourceTxIndex)
         : Long.UZERO;
+    message.sender = object.sender ?? new Uint8Array(0);
     return message;
   },
 };
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
     const bin = globalThis.atob(b64);
@@ -1216,7 +1235,7 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];

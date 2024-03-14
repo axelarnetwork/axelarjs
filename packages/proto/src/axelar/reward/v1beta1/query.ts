@@ -8,10 +8,13 @@ export const protobufPackage = "axelar.reward.v1beta1";
 
 /**
  * InflationRateRequest represents a message that queries the Axelar specific
- * inflation RPC method.
+ * inflation RPC method. Ideally, this would use ValAddress as the validator
+ * field type. However, this makes it awkward for REST-based calls, because it
+ * would expect a byte array as part of the url. So, the bech32 encoded address
+ * string is used for this request instead.
  */
 export interface InflationRateRequest {
-  validator: Uint8Array;
+  validator: string;
 }
 
 export interface InflationRateResponse {
@@ -26,7 +29,7 @@ export interface ParamsResponse {
 }
 
 function createBaseInflationRateRequest(): InflationRateRequest {
-  return { validator: new Uint8Array(0) };
+  return { validator: "" };
 }
 
 export const InflationRateRequest = {
@@ -34,8 +37,8 @@ export const InflationRateRequest = {
     message: InflationRateRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.validator.length !== 0) {
-      writer.uint32(10).bytes(message.validator);
+    if (message.validator !== "") {
+      writer.uint32(10).string(message.validator);
     }
     return writer;
   },
@@ -56,7 +59,7 @@ export const InflationRateRequest = {
             break;
           }
 
-          message.validator = reader.bytes();
+          message.validator = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -70,15 +73,15 @@ export const InflationRateRequest = {
   fromJSON(object: any): InflationRateRequest {
     return {
       validator: isSet(object.validator)
-        ? bytesFromBase64(object.validator)
-        : new Uint8Array(0),
+        ? globalThis.String(object.validator)
+        : "",
     };
   },
 
   toJSON(message: InflationRateRequest): unknown {
     const obj: any = {};
-    if (message.validator.length !== 0) {
-      obj.validator = base64FromBytes(message.validator);
+    if (message.validator !== "") {
+      obj.validator = message.validator;
     }
     return obj;
   },
@@ -92,7 +95,7 @@ export const InflationRateRequest = {
     object: I
   ): InflationRateRequest {
     const message = createBaseInflationRateRequest();
-    message.validator = object.validator ?? new Uint8Array(0);
+    message.validator = object.validator ?? "";
     return message;
   },
 };
@@ -291,7 +294,7 @@ export const ParamsResponse = {
 };
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
     const bin = globalThis.atob(b64);
@@ -304,7 +307,7 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
