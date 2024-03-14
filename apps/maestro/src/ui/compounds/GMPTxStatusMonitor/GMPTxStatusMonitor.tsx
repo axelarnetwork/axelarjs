@@ -31,7 +31,7 @@ const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
 };
 
 const STATUS_COLORS: Partial<
-  Record<ExtendedGMPTxStatus, NonNullable<BadgeProps["variant"]>>
+  Record<ExtendedGMPTxStatus, NonNullable<BadgeProps["$variant"]>>
 > = {
   error: "error",
   executed: "success",
@@ -118,7 +118,7 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
         block confirmations ({progress})
       </span>
       <Progress
-        variant="accent"
+        $variant="accent"
         className="w-full"
         value={elapsedBlocks}
         max={expectedConfirmations}
@@ -324,11 +324,11 @@ export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
       >
         <div className="flex items-center text-sm">
           <Badge
+            $variant={STATUS_COLORS[status]}
+            $size="xs"
             className={cn("-translate-x-1.5 text-xs", {
               "animate-pulse": !["error", "executed"].includes(status),
             })}
-            variant={STATUS_COLORS[status]}
-            size="xs"
             aria-label={`status: ${STATUS_LABELS[status]}`}
           />
 

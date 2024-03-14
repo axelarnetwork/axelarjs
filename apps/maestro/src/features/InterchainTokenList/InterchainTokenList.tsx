@@ -73,7 +73,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
           </span>
         </div>
         {tokens.length > 0 && Boolean(onToggleSelection) && (
-          <Button size="sm" variant="primary" onClick={handleToggleAll}>
+          <Button $size="sm" $variant="primary" onClick={handleToggleAll}>
             Toggle All
           </Button>
         )}

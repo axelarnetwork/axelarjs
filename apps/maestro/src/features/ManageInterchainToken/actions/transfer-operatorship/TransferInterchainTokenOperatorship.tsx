@@ -177,7 +177,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
         <span>Transfer rate limit operator</span>
       </Dialog.Title>
       {txState.status === "confirmed" ? (
-        <Alert status="success">
+        <Alert $status="success">
           Token operatorship has been successfully transferred.
         </Alert>
       ) : (
@@ -191,7 +191,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
             </Label>
             <TextInput
               id="recipientAddress"
-              bordered
+              $bordered
               placeholder="Enter new operator address"
               className="bg-base-200"
               min={0}
@@ -209,10 +209,10 @@ export const TransferInterchainTokenOperatorship: FC = () => {
           </FormControl>
 
           <Button
-            variant="primary"
             type="submit"
             disabled={!formState.isValid || isTransfering}
-            loading={
+            $variant="primary"
+            $loading={
               txState.status === "awaiting_approval" ||
               txState.status === "submitted"
             }

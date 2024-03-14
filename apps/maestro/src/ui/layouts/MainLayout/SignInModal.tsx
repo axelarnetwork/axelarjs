@@ -52,9 +52,9 @@ const SignInModal: FC<SignInModalProps> = ({
               <span>Please sign in with your wallet to continue</span>
               <Button
                 onClick={onAbort}
-                length="block"
-                variant="link"
-                size="lg"
+                $length="block"
+                $variant="link"
+                $size="lg"
                 className="text-error/80"
               >
                 cancel & exit

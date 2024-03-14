@@ -109,7 +109,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
               className="list-item"
             >
               <Link href={href}>
-                <Card className="bg-base-200" compact>
+                <Card className="bg-base-200" $compact>
                   <Card.Body>
                     <Card.Title>
                       <ChainIcon src={chain.image} size="sm" alt={chain.name} />{" "}
@@ -118,9 +118,9 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
                     <Card.Actions className="justify-between">
                       <CopyToClipboardButton
                         copyText={token.tokenAddress}
-                        variant="ghost"
-                        length="block"
-                        size="sm"
+                        $variant="ghost"
+                        $length="block"
+                        $size="sm"
                         className="bg-base-300 dark:bg-base-100"
                       >
                         {maskAddress(token.tokenAddress as `0x${string}`, {
@@ -154,7 +154,7 @@ const EmptyState = () => (
         (0)
       </span>
     </PageTitle>
-    <Card className="grid flex-1 place-items-center" compact>
+    <Card className="grid flex-1 place-items-center" $compact>
       <Card.Body className="borde grid place-items-center gap-4">
         <Card.Title className="text-center">
           {"Looks like you haven't deployed any token yet"}

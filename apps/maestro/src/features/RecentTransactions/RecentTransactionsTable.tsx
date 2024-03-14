@@ -101,7 +101,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   return (
     <Card className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
       <Card.Body>
-        <Table className="relative space-y-4" zebra>
+        <Table className="relative space-y-4" $zebra>
           <Table.Head>
             <Table.Row>
               <Table.Column

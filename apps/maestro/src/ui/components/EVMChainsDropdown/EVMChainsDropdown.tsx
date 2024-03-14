@@ -112,7 +112,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
   };
 
   return (
-    <Dropdown align="end">
+    <Dropdown $align="end">
       {props.renderTrigger?.() ?? (
         <Dropdown.Trigger
           $as="button"

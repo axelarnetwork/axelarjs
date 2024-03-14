@@ -38,7 +38,7 @@ export const GlobalMessageManager = () => {
       <Card.Body>
         <Card.Title className="items-center justify-between">
           <span>Global Message</span>
-          <Tabs boxed>
+          <Tabs $boxed>
             {TABS.map((tab) => (
               <Tabs.Tab
                 key={tab}
@@ -66,8 +66,8 @@ export const GlobalMessageManager = () => {
         )}
         <Card.Actions className="justify-end">
           <Button
-            loading={isSavingGlobalMessage}
-            variant="primary"
+            $loading={isSavingGlobalMessage}
+            $variant="primary"
             onClick={async () => {
               if (globalMessage) {
                 await saveGlobalMessage({

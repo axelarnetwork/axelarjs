@@ -61,9 +61,9 @@ export const AccountStatusesManager = () => {
         <Card.Title className="justify-between">
           <span>Account Statuses</span>
           <Button
-            variant="primary"
-            size="sm"
-            shape="square"
+            $variant="primary"
+            $size="sm"
+            $shape="square"
             ariala-label="Add account status"
             onClick={() =>
               setViewState((prev) => ({
@@ -144,7 +144,7 @@ const AccountStatusDropdown: FC<{
 
   return (
     <DropdownMenu>
-      <DropdownMenu.Trigger variant="primary" size="sm">
+      <DropdownMenu.Trigger $variant="primary" $size="sm">
         {capitalize(selectedStatus)}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content className="bg-base-300 rounded-xl">
@@ -191,9 +191,9 @@ const AccountStatusRow: FC<AccountStatusRowProps> = (props) => {
       <Table.Cell>
         <Tooltip tip={`${props.isEditting ? "Save" : "Edit"} account status`}>
           <Button
-            variant="primary"
-            size="sm"
-            shape="square"
+            $variant="primary"
+            $size="sm"
+            $shape="square"
             ariala-label="Edit account status"
             disabled={props.disabled}
             onClick={
@@ -235,8 +235,8 @@ const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
         <Card.Title className="justify-between">
           <span>Add Account Status</span>
           <Button
-            size="sm"
-            shape="circle"
+            $size="sm"
+            $shape="circle"
             ariala-label="Add account status"
             onClick={onClose}
           >
@@ -248,7 +248,7 @@ const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
             <Label>Account Adrress</Label>
             <TextInput
               placeholder="0x"
-              inputSize="sm"
+              $size="sm"
               value={accountAddress}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setAccountAddress(e.target.value as `0x${string}`)
@@ -265,8 +265,8 @@ const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
           <FormControl>
             <Label>&nbsp;</Label>
             <Button
-              variant="primary"
-              size="sm"
+              $variant="primary"
+              $size="sm"
               disabled={isDisabled}
               onClick={() => {
                 if (onAdd && accountAddress) {

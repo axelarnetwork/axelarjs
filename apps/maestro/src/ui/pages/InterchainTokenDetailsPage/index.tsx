@@ -34,7 +34,7 @@ const InterchainTokensPage: FC = () => {
   });
 
   if (!isAddress(tokenAddress)) {
-    return <Alert status="error">Invalid token address</Alert>;
+    return <Alert $status="error">Invalid token address</Alert>;
   }
 
   return (

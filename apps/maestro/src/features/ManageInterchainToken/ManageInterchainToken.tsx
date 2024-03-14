@@ -19,9 +19,9 @@ import {
 const StepLoading = () => (
   <div className="grid h-64 place-items-center">
     <LinkButton
-      loading
-      variant="ghost"
-      length="block"
+      $loading
+      $variant="ghost"
+      $length="block"
       className="pointer-events-none"
     >
       Loading...

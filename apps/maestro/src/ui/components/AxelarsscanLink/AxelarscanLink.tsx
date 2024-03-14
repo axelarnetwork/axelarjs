@@ -13,7 +13,7 @@ type Props = Omit<LinkButtonProps, "ref"> & {
 const AxelarscanLink: FC<Props> = ({ txHash, ...props }) => {
   return (
     <LinkButton
-      size="sm"
+      $size="sm"
       href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
       className="flex items-center gap-2"
       target="_blank"

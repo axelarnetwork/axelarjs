@@ -26,16 +26,16 @@ const Appbar: FC<AppbarProps> = (props) => {
         <LinkButton
           className="flex items-center gap-2 text-lg font-bold uppercase"
           href="/"
-          variant="ghost"
+          $variant="ghost"
         >
           <AxelarIcon className="h-6 w-6 dark:invert" />
           <Indicator>
             <span>{APP_NAME}</span>
             {process.env.NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
               <Indicator.Item
-                size="xs"
-                variant="success"
-                position="bottom"
+                $size="xs"
+                $variant="success"
+                $position="bottom"
                 className="translate-x-2 translate-y-2 lowercase"
               >
                 {process.env.NEXT_PUBLIC_NETWORK_ENV}
