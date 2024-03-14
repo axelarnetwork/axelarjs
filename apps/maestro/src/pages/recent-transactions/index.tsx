@@ -44,7 +44,7 @@ const RecentTransactionsPage = () => {
             <Page.FullScreenLoading loadingMessage="loading recent transactions..." />
           }
         >
-          <Tabs boxed>
+          <Tabs $boxed>
             {CONTRACT_METHODS.map((method) => (
               <Tabs.Tab
                 key={method}

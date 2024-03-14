@@ -220,7 +220,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         actions.setIsModalOpen(isOpen);
       }}
     >
-      <Modal.Body className="flex min-h-96 flex-col">
+      <Modal.Body className="min-h-96 flex flex-col">
         <Modal.Title>Interchain Transfer</Modal.Title>
 
         <div className="grid grid-cols-2 gap-4 p-1">
@@ -286,7 +286,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             </Label>
             <TextInput
               id="amountToTransfer"
-              bordered
+              $bordered
               placeholder="Enter your amount to transfer"
               className="bg-base-200"
               min={0}
@@ -358,19 +358,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
               )}
             </Label>
             {buttonStatus === "error" ? (
-              <Alert role="alert" status="error">
+              <Alert role="alert" $status="error">
                 {buttonChildren}
               </Alert>
             ) : (
               <Button
-                variant="primary"
+                $variant="primary"
                 type="submit"
                 disabled={
                   !formState.isValid ||
                   isFormDisabled ||
                   state.hasInsufficientGasBalance
                 }
-                loading={state.isSending}
+                $loading={state.isSending}
               >
                 {buttonChildren}
               </Button>

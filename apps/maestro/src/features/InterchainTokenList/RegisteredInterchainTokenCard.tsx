@@ -38,7 +38,7 @@ const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
 
   return (
     <Tooltip tip={tip} aria-label={tip} position="left">
-      <Badge size="sm" variant={props.isOriginToken ? "success" : "info"} />
+      <Badge $size="sm" $variant={props.isOriginToken ? "success" : "info"} />
     </Tooltip>
   );
 };
@@ -90,7 +90,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
   const switchChainButton = (
     <Button
-      size="xs"
+      $size="xs"
       className="flex items-center gap-2"
       onClick={handleSwitchChain}
     >
@@ -105,7 +105,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
   return (
     <Card
-      compact
+      $compact
       className={cn(
         "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
         "hover:opacity-75 hover:shadow-xl",
@@ -136,11 +136,11 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             <ManageInterchainToken
               trigger={
                 <Button
-                  size="xs"
+                  $size="xs"
+                  $variant="primary"
+                  $outline
                   aria-label="manage interchain token"
                   className="group absolute right-4 top-4 px-2 py-1"
-                  variant="primary"
-                  outline
                 >
                   <SettingsIcon className="-mr-4 h-[1em] -translate-x-2" />
                   Manage Token
@@ -162,8 +162,8 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           )}
           {props.deploymentStatus && (
             <Badge
-              outline
-              variant="warning"
+              $outline
+              $variant="warning"
               className="flex items-center gap-0.5"
             >
               <span className="-translate-x-1">
@@ -233,8 +233,8 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                       <SendInterchainToken
                         trigger={
                           <Button
-                            size="xs"
-                            variant="primary"
+                            $size="xs"
+                            $variant="primary"
                             className="absolute right-6"
                             disabled={
                               !props.hasRemoteTokens ||
@@ -277,10 +277,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             </Tooltip>
 
             <CopyToClipboardButton
+              $variant="ghost"
+              $length="block"
+              $size="sm"
               copyText={props.tokenManagerAddress}
-              variant="ghost"
-              length="block"
-              size="sm"
               className="bg-base-300 dark:bg-base-100"
             >
               {maskAddress(props.tokenManagerAddress, {
@@ -293,10 +293,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         <Card.Actions className="justify-between">
           Token Address
           <CopyToClipboardButton
+            $variant="ghost"
+            $length="block"
+            $size="sm"
             copyText={props.tokenAddress}
-            variant="ghost"
-            length="block"
-            size="sm"
             className="bg-base-300 dark:bg-base-100"
           >
             {maskAddress(props.tokenAddress, {

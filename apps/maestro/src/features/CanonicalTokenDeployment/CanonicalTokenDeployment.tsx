@@ -52,7 +52,7 @@ const CanonicalTokenDeployment: FC = () => {
 
   if (isGatewayToken)
     return (
-      <Alert status="warning" icon={<InfoIcon className="h-6 w-6" />}>
+      <Alert $status="warning" icon={<InfoIcon className="h-6 w-6" />}>
         This token is registered natively on Axelar and will be supported by ITS
         in the near future. You can use{" "}
         {

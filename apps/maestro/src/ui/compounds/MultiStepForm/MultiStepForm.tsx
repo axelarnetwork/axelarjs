@@ -41,7 +41,7 @@ type ButtonProps = ComponentProps<typeof Button>;
 export const ModalFormInput = tw(TextInput)`bg-base-200`;
 
 ModalFormInput.defaultProps = {
-  bordered: true,
+  $bordered: true,
 };
 
 const StyledButton = tw(Button)`gap-2`;
@@ -61,9 +61,9 @@ export const PrevButton: FC<ButtonProps> = ({ children, ...props }) => (
 export const StepLoading = () => (
   <div className="grid h-64 place-items-center">
     <LinkButton
-      loading
-      variant="ghost"
-      length="block"
+      $loading
+      $variant="ghost"
+      $length="block"
       className="pointer-events-none"
     >
       Loading...
@@ -74,9 +74,9 @@ export const StepLoading = () => (
 export const TriggerButton: FC<ButtonProps> = (props) => (
   <Button
     {...props}
-    size="md"
+    $size="md"
+    $variant="primary"
     className="w-full max-w-xs md:max-w-md"
-    variant="primary"
   >
     {props.children}
   </Button>
@@ -85,8 +85,8 @@ export const TriggerButton: FC<ButtonProps> = (props) => (
 export const BackButton: FC<ButtonProps> = (props) => (
   <PrevButton
     {...props}
-    shape="square"
-    size="lg"
+    $shape="square"
+    $size="lg"
     className="absolute left-0 top-0 rounded-none rounded-br-2xl"
   >
     {props.children}
@@ -264,7 +264,7 @@ export const ShareHaikuButton: FC<{
   return (
     <Button
       onClick={handleShareHaiku}
-      loading={isPending}
+      $loading={isPending}
       disabled={isPending || isSuccess}
       className="mt-2 w-full bg-black"
       aria-label="Share an interchain token haiku on X"
@@ -305,10 +305,10 @@ export const TokenNameAlert = () => {
   }
 
   return (
-    <Alert status="info" className="relative">
+    <Alert $status="info" className="relative">
       <Button
-        size="sm"
-        variant="ghost"
+        $size="sm"
+        $variant="ghost"
         className="absolute right-1 top-1"
         aria-label="Close"
         onClick={() => setShow(false)}

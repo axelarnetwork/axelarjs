@@ -159,7 +159,7 @@ export const TransferInterchainTokenMintership: FC = () => {
         <span>Transfer token mintership</span>
       </Dialog.Title>
       {txState.status === "confirmed" ? (
-        <Alert status="success">
+        <Alert $status="success">
           Token mintership has been successfully transferred.
         </Alert>
       ) : (
@@ -172,8 +172,8 @@ export const TransferInterchainTokenMintership: FC = () => {
               <Label.Text>New minter</Label.Text>
             </Label>
             <TextInput
+              $bordered
               id="recipientAddress"
-              bordered
               placeholder="Enter new minter"
               className="bg-base-200"
               min={0}
@@ -191,13 +191,13 @@ export const TransferInterchainTokenMintership: FC = () => {
           </FormControl>
 
           <Button
-            variant="primary"
-            type="submit"
-            disabled={!formState.isValid || isTransfering}
-            loading={
+            $variant="primary"
+            $loading={
               txState.status === "awaiting_approval" ||
               txState.status === "submitted"
             }
+            type="submit"
+            disabled={!formState.isValid || isTransfering}
           >
             {buttonChildren}
           </Button>

@@ -72,7 +72,7 @@ const Review: FC = () => {
       <div className="grid gap-4">
         {state.txState.type === "deployed" && (
           <>
-            <Alert status="success">
+            <Alert $status="success">
               <div className="flex justify-center font-semibold md:justify-start">
                 Token deployed successfully!
               </div>
@@ -80,8 +80,8 @@ const Review: FC = () => {
                 Address:
                 <CopyToClipboardButton
                   copyText={state.txState.tokenAddress}
-                  size="sm"
-                  variant="ghost"
+                  $size="sm"
+                  $variant="ghost"
                 >
                   {maskAddress(state.txState.tokenAddress)}
                 </CopyToClipboardButton>
@@ -106,7 +106,7 @@ const Review: FC = () => {
               <GMPTxStatusMonitor txHash={state.txState.txHash} />
             ) : (
               <LinkButton
-                size="sm"
+                $size="sm"
                 href={`${chain?.blockExplorers?.default.url}/tx/${state.txState.txHash}`}
                 className="flex items-center gap-2"
                 target="_blank"
@@ -126,8 +126,8 @@ const Review: FC = () => {
         {routeChain ? (
           // if the chain is not the same as the route, we need to refresh the page
           <Dialog.CloseAction
-            length="block"
-            variant="primary"
+            $length="block"
+            $variant="primary"
             onClick={async () => {
               setShouldFetch(true);
               // refresh the page to show the new token
@@ -138,8 +138,8 @@ const Review: FC = () => {
           </Dialog.CloseAction>
         ) : (
           <Button
-            length="block"
-            variant="primary"
+            $length="block"
+            $variant="primary"
             disabled={!chain?.name || state.txState.type !== "deployed"}
             onClick={handleGoToTokenPage}
           >

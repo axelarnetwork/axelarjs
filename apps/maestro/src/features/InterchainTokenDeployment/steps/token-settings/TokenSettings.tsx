@@ -114,8 +114,8 @@ const TokenSettings: FC = () => {
             <Label.AltText>
               <Toggle
                 id="isMintable"
-                variant="primary"
-                inputSize="sm"
+                $variant="primary"
+                $size="sm"
                 {...register("isMintable")}
               />
             </Label.AltText>
@@ -201,7 +201,7 @@ const TokenSettings: FC = () => {
       </form>
       <Dialog.Actions>
         <NextButton
-          length="block"
+          $length="block"
           disabled={!isFormValid}
           onClick={() => formSubmitRef.current?.click()}
         >
