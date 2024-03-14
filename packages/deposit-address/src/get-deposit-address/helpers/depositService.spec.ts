@@ -8,17 +8,18 @@ describe("depositService - helper", () => {
     test("should return true if destination chain is EVM and asset is wrapped native gas token", async () => {
       const env = ENVIRONMENTS.testnet;
       const configClients = createAxelarConfigClient(env);
-      const chainConfigs = await configClients.getChainConfigs(env);
+      const chainConfigs = await configClients.getAxelarConfigs(env);
 
-      Object.entries(chainConfigs.chains).forEach(([chainId, chainConfig]) => {
-        const { assets } = chainConfig;
-        assets.map((asset) => {
-          if (asset.module === "evm" && asset.isERC20WrappedNativeGasToken) {
-            expect(unwrappable(chainId, asset.id, chainConfigs)).toBeTruthy();
-          } else {
-            expect(unwrappable(chainId, asset.id, chainConfigs)).toBeFalsy();
+      Object.entries(chainConfigs.assets).forEach(([assetId, assetConfig]) => {
+        Object.entries(assetConfig.chains).forEach(
+          ([chainId, assetChainConfig]) => {
+            if (assetChainConfig.isERC20WrappedNativeGasToken) {
+              expect(unwrappable(chainId, assetId, chainConfigs)).toBeTruthy();
+            } else {
+              expect(unwrappable(chainId, assetId, chainConfigs)).toBeFalsy();
+            }
           }
-        });
+        );
       });
     });
   });

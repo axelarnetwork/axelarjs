@@ -1,7 +1,7 @@
 import type { Environment } from "@axelarjs/core";
 
 import { RestService, type RestServiceOptions } from "../lib/rest-service";
-import type { Asset, ChainConfig, ChainConfigsResponse } from "./types";
+import type { AxelarConfigsResponse } from "./types";
 
 export class AxelarConfigClient extends RestService {
   static init(options: RestServiceOptions) {
@@ -11,31 +11,9 @@ export class AxelarConfigClient extends RestService {
     });
   }
 
-  async getChainConfigs(env: Environment) {
-    const response = await this.client
-      .get(`configs/${env}-chain-config-latest.json`)
-      .json<ChainConfigsResponse>();
-
-    const chainEntries = Object.entries(response.chains);
-
-    const tagChainAsset = ([chainId, chainConfig]: [string, ChainConfig]) =>
-      [
-        chainId,
-        {
-          ...chainConfig,
-          assets: chainConfig.assets.map(
-            (asset) =>
-              ({
-                ...asset,
-                module: chainConfig.module === "evm" ? "evm" : "axelarnet",
-              } as Asset)
-          ),
-        } as ChainConfig,
-      ] as const;
-
-    return {
-      ...response,
-      chains: Object.fromEntries(chainEntries.map(tagChainAsset)),
-    };
+  async getAxelarConfigs(env: Environment) {
+    return this.client
+      .get(`configs/${env}-config-1.x.json`)
+      .json<AxelarConfigsResponse>();
   }
 }

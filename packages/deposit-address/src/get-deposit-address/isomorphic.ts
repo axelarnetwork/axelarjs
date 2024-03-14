@@ -38,7 +38,7 @@ export async function getDepositAddress(
     requestConfig,
   } = params;
 
-  const chainConfigs = await dependencies.configClient.getChainConfigs(
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
     params.environment
   );
 
@@ -107,7 +107,7 @@ export async function getLinkedDepositAddress(
   params: SendOptions,
   dependencies: GetLinkedDepositAddressDependencies
 ) {
-  const chainConfigs = await dependencies.configClient.getChainConfigs(
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
     params.environment
   );
 
@@ -136,7 +136,7 @@ export async function getNativeWrapDepositAddress(
   params: DepositNativeWrapOptions,
   dependencies: GetDepositServiceDependencies
 ) {
-  const chainConfigs = await dependencies.configClient.getChainConfigs(
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
     params.environment
   );
 
@@ -164,7 +164,7 @@ export async function getNativeUnwrapDepositAddress(
   params: DepositNativeUnwrapOptions,
   dependencies: GetDepositServiceDependencies
 ) {
-  const chainConfigs = await dependencies.configClient.getChainConfigs(
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
     params.environment
   );
 

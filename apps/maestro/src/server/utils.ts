@@ -1,5 +1,6 @@
 import {
   AxelarConfigClient,
+  AxelarConfigsResponse,
   AxelarscanClient,
   EVMChainConfig,
 } from "@axelarjs/api";
@@ -80,7 +81,7 @@ export async function axelarConfigs<TCacheKey extends string>(
   kvClient: MaestroKVClient,
   axelarConfigClient: AxelarConfigClient,
   cacheKey: TCacheKey
-): Promise<any> {
+): Promise<AxelarConfigsResponse> {
   if (process.env.DISABLE_CACHE !== "true") {
     const cached = await kvClient.getCached<any>(cacheKey);
 
@@ -89,7 +90,7 @@ export async function axelarConfigs<TCacheKey extends string>(
     }
   }
 
-  const chainConfigs = await axelarConfigClient.getChainConfigs(
+  const chainConfigs = await axelarConfigClient.getAxelarConfigs(
     NEXT_PUBLIC_NETWORK_ENV
   );
 
