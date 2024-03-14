@@ -4,7 +4,7 @@ import tw from "../../tw";
 
 export const Badge = tw.span.cva("badge", {
   variants: {
-    variant: {
+    $variant: {
       primary: "badge-primary",
       secondary: "badge-secondary",
       accent: "badge-accent",
@@ -14,13 +14,13 @@ export const Badge = tw.span.cva("badge", {
       warning: "badge-warning",
       info: "badge-info",
     },
-    size: {
+    $size: {
       xs: "badge-xs",
       sm: "badge-sm",
       md: "badge-md",
       lg: "badge-lg",
     },
-    outline: {
+    $outline: {
       true: "badge-outline",
     },
   },

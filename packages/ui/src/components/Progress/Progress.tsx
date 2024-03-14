@@ -10,11 +10,11 @@ import tw from "../../tw";
  *
  * @example
  
- * <Progress variant="accent" value={10} max={25} />
+ * <Progress $variant="accent" value={10} max={25} />
  */
 export const Progress = tw.progress.cva("progress", {
   variants: {
-    variant: {
+    $variant: {
       primary: "progress-primary",
       secondary: "progress-secondary",
       accent: "progress-accent",

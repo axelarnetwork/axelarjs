@@ -51,7 +51,7 @@ export const CopyToClipboardButton = forwardRef<
         <CheckCircleIcon
           className={cn(
             "swap-on h-[1em] w-[1em]",
-            props.variant === "success"
+            props.$variant === "success"
               ? "text-success-content"
               : "text-success"
           )}
@@ -63,5 +63,5 @@ export const CopyToClipboardButton = forwardRef<
 });
 
 CopyToClipboardButton.defaultProps = {
-  size: "md",
+  $size: "md",
 };

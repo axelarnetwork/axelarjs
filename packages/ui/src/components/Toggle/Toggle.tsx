@@ -5,7 +5,7 @@ import tw from "../../tw";
 
 const StyledToggle = tw.input.cva("toggle", {
   variants: {
-    variant: {
+    $variant: {
       primary: "toggle-primary",
       secondary: "toggle-secondary",
       accent: "toggle-accent",
@@ -14,7 +14,7 @@ const StyledToggle = tw.input.cva("toggle", {
       warning: "toggle-warning",
       error: "toggle-error",
     },
-    inputSize: {
+    $size: {
       xs: "toggle-xs",
       sm: "toggle-sm",
       md: "toggle-md",
