@@ -4,13 +4,13 @@ import tw from "../../tw";
 
 const StyledCard = tw.div.cva("card", {
   variants: {
-    bordered: {
+    $bordered: {
       true: "card-bordered",
     },
-    compact: {
+    $compact: {
       true: "card-compact",
     },
-    normal: {
+    $normal: {
       true: "card-normal",
     },
   },

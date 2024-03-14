@@ -4,16 +4,16 @@ import tw from "../../tw";
 
 const StyledDropdown = tw.div.cva("dropdown", {
   variants: {
-    placement: {
+    $placement: {
       top: "dropdown-top",
       bottom: "dropdown-bottom",
       left: "dropdown-left",
       right: "dropdown-right",
     },
-    align: {
+    $align: {
       end: "dropdown-end",
     },
-    hover: {
+    $hover: {
       true: "dropdown-hover",
     },
   },

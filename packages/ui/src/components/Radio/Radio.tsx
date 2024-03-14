@@ -7,7 +7,7 @@ import tw from "../../tw";
  */
 export const Radio = tw.input.cva("radio", {
   variants: {
-    variant: {
+    $variant: {
       primary: "radio-primary",
       secondary: "radio-secondary",
       accent: "radio-accent",
@@ -16,7 +16,7 @@ export const Radio = tw.input.cva("radio", {
       error: "radio-error",
       info: "radio-info",
     },
-    inputSize: {
+    $size: {
       xs: "radio-xs",
       sm: "radio-sm",
       md: "radio-md",

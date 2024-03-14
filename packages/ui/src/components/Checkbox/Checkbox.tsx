@@ -4,7 +4,7 @@ import tw from "../../tw";
 
 const StyledInput = tw.input.cva("checkbox", {
   variants: {
-    variant: {
+    $variant: {
       primary: "checkbox-primary",
       secondary: "checkbox-secondary",
       accent: "checkbox-accent",
@@ -13,7 +13,7 @@ const StyledInput = tw.input.cva("checkbox", {
       error: "checkbox-error",
       info: "checkbox-info",
     },
-    inputSize: {
+    $size: {
       xs: "checkbox-xs",
       sm: "checkbox-sm",
       md: "checkbox-md",
