@@ -192,9 +192,7 @@ export class AxelarQueryAPIClient extends RestService {
 
     const excludedL1ExecutionFeeWithMultiplier =
       actualGasMultiplier > 1
-        ? Math.floor(
-            Number(excludedL1ExecutionFee) * Number(actualGasMultiplier)
-          )
+        ? multiplyFloatByBigInt(actualGasMultiplier, excludedL1ExecutionFee)
         : excludedL1ExecutionFee;
 
     const baseFee = parseUnits(base_fee.toString(), source_token.decimals);
