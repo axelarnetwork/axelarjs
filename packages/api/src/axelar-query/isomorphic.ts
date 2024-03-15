@@ -112,16 +112,15 @@ export class AxelarQueryAPIClient extends RestService {
    * Calculate estimated gas amount to pay for the gas receiver contract.
    * @param sourceChain Chain ID (as recognized by Axelar) of the source chain
    * @param destinationChain Chain ID (as recognized by Axelar) of the destination chain
+   * @param gasLimit An estimated gas amount required to execute `executeWithToken` function.
    * @param sourceTokenSymbol (Optional) the token symbol on the source chain
    * @param sourceContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
    * @param sourceTokenAddress (Optional) the contract address of the token symbol on the source chain
-   * @param executeData (Optional) the transaction data to be executed on the destination chain. Required if the destination chain is L2.
-   * @param destinationContractAddress (Optional) the address of the contract invoking the GMP call from the source chain
-   * @param amount (Optional) the amount of assets transferred in terms of symbol, not unit denom, e.g. use 1 for 1 axlUSDC, not 1000000
-   * @param amountInUnits (Optional) the amount of assets transferred in terms of unit denom, not symbol, e.g. use 1000000 for 1 axlUSDC, not 1
+   * @param executeData (Optional) The data to be executed on the destination chain. It's recommended to specify it if the destination chain is an L2 chain to calculate more accurate gas fee.
+   * @param destinationContractAddress (Optional) the destination contract address for checking express supported
+   * @param amountInUnits (Optional) An amount (in the smallest denomination) that using in callContractWithToken for checking express supported
    * @param minGasPrice (Optional) A minimum value, in wei, for the gas price on the destination chain that is used to override the estimated gas price if it falls below this specified value.
-   * @param gasLimit (Optional) An estimated gas amount required to execute `executeWithToken` function. The default value is 1MM which should be sufficient for most transactions.
-   * @param gasMultiplier (Optional) A multiplier used to create a buffer above the calculated gas fee, to account for potential slippage throughout tx execution, e.g. 1.1 = 10% buffer
+   * @param gasMultiplier (Optional) A multiplier used to create a buffer above the calculated gas fee, to account for potential slippage throughout tx execution, e.g. 1.1 = 10% buffer. Default to "auto" which will use the gas multiplier from the GMP response.
    * @param showDetailedFees (Optional) will return the full breakdown of fee components if specified true
    * @returns
    */
@@ -133,7 +132,6 @@ export class AxelarQueryAPIClient extends RestService {
     sourceContractAddress,
     sourceTokenAddress,
     destinationContractAddress,
-    amount,
     amountInUnits,
     executeData,
     minGasPrice = "0",
@@ -151,7 +149,6 @@ export class AxelarQueryAPIClient extends RestService {
       sourceContractAddress,
       sourceTokenAddress,
       destinationContractAddress,
-      amount,
       amountInUnits,
     });
 
