@@ -36,3 +36,20 @@ export function gasToWei(
     );
   }
 }
+
+export function multiplyFloatByBigInt(floatNum: number, bigIntNum: bigint) {
+  // Determine the number of decimal places in the float
+  const decimalPlaces = floatNum.toString().split(".")[1]?.length || 0;
+
+  // Scaling factor
+  const scalingFactor = 10 ** decimalPlaces;
+
+  // Convert float to scaled BigInt (as before)
+  const scaledBigInt = BigInt(floatNum * scalingFactor);
+
+  // Perform the multiplication (both are now BigInts)
+  const result = scaledBigInt * bigIntNum;
+
+  // Divide by scaling factor to get the final result
+  return result / BigInt(scalingFactor);
+}
