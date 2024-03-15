@@ -138,7 +138,7 @@ export class AxelarQueryAPIClient extends RestService {
     gasMultiplier = "auto",
     showDetailedFees = false,
   }: EstimateGasFeeParams): Promise<EstimateGasFeeResponse | string> {
-    if (gasLimit < 21000) {
+    if (gasLimit < 1) {
       throw new Error("Gas limit is too low.");
     }
 
