@@ -67,23 +67,14 @@ async function getMantleL1Fee(
 
   const abi = parseAbi(["function overhead() returns (uint256)"]);
 
-  const multicallResponse = await publicClient.multicall({
-    contracts: [
-      {
-        address: contractAddress,
-        abi,
-        functionName: "overhead" as never,
-        args: [],
-      },
-    ],
+  const fixedOverhead = await publicClient.readContract({
+    address: contractAddress,
+    abi,
+    functionName: "overhead",
+    args: [],
   });
 
-  const [fixedOverhead] = multicallResponse.flatMap((r) => r.result ?? 0n) as [
-    bigint
-  ];
-
-  const totalGasUsed = fixedOverhead;
   const gasPrice = BigInt(l1GasPrice.value);
 
-  return totalGasUsed * gasPrice;
+  return fixedOverhead * gasPrice;
 }
