@@ -41,9 +41,10 @@ async function getOptimismL1Fee(
   publicClient: PublicClient<HttpTransport>,
   estimateL1FeeParams: EstimateL1FeeParams
 ) {
-  const { executeData } = estimateL1FeeParams;
+  const { executeData, l1GasOracleAddress } = estimateL1FeeParams;
 
-  const contractAddress = "0x420000000000000000000000000000000000000F";
+  const contractAddress =
+    l1GasOracleAddress || "0x420000000000000000000000000000000000000F";
   const abi = parseAbi(["function getL1Fee(bytes) returns (uint256)"]);
 
   const fee = await publicClient.readContract({
@@ -60,8 +61,9 @@ async function getMantleL1Fee(
   publicClient: PublicClient<HttpTransport>,
   estimateL1FeeParams: EstimateL1FeeParams
 ) {
-  const contractAddress = "0x420000000000000000000000000000000000000F";
-  const { l1GasPrice } = estimateL1FeeParams;
+  const { l1GasPrice, l1GasOracleAddress } = estimateL1FeeParams;
+  const contractAddress =
+    l1GasOracleAddress || "0x420000000000000000000000000000000000000F";
 
   const abi = parseAbi(["function overhead() returns (uint256)"]);
 
