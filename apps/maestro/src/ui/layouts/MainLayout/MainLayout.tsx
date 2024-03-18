@@ -1,5 +1,6 @@
 import {
   Alert,
+  AnimatedBlobBackground,
   Badge,
   Button,
   Card,
@@ -72,6 +73,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
+      <AnimatedBlobBackground />
       <Drawer>
         <Drawer.Toggle
           checked={isDrawerOpen}
@@ -80,7 +82,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         />
         <Drawer.Content
           className={cn(
-            "flex min-h-[100dvh] flex-1 flex-col gap-4 bg-[url('/illustrations/bg.svg')] lg:min-h-screen",
+            "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
             {
               "pointer-events-none": isSignInModalOpen,
             }
