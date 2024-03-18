@@ -9,9 +9,7 @@ import {
 import tw from "../../tw";
 
 export interface AnimatedBlobBackgroundProps
-  extends ComponentProps<typeof Container> {
-  // add props here
-}
+  extends ComponentProps<typeof Container> {}
 
 export const AnimatedBlobBackground: FC<AnimatedBlobBackgroundProps> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,8 +29,8 @@ export const AnimatedBlobBackground: FC<AnimatedBlobBackgroundProps> = () => {
       <div
         className="absolute w-full max-w-lg"
         style={{
-          transform: `translate(${mousePosition.x * 0.06}px, ${
-            mousePosition.y * 0.06
+          transform: `translate(${mousePosition.x * 0.03}px, ${
+            mousePosition.y * 0.03
           }px)`,
         }}
       >
