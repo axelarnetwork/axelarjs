@@ -124,7 +124,7 @@ const Page: FC<Props> = ({
             <div className="mb-20 w-full">
               <ConditionalRenderInterchainBanner />
             </div>
-            <div className="grid w-full flex-1 place-items-center">
+            <div className="bg-base-100/70 grid w-full max-w-lg place-items-center rounded-2xl p-4">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>
               <ConnectWalletButton className="w-full max-w-md" $size="md" />
