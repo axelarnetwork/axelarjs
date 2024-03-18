@@ -84,7 +84,7 @@
     "@types/node": "^20.11.28",
     "dotenv": "^16.4.5",
     "fast-check": "^3.16.0",
-    "happy-dom": "^9.20.3",
+    "happy-dom": "^13.9.0",
     "jsonschema": "^1.4.1",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
