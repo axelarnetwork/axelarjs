@@ -26,7 +26,7 @@ pnpm storybook
 
 - tailwindcss for styling
 - radix primitives for accessible interactive components
-- class-variant-authority for
+- class-variance-authority for
 - tailwind-merge utility for merging classNames
 - tailwind-styled-components for styled-components-like component definition syntax
 - storybook v7 for interactive docs

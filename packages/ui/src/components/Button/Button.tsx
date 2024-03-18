@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
+import { cva, VariantProps } from "styled-cva";
 import { twMerge } from "tailwind-merge";
 
 import { Loading } from "../Loading";
