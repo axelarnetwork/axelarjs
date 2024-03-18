@@ -1,6 +1,6 @@
 import type { ComponentProps, FC } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
+import { cva, VariantProps } from "styled-cva";
 
 import tw from "../../tw";
 import { cn } from "../../utils";

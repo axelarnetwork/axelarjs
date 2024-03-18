@@ -656,9 +656,6 @@ importers:
       '@storybook/test':
         specifier: ^8.0.0
         version: 8.0.0(vitest@1.4.0)
-      class-variance-authority:
-        specifier: 0.4.0
-        version: 0.4.0(typescript@5.4.2)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -681,8 +678,8 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4(react-dom@18.2.0)(react@18.2.0)
       styled-cva:
-        specifier: ^0.1.4
-        version: 0.1.4(typescript@5.4.2)
+        specifier: ^0.2.1
+        version: 0.2.1(typescript@5.4.2)
       tailwind-merge:
         specifier: ^1.14.0
         version: 1.14.0
@@ -10675,17 +10672,6 @@ packages:
     dependencies:
       consola: 3.2.3
 
-  /class-variance-authority@0.4.0(typescript@5.4.2):
-    resolution: {integrity: sha512-74enNN8O9ZNieycac/y8FxqgyzZhZbxmCitAtAeUrLPlxjSd5zA7LfpprmxEcOmQBnaGs5hYhiSGnJ0mqrtBLQ==}
-    peerDependencies:
-      typescript: '>= 4.5.5 < 5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      typescript: 5.4.2
-    dev: false
-
   /classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
     dev: false
@@ -19318,10 +19304,10 @@ packages:
       inline-style-parser: 0.1.1
     dev: false
 
-  /styled-cva@0.1.4(typescript@5.4.2):
-    resolution: {integrity: sha512-HFeTBDw38a4otsIX9UYK4dyXE4ZtHZQLyjpdsSzw94nHI/5U5N4om5ivPyp55i/igldiKnoAlJ2PVjVG51fF7g==}
+  /styled-cva@0.2.1(typescript@5.4.2):
+    resolution: {integrity: sha512-RM/U/5ex54En5g+qFQkdAb51WgSAv4OqGU+gwkgXX1c+Oabu7MibcmPwNTthRAnxJIH1Vret6oRpLioVPQ//rA==}
     peerDependencies:
-      typescript: ^5.0.0
+      typescript: '>=5.0.0'
     dependencies:
       clsx: 2.1.0
       typescript: 5.4.2
