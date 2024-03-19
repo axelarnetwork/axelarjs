@@ -34,8 +34,8 @@ export const AnimatedBlobBackground: FC<AnimatedBlobBackgroundProps> = () => {
           }px)`,
         }}
       >
-        <AnimatedBlob className="bg-primary -left-[5dvh] -top-[40dvh]" />
-        <AnimatedBlob className="delay-2000 bg-secondary -top-[45dvh] right-[5dvh]" />
+        <AnimatedBlob className="bg-primary -left-[5dvh] -top-[35dvh]" />
+        <AnimatedBlob className="delay-2000 bg-secondary -top-[40dvh] right-[5dvh]" />
         <AnimatedBlob className="delay-4000 bg-accent -top-[35dvh] left-[15dvh]" />
       </div>
       <div className="bg-grid-pattern absolute inset-0" />
@@ -55,8 +55,8 @@ const AnimatedBlob = tw.div`
   rounded-full
   mix-blend-multiply
   absolute
-  filter blur-xl
-  bg-opacity-5
+  filter blur-3xl
+  bg-opacity-15
   animate-blob
-  size-[30dvh]
+  size-[28dvh]
 `;
