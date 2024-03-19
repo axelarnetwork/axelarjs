@@ -29,8 +29,6 @@ export async function getL1FeeForL2(
     case "op":
       return getOptimismL1Fee(publicClient, params);
     case "mantle":
-      return getMantleL1Fee(publicClient, params);
-    // Most of the ethereum clients are already included L1 fee in the gas estimation for Arbitrum.
     case "arb":
     default:
       return 0n;
@@ -55,26 +53,4 @@ async function getOptimismL1Fee(
   });
 
   return fee;
-}
-
-async function getMantleL1Fee(
-  publicClient: PublicClient<HttpTransport>,
-  estimateL1FeeParams: EstimateL1FeeParams
-) {
-  const { l1GasPrice, l1GasOracleAddress } = estimateL1FeeParams;
-  const contractAddress =
-    l1GasOracleAddress || "0x420000000000000000000000000000000000000F";
-
-  const abi = parseAbi(["function overhead() returns (uint256)"]);
-
-  const fixedOverhead = await publicClient.readContract({
-    address: contractAddress,
-    abi,
-    functionName: "overhead",
-    args: [],
-  });
-
-  const gasPrice = BigInt(l1GasPrice.value);
-
-  return fixedOverhead * gasPrice;
 }
