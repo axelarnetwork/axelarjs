@@ -12,7 +12,7 @@ title: getInterchainTokenByTokenId
 ---
 sequenceDiagram
 
-box White Browser
+box Browser
     participant Client
 end
 box Black Vercel
@@ -39,7 +39,7 @@ title: recordInterchainTokenDeployment
 ---
 sequenceDiagram
 
-box White Browser
+box Browser
     participant Client
 end
 box Black Vercel
