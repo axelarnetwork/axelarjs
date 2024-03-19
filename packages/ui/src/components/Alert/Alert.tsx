@@ -10,7 +10,7 @@ import {
 
 const StyledAlert = tw.div.cva("alert", {
   variants: {
-    status: {
+    $status: {
       info: "alert-info",
       success: "alert-success",
       warning: "alert-warning",
@@ -23,7 +23,7 @@ export interface AlertProps extends ComponentProps<typeof StyledAlert> {
   icon?: ReactNode;
 }
 
-const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
+const ICON_MAP: Record<NonNullable<AlertProps["$status"]>, ReactNode> = {
   info: <InfoIcon className="h-6 w-6" />,
   success: <CheckCircleIcon className="h-6 w-6" />,
   warning: <AlertTriangleIcon className="h-6 w-6" />,
@@ -41,21 +41,21 @@ const ICON_MAP: Record<NonNullable<AlertProps["status"]>, ReactNode> = {
  * @returns {JSX.Element}
  *
  * @example
- * <Alert status="info" icon={<Info className="h-6 w-6" />}>
+ * <Alert $status="info" icon={<Info className="h-6 w-6" />}>
  *  This is an alert
  * </Alert>
  */
 export const Alert: FC<AlertProps> = ({
-  status,
+  $status,
   icon,
 
   children,
   ...props
 }) => {
   return (
-    <StyledAlert status={status} {...props}>
-      <div className={!status ? "text-info" : ""}>
-        {icon ?? ICON_MAP[status ?? "info"]}
+    <StyledAlert $status={$status} {...props}>
+      <div className={!$status ? "text-info" : ""}>
+        {icon ?? ICON_MAP[$status ?? "info"]}
       </div>
       <div className="w-full">{children}</div>
     </StyledAlert>

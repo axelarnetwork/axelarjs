@@ -250,11 +250,11 @@ export const Step3: FC = () => {
       </form>
       <Dialog.Actions>
         {buttonStatus === "error" ? (
-          <Alert status="error">{buttonChildren}</Alert>
+          <Alert $status="error">{buttonChildren}</Alert>
         ) : (
           <NextButton
-            length="block"
-            loading={
+            $length="block"
+            $loading={
               rootState.txState.type === "pending_approval" ||
               rootState.txState.type === "deploying"
             }

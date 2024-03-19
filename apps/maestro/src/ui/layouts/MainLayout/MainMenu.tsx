@@ -178,8 +178,8 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
                 <br />
                 <Button
                   className="mt-2"
-                  length="block"
-                  size="sm"
+                  $length="block"
+                  $size="sm"
                   onClick={() => {
                     window.localStorage.clear();
                     window.sessionStorage.clear();

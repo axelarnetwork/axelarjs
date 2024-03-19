@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { intlFormatDistance } from "date-fns";
+import { clamp } from "rambda";
 
 import {
   NEXT_PUBLIC_COMPETITION_END_TIMESTAMP,
@@ -102,16 +103,20 @@ const CompetitionPage = () => {
     return () => window.clearInterval(interval);
   }, []);
 
-  const endDateDistance = intlFormatDistance(COMPETITION_END_TS, now);
-  const startDateDistance = intlFormatDistance(COMPETITION_START_TS, now);
-
   const content = useMemo(() => {
-    const totalTime = COMPETITION_END_TS - COMPETITION_START_TS;
-    const timeElapsed = now - COMPETITION_START_TS;
-    const progress = timeElapsed / totalTime;
+    const competitionDuration = COMPETITION_END_TS - COMPETITION_START_TS;
+    const timeElapsed = clamp(
+      0,
+      competitionDuration,
+      now - COMPETITION_START_TS
+    );
+    const isCompetitionOver = now > COMPETITION_END_TS;
+    const progress = timeElapsed / competitionDuration;
     const progressPercent = progress.toLocaleString(undefined, {
       style: "percent",
     });
+    const endDateDistance = intlFormatDistance(COMPETITION_END_TS, now);
+    const startDateDistance = intlFormatDistance(COMPETITION_START_TS, now);
 
     return (
       <Card className="bg-base-200/95 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
@@ -121,22 +126,24 @@ const CompetitionPage = () => {
               {TOP_TOKEN_COUNT} most transfered tokens
             </div>
             <Tooltip
-              tip={`The competition started ${startDateDistance}. It ends ${endDateDistance}.`}
-              position="left"
+              tip={`The competition started ${startDateDistance}. It ${
+                isCompetitionOver ? "ended" : "ends"
+              } ${endDateDistance}.`}
+              $position="left"
             >
               <FormControl>
                 <Label className="w-full">
                   <span className="text-sm">({progressPercent})</span>
                 </Label>
                 <Progress
-                  variant="accent"
+                  $variant="accent"
                   value={timeElapsed}
-                  max={totalTime}
+                  max={competitionDuration}
                 />
               </FormControl>
             </Tooltip>
           </Card.Title>
-          <Table zebra>
+          <Table $zebra>
             <Table.Head>
               <Table.Column className="text-right">Rank</Table.Column>
               <Table.Column>Token Id</Table.Column>
@@ -154,7 +161,7 @@ const CompetitionPage = () => {
         </Card.Body>
       </Card>
     );
-  }, [data, endDateDistance, now, startDateDistance]);
+  }, [data, now]);
 
   const compStart = getDateMeta(COMPETITION_END_TS);
   const compEnd = getDateMeta(COMPETITION_START_TS);

@@ -52,7 +52,7 @@ describe("ConnectWalletButton", () => {
 
   it("renders the button with custom props", () => {
     const { getByText } = render(
-      <ConnectWalletButton size="lg" variant="secondary">
+      <ConnectWalletButton $size="lg" $variant="secondary">
         Custom Connect
       </ConnectWalletButton>
     );

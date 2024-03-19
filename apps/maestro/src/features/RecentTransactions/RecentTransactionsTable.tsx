@@ -101,7 +101,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   return (
     <Card className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
       <Card.Body>
-        <Table className="relative space-y-4" zebra>
+        <Table className="relative space-y-4" $zebra>
           <Table.Head>
             <Table.Row>
               <Table.Column
@@ -173,7 +173,7 @@ const TransactionRow: FC<{
         </Link>
       </Table.Cell>
       <Table.Cell>
-        <Tooltip tip="View on AxelarScan" position="bottom">
+        <Tooltip tip="View on AxelarScan" $position="bottom">
           <Link
             className="group inline-flex items-center text-sm font-semibold hover:underline"
             href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}

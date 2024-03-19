@@ -1,8 +1,8 @@
 import { createContainer } from "@axelarjs/utils/react";
 import { FC, ReactNode, useState } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
 import { dec, inc, range } from "rambda";
+import { cva, VariantProps } from "styled-cva";
 import { twMerge } from "tailwind-merge";
 
 const colorVariants = {
@@ -17,7 +17,7 @@ const colorVariants = {
 
 const stepsVariance = cva("steps", {
   variants: {
-    direction: {
+    $direction: {
       horizontal: "steps-horizontal",
       vertical: "steps-vertical",
     },
@@ -28,7 +28,7 @@ type StepsVProps = VariantProps<typeof stepsVariance>;
 
 const stepVariance = cva("step", {
   variants: {
-    variant: {
+    $variant: {
       primary: "step-primary",
       secondary: "step-secondary",
       accent: "step-accent",
@@ -76,7 +76,7 @@ export type StepsProps = BaseStepsProps & PolymorphicProps;
 
 function useStepsState(initialState?: {
   stepIndex: number;
-  variant: StepVProps["variant"];
+  variant: StepVProps["$variant"];
 }) {
   const [stepIndex, setStep] = useState(initialState?.stepIndex ?? 0);
 
@@ -92,12 +92,12 @@ function useStepsState(initialState?: {
 const { Provider: StepsStateProvider, useContainer: useStepsStateContainer } =
   createContainer(useStepsState);
 
-const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
+const StepsRoot: FC<StepsProps> = ({ className, $direction, ...props }) => {
   return (
     <ul
       className={twMerge(
         stepsVariance({
-          direction,
+          $direction,
         }),
         className
       )}
@@ -107,7 +107,7 @@ const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
             <Step
               key={`step-${i}`}
               active={i <= props.stepIndex}
-              variant={props.variant}
+              $variant={props.variant}
               content={String(i + 1)}
             >
               {props.stepPrefix && (
@@ -123,7 +123,7 @@ const StepsRoot: FC<StepsProps> = ({ className, direction, ...props }) => {
 };
 
 const RootWithProvider: FC<StepsProps> = (props) => {
-  const defaultColor = props.variant ?? "primary";
+  const defaultColor = props.$variant ?? "primary";
 
   const initialState =
     "stepIndex" in props
@@ -148,7 +148,7 @@ interface StapProps extends LiElement, StepVProps {
   /**
    * The content of the step, defaults to the index of the step
    */
-  content?: string;
+  $content?: string;
   /**
    * Whether the step is active
    */
@@ -162,7 +162,7 @@ const Step: FC<StapProps> = ({ className, content, active, ...props }) => {
     <li
       data-content={content}
       className={twMerge(
-        stepVariance(active ? { variant: state.variant } : {}),
+        stepVariance(active ? { $variant: state.variant } : {}),
         className
       )}
       {...props}
@@ -175,5 +175,5 @@ export const Steps = Object.assign(RootWithProvider, {
 });
 
 Steps.defaultProps = {
-  direction: "horizontal",
+  $direction: "horizontal",
 };

@@ -23,8 +23,8 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
 ConnectWalletButton.displayName = "ConnectWalletButton";
 
 ConnectWalletButton.defaultProps = {
-  size: "sm",
-  variant: "primary",
+  $size: "sm",
+  $variant: "primary",
   children: "Connect Wallet",
 };
 

@@ -60,7 +60,7 @@ export default function HomePage() {
             <Dialog open onClose={handleDismissBanner} className="bg-warning">
               <Dialog.Body className="bg-warning text-warning-content">
                 <Dialog.CornerCloseAction onClick={handleDismissBanner} />
-                <Alert status="warning">
+                <Alert $status="warning">
                   <span className="font-semibold">
                     You are using the Interchain Token Service Beta. The app is
                     in active development; further updates and improvements to

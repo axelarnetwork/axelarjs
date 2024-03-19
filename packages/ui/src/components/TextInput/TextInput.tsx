@@ -5,9 +5,9 @@ import tw from "../../tw";
 /**
  * A text input component
  */
-const StyledTextInput = tw.input.cva("input", {
+const StyledTextInput = tw.input.cva("input disabled:input-disabled", {
   variants: {
-    variant: {
+    $variant: {
       primary: "input-primary",
       secondary: "input-secondary",
       accent: "input-accent",
@@ -16,20 +16,17 @@ const StyledTextInput = tw.input.cva("input", {
       error: "input-error",
       info: "input-info",
     },
-    inputSize: {
+    $size: {
       xs: "input-xs",
       sm: "input-sm",
       md: "input-md",
       lg: "input-lg",
     },
-    ghost: {
+    $ghost: {
       true: "input-ghost",
     },
-    bordered: {
+    $bordered: {
       true: "input-bordered",
-    },
-    disabled: {
-      true: "input-disabled",
     },
   },
 });
@@ -41,7 +38,6 @@ StyledTextInput.defaultProps = {
 
 export interface TextInputProps extends ComponentProps<typeof StyledTextInput> {
   type?: "text" | "password" | "email" | "number" | "tel" | "url" | "search";
-  disabled?: boolean;
 }
 
 // this is only forwarded so the `type` prop can is restricted to the types we want

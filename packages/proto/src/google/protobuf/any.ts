@@ -29,6 +29,10 @@ export const protobufPackage = "google.protobuf";
  *     if (any.is(Foo.class)) {
  *       foo = any.unpack(Foo.class);
  *     }
+ *     // or ...
+ *     if (any.isSameTypeAs(Foo.getDefaultInstance())) {
+ *       foo = any.unpack(Foo.getDefaultInstance());
+ *     }
  *
  *  Example 3: Pack and unpack a message in Python.
  *
@@ -43,10 +47,13 @@ export const protobufPackage = "google.protobuf";
  *  Example 4: Pack and unpack a message in Go
  *
  *      foo := &pb.Foo{...}
- *      any, err := ptypes.MarshalAny(foo)
+ *      any, err := anypb.New(foo)
+ *      if err != nil {
+ *        ...
+ *      }
  *      ...
  *      foo := &pb.Foo{}
- *      if err := ptypes.UnmarshalAny(any, foo); err != nil {
+ *      if err := any.UnmarshalTo(foo); err != nil {
  *        ...
  *      }
  *
@@ -109,7 +116,8 @@ export interface Any {
    *
    * Note: this functionality is not currently available in the official
    * protobuf release, and it is not used for type URLs beginning with
-   * type.googleapis.com.
+   * type.googleapis.com. As of May 2023, there are no widely used type server
+   * implementations and no plans to implement one.
    *
    * Schemes other than `http`, `https` (or the empty scheme) might be
    * used with implementation specific semantics.
@@ -197,7 +205,7 @@ export const Any = {
 };
 
 function bytesFromBase64(b64: string): Uint8Array {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
     const bin = globalThis.atob(b64);
@@ -210,7 +218,7 @@ function bytesFromBase64(b64: string): Uint8Array {
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  if (globalThis.Buffer) {
+  if ((globalThis as any).Buffer) {
     return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];

@@ -13,8 +13,8 @@ export type Props = TokenInfo & {
 export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
   return (
     <Card
-      compact
-      bordered
+      $compact
+      $bordered
       onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
       className={cn(
         "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",

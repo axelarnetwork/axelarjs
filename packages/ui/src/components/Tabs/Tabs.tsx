@@ -1,32 +1,26 @@
-import type { ComponentProps, FC } from "react";
-
-import { cva, VariantProps } from "class-variance-authority";
+import type { ComponentProps } from "react";
 
 import tw from "../../tw";
-import { cn } from "../../utils";
 
-const StyledTabs = tw.div`tabs`;
-const StyledTab = tw.a`tab`;
-
-StyledTab.defaultProps = {
-  href: "#",
-};
-
-export const tabsVariance = cva("tabs", {
+const StyledTabs = tw.div.cva("tabs", {
   variants: {
-    boxed: {
+    $boxed: {
       true: "tabs-boxed",
     },
   },
 });
 
-export const tabVariance = cva("tab", {
+export type TabsProps = ComponentProps<typeof StyledTabs>;
+
+export type TabProps = ComponentProps<typeof StyledTab>;
+
+const StyledTab = tw.a.cva("tab", {
   variants: {
+    $bordered: {
+      true: "tab-bordered",
+    },
     active: {
       true: "tab-active",
-    },
-    bordered: {
-      true: "tab-bordered",
     },
     disabled: {
       true: "tab-disabled",
@@ -34,31 +28,10 @@ export const tabVariance = cva("tab", {
   },
 });
 
-export interface TabsProps
-  extends ComponentProps<typeof StyledTabs>,
-    VariantProps<typeof tabsVariance> {}
+StyledTab.defaultProps = {
+  href: "#",
+};
 
-const TabsRoot: FC<TabsProps> = ({ boxed, className, ...props }) => (
-  <StyledTabs className={cn(tabsVariance({ boxed }), className)} {...props} />
-);
-
-export interface TabProps
-  extends ComponentProps<typeof StyledTab>,
-    VariantProps<typeof tabVariance> {}
-
-const Tab: FC<TabProps> = ({
-  active,
-  bordered,
-  disabled,
-  className,
-  ...props
-}) => (
-  <StyledTab
-    className={cn(tabVariance({ active, bordered, disabled }), className)}
-    {...props}
-  />
-);
-
-export const Tabs = Object.assign(TabsRoot, {
-  Tab,
+export const Tabs = Object.assign(StyledTabs, {
+  Tab: StyledTab,
 });

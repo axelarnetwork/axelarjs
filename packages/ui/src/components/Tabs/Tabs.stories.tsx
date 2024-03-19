@@ -62,5 +62,5 @@ Default.args = {};
 export const Boxed = Template.bind({});
 
 Boxed.args = {
-  boxed: true,
+  $boxed: true,
 };

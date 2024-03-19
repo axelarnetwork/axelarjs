@@ -130,7 +130,7 @@ export async function addNativeGas(
     abi: parseAbi([
       "function addNativeGas(bytes32 txHash,uint256 logIndex,address refundAddress) external payable",
     ]),
-    address: gasServiceAddress,
+    address: gasServiceAddress as `0x${string}`,
     client: {
       wallet: walletClient,
     },

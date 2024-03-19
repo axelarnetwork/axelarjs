@@ -31,7 +31,7 @@ const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
 };
 
 const STATUS_COLORS: Partial<
-  Record<ExtendedGMPTxStatus, NonNullable<BadgeProps["variant"]>>
+  Record<ExtendedGMPTxStatus, NonNullable<BadgeProps["$variant"]>>
 > = {
   error: "error",
   executed: "success",
@@ -118,7 +118,7 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
         block confirmations ({progress})
       </span>
       <Progress
-        variant="accent"
+        $variant="accent"
         className="w-full"
         value={elapsedBlocks}
         max={expectedConfirmations}
@@ -228,7 +228,7 @@ const CollapsedChains: FC<{
       .map((chain) => chain.name)
       .join(", ");
     return (
-      <Tooltip tip={collapsedChainNames} position="left">
+      <Tooltip tip={collapsedChainNames} $position="left">
         <span className="bg-info text-info-content -ml-2 flex h-6 w-6 items-center justify-center rounded-full">
           +{chains.length - offset}
         </span>
@@ -257,7 +257,7 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
           <span key={chain.id} className="-ml-2 flex items-center">
             <Tooltip
               tip={`${chain.name} - view tx on Axelarscan`}
-              position="left"
+              $position="left"
             >
               <Link
                 href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}:${logIndexes[i]}`}
@@ -316,7 +316,7 @@ export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
   txHash,
 }) => {
   return (
-    <Tooltip tip="View on Axelarscan" position="left">
+    <Tooltip tip="View on Axelarscan" $position="left">
       <Link
         href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}`}
         target="_blank"
@@ -324,11 +324,11 @@ export const GMPStatusIndicator: FC<StatusIndicatorProps> = ({
       >
         <div className="flex items-center text-sm">
           <Badge
+            $variant={STATUS_COLORS[status]}
+            $size="xs"
             className={cn("-translate-x-1.5 text-xs", {
               "animate-pulse": !["error", "executed"].includes(status),
             })}
-            variant={STATUS_COLORS[status]}
-            size="xs"
             aria-label={`status: ${STATUS_LABELS[status]}`}
           />
 
