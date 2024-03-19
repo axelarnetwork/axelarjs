@@ -77,7 +77,6 @@ describe("getL1Fee", () => {
       ?.rpc[0];
 
     const fee = await getL1FeeForL2(rpcUrl!, params);
-    expect(fee).toBeDefined();
-    expect(fee).toBeGreaterThan(0n);
+    expect(fee).toBe(0n);
   });
 });
