@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.3.14
+
+### Patch Changes
+
+- [#298](https://github.com/axelarnetwork/axelarjs/pull/298) [`a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476`](https://github.com/axelarnetwork/axelarjs/commit/a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476) Thanks [@canhtrinh](https://github.com/canhtrinh)! - make axelarjs/utils an explicit dependency
+
 ## 0.3.13
 
 ### Patch Changes
