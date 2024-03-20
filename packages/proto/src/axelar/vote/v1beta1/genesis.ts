@@ -19,7 +19,7 @@ function createBaseGenesisState(): GenesisState {
 export const GenesisState = {
   encode(
     message: GenesisState,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -51,7 +51,7 @@ export const GenesisState = {
           }
 
           message.pollMetadatas.push(
-            PollMetadata.decode(reader, reader.uint32()),
+            PollMetadata.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -79,19 +79,19 @@ export const GenesisState = {
     }
     if (message.pollMetadatas?.length) {
       obj.pollMetadatas = message.pollMetadatas.map((e) =>
-        PollMetadata.toJSON(e),
+        PollMetadata.toJSON(e)
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
-    base?: I,
+    base?: I
   ): GenesisState {
     return GenesisState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
-    object: I,
+    object: I
   ): GenesisState {
     const message = createBaseGenesisState();
     message.params =

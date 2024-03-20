@@ -8,7 +8,7 @@ import { AxelarConfigClient } from "./isomorphic";
 
 export const createAxelarConfigClient = (
   env: Environment,
-  options?: HttpClientOptions,
+  options?: HttpClientOptions
 ) =>
   AxelarConfigClient.init({
     instance: HttpClient.extend({

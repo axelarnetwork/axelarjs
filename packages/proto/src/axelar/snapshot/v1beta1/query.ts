@@ -40,12 +40,12 @@ function createBaseQueryValidatorsResponse(): QueryValidatorsResponse {
 export const QueryValidatorsResponse = {
   encode(
     message: QueryValidatorsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.validators) {
       QueryValidatorsResponse_Validator.encode(
         v!,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     return writer;
@@ -53,7 +53,7 @@ export const QueryValidatorsResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): QueryValidatorsResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -68,7 +68,7 @@ export const QueryValidatorsResponse = {
           }
 
           message.validators.push(
-            QueryValidatorsResponse_Validator.decode(reader, reader.uint32()),
+            QueryValidatorsResponse_Validator.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -84,7 +84,7 @@ export const QueryValidatorsResponse = {
     return {
       validators: globalThis.Array.isArray(object?.validators)
         ? object.validators.map((e: any) =>
-            QueryValidatorsResponse_Validator.fromJSON(e),
+            QueryValidatorsResponse_Validator.fromJSON(e)
           )
         : [],
     };
@@ -94,24 +94,24 @@ export const QueryValidatorsResponse = {
     const obj: any = {};
     if (message.validators?.length) {
       obj.validators = message.validators.map((e) =>
-        QueryValidatorsResponse_Validator.toJSON(e),
+        QueryValidatorsResponse_Validator.toJSON(e)
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<QueryValidatorsResponse>, I>>(
-    base?: I,
+    base?: I
   ): QueryValidatorsResponse {
     return QueryValidatorsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryValidatorsResponse>, I>>(
-    object: I,
+    object: I
   ): QueryValidatorsResponse {
     const message = createBaseQueryValidatorsResponse();
     message.validators =
       object.validators?.map((e) =>
-        QueryValidatorsResponse_Validator.fromPartial(e),
+        QueryValidatorsResponse_Validator.fromPartial(e)
       ) || [];
     return message;
   },
@@ -132,7 +132,7 @@ function createBaseQueryValidatorsResponse_TssIllegibilityInfo(): QueryValidator
 export const QueryValidatorsResponse_TssIllegibilityInfo = {
   encode(
     message: QueryValidatorsResponse_TssIllegibilityInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.tombstoned === true) {
       writer.uint32(8).bool(message.tombstoned);
@@ -160,7 +160,7 @@ export const QueryValidatorsResponse_TssIllegibilityInfo = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): QueryValidatorsResponse_TssIllegibilityInfo {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -284,7 +284,7 @@ export const QueryValidatorsResponse_TssIllegibilityInfo = {
     >,
   >(base?: I): QueryValidatorsResponse_TssIllegibilityInfo {
     return QueryValidatorsResponse_TssIllegibilityInfo.fromPartial(
-      base ?? ({} as any),
+      base ?? ({} as any)
     );
   },
   fromPartial<
@@ -312,7 +312,7 @@ function createBaseQueryValidatorsResponse_Validator(): QueryValidatorsResponse_
 export const QueryValidatorsResponse_Validator = {
   encode(
     message: QueryValidatorsResponse_Validator,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.operatorAddress !== "") {
       writer.uint32(10).string(message.operatorAddress);
@@ -323,7 +323,7 @@ export const QueryValidatorsResponse_Validator = {
     if (message.tssIllegibilityInfo !== undefined) {
       QueryValidatorsResponse_TssIllegibilityInfo.encode(
         message.tssIllegibilityInfo,
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     }
     return writer;
@@ -331,7 +331,7 @@ export const QueryValidatorsResponse_Validator = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): QueryValidatorsResponse_Validator {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -362,7 +362,7 @@ export const QueryValidatorsResponse_Validator = {
           message.tssIllegibilityInfo =
             QueryValidatorsResponse_TssIllegibilityInfo.decode(
               reader,
-              reader.uint32(),
+              reader.uint32()
             );
           continue;
       }
@@ -382,7 +382,7 @@ export const QueryValidatorsResponse_Validator = {
       moniker: isSet(object.moniker) ? globalThis.String(object.moniker) : "",
       tssIllegibilityInfo: isSet(object.tssIllegibilityInfo)
         ? QueryValidatorsResponse_TssIllegibilityInfo.fromJSON(
-            object.tssIllegibilityInfo,
+            object.tssIllegibilityInfo
           )
         : undefined,
     };
@@ -399,14 +399,14 @@ export const QueryValidatorsResponse_Validator = {
     if (message.tssIllegibilityInfo !== undefined) {
       obj.tssIllegibilityInfo =
         QueryValidatorsResponse_TssIllegibilityInfo.toJSON(
-          message.tssIllegibilityInfo,
+          message.tssIllegibilityInfo
         );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<QueryValidatorsResponse_Validator>, I>>(
-    base?: I,
+    base?: I
   ): QueryValidatorsResponse_Validator {
     return QueryValidatorsResponse_Validator.fromPartial(base ?? ({} as any));
   },
@@ -420,7 +420,7 @@ export const QueryValidatorsResponse_Validator = {
       object.tssIllegibilityInfo !== undefined &&
       object.tssIllegibilityInfo !== null
         ? QueryValidatorsResponse_TssIllegibilityInfo.fromPartial(
-            object.tssIllegibilityInfo,
+            object.tssIllegibilityInfo
           )
         : undefined;
     return message;
@@ -434,7 +434,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     _: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
@@ -466,12 +466,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I,
+    base?: I
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    _: I,
+    _: I
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     return message;
@@ -485,7 +485,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -532,12 +532,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I,
+    base?: I
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I,
+    object: I
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =

@@ -40,5 +40,5 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
     }, [indeterminate]);
 
     return <StyledToggle ref={innerRef} type="checkbox" {...props} />;
-  },
+  }
 );

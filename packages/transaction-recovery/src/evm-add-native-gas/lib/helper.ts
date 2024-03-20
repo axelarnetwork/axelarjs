@@ -32,7 +32,7 @@ import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
 export async function getGasServiceAddressFromChainConfig(
   configClient: AxelarConfigClient,
   env: Environment,
-  chain: string,
+  chain: string
 ) {
   const _chainConfigs = await configClient.getAxelarConfigs(env);
   return (
@@ -48,7 +48,7 @@ export async function calculateNativeGasFee(
   destinationChain: string,
   estimatedGasUsed: number,
   axelarQueryClient: AxelarQueryAPIClient,
-  gasMultiplier?: number,
+  gasMultiplier?: number
 ): Promise<bigint> {
   const stringTotalAmount = (await axelarQueryClient.estimateGasFee({
     sourceChain,
@@ -67,7 +67,7 @@ export async function calculateNativeGasFee(
 export async function isInsufficientFeeTx(
   client: GMPClient,
   txHash: Hash,
-  logIndex: number,
+  logIndex: number
 ) {
   const gmpTxs = await client.searchGMP({
     txHash: txHash,
@@ -88,7 +88,7 @@ export async function isInsufficientFeeTx(
  */
 export function getWalletClient(
   rpcUrl: string,
-  privateKey?: `0x${string}`,
+  privateKey?: `0x${string}`
 ): WalletClient {
   if (typeof window !== "undefined" && !window.ethereum) {
     throw EvmAddNativeGasError.WALLET_CLIENT_NOT_FOUND;

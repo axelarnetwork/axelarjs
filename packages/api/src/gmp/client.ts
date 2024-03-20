@@ -5,7 +5,7 @@ import { GMPClient } from "./isomorphic";
 
 export const createGMPClient = (
   env: Environment,
-  options?: HttpClientOptions,
+  options?: HttpClientOptions
 ) =>
   GMPClient.init({
     instance: HttpClient.extend({

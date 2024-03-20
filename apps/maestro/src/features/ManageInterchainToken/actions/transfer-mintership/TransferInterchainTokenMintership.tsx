@@ -76,7 +76,7 @@ export const TransferInterchainTokenMintership: FC = () => {
       transferTxHash,
       trpcContext.erc20.getERC20TokenBalanceForOwner,
       trpcContext.interchainToken.searchInterchainToken,
-    ],
+    ]
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
@@ -91,7 +91,7 @@ export const TransferInterchainTokenMintership: FC = () => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt],
+    [receipt]
   );
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(
@@ -118,10 +118,10 @@ export const TransferInterchainTokenMintership: FC = () => {
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
-            `Failed to transfer token mintership: ${error.cause.shortMessage}`,
+            `Failed to transfer token mintership: ${error.cause.shortMessage}`
           );
           logger.error(
-            `Failed to transfer token mintership: ${error.cause.message}`,
+            `Failed to transfer token mintership: ${error.cause.message}`
           );
 
           setTxState({
@@ -136,7 +136,7 @@ export const TransferInterchainTokenMintership: FC = () => {
         });
       }
     },
-    [chainId, setTxState, state.tokenAddress, transferMintershipAsync],
+    [chainId, setTxState, state.tokenAddress, transferMintershipAsync]
   );
 
   const buttonChildren = useMemo(() => {

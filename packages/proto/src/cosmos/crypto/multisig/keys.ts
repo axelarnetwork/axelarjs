@@ -23,7 +23,7 @@ function createBaseLegacyAminoPubKey(): LegacyAminoPubKey {
 export const LegacyAminoPubKey = {
   encode(
     message: LegacyAminoPubKey,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.threshold !== 0) {
       writer.uint32(8).uint32(message.threshold);
@@ -88,12 +88,12 @@ export const LegacyAminoPubKey = {
   },
 
   create<I extends Exact<DeepPartial<LegacyAminoPubKey>, I>>(
-    base?: I,
+    base?: I
   ): LegacyAminoPubKey {
     return LegacyAminoPubKey.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LegacyAminoPubKey>, I>>(
-    object: I,
+    object: I
   ): LegacyAminoPubKey {
     const message = createBaseLegacyAminoPubKey();
     message.threshold = object.threshold ?? 0;

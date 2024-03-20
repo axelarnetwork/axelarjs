@@ -16,7 +16,7 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.minProxyBalance.isZero()) {
       writer.uint32(8).int64(message.minProxyBalance);

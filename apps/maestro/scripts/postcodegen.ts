@@ -12,7 +12,7 @@ const DISABLED_RULES = [
 ];
 
 const ESLINT_DISABLE_PREFIX = DISABLED_RULES.map(
-  (rule) => `/* eslint-disable ${rule} */`,
+  (rule) => `/* eslint-disable ${rule} */`
 ).join("\n");
 
 /**
@@ -56,7 +56,7 @@ async function replaceContentInFile(filePath: string) {
     .replace(
       `from "wagmi";`,
       `from "wagmi";
-       import ABI from "./${fileName.replace("hooks.ts", "abi")}";`,
+       import ABI from "./${fileName.replace("hooks.ts", "abi")}";`
     );
 
   const formattedContent = await prettier.format(replacedContent, {
@@ -70,7 +70,7 @@ await Promise.all(
   patchFiles.map(async (file) => {
     await prepend(ESLINT_DISABLE_PREFIX, file);
     await replaceContentInFile(path.join(destFolder, file));
-  }),
+  })
 );
 
 console.log(`\nPatched ${patchFiles.length} files 🎉`);

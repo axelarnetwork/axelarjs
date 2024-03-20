@@ -54,7 +54,7 @@ describe("ConnectWalletButton", () => {
     const { getByText } = render(
       <ConnectWalletButton $size="lg" $variant="secondary">
         Custom Connect
-      </ConnectWalletButton>,
+      </ConnectWalletButton>
     );
     const button = getByText("Custom Connect");
 

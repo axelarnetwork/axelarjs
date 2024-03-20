@@ -27,7 +27,7 @@ export const getChainInfo = publicProcedure
       chainName: z.string(),
       blockConfirmations: z.number().optional(),
       estimatedWaitTimeInMinutes: z.number(),
-    }),
+    })
   )
   .query(async ({ ctx, input }) => {
     try {

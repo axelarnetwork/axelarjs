@@ -66,7 +66,7 @@ Do you want to continue? [Y/n]
           stdout
             .split("\n")
             .filter(Boolean)
-            .map((x) => x.trim()),
+            .map((x) => x.trim())
       );
 
       const componentsIndexContent = components
@@ -87,24 +87,24 @@ Do you want to continue? [Y/n]
               storiesContent,
             })
               .filter((x) => !x)
-              .join(", ")})`,
+              .join(", ")})`
           );
         }
 
         await $`mkdir ${targetDir}`;
         await $`echo ${replaceName(indexContent)} > ${targetDir}/index.ts`;
         await $`echo ${replaceName(
-          componentContent,
+          componentContent
         )} > ${targetDir}/${component}.tsx`;
         await $`echo ${replaceName(
-          storiesContent,
+          storiesContent
         )} > ${targetDir}/${component}.stories.tsx`;
         await $`echo ${replaceName(
-          specContent,
+          specContent
         )} > ${targetDir}/${component}.spec.tsx`;
 
         await $`echo ${replaceName(
-          componentsIndexContent,
+          componentsIndexContent
         )} > ${componentsDir}/index.ts`;
 
         console.log(`Created component (${component}): \n- ${targetDir}/`);
@@ -132,7 +132,7 @@ program
 program
   .command("component")
   .description(
-    "Scaffold a new component under src/components with a stories file",
+    "Scaffold a new component under src/components with a stories file"
   )
   .argument("[componentName]", "component name")
   .action(codegen("component"));
@@ -140,7 +140,7 @@ program
 program
   .command("compound")
   .description(
-    "Scaffold a new compound under src/compounds with a stories file",
+    "Scaffold a new compound under src/compounds with a stories file"
   )
   .argument("[compoundName]", "compound name")
   .action(codegen("compound"));

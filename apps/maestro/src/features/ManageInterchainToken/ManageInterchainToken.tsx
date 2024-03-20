@@ -33,7 +33,7 @@ const MintInterchainToken = dynamic(
   () => import("~/features/ManageInterchainToken/actions/mint"),
   {
     loading: StepLoading,
-  },
+  }
 );
 
 const TransferOperatorship = dynamic(
@@ -41,14 +41,14 @@ const TransferOperatorship = dynamic(
     import("~/features/ManageInterchainToken/actions/transfer-operatorship"),
   {
     loading: StepLoading,
-  },
+  }
 );
 
 const TransferMintership = dynamic(
   () => import("~/features/ManageInterchainToken/actions/transfer-mintership"),
   {
     loading: StepLoading,
-  },
+  }
 );
 
 const ACTIONS: Record<InterchainTokenAction, ComponentType<any>> = {
@@ -103,7 +103,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
 
   const CurrentStep = useMemo(
     () => (state.selectedAction ? ACTIONS[state.selectedAction] : undefined),
-    [state.selectedAction],
+    [state.selectedAction]
   );
 
   return (

@@ -27,7 +27,7 @@ function createBaseCallContractsProposal(): CallContractsProposal {
 export const CallContractsProposal = {
   encode(
     message: CallContractsProposal,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -43,7 +43,7 @@ export const CallContractsProposal = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CallContractsProposal {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -72,7 +72,7 @@ export const CallContractsProposal = {
           }
 
           message.contractCalls.push(
-            ContractCall.decode(reader, reader.uint32()),
+            ContractCall.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -106,19 +106,19 @@ export const CallContractsProposal = {
     }
     if (message.contractCalls?.length) {
       obj.contractCalls = message.contractCalls.map((e) =>
-        ContractCall.toJSON(e),
+        ContractCall.toJSON(e)
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<CallContractsProposal>, I>>(
-    base?: I,
+    base?: I
   ): CallContractsProposal {
     return CallContractsProposal.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CallContractsProposal>, I>>(
-    object: I,
+    object: I
   ): CallContractsProposal {
     const message = createBaseCallContractsProposal();
     message.title = object.title ?? "";
@@ -136,7 +136,7 @@ function createBaseContractCall(): ContractCall {
 export const ContractCall = {
   encode(
     message: ContractCall,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -215,12 +215,12 @@ export const ContractCall = {
   },
 
   create<I extends Exact<DeepPartial<ContractCall>, I>>(
-    base?: I,
+    base?: I
   ): ContractCall {
     return ContractCall.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ContractCall>, I>>(
-    object: I,
+    object: I
   ): ContractCall {
     const message = createBaseContractCall();
     message.chain = object.chain ?? "";

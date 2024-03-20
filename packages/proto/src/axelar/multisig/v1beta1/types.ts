@@ -94,13 +94,13 @@ export const Key = {
     Object.entries(message.pubKeys).forEach(([key, value]) => {
       Key_PubKeysEntry.encode(
         { key: key as any, value },
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     });
     if (message.signingThreshold !== undefined) {
       Threshold.encode(
         message.signingThreshold,
-        writer.uint32(34).fork(),
+        writer.uint32(34).fork()
       ).ldelim();
     }
     if (message.state !== 0) {
@@ -176,7 +176,7 @@ export const Key = {
               acc[key] = bytesFromBase64(value as string);
               return acc;
             },
-            {},
+            {}
           )
         : {},
       signingThreshold: isSet(object.signingThreshold)
@@ -246,7 +246,7 @@ function createBaseKey_PubKeysEntry(): Key_PubKeysEntry {
 export const Key_PubKeysEntry = {
   encode(
     message: Key_PubKeysEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -309,12 +309,12 @@ export const Key_PubKeysEntry = {
   },
 
   create<I extends Exact<DeepPartial<Key_PubKeysEntry>, I>>(
-    base?: I,
+    base?: I
   ): Key_PubKeysEntry {
     return Key_PubKeysEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Key_PubKeysEntry>, I>>(
-    object: I,
+    object: I
   ): Key_PubKeysEntry {
     const message = createBaseKey_PubKeysEntry();
     message.key = object.key ?? "";
@@ -338,7 +338,7 @@ function createBaseKeygenSession(): KeygenSession {
 export const KeygenSession = {
   encode(
     message: KeygenSession,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== undefined) {
       Key.encode(message.key, writer.uint32(10).fork()).ldelim();
@@ -349,7 +349,7 @@ export const KeygenSession = {
     if (message.keygenThreshold !== undefined) {
       Threshold.encode(
         message.keygenThreshold,
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     }
     if (!message.expiresAt.isZero()) {
@@ -361,7 +361,7 @@ export const KeygenSession = {
     Object.entries(message.isPubKeyReceived).forEach(([key, value]) => {
       KeygenSession_IsPubKeyReceivedEntry.encode(
         { key: key as any, value },
-        writer.uint32(50).fork(),
+        writer.uint32(50).fork()
       ).ldelim();
     });
     if (!message.gracePeriod.isZero()) {
@@ -420,7 +420,7 @@ export const KeygenSession = {
 
           const entry6 = KeygenSession_IsPubKeyReceivedEntry.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           if (entry6.value !== undefined) {
             message.isPubKeyReceived[entry6.key] = entry6.value;
@@ -502,12 +502,12 @@ export const KeygenSession = {
   },
 
   create<I extends Exact<DeepPartial<KeygenSession>, I>>(
-    base?: I,
+    base?: I
   ): KeygenSession {
     return KeygenSession.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenSession>, I>>(
-    object: I,
+    object: I
   ): KeygenSession {
     const message = createBaseKeygenSession();
     message.key =
@@ -528,7 +528,7 @@ export const KeygenSession = {
         ? Long.fromValue(object.completedAt)
         : Long.ZERO;
     message.isPubKeyReceived = Object.entries(
-      object.isPubKeyReceived ?? {},
+      object.isPubKeyReceived ?? {}
     ).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = globalThis.Boolean(value);
@@ -550,7 +550,7 @@ function createBaseKeygenSession_IsPubKeyReceivedEntry(): KeygenSession_IsPubKey
 export const KeygenSession_IsPubKeyReceivedEntry = {
   encode(
     message: KeygenSession_IsPubKeyReceivedEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -563,7 +563,7 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): KeygenSession_IsPubKeyReceivedEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -614,7 +614,7 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
   },
 
   create<I extends Exact<DeepPartial<KeygenSession_IsPubKeyReceivedEntry>, I>>(
-    base?: I,
+    base?: I
   ): KeygenSession_IsPubKeyReceivedEntry {
     return KeygenSession_IsPubKeyReceivedEntry.fromPartial(base ?? ({} as any));
   },
@@ -635,7 +635,7 @@ function createBaseMultiSig(): MultiSig {
 export const MultiSig = {
   encode(
     message: MultiSig,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -646,7 +646,7 @@ export const MultiSig = {
     Object.entries(message.sigs).forEach(([key, value]) => {
       MultiSig_SigsEntry.encode(
         { key: key as any, value },
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     });
     return writer;
@@ -705,7 +705,7 @@ export const MultiSig = {
               acc[key] = bytesFromBase64(value as string);
               return acc;
             },
-            {},
+            {}
           )
         : {},
     };
@@ -757,7 +757,7 @@ function createBaseMultiSig_SigsEntry(): MultiSig_SigsEntry {
 export const MultiSig_SigsEntry = {
   encode(
     message: MultiSig_SigsEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -820,12 +820,12 @@ export const MultiSig_SigsEntry = {
   },
 
   create<I extends Exact<DeepPartial<MultiSig_SigsEntry>, I>>(
-    base?: I,
+    base?: I
   ): MultiSig_SigsEntry {
     return MultiSig_SigsEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MultiSig_SigsEntry>, I>>(
-    object: I,
+    object: I
   ): MultiSig_SigsEntry {
     const message = createBaseMultiSig_SigsEntry();
     message.key = object.key ?? "";
@@ -851,7 +851,7 @@ function createBaseSigningSession(): SigningSession {
 export const SigningSession = {
   encode(
     message: SigningSession,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.id.isZero()) {
       writer.uint32(8).uint64(message.id);
@@ -1020,12 +1020,12 @@ export const SigningSession = {
   },
 
   create<I extends Exact<DeepPartial<SigningSession>, I>>(
-    base?: I,
+    base?: I
   ): SigningSession {
     return SigningSession.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigningSession>, I>>(
-    object: I,
+    object: I
   ): SigningSession {
     const message = createBaseSigningSession();
     message.id =
@@ -1069,7 +1069,7 @@ function createBaseKeyEpoch(): KeyEpoch {
 export const KeyEpoch = {
   encode(
     message: KeyEpoch,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.epoch.isZero()) {
       writer.uint32(8).uint64(message.epoch);

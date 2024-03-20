@@ -20,7 +20,7 @@ export function useStep3ChainSelectionState() {
   const [totalGasFee, $setTotalGasFee] = useState(formatEther(0n));
   const [sourceChainId, setSourceChainId] = useState(
     evmChains?.find((evmChain: EVMChainConfig) => evmChain.chain_id === chainId)
-      ?.id as string,
+      ?.id as string
   );
 
   const { state: rootState } = useCanonicalTokenDeploymentStateContainer();
@@ -40,7 +40,7 @@ export function useStep3ChainSelectionState() {
     () =>
       remoteDeploymentGasFees &&
       setTotalGasFee(remoteDeploymentGasFees.totalGasFee),
-    [remoteDeploymentGasFees],
+    [remoteDeploymentGasFees]
   );
 
   const resetState = () => {
@@ -55,7 +55,7 @@ export function useStep3ChainSelectionState() {
 
   useEffect(() => {
     const candidateChain = evmChains?.find(
-      (evmChain) => evmChain.chain_id === chainId,
+      (evmChain) => evmChain.chain_id === chainId
     );
     if (!candidateChain || candidateChain.chain_name === sourceChainId) return;
 

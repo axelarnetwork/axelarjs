@@ -22,7 +22,7 @@ export type AddGasDependencies = {
   gmpClient: GMPClient;
   getSigningStargateClient: (
     rpcUrl: string,
-    offlineSigner: OfflineSigner,
+    offlineSigner: OfflineSigner
   ) => Promise<AxelarSigningStargateClient>;
 };
 
@@ -34,10 +34,10 @@ export type AddGasDependencies = {
  */
 export async function addGas(
   { autocalculateGasOptions, sendOptions, ...params }: AddGasParams,
-  dependencies: AddGasDependencies,
+  dependencies: AddGasDependencies
 ): Promise<AddGasResponse> {
   const { chains } = await dependencies.configClient.getAxelarConfigs(
-    sendOptions.environment,
+    sendOptions.environment
   );
 
   const chainConfig =
@@ -65,7 +65,7 @@ export async function addGas(
   const denomOnSrcChain = getIBCDenomOnSrcChain(
     tx.gas_paid?.returnValues?.denom,
     sendOptions.environment,
-    chainConfig,
+    chainConfig
   );
 
   if (!denomOnSrcChain) throw new Error("could not find denomOnSrcChain");
@@ -100,7 +100,7 @@ export async function addGas(
 
   const signingStargateClient = await dependencies.getSigningStargateClient(
     rpcUrl,
-    sendOptions.offlineSigner,
+    sendOptions.offlineSigner
   );
 
   const sender = await sendOptions.offlineSigner
@@ -115,7 +115,7 @@ export async function addGas(
   }
 
   const timeoutTimestamp = longify(
-    sendOptions.timeoutTimestamp ?? getDefaultTimeoutTimestamp(),
+    sendOptions.timeoutTimestamp ?? getDefaultTimeoutTimestamp()
   );
 
   const broadcastResult =
@@ -130,7 +130,7 @@ export async function addGas(
         timeoutTimestamp,
         memo: tx.call.id,
       },
-      sendOptions.txFee,
+      sendOptions.txFee
     );
 
   assertIsDeliverTxSuccess(broadcastResult);
@@ -162,7 +162,7 @@ async function getFullFee({
   const denom = getIBCDenomOnSrcChain(
     tx.gas_paid?.returnValues?.denom,
     environment,
-    chainConfig,
+    chainConfig
   );
 
   if (!denom) throw new Error("could not find denom");
@@ -175,7 +175,7 @@ async function getFullFee({
 
 function matchesOriginalTokenPayment(
   token: Coin | "autocalculate",
-  denom: string,
+  denom: string
 ) {
   return token === "autocalculate" || token?.denom === denom;
 }
@@ -183,7 +183,7 @@ function matchesOriginalTokenPayment(
 function getIBCDenomOnSrcChain(
   denomOnAxelar: string | undefined,
   env: Environment,
-  chain: ChainConfig,
+  chain: ChainConfig
 ) {
   if (chain.chainType !== "axelarnet") {
     throw new Error("cannot find token that matches original gas payment");

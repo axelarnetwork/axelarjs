@@ -152,14 +152,14 @@ export const IADDRESS_TRACKER_ENCODERS = {
 };
 
 export function createIAddressTrackerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
     chainName() {
       return publicClient.read("chainName");
     },
     isTrustedAddress(
-      isTrustedAddressArgs: IAddressTrackerIsTrustedAddressArgs,
+      isTrustedAddressArgs: IAddressTrackerIsTrustedAddressArgs
     ) {
       const encoder = IADDRESS_TRACKER_ENCODERS["isTrustedAddress"];
       const encodedArgs = encoder.args(isTrustedAddressArgs);
@@ -173,7 +173,7 @@ export function createIAddressTrackerReadClient(
       return publicClient.read("trustedAddress", { args: encodedArgs });
     },
     trustedAddressHash(
-      trustedAddressHashArgs: IAddressTrackerTrustedAddressHashArgs,
+      trustedAddressHashArgs: IAddressTrackerTrustedAddressHashArgs
     ) {
       const encoder = IADDRESS_TRACKER_ENCODERS["trustedAddressHash"];
       const encodedArgs = encoder.args(trustedAddressHashArgs);

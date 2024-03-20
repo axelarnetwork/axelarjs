@@ -28,7 +28,7 @@ export class AxelarQueryClient extends QueryClient {
 
       instance = QueryClient.withExtensions(
         tmClient,
-        setupQueryClientExtension,
+        setupQueryClientExtension
       );
     }
     return instance;
@@ -47,7 +47,7 @@ export function createAxelarRPCTxClient(
     fee?: StdFee;
     broadcastPollIntervalMs?: number;
     broadcastTimeoutMs?: number;
-  },
+  }
 ) {
   const axelarRpcUrl =
     config.axelarRpcUrl || getConfigs(config.environment).axelarRpcUrl;
@@ -60,8 +60,8 @@ export function createAxelarRPCTxClient(
         offlineSigner,
         config.chainId,
         config.onDeliverTxResponse,
-        options,
-      ),
+        options
+      )
   );
 }
 

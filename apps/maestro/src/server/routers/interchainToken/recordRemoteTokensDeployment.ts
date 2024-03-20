@@ -16,7 +16,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
       deploymentMessageId: z.string(),
       tokenAddress: hex40Literal(),
       remoteTokens: z.array(remoteInterchainTokenSchema),
-    }),
+    })
   )
   .mutation(async ({ ctx, input }) => {
     const chains = await ctx.configs.evmChains();
@@ -25,7 +25,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
     const originToken =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         configs.info.id,
-        input.tokenAddress,
+        input.tokenAddress
       );
 
     if (!originToken) {
@@ -47,7 +47,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
 
     if (!input.remoteTokens.length) {
       console.warn(
-        `No remote tokens provided for ${input.tokenAddress} on chain ${input.chainId}`,
+        `No remote tokens provided for ${input.tokenAddress} on chain ${input.chainId}`
       );
       return;
     }
@@ -58,7 +58,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         const configs = chains[remoteToken.axelarChainId];
 
         const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          configs.wagmi,
+          configs.wagmi
         );
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
@@ -83,10 +83,10 @@ export const recordRemoteTokensDeployment = protectedProcedure
           deploymentStatus: "pending" as const,
           deploymentMessageId: input.deploymentMessageId,
         };
-      }),
+      })
     );
 
     return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      remoteTokens,
+      remoteTokens
     );
   });

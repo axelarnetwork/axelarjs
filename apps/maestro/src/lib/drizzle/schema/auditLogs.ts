@@ -26,7 +26,7 @@ export type AuditLogEvent<K extends AuditLogEventKind> = {
 
 export const auditLogEventKind = pgEnum(
   "audit_log_event_kind",
-  AUDIT_EVENT_KINDS,
+  AUDIT_EVENT_KINDS
 );
 
 /**

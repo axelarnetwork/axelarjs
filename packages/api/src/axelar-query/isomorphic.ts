@@ -24,7 +24,7 @@ export class AxelarQueryAPIClient extends RestService {
     options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
     env: Environment,
-    meta?: ClientMeta,
+    meta?: ClientMeta
   ) {
     super(options, meta);
     this.gmpClient = dependencies.gmpClient;
@@ -34,7 +34,7 @@ export class AxelarQueryAPIClient extends RestService {
   static init(
     options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
-    env: Environment,
+    env: Environment
   ) {
     return new AxelarQueryAPIClient(options, dependencies, env, {
       name: "AxelarQueryAPI",
@@ -101,21 +101,21 @@ export class AxelarQueryAPIClient extends RestService {
 
     if (!response || !source_token || isNaN(base_fee)) {
       throw new Error(
-        "Failed to retrieve fee estimate from API. Please try again later.",
+        "Failed to retrieve fee estimate from API. Please try again later."
       );
     }
 
     const destGasFeeWei = gasToWei(
       gasLimit,
       destination_native_token.gas_price,
-      destination_native_token.decimals,
+      destination_native_token.decimals
     );
     const minDestGasFeeWei = BigInt(minGasPrice) * BigInt(gasLimit);
 
     const srcGasFeeWei = gasToWei(
       gasLimit,
       source_token.gas_price,
-      source_token.decimals,
+      source_token.decimals
     );
 
     const excludedL1ExecutionFee =
@@ -131,7 +131,7 @@ export class AxelarQueryAPIClient extends RestService {
     const excludedL1ExecutionFeeWithMultiplier =
       actualGasMultiplier > 1
         ? Math.floor(
-            Number(excludedL1ExecutionFee) * Number(actualGasMultiplier),
+            Number(excludedL1ExecutionFee) * Number(actualGasMultiplier)
           )
         : excludedL1ExecutionFee;
 
@@ -144,13 +144,13 @@ export class AxelarQueryAPIClient extends RestService {
     if (isL2Chain(destinationChain)) {
       if (!executeData) {
         throw new Error(
-          `executeData is required to calculate the L1 execution fee for ${destinationChain}`,
+          `executeData is required to calculate the L1 execution fee for ${destinationChain}`
         );
       }
 
       if (!destination_native_token.l1_gas_price_in_units) {
         throw new Error(
-          `Could not find L1 gas price for ${destinationChain}. Please try again later.`,
+          `Could not find L1 gas price for ${destinationChain}. Please try again later.`
         );
       }
 
@@ -167,12 +167,12 @@ export class AxelarQueryAPIClient extends RestService {
       const ethToSrcTokenPriceRatio = ethTokenPrice / srcTokenPrice;
 
       l1ExecutionFee = BigInt(
-        Math.ceil(Number(l1ExecutionFee) * ethToSrcTokenPriceRatio),
+        Math.ceil(Number(l1ExecutionFee) * ethToSrcTokenPriceRatio)
       );
 
       // Calculate the L1 execution fee with the gas multiplier
       l1ExecutionFeeWithMultiplier = Math.floor(
-        Number(l1ExecutionFee) * Number(actualGasMultiplier),
+        Number(l1ExecutionFee) * Number(actualGasMultiplier)
       );
     }
 

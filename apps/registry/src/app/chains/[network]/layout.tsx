@@ -34,7 +34,7 @@ const ChainsLayout: FC<Props> = (props) => {
 
       return params.toString();
     },
-    [searchParams],
+    [searchParams]
   );
 
   const handleSeachChange = debounce((e: ChangeEvent<HTMLInputElement>) => {

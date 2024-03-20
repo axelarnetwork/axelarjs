@@ -26,7 +26,7 @@ export type EvmAddNativeGasDependencies = {
 
 export async function addNativeGas(
   params: EvmAddNativeGasParams,
-  dependencies: EvmAddNativeGasDependencies,
+  dependencies: EvmAddNativeGasDependencies
 ) {
   const {
     environment,
@@ -42,7 +42,7 @@ export async function addNativeGas(
   const chainConfigs = await axelarscanClient.getChainConfigs();
   const evmChainConfigs = chainConfigs.evm;
   const chainConfig = evmChainConfigs.find(
-    (config) => config.id.toLowerCase() === params.srcChain.toLowerCase(),
+    (config) => config.id.toLowerCase() === params.srcChain.toLowerCase()
   );
 
   // Use the public RPC endpoint if it is not provided in the chain config
@@ -88,7 +88,7 @@ export async function addNativeGas(
   const shouldAddNativeGas = await isInsufficientFeeTx(
     gmpClient,
     params.txHash,
-    logIndex,
+    logIndex
   );
 
   // Throw an error if the transaction does not require native gas to be paid.
@@ -108,7 +108,7 @@ export async function addNativeGas(
           destChain,
           estimatedGasUsed,
           dependencies.axelarQueryClient,
-          gasMultiplier,
+          gasMultiplier
         );
 
   // Throw an error if the amount of native gas to be paid is 0.
@@ -119,7 +119,7 @@ export async function addNativeGas(
   const gasServiceAddress = await getGasServiceAddressFromChainConfig(
     configClient,
     environment,
-    destChain,
+    destChain
   );
 
   if (!gasServiceAddress) {
@@ -151,6 +151,6 @@ export async function addNativeGas(
         },
       },
       value: gasToAdd,
-    },
+    }
   );
 }

@@ -49,7 +49,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
-    },
+    }
   ): Promise<ContractFunctionReturnType<TAbi, "view", TFunctionName>> {
     const address = params?.address ?? this.address;
 
@@ -79,7 +79,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
       "address" | "functionName" | "abi"
     > & {
       address?: `0x${string}`;
-    },
+    }
   ): Promise<`0x${string}`> {
     const address = params?.address ?? this.address;
 

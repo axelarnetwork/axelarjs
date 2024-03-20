@@ -40,7 +40,7 @@ describe("usePersistedState", () => {
 
   it("should initialize with the default value", () => {
     const { result } = renderHook(() =>
-      usePersistedState(storage, key, defaultValue),
+      usePersistedState(storage, key, defaultValue)
     );
 
     const [state] = result.current;
@@ -50,7 +50,7 @@ describe("usePersistedState", () => {
 
   it("should update the state and storage with a new value", () => {
     const { result } = renderHook(() =>
-      usePersistedState(storage, key, defaultValue),
+      usePersistedState(storage, key, defaultValue)
     );
 
     act(() => {
@@ -72,7 +72,7 @@ describe("usePersistedState", () => {
 
   it("should update the state and storage using an Immer producer function", () => {
     const { result } = renderHook(() =>
-      usePersistedState(storage, key, defaultValue),
+      usePersistedState(storage, key, defaultValue)
     );
 
     act(() => {

@@ -24,7 +24,7 @@ function createBaseRegisterProxyRequest(): RegisterProxyRequest {
 export const RegisterProxyRequest = {
   encode(
     message: RegisterProxyRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -37,7 +37,7 @@ export const RegisterProxyRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RegisterProxyRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -92,12 +92,12 @@ export const RegisterProxyRequest = {
   },
 
   create<I extends Exact<DeepPartial<RegisterProxyRequest>, I>>(
-    base?: I,
+    base?: I
   ): RegisterProxyRequest {
     return RegisterProxyRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RegisterProxyRequest>, I>>(
-    object: I,
+    object: I
   ): RegisterProxyRequest {
     const message = createBaseRegisterProxyRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -113,14 +113,14 @@ function createBaseRegisterProxyResponse(): RegisterProxyResponse {
 export const RegisterProxyResponse = {
   encode(
     _: RegisterProxyResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RegisterProxyResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -148,12 +148,12 @@ export const RegisterProxyResponse = {
   },
 
   create<I extends Exact<DeepPartial<RegisterProxyResponse>, I>>(
-    base?: I,
+    base?: I
   ): RegisterProxyResponse {
     return RegisterProxyResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RegisterProxyResponse>, I>>(
-    _: I,
+    _: I
   ): RegisterProxyResponse {
     const message = createBaseRegisterProxyResponse();
     return message;
@@ -167,7 +167,7 @@ function createBaseDeactivateProxyRequest(): DeactivateProxyRequest {
 export const DeactivateProxyRequest = {
   encode(
     message: DeactivateProxyRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -177,7 +177,7 @@ export const DeactivateProxyRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): DeactivateProxyRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -219,12 +219,12 @@ export const DeactivateProxyRequest = {
   },
 
   create<I extends Exact<DeepPartial<DeactivateProxyRequest>, I>>(
-    base?: I,
+    base?: I
   ): DeactivateProxyRequest {
     return DeactivateProxyRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DeactivateProxyRequest>, I>>(
-    object: I,
+    object: I
   ): DeactivateProxyRequest {
     const message = createBaseDeactivateProxyRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -239,14 +239,14 @@ function createBaseDeactivateProxyResponse(): DeactivateProxyResponse {
 export const DeactivateProxyResponse = {
   encode(
     _: DeactivateProxyResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): DeactivateProxyResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -274,12 +274,12 @@ export const DeactivateProxyResponse = {
   },
 
   create<I extends Exact<DeepPartial<DeactivateProxyResponse>, I>>(
-    base?: I,
+    base?: I
   ): DeactivateProxyResponse {
     return DeactivateProxyResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DeactivateProxyResponse>, I>>(
-    _: I,
+    _: I
   ): DeactivateProxyResponse {
     const message = createBaseDeactivateProxyResponse();
     return message;

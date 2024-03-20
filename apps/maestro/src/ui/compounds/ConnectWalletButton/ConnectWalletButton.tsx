@@ -17,7 +17,7 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
         ref={ref}
       />
     );
-  },
+  }
 );
 
 ConnectWalletButton.displayName = "ConnectWalletButton";

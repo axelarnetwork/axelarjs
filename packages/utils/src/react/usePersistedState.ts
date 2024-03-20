@@ -7,11 +7,11 @@ import { Maybe } from "../monad";
 export function usePersistedState<T>(
   storage: Storage,
   key: string,
-  defaultValue: T,
+  defaultValue: T
 ): readonly [T, (valueOrProducerFn: T | ((draft: Draft<T>) => void)) => void] {
   const [state, _setState] = useState<T>(() =>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    Maybe.of(storage.getItem(key)).mapOr(defaultValue, JSON.parse),
+    Maybe.of(storage.getItem(key)).mapOr(defaultValue, JSON.parse)
   );
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function usePersistedState<T>(
       _setState(
         produce<T>((x) => {
           producerFn(x);
-        }),
+        })
       );
       return;
     }

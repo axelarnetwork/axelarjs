@@ -21,12 +21,12 @@ function createBaseBitmap(): Bitmap {
 export const Bitmap = {
   encode(
     message: Bitmap,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.trueCountCache !== undefined) {
       CircularBuffer.encode(
         message.trueCountCache,
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     return writer;
@@ -47,7 +47,7 @@ export const Bitmap = {
 
           message.trueCountCache = CircularBuffer.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -95,7 +95,7 @@ function createBaseCircularBuffer(): CircularBuffer {
 export const CircularBuffer = {
   encode(
     message: CircularBuffer,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     writer.uint32(10).fork();
     for (const v of message.cumulativeValue) {
@@ -173,7 +173,7 @@ export const CircularBuffer = {
     const obj: any = {};
     if (message.cumulativeValue?.length) {
       obj.cumulativeValue = message.cumulativeValue.map((e) =>
-        (e || Long.UZERO).toString(),
+        (e || Long.UZERO).toString()
       );
     }
     if (message.index !== 0) {
@@ -186,12 +186,12 @@ export const CircularBuffer = {
   },
 
   create<I extends Exact<DeepPartial<CircularBuffer>, I>>(
-    base?: I,
+    base?: I
   ): CircularBuffer {
     return CircularBuffer.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CircularBuffer>, I>>(
-    object: I,
+    object: I
   ): CircularBuffer {
     const message = createBaseCircularBuffer();
     message.cumulativeValue =

@@ -64,7 +64,7 @@ const ModalRoot: FC<ModalProps> = ({
           onClick: actions.open,
         })
       ) : null,
-    [props],
+    [props]
   );
 
   return (

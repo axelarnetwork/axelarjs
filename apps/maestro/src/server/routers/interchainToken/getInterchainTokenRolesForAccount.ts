@@ -13,7 +13,7 @@ export const getInterchainTokenRolesForAccount = publicProcedure
     z.object({
       tokenId: hex64Literal(),
       accountAddress: hex40Literal(),
-    }),
+    })
   )
   .query(async ({ ctx, input }) => {
     const tokenDetails =
@@ -38,12 +38,12 @@ export const getInterchainTokenRolesForAccount = publicProcedure
 
     const tokenManagerClient = ctx.contracts.createTokenManagerClient(
       configs.wagmi,
-      tokenDetails.tokenManagerAddress as `0x${string}`,
+      tokenDetails.tokenManagerAddress as `0x${string}`
     );
 
     const tokenClient = ctx.contracts.createInterchainTokenClient(
       configs.wagmi,
-      tokenDetails.tokenAddress as `0x${string}`,
+      tokenDetails.tokenAddress as `0x${string}`
     );
 
     const tokenRoles = await Promise.all(
@@ -54,8 +54,8 @@ export const getInterchainTokenRolesForAccount = publicProcedure
             role: getRoleIndex(role),
           })
           .then((hasRole) => [role, hasRole] as const)
-          .catch(() => [role, false] as const),
-      ),
+          .catch(() => [role, false] as const)
+      )
     );
 
     const tokenManagerRoles = await Promise.all(
@@ -66,8 +66,8 @@ export const getInterchainTokenRolesForAccount = publicProcedure
             role: getRoleIndex(role),
           })
           .then((hasRole) => [role, hasRole] as const)
-          .catch(() => [role, false] as const),
-      ),
+          .catch(() => [role, false] as const)
+      )
     );
 
     return {

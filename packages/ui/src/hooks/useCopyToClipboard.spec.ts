@@ -39,7 +39,7 @@ describe("useCopyToClipboard", () => {
 
   it("handles clipboard write failure", async () => {
     vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(
-      new Error("Copy failed"),
+      new Error("Copy failed")
     );
 
     const { result } = renderHook(useCopyToClipboard);

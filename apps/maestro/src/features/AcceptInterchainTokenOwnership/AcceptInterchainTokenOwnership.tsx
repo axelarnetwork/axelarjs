@@ -75,7 +75,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt],
+    [receipt]
   );
 
   const handleSubmit = useCallback(async () => {

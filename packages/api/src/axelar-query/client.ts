@@ -9,7 +9,7 @@ import { AxelarQueryAPIClient } from "./isomorphic";
 
 export const createAxelarQueryClient = (
   env: Environment,
-  options?: HttpClientOptions,
+  options?: HttpClientOptions
 ) =>
   AxelarQueryAPIClient.init(
     {
@@ -18,5 +18,5 @@ export const createAxelarQueryClient = (
     {
       gmpClient: createGMPClient(env),
     },
-    env,
+    env
   );

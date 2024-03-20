@@ -28,7 +28,7 @@ export const newInterchainTokenSchema = interchainTokensZodSchemas.insert.omit({
 const sanitizeObject = <
   const T extends Record<string, any> = Record<string, any>,
 >(
-  obj: T,
+  obj: T
 ) => Object.fromEntries(Object.entries(obj).filter(([, v]) => Boolean(v)));
 
 export type NewRemoteInterchainTokenInput = z.infer<
@@ -78,7 +78,7 @@ export default class MaestroPostgresClient {
    * @returns
    */
   async recordRemoteInterchainTokenDeployment(
-    value: NewRemoteInterchainTokenInput,
+    value: NewRemoteInterchainTokenInput
   ) {
     await this.db.insert(remoteInterchainTokens).values({
       ...value,
@@ -95,7 +95,7 @@ export default class MaestroPostgresClient {
    * @returns
    */
   async recordRemoteInterchainTokenDeployments(
-    values: NewRemoteInterchainTokenInput[],
+    values: NewRemoteInterchainTokenInput[]
   ) {
     await this.db.transaction(async (tx) => {
       const existingTokens = await tx.query.remoteInterchainTokens.findMany({
@@ -108,7 +108,7 @@ export default class MaestroPostgresClient {
             [
               t,
               sanitizeObject(values.find((v) => v.tokenId === t.tokenId) ?? {}),
-            ] as const,
+            ] as const
         )
         .filter(([, v]) => Boolean(v));
 
@@ -140,8 +140,8 @@ export default class MaestroPostgresClient {
                   updateValue.tokenAddress ?? existingToken.tokenAddress,
                 updatedAt: new Date(),
               })
-              .where(eq(remoteInterchainTokens.id, existingToken.id)),
-          ),
+              .where(eq(remoteInterchainTokens.id, existingToken.id))
+          )
         );
       }
 
@@ -155,7 +155,7 @@ export default class MaestroPostgresClient {
           id: `${v.axelarChainId}:${v.tokenAddress}`,
           createdAt: new Date(),
           updatedAt: new Date(),
-        })),
+        }))
       );
     });
   }
@@ -166,7 +166,7 @@ export default class MaestroPostgresClient {
   async updateRemoteInterchainTokenDeploymentsStatus(
     tokenId: string,
     deploymentStatus: "confirmed" | "pending",
-    axelarChainIds: string[],
+    axelarChainIds: string[]
   ) {
     await this.db
       .update(remoteInterchainTokens)
@@ -174,8 +174,8 @@ export default class MaestroPostgresClient {
       .where(
         and(
           eq(remoteInterchainTokens.tokenId, tokenId),
-          inArray(remoteInterchainTokens.axelarChainId, axelarChainIds),
-        ),
+          inArray(remoteInterchainTokens.axelarChainId, axelarChainIds)
+        )
       );
   }
 
@@ -200,13 +200,13 @@ export default class MaestroPostgresClient {
    */
   async getInterchainTokenByChainIdAndTokenAddress(
     axelarChainId: string,
-    tokenAddress: Address,
+    tokenAddress: Address
   ) {
     const query = this.db.query.interchainTokens.findFirst({
       where: (table, { ilike, and }) =>
         and(
           eq(table.axelarChainId, axelarChainId),
-          ilike(table.tokenAddress, tokenAddress),
+          ilike(table.tokenAddress, tokenAddress)
         ),
       with: {
         remoteTokens: true,
@@ -221,13 +221,13 @@ export default class MaestroPostgresClient {
    */
   async getRemoteInterchainTokenByChainIdAndTokenAddress(
     axelarChainId: string,
-    tokenAddress: Address,
+    tokenAddress: Address
   ) {
     const query = this.db.query.remoteInterchainTokens.findFirst({
       where: (table, { ilike, and }) =>
         and(
           eq(table.axelarChainId, axelarChainId),
-          ilike(table.tokenAddress, tokenAddress),
+          ilike(table.tokenAddress, tokenAddress)
         ),
     });
 
@@ -247,7 +247,7 @@ export default class MaestroPostgresClient {
   }
 
   async recordAuditLogEvent<T extends AuditLogEventKind>(
-    event: AuditLogEvent<T>,
+    event: AuditLogEvent<T>
   ) {
     await this.db.insert(auditLogs).values({
       eventKind: event.kind,

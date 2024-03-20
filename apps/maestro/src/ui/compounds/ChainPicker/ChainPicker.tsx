@@ -26,7 +26,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
       selectedChains.length < eligibleChains.length;
 
     const unselectedChains = eligibleChains.filter(
-      (chain) => !selectedChains.includes(chain.id),
+      (chain) => !selectedChains.includes(chain.id)
     );
 
     if (hasPartialSelection) {
@@ -39,7 +39,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
 
     // toggle all tokens
     eligibleChains.forEach((chain, i) =>
-      setTimeout(onChainClick.bind(null, chain.id), 16.6 * i),
+      setTimeout(onChainClick.bind(null, chain.id), 16.6 * i)
     );
   }, [eligibleChains, onChainClick, selectedChains]);
 
@@ -79,7 +79,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
                     "pointer-events-none absolute left-3 -translate-x-2 rounded-full",
                     {
                       hidden: isSelected && loading,
-                    },
+                    }
                   )}
                   src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
                   width={24}

@@ -68,7 +68,7 @@ export type InterchainTokenDeploymentState = typeof INITIAL_STATE;
 export type TokenDetails = InterchainTokenDeploymentState["tokenDetails"];
 
 function useInterchainTokenDeploymentState(
-  partialInitialState: Partial<InterchainTokenDeploymentState> = INITIAL_STATE,
+  partialInitialState: Partial<InterchainTokenDeploymentState> = INITIAL_STATE
 ) {
   const initialState = {
     ...INITIAL_STATE,
@@ -77,7 +77,7 @@ function useInterchainTokenDeploymentState(
 
   const [state, setState] = useSessionStorageState(
     "@maestro/interchain-deployment",
-    initialState,
+    initialState
   );
 
   const tokenDetailsForm = useForm<TokenDetailsFormState>({
@@ -99,7 +99,7 @@ function useInterchainTokenDeploymentState(
       tokenDetailsForm.setValue("salt", salt);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [address],
+    [address]
   );
 
   /**
@@ -129,7 +129,7 @@ function useInterchainTokenDeploymentState(
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [partialInitialState.tokenDetails],
+    [partialInitialState.tokenDetails]
   );
 
   return {

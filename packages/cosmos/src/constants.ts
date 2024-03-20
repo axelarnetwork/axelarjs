@@ -26,7 +26,7 @@ const configsMap: Record<Environment, EnvironmentConfigs> = {
 };
 
 export const getConfigs = memoize(
-  (environment: Environment): EnvironmentConfigs => configsMap[environment],
+  (environment: Environment): EnvironmentConfigs => configsMap[environment]
 );
 
 export const STANDARD_FEE: StdFee = {

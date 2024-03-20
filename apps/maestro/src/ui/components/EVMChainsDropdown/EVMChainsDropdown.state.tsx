@@ -8,7 +8,7 @@ export const INITIAL_STATE = {
 function useEVMChainsDropdownState(initialState = INITIAL_STATE) {
   const [state, setState] = useSessionStorageState(
     "@maestro/evm-chains-dropdown",
-    initialState,
+    initialState
   );
 
   const actions = {

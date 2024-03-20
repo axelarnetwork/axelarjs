@@ -26,7 +26,7 @@ export const CopyToClipboardButton = forwardRef<
   const handleCopy = async (text = "") => {
     if (!text) {
       throw new Error(
-        "[CopyToClipboardButton]: missing props 'copyText' or string children",
+        "[CopyToClipboardButton]: missing props 'copyText' or string children"
       );
     }
     await copy(text ?? "");
@@ -53,7 +53,7 @@ export const CopyToClipboardButton = forwardRef<
             "swap-on h-[1em] w-[1em]",
             props.$variant === "success"
               ? "text-success-content"
-              : "text-success",
+              : "text-success"
           )}
         />
         <CopyIcon className={cn("swap-off", "h-[1em] w-[1em]")} />

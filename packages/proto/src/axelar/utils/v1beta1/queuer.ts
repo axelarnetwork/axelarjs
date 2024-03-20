@@ -25,12 +25,12 @@ function createBaseQueueState(): QueueState {
 export const QueueState = {
   encode(
     message: QueueState,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     Object.entries(message.items).forEach(([key, value]) => {
       QueueState_ItemsEntry.encode(
         { key: key as any, value },
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     });
     return writer;
@@ -94,7 +94,7 @@ export const QueueState = {
     return QueueState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueueState>, I>>(
-    object: I,
+    object: I
   ): QueueState {
     const message = createBaseQueueState();
     message.items = Object.entries(object.items ?? {}).reduce<{
@@ -116,7 +116,7 @@ function createBaseQueueState_Item(): QueueState_Item {
 export const QueueState_Item = {
   encode(
     message: QueueState_Item,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -179,12 +179,12 @@ export const QueueState_Item = {
   },
 
   create<I extends Exact<DeepPartial<QueueState_Item>, I>>(
-    base?: I,
+    base?: I
   ): QueueState_Item {
     return QueueState_Item.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueueState_Item>, I>>(
-    object: I,
+    object: I
   ): QueueState_Item {
     const message = createBaseQueueState_Item();
     message.key = object.key ?? new Uint8Array(0);
@@ -200,7 +200,7 @@ function createBaseQueueState_ItemsEntry(): QueueState_ItemsEntry {
 export const QueueState_ItemsEntry = {
   encode(
     message: QueueState_ItemsEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -213,7 +213,7 @@ export const QueueState_ItemsEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): QueueState_ItemsEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -266,12 +266,12 @@ export const QueueState_ItemsEntry = {
   },
 
   create<I extends Exact<DeepPartial<QueueState_ItemsEntry>, I>>(
-    base?: I,
+    base?: I
   ): QueueState_ItemsEntry {
     return QueueState_ItemsEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueueState_ItemsEntry>, I>>(
-    object: I,
+    object: I
   ): QueueState_ItemsEntry {
     const message = createBaseQueueState_ItemsEntry();
     message.key = object.key ?? "";

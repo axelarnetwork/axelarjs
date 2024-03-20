@@ -51,7 +51,7 @@ export function useSendInterchainTokenState(props: {
       props.kind === "canonical" &&
       interchainToken.chainId !== undefined &&
       interchainToken.chainId === props.originTokenChainId,
-    [interchainToken.chainId, props.kind, props.originTokenChainId],
+    [interchainToken.chainId, props.kind, props.originTokenChainId]
   );
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
@@ -81,7 +81,7 @@ export function useSendInterchainTokenState(props: {
       eligibleTargetChains.find((c) => c.chain_id === toChainId) ??
       eligibleTargetChains[0],
 
-    [toChainId, eligibleTargetChains],
+    [toChainId, eligibleTargetChains]
   );
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -91,7 +91,7 @@ export function useSendInterchainTokenState(props: {
   const { data: balance } = useBalance({ address });
 
   const nativeTokenSymbol = getNativeToken(
-    props.sourceChain.chain_name.toLowerCase(),
+    props.sourceChain.chain_name.toLowerCase()
   );
   const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.chain_name,
@@ -165,7 +165,7 @@ export function useSendInterchainTokenState(props: {
       interchainTransferAsync,
       isInterchainTransferSending,
       interchainTransferTxState,
-    ],
+    ]
   );
 
   return [
@@ -181,7 +181,7 @@ export function useSendInterchainTokenState(props: {
       hasInsufficientGasBalance,
       estimatedWaitTimeInMinutes: Maybe.of(sourceChainInfo).mapOr(
         0,
-        (x) => x.estimatedWaitTimeInMinutes,
+        (x) => x.estimatedWaitTimeInMinutes
       ),
     },
     {

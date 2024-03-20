@@ -1306,7 +1306,7 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
 };
 
 export function createIInterchainTokenServiceReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
     chainName() {
@@ -1316,7 +1316,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("chainNameHash");
     },
     contractCallValue(
-      contractCallValueArgs: IInterchainTokenServiceContractCallValueArgs,
+      contractCallValueArgs: IInterchainTokenServiceContractCallValueArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["contractCallValue"];
       const encodedArgs = encoder.args(contractCallValueArgs);
@@ -1324,7 +1324,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("contractCallValue", { args: encodedArgs });
     },
     contractCallWithTokenValue(
-      contractCallWithTokenValueArgs: IInterchainTokenServiceContractCallWithTokenValueArgs,
+      contractCallWithTokenValueArgs: IInterchainTokenServiceContractCallWithTokenValueArgs
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["contractCallWithTokenValue"];
@@ -1359,7 +1359,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("gateway");
     },
     getExpressExecutor(
-      getExpressExecutorArgs: IInterchainTokenServiceGetExpressExecutorArgs,
+      getExpressExecutorArgs: IInterchainTokenServiceGetExpressExecutorArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["getExpressExecutor"];
       const encodedArgs = encoder.args(getExpressExecutorArgs);
@@ -1367,7 +1367,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("getExpressExecutor", { args: encodedArgs });
     },
     getExpressExecutorWithToken(
-      getExpressExecutorWithTokenArgs: IInterchainTokenServiceGetExpressExecutorWithTokenArgs,
+      getExpressExecutorWithTokenArgs: IInterchainTokenServiceGetExpressExecutorWithTokenArgs
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["getExpressExecutorWithToken"];
@@ -1387,7 +1387,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("implementation");
     },
     interchainTokenAddress(
-      interchainTokenAddressArgs: IInterchainTokenServiceInterchainTokenAddressArgs,
+      interchainTokenAddressArgs: IInterchainTokenServiceInterchainTokenAddressArgs
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["interchainTokenAddress"];
@@ -1402,7 +1402,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("interchainTokenFactory");
     },
     interchainTokenId(
-      interchainTokenIdArgs: IInterchainTokenServiceInterchainTokenIdArgs,
+      interchainTokenIdArgs: IInterchainTokenServiceInterchainTokenIdArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["interchainTokenId"];
       const encodedArgs = encoder.args(interchainTokenIdArgs);
@@ -1416,7 +1416,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("isOperator", { args: encodedArgs });
     },
     isTrustedAddress(
-      isTrustedAddressArgs: IInterchainTokenServiceIsTrustedAddressArgs,
+      isTrustedAddressArgs: IInterchainTokenServiceIsTrustedAddressArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["isTrustedAddress"];
       const encodedArgs = encoder.args(isTrustedAddressArgs);
@@ -1439,7 +1439,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("tokenManager");
     },
     tokenManagerAddress(
-      tokenManagerAddressArgs: IInterchainTokenServiceTokenManagerAddressArgs,
+      tokenManagerAddressArgs: IInterchainTokenServiceTokenManagerAddressArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerAddress"];
       const encodedArgs = encoder.args(tokenManagerAddressArgs);
@@ -1450,7 +1450,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("tokenManagerDeployer");
     },
     tokenManagerImplementation(
-      tokenManagerImplementationArgs: IInterchainTokenServiceTokenManagerImplementationArgs,
+      tokenManagerImplementationArgs: IInterchainTokenServiceTokenManagerImplementationArgs
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerImplementation"];
@@ -1461,7 +1461,7 @@ export function createIInterchainTokenServiceReadClient(
       });
     },
     trustedAddress(
-      trustedAddressArgs: IInterchainTokenServiceTrustedAddressArgs,
+      trustedAddressArgs: IInterchainTokenServiceTrustedAddressArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["trustedAddress"];
       const encodedArgs = encoder.args(trustedAddressArgs);
@@ -1469,7 +1469,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("trustedAddress", { args: encodedArgs });
     },
     trustedAddressHash(
-      trustedAddressHashArgs: IInterchainTokenServiceTrustedAddressHashArgs,
+      trustedAddressHashArgs: IInterchainTokenServiceTrustedAddressHashArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["trustedAddressHash"];
       const encodedArgs = encoder.args(trustedAddressHashArgs);
@@ -1477,7 +1477,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("trustedAddressHash", { args: encodedArgs });
     },
     validTokenAddress(
-      validTokenAddressArgs: IInterchainTokenServiceValidTokenAddressArgs,
+      validTokenAddressArgs: IInterchainTokenServiceValidTokenAddressArgs
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["validTokenAddress"];
       const encodedArgs = encoder.args(validTokenAddressArgs);
@@ -1485,7 +1485,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("validTokenAddress", { args: encodedArgs });
     },
     validTokenManagerAddress(
-      validTokenManagerAddressArgs: IInterchainTokenServiceValidTokenManagerAddressArgs,
+      validTokenManagerAddressArgs: IInterchainTokenServiceValidTokenManagerAddressArgs
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["validTokenManagerAddress"];

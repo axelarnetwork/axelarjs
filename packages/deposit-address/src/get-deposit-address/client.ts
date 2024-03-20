@@ -51,7 +51,7 @@ export function getNativeWrapDepositAddress(params: DepositNativeWrapOptions) {
 }
 
 export function getNativeUnwrapDepositAddress(
-  params: DepositNativeUnwrapOptions,
+  params: DepositNativeUnwrapOptions
 ) {
   const { environment } = params;
 

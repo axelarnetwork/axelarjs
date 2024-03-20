@@ -65,7 +65,7 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
       currentBlockNumber && txInfo?.blockNumber
         ? Number(currentBlockNumber - txInfo.blockNumber)
         : 0,
-    [currentBlockNumber, txInfo?.blockNumber],
+    [currentBlockNumber, txInfo?.blockNumber]
   );
 
   const expectedConfirmations = Number(chainInfo?.blockConfirmations ?? 1);
@@ -104,7 +104,7 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
 }) => {
   const { progress, elapsedBlocks, expectedConfirmations } = useGMPTxProgress(
     txHash,
-    chainId,
+    chainId
   );
 
   if (elapsedBlocks >= expectedConfirmations) {
@@ -162,7 +162,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   }
 
   const showFinalityProgressBar = statusList.some(
-    (chain) => chain.status === "called",
+    (chain) => chain.status === "called"
   );
 
   return (
@@ -191,7 +191,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
                 logIndex={logIndex}
               />
             );
-          },
+          }
         )}
       </ul>
     </div>

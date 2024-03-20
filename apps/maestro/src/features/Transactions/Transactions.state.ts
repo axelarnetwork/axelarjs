@@ -42,7 +42,7 @@ export const {
     {
       transactions,
       pendingTransactions: Object.values(transactions).filter(
-        (tx) => tx.status === "submitted",
+        (tx) => tx.status === "submitted"
       ),
     },
     {

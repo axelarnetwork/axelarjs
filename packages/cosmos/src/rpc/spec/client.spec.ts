@@ -13,7 +13,7 @@ describe("rpc client", () => {
     const axelarLcdUrl = "https://lcd-axelar-testnet.imperator.co";
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
-      { prefix: "axelar" },
+      { prefix: "axelar" }
     );
 
     let response: DeliverTxResponse | undefined;
@@ -26,12 +26,12 @@ describe("rpc client", () => {
       axelarLcdUrl,
       wallet,
       "axelar-testnet-lisbon-3",
-      onDeliverTxResponse,
+      onDeliverTxResponse
     );
     stubRpcImpl;
 
     vi.spyOn(stubRpcImpl, "broadcastTx").mockImplementation(() =>
-      Promise.resolve(MOCK_BROADCAST_RESPONSE),
+      Promise.resolve(MOCK_BROADCAST_RESPONSE)
     );
 
     const rpcClient = createAxelarRPCTxClient(
@@ -47,7 +47,7 @@ describe("rpc client", () => {
         fee: STANDARD_FEE,
         broadcastPollIntervalMs: 300,
         broadcastTimeoutMs: 60_000,
-      },
+      }
     );
 
     const [accData] = await wallet.getAccounts();
@@ -62,7 +62,7 @@ describe("rpc client", () => {
 
     expect(response).toBeDefined();
     expect(response?.transactionHash).toEqual(
-      MOCK_BROADCAST_RESPONSE.transactionHash,
+      MOCK_BROADCAST_RESPONSE.transactionHash
     );
     expect(data.depositAddr).toBeDefined();
   });

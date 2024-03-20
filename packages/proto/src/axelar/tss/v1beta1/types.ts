@@ -65,7 +65,7 @@ function createBaseKeygenVoteData(): KeygenVoteData {
 export const KeygenVoteData = {
   encode(
     message: KeygenVoteData,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.pubKey.length !== 0) {
       writer.uint32(10).bytes(message.pubKey);
@@ -130,12 +130,12 @@ export const KeygenVoteData = {
   },
 
   create<I extends Exact<DeepPartial<KeygenVoteData>, I>>(
-    base?: I,
+    base?: I
   ): KeygenVoteData {
     return KeygenVoteData.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenVoteData>, I>>(
-    object: I,
+    object: I
   ): KeygenVoteData {
     const message = createBaseKeygenVoteData();
     message.pubKey = object.pubKey ?? new Uint8Array(0);
@@ -151,7 +151,7 @@ function createBaseKeyInfo(): KeyInfo {
 export const KeyInfo = {
   encode(
     message: KeyInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -244,7 +244,7 @@ function createBaseMultisigInfo(): MultisigInfo {
 export const MultisigInfo = {
   encode(
     message: MultisigInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -339,12 +339,12 @@ export const MultisigInfo = {
   },
 
   create<I extends Exact<DeepPartial<MultisigInfo>, I>>(
-    base?: I,
+    base?: I
   ): MultisigInfo {
     return MultisigInfo.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MultisigInfo>, I>>(
-    object: I,
+    object: I
   ): MultisigInfo {
     const message = createBaseMultisigInfo();
     message.id = object.id ?? "";
@@ -369,7 +369,7 @@ function createBaseMultisigInfo_Info(): MultisigInfo_Info {
 export const MultisigInfo_Info = {
   encode(
     message: MultisigInfo_Info,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.participant.length !== 0) {
       writer.uint32(10).bytes(message.participant);
@@ -434,12 +434,12 @@ export const MultisigInfo_Info = {
   },
 
   create<I extends Exact<DeepPartial<MultisigInfo_Info>, I>>(
-    base?: I,
+    base?: I
   ): MultisigInfo_Info {
     return MultisigInfo_Info.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MultisigInfo_Info>, I>>(
-    object: I,
+    object: I
   ): MultisigInfo_Info {
     const message = createBaseMultisigInfo_Info();
     message.participant = object.participant ?? new Uint8Array(0);
@@ -455,7 +455,7 @@ function createBaseKeyRecoveryInfo(): KeyRecoveryInfo {
 export const KeyRecoveryInfo = {
   encode(
     message: KeyRecoveryInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -466,7 +466,7 @@ export const KeyRecoveryInfo = {
     Object.entries(message.private).forEach(([key, value]) => {
       KeyRecoveryInfo_PrivateEntry.encode(
         { key: key as any, value },
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     });
     return writer;
@@ -501,7 +501,7 @@ export const KeyRecoveryInfo = {
 
           const entry3 = KeyRecoveryInfo_PrivateEntry.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           if (entry3.value !== undefined) {
             message.private[entry3.key] = entry3.value;
@@ -528,7 +528,7 @@ export const KeyRecoveryInfo = {
               acc[key] = bytesFromBase64(value as string);
               return acc;
             },
-            {},
+            {}
           )
         : {},
     };
@@ -555,12 +555,12 @@ export const KeyRecoveryInfo = {
   },
 
   create<I extends Exact<DeepPartial<KeyRecoveryInfo>, I>>(
-    base?: I,
+    base?: I
   ): KeyRecoveryInfo {
     return KeyRecoveryInfo.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyRecoveryInfo>, I>>(
-    object: I,
+    object: I
   ): KeyRecoveryInfo {
     const message = createBaseKeyRecoveryInfo();
     message.keyId = object.keyId ?? "";
@@ -584,7 +584,7 @@ function createBaseKeyRecoveryInfo_PrivateEntry(): KeyRecoveryInfo_PrivateEntry 
 export const KeyRecoveryInfo_PrivateEntry = {
   encode(
     message: KeyRecoveryInfo_PrivateEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -597,7 +597,7 @@ export const KeyRecoveryInfo_PrivateEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): KeyRecoveryInfo_PrivateEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -650,12 +650,12 @@ export const KeyRecoveryInfo_PrivateEntry = {
   },
 
   create<I extends Exact<DeepPartial<KeyRecoveryInfo_PrivateEntry>, I>>(
-    base?: I,
+    base?: I
   ): KeyRecoveryInfo_PrivateEntry {
     return KeyRecoveryInfo_PrivateEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyRecoveryInfo_PrivateEntry>, I>>(
-    object: I,
+    object: I
   ): KeyRecoveryInfo_PrivateEntry {
     const message = createBaseKeyRecoveryInfo_PrivateEntry();
     message.key = object.key ?? "";
@@ -671,7 +671,7 @@ function createBaseExternalKeys(): ExternalKeys {
 export const ExternalKeys = {
   encode(
     message: ExternalKeys,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -734,12 +734,12 @@ export const ExternalKeys = {
   },
 
   create<I extends Exact<DeepPartial<ExternalKeys>, I>>(
-    base?: I,
+    base?: I
   ): ExternalKeys {
     return ExternalKeys.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ExternalKeys>, I>>(
-    object: I,
+    object: I
   ): ExternalKeys {
     const message = createBaseExternalKeys();
     message.chain = object.chain ?? "";
@@ -755,7 +755,7 @@ function createBaseValidatorStatus(): ValidatorStatus {
 export const ValidatorStatus = {
   encode(
     message: ValidatorStatus,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.validator.length !== 0) {
       writer.uint32(10).bytes(message.validator);
@@ -820,12 +820,12 @@ export const ValidatorStatus = {
   },
 
   create<I extends Exact<DeepPartial<ValidatorStatus>, I>>(
-    base?: I,
+    base?: I
   ): ValidatorStatus {
     return ValidatorStatus.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ValidatorStatus>, I>>(
-    object: I,
+    object: I
   ): ValidatorStatus {
     const message = createBaseValidatorStatus();
     message.validator = object.validator ?? new Uint8Array(0);

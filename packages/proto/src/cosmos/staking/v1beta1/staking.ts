@@ -303,7 +303,7 @@ function createBaseHistoricalInfo(): HistoricalInfo {
 export const HistoricalInfo = {
   encode(
     message: HistoricalInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.header !== undefined) {
       Header.encode(message.header, writer.uint32(10).fork()).ldelim();
@@ -366,12 +366,12 @@ export const HistoricalInfo = {
   },
 
   create<I extends Exact<DeepPartial<HistoricalInfo>, I>>(
-    base?: I,
+    base?: I
   ): HistoricalInfo {
     return HistoricalInfo.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<HistoricalInfo>, I>>(
-    object: I,
+    object: I
   ): HistoricalInfo {
     const message = createBaseHistoricalInfo();
     message.header =
@@ -390,7 +390,7 @@ function createBaseCommissionRates(): CommissionRates {
 export const CommissionRates = {
   encode(
     message: CommissionRates,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.rate !== "") {
       writer.uint32(10).string(message.rate);
@@ -467,12 +467,12 @@ export const CommissionRates = {
   },
 
   create<I extends Exact<DeepPartial<CommissionRates>, I>>(
-    base?: I,
+    base?: I
   ): CommissionRates {
     return CommissionRates.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommissionRates>, I>>(
-    object: I,
+    object: I
   ): CommissionRates {
     const message = createBaseCommissionRates();
     message.rate = object.rate ?? "";
@@ -489,18 +489,18 @@ function createBaseCommission(): Commission {
 export const Commission = {
   encode(
     message: Commission,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.commissionRates !== undefined) {
       CommissionRates.encode(
         message.commissionRates,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     if (message.updateTime !== undefined) {
       Timestamp.encode(
         toTimestamp(message.updateTime),
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     return writer;
@@ -521,7 +521,7 @@ export const Commission = {
 
           message.commissionRates = CommissionRates.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 2:
@@ -530,7 +530,7 @@ export const Commission = {
           }
 
           message.updateTime = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -568,7 +568,7 @@ export const Commission = {
     return Commission.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Commission>, I>>(
-    object: I,
+    object: I
   ): Commission {
     const message = createBaseCommission();
     message.commissionRates =
@@ -593,7 +593,7 @@ function createBaseDescription(): Description {
 export const Description = {
   encode(
     message: Description,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.moniker !== "") {
       writer.uint32(10).string(message.moniker);
@@ -703,7 +703,7 @@ export const Description = {
     return Description.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Description>, I>>(
-    object: I,
+    object: I
   ): Description {
     const message = createBaseDescription();
     message.moniker = object.moniker ?? "";
@@ -734,7 +734,7 @@ function createBaseValidator(): Validator {
 export const Validator = {
   encode(
     message: Validator,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.operatorAddress !== "") {
       writer.uint32(10).string(message.operatorAddress);
@@ -757,7 +757,7 @@ export const Validator = {
     if (message.description !== undefined) {
       Description.encode(
         message.description,
-        writer.uint32(58).fork(),
+        writer.uint32(58).fork()
       ).ldelim();
     }
     if (!message.unbondingHeight.isZero()) {
@@ -766,7 +766,7 @@ export const Validator = {
     if (message.unbondingTime !== undefined) {
       Timestamp.encode(
         toTimestamp(message.unbondingTime),
-        writer.uint32(74).fork(),
+        writer.uint32(74).fork()
       ).ldelim();
     }
     if (message.commission !== undefined) {
@@ -848,7 +848,7 @@ export const Validator = {
           }
 
           message.unbondingTime = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 10:
@@ -948,7 +948,7 @@ export const Validator = {
     return Validator.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Validator>, I>>(
-    object: I,
+    object: I
   ): Validator {
     const message = createBaseValidator();
     message.operatorAddress = object.operatorAddress ?? "";
@@ -985,7 +985,7 @@ function createBaseValAddresses(): ValAddresses {
 export const ValAddresses = {
   encode(
     message: ValAddresses,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.addresses) {
       writer.uint32(10).string(v!);
@@ -1034,12 +1034,12 @@ export const ValAddresses = {
   },
 
   create<I extends Exact<DeepPartial<ValAddresses>, I>>(
-    base?: I,
+    base?: I
   ): ValAddresses {
     return ValAddresses.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ValAddresses>, I>>(
-    object: I,
+    object: I
   ): ValAddresses {
     const message = createBaseValAddresses();
     message.addresses = object.addresses?.map((e) => e) || [];
@@ -1054,7 +1054,7 @@ function createBaseDVPair(): DVPair {
 export const DVPair = {
   encode(
     message: DVPair,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1136,7 +1136,7 @@ function createBaseDVPairs(): DVPairs {
 export const DVPairs = {
   encode(
     message: DVPairs,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.pairs) {
       DVPair.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1205,7 +1205,7 @@ function createBaseDVVTriplet(): DVVTriplet {
 export const DVVTriplet = {
   encode(
     message: DVVTriplet,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1289,7 +1289,7 @@ export const DVVTriplet = {
     return DVVTriplet.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DVVTriplet>, I>>(
-    object: I,
+    object: I
   ): DVVTriplet {
     const message = createBaseDVVTriplet();
     message.delegatorAddress = object.delegatorAddress ?? "";
@@ -1306,7 +1306,7 @@ function createBaseDVVTriplets(): DVVTriplets {
 export const DVVTriplets = {
   encode(
     message: DVVTriplets,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.triplets) {
       DVVTriplet.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1358,7 +1358,7 @@ export const DVVTriplets = {
     return DVVTriplets.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DVVTriplets>, I>>(
-    object: I,
+    object: I
   ): DVVTriplets {
     const message = createBaseDVVTriplets();
     message.triplets =
@@ -1374,7 +1374,7 @@ function createBaseDelegation(): Delegation {
 export const Delegation = {
   encode(
     message: Delegation,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1456,7 +1456,7 @@ export const Delegation = {
     return Delegation.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Delegation>, I>>(
-    object: I,
+    object: I
   ): Delegation {
     const message = createBaseDelegation();
     message.delegatorAddress = object.delegatorAddress ?? "";
@@ -1473,7 +1473,7 @@ function createBaseUnbondingDelegation(): UnbondingDelegation {
 export const UnbondingDelegation = {
   encode(
     message: UnbondingDelegation,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1515,7 +1515,7 @@ export const UnbondingDelegation = {
           }
 
           message.entries.push(
-            UnbondingDelegationEntry.decode(reader, reader.uint32()),
+            UnbondingDelegationEntry.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -1551,19 +1551,19 @@ export const UnbondingDelegation = {
     }
     if (message.entries?.length) {
       obj.entries = message.entries.map((e) =>
-        UnbondingDelegationEntry.toJSON(e),
+        UnbondingDelegationEntry.toJSON(e)
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<UnbondingDelegation>, I>>(
-    base?: I,
+    base?: I
   ): UnbondingDelegation {
     return UnbondingDelegation.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<UnbondingDelegation>, I>>(
-    object: I,
+    object: I
   ): UnbondingDelegation {
     const message = createBaseUnbondingDelegation();
     message.delegatorAddress = object.delegatorAddress ?? "";
@@ -1586,7 +1586,7 @@ function createBaseUnbondingDelegationEntry(): UnbondingDelegationEntry {
 export const UnbondingDelegationEntry = {
   encode(
     message: UnbondingDelegationEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.creationHeight.isZero()) {
       writer.uint32(8).int64(message.creationHeight);
@@ -1594,7 +1594,7 @@ export const UnbondingDelegationEntry = {
     if (message.completionTime !== undefined) {
       Timestamp.encode(
         toTimestamp(message.completionTime),
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     if (message.initialBalance !== "") {
@@ -1608,7 +1608,7 @@ export const UnbondingDelegationEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): UnbondingDelegationEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1630,7 +1630,7 @@ export const UnbondingDelegationEntry = {
           }
 
           message.completionTime = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 3:
@@ -1689,12 +1689,12 @@ export const UnbondingDelegationEntry = {
   },
 
   create<I extends Exact<DeepPartial<UnbondingDelegationEntry>, I>>(
-    base?: I,
+    base?: I
   ): UnbondingDelegationEntry {
     return UnbondingDelegationEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<UnbondingDelegationEntry>, I>>(
-    object: I,
+    object: I
   ): UnbondingDelegationEntry {
     const message = createBaseUnbondingDelegationEntry();
     message.creationHeight =
@@ -1720,7 +1720,7 @@ function createBaseRedelegationEntry(): RedelegationEntry {
 export const RedelegationEntry = {
   encode(
     message: RedelegationEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.creationHeight.isZero()) {
       writer.uint32(8).int64(message.creationHeight);
@@ -1728,7 +1728,7 @@ export const RedelegationEntry = {
     if (message.completionTime !== undefined) {
       Timestamp.encode(
         toTimestamp(message.completionTime),
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     if (message.initialBalance !== "") {
@@ -1761,7 +1761,7 @@ export const RedelegationEntry = {
           }
 
           message.completionTime = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 3:
@@ -1822,12 +1822,12 @@ export const RedelegationEntry = {
   },
 
   create<I extends Exact<DeepPartial<RedelegationEntry>, I>>(
-    base?: I,
+    base?: I
   ): RedelegationEntry {
     return RedelegationEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RedelegationEntry>, I>>(
-    object: I,
+    object: I
   ): RedelegationEntry {
     const message = createBaseRedelegationEntry();
     message.creationHeight =
@@ -1853,7 +1853,7 @@ function createBaseRedelegation(): Redelegation {
 export const Redelegation = {
   encode(
     message: Redelegation,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1905,7 +1905,7 @@ export const Redelegation = {
           }
 
           message.entries.push(
-            RedelegationEntry.decode(reader, reader.uint32()),
+            RedelegationEntry.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -1952,12 +1952,12 @@ export const Redelegation = {
   },
 
   create<I extends Exact<DeepPartial<Redelegation>, I>>(
-    base?: I,
+    base?: I
   ): Redelegation {
     return Redelegation.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Redelegation>, I>>(
-    object: I,
+    object: I
   ): Redelegation {
     const message = createBaseRedelegation();
     message.delegatorAddress = object.delegatorAddress ?? "";
@@ -1982,7 +1982,7 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.unbondingTime !== undefined) {
       Duration.encode(message.unbondingTime, writer.uint32(10).fork()).ldelim();
@@ -2118,7 +2118,7 @@ function createBaseDelegationResponse(): DelegationResponse {
 export const DelegationResponse = {
   encode(
     message: DelegationResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.delegation !== undefined) {
       Delegation.encode(message.delegation, writer.uint32(10).fork()).ldelim();
@@ -2183,12 +2183,12 @@ export const DelegationResponse = {
   },
 
   create<I extends Exact<DeepPartial<DelegationResponse>, I>>(
-    base?: I,
+    base?: I
   ): DelegationResponse {
     return DelegationResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DelegationResponse>, I>>(
-    object: I,
+    object: I
   ): DelegationResponse {
     const message = createBaseDelegationResponse();
     message.delegation =
@@ -2210,12 +2210,12 @@ function createBaseRedelegationEntryResponse(): RedelegationEntryResponse {
 export const RedelegationEntryResponse = {
   encode(
     message: RedelegationEntryResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.redelegationEntry !== undefined) {
       RedelegationEntry.encode(
         message.redelegationEntry,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     if (message.balance !== "") {
@@ -2226,7 +2226,7 @@ export const RedelegationEntryResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RedelegationEntryResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2242,7 +2242,7 @@ export const RedelegationEntryResponse = {
 
           message.redelegationEntry = RedelegationEntry.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 4:
@@ -2274,7 +2274,7 @@ export const RedelegationEntryResponse = {
     const obj: any = {};
     if (message.redelegationEntry !== undefined) {
       obj.redelegationEntry = RedelegationEntry.toJSON(
-        message.redelegationEntry,
+        message.redelegationEntry
       );
     }
     if (message.balance !== "") {
@@ -2284,12 +2284,12 @@ export const RedelegationEntryResponse = {
   },
 
   create<I extends Exact<DeepPartial<RedelegationEntryResponse>, I>>(
-    base?: I,
+    base?: I
   ): RedelegationEntryResponse {
     return RedelegationEntryResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RedelegationEntryResponse>, I>>(
-    object: I,
+    object: I
   ): RedelegationEntryResponse {
     const message = createBaseRedelegationEntryResponse();
     message.redelegationEntry =
@@ -2309,12 +2309,12 @@ function createBaseRedelegationResponse(): RedelegationResponse {
 export const RedelegationResponse = {
   encode(
     message: RedelegationResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.redelegation !== undefined) {
       Redelegation.encode(
         message.redelegation,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     for (const v of message.entries) {
@@ -2325,7 +2325,7 @@ export const RedelegationResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RedelegationResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2347,7 +2347,7 @@ export const RedelegationResponse = {
           }
 
           message.entries.push(
-            RedelegationEntryResponse.decode(reader, reader.uint32()),
+            RedelegationEntryResponse.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -2377,19 +2377,19 @@ export const RedelegationResponse = {
     }
     if (message.entries?.length) {
       obj.entries = message.entries.map((e) =>
-        RedelegationEntryResponse.toJSON(e),
+        RedelegationEntryResponse.toJSON(e)
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RedelegationResponse>, I>>(
-    base?: I,
+    base?: I
   ): RedelegationResponse {
     return RedelegationResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RedelegationResponse>, I>>(
-    object: I,
+    object: I
   ): RedelegationResponse {
     const message = createBaseRedelegationResponse();
     message.redelegation =

@@ -39,7 +39,7 @@ export const RecentTransactionsTable: FC<Props> = ({
     },
     {
       suspense: true,
-    },
+    }
   );
 
   const { data: prevPageTxns } = trpc.gmp.getRecentTransactions.useQuery(
@@ -51,7 +51,7 @@ export const RecentTransactionsTable: FC<Props> = ({
     },
     {
       suspense: true,
-    },
+    }
   );
 
   const { data: nextPageTxns } = trpc.gmp.getRecentTransactions.useQuery({
@@ -95,7 +95,7 @@ export const RecentTransactionsTable: FC<Props> = ({
           </Table.Cell>
         </Table.Row>
       ) : null,
-    [columns.length, hasNextPage, hasPrevPage, page],
+    [columns.length, hasNextPage, hasPrevPage, page]
   );
 
   return (

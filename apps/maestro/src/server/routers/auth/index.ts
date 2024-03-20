@@ -4,7 +4,7 @@ import { createSignInMessage } from "./createSignInMessage";
 export const authRouter = router({
   createSignInMessage,
   getSession: publicProcedure.query(({ ctx }) =>
-    ctx.session ? { address: ctx.session?.address } : null,
+    ctx.session ? { address: ctx.session?.address } : null
   ),
 });
 

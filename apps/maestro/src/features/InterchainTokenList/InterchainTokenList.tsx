@@ -26,14 +26,14 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
         .filter((x) => x.chain)
         .sort((a, b) =>
           // sort by origin token ascending
-          a?.isOriginToken ? -1 : b?.isOriginToken ? 1 : 0,
+          a?.isOriginToken ? -1 : b?.isOriginToken ? 1 : 0
         ),
-    [props.tokens],
+    [props.tokens]
   );
 
   const [selectedTokens, unselectedTokens] = partition(
     (x) => Boolean(x.isSelected),
-    tokens,
+    tokens
   );
 
   const handleToggleAll = useCallback(() => {
@@ -82,7 +82,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
         <ul
           className={cn(
             "grid w-full gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-5",
-            props.listClassName,
+            props.listClassName
           )}
         >
           {tokens.map((token) =>
@@ -100,7 +100,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
                 onToggleSelection={onToggleSelection?.bind(null, token.chainId)}
                 {...token}
               />
-            ),
+            )
           )}
         </ul>
       </main>

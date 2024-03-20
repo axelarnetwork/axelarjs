@@ -180,7 +180,7 @@ function createBasePollFailed(): PollFailed {
 export const PollFailed = {
   encode(
     message: PollFailed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -260,7 +260,7 @@ export const PollFailed = {
     return PollFailed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollFailed>, I>>(
-    object: I,
+    object: I
   ): PollFailed {
     const message = createBasePollFailed();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -280,7 +280,7 @@ function createBasePollExpired(): PollExpired {
 export const PollExpired = {
   encode(
     message: PollExpired,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -360,7 +360,7 @@ export const PollExpired = {
     return PollExpired.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollExpired>, I>>(
-    object: I,
+    object: I
   ): PollExpired {
     const message = createBasePollExpired();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -380,7 +380,7 @@ function createBasePollCompleted(): PollCompleted {
 export const PollCompleted = {
   encode(
     message: PollCompleted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -457,12 +457,12 @@ export const PollCompleted = {
   },
 
   create<I extends Exact<DeepPartial<PollCompleted>, I>>(
-    base?: I,
+    base?: I
   ): PollCompleted {
     return PollCompleted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollCompleted>, I>>(
-    object: I,
+    object: I
   ): PollCompleted {
     const message = createBasePollCompleted();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -482,7 +482,7 @@ function createBaseNoEventsConfirmed(): NoEventsConfirmed {
 export const NoEventsConfirmed = {
   encode(
     message: NoEventsConfirmed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -559,12 +559,12 @@ export const NoEventsConfirmed = {
   },
 
   create<I extends Exact<DeepPartial<NoEventsConfirmed>, I>>(
-    base?: I,
+    base?: I
   ): NoEventsConfirmed {
     return NoEventsConfirmed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<NoEventsConfirmed>, I>>(
-    object: I,
+    object: I
   ): NoEventsConfirmed {
     const message = createBaseNoEventsConfirmed();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -590,7 +590,7 @@ function createBaseConfirmKeyTransferStarted(): ConfirmKeyTransferStarted {
 export const ConfirmKeyTransferStarted = {
   encode(
     message: ConfirmKeyTransferStarted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -607,7 +607,7 @@ export const ConfirmKeyTransferStarted = {
     if (message.participants !== undefined) {
       PollParticipants.encode(
         message.participants,
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     }
     return writer;
@@ -615,7 +615,7 @@ export const ConfirmKeyTransferStarted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmKeyTransferStarted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -659,7 +659,7 @@ export const ConfirmKeyTransferStarted = {
 
           message.participants = PollParticipants.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -712,12 +712,12 @@ export const ConfirmKeyTransferStarted = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmKeyTransferStarted>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmKeyTransferStarted {
     return ConfirmKeyTransferStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmKeyTransferStarted>, I>>(
-    object: I,
+    object: I
   ): ConfirmKeyTransferStarted {
     const message = createBaseConfirmKeyTransferStarted();
     message.chain = object.chain ?? "";
@@ -749,7 +749,7 @@ function createBaseConfirmGatewayTxStarted(): ConfirmGatewayTxStarted {
 export const ConfirmGatewayTxStarted = {
   encode(
     message: ConfirmGatewayTxStarted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -766,7 +766,7 @@ export const ConfirmGatewayTxStarted = {
     if (message.participants !== undefined) {
       PollParticipants.encode(
         message.participants,
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     }
     return writer;
@@ -774,7 +774,7 @@ export const ConfirmGatewayTxStarted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmGatewayTxStarted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -818,7 +818,7 @@ export const ConfirmGatewayTxStarted = {
 
           message.participants = PollParticipants.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -871,12 +871,12 @@ export const ConfirmGatewayTxStarted = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxStarted>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmGatewayTxStarted {
     return ConfirmGatewayTxStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxStarted>, I>>(
-    object: I,
+    object: I
   ): ConfirmGatewayTxStarted {
     const message = createBaseConfirmGatewayTxStarted();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -902,7 +902,7 @@ function createBasePollMapping(): PollMapping {
 export const PollMapping = {
   encode(
     message: PollMapping,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -968,7 +968,7 @@ export const PollMapping = {
     return PollMapping.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollMapping>, I>>(
-    object: I,
+    object: I
   ): PollMapping {
     const message = createBasePollMapping();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -993,7 +993,7 @@ function createBaseConfirmGatewayTxsStarted(): ConfirmGatewayTxsStarted {
 export const ConfirmGatewayTxsStarted = {
   encode(
     message: ConfirmGatewayTxsStarted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.pollMappings) {
       PollMapping.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1015,7 +1015,7 @@ export const ConfirmGatewayTxsStarted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmGatewayTxsStarted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1030,7 +1030,7 @@ export const ConfirmGatewayTxsStarted = {
           }
 
           message.pollMappings.push(
-            PollMapping.decode(reader, reader.uint32()),
+            PollMapping.decode(reader, reader.uint32())
           );
           continue;
         case 2:
@@ -1111,12 +1111,12 @@ export const ConfirmGatewayTxsStarted = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxsStarted>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmGatewayTxsStarted {
     return ConfirmGatewayTxsStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxsStarted>, I>>(
-    object: I,
+    object: I
   ): ConfirmGatewayTxsStarted {
     const message = createBaseConfirmGatewayTxsStarted();
     message.pollMappings =
@@ -1148,7 +1148,7 @@ function createBaseConfirmDepositStarted(): ConfirmDepositStarted {
 export const ConfirmDepositStarted = {
   encode(
     message: ConfirmDepositStarted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -1168,7 +1168,7 @@ export const ConfirmDepositStarted = {
     if (message.participants !== undefined) {
       PollParticipants.encode(
         message.participants,
-        writer.uint32(50).fork(),
+        writer.uint32(50).fork()
       ).ldelim();
     }
     if (message.asset !== "") {
@@ -1179,7 +1179,7 @@ export const ConfirmDepositStarted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmDepositStarted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1230,7 +1230,7 @@ export const ConfirmDepositStarted = {
 
           message.participants = PollParticipants.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 7:
@@ -1300,12 +1300,12 @@ export const ConfirmDepositStarted = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmDepositStarted>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmDepositStarted {
     return ConfirmDepositStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmDepositStarted>, I>>(
-    object: I,
+    object: I
   ): ConfirmDepositStarted {
     const message = createBaseConfirmDepositStarted();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -1341,7 +1341,7 @@ function createBaseConfirmTokenStarted(): ConfirmTokenStarted {
 export const ConfirmTokenStarted = {
   encode(
     message: ConfirmTokenStarted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -1358,7 +1358,7 @@ export const ConfirmTokenStarted = {
     if (message.tokenDetails !== undefined) {
       TokenDetails.encode(
         message.tokenDetails,
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     }
     if (!message.confirmationHeight.isZero()) {
@@ -1367,7 +1367,7 @@ export const ConfirmTokenStarted = {
     if (message.participants !== undefined) {
       PollParticipants.encode(
         message.participants,
-        writer.uint32(58).fork(),
+        writer.uint32(58).fork()
       ).ldelim();
     }
     return writer;
@@ -1430,7 +1430,7 @@ export const ConfirmTokenStarted = {
 
           message.participants = PollParticipants.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -1495,12 +1495,12 @@ export const ConfirmTokenStarted = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmTokenStarted>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmTokenStarted {
     return ConfirmTokenStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmTokenStarted>, I>>(
-    object: I,
+    object: I
   ): ConfirmTokenStarted {
     const message = createBaseConfirmTokenStarted();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -1531,7 +1531,7 @@ function createBaseChainAdded(): ChainAdded {
 export const ChainAdded = {
   encode(
     message: ChainAdded,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1581,7 +1581,7 @@ export const ChainAdded = {
     return ChainAdded.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainAdded>, I>>(
-    object: I,
+    object: I
   ): ChainAdded {
     const message = createBaseChainAdded();
     message.chain = object.chain ?? "";
@@ -1596,7 +1596,7 @@ function createBaseCommandBatchSigned(): CommandBatchSigned {
 export const CommandBatchSigned = {
   encode(
     message: CommandBatchSigned,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
@@ -1659,12 +1659,12 @@ export const CommandBatchSigned = {
   },
 
   create<I extends Exact<DeepPartial<CommandBatchSigned>, I>>(
-    base?: I,
+    base?: I
   ): CommandBatchSigned {
     return CommandBatchSigned.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommandBatchSigned>, I>>(
-    object: I,
+    object: I
   ): CommandBatchSigned {
     const message = createBaseCommandBatchSigned();
     message.chain = object.chain ?? "";
@@ -1680,7 +1680,7 @@ function createBaseCommandBatchAborted(): CommandBatchAborted {
 export const CommandBatchAborted = {
   encode(
     message: CommandBatchAborted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
@@ -1743,12 +1743,12 @@ export const CommandBatchAborted = {
   },
 
   create<I extends Exact<DeepPartial<CommandBatchAborted>, I>>(
-    base?: I,
+    base?: I
   ): CommandBatchAborted {
     return CommandBatchAborted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommandBatchAborted>, I>>(
-    object: I,
+    object: I
   ): CommandBatchAborted {
     const message = createBaseCommandBatchAborted();
     message.chain = object.chain ?? "";
@@ -1764,7 +1764,7 @@ function createBaseEVMEventConfirmed(): EVMEventConfirmed {
 export const EVMEventConfirmed = {
   encode(
     message: EVMEventConfirmed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1839,12 +1839,12 @@ export const EVMEventConfirmed = {
   },
 
   create<I extends Exact<DeepPartial<EVMEventConfirmed>, I>>(
-    base?: I,
+    base?: I
   ): EVMEventConfirmed {
     return EVMEventConfirmed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EVMEventConfirmed>, I>>(
-    object: I,
+    object: I
   ): EVMEventConfirmed {
     const message = createBaseEVMEventConfirmed();
     message.chain = object.chain ?? "";
@@ -1861,7 +1861,7 @@ function createBaseEVMEventCompleted(): EVMEventCompleted {
 export const EVMEventCompleted = {
   encode(
     message: EVMEventCompleted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1936,12 +1936,12 @@ export const EVMEventCompleted = {
   },
 
   create<I extends Exact<DeepPartial<EVMEventCompleted>, I>>(
-    base?: I,
+    base?: I
   ): EVMEventCompleted {
     return EVMEventCompleted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EVMEventCompleted>, I>>(
-    object: I,
+    object: I
   ): EVMEventCompleted {
     const message = createBaseEVMEventCompleted();
     message.chain = object.chain ?? "";
@@ -1958,7 +1958,7 @@ function createBaseEVMEventFailed(): EVMEventFailed {
 export const EVMEventFailed = {
   encode(
     message: EVMEventFailed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2033,12 +2033,12 @@ export const EVMEventFailed = {
   },
 
   create<I extends Exact<DeepPartial<EVMEventFailed>, I>>(
-    base?: I,
+    base?: I
   ): EVMEventFailed {
     return EVMEventFailed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EVMEventFailed>, I>>(
-    object: I,
+    object: I
   ): EVMEventFailed {
     const message = createBaseEVMEventFailed();
     message.chain = object.chain ?? "";
@@ -2055,7 +2055,7 @@ function createBaseEVMEventRetryFailed(): EVMEventRetryFailed {
 export const EVMEventRetryFailed = {
   encode(
     message: EVMEventRetryFailed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2130,12 +2130,12 @@ export const EVMEventRetryFailed = {
   },
 
   create<I extends Exact<DeepPartial<EVMEventRetryFailed>, I>>(
-    base?: I,
+    base?: I
   ): EVMEventRetryFailed {
     return EVMEventRetryFailed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EVMEventRetryFailed>, I>>(
-    object: I,
+    object: I
   ): EVMEventRetryFailed {
     const message = createBaseEVMEventRetryFailed();
     message.chain = object.chain ?? "";
@@ -2160,7 +2160,7 @@ function createBaseContractCallApproved(): ContractCallApproved {
 export const ContractCallApproved = {
   encode(
     message: ContractCallApproved,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2188,7 +2188,7 @@ export const ContractCallApproved = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ContractCallApproved {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2302,12 +2302,12 @@ export const ContractCallApproved = {
   },
 
   create<I extends Exact<DeepPartial<ContractCallApproved>, I>>(
-    base?: I,
+    base?: I
   ): ContractCallApproved {
     return ContractCallApproved.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ContractCallApproved>, I>>(
-    object: I,
+    object: I
   ): ContractCallApproved {
     const message = createBaseContractCallApproved();
     message.chain = object.chain ?? "";
@@ -2328,7 +2328,7 @@ function createBaseContractCallFailed(): ContractCallFailed {
 export const ContractCallFailed = {
   encode(
     message: ContractCallFailed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2389,12 +2389,12 @@ export const ContractCallFailed = {
   },
 
   create<I extends Exact<DeepPartial<ContractCallFailed>, I>>(
-    base?: I,
+    base?: I
   ): ContractCallFailed {
     return ContractCallFailed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ContractCallFailed>, I>>(
-    object: I,
+    object: I
   ): ContractCallFailed {
     const message = createBaseContractCallFailed();
     message.chain = object.chain ?? "";
@@ -2419,7 +2419,7 @@ function createBaseContractCallWithMintApproved(): ContractCallWithMintApproved 
 export const ContractCallWithMintApproved = {
   encode(
     message: ContractCallWithMintApproved,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2450,7 +2450,7 @@ export const ContractCallWithMintApproved = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ContractCallWithMintApproved {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2575,12 +2575,12 @@ export const ContractCallWithMintApproved = {
   },
 
   create<I extends Exact<DeepPartial<ContractCallWithMintApproved>, I>>(
-    base?: I,
+    base?: I
   ): ContractCallWithMintApproved {
     return ContractCallWithMintApproved.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ContractCallWithMintApproved>, I>>(
-    object: I,
+    object: I
   ): ContractCallWithMintApproved {
     const message = createBaseContractCallWithMintApproved();
     message.chain = object.chain ?? "";
@@ -2613,7 +2613,7 @@ function createBaseTokenSent(): TokenSent {
 export const TokenSent = {
   encode(
     message: TokenSent,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2753,7 +2753,7 @@ export const TokenSent = {
     return TokenSent.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TokenSent>, I>>(
-    object: I,
+    object: I
   ): TokenSent {
     const message = createBaseTokenSent();
     message.chain = object.chain ?? "";
@@ -2787,7 +2787,7 @@ function createBaseMintCommand(): MintCommand {
 export const MintCommand = {
   encode(
     message: MintCommand,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2915,7 +2915,7 @@ export const MintCommand = {
     return MintCommand.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MintCommand>, I>>(
-    object: I,
+    object: I
   ): MintCommand {
     const message = createBaseMintCommand();
     message.chain = object.chain ?? "";
@@ -2947,7 +2947,7 @@ function createBaseBurnCommand(): BurnCommand {
 export const BurnCommand = {
   encode(
     message: BurnCommand,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -3059,7 +3059,7 @@ export const BurnCommand = {
     return BurnCommand.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BurnCommand>, I>>(
-    object: I,
+    object: I
   ): BurnCommand {
     const message = createBaseBurnCommand();
     message.chain = object.chain ?? "";

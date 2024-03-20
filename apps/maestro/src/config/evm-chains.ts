@@ -289,5 +289,5 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
 ] as const;
 
 export const WAGMI_CHAIN_CONFIGS = ALL_CHAINS.filter(
-  (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV,
+  (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
 ) as [ExtendedWagmiChainConfig, ...ExtendedWagmiChainConfig[]];

@@ -76,7 +76,7 @@ const run = async () => {
   const ranges = getUnixTimestampRanges("2024-02-07");
 
   const res = await Promise.all(
-    ranges.map(async (range) => await transformTransfers(range[0], range[1])),
+    ranges.map(async (range) => await transformTransfers(range[0], range[1]))
   );
   console.log(JSON.stringify(res.flat()));
 };

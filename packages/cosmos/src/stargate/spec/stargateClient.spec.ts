@@ -25,16 +25,16 @@ describe("stargate client", () => {
   test("broadcast link transaction", async () => {
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
-      { prefix: "axelar" },
+      { prefix: "axelar" }
     );
 
     const client = await createAxelarSigningClient(
       AXELAR_RPC_URLS.testnet,
-      offlineSigner,
+      offlineSigner
     );
 
     vi.spyOn(client, "signAndBroadcast").mockImplementation(() =>
-      Promise.resolve(MOCK_BROADCAST_RESPONSE),
+      Promise.resolve(MOCK_BROADCAST_RESPONSE)
     );
 
     const [accData] = await offlineSigner.getAccounts();
@@ -52,23 +52,23 @@ describe("stargate client", () => {
         asset: "wavax-wei",
         chain: "fantom",
       },
-      STANDARD_FEE,
+      STANDARD_FEE
     );
 
     expect(txResponse.transactionHash).toEqual(
-      MOCK_BROADCAST_RESPONSE.transactionHash,
+      MOCK_BROADCAST_RESPONSE.transactionHash
     );
   });
 
   test("simulate link transaction", async () => {
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       process.env["COSMOS_WALLET_MNEMONIC"] as string,
-      { prefix: "axelar" },
+      { prefix: "axelar" }
     );
 
     const client = await createAxelarSigningClient(
       AXELAR_RPC_URLS.testnet,
-      offlineSigner,
+      offlineSigner
     );
 
     const [accData] = await offlineSigner.getAccounts();

@@ -21,7 +21,7 @@ function createBaseProxiedValidator(): ProxiedValidator {
 export const ProxiedValidator = {
   encode(
     message: ProxiedValidator,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.validator.length !== 0) {
       writer.uint32(10).bytes(message.validator);
@@ -100,12 +100,12 @@ export const ProxiedValidator = {
   },
 
   create<I extends Exact<DeepPartial<ProxiedValidator>, I>>(
-    base?: I,
+    base?: I
   ): ProxiedValidator {
     return ProxiedValidator.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ProxiedValidator>, I>>(
-    object: I,
+    object: I
   ): ProxiedValidator {
     const message = createBaseProxiedValidator();
     message.validator = object.validator ?? new Uint8Array(0);

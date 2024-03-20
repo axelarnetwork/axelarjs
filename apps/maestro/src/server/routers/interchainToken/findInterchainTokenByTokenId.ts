@@ -16,7 +16,7 @@ import { publicProcedure } from "~/server/trpc";
  */
 export async function scanInterchainTokenOnChainByTokenId(
   tokenId: `0x${string}`,
-  ctx: Context,
+  ctx: Context
 ) {
   const results = await Promise.all(
     ctx.configs.wagmiChainConfigs.map(async (config) => {
@@ -50,7 +50,7 @@ export async function scanInterchainTokenOnChainByTokenId(
 
       const tokenManagerClient = ctx.contracts.createTokenManagerClient(
         config,
-        tokenManagerAddress,
+        tokenManagerAddress
       );
 
       const [tokenManagerTypeCode, originTokenAddress] = await Promise.all([
@@ -59,12 +59,12 @@ export async function scanInterchainTokenOnChainByTokenId(
       ]);
 
       const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOrNull(
-        getTokenManagerTypeFromBigInt,
+        getTokenManagerTypeFromBigInt
       );
 
       const erc20Client = ctx.contracts.createERC20Client(
         config,
-        originTokenAddress ?? tokenAddress,
+        originTokenAddress ?? tokenAddress
       );
 
       const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([
@@ -119,7 +119,7 @@ export async function scanInterchainTokenOnChainByTokenId(
         tokenManagerAddress,
         tokenManagerType,
       };
-    }),
+    })
   );
 
   return results;
@@ -129,10 +129,10 @@ export const findInterchainTokenByTokenId = publicProcedure
   .input(
     z.object({
       tokenId: hex64Literal(),
-    }),
+    })
   )
   .query(async ({ ctx, input }) =>
-    scanInterchainTokenOnChainByTokenId(input.tokenId, ctx),
+    scanInterchainTokenOnChainByTokenId(input.tokenId, ctx)
   );
 
 export type FindInterchainTokenByTokenIdOutput =
