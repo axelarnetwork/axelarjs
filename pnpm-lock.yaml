@@ -354,6 +354,9 @@ importers:
       '@axelarjs/core':
         specifier: workspace:*
         version: link:../core
+      '@axelarjs/utils':
+        specifier: workspace:*
+        version: link:../utils
       isomorphic-unfetch:
         specifier: ^4.0.2
         version: 4.0.2
@@ -370,9 +373,6 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
-      '@axelarjs/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@types/node':
         specifier: ^20.11.28
         version: 20.11.28

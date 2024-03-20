@@ -99,6 +99,7 @@
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
     "viem": "^2.8.11"
