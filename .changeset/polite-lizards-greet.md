@@ -6,3 +6,4 @@
 ---
 
 - chore: update packages affected by api/axelar-configs schema change
+- chore: various docs updates: https://github.com/axelarnetwork/axelarjs/pull/291
