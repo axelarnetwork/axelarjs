@@ -32,6 +32,7 @@ The following scripts are available in the project:
 - `test:coverage`: Runs unit tests with coverage reporting using `vitest`.
 - `sync`: Runs the `sync.cjs` script to sync the app with other environments.
 - `codegen`: Runs the `wagmi generate` command to generate typesafe react-query client for interacting with the ITS contracts.
+- `release`: Creates a github release from the latest [changelog](/apps/maestro/CHANGELOG.md) entry.
 
 ### E2E tests
 
