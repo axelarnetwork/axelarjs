@@ -139,7 +139,7 @@ const AccountStatusDropdown: FC<{
   onChange: (status: AccountStatus) => void;
 }> = ({ selectedStatus, onChange }) => {
   const unselectedStatuses = STATUS_OPTIONS.filter(
-    (x) => x !== selectedStatus
+    (x) => x !== selectedStatus,
   ) as AccountStatus[];
 
   return (
@@ -170,7 +170,7 @@ type AccountStatusRowProps = {
 
 const AccountStatusRow: FC<AccountStatusRowProps> = (props) => {
   const [accountStatus, setAccountStatus] = useState<AccountStatus>(
-    props.status
+    props.status,
   );
 
   return (

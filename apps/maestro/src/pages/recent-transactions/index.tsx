@@ -23,7 +23,7 @@ export const REVERSE_TAB_MAP = invert(TAB_MAP);
 const RecentTransactionsPage = () => {
   const [tab, setTab] = useQueryStringState<keyof typeof TAB_MAP>(
     "tab",
-    "interchainTransfer"
+    "interchainTransfer",
   );
 
   const { address } = useAccount();

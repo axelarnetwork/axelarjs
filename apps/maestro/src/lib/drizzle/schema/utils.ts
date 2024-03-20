@@ -1,7 +1,7 @@
 import { DeploymentMessageId } from "./types";
 
 export function decodeDeploymentMessageId(
-  deploymentMessageId: DeploymentMessageId
+  deploymentMessageId: DeploymentMessageId,
 ) {
   const [hash, index] = deploymentMessageId.split("-");
 
@@ -13,7 +13,7 @@ export function decodeDeploymentMessageId(
 
 export function encodeDeploymentMessageId(
   hash: `0x${string}`,
-  index: number
+  index: number,
 ): DeploymentMessageId {
   return `${hash}-${index}`;
 }

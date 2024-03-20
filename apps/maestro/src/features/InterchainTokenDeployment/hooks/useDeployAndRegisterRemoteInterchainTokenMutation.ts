@@ -41,7 +41,7 @@ export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
 
 export function useDeployAndRegisterRemoteInterchainTokenMutation(
   config: UseDeployAndRegisterRemoteInterchainTokenConfig,
-  input?: UseDeployAndRegisterInterchainTokenInput
+  input?: UseDeployAndRegisterInterchainTokenInput,
 ) {
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
@@ -88,7 +88,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       destinationChainNames:
         input?.destinationChainIds.map(
           (destinationChainId) =>
-            index[destinationChainId]?.chain_name ?? "Unknown"
+            index[destinationChainId]?.chain_name ?? "Unknown",
         ) ?? [],
     };
   }, [
@@ -128,7 +128,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         originalChainName,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
-      })
+      }),
     );
 
     return [deployTxData, ...registerTxData];
@@ -149,7 +149,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       query: {
         enabled: isMutationReady,
       },
-    }
+    },
   );
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
@@ -172,7 +172,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             tokenId,
             deployerAddress,
             input,
-          }
+          },
         );
         return;
       }
@@ -192,7 +192,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },
-    [deployerAddress, input, tokenAddress, tokenId]
+    [deployerAddress, input, tokenAddress, tokenId],
   );
 
   useEffect(
@@ -202,7 +202,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
+    [receipt],
   );
 
   useEffect(
@@ -211,7 +211,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         recordDeploymentAsync(recordDeploymentArgs)
           .then(() => {
             const tx = decodeDeploymentMessageId(
-              recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
+              recordDeploymentArgs.deploymentMessageId as DeploymentMessageId,
             );
             onStatusUpdate({
               type: "deployed",
@@ -222,7 +222,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           .catch((e) => {
             console.error(
               "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
-              e
+              e,
             );
             onStatusUpdate({
               type: "idle",
@@ -231,7 +231,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [recordDeploymentArgs]
+    [recordDeploymentArgs],
   );
 
   const recordDeploymentDraft = useCallback(async () => {
@@ -258,7 +258,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const writeAsync = useCallback(async () => {
     invariant(
       prepareMulticall?.request !== undefined,
-      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined",
     );
 
     await recordDeploymentDraft();
@@ -269,7 +269,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const write = useCallback(() => {
     invariant(
       prepareMulticall?.request !== undefined,
-      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined",
     );
 
     recordDeploymentDraft()
@@ -277,7 +277,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       .catch((e) => {
         console.error(
           "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
-          e
+          e,
         );
         onStatusUpdate({
           type: "idle",

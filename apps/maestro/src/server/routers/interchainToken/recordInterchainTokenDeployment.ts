@@ -40,7 +40,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
       ? null
       : ctx.contracts.createTokenManagerClient(
           configs.wagmi,
-          tokenManagerAddress
+          tokenManagerAddress,
         );
 
     const tokenManagerTypeCode = !tokenManagerClient
@@ -51,7 +51,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
       // default to mint_burn for interchain tokens
       // and lock_unlock for canonical tokens
       input.kind === "canonical" ? "lock_unlock" : "mint_burn",
-      getTokenManagerTypeFromBigInt
+      getTokenManagerTypeFromBigInt,
     );
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
@@ -70,7 +70,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         const configs = chains[axelarChainId];
 
         const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          configs.wagmi
+          configs.wagmi,
         );
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
@@ -97,11 +97,11 @@ export const recordInterchainTokenDeployment = protectedProcedure
           originalMinterAddress: input.originalMinterAddress,
           deploymentStatus: "pending" as const,
         };
-      })
+      }),
     );
 
     const validTokens = remoteTokens.filter(
-      (token) => token.tokenAddress !== "0x"
+      (token) => token.tokenAddress !== "0x",
     );
 
     if (validTokens.length !== remoteTokens.length) {
@@ -109,13 +109,13 @@ export const recordInterchainTokenDeployment = protectedProcedure
         "recordInterchainTokenDeployment: some tokens are not valid",
         {
           invalidTokens: remoteTokens.filter(
-            (token) => token.tokenAddress === "0x"
+            (token) => token.tokenAddress === "0x",
           ),
-        }
+        },
       );
     }
 
     await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      validTokens
+      validTokens,
     );
   });

@@ -36,7 +36,7 @@ const stories = configurePlayground(
   },
   {
     defaultChecked: true,
-  }
+  },
 );
 
 export const Sizes = stories.$size;

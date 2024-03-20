@@ -19,7 +19,7 @@ export const interchainTokenRelations = relations(
   // one interchain token has many remote interchain tokens
   ({ many }) => ({
     remoteTokens: many(remoteInterchainTokens),
-  })
+  }),
 );
 
 export const remoteInterchainTokenRelations = relations(
@@ -30,5 +30,5 @@ export const remoteInterchainTokenRelations = relations(
       fields: [remoteInterchainTokens.tokenId],
       references: [interchainTokens.tokenId],
     }),
-  })
+  }),
 );

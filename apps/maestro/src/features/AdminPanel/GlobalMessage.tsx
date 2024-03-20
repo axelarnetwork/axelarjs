@@ -13,7 +13,7 @@ type TabKind = (typeof TABS)[number];
 export const GlobalMessageManager = () => {
   const { data: globalMessage } = trpc.messages.getGlobalMessage.useQuery(
     undefined,
-    { suspense: true }
+    { suspense: true },
   );
   const { mutateAsync: saveGlobalMessage, isPending: isSavingGlobalMessage } =
     trpc.messages.setGlobalMessage.useMutation({

@@ -47,7 +47,7 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.keyRequirements) {
       KeyRequirement.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -61,7 +61,7 @@ export const Params = {
     if (message.maxMissedBlocksPerWindow !== undefined) {
       Threshold.encode(
         message.maxMissedBlocksPerWindow,
-        writer.uint32(34).fork()
+        writer.uint32(34).fork(),
       ).ldelim();
     }
     if (!message.unbondingLockingKeyRotationCount.isZero()) {
@@ -70,7 +70,7 @@ export const Params = {
     if (message.externalMultisigThreshold !== undefined) {
       Threshold.encode(
         message.externalMultisigThreshold,
-        writer.uint32(50).fork()
+        writer.uint32(50).fork(),
       ).ldelim();
     }
     if (!message.maxSignQueueSize.isZero()) {
@@ -99,7 +99,7 @@ export const Params = {
           }
 
           message.keyRequirements.push(
-            KeyRequirement.decode(reader, reader.uint32())
+            KeyRequirement.decode(reader, reader.uint32()),
           );
           continue;
         case 2:
@@ -123,7 +123,7 @@ export const Params = {
 
           message.maxMissedBlocksPerWindow = Threshold.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 5:
@@ -140,7 +140,7 @@ export const Params = {
 
           message.externalMultisigThreshold = Threshold.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 7:
@@ -188,7 +188,7 @@ export const Params = {
         ? Threshold.fromJSON(object.maxMissedBlocksPerWindow)
         : undefined,
       unbondingLockingKeyRotationCount: isSet(
-        object.unbondingLockingKeyRotationCount
+        object.unbondingLockingKeyRotationCount,
       )
         ? Long.fromValue(object.unbondingLockingKeyRotationCount)
         : Long.ZERO,
@@ -211,7 +211,7 @@ export const Params = {
     const obj: any = {};
     if (message.keyRequirements?.length) {
       obj.keyRequirements = message.keyRequirements.map((e) =>
-        KeyRequirement.toJSON(e)
+        KeyRequirement.toJSON(e),
       );
     }
     if (!message.suspendDurationInBlocks.isZero()) {
@@ -226,7 +226,7 @@ export const Params = {
     }
     if (message.maxMissedBlocksPerWindow !== undefined) {
       obj.maxMissedBlocksPerWindow = Threshold.toJSON(
-        message.maxMissedBlocksPerWindow
+        message.maxMissedBlocksPerWindow,
       );
     }
     if (!message.unbondingLockingKeyRotationCount.isZero()) {
@@ -236,7 +236,7 @@ export const Params = {
     }
     if (message.externalMultisigThreshold !== undefined) {
       obj.externalMultisigThreshold = Threshold.toJSON(
-        message.externalMultisigThreshold
+        message.externalMultisigThreshold,
       );
     }
     if (!message.maxSignQueueSize.isZero()) {
@@ -317,14 +317,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

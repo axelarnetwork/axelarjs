@@ -73,7 +73,7 @@ export interface LinkButtonProps extends LinkElement, VProps {
 }
 
 const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
-  props: T
+  props: T,
 ) => {
   const {
     className,
@@ -98,7 +98,7 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
         $variant,
         $loading,
       }),
-      className
+      className,
     ),
     componentProps,
   ] as const;
@@ -134,7 +134,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {props.children}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";
@@ -148,7 +148,7 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         {props.children}
       </a>
     );
-  }
+  },
 );
 
 LinkButton.displayName = "LinkButton";

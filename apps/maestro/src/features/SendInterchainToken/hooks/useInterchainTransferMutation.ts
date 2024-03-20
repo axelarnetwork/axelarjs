@@ -25,7 +25,7 @@ export type UseSendInterchainTokenInput = {
 };
 
 export function useInterchainTransferMutation(
-  config: UseSendInterchainTokenConfig
+  config: UseSendInterchainTokenConfig,
 ) {
   const [txState, setTxState] = useTransactionState();
   const { data: decimals } = useReadInterchainTokenDecimals({

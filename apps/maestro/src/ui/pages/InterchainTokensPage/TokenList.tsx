@@ -24,7 +24,7 @@ function getChainNameSlug(chainId: number) {
 }
 
 const InterchainTokenDeployment = dynamic(
-  () => import("~/features/InterchainTokenDeployment")
+  () => import("~/features/InterchainTokenDeployment"),
 );
 
 const PAGE_LIMIT = 15;
@@ -50,7 +50,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
     {
       suspense: true,
       enabled: Boolean(sessionAddress),
-    }
+    },
   );
 
   const { computed } = useEVMChainConfigsQuery();
@@ -64,14 +64,14 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, computed.indexedById[token.axelarChainId]] as const
-          )
+              [token, computed.indexedById[token.axelarChainId]] as const,
+          ),
         )
         .mapOr(
           [],
-          filter(([token, chain]) => Boolean(token) && Boolean(chain))
+          filter(([token, chain]) => Boolean(token) && Boolean(chain)),
         ),
-    [computed.indexedById, maybeTokens]
+    [computed.indexedById, maybeTokens],
   );
 
   const totalTokens = Maybe.of(data).mapOr(0, (data) => data.totalItems);

@@ -23,8 +23,8 @@ export const getTransactionStatusesOnDestinationChains = publicProcedure
           ctx.services.gmp.searchGMP({
             txHash,
             _source: SEARCHGMP_SOURCE,
-          })
-        )
+          }),
+        ),
       );
 
       return results.flat().reduce(
@@ -44,7 +44,7 @@ export const getTransactionStatusesOnDestinationChains = publicProcedure
             logIndex: number;
             txId?: string;
           };
-        }
+        },
       );
     } catch (error) {
       // If we get a TRPC error, we throw it

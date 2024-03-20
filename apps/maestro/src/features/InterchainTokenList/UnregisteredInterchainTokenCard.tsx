@@ -24,7 +24,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
           "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 -translate-y-1.5 ring-4":
             props.isSelected,
         },
-        props.className
+        props.className,
       )}
       aria-label={
         props.onToggleSelection ? "click to toggle token selection" : undefined
@@ -48,7 +48,7 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
             {
               "scale-125 opacity-25 hover:scale-150 hover:blur-sm":
                 props.isSelected,
-            }
+            },
           )}
         />
       )}

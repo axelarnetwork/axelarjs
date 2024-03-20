@@ -46,7 +46,7 @@ const evmChainConfigSchema = z.object({
         decimals: z.number(),
       }),
       blockExplorerUrls: z.array(z.string()),
-    })
+    }),
   ),
 });
 
@@ -66,7 +66,7 @@ export const getEVMChainConfigs = publicProcedure
         axelarChainId: z.string().max(64).optional(),
         chainId: z.number().optional(),
       })
-      .optional()
+      .optional(),
   )
   .output(z.array(evmChainConfigSchema))
   .query(async ({ ctx, input }) => {
@@ -76,7 +76,7 @@ export const getEVMChainConfigs = publicProcedure
       const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
 
       const validChainInfos = uniqueChainInfos.filter(
-        (chain) => evmChainConfigSchema.safeParse(chain).success
+        (chain) => evmChainConfigSchema.safeParse(chain).success,
       );
 
       return validChainInfos
@@ -88,7 +88,7 @@ export const getEVMChainConfigs = publicProcedure
             // filter also by chainId if provided
             (!input?.chainId || chain.chain_id === input?.chainId) &&
             // filter out disabled chains
-            !NEXT_PUBLIC_DISABLED_CHAINS.includes(chain.id)
+            !NEXT_PUBLIC_DISABLED_CHAINS.includes(chain.id),
         )
         .sort((a, b) => a.name.localeCompare(b.name));
     } catch (error) {

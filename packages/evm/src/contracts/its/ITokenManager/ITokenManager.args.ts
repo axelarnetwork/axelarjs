@@ -380,7 +380,7 @@ export const ITOKEN_MANAGER_ENCODERS = {
 };
 
 export function createITokenManagerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     contractId() {
@@ -396,7 +396,7 @@ export function createITokenManagerReadClient(
       return publicClient.read("flowOutAmount");
     },
     getTokenAddressFromParams(
-      getTokenAddressFromParamsArgs: ITokenManagerGetTokenAddressFromParamsArgs
+      getTokenAddressFromParamsArgs: ITokenManagerGetTokenAddressFromParamsArgs,
     ) {
       const encoder = ITOKEN_MANAGER_ENCODERS["getTokenAddressFromParams"];
       const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);

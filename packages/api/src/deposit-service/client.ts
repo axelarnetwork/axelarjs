@@ -5,7 +5,7 @@ import { DepositServiceClient } from "./isomorphic";
 
 export const createDepositServiceApiClient = (
   env: Environment,
-  options?: HttpClientOptions
+  options?: HttpClientOptions,
 ) =>
   DepositServiceClient.init({
     instance: HttpClient.extend({

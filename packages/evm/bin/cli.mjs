@@ -14,14 +14,14 @@ program
   .option(
     "--foldercase <case>",
     "The case format for the folder names",
-    "pascal"
+    "pascal",
   )
   .option("--filecase <case>", "The case format for the file names", "pascal")
   .option("--exclude <patterns>", "Patterns to exclude", "")
   .option(
     "--client <path>",
     "The path to the publicClient module",
-    "@axelarjs/evm"
+    "@axelarjs/evm",
   )
   .option("--flatten", "Flatten the output", false)
   .option("--index", "Generate index files", false)
@@ -49,7 +49,7 @@ program
       --client ${client} \
       ${index ? "--index" : ""} \
       ${flatten ? "--flatten" : ""}`;
-    }
+    },
   );
 
 program.parse(process.argv);

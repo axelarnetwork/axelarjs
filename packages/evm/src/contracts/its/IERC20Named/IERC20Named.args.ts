@@ -162,7 +162,7 @@ export const IERC20_NAMED_ENCODERS = {
 };
 
 export function createIERC20NamedReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     allowance(allowanceArgs: IERC20NamedAllowanceArgs) {

@@ -11,7 +11,7 @@ test.describe("Index page", () => {
     const connectButtonCount = await connectButton.count();
 
     const connectedWalletDropdownTrigger = page.locator(
-      "button[aria-label='connected wallet dropdown trigger']"
+      "button[aria-label='connected wallet dropdown trigger']",
     );
 
     const isAutoConnected = connectButtonCount === 0;

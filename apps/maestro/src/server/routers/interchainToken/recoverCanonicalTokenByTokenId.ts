@@ -11,18 +11,18 @@ export const recoverCanonicalTokenByTokenId = protectedProcedure
       tokenId: hex64Literal(),
       deploymentMessageId: hex64Literal().optional(),
       deployerAddress: hex40Literal().optional(),
-    })
+    }),
   )
   .mutation(async ({ ctx, input }) => {
     const { postgres } = ctx.persistence;
 
     const onChainData = await scanInterchainTokenOnChainByTokenId(
       input.tokenId,
-      ctx
+      ctx,
     );
 
     const successResults = onChainData.filter(
-      (result) => result.status === "success"
+      (result) => result.status === "success",
     );
 
     if (successResults.length === 0) {
@@ -31,7 +31,7 @@ export const recoverCanonicalTokenByTokenId = protectedProcedure
 
     const [[originToken], remoteTokens] = partition(
       (result) => result.tokenManagerType === "lock_unlock",
-      successResults
+      successResults,
     );
 
     if (!originToken || originToken.status !== "success") {

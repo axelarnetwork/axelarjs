@@ -55,14 +55,14 @@ function createBasePendingIBCTransferCountRequest(): PendingIBCTransferCountRequ
 export const PendingIBCTransferCountRequest = {
   encode(
     _: PendingIBCTransferCountRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): PendingIBCTransferCountRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -90,12 +90,12 @@ export const PendingIBCTransferCountRequest = {
   },
 
   create<I extends Exact<DeepPartial<PendingIBCTransferCountRequest>, I>>(
-    base?: I
+    base?: I,
   ): PendingIBCTransferCountRequest {
     return PendingIBCTransferCountRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PendingIBCTransferCountRequest>, I>>(
-    _: I
+    _: I,
   ): PendingIBCTransferCountRequest {
     const message = createBasePendingIBCTransferCountRequest();
     return message;
@@ -109,12 +109,12 @@ function createBasePendingIBCTransferCountResponse(): PendingIBCTransferCountRes
 export const PendingIBCTransferCountResponse = {
   encode(
     message: PendingIBCTransferCountResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     Object.entries(message.transfersByChain).forEach(([key, value]) => {
       PendingIBCTransferCountResponse_TransfersByChainEntry.encode(
         { key: key as any, value },
-        writer.uint32(10).fork()
+        writer.uint32(10).fork(),
       ).ldelim();
     });
     return writer;
@@ -122,7 +122,7 @@ export const PendingIBCTransferCountResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): PendingIBCTransferCountResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -139,7 +139,7 @@ export const PendingIBCTransferCountResponse = {
           const entry1 =
             PendingIBCTransferCountResponse_TransfersByChainEntry.decode(
               reader,
-              reader.uint32()
+              reader.uint32(),
             );
           if (entry1.value !== undefined) {
             message.transfersByChain[entry1.key] = entry1.value;
@@ -182,16 +182,16 @@ export const PendingIBCTransferCountResponse = {
   },
 
   create<I extends Exact<DeepPartial<PendingIBCTransferCountResponse>, I>>(
-    base?: I
+    base?: I,
   ): PendingIBCTransferCountResponse {
     return PendingIBCTransferCountResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PendingIBCTransferCountResponse>, I>>(
-    object: I
+    object: I,
   ): PendingIBCTransferCountResponse {
     const message = createBasePendingIBCTransferCountResponse();
     message.transfersByChain = Object.entries(
-      object.transfersByChain ?? {}
+      object.transfersByChain ?? {},
     ).reduce<{ [key: string]: number }>((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = globalThis.Number(value);
@@ -209,7 +209,7 @@ function createBasePendingIBCTransferCountResponse_TransfersByChainEntry(): Pend
 export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
   encode(
     message: PendingIBCTransferCountResponse_TransfersByChainEntry,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -222,7 +222,7 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): PendingIBCTransferCountResponse_TransfersByChainEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -263,7 +263,7 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
   },
 
   toJSON(
-    message: PendingIBCTransferCountResponse_TransfersByChainEntry
+    message: PendingIBCTransferCountResponse_TransfersByChainEntry,
   ): unknown {
     const obj: any = {};
     if (message.key !== "") {
@@ -279,17 +279,17 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
     I extends Exact<
       DeepPartial<PendingIBCTransferCountResponse_TransfersByChainEntry>,
       I
-    >
+    >,
   >(base?: I): PendingIBCTransferCountResponse_TransfersByChainEntry {
     return PendingIBCTransferCountResponse_TransfersByChainEntry.fromPartial(
-      base ?? ({} as any)
+      base ?? ({} as any),
     );
   },
   fromPartial<
     I extends Exact<
       DeepPartial<PendingIBCTransferCountResponse_TransfersByChainEntry>,
       I
-    >
+    >,
   >(object: I): PendingIBCTransferCountResponse_TransfersByChainEntry {
     const message =
       createBasePendingIBCTransferCountResponse_TransfersByChainEntry();
@@ -306,7 +306,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     _: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     return writer;
   },
@@ -338,12 +338,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I
+    base?: I,
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    _: I
+    _: I,
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     return message;
@@ -357,7 +357,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -404,12 +404,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I
+    base?: I,
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I
+    object: I,
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =
@@ -427,7 +427,7 @@ function createBaseIBCPathRequest(): IBCPathRequest {
 export const IBCPathRequest = {
   encode(
     message: IBCPathRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -474,12 +474,12 @@ export const IBCPathRequest = {
   },
 
   create<I extends Exact<DeepPartial<IBCPathRequest>, I>>(
-    base?: I
+    base?: I,
   ): IBCPathRequest {
     return IBCPathRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCPathRequest>, I>>(
-    object: I
+    object: I,
   ): IBCPathRequest {
     const message = createBaseIBCPathRequest();
     message.chain = object.chain ?? "";
@@ -494,7 +494,7 @@ function createBaseIBCPathResponse(): IBCPathResponse {
 export const IBCPathResponse = {
   encode(
     message: IBCPathResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.ibcPath !== "") {
       writer.uint32(10).string(message.ibcPath);
@@ -541,12 +541,12 @@ export const IBCPathResponse = {
   },
 
   create<I extends Exact<DeepPartial<IBCPathResponse>, I>>(
-    base?: I
+    base?: I,
   ): IBCPathResponse {
     return IBCPathResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCPathResponse>, I>>(
-    object: I
+    object: I,
   ): IBCPathResponse {
     const message = createBaseIBCPathResponse();
     message.ibcPath = object.ibcPath ?? "";
@@ -561,7 +561,7 @@ function createBaseChainByIBCPathRequest(): ChainByIBCPathRequest {
 export const ChainByIBCPathRequest = {
   encode(
     message: ChainByIBCPathRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.ibcPath !== "") {
       writer.uint32(10).string(message.ibcPath);
@@ -571,7 +571,7 @@ export const ChainByIBCPathRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ChainByIBCPathRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -611,12 +611,12 @@ export const ChainByIBCPathRequest = {
   },
 
   create<I extends Exact<DeepPartial<ChainByIBCPathRequest>, I>>(
-    base?: I
+    base?: I,
   ): ChainByIBCPathRequest {
     return ChainByIBCPathRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainByIBCPathRequest>, I>>(
-    object: I
+    object: I,
   ): ChainByIBCPathRequest {
     const message = createBaseChainByIBCPathRequest();
     message.ibcPath = object.ibcPath ?? "";
@@ -631,7 +631,7 @@ function createBaseChainByIBCPathResponse(): ChainByIBCPathResponse {
 export const ChainByIBCPathResponse = {
   encode(
     message: ChainByIBCPathResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -641,7 +641,7 @@ export const ChainByIBCPathResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ChainByIBCPathResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -681,12 +681,12 @@ export const ChainByIBCPathResponse = {
   },
 
   create<I extends Exact<DeepPartial<ChainByIBCPathResponse>, I>>(
-    base?: I
+    base?: I,
   ): ChainByIBCPathResponse {
     return ChainByIBCPathResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainByIBCPathResponse>, I>>(
-    object: I
+    object: I,
   ): ChainByIBCPathResponse {
     const message = createBaseChainByIBCPathResponse();
     message.chain = object.chain ?? "";
@@ -706,14 +706,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

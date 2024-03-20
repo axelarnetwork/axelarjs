@@ -104,7 +104,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   ];
 
   const sanitizedTokenDetails = tokenDetails.filter(([, value]) =>
-    Boolean(value)
+    Boolean(value),
   );
 
   return (
@@ -187,7 +187,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({
       },
       {
         enabled: Boolean(address),
-      }
+      },
     );
 
   const isOperator = roles?.tokenManager?.includes("OPERATOR");
@@ -218,7 +218,7 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
       },
       {
         enabled: isInViewport && hex64Literal().safeParse(tokenId).success,
-      }
+      },
     );
 
   return (
@@ -228,7 +228,7 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
         "ring-primary/50 ring-offset-base-100 relative grid h-9 w-9 place-items-start overflow-hidden rounded-full ring-2 ring-offset-2",
         {
           "animate-pulse": isLoading,
-        }
+        },
       )}
     >
       {meta?.iconUrl ? (

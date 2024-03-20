@@ -39,7 +39,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       },
       {
         enabled: !!state.tokenId,
-      }
+      },
     );
 
   const { register, handleSubmit, formState } = useForm<FormState>({
@@ -88,7 +88,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       transferTxHash,
       trpcContext.erc20.getERC20TokenBalanceForOwner,
       trpcContext.interchainToken.searchInterchainToken,
-    ]
+    ],
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
@@ -104,7 +104,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
+    [receipt],
   );
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(
@@ -131,10 +131,10 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
-            `Failed to transfer token operatorship: ${error.cause.shortMessage}`
+            `Failed to transfer token operatorship: ${error.cause.shortMessage}`,
           );
           logger.error(
-            `Failed to transfer token operatorship: ${error.cause.message}`
+            `Failed to transfer token operatorship: ${error.cause.message}`,
           );
 
           setTxState({
@@ -154,7 +154,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       setTxState,
       tokenDetails?.tokenManagerAddress,
       transferOperatorshipAsync,
-    ]
+    ],
   );
 
   const buttonChildren = useMemo(() => {

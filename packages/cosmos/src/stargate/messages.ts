@@ -65,7 +65,7 @@ export type ModuleMethodApi<T> = T extends GeneratedType
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         message: ReturnType<T["fromPartial"]>,
-        fee: StdFee
+        fee: StdFee,
       ): Promise<DeliverTxResponse>;
       sign(
         signerAddress: string,
@@ -74,14 +74,14 @@ export type ModuleMethodApi<T> = T extends GeneratedType
         message: ReturnType<T["fromPartial"]>,
         fee: StdFee,
         memo: string,
-        explicitSignerData?: SignerData
+        explicitSignerData?: SignerData,
       ): Promise<TxRaw>;
       simulate(
         signerAddress: string,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         message: ReturnType<T["fromPartial"]>,
-        memo?: string
+        memo?: string,
       ): Promise<number>;
     }
   : never;
@@ -100,7 +100,7 @@ const normalizeMethodName = (method: string) =>
 const createModuleMethodApi = (
   client: SigningStargateClient,
   module: { protobufPackage: string },
-  method: string
+  method: string,
 ) => ({
   /**
    * Sign and broadcast a message.
@@ -113,7 +113,7 @@ const createModuleMethodApi = (
   signAndBroadcast: (
     senderAddress: string,
     message: EncodeObject["value"],
-    fee: StdFee
+    fee: StdFee,
   ) =>
     client.signAndBroadcast(
       senderAddress,
@@ -124,7 +124,7 @@ const createModuleMethodApi = (
           value: message,
         },
       ],
-      fee
+      fee,
     ),
   /**
    * Sign a message.
@@ -142,7 +142,7 @@ const createModuleMethodApi = (
     message: EncodeObject["value"],
     fee: StdFee,
     memo: string,
-    explicitSignerData?: SignerData
+    explicitSignerData?: SignerData,
   ) =>
     client.sign(
       signerAddress,
@@ -155,7 +155,7 @@ const createModuleMethodApi = (
       ],
       fee,
       memo,
-      explicitSignerData
+      explicitSignerData,
     ),
   /**
    * Simulate a message.
@@ -167,7 +167,7 @@ const createModuleMethodApi = (
   simulate: (
     signerAddress: string,
     message: EncodeObject["value"],
-    memo: string | undefined
+    memo: string | undefined,
   ) =>
     client.simulate(
       signerAddress,
@@ -178,7 +178,7 @@ const createModuleMethodApi = (
           value: message,
         },
       ],
-      memo
+      memo,
     ),
 });
 
@@ -189,7 +189,7 @@ const createMsgMethodClient =
     [normalizeMethodName(method)]: createModuleMethodApi(
       client,
       module,
-      method
+      method,
     ),
   });
 
@@ -204,14 +204,14 @@ export const createMsgClient = (baseClient: SigningStargateClient) =>
             (method.endsWith("Request") ||
               (method.startsWith("Msg") &&
                 !method.endsWith("Response") &&
-                !method.endsWith("Impl")))
+                !method.endsWith("Impl"))),
         )
         .reduce(
           createMsgMethodClient(baseClient, module),
-          {} as Record<string, unknown>
+          {} as Record<string, unknown>,
         ),
     }),
-    {} as AxelarMsgClient
+    {} as AxelarMsgClient,
   );
 
 export type AxelarEncodeObjectRecord = EncodedProtoPackage<typeof axelarnet> &

@@ -30,7 +30,7 @@ function createBaseParticipant(): Participant {
 export const Participant = {
   encode(
     message: Participant,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address.length !== 0) {
       writer.uint32(10).bytes(message.address);
@@ -98,7 +98,7 @@ export const Participant = {
     return Participant.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Participant>, I>>(
-    object: I
+    object: I,
   ): Participant {
     const message = createBaseParticipant();
     message.address = object.address ?? new Uint8Array(0);
@@ -119,12 +119,12 @@ function createBaseSnapshot(): Snapshot {
 export const Snapshot = {
   encode(
     message: Snapshot,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.timestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.timestamp),
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     if (!message.height.isZero()) {
@@ -133,7 +133,7 @@ export const Snapshot = {
     Object.entries(message.participants).forEach(([key, value]) => {
       Snapshot_ParticipantsEntry.encode(
         { key: key as any, value },
-        writer.uint32(66).fork()
+        writer.uint32(66).fork(),
       ).ldelim();
     });
     if (message.bondedWeight.length !== 0) {
@@ -156,7 +156,7 @@ export const Snapshot = {
           }
 
           message.timestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32())
+            Timestamp.decode(reader, reader.uint32()),
           );
           continue;
         case 3:
@@ -173,7 +173,7 @@ export const Snapshot = {
 
           const entry8 = Snapshot_ParticipantsEntry.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           if (entry8.value !== undefined) {
             message.participants[entry8.key] = entry8.value;
@@ -268,7 +268,7 @@ function createBaseSnapshot_ParticipantsEntry(): Snapshot_ParticipantsEntry {
 export const Snapshot_ParticipantsEntry = {
   encode(
     message: Snapshot_ParticipantsEntry,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -281,7 +281,7 @@ export const Snapshot_ParticipantsEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): Snapshot_ParticipantsEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -334,12 +334,12 @@ export const Snapshot_ParticipantsEntry = {
   },
 
   create<I extends Exact<DeepPartial<Snapshot_ParticipantsEntry>, I>>(
-    base?: I
+    base?: I,
   ): Snapshot_ParticipantsEntry {
     return Snapshot_ParticipantsEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Snapshot_ParticipantsEntry>, I>>(
-    object: I
+    object: I,
   ): Snapshot_ParticipantsEntry {
     const message = createBaseSnapshot_ParticipantsEntry();
     message.key = object.key ?? "";
@@ -388,14 +388,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

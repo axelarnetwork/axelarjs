@@ -5,7 +5,7 @@ import { DepositAddressClient } from "./isomorphic";
 
 export const createDepositAddressApiClient = (
   env: Environment,
-  options?: HttpClientOptions
+  options?: HttpClientOptions,
 ) =>
   DepositAddressClient.init({
     instance: HttpClient.extend({

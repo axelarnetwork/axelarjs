@@ -14,7 +14,7 @@ import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
 const InterchainTokenDeployment = dynamic(
-  () => import("~/features/InterchainTokenDeployment")
+  () => import("~/features/InterchainTokenDeployment"),
 );
 
 export default function HomePage() {
@@ -29,10 +29,10 @@ export default function HomePage() {
       }
 
       await router.push(
-        `/${result.chainName?.toLowerCase() ?? ""}/${result?.tokenAddress}`
+        `/${result.chainName?.toLowerCase() ?? ""}/${result?.tokenAddress}`,
       );
     },
-    [chain, router]
+    [chain, router],
   );
 
   const handleDismissBanner = layoutActions.dismissDisclaimerBanner;

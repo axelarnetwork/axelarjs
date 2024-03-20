@@ -23,7 +23,7 @@ export function useEVMChainConfigsQuery() {
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
     () => partition((x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID, data ?? []),
-    [data]
+    [data],
   );
 
   if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
@@ -37,15 +37,15 @@ export function useEVMChainConfigsQuery() {
               name: x.name,
             },
             null,
-            2
-          )
+            2,
+          ),
         )
-        .join("\n")}`
+        .join("\n")}`,
     );
   }
 
   const wagmiChains = configured.map(
-    (x) => EVM_CHAIN_CONFIGS_BY_ID[x.chain_id]
+    (x) => EVM_CHAIN_CONFIGS_BY_ID[x.chain_id],
   );
 
   return {
@@ -68,7 +68,7 @@ export function useAssetsQuery(denoms: string[] = []) {
     queryKey: ["axelarscan-assets", denoms],
     queryFn: axelarscanClient.getAssets.bind(
       null,
-      denoms?.length ? { denoms } : undefined
+      denoms?.length ? { denoms } : undefined,
     ),
   });
 }

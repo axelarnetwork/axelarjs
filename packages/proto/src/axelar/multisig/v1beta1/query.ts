@@ -91,7 +91,7 @@ function createBaseKeyIDRequest(): KeyIDRequest {
 export const KeyIDRequest = {
   encode(
     message: KeyIDRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -138,12 +138,12 @@ export const KeyIDRequest = {
   },
 
   create<I extends Exact<DeepPartial<KeyIDRequest>, I>>(
-    base?: I
+    base?: I,
   ): KeyIDRequest {
     return KeyIDRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyIDRequest>, I>>(
-    object: I
+    object: I,
   ): KeyIDRequest {
     const message = createBaseKeyIDRequest();
     message.chain = object.chain ?? "";
@@ -158,7 +158,7 @@ function createBaseKeyIDResponse(): KeyIDResponse {
 export const KeyIDResponse = {
   encode(
     message: KeyIDResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -205,12 +205,12 @@ export const KeyIDResponse = {
   },
 
   create<I extends Exact<DeepPartial<KeyIDResponse>, I>>(
-    base?: I
+    base?: I,
   ): KeyIDResponse {
     return KeyIDResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyIDResponse>, I>>(
-    object: I
+    object: I,
   ): KeyIDResponse {
     const message = createBaseKeyIDResponse();
     message.keyId = object.keyId ?? "";
@@ -225,7 +225,7 @@ function createBaseNextKeyIDRequest(): NextKeyIDRequest {
 export const NextKeyIDRequest = {
   encode(
     message: NextKeyIDRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -272,12 +272,12 @@ export const NextKeyIDRequest = {
   },
 
   create<I extends Exact<DeepPartial<NextKeyIDRequest>, I>>(
-    base?: I
+    base?: I,
   ): NextKeyIDRequest {
     return NextKeyIDRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<NextKeyIDRequest>, I>>(
-    object: I
+    object: I,
   ): NextKeyIDRequest {
     const message = createBaseNextKeyIDRequest();
     message.chain = object.chain ?? "";
@@ -292,7 +292,7 @@ function createBaseNextKeyIDResponse(): NextKeyIDResponse {
 export const NextKeyIDResponse = {
   encode(
     message: NextKeyIDResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -339,12 +339,12 @@ export const NextKeyIDResponse = {
   },
 
   create<I extends Exact<DeepPartial<NextKeyIDResponse>, I>>(
-    base?: I
+    base?: I,
   ): NextKeyIDResponse {
     return NextKeyIDResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<NextKeyIDResponse>, I>>(
-    object: I
+    object: I,
   ): NextKeyIDResponse {
     const message = createBaseNextKeyIDResponse();
     message.keyId = object.keyId ?? "";
@@ -359,7 +359,7 @@ function createBaseKeyRequest(): KeyRequest {
 export const KeyRequest = {
   encode(
     message: KeyRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -409,7 +409,7 @@ export const KeyRequest = {
     return KeyRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyRequest>, I>>(
-    object: I
+    object: I,
   ): KeyRequest {
     const message = createBaseKeyRequest();
     message.keyId = object.keyId ?? "";
@@ -424,7 +424,7 @@ function createBaseKeygenParticipant(): KeygenParticipant {
 export const KeygenParticipant = {
   encode(
     message: KeygenParticipant,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -501,12 +501,12 @@ export const KeygenParticipant = {
   },
 
   create<I extends Exact<DeepPartial<KeygenParticipant>, I>>(
-    base?: I
+    base?: I,
   ): KeygenParticipant {
     return KeygenParticipant.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenParticipant>, I>>(
-    object: I
+    object: I,
   ): KeygenParticipant {
     const message = createBaseKeygenParticipant();
     message.address = object.address ?? "";
@@ -531,7 +531,7 @@ function createBaseKeyResponse(): KeyResponse {
 export const KeyResponse = {
   encode(
     message: KeyResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -545,7 +545,7 @@ export const KeyResponse = {
     if (message.startedAtTimestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.startedAtTimestamp),
-        writer.uint32(34).fork()
+        writer.uint32(34).fork(),
       ).ldelim();
     }
     if (message.thresholdWeight.length !== 0) {
@@ -595,7 +595,7 @@ export const KeyResponse = {
           }
 
           message.startedAtTimestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32())
+            Timestamp.decode(reader, reader.uint32()),
           );
           continue;
         case 5:
@@ -618,7 +618,7 @@ export const KeyResponse = {
           }
 
           message.participants.push(
-            KeygenParticipant.decode(reader, reader.uint32())
+            KeygenParticipant.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -674,7 +674,7 @@ export const KeyResponse = {
     }
     if (message.participants?.length) {
       obj.participants = message.participants.map((e) =>
-        KeygenParticipant.toJSON(e)
+        KeygenParticipant.toJSON(e),
       );
     }
     return obj;
@@ -684,7 +684,7 @@ export const KeyResponse = {
     return KeyResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyResponse>, I>>(
-    object: I
+    object: I,
   ): KeyResponse {
     const message = createBaseKeyResponse();
     message.keyId = object.keyId ?? "";
@@ -709,7 +709,7 @@ function createBaseKeygenSessionRequest(): KeygenSessionRequest {
 export const KeygenSessionRequest = {
   encode(
     message: KeygenSessionRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -719,7 +719,7 @@ export const KeygenSessionRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): KeygenSessionRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -759,12 +759,12 @@ export const KeygenSessionRequest = {
   },
 
   create<I extends Exact<DeepPartial<KeygenSessionRequest>, I>>(
-    base?: I
+    base?: I,
   ): KeygenSessionRequest {
     return KeygenSessionRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenSessionRequest>, I>>(
-    object: I
+    object: I,
   ): KeygenSessionRequest {
     const message = createBaseKeygenSessionRequest();
     message.keyId = object.keyId ?? "";
@@ -790,7 +790,7 @@ function createBaseKeygenSessionResponse(): KeygenSessionResponse {
 export const KeygenSessionResponse = {
   encode(
     message: KeygenSessionResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.startedAt.isZero()) {
       writer.uint32(8).int64(message.startedAt);
@@ -798,7 +798,7 @@ export const KeygenSessionResponse = {
     if (message.startedAtTimestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.startedAtTimestamp),
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     if (!message.expiresAt.isZero()) {
@@ -830,7 +830,7 @@ export const KeygenSessionResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): KeygenSessionResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -852,7 +852,7 @@ export const KeygenSessionResponse = {
           }
 
           message.startedAtTimestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32())
+            Timestamp.decode(reader, reader.uint32()),
           );
           continue;
         case 3:
@@ -910,7 +910,7 @@ export const KeygenSessionResponse = {
           }
 
           message.participants.push(
-            KeygenParticipant.decode(reader, reader.uint32())
+            KeygenParticipant.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -977,12 +977,12 @@ export const KeygenSessionResponse = {
     }
     if (message.keygenThresholdWeight.length !== 0) {
       obj.keygenThresholdWeight = base64FromBytes(
-        message.keygenThresholdWeight
+        message.keygenThresholdWeight,
       );
     }
     if (message.signingThresholdWeight.length !== 0) {
       obj.signingThresholdWeight = base64FromBytes(
-        message.signingThresholdWeight
+        message.signingThresholdWeight,
       );
     }
     if (message.bondedWeight.length !== 0) {
@@ -990,19 +990,19 @@ export const KeygenSessionResponse = {
     }
     if (message.participants?.length) {
       obj.participants = message.participants.map((e) =>
-        KeygenParticipant.toJSON(e)
+        KeygenParticipant.toJSON(e),
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<KeygenSessionResponse>, I>>(
-    base?: I
+    base?: I,
   ): KeygenSessionResponse {
     return KeygenSessionResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenSessionResponse>, I>>(
-    object: I
+    object: I,
   ): KeygenSessionResponse {
     const message = createBaseKeygenSessionResponse();
     message.startedAt =
@@ -1041,7 +1041,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     _: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     return writer;
   },
@@ -1073,12 +1073,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I
+    base?: I,
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    _: I
+    _: I,
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     return message;
@@ -1092,7 +1092,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -1139,12 +1139,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I
+    base?: I,
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I
+    object: I,
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =
@@ -1192,14 +1192,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

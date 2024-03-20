@@ -43,7 +43,7 @@ export class RpcImpl implements Rpc {
     onDeliverTxResponse?:
       | undefined
       | ((deliverTxResponse: DeliverTxResponse) => void),
-    broadcastOptions?: BroadcastTxOptions
+    broadcastOptions?: BroadcastTxOptions,
   ) {
     this.axelarRpcUrl = axelarRpcUrl;
     this.axelarLcdUrl = axelarLcdUrl;
@@ -56,7 +56,7 @@ export class RpcImpl implements Rpc {
   public async request(
     service: string,
     method: string,
-    data: Uint8Array
+    data: Uint8Array,
   ): Promise<Uint8Array> {
     const [accData] = await this.offlineSigner.getAccounts();
 
@@ -78,7 +78,7 @@ export class RpcImpl implements Rpc {
             },
           ],
           memo: `@axelarjs/cosmos tx signed at: ${new Date().toLocaleTimeString()}`,
-        })
+        }),
       ).finish(),
       authInfoBytes: AuthInfo.encode({
         signerInfos: [
@@ -104,7 +104,7 @@ export class RpcImpl implements Rpc {
                 denom: coin.denom,
                 amount: coin.amount.toString(),
               };
-            }
+            },
           ),
           gasLimit: (this.broadcastOptions?.fee ?? STANDARD_FEE).gas,
         }),
@@ -135,7 +135,7 @@ export class RpcImpl implements Rpc {
     if (!this.signer) {
       this.signer = await SigningStargateClient.connectWithSigner(
         this.axelarRpcUrl,
-        this.offlineSigner
+        this.offlineSigner,
       );
     }
     return this.signer;
@@ -147,7 +147,7 @@ export class RpcImpl implements Rpc {
     return signer.broadcastTx(
       tx,
       this.broadcastOptions?.broadcastTimeoutMs,
-      this.broadcastOptions?.broadcastPollIntervalMs
+      this.broadcastOptions?.broadcastPollIntervalMs,
     );
   }
 
@@ -158,7 +158,7 @@ export class RpcImpl implements Rpc {
   private async getAccountInfo(address: string) {
     try {
       const result = await fetch(
-        `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`
+        `${this.axelarLcdUrl}/cosmos/auth/v1beta1/accounts/${address}`,
       )
         .then((res) => res.json() as Promise<{ account: AccountData }>)
         .catch(() => undefined);

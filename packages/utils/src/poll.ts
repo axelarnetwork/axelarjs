@@ -4,7 +4,7 @@ export async function poll<T>(
   fn: () => Promise<T>,
   keepGoingCondition: (...params: any[]) => boolean,
   ms: number,
-  maxTries: number
+  maxTries: number,
 ) {
   let tries = 0;
   let results = await fn();

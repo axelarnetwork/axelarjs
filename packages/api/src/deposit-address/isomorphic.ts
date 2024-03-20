@@ -22,7 +22,7 @@ export class DepositAddressClient extends RestService {
   }
 
   async requestDepositAddress(
-    params: GetDepositAddressParams
+    params: GetDepositAddressParams,
   ): Promise<DepositAddressResponse> {
     return await this.client
       .post("transfer-assets", {

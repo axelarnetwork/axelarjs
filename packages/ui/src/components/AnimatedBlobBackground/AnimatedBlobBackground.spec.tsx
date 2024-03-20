@@ -11,4 +11,3 @@ describe("AnimatedBlobBackground", () => {
     expect(container).toBeVisible();
   });
 });
-

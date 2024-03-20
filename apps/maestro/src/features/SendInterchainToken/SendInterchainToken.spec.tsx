@@ -112,13 +112,13 @@ describe("SendInterchainToken", () => {
         tokenId="0x00"
         originTokenAddress="0x00"
         originTokenChainId={MOCK_EVM_CHAIN_CONFIG.chain_id}
-      />
+      />,
     );
 
     expect(
       screen.getByRole("button", {
         name: /set max balance/i,
-      })
+      }),
     ).toMatchInlineSnapshot(`
       <span
         aria-label="set max balance to transfer"
@@ -148,13 +148,13 @@ describe("SendInterchainToken", () => {
         tokenId="0x00"
         originTokenAddress="0x00"
         originTokenChainId={MOCK_EVM_CHAIN_CONFIG.chain_id}
-      />
+      />,
     );
 
     // type in an amount
     await user.type(
       screen.getByPlaceholderText("Enter your amount to transfer"),
-      "100"
+      "100",
     );
 
     expect(screen.getByRole("button", { name: /Transfer/ }))

@@ -20,7 +20,7 @@ export type RegisterRemoteInterchainTokensInput = {
 };
 
 export default function useRegisterRemoteInterchainTokens(
-  input: RegisterRemoteInterchainTokensInput
+  input: RegisterRemoteInterchainTokensInput,
 ) {
   const { computed } = useEVMChainConfigsQuery();
   const chainId = useChainId();
@@ -30,16 +30,16 @@ export default function useRegisterRemoteInterchainTokens(
       input.chainIds
         .map((chainId) => computed.indexedByChainId[chainId])
         .filter(Boolean),
-    [input.chainIds, computed.indexedByChainId]
+    [input.chainIds, computed.indexedByChainId],
   );
 
   const destinationChainIds = destinationChains.map(
-    (chain) => chain.chain_name
+    (chain) => chain.chain_name,
   );
 
   const sourceChain = useMemo(
     () => computed.indexedByChainId[chainId],
-    [chainId, computed.indexedByChainId]
+    [chainId, computed.indexedByChainId],
   );
 
   const { data: tokenDeployment } = useInterchainTokenDetailsQuery({
@@ -69,7 +69,7 @@ export default function useRegisterRemoteInterchainTokens(
         minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
         destinationChain: chainId,
         gasValue: gasFeesData.gasFees[i].fee,
-      })
+      }),
     );
   }, [
     destinationChainIds,

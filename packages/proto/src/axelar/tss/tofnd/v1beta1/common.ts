@@ -26,7 +26,7 @@ export enum KeyPresenceResponse_Response {
 }
 
 export function keyPresenceResponse_ResponseFromJSON(
-  object: any
+  object: any,
 ): KeyPresenceResponse_Response {
   switch (object) {
     case 0:
@@ -49,7 +49,7 @@ export function keyPresenceResponse_ResponseFromJSON(
 }
 
 export function keyPresenceResponse_ResponseToJSON(
-  object: KeyPresenceResponse_Response
+  object: KeyPresenceResponse_Response,
 ): string {
   switch (object) {
     case KeyPresenceResponse_Response.RESPONSE_UNSPECIFIED:
@@ -73,7 +73,7 @@ function createBaseKeyPresenceRequest(): KeyPresenceRequest {
 export const KeyPresenceRequest = {
   encode(
     message: KeyPresenceRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyUid !== "") {
       writer.uint32(10).string(message.keyUid);
@@ -136,12 +136,12 @@ export const KeyPresenceRequest = {
   },
 
   create<I extends Exact<DeepPartial<KeyPresenceRequest>, I>>(
-    base?: I
+    base?: I,
   ): KeyPresenceRequest {
     return KeyPresenceRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyPresenceRequest>, I>>(
-    object: I
+    object: I,
   ): KeyPresenceRequest {
     const message = createBaseKeyPresenceRequest();
     message.keyUid = object.keyUid ?? "";
@@ -157,7 +157,7 @@ function createBaseKeyPresenceResponse(): KeyPresenceResponse {
 export const KeyPresenceResponse = {
   encode(
     message: KeyPresenceResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.response !== 0) {
       writer.uint32(8).int32(message.response);
@@ -206,12 +206,12 @@ export const KeyPresenceResponse = {
   },
 
   create<I extends Exact<DeepPartial<KeyPresenceResponse>, I>>(
-    base?: I
+    base?: I,
   ): KeyPresenceResponse {
     return KeyPresenceResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyPresenceResponse>, I>>(
-    object: I
+    object: I,
   ): KeyPresenceResponse {
     const message = createBaseKeyPresenceResponse();
     message.response = object.response ?? 0;
@@ -256,14 +256,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

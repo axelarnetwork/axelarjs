@@ -35,7 +35,7 @@ function createBaseInflationRateRequest(): InflationRateRequest {
 export const InflationRateRequest = {
   encode(
     message: InflationRateRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.validator !== "") {
       writer.uint32(10).string(message.validator);
@@ -45,7 +45,7 @@ export const InflationRateRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): InflationRateRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -87,12 +87,12 @@ export const InflationRateRequest = {
   },
 
   create<I extends Exact<DeepPartial<InflationRateRequest>, I>>(
-    base?: I
+    base?: I,
   ): InflationRateRequest {
     return InflationRateRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<InflationRateRequest>, I>>(
-    object: I
+    object: I,
   ): InflationRateRequest {
     const message = createBaseInflationRateRequest();
     message.validator = object.validator ?? "";
@@ -107,7 +107,7 @@ function createBaseInflationRateResponse(): InflationRateResponse {
 export const InflationRateResponse = {
   encode(
     message: InflationRateResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.inflationRate.length !== 0) {
       writer.uint32(10).bytes(message.inflationRate);
@@ -117,7 +117,7 @@ export const InflationRateResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): InflationRateResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -159,12 +159,12 @@ export const InflationRateResponse = {
   },
 
   create<I extends Exact<DeepPartial<InflationRateResponse>, I>>(
-    base?: I
+    base?: I,
   ): InflationRateResponse {
     return InflationRateResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<InflationRateResponse>, I>>(
-    object: I
+    object: I,
   ): InflationRateResponse {
     const message = createBaseInflationRateResponse();
     message.inflationRate = object.inflationRate ?? new Uint8Array(0);
@@ -179,7 +179,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     _: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     return writer;
   },
@@ -211,12 +211,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I
+    base?: I,
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    _: I
+    _: I,
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     return message;
@@ -230,7 +230,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -277,12 +277,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I
+    base?: I,
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I
+    object: I,
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =
@@ -330,14 +330,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

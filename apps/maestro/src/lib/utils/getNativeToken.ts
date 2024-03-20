@@ -24,7 +24,8 @@ export const getNativeToken = memoize((axelarChainId: string) => {
   }
 
   const chainConfig = WAGMI_CHAIN_CONFIGS.find(
-    (chain) => chain.axelarChainId.toLowerCase() === axelarChainId.toLowerCase()
+    (chain) =>
+      chain.axelarChainId.toLowerCase() === axelarChainId.toLowerCase(),
   );
 
   if (!chainConfig) {

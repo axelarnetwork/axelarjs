@@ -29,7 +29,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RefundMsgRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RefundMsg", data);
     return promise.then((data) =>
-      RefundMsgResponse.decode(_m0.Reader.create(data))
+      RefundMsgResponse.decode(_m0.Reader.create(data)),
     );
   }
 }
@@ -54,7 +54,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = InflationRateRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "InflationRate", data);
     return promise.then((data) =>
-      InflationRateResponse.decode(_m0.Reader.create(data))
+      InflationRateResponse.decode(_m0.Reader.create(data)),
     );
   }
 
@@ -62,7 +62,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = ParamsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Params", data);
     return promise.then((data) =>
-      ParamsResponse.decode(_m0.Reader.create(data))
+      ParamsResponse.decode(_m0.Reader.create(data)),
     );
   }
 }
@@ -71,6 +71,6 @@ interface Rpc {
   request(
     service: string,
     method: string,
-    data: Uint8Array
+    data: Uint8Array,
   ): Promise<Uint8Array>;
 }

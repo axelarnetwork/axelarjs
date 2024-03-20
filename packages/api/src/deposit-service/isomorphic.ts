@@ -35,7 +35,7 @@ export class DepositServiceClient extends RestService {
   }
 
   async getDepositAddressForNativeUnwrap(
-    params: DepositAddressNativeUnwrapParams
+    params: DepositAddressNativeUnwrapParams,
   ) {
     const endpoint = `/deposit/unwrap`;
     const response = await this.client

@@ -12,7 +12,7 @@ const INITIAL_STATE = {
 type ReactComponentState = typeof INITIAL_STATE;
 
 function useReactComponentState(
-  initialState: ReactComponentState = INITIAL_STATE
+  initialState: ReactComponentState = INITIAL_STATE,
 ) {
   const [state, setState] = useState(initialState);
 

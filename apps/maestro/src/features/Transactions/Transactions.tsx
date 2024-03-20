@@ -41,11 +41,11 @@ function useGroupedStatuses(txHash: `0x${string}`) {
       ([axelarChainId, entry]) => ({
         ...entry,
         chain: computed.indexedById[axelarChainId],
-      })
+      }),
     );
 
     const groupedStatusesProps = Object.entries(
-      groupBy((x) => x.status, statusValues)
+      groupBy((x) => x.status, statusValues),
     ).map(([status, entries]) => ({
       status: status as ExtendedGMPTxStatus,
       chains: entries.map((entry) => entry.chain),
@@ -75,7 +75,7 @@ const ToastElement: FC<ToastElementProps> = ({
 }) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
-    chainId
+    chainId,
   );
 
   const { computed } = useEVMChainConfigsQuery();
@@ -83,7 +83,7 @@ const ToastElement: FC<ToastElementProps> = ({
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
   const txTypeText = Maybe.of(txType).mapOrNull(
-    (txType) => TX_LABEL_MAP[txType]
+    (txType) => TX_LABEL_MAP[txType],
   );
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
@@ -92,7 +92,7 @@ const ToastElement: FC<ToastElementProps> = ({
 
   const wagmiChain = useMemo(
     () => computed.wagmiChains.find((wagmiChain) => wagmiChain.id === chainId),
-    [computed.wagmiChains, chainId]
+    [computed.wagmiChains, chainId],
   );
 
   const showFinalityProgressBar =
@@ -157,7 +157,7 @@ const ToastElement: FC<ToastElementProps> = ({
     // dismiss permanently if tx status is error or insufficient_fee
     if (
       groupedStatusesProps.some(
-        (x) => x.status === "error" || x.status === "insufficient_fee"
+        (x) => x.status === "error" || x.status === "insufficient_fee",
       )
     ) {
       onRemoveTx?.(txHash);
@@ -218,7 +218,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
           }
         }, 5000);
       }),
-    [executed, isLoading, total]
+    [executed, isLoading, total],
   );
 
   useEffect(() => {
@@ -233,7 +233,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
       {
         id: props.txHash,
         duration: Infinity,
-      }
+      },
     );
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -258,7 +258,7 @@ const Transactions = () => {
 
   const triggerRender = useCallback(
     () => setRenderCount((renderCount) => renderCount + 1),
-    []
+    [],
   );
 
   return (

@@ -72,7 +72,7 @@ export class AxelarscanClient extends RestService {
     params: {
       isStaging?: boolean;
       disabledChains?: string[];
-    } = {}
+    } = {},
   ) {
     const json = {
       module: MODULES.data,
@@ -82,7 +82,7 @@ export class AxelarscanClient extends RestService {
 
     const [evm, cosmos] = partition(
       (c) => c.chain_type === "evm",
-      await this.client.post("", { json }).json<GetChainConfigsResponse>()
+      await this.client.post("", { json }).json<GetChainConfigsResponse>(),
     );
 
     const isEligible = (a: EVMChainConfig | CosmosChainConfig) =>

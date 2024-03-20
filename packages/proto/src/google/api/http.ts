@@ -460,7 +460,7 @@ function createBaseHttpRule(): HttpRule {
 export const HttpRule = {
   encode(
     message: HttpRule,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.selector !== "") {
       writer.uint32(10).string(message.selector);
@@ -483,7 +483,7 @@ export const HttpRule = {
     if (message.custom !== undefined) {
       CustomHttpPattern.encode(
         message.custom,
-        writer.uint32(66).fork()
+        writer.uint32(66).fork(),
       ).ldelim();
     }
     if (message.body !== "") {
@@ -575,7 +575,7 @@ export const HttpRule = {
           }
 
           message.additionalBindings.push(
-            HttpRule.decode(reader, reader.uint32())
+            HttpRule.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -643,7 +643,7 @@ export const HttpRule = {
     }
     if (message.additionalBindings?.length) {
       obj.additionalBindings = message.additionalBindings.map((e) =>
-        HttpRule.toJSON(e)
+        HttpRule.toJSON(e),
       );
     }
     return obj;
@@ -679,7 +679,7 @@ function createBaseCustomHttpPattern(): CustomHttpPattern {
 export const CustomHttpPattern = {
   encode(
     message: CustomHttpPattern,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.kind !== "") {
       writer.uint32(10).string(message.kind);
@@ -740,12 +740,12 @@ export const CustomHttpPattern = {
   },
 
   create<I extends Exact<DeepPartial<CustomHttpPattern>, I>>(
-    base?: I
+    base?: I,
   ): CustomHttpPattern {
     return CustomHttpPattern.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CustomHttpPattern>, I>>(
-    object: I
+    object: I,
   ): CustomHttpPattern {
     const message = createBaseCustomHttpPattern();
     message.kind = object.kind ?? "";
@@ -766,14 +766,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

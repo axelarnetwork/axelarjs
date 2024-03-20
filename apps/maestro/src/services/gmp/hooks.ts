@@ -25,7 +25,7 @@ export function useInterchainTokensQuery(input: {
         enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
         retry: false,
         refetchOnWindowFocus: false,
-      }
+      },
     );
 
   return {
@@ -36,14 +36,14 @@ export function useInterchainTokensQuery(input: {
         ...token,
         chain: computed.indexedById[token.axelarChainId ?? ""],
         wagmiConfig: computed.wagmiChains?.find(
-          (x) => x?.id === Number(token.chainId)
+          (x) => x?.id === Number(token.chainId),
         ),
       })),
       chain: Maybe.of(input.chainId).mapOrUndefined(
-        (x) => computed.indexedByChainId[x]
+        (x) => computed.indexedByChainId[x],
       ),
       wagmiConfig: computed.wagmiChains?.find(
-        (x) => x?.id === Number(input.chainId)
+        (x) => x?.id === Number(input.chainId),
       ),
     },
     isLoading: evmChainsQuery.isLoading || queryResult.isLoading,
@@ -60,7 +60,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   options?: {
     enabled?: boolean;
     refetchInterval?: number;
-  }
+  },
 ) {
   const { data, ...query } =
     trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
@@ -74,7 +74,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
           hex64().safeParse(input.txHash).success &&
           // apply the default value if the option is not provided
           Maybe.of(options?.enabled).mapOr(true, Boolean),
-      }
+      },
     );
 
   return {
@@ -98,7 +98,7 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
   options?: {
     enabled?: boolean;
     refetchInterval?: number;
-  }
+  },
 ) {
   const { data, ...query } =
     trpc.gmp.getTransactionStatusesOnDestinationChains.useQuery(
@@ -107,11 +107,13 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
       },
       {
         enabled: Boolean(
-          input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
+          input.txHashes?.every((txHash) =>
+            txHash.match(/^(0x)?[0-9a-f]{64}/i),
+          ),
         ),
         refetchInterval: 1000 * 10, // 10 seconds
         ...options,
-      }
+      },
     );
 
   return {

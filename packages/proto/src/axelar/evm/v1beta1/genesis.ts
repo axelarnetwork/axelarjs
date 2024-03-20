@@ -42,7 +42,7 @@ function createBaseGenesisState(): GenesisState {
 export const GenesisState = {
   encode(
     message: GenesisState,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.chains) {
       GenesisState_Chain.encode(v!, writer.uint32(26).fork()).ldelim();
@@ -64,7 +64,7 @@ export const GenesisState = {
           }
 
           message.chains.push(
-            GenesisState_Chain.decode(reader, reader.uint32())
+            GenesisState_Chain.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -93,12 +93,12 @@ export const GenesisState = {
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
-    base?: I
+    base?: I,
   ): GenesisState {
     return GenesisState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
-    object: I
+    object: I,
   ): GenesisState {
     const message = createBaseGenesisState();
     message.chains =
@@ -127,7 +127,7 @@ function createBaseGenesisState_Chain(): GenesisState_Chain {
 export const GenesisState_Chain = {
   encode(
     message: GenesisState_Chain,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -138,7 +138,7 @@ export const GenesisState_Chain = {
     if (message.commandQueue !== undefined) {
       QueueState.encode(
         message.commandQueue,
-        writer.uint32(26).fork()
+        writer.uint32(26).fork(),
       ).ldelim();
     }
     for (const v of message.confirmedDeposits) {
@@ -162,7 +162,7 @@ export const GenesisState_Chain = {
     if (message.confirmedEventQueue !== undefined) {
       QueueState.encode(
         message.confirmedEventQueue,
-        writer.uint32(98).fork()
+        writer.uint32(98).fork(),
       ).ldelim();
     }
     for (const v of message.legacyConfirmedDeposits) {
@@ -209,7 +209,7 @@ export const GenesisState_Chain = {
           }
 
           message.confirmedDeposits.push(
-            ERC20Deposit.decode(reader, reader.uint32())
+            ERC20Deposit.decode(reader, reader.uint32()),
           );
           continue;
         case 5:
@@ -218,7 +218,7 @@ export const GenesisState_Chain = {
           }
 
           message.burnedDeposits.push(
-            ERC20Deposit.decode(reader, reader.uint32())
+            ERC20Deposit.decode(reader, reader.uint32()),
           );
           continue;
         case 8:
@@ -227,7 +227,7 @@ export const GenesisState_Chain = {
           }
 
           message.commandBatches.push(
-            CommandBatchMetadata.decode(reader, reader.uint32())
+            CommandBatchMetadata.decode(reader, reader.uint32()),
           );
           continue;
         case 9:
@@ -243,7 +243,7 @@ export const GenesisState_Chain = {
           }
 
           message.tokens.push(
-            ERC20TokenMetadata.decode(reader, reader.uint32())
+            ERC20TokenMetadata.decode(reader, reader.uint32()),
           );
           continue;
         case 11:
@@ -260,7 +260,7 @@ export const GenesisState_Chain = {
 
           message.confirmedEventQueue = QueueState.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 13:
@@ -269,7 +269,7 @@ export const GenesisState_Chain = {
           }
 
           message.legacyConfirmedDeposits.push(
-            ERC20Deposit.decode(reader, reader.uint32())
+            ERC20Deposit.decode(reader, reader.uint32()),
           );
           continue;
         case 14:
@@ -278,7 +278,7 @@ export const GenesisState_Chain = {
           }
 
           message.legacyBurnedDeposits.push(
-            ERC20Deposit.decode(reader, reader.uint32())
+            ERC20Deposit.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -307,7 +307,7 @@ export const GenesisState_Chain = {
         : [],
       commandBatches: globalThis.Array.isArray(object?.commandBatches)
         ? object.commandBatches.map((e: any) =>
-            CommandBatchMetadata.fromJSON(e)
+            CommandBatchMetadata.fromJSON(e),
           )
         : [],
       gateway: isSet(object.gateway)
@@ -323,14 +323,14 @@ export const GenesisState_Chain = {
         ? QueueState.fromJSON(object.confirmedEventQueue)
         : undefined,
       legacyConfirmedDeposits: globalThis.Array.isArray(
-        object?.legacyConfirmedDeposits
+        object?.legacyConfirmedDeposits,
       )
         ? object.legacyConfirmedDeposits.map((e: any) =>
-            ERC20Deposit.fromJSON(e)
+            ERC20Deposit.fromJSON(e),
           )
         : [],
       legacyBurnedDeposits: globalThis.Array.isArray(
-        object?.legacyBurnedDeposits
+        object?.legacyBurnedDeposits,
       )
         ? object.legacyBurnedDeposits.map((e: any) => ERC20Deposit.fromJSON(e))
         : [],
@@ -350,17 +350,17 @@ export const GenesisState_Chain = {
     }
     if (message.confirmedDeposits?.length) {
       obj.confirmedDeposits = message.confirmedDeposits.map((e) =>
-        ERC20Deposit.toJSON(e)
+        ERC20Deposit.toJSON(e),
       );
     }
     if (message.burnedDeposits?.length) {
       obj.burnedDeposits = message.burnedDeposits.map((e) =>
-        ERC20Deposit.toJSON(e)
+        ERC20Deposit.toJSON(e),
       );
     }
     if (message.commandBatches?.length) {
       obj.commandBatches = message.commandBatches.map((e) =>
-        CommandBatchMetadata.toJSON(e)
+        CommandBatchMetadata.toJSON(e),
       );
     }
     if (message.gateway !== undefined) {
@@ -377,24 +377,24 @@ export const GenesisState_Chain = {
     }
     if (message.legacyConfirmedDeposits?.length) {
       obj.legacyConfirmedDeposits = message.legacyConfirmedDeposits.map((e) =>
-        ERC20Deposit.toJSON(e)
+        ERC20Deposit.toJSON(e),
       );
     }
     if (message.legacyBurnedDeposits?.length) {
       obj.legacyBurnedDeposits = message.legacyBurnedDeposits.map((e) =>
-        ERC20Deposit.toJSON(e)
+        ERC20Deposit.toJSON(e),
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<GenesisState_Chain>, I>>(
-    base?: I
+    base?: I,
   ): GenesisState_Chain {
     return GenesisState_Chain.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState_Chain>, I>>(
-    object: I
+    object: I,
   ): GenesisState_Chain {
     const message = createBaseGenesisState_Chain();
     message.params =
@@ -448,14 +448,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

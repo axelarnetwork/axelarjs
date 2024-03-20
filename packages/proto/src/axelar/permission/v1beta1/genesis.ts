@@ -22,7 +22,7 @@ function createBaseGenesisState(): GenesisState {
 export const GenesisState = {
   encode(
     message: GenesisState,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -30,7 +30,7 @@ export const GenesisState = {
     if (message.governanceKey !== undefined) {
       LegacyAminoPubKey.encode(
         message.governanceKey,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     for (const v of message.govAccounts) {
@@ -61,7 +61,7 @@ export const GenesisState = {
 
           message.governanceKey = LegacyAminoPubKey.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 3:
@@ -107,12 +107,12 @@ export const GenesisState = {
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
-    base?: I
+    base?: I,
   ): GenesisState {
     return GenesisState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
-    object: I
+    object: I,
   ): GenesisState {
     const message = createBaseGenesisState();
     message.params =
@@ -141,14 +141,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

@@ -36,7 +36,7 @@ describe("axelar-query (node client)", () => {
 
       expect(fees).toBeTruthy();
       expect(
-        Number(formatEther(BigInt(fees as string))) - Number("0.0000001") > 0
+        Number(formatEther(BigInt(fees as string))) - Number("0.0000001") > 0,
       );
     });
 
@@ -57,15 +57,15 @@ describe("axelar-query (node client)", () => {
       })) as EstimateGasFeeResponse;
 
       const l1ExecutionFeeWithMultiplier = parseInt(
-        fees.l1ExecutionFeeWithMultiplier
+        fees.l1ExecutionFeeWithMultiplier,
       );
       const executionFeeWithMultiplier = parseInt(
-        fees.executionFeeWithMultiplier
+        fees.executionFeeWithMultiplier,
       );
 
       expect(fees).toBeTruthy();
       expect(l1ExecutionFeeWithMultiplier).toBeGreaterThan(
-        executionFeeWithMultiplier
+        executionFeeWithMultiplier,
       );
     });
 
@@ -83,9 +83,9 @@ describe("axelar-query (node client)", () => {
         api.estimateGasFee({
           ...l2RequestParams,
           showDetailedFees: true,
-        })
+        }),
       ).rejects.toThrowError(
-        "executeData is required to calculate the L1 execution fee for optimism"
+        "executeData is required to calculate the L1 execution fee for optimism",
       );
     });
 

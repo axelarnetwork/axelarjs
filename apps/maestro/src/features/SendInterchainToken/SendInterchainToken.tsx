@@ -87,7 +87,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             logger.always.error(error);
           }
         },
-      }
+      },
     );
   };
 
@@ -155,13 +155,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const isFormDisabled = useMemo(
     () =>
       state.txState.status !== "idle" && state.txState.status !== "reverted",
-    [state.txState.status]
+    [state.txState.status],
   );
 
   const txHash = useMemo(
     () =>
       state.txState.status === "submitted" ? state.txState.hash : undefined,
-    [state.txState]
+    [state.txState],
   );
 
   useEffect(() => {
@@ -189,7 +189,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const handleSetMaxBalance = useCallback(() => {
     const value = formatUnits(
       BigInt(props.balance.tokenBalance),
-      Number(props.balance.decimals)
+      Number(props.balance.decimals),
     ).replace(/,/gi, "");
 
     const [integerPart, decimalPart] = value.split(".") as [string, string];
@@ -220,7 +220,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         actions.setIsModalOpen(isOpen);
       }}
     >
-      <Modal.Body className="min-h-96 flex flex-col">
+      <Modal.Body className="flex min-h-96 flex-col">
         <Modal.Title>Interchain Transfer</Modal.Title>
 
         <div className="grid grid-cols-2 gap-4 p-1">
@@ -300,12 +300,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
                   const bnValue = parseUnits(
                     value as `${number}`,
-                    Number(props.balance.decimals) * 2
+                    Number(props.balance.decimals) * 2,
                   );
 
                   const bnBalance = parseUnits(
                     props.balance.tokenBalance,
-                    Number(props.balance.decimals)
+                    Number(props.balance.decimals),
                   );
 
                   if (bnValue > bnBalance) {

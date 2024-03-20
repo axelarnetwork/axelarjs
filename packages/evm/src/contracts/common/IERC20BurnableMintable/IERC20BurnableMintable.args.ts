@@ -290,7 +290,7 @@ export const IERC20BurnableMintable_ENCODERS = {
 };
 
 export function createIERC20BurnableMintableReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     allowance(allowanceArgs: IERC20BurnableMintableAllowanceArgs) {

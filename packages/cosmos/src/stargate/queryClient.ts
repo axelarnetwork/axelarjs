@@ -23,7 +23,7 @@ import type { Rpc, StringLiteral } from "./types";
 const setupBareExtension =
   <TModule, TClient>(
     moduleName: StringLiteral<TModule>,
-    client: { new (rpc: Rpc): TClient }
+    client: { new (rpc: Rpc): TClient },
   ) =>
   (base: QueryClient) => {
     const rpc = createProtobufRpcClient(base);
@@ -38,9 +38,9 @@ const setupBareExtension =
           x[0]?.toLowerCase() + x.slice(1),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ((baseClient as any)[x] as (...args: any[]) => unknown).bind(
-            baseClient
+            baseClient,
           ),
-        ])
+        ]),
     ) as {
       [P in keyof TClient as P extends string
         ? Uncapitalize<P>
@@ -69,7 +69,7 @@ const createQueryClientFromTmClient = (tmClient: Tendermint37Client) =>
     setupBareExtension("reward", RewardQueryClient),
     setupBareExtension("snapshot", SnapshotQueryClient),
     setupBareExtension("tss", TSSQueryClient),
-    setupBareExtension("vote", VoteQueryClient)
+    setupBareExtension("vote", VoteQueryClient),
   );
 
 const createQueryClientFromEndpoint = async (endpoint: string | HttpEndpoint) =>
@@ -80,13 +80,13 @@ export type AxelarQueryClient = ReturnType<
 >;
 
 export function createQueryClient(
-  endpoint: string | HttpEndpoint
+  endpoint: string | HttpEndpoint,
 ): Promise<AxelarQueryClient>;
 export function createQueryClient(
-  tmClient: Tendermint37Client
+  tmClient: Tendermint37Client,
 ): AxelarQueryClient;
 export function createQueryClient(
-  endpointOrTmClient: string | HttpEndpoint | Tendermint37Client
+  endpointOrTmClient: string | HttpEndpoint | Tendermint37Client,
 ) {
   return endpointOrTmClient instanceof Tendermint37Client
     ? createQueryClientFromTmClient(endpointOrTmClient)

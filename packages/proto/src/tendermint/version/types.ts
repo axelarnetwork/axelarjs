@@ -113,7 +113,7 @@ function createBaseConsensus(): Consensus {
 export const Consensus = {
   encode(
     message: Consensus,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.block.isZero()) {
       writer.uint32(8).uint64(message.block);
@@ -177,7 +177,7 @@ export const Consensus = {
     return Consensus.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Consensus>, I>>(
-    object: I
+    object: I,
   ): Consensus {
     const message = createBaseConsensus();
     message.block =
@@ -204,14 +204,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

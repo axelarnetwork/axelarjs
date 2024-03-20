@@ -67,7 +67,7 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
 
   async setAccountStatus(
     accountAddress: `0x${string}`,
-    newStatus: AccountStatus
+    newStatus: AccountStatus,
   ) {
     const oldStatus = await this.getAccountStatus(accountAddress);
 

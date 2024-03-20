@@ -78,7 +78,7 @@ export const getRecentTransactions = publicProcedure
 
 function extractEvent(
   response: Partial<SearchGMPResponseData>,
-  contractMethod: ContractMethod
+  contractMethod: ContractMethod,
 ) {
   switch (contractMethod) {
     case "InterchainTransfer":

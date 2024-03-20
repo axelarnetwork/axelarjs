@@ -65,7 +65,7 @@ async function codegenContract({
   // replace ERC* with erc* and EIP* with eip* to avoid inconsistent casing
   const sanitizedPascalName = pascalName.replace(
     /^(ERC|EIP)([0-9]+)/,
-    (_, p1, p2) => `${p1.toLowerCase()}${p2}`
+    (_, p1, p2) => `${p1.toLowerCase()}${p2}`,
   );
   const kebabtName = pascalToKebabCase(sanitizedPascalName);
 
@@ -79,14 +79,14 @@ async function codegenContract({
     `;
 
   const subPath = path.dirname(
-    contractFolder.replace(config.contractsFolder, "")
+    contractFolder.replace(config.contractsFolder, ""),
   );
 
   const outputFolderPath = path.resolve(config.outputFolder ?? "");
 
   const outputPath = path.join(
     config.flatten ? outputFolderPath : path.join(outputFolderPath, subPath),
-    folderName
+    folderName,
   );
 
   // create base path folder
@@ -101,7 +101,7 @@ async function codegenContract({
   ];
 
   const readFns = abiFns.filter(
-    (x) => x.stateMutability === "view" || x.stateMutability === "pure"
+    (x) => x.stateMutability === "view" || x.stateMutability === "pure",
   );
 
   if (abiFns.length) {
@@ -141,16 +141,18 @@ async function codegenContract({
   // write files
   await Promise.all(
     files.map(async ({ name, content, parser }) =>
-      fs.writeFile(
-        path.join(outputPath, name),
-        prettier.format(
+      {
+        const file = await prettier.format(
           parser === "json"
             ? content
             : `${GENERATED_DISCLAIMER({ abiPath })}\n\n${content}`,
-          { parser }
+          { parser },
         )
-      )
-    )
+        return fs.writeFile(
+        path.join(outputPath, name),
+        file,
+      )},
+    ),
   );
 }
 
@@ -195,7 +197,7 @@ async function codegen(config: CodegenConfig) {
   await spinner("Generating contract ABIs", () => Promise.all(promises));
 
   const summary = `Done. Generated ${chalk.green(
-    contractFolders.length
+    contractFolders.length,
   )} typed contract ABIs! 🎉`;
   console.log(summary);
   process.exit(0);

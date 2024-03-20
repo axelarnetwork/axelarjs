@@ -47,11 +47,11 @@ export const ITOKEN_MANAGER_IMPLEMENTATION_ENCODERS = {
 };
 
 export function createITokenManagerImplementationReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     tokenManagerImplementation(
-      tokenManagerImplementationArgs: ITokenManagerImplementationTokenManagerImplementationArgs
+      tokenManagerImplementationArgs: ITokenManagerImplementationTokenManagerImplementationArgs,
     ) {
       const encoder =
         ITOKEN_MANAGER_IMPLEMENTATION_ENCODERS["tokenManagerImplementation"];

@@ -10,7 +10,7 @@ export const setInterchainTokenIconUrl = protectedProcedure
     z.object({
       iconUrl: z.string().url(),
       tokenId: hex64Literal(),
-    })
+    }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
@@ -30,7 +30,7 @@ export const setInterchainTokenIconUrl = protectedProcedure
 
       return await ctx.persistence.kv.setTokenIconUrl(
         input.tokenId,
-        sanitizedUrl
+        sanitizedUrl,
       );
     } catch (error) {
       if (error instanceof TRPCError) {
@@ -74,7 +74,7 @@ function sanitizeUrl(url: string) {
 
 async function isImageSafeToBeUsed(
   imageUrl: string,
-  ctx: Context
+  ctx: Context,
 ): Promise<boolean> {
   const promptText = `
     Is this image safe to be used as a token icon?.

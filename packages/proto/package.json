@@ -50,7 +50,7 @@
     "@axelarjs/config": "workspace:*",
     "@types/node": "^20.11.28",
     "degit": "^2.8.4",
-    "prettier": "^2.8.8",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "ts-proto": "^1.169.1",
     "typescript": "^5.4.2"

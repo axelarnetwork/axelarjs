@@ -77,7 +77,7 @@ export class HttpClient {
   private async request<T>(
     path: string,
     method: HttpMethod = "GET",
-    body?: T
+    body?: T,
   ): Promise<Response> {
     const url = new URL(path, this.prefixUrl).toString();
 
@@ -151,7 +151,7 @@ export class HttpClient {
    */
   private requestWithUnwrapper<B extends Body | undefined>(
     path: string,
-    { method, body }: Payload<B>
+    { method, body }: Payload<B>,
   ): Unwrapper {
     const fetcher = async () => {
       if (method === "GET" || method === "DELETE") {
@@ -161,7 +161,7 @@ export class HttpClient {
       return this.request(
         path,
         method,
-        body && "json" in body ? body.json : body
+        body && "json" in body ? body.json : body,
       );
     };
 

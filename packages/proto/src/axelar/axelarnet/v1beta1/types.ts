@@ -99,7 +99,7 @@ function createBaseIBCTransfer(): IBCTransfer {
 export const IBCTransfer = {
   encode(
     message: IBCTransfer,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -257,7 +257,7 @@ export const IBCTransfer = {
     return IBCTransfer.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCTransfer>, I>>(
-    object: I
+    object: I,
   ): IBCTransfer {
     const message = createBaseIBCTransfer();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -288,7 +288,7 @@ function createBaseCosmosChain(): CosmosChain {
 export const CosmosChain = {
   encode(
     message: CosmosChain,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -384,7 +384,7 @@ export const CosmosChain = {
     return CosmosChain.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CosmosChain>, I>>(
-    object: I
+    object: I,
   ): CosmosChain {
     const message = createBaseCosmosChain();
     message.name = object.name ?? "";
@@ -610,14 +610,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

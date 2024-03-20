@@ -28,7 +28,7 @@ import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";
 
 const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
-  props
+  props,
 ) => {
   if (!props.isRegistered && !props.isOriginToken) {
     return null;
@@ -109,7 +109,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
       className={cn(
         "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
         "hover:opacity-75 hover:shadow-xl",
-        props.className
+        props.className,
       )}
     >
       <Card.Body className="w-full">
@@ -240,7 +240,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                               !props.hasRemoteTokens ||
                               shouldDisableSend(
                                 props.axelarChainId,
-                                props.tokenAddress
+                                props.tokenAddress,
                               )
                             }
                           >

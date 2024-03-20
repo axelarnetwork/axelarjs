@@ -23,7 +23,7 @@ export enum RecoverResponse_Response {
 }
 
 export function recoverResponse_ResponseFromJSON(
-  object: any
+  object: any,
 ): RecoverResponse_Response {
   switch (object) {
     case 0:
@@ -43,7 +43,7 @@ export function recoverResponse_ResponseFromJSON(
 }
 
 export function recoverResponse_ResponseToJSON(
-  object: RecoverResponse_Response
+  object: RecoverResponse_Response,
 ): string {
   switch (object) {
     case RecoverResponse_Response.RESPONSE_UNSPECIFIED:
@@ -124,7 +124,7 @@ export enum MessageOut_CriminalList_Criminal_CrimeType {
 }
 
 export function messageOut_CriminalList_Criminal_CrimeTypeFromJSON(
-  object: any
+  object: any,
 ): MessageOut_CriminalList_Criminal_CrimeType {
   switch (object) {
     case 0:
@@ -144,7 +144,7 @@ export function messageOut_CriminalList_Criminal_CrimeTypeFromJSON(
 }
 
 export function messageOut_CriminalList_Criminal_CrimeTypeToJSON(
-  object: MessageOut_CriminalList_Criminal_CrimeType
+  object: MessageOut_CriminalList_Criminal_CrimeType,
 ): string {
   switch (object) {
     case MessageOut_CriminalList_Criminal_CrimeType.CRIME_TYPE_UNSPECIFIED:
@@ -195,7 +195,7 @@ function createBaseRecoverRequest(): RecoverRequest {
 export const RecoverRequest = {
   encode(
     message: RecoverRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keygenInit !== undefined) {
       KeygenInit.encode(message.keygenInit, writer.uint32(10).fork()).ldelim();
@@ -203,7 +203,7 @@ export const RecoverRequest = {
     if (message.keygenOutput !== undefined) {
       KeygenOutput.encode(
         message.keygenOutput,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     return writer;
@@ -263,12 +263,12 @@ export const RecoverRequest = {
   },
 
   create<I extends Exact<DeepPartial<RecoverRequest>, I>>(
-    base?: I
+    base?: I,
   ): RecoverRequest {
     return RecoverRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RecoverRequest>, I>>(
-    object: I
+    object: I,
   ): RecoverRequest {
     const message = createBaseRecoverRequest();
     message.keygenInit =
@@ -290,7 +290,7 @@ function createBaseRecoverResponse(): RecoverResponse {
 export const RecoverResponse = {
   encode(
     message: RecoverResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.response !== 0) {
       writer.uint32(8).int32(message.response);
@@ -339,12 +339,12 @@ export const RecoverResponse = {
   },
 
   create<I extends Exact<DeepPartial<RecoverResponse>, I>>(
-    base?: I
+    base?: I,
   ): RecoverResponse {
     return RecoverResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RecoverResponse>, I>>(
-    object: I
+    object: I,
   ): RecoverResponse {
     const message = createBaseRecoverResponse();
     message.response = object.response ?? 0;
@@ -363,7 +363,7 @@ function createBaseKeygenOutput(): KeygenOutput {
 export const KeygenOutput = {
   encode(
     message: KeygenOutput,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.pubKey.length !== 0) {
       writer.uint32(10).bytes(message.pubKey);
@@ -444,12 +444,12 @@ export const KeygenOutput = {
   },
 
   create<I extends Exact<DeepPartial<KeygenOutput>, I>>(
-    base?: I
+    base?: I,
   ): KeygenOutput {
     return KeygenOutput.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenOutput>, I>>(
-    object: I
+    object: I,
   ): KeygenOutput {
     const message = createBaseKeygenOutput();
     message.pubKey = object.pubKey ?? new Uint8Array(0);
@@ -471,7 +471,7 @@ function createBaseMessageIn(): MessageIn {
 export const MessageIn = {
   encode(
     message: MessageIn,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keygenInit !== undefined) {
       KeygenInit.encode(message.keygenInit, writer.uint32(10).fork()).ldelim();
@@ -569,7 +569,7 @@ export const MessageIn = {
     return MessageIn.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageIn>, I>>(
-    object: I
+    object: I,
   ): MessageIn {
     const message = createBaseMessageIn();
     message.keygenInit =
@@ -601,7 +601,7 @@ function createBaseMessageOut(): MessageOut {
 export const MessageOut = {
   encode(
     message: MessageOut,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.traffic !== undefined) {
       TrafficOut.encode(message.traffic, writer.uint32(10).fork()).ldelim();
@@ -609,13 +609,13 @@ export const MessageOut = {
     if (message.keygenResult !== undefined) {
       MessageOut_KeygenResult.encode(
         message.keygenResult,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     if (message.signResult !== undefined) {
       MessageOut_SignResult.encode(
         message.signResult,
-        writer.uint32(26).fork()
+        writer.uint32(26).fork(),
       ).ldelim();
     }
     if (message.needRecover !== undefined) {
@@ -646,7 +646,7 @@ export const MessageOut = {
 
           message.keygenResult = MessageOut_KeygenResult.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 3:
@@ -656,7 +656,7 @@ export const MessageOut = {
 
           message.signResult = MessageOut_SignResult.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 4:
@@ -713,7 +713,7 @@ export const MessageOut = {
     return MessageOut.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageOut>, I>>(
-    object: I
+    object: I,
   ): MessageOut {
     const message = createBaseMessageOut();
     message.traffic =
@@ -740,7 +740,7 @@ function createBaseMessageOut_KeygenResult(): MessageOut_KeygenResult {
 export const MessageOut_KeygenResult = {
   encode(
     message: MessageOut_KeygenResult,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.data !== undefined) {
       KeygenOutput.encode(message.data, writer.uint32(10).fork()).ldelim();
@@ -748,7 +748,7 @@ export const MessageOut_KeygenResult = {
     if (message.criminals !== undefined) {
       MessageOut_CriminalList.encode(
         message.criminals,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     return writer;
@@ -756,7 +756,7 @@ export const MessageOut_KeygenResult = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): MessageOut_KeygenResult {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -779,7 +779,7 @@ export const MessageOut_KeygenResult = {
 
           message.criminals = MessageOut_CriminalList.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
       }
@@ -812,12 +812,12 @@ export const MessageOut_KeygenResult = {
   },
 
   create<I extends Exact<DeepPartial<MessageOut_KeygenResult>, I>>(
-    base?: I
+    base?: I,
   ): MessageOut_KeygenResult {
     return MessageOut_KeygenResult.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageOut_KeygenResult>, I>>(
-    object: I
+    object: I,
   ): MessageOut_KeygenResult {
     const message = createBaseMessageOut_KeygenResult();
     message.data =
@@ -839,7 +839,7 @@ function createBaseMessageOut_SignResult(): MessageOut_SignResult {
 export const MessageOut_SignResult = {
   encode(
     message: MessageOut_SignResult,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.signature !== undefined) {
       writer.uint32(10).bytes(message.signature);
@@ -847,7 +847,7 @@ export const MessageOut_SignResult = {
     if (message.criminals !== undefined) {
       MessageOut_CriminalList.encode(
         message.criminals,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     return writer;
@@ -855,7 +855,7 @@ export const MessageOut_SignResult = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): MessageOut_SignResult {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -878,7 +878,7 @@ export const MessageOut_SignResult = {
 
           message.criminals = MessageOut_CriminalList.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
       }
@@ -913,12 +913,12 @@ export const MessageOut_SignResult = {
   },
 
   create<I extends Exact<DeepPartial<MessageOut_SignResult>, I>>(
-    base?: I
+    base?: I,
   ): MessageOut_SignResult {
     return MessageOut_SignResult.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageOut_SignResult>, I>>(
-    object: I
+    object: I,
   ): MessageOut_SignResult {
     const message = createBaseMessageOut_SignResult();
     message.signature = object.signature ?? undefined;
@@ -937,12 +937,12 @@ function createBaseMessageOut_CriminalList(): MessageOut_CriminalList {
 export const MessageOut_CriminalList = {
   encode(
     message: MessageOut_CriminalList,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.criminals) {
       MessageOut_CriminalList_Criminal.encode(
         v!,
-        writer.uint32(10).fork()
+        writer.uint32(10).fork(),
       ).ldelim();
     }
     return writer;
@@ -950,7 +950,7 @@ export const MessageOut_CriminalList = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): MessageOut_CriminalList {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -965,7 +965,7 @@ export const MessageOut_CriminalList = {
           }
 
           message.criminals.push(
-            MessageOut_CriminalList_Criminal.decode(reader, reader.uint32())
+            MessageOut_CriminalList_Criminal.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -981,7 +981,7 @@ export const MessageOut_CriminalList = {
     return {
       criminals: globalThis.Array.isArray(object?.criminals)
         ? object.criminals.map((e: any) =>
-            MessageOut_CriminalList_Criminal.fromJSON(e)
+            MessageOut_CriminalList_Criminal.fromJSON(e),
           )
         : [],
     };
@@ -991,24 +991,24 @@ export const MessageOut_CriminalList = {
     const obj: any = {};
     if (message.criminals?.length) {
       obj.criminals = message.criminals.map((e) =>
-        MessageOut_CriminalList_Criminal.toJSON(e)
+        MessageOut_CriminalList_Criminal.toJSON(e),
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MessageOut_CriminalList>, I>>(
-    base?: I
+    base?: I,
   ): MessageOut_CriminalList {
     return MessageOut_CriminalList.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageOut_CriminalList>, I>>(
-    object: I
+    object: I,
   ): MessageOut_CriminalList {
     const message = createBaseMessageOut_CriminalList();
     message.criminals =
       object.criminals?.map((e) =>
-        MessageOut_CriminalList_Criminal.fromPartial(e)
+        MessageOut_CriminalList_Criminal.fromPartial(e),
       ) || [];
     return message;
   },
@@ -1021,7 +1021,7 @@ function createBaseMessageOut_CriminalList_Criminal(): MessageOut_CriminalList_C
 export const MessageOut_CriminalList_Criminal = {
   encode(
     message: MessageOut_CriminalList_Criminal,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.partyUid !== "") {
       writer.uint32(10).string(message.partyUid);
@@ -1034,7 +1034,7 @@ export const MessageOut_CriminalList_Criminal = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): MessageOut_CriminalList_Criminal {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1084,19 +1084,19 @@ export const MessageOut_CriminalList_Criminal = {
     }
     if (message.crimeType !== 0) {
       obj.crimeType = messageOut_CriminalList_Criminal_CrimeTypeToJSON(
-        message.crimeType
+        message.crimeType,
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<MessageOut_CriminalList_Criminal>, I>>(
-    base?: I
+    base?: I,
   ): MessageOut_CriminalList_Criminal {
     return MessageOut_CriminalList_Criminal.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<MessageOut_CriminalList_Criminal>, I>
+    I extends Exact<DeepPartial<MessageOut_CriminalList_Criminal>, I>,
   >(object: I): MessageOut_CriminalList_Criminal {
     const message = createBaseMessageOut_CriminalList_Criminal();
     message.partyUid = object.partyUid ?? "";
@@ -1112,7 +1112,7 @@ function createBaseTrafficIn(): TrafficIn {
 export const TrafficIn = {
   encode(
     message: TrafficIn,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.fromPartyUid !== "") {
       writer.uint32(10).string(message.fromPartyUid);
@@ -1196,7 +1196,7 @@ export const TrafficIn = {
     return TrafficIn.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TrafficIn>, I>>(
-    object: I
+    object: I,
   ): TrafficIn {
     const message = createBaseTrafficIn();
     message.fromPartyUid = object.fromPartyUid ?? "";
@@ -1213,7 +1213,7 @@ function createBaseTrafficOut(): TrafficOut {
 export const TrafficOut = {
   encode(
     message: TrafficOut,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.toPartyUid !== "") {
       writer.uint32(10).string(message.toPartyUid);
@@ -1297,7 +1297,7 @@ export const TrafficOut = {
     return TrafficOut.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TrafficOut>, I>>(
-    object: I
+    object: I,
   ): TrafficOut {
     const message = createBaseTrafficOut();
     message.toPartyUid = object.toPartyUid ?? "";
@@ -1320,7 +1320,7 @@ function createBaseKeygenInit(): KeygenInit {
 export const KeygenInit = {
   encode(
     message: KeygenInit,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.newKeyUid !== "") {
       writer.uint32(10).string(message.newKeyUid);
@@ -1448,7 +1448,7 @@ export const KeygenInit = {
     return KeygenInit.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenInit>, I>>(
-    object: I
+    object: I,
   ): KeygenInit {
     const message = createBaseKeygenInit();
     message.newKeyUid = object.newKeyUid ?? "";
@@ -1472,7 +1472,7 @@ function createBaseSignInit(): SignInit {
 export const SignInit = {
   encode(
     message: SignInit,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.newSigUid !== "") {
       writer.uint32(10).string(message.newSigUid);
@@ -1616,14 +1616,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

@@ -14,7 +14,7 @@ const capitalize = (str: string) =>
 
 type PolymorphicVariantConfig<
   TComponent extends FC,
-  TKey extends keyof ComponentProps<TComponent>
+  TKey extends keyof ComponentProps<TComponent>,
 > =
   | {
       noChildren: true;
@@ -26,7 +26,7 @@ type PolymorphicVariantConfig<
 
 type VariantConfig<
   TComponent extends FC,
-  TKey extends keyof ComponentProps<TComponent>
+  TKey extends keyof ComponentProps<TComponent>,
 > = {
   values: ComponentProps<TComponent>[TKey][];
   description?: string;
@@ -38,7 +38,7 @@ type VariantConfigLike<TComponent extends FC> = VariantConfig<TComponent, any>;
 
 type VariantsProps<
   TComponent extends FC,
-  TComponentProps extends ComponentProps<TComponent>
+  TComponentProps extends ComponentProps<TComponent>,
 > = {
   propKey: string;
   variant: VariantConfigLike<TComponent>;
@@ -88,9 +88,9 @@ type Artboard = (typeof ARTBOARD_OPTIONS)[number];
 
 const Variants = <
   TComponent extends FC,
-  TComponentProps extends ComponentProps<TComponent>
+  TComponentProps extends ComponentProps<TComponent>,
 >(
-  props: VariantsProps<TComponent, TComponentProps>
+  props: VariantsProps<TComponent, TComponentProps>,
 ) => {
   const [view, setView] = useState<Viewport>("desktop");
 
@@ -99,7 +99,7 @@ const Variants = <
       ...acc,
       [artboard]: artboard === VIEWPORTS[view].className,
     }),
-    {} as Record<Artboard, boolean>
+    {} as Record<Artboard, boolean>,
   );
 
   return (
@@ -135,7 +135,7 @@ const Variants = <
           <div
             className={cn(
               "artboard artboard-demo bg-base-300 mx-auto p-4 transition-all duration-300",
-              { ...viewports }
+              { ...viewports },
             )}
           >
             <ul className="flex flex-wrap items-center gap-4">
@@ -180,22 +180,27 @@ const Template: StoryFn<typeof Variants> = (args) => <Variants {...args} />;
 
 export const configurePlayground = <
   TComponent extends FC,
-  TComponentProps extends ComponentProps<TComponent>
+  TComponentProps extends ComponentProps<TComponent>,
 >(
   component: FC<TComponentProps>,
   variants: {
     [TKey in keyof TComponentProps]: VariantConfigLike<TComponent>;
   },
-  defaultProps?: Partial<TComponentProps>
+  defaultProps?: Partial<TComponentProps>,
 ) => {
-  return Object.entries(variants).reduce((acc, [propKey, variant]) => {
-    const componentStory = Template.bind({});
-    // @ts-ignore
-    componentStory.args = { propKey, variant, component, defaultProps };
+  return Object.entries(variants).reduce(
+    (acc, [propKey, variant]) => {
+      const componentStory = Template.bind({});
+      // @ts-ignore
+      componentStory.args = { propKey, variant, component, defaultProps };
 
-    return {
-      ...acc,
-      [capitalize(propKey)]: componentStory,
-    };
-  }, {} as CapitalizeKeys<Record<keyof typeof variants, StoryFn<typeof Variants>>>);
+      return {
+        ...acc,
+        [capitalize(propKey)]: componentStory,
+      };
+    },
+    {} as CapitalizeKeys<
+      Record<keyof typeof variants, StoryFn<typeof Variants>>
+    >,
+  );
 };

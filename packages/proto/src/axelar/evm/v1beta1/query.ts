@@ -319,7 +319,7 @@ function createBaseDepositQueryParams(): DepositQueryParams {
 export const DepositQueryParams = {
   encode(
     message: DepositQueryParams,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -394,12 +394,12 @@ export const DepositQueryParams = {
   },
 
   create<I extends Exact<DeepPartial<DepositQueryParams>, I>>(
-    base?: I
+    base?: I,
   ): DepositQueryParams {
     return DepositQueryParams.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DepositQueryParams>, I>>(
-    object: I
+    object: I,
   ): DepositQueryParams {
     const message = createBaseDepositQueryParams();
     message.address = object.address ?? "";
@@ -416,7 +416,7 @@ function createBaseBatchedCommandsRequest(): BatchedCommandsRequest {
 export const BatchedCommandsRequest = {
   encode(
     message: BatchedCommandsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -429,7 +429,7 @@ export const BatchedCommandsRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): BatchedCommandsRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -480,12 +480,12 @@ export const BatchedCommandsRequest = {
   },
 
   create<I extends Exact<DeepPartial<BatchedCommandsRequest>, I>>(
-    base?: I
+    base?: I,
   ): BatchedCommandsRequest {
     return BatchedCommandsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BatchedCommandsRequest>, I>>(
-    object: I
+    object: I,
   ): BatchedCommandsRequest {
     const message = createBaseBatchedCommandsRequest();
     message.chain = object.chain ?? "";
@@ -510,7 +510,7 @@ function createBaseBatchedCommandsResponse(): BatchedCommandsResponse {
 export const BatchedCommandsResponse = {
   encode(
     message: BatchedCommandsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -541,7 +541,7 @@ export const BatchedCommandsResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): BatchedCommandsResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -666,12 +666,12 @@ export const BatchedCommandsResponse = {
   },
 
   create<I extends Exact<DeepPartial<BatchedCommandsResponse>, I>>(
-    base?: I
+    base?: I,
   ): BatchedCommandsResponse {
     return BatchedCommandsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BatchedCommandsResponse>, I>>(
-    object: I
+    object: I,
   ): BatchedCommandsResponse {
     const message = createBaseBatchedCommandsResponse();
     message.id = object.id ?? "";
@@ -696,7 +696,7 @@ function createBaseKeyAddressRequest(): KeyAddressRequest {
 export const KeyAddressRequest = {
   encode(
     message: KeyAddressRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -757,12 +757,12 @@ export const KeyAddressRequest = {
   },
 
   create<I extends Exact<DeepPartial<KeyAddressRequest>, I>>(
-    base?: I
+    base?: I,
   ): KeyAddressRequest {
     return KeyAddressRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyAddressRequest>, I>>(
-    object: I
+    object: I,
   ): KeyAddressRequest {
     const message = createBaseKeyAddressRequest();
     message.chain = object.chain ?? "";
@@ -778,7 +778,7 @@ function createBaseKeyAddressResponse(): KeyAddressResponse {
 export const KeyAddressResponse = {
   encode(
     message: KeyAddressResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.keyId !== "") {
       writer.uint32(10).string(message.keyId);
@@ -786,7 +786,7 @@ export const KeyAddressResponse = {
     for (const v of message.addresses) {
       KeyAddressResponse_WeightedAddress.encode(
         v!,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     if (message.threshold !== "") {
@@ -816,7 +816,7 @@ export const KeyAddressResponse = {
           }
 
           message.addresses.push(
-            KeyAddressResponse_WeightedAddress.decode(reader, reader.uint32())
+            KeyAddressResponse_WeightedAddress.decode(reader, reader.uint32()),
           );
           continue;
         case 3:
@@ -840,7 +840,7 @@ export const KeyAddressResponse = {
       keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
       addresses: globalThis.Array.isArray(object?.addresses)
         ? object.addresses.map((e: any) =>
-            KeyAddressResponse_WeightedAddress.fromJSON(e)
+            KeyAddressResponse_WeightedAddress.fromJSON(e),
           )
         : [],
       threshold: isSet(object.threshold)
@@ -856,7 +856,7 @@ export const KeyAddressResponse = {
     }
     if (message.addresses?.length) {
       obj.addresses = message.addresses.map((e) =>
-        KeyAddressResponse_WeightedAddress.toJSON(e)
+        KeyAddressResponse_WeightedAddress.toJSON(e),
       );
     }
     if (message.threshold !== "") {
@@ -866,18 +866,18 @@ export const KeyAddressResponse = {
   },
 
   create<I extends Exact<DeepPartial<KeyAddressResponse>, I>>(
-    base?: I
+    base?: I,
   ): KeyAddressResponse {
     return KeyAddressResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyAddressResponse>, I>>(
-    object: I
+    object: I,
   ): KeyAddressResponse {
     const message = createBaseKeyAddressResponse();
     message.keyId = object.keyId ?? "";
     message.addresses =
       object.addresses?.map((e) =>
-        KeyAddressResponse_WeightedAddress.fromPartial(e)
+        KeyAddressResponse_WeightedAddress.fromPartial(e),
       ) || [];
     message.threshold = object.threshold ?? "";
     return message;
@@ -891,7 +891,7 @@ function createBaseKeyAddressResponse_WeightedAddress(): KeyAddressResponse_Weig
 export const KeyAddressResponse_WeightedAddress = {
   encode(
     message: KeyAddressResponse_WeightedAddress,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -904,7 +904,7 @@ export const KeyAddressResponse_WeightedAddress = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): KeyAddressResponse_WeightedAddress {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -955,12 +955,12 @@ export const KeyAddressResponse_WeightedAddress = {
   },
 
   create<I extends Exact<DeepPartial<KeyAddressResponse_WeightedAddress>, I>>(
-    base?: I
+    base?: I,
   ): KeyAddressResponse_WeightedAddress {
     return KeyAddressResponse_WeightedAddress.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<KeyAddressResponse_WeightedAddress>, I>
+    I extends Exact<DeepPartial<KeyAddressResponse_WeightedAddress>, I>,
   >(object: I): KeyAddressResponse_WeightedAddress {
     const message = createBaseKeyAddressResponse_WeightedAddress();
     message.address = object.address ?? "";
@@ -976,7 +976,7 @@ function createBaseQueryTokenAddressResponse(): QueryTokenAddressResponse {
 export const QueryTokenAddressResponse = {
   encode(
     message: QueryTokenAddressResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -989,7 +989,7 @@ export const QueryTokenAddressResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): QueryTokenAddressResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1042,12 +1042,12 @@ export const QueryTokenAddressResponse = {
   },
 
   create<I extends Exact<DeepPartial<QueryTokenAddressResponse>, I>>(
-    base?: I
+    base?: I,
   ): QueryTokenAddressResponse {
     return QueryTokenAddressResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryTokenAddressResponse>, I>>(
-    object: I
+    object: I,
   ): QueryTokenAddressResponse {
     const message = createBaseQueryTokenAddressResponse();
     message.address = object.address ?? "";
@@ -1063,7 +1063,7 @@ function createBaseQueryDepositStateParams(): QueryDepositStateParams {
 export const QueryDepositStateParams = {
   encode(
     message: QueryDepositStateParams,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -1076,7 +1076,7 @@ export const QueryDepositStateParams = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): QueryDepositStateParams {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1131,12 +1131,12 @@ export const QueryDepositStateParams = {
   },
 
   create<I extends Exact<DeepPartial<QueryDepositStateParams>, I>>(
-    base?: I
+    base?: I,
   ): QueryDepositStateParams {
     return QueryDepositStateParams.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryDepositStateParams>, I>>(
-    object: I
+    object: I,
   ): QueryDepositStateParams {
     const message = createBaseQueryDepositStateParams();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -1152,7 +1152,7 @@ function createBaseDepositStateRequest(): DepositStateRequest {
 export const DepositStateRequest = {
   encode(
     message: DepositStateRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1160,7 +1160,7 @@ export const DepositStateRequest = {
     if (message.params !== undefined) {
       QueryDepositStateParams.encode(
         message.params,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     return writer;
@@ -1188,7 +1188,7 @@ export const DepositStateRequest = {
 
           message.params = QueryDepositStateParams.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
       }
@@ -1221,12 +1221,12 @@ export const DepositStateRequest = {
   },
 
   create<I extends Exact<DeepPartial<DepositStateRequest>, I>>(
-    base?: I
+    base?: I,
   ): DepositStateRequest {
     return DepositStateRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DepositStateRequest>, I>>(
-    object: I
+    object: I,
   ): DepositStateRequest {
     const message = createBaseDepositStateRequest();
     message.chain = object.chain ?? "";
@@ -1245,7 +1245,7 @@ function createBaseDepositStateResponse(): DepositStateResponse {
 export const DepositStateResponse = {
   encode(
     message: DepositStateResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.status !== 0) {
       writer.uint32(16).int32(message.status);
@@ -1255,7 +1255,7 @@ export const DepositStateResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): DepositStateResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1295,12 +1295,12 @@ export const DepositStateResponse = {
   },
 
   create<I extends Exact<DeepPartial<DepositStateResponse>, I>>(
-    base?: I
+    base?: I,
   ): DepositStateResponse {
     return DepositStateResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<DepositStateResponse>, I>>(
-    object: I
+    object: I,
   ): DepositStateResponse {
     const message = createBaseDepositStateResponse();
     message.status = object.status ?? 0;
@@ -1315,7 +1315,7 @@ function createBaseEventRequest(): EventRequest {
 export const EventRequest = {
   encode(
     message: EventRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1376,12 +1376,12 @@ export const EventRequest = {
   },
 
   create<I extends Exact<DeepPartial<EventRequest>, I>>(
-    base?: I
+    base?: I,
   ): EventRequest {
     return EventRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventRequest>, I>>(
-    object: I
+    object: I,
   ): EventRequest {
     const message = createBaseEventRequest();
     message.chain = object.chain ?? "";
@@ -1397,7 +1397,7 @@ function createBaseEventResponse(): EventResponse {
 export const EventResponse = {
   encode(
     message: EventResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.event !== undefined) {
       Event.encode(message.event, writer.uint32(10).fork()).ldelim();
@@ -1444,12 +1444,12 @@ export const EventResponse = {
   },
 
   create<I extends Exact<DeepPartial<EventResponse>, I>>(
-    base?: I
+    base?: I,
   ): EventResponse {
     return EventResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventResponse>, I>>(
-    object: I
+    object: I,
   ): EventResponse {
     const message = createBaseEventResponse();
     message.event =
@@ -1467,7 +1467,7 @@ function createBaseQueryBurnerAddressResponse(): QueryBurnerAddressResponse {
 export const QueryBurnerAddressResponse = {
   encode(
     message: QueryBurnerAddressResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -1477,7 +1477,7 @@ export const QueryBurnerAddressResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): QueryBurnerAddressResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1517,12 +1517,12 @@ export const QueryBurnerAddressResponse = {
   },
 
   create<I extends Exact<DeepPartial<QueryBurnerAddressResponse>, I>>(
-    base?: I
+    base?: I,
   ): QueryBurnerAddressResponse {
     return QueryBurnerAddressResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryBurnerAddressResponse>, I>>(
-    object: I
+    object: I,
   ): QueryBurnerAddressResponse {
     const message = createBaseQueryBurnerAddressResponse();
     message.address = object.address ?? "";
@@ -1537,7 +1537,7 @@ function createBaseChainsRequest(): ChainsRequest {
 export const ChainsRequest = {
   encode(
     message: ChainsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.status !== 0) {
       writer.uint32(8).int32(message.status);
@@ -1584,12 +1584,12 @@ export const ChainsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ChainsRequest>, I>>(
-    base?: I
+    base?: I,
   ): ChainsRequest {
     return ChainsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainsRequest>, I>>(
-    object: I
+    object: I,
   ): ChainsRequest {
     const message = createBaseChainsRequest();
     message.status = object.status ?? 0;
@@ -1604,7 +1604,7 @@ function createBaseChainsResponse(): ChainsResponse {
 export const ChainsResponse = {
   encode(
     message: ChainsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.chains) {
       writer.uint32(10).string(v!);
@@ -1653,12 +1653,12 @@ export const ChainsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ChainsResponse>, I>>(
-    base?: I
+    base?: I,
   ): ChainsResponse {
     return ChainsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainsResponse>, I>>(
-    object: I
+    object: I,
   ): ChainsResponse {
     const message = createBaseChainsResponse();
     message.chains = object.chains?.map((e) => e) || [];
@@ -1673,7 +1673,7 @@ function createBaseCommandRequest(): CommandRequest {
 export const CommandRequest = {
   encode(
     message: CommandRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1734,12 +1734,12 @@ export const CommandRequest = {
   },
 
   create<I extends Exact<DeepPartial<CommandRequest>, I>>(
-    base?: I
+    base?: I,
   ): CommandRequest {
     return CommandRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommandRequest>, I>>(
-    object: I
+    object: I,
   ): CommandRequest {
     const message = createBaseCommandRequest();
     message.chain = object.chain ?? "";
@@ -1755,7 +1755,7 @@ function createBaseCommandResponse(): CommandResponse {
 export const CommandResponse = {
   encode(
     message: CommandResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -1766,7 +1766,7 @@ export const CommandResponse = {
     Object.entries(message.params).forEach(([key, value]) => {
       CommandResponse_ParamsEntry.encode(
         { key: key as any, value },
-        writer.uint32(26).fork()
+        writer.uint32(26).fork(),
       ).ldelim();
     });
     if (message.keyId !== "") {
@@ -1807,7 +1807,7 @@ export const CommandResponse = {
 
           const entry3 = CommandResponse_ParamsEntry.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           if (entry3.value !== undefined) {
             message.params[entry3.key] = entry3.value;
@@ -1846,7 +1846,7 @@ export const CommandResponse = {
               acc[key] = String(value);
               return acc;
             },
-            {}
+            {},
           )
         : {},
       keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
@@ -1883,12 +1883,12 @@ export const CommandResponse = {
   },
 
   create<I extends Exact<DeepPartial<CommandResponse>, I>>(
-    base?: I
+    base?: I,
   ): CommandResponse {
     return CommandResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommandResponse>, I>>(
-    object: I
+    object: I,
   ): CommandResponse {
     const message = createBaseCommandResponse();
     message.id = object.id ?? "";
@@ -1914,7 +1914,7 @@ function createBaseCommandResponse_ParamsEntry(): CommandResponse_ParamsEntry {
 export const CommandResponse_ParamsEntry = {
   encode(
     message: CommandResponse_ParamsEntry,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -1927,7 +1927,7 @@ export const CommandResponse_ParamsEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): CommandResponse_ParamsEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1978,12 +1978,12 @@ export const CommandResponse_ParamsEntry = {
   },
 
   create<I extends Exact<DeepPartial<CommandResponse_ParamsEntry>, I>>(
-    base?: I
+    base?: I,
   ): CommandResponse_ParamsEntry {
     return CommandResponse_ParamsEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommandResponse_ParamsEntry>, I>>(
-    object: I
+    object: I,
   ): CommandResponse_ParamsEntry {
     const message = createBaseCommandResponse_ParamsEntry();
     message.key = object.key ?? "";
@@ -1999,7 +1999,7 @@ function createBasePendingCommandsRequest(): PendingCommandsRequest {
 export const PendingCommandsRequest = {
   encode(
     message: PendingCommandsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2009,7 +2009,7 @@ export const PendingCommandsRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): PendingCommandsRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2049,12 +2049,12 @@ export const PendingCommandsRequest = {
   },
 
   create<I extends Exact<DeepPartial<PendingCommandsRequest>, I>>(
-    base?: I
+    base?: I,
   ): PendingCommandsRequest {
     return PendingCommandsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PendingCommandsRequest>, I>>(
-    object: I
+    object: I,
   ): PendingCommandsRequest {
     const message = createBasePendingCommandsRequest();
     message.chain = object.chain ?? "";
@@ -2069,7 +2069,7 @@ function createBasePendingCommandsResponse(): PendingCommandsResponse {
 export const PendingCommandsResponse = {
   encode(
     message: PendingCommandsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.commands) {
       QueryCommandResponse.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -2079,7 +2079,7 @@ export const PendingCommandsResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): PendingCommandsResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2094,7 +2094,7 @@ export const PendingCommandsResponse = {
           }
 
           message.commands.push(
-            QueryCommandResponse.decode(reader, reader.uint32())
+            QueryCommandResponse.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -2118,19 +2118,19 @@ export const PendingCommandsResponse = {
     const obj: any = {};
     if (message.commands?.length) {
       obj.commands = message.commands.map((e) =>
-        QueryCommandResponse.toJSON(e)
+        QueryCommandResponse.toJSON(e),
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<PendingCommandsResponse>, I>>(
-    base?: I
+    base?: I,
   ): PendingCommandsResponse {
     return PendingCommandsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PendingCommandsResponse>, I>>(
-    object: I
+    object: I,
   ): PendingCommandsResponse {
     const message = createBasePendingCommandsResponse();
     message.commands =
@@ -2146,7 +2146,7 @@ function createBaseQueryCommandResponse(): QueryCommandResponse {
 export const QueryCommandResponse = {
   encode(
     message: QueryCommandResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -2157,7 +2157,7 @@ export const QueryCommandResponse = {
     Object.entries(message.params).forEach(([key, value]) => {
       QueryCommandResponse_ParamsEntry.encode(
         { key: key as any, value },
-        writer.uint32(26).fork()
+        writer.uint32(26).fork(),
       ).ldelim();
     });
     if (message.keyId !== "") {
@@ -2171,7 +2171,7 @@ export const QueryCommandResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): QueryCommandResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2201,7 +2201,7 @@ export const QueryCommandResponse = {
 
           const entry3 = QueryCommandResponse_ParamsEntry.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           if (entry3.value !== undefined) {
             message.params[entry3.key] = entry3.value;
@@ -2240,7 +2240,7 @@ export const QueryCommandResponse = {
               acc[key] = String(value);
               return acc;
             },
-            {}
+            {},
           )
         : {},
       keyId: isSet(object.keyId) ? globalThis.String(object.keyId) : "",
@@ -2277,12 +2277,12 @@ export const QueryCommandResponse = {
   },
 
   create<I extends Exact<DeepPartial<QueryCommandResponse>, I>>(
-    base?: I
+    base?: I,
   ): QueryCommandResponse {
     return QueryCommandResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryCommandResponse>, I>>(
-    object: I
+    object: I,
   ): QueryCommandResponse {
     const message = createBaseQueryCommandResponse();
     message.id = object.id ?? "";
@@ -2308,7 +2308,7 @@ function createBaseQueryCommandResponse_ParamsEntry(): QueryCommandResponse_Para
 export const QueryCommandResponse_ParamsEntry = {
   encode(
     message: QueryCommandResponse_ParamsEntry,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -2321,7 +2321,7 @@ export const QueryCommandResponse_ParamsEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): QueryCommandResponse_ParamsEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2372,12 +2372,12 @@ export const QueryCommandResponse_ParamsEntry = {
   },
 
   create<I extends Exact<DeepPartial<QueryCommandResponse_ParamsEntry>, I>>(
-    base?: I
+    base?: I,
   ): QueryCommandResponse_ParamsEntry {
     return QueryCommandResponse_ParamsEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<QueryCommandResponse_ParamsEntry>, I>
+    I extends Exact<DeepPartial<QueryCommandResponse_ParamsEntry>, I>,
   >(object: I): QueryCommandResponse_ParamsEntry {
     const message = createBaseQueryCommandResponse_ParamsEntry();
     message.key = object.key ?? "";
@@ -2393,7 +2393,7 @@ function createBaseBurnerInfoRequest(): BurnerInfoRequest {
 export const BurnerInfoRequest = {
   encode(
     message: BurnerInfoRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address.length !== 0) {
       writer.uint32(10).bytes(message.address);
@@ -2442,12 +2442,12 @@ export const BurnerInfoRequest = {
   },
 
   create<I extends Exact<DeepPartial<BurnerInfoRequest>, I>>(
-    base?: I
+    base?: I,
   ): BurnerInfoRequest {
     return BurnerInfoRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BurnerInfoRequest>, I>>(
-    object: I
+    object: I,
   ): BurnerInfoRequest {
     const message = createBaseBurnerInfoRequest();
     message.address = object.address ?? new Uint8Array(0);
@@ -2462,7 +2462,7 @@ function createBaseBurnerInfoResponse(): BurnerInfoResponse {
 export const BurnerInfoResponse = {
   encode(
     message: BurnerInfoResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2525,12 +2525,12 @@ export const BurnerInfoResponse = {
   },
 
   create<I extends Exact<DeepPartial<BurnerInfoResponse>, I>>(
-    base?: I
+    base?: I,
   ): BurnerInfoResponse {
     return BurnerInfoResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BurnerInfoResponse>, I>>(
-    object: I
+    object: I,
   ): BurnerInfoResponse {
     const message = createBaseBurnerInfoResponse();
     message.chain = object.chain ?? "";
@@ -2549,7 +2549,7 @@ function createBaseConfirmationHeightRequest(): ConfirmationHeightRequest {
 export const ConfirmationHeightRequest = {
   encode(
     message: ConfirmationHeightRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2559,7 +2559,7 @@ export const ConfirmationHeightRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ConfirmationHeightRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2599,12 +2599,12 @@ export const ConfirmationHeightRequest = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmationHeightRequest>, I>>(
-    base?: I
+    base?: I,
   ): ConfirmationHeightRequest {
     return ConfirmationHeightRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmationHeightRequest>, I>>(
-    object: I
+    object: I,
   ): ConfirmationHeightRequest {
     const message = createBaseConfirmationHeightRequest();
     message.chain = object.chain ?? "";
@@ -2619,7 +2619,7 @@ function createBaseConfirmationHeightResponse(): ConfirmationHeightResponse {
 export const ConfirmationHeightResponse = {
   encode(
     message: ConfirmationHeightResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.height.isZero()) {
       writer.uint32(8).uint64(message.height);
@@ -2629,7 +2629,7 @@ export const ConfirmationHeightResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ConfirmationHeightResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2669,12 +2669,12 @@ export const ConfirmationHeightResponse = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmationHeightResponse>, I>>(
-    base?: I
+    base?: I,
   ): ConfirmationHeightResponse {
     return ConfirmationHeightResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmationHeightResponse>, I>>(
-    object: I
+    object: I,
   ): ConfirmationHeightResponse {
     const message = createBaseConfirmationHeightResponse();
     message.height =
@@ -2692,7 +2692,7 @@ function createBaseGatewayAddressRequest(): GatewayAddressRequest {
 export const GatewayAddressRequest = {
   encode(
     message: GatewayAddressRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2702,7 +2702,7 @@ export const GatewayAddressRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): GatewayAddressRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2742,12 +2742,12 @@ export const GatewayAddressRequest = {
   },
 
   create<I extends Exact<DeepPartial<GatewayAddressRequest>, I>>(
-    base?: I
+    base?: I,
   ): GatewayAddressRequest {
     return GatewayAddressRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GatewayAddressRequest>, I>>(
-    object: I
+    object: I,
   ): GatewayAddressRequest {
     const message = createBaseGatewayAddressRequest();
     message.chain = object.chain ?? "";
@@ -2762,7 +2762,7 @@ function createBaseGatewayAddressResponse(): GatewayAddressResponse {
 export const GatewayAddressResponse = {
   encode(
     message: GatewayAddressResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -2772,7 +2772,7 @@ export const GatewayAddressResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): GatewayAddressResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2812,12 +2812,12 @@ export const GatewayAddressResponse = {
   },
 
   create<I extends Exact<DeepPartial<GatewayAddressResponse>, I>>(
-    base?: I
+    base?: I,
   ): GatewayAddressResponse {
     return GatewayAddressResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GatewayAddressResponse>, I>>(
-    object: I
+    object: I,
   ): GatewayAddressResponse {
     const message = createBaseGatewayAddressResponse();
     message.address = object.address ?? "";
@@ -2832,7 +2832,7 @@ function createBaseBytecodeRequest(): BytecodeRequest {
 export const BytecodeRequest = {
   encode(
     message: BytecodeRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -2895,12 +2895,12 @@ export const BytecodeRequest = {
   },
 
   create<I extends Exact<DeepPartial<BytecodeRequest>, I>>(
-    base?: I
+    base?: I,
   ): BytecodeRequest {
     return BytecodeRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BytecodeRequest>, I>>(
-    object: I
+    object: I,
   ): BytecodeRequest {
     const message = createBaseBytecodeRequest();
     message.chain = object.chain ?? "";
@@ -2916,7 +2916,7 @@ function createBaseBytecodeResponse(): BytecodeResponse {
 export const BytecodeResponse = {
   encode(
     message: BytecodeResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.bytecode !== "") {
       writer.uint32(10).string(message.bytecode);
@@ -2965,12 +2965,12 @@ export const BytecodeResponse = {
   },
 
   create<I extends Exact<DeepPartial<BytecodeResponse>, I>>(
-    base?: I
+    base?: I,
   ): BytecodeResponse {
     return BytecodeResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BytecodeResponse>, I>>(
-    object: I
+    object: I,
   ): BytecodeResponse {
     const message = createBaseBytecodeResponse();
     message.bytecode = object.bytecode ?? "";
@@ -2985,7 +2985,7 @@ function createBaseERC20TokensRequest(): ERC20TokensRequest {
 export const ERC20TokensRequest = {
   encode(
     message: ERC20TokensRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -3046,12 +3046,12 @@ export const ERC20TokensRequest = {
   },
 
   create<I extends Exact<DeepPartial<ERC20TokensRequest>, I>>(
-    base?: I
+    base?: I,
   ): ERC20TokensRequest {
     return ERC20TokensRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ERC20TokensRequest>, I>>(
-    object: I
+    object: I,
   ): ERC20TokensRequest {
     const message = createBaseERC20TokensRequest();
     message.chain = object.chain ?? "";
@@ -3067,7 +3067,7 @@ function createBaseERC20TokensResponse(): ERC20TokensResponse {
 export const ERC20TokensResponse = {
   encode(
     message: ERC20TokensResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.tokens) {
       ERC20TokensResponse_Token.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -3089,7 +3089,7 @@ export const ERC20TokensResponse = {
           }
 
           message.tokens.push(
-            ERC20TokensResponse_Token.decode(reader, reader.uint32())
+            ERC20TokensResponse_Token.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -3113,19 +3113,19 @@ export const ERC20TokensResponse = {
     const obj: any = {};
     if (message.tokens?.length) {
       obj.tokens = message.tokens.map((e) =>
-        ERC20TokensResponse_Token.toJSON(e)
+        ERC20TokensResponse_Token.toJSON(e),
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ERC20TokensResponse>, I>>(
-    base?: I
+    base?: I,
   ): ERC20TokensResponse {
     return ERC20TokensResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ERC20TokensResponse>, I>>(
-    object: I
+    object: I,
   ): ERC20TokensResponse {
     const message = createBaseERC20TokensResponse();
     message.tokens =
@@ -3141,7 +3141,7 @@ function createBaseERC20TokensResponse_Token(): ERC20TokensResponse_Token {
 export const ERC20TokensResponse_Token = {
   encode(
     message: ERC20TokensResponse_Token,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.asset !== "") {
       writer.uint32(10).string(message.asset);
@@ -3154,7 +3154,7 @@ export const ERC20TokensResponse_Token = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ERC20TokensResponse_Token {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -3205,12 +3205,12 @@ export const ERC20TokensResponse_Token = {
   },
 
   create<I extends Exact<DeepPartial<ERC20TokensResponse_Token>, I>>(
-    base?: I
+    base?: I,
   ): ERC20TokensResponse_Token {
     return ERC20TokensResponse_Token.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ERC20TokensResponse_Token>, I>>(
-    object: I
+    object: I,
   ): ERC20TokensResponse_Token {
     const message = createBaseERC20TokensResponse_Token();
     message.asset = object.asset ?? "";
@@ -3226,7 +3226,7 @@ function createBaseTokenInfoRequest(): TokenInfoRequest {
 export const TokenInfoRequest = {
   encode(
     message: TokenInfoRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -3319,12 +3319,12 @@ export const TokenInfoRequest = {
   },
 
   create<I extends Exact<DeepPartial<TokenInfoRequest>, I>>(
-    base?: I
+    base?: I,
   ): TokenInfoRequest {
     return TokenInfoRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TokenInfoRequest>, I>>(
-    object: I
+    object: I,
   ): TokenInfoRequest {
     const message = createBaseTokenInfoRequest();
     message.chain = object.chain ?? "";
@@ -3349,7 +3349,7 @@ function createBaseTokenInfoResponse(): TokenInfoResponse {
 export const TokenInfoResponse = {
   encode(
     message: TokenInfoResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.asset !== "") {
       writer.uint32(10).string(message.asset);
@@ -3474,12 +3474,12 @@ export const TokenInfoResponse = {
   },
 
   create<I extends Exact<DeepPartial<TokenInfoResponse>, I>>(
-    base?: I
+    base?: I,
   ): TokenInfoResponse {
     return TokenInfoResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TokenInfoResponse>, I>>(
-    object: I
+    object: I,
   ): TokenInfoResponse {
     const message = createBaseTokenInfoResponse();
     message.asset = object.asset ?? "";
@@ -3615,7 +3615,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     message: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -3662,12 +3662,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I
+    base?: I,
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    object: I
+    object: I,
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     message.chain = object.chain ?? "";
@@ -3682,7 +3682,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -3729,12 +3729,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I
+    base?: I,
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I
+    object: I,
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =
@@ -3782,14 +3782,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

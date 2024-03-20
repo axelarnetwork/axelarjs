@@ -7,6 +7,6 @@ export const EvmAddNativeGasError = {
   CHAIN_CONFIG_NOT_FOUND: (chain: string) =>
     new Error(`Chain config not found ${chain}`),
   WALLET_CLIENT_NOT_FOUND: new Error(
-    "Either 'window.ethereum' or 'privateKey' must be provided"
+    "Either 'window.ethereum' or 'privateKey' must be provided",
   ),
 };

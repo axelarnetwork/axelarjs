@@ -52,7 +52,7 @@ export function useSortedArray<T>(tokens: T[], defaultOptions: SortOptions<T>) {
         setSortOptions(options);
       }
     },
-    [sortKey]
+    [sortKey],
   );
 
   return { sorted, sortKey, sortDirection, sort: handleSortClick };

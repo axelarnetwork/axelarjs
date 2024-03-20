@@ -118,7 +118,7 @@ function createBaseDecCoin(): DecCoin {
 export const DecCoin = {
   encode(
     message: DecCoin,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -196,7 +196,7 @@ function createBaseIntProto(): IntProto {
 export const IntProto = {
   encode(
     message: IntProto,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.int !== "") {
       writer.uint32(10).string(message.int);
@@ -257,7 +257,7 @@ function createBaseDecProto(): DecProto {
 export const DecProto = {
   encode(
     message: DecProto,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.dec !== "") {
       writer.uint32(10).string(message.dec);
@@ -323,14 +323,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

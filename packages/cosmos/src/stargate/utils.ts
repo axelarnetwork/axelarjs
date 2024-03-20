@@ -48,7 +48,7 @@ export const convertToSnakeCaseDeep = (obj: UnknownRecord): any => {
 
   for (const prop in obj) {
     newObj[underscore(prop)] = convertToSnakeCaseDeep(
-      obj[prop] as UnknownRecord
+      obj[prop] as UnknownRecord,
     );
   }
 
@@ -67,7 +67,7 @@ export const convertToCamelCaseDeep = (obj: UnknownRecord): any => {
 
   for (const prop in obj) {
     newObj[camelize(prop, true)] = convertToCamelCaseDeep(
-      obj[prop] as UnknownRecord
+      obj[prop] as UnknownRecord,
     );
   }
 

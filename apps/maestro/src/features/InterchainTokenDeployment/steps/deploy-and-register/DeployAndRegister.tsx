@@ -39,9 +39,9 @@ export const Step3: FC = () => {
           x.status === "success"
             ? [[...succeeded, x.destinationChainId], errored]
             : [succeeded, [...errored, x.destinationChainId]],
-        [[], []] as [string[], string[]]
+        [[], []] as [string[], string[]],
       ),
-    [state.remoteDeploymentGasFees?.gasFees]
+    [state.remoteDeploymentGasFees?.gasFees],
   );
 
   const { writeAsync: deployInterchainTokenAsync } =
@@ -70,9 +70,9 @@ export const Step3: FC = () => {
         minterAddress: rootState.tokenDetails.minter,
         initialSupply: parseUnits(
           rootState.tokenDetails.initialSupply,
-          rootState.tokenDetails.tokenDecimals || 0
+          rootState.tokenDetails.tokenDecimals || 0,
         ),
-      }
+      },
     );
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -136,12 +136,12 @@ export const Step3: FC = () => {
       sourceChain,
       rootActions,
       addTransaction,
-    ]
+    ],
   );
 
   const eligibleChains = useMemo(
     () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
-    [state.evmChains, chainId]
+    [state.evmChains, chainId],
   );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);

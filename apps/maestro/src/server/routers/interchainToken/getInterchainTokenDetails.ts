@@ -66,7 +66,7 @@ export const getInterchainTokenDetails = publicProcedure
     const tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         configs.info.id,
-        input.tokenAddress
+        input.tokenAddress,
       );
 
     if (!tokenRecord) {

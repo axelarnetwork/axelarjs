@@ -71,7 +71,7 @@ export type EVMChainConfig = {
         decimals: number;
       };
       blockExplorerUrls: string[];
-    }
+    },
   ];
   gateway_address: string;
   no_inflation: boolean;
@@ -128,7 +128,7 @@ export type LinkEvent = {
       key: "destinationAddress";
       value: string;
     },
-    { key: "asset"; value: string }
+    { key: "asset"; value: string },
   ];
 };
 export type MessageEvent = {
@@ -147,7 +147,7 @@ export type LinkRequestRawResponse = {
           msg_index: number;
           log: string;
           events: (LinkEvent | MessageEvent)[];
-        }
+        },
       ];
       info: string;
       gas_wanted: string;
@@ -161,7 +161,7 @@ export type LinkRequestRawResponse = {
               recipient_addr: string;
               recipient_chain: string;
               denom: string;
-            }
+            },
           ];
           memo: string;
           timeout_height: string;
@@ -171,7 +171,7 @@ export type LinkRequestRawResponse = {
       addresses: string[];
       types: string[];
       id: string;
-    }
+    },
   ];
   total: number;
   time_spent: number;

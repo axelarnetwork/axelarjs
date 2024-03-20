@@ -17,7 +17,7 @@ dotenv.config(hasEnvLocal ? { path: envLocalPath } : undefined);
 console.log(
   `📝 Loaded environment variables from ${
     hasEnvLocal ? ".env.local" : ".env"
-  }\n`
+  }\n`,
 );
 
 const contractsDir = path.join(
@@ -28,7 +28,7 @@ const contractsDir = path.join(
   "evm",
   "src",
   "contracts",
-  "its"
+  "its",
 );
 
 const WHITELISTED_CONTRACTS = [
@@ -49,9 +49,9 @@ await Promise.all(
   contractFolders.map((folder) =>
     fs.copyFile(
       path.join(contractsDir, folder, `${folder}.abi.ts`),
-      path.join(destFolder, `${folder}.abi.ts`)
-    )
-  )
+      path.join(destFolder, `${folder}.abi.ts`),
+    ),
+  ),
 );
 
 const pascalToConstName = (contract = "") =>
@@ -78,7 +78,7 @@ const contractConfigs = `export const contracts = [
             ? ".env.local"
             : "Vercel environment variables";
           console.warn(
-            `WARNING: ${envKey} is missing under ${envFile}. The interactions will require an explicit address.\n`
+            `WARNING: ${envKey} is missing under ${envFile}. The interactions will require an explicit address.\n`,
           );
         }
 
@@ -98,12 +98,12 @@ const contractConfigs = `export const contracts = [
 const content = contractFolders
   .map(
     (folder) =>
-      `import  ${pascalToConstName(folder)}_ABI from "./${folder}.abi";`
+      `import  ${pascalToConstName(folder)}_ABI from "./${folder}.abi";`,
   )
   .join("\n")
   .concat("\n\n", contractConfigs);
 
-const formatted = prettier.format(content, { parser: "typescript" });
+const formatted = await prettier.format(content, { parser: "typescript" });
 
 await fs.writeFile(path.join(destFolder, "index.ts"), formatted);
 

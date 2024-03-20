@@ -40,7 +40,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
   const session = await getServerSession<AuthOptions, Web3Session>(
     req,
     res,
-    NEXT_AUTH_OPTIONS
+    NEXT_AUTH_OPTIONS,
   );
 
   const maestroKVClient = new MaestroKVClient(kv);
@@ -72,13 +72,13 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         null,
         maestroKVClient,
         axelarscanClient,
-        "evmChains" as const
+        "evmChains" as const,
       ),
       axelarConfigs: axelarConfigs.bind(
         null,
         maestroKVClient,
         axelarConfigClient,
-        "axelarConfigs" as const
+        "axelarConfigs" as const,
       ),
       wagmiChainConfigs: WAGMI_CHAIN_CONFIGS,
     },
@@ -104,7 +104,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       },
       createInterchainTokenServiceClient(
         chain: Chain,
-        address?: `0x${string}`
+        address?: `0x${string}`,
       ) {
         return new InterchainTokenServiceClient({
           chain,
@@ -113,7 +113,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       },
       createInterchainTokenFactoryClient(
         chain: Chain,
-        address?: `0x${string}`
+        address?: `0x${string}`,
       ) {
         return new InterchainTokenFactoryClient({
           chain,
