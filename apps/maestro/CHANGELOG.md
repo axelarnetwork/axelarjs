@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.7
+
+### Patch Changes
+
+- [#293](https://github.com/axelarnetwork/axelarjs/pull/293) [`8e01374c5630271ceeab5c6d670b52c6a0ca225c`](https://github.com/axelarnetwork/axelarjs/commit/8e01374c5630271ceeab5c6d670b52c6a0ca225c) Thanks [@canhtrinh](https://github.com/canhtrinh)! - bump axelarjs-sdk version to 0.15.0-alpha.5
+
 ## 0.3.6
 
 ### Patch Changes
