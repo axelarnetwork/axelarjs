@@ -354,6 +354,9 @@ importers:
       '@axelarjs/core':
         specifier: workspace:*
         version: link:../core
+      '@axelarjs/utils':
+        specifier: workspace:*
+        version: link:../utils
       isomorphic-unfetch:
         specifier: ^4.0.2
         version: 4.0.2
@@ -370,9 +373,6 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
-      '@axelarjs/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@types/node':
         specifier: ^20.11.28
         version: 20.11.28
@@ -7625,6 +7625,7 @@ packages:
 
   /@swagger-api/apidom-ns-json-schema-draft-4@0.97.0:
     resolution: {integrity: sha512-eBMIPxX4huNDGle6TOfSe1kKS1/HvL6w66GWWLFxZW2doCQHMADgjo7j/kVowrXiJtEoMgjBVp3W30WkcwBVug==}
+    requiresBuild: true
     dependencies:
       '@babel/runtime-corejs3': 7.24.0
       '@swagger-api/apidom-ast': 0.97.0
