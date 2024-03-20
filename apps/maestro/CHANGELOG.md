@@ -1,5 +1,12 @@
 # @axelarjs/maestro
 
+## 0.3.9
+
+### Patch Changes
+
+- Updated dependencies [[`a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476`](https://github.com/axelarnetwork/axelarjs/commit/a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476)]:
+  - @axelarjs/api@0.3.14
+
 ## 0.3.8
 
 ### Patch Changes
