@@ -34,7 +34,7 @@
     "release": "tsx scripts/release.ts"
   },
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "^0.14.2",
+    "@axelar-network/axelarjs-sdk": "0.15.0-alpha.5",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",

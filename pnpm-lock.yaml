@@ -74,8 +74,8 @@ importers:
   apps/maestro:
     dependencies:
       '@axelar-network/axelarjs-sdk':
-        specifier: ^0.14.2
-        version: 0.14.2
+        specifier: 0.15.0-alpha.5
+        version: 0.15.0-alpha.5
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -960,8 +960,8 @@ packages:
     engines: {node: '>=16'}
     dev: true
 
-  /@axelar-network/axelarjs-sdk@0.14.2:
-    resolution: {integrity: sha512-4O0zr1q6Js3F/GFFMjooMML2uQW16zQ/q6nsSxQPU2h4ifWao6CNxkYDKezqJOKIlVS0jahRKRVpJyX/GJoKdg==}
+  /@axelar-network/axelarjs-sdk@0.15.0-alpha.5:
+    resolution: {integrity: sha512-dWhTwMfbFuSX7YrNTPzkn27886eQ3r+7qXCCrYHJREXSLvt5qVmj5+TzKSaZ0LwIwEmCvvOApfYbydLsl63uKA==}
     requiresBuild: true
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 4.5.0
@@ -980,7 +980,7 @@ packages:
       standard-http-error: 2.0.1
       string-similarity-js: 2.1.4
       uuid: 8.3.2
-      ws: 8.14.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      ws: 8.16.0
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -9570,6 +9570,9 @@ packages:
     resolution: {integrity: sha512-GBryCiyl+taz5DPq0expxzfMVcrpKjWvEBSAqT1tPUSthnzOWnVF77XlUAYgFZqzPsEu9lQ1dHCdqZx7WWMCXA==}
     peerDependencies:
       '@web3modal/wallet': 4.1.1
+    peerDependenciesMeta:
+      '@web3modal/siwe':
+        optional: true
     dependencies:
       '@web3modal/common': 4.1.1
       '@web3modal/core': 4.1.1(@types/react@18.2.21)(react@18.2.0)
@@ -9610,6 +9613,15 @@ packages:
       '@wagmi/connectors': '>=4.0.0'
       '@wagmi/core': '>=2.0.0'
       viem: '>=2.0.0'
+    peerDependenciesMeta:
+      '@web3modal/siwe':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      vue:
+        optional: true
     dependencies:
       '@wagmi/connectors': 4.1.17(@types/react@18.2.21)(@vercel/kv@1.0.1)(@wagmi/core@2.6.8)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)(typescript@5.4.2)(viem@2.8.11)(zod@3.22.4)
       '@wagmi/core': 2.6.8(@types/react@18.2.21)(react@18.2.0)(typescript@5.4.2)(viem@2.8.11)(zod@3.22.4)
@@ -21183,7 +21195,6 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-    dev: true
 
   /xml-but-prettier@1.0.1:
     resolution: {integrity: sha512-C2CJaadHrZTqESlH03WOyw0oZTtoy2uEg6dSDF6YRg+9GnYNub53RRemLpnvtbHDFelxMx4LajiFsYeR6XJHgQ==}
