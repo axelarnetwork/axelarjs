@@ -80,7 +80,6 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@axelarjs/utils": "workspace:*",
     "@types/node": "^20.11.28",
     "dotenv": "^16.4.5",
     "fast-check": "^3.16.0",
@@ -99,6 +98,7 @@
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
     "viem": "^2.8.11"
