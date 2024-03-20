@@ -5,4 +5,4 @@
 "@axelarjs/transaction-recovery": patch
 ---
 
-update packages affected by api/axelar-configs schema change
+- chore: update packages affected by api/axelar-configs schema change
