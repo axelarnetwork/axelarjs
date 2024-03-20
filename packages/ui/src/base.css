@@ -26,6 +26,18 @@
   .clamp-content {
     @apply clamp max-w-screen-4.5xl;
   }
+
+  .delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .delay-3000 {
+    animation-delay: 3s;
+  }
+
+  .delay-4000 {
+    animation-delay: 4s;
+  }
 }
 
 @layer base {
@@ -58,12 +70,17 @@
     -moz-appearance: textfield;
   }
 
-  .bg-body-gradient {
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0) 0%,
-        #ffffff 47.4%
-      ),
-      #e5fcff;
+  .bg-grid-pattern {
+    @apply bg-transparent bg-repeat opacity-90;
+
+    background-image: linear-gradient(#fff 1px, transparent 1px),
+      linear-gradient(to right, #fff 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  html[data-theme="dark"] .bg-grid-pattern {
+    background-image: linear-gradient(#222 1px, transparent 1px),
+      linear-gradient(to right, #222 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 }

@@ -1,5 +1,6 @@
 import {
   Alert,
+  AnimatedBlobBackground,
   Badge,
   Button,
   Card,
@@ -20,6 +21,7 @@ import tw from "@axelarjs/ui/tw";
 import React, { useEffect, type FC, type PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { ErrorBoundary, type FallbackRender } from "@sentry/nextjs";
@@ -42,6 +44,7 @@ import { BOTTOM_MENU_ITEMS } from "./MainMenu";
 import SignInModal from "./SignInModal";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
+  const router = useRouter();
   const theme = useTheme();
   const { setThemeMode } = useWeb3ModalTheme();
 
@@ -72,6 +75,8 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
+      {/* only render when route path is / */}
+      {router.pathname === "/" && <AnimatedBlobBackground />}
       <Drawer>
         <Drawer.Toggle
           checked={isDrawerOpen}
@@ -80,7 +85,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         />
         <Drawer.Content
           className={cn(
-            "flex min-h-[100dvh] flex-1 flex-col gap-4 bg-[url('/illustrations/bg.svg')] lg:min-h-screen",
+            "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
             {
               "pointer-events-none": isSignInModalOpen,
             }

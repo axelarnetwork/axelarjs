@@ -32,6 +32,7 @@ The following scripts are available in the project:
 - `test:coverage`: Runs unit tests with coverage reporting using `vitest`.
 - `sync`: Runs the `sync.cjs` script to sync the app with other environments.
 - `codegen`: Runs the `wagmi generate` command to generate typesafe react-query client for interacting with the ITS contracts.
+- `release`: Creates a github release from the latest [changelog](/apps/maestro/CHANGELOG.md) entry.
 
 ### E2E tests
 
@@ -48,3 +49,11 @@ on another terminal, run the tests
 ```
 pnpm test:e2e
 ```
+
+### Docs
+
+- [lib](/apps/maestro/src/lib/) libraries and application specific utilities
+  - [auth](/apps/maestro/src/lib/auth) auth utilities and hooks
+  - [drizle](/apps/maestro/src/lib/drizzle) drizzle setup
+    - [schema](/apps/maestro/src/lib/drizzle/schema) relational db schema
+- [server](/apps/maestro/src/server/) tRPC routers/procedures
