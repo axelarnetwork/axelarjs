@@ -29,18 +29,18 @@ const STEPS = [Step1, Step2, Step3];
 const CanonicalTokenDeployment: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
   const routeChain = useChainFromRoute();
-  const { data: tokenInfo } = useGetChainsConfig({
+  const { data: chainInfo } = useGetChainsConfig({
     axelarChainId: routeChain?.axelarChainId,
   });
 
   const isGatewayToken = useMemo(
     () =>
       (
-        tokenInfo?.assets.map((asset: any) =>
-          asset.tokenAddress.toLowerCase()
+        Object.values(chainInfo?.assets ?? []).map((assetId: any) =>
+          String(assetId ?? "").toLowerCase()
         ) || []
       ).includes(state.tokenDetails.tokenAddress.toLowerCase()),
-    [tokenInfo, state.tokenDetails.tokenAddress]
+    [chainInfo, state.tokenDetails.tokenAddress]
   );
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
