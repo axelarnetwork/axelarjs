@@ -37,17 +37,17 @@ const CanonicalTokenDeployment: FC = () => {
     () =>
       (
         Object.values(chainInfo?.assets ?? []).map((assetId: any) =>
-          String(assetId ?? "").toLowerCase()
+          String(assetId ?? "").toLowerCase(),
         ) || []
       ).includes(state.tokenDetails.tokenAddress.toLowerCase()),
-    [chainInfo, state.tokenDetails.tokenAddress]
+    [chainInfo, state.tokenDetails.tokenAddress],
   );
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
   const showBackButton = useMemo(
     () => state.step !== 0 && state.step !== 2,
-    [state.step]
+    [state.step],
   );
 
   if (isGatewayToken)

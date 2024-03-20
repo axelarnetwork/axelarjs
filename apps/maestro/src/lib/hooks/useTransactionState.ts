@@ -38,7 +38,7 @@ export type TransactionState<TError = Error> =
   | SubmittedTransactionState<TError>;
 
 export function useTransactionState<TError = Error>(
-  initialState: TransactionState<TError> = { status: "idle" }
+  initialState: TransactionState<TError> = { status: "idle" },
 ) {
   const [state, _setState] = useState<TransactionState<TError>>(initialState);
 

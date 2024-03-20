@@ -105,7 +105,7 @@ export type StepsSummaryProps = {
 };
 
 export const StepsSummary: FC<StepsSummaryProps> = (
-  props: StepsSummaryProps
+  props: StepsSummaryProps,
 ) => {
   return (
     <Steps className="my-6 h-20 w-full text-sm sm:my-10 sm:h-24">
@@ -119,7 +119,7 @@ export const StepsSummary: FC<StepsSummaryProps> = (
 };
 
 export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
-  props
+  props,
 ) => {
   const { width } = useWindowSize();
   return (
@@ -177,7 +177,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     "You seem to have work in progress. Are you sure you'd like to leave this page?",
     {
       enabled: disableClose,
-    }
+    },
   );
 
   return (
@@ -252,7 +252,7 @@ export const ShareHaikuButton: FC<{
 
       // redirect to twitter with haiku
       const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        tweet.trim()
+        tweet.trim(),
       )}`;
 
       window.open(url, "_blank");

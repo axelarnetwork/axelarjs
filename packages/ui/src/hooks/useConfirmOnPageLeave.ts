@@ -13,7 +13,7 @@ interface UseConfirmOnPageLeaveOptions {
  */
 export function useConfirmOnPageLeave(
   message: string,
-  options: UseConfirmOnPageLeaveOptions = { enabled: true }
+  options: UseConfirmOnPageLeaveOptions = { enabled: true },
 ) {
   useEffect(() => {
     if (!options.enabled) {

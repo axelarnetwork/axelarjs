@@ -13,6 +13,6 @@ export const setAccountStatus = publicProcedure
   .mutation(async ({ ctx, input }) => {
     return await ctx.persistence.kv.setAccountStatus(
       input.accountAddress,
-      input.status
+      input.status,
     );
   });

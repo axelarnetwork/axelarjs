@@ -85,7 +85,7 @@ function createBaseKeygenStarted(): KeygenStarted {
 export const KeygenStarted = {
   encode(
     message: KeygenStarted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -162,12 +162,12 @@ export const KeygenStarted = {
   },
 
   create<I extends Exact<DeepPartial<KeygenStarted>, I>>(
-    base?: I
+    base?: I,
   ): KeygenStarted {
     return KeygenStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenStarted>, I>>(
-    object: I
+    object: I,
   ): KeygenStarted {
     const message = createBaseKeygenStarted();
     message.module = object.module ?? "";
@@ -184,7 +184,7 @@ function createBaseKeygenCompleted(): KeygenCompleted {
 export const KeygenCompleted = {
   encode(
     message: KeygenCompleted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -245,12 +245,12 @@ export const KeygenCompleted = {
   },
 
   create<I extends Exact<DeepPartial<KeygenCompleted>, I>>(
-    base?: I
+    base?: I,
   ): KeygenCompleted {
     return KeygenCompleted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenCompleted>, I>>(
-    object: I
+    object: I,
   ): KeygenCompleted {
     const message = createBaseKeygenCompleted();
     message.module = object.module ?? "";
@@ -266,7 +266,7 @@ function createBaseKeygenExpired(): KeygenExpired {
 export const KeygenExpired = {
   encode(
     message: KeygenExpired,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -327,12 +327,12 @@ export const KeygenExpired = {
   },
 
   create<I extends Exact<DeepPartial<KeygenExpired>, I>>(
-    base?: I
+    base?: I,
   ): KeygenExpired {
     return KeygenExpired.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenExpired>, I>>(
-    object: I
+    object: I,
   ): KeygenExpired {
     const message = createBaseKeygenExpired();
     message.module = object.module ?? "";
@@ -353,7 +353,7 @@ function createBasePubKeySubmitted(): PubKeySubmitted {
 export const PubKeySubmitted = {
   encode(
     message: PubKeySubmitted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -446,12 +446,12 @@ export const PubKeySubmitted = {
   },
 
   create<I extends Exact<DeepPartial<PubKeySubmitted>, I>>(
-    base?: I
+    base?: I,
   ): PubKeySubmitted {
     return PubKeySubmitted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PubKeySubmitted>, I>>(
-    object: I
+    object: I,
   ): PubKeySubmitted {
     const message = createBasePubKeySubmitted();
     message.module = object.module ?? "";
@@ -476,7 +476,7 @@ function createBaseSigningStarted(): SigningStarted {
 export const SigningStarted = {
   encode(
     message: SigningStarted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -490,7 +490,7 @@ export const SigningStarted = {
     Object.entries(message.pubKeys).forEach(([key, value]) => {
       SigningStarted_PubKeysEntry.encode(
         { key: key as any, value },
-        writer.uint32(34).fork()
+        writer.uint32(34).fork(),
       ).ldelim();
     });
     if (message.payloadHash.length !== 0) {
@@ -538,7 +538,7 @@ export const SigningStarted = {
 
           const entry4 = SigningStarted_PubKeysEntry.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           if (entry4.value !== undefined) {
             message.pubKeys[entry4.key] = entry4.value;
@@ -578,7 +578,7 @@ export const SigningStarted = {
               acc[key] = bytesFromBase64(value as string);
               return acc;
             },
-            {}
+            {},
           )
         : {},
       payloadHash: isSet(object.payloadHash)
@@ -620,12 +620,12 @@ export const SigningStarted = {
   },
 
   create<I extends Exact<DeepPartial<SigningStarted>, I>>(
-    base?: I
+    base?: I,
   ): SigningStarted {
     return SigningStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigningStarted>, I>>(
-    object: I
+    object: I,
   ): SigningStarted {
     const message = createBaseSigningStarted();
     message.module = object.module ?? "";
@@ -655,7 +655,7 @@ function createBaseSigningStarted_PubKeysEntry(): SigningStarted_PubKeysEntry {
 export const SigningStarted_PubKeysEntry = {
   encode(
     message: SigningStarted_PubKeysEntry,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -668,7 +668,7 @@ export const SigningStarted_PubKeysEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): SigningStarted_PubKeysEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -721,12 +721,12 @@ export const SigningStarted_PubKeysEntry = {
   },
 
   create<I extends Exact<DeepPartial<SigningStarted_PubKeysEntry>, I>>(
-    base?: I
+    base?: I,
   ): SigningStarted_PubKeysEntry {
     return SigningStarted_PubKeysEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigningStarted_PubKeysEntry>, I>>(
-    object: I
+    object: I,
   ): SigningStarted_PubKeysEntry {
     const message = createBaseSigningStarted_PubKeysEntry();
     message.key = object.key ?? "";
@@ -742,7 +742,7 @@ function createBaseSigningCompleted(): SigningCompleted {
 export const SigningCompleted = {
   encode(
     message: SigningCompleted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -803,12 +803,12 @@ export const SigningCompleted = {
   },
 
   create<I extends Exact<DeepPartial<SigningCompleted>, I>>(
-    base?: I
+    base?: I,
   ): SigningCompleted {
     return SigningCompleted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigningCompleted>, I>>(
-    object: I
+    object: I,
   ): SigningCompleted {
     const message = createBaseSigningCompleted();
     message.module = object.module ?? "";
@@ -827,7 +827,7 @@ function createBaseSigningExpired(): SigningExpired {
 export const SigningExpired = {
   encode(
     message: SigningExpired,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -888,12 +888,12 @@ export const SigningExpired = {
   },
 
   create<I extends Exact<DeepPartial<SigningExpired>, I>>(
-    base?: I
+    base?: I,
   ): SigningExpired {
     return SigningExpired.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigningExpired>, I>>(
-    object: I
+    object: I,
   ): SigningExpired {
     const message = createBaseSigningExpired();
     message.module = object.module ?? "";
@@ -917,7 +917,7 @@ function createBaseSignatureSubmitted(): SignatureSubmitted {
 export const SignatureSubmitted = {
   encode(
     message: SignatureSubmitted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -1010,12 +1010,12 @@ export const SignatureSubmitted = {
   },
 
   create<I extends Exact<DeepPartial<SignatureSubmitted>, I>>(
-    base?: I
+    base?: I,
   ): SignatureSubmitted {
     return SignatureSubmitted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SignatureSubmitted>, I>>(
-    object: I
+    object: I,
   ): SignatureSubmitted {
     const message = createBaseSignatureSubmitted();
     message.module = object.module ?? "";
@@ -1036,7 +1036,7 @@ function createBaseKeyAssigned(): KeyAssigned {
 export const KeyAssigned = {
   encode(
     message: KeyAssigned,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -1114,7 +1114,7 @@ export const KeyAssigned = {
     return KeyAssigned.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyAssigned>, I>>(
-    object: I
+    object: I,
   ): KeyAssigned {
     const message = createBaseKeyAssigned();
     message.module = object.module ?? "";
@@ -1131,7 +1131,7 @@ function createBaseKeyRotated(): KeyRotated {
 export const KeyRotated = {
   encode(
     message: KeyRotated,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -1209,7 +1209,7 @@ export const KeyRotated = {
     return KeyRotated.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyRotated>, I>>(
-    object: I
+    object: I,
   ): KeyRotated {
     const message = createBaseKeyRotated();
     message.module = object.module ?? "";
@@ -1226,7 +1226,7 @@ function createBaseKeygenOptOut(): KeygenOptOut {
 export const KeygenOptOut = {
   encode(
     message: KeygenOptOut,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.participant.length !== 0) {
       writer.uint32(10).bytes(message.participant);
@@ -1275,12 +1275,12 @@ export const KeygenOptOut = {
   },
 
   create<I extends Exact<DeepPartial<KeygenOptOut>, I>>(
-    base?: I
+    base?: I,
   ): KeygenOptOut {
     return KeygenOptOut.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenOptOut>, I>>(
-    object: I
+    object: I,
   ): KeygenOptOut {
     const message = createBaseKeygenOptOut();
     message.participant = object.participant ?? new Uint8Array(0);
@@ -1295,7 +1295,7 @@ function createBaseKeygenOptIn(): KeygenOptIn {
 export const KeygenOptIn = {
   encode(
     message: KeygenOptIn,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.participant.length !== 0) {
       writer.uint32(10).bytes(message.participant);
@@ -1347,7 +1347,7 @@ export const KeygenOptIn = {
     return KeygenOptIn.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeygenOptIn>, I>>(
-    object: I
+    object: I,
   ): KeygenOptIn {
     const message = createBaseKeygenOptIn();
     message.participant = object.participant ?? new Uint8Array(0);
@@ -1392,14 +1392,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

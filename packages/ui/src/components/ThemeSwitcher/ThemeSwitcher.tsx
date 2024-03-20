@@ -47,7 +47,7 @@ function useThemeState(initialState: ThemeKind | null = null) {
 
       if (!(isValidTheme(primaryTheme) && isValidTheme(secondaryTheme))) {
         console.warn(
-          `Invalid theme data: ${primaryTheme}, ${secondaryTheme}. Expected "light" or "dark".`
+          `Invalid theme data: ${primaryTheme}, ${secondaryTheme}. Expected "light" or "dark".`,
         );
         return;
       }
@@ -57,7 +57,7 @@ function useThemeState(initialState: ThemeKind | null = null) {
 
       setTheme(nextTheme);
     },
-    []
+    [],
   );
 
   return [theme, { toggleTheme: handleToggleTheme }] as const;
@@ -83,7 +83,7 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = ({
       className={cn(
         "swap-rotate swap",
         { "swap-active": theme === "dark" },
-        className
+        className,
       )}
       {...props}
     >

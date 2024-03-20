@@ -17,14 +17,14 @@ export const caseInsensitiveRecord = <T>(record: Record<string, T>) =>
 
       return Object.entries(target).find(
         ([key]) =>
-          key.localeCompare(p, undefined, { sensitivity: "accent" }) === 0
+          key.localeCompare(p, undefined, { sensitivity: "accent" }) === 0,
       )?.[1];
     },
   });
 
 export function pluralizeKeys<T extends AnyRecord>(obj: T) {
   const nextEntries = Object.entries(obj).map(
-    ([key, value]) => [`${key}s`, value] as const
+    ([key, value]) => [`${key}s`, value] as const,
   );
 
   return Object.fromEntries(nextEntries) as PluralizeKeys<T>;

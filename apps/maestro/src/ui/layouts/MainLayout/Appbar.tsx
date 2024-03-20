@@ -121,7 +121,7 @@ const Appbar: FC<AppbarProps> = (props) => {
       ));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isConnected, address]
+    [isConnected, address],
   );
 
   return (
@@ -132,7 +132,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
           "z-10": isSticky && !state.isDrawerOpen,
         },
-        props.className
+        props.className,
       )}
     >
       <Navbar.Start>

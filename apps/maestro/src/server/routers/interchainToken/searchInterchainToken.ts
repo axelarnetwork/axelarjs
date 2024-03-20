@@ -55,7 +55,7 @@ export const searchInterchainToken = publicProcedure
     try {
       const [[chainConfig], remainingChainConfigs] = partition(
         (chain) => chain.id === input.chainId,
-        ctx.configs.wagmiChainConfigs
+        ctx.configs.wagmiChainConfigs,
       );
 
       const scanPromise = !chainConfig
@@ -69,7 +69,7 @@ export const searchInterchainToken = publicProcedure
               : // scan all chains, starting with the specified chain
                 [chainConfig, ...remainingChainConfigs],
             input.tokenAddress,
-            ctx
+            ctx,
           );
 
       const result = await scanPromise;
@@ -104,13 +104,13 @@ async function getInterchainToken(
   tokenDetails: TokenDetails,
   chainConfig: ExtendedWagmiChainConfig,
   remainingChainConfigs: ExtendedWagmiChainConfig[],
-  ctx: Context
+  ctx: Context,
 ) {
   const originChainConfig =
     tokenDetails.axelarChainId === chainConfig.axelarChainId
       ? chainConfig
       : remainingChainConfigs.find(
-          propEq(tokenDetails.axelarChainId, "axelarChainId")
+          propEq(tokenDetails.axelarChainId, "axelarChainId"),
         );
 
   if (!originChainConfig) {
@@ -131,7 +131,7 @@ async function getInterchainToken(
   };
 
   const pendingRemoteTokens = tokenDetails.remoteTokens.filter(
-    (token) => token.deploymentStatus === "pending"
+    (token) => token.deploymentStatus === "pending",
   );
 
   const hasPendingRemoteTokens = pendingRemoteTokens.length > 0;
@@ -143,9 +143,10 @@ async function getInterchainToken(
           [
             remoteToken,
             remainingChainConfigs.find(
-              ({ axelarChainId }) => axelarChainId === remoteToken.axelarChainId
+              ({ axelarChainId }) =>
+                axelarChainId === remoteToken.axelarChainId,
             ),
-          ] as const
+          ] as const,
       )
       .filter(([, chain]) => chain)
       .map(async ([remoteToken, chainConfig]) => {
@@ -201,7 +202,7 @@ async function getInterchainToken(
           tokenAddress,
           isRegistered,
         };
-      })
+      }),
   );
 
   if (hasPendingRemoteTokens) {
@@ -210,7 +211,7 @@ async function getInterchainToken(
       .filter((token) => token.isRegistered)
       .map((registeredToken) => {
         const match = tokenDetails.remoteTokens.find(
-          (token) => token.axelarChainId === registeredToken.axelarChainId
+          (token) => token.axelarChainId === registeredToken.axelarChainId,
         );
         return match
           ? {
@@ -231,7 +232,7 @@ async function getInterchainToken(
       await ctx.persistence.postgres.updateRemoteInterchainTokenDeploymentsStatus(
         tokenDetails.tokenId as `0x${string}`,
         "confirmed",
-        axelarChainIds
+        axelarChainIds,
       );
     }
   }
@@ -241,8 +242,8 @@ async function getInterchainToken(
       (chain) =>
         chain.id !== chainConfig.id &&
         !tokenDetails.remoteTokens.some(
-          (token) => token.axelarChainId === chain.axelarChainId
-        )
+          (token) => token.axelarChainId === chain.axelarChainId,
+        ),
     )
     .map((chain) => ({
       chainId: chain.id,
@@ -274,7 +275,7 @@ async function getInterchainToken(
 async function scanChains(
   chainConfigs: ExtendedWagmiChainConfig[],
   tokenAddress: `0x${string}`,
-  ctx: Context
+  ctx: Context,
 ) {
   for (const chainConfig of chainConfigs) {
     const tokenDetails = await getTokenDetails(chainConfig, tokenAddress, ctx);
@@ -284,7 +285,7 @@ async function scanChains(
         tokenDetails,
         chainConfig,
         chainConfigs,
-        ctx
+        ctx,
       );
 
       if (result) {
@@ -299,12 +300,12 @@ async function scanChains(
 async function getTokenDetails(
   chainConfig: ExtendedWagmiChainConfig,
   tokenAddress: `0x${string}`,
-  ctx: Context
+  ctx: Context,
 ) {
   const tokenDetails =
     await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
       chainConfig.axelarChainId,
-      tokenAddress
+      tokenAddress,
     );
 
   if (tokenDetails) {
@@ -314,12 +315,12 @@ async function getTokenDetails(
   const remoteTokenDetails =
     await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
       chainConfig.axelarChainId,
-      tokenAddress
+      tokenAddress,
     );
 
   if (remoteTokenDetails) {
     return ctx.persistence.postgres.getInterchainTokenByTokenId(
-      remoteTokenDetails.tokenId
+      remoteTokenDetails.tokenId,
     );
   }
 

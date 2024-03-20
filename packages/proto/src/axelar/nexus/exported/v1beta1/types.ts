@@ -159,7 +159,7 @@ export enum GeneralMessage_Status {
 }
 
 export function generalMessage_StatusFromJSON(
-  object: any
+  object: any,
 ): GeneralMessage_Status {
   switch (object) {
     case 0:
@@ -185,7 +185,7 @@ export function generalMessage_StatusFromJSON(
 }
 
 export function generalMessage_StatusToJSON(
-  object: GeneralMessage_Status
+  object: GeneralMessage_Status,
 ): string {
   switch (object) {
     case GeneralMessage_Status.STATUS_UNSPECIFIED:
@@ -329,7 +329,7 @@ function createBaseCrossChainAddress(): CrossChainAddress {
 export const CrossChainAddress = {
   encode(
     message: CrossChainAddress,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== undefined) {
       Chain.encode(message.chain, writer.uint32(10).fork()).ldelim();
@@ -390,12 +390,12 @@ export const CrossChainAddress = {
   },
 
   create<I extends Exact<DeepPartial<CrossChainAddress>, I>>(
-    base?: I
+    base?: I,
   ): CrossChainAddress {
     return CrossChainAddress.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CrossChainAddress>, I>>(
-    object: I
+    object: I,
   ): CrossChainAddress {
     const message = createBaseCrossChainAddress();
     message.chain =
@@ -414,12 +414,12 @@ function createBaseCrossChainTransfer(): CrossChainTransfer {
 export const CrossChainTransfer = {
   encode(
     message: CrossChainTransfer,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.recipient !== undefined) {
       CrossChainAddress.encode(
         message.recipient,
-        writer.uint32(10).fork()
+        writer.uint32(10).fork(),
       ).ldelim();
     }
     if (message.asset !== undefined) {
@@ -508,12 +508,12 @@ export const CrossChainTransfer = {
   },
 
   create<I extends Exact<DeepPartial<CrossChainTransfer>, I>>(
-    base?: I
+    base?: I,
   ): CrossChainTransfer {
     return CrossChainTransfer.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CrossChainTransfer>, I>>(
-    object: I
+    object: I,
   ): CrossChainTransfer {
     const message = createBaseCrossChainTransfer();
     message.recipient =
@@ -540,7 +540,7 @@ function createBaseTransferFee(): TransferFee {
 export const TransferFee = {
   encode(
     message: TransferFee,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.coins) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -592,7 +592,7 @@ export const TransferFee = {
     return TransferFee.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferFee>, I>>(
-    object: I
+    object: I,
   ): TransferFee {
     const message = createBaseTransferFee();
     message.coins = object.coins?.map((e) => Coin.fromPartial(e)) || [];
@@ -613,7 +613,7 @@ function createBaseFeeInfo(): FeeInfo {
 export const FeeInfo = {
   encode(
     message: FeeInfo,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -828,7 +828,7 @@ function createBaseGeneralMessage(): GeneralMessage {
 export const GeneralMessage = {
   encode(
     message: GeneralMessage,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -836,13 +836,13 @@ export const GeneralMessage = {
     if (message.sender !== undefined) {
       CrossChainAddress.encode(
         message.sender,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     if (message.recipient !== undefined) {
       CrossChainAddress.encode(
         message.recipient,
-        writer.uint32(26).fork()
+        writer.uint32(26).fork(),
       ).ldelim();
     }
     if (message.payloadHash.length !== 0) {
@@ -991,12 +991,12 @@ export const GeneralMessage = {
   },
 
   create<I extends Exact<DeepPartial<GeneralMessage>, I>>(
-    base?: I
+    base?: I,
   ): GeneralMessage {
     return GeneralMessage.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GeneralMessage>, I>>(
-    object: I
+    object: I,
   ): GeneralMessage {
     const message = createBaseGeneralMessage();
     message.id = object.id ?? "";
@@ -1039,7 +1039,7 @@ function createBaseWasmMessage(): WasmMessage {
 export const WasmMessage = {
   encode(
     message: WasmMessage,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.sourceChain !== "") {
       writer.uint32(10).string(message.sourceChain);
@@ -1203,7 +1203,7 @@ export const WasmMessage = {
     return WasmMessage.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<WasmMessage>, I>>(
-    object: I
+    object: I,
   ): WasmMessage {
     const message = createBaseWasmMessage();
     message.sourceChain = object.sourceChain ?? "";
@@ -1258,14 +1258,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

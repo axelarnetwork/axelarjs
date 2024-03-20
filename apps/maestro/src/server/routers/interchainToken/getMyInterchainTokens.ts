@@ -13,19 +13,19 @@ export const getMyInterchainTokens = protectedProcedure
       // pagination
       limit: z.number().optional().default(10),
       offset: z.number().optional().default(0),
-    })
+    }),
   )
   .query(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "Missing session address");
 
     const tokenRecords =
       await ctx.persistence.postgres.getInterchainTokensByDeployerAddress(
-        ctx.session?.address
+        ctx.session?.address,
       );
 
     const sorted = tokenRecords.sort(
       // sort by creation date newest to oldest
-      (a, b) => Number(b.createdAt?.getTime()) - Number(a.createdAt?.getTime())
+      (a, b) => Number(b.createdAt?.getTime()) - Number(a.createdAt?.getTime()),
     );
 
     const totalPages = Math.ceil(sorted.length / input.limit);

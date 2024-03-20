@@ -12,7 +12,7 @@ export function useChainFromRoute() {
       return WAGMI_CHAIN_CONFIGS.find(
         (chain) =>
           chain.axelarChainName === chainName ||
-          chain.axelarChainId === chainName
+          chain.axelarChainId === chainName,
       );
     }
   }, [chainName]);

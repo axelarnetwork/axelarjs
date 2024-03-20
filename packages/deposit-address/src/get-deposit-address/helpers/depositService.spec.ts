@@ -18,7 +18,7 @@ describe("depositService - helper", () => {
             } else {
               expect(unwrappable(chainId, assetId, chainConfigs)).toBeFalsy();
             }
-          }
+          },
         );
       });
     });

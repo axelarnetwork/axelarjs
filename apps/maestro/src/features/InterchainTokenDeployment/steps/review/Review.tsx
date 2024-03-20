@@ -36,7 +36,7 @@ const Review: FC = () => {
           chainId: routeChain.id,
           tokenAddress: state.txState.tokenAddress,
         }
-      : {}
+      : {},
   );
 
   // persist token deployment tx hash
@@ -47,14 +47,14 @@ const Review: FC = () => {
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) => computed.indexedById[axelarChainId].chain_id
-        )
+          (axelarChainId) => computed.indexedById[axelarChainId].chain_id,
+        ),
       );
     }
   }, [chain, computed.indexedById, state.selectedChains, state.txState]);
 
   const chainConfig = Maybe.of(chain).mapOrUndefined(
-    (chain) => computed.indexedByChainId[chain.id]
+    (chain) => computed.indexedByChainId[chain.id],
   );
 
   const handleGoToTokenPage = useCallback(async () => {
@@ -62,7 +62,7 @@ const Review: FC = () => {
       actions.reset();
 
       await router.push(
-        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
+        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`,
       );
     }
   }, [actions, chainConfig, router, state.txState]);

@@ -11,7 +11,7 @@ describe("Toggle", () => {
     const { container } = render(
       <ThemeProvider>
         <Variants />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(container).toBeVisible();
   });

@@ -75,8 +75,8 @@ export const ARGS_FILE = ({
       .map(
         (input, i) =>
           `${input.name || getDefaultArgName(name, i)}: ${parseInputType(
-            input
-          )}`
+            input,
+          )}`,
       )
       .join("; ");
 
@@ -110,7 +110,7 @@ export const ARGS_FILE = ({
             .map(({ name, inputs }) =>
               inputs.length > 0
                 ? `"${name}"(${name}Args: ${pascalName}${capitalize(
-                    name
+                    name,
                   )}Args) {
                   const encoder = ${constantName}_ENCODERS["${name}"];
                   const encodedArgs = encoder.args(${name}Args);
@@ -119,7 +119,7 @@ export const ARGS_FILE = ({
                 }`
                 : `"${name}"() {
                   return publicClient.read("${name}");
-                }`
+                }`,
             )
             .join(",\n")}
         }
@@ -153,7 +153,7 @@ export const ARGS_FILE = ({
             `"${name}": {
               args: encode${pascalName}${capitalize(name)}Args,
               data: encode${pascalName}${capitalize(name)}Data,
-            }`
+            }`,
         )
         .join(",\n")}
     }

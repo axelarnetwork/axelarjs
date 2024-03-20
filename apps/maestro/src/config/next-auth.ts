@@ -64,7 +64,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
               (headers) => ({
                 ip: headers["x-real-ip"] ?? headers["x-forwarded-for"],
                 userAgent: headers["user-agent"],
-              })
+              }),
             );
 
             // record unauthorized access attempt event to audit logs

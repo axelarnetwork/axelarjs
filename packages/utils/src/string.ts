@@ -1,5 +1,5 @@
 export const isNilOrWhitespace = (
-  value: string | undefined | null
+  value: string | undefined | null,
 ): value is undefined | null => (value?.trim() ?? "") === "";
 
 export const capitalize = (value: string) =>
@@ -19,10 +19,10 @@ export const maskAddress = (
   opts?: {
     segmentA: number;
     segmentB: number;
-  }
+  },
 ) =>
   `${address.slice(0, opts?.segmentA ?? 6)}...${address.slice(
-    opts?.segmentB ?? -4
+    opts?.segmentB ?? -4,
   )}`;
 
 export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
@@ -30,7 +30,7 @@ export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
 
   const hash = bytes.reduce(
     (acc, byte) => acc + byte.toString(16).padStart(2, "0"),
-    ""
+    "",
   );
 
   return `0x${hash}`;
@@ -44,7 +44,7 @@ export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
  */
 export function caseInsensitiveEqual(
   a: string | undefined,
-  b: string | undefined
+  b: string | undefined,
 ) {
   return a?.toLowerCase() === b?.toLowerCase();
 }

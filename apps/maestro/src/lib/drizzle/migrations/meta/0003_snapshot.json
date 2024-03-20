@@ -217,12 +217,8 @@
           "name": "remote_interchain_tokens_token_id_interchain_tokens_token_id_fk",
           "tableFrom": "remote_interchain_tokens",
           "tableTo": "interchain_tokens",
-          "columnsFrom": [
-            "token_id"
-          ],
-          "columnsTo": [
-            "token_id"
-          ],
+          "columnsFrom": ["token_id"],
+          "columnsTo": ["token_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

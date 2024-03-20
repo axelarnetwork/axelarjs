@@ -27,7 +27,7 @@ import {
 export function getL1FeeForL2(
   env: Environment,
   chain: L2Chain,
-  params: EstimateL1FeeParams
+  params: EstimateL1FeeParams,
 ): Promise<bigint> {
   const chains = env === "mainnet" ? MAINNET_L2_CHAINS : TESTNET_L2_CHAINS;
 
@@ -51,7 +51,7 @@ export function getL1FeeForL2(
 
 async function getOptimismL1Fee<T extends Chain>(
   publicClient: PublicClient<HttpTransport, T>,
-  estimateL1FeeParams: EstimateL1FeeParams
+  estimateL1FeeParams: EstimateL1FeeParams,
 ) {
   const { l1GasPrice, executeData } = estimateL1FeeParams;
 
@@ -86,7 +86,7 @@ async function getOptimismL1Fee<T extends Chain>(
   });
 
   const [gasUsed, _dynamicOverhead, _fixedOverhead] = multicallResponse.flatMap(
-    (r) => r.result ?? 0n
+    (r) => r.result ?? 0n,
   ) as [bigint, bigint, bigint];
 
   const dynamicOverhead = _dynamicOverhead || 684000n;
@@ -125,7 +125,7 @@ async function getOptimismL1Fee<T extends Chain>(
 
 async function getMantleL1Fee<T extends Chain>(
   publicClient: PublicClient<HttpTransport, T>,
-  estimateL1FeeParams: EstimateL1FeeParams
+  estimateL1FeeParams: EstimateL1FeeParams,
 ) {
   const contractAddress = "0x420000000000000000000000000000000000000F";
   const { l1GasPrice } = estimateL1FeeParams;
@@ -153,7 +153,7 @@ async function getMantleL1Fee<T extends Chain>(
   });
 
   const [fixedOverhead, dynamicOverhead] = multicallResponse.flatMap(
-    (r) => r.result ?? 0n
+    (r) => r.result ?? 0n,
   ) as [bigint, bigint];
 
   const totalGasUsed = (fixedOverhead * dynamicOverhead) / 1_000_000n;

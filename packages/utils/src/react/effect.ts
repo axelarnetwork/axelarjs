@@ -7,7 +7,7 @@ import {
 
 export const useChangedEffect = (
   effect: EffectCallback,
-  deps?: DependencyList
+  deps?: DependencyList,
 ) => {
   const isFirstMountRef = useRef(true);
 

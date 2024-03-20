@@ -108,7 +108,7 @@ function createBasePollMetadata(): PollMetadata {
 export const PollMetadata = {
   encode(
     message: PollMetadata,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.expiresAt.isZero()) {
       writer.uint32(24).int64(message.expiresAt);
@@ -119,7 +119,7 @@ export const PollMetadata = {
     if (message.votingThreshold !== undefined) {
       Threshold.encode(
         message.votingThreshold,
-        writer.uint32(42).fork()
+        writer.uint32(42).fork(),
       ).ldelim();
     }
     if (message.state !== 0) {
@@ -328,12 +328,12 @@ export const PollMetadata = {
   },
 
   create<I extends Exact<DeepPartial<PollMetadata>, I>>(
-    base?: I
+    base?: I,
   ): PollMetadata {
     return PollMetadata.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollMetadata>, I>>(
-    object: I
+    object: I,
   ): PollMetadata {
     const message = createBasePollMetadata();
     message.expiresAt =
@@ -386,7 +386,7 @@ function createBasePollKey(): PollKey {
 export const PollKey = {
   encode(
     message: PollKey,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -464,7 +464,7 @@ function createBasePollParticipants(): PollParticipants {
 export const PollParticipants = {
   encode(
     message: PollParticipants,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.pollId.isZero()) {
       writer.uint32(8).uint64(message.pollId);
@@ -527,12 +527,12 @@ export const PollParticipants = {
   },
 
   create<I extends Exact<DeepPartial<PollParticipants>, I>>(
-    base?: I
+    base?: I,
   ): PollParticipants {
     return PollParticipants.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollParticipants>, I>>(
-    object: I
+    object: I,
   ): PollParticipants {
     const message = createBasePollParticipants();
     message.pollId =
@@ -581,14 +581,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

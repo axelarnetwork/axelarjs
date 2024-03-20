@@ -18,11 +18,11 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       chainId: z.number(),
       tokenAddress: hex40Literal(),
       owner: hex40Literal(),
-    })
+    }),
   )
   .query(async ({ input, ctx }) => {
     const chainConfig = ctx.configs.wagmiChainConfigs.find(
-      (chain) => chain.id === input.chainId
+      (chain) => chain.id === input.chainId,
     );
 
     if (!chainConfig) {
@@ -35,7 +35,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     try {
       const client = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress
+        input.tokenAddress,
       );
 
       const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
@@ -47,7 +47,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
 
       const itClient = ctx.contracts.createInterchainTokenClient(
         chainConfig,
-        input.tokenAddress
+        input.tokenAddress,
       );
 
       const [
@@ -72,7 +72,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
             role: getRoleIndex("FLOW_LIMITER"),
             account: input.owner,
           }),
-        ].map((p) => p.catch(always(false)))
+        ].map((p) => p.catch(always(false))),
       );
 
       const isTokenOwner = owner === input.owner;

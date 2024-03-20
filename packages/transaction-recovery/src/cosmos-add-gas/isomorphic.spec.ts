@@ -38,7 +38,7 @@ describe("addGas - (isomorphic)", () => {
           },
         },
       },
-    })
+    }),
   );
 
   const DEFAULT_ADD_GAS_DEPENDENCIES: AddGasDependencies = {
@@ -60,7 +60,7 @@ describe("addGas - (isomorphic)", () => {
     };
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       COSMOS_WALLET_MNEMONIC,
-      { prefix: "osmo" }
+      { prefix: "osmo" },
     );
 
     const sendOptions: SendOptions = {
@@ -80,7 +80,7 @@ describe("addGas - (isomorphic)", () => {
         sendOptions,
         chain: "osmosis-7",
       },
-      DEFAULT_ADD_GAS_DEPENDENCIES
+      DEFAULT_ADD_GAS_DEPENDENCIES,
     );
 
     expect(res).toEqual({
@@ -101,7 +101,7 @@ describe("addGas - (isomorphic)", () => {
 
     const offlineSigner = await DirectSecp256k1HdWallet.fromMnemonic(
       COSMOS_WALLET_MNEMONIC,
-      { prefix: "osmo" }
+      { prefix: "osmo" },
     );
 
     const sendOptions: SendOptions = {
@@ -121,7 +121,7 @@ describe("addGas - (isomorphic)", () => {
         autocalculateGasOptions,
         chain: "osmosis-7",
       },
-      DEFAULT_ADD_GAS_DEPENDENCIES
+      DEFAULT_ADD_GAS_DEPENDENCIES,
     );
 
     expect(res).toEqual({

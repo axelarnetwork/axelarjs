@@ -109,7 +109,7 @@ function createBaseIBCTransferSent(): IBCTransferSent {
 export const IBCTransferSent = {
   encode(
     message: IBCTransferSent,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.id.isZero()) {
       writer.uint32(8).uint64(message.id);
@@ -248,12 +248,12 @@ export const IBCTransferSent = {
   },
 
   create<I extends Exact<DeepPartial<IBCTransferSent>, I>>(
-    base?: I
+    base?: I,
   ): IBCTransferSent {
     return IBCTransferSent.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCTransferSent>, I>>(
-    object: I
+    object: I,
   ): IBCTransferSent {
     const message = createBaseIBCTransferSent();
     message.id =
@@ -283,7 +283,7 @@ function createBaseIBCTransferCompleted(): IBCTransferCompleted {
 export const IBCTransferCompleted = {
   encode(
     message: IBCTransferCompleted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.id.isZero()) {
       writer.uint32(8).uint64(message.id);
@@ -302,7 +302,7 @@ export const IBCTransferCompleted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): IBCTransferCompleted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -379,12 +379,12 @@ export const IBCTransferCompleted = {
   },
 
   create<I extends Exact<DeepPartial<IBCTransferCompleted>, I>>(
-    base?: I
+    base?: I,
   ): IBCTransferCompleted {
     return IBCTransferCompleted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCTransferCompleted>, I>>(
-    object: I
+    object: I,
   ): IBCTransferCompleted {
     const message = createBaseIBCTransferCompleted();
     message.id =
@@ -408,7 +408,7 @@ function createBaseIBCTransferFailed(): IBCTransferFailed {
 export const IBCTransferFailed = {
   encode(
     message: IBCTransferFailed,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.id.isZero()) {
       writer.uint32(8).uint64(message.id);
@@ -501,12 +501,12 @@ export const IBCTransferFailed = {
   },
 
   create<I extends Exact<DeepPartial<IBCTransferFailed>, I>>(
-    base?: I
+    base?: I,
   ): IBCTransferFailed {
     return IBCTransferFailed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCTransferFailed>, I>>(
-    object: I
+    object: I,
   ): IBCTransferFailed {
     const message = createBaseIBCTransferFailed();
     message.id =
@@ -538,7 +538,7 @@ function createBaseIBCTransferRetried(): IBCTransferRetried {
 export const IBCTransferRetried = {
   encode(
     message: IBCTransferRetried,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.id.isZero()) {
       writer.uint32(8).uint64(message.id);
@@ -677,12 +677,12 @@ export const IBCTransferRetried = {
   },
 
   create<I extends Exact<DeepPartial<IBCTransferRetried>, I>>(
-    base?: I
+    base?: I,
   ): IBCTransferRetried {
     return IBCTransferRetried.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<IBCTransferRetried>, I>>(
-    object: I
+    object: I,
   ): IBCTransferRetried {
     const message = createBaseIBCTransferRetried();
     message.id =
@@ -712,7 +712,7 @@ function createBaseAxelarTransferCompleted(): AxelarTransferCompleted {
 export const AxelarTransferCompleted = {
   encode(
     message: AxelarTransferCompleted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.id.isZero()) {
       writer.uint32(8).uint64(message.id);
@@ -731,7 +731,7 @@ export const AxelarTransferCompleted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): AxelarTransferCompleted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -808,12 +808,12 @@ export const AxelarTransferCompleted = {
   },
 
   create<I extends Exact<DeepPartial<AxelarTransferCompleted>, I>>(
-    base?: I
+    base?: I,
   ): AxelarTransferCompleted {
     return AxelarTransferCompleted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<AxelarTransferCompleted>, I>>(
-    object: I
+    object: I,
   ): AxelarTransferCompleted {
     const message = createBaseAxelarTransferCompleted();
     message.id =
@@ -837,7 +837,7 @@ function createBaseFeeCollected(): FeeCollected {
 export const FeeCollected = {
   encode(
     message: FeeCollected,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.collector.length !== 0) {
       writer.uint32(10).bytes(message.collector);
@@ -900,12 +900,12 @@ export const FeeCollected = {
   },
 
   create<I extends Exact<DeepPartial<FeeCollected>, I>>(
-    base?: I
+    base?: I,
   ): FeeCollected {
     return FeeCollected.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<FeeCollected>, I>>(
-    object: I
+    object: I,
   ): FeeCollected {
     const message = createBaseFeeCollected();
     message.collector = object.collector ?? new Uint8Array(0);
@@ -930,7 +930,7 @@ function createBaseFeePaid(): FeePaid {
 export const FeePaid = {
   encode(
     message: FeePaid,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.messageId !== "") {
       writer.uint32(10).string(message.messageId);
@@ -1070,7 +1070,7 @@ function createBaseContractCallSubmitted(): ContractCallSubmitted {
 export const ContractCallSubmitted = {
   encode(
     message: ContractCallSubmitted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.messageId !== "") {
       writer.uint32(10).string(message.messageId);
@@ -1098,7 +1098,7 @@ export const ContractCallSubmitted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ContractCallSubmitted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1216,12 +1216,12 @@ export const ContractCallSubmitted = {
   },
 
   create<I extends Exact<DeepPartial<ContractCallSubmitted>, I>>(
-    base?: I
+    base?: I,
   ): ContractCallSubmitted {
     return ContractCallSubmitted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ContractCallSubmitted>, I>>(
-    object: I
+    object: I,
   ): ContractCallSubmitted {
     const message = createBaseContractCallSubmitted();
     message.messageId = object.messageId ?? "";
@@ -1251,7 +1251,7 @@ function createBaseContractCallWithTokenSubmitted(): ContractCallWithTokenSubmit
 export const ContractCallWithTokenSubmitted = {
   encode(
     message: ContractCallWithTokenSubmitted,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.messageId !== "") {
       writer.uint32(10).string(message.messageId);
@@ -1282,7 +1282,7 @@ export const ContractCallWithTokenSubmitted = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): ContractCallWithTokenSubmitted {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1411,12 +1411,12 @@ export const ContractCallWithTokenSubmitted = {
   },
 
   create<I extends Exact<DeepPartial<ContractCallWithTokenSubmitted>, I>>(
-    base?: I
+    base?: I,
   ): ContractCallWithTokenSubmitted {
     return ContractCallWithTokenSubmitted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ContractCallWithTokenSubmitted>, I>>(
-    object: I
+    object: I,
   ): ContractCallWithTokenSubmitted {
     const message = createBaseContractCallWithTokenSubmitted();
     message.messageId = object.messageId ?? "";
@@ -1448,7 +1448,7 @@ function createBaseTokenSent(): TokenSent {
 export const TokenSent = {
   encode(
     message: TokenSent,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.transferId.isZero()) {
       writer.uint32(8).uint64(message.transferId);
@@ -1576,7 +1576,7 @@ export const TokenSent = {
     return TokenSent.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TokenSent>, I>>(
-    object: I
+    object: I,
   ): TokenSent {
     const message = createBaseTokenSent();
     message.transferId =
@@ -1632,14 +1632,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

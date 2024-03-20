@@ -106,7 +106,7 @@ function createBasePool_Reward(): Pool_Reward {
 export const Pool_Reward = {
   encode(
     message: Pool_Reward,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.validator.length !== 0) {
       writer.uint32(10).bytes(message.validator);
@@ -174,7 +174,7 @@ export const Pool_Reward = {
     return Pool_Reward.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Pool_Reward>, I>>(
-    object: I
+    object: I,
   ): Pool_Reward {
     const message = createBasePool_Reward();
     message.validator = object.validator ?? new Uint8Array(0);
@@ -190,7 +190,7 @@ function createBaseRefund(): Refund {
 export const Refund = {
   encode(
     message: Refund,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.payer.length !== 0) {
       writer.uint32(10).bytes(message.payer);
@@ -302,14 +302,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

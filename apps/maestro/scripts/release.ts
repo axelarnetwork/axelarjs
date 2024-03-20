@@ -23,7 +23,7 @@ async function main() {
     await $`gh --version`;
   } catch (e) {
     console.error(
-      `❌  gh is not installed. Please install it from https://cli.github.com/`
+      `❌  gh is not installed. Please install it from https://cli.github.com/`,
     );
     return;
   }
@@ -33,7 +33,7 @@ async function main() {
     await $`gh auth status`;
   } catch (e) {
     console.error(
-      `❌  You are not logged in to GitHub. Please run 'gh auth login'`
+      `❌  You are not logged in to GitHub. Please run 'gh auth login'`,
     );
     return;
   }
@@ -44,12 +44,12 @@ async function main() {
 
   // find the line with the version
   const changelogLineStartIndex = changelogLines.findIndex((line) =>
-    line.startsWith(`## ${version}`)
+    line.startsWith(`## ${version}`),
   );
 
   const changelogLineEndIndex = changelogLines.findIndex(
     (line, index) =>
-      index > changelogLineStartIndex && /^## \d+\.\d+\.\d+/.test(line)
+      index > changelogLineStartIndex && /^## \d+\.\d+\.\d+/.test(line),
   );
 
   const changelogContent = changelogLines

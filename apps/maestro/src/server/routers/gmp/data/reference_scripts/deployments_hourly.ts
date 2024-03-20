@@ -76,7 +76,7 @@ const run = async () => {
   const ranges = getUnixTimestampRanges(1709568000);
 
   const res = await Promise.all(
-    ranges.map(async (range) => await transformDeployments(range[0], range[1]))
+    ranges.map(async (range) => await transformDeployments(range[0], range[1])),
   );
   const results = res.flat();
   console.log(JSON.stringify(results));

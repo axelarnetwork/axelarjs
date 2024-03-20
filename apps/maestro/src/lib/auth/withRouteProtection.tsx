@@ -10,7 +10,7 @@ export function withRouteProtection<TProps = any>(
   config = {
     redirectTo: "/",
     accountStatuses: ["enabled", "privileged"],
-  } as UseRouteProtectionProps
+  } as UseRouteProtectionProps,
 ) {
   const Wrapped = (props: JSX.IntrinsicAttributes & TProps) => {
     useRouteProtection(config);

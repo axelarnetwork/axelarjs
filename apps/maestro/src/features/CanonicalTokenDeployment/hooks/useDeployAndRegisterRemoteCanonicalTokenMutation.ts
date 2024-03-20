@@ -38,7 +38,7 @@ export interface UseDeployAndRegisterRemoteCanonicalTokenConfig {
 
 export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   config: UseDeployAndRegisterRemoteCanonicalTokenConfig,
-  input?: UseDeployAndRegisterCanonicalTokenInput
+  input?: UseDeployAndRegisterCanonicalTokenInput,
 ) {
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
@@ -71,7 +71,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     const destinationChainNames =
       input?.destinationChainIds.map(
         (destinationChainId) =>
-          index[destinationChainId]?.chain_name ?? "Unknown"
+          index[destinationChainId]?.chain_name ?? "Unknown",
       ) ?? [];
 
     return {
@@ -111,7 +111,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       };
 
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
-        args
+        args,
       );
     });
 
@@ -120,7 +120,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
-    reduce((a, b) => a + b, 0n)
+    reduce((a, b) => a + b, 0n),
   );
 
   const isMutationReady =
@@ -150,7 +150,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       if (!transactionHash || !tokenId || !deployerAddress || !input) {
         console.error(
           "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to setRecordDeploymentArgs",
-          { transactionHash, tokenId, deployerAddress, input }
+          { transactionHash, tokenId, deployerAddress, input },
         );
         return;
       }
@@ -168,7 +168,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },
-    [deployerAddress, input, tokenId]
+    [deployerAddress, input, tokenId],
   );
 
   useEffect(
@@ -177,7 +177,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       onReceipt(receipt);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
+    [receipt],
   );
 
   useEffect(
@@ -189,7 +189,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       recordDeploymentAsync(recordDeploymentArgs)
         .then(() => {
           const tx = decodeDeploymentMessageId(
-            recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
+            recordDeploymentArgs.deploymentMessageId as DeploymentMessageId,
           );
           onStatusUpdate({
             type: "deployed",
@@ -200,7 +200,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         .catch((e) => {
           console.error(
             "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
-            e
+            e,
           );
           onStatusUpdate({
             type: "idle",
@@ -208,7 +208,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [recordDeploymentArgs]
+    [recordDeploymentArgs],
   );
 
   const recordDeploymentDraft = useCallback(async () => {
@@ -233,7 +233,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const writeAsync = useCallback(async () => {
     if (!multicall.writeContractAsync || !data) {
       throw new Error(
-        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined",
       );
     }
 
@@ -245,7 +245,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const write = useCallback(() => {
     if (!multicall.writeContract || !data) {
       throw new Error(
-        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.write is not defined"
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.write is not defined",
       );
     }
 
@@ -254,7 +254,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       .catch((e) => {
         console.error(
           "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
-          e
+          e,
         );
         onStatusUpdate({
           type: "idle",

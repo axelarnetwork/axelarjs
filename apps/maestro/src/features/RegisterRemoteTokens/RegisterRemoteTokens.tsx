@@ -74,7 +74,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       props.tokenAddress,
       recordRemoteTokenDeployment,
       setTxState,
-    ]
+    ],
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
@@ -89,7 +89,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         toast.error("Failed to record remote token deployment");
       });
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
+    [receipt],
   );
 
   const {
@@ -123,7 +123,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [txState.status]
+    [txState.status],
   );
 
   const registerTokensAsync = useMemo(() => {

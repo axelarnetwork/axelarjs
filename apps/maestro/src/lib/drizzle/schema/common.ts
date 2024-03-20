@@ -60,13 +60,12 @@ export const getTokenManagerTypeFromBigInt = (tokenManagerType: bigint) =>
 
 export const tokenManagerTypeEnum = pgEnum(
   "token_manager_type",
-  TOKEN_MANAGER_TYPES
+  TOKEN_MANAGER_TYPES,
 );
 
-export type TokenManagerType = typeof tokenManagerTypeEnum extends PgEnum<
-  infer T
->
-  ? T extends any[]
-    ? T[number]
-    : never
-  : never;
+export type TokenManagerType =
+  typeof tokenManagerTypeEnum extends PgEnum<infer T>
+    ? T extends any[]
+      ? T[number]
+      : never
+    : never;

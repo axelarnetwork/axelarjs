@@ -31,7 +31,7 @@ function createBaseValidatorSet(): ValidatorSet {
 export const ValidatorSet = {
   encode(
     message: ValidatorSet,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     for (const v of message.validators) {
       Validator.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -112,12 +112,12 @@ export const ValidatorSet = {
   },
 
   create<I extends Exact<DeepPartial<ValidatorSet>, I>>(
-    base?: I
+    base?: I,
   ): ValidatorSet {
     return ValidatorSet.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ValidatorSet>, I>>(
-    object: I
+    object: I,
   ): ValidatorSet {
     const message = createBaseValidatorSet();
     message.validators =
@@ -146,7 +146,7 @@ function createBaseValidator(): Validator {
 export const Validator = {
   encode(
     message: Validator,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.address.length !== 0) {
       writer.uint32(10).bytes(message.address);
@@ -246,7 +246,7 @@ export const Validator = {
     return Validator.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Validator>, I>>(
-    object: I
+    object: I,
   ): Validator {
     const message = createBaseValidator();
     message.address = object.address ?? new Uint8Array(0);
@@ -273,7 +273,7 @@ function createBaseSimpleValidator(): SimpleValidator {
 export const SimpleValidator = {
   encode(
     message: SimpleValidator,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.pubKey !== undefined) {
       PublicKey.encode(message.pubKey, writer.uint32(10).fork()).ldelim();
@@ -338,12 +338,12 @@ export const SimpleValidator = {
   },
 
   create<I extends Exact<DeepPartial<SimpleValidator>, I>>(
-    base?: I
+    base?: I,
   ): SimpleValidator {
     return SimpleValidator.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SimpleValidator>, I>>(
-    object: I
+    object: I,
   ): SimpleValidator {
     const message = createBaseSimpleValidator();
     message.pubKey =
@@ -395,14 +395,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

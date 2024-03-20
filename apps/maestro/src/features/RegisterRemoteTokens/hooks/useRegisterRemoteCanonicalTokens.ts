@@ -20,7 +20,7 @@ export type RegisterRemoteCanonicalTokensInput = {
 };
 
 export default function useRegisterRemoteCanonicalTokens(
-  input: RegisterRemoteCanonicalTokensInput
+  input: RegisterRemoteCanonicalTokensInput,
 ) {
   const { computed } = useEVMChainConfigsQuery();
   const chainId = useChainId();
@@ -30,16 +30,16 @@ export default function useRegisterRemoteCanonicalTokens(
       input.chainIds
         .map((chainId) => computed.indexedByChainId[chainId])
         .filter(Boolean),
-    [input.chainIds, computed.indexedByChainId]
+    [input.chainIds, computed.indexedByChainId],
   );
 
   const destinationChainIds = destinationChains.map(
-    (chain) => chain.chain_name
+    (chain) => chain.chain_name,
   );
 
   const sourceChain = useMemo(
     () => computed.indexedByChainId[chainId],
-    [chainId, computed.indexedByChainId]
+    [chainId, computed.indexedByChainId],
   );
 
   const { data: tokenDetails } = useInterchainTokenDetailsQuery({
@@ -66,7 +66,7 @@ export default function useRegisterRemoteCanonicalTokens(
           originalTokenAddress: tokenDetails.tokenAddress,
           destinationChain: axelarChainId,
           gasValue,
-        }
+        },
       );
     });
   }, [destinationChainIds, gasFeesData, sourceChain?.chain_name, tokenDetails]);

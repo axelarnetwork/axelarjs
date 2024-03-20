@@ -77,8 +77,8 @@ const run = async () => {
 
   const res = await Promise.all(
     ranges.map(
-      async (range: number[]) => await transformDeployments(range[0], range[1])
-    )
+      async (range: number[]) => await transformDeployments(range[0], range[1]),
+    ),
   );
   const results = res.flat();
   console.log(JSON.stringify(results));

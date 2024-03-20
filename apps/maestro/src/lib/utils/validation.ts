@@ -6,7 +6,7 @@ import { z } from "zod";
  * @param address The address to check.
  */
 export const isValidEVMAddress = (
-  address: string
+  address: string,
 ): address is `0x${string}` => {
   try {
     return typeof getAddress(address) === "string";
@@ -29,7 +29,7 @@ export const VALID_NON_NUMERIC_KEYS = [
 ];
 
 export const preventNonNumericInput = (
-  e: React.KeyboardEvent<HTMLInputElement>
+  e: React.KeyboardEvent<HTMLInputElement>,
 ) => {
   if (VALID_NON_NUMERIC_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) {
     // allow valid non-numeric keys & ctrl shortcuts
@@ -41,7 +41,7 @@ export const preventNonNumericInput = (
 };
 
 export const preventNonHexInput = (
-  e: React.KeyboardEvent<HTMLInputElement>
+  e: React.KeyboardEvent<HTMLInputElement>,
 ) => {
   if (VALID_NON_NUMERIC_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) {
     // allow valid non-numeric keys & ctrl shortcuts
@@ -108,5 +108,5 @@ export const contractABI = z.array(
     name: z.string().optional(),
     outputs: z.array(abiInputSchema).optional(),
     type: z.string().optional(),
-  })
+  }),
 );

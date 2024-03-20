@@ -461,11 +461,11 @@ export const IINTERCHAIN_TOKEN_FACTORY_ENCODERS = {
 };
 
 export function createIInterchainTokenFactoryReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     canonicalInterchainTokenId(
-      canonicalInterchainTokenIdArgs: IInterchainTokenFactoryCanonicalInterchainTokenIdArgs
+      canonicalInterchainTokenIdArgs: IInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenId"];
@@ -476,7 +476,7 @@ export function createIInterchainTokenFactoryReadClient(
       });
     },
     canonicalInterchainTokenSalt(
-      canonicalInterchainTokenSaltArgs: IInterchainTokenFactoryCanonicalInterchainTokenSaltArgs
+      canonicalInterchainTokenSaltArgs: IInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenSalt"];
@@ -496,7 +496,7 @@ export function createIInterchainTokenFactoryReadClient(
       return publicClient.read("implementation");
     },
     interchainTokenAddress(
-      interchainTokenAddressArgs: IInterchainTokenFactoryInterchainTokenAddressArgs
+      interchainTokenAddressArgs: IInterchainTokenFactoryInterchainTokenAddressArgs,
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenAddress"];
@@ -505,7 +505,7 @@ export function createIInterchainTokenFactoryReadClient(
       return publicClient.read("interchainTokenAddress", { args: encodedArgs });
     },
     interchainTokenId(
-      interchainTokenIdArgs: IInterchainTokenFactoryInterchainTokenIdArgs
+      interchainTokenIdArgs: IInterchainTokenFactoryInterchainTokenIdArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenId"];
       const encodedArgs = encoder.args(interchainTokenIdArgs);
@@ -513,7 +513,7 @@ export function createIInterchainTokenFactoryReadClient(
       return publicClient.read("interchainTokenId", { args: encodedArgs });
     },
     interchainTokenSalt(
-      interchainTokenSaltArgs: IInterchainTokenFactoryInterchainTokenSaltArgs
+      interchainTokenSaltArgs: IInterchainTokenFactoryInterchainTokenSaltArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenSalt"];
       const encodedArgs = encoder.args(interchainTokenSaltArgs);

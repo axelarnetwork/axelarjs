@@ -20,11 +20,11 @@ const makeCenter =
 
 function renderBox(
   lines: Line[] = [],
-  { color = chalk.green, padding = 1 } = {}
+  { color = chalk.green, padding = 1 } = {},
 ) {
   const maxLineLength = lines
     .map((line) =>
-      typeof line === "function" ? line({ center: (x) => x }) : line
+      typeof line === "function" ? line({ center: (x) => x }) : line,
     )
     .reduce((max, line) => Math.max(max, stripAnsi(line).length), 0);
 
@@ -79,8 +79,8 @@ async function inferPackageManager() {
       fs
         .readFile(file, "utf8")
         .then(Boolean)
-        .catch(() => false)
-    )
+        .catch(() => false),
+    ),
   );
 
   if (hasYarnLock) return "yarn";
@@ -98,7 +98,7 @@ function isLatestVersion(version: string, latest: string) {
       v
         .replace(/[^0-9.]/g, "")
         .split(".")
-        .map(Number) as VersionTuple
+        .map(Number) as VersionTuple,
   ) as [VersionTuple, VersionTuple];
 
   for (let i = 0; i < v1.length; i++) {
@@ -132,7 +132,7 @@ async function main() {
   const changelogUrl = `${REPOSITORY_URL}/blob/v${latest}/CHANGELOG.md`;
 
   const updateLine = chalk.bold(
-    `📦 Update available! ${chalk.red(version)} → ${chalk.green(latest)}`
+    `📦 Update available! ${chalk.red(version)} → ${chalk.green(latest)}`,
   );
 
   const AXELARJS_TAG = [
@@ -162,7 +162,7 @@ async function main() {
       "",
       (ctx) =>
         ctx.center(
-          `Run ${chalk.bgGray(installCommands[packageManager])} to update!`
+          `Run ${chalk.bgGray(installCommands[packageManager])} to update!`,
         ),
       "",
       "Find out more about this release:",
@@ -173,7 +173,7 @@ async function main() {
     ],
     {
       color: chalk.bold.yellow,
-    }
+    },
   );
 }
 

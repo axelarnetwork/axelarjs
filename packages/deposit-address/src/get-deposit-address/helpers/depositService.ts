@@ -8,7 +8,7 @@ import { DepositAddressRequestConfig } from "../types";
 export function unwrappable(
   destinationChain: string,
   asset: string,
-  chainConfigs: AxelarConfigsResponse
+  chainConfigs: AxelarConfigsResponse,
 ): boolean {
   const destinationChainConfig =
     chainConfigs.chains[destinationChain.toLowerCase()];
@@ -20,7 +20,7 @@ export function unwrappable(
     .find(({ id }) => id === asset);
 
   const chainForDestAsset = Object.entries(destAsset?.chains ?? []).find(
-    (tuple) => tuple[0] === destinationChain
+    (tuple) => tuple[0] === destinationChain,
   );
 
   if (chainForDestAsset) {
@@ -31,10 +31,10 @@ export function unwrappable(
 
 export async function getActiveChains(
   environment: Environment,
-  requestConfig?: DepositAddressRequestConfig
+  requestConfig?: DepositAddressRequestConfig,
 ) {
   const axelarQueryClient = await createAxelarQueryClient(
-    requestConfig?.axelarRpcUrl ?? AXELAR_RPC_URLS[environment]
+    requestConfig?.axelarRpcUrl ?? AXELAR_RPC_URLS[environment],
   );
 
   return axelarQueryClient.nexus

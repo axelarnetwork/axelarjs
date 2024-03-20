@@ -45,7 +45,7 @@ export default async function handler(req: NextRequest) {
   if (!SUPPORTED_IMAGE_FORMATS.some((f) => contentType.startsWith(f))) {
     return new Response(
       "Invalid image format. Only JPG, PNG and WEBP are supported.",
-      { status: 400 }
+      { status: 400 },
     );
   }
 

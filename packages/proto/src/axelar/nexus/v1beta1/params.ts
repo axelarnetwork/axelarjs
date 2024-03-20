@@ -30,24 +30,24 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chainActivationThreshold !== undefined) {
       Threshold.encode(
         message.chainActivationThreshold,
-        writer.uint32(10).fork()
+        writer.uint32(10).fork(),
       ).ldelim();
     }
     if (message.chainMaintainerMissingVoteThreshold !== undefined) {
       Threshold.encode(
         message.chainMaintainerMissingVoteThreshold,
-        writer.uint32(18).fork()
+        writer.uint32(18).fork(),
       ).ldelim();
     }
     if (message.chainMaintainerIncorrectVoteThreshold !== undefined) {
       Threshold.encode(
         message.chainMaintainerIncorrectVoteThreshold,
-        writer.uint32(26).fork()
+        writer.uint32(26).fork(),
       ).ldelim();
     }
     if (message.chainMaintainerCheckWindow !== 0) {
@@ -77,7 +77,7 @@ export const Params = {
 
           message.chainActivationThreshold = Threshold.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 2:
@@ -87,7 +87,7 @@ export const Params = {
 
           message.chainMaintainerMissingVoteThreshold = Threshold.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 3:
@@ -97,7 +97,7 @@ export const Params = {
 
           message.chainMaintainerIncorrectVoteThreshold = Threshold.decode(
             reader,
-            reader.uint32()
+            reader.uint32(),
           );
           continue;
         case 4:
@@ -136,12 +136,12 @@ export const Params = {
         ? Threshold.fromJSON(object.chainActivationThreshold)
         : undefined,
       chainMaintainerMissingVoteThreshold: isSet(
-        object.chainMaintainerMissingVoteThreshold
+        object.chainMaintainerMissingVoteThreshold,
       )
         ? Threshold.fromJSON(object.chainMaintainerMissingVoteThreshold)
         : undefined,
       chainMaintainerIncorrectVoteThreshold: isSet(
-        object.chainMaintainerIncorrectVoteThreshold
+        object.chainMaintainerIncorrectVoteThreshold,
       )
         ? Threshold.fromJSON(object.chainMaintainerIncorrectVoteThreshold)
         : undefined,
@@ -161,22 +161,22 @@ export const Params = {
     const obj: any = {};
     if (message.chainActivationThreshold !== undefined) {
       obj.chainActivationThreshold = Threshold.toJSON(
-        message.chainActivationThreshold
+        message.chainActivationThreshold,
       );
     }
     if (message.chainMaintainerMissingVoteThreshold !== undefined) {
       obj.chainMaintainerMissingVoteThreshold = Threshold.toJSON(
-        message.chainMaintainerMissingVoteThreshold
+        message.chainMaintainerMissingVoteThreshold,
       );
     }
     if (message.chainMaintainerIncorrectVoteThreshold !== undefined) {
       obj.chainMaintainerIncorrectVoteThreshold = Threshold.toJSON(
-        message.chainMaintainerIncorrectVoteThreshold
+        message.chainMaintainerIncorrectVoteThreshold,
       );
     }
     if (message.chainMaintainerCheckWindow !== 0) {
       obj.chainMaintainerCheckWindow = Math.round(
-        message.chainMaintainerCheckWindow
+        message.chainMaintainerCheckWindow,
       );
     }
     if (message.gateway.length !== 0) {
@@ -255,14 +255,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

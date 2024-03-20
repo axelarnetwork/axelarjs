@@ -21,13 +21,13 @@ export const protobufPackage = "axelar.permission.v1beta1";
 /** Msg defines the gov Msg service. */
 export interface Msg {
   RegisterController(
-    request: RegisterControllerRequest
+    request: RegisterControllerRequest,
   ): Promise<RegisterControllerResponse>;
   DeregisterController(
-    request: DeregisterControllerRequest
+    request: DeregisterControllerRequest,
   ): Promise<DeregisterControllerResponse>;
   UpdateGovernanceKey(
-    request: UpdateGovernanceKeyRequest
+    request: UpdateGovernanceKeyRequest,
   ): Promise<UpdateGovernanceKeyResponse>;
 }
 
@@ -43,36 +43,36 @@ export class MsgClientImpl implements Msg {
     this.UpdateGovernanceKey = this.UpdateGovernanceKey.bind(this);
   }
   RegisterController(
-    request: RegisterControllerRequest
+    request: RegisterControllerRequest,
   ): Promise<RegisterControllerResponse> {
     const data = RegisterControllerRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RegisterController", data);
     return promise.then((data) =>
-      RegisterControllerResponse.decode(_m0.Reader.create(data))
+      RegisterControllerResponse.decode(_m0.Reader.create(data)),
     );
   }
 
   DeregisterController(
-    request: DeregisterControllerRequest
+    request: DeregisterControllerRequest,
   ): Promise<DeregisterControllerResponse> {
     const data = DeregisterControllerRequest.encode(request).finish();
     const promise = this.rpc.request(
       this.service,
       "DeregisterController",
-      data
+      data,
     );
     return promise.then((data) =>
-      DeregisterControllerResponse.decode(_m0.Reader.create(data))
+      DeregisterControllerResponse.decode(_m0.Reader.create(data)),
     );
   }
 
   UpdateGovernanceKey(
-    request: UpdateGovernanceKeyRequest
+    request: UpdateGovernanceKeyRequest,
   ): Promise<UpdateGovernanceKeyResponse> {
     const data = UpdateGovernanceKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateGovernanceKey", data);
     return promise.then((data) =>
-      UpdateGovernanceKeyResponse.decode(_m0.Reader.create(data))
+      UpdateGovernanceKeyResponse.decode(_m0.Reader.create(data)),
     );
   }
 }
@@ -81,7 +81,7 @@ export class MsgClientImpl implements Msg {
 export interface Query {
   /** GovernanceKey returns the multisig governance key */
   GovernanceKey(
-    request: QueryGovernanceKeyRequest
+    request: QueryGovernanceKeyRequest,
   ): Promise<QueryGovernanceKeyResponse>;
   Params(request: ParamsRequest): Promise<ParamsResponse>;
 }
@@ -97,12 +97,12 @@ export class QueryClientImpl implements Query {
     this.Params = this.Params.bind(this);
   }
   GovernanceKey(
-    request: QueryGovernanceKeyRequest
+    request: QueryGovernanceKeyRequest,
   ): Promise<QueryGovernanceKeyResponse> {
     const data = QueryGovernanceKeyRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GovernanceKey", data);
     return promise.then((data) =>
-      QueryGovernanceKeyResponse.decode(_m0.Reader.create(data))
+      QueryGovernanceKeyResponse.decode(_m0.Reader.create(data)),
     );
   }
 
@@ -110,7 +110,7 @@ export class QueryClientImpl implements Query {
     const data = ParamsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Params", data);
     return promise.then((data) =>
-      ParamsResponse.decode(_m0.Reader.create(data))
+      ParamsResponse.decode(_m0.Reader.create(data)),
     );
   }
 }
@@ -119,6 +119,6 @@ interface Rpc {
   request(
     service: string,
     method: string,
-    data: Uint8Array
+    data: Uint8Array,
   ): Promise<Uint8Array>;
 }

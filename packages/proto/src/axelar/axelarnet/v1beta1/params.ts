@@ -33,7 +33,7 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (!message.routeTimeoutWindow.isZero()) {
       writer.uint32(8).uint64(message.routeTimeoutWindow);
@@ -47,7 +47,7 @@ export const Params = {
     for (const v of message.callContractsProposalMinDeposits) {
       CallContractProposalMinDeposit.encode(
         v!,
-        writer.uint32(42).fork()
+        writer.uint32(42).fork(),
       ).ldelim();
     }
     return writer;
@@ -88,7 +88,7 @@ export const Params = {
           }
 
           message.callContractsProposalMinDeposits.push(
-            CallContractProposalMinDeposit.decode(reader, reader.uint32())
+            CallContractProposalMinDeposit.decode(reader, reader.uint32()),
           );
           continue;
       }
@@ -112,10 +112,10 @@ export const Params = {
         ? Long.fromValue(object.endBlockerLimit)
         : Long.UZERO,
       callContractsProposalMinDeposits: globalThis.Array.isArray(
-        object?.callContractsProposalMinDeposits
+        object?.callContractsProposalMinDeposits,
       )
         ? object.callContractsProposalMinDeposits.map((e: any) =>
-            CallContractProposalMinDeposit.fromJSON(e)
+            CallContractProposalMinDeposit.fromJSON(e),
           )
         : [],
     };
@@ -137,7 +137,7 @@ export const Params = {
     if (message.callContractsProposalMinDeposits?.length) {
       obj.callContractsProposalMinDeposits =
         message.callContractsProposalMinDeposits.map((e) =>
-          CallContractProposalMinDeposit.toJSON(e)
+          CallContractProposalMinDeposit.toJSON(e),
         );
     }
     return obj;
@@ -163,7 +163,7 @@ export const Params = {
         : Long.UZERO;
     message.callContractsProposalMinDeposits =
       object.callContractsProposalMinDeposits?.map((e) =>
-        CallContractProposalMinDeposit.fromPartial(e)
+        CallContractProposalMinDeposit.fromPartial(e),
       ) || [];
     return message;
   },
@@ -176,7 +176,7 @@ function createBaseCallContractProposalMinDeposit(): CallContractProposalMinDepo
 export const CallContractProposalMinDeposit = {
   encode(
     message: CallContractProposalMinDeposit,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -192,7 +192,7 @@ export const CallContractProposalMinDeposit = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number
+    length?: number,
   ): CallContractProposalMinDeposit {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -258,12 +258,12 @@ export const CallContractProposalMinDeposit = {
   },
 
   create<I extends Exact<DeepPartial<CallContractProposalMinDeposit>, I>>(
-    base?: I
+    base?: I,
   ): CallContractProposalMinDeposit {
     return CallContractProposalMinDeposit.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CallContractProposalMinDeposit>, I>>(
-    object: I
+    object: I,
   ): CallContractProposalMinDeposit {
     const message = createBaseCallContractProposalMinDeposit();
     message.chain = object.chain ?? "";
@@ -286,14 +286,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

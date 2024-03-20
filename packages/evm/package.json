@@ -56,7 +56,7 @@
     "@types/node": "^20.11.28",
     "@types/prettier": "^2.7.3",
     "commander": "^11.1.0",
-    "prettier": "^2.8.8",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "strip-ansi": "^6.0.1",
     "typescript": "^5.4.2"

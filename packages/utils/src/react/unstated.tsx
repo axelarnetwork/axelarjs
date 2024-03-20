@@ -43,7 +43,7 @@ export interface Container<Value, State = void> {
  * }
  */
 export function createContainer<Value, State = void>(
-  useHook: (initialState?: State) => Value
+  useHook: (initialState?: State) => Value,
 ): Container<Value, State> {
   const Context = createContext<Value | typeof EMPTY>(EMPTY);
 
@@ -64,7 +64,7 @@ export function createContainer<Value, State = void>(
 }
 
 export function useContainer<Value, State = void>(
-  container: Container<Value, State>
+  container: Container<Value, State>,
 ): Value {
   return container.useContainer();
 }

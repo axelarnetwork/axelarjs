@@ -43,14 +43,14 @@ const InterchainTokenDeployment = () => {
 
   const showBackButton = useMemo(
     () => state.step > 0 && state.step < 3,
-    [state.step]
+    [state.step],
   );
 
   const disableChainDropdown = useMemo(
     () =>
       state.txState.type !== "idle" ||
       (state.step > 1 && state.selectedChains.length > 0),
-    [state]
+    [state],
   );
 
   return (

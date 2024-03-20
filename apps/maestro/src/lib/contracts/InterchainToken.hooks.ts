@@ -3,9 +3,9 @@
 
 import {
   createUseReadContract,
-  createUseWriteContract,
   createUseSimulateContract,
   createUseWatchContractEvent,
+  createUseWriteContract,
 } from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -518,14 +518,14 @@ export const useReadInterchainTokenNameHash =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenAbi}__ and `functionName` set to `"nonces"`
  */
 export const useReadInterchainTokenNonces = /*#__PURE__*/ createUseReadContract(
-  { abi: interchainTokenAbi, functionName: "nonces" }
+  { abi: interchainTokenAbi, functionName: "nonces" },
 );
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenAbi}__ and `functionName` set to `"symbol"`
  */
 export const useReadInterchainTokenSymbol = /*#__PURE__*/ createUseReadContract(
-  { abi: interchainTokenAbi, functionName: "symbol" }
+  { abi: interchainTokenAbi, functionName: "symbol" },
 );
 
 /**
@@ -566,7 +566,7 @@ export const useWriteInterchainTokenApprove =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenAbi}__ and `functionName` set to `"burn"`
  */
 export const useWriteInterchainTokenBurn = /*#__PURE__*/ createUseWriteContract(
-  { abi: interchainTokenAbi, functionName: "burn" }
+  { abi: interchainTokenAbi, functionName: "burn" },
 );
 
 /**
@@ -591,7 +591,7 @@ export const useWriteInterchainTokenIncreaseAllowance =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenAbi}__ and `functionName` set to `"init"`
  */
 export const useWriteInterchainTokenInit = /*#__PURE__*/ createUseWriteContract(
-  { abi: interchainTokenAbi, functionName: "init" }
+  { abi: interchainTokenAbi, functionName: "init" },
 );
 
 /**
@@ -616,7 +616,7 @@ export const useWriteInterchainTokenInterchainTransferFrom =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenAbi}__ and `functionName` set to `"mint"`
  */
 export const useWriteInterchainTokenMint = /*#__PURE__*/ createUseWriteContract(
-  { abi: interchainTokenAbi, functionName: "mint" }
+  { abi: interchainTokenAbi, functionName: "mint" },
 );
 
 /**

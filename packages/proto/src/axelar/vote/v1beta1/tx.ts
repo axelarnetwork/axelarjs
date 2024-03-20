@@ -23,7 +23,7 @@ function createBaseVoteRequest(): VoteRequest {
 export const VoteRequest = {
   encode(
     message: VoteRequest,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -103,7 +103,7 @@ export const VoteRequest = {
     return VoteRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<VoteRequest>, I>>(
-    object: I
+    object: I,
   ): VoteRequest {
     const message = createBaseVoteRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -126,7 +126,7 @@ function createBaseVoteResponse(): VoteResponse {
 export const VoteResponse = {
   encode(
     message: VoteResponse,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.log !== "") {
       writer.uint32(10).string(message.log);
@@ -171,12 +171,12 @@ export const VoteResponse = {
   },
 
   create<I extends Exact<DeepPartial<VoteResponse>, I>>(
-    base?: I
+    base?: I,
   ): VoteResponse {
     return VoteResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<VoteResponse>, I>>(
-    object: I
+    object: I,
   ): VoteResponse {
     const message = createBaseVoteResponse();
     message.log = object.log ?? "";
@@ -221,14 +221,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

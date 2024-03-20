@@ -20,7 +20,7 @@ import { parseUnits } from "viem";
 export function gasToWei(
   gasLimit: bigint,
   gasPrice: string,
-  decimals: number
+  decimals: number,
 ): bigint {
   // Split the gasPrice into integer and fractional parts
   const fractionalPart = gasPrice.split(".")[1] || "";

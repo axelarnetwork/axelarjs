@@ -12,7 +12,7 @@ const BigNumberText = (props: BigNumberTextProps) => {
     <>
       {Number(formatUnits(props.children, props.decimals ?? 0)).toLocaleString(
         props.locales,
-        props.localeOptions
+        props.localeOptions,
       )}
     </>
   );

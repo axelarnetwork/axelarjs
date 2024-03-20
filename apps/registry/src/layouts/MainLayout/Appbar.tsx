@@ -19,7 +19,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         {
           "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
         },
-        props.className
+        props.className,
       )}
     >
       <Navbar.Start>

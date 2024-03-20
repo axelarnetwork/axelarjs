@@ -27,13 +27,13 @@ const splitAt = <T>(index: number = 0, x: string | T[]) => [
 export function rainbow(text: string = ""): string {
   const rainbowRipple = [..."{{{}}}"]
     .map((x, i) =>
-      Maybe.of(COLORS[i % COLORS.length]).mapOr(x, (color) => chalk[color](x))
+      Maybe.of(COLORS[i % COLORS.length]).mapOr(x, (color) => chalk[color](x)),
     )
     .join("");
 
   const [pre, pos] = splitAt(rainbowRipple.length / 2, rainbowRipple) as [
     string,
-    string
+    string,
   ];
 
   return `${pre} ${text} ${pos}`;

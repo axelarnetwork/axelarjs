@@ -10,7 +10,7 @@ describe("deposit service", () => {
     const salt = keccak256(
       encodeAbiParameters(parseAbiParameters("uint"), [
         BigInt(new Date().getTime()),
-      ])
+      ]),
     );
 
     const response = await client.getDepositAddressForNativeWrap({

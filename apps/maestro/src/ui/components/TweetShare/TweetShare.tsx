@@ -9,7 +9,7 @@ interface TweetShareProps {
 const TweetShare: FC<TweetShareProps> = ({ tweetText, className }) => {
   // Construct the Twitter share URL
   const twitterShareURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-    tweetText
+    tweetText,
   )}`;
 
   return (

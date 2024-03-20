@@ -8,7 +8,7 @@ import { AxelarscanClient } from "./isomorphic";
 
 export const createAxelarscanClient = (
   env: Environment,
-  options?: HttpClientOptions
+  options?: HttpClientOptions,
 ) =>
   AxelarscanClient.init({
     instance: HttpClient.extend({

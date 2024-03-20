@@ -21,7 +21,7 @@ export const INITIAL_STATE = {
 function useManageInterchainTokenState(initialState = INITIAL_STATE) {
   const [state, setState] = useSessionStorageState(
     "@maestro/manage-interchain-token",
-    initialState
+    initialState,
   );
 
   // Reset state when token address changes
@@ -35,7 +35,7 @@ function useManageInterchainTokenState(initialState = INITIAL_STATE) {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [initialState, state.tokenAddress, state.tokenId]
+    [initialState, state.tokenAddress, state.tokenId],
   );
 
   const actions = {

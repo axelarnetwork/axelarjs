@@ -37,7 +37,7 @@ const DrawerRoot: FC<DrawerProps> = ({ end, mobile, className, ...props }) => {
           end,
           mobile,
         }),
-        className
+        className,
       )}
       {...props}
     />

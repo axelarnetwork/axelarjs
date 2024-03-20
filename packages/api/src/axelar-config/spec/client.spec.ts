@@ -21,7 +21,7 @@ describe("axelar-config (node client)", () => {
     test("It should return the config client", async () => {
       // TODO: only validating stubbed until this PR is merged with new json config: https://github.com/axelarnetwork/chains/pull/515
       const configs: AxelarConfigsResponse = await api.getAxelarConfigs(
-        ENVIRONMENTS.testnet
+        ENVIRONMENTS.testnet,
       );
       const stubbed: unknown = stub;
 
