@@ -27,7 +27,7 @@ import type {
  */
 export async function getDepositAddress(
   params: DepositAddressOptions,
-  dependencies: GetDepositAddressDependencies,
+  dependencies: GetDepositAddressDependencies
 ) {
   const {
     asset,
@@ -39,7 +39,7 @@ export async function getDepositAddress(
   } = params;
 
   const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment,
+    params.environment
   );
 
   // we consider undefined asset as a native token asset
@@ -54,14 +54,14 @@ export async function getDepositAddress(
         salt: params.options?.salt,
         refundAddress: params.options?.refundAddress || destinationAddress,
       },
-      dependencies,
+      dependencies
     );
   } else {
     // this is an erc20 token, we need to check if it is unwrappable at the destination chain
     const shouldUnwrapToken = unwrappable(
       destinationChain,
       asset,
-      chainConfigs,
+      chainConfigs
     );
 
     // define a function to get the linked deposit address based on the destination address, where:
@@ -77,7 +77,7 @@ export async function getDepositAddress(
           asset,
           requestConfig,
         },
-        dependencies,
+        dependencies
       ).then((res) => res?.depositAddress);
 
     if (shouldUnwrapToken && !params.options?.skipUnwrap) {
@@ -91,7 +91,7 @@ export async function getDepositAddress(
           refundAddress:
             params.options?.refundAddress || params.destinationAddress,
         },
-        dependencies,
+        dependencies
       );
 
       // then, we need to get the linked deposit address based on the unwrapped deposit address and return it
@@ -105,10 +105,10 @@ export async function getDepositAddress(
 
 export async function getLinkedDepositAddress(
   params: SendOptions,
-  dependencies: GetLinkedDepositAddressDependencies,
+  dependencies: GetLinkedDepositAddressDependencies
 ) {
   const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment,
+    params.environment
   );
 
   /**
@@ -118,7 +118,7 @@ export async function getLinkedDepositAddress(
   validateAsset(
     [params.sourceChain, params.destinationChain],
     params.asset,
-    chainConfigs,
+    chainConfigs
   );
   await validateAddressAndChains(
     params.sourceChain,
@@ -126,7 +126,7 @@ export async function getLinkedDepositAddress(
     params.destinationAddress,
     chainConfigs,
     params.environment,
-    params.requestConfig,
+    params.requestConfig
   );
 
   return getDepositAddressFromAxelarNetwork(params, chainConfigs, dependencies);
@@ -134,10 +134,10 @@ export async function getLinkedDepositAddress(
 
 export async function getNativeWrapDepositAddress(
   params: DepositNativeWrapOptions,
-  dependencies: GetDepositServiceDependencies,
+  dependencies: GetDepositServiceDependencies
 ) {
   const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment,
+    params.environment
   );
 
   await validateAddressAndChains(
@@ -145,7 +145,7 @@ export async function getNativeWrapDepositAddress(
     params.destinationChain,
     params.destinationAddress,
     chainConfigs,
-    params.environment,
+    params.environment
   );
 
   const { address } =
@@ -162,10 +162,10 @@ export async function getNativeWrapDepositAddress(
 
 export async function getNativeUnwrapDepositAddress(
   params: DepositNativeUnwrapOptions,
-  dependencies: GetDepositServiceDependencies,
+  dependencies: GetDepositServiceDependencies
 ) {
   const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment,
+    params.environment
   );
 
   await validateAddressAndChains(
@@ -173,7 +173,7 @@ export async function getNativeUnwrapDepositAddress(
     params.destinationChain,
     params.destinationAddress,
     chainConfigs,
-    params.environment,
+    params.environment
   );
 
   const { address } =

@@ -173,7 +173,7 @@ function createBaseSetGatewayRequest(): SetGatewayRequest {
 export const SetGatewayRequest = {
   encode(
     message: SetGatewayRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -252,12 +252,12 @@ export const SetGatewayRequest = {
   },
 
   create<I extends Exact<DeepPartial<SetGatewayRequest>, I>>(
-    base?: I,
+    base?: I
   ): SetGatewayRequest {
     return SetGatewayRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SetGatewayRequest>, I>>(
-    object: I,
+    object: I
   ): SetGatewayRequest {
     const message = createBaseSetGatewayRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -274,7 +274,7 @@ function createBaseSetGatewayResponse(): SetGatewayResponse {
 export const SetGatewayResponse = {
   encode(
     _: SetGatewayResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
@@ -306,12 +306,12 @@ export const SetGatewayResponse = {
   },
 
   create<I extends Exact<DeepPartial<SetGatewayResponse>, I>>(
-    base?: I,
+    base?: I
   ): SetGatewayResponse {
     return SetGatewayResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SetGatewayResponse>, I>>(
-    _: I,
+    _: I
   ): SetGatewayResponse {
     const message = createBaseSetGatewayResponse();
     return message;
@@ -325,7 +325,7 @@ function createBaseConfirmGatewayTxRequest(): ConfirmGatewayTxRequest {
 export const ConfirmGatewayTxRequest = {
   encode(
     message: ConfirmGatewayTxRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -341,7 +341,7 @@ export const ConfirmGatewayTxRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmGatewayTxRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -407,12 +407,12 @@ export const ConfirmGatewayTxRequest = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxRequest>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmGatewayTxRequest {
     return ConfirmGatewayTxRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxRequest>, I>>(
-    object: I,
+    object: I
   ): ConfirmGatewayTxRequest {
     const message = createBaseConfirmGatewayTxRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -429,14 +429,14 @@ function createBaseConfirmGatewayTxResponse(): ConfirmGatewayTxResponse {
 export const ConfirmGatewayTxResponse = {
   encode(
     _: ConfirmGatewayTxResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmGatewayTxResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -464,12 +464,12 @@ export const ConfirmGatewayTxResponse = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxResponse>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmGatewayTxResponse {
     return ConfirmGatewayTxResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxResponse>, I>>(
-    _: I,
+    _: I
   ): ConfirmGatewayTxResponse {
     const message = createBaseConfirmGatewayTxResponse();
     return message;
@@ -483,7 +483,7 @@ function createBaseConfirmGatewayTxsRequest(): ConfirmGatewayTxsRequest {
 export const ConfirmGatewayTxsRequest = {
   encode(
     message: ConfirmGatewayTxsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -499,7 +499,7 @@ export const ConfirmGatewayTxsRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmGatewayTxsRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -565,12 +565,12 @@ export const ConfirmGatewayTxsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxsRequest>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmGatewayTxsRequest {
     return ConfirmGatewayTxsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxsRequest>, I>>(
-    object: I,
+    object: I
   ): ConfirmGatewayTxsRequest {
     const message = createBaseConfirmGatewayTxsRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -587,14 +587,14 @@ function createBaseConfirmGatewayTxsResponse(): ConfirmGatewayTxsResponse {
 export const ConfirmGatewayTxsResponse = {
   encode(
     _: ConfirmGatewayTxsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmGatewayTxsResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -622,12 +622,12 @@ export const ConfirmGatewayTxsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmGatewayTxsResponse>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmGatewayTxsResponse {
     return ConfirmGatewayTxsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmGatewayTxsResponse>, I>>(
-    _: I,
+    _: I
   ): ConfirmGatewayTxsResponse {
     const message = createBaseConfirmGatewayTxsResponse();
     return message;
@@ -647,7 +647,7 @@ function createBaseConfirmDepositRequest(): ConfirmDepositRequest {
 export const ConfirmDepositRequest = {
   encode(
     message: ConfirmDepositRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -669,7 +669,7 @@ export const ConfirmDepositRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmDepositRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -761,12 +761,12 @@ export const ConfirmDepositRequest = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmDepositRequest>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmDepositRequest {
     return ConfirmDepositRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmDepositRequest>, I>>(
-    object: I,
+    object: I
   ): ConfirmDepositRequest {
     const message = createBaseConfirmDepositRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -785,14 +785,14 @@ function createBaseConfirmDepositResponse(): ConfirmDepositResponse {
 export const ConfirmDepositResponse = {
   encode(
     _: ConfirmDepositResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmDepositResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -820,12 +820,12 @@ export const ConfirmDepositResponse = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmDepositResponse>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmDepositResponse {
     return ConfirmDepositResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmDepositResponse>, I>>(
-    _: I,
+    _: I
   ): ConfirmDepositResponse {
     const message = createBaseConfirmDepositResponse();
     return message;
@@ -844,7 +844,7 @@ function createBaseConfirmTokenRequest(): ConfirmTokenRequest {
 export const ConfirmTokenRequest = {
   encode(
     message: ConfirmTokenRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -937,12 +937,12 @@ export const ConfirmTokenRequest = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmTokenRequest>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmTokenRequest {
     return ConfirmTokenRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmTokenRequest>, I>>(
-    object: I,
+    object: I
   ): ConfirmTokenRequest {
     const message = createBaseConfirmTokenRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -963,14 +963,14 @@ function createBaseConfirmTokenResponse(): ConfirmTokenResponse {
 export const ConfirmTokenResponse = {
   encode(
     _: ConfirmTokenResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmTokenResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -998,12 +998,12 @@ export const ConfirmTokenResponse = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmTokenResponse>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmTokenResponse {
     return ConfirmTokenResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmTokenResponse>, I>>(
-    _: I,
+    _: I
   ): ConfirmTokenResponse {
     const message = createBaseConfirmTokenResponse();
     return message;
@@ -1017,7 +1017,7 @@ function createBaseConfirmTransferKeyRequest(): ConfirmTransferKeyRequest {
 export const ConfirmTransferKeyRequest = {
   encode(
     message: ConfirmTransferKeyRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1033,7 +1033,7 @@ export const ConfirmTransferKeyRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmTransferKeyRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1099,12 +1099,12 @@ export const ConfirmTransferKeyRequest = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmTransferKeyRequest>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmTransferKeyRequest {
     return ConfirmTransferKeyRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmTransferKeyRequest>, I>>(
-    object: I,
+    object: I
   ): ConfirmTransferKeyRequest {
     const message = createBaseConfirmTransferKeyRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1121,14 +1121,14 @@ function createBaseConfirmTransferKeyResponse(): ConfirmTransferKeyResponse {
 export const ConfirmTransferKeyResponse = {
   encode(
     _: ConfirmTransferKeyResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ConfirmTransferKeyResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1156,12 +1156,12 @@ export const ConfirmTransferKeyResponse = {
   },
 
   create<I extends Exact<DeepPartial<ConfirmTransferKeyResponse>, I>>(
-    base?: I,
+    base?: I
   ): ConfirmTransferKeyResponse {
     return ConfirmTransferKeyResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ConfirmTransferKeyResponse>, I>>(
-    _: I,
+    _: I
   ): ConfirmTransferKeyResponse {
     const message = createBaseConfirmTransferKeyResponse();
     return message;
@@ -1181,7 +1181,7 @@ function createBaseLinkRequest(): LinkRequest {
 export const LinkRequest = {
   encode(
     message: LinkRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1293,7 +1293,7 @@ export const LinkRequest = {
     return LinkRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LinkRequest>, I>>(
-    object: I,
+    object: I
   ): LinkRequest {
     const message = createBaseLinkRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1312,7 +1312,7 @@ function createBaseLinkResponse(): LinkResponse {
 export const LinkResponse = {
   encode(
     message: LinkResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.depositAddr !== "") {
       writer.uint32(10).string(message.depositAddr);
@@ -1361,12 +1361,12 @@ export const LinkResponse = {
   },
 
   create<I extends Exact<DeepPartial<LinkResponse>, I>>(
-    base?: I,
+    base?: I
   ): LinkResponse {
     return LinkResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LinkResponse>, I>>(
-    object: I,
+    object: I
   ): LinkResponse {
     const message = createBaseLinkResponse();
     message.depositAddr = object.depositAddr ?? "";
@@ -1381,7 +1381,7 @@ function createBaseCreateBurnTokensRequest(): CreateBurnTokensRequest {
 export const CreateBurnTokensRequest = {
   encode(
     message: CreateBurnTokensRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1394,7 +1394,7 @@ export const CreateBurnTokensRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateBurnTokensRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1447,12 +1447,12 @@ export const CreateBurnTokensRequest = {
   },
 
   create<I extends Exact<DeepPartial<CreateBurnTokensRequest>, I>>(
-    base?: I,
+    base?: I
   ): CreateBurnTokensRequest {
     return CreateBurnTokensRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateBurnTokensRequest>, I>>(
-    object: I,
+    object: I
   ): CreateBurnTokensRequest {
     const message = createBaseCreateBurnTokensRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1468,14 +1468,14 @@ function createBaseCreateBurnTokensResponse(): CreateBurnTokensResponse {
 export const CreateBurnTokensResponse = {
   encode(
     _: CreateBurnTokensResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateBurnTokensResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1503,12 +1503,12 @@ export const CreateBurnTokensResponse = {
   },
 
   create<I extends Exact<DeepPartial<CreateBurnTokensResponse>, I>>(
-    base?: I,
+    base?: I
   ): CreateBurnTokensResponse {
     return CreateBurnTokensResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateBurnTokensResponse>, I>>(
-    _: I,
+    _: I
   ): CreateBurnTokensResponse {
     const message = createBaseCreateBurnTokensResponse();
     return message;
@@ -1529,7 +1529,7 @@ function createBaseCreateDeployTokenRequest(): CreateDeployTokenRequest {
 export const CreateDeployTokenRequest = {
   encode(
     message: CreateDeployTokenRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1543,7 +1543,7 @@ export const CreateDeployTokenRequest = {
     if (message.tokenDetails !== undefined) {
       TokenDetails.encode(
         message.tokenDetails,
-        writer.uint32(34).fork(),
+        writer.uint32(34).fork()
       ).ldelim();
     }
     if (message.address.length !== 0) {
@@ -1557,7 +1557,7 @@ export const CreateDeployTokenRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateDeployTokenRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1660,12 +1660,12 @@ export const CreateDeployTokenRequest = {
   },
 
   create<I extends Exact<DeepPartial<CreateDeployTokenRequest>, I>>(
-    base?: I,
+    base?: I
   ): CreateDeployTokenRequest {
     return CreateDeployTokenRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateDeployTokenRequest>, I>>(
-    object: I,
+    object: I
   ): CreateDeployTokenRequest {
     const message = createBaseCreateDeployTokenRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1691,14 +1691,14 @@ function createBaseCreateDeployTokenResponse(): CreateDeployTokenResponse {
 export const CreateDeployTokenResponse = {
   encode(
     _: CreateDeployTokenResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateDeployTokenResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1726,12 +1726,12 @@ export const CreateDeployTokenResponse = {
   },
 
   create<I extends Exact<DeepPartial<CreateDeployTokenResponse>, I>>(
-    base?: I,
+    base?: I
   ): CreateDeployTokenResponse {
     return CreateDeployTokenResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateDeployTokenResponse>, I>>(
-    _: I,
+    _: I
   ): CreateDeployTokenResponse {
     const message = createBaseCreateDeployTokenResponse();
     return message;
@@ -1745,7 +1745,7 @@ function createBaseCreatePendingTransfersRequest(): CreatePendingTransfersReques
 export const CreatePendingTransfersRequest = {
   encode(
     message: CreatePendingTransfersRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1758,7 +1758,7 @@ export const CreatePendingTransfersRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreatePendingTransfersRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1811,12 +1811,12 @@ export const CreatePendingTransfersRequest = {
   },
 
   create<I extends Exact<DeepPartial<CreatePendingTransfersRequest>, I>>(
-    base?: I,
+    base?: I
   ): CreatePendingTransfersRequest {
     return CreatePendingTransfersRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreatePendingTransfersRequest>, I>>(
-    object: I,
+    object: I
   ): CreatePendingTransfersRequest {
     const message = createBaseCreatePendingTransfersRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1832,14 +1832,14 @@ function createBaseCreatePendingTransfersResponse(): CreatePendingTransfersRespo
 export const CreatePendingTransfersResponse = {
   encode(
     _: CreatePendingTransfersResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreatePendingTransfersResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1867,12 +1867,12 @@ export const CreatePendingTransfersResponse = {
   },
 
   create<I extends Exact<DeepPartial<CreatePendingTransfersResponse>, I>>(
-    base?: I,
+    base?: I
   ): CreatePendingTransfersResponse {
     return CreatePendingTransfersResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreatePendingTransfersResponse>, I>>(
-    _: I,
+    _: I
   ): CreatePendingTransfersResponse {
     const message = createBaseCreatePendingTransfersResponse();
     return message;
@@ -1886,7 +1886,7 @@ function createBaseCreateTransferOwnershipRequest(): CreateTransferOwnershipRequ
 export const CreateTransferOwnershipRequest = {
   encode(
     message: CreateTransferOwnershipRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1902,7 +1902,7 @@ export const CreateTransferOwnershipRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateTransferOwnershipRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1966,12 +1966,12 @@ export const CreateTransferOwnershipRequest = {
   },
 
   create<I extends Exact<DeepPartial<CreateTransferOwnershipRequest>, I>>(
-    base?: I,
+    base?: I
   ): CreateTransferOwnershipRequest {
     return CreateTransferOwnershipRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateTransferOwnershipRequest>, I>>(
-    object: I,
+    object: I
   ): CreateTransferOwnershipRequest {
     const message = createBaseCreateTransferOwnershipRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1988,14 +1988,14 @@ function createBaseCreateTransferOwnershipResponse(): CreateTransferOwnershipRes
 export const CreateTransferOwnershipResponse = {
   encode(
     _: CreateTransferOwnershipResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateTransferOwnershipResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2023,12 +2023,12 @@ export const CreateTransferOwnershipResponse = {
   },
 
   create<I extends Exact<DeepPartial<CreateTransferOwnershipResponse>, I>>(
-    base?: I,
+    base?: I
   ): CreateTransferOwnershipResponse {
     return CreateTransferOwnershipResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CreateTransferOwnershipResponse>, I>>(
-    _: I,
+    _: I
   ): CreateTransferOwnershipResponse {
     const message = createBaseCreateTransferOwnershipResponse();
     return message;
@@ -2042,7 +2042,7 @@ function createBaseCreateTransferOperatorshipRequest(): CreateTransferOperatorsh
 export const CreateTransferOperatorshipRequest = {
   encode(
     message: CreateTransferOperatorshipRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -2058,7 +2058,7 @@ export const CreateTransferOperatorshipRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateTransferOperatorshipRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2122,7 +2122,7 @@ export const CreateTransferOperatorshipRequest = {
   },
 
   create<I extends Exact<DeepPartial<CreateTransferOperatorshipRequest>, I>>(
-    base?: I,
+    base?: I
   ): CreateTransferOperatorshipRequest {
     return CreateTransferOperatorshipRequest.fromPartial(base ?? ({} as any));
   },
@@ -2144,14 +2144,14 @@ function createBaseCreateTransferOperatorshipResponse(): CreateTransferOperators
 export const CreateTransferOperatorshipResponse = {
   encode(
     _: CreateTransferOperatorshipResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CreateTransferOperatorshipResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2179,7 +2179,7 @@ export const CreateTransferOperatorshipResponse = {
   },
 
   create<I extends Exact<DeepPartial<CreateTransferOperatorshipResponse>, I>>(
-    base?: I,
+    base?: I
   ): CreateTransferOperatorshipResponse {
     return CreateTransferOperatorshipResponse.fromPartial(base ?? ({} as any));
   },
@@ -2198,7 +2198,7 @@ function createBaseSignCommandsRequest(): SignCommandsRequest {
 export const SignCommandsRequest = {
   encode(
     message: SignCommandsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -2261,12 +2261,12 @@ export const SignCommandsRequest = {
   },
 
   create<I extends Exact<DeepPartial<SignCommandsRequest>, I>>(
-    base?: I,
+    base?: I
   ): SignCommandsRequest {
     return SignCommandsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SignCommandsRequest>, I>>(
-    object: I,
+    object: I
   ): SignCommandsRequest {
     const message = createBaseSignCommandsRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -2282,7 +2282,7 @@ function createBaseSignCommandsResponse(): SignCommandsResponse {
 export const SignCommandsResponse = {
   encode(
     message: SignCommandsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.batchedCommandsId.length !== 0) {
       writer.uint32(10).bytes(message.batchedCommandsId);
@@ -2295,7 +2295,7 @@ export const SignCommandsResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): SignCommandsResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2350,12 +2350,12 @@ export const SignCommandsResponse = {
   },
 
   create<I extends Exact<DeepPartial<SignCommandsResponse>, I>>(
-    base?: I,
+    base?: I
   ): SignCommandsResponse {
     return SignCommandsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SignCommandsResponse>, I>>(
-    object: I,
+    object: I
   ): SignCommandsResponse {
     const message = createBaseSignCommandsResponse();
     message.batchedCommandsId = object.batchedCommandsId ?? new Uint8Array(0);
@@ -2376,7 +2376,7 @@ function createBaseAddChainRequest(): AddChainRequest {
 export const AddChainRequest = {
   encode(
     message: AddChainRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -2469,12 +2469,12 @@ export const AddChainRequest = {
   },
 
   create<I extends Exact<DeepPartial<AddChainRequest>, I>>(
-    base?: I,
+    base?: I
   ): AddChainRequest {
     return AddChainRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<AddChainRequest>, I>>(
-    object: I,
+    object: I
   ): AddChainRequest {
     const message = createBaseAddChainRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -2492,7 +2492,7 @@ function createBaseAddChainResponse(): AddChainResponse {
 export const AddChainResponse = {
   encode(
     _: AddChainResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
@@ -2524,12 +2524,12 @@ export const AddChainResponse = {
   },
 
   create<I extends Exact<DeepPartial<AddChainResponse>, I>>(
-    base?: I,
+    base?: I
   ): AddChainResponse {
     return AddChainResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<AddChainResponse>, I>>(
-    _: I,
+    _: I
   ): AddChainResponse {
     const message = createBaseAddChainResponse();
     return message;
@@ -2543,7 +2543,7 @@ function createBaseRetryFailedEventRequest(): RetryFailedEventRequest {
 export const RetryFailedEventRequest = {
   encode(
     message: RetryFailedEventRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -2559,7 +2559,7 @@ export const RetryFailedEventRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RetryFailedEventRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2623,12 +2623,12 @@ export const RetryFailedEventRequest = {
   },
 
   create<I extends Exact<DeepPartial<RetryFailedEventRequest>, I>>(
-    base?: I,
+    base?: I
   ): RetryFailedEventRequest {
     return RetryFailedEventRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RetryFailedEventRequest>, I>>(
-    object: I,
+    object: I
   ): RetryFailedEventRequest {
     const message = createBaseRetryFailedEventRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -2645,14 +2645,14 @@ function createBaseRetryFailedEventResponse(): RetryFailedEventResponse {
 export const RetryFailedEventResponse = {
   encode(
     _: RetryFailedEventResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RetryFailedEventResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2680,12 +2680,12 @@ export const RetryFailedEventResponse = {
   },
 
   create<I extends Exact<DeepPartial<RetryFailedEventResponse>, I>>(
-    base?: I,
+    base?: I
   ): RetryFailedEventResponse {
     return RetryFailedEventResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RetryFailedEventResponse>, I>>(
-    _: I,
+    _: I
   ): RetryFailedEventResponse {
     const message = createBaseRetryFailedEventResponse();
     return message;

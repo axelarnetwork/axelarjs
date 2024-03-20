@@ -238,7 +238,7 @@ function createBaseChainMaintainersRequest(): ChainMaintainersRequest {
 export const ChainMaintainersRequest = {
   encode(
     message: ChainMaintainersRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -248,7 +248,7 @@ export const ChainMaintainersRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ChainMaintainersRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -288,12 +288,12 @@ export const ChainMaintainersRequest = {
   },
 
   create<I extends Exact<DeepPartial<ChainMaintainersRequest>, I>>(
-    base?: I,
+    base?: I
   ): ChainMaintainersRequest {
     return ChainMaintainersRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainMaintainersRequest>, I>>(
-    object: I,
+    object: I
   ): ChainMaintainersRequest {
     const message = createBaseChainMaintainersRequest();
     message.chain = object.chain ?? "";
@@ -308,7 +308,7 @@ function createBaseChainMaintainersResponse(): ChainMaintainersResponse {
 export const ChainMaintainersResponse = {
   encode(
     message: ChainMaintainersResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.maintainers) {
       writer.uint32(10).bytes(v!);
@@ -318,7 +318,7 @@ export const ChainMaintainersResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ChainMaintainersResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -360,12 +360,12 @@ export const ChainMaintainersResponse = {
   },
 
   create<I extends Exact<DeepPartial<ChainMaintainersResponse>, I>>(
-    base?: I,
+    base?: I
   ): ChainMaintainersResponse {
     return ChainMaintainersResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainMaintainersResponse>, I>>(
-    object: I,
+    object: I
   ): ChainMaintainersResponse {
     const message = createBaseChainMaintainersResponse();
     message.maintainers = object.maintainers?.map((e) => e) || [];
@@ -380,7 +380,7 @@ function createBaseLatestDepositAddressRequest(): LatestDepositAddressRequest {
 export const LatestDepositAddressRequest = {
   encode(
     message: LatestDepositAddressRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.recipientAddr !== "") {
       writer.uint32(10).string(message.recipientAddr);
@@ -396,7 +396,7 @@ export const LatestDepositAddressRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): LatestDepositAddressRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -464,12 +464,12 @@ export const LatestDepositAddressRequest = {
   },
 
   create<I extends Exact<DeepPartial<LatestDepositAddressRequest>, I>>(
-    base?: I,
+    base?: I
   ): LatestDepositAddressRequest {
     return LatestDepositAddressRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LatestDepositAddressRequest>, I>>(
-    object: I,
+    object: I
   ): LatestDepositAddressRequest {
     const message = createBaseLatestDepositAddressRequest();
     message.recipientAddr = object.recipientAddr ?? "";
@@ -486,7 +486,7 @@ function createBaseLatestDepositAddressResponse(): LatestDepositAddressResponse 
 export const LatestDepositAddressResponse = {
   encode(
     message: LatestDepositAddressResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.depositAddr !== "") {
       writer.uint32(10).string(message.depositAddr);
@@ -496,7 +496,7 @@ export const LatestDepositAddressResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): LatestDepositAddressResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -538,12 +538,12 @@ export const LatestDepositAddressResponse = {
   },
 
   create<I extends Exact<DeepPartial<LatestDepositAddressResponse>, I>>(
-    base?: I,
+    base?: I
   ): LatestDepositAddressResponse {
     return LatestDepositAddressResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LatestDepositAddressResponse>, I>>(
-    object: I,
+    object: I
   ): LatestDepositAddressResponse {
     const message = createBaseLatestDepositAddressResponse();
     message.depositAddr = object.depositAddr ?? "";
@@ -558,7 +558,7 @@ function createBaseTransfersForChainRequest(): TransfersForChainRequest {
 export const TransfersForChainRequest = {
   encode(
     message: TransfersForChainRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -574,7 +574,7 @@ export const TransfersForChainRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): TransfersForChainRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -638,12 +638,12 @@ export const TransfersForChainRequest = {
   },
 
   create<I extends Exact<DeepPartial<TransfersForChainRequest>, I>>(
-    base?: I,
+    base?: I
   ): TransfersForChainRequest {
     return TransfersForChainRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransfersForChainRequest>, I>>(
-    object: I,
+    object: I
   ): TransfersForChainRequest {
     const message = createBaseTransfersForChainRequest();
     message.chain = object.chain ?? "";
@@ -663,7 +663,7 @@ function createBaseTransfersForChainResponse(): TransfersForChainResponse {
 export const TransfersForChainResponse = {
   encode(
     message: TransfersForChainResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.transfers) {
       CrossChainTransfer.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -671,7 +671,7 @@ export const TransfersForChainResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(
         message.pagination,
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     return writer;
@@ -679,7 +679,7 @@ export const TransfersForChainResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): TransfersForChainResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -694,7 +694,7 @@ export const TransfersForChainResponse = {
           }
 
           message.transfers.push(
-            CrossChainTransfer.decode(reader, reader.uint32()),
+            CrossChainTransfer.decode(reader, reader.uint32())
           );
           continue;
         case 2:
@@ -728,7 +728,7 @@ export const TransfersForChainResponse = {
     const obj: any = {};
     if (message.transfers?.length) {
       obj.transfers = message.transfers.map((e) =>
-        CrossChainTransfer.toJSON(e),
+        CrossChainTransfer.toJSON(e)
       );
     }
     if (message.pagination !== undefined) {
@@ -738,12 +738,12 @@ export const TransfersForChainResponse = {
   },
 
   create<I extends Exact<DeepPartial<TransfersForChainResponse>, I>>(
-    base?: I,
+    base?: I
   ): TransfersForChainResponse {
     return TransfersForChainResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransfersForChainResponse>, I>>(
-    object: I,
+    object: I
   ): TransfersForChainResponse {
     const message = createBaseTransfersForChainResponse();
     message.transfers =
@@ -763,7 +763,7 @@ function createBaseFeeInfoRequest(): FeeInfoRequest {
 export const FeeInfoRequest = {
   encode(
     message: FeeInfoRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -824,12 +824,12 @@ export const FeeInfoRequest = {
   },
 
   create<I extends Exact<DeepPartial<FeeInfoRequest>, I>>(
-    base?: I,
+    base?: I
   ): FeeInfoRequest {
     return FeeInfoRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<FeeInfoRequest>, I>>(
-    object: I,
+    object: I
   ): FeeInfoRequest {
     const message = createBaseFeeInfoRequest();
     message.chain = object.chain ?? "";
@@ -845,7 +845,7 @@ function createBaseFeeInfoResponse(): FeeInfoResponse {
 export const FeeInfoResponse = {
   encode(
     message: FeeInfoResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.feeInfo !== undefined) {
       FeeInfo.encode(message.feeInfo, writer.uint32(10).fork()).ldelim();
@@ -894,12 +894,12 @@ export const FeeInfoResponse = {
   },
 
   create<I extends Exact<DeepPartial<FeeInfoResponse>, I>>(
-    base?: I,
+    base?: I
   ): FeeInfoResponse {
     return FeeInfoResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<FeeInfoResponse>, I>>(
-    object: I,
+    object: I
   ): FeeInfoResponse {
     const message = createBaseFeeInfoResponse();
     message.feeInfo =
@@ -917,7 +917,7 @@ function createBaseTransferFeeRequest(): TransferFeeRequest {
 export const TransferFeeRequest = {
   encode(
     message: TransferFeeRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sourceChain !== "") {
       writer.uint32(10).string(message.sourceChain);
@@ -996,12 +996,12 @@ export const TransferFeeRequest = {
   },
 
   create<I extends Exact<DeepPartial<TransferFeeRequest>, I>>(
-    base?: I,
+    base?: I
   ): TransferFeeRequest {
     return TransferFeeRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferFeeRequest>, I>>(
-    object: I,
+    object: I
   ): TransferFeeRequest {
     const message = createBaseTransferFeeRequest();
     message.sourceChain = object.sourceChain ?? "";
@@ -1018,7 +1018,7 @@ function createBaseTransferFeeResponse(): TransferFeeResponse {
 export const TransferFeeResponse = {
   encode(
     message: TransferFeeResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.fee !== undefined) {
       Coin.encode(message.fee, writer.uint32(10).fork()).ldelim();
@@ -1063,12 +1063,12 @@ export const TransferFeeResponse = {
   },
 
   create<I extends Exact<DeepPartial<TransferFeeResponse>, I>>(
-    base?: I,
+    base?: I
   ): TransferFeeResponse {
     return TransferFeeResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferFeeResponse>, I>>(
-    object: I,
+    object: I
   ): TransferFeeResponse {
     const message = createBaseTransferFeeResponse();
     message.fee =
@@ -1086,7 +1086,7 @@ function createBaseChainsRequest(): ChainsRequest {
 export const ChainsRequest = {
   encode(
     message: ChainsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.status !== 0) {
       writer.uint32(8).int32(message.status);
@@ -1133,12 +1133,12 @@ export const ChainsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ChainsRequest>, I>>(
-    base?: I,
+    base?: I
   ): ChainsRequest {
     return ChainsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainsRequest>, I>>(
-    object: I,
+    object: I
   ): ChainsRequest {
     const message = createBaseChainsRequest();
     message.status = object.status ?? 0;
@@ -1153,7 +1153,7 @@ function createBaseChainsResponse(): ChainsResponse {
 export const ChainsResponse = {
   encode(
     message: ChainsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.chains) {
       writer.uint32(10).string(v!);
@@ -1202,12 +1202,12 @@ export const ChainsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ChainsResponse>, I>>(
-    base?: I,
+    base?: I
   ): ChainsResponse {
     return ChainsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainsResponse>, I>>(
-    object: I,
+    object: I
   ): ChainsResponse {
     const message = createBaseChainsResponse();
     message.chains = object.chains?.map((e) => e) || [];
@@ -1222,7 +1222,7 @@ function createBaseAssetsRequest(): AssetsRequest {
 export const AssetsRequest = {
   encode(
     message: AssetsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1269,12 +1269,12 @@ export const AssetsRequest = {
   },
 
   create<I extends Exact<DeepPartial<AssetsRequest>, I>>(
-    base?: I,
+    base?: I
   ): AssetsRequest {
     return AssetsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<AssetsRequest>, I>>(
-    object: I,
+    object: I
   ): AssetsRequest {
     const message = createBaseAssetsRequest();
     message.chain = object.chain ?? "";
@@ -1289,7 +1289,7 @@ function createBaseAssetsResponse(): AssetsResponse {
 export const AssetsResponse = {
   encode(
     message: AssetsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.assets) {
       writer.uint32(10).string(v!);
@@ -1338,12 +1338,12 @@ export const AssetsResponse = {
   },
 
   create<I extends Exact<DeepPartial<AssetsResponse>, I>>(
-    base?: I,
+    base?: I
   ): AssetsResponse {
     return AssetsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<AssetsResponse>, I>>(
-    object: I,
+    object: I
   ): AssetsResponse {
     const message = createBaseAssetsResponse();
     message.assets = object.assets?.map((e) => e) || [];
@@ -1358,7 +1358,7 @@ function createBaseChainStateRequest(): ChainStateRequest {
 export const ChainStateRequest = {
   encode(
     message: ChainStateRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1405,12 +1405,12 @@ export const ChainStateRequest = {
   },
 
   create<I extends Exact<DeepPartial<ChainStateRequest>, I>>(
-    base?: I,
+    base?: I
   ): ChainStateRequest {
     return ChainStateRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainStateRequest>, I>>(
-    object: I,
+    object: I
   ): ChainStateRequest {
     const message = createBaseChainStateRequest();
     message.chain = object.chain ?? "";
@@ -1425,7 +1425,7 @@ function createBaseChainStateResponse(): ChainStateResponse {
 export const ChainStateResponse = {
   encode(
     message: ChainStateResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.state !== undefined) {
       ChainState.encode(message.state, writer.uint32(10).fork()).ldelim();
@@ -1474,12 +1474,12 @@ export const ChainStateResponse = {
   },
 
   create<I extends Exact<DeepPartial<ChainStateResponse>, I>>(
-    base?: I,
+    base?: I
   ): ChainStateResponse {
     return ChainStateResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainStateResponse>, I>>(
-    object: I,
+    object: I
   ): ChainStateResponse {
     const message = createBaseChainStateResponse();
     message.state =
@@ -1497,7 +1497,7 @@ function createBaseChainsByAssetRequest(): ChainsByAssetRequest {
 export const ChainsByAssetRequest = {
   encode(
     message: ChainsByAssetRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.asset !== "") {
       writer.uint32(10).string(message.asset);
@@ -1507,7 +1507,7 @@ export const ChainsByAssetRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ChainsByAssetRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1547,12 +1547,12 @@ export const ChainsByAssetRequest = {
   },
 
   create<I extends Exact<DeepPartial<ChainsByAssetRequest>, I>>(
-    base?: I,
+    base?: I
   ): ChainsByAssetRequest {
     return ChainsByAssetRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainsByAssetRequest>, I>>(
-    object: I,
+    object: I
   ): ChainsByAssetRequest {
     const message = createBaseChainsByAssetRequest();
     message.asset = object.asset ?? "";
@@ -1567,7 +1567,7 @@ function createBaseChainsByAssetResponse(): ChainsByAssetResponse {
 export const ChainsByAssetResponse = {
   encode(
     message: ChainsByAssetResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.chains) {
       writer.uint32(10).string(v!);
@@ -1577,7 +1577,7 @@ export const ChainsByAssetResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): ChainsByAssetResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1619,12 +1619,12 @@ export const ChainsByAssetResponse = {
   },
 
   create<I extends Exact<DeepPartial<ChainsByAssetResponse>, I>>(
-    base?: I,
+    base?: I
   ): ChainsByAssetResponse {
     return ChainsByAssetResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainsByAssetResponse>, I>>(
-    object: I,
+    object: I
   ): ChainsByAssetResponse {
     const message = createBaseChainsByAssetResponse();
     message.chains = object.chains?.map((e) => e) || [];
@@ -1639,7 +1639,7 @@ function createBaseRecipientAddressRequest(): RecipientAddressRequest {
 export const RecipientAddressRequest = {
   encode(
     message: RecipientAddressRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.depositAddr !== "") {
       writer.uint32(10).string(message.depositAddr);
@@ -1652,7 +1652,7 @@ export const RecipientAddressRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RecipientAddressRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1707,12 +1707,12 @@ export const RecipientAddressRequest = {
   },
 
   create<I extends Exact<DeepPartial<RecipientAddressRequest>, I>>(
-    base?: I,
+    base?: I
   ): RecipientAddressRequest {
     return RecipientAddressRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RecipientAddressRequest>, I>>(
-    object: I,
+    object: I
   ): RecipientAddressRequest {
     const message = createBaseRecipientAddressRequest();
     message.depositAddr = object.depositAddr ?? "";
@@ -1728,7 +1728,7 @@ function createBaseRecipientAddressResponse(): RecipientAddressResponse {
 export const RecipientAddressResponse = {
   encode(
     message: RecipientAddressResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.recipientAddr !== "") {
       writer.uint32(10).string(message.recipientAddr);
@@ -1741,7 +1741,7 @@ export const RecipientAddressResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): RecipientAddressResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1796,12 +1796,12 @@ export const RecipientAddressResponse = {
   },
 
   create<I extends Exact<DeepPartial<RecipientAddressResponse>, I>>(
-    base?: I,
+    base?: I
   ): RecipientAddressResponse {
     return RecipientAddressResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RecipientAddressResponse>, I>>(
-    object: I,
+    object: I
   ): RecipientAddressResponse {
     const message = createBaseRecipientAddressResponse();
     message.recipientAddr = object.recipientAddr ?? "";
@@ -1817,7 +1817,7 @@ function createBaseTransferRateLimitRequest(): TransferRateLimitRequest {
 export const TransferRateLimitRequest = {
   encode(
     message: TransferRateLimitRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -1830,7 +1830,7 @@ export const TransferRateLimitRequest = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): TransferRateLimitRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1881,12 +1881,12 @@ export const TransferRateLimitRequest = {
   },
 
   create<I extends Exact<DeepPartial<TransferRateLimitRequest>, I>>(
-    base?: I,
+    base?: I
   ): TransferRateLimitRequest {
     return TransferRateLimitRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferRateLimitRequest>, I>>(
-    object: I,
+    object: I
   ): TransferRateLimitRequest {
     const message = createBaseTransferRateLimitRequest();
     message.chain = object.chain ?? "";
@@ -1902,12 +1902,12 @@ function createBaseTransferRateLimitResponse(): TransferRateLimitResponse {
 export const TransferRateLimitResponse = {
   encode(
     message: TransferRateLimitResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.transferRateLimit !== undefined) {
       TransferRateLimit.encode(
         message.transferRateLimit,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     return writer;
@@ -1915,7 +1915,7 @@ export const TransferRateLimitResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): TransferRateLimitResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1931,7 +1931,7 @@ export const TransferRateLimitResponse = {
 
           message.transferRateLimit = TransferRateLimit.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -1955,19 +1955,19 @@ export const TransferRateLimitResponse = {
     const obj: any = {};
     if (message.transferRateLimit !== undefined) {
       obj.transferRateLimit = TransferRateLimit.toJSON(
-        message.transferRateLimit,
+        message.transferRateLimit
       );
     }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<TransferRateLimitResponse>, I>>(
-    base?: I,
+    base?: I
   ): TransferRateLimitResponse {
     return TransferRateLimitResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferRateLimitResponse>, I>>(
-    object: I,
+    object: I
   ): TransferRateLimitResponse {
     const message = createBaseTransferRateLimitResponse();
     message.transferRateLimit =
@@ -1994,7 +1994,7 @@ function createBaseTransferRateLimit(): TransferRateLimit {
 export const TransferRateLimit = {
   encode(
     message: TransferRateLimit,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.limit.length !== 0) {
       writer.uint32(10).bytes(message.limit);
@@ -2137,12 +2137,12 @@ export const TransferRateLimit = {
   },
 
   create<I extends Exact<DeepPartial<TransferRateLimit>, I>>(
-    base?: I,
+    base?: I
   ): TransferRateLimit {
     return TransferRateLimit.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferRateLimit>, I>>(
-    object: I,
+    object: I
   ): TransferRateLimit {
     const message = createBaseTransferRateLimit();
     message.limit = object.limit ?? new Uint8Array(0);
@@ -2169,7 +2169,7 @@ function createBaseMessageRequest(): MessageRequest {
 export const MessageRequest = {
   encode(
     message: MessageRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -2214,12 +2214,12 @@ export const MessageRequest = {
   },
 
   create<I extends Exact<DeepPartial<MessageRequest>, I>>(
-    base?: I,
+    base?: I
   ): MessageRequest {
     return MessageRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageRequest>, I>>(
-    object: I,
+    object: I
   ): MessageRequest {
     const message = createBaseMessageRequest();
     message.id = object.id ?? "";
@@ -2234,7 +2234,7 @@ function createBaseMessageResponse(): MessageResponse {
 export const MessageResponse = {
   encode(
     message: MessageResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.message !== undefined) {
       GeneralMessage.encode(message.message, writer.uint32(10).fork()).ldelim();
@@ -2283,12 +2283,12 @@ export const MessageResponse = {
   },
 
   create<I extends Exact<DeepPartial<MessageResponse>, I>>(
-    base?: I,
+    base?: I
   ): MessageResponse {
     return MessageResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageResponse>, I>>(
-    object: I,
+    object: I
   ): MessageResponse {
     const message = createBaseMessageResponse();
     message.message =
@@ -2306,7 +2306,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     _: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
@@ -2338,12 +2338,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I,
+    base?: I
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    _: I,
+    _: I
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     return message;
@@ -2357,7 +2357,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -2404,12 +2404,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I,
+    base?: I
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I,
+    object: I
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =

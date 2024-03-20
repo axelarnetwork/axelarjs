@@ -23,7 +23,7 @@ export function useMintInterchainTokenState() {
     },
     {
       enabled: isAddress(managerState.tokenAddress) && Boolean(chainId),
-    },
+    }
   );
 
   const {
@@ -63,7 +63,7 @@ export function useMintInterchainTokenState() {
       managerState.tokenAddress,
       accountAddress,
       setTxState,
-    ],
+    ]
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
@@ -78,7 +78,7 @@ export function useMintInterchainTokenState() {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt],
+    [receipt]
   );
 
   const state = {

@@ -35,14 +35,14 @@ function createBaseQueryGovernanceKeyRequest(): QueryGovernanceKeyRequest {
 export const QueryGovernanceKeyRequest = {
   encode(
     _: QueryGovernanceKeyRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): QueryGovernanceKeyRequest {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -70,12 +70,12 @@ export const QueryGovernanceKeyRequest = {
   },
 
   create<I extends Exact<DeepPartial<QueryGovernanceKeyRequest>, I>>(
-    base?: I,
+    base?: I
   ): QueryGovernanceKeyRequest {
     return QueryGovernanceKeyRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryGovernanceKeyRequest>, I>>(
-    _: I,
+    _: I
   ): QueryGovernanceKeyRequest {
     const message = createBaseQueryGovernanceKeyRequest();
     return message;
@@ -89,12 +89,12 @@ function createBaseQueryGovernanceKeyResponse(): QueryGovernanceKeyResponse {
 export const QueryGovernanceKeyResponse = {
   encode(
     message: QueryGovernanceKeyResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.governanceKey !== undefined) {
       LegacyAminoPubKey.encode(
         message.governanceKey,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     return writer;
@@ -102,7 +102,7 @@ export const QueryGovernanceKeyResponse = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): QueryGovernanceKeyResponse {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -118,7 +118,7 @@ export const QueryGovernanceKeyResponse = {
 
           message.governanceKey = LegacyAminoPubKey.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -147,12 +147,12 @@ export const QueryGovernanceKeyResponse = {
   },
 
   create<I extends Exact<DeepPartial<QueryGovernanceKeyResponse>, I>>(
-    base?: I,
+    base?: I
   ): QueryGovernanceKeyResponse {
     return QueryGovernanceKeyResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<QueryGovernanceKeyResponse>, I>>(
-    object: I,
+    object: I
   ): QueryGovernanceKeyResponse {
     const message = createBaseQueryGovernanceKeyResponse();
     message.governanceKey =
@@ -170,7 +170,7 @@ function createBaseParamsRequest(): ParamsRequest {
 export const ParamsRequest = {
   encode(
     _: ParamsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     return writer;
   },
@@ -202,12 +202,12 @@ export const ParamsRequest = {
   },
 
   create<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    base?: I,
+    base?: I
   ): ParamsRequest {
     return ParamsRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsRequest>, I>>(
-    _: I,
+    _: I
   ): ParamsRequest {
     const message = createBaseParamsRequest();
     return message;
@@ -221,7 +221,7 @@ function createBaseParamsResponse(): ParamsResponse {
 export const ParamsResponse = {
   encode(
     message: ParamsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -268,12 +268,12 @@ export const ParamsResponse = {
   },
 
   create<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    base?: I,
+    base?: I
   ): ParamsResponse {
     return ParamsResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(
-    object: I,
+    object: I
   ): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params =

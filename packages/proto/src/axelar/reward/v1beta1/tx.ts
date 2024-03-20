@@ -23,7 +23,7 @@ function createBaseRefundMsgRequest(): RefundMsgRequest {
 export const RefundMsgRequest = {
   encode(
     message: RefundMsgRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -88,12 +88,12 @@ export const RefundMsgRequest = {
   },
 
   create<I extends Exact<DeepPartial<RefundMsgRequest>, I>>(
-    base?: I,
+    base?: I
   ): RefundMsgRequest {
     return RefundMsgRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RefundMsgRequest>, I>>(
-    object: I,
+    object: I
   ): RefundMsgRequest {
     const message = createBaseRefundMsgRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -112,7 +112,7 @@ function createBaseRefundMsgResponse(): RefundMsgResponse {
 export const RefundMsgResponse = {
   encode(
     message: RefundMsgResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
@@ -175,12 +175,12 @@ export const RefundMsgResponse = {
   },
 
   create<I extends Exact<DeepPartial<RefundMsgResponse>, I>>(
-    base?: I,
+    base?: I
   ): RefundMsgResponse {
     return RefundMsgResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RefundMsgResponse>, I>>(
-    object: I,
+    object: I
   ): RefundMsgResponse {
     const message = createBaseRefundMsgResponse();
     message.data = object.data ?? new Uint8Array(0);

@@ -1,7 +1,7 @@
 import { parseAbi, parseEventLogs, type TransactionReceipt } from "viem";
 
 export function extractReceiptInfoForNativeGasPaid(
-  receipt: TransactionReceipt,
+  receipt: TransactionReceipt
 ) {
   const paidFee = getNativeGasAmountFromTxReceipt(receipt);
   const destChain = getDestinationChainFromTxReceipt(receipt);
@@ -55,7 +55,7 @@ function getNativeGasPaidForContractCallEvent(receipt: TransactionReceipt) {
 }
 
 function getNativeGasPaidForContractCallWithTokenEvent(
-  receipt: TransactionReceipt,
+  receipt: TransactionReceipt
 ) {
   const abi = parseAbi([
     "event NativeGasPaidForContractCallWithToken(address indexed sourceAddress,string destinationChain,string destinationAddress,bytes32 indexed payloadHash,string symbol,uint256 amount,uint256 gasFeeAmount,address refundAddress)",

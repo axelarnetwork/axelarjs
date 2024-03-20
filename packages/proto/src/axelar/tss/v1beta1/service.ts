@@ -24,7 +24,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = HeartBeatRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "HeartBeat", data);
     return promise.then((data) =>
-      HeartBeatResponse.decode(_m0.Reader.create(data)),
+      HeartBeatResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -47,7 +47,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = ParamsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Params", data);
     return promise.then((data) =>
-      ParamsResponse.decode(_m0.Reader.create(data)),
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -56,6 +56,6 @@ interface Rpc {
   request(
     service: string,
     method: string,
-    data: Uint8Array,
+    data: Uint8Array
   ): Promise<Uint8Array>;
 }

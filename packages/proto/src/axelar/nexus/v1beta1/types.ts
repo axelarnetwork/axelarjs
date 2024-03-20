@@ -63,7 +63,7 @@ function createBaseMaintainerState(): MaintainerState {
 export const MaintainerState = {
   encode(
     message: MaintainerState,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.address.length !== 0) {
       writer.uint32(10).bytes(message.address);
@@ -158,12 +158,12 @@ export const MaintainerState = {
   },
 
   create<I extends Exact<DeepPartial<MaintainerState>, I>>(
-    base?: I,
+    base?: I
   ): MaintainerState {
     return MaintainerState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MaintainerState>, I>>(
-    object: I,
+    object: I
   ): MaintainerState {
     const message = createBaseMaintainerState();
     message.address = object.address ?? new Uint8Array(0);
@@ -192,7 +192,7 @@ function createBaseChainState(): ChainState {
 export const ChainState = {
   encode(
     message: ChainState,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== undefined) {
       Chain.encode(message.chain, writer.uint32(10).fork()).ldelim();
@@ -244,7 +244,7 @@ export const ChainState = {
           }
 
           message.maintainerStates.push(
-            MaintainerState.decode(reader, reader.uint32()),
+            MaintainerState.decode(reader, reader.uint32())
           );
           continue;
       }
@@ -284,7 +284,7 @@ export const ChainState = {
     }
     if (message.maintainerStates?.length) {
       obj.maintainerStates = message.maintainerStates.map((e) =>
-        MaintainerState.toJSON(e),
+        MaintainerState.toJSON(e)
       );
     }
     return obj;
@@ -294,7 +294,7 @@ export const ChainState = {
     return ChainState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ChainState>, I>>(
-    object: I,
+    object: I
   ): ChainState {
     const message = createBaseChainState();
     message.chain =
@@ -316,18 +316,18 @@ function createBaseLinkedAddresses(): LinkedAddresses {
 export const LinkedAddresses = {
   encode(
     message: LinkedAddresses,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.depositAddress !== undefined) {
       CrossChainAddress.encode(
         message.depositAddress,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     if (message.recipientAddress !== undefined) {
       CrossChainAddress.encode(
         message.recipientAddress,
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     return writer;
@@ -348,7 +348,7 @@ export const LinkedAddresses = {
 
           message.depositAddress = CrossChainAddress.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 2:
@@ -358,7 +358,7 @@ export const LinkedAddresses = {
 
           message.recipientAddress = CrossChainAddress.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
       }
@@ -393,12 +393,12 @@ export const LinkedAddresses = {
   },
 
   create<I extends Exact<DeepPartial<LinkedAddresses>, I>>(
-    base?: I,
+    base?: I
   ): LinkedAddresses {
     return LinkedAddresses.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LinkedAddresses>, I>>(
-    object: I,
+    object: I
   ): LinkedAddresses {
     const message = createBaseLinkedAddresses();
     message.depositAddress =
@@ -420,7 +420,7 @@ function createBaseRateLimit(): RateLimit {
 export const RateLimit = {
   encode(
     message: RateLimit,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -500,7 +500,7 @@ export const RateLimit = {
     return RateLimit.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RateLimit>, I>>(
-    object: I,
+    object: I
   ): RateLimit {
     const message = createBaseRateLimit();
     message.chain = object.chain ?? "";
@@ -523,7 +523,7 @@ function createBaseTransferEpoch(): TransferEpoch {
 export const TransferEpoch = {
   encode(
     message: TransferEpoch,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -614,12 +614,12 @@ export const TransferEpoch = {
   },
 
   create<I extends Exact<DeepPartial<TransferEpoch>, I>>(
-    base?: I,
+    base?: I
   ): TransferEpoch {
     return TransferEpoch.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferEpoch>, I>>(
-    object: I,
+    object: I
   ): TransferEpoch {
     const message = createBaseTransferEpoch();
     message.chain = object.chain ?? "";

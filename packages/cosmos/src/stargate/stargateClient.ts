@@ -59,13 +59,13 @@ export const createAxelarAminoConverters = (): AminoConverters =>
         toAmino: convertToSnakeCaseDeep,
         fromAmino: convertToCamelCaseDeep,
       },
-    ]),
+    ])
   );
 
 export const createDefaultRegistry = (defaultTypes = defaultRegistryTypes) => {
   const registry = new Registry(defaultTypes);
   MODULES.flatMap(generateTypeUrlAndTypeRecords).forEach((x) =>
-    registry.register(x.typeUrl, x.type),
+    registry.register(x.typeUrl, x.type)
   );
   return registry;
 };
@@ -83,7 +83,7 @@ export const createDefaultAminoTypes = () =>
   });
 
 export function getAxelarSigningClientOptions(
-  defaultTypes = defaultRegistryTypes,
+  defaultTypes = defaultRegistryTypes
 ) {
   return {
     registry: createDefaultRegistry(defaultTypes),
@@ -106,7 +106,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
   protected constructor(
     tmClient: Tendermint37Client | undefined,
     signer: OfflineSigner,
-    options: SigningStargateClientOptions,
+    options: SigningStargateClientOptions
   ) {
     const { registry, aminoTypes } = getAxelarSigningClientOptions();
 
@@ -127,7 +127,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
 
   static override async connect(
     endpoint: string | HttpEndpoint,
-    options: StargateClientOptions = {},
+    options: StargateClientOptions = {}
   ) {
     const tmClient = await Tendermint37Client.connect(endpoint);
     return new this(tmClient, {} as OfflineSigner, options);
@@ -136,7 +136,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
   static override async connectWithSigner(
     endpoint: string | HttpEndpoint,
     signer: OfflineSigner,
-    options: SigningStargateClientOptions = {},
+    options: SigningStargateClientOptions = {}
   ) {
     const tmClient = await Tendermint37Client.connect(endpoint);
     return new this(tmClient, signer, options);
@@ -144,7 +144,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
 
   static override offline(
     signer: OfflineSigner,
-    options: SigningStargateClientOptions = {},
+    options: SigningStargateClientOptions = {}
   ) {
     return Promise.resolve(new this(undefined, signer, options));
   }
@@ -152,7 +152,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
   override simulate(
     signerAddress: string,
     messages: readonly AxelarSigningClientMessage[],
-    memo: string | undefined,
+    memo: string | undefined
   ) {
     return super.simulate(signerAddress, messages, memo);
   }
@@ -162,7 +162,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     messages: readonly AxelarSigningClientMessage[],
     fee: StdFee,
     memo: string,
-    explicitSignerData?: SignerData,
+    explicitSignerData?: SignerData
   ): Promise<TxRaw> {
     return super.sign(signerAddress, messages, fee, memo, explicitSignerData);
   }
@@ -171,7 +171,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
     signerAddress: string,
     messages: readonly AxelarSigningClientMessage[],
     fee: number | StdFee | "auto",
-    memo?: string,
+    memo?: string
   ) {
     return super.signAndBroadcast(signerAddress, messages, fee, memo);
   }
@@ -183,7 +183,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
   protected override forceGetQueryClient() {
     if (this.query === undefined) {
       throw new Error(
-        "Query client not available. You cannot use online functionality in offline mode.",
+        "Query client not available. You cannot use online functionality in offline mode."
       );
     }
 
@@ -193,7 +193,7 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
 
 export async function createAxelarQueryClient(
   endpoint: string | HttpEndpoint,
-  options: StargateClientOptions = {},
+  options: StargateClientOptions = {}
 ) {
   const client = await AxelarSigningStargateClient.connect(endpoint, options);
 
@@ -202,5 +202,5 @@ export async function createAxelarQueryClient(
 
 export const createAxelarSigningClient =
   AxelarSigningStargateClient.connectWithSigner.bind(
-    AxelarSigningStargateClient,
+    AxelarSigningStargateClient
   );

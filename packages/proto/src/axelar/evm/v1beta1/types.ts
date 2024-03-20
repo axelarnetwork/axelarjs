@@ -127,7 +127,7 @@ export enum BatchedCommandsStatus {
 }
 
 export function batchedCommandsStatusFromJSON(
-  object: any,
+  object: any
 ): BatchedCommandsStatus {
   switch (object) {
     case 0:
@@ -150,7 +150,7 @@ export function batchedCommandsStatusFromJSON(
 }
 
 export function batchedCommandsStatusToJSON(
-  object: BatchedCommandsStatus,
+  object: BatchedCommandsStatus
 ): string {
   switch (object) {
     case BatchedCommandsStatus.BATCHED_COMMANDS_STATUS_UNSPECIFIED:
@@ -477,7 +477,7 @@ function createBaseVoteEvents(): VoteEvents {
 export const VoteEvents = {
   encode(
     message: VoteEvents,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -543,7 +543,7 @@ export const VoteEvents = {
     return VoteEvents.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<VoteEvents>, I>>(
-    object: I,
+    object: I
   ): VoteEvents {
     const message = createBaseVoteEvents();
     message.chain = object.chain ?? "";
@@ -585,19 +585,19 @@ export const Event = {
     if (message.tokenSent !== undefined) {
       EventTokenSent.encode(
         message.tokenSent,
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     }
     if (message.contractCall !== undefined) {
       EventContractCall.encode(
         message.contractCall,
-        writer.uint32(50).fork(),
+        writer.uint32(50).fork()
       ).ldelim();
     }
     if (message.contractCallWithToken !== undefined) {
       EventContractCallWithToken.encode(
         message.contractCallWithToken,
-        writer.uint32(58).fork(),
+        writer.uint32(58).fork()
       ).ldelim();
     }
     if (message.transfer !== undefined) {
@@ -606,19 +606,19 @@ export const Event = {
     if (message.tokenDeployed !== undefined) {
       EventTokenDeployed.encode(
         message.tokenDeployed,
-        writer.uint32(74).fork(),
+        writer.uint32(74).fork()
       ).ldelim();
     }
     if (message.multisigOwnershipTransferred !== undefined) {
       EventMultisigOwnershipTransferred.encode(
         message.multisigOwnershipTransferred,
-        writer.uint32(82).fork(),
+        writer.uint32(82).fork()
       ).ldelim();
     }
     if (message.multisigOperatorshipTransferred !== undefined) {
       EventMultisigOperatorshipTransferred.encode(
         message.multisigOperatorshipTransferred,
-        writer.uint32(90).fork(),
+        writer.uint32(90).fork()
       ).ldelim();
     }
     return writer;
@@ -674,7 +674,7 @@ export const Event = {
 
           message.contractCall = EventContractCall.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 7:
@@ -684,7 +684,7 @@ export const Event = {
 
           message.contractCallWithToken = EventContractCallWithToken.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 8:
@@ -701,7 +701,7 @@ export const Event = {
 
           message.tokenDeployed = EventTokenDeployed.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 10:
@@ -720,7 +720,7 @@ export const Event = {
           message.multisigOperatorshipTransferred =
             EventMultisigOperatorshipTransferred.decode(
               reader,
-              reader.uint32(),
+              reader.uint32()
             );
           continue;
       }
@@ -757,14 +757,14 @@ export const Event = {
         : undefined,
       multisigOwnershipTransferred: isSet(object.multisigOwnershipTransferred)
         ? EventMultisigOwnershipTransferred.fromJSON(
-            object.multisigOwnershipTransferred,
+            object.multisigOwnershipTransferred
           )
         : undefined,
       multisigOperatorshipTransferred: isSet(
-        object.multisigOperatorshipTransferred,
+        object.multisigOperatorshipTransferred
       )
         ? EventMultisigOperatorshipTransferred.fromJSON(
-            object.multisigOperatorshipTransferred,
+            object.multisigOperatorshipTransferred
           )
         : undefined,
     };
@@ -792,7 +792,7 @@ export const Event = {
     }
     if (message.contractCallWithToken !== undefined) {
       obj.contractCallWithToken = EventContractCallWithToken.toJSON(
-        message.contractCallWithToken,
+        message.contractCallWithToken
       );
     }
     if (message.transfer !== undefined) {
@@ -804,13 +804,13 @@ export const Event = {
     if (message.multisigOwnershipTransferred !== undefined) {
       obj.multisigOwnershipTransferred =
         EventMultisigOwnershipTransferred.toJSON(
-          message.multisigOwnershipTransferred,
+          message.multisigOwnershipTransferred
         );
     }
     if (message.multisigOperatorshipTransferred !== undefined) {
       obj.multisigOperatorshipTransferred =
         EventMultisigOperatorshipTransferred.toJSON(
-          message.multisigOperatorshipTransferred,
+          message.multisigOperatorshipTransferred
         );
     }
     return obj;
@@ -853,14 +853,14 @@ export const Event = {
       object.multisigOwnershipTransferred !== undefined &&
       object.multisigOwnershipTransferred !== null
         ? EventMultisigOwnershipTransferred.fromPartial(
-            object.multisigOwnershipTransferred,
+            object.multisigOwnershipTransferred
           )
         : undefined;
     message.multisigOperatorshipTransferred =
       object.multisigOperatorshipTransferred !== undefined &&
       object.multisigOperatorshipTransferred !== null
         ? EventMultisigOperatorshipTransferred.fromPartial(
-            object.multisigOperatorshipTransferred,
+            object.multisigOperatorshipTransferred
           )
         : undefined;
     return message;
@@ -880,7 +880,7 @@ function createBaseEventTokenSent(): EventTokenSent {
 export const EventTokenSent = {
   encode(
     message: EventTokenSent,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -991,12 +991,12 @@ export const EventTokenSent = {
   },
 
   create<I extends Exact<DeepPartial<EventTokenSent>, I>>(
-    base?: I,
+    base?: I
   ): EventTokenSent {
     return EventTokenSent.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventTokenSent>, I>>(
-    object: I,
+    object: I
   ): EventTokenSent {
     const message = createBaseEventTokenSent();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1020,7 +1020,7 @@ function createBaseEventContractCall(): EventContractCall {
 export const EventContractCall = {
   encode(
     message: EventContractCall,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1117,12 +1117,12 @@ export const EventContractCall = {
   },
 
   create<I extends Exact<DeepPartial<EventContractCall>, I>>(
-    base?: I,
+    base?: I
   ): EventContractCall {
     return EventContractCall.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventContractCall>, I>>(
-    object: I,
+    object: I
   ): EventContractCall {
     const message = createBaseEventContractCall();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1147,7 +1147,7 @@ function createBaseEventContractCallWithToken(): EventContractCallWithToken {
 export const EventContractCallWithToken = {
   encode(
     message: EventContractCallWithToken,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
@@ -1172,7 +1172,7 @@ export const EventContractCallWithToken = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): EventContractCallWithToken {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1277,12 +1277,12 @@ export const EventContractCallWithToken = {
   },
 
   create<I extends Exact<DeepPartial<EventContractCallWithToken>, I>>(
-    base?: I,
+    base?: I
   ): EventContractCallWithToken {
     return EventContractCallWithToken.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventContractCallWithToken>, I>>(
-    object: I,
+    object: I
   ): EventContractCallWithToken {
     const message = createBaseEventContractCallWithToken();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -1302,7 +1302,7 @@ function createBaseEventTransfer(): EventTransfer {
 export const EventTransfer = {
   encode(
     message: EventTransfer,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.to.length !== 0) {
       writer.uint32(10).bytes(message.to);
@@ -1365,12 +1365,12 @@ export const EventTransfer = {
   },
 
   create<I extends Exact<DeepPartial<EventTransfer>, I>>(
-    base?: I,
+    base?: I
   ): EventTransfer {
     return EventTransfer.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventTransfer>, I>>(
-    object: I,
+    object: I
   ): EventTransfer {
     const message = createBaseEventTransfer();
     message.to = object.to ?? new Uint8Array(0);
@@ -1386,7 +1386,7 @@ function createBaseEventTokenDeployed(): EventTokenDeployed {
 export const EventTokenDeployed = {
   encode(
     message: EventTokenDeployed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.symbol !== "") {
       writer.uint32(10).string(message.symbol);
@@ -1449,12 +1449,12 @@ export const EventTokenDeployed = {
   },
 
   create<I extends Exact<DeepPartial<EventTokenDeployed>, I>>(
-    base?: I,
+    base?: I
   ): EventTokenDeployed {
     return EventTokenDeployed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<EventTokenDeployed>, I>>(
-    object: I,
+    object: I
   ): EventTokenDeployed {
     const message = createBaseEventTokenDeployed();
     message.symbol = object.symbol ?? "";
@@ -1475,7 +1475,7 @@ function createBaseEventMultisigOwnershipTransferred(): EventMultisigOwnershipTr
 export const EventMultisigOwnershipTransferred = {
   encode(
     message: EventMultisigOwnershipTransferred,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.preOwners) {
       writer.uint32(10).bytes(v!);
@@ -1494,7 +1494,7 @@ export const EventMultisigOwnershipTransferred = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): EventMultisigOwnershipTransferred {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1575,7 +1575,7 @@ export const EventMultisigOwnershipTransferred = {
   },
 
   create<I extends Exact<DeepPartial<EventMultisigOwnershipTransferred>, I>>(
-    base?: I,
+    base?: I
   ): EventMultisigOwnershipTransferred {
     return EventMultisigOwnershipTransferred.fromPartial(base ?? ({} as any));
   },
@@ -1598,7 +1598,7 @@ function createBaseEventMultisigOperatorshipTransferred(): EventMultisigOperator
 export const EventMultisigOperatorshipTransferred = {
   encode(
     message: EventMultisigOperatorshipTransferred,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.newOperators) {
       writer.uint32(26).bytes(v!);
@@ -1614,7 +1614,7 @@ export const EventMultisigOperatorshipTransferred = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): EventMultisigOperatorshipTransferred {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -1682,10 +1682,10 @@ export const EventMultisigOperatorshipTransferred = {
   },
 
   create<I extends Exact<DeepPartial<EventMultisigOperatorshipTransferred>, I>>(
-    base?: I,
+    base?: I
   ): EventMultisigOperatorshipTransferred {
     return EventMultisigOperatorshipTransferred.fromPartial(
-      base ?? ({} as any),
+      base ?? ({} as any)
     );
   },
   fromPartial<
@@ -1706,7 +1706,7 @@ function createBaseNetworkInfo(): NetworkInfo {
 export const NetworkInfo = {
   encode(
     message: NetworkInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -1770,7 +1770,7 @@ export const NetworkInfo = {
     return NetworkInfo.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<NetworkInfo>, I>>(
-    object: I,
+    object: I
   ): NetworkInfo {
     const message = createBaseNetworkInfo();
     message.name = object.name ?? "";
@@ -1793,7 +1793,7 @@ function createBaseBurnerInfo(): BurnerInfo {
 export const BurnerInfo = {
   encode(
     message: BurnerInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.burnerAddress.length !== 0) {
       writer.uint32(10).bytes(message.burnerAddress);
@@ -1921,7 +1921,7 @@ export const BurnerInfo = {
     return BurnerInfo.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BurnerInfo>, I>>(
-    object: I,
+    object: I
   ): BurnerInfo {
     const message = createBaseBurnerInfo();
     message.burnerAddress = object.burnerAddress ?? new Uint8Array(0);
@@ -1948,7 +1948,7 @@ function createBaseERC20Deposit(): ERC20Deposit {
 export const ERC20Deposit = {
   encode(
     message: ERC20Deposit,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -2075,12 +2075,12 @@ export const ERC20Deposit = {
   },
 
   create<I extends Exact<DeepPartial<ERC20Deposit>, I>>(
-    base?: I,
+    base?: I
   ): ERC20Deposit {
     return ERC20Deposit.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ERC20Deposit>, I>>(
-    object: I,
+    object: I
   ): ERC20Deposit {
     const message = createBaseERC20Deposit();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -2112,7 +2112,7 @@ function createBaseERC20TokenMetadata(): ERC20TokenMetadata {
 export const ERC20TokenMetadata = {
   encode(
     message: ERC20TokenMetadata,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.asset !== "") {
       writer.uint32(10).string(message.asset);
@@ -2267,12 +2267,12 @@ export const ERC20TokenMetadata = {
   },
 
   create<I extends Exact<DeepPartial<ERC20TokenMetadata>, I>>(
-    base?: I,
+    base?: I
   ): ERC20TokenMetadata {
     return ERC20TokenMetadata.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ERC20TokenMetadata>, I>>(
-    object: I,
+    object: I
   ): ERC20TokenMetadata {
     const message = createBaseERC20TokenMetadata();
     message.asset = object.asset ?? "";
@@ -2297,7 +2297,7 @@ function createBaseTransactionMetadata(): TransactionMetadata {
 export const TransactionMetadata = {
   encode(
     message: TransactionMetadata,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.rawTx.length !== 0) {
       writer.uint32(10).bytes(message.rawTx);
@@ -2362,12 +2362,12 @@ export const TransactionMetadata = {
   },
 
   create<I extends Exact<DeepPartial<TransactionMetadata>, I>>(
-    base?: I,
+    base?: I
   ): TransactionMetadata {
     return TransactionMetadata.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransactionMetadata>, I>>(
-    object: I,
+    object: I
   ): TransactionMetadata {
     const message = createBaseTransactionMetadata();
     message.rawTx = object.rawTx ?? new Uint8Array(0);
@@ -2390,7 +2390,7 @@ function createBaseCommand(): Command {
 export const Command = {
   encode(
     message: Command,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id.length !== 0) {
       writer.uint32(10).bytes(message.id);
@@ -2541,7 +2541,7 @@ function createBaseCommandBatchMetadata(): CommandBatchMetadata {
 export const CommandBatchMetadata = {
   encode(
     message: CommandBatchMetadata,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id.length !== 0) {
       writer.uint32(10).bytes(message.id);
@@ -2572,7 +2572,7 @@ export const CommandBatchMetadata = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): CommandBatchMetadata {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -2693,7 +2693,7 @@ export const CommandBatchMetadata = {
     }
     if (message.prevBatchedCommandsId.length !== 0) {
       obj.prevBatchedCommandsId = base64FromBytes(
-        message.prevBatchedCommandsId,
+        message.prevBatchedCommandsId
       );
     }
     if (message.signature !== undefined) {
@@ -2703,12 +2703,12 @@ export const CommandBatchMetadata = {
   },
 
   create<I extends Exact<DeepPartial<CommandBatchMetadata>, I>>(
-    base?: I,
+    base?: I
   ): CommandBatchMetadata {
     return CommandBatchMetadata.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommandBatchMetadata>, I>>(
-    object: I,
+    object: I
   ): CommandBatchMetadata {
     const message = createBaseCommandBatchMetadata();
     message.id = object.id ?? new Uint8Array(0);
@@ -2734,7 +2734,7 @@ function createBaseSigMetadata(): SigMetadata {
 export const SigMetadata = {
   encode(
     message: SigMetadata,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
@@ -2814,7 +2814,7 @@ export const SigMetadata = {
     return SigMetadata.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigMetadata>, I>>(
-    object: I,
+    object: I
   ): SigMetadata {
     const message = createBaseSigMetadata();
     message.type = object.type ?? 0;
@@ -2831,7 +2831,7 @@ function createBaseTransferKey(): TransferKey {
 export const TransferKey = {
   encode(
     message: TransferKey,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
@@ -2899,7 +2899,7 @@ export const TransferKey = {
     return TransferKey.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TransferKey>, I>>(
-    object: I,
+    object: I
   ): TransferKey {
     const message = createBaseTransferKey();
     message.txId = object.txId ?? new Uint8Array(0);
@@ -2995,7 +2995,7 @@ function createBaseTokenDetails(): TokenDetails {
 export const TokenDetails = {
   encode(
     message: TokenDetails,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.tokenName !== "") {
       writer.uint32(10).string(message.tokenName);
@@ -3088,12 +3088,12 @@ export const TokenDetails = {
   },
 
   create<I extends Exact<DeepPartial<TokenDetails>, I>>(
-    base?: I,
+    base?: I
   ): TokenDetails {
     return TokenDetails.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TokenDetails>, I>>(
-    object: I,
+    object: I
   ): TokenDetails {
     const message = createBaseTokenDetails();
     message.tokenName = object.tokenName ?? "";
@@ -3111,7 +3111,7 @@ function createBaseGateway(): Gateway {
 export const Gateway = {
   encode(
     message: Gateway,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.address.length !== 0) {
       writer.uint32(10).bytes(message.address);
@@ -3176,7 +3176,7 @@ function createBasePollMetadata(): PollMetadata {
 export const PollMetadata = {
   encode(
     message: PollMetadata,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -3239,12 +3239,12 @@ export const PollMetadata = {
   },
 
   create<I extends Exact<DeepPartial<PollMetadata>, I>>(
-    base?: I,
+    base?: I
   ): PollMetadata {
     return PollMetadata.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PollMetadata>, I>>(
-    object: I,
+    object: I
   ): PollMetadata {
     const message = createBasePollMetadata();
     message.chain = object.chain ?? "";

@@ -99,7 +99,7 @@ const StepsRoot: FC<StepsProps> = ({ className, $direction, ...props }) => {
         stepsVariance({
           $direction,
         }),
-        className,
+        className
       )}
     >
       {"totalSteps" in props
@@ -163,7 +163,7 @@ const Step: FC<StapProps> = ({ className, content, active, ...props }) => {
       data-content={content}
       className={twMerge(
         stepVariance(active ? { $variant: state.variant } : {}),
-        className,
+        className
       )}
       {...props}
     />

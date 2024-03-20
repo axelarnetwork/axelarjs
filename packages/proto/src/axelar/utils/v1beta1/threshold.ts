@@ -20,7 +20,7 @@ function createBaseThreshold(): Threshold {
 export const Threshold = {
   encode(
     message: Threshold,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.numerator.isZero()) {
       writer.uint32(8).int64(message.numerator);
@@ -88,7 +88,7 @@ export const Threshold = {
     return Threshold.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Threshold>, I>>(
-    object: I,
+    object: I
   ): Threshold {
     const message = createBaseThreshold();
     message.numerator =

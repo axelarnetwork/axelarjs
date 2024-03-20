@@ -37,7 +37,7 @@ describe("addNativeGasEvm", () => {
         addNativeGasOptions: {
           privateKey: randomPk,
         },
-      }),
+      })
     ).rejects.toThrowError(EvmAddNativeGasError.ENOUGH_PAID);
 
     // Scenario 2: Axelar GMP status is gas_paid_not_enough_gas, but the estimated gas fee is lower than already paid gas
@@ -54,7 +54,7 @@ describe("addNativeGasEvm", () => {
         addNativeGasOptions: {
           privateKey: randomPk,
         },
-      }),
+      })
     ).rejects.toThrowError(EvmAddNativeGasError.ENOUGH_PAID);
   });
 
@@ -69,7 +69,7 @@ describe("addNativeGasEvm", () => {
         txHash:
           "0x37183ac1c2b0910276f2e3b3ecb14f11f0196dd0068edf4783254a8ccee11996",
         environment: "mainnet",
-      }),
+      })
     ).rejects.toThrowError(EvmAddNativeGasError.WALLET_CLIENT_NOT_FOUND);
   });
 
@@ -84,9 +84,9 @@ describe("addNativeGasEvm", () => {
         addNativeGasOptions: {
           privateKey: generatePrivateKey(),
         },
-      }),
+      })
     ).rejects.toThrowError(
-      EvmAddNativeGasError.CHAIN_CONFIG_NOT_FOUND("unknown"),
+      EvmAddNativeGasError.CHAIN_CONFIG_NOT_FOUND("unknown")
     );
   });
 
@@ -111,7 +111,7 @@ describe("addNativeGasEvm", () => {
     const chainConfigs = await client.getChainConfigs();
     const evmChainConfigs = chainConfigs.evm;
     const chainConfig = evmChainConfigs.find(
-      (config) => config.id.toLowerCase() === "linea",
+      (config) => config.id.toLowerCase() === "linea"
     );
 
     const expectedRpcUrl = chainConfig?.endpoints?.rpc?.[0];
@@ -135,7 +135,7 @@ describe("addNativeGasEvm", () => {
             },
           },
         },
-      },
+      }
     );
   });
 });

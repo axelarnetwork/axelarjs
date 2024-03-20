@@ -76,7 +76,7 @@ export const setupRpcClientQueryExtensions = (client: ProtobufRpcClient) =>
     (acc, [key, Ctrl]) => ({ ...acc, [key]: new Ctrl(client) }),
     {} as {
       [key in QueryServiceName]: InstanceType<(typeof QUERY_SERVICES)[key]>;
-    },
+    }
   );
 
 const TRANSACTIONS = Object.entries(BROADCAST_SERVICES);
@@ -88,7 +88,7 @@ export const setupRpcClientBroadcastExtension = (rpcImpl: ProtobufRpcClient) =>
       [key in BroadcastServiceName]: InstanceType<
         (typeof BROADCAST_SERVICES)[key]
       >;
-    },
+    }
   );
 
 export function setupQueryClientExtension(base: QueryClient) {

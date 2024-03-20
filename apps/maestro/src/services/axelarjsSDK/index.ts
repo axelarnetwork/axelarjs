@@ -22,7 +22,7 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
     params.gasLimit,
     params.gasMultiplier,
     params.sourceChainTokenSymbol,
-    params.minGasPrice,
+    params.minGasPrice
   );
 
   const rawFee = typeof response === "string" ? response : response.baseFee;
@@ -31,7 +31,7 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
 }
 
 async function estimateGasFeeMultipleChains(
-  params: EstimateGasFeeMultipleChainsInput,
+  params: EstimateGasFeeMultipleChainsInput
 ) {
   const results = await Promise.all([
     ...params.destinationChainIds.map((destinationChainId) =>
@@ -52,7 +52,7 @@ async function estimateGasFeeMultipleChains(
           fee: 0n,
           sourceChainId: params.sourceChainId,
           destinationChainId,
-        })),
+        }))
     ),
   ]);
 

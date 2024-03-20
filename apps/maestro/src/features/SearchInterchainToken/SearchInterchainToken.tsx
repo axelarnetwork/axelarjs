@@ -30,11 +30,11 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   const [selectedChainId, setSelectedChainId] = useSessionStorageState(
     "@maestro/SearchInterchainToken.selectedChainId",
-    connectedChain?.id ?? -1,
+    connectedChain?.id ?? -1
   );
   const defaultChain = useMemo(
     () => computed.indexedByChainId[selectedChainId],
-    [computed.indexedByChainId, selectedChainId],
+    [computed.indexedByChainId, selectedChainId]
   );
 
   const isValidAddress = isAddress(search as `0x${string}`);

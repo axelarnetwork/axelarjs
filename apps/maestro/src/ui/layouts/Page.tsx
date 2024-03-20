@@ -56,12 +56,12 @@ const Page: FC<Props> = ({
 
   const evmChain = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === chain?.id),
-    [chain, evmChains],
+    [chain, evmChains]
   );
 
   const evmChainFromRoute = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === chainFromRoute?.id),
-    [chainFromRoute, evmChains],
+    [chainFromRoute, evmChains]
   );
 
   const pageState = useMemo<PageState>(() => {
@@ -108,10 +108,10 @@ const Page: FC<Props> = ({
       }
 
       await router.push(
-        `/${result.chainName.toLowerCase()}/${result?.tokenAddress}`,
+        `/${result.chainName.toLowerCase()}/${result?.tokenAddress}`
       );
     },
-    [router],
+    [router]
   );
 
   const pageContent = useMemo(() => {
@@ -244,7 +244,7 @@ const Page: FC<Props> = ({
             {
               "place-items-center": isExceptionalState,
             },
-            contentClassName,
+            contentClassName
           )}
           {...props}
         >

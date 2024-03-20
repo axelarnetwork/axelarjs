@@ -33,7 +33,7 @@ const PRIZES = [
 const TROPHY_EMOJIS = ["🏆", "🥈", "🥉"];
 
 const COMPETITION_START_TS = Date.parse(
-  NEXT_PUBLIC_COMPETITION_START_TIMESTAMP,
+  NEXT_PUBLIC_COMPETITION_START_TIMESTAMP
 );
 const COMPETITION_END_TS = Date.parse(NEXT_PUBLIC_COMPETITION_END_TIMESTAMP);
 
@@ -94,7 +94,7 @@ const CompetitionPage = () => {
     },
     {
       enabled: true,
-    },
+    }
   );
 
   useEffect(() => {
@@ -108,7 +108,7 @@ const CompetitionPage = () => {
     const timeElapsed = clamp(
       0,
       competitionDuration,
-      now - COMPETITION_START_TS,
+      now - COMPETITION_START_TS
     );
     const isCompetitionOver = now > COMPETITION_END_TS;
     const progress = timeElapsed / competitionDuration;
@@ -167,7 +167,7 @@ const CompetitionPage = () => {
   const compEnd = getDateMeta(COMPETITION_START_TS);
 
   const durationInWeeks = Math.floor(
-    (COMPETITION_END_TS - COMPETITION_START_TS) / (1000 * 60 * 60 * 24 * 7),
+    (COMPETITION_END_TS - COMPETITION_START_TS) / (1000 * 60 * 60 * 24 * 7)
   );
 
   return (

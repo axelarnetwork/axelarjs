@@ -64,7 +64,7 @@ const DialogRoot: FC<DialogProps> = (props) => {
       ) : "trigger" in props ? (
         props.trigger
       ) : null,
-    [props],
+    [props]
   );
 
   return (

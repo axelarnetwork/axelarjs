@@ -23,7 +23,7 @@ export type EVMChainsMap = Record<
 export async function evmChains<TCacheKey extends string>(
   kvClient: MaestroKVClient,
   axelarscanClient: AxelarscanClient,
-  cacheKey: TCacheKey,
+  cacheKey: TCacheKey
 ): Promise<EVMChainsMap> {
   if (process.env.DISABLE_CACHE !== "true") {
     const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
@@ -39,13 +39,13 @@ export async function evmChains<TCacheKey extends string>(
 
   const eligibleChains = chainConfigs.evm.filter((chain) =>
     // filter out chains that are do not have a wagmi config
-    configuredIDs.includes(chain.chain_id),
+    configuredIDs.includes(chain.chain_id)
   );
 
   const evmChainsMap = eligibleChains.reduce(
     (acc, chain) => {
       const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
-        (config) => config.id === chain.chain_id,
+        (config) => config.id === chain.chain_id
       );
 
       // for type safety
@@ -68,7 +68,7 @@ export async function evmChains<TCacheKey extends string>(
         info: EVMChainConfig;
         wagmi: ExtendedWagmiChainConfig;
       }
-    >,
+    >
   );
 
   // cache for 1 hour
@@ -80,7 +80,7 @@ export async function evmChains<TCacheKey extends string>(
 export async function axelarConfigs<TCacheKey extends string>(
   kvClient: MaestroKVClient,
   axelarConfigClient: AxelarConfigClient,
-  cacheKey: TCacheKey,
+  cacheKey: TCacheKey
 ): Promise<AxelarConfigsResponse> {
   if (process.env.DISABLE_CACHE !== "true") {
     const cached = await kvClient.getCached<any>(cacheKey);
@@ -91,7 +91,7 @@ export async function axelarConfigs<TCacheKey extends string>(
   }
 
   const chainConfigs = await axelarConfigClient.getAxelarConfigs(
-    NEXT_PUBLIC_NETWORK_ENV,
+    NEXT_PUBLIC_NETWORK_ENV
   );
 
   // cache for 1 hour
@@ -102,11 +102,11 @@ export async function axelarConfigs<TCacheKey extends string>(
 
 // Calculate PREFIX_INTERCHAIN_TOKEN_SALT
 const PREFIX_INTERCHAIN_TOKEN_SALT = keccak256(
-  Buffer.from(process.env.INTERCHAIN_TOKEN_SALT || "its-interchain-token-salt"),
+  Buffer.from(process.env.INTERCHAIN_TOKEN_SALT || "its-interchain-token-salt")
 );
 
 export function generateInterchainTokenSalt(
-  tokenId: `0x${string}`,
+  tokenId: `0x${string}`
 ): `0x${string}` {
   if (!tokenId.startsWith("0x") || tokenId.length !== 66) {
     throw new Error("tokenId must be a valid bytes32 hex string");
@@ -118,7 +118,7 @@ export function generateInterchainTokenSalt(
       { name: "y", type: "bytes32" },
       { name: "z", type: "bytes32" },
     ],
-    [PREFIX_INTERCHAIN_TOKEN_SALT, keccak256(tokenId)],
+    [PREFIX_INTERCHAIN_TOKEN_SALT, keccak256(tokenId)]
   );
 
   // Create a keccak256 hash of the buffer

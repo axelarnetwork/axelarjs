@@ -84,7 +84,7 @@ export async function getNormalizedChainConfigs({
         ({
           network,
           config,
-        }) as ChainItem<typeof network>,
+        }) as ChainItem<typeof network>
     )
     .map((chain) => ({
       ...chain,

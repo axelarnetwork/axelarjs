@@ -21,28 +21,28 @@ export const getERC20TokenDetails = publicProcedure
     z.object({
       chainId: z.number().optional(),
       tokenAddress: hex40Literal(),
-    }),
+    })
   )
   .query(async ({ input, ctx }) => {
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
 
       const chainConfig = chainConfigs.find(
-        (chain) => chain.id === input.chainId,
+        (chain) => chain.id === input.chainId
       );
 
       if (!chainConfig) {
         for (const config of chainConfigs) {
           const client = ctx.contracts.createERC20Client(
             config,
-            input.tokenAddress,
+            input.tokenAddress
           );
 
           try {
             const details = await getTokenPublicDetails(
               client,
               config,
-              input.tokenAddress,
+              input.tokenAddress
             );
 
             if (details) {
@@ -50,7 +50,7 @@ export const getERC20TokenDetails = publicProcedure
             }
           } catch (error) {
             console.log(
-              `Token ${input.tokenAddress} not found on ${config.name}`,
+              `Token ${input.tokenAddress} not found on ${config.name}`
             );
           }
         }
@@ -63,7 +63,7 @@ export const getERC20TokenDetails = publicProcedure
 
       const client = ctx.contracts.createERC20Client(
         chainConfig,
-        input.tokenAddress,
+        input.tokenAddress
       );
 
       return getTokenPublicDetails(client, chainConfig, input.tokenAddress);
@@ -83,7 +83,7 @@ export const getERC20TokenDetails = publicProcedure
 async function getTokenPublicDetails(
   client: IERC20BurnableMintableClient,
   chainConfig: ExtendedWagmiChainConfig,
-  tokenAddress: `0x${string}`,
+  tokenAddress: `0x${string}`
 ) {
   invariant(client.chain, "client.chain must be defined");
 

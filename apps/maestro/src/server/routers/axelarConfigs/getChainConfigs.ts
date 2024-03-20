@@ -17,7 +17,7 @@ export const getConfigForChain = publicProcedure
   .input(
     z.object({
       axelarChainId: z.string().max(64),
-    }),
+    })
   )
   .output(z.any())
   .query(async ({ ctx, input }) => {

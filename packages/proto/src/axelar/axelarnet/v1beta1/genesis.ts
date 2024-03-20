@@ -36,7 +36,7 @@ function createBaseGenesisState(): GenesisState {
 export const GenesisState = {
   encode(
     message: GenesisState,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -50,7 +50,7 @@ export const GenesisState = {
     if (message.transferQueue !== undefined) {
       QueueState.encode(
         message.transferQueue,
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     }
     for (const v of message.ibcTransfers) {
@@ -59,7 +59,7 @@ export const GenesisState = {
     Object.entries(message.seqIdMapping).forEach(([key, value]) => {
       GenesisState_SeqIdMappingEntry.encode(
         { key: key as any, value },
-        writer.uint32(66).fork(),
+        writer.uint32(66).fork()
       ).ldelim();
     });
     return writer;
@@ -107,7 +107,7 @@ export const GenesisState = {
           }
 
           message.ibcTransfers.push(
-            IBCTransfer.decode(reader, reader.uint32()),
+            IBCTransfer.decode(reader, reader.uint32())
           );
           continue;
         case 8:
@@ -117,7 +117,7 @@ export const GenesisState = {
 
           const entry8 = GenesisState_SeqIdMappingEntry.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           if (entry8.value !== undefined) {
             message.seqIdMapping[entry8.key] = entry8.value;
@@ -153,7 +153,7 @@ export const GenesisState = {
               acc[key] = Long.fromValue(value as Long | string);
               return acc;
             },
-            {},
+            {}
           )
         : {},
     };
@@ -189,12 +189,12 @@ export const GenesisState = {
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
-    base?: I,
+    base?: I
   ): GenesisState {
     return GenesisState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
-    object: I,
+    object: I
   ): GenesisState {
     const message = createBaseGenesisState();
     message.params =
@@ -229,7 +229,7 @@ function createBaseGenesisState_SeqIdMappingEntry(): GenesisState_SeqIdMappingEn
 export const GenesisState_SeqIdMappingEntry = {
   encode(
     message: GenesisState_SeqIdMappingEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -242,7 +242,7 @@ export const GenesisState_SeqIdMappingEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): GenesisState_SeqIdMappingEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -293,12 +293,12 @@ export const GenesisState_SeqIdMappingEntry = {
   },
 
   create<I extends Exact<DeepPartial<GenesisState_SeqIdMappingEntry>, I>>(
-    base?: I,
+    base?: I
   ): GenesisState_SeqIdMappingEntry {
     return GenesisState_SeqIdMappingEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState_SeqIdMappingEntry>, I>>(
-    object: I,
+    object: I
   ): GenesisState_SeqIdMappingEntry {
     const message = createBaseGenesisState_SeqIdMappingEntry();
     message.key = object.key ?? "";

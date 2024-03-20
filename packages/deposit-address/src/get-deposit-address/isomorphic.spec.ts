@@ -72,7 +72,7 @@ describe("Deposit Address", () => {
 
       expect(res?.depositAddress).toBeTruthy();
       expect(res?.sourceChain?.toLowerCase()).toEqual(
-        params.sourceChain.toLowerCase(),
+        params.sourceChain.toLowerCase()
       );
       expect(res?.depositAddress?.startsWith("0x")).toBeTruthy();
     });
@@ -117,7 +117,7 @@ describe("Deposit Address", () => {
       };
 
       await expect(
-        getNativeUnwrapDepositAddress(invalidSourceParams),
+        getNativeUnwrapDepositAddress(invalidSourceParams)
       ).rejects.toThrowError();
 
       const invalidDestParams: DepositNativeUnwrapOptions = {
@@ -129,7 +129,7 @@ describe("Deposit Address", () => {
       };
 
       await expect(
-        getNativeUnwrapDepositAddress(invalidDestParams),
+        getNativeUnwrapDepositAddress(invalidDestParams)
       ).rejects.toThrowError();
     });
   });
@@ -170,7 +170,7 @@ describe("Deposit Address", () => {
       };
 
       await expect(
-        getNativeWrapDepositAddress(invalidSourceParams),
+        getNativeWrapDepositAddress(invalidSourceParams)
       ).rejects.toThrowError();
 
       const invalidDestParams: DepositNativeWrapOptions = {
@@ -182,7 +182,7 @@ describe("Deposit Address", () => {
       };
 
       await expect(
-        getNativeWrapDepositAddress(invalidDestParams),
+        getNativeWrapDepositAddress(invalidDestParams)
       ).rejects.toThrowError();
     });
   });

@@ -70,7 +70,7 @@ export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
 
 export function createPublicClient(
-  chainName: SupportedMainnetChain,
+  chainName: SupportedMainnetChain
 ): PublicClient<HttpTransport, Chain> {
   const chain = MAINNET_CHAINS[chainName] as Chain;
 
@@ -82,7 +82,7 @@ export function createPublicClient(
 }
 
 export function createPublicTestnetClient(
-  chainName: SupportedTestnetChain,
+  chainName: SupportedTestnetChain
 ): PublicClient<HttpTransport, Chain> {
   const chain = TESTNET_CHAINS[chainName] as Chain;
 

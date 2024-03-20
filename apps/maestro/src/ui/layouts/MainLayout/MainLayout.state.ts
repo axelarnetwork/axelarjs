@@ -13,12 +13,12 @@ const DEFAULT_BANNERS_STATE = {
 
 function useLayoutState() {
   const [DrawerSideContent, setDrawerSideContent] = useState<FC>(
-    () => () => null,
+    () => () => null
   );
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [persistedState, setPersistedState] = useLocalStorageState(
     "@axelar/maestro/banners",
-    DEFAULT_BANNERS_STATE,
+    DEFAULT_BANNERS_STATE
   );
 
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
@@ -37,7 +37,7 @@ function useLayoutState() {
     if (isSignedIn) {
       timeoutId = window.setTimeout(
         setIsSignInModalOpen.bind(null, false),
-        3000,
+        3000
       );
 
       if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet") {

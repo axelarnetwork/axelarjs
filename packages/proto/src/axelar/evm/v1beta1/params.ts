@@ -51,7 +51,7 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -77,7 +77,7 @@ export const Params = {
     if (message.votingThreshold !== undefined) {
       Threshold.encode(
         message.votingThreshold,
-        writer.uint32(74).fork(),
+        writer.uint32(74).fork()
       ).ldelim();
     }
     if (!message.minVoterCount.isZero()) {
@@ -350,7 +350,7 @@ function createBasePendingChain(): PendingChain {
 export const PendingChain = {
   encode(
     message: PendingChain,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -411,12 +411,12 @@ export const PendingChain = {
   },
 
   create<I extends Exact<DeepPartial<PendingChain>, I>>(
-    base?: I,
+    base?: I
   ): PendingChain {
     return PendingChain.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PendingChain>, I>>(
-    object: I,
+    object: I
   ): PendingChain {
     const message = createBasePendingChain();
     message.params =

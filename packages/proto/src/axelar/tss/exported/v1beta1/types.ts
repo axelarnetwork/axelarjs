@@ -104,7 +104,7 @@ export enum KeyShareDistributionPolicy {
 }
 
 export function keyShareDistributionPolicyFromJSON(
-  object: any,
+  object: any
 ): KeyShareDistributionPolicy {
   switch (object) {
     case 0:
@@ -124,7 +124,7 @@ export function keyShareDistributionPolicyFromJSON(
 }
 
 export function keyShareDistributionPolicyToJSON(
-  object: KeyShareDistributionPolicy,
+  object: KeyShareDistributionPolicy
 ): string {
   switch (object) {
     case KeyShareDistributionPolicy.KEY_SHARE_DISTRIBUTION_POLICY_UNSPECIFIED:
@@ -179,7 +179,7 @@ function createBaseKeyRequirement(): KeyRequirement {
 export const KeyRequirement = {
   encode(
     message: KeyRequirement,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.keyRole !== 0) {
       writer.uint32(8).int32(message.keyRole);
@@ -190,13 +190,13 @@ export const KeyRequirement = {
     if (message.minKeygenThreshold !== undefined) {
       Threshold.encode(
         message.minKeygenThreshold,
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     }
     if (message.safetyThreshold !== undefined) {
       Threshold.encode(
         message.safetyThreshold,
-        writer.uint32(34).fork(),
+        writer.uint32(34).fork()
       ).ldelim();
     }
     if (message.keyShareDistributionPolicy !== 0) {
@@ -211,13 +211,13 @@ export const KeyRequirement = {
     if (message.keygenVotingThreshold !== undefined) {
       Threshold.encode(
         message.keygenVotingThreshold,
-        writer.uint32(66).fork(),
+        writer.uint32(66).fork()
       ).ldelim();
     }
     if (message.signVotingThreshold !== undefined) {
       Threshold.encode(
         message.signVotingThreshold,
-        writer.uint32(74).fork(),
+        writer.uint32(74).fork()
       ).ldelim();
     }
     if (!message.keygenTimeout.isZero()) {
@@ -258,7 +258,7 @@ export const KeyRequirement = {
 
           message.minKeygenThreshold = Threshold.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 4:
@@ -296,7 +296,7 @@ export const KeyRequirement = {
 
           message.keygenVotingThreshold = Threshold.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 9:
@@ -306,7 +306,7 @@ export const KeyRequirement = {
 
           message.signVotingThreshold = Threshold.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 10:
@@ -382,7 +382,7 @@ export const KeyRequirement = {
     }
     if (message.keyShareDistributionPolicy !== 0) {
       obj.keyShareDistributionPolicy = keyShareDistributionPolicyToJSON(
-        message.keyShareDistributionPolicy,
+        message.keyShareDistributionPolicy
       );
     }
     if (!message.maxTotalShareCount.isZero()) {
@@ -397,7 +397,7 @@ export const KeyRequirement = {
     }
     if (message.keygenVotingThreshold !== undefined) {
       obj.keygenVotingThreshold = Threshold.toJSON(
-        message.keygenVotingThreshold,
+        message.keygenVotingThreshold
       );
     }
     if (message.signVotingThreshold !== undefined) {
@@ -413,12 +413,12 @@ export const KeyRequirement = {
   },
 
   create<I extends Exact<DeepPartial<KeyRequirement>, I>>(
-    base?: I,
+    base?: I
   ): KeyRequirement {
     return KeyRequirement.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<KeyRequirement>, I>>(
-    object: I,
+    object: I
   ): KeyRequirement {
     const message = createBaseKeyRequirement();
     message.keyRole = object.keyRole ?? 0;
@@ -472,7 +472,7 @@ function createBaseSigKeyPair(): SigKeyPair {
 export const SigKeyPair = {
   encode(
     message: SigKeyPair,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.pubKey.length !== 0) {
       writer.uint32(10).bytes(message.pubKey);
@@ -540,7 +540,7 @@ export const SigKeyPair = {
     return SigKeyPair.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SigKeyPair>, I>>(
-    object: I,
+    object: I
   ): SigKeyPair {
     const message = createBaseSigKeyPair();
     message.pubKey = object.pubKey ?? new Uint8Array(0);

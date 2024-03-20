@@ -40,7 +40,7 @@ type InterchainTokenDetailsPageSessionStorageProps = {
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (
   props: InterchainTokenDetailsPageSessionStorageProps,
-  version = 1,
+  version = 1
 ) =>
   `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
 
@@ -53,7 +53,7 @@ export function persistTokenDeploymentTxHash(
   tokenAddress: `0x${string}`,
   chainId: number,
   deployTokensTxHash: `0x${string}`,
-  selectedChainIds: number[],
+  selectedChainIds: number[]
 ) {
   const key = getInterchainTokenDetailsPageSessionStorageKey({
     tokenAddress,
@@ -62,7 +62,7 @@ export function persistTokenDeploymentTxHash(
 
   const currentState = Maybe.of(sessionStorage.getItem(key)).mapOr(
     {},
-    JSON.parse,
+    JSON.parse
   ) as Partial<InterchainTokenDetailsPageState>;
 
   const nextDeployTokensTxHashes = [deployTokensTxHash];
@@ -81,7 +81,7 @@ export function persistTokenDeploymentTxHash(
 }
 
 export function useInterchainTokenDetailsPageState(
-  props: InterchainTokenDetailsPageSessionStorageProps,
+  props: InterchainTokenDetailsPageSessionStorageProps
 ) {
   const key = getInterchainTokenDetailsPageSessionStorageKey(props);
   return useSessionStorageState<InterchainTokenDetailsPageState>(key, {
@@ -91,7 +91,7 @@ export function useInterchainTokenDetailsPageState(
 }
 
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
-  props,
+  props
 ) => {
   const { address } = useAccount();
   const chainId = useChainId();
@@ -125,12 +125,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             decimals: Number(tokenDetails?.decimals),
             tokenId: token.tokenId as `0x${string}`,
             tokenAddress: token.tokenAddress as `0x${string}`,
-          }) as TokenInfo,
-      ),
+          }) as TokenInfo
+      )
     )
     .mapOr(
       [[], []],
-      partition((x) => x.isRegistered),
+      partition((x) => x.isRegistered)
     );
 
   const destinationChainIds = useMemo(
@@ -139,10 +139,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         .map(
           (x) =>
             (interchainToken?.matchingTokens ?? []).find((y) => y.chainId === x)
-              ?.chain.id,
+              ?.chain.id
         )
         .filter(Boolean) as string[],
-    [interchainToken?.matchingTokens, sessionState.selectedChainIds],
+    [interchainToken?.matchingTokens, sessionState.selectedChainIds]
   );
 
   const { data: statuses, isSuccess: hasFetchedStatuses } =
@@ -161,7 +161,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           ...acc,
           [chainId]: "pending" as const,
         }),
-        {} as Record<string, "pending" | GMPTxStatus>,
+        {} as Record<string, "pending" | GMPTxStatus>
       )
     );
   }, [statuses, destinationChainIds]);
@@ -174,7 +174,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
     if (
       Object.values(statusesByChain).every(
-        ({ status }) => status === "executed" || status === "error",
+        ({ status }) => status === "executed" || status === "error"
       )
     ) {
       setSessionState((draft) => {
@@ -189,7 +189,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       Object.entries(statusesByChain)
         .filter(([, { status }]) => status === "executed")
         .map(([chainId]) => chainId),
-    [statusesByChain],
+    [statusesByChain]
   );
 
   useEffect(() => {
@@ -235,19 +235,19 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const originToken = useMemo(
     () => interchainToken.matchingTokens?.find((x) => x.isOriginToken),
-    [interchainToken],
+    [interchainToken]
   );
 
   const runninChainIds = useMemo(
     () =>
       Object.entries(statusesByChain).map(
-        ([axelarChainId]) => computed.indexedById[axelarChainId]?.chain_id,
+        ([axelarChainId]) => computed.indexedById[axelarChainId]?.chain_id
       ),
-    [computed.indexedById, statusesByChain],
+    [computed.indexedById, statusesByChain]
   );
 
   const nonRunningSelectedChainIds = sessionState.selectedChainIds.filter(
-    (x) => !runninChainIds.includes(x),
+    (x) => !runninChainIds.includes(x)
   );
 
   const isRestrictedToDeployer =
@@ -269,11 +269,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         .filter(
           (x) =>
             // filter out tokens that are already registered on the current chain
-            x.chain && !remoteChainsExecuted.includes(x.chain.id),
+            x.chain && !remoteChainsExecuted.includes(x.chain.id)
         )
         .map((token) => {
           const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
-            (id) => statusesByChain[id],
+            (id) => statusesByChain[id]
           );
 
           const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
@@ -284,7 +284,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             isRegistered: false,
             deploymentStatus: gmpInfo?.status,
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
-              ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const,
+              ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),
           } as TokenInfo;
         }),
@@ -293,12 +293,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       remoteChainsExecuted,
       statusesByChain,
       nonRunningSelectedChainIds,
-    ],
+    ]
   );
 
   const [idleUnregisteredTokens, pendingUnregisteredTokens] = partition(
     (x) => !x.deploymentStatus,
-    unregisteredTokens,
+    unregisteredTokens
   );
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -311,7 +311,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             "bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2",
             {
               "pointer-events-none opacity-0": !shouldRenderFooter,
-            },
+            }
           )}
         >
           {isGasPriceQueryLoading && (
@@ -383,7 +383,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
                   switchChainAsync?.({ chainId: originToken.chainId }).catch(
                     () => {
                       logger.error("Failed to switch network");
-                    },
+                    }
                   );
                 }
               }}
@@ -440,7 +440,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               : (chainId) => {
                   setSessionState((draft) => {
                     draft.selectedChainIds = draft.selectedChainIds.includes(
-                      chainId,
+                      chainId
                     )
                       ? without([chainId], draft.selectedChainIds)
                       : draft.selectedChainIds.concat(chainId);

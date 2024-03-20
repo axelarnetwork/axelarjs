@@ -10,5 +10,5 @@ export default defineConfig(
       contracts: [contract],
       plugins: [react()],
     },
-  ]),
+  ])
 );

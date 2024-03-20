@@ -66,7 +66,7 @@ function createBaseFeeDeducted(): FeeDeducted {
 export const FeeDeducted = {
   encode(
     message: FeeDeducted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.transferId.isZero()) {
       writer.uint32(8).uint64(message.transferId);
@@ -178,7 +178,7 @@ export const FeeDeducted = {
     return FeeDeducted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<FeeDeducted>, I>>(
-    object: I,
+    object: I
   ): FeeDeducted {
     const message = createBaseFeeDeducted();
     message.transferId =
@@ -212,7 +212,7 @@ function createBaseInsufficientFee(): InsufficientFee {
 export const InsufficientFee = {
   encode(
     message: InsufficientFee,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.transferId.isZero()) {
       writer.uint32(8).uint64(message.transferId);
@@ -321,12 +321,12 @@ export const InsufficientFee = {
   },
 
   create<I extends Exact<DeepPartial<InsufficientFee>, I>>(
-    base?: I,
+    base?: I
   ): InsufficientFee {
     return InsufficientFee.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<InsufficientFee>, I>>(
-    object: I,
+    object: I
   ): InsufficientFee {
     const message = createBaseInsufficientFee();
     message.transferId =
@@ -354,7 +354,7 @@ function createBaseRateLimitUpdated(): RateLimitUpdated {
 export const RateLimitUpdated = {
   encode(
     message: RateLimitUpdated,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
@@ -431,12 +431,12 @@ export const RateLimitUpdated = {
   },
 
   create<I extends Exact<DeepPartial<RateLimitUpdated>, I>>(
-    base?: I,
+    base?: I
   ): RateLimitUpdated {
     return RateLimitUpdated.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<RateLimitUpdated>, I>>(
-    object: I,
+    object: I
   ): RateLimitUpdated {
     const message = createBaseRateLimitUpdated();
     message.chain = object.chain ?? "";
@@ -464,7 +464,7 @@ function createBaseMessageReceived(): MessageReceived {
 export const MessageReceived = {
   encode(
     message: MessageReceived,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -475,13 +475,13 @@ export const MessageReceived = {
     if (message.sender !== undefined) {
       CrossChainAddress.encode(
         message.sender,
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     }
     if (message.recipient !== undefined) {
       CrossChainAddress.encode(
         message.recipient,
-        writer.uint32(34).fork(),
+        writer.uint32(34).fork()
       ).ldelim();
     }
     return writer;
@@ -565,12 +565,12 @@ export const MessageReceived = {
   },
 
   create<I extends Exact<DeepPartial<MessageReceived>, I>>(
-    base?: I,
+    base?: I
   ): MessageReceived {
     return MessageReceived.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageReceived>, I>>(
-    object: I,
+    object: I
   ): MessageReceived {
     const message = createBaseMessageReceived();
     message.id = object.id ?? "";
@@ -594,7 +594,7 @@ function createBaseMessageProcessing(): MessageProcessing {
 export const MessageProcessing = {
   encode(
     message: MessageProcessing,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -639,12 +639,12 @@ export const MessageProcessing = {
   },
 
   create<I extends Exact<DeepPartial<MessageProcessing>, I>>(
-    base?: I,
+    base?: I
   ): MessageProcessing {
     return MessageProcessing.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageProcessing>, I>>(
-    object: I,
+    object: I
   ): MessageProcessing {
     const message = createBaseMessageProcessing();
     message.id = object.id ?? "";
@@ -659,7 +659,7 @@ function createBaseMessageExecuted(): MessageExecuted {
 export const MessageExecuted = {
   encode(
     message: MessageExecuted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -704,12 +704,12 @@ export const MessageExecuted = {
   },
 
   create<I extends Exact<DeepPartial<MessageExecuted>, I>>(
-    base?: I,
+    base?: I
   ): MessageExecuted {
     return MessageExecuted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageExecuted>, I>>(
-    object: I,
+    object: I
   ): MessageExecuted {
     const message = createBaseMessageExecuted();
     message.id = object.id ?? "";
@@ -724,7 +724,7 @@ function createBaseMessageFailed(): MessageFailed {
 export const MessageFailed = {
   encode(
     message: MessageFailed,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -769,12 +769,12 @@ export const MessageFailed = {
   },
 
   create<I extends Exact<DeepPartial<MessageFailed>, I>>(
-    base?: I,
+    base?: I
   ): MessageFailed {
     return MessageFailed.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<MessageFailed>, I>>(
-    object: I,
+    object: I
   ): MessageFailed {
     const message = createBaseMessageFailed();
     message.id = object.id ?? "";
@@ -789,7 +789,7 @@ function createBaseWasmMessageRouted(): WasmMessageRouted {
 export const WasmMessageRouted = {
   encode(
     message: WasmMessageRouted,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.message !== undefined) {
       WasmMessage.encode(message.message, writer.uint32(10).fork()).ldelim();
@@ -838,12 +838,12 @@ export const WasmMessageRouted = {
   },
 
   create<I extends Exact<DeepPartial<WasmMessageRouted>, I>>(
-    base?: I,
+    base?: I
   ): WasmMessageRouted {
     return WasmMessageRouted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<WasmMessageRouted>, I>>(
-    object: I,
+    object: I
   ): WasmMessageRouted {
     const message = createBaseWasmMessageRouted();
     message.message =

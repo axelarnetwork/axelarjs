@@ -17,7 +17,7 @@ export function useInterchainTokenDetailsQuery(input: {
       enabled: isAddress(input.tokenAddress ?? ""),
       staleTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,
-    },
+    }
   );
 }
 
@@ -38,6 +38,6 @@ export function useInterchainTokenBalanceForOwnerQuery(input: {
         isAddress(input.tokenAddress ?? "") &&
         isAddress(input.owner ?? "") &&
         parseInt(String(input.tokenAddress), 16) !== 0,
-    },
+    }
   );
 }

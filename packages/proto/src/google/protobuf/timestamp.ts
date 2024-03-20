@@ -118,7 +118,7 @@ function createBaseTimestamp(): Timestamp {
 export const Timestamp = {
   encode(
     message: Timestamp,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.seconds.isZero()) {
       writer.uint32(8).int64(message.seconds);
@@ -184,7 +184,7 @@ export const Timestamp = {
     return Timestamp.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<Timestamp>, I>>(
-    object: I,
+    object: I
   ): Timestamp {
     const message = createBaseTimestamp();
     message.seconds =

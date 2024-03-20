@@ -76,7 +76,7 @@ export const CanonicalTokenRecovery = () => {
       },
       {
         enabled: isValid,
-      },
+      }
     );
 
   const { mutateAsync, isPending: isMutating } =
@@ -147,7 +147,7 @@ export const CanonicalTokenRecovery = () => {
           .filter(
             ([key, value]) =>
               (EXCLUDED_COLUMNS.includes(key) && typeof value === "string") ||
-              typeof value === "number",
+              typeof value === "number"
           )
           .map(([key, value]) => (
             <li key={key}>

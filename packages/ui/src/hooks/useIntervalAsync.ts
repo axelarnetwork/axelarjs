@@ -4,7 +4,7 @@ export type GenericFunction = (...args: unknown[]) => unknown;
 
 export const useIntervalAsync = <TCallback extends GenericFunction>(
   callback: TCallback,
-  delay: number | null,
+  delay: number | null
 ) => {
   const intervalRef = useRef(null);
   const savedCallback = useRef(callback);

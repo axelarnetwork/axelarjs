@@ -37,7 +37,7 @@ const DEFAULT_HOOKS: TransactionResultHooks = {
  */
 export async function handleTransactionResult(
   txPromise: Promise<WriteContractData | undefined>,
-  hooks: TransactionResultHooks,
+  hooks: TransactionResultHooks
 ): Promise<void> {
   const handleSuccess = hooks.onSuccess ?? DEFAULT_HOOKS.onSuccess;
   const handleTransactionError =

@@ -80,7 +80,7 @@ export const getTopTransactions = publicProcedure
         ...CACHED_DEPLOYMENTS_HOURLY_2,
         ...CACHED_DEPLOYMENTS_HOURLY_3,
         ...uncachedTokenDeployments.filter(
-          (deployment) => deployment.status === "executed",
+          (deployment) => deployment.status === "executed"
         ),
       ];
       const interchainTransfers = [
@@ -89,7 +89,7 @@ export const getTopTransactions = publicProcedure
         ...CACHED_TRANSFERS_HOURLY_2,
         ...CACHED_TRANSFERS_HOURLY_3,
         ...uncachedTransfers.filter(
-          (transfer) => transfer.status === "executed",
+          (transfer) => transfer.status === "executed"
         ),
       ];
 
@@ -98,25 +98,25 @@ export const getTopTransactions = publicProcedure
           .map(
             (tx) =>
               tx.interchain_token_deployment_started?.tokenId ||
-              tx.token_manager_deployment_started?.tokenId,
+              tx.token_manager_deployment_started?.tokenId
           )
-          .filter(Boolean),
+          .filter(Boolean)
       );
 
       const eligibleTransfers = uniqBy(
         ({ call }) => `${call.transactionHash}:${call._logIndex}`,
         interchainTransfers.filter((transfer) =>
-          eligibleTokenIds.has(transfer.interchain_transfer?.tokenId),
-        ),
+          eligibleTokenIds.has(transfer.interchain_transfer?.tokenId)
+        )
       );
 
       const grouped = groupBy(
         (tx) => tx.interchain_transfer?.tokenId ?? "",
-        eligibleTransfers,
+        eligibleTransfers
       );
 
       const filtered = Object.entries(grouped).filter(
-        ([, txs]) => txs.length >= input.minTxCount,
+        ([, txs]) => txs.length >= input.minTxCount
       );
 
       const results = filtered

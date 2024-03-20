@@ -8,7 +8,7 @@ import Page from "~/ui/layouts/Page";
 const TokenDetailsRedirectPage = () => {
   const router = useRouter();
   const [loadingMessage, setLoadingMessage] = useState(
-    "Loading interchain token...",
+    "Loading interchain token..."
   );
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -32,7 +32,7 @@ const TokenDetailsRedirectPage = () => {
     }
 
     const wagmiChain = computed.wagmiChains.find(
-      (c) => c.axelarChainId === interchainToken.axelarChainId,
+      (c) => c.axelarChainId === interchainToken.axelarChainId
     );
 
     setLoadingMessage("Redirecting...");
@@ -46,7 +46,7 @@ const TokenDetailsRedirectPage = () => {
       .push(
         `/${wagmiChain.axelarChainName.toLowerCase()}/${
           interchainToken.tokenAddress
-        }`,
+        }`
       )
       .catch(() => {
         setErrorMessage("Error redirecting to token details page");

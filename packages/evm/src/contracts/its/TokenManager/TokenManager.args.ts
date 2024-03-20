@@ -378,7 +378,7 @@ export const TOKEN_MANAGER_ENCODERS = {
 };
 
 export function createTokenManagerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
     contractId() {
@@ -394,7 +394,7 @@ export function createTokenManagerReadClient(
       return publicClient.read("flowOutAmount");
     },
     getTokenAddressFromParams(
-      getTokenAddressFromParamsArgs: TokenManagerGetTokenAddressFromParamsArgs,
+      getTokenAddressFromParamsArgs: TokenManagerGetTokenAddressFromParamsArgs
     ) {
       const encoder = TOKEN_MANAGER_ENCODERS["getTokenAddressFromParams"];
       const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);

@@ -42,7 +42,7 @@ export type CanonicalTokenDeploymentState = typeof INITIAL_STATE;
 export type TokenDetails = CanonicalTokenDeploymentState["tokenDetails"];
 
 function useCanonicalTokenDeploymentState(
-  partialInitialState: Partial<CanonicalTokenDeploymentState> = INITIAL_STATE,
+  partialInitialState: Partial<CanonicalTokenDeploymentState> = INITIAL_STATE
 ) {
   const initialState = {
     ...INITIAL_STATE,
@@ -51,7 +51,7 @@ function useCanonicalTokenDeploymentState(
 
   const [state, setState] = useSessionStorageState(
     "@maestro/canonical-deployment",
-    initialState,
+    initialState
   );
 
   /**
@@ -81,7 +81,7 @@ function useCanonicalTokenDeploymentState(
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [partialInitialState.tokenDetails],
+    [partialInitialState.tokenDetails]
   );
 
   return {

@@ -233,7 +233,7 @@ function createBasePartSetHeader(): PartSetHeader {
 export const PartSetHeader = {
   encode(
     message: PartSetHeader,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.total !== 0) {
       writer.uint32(8).uint32(message.total);
@@ -296,12 +296,12 @@ export const PartSetHeader = {
   },
 
   create<I extends Exact<DeepPartial<PartSetHeader>, I>>(
-    base?: I,
+    base?: I
   ): PartSetHeader {
     return PartSetHeader.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<PartSetHeader>, I>>(
-    object: I,
+    object: I
   ): PartSetHeader {
     const message = createBasePartSetHeader();
     message.total = object.total ?? 0;
@@ -412,7 +412,7 @@ function createBaseBlockID(): BlockID {
 export const BlockID = {
   encode(
     message: BlockID,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.hash.length !== 0) {
       writer.uint32(10).bytes(message.hash);
@@ -420,7 +420,7 @@ export const BlockID = {
     if (message.partSetHeader !== undefined) {
       PartSetHeader.encode(
         message.partSetHeader,
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     return writer;
@@ -515,7 +515,7 @@ function createBaseHeader(): Header {
 export const Header = {
   encode(
     message: Header,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.version !== undefined) {
       Consensus.encode(message.version, writer.uint32(10).fork()).ldelim();
@@ -529,7 +529,7 @@ export const Header = {
     if (message.time !== undefined) {
       Timestamp.encode(
         toTimestamp(message.time),
-        writer.uint32(34).fork(),
+        writer.uint32(34).fork()
       ).ldelim();
     }
     if (message.lastBlockId !== undefined) {
@@ -600,7 +600,7 @@ export const Header = {
           }
 
           message.time = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 5:
@@ -894,7 +894,7 @@ export const Vote = {
     if (message.timestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.timestamp),
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     }
     if (message.validatorAddress.length !== 0) {
@@ -951,7 +951,7 @@ export const Vote = {
           }
 
           message.timestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 6:
@@ -1066,7 +1066,7 @@ function createBaseCommit(): Commit {
 export const Commit = {
   encode(
     message: Commit,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.height.isZero()) {
       writer.uint32(8).int64(message.height);
@@ -1190,7 +1190,7 @@ function createBaseCommitSig(): CommitSig {
 export const CommitSig = {
   encode(
     message: CommitSig,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.blockIdFlag !== 0) {
       writer.uint32(8).int32(message.blockIdFlag);
@@ -1201,7 +1201,7 @@ export const CommitSig = {
     if (message.timestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.timestamp),
-        writer.uint32(26).fork(),
+        writer.uint32(26).fork()
       ).ldelim();
     }
     if (message.signature.length !== 0) {
@@ -1238,7 +1238,7 @@ export const CommitSig = {
           }
 
           message.timestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 4:
@@ -1295,7 +1295,7 @@ export const CommitSig = {
     return CommitSig.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<CommitSig>, I>>(
-    object: I,
+    object: I
   ): CommitSig {
     const message = createBaseCommitSig();
     message.blockIdFlag = object.blockIdFlag ?? 0;
@@ -1321,7 +1321,7 @@ function createBaseProposal(): Proposal {
 export const Proposal = {
   encode(
     message: Proposal,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
@@ -1341,7 +1341,7 @@ export const Proposal = {
     if (message.timestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.timestamp),
-        writer.uint32(50).fork(),
+        writer.uint32(50).fork()
       ).ldelim();
     }
     if (message.signature.length !== 0) {
@@ -1399,7 +1399,7 @@ export const Proposal = {
           }
 
           message.timestamp = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
+            Timestamp.decode(reader, reader.uint32())
           );
           continue;
         case 7:
@@ -1491,7 +1491,7 @@ function createBaseSignedHeader(): SignedHeader {
 export const SignedHeader = {
   encode(
     message: SignedHeader,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.header !== undefined) {
       Header.encode(message.header, writer.uint32(10).fork()).ldelim();
@@ -1552,12 +1552,12 @@ export const SignedHeader = {
   },
 
   create<I extends Exact<DeepPartial<SignedHeader>, I>>(
-    base?: I,
+    base?: I
   ): SignedHeader {
     return SignedHeader.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<SignedHeader>, I>>(
-    object: I,
+    object: I
   ): SignedHeader {
     const message = createBaseSignedHeader();
     message.header =
@@ -1579,18 +1579,18 @@ function createBaseLightBlock(): LightBlock {
 export const LightBlock = {
   encode(
     message: LightBlock,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.signedHeader !== undefined) {
       SignedHeader.encode(
         message.signedHeader,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     if (message.validatorSet !== undefined) {
       ValidatorSet.encode(
         message.validatorSet,
-        writer.uint32(18).fork(),
+        writer.uint32(18).fork()
       ).ldelim();
     }
     return writer;
@@ -1653,7 +1653,7 @@ export const LightBlock = {
     return LightBlock.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<LightBlock>, I>>(
-    object: I,
+    object: I
   ): LightBlock {
     const message = createBaseLightBlock();
     message.signedHeader =
@@ -1680,7 +1680,7 @@ function createBaseBlockMeta(): BlockMeta {
 export const BlockMeta = {
   encode(
     message: BlockMeta,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.blockId !== undefined) {
       BlockID.encode(message.blockId, writer.uint32(10).fork()).ldelim();
@@ -1776,7 +1776,7 @@ export const BlockMeta = {
     return BlockMeta.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<BlockMeta>, I>>(
-    object: I,
+    object: I
   ): BlockMeta {
     const message = createBaseBlockMeta();
     message.blockId =
@@ -1810,7 +1810,7 @@ function createBaseTxProof(): TxProof {
 export const TxProof = {
   encode(
     message: TxProof,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.rootHash.length !== 0) {
       writer.uint32(10).bytes(message.rootHash);

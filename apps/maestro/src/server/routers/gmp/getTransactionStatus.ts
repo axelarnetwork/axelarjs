@@ -11,7 +11,7 @@ export const getTransactionStatus = publicProcedure
   .input(
     z.object({
       txHash: hex40Literal(),
-    }),
+    })
   )
   // a procedure can either be a query or a mutation
   // a query is a read-only operation, a mutation is a write operation

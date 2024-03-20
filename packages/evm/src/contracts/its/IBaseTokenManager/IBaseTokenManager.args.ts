@@ -44,11 +44,11 @@ export const IBASE_TOKEN_MANAGER_ENCODERS = {
 };
 
 export function createIBaseTokenManagerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
     getTokenAddressFromParams(
-      getTokenAddressFromParamsArgs: IBaseTokenManagerGetTokenAddressFromParamsArgs,
+      getTokenAddressFromParamsArgs: IBaseTokenManagerGetTokenAddressFromParamsArgs
     ) {
       const encoder = IBASE_TOKEN_MANAGER_ENCODERS["getTokenAddressFromParams"];
       const encodedArgs = encoder.args(getTokenAddressFromParamsArgs);

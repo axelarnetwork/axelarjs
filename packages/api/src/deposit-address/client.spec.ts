@@ -7,7 +7,7 @@ import { createDepositAddressApiClient } from "./client";
 
 const retryGetOtc = async (
   api: DepositAddressClient,
-  signerAddress: `0x${string}`,
+  signerAddress: `0x${string}`
 ) => {
   let otcRes!: OTC;
   let retry = 0;
@@ -37,13 +37,13 @@ describe("deposit address client (node)", () => {
       const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
       const otcRes = await retryGetOtc(
         api,
-        "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        "0xB8Cd93C83A974649D76B1c19f311f639e62272BC"
       );
 
       expect(
         otcRes.validationMsg?.includes(
-          "Verify I'm a real user with this one-time-code",
-        ),
+          "Verify I'm a real user with this one-time-code"
+        )
       ).toBeTruthy();
     });
   });

@@ -39,7 +39,7 @@ export type UseSendInterchainTokenInput = {
 };
 
 export function useInterchainTokenServiceTransferMutation(
-  config: UseSendInterchainTokenConfig,
+  config: UseSendInterchainTokenConfig
 ) {
   const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
@@ -52,7 +52,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress,
-    NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+    NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
   );
 
   const {
@@ -151,7 +151,7 @@ export function useInterchainTokenServiceTransferMutation(
       approveERC20Recepit,
       config.destinationChainName,
       interchainTransferAsync,
-    ],
+    ]
   );
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
@@ -184,7 +184,7 @@ export function useInterchainTokenServiceTransferMutation(
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(
-            `Approval transaction failed: ${error.cause.shortMessage}`,
+            `Approval transaction failed: ${error.cause.shortMessage}`
           );
           logger.error("Failed to approve token transfer:", error.cause);
 
@@ -218,7 +218,7 @@ export function useInterchainTokenServiceTransferMutation(
  */
 function useWatchInterchainTokenAllowance(
   tokenAddress: `0x${string}`,
-  spender: `0x${string}`,
+  spender: `0x${string}`
 ) {
   const { queryKey, ...query } = useReadInterchainTokenAllowance({
     address: tokenAddress,
@@ -242,7 +242,7 @@ function useWatchInterchainTokenAllowance(
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [block],
+    [block]
   );
 
   return { ...query, queryKey };

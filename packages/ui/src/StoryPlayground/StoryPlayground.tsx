@@ -90,7 +90,7 @@ const Variants = <
   TComponent extends FC,
   TComponentProps extends ComponentProps<TComponent>,
 >(
-  props: VariantsProps<TComponent, TComponentProps>,
+  props: VariantsProps<TComponent, TComponentProps>
 ) => {
   const [view, setView] = useState<Viewport>("desktop");
 
@@ -99,7 +99,7 @@ const Variants = <
       ...acc,
       [artboard]: artboard === VIEWPORTS[view].className,
     }),
-    {} as Record<Artboard, boolean>,
+    {} as Record<Artboard, boolean>
   );
 
   return (
@@ -135,7 +135,7 @@ const Variants = <
           <div
             className={cn(
               "artboard artboard-demo bg-base-300 mx-auto p-4 transition-all duration-300",
-              { ...viewports },
+              { ...viewports }
             )}
           >
             <ul className="flex flex-wrap items-center gap-4">
@@ -186,7 +186,7 @@ export const configurePlayground = <
   variants: {
     [TKey in keyof TComponentProps]: VariantConfigLike<TComponent>;
   },
-  defaultProps?: Partial<TComponentProps>,
+  defaultProps?: Partial<TComponentProps>
 ) => {
   return Object.entries(variants).reduce(
     (acc, [propKey, variant]) => {
@@ -201,6 +201,6 @@ export const configurePlayground = <
     },
     {} as CapitalizeKeys<
       Record<keyof typeof variants, StoryFn<typeof Variants>>
-    >,
+    >
   );
 };

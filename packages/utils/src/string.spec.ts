@@ -78,7 +78,7 @@ describe("maskAddress", () => {
   it("masks an address with custom options", () => {
     const address = "0x1234567890abcdef";
     expect(maskAddress(address, { segmentA: 4, segmentB: -6 })).toBe(
-      "0x12...abcdef",
+      "0x12...abcdef"
     );
   });
 });

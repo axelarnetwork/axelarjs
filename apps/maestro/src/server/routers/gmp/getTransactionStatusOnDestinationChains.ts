@@ -70,7 +70,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
               txId: string;
               logIndex: number;
             };
-          },
+          }
         );
 
         return result;

@@ -54,7 +54,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   useEffect(
     () => setThemeMode(theme ?? "light"),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [theme],
+    [theme]
   );
 
   const [
@@ -88,7 +88,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
             {
               "pointer-events-none": isSignInModalOpen,
-            },
+            }
           )}
         >
           {globalMessage && !isGlobalBannerDismissed && (
@@ -287,7 +287,7 @@ const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
       isRTL: document.documentElement.getAttribute("dir") === "rtl",
     },
     null,
-    2,
+    2
   );
 
   const errorContent = `\n\`\`\`\n${stringified}\n\`\`\``;

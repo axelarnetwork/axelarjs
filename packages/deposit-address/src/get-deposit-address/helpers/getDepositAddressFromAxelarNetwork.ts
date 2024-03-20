@@ -22,14 +22,14 @@ export type ListenerParams = {
 export async function getDepositAddressFromAxelarNetwork(
   params: SendOptions,
   chainConfigs: AxelarConfigsResponse,
-  dependencies: GetLinkedDepositAddressDependencies,
+  dependencies: GetLinkedDepositAddressDependencies
 ) {
   /**
    * invoke API to get deposit address
    */
   const response = await triggerGetDepositAddressFromAxelar(
     params,
-    dependencies.depositAddressClient,
+    dependencies.depositAddressClient
   );
 
   if (!response.data) {
@@ -42,14 +42,14 @@ export async function getDepositAddressFromAxelarNetwork(
   return waitForDepositAddress(
     params,
     chainConfigs,
-    dependencies.axelarscanClient,
+    dependencies.axelarscanClient
   );
 }
 
 function findLinkRequest(
   params: ListenerParams,
   module: "evm" | "axelarnet" | undefined,
-  results: LinkRequestResponse[],
+  results: LinkRequestResponse[]
 ) {
   return results.find((linkRequest) => {
     const matchesBaseConditions = [
@@ -78,7 +78,7 @@ function findLinkRequest(
 async function waitForDepositAddress(
   params: ListenerParams,
   chainConfigs: AxelarConfigsResponse,
-  axelarscanClient: AxelarscanClient,
+  axelarscanClient: AxelarscanClient
 ) {
   const srcChainConfig = chainConfigs.chains[params.sourceChain.toLowerCase()];
   return findLinkRequest(
@@ -89,14 +89,14 @@ async function waitForDepositAddress(
       (res: LinkRequestResponse[]) =>
         !findLinkRequest(params, srcChainConfig?.chainType, res),
       5_000,
-      5,
-    ),
+      5
+    )
   );
 }
 
 async function triggerGetDepositAddressFromAxelar(
   params: SendOptions,
-  depositAddressClient: DepositAddressClient,
+  depositAddressClient: DepositAddressClient
 ) {
   const account = createDummyAccount();
   const publicAddress = account.address;

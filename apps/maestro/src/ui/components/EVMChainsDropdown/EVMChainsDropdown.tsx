@@ -36,7 +36,7 @@ export const ChainIcon: FC<{
     <div
       className={cn(
         "bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2",
-        props.className,
+        props.className
       )}
     >
       <Image
@@ -73,22 +73,22 @@ const EVMChainsDropdown: FC<Props> = (props) => {
   const selectedChain = useMemo(
     () =>
       Maybe.of(evmChains).mapOrUndefined(
-        find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id)),
+        find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
       ),
-    [chain?.id, evmChains, state.selectedChainId],
+    [chain?.id, evmChains, state.selectedChainId]
   );
 
   const eligibleChains = Maybe.of(props.chains ?? evmChains).mapOr(
     [],
     (chains) =>
-      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id),
+      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 
   const handleChainChange = async (chainId: number) => {
     try {
       if (props.onSelectChain) {
         props.onSelectChain(
-          eligibleChains.find(propEq(chainId, "chain_id")) ?? null,
+          eligibleChains.find(propEq(chainId, "chain_id")) ?? null
         );
       } else {
         await switchChainAsync?.({ chainId });
@@ -123,7 +123,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
             {
               "pointer-events-none": props.disabled,
             },
-            props.triggerClassName,
+            props.triggerClassName
           )}
           tabIndex={props.compact ? -1 : 0}
         >
@@ -138,7 +138,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 size="sm"
                 className={cn(
                   { "-translate-x-1.5": !props.hideLabel },
-                  props.chainIconClassName,
+                  props.chainIconClassName
                 )}
               />
               {!props.hideLabel && <span>{props.selectedChain.name}</span>}
@@ -151,7 +151,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 size="sm"
                 className={cn(
                   { "-translate-x-1.5": !props.hideLabel },
-                  props.chainIconClassName,
+                  props.chainIconClassName
                 )}
               />
               {!props.hideLabel && <span>{selectedChain.name}</span>}
@@ -161,7 +161,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
               size="24"
               className={cn(
                 { "-translate-x-1.5": !props.hideLabel },
-                props.chainIconClassName,
+                props.chainIconClassName
               )}
             />
           )}
@@ -176,7 +176,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
               "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
                 props.compact,
             },
-            props.contentClassName,
+            props.contentClassName
           )}
         >
           {!chain && (

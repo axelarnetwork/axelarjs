@@ -40,23 +40,23 @@ export const protobufPackage = "axelar.axelarnet.v1beta1";
 export interface MsgService {
   Link(request: LinkRequest): Promise<LinkResponse>;
   ConfirmDeposit(
-    request: ConfirmDepositRequest,
+    request: ConfirmDepositRequest
   ): Promise<ConfirmDepositResponse>;
   ExecutePendingTransfers(
-    request: ExecutePendingTransfersRequest,
+    request: ExecutePendingTransfersRequest
   ): Promise<ExecutePendingTransfersResponse>;
   AddCosmosBasedChain(
-    request: AddCosmosBasedChainRequest,
+    request: AddCosmosBasedChainRequest
   ): Promise<AddCosmosBasedChainResponse>;
   RegisterAsset(request: RegisterAssetRequest): Promise<RegisterAssetResponse>;
   RouteIBCTransfers(
-    request: RouteIBCTransfersRequest,
+    request: RouteIBCTransfersRequest
   ): Promise<RouteIBCTransfersResponse>;
   RegisterFeeCollector(
-    request: RegisterFeeCollectorRequest,
+    request: RegisterFeeCollectorRequest
   ): Promise<RegisterFeeCollectorResponse>;
   RetryIBCTransfer(
-    request: RetryIBCTransferRequest,
+    request: RetryIBCTransferRequest
   ): Promise<RetryIBCTransferResponse>;
   RouteMessage(request: RouteMessageRequest): Promise<RouteMessageResponse>;
   CallContract(request: CallContractRequest): Promise<CallContractResponse>;
@@ -87,36 +87,36 @@ export class MsgServiceClientImpl implements MsgService {
   }
 
   ConfirmDeposit(
-    request: ConfirmDepositRequest,
+    request: ConfirmDepositRequest
   ): Promise<ConfirmDepositResponse> {
     const data = ConfirmDepositRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ConfirmDeposit", data);
     return promise.then((data) =>
-      ConfirmDepositResponse.decode(_m0.Reader.create(data)),
+      ConfirmDepositResponse.decode(_m0.Reader.create(data))
     );
   }
 
   ExecutePendingTransfers(
-    request: ExecutePendingTransfersRequest,
+    request: ExecutePendingTransfersRequest
   ): Promise<ExecutePendingTransfersResponse> {
     const data = ExecutePendingTransfersRequest.encode(request).finish();
     const promise = this.rpc.request(
       this.service,
       "ExecutePendingTransfers",
-      data,
+      data
     );
     return promise.then((data) =>
-      ExecutePendingTransfersResponse.decode(_m0.Reader.create(data)),
+      ExecutePendingTransfersResponse.decode(_m0.Reader.create(data))
     );
   }
 
   AddCosmosBasedChain(
-    request: AddCosmosBasedChainRequest,
+    request: AddCosmosBasedChainRequest
   ): Promise<AddCosmosBasedChainResponse> {
     const data = AddCosmosBasedChainRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "AddCosmosBasedChain", data);
     return promise.then((data) =>
-      AddCosmosBasedChainResponse.decode(_m0.Reader.create(data)),
+      AddCosmosBasedChainResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -124,41 +124,41 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RegisterAssetRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RegisterAsset", data);
     return promise.then((data) =>
-      RegisterAssetResponse.decode(_m0.Reader.create(data)),
+      RegisterAssetResponse.decode(_m0.Reader.create(data))
     );
   }
 
   RouteIBCTransfers(
-    request: RouteIBCTransfersRequest,
+    request: RouteIBCTransfersRequest
   ): Promise<RouteIBCTransfersResponse> {
     const data = RouteIBCTransfersRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RouteIBCTransfers", data);
     return promise.then((data) =>
-      RouteIBCTransfersResponse.decode(_m0.Reader.create(data)),
+      RouteIBCTransfersResponse.decode(_m0.Reader.create(data))
     );
   }
 
   RegisterFeeCollector(
-    request: RegisterFeeCollectorRequest,
+    request: RegisterFeeCollectorRequest
   ): Promise<RegisterFeeCollectorResponse> {
     const data = RegisterFeeCollectorRequest.encode(request).finish();
     const promise = this.rpc.request(
       this.service,
       "RegisterFeeCollector",
-      data,
+      data
     );
     return promise.then((data) =>
-      RegisterFeeCollectorResponse.decode(_m0.Reader.create(data)),
+      RegisterFeeCollectorResponse.decode(_m0.Reader.create(data))
     );
   }
 
   RetryIBCTransfer(
-    request: RetryIBCTransferRequest,
+    request: RetryIBCTransferRequest
   ): Promise<RetryIBCTransferResponse> {
     const data = RetryIBCTransferRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RetryIBCTransfer", data);
     return promise.then((data) =>
-      RetryIBCTransferResponse.decode(_m0.Reader.create(data)),
+      RetryIBCTransferResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -166,7 +166,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = RouteMessageRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "RouteMessage", data);
     return promise.then((data) =>
-      RouteMessageResponse.decode(_m0.Reader.create(data)),
+      RouteMessageResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -174,7 +174,7 @@ export class MsgServiceClientImpl implements MsgService {
     const data = CallContractRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "CallContract", data);
     return promise.then((data) =>
-      CallContractResponse.decode(_m0.Reader.create(data)),
+      CallContractResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -183,12 +183,12 @@ export class MsgServiceClientImpl implements MsgService {
 export interface QueryService {
   /** PendingIBCTransferCount queries the pending ibc transfers for all chains */
   PendingIBCTransferCount(
-    request: PendingIBCTransferCountRequest,
+    request: PendingIBCTransferCountRequest
   ): Promise<PendingIBCTransferCountResponse>;
   Params(request: ParamsRequest): Promise<ParamsResponse>;
   IBCPath(request: IBCPathRequest): Promise<IBCPathResponse>;
   ChainByIBCPath(
-    request: ChainByIBCPathRequest,
+    request: ChainByIBCPathRequest
   ): Promise<ChainByIBCPathResponse>;
 }
 
@@ -205,16 +205,16 @@ export class QueryServiceClientImpl implements QueryService {
     this.ChainByIBCPath = this.ChainByIBCPath.bind(this);
   }
   PendingIBCTransferCount(
-    request: PendingIBCTransferCountRequest,
+    request: PendingIBCTransferCountRequest
   ): Promise<PendingIBCTransferCountResponse> {
     const data = PendingIBCTransferCountRequest.encode(request).finish();
     const promise = this.rpc.request(
       this.service,
       "PendingIBCTransferCount",
-      data,
+      data
     );
     return promise.then((data) =>
-      PendingIBCTransferCountResponse.decode(_m0.Reader.create(data)),
+      PendingIBCTransferCountResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -222,7 +222,7 @@ export class QueryServiceClientImpl implements QueryService {
     const data = ParamsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Params", data);
     return promise.then((data) =>
-      ParamsResponse.decode(_m0.Reader.create(data)),
+      ParamsResponse.decode(_m0.Reader.create(data))
     );
   }
 
@@ -230,17 +230,17 @@ export class QueryServiceClientImpl implements QueryService {
     const data = IBCPathRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "IBCPath", data);
     return promise.then((data) =>
-      IBCPathResponse.decode(_m0.Reader.create(data)),
+      IBCPathResponse.decode(_m0.Reader.create(data))
     );
   }
 
   ChainByIBCPath(
-    request: ChainByIBCPathRequest,
+    request: ChainByIBCPathRequest
   ): Promise<ChainByIBCPathResponse> {
     const data = ChainByIBCPathRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ChainByIBCPath", data);
     return promise.then((data) =>
-      ChainByIBCPathResponse.decode(_m0.Reader.create(data)),
+      ChainByIBCPathResponse.decode(_m0.Reader.create(data))
     );
   }
 }
@@ -249,6 +249,6 @@ interface Rpc {
   request(
     service: string,
     method: string,
-    data: Uint8Array,
+    data: Uint8Array
   ): Promise<Uint8Array>;
 }

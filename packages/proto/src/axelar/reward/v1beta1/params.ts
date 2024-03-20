@@ -20,7 +20,7 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.externalChainVotingInflationRate.length !== 0) {
       writer.uint32(10).bytes(message.externalChainVotingInflationRate);
@@ -65,7 +65,7 @@ export const Params = {
   fromJSON(object: any): Params {
     return {
       externalChainVotingInflationRate: isSet(
-        object.externalChainVotingInflationRate,
+        object.externalChainVotingInflationRate
       )
         ? bytesFromBase64(object.externalChainVotingInflationRate)
         : new Uint8Array(0),
@@ -79,12 +79,12 @@ export const Params = {
     const obj: any = {};
     if (message.externalChainVotingInflationRate.length !== 0) {
       obj.externalChainVotingInflationRate = base64FromBytes(
-        message.externalChainVotingInflationRate,
+        message.externalChainVotingInflationRate
       );
     }
     if (message.keyMgmtRelativeInflationRate.length !== 0) {
       obj.keyMgmtRelativeInflationRate = base64FromBytes(
-        message.keyMgmtRelativeInflationRate,
+        message.keyMgmtRelativeInflationRate
       );
     }
     return obj;

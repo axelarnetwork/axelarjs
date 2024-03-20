@@ -34,7 +34,7 @@ function createBaseTalliedVote(): TalliedVote {
 export const TalliedVote = {
   encode(
     message: TalliedVote,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.tally.length !== 0) {
       writer.uint32(10).bytes(message.tally);
@@ -48,7 +48,7 @@ export const TalliedVote = {
     Object.entries(message.isVoterLate).forEach(([key, value]) => {
       TalliedVote_IsVoterLateEntry.encode(
         { key: key as any, value },
-        writer.uint32(42).fork(),
+        writer.uint32(42).fork()
       ).ldelim();
     });
     return writer;
@@ -90,7 +90,7 @@ export const TalliedVote = {
 
           const entry5 = TalliedVote_IsVoterLateEntry.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           if (entry5.value !== undefined) {
             message.isVoterLate[entry5.key] = entry5.value;
@@ -118,7 +118,7 @@ export const TalliedVote = {
               acc[key] = Boolean(value);
               return acc;
             },
-            {},
+            {}
           )
         : {},
     };
@@ -151,7 +151,7 @@ export const TalliedVote = {
     return TalliedVote.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TalliedVote>, I>>(
-    object: I,
+    object: I
   ): TalliedVote {
     const message = createBaseTalliedVote();
     message.tally = object.tally ?? new Uint8Array(0);
@@ -182,7 +182,7 @@ function createBaseTalliedVote_IsVoterLateEntry(): TalliedVote_IsVoterLateEntry 
 export const TalliedVote_IsVoterLateEntry = {
   encode(
     message: TalliedVote_IsVoterLateEntry,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -195,7 +195,7 @@ export const TalliedVote_IsVoterLateEntry = {
 
   decode(
     input: _m0.Reader | Uint8Array,
-    length?: number,
+    length?: number
   ): TalliedVote_IsVoterLateEntry {
     const reader =
       input instanceof _m0.Reader ? input : _m0.Reader.create(input);
@@ -246,12 +246,12 @@ export const TalliedVote_IsVoterLateEntry = {
   },
 
   create<I extends Exact<DeepPartial<TalliedVote_IsVoterLateEntry>, I>>(
-    base?: I,
+    base?: I
   ): TalliedVote_IsVoterLateEntry {
     return TalliedVote_IsVoterLateEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<TalliedVote_IsVoterLateEntry>, I>>(
-    object: I,
+    object: I
   ): TalliedVote_IsVoterLateEntry {
     const message = createBaseTalliedVote_IsVoterLateEntry();
     message.key = object.key ?? "";

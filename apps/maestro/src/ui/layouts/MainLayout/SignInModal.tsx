@@ -28,7 +28,7 @@ const SignInModal: FC<SignInModalProps> = ({
             "swap-rotate swap relative grid h-16 w-16 place-items-center",
             {
               "swap-active": isSignedIn || signInError,
-            },
+            }
           )}
         >
           {signInError ? (

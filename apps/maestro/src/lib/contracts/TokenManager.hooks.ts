@@ -396,7 +396,7 @@ export const useReadTokenManagerFlowInAmount =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"flowLimit"`
  */
 export const useReadTokenManagerFlowLimit = /*#__PURE__*/ createUseReadContract(
-  { abi: tokenManagerAbi, functionName: "flowLimit" },
+  { abi: tokenManagerAbi, functionName: "flowLimit" }
 );
 
 /**

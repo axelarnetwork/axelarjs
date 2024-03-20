@@ -8,7 +8,7 @@ export const getInterchainTokenByTokenId = publicProcedure
   .input(
     z.object({
       tokenId: hex64Literal(),
-    }),
+    })
   )
   .query(async ({ input, ctx }) => {
     const tokenRecord =

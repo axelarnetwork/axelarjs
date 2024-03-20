@@ -19,12 +19,12 @@ function createBaseParams(): Params {
 export const Params = {
   encode(
     message: Params,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.defaultVotingThreshold !== undefined) {
       Threshold.encode(
         message.defaultVotingThreshold,
-        writer.uint32(10).fork(),
+        writer.uint32(10).fork()
       ).ldelim();
     }
     if (!message.endBlockerLimit.isZero()) {
@@ -48,7 +48,7 @@ export const Params = {
 
           message.defaultVotingThreshold = Threshold.decode(
             reader,
-            reader.uint32(),
+            reader.uint32()
           );
           continue;
         case 2:
@@ -82,7 +82,7 @@ export const Params = {
     const obj: any = {};
     if (message.defaultVotingThreshold !== undefined) {
       obj.defaultVotingThreshold = Threshold.toJSON(
-        message.defaultVotingThreshold,
+        message.defaultVotingThreshold
       );
     }
     if (!message.endBlockerLimit.isZero()) {

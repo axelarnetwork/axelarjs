@@ -50,7 +50,7 @@ function createBaseGenesisState(): GenesisState {
 export const GenesisState = {
   encode(
     message: GenesisState,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -133,7 +133,7 @@ export const GenesisState = {
           }
 
           message.linkedAddresses.push(
-            LinkedAddresses.decode(reader, reader.uint32()),
+            LinkedAddresses.decode(reader, reader.uint32())
           );
           continue;
         case 6:
@@ -142,7 +142,7 @@ export const GenesisState = {
           }
 
           message.transfers.push(
-            CrossChainTransfer.decode(reader, reader.uint32()),
+            CrossChainTransfer.decode(reader, reader.uint32())
           );
           continue;
         case 7:
@@ -172,7 +172,7 @@ export const GenesisState = {
           }
 
           message.transferEpochs.push(
-            TransferEpoch.decode(reader, reader.uint32()),
+            TransferEpoch.decode(reader, reader.uint32())
           );
           continue;
         case 11:
@@ -249,12 +249,12 @@ export const GenesisState = {
     }
     if (message.linkedAddresses?.length) {
       obj.linkedAddresses = message.linkedAddresses.map((e) =>
-        LinkedAddresses.toJSON(e),
+        LinkedAddresses.toJSON(e)
       );
     }
     if (message.transfers?.length) {
       obj.transfers = message.transfers.map((e) =>
-        CrossChainTransfer.toJSON(e),
+        CrossChainTransfer.toJSON(e)
       );
     }
     if (message.fee !== undefined) {
@@ -268,7 +268,7 @@ export const GenesisState = {
     }
     if (message.transferEpochs?.length) {
       obj.transferEpochs = message.transferEpochs.map((e) =>
-        TransferEpoch.toJSON(e),
+        TransferEpoch.toJSON(e)
       );
     }
     if (message.messages?.length) {
@@ -281,12 +281,12 @@ export const GenesisState = {
   },
 
   create<I extends Exact<DeepPartial<GenesisState>, I>>(
-    base?: I,
+    base?: I
   ): GenesisState {
     return GenesisState.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(
-    object: I,
+    object: I
   ): GenesisState {
     const message = createBaseGenesisState();
     message.params =

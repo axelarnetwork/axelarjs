@@ -33,7 +33,7 @@ export interface CheckboxProps extends InputElement {
  * A checkbox input component
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ ...props }, ref) => <StyledInput ref={ref} type="checkbox" {...props} />,
+  ({ ...props }, ref) => <StyledInput ref={ref} type="checkbox" {...props} />
 );
 
 Checkbox.displayName = "Checkbox";

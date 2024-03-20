@@ -37,7 +37,7 @@ export const MintInterchainToken: FC = () => {
 
     const adjustedAmount = parseUnits(
       data.amountToMint,
-      erc20Details?.decimals || 18,
+      erc20Details?.decimals || 18
     );
 
     setTxState({

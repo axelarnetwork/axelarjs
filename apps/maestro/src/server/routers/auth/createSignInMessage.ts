@@ -13,7 +13,7 @@ export const createSignInMessage = publicProcedure
   .input(
     z.object({
       address: hex40Literal(),
-    }),
+    })
   )
   .mutation(async ({ input, ctx }) => {
     const { kv } = ctx.persistence;

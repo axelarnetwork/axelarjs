@@ -39,9 +39,9 @@ export const Step3: FC = () => {
           x.status === "success"
             ? [[...succeeded, x.destinationChainId], errored]
             : [succeeded, [...errored, x.destinationChainId]],
-        [[], []] as [string[], string[]],
+        [[], []] as [string[], string[]]
       ),
-    [state.remoteDeploymentGasFees?.gasFees],
+    [state.remoteDeploymentGasFees?.gasFees]
   );
 
   const { writeAsync: deployCanonicalTokenAsync } =
@@ -67,7 +67,7 @@ export const Step3: FC = () => {
         remoteDeploymentGasFees:
           state.remoteDeploymentGasFees?.gasFees.map((x) => x.fee) ?? [],
         sourceChainId: sourceChain?.id ?? "",
-      },
+      }
     );
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -133,12 +133,12 @@ export const Step3: FC = () => {
       rootActions,
       validDestinationChainIds.length,
       addTransaction,
-    ],
+    ]
   );
 
   const eligibleChains = useMemo(
     () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
-    [state.evmChains, chainId],
+    [state.evmChains, chainId]
   );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);

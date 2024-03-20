@@ -4,15 +4,15 @@ import { useSearchParams } from "next/navigation";
 
 export default function useQueryStringState<TState extends string>(
   key: string,
-  initialState: TState | (() => TState) = "" as TState,
+  initialState: TState | (() => TState) = "" as TState
 ) {
   const searchParams = useSearchParams();
 
   const [state, setState] = useState<TState>(() =>
     Maybe.of(searchParams.get(key)).mapOr(
       typeof initialState === "function" ? initialState() : initialState,
-      (value) => value as TState,
-    ),
+      (value) => value as TState
+    )
   );
 
   useEffect(() => {

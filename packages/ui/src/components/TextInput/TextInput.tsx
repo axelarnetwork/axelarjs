@@ -42,5 +42,5 @@ export interface TextInputProps extends ComponentProps<typeof StyledTextInput> {
 
 // this is only forwarded so the `type` prop can is restricted to the types we want
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  (props, ref) => <StyledTextInput {...props} ref={ref} />,
+  (props, ref) => <StyledTextInput {...props} ref={ref} />
 );
