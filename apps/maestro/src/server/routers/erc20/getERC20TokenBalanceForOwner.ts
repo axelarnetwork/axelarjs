@@ -28,7 +28,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     if (!chainConfig) {
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: "Invalid chainId",
+        message: `Invalid chainId: ${input.chainId}`,
       });
     }
 
