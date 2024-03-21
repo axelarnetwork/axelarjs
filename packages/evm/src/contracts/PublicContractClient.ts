@@ -12,6 +12,11 @@ import { mainnet } from "viem/chains";
 
 type PublicClientType = ReturnType<typeof createPublicClient>;
 
+/**
+ * Public contract client
+ *
+ * A client for interacting with public contracts
+ */
 export class PublicContractClient<TAbi extends readonly unknown[]> {
   private client: PublicClientType;
   private provider: WalletClient;
