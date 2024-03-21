@@ -36,11 +36,11 @@
     "compile": "tsc --noEmit",
     "postinstall": "tsx scripts/postinstall.ts",
     "codegen": "./scripts/codegen-its.sh && pnpm build && pnpm docgen",
-    "docgen": "typedoc src/index.ts",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write src",
     "test": "vitest run src",
+    "docgen": "typedoc",
     "deploy:docs": "gh-pages -d docs -e evm"
   },
   "keywords": [],
