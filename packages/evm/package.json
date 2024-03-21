@@ -41,7 +41,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write src",
     "test": "vitest run src",
-    "deploy:docs": "gh-pages -d docs"
+    "deploy:docs": "gh-pages -d docs -e evm"
   },
   "keywords": [],
   "author": "",
