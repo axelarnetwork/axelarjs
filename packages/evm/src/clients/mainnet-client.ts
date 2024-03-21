@@ -21,7 +21,10 @@ import {
   scroll,
 } from "viem/chains";
 
-const MAINNET_CHAINS = {
+/**
+ * Mainnet chains
+ */
+export const MAINNET_CHAINS = {
   mainnet,
   fantom,
   filecoin,

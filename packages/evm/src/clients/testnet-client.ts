@@ -21,7 +21,10 @@ import {
   sepolia,
 } from "viem/chains";
 
-const TESTNET_CHAINS = {
+/**
+ * Testnet chains
+ */
+export const TESTNET_CHAINS = {
   sepolia,
   arbitrumSepolia,
   baseSepolia,
