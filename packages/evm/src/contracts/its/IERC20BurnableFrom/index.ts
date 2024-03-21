@@ -17,6 +17,20 @@ export * from "./IERC20BurnableFrom.args";
 
 export const IERC20_BURNABLE_FROM_ABI = ABI_FILE.abi;
 
+/**
+ * IERC20BurnableFromClient
+ *
+ * @description Type-safe contract client for IERC20BurnableFrom
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIERC20BurnableFromClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IERC20BurnableFromClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {

@@ -20,6 +20,20 @@ export * from "./IOperator.args";
 
 export const IOPERATOR_ABI = ABI_FILE.abi;
 
+/**
+ * IOperatorClient
+ *
+ * @description Type-safe contract client for IOperator
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIOperatorClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IOperatorClient extends PublicContractClient<typeof ABI_FILE.abi> {
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;

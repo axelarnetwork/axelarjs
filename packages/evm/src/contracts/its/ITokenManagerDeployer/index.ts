@@ -17,6 +17,20 @@ export * from "./ITokenManagerDeployer.args";
 
 export const ITOKEN_MANAGER_DEPLOYER_ABI = ABI_FILE.abi;
 
+/**
+ * ITokenManagerDeployerClient
+ *
+ * @description Type-safe contract client for ITokenManagerDeployer
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createITokenManagerDeployerClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class ITokenManagerDeployerClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {

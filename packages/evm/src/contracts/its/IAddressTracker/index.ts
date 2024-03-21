@@ -20,6 +20,20 @@ export * from "./IAddressTracker.args";
 
 export const IADDRESS_TRACKER_ABI = ABI_FILE.abi;
 
+/**
+ * IAddressTrackerClient
+ *
+ * @description Type-safe contract client for IAddressTracker
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIAddressTrackerClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IAddressTrackerClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {

@@ -20,6 +20,20 @@ export * from "./InterchainTokenStandard.args";
 
 export const INTERCHAIN_TOKEN_STANDARD_ABI = ABI_FILE.abi;
 
+/**
+ * InterchainTokenStandardClient
+ *
+ * @description Type-safe contract client for InterchainTokenStandard
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createInterchainTokenStandardClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class InterchainTokenStandardClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {

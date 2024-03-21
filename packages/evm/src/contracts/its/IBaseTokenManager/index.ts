@@ -20,6 +20,20 @@ export * from "./IBaseTokenManager.args";
 
 export const IBASE_TOKEN_MANAGER_ABI = ABI_FILE.abi;
 
+/**
+ * IBaseTokenManagerClient
+ *
+ * @description Type-safe contract client for IBaseTokenManager
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIBaseTokenManagerClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IBaseTokenManagerClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {

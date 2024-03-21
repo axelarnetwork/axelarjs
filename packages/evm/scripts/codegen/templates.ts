@@ -27,6 +27,20 @@ export const INDEX_FILE = ({
 
   export const ${constantName}_ABI = ABI_FILE.abi;
   
+  /**
+   * ${pascalName}Client
+   * 
+   * @description Type-safe contract client for ${pascalName}
+   * 
+   * @example
+   * 
+   * import { sepolia } from "viem/chains";
+   * 
+   * const client = create${pascalName}Client({
+   *  chain: sepolia,
+   *  address: "0x1234..."
+   * });
+   */
   export class ${pascalName}Client extends PublicContractClient<
     typeof ABI_FILE.abi
   > {
