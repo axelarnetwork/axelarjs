@@ -5,6 +5,10 @@
 
 EVM sdk for Axelar Network
 
+## Docs
+
+A comprehensive typescript modules documentation can be found [here](https://axelarnetwork.github.io/axelarjs/evm/)
+
 ## Guides
 
 ### Upgrading ITS contracts
