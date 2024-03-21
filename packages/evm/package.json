@@ -40,7 +40,8 @@
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write src",
-    "test": "vitest run src"
+    "test": "vitest run src",
+    "deploy:docs": "gh-pages -d docs"
   },
   "keywords": [],
   "author": "",
@@ -59,6 +60,7 @@
     "@types/prettier": "^2.7.3",
     "commander": "^11.1.0",
     "dotenv": "^16.4.5",
+    "gh-pages": "^6.1.1",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "strip-ansi": "^6.0.1",
