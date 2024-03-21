@@ -31,3 +31,8 @@ export class TokenHandlerClient extends PublicContractClient<
     });
   }
 }
+
+export const createTokenHandlerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new TokenHandlerClient(options);

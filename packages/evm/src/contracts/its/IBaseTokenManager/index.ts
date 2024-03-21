@@ -38,3 +38,8 @@ export class IBaseTokenManagerClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createIBaseTokenManagerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IBaseTokenManagerClient(options);

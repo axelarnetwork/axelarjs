@@ -31,3 +31,8 @@ export class IInterchainTokenStandardClient extends PublicContractClient<
     });
   }
 }
+
+export const createIInterchainTokenStandardClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IInterchainTokenStandardClient(options);

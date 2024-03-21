@@ -38,3 +38,8 @@ export class ERC20PermitClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createERC20PermitClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ERC20PermitClient(options);

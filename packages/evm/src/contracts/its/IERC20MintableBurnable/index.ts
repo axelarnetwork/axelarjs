@@ -31,3 +31,8 @@ export class IERC20MintableBurnableClient extends PublicContractClient<
     });
   }
 }
+
+export const createIERC20MintableBurnableClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IERC20MintableBurnableClient(options);

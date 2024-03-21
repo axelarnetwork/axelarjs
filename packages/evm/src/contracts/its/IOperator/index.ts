@@ -36,3 +36,8 @@ export class IOperatorClient extends PublicContractClient<typeof ABI_FILE.abi> {
     this.reads = createReadClient(this);
   }
 }
+
+export const createIOperatorClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IOperatorClient(options);

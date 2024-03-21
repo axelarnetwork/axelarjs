@@ -36,3 +36,8 @@ export class IMinterClient extends PublicContractClient<typeof ABI_FILE.abi> {
     this.reads = createReadClient(this);
   }
 }
+
+export const createIMinterClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IMinterClient(options);

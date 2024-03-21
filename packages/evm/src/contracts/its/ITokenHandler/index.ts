@@ -31,3 +31,8 @@ export class ITokenHandlerClient extends PublicContractClient<
     });
   }
 }
+
+export const createITokenHandlerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ITokenHandlerClient(options);
