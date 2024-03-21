@@ -17,6 +17,20 @@ export * from "./IERC20MintableBurnable.args";
 
 export const IERC20_MINTABLE_BURNABLE_ABI = ABI_FILE.abi;
 
+/**
+ * IERC20MintableBurnableClient
+ *
+ * @description Type-safe contract client for IERC20MintableBurnable
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIERC20MintableBurnableClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IERC20MintableBurnableClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {

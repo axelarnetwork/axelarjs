@@ -17,6 +17,20 @@ export * from "./TokenHandler.args";
 
 export const TOKEN_HANDLER_ABI = ABI_FILE.abi;
 
+/**
+ * TokenHandlerClient
+ *
+ * @description Type-safe contract client for TokenHandler
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createTokenHandlerClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class TokenHandlerClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {
