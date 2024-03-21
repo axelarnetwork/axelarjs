@@ -38,3 +38,8 @@ export class ITokenManagerClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createITokenManagerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ITokenManagerClient(options);

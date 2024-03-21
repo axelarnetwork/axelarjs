@@ -38,3 +38,8 @@ export class IAddressTrackerClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createIAddressTrackerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IAddressTrackerClient(options);

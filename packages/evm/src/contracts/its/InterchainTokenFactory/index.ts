@@ -38,3 +38,8 @@ export class InterchainTokenFactoryClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createInterchainTokenFactoryClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new InterchainTokenFactoryClient(options);

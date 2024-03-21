@@ -38,3 +38,8 @@ export class TokenManagerClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createTokenManagerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new TokenManagerClient(options);

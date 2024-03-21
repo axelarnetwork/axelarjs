@@ -38,3 +38,8 @@ export class IERC20NamedClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createIERC20NamedClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IERC20NamedClient(options);

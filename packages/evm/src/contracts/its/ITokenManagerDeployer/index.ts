@@ -31,3 +31,8 @@ export class ITokenManagerDeployerClient extends PublicContractClient<
     });
   }
 }
+
+export const createITokenManagerDeployerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ITokenManagerDeployerClient(options);

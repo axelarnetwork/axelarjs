@@ -48,7 +48,10 @@ export const INDEX_FILE = ({
 
       ${hasReadFns ? `this.reads = createReadClient(this);` : ""}
     }
-  }`;
+  }
+  
+  export const create${pascalName}Client = (options: { chain: Chain; address: \`0x\${string}\` }) => new ${pascalName}Client(options);
+  `;
 
 function getDefaultArgName(functionName: string, argIndex: number) {
   if (functionName === "allowance") {

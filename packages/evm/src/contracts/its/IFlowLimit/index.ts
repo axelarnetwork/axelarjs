@@ -38,3 +38,8 @@ export class IFlowLimitClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createIFlowLimitClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IFlowLimitClient(options);

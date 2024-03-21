@@ -31,3 +31,8 @@ export class IInterchainTokenExpressExecutableClient extends PublicContractClien
     });
   }
 }
+
+export const createIInterchainTokenExpressExecutableClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IInterchainTokenExpressExecutableClient(options);

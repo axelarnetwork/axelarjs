@@ -38,3 +38,8 @@ export class ITokenManagerProxyClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createITokenManagerProxyClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ITokenManagerProxyClient(options);
