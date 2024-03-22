@@ -19,6 +19,7 @@ Simulate a `link` transaction
 ```ts
 import { AXELAR_RPC_URLS } from "@axelarjs/core";
 import { STANDARD_FEE } from "@axelarjs/cosmos/constants";
+import { createAxelarSigningClient } from "@axelarjs/cosmos/constants/stargateClient";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
@@ -55,6 +56,7 @@ Broadcast a `link` transaction
 ```ts
 import { AXELAR_RPC_URLS } from "@axelarjs/core";
 import { STANDARD_FEE } from "@axelarjs/cosmos/constants";
+import { createAxelarSigningClient } from "@axelarjs/cosmos/constants/stargateClient";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
