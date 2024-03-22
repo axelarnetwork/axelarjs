@@ -28,7 +28,7 @@ export const VoteRequest = {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.pollId);
     }
     if (message.vote !== undefined) {
@@ -90,7 +90,7 @@ export const VoteRequest = {
     if (message.sender.length !== 0) {
       obj.sender = base64FromBytes(message.sender);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     if (message.vote !== undefined) {

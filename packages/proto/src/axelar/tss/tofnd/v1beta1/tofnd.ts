@@ -1120,7 +1120,7 @@ export const TrafficIn = {
     if (message.payload.length !== 0) {
       writer.uint32(18).bytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       writer.uint32(24).bool(message.isBroadcast);
     }
     return writer;
@@ -1186,7 +1186,7 @@ export const TrafficIn = {
     if (message.payload.length !== 0) {
       obj.payload = base64FromBytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       obj.isBroadcast = message.isBroadcast;
     }
     return obj;
@@ -1221,7 +1221,7 @@ export const TrafficOut = {
     if (message.payload.length !== 0) {
       writer.uint32(18).bytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       writer.uint32(24).bool(message.isBroadcast);
     }
     return writer;
@@ -1287,7 +1287,7 @@ export const TrafficOut = {
     if (message.payload.length !== 0) {
       obj.payload = base64FromBytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       obj.isBroadcast = message.isBroadcast;
     }
     return obj;

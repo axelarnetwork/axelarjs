@@ -368,7 +368,7 @@ export const SubmitSignatureRequest = {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sigId);
     }
     if (message.signature.length !== 0) {
@@ -433,7 +433,7 @@ export const SubmitSignatureRequest = {
     if (message.sender !== "") {
       obj.sender = message.sender;
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       obj.sigId = (message.sigId || Long.UZERO).toString();
     }
     if (message.signature.length !== 0) {

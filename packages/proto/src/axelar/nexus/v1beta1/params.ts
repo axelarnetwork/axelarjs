@@ -13,7 +13,6 @@ export interface Params {
   chainMaintainerIncorrectVoteThreshold?: Threshold | undefined;
   chainMaintainerCheckWindow: number;
   gateway: Uint8Array;
-  endBlockerLimit: Long;
 }
 
 function createBaseParams(): Params {
@@ -23,7 +22,6 @@ function createBaseParams(): Params {
     chainMaintainerIncorrectVoteThreshold: undefined,
     chainMaintainerCheckWindow: 0,
     gateway: new Uint8Array(0),
-    endBlockerLimit: Long.UZERO,
   };
 }
 
@@ -55,9 +53,6 @@ export const Params = {
     }
     if (message.gateway.length !== 0) {
       writer.uint32(42).bytes(message.gateway);
-    }
-    if (!message.endBlockerLimit.isZero()) {
-      writer.uint32(48).uint64(message.endBlockerLimit);
     }
     return writer;
   },
@@ -114,13 +109,6 @@ export const Params = {
 
           message.gateway = reader.bytes();
           continue;
-        case 6:
-          if (tag !== 48) {
-            break;
-          }
-
-          message.endBlockerLimit = reader.uint64() as Long;
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -151,9 +139,6 @@ export const Params = {
       gateway: isSet(object.gateway)
         ? bytesFromBase64(object.gateway)
         : new Uint8Array(0),
-      endBlockerLimit: isSet(object.endBlockerLimit)
-        ? Long.fromValue(object.endBlockerLimit)
-        : Long.UZERO,
     };
   },
 
@@ -182,9 +167,6 @@ export const Params = {
     if (message.gateway.length !== 0) {
       obj.gateway = base64FromBytes(message.gateway);
     }
-    if (!message.endBlockerLimit.isZero()) {
-      obj.endBlockerLimit = (message.endBlockerLimit || Long.UZERO).toString();
-    }
     return obj;
   },
 
@@ -210,10 +192,6 @@ export const Params = {
         : undefined;
     message.chainMaintainerCheckWindow = object.chainMaintainerCheckWindow ?? 0;
     message.gateway = object.gateway ?? new Uint8Array(0);
-    message.endBlockerLimit =
-      object.endBlockerLimit !== undefined && object.endBlockerLimit !== null
-        ? Long.fromValue(object.endBlockerLimit)
-        : Long.UZERO;
     return message;
   },
 };

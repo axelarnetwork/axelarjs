@@ -42,7 +42,7 @@ export const TalliedVote = {
     if (message.data !== undefined) {
       Any.encode(message.data, writer.uint32(26).fork()).ldelim();
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.pollId);
     }
     Object.entries(message.isVoterLate).forEach(([key, value]) => {
@@ -132,7 +132,7 @@ export const TalliedVote = {
     if (message.data !== undefined) {
       obj.data = Any.toJSON(message.data);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     if (message.isVoterLate) {
@@ -187,7 +187,7 @@ export const TalliedVote_IsVoterLateEntry = {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
-    if (message.value === true) {
+    if (message.value !== false) {
       writer.uint32(16).bool(message.value);
     }
     return writer;
@@ -239,7 +239,7 @@ export const TalliedVote_IsVoterLateEntry = {
     if (message.key !== "") {
       obj.key = message.key;
     }
-    if (message.value === true) {
+    if (message.value !== false) {
       obj.value = message.value;
     }
     return obj;

@@ -981,7 +981,7 @@ export const QueryTokenAddressResponse = {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
-    if (message.confirmed === true) {
+    if (message.confirmed !== false) {
       writer.uint32(16).bool(message.confirmed);
     }
     return writer;
@@ -1035,7 +1035,7 @@ export const QueryTokenAddressResponse = {
     if (message.address !== "") {
       obj.address = message.address;
     }
-    if (message.confirmed === true) {
+    if (message.confirmed !== false) {
       obj.confirmed = message.confirmed;
     }
     return obj;
@@ -2621,7 +2621,7 @@ export const ConfirmationHeightResponse = {
     message: ConfirmationHeightResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.height);
     }
     return writer;
@@ -2662,7 +2662,7 @@ export const ConfirmationHeightResponse = {
 
   toJSON(message: ConfirmationHeightResponse): unknown {
     const obj: any = {};
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.UZERO)) {
       obj.height = (message.height || Long.UZERO).toString();
     }
     return obj;
@@ -3360,10 +3360,10 @@ export const TokenInfoResponse = {
     if (message.address !== "") {
       writer.uint32(26).string(message.address);
     }
-    if (message.confirmed === true) {
+    if (message.confirmed !== false) {
       writer.uint32(32).bool(message.confirmed);
     }
-    if (message.isExternal === true) {
+    if (message.isExternal !== false) {
       writer.uint32(40).bool(message.isExternal);
     }
     if (message.burnerCodeHash !== "") {
@@ -3461,10 +3461,10 @@ export const TokenInfoResponse = {
     if (message.address !== "") {
       obj.address = message.address;
     }
-    if (message.confirmed === true) {
+    if (message.confirmed !== false) {
       obj.confirmed = message.confirmed;
     }
-    if (message.isExternal === true) {
+    if (message.isExternal !== false) {
       obj.isExternal = message.isExternal;
     }
     if (message.burnerCodeHash !== "") {

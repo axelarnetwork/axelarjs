@@ -116,10 +116,10 @@ export const IBCTransfer = {
     if (message.channelId !== "") {
       writer.uint32(42).string(message.channelId);
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       writer.uint32(48).uint64(message.sequence);
     }
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(56).uint64(message.id);
     }
     if (message.status !== 0) {
@@ -241,10 +241,10 @@ export const IBCTransfer = {
     if (message.channelId !== "") {
       obj.channelId = message.channelId;
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       obj.sequence = (message.sequence || Long.UZERO).toString();
     }
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     if (message.status !== 0) {

@@ -188,7 +188,7 @@ export const PollFailed = {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.pollId);
     }
     return writer;
@@ -250,7 +250,7 @@ export const PollFailed = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     return obj;
@@ -288,7 +288,7 @@ export const PollExpired = {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.pollId);
     }
     return writer;
@@ -350,7 +350,7 @@ export const PollExpired = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     return obj;
@@ -388,7 +388,7 @@ export const PollCompleted = {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.pollId);
     }
     return writer;
@@ -450,7 +450,7 @@ export const PollCompleted = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     return obj;
@@ -490,7 +490,7 @@ export const NoEventsConfirmed = {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.pollId);
     }
     return writer;
@@ -552,7 +552,7 @@ export const NoEventsConfirmed = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     return obj;
@@ -601,7 +601,7 @@ export const ConfirmKeyTransferStarted = {
     if (message.gatewayAddress.length !== 0) {
       writer.uint32(26).bytes(message.gatewayAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.confirmationHeight);
     }
     if (message.participants !== undefined) {
@@ -700,7 +700,7 @@ export const ConfirmKeyTransferStarted = {
     if (message.gatewayAddress.length !== 0) {
       obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
       ).toString();
@@ -760,7 +760,7 @@ export const ConfirmGatewayTxStarted = {
     if (message.gatewayAddress.length !== 0) {
       writer.uint32(26).bytes(message.gatewayAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.confirmationHeight);
     }
     if (message.participants !== undefined) {
@@ -859,7 +859,7 @@ export const ConfirmGatewayTxStarted = {
     if (message.gatewayAddress.length !== 0) {
       obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
       ).toString();
@@ -907,7 +907,7 @@ export const PollMapping = {
     if (message.txId.length !== 0) {
       writer.uint32(10).bytes(message.txId);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.pollId);
     }
     return writer;
@@ -958,7 +958,7 @@ export const PollMapping = {
     if (message.txId.length !== 0) {
       obj.txId = base64FromBytes(message.txId);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     return obj;
@@ -1004,7 +1004,7 @@ export const ConfirmGatewayTxsStarted = {
     if (message.gatewayAddress.length !== 0) {
       writer.uint32(26).bytes(message.gatewayAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.confirmationHeight);
     }
     for (const v of message.participants) {
@@ -1099,7 +1099,7 @@ export const ConfirmGatewayTxsStarted = {
     if (message.gatewayAddress.length !== 0) {
       obj.gatewayAddress = base64FromBytes(message.gatewayAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
       ).toString();
@@ -1162,7 +1162,7 @@ export const ConfirmDepositStarted = {
     if (message.tokenAddress.length !== 0) {
       writer.uint32(34).bytes(message.tokenAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       writer.uint32(40).uint64(message.confirmationHeight);
     }
     if (message.participants !== undefined) {
@@ -1285,7 +1285,7 @@ export const ConfirmDepositStarted = {
     if (message.tokenAddress.length !== 0) {
       obj.tokenAddress = base64FromBytes(message.tokenAddress);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
       ).toString();
@@ -1361,7 +1361,7 @@ export const ConfirmTokenStarted = {
         writer.uint32(42).fork()
       ).ldelim();
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       writer.uint32(48).uint64(message.confirmationHeight);
     }
     if (message.participants !== undefined) {
@@ -1483,7 +1483,7 @@ export const ConfirmTokenStarted = {
     if (message.tokenDetails !== undefined) {
       obj.tokenDetails = TokenDetails.toJSON(message.tokenDetails);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
       ).toString();
@@ -2621,7 +2621,7 @@ export const TokenSent = {
     if (message.eventId !== "") {
       writer.uint32(18).string(message.eventId);
     }
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.transferId);
     }
     if (message.sender !== "") {
@@ -2731,7 +2731,7 @@ export const TokenSent = {
     if (message.eventId !== "") {
       obj.eventId = message.eventId;
     }
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.sender !== "") {
@@ -2792,7 +2792,7 @@ export const MintCommand = {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
     }
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.transferId);
     }
     if (message.commandId.length !== 0) {
@@ -2893,7 +2893,7 @@ export const MintCommand = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.commandId.length !== 0) {

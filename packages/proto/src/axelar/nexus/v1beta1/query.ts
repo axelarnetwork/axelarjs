@@ -206,14 +206,10 @@ export interface TransferRateLimitResponse {
 export interface TransferRateLimit {
   limit: Uint8Array;
   window?: Duration | undefined;
-  /** @deprecated */
   incoming: Uint8Array;
-  /** @deprecated */
   outgoing: Uint8Array;
   /** time_left indicates the time left in the rate limit window */
   timeLeft?: Duration | undefined;
-  from: Uint8Array;
-  to: Uint8Array;
 }
 
 export interface MessageRequest {
@@ -1986,8 +1982,6 @@ function createBaseTransferRateLimit(): TransferRateLimit {
     incoming: new Uint8Array(0),
     outgoing: new Uint8Array(0),
     timeLeft: undefined,
-    from: new Uint8Array(0),
-    to: new Uint8Array(0),
   };
 }
 
@@ -2010,12 +2004,6 @@ export const TransferRateLimit = {
     }
     if (message.timeLeft !== undefined) {
       Duration.encode(message.timeLeft, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.from.length !== 0) {
-      writer.uint32(50).bytes(message.from);
-    }
-    if (message.to.length !== 0) {
-      writer.uint32(58).bytes(message.to);
     }
     return writer;
   },
@@ -2063,20 +2051,6 @@ export const TransferRateLimit = {
 
           message.timeLeft = Duration.decode(reader, reader.uint32());
           continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.from = reader.bytes();
-          continue;
-        case 7:
-          if (tag !== 58) {
-            break;
-          }
-
-          message.to = reader.bytes();
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2103,10 +2077,6 @@ export const TransferRateLimit = {
       timeLeft: isSet(object.timeLeft)
         ? Duration.fromJSON(object.timeLeft)
         : undefined,
-      from: isSet(object.from)
-        ? bytesFromBase64(object.from)
-        : new Uint8Array(0),
-      to: isSet(object.to) ? bytesFromBase64(object.to) : new Uint8Array(0),
     };
   },
 
@@ -2126,12 +2096,6 @@ export const TransferRateLimit = {
     }
     if (message.timeLeft !== undefined) {
       obj.timeLeft = Duration.toJSON(message.timeLeft);
-    }
-    if (message.from.length !== 0) {
-      obj.from = base64FromBytes(message.from);
-    }
-    if (message.to.length !== 0) {
-      obj.to = base64FromBytes(message.to);
     }
     return obj;
   },
@@ -2156,8 +2120,6 @@ export const TransferRateLimit = {
       object.timeLeft !== undefined && object.timeLeft !== null
         ? Duration.fromPartial(object.timeLeft)
         : undefined;
-    message.from = object.from ?? new Uint8Array(0);
-    message.to = object.to ?? new Uint8Array(0);
     return message;
   },
 };

@@ -46,19 +46,19 @@ export const Params = {
         writer.uint32(18).fork()
       ).ldelim();
     }
-    if (!message.keygenTimeout.isZero()) {
+    if (!message.keygenTimeout.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.keygenTimeout);
     }
-    if (!message.keygenGracePeriod.isZero()) {
+    if (!message.keygenGracePeriod.equals(Long.ZERO)) {
       writer.uint32(32).int64(message.keygenGracePeriod);
     }
-    if (!message.signingTimeout.isZero()) {
+    if (!message.signingTimeout.equals(Long.ZERO)) {
       writer.uint32(40).int64(message.signingTimeout);
     }
-    if (!message.signingGracePeriod.isZero()) {
+    if (!message.signingGracePeriod.equals(Long.ZERO)) {
       writer.uint32(48).int64(message.signingGracePeriod);
     }
-    if (!message.activeEpochCount.isZero()) {
+    if (!message.activeEpochCount.equals(Long.UZERO)) {
       writer.uint32(56).uint64(message.activeEpochCount);
     }
     return writer;
@@ -164,23 +164,23 @@ export const Params = {
     if (message.signingThreshold !== undefined) {
       obj.signingThreshold = Threshold.toJSON(message.signingThreshold);
     }
-    if (!message.keygenTimeout.isZero()) {
+    if (!message.keygenTimeout.equals(Long.ZERO)) {
       obj.keygenTimeout = (message.keygenTimeout || Long.ZERO).toString();
     }
-    if (!message.keygenGracePeriod.isZero()) {
+    if (!message.keygenGracePeriod.equals(Long.ZERO)) {
       obj.keygenGracePeriod = (
         message.keygenGracePeriod || Long.ZERO
       ).toString();
     }
-    if (!message.signingTimeout.isZero()) {
+    if (!message.signingTimeout.equals(Long.ZERO)) {
       obj.signingTimeout = (message.signingTimeout || Long.ZERO).toString();
     }
-    if (!message.signingGracePeriod.isZero()) {
+    if (!message.signingGracePeriod.equals(Long.ZERO)) {
       obj.signingGracePeriod = (
         message.signingGracePeriod || Long.ZERO
       ).toString();
     }
-    if (!message.activeEpochCount.isZero()) {
+    if (!message.activeEpochCount.equals(Long.UZERO)) {
       obj.activeEpochCount = (
         message.activeEpochCount || Long.UZERO
       ).toString();

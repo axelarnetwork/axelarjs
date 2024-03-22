@@ -56,7 +56,7 @@ export const Params = {
     if (message.chain !== "") {
       writer.uint32(10).string(message.chain);
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.confirmationHeight);
     }
     if (message.network !== "") {
@@ -68,7 +68,7 @@ export const Params = {
     if (message.burnable.length !== 0) {
       writer.uint32(50).bytes(message.burnable);
     }
-    if (!message.revoteLockingPeriod.isZero()) {
+    if (!message.revoteLockingPeriod.equals(Long.ZERO)) {
       writer.uint32(56).int64(message.revoteLockingPeriod);
     }
     for (const v of message.networks) {
@@ -80,19 +80,19 @@ export const Params = {
         writer.uint32(74).fork()
       ).ldelim();
     }
-    if (!message.minVoterCount.isZero()) {
+    if (!message.minVoterCount.equals(Long.ZERO)) {
       writer.uint32(80).int64(message.minVoterCount);
     }
     if (message.commandsGasLimit !== 0) {
       writer.uint32(88).uint32(message.commandsGasLimit);
     }
-    if (!message.votingGracePeriod.isZero()) {
+    if (!message.votingGracePeriod.equals(Long.ZERO)) {
       writer.uint32(104).int64(message.votingGracePeriod);
     }
-    if (!message.endBlockerLimit.isZero()) {
+    if (!message.endBlockerLimit.equals(Long.ZERO)) {
       writer.uint32(112).int64(message.endBlockerLimit);
     }
-    if (!message.transferLimit.isZero()) {
+    if (!message.transferLimit.equals(Long.UZERO)) {
       writer.uint32(120).uint64(message.transferLimit);
     }
     return writer;
@@ -251,7 +251,7 @@ export const Params = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.confirmationHeight.isZero()) {
+    if (!message.confirmationHeight.equals(Long.UZERO)) {
       obj.confirmationHeight = (
         message.confirmationHeight || Long.UZERO
       ).toString();
@@ -265,7 +265,7 @@ export const Params = {
     if (message.burnable.length !== 0) {
       obj.burnable = base64FromBytes(message.burnable);
     }
-    if (!message.revoteLockingPeriod.isZero()) {
+    if (!message.revoteLockingPeriod.equals(Long.ZERO)) {
       obj.revoteLockingPeriod = (
         message.revoteLockingPeriod || Long.ZERO
       ).toString();
@@ -276,21 +276,21 @@ export const Params = {
     if (message.votingThreshold !== undefined) {
       obj.votingThreshold = Threshold.toJSON(message.votingThreshold);
     }
-    if (!message.minVoterCount.isZero()) {
+    if (!message.minVoterCount.equals(Long.ZERO)) {
       obj.minVoterCount = (message.minVoterCount || Long.ZERO).toString();
     }
     if (message.commandsGasLimit !== 0) {
       obj.commandsGasLimit = Math.round(message.commandsGasLimit);
     }
-    if (!message.votingGracePeriod.isZero()) {
+    if (!message.votingGracePeriod.equals(Long.ZERO)) {
       obj.votingGracePeriod = (
         message.votingGracePeriod || Long.ZERO
       ).toString();
     }
-    if (!message.endBlockerLimit.isZero()) {
+    if (!message.endBlockerLimit.equals(Long.ZERO)) {
       obj.endBlockerLimit = (message.endBlockerLimit || Long.ZERO).toString();
     }
-    if (!message.transferLimit.isZero()) {
+    if (!message.transferLimit.equals(Long.UZERO)) {
       obj.transferLimit = (message.transferLimit || Long.UZERO).toString();
     }
     return obj;

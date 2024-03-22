@@ -27,7 +27,7 @@ export const Params = {
         writer.uint32(10).fork()
       ).ldelim();
     }
-    if (!message.endBlockerLimit.isZero()) {
+    if (!message.endBlockerLimit.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.endBlockerLimit);
     }
     return writer;
@@ -85,7 +85,7 @@ export const Params = {
         message.defaultVotingThreshold
       );
     }
-    if (!message.endBlockerLimit.isZero()) {
+    if (!message.endBlockerLimit.equals(Long.ZERO)) {
       obj.endBlockerLimit = (message.endBlockerLimit || Long.ZERO).toString();
     }
     return obj;

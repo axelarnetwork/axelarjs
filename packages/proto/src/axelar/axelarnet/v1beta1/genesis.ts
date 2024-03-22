@@ -234,7 +234,7 @@ export const GenesisState_SeqIdMappingEntry = {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
-    if (!message.value.isZero()) {
+    if (!message.value.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.value);
     }
     return writer;
@@ -286,7 +286,7 @@ export const GenesisState_SeqIdMappingEntry = {
     if (message.key !== "") {
       obj.key = message.key;
     }
-    if (!message.value.isZero()) {
+    if (!message.value.equals(Long.UZERO)) {
       obj.value = (message.value || Long.UZERO).toString();
     }
     return obj;
