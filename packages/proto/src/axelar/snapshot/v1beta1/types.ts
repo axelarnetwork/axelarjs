@@ -29,7 +29,7 @@ export const ProxiedValidator = {
     if (message.proxy.length !== 0) {
       writer.uint32(18).bytes(message.proxy);
     }
-    if (message.active === true) {
+    if (message.active !== false) {
       writer.uint32(24).bool(message.active);
     }
     return writer;
@@ -93,7 +93,7 @@ export const ProxiedValidator = {
     if (message.proxy.length !== 0) {
       obj.proxy = base64FromBytes(message.proxy);
     }
-    if (message.active === true) {
+    if (message.active !== false) {
       obj.active = message.active;
     }
     return obj;

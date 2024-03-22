@@ -111,7 +111,7 @@ export const IBCTransferSent = {
     message: IBCTransferSent,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.id);
     }
     if (message.receipient !== "") {
@@ -120,7 +120,7 @@ export const IBCTransferSent = {
     if (message.asset !== undefined) {
       Coin.encode(message.asset, writer.uint32(26).fork()).ldelim();
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.sequence);
     }
     if (message.portId !== "") {
@@ -223,7 +223,7 @@ export const IBCTransferSent = {
 
   toJSON(message: IBCTransferSent): unknown {
     const obj: any = {};
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     if (message.receipient !== "") {
@@ -232,7 +232,7 @@ export const IBCTransferSent = {
     if (message.asset !== undefined) {
       obj.asset = Coin.toJSON(message.asset);
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       obj.sequence = (message.sequence || Long.UZERO).toString();
     }
     if (message.portId !== "") {
@@ -285,10 +285,10 @@ export const IBCTransferCompleted = {
     message: IBCTransferCompleted,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.id);
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sequence);
     }
     if (message.portId !== "") {
@@ -363,10 +363,10 @@ export const IBCTransferCompleted = {
 
   toJSON(message: IBCTransferCompleted): unknown {
     const obj: any = {};
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       obj.sequence = (message.sequence || Long.UZERO).toString();
     }
     if (message.portId !== "") {
@@ -410,10 +410,10 @@ export const IBCTransferFailed = {
     message: IBCTransferFailed,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.id);
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sequence);
     }
     if (message.portId !== "") {
@@ -485,10 +485,10 @@ export const IBCTransferFailed = {
 
   toJSON(message: IBCTransferFailed): unknown {
     const obj: any = {};
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       obj.sequence = (message.sequence || Long.UZERO).toString();
     }
     if (message.portId !== "") {
@@ -540,7 +540,7 @@ export const IBCTransferRetried = {
     message: IBCTransferRetried,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.id);
     }
     if (message.receipient !== "") {
@@ -549,7 +549,7 @@ export const IBCTransferRetried = {
     if (message.asset !== undefined) {
       Coin.encode(message.asset, writer.uint32(26).fork()).ldelim();
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.sequence);
     }
     if (message.portId !== "") {
@@ -652,7 +652,7 @@ export const IBCTransferRetried = {
 
   toJSON(message: IBCTransferRetried): unknown {
     const obj: any = {};
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     if (message.receipient !== "") {
@@ -661,7 +661,7 @@ export const IBCTransferRetried = {
     if (message.asset !== undefined) {
       obj.asset = Coin.toJSON(message.asset);
     }
-    if (!message.sequence.isZero()) {
+    if (!message.sequence.equals(Long.UZERO)) {
       obj.sequence = (message.sequence || Long.UZERO).toString();
     }
     if (message.portId !== "") {
@@ -714,7 +714,7 @@ export const AxelarTransferCompleted = {
     message: AxelarTransferCompleted,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.id);
     }
     if (message.receipient !== "") {
@@ -792,7 +792,7 @@ export const AxelarTransferCompleted = {
 
   toJSON(message: AxelarTransferCompleted): unknown {
     const obj: any = {};
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     if (message.receipient !== "") {
@@ -1450,7 +1450,7 @@ export const TokenSent = {
     message: TokenSent,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.transferId);
     }
     if (message.sender !== "") {
@@ -1551,7 +1551,7 @@ export const TokenSent = {
 
   toJSON(message: TokenSent): unknown {
     const obj: any = {};
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.sender !== "") {

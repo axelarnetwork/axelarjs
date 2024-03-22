@@ -68,7 +68,7 @@ export const FeeDeducted = {
     message: FeeDeducted,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.transferId);
     }
     if (message.recipientChain !== "") {
@@ -156,7 +156,7 @@ export const FeeDeducted = {
 
   toJSON(message: FeeDeducted): unknown {
     const obj: any = {};
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.recipientChain !== "") {
@@ -214,7 +214,7 @@ export const InsufficientFee = {
     message: InsufficientFee,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.transferId);
     }
     if (message.recipientChain !== "") {
@@ -302,7 +302,7 @@ export const InsufficientFee = {
 
   toJSON(message: InsufficientFee): unknown {
     const obj: any = {};
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.recipientChain !== "") {

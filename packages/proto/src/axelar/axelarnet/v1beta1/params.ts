@@ -35,13 +35,13 @@ export const Params = {
     message: Params,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.routeTimeoutWindow.isZero()) {
+    if (!message.routeTimeoutWindow.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.routeTimeoutWindow);
     }
-    if (!message.transferLimit.isZero()) {
+    if (!message.transferLimit.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.transferLimit);
     }
-    if (!message.endBlockerLimit.isZero()) {
+    if (!message.endBlockerLimit.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.endBlockerLimit);
     }
     for (const v of message.callContractsProposalMinDeposits) {
@@ -123,15 +123,15 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (!message.routeTimeoutWindow.isZero()) {
+    if (!message.routeTimeoutWindow.equals(Long.UZERO)) {
       obj.routeTimeoutWindow = (
         message.routeTimeoutWindow || Long.UZERO
       ).toString();
     }
-    if (!message.transferLimit.isZero()) {
+    if (!message.transferLimit.equals(Long.UZERO)) {
       obj.transferLimit = (message.transferLimit || Long.UZERO).toString();
     }
-    if (!message.endBlockerLimit.isZero()) {
+    if (!message.endBlockerLimit.equals(Long.UZERO)) {
       obj.endBlockerLimit = (message.endBlockerLimit || Long.UZERO).toString();
     }
     if (message.callContractsProposalMinDeposits?.length) {

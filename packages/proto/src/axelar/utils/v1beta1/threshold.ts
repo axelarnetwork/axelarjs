@@ -22,10 +22,10 @@ export const Threshold = {
     message: Threshold,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.numerator.isZero()) {
+    if (!message.numerator.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.numerator);
     }
-    if (!message.denominator.isZero()) {
+    if (!message.denominator.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.denominator);
     }
     return writer;
@@ -75,10 +75,10 @@ export const Threshold = {
 
   toJSON(message: Threshold): unknown {
     const obj: any = {};
-    if (!message.numerator.isZero()) {
+    if (!message.numerator.equals(Long.ZERO)) {
       obj.numerator = (message.numerator || Long.ZERO).toString();
     }
-    if (!message.denominator.isZero()) {
+    if (!message.denominator.equals(Long.ZERO)) {
       obj.denominator = (message.denominator || Long.ZERO).toString();
     }
     return obj;

@@ -202,10 +202,10 @@ export const KeyRequirement = {
     if (message.keyShareDistributionPolicy !== 0) {
       writer.uint32(40).int32(message.keyShareDistributionPolicy);
     }
-    if (!message.maxTotalShareCount.isZero()) {
+    if (!message.maxTotalShareCount.equals(Long.ZERO)) {
       writer.uint32(48).int64(message.maxTotalShareCount);
     }
-    if (!message.minTotalShareCount.isZero()) {
+    if (!message.minTotalShareCount.equals(Long.ZERO)) {
       writer.uint32(56).int64(message.minTotalShareCount);
     }
     if (message.keygenVotingThreshold !== undefined) {
@@ -220,10 +220,10 @@ export const KeyRequirement = {
         writer.uint32(74).fork()
       ).ldelim();
     }
-    if (!message.keygenTimeout.isZero()) {
+    if (!message.keygenTimeout.equals(Long.ZERO)) {
       writer.uint32(80).int64(message.keygenTimeout);
     }
-    if (!message.signTimeout.isZero()) {
+    if (!message.signTimeout.equals(Long.ZERO)) {
       writer.uint32(88).int64(message.signTimeout);
     }
     return writer;
@@ -385,12 +385,12 @@ export const KeyRequirement = {
         message.keyShareDistributionPolicy
       );
     }
-    if (!message.maxTotalShareCount.isZero()) {
+    if (!message.maxTotalShareCount.equals(Long.ZERO)) {
       obj.maxTotalShareCount = (
         message.maxTotalShareCount || Long.ZERO
       ).toString();
     }
-    if (!message.minTotalShareCount.isZero()) {
+    if (!message.minTotalShareCount.equals(Long.ZERO)) {
       obj.minTotalShareCount = (
         message.minTotalShareCount || Long.ZERO
       ).toString();
@@ -403,10 +403,10 @@ export const KeyRequirement = {
     if (message.signVotingThreshold !== undefined) {
       obj.signVotingThreshold = Threshold.toJSON(message.signVotingThreshold);
     }
-    if (!message.keygenTimeout.isZero()) {
+    if (!message.keygenTimeout.equals(Long.ZERO)) {
       obj.keygenTimeout = (message.keygenTimeout || Long.ZERO).toString();
     }
-    if (!message.signTimeout.isZero()) {
+    if (!message.signTimeout.equals(Long.ZERO)) {
       obj.signTimeout = (message.signTimeout || Long.ZERO).toString();
     }
     return obj;

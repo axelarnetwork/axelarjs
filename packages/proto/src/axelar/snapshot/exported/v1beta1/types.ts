@@ -127,7 +127,7 @@ export const Snapshot = {
         writer.uint32(18).fork()
       ).ldelim();
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.height);
     }
     Object.entries(message.participants).forEach(([key, value]) => {
@@ -220,7 +220,7 @@ export const Snapshot = {
     if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp.toISOString();
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       obj.height = (message.height || Long.ZERO).toString();
     }
     if (message.participants) {

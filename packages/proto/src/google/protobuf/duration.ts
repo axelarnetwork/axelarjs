@@ -91,7 +91,7 @@ export const Duration = {
     message: Duration,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.seconds.isZero()) {
+    if (!message.seconds.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.seconds);
     }
     if (message.nanos !== 0) {
@@ -142,7 +142,7 @@ export const Duration = {
 
   toJSON(message: Duration): unknown {
     const obj: any = {};
-    if (!message.seconds.isZero()) {
+    if (!message.seconds.equals(Long.ZERO)) {
       obj.seconds = (message.seconds || Long.ZERO).toString();
     }
     if (message.nanos !== 0) {

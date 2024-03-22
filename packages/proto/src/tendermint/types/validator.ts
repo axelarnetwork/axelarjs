@@ -39,7 +39,7 @@ export const ValidatorSet = {
     if (message.proposer !== undefined) {
       Validator.encode(message.proposer, writer.uint32(18).fork()).ldelim();
     }
-    if (!message.totalVotingPower.isZero()) {
+    if (!message.totalVotingPower.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.totalVotingPower);
     }
     return writer;
@@ -105,7 +105,7 @@ export const ValidatorSet = {
     if (message.proposer !== undefined) {
       obj.proposer = Validator.toJSON(message.proposer);
     }
-    if (!message.totalVotingPower.isZero()) {
+    if (!message.totalVotingPower.equals(Long.ZERO)) {
       obj.totalVotingPower = (message.totalVotingPower || Long.ZERO).toString();
     }
     return obj;
@@ -154,10 +154,10 @@ export const Validator = {
     if (message.pubKey !== undefined) {
       PublicKey.encode(message.pubKey, writer.uint32(18).fork()).ldelim();
     }
-    if (!message.votingPower.isZero()) {
+    if (!message.votingPower.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.votingPower);
     }
-    if (!message.proposerPriority.isZero()) {
+    if (!message.proposerPriority.equals(Long.ZERO)) {
       writer.uint32(32).int64(message.proposerPriority);
     }
     return writer;
@@ -233,10 +233,10 @@ export const Validator = {
     if (message.pubKey !== undefined) {
       obj.pubKey = PublicKey.toJSON(message.pubKey);
     }
-    if (!message.votingPower.isZero()) {
+    if (!message.votingPower.equals(Long.ZERO)) {
       obj.votingPower = (message.votingPower || Long.ZERO).toString();
     }
-    if (!message.proposerPriority.isZero()) {
+    if (!message.proposerPriority.equals(Long.ZERO)) {
       obj.proposerPriority = (message.proposerPriority || Long.ZERO).toString();
     }
     return obj;
@@ -278,7 +278,7 @@ export const SimpleValidator = {
     if (message.pubKey !== undefined) {
       PublicKey.encode(message.pubKey, writer.uint32(10).fork()).ldelim();
     }
-    if (!message.votingPower.isZero()) {
+    if (!message.votingPower.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.votingPower);
     }
     return writer;
@@ -331,7 +331,7 @@ export const SimpleValidator = {
     if (message.pubKey !== undefined) {
       obj.pubKey = PublicKey.toJSON(message.pubKey);
     }
-    if (!message.votingPower.isZero()) {
+    if (!message.votingPower.equals(Long.ZERO)) {
       obj.votingPower = (message.votingPower || Long.ZERO).toString();
     }
     return obj;

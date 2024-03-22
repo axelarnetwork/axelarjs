@@ -18,7 +18,7 @@ export const Params = {
     message: Params,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.minProxyBalance.isZero()) {
+    if (!message.minProxyBalance.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.minProxyBalance);
     }
     return writer;
@@ -58,7 +58,7 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (!message.minProxyBalance.isZero()) {
+    if (!message.minProxyBalance.equals(Long.ZERO)) {
       obj.minProxyBalance = (message.minProxyBalance || Long.ZERO).toString();
     }
     return obj;

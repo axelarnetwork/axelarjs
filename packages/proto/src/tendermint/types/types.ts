@@ -523,7 +523,7 @@ export const Header = {
     if (message.chainId !== "") {
       writer.uint32(18).string(message.chainId);
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.height);
     }
     if (message.time !== undefined) {
@@ -731,7 +731,7 @@ export const Header = {
     if (message.chainId !== "") {
       obj.chainId = message.chainId;
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       obj.height = (message.height || Long.ZERO).toString();
     }
     if (message.time !== undefined) {
@@ -882,7 +882,7 @@ export const Vote = {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.height);
     }
     if (message.round !== 0) {
@@ -1012,7 +1012,7 @@ export const Vote = {
     if (message.type !== 0) {
       obj.type = signedMsgTypeToJSON(message.type);
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       obj.height = (message.height || Long.ZERO).toString();
     }
     if (message.round !== 0) {
@@ -1068,7 +1068,7 @@ export const Commit = {
     message: Commit,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.height);
     }
     if (message.round !== 0) {
@@ -1143,7 +1143,7 @@ export const Commit = {
 
   toJSON(message: Commit): unknown {
     const obj: any = {};
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       obj.height = (message.height || Long.ZERO).toString();
     }
     if (message.round !== 0) {
@@ -1326,7 +1326,7 @@ export const Proposal = {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.height);
     }
     if (message.round !== 0) {
@@ -1441,7 +1441,7 @@ export const Proposal = {
     if (message.type !== 0) {
       obj.type = signedMsgTypeToJSON(message.type);
     }
-    if (!message.height.isZero()) {
+    if (!message.height.equals(Long.ZERO)) {
       obj.height = (message.height || Long.ZERO).toString();
     }
     if (message.round !== 0) {
@@ -1685,13 +1685,13 @@ export const BlockMeta = {
     if (message.blockId !== undefined) {
       BlockID.encode(message.blockId, writer.uint32(10).fork()).ldelim();
     }
-    if (!message.blockSize.isZero()) {
+    if (!message.blockSize.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.blockSize);
     }
     if (message.header !== undefined) {
       Header.encode(message.header, writer.uint32(26).fork()).ldelim();
     }
-    if (!message.numTxs.isZero()) {
+    if (!message.numTxs.equals(Long.ZERO)) {
       writer.uint32(32).int64(message.numTxs);
     }
     return writer;
@@ -1760,13 +1760,13 @@ export const BlockMeta = {
     if (message.blockId !== undefined) {
       obj.blockId = BlockID.toJSON(message.blockId);
     }
-    if (!message.blockSize.isZero()) {
+    if (!message.blockSize.equals(Long.ZERO)) {
       obj.blockSize = (message.blockSize || Long.ZERO).toString();
     }
     if (message.header !== undefined) {
       obj.header = Header.toJSON(message.header);
     }
-    if (!message.numTxs.isZero()) {
+    if (!message.numTxs.equals(Long.ZERO)) {
       obj.numTxs = (message.numTxs || Long.ZERO).toString();
     }
     return obj;

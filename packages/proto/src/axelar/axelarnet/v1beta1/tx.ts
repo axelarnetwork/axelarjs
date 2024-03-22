@@ -1483,7 +1483,7 @@ export const RetryIBCTransferRequest = {
     if (message.chain !== "") {
       writer.uint32(18).string(message.chain);
     }
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.id);
     }
     return writer;
@@ -1548,7 +1548,7 @@ export const RetryIBCTransferRequest = {
     if (message.chain !== "") {
       obj.chain = message.chain;
     }
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     return obj;

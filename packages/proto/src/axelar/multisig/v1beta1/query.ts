@@ -539,7 +539,7 @@ export const KeyResponse = {
     if (message.state !== 0) {
       writer.uint32(16).int32(message.state);
     }
-    if (!message.startedAt.isZero()) {
+    if (!message.startedAt.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.startedAt);
     }
     if (message.startedAtTimestamp !== undefined) {
@@ -660,7 +660,7 @@ export const KeyResponse = {
     if (message.state !== 0) {
       obj.state = keyStateToJSON(message.state);
     }
-    if (!message.startedAt.isZero()) {
+    if (!message.startedAt.equals(Long.ZERO)) {
       obj.startedAt = (message.startedAt || Long.ZERO).toString();
     }
     if (message.startedAtTimestamp !== undefined) {
@@ -792,7 +792,7 @@ export const KeygenSessionResponse = {
     message: KeygenSessionResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.startedAt.isZero()) {
+    if (!message.startedAt.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.startedAt);
     }
     if (message.startedAtTimestamp !== undefined) {
@@ -801,13 +801,13 @@ export const KeygenSessionResponse = {
         writer.uint32(18).fork()
       ).ldelim();
     }
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.expiresAt);
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       writer.uint32(32).int64(message.completedAt);
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       writer.uint32(40).int64(message.gracePeriod);
     }
     if (message.state !== 0) {
@@ -957,19 +957,19 @@ export const KeygenSessionResponse = {
 
   toJSON(message: KeygenSessionResponse): unknown {
     const obj: any = {};
-    if (!message.startedAt.isZero()) {
+    if (!message.startedAt.equals(Long.ZERO)) {
       obj.startedAt = (message.startedAt || Long.ZERO).toString();
     }
     if (message.startedAtTimestamp !== undefined) {
       obj.startedAtTimestamp = message.startedAtTimestamp.toISOString();
     }
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       obj.completedAt = (message.completedAt || Long.ZERO).toString();
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
     }
     if (message.state !== 0) {

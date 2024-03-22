@@ -30,7 +30,7 @@ function createBaseApp(): App {
 
 export const App = {
   encode(message: App, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (!message.protocol.isZero()) {
+    if (!message.protocol.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.protocol);
     }
     if (message.software !== "") {
@@ -83,7 +83,7 @@ export const App = {
 
   toJSON(message: App): unknown {
     const obj: any = {};
-    if (!message.protocol.isZero()) {
+    if (!message.protocol.equals(Long.UZERO)) {
       obj.protocol = (message.protocol || Long.UZERO).toString();
     }
     if (message.software !== "") {
@@ -115,10 +115,10 @@ export const Consensus = {
     message: Consensus,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.block.isZero()) {
+    if (!message.block.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.block);
     }
-    if (!message.app.isZero()) {
+    if (!message.app.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.app);
     }
     return writer;
@@ -164,10 +164,10 @@ export const Consensus = {
 
   toJSON(message: Consensus): unknown {
     const obj: any = {};
-    if (!message.block.isZero()) {
+    if (!message.block.equals(Long.UZERO)) {
       obj.block = (message.block || Long.UZERO).toString();
     }
-    if (!message.app.isZero()) {
+    if (!message.app.equals(Long.UZERO)) {
       obj.app = (message.app || Long.UZERO).toString();
     }
     return obj;
