@@ -54,7 +54,7 @@
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "docgen": "typedoc",
-    "deploy:docs": "gh-pages -d docs -e proto"
+    "deploy:docs": "gh-pages -d docs -e cosmos"
   },
   "keywords": [],
   "author": "",
