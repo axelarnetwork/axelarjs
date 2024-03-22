@@ -2,6 +2,8 @@
 /build/
 /rpc/
 /stargate/
+/docs/
+
 *.js
 *.d.ts
 
