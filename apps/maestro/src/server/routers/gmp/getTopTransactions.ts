@@ -1,3 +1,5 @@
+import type { SearchGMPResponseData } from "@axelarjs/api";
+
 import { TRPCError } from "@trpc/server";
 import { groupBy, uniqBy } from "rambda";
 import { z } from "zod";
@@ -91,7 +93,7 @@ export const getTopTransactions = publicProcedure
         ...uncachedTransfers.filter(
           (transfer) => transfer.status === "executed"
         ),
-      ];
+      ] as SearchGMPResponseData[];
 
       const eligibleTokenIds = new Set(
         tokenDeployments
