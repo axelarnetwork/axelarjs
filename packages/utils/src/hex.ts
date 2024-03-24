@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 export type Bytes = ArrayLike<number>;
 
 export type BytesLike = Bytes | string;
@@ -22,6 +21,13 @@ function isHexable(value: any): value is Hexable {
   return !!value.toHexString;
 }
 
+/**
+ * Type guard to check if a value is a hex string.
+ *
+ * @param value value to check
+ * @param length
+ * @returns
+ */
 export function isHexString(value: any, length?: number): boolean {
   if (typeof value !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
     return false;
@@ -32,14 +38,32 @@ export function isHexString(value: any, length?: number): boolean {
   return true;
 }
 
+/**
+ * Type guard to check if a value is a hex string or a byte array.
+ *
+ * @param value value to check
+ * @returns true if the value is a hex string or a byte array, false otherwise
+ */
 export function isBytesLike(value: any): value is BytesLike {
   return (isHexString(value) && !(value.length % 2)) || isBytes(value);
 }
 
+/**
+ * Type guard to check if a value is an integer.
+ *
+ * @param value value to check
+ * @returns true if the value is an integer, false otherwise
+ */
 function isInteger(value: number) {
   return typeof value === "number" && value === value && value % 1 === 0;
 }
 
+/**
+ * Type guard to check if a value is a byte array.
+ *
+ * @param value value to check
+ * @returns true if the value is a byte array, false otherwise
+ */
 export function isBytes(value: any): value is Bytes {
   if (value == null) {
     return false;
@@ -66,6 +90,13 @@ export function isBytes(value: any): value is Bytes {
 
 export type HexIsh = BytesLike | Hexable | number | bigint;
 
+/**
+ * Convert a value to a hex string.
+ *
+ * @param value value to convert
+ * @param options
+ * @returns hex string
+ */
 export function hexlify(value: HexIsh, options?: DataOptions): string {
   if (!options) {
     options = {};
@@ -73,7 +104,6 @@ export function hexlify(value: HexIsh, options?: DataOptions): string {
 
   if (typeof value === "number") {
     if (value < 0) {
-      // logger.throwArgumentError("invalid hexlify value", "value", value);
       throw new Error("invalid hexlify value");
     }
 
@@ -118,9 +148,8 @@ export function hexlify(value: HexIsh, options?: DataOptions): string {
       if (options.hexPad === "left") {
         value = `0x0${(value as string).substring(2)}`;
       } else if (options.hexPad === "right") {
-        value += "0";
+        value = String(value).concat("0");
       } else {
-        // logger.throwArgumentError("hex data is odd-length", "value", value);
         throw new Error("hex data is odd-length");
       }
     }
@@ -140,20 +169,24 @@ export function hexlify(value: HexIsh, options?: DataOptions): string {
     return result;
   }
 
-  // logger.throwArgumentError("invalid hexlify value", "value", value);
   throw new Error("invalid hexlify value");
 }
 
+/**
+ * Pad a byte array with zeros on the right to the specified length.
+ *
+ * @param value value to pad
+ * @param length desired length
+ * @returns padded byte array
+ */
 export function hexZeroPad(value: BytesLike, length: number): string {
   if (typeof value !== "string") {
     value = hexlify(value);
   } else if (!isHexString(value)) {
-    // logger.throwArgumentError("invalid hex string", "value", value);
     throw new Error("invalid hex string");
   }
 
   if (value.length > 2 * length + 2) {
-    // logger.throwArgumentError("value out of range", "value", arguments[1]);
     throw new Error("value out of range");
   }
 
