@@ -423,9 +423,15 @@ importers:
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
+      gh-pages:
+        specifier: ^6.1.1
+        version: 6.1.1
       rimraf:
         specifier: ^5.0.5
         version: 5.0.5
+      typedoc:
+        specifier: ^0.25.12
+        version: 0.25.12(typescript@5.4.2)
       typescript:
         specifier: ^5.4.2
         version: 5.4.2
