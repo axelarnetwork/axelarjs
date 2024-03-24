@@ -178,6 +178,14 @@ const Variants = <
 
 const Template: StoryFn<typeof Variants> = (args) => <Variants {...args} />;
 
+/**
+ * Configure the playground for a component
+ *
+ * @param component The component to configure the playground for
+ * @param variants The variants to configure the playground with
+ * @param defaultProps The default props for the component
+ * @returns The playground configuration
+ */
 export const configurePlayground = <
   TComponent extends FC,
   TComponentProps extends ComponentProps<TComponent>,

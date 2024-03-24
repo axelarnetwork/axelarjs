@@ -1,0 +1,16 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/**/*.ts"],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.stories.tsx",
+    "src/components/**"
+  ],
+  "out": "docs",
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  }
+}
