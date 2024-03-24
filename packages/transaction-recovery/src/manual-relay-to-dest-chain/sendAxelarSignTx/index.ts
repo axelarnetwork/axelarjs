@@ -1,9 +1,14 @@
-import type { AxelarRecoveryApiClient, AxelarscanClient } from "@axelarjs/api";
+import type {
+  AxelarRecoveryApiClient,
+  AxelarscanClient,
+  SearchBatchesResponse,
+} from "@axelarjs/api";
 
 import type { RecoveryTxResponse } from "../types";
 
 export type SendAxelarSignTxParams = {
-  commandId: string;
+  commandId?: string | undefined;
+  sourceTransactionHash?: `0x${string}` | undefined;
   chainId: string;
 };
 
@@ -16,18 +21,29 @@ export async function sendAxelarSignTx(
   params: SendAxelarSignTxParams,
   deps: SendAxelarSignTxDependencies
 ): Promise<RecoveryTxResponse> {
-  const { commandId, chainId } = params;
+  const { commandId, chainId, sourceTransactionHash } = params;
 
-  const batchedCommands = await deps.axelarscanClient.searchBatchedCommands({
-    commandId,
-  });
+  let batchedCommands: SearchBatchesResponse | undefined;
+
+  try {
+    batchedCommands = await deps.axelarscanClient.searchBatchedCommands({
+      commandId,
+      sourceTransactionHash,
+    });
+  } catch (e) {
+    return {
+      skip: true,
+      error: new Error(`Failed to search batched commands`),
+    };
+  }
 
   // TODO: try to fetch the batched commands from axelar-core as well
 
-  if (batchedCommands.data.length === 0) {
+  if (batchedCommands?.data.length === 0) {
     // already sent batched tx; no need to sign
     return {
       skip: true,
+      skipReason: "No batched commands found",
     };
   }
 
