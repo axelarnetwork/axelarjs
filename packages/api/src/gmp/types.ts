@@ -86,6 +86,7 @@ type SearchGMPCall = {
   _logIndex?: number;
   logIndex?: number;
   event: string;
+  eventIndex: number;
   eventSignature: string;
   id: string;
   chain: string;
@@ -257,6 +258,7 @@ export type SearchGMPResponseData = {
   executed?: SearchGMPExecuted;
   gas_paid: SearchGMPGasPaid;
   gas_status: SearchGMPGasStatus;
+  command_id?: string;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;
