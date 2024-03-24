@@ -25,9 +25,9 @@ export const HeroSection: FC<Props> = ({ onCTAClick }) => {
             Take your tokens Interchain with the {APP_NAME}
           </p>
           <Button
-            variant="ghost"
-            shape="circle"
-            size="lg"
+            $variant="ghost"
+            $shape="circle"
+            $size="lg"
             className="bg-accent/25 animate-pulse"
             onClick={onCTAClick}
           >

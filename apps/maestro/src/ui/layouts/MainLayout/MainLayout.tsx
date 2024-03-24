@@ -1,5 +1,6 @@
 import {
   Alert,
+  AnimatedBlobBackground,
   Badge,
   Button,
   Card,
@@ -20,6 +21,7 @@ import tw from "@axelarjs/ui/tw";
 import React, { useEffect, type FC, type PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { ErrorBoundary, type FallbackRender } from "@sentry/nextjs";
@@ -42,6 +44,7 @@ import { BOTTOM_MENU_ITEMS } from "./MainMenu";
 import SignInModal from "./SignInModal";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
+  const router = useRouter();
   const theme = useTheme();
   const { setThemeMode } = useWeb3ModalTheme();
 
@@ -72,6 +75,8 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
+      {/* only render when route path is / */}
+      {router.pathname === "/" && <AnimatedBlobBackground />}
       <Drawer>
         <Drawer.Toggle
           checked={isDrawerOpen}
@@ -80,7 +85,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         />
         <Drawer.Content
           className={cn(
-            "flex min-h-[100dvh] flex-1 flex-col gap-4 bg-[url('/illustrations/bg.svg')] lg:min-h-screen",
+            "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
             {
               "pointer-events-none": isSignInModalOpen,
             }
@@ -96,7 +101,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               <Tooltip
                 tip="Dismiss this messages"
                 className="text-error absolute right-4 top-4"
-                position="left"
+                $position="left"
               >
                 <button onClick={actions.dismissGlobalBanner}>
                   <XCircleIcon />
@@ -171,7 +176,7 @@ const PackageVersionItem = ({
 const LayoutFooter = () => (
   <Footer
     className="bg-neutral text-neutral-content footer p-6 md:p-8 xl:p-10"
-    center={true}
+    $center={true}
   >
     <div className="w-full max-w-4xl items-center justify-evenly md:flex">
       {BOTTOM_MENU_ITEMS.map((item, index) => (
@@ -241,12 +246,12 @@ const LayoutFooter = () => (
 const TestnetBanner = ({ onClose = () => {} }) => (
   <Card
     className="bg-base-200 fixed bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
-    compact
+    $compact
   >
     <Card.Body>
       <Button
-        size="sm"
-        shape="circle"
+        $size="sm"
+        $shape="circle"
         className="absolute right-2 top-2"
         onClick={onClose}
       >
@@ -259,8 +264,8 @@ const TestnetBanner = ({ onClose = () => {} }) => (
       </p>
       <Card.Actions className="justify-end">
         <LinkButton
-          variant="accent"
-          size="xs"
+          $variant="accent"
+          $size="xs"
           href={process.env.NEXT_PUBLIC_TESTNET_URL}
         >
           Go to testnet

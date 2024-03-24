@@ -29,18 +29,18 @@ const STEPS = [Step1, Step2, Step3];
 const CanonicalTokenDeployment: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
   const routeChain = useChainFromRoute();
-  const { data: tokenInfo } = useGetChainsConfig({
+  const { data: chainInfo } = useGetChainsConfig({
     axelarChainId: routeChain?.axelarChainId,
   });
 
   const isGatewayToken = useMemo(
     () =>
       (
-        tokenInfo?.assets.map((asset: any) =>
-          asset.tokenAddress.toLowerCase()
+        Object.values(chainInfo?.assets ?? []).map((assetId: any) =>
+          String(assetId ?? "").toLowerCase()
         ) || []
       ).includes(state.tokenDetails.tokenAddress.toLowerCase()),
-    [tokenInfo, state.tokenDetails.tokenAddress]
+    [chainInfo, state.tokenDetails.tokenAddress]
   );
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
@@ -52,7 +52,7 @@ const CanonicalTokenDeployment: FC = () => {
 
   if (isGatewayToken)
     return (
-      <Alert status="warning" icon={<InfoIcon className="h-6 w-6" />}>
+      <Alert $status="warning" icon={<InfoIcon className="h-6 w-6" />}>
         This token is registered natively on Axelar and will be supported by ITS
         in the near future. You can use{" "}
         {

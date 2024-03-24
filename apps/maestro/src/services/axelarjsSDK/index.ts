@@ -19,9 +19,9 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
   const response = await client.estimateGasFee(
     params.sourceChainId,
     params.destinationChainId,
-    params.sourceChainTokenSymbol,
     params.gasLimit,
     params.gasMultiplier,
+    params.sourceChainTokenSymbol,
     params.minGasPrice
   );
 

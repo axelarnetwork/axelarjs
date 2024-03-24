@@ -1,6 +1,6 @@
 import type {
-  AxelarCosmosChainConfig,
   AxelarQueryAPIClient,
+  ChainConfig,
   SearchGMPResponseData,
 } from "@axelarjs/api";
 import type { Environment } from "@axelarjs/core";
@@ -37,7 +37,7 @@ export type AddGasResponse = {
 export type GetFullFeeOptions = {
   autocalculateGasOptions?: AutocalculateGasOptions | undefined;
   tx: SearchGMPResponseData;
-  chainConfig: AxelarCosmosChainConfig;
+  chainConfig: ChainConfig;
   axelarQueryClient: AxelarQueryAPIClient;
   environment: Environment;
 };

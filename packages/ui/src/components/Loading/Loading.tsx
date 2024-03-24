@@ -7,7 +7,7 @@ export const Loading = tw.span.cva("loading", {
     /**
      * The size of the loading indicator
      **/
-    size: {
+    $size: {
       xs: "loading-xs",
       sm: "loading-sm",
       md: "loading-md",
@@ -16,7 +16,7 @@ export const Loading = tw.span.cva("loading", {
     /**
      * The variant of the loading indicator, configurable in the theme
      **/
-    variant: {
+    $variant: {
       primary: "text-primary",
       secondary: "text-secondary",
       neutral: "text-neutral",
@@ -29,7 +29,7 @@ export const Loading = tw.span.cva("loading", {
     /**
      * The shape of the loading indicator (circle or square)
      **/
-    shape: {
+    $shape: {
       spinner: "loading-spinner",
       dots: "loading-dots",
       ring: "loading-ring",
@@ -43,6 +43,6 @@ export const Loading = tw.span.cva("loading", {
 export type LoadingProps = ComponentProps<typeof Loading>;
 
 Loading.defaultProps = {
-  shape: "spinner",
-  size: "md",
+  $shape: "spinner",
+  $size: "md",
 };

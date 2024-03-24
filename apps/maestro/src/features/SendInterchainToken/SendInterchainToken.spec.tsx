@@ -159,18 +159,18 @@ describe("SendInterchainToken", () => {
 
     expect(screen.getByRole("button", { name: /Transfer/ }))
       .toMatchInlineSnapshot(`
-        <button
-          class="btn btn-primary"
-          type="submit"
-        >
-          Transfer 
-          100
-           
-          tokens
-           to
-           
-          Ethereum Mainnet
-        </button>
-      `);
+      <button
+        class="btn disabled:btn-disabled btn-primary"
+        type="submit"
+      >
+        Transfer 
+        100
+         
+        tokens
+         to
+         
+        Ethereum Mainnet
+      </button>
+    `);
   });
 });

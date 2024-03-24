@@ -1,22 +1,22 @@
 import { forwardRef } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
+import { cva, VariantProps } from "styled-cva";
 import { twMerge } from "tailwind-merge";
 
 import { Loading } from "../Loading";
 
-export const buttonVariance = cva("btn", {
+export const buttonVariance = cva("btn disabled:btn-disabled", {
   variants: {
     /**
      * The size of the button
      **/
-    size: {
+    $size: {
       xs: "btn-xs",
       sm: "btn-sm",
       md: "btn-md",
       lg: "btn-lg",
     },
-    variant: {
+    $variant: {
       primary: "btn-primary",
       secondary: "btn-secondary",
       neutral: "btn-neutral",
@@ -31,33 +31,27 @@ export const buttonVariance = cva("btn", {
     /**
      * The shape of the button (circle or square)
      **/
-    shape: {
+    $shape: {
       square: "btn-square",
       circle: "btn-circle",
     },
     /**
      * Renders a wireframe button
      **/
-    outline: {
+    $outline: {
       true: "btn-outline",
-    },
-    /**
-     * Renders a disabled button
-     **/
-    disabled: {
-      true: "btn-disabled",
     },
     /**
      * Renders a glass button, which is a semi transparent with a glass effect
      **/
-    glass: {
+    $glass: {
       true: "glass",
     },
-    length: {
+    $length: {
       wide: "btn-wide",
       block: "btn-block",
     },
-    loading: {
+    $loading: {
       true: "pointer-events-none",
     },
   },
@@ -83,28 +77,26 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
 ) => {
   const {
     className,
-    size,
-    disabled,
-    shape,
-    glass,
-    outline,
-    length,
-    loading,
-    variant,
+    $size,
+    $shape,
+    $glass,
+    $outline,
+    $length,
+    $loading,
+    $variant,
     ...componentProps
   } = props;
 
   return [
     twMerge(
       buttonVariance({
-        size,
-        disabled,
-        shape,
-        outline,
-        glass,
-        length,
-        variant,
-        loading,
+        $size,
+        $shape,
+        $outline,
+        $glass,
+        $length,
+        $variant,
+        $loading,
       }),
       className
     ),
@@ -136,7 +128,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...componentProps}
         ref={ref}
       >
-        {props.loading && <Loading size={props.size === "xs" ? "xs" : "sm"} />}
+        {props.loading && (
+          <Loading $size={props.$size === "xs" ? "xs" : "sm"} />
+        )}
         {props.children}
       </button>
     );

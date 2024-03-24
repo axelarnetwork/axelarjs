@@ -4,7 +4,7 @@ import tw from "../../tw";
 
 const StyledFooter = tw.footer.cva("footer", {
   variants: {
-    center: {
+    $center: {
       true: "footer-center",
     },
   },

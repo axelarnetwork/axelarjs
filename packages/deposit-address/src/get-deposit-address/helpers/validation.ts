@@ -1,6 +1,7 @@
 import type {
+  AxelarConfigsResponse,
   ChainConfig,
-  ChainConfigsResponse,
+  ChainCosmosSubconfig,
 } from "@axelarjs/api/axelar-config/types";
 import { Environment } from "@axelarjs/core";
 
@@ -14,7 +15,7 @@ export async function validateAddressAndChains(
   sourceChain: string,
   destinationChain: string,
   destinationAddress: string,
-  chainConfigs: ChainConfigsResponse,
+  chainConfigs: AxelarConfigsResponse,
   environment: Environment,
   requestConfig?: DepositAddressRequestConfig
 ) {
@@ -32,13 +33,13 @@ export function validateAddress(
   destinationAddress: string,
   chainConfig: ChainConfig
 ) {
-  const { module } = chainConfig;
-  if (module === "evm") {
+  const { chainType } = chainConfig;
+  if (chainType === "evm") {
     if (!isAddress(destinationAddress))
       throw new Error(`${destinationAddress} is not a valid EVM address`);
   } else {
     try {
-      const { addressPrefix } = chainConfig.cosmosConfigs;
+      const { addressPrefix } = chainConfig.config as ChainCosmosSubconfig;
       if (!(bech32.decode(destinationAddress).prefix === addressPrefix)) {
         throw new Error(
           `${destinationAddress} is not a valid address for ${chainConfig.id}`
@@ -51,7 +52,7 @@ export function validateAddress(
 }
 export function validateChainIds(
   chainIds: string[],
-  chainConfigs: ChainConfigsResponse
+  chainConfigs: AxelarConfigsResponse
 ) {
   chainIds.forEach((chainId) => {
     if (!chainConfigs.chains[chainId.toLowerCase()])
@@ -64,22 +65,24 @@ export function validateActiveChains(
   activeChains: string[]
 ) {
   chainIds.forEach((chainId) => {
-    if (!activeChains.includes(chainId.toLowerCase()))
+    if (!activeChains.includes(chainId.toLowerCase())) {
       throw new Error(`chain ID ${chainId} is not active`);
+    }
   });
 }
 
 export function validateAsset(
   chainIds: string[],
   assetId: string,
-  chainConfigs: ChainConfigsResponse
+  chainConfigs: AxelarConfigsResponse
 ) {
   chainIds.forEach((chainId) => {
     const chainConfig = chainConfigs.chains[chainId.toLowerCase()];
 
-    if (!chainConfig?.assets.find(({ id }) => id === assetId))
+    if (!Object.keys(chainConfig?.assets || []).includes(assetId)) {
       throw new Error(
         `asset ID ${assetId} does not exist on chain ${chainConfig?.id}`
       );
+    }
   });
 }

@@ -18,19 +18,19 @@ const Pagination: FC<PaginationProps> = ({
     <div className="join flex items-center justify-center">
       <Button
         aria-label="previous page"
-        size="sm"
+        $size="sm"
         disabled={!hasPrevPage}
         onClick={onPageChange.bind(null, page - 1)}
         className="join-item disabled:opacity-50"
       >
         «
       </Button>
-      <Button size="sm" className="join-item">
+      <Button $size="sm" className="join-item">
         Page {page + 1}
       </Button>
       <Button
         aria-label="next page"
-        size="sm"
+        $size="sm"
         disabled={!hasNextPage}
         onClick={onPageChange.bind(null, page + 1)}
         className="join-item disabled:opacity-50"

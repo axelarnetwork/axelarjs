@@ -123,10 +123,10 @@ Dialog.defaultProps = {};
 Dialog.Body.defaultProps = {};
 
 Dialog.CornerCloseAction.defaultProps = {
-  shape: "circle",
-  variant: "ghost",
+  $shape: "circle",
+  $variant: "ghost",
+  $size: "sm",
   children: "✕",
-  size: "sm",
   className: "absolute top-2 right-2",
 };
 

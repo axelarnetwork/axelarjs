@@ -1,5 +1,3 @@
-import { pluralizeKeys } from "@axelarjs/utils";
-
 import type { Meta, StoryFn } from "@storybook/react";
 
 import { configurePlayground } from "../../StoryPlayground";
@@ -26,10 +24,8 @@ Default.args = {
   children: "Ctrl",
 };
 
-const { Sizes } = pluralizeKeys(
-  configurePlayground(Kbd, {
-    size: { values: SIZE_VARIANTS },
-  })
-);
+const stories = configurePlayground(Kbd, {
+  $size: { values: SIZE_VARIANTS },
+});
 
-export { Sizes };
+export const Sizes = stories.$size;

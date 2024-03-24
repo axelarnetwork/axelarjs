@@ -94,6 +94,20 @@ module.exports = {
             transform: "translateY(calc(100% + 1rem))",
           },
         },
+        blob: {
+          "0%": {
+            transform: "translate(0, 0) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "translate(0, 0) scale(1)",
+          },
+        },
       },
       animation: {
         // Dropdown menu
@@ -123,6 +137,8 @@ module.exports = {
           "toast-slide-in-bottom 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         "toast-swipe-out-x": "toast-swipe-out-x 100ms ease-out forwards",
         "toast-swipe-out-y": "toast-swipe-out-y 100ms ease-out forwards",
+        // blob
+        blob: "blob 8s infinite",
       },
     },
   },

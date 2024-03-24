@@ -51,8 +51,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       "Token Address",
       <CopyToClipboardButton
         key="token-address"
-        size="sm"
-        variant="ghost"
+        $size="sm"
+        $variant="ghost"
         copyText={props.tokenAddress}
       >
         {maskAddress(props.tokenAddress)}
@@ -62,13 +62,13 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       [
         "Token ID",
         <div key="token-id" className="flex items-center">
-          <CopyToClipboardButton size="sm" variant="ghost" copyText={tokenId}>
+          <CopyToClipboardButton $size="sm" $variant="ghost" copyText={tokenId}>
             {maskAddress(tokenId)}
           </CopyToClipboardButton>
           <Tooltip
             tip="TokenId is a common key used to identify an interchain token across all chains"
-            variant="info"
-            position="bottom"
+            $variant="info"
+            $position="bottom"
           >
             <InfoIcon className="text-info h-[1em] w-[1em]" />
           </Tooltip>
@@ -80,7 +80,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           <LinkButton
             target="_blank"
             className="ml-[-10px]"
-            variant="link"
+            $variant="link"
             href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
           >
             Claim
@@ -93,8 +93,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         "Token Manager",
         <CopyToClipboardButton
           key="token-manager"
-          size="sm"
-          variant="ghost"
+          $size="sm"
+          $variant="ghost"
           copyText={tokenManagerAddress}
         >
           {maskAddress(tokenManagerAddress)}
@@ -130,7 +130,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           href={`${props.chain.explorer.url}/token/${props.tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
-          size="sm"
+          $size="sm"
         >
           <ChainIcon src={props.chain.image} alt={props.chain.name} size="md" />
           <span>View token</span>
@@ -300,9 +300,9 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
     if (VALID_IMAGE_FORMATS.every((ext) => !iconUrl.endsWith(ext))) {
       return (
         <>
-          URL must end with <Badge variant="neutral">.png</Badge>,{" "}
-          <Badge variant="neutral">.jpg</Badge>, or{" "}
-          <Badge variant="neutral">.webp</Badge>
+          URL must end with <Badge $variant="neutral">.png</Badge>,{" "}
+          <Badge $variant="neutral">.jpg</Badge>, or{" "}
+          <Badge $variant="neutral">.webp</Badge>
         </>
       );
     }
@@ -326,14 +326,14 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
   });
 
   return (
-    <Tooltip $as={Indicator} position="bottom" tip="Update token icon">
+    <Tooltip $as={Indicator} $position="bottom" tip="Update token icon">
       {!existingIconUrl && (
         <Indicator.Item
           $as={Badge}
-          variant="accent"
-          size="xs"
+          $variant="accent"
+          $size="xs"
           className="animate-pulse"
-          position="start"
+          $position="start"
         />
       )}
       <Modal
@@ -353,7 +353,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
               Token Icon UR{" "}
               <Tooltip
                 tip="Provide a URL to an image to use as the token icon"
-                position="right"
+                $position="right"
               >
                 <InfoIcon className="text-info h-[1em]" />
               </Tooltip>
@@ -386,12 +386,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
         </Modal.Body>
         <Modal.Actions className="">
           {formValidationMessage ? (
-            <Alert status="error">{formValidationMessage}</Alert>
+            <Alert $status="error">{formValidationMessage}</Alert>
           ) : (
             <Button
-              length="block"
-              variant="primary"
-              loading={isPending}
+              $length="block"
+              $variant="primary"
+              $loading={isPending}
               disabled={Boolean(formValidationMessage) || Boolean(error)}
               onClick={() => {
                 if (iconUrl) {

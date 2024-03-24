@@ -4,16 +4,16 @@ import tw from "../../tw";
 
 const StyledTable = tw.table.cva("table", {
   variants: {
-    zebra: {
+    $zebra: {
       true: "table-zebra",
     },
-    pinRows: {
+    $pinRows: {
       true: "table-pin-rows",
     },
-    pinCols: {
+    $pinCols: {
       true: "table-pin-cols",
     },
-    size: {
+    $size: {
       xs: "table-xs",
       sm: "table-sm",
       md: "table-md",

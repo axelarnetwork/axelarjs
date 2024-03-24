@@ -1,6 +1,6 @@
 import type { ComponentProps, FC } from "react";
 
-import { cva, VariantProps } from "class-variance-authority";
+import { cva, VariantProps } from "styled-cva";
 
 import tw from "../../tw";
 import { cn } from "../../utils";
@@ -8,9 +8,9 @@ import { Badge } from "../Badge";
 
 const StyledIndicator = tw.div`indicator`;
 
-const indicatorItemVariance = cva("indicator", {
+const indicatorItemVariance = cva("indicator-item", {
   variants: {
-    position: {
+    $position: {
       top: "indicator-top",
       bottom: "indicator-bottom",
       center: "indicator-center",
@@ -24,19 +24,17 @@ const indicatorItemVariance = cva("indicator", {
 export interface IndicatorProps
   extends ComponentProps<typeof StyledIndicator> {}
 
-const StyledIndicatorItem = tw(Badge)`indicator-item`;
-
 export interface IndicatorItemProps
-  extends ComponentProps<typeof StyledIndicatorItem>,
+  extends ComponentProps<typeof Badge>,
     VariantProps<typeof indicatorItemVariance> {}
 
 const IndicatorItem: FC<IndicatorItemProps> = ({
-  position,
+  $position,
   className,
   ...props
 }) => (
-  <StyledIndicatorItem
-    className={cn(indicatorItemVariance({ position }), className)}
+  <Badge
+    className={cn(indicatorItemVariance({ $position, className }))}
     {...props}
   />
 );

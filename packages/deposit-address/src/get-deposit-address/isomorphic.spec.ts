@@ -30,7 +30,7 @@ describe("Deposit Address", () => {
       expect(depositAddress).toBeDefined();
     });
 
-    test("should get the deposit address if the asset is defined, but unwrappable at the destination chain", async () => {
+    test("should get the deposit address if the asset is defined, but wrappable at the destination chain", async () => {
       const params: DepositAddressOptions = {
         sourceChain: "Avalanche",
         destinationChain: "Fantom",
@@ -63,7 +63,7 @@ describe("Deposit Address", () => {
     test("should get linked deposit address from an EVM source chain", async () => {
       const params: SendOptions = {
         sourceChain: "Fantom",
-        destinationChain: "ethereum-2",
+        destinationChain: "ethereum-sepolia",
         asset: "uaxl",
         destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
         environment: ENVIRONMENTS.testnet,
@@ -80,7 +80,7 @@ describe("Deposit Address", () => {
     test("should get linked deposit address from an cosmos-based source chain", async () => {
       const params: SendOptions = {
         sourceChain: "osmosis-7",
-        destinationChain: "ethereum-2",
+        destinationChain: "ethereum-sepolia",
         asset: "uaxl",
         destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
         environment: ENVIRONMENTS.testnet,
@@ -194,7 +194,7 @@ describe("requestConfigs", () => {
     const axelarRpcUrl = "https://axelar-testnet-rpc.qubelabs.io:443";
     const params: SendOptions = {
       sourceChain: "osmosis-7",
-      destinationChain: "ethereum-2",
+      destinationChain: "ethereum-sepolia",
       asset: "uaxl",
       destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
       environment: ENVIRONMENTS.testnet,

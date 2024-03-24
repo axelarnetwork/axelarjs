@@ -182,10 +182,10 @@ export const CanonicalTokenRecovery = () => {
         </div>
         <Card.Actions className="justify-end">
           <Button
-            variant="primary"
+            $variant="primary"
+            $loading={isMutating}
             onClick={() => mutateAsync({ tokenId: searchValue })}
             disabled={isMutating}
-            loading={isMutating}
           >
             Restore interchain token data
           </Button>
@@ -213,7 +213,7 @@ export const CanonicalTokenRecovery = () => {
             <Label>
               <Label.Text>Search token by</Label.Text>
               <DropdownMenu>
-                <DropdownMenu.Trigger variant="primary" size="sm">
+                <DropdownMenu.Trigger $variant="primary" $size="sm">
                   {searchBy}
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content className="bg-base-300 rounded-xl">
@@ -241,7 +241,7 @@ export const CanonicalTokenRecovery = () => {
           {resultSection}
 
           {validationMessage && (
-            <Alert status={validationMessage.status} className="mt-4">
+            <Alert $status={validationMessage.status} className="mt-4">
               {validationMessage.message}
             </Alert>
           )}

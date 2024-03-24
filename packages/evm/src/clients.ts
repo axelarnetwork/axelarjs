@@ -1,39 +1,43 @@
 import {
   createPublicClient as _createPublicClient,
   http,
+  type Chain,
   type HttpTransport,
   type PublicClient,
 } from "viem";
 import {
   arbitrum,
-  arbitrumGoerli,
+  arbitrumSepolia,
   aurora,
   auroraTestnet,
   avalanche,
   avalancheFuji,
   base,
-  baseGoerli,
+  baseSepolia,
+  blast,
+  blastSepolia,
   celo,
   celoAlfajores,
   fantom,
   fantomTestnet,
   filecoin,
   filecoinHyperspace,
-  goerli,
+  fraxtal,
+  fraxtalTestnet,
   mainnet,
   mantle,
   mantleTestnet,
   optimism,
-  optimismGoerli,
+  optimismSepolia,
   scroll,
   scrollSepolia,
+  sepolia,
 } from "viem/chains";
 
 const MAINNET_CHAINS = {
   mainnet,
   fantom,
   filecoin,
-  goerli,
   arbitrum,
   aurora,
   avalanche,
@@ -42,21 +46,24 @@ const MAINNET_CHAINS = {
   optimism,
   scroll,
   base,
-  baseGoerli,
+  blast,
+  fraxtal,
 } as const;
 
 const TESTNET_CHAINS = {
-  goerli,
-  arbitrumGoerli,
-  baseGoerli,
+  sepolia,
+  arbitrumSepolia,
+  baseSepolia,
   fantomTestnet,
   filecoinHyperspace,
   auroraTestnet,
   avalancheFuji,
   celoAlfajores,
   mantleTestnet,
-  optimismGoerli,
+  optimismSepolia,
   scrollSepolia,
+  blastSepolia,
+  fraxtalTestnet,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
@@ -64,8 +71,8 @@ export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
 
 export function createPublicClient(
   chainName: SupportedMainnetChain
-): PublicClient<HttpTransport, (typeof MAINNET_CHAINS)[typeof chainName]> {
-  const chain = MAINNET_CHAINS[chainName];
+): PublicClient<HttpTransport, Chain> {
+  const chain = MAINNET_CHAINS[chainName] as Chain;
 
   const client = _createPublicClient({
     chain,
@@ -76,8 +83,8 @@ export function createPublicClient(
 
 export function createPublicTestnetClient(
   chainName: SupportedTestnetChain
-): PublicClient<HttpTransport, (typeof TESTNET_CHAINS)[typeof chainName]> {
-  const chain = TESTNET_CHAINS[chainName];
+): PublicClient<HttpTransport, Chain> {
+  const chain = TESTNET_CHAINS[chainName] as Chain;
 
   const client = _createPublicClient({
     chain,

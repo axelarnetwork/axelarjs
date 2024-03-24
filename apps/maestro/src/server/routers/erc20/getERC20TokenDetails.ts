@@ -57,7 +57,7 @@ export const getERC20TokenDetails = publicProcedure
 
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Invalid chainId",
+          message: `Invalid chainId: ${input.chainId}`,
         });
       }
 

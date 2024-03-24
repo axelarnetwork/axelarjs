@@ -57,21 +57,21 @@ const ChainPicker: FC<ChainPickerProps> = ({
 
           return (
             <Tooltip
+              key={chain.chain_name}
               tip={
                 buttonVariant !== "error"
                   ? `Deploy on ${chain.name}`
                   : "Failed to estimate gas fees"
               }
-              variant={buttonVariant === "error" ? "warning" : undefined}
-              key={chain.chain_name}
-              position="top"
+              $variant={buttonVariant === "error" ? "warning" : undefined}
+              $position="top"
             >
               <Button
                 disabled={disabled}
                 className="w-full rounded-2xl hover:ring"
-                size="sm"
+                $size="sm"
                 role="button"
-                variant={buttonVariant}
+                $variant={buttonVariant}
                 onClick={onChainClick.bind(null, chain.id)}
               >
                 <Image
@@ -90,7 +90,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
                   className={cn("absolute left-3 -translate-x-2 rounded-full", {
                     hidden: !isSelected || !loading,
                   })}
-                  size="sm"
+                  $size="sm"
                 />
                 <span className="ml-4">{chain.name}</span>
               </Button>
@@ -99,7 +99,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
         })}
       </div>
       <div className="grid place-content-center">
-        <Button size="sm" variant="ghost" onClick={handleToggleAll}>
+        <Button $size="sm" $variant="ghost" onClick={handleToggleAll}>
           Toggle All
         </Button>
       </div>

@@ -4,13 +4,13 @@ import tw from "../../tw";
 
 const StyledTooltip = tw.div.cva("tooltip", {
   variants: {
-    position: {
+    $position: {
       top: "tooltip-top",
       right: "tooltip-right",
       bottom: "tooltip-bottom",
       left: "tooltip-left",
     },
-    variant: {
+    $variant: {
       primary: "tooltip-primary",
       secondary: "tooltip-secondary",
       accent: "tooltip-accent",
@@ -18,7 +18,7 @@ const StyledTooltip = tw.div.cva("tooltip", {
       warning: "tooltip-warning",
       danger: "tooltip-error",
     },
-    open: {
+    $open: {
       true: "tooltip-open",
     },
   },

@@ -1,7 +1,7 @@
 import {
   AxelarConfigClient,
-  AxelarEVMChainConfig,
   AxelarQueryAPIClient,
+  ChainEvmSubconfig,
   GMPClient,
 } from "@axelarjs/api";
 import { Environment } from "@axelarjs/core";
@@ -30,25 +30,14 @@ import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
  * @returns The address of the gas service contract.
  */
 export async function getGasServiceAddressFromChainConfig(
-  chainConfig: AxelarConfigClient,
+  configClient: AxelarConfigClient,
   env: Environment,
   chain: string
 ) {
-  const _chainConfigs = await chainConfig.getChainConfigs(env);
-  const mapEvmChains: Record<string, AxelarEVMChainConfig> = Object.entries(
-    _chainConfigs.chains
-  )
-    .filter(([, v]) => {
-      return v.module === "evm";
-    })
-    .reduce((acc, [k, v]) => {
-      acc[k] = v as AxelarEVMChainConfig;
-      return acc;
-    }, {} as Record<string, AxelarEVMChainConfig>);
-
-  const srcChainConfig = mapEvmChains[chain.toLowerCase()];
-
-  return srcChainConfig?.evmConfigs?.contracts?.gasService;
+  const _chainConfigs = await configClient.getAxelarConfigs(env);
+  return (
+    _chainConfigs.chains[chain.toLowerCase()]?.config as ChainEvmSubconfig
+  ).contracts?.AxelarGasService?.address;
 }
 
 // Calculate the amount of native gas to be paid. If the amount is 0, then no native gas needs to be paid.

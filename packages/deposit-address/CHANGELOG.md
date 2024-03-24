@@ -1,5 +1,22 @@
 # @axelarjs/deposit-address
 
+## 0.1.15
+
+### Patch Changes
+
+- [#296](https://github.com/axelarnetwork/axelarjs/pull/296) [`96d2d53db8396c726474141724c339af19072bf2`](https://github.com/axelarnetwork/axelarjs/commit/96d2d53db8396c726474141724c339af19072bf2) Thanks [@canhtrinh](https://github.com/canhtrinh)! - - chore: update packages affected by api/axelar-configs schema change
+  - chore: various docs updates: https://github.com/axelarnetwork/axelarjs/pull/291
+- Updated dependencies [[`96d2d53db8396c726474141724c339af19072bf2`](https://github.com/axelarnetwork/axelarjs/commit/96d2d53db8396c726474141724c339af19072bf2)]:
+  - @axelarjs/api@0.3.13
+
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [[`d9cb84a748cff5303ceb8b8063d40981183b147d`](https://github.com/axelarnetwork/axelarjs/commit/d9cb84a748cff5303ceb8b8063d40981183b147d)]:
+  - @axelarjs/proto@0.35.5
+  - @axelarjs/cosmos@0.2.12
+
 ## 0.1.13
 
 ### Patch Changes

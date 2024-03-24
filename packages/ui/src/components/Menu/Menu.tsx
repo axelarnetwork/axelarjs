@@ -6,15 +6,15 @@ export type MenuProps = ComponentProps<typeof MenuRoot>;
 
 const MenuRoot = tw.ul.cva("menu", {
   variants: {
-    direction: {
+    $direction: {
       vertical: "menu-vertical",
       horizontal: "menu-horizontal",
     },
-    size: {
+    $size: {
       normal: "menu-normal",
       compact: "menu-compact",
     },
-    rounded: {
+    $rounded: {
       true: "rounded-box",
     },
   },
@@ -22,14 +22,14 @@ const MenuRoot = tw.ul.cva("menu", {
 
 const MenuItem = tw.li.cva("menu-item", {
   variants: {
-    active: {
+    $active: {
       true: "active",
     },
-    bordered: {
+    $bordered: {
       true: "bordered",
       hover: "hover-bordered",
     },
-    disabled: {
+    $disabled: {
       true: "disabled",
     },
   },

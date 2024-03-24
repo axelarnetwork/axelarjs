@@ -1,5 +1,11 @@
 # @axelarjs/proto
 
+## 0.35.5
+
+### Patch Changes
+
+- [#281](https://github.com/axelarnetwork/axelarjs/pull/281) [`d9cb84a748cff5303ceb8b8063d40981183b147d`](https://github.com/axelarnetwork/axelarjs/commit/d9cb84a748cff5303ceb8b8063d40981183b147d) Thanks [@npty](https://github.com/npty)! - generate proto types based on axelar-core v0.35.5
+
 ## 0.34.9
 
 ### Patch Changes
