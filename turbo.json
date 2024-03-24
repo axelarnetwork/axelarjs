@@ -30,7 +30,7 @@
       "cache": false
     },
     "docgen": {
-      "outputs": ["docs/**"]
+      "outputs": ["docs"]
     }
   }
 }
