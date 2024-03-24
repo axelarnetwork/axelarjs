@@ -60,3 +60,10 @@ export const AXELAR_RPC_URLS = {
 } as const;
 
 export type AxelarRPCUrl = keyof typeof AXELAR_RPC_URLS;
+
+export const AXELAR_RECOVERY_API_URLS = {
+  testnet: "https://axelar-signing-relayer-testnet.axelar.dev",
+  mainnet: "https://axelar-signing-relayer-mainnet.axelar.dev",
+};
+
+export type AxelarRecoveryAPIUrl = keyof typeof AXELAR_RECOVERY_API_URLS;
