@@ -31,6 +31,9 @@
     },
     "docgen": {
       "outputs": ["docs"]
+    },
+    "deploy:docs": {
+      "dependsOn": ["docgen"]
     }
   }
 }

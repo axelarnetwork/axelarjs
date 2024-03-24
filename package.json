@@ -20,6 +20,7 @@
     "storybook": "pnpm -C ./packages/ui run storybook ",
     "build-storybook": "turbo run build-storybook",
     "docgen": "turbo run docgen",
+    "deploy:docs": "turbo run deploy:docs",
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
     "dev:registry": "pnpm -C ./apps/registry run dev",
     "changeset": "changeset",
