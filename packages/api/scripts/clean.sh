@@ -1,1 +1,1 @@
-npx rimraf build lib axelar-query axelarscan axelar-config gmp *.js *.d.ts
+npx rimraf build lib axelar-query axelarscan axelar-config gmp docs *.js *.d.ts
