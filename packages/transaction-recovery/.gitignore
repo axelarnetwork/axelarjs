@@ -2,6 +2,7 @@ node_modules/
 build/
 /cosmos-add-gas
 /evm-add-native-gas
+/docs
 
 *.d.ts
 *.js
