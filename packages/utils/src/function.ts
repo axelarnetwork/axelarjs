@@ -10,6 +10,13 @@ type FN<T, R> = (arg: T) => R;
  *
  * @param func function to memoize
  * @returns memoized function
+ *
+ * @example
+ *
+ * const add = (a: number, b: number) => a + b;
+ * const memoizedAdd = memoize(add);
+ *
+ * memoizedAdd(1, 2); // 3
  */
 export function memoize<T, R>(func: FN<T, R>): FN<T, R> {
   const cache = new Map<T, R>();
