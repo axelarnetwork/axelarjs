@@ -28,6 +28,9 @@
     "dev": {
       "dependsOn": ["^build"],
       "cache": false
+    },
+    "docgen": {
+      "outputs": ["docs/**"]
     }
   }
 }
