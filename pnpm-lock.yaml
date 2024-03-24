@@ -804,6 +804,9 @@ importers:
       fast-check:
         specifier: ^3.16.0
         version: 3.16.0
+      gh-pages:
+        specifier: ^6.1.1
+        version: 6.1.1
       happy-dom:
         specifier: ^13.9.0
         version: 13.9.0
@@ -846,6 +849,9 @@ importers:
       tsx:
         specifier: ^4.7.1
         version: 4.7.1
+      typedoc:
+        specifier: ^0.25.12
+        version: 0.25.12(typescript@5.4.2)
       typescript:
         specifier: ^5.4.2
         version: 5.4.2
