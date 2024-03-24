@@ -1,6 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["./src/index.ts"],
+  "exclude": ["**/*.spec.ts", "**/*.spec.tsx"],
   "out": "docs",
   "validation": {
     "notExported": true,
