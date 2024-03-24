@@ -20,6 +20,7 @@ import {
   SignerData,
   SigningStargateClient,
   SigningStargateClientOptions,
+  StargateClient,
   StargateClientOptions,
   StdFee,
 } from "@cosmjs/stargate";
@@ -204,3 +205,6 @@ export const createAxelarSigningClient =
   AxelarSigningStargateClient.connectWithSigner.bind(
     AxelarSigningStargateClient
   );
+
+export const createAxelarBroadcastClient =
+  StargateClient.connect.bind(StargateClient);
