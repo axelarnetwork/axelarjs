@@ -64,7 +64,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "docgen": "typedoc",
-    "deploy:docs": "gh-pages -d docs -e api"
+    "deploy:docs": "gh-pages -d docs -e ui"
   },
   "dependencies": {
     "@axelarjs/config": "workspace:*",
