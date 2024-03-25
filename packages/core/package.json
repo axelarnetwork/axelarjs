@@ -41,6 +41,6 @@
     "gh-pages": "^6.1.1",
     "rimraf": "^5.0.5",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   }
 }
