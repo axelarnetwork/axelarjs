@@ -729,8 +729,8 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4(react-dom@18.2.0)(react@18.2.0)
       styled-cva:
-        specifier: ^0.2.1
-        version: 0.2.1(typescript@5.4.3)
+        specifier: ^0.2.2
+        version: 0.2.2(typescript@5.4.3)
       tailwind-merge:
         specifier: ^1.14.0
         version: 1.14.0
@@ -19764,8 +19764,8 @@ packages:
       inline-style-parser: 0.1.1
     dev: false
 
-  /styled-cva@0.2.1(typescript@5.4.3):
-    resolution: {integrity: sha512-RM/U/5ex54En5g+qFQkdAb51WgSAv4OqGU+gwkgXX1c+Oabu7MibcmPwNTthRAnxJIH1Vret6oRpLioVPQ//rA==}
+  /styled-cva@0.2.2(typescript@5.4.3):
+    resolution: {integrity: sha512-Azr+P07BlPRl2Wan9wfSoDcVHOksa6TKIN+rW4SVpJUsWhwTe3Q6Z/gUw6etsgY+yJsvVWoxUqNsjaz49OsIrw==}
     peerDependencies:
       typescript: '>=5.0.0'
     dependencies:

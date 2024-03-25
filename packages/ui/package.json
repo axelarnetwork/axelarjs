@@ -82,7 +82,7 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-jazzicon": "^1.0.4",
-    "styled-cva": "^0.2.1",
+    "styled-cva": "^0.2.2",
     "tailwind-merge": "^1.14.0"
   },
   "devDependencies": {

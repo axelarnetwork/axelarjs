@@ -46,7 +46,7 @@ ModalFormInput.defaultProps = {
 
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => (
   <Button {...props}>
-    {children} <ChevronRightIcon className={cn({ hidden: props.loading })} />
+    {children} <ChevronRightIcon className={cn({ hidden: props.$loading })} />
   </Button>
 );
 

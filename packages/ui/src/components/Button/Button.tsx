@@ -62,14 +62,21 @@ type VProps = VariantProps<typeof buttonVariance>;
 type ButtonElement = Omit<JSX.IntrinsicElements["button"], "color">;
 
 export interface ButtonProps extends ButtonElement, VProps {
-  loading?: boolean;
+  /**
+   * @deprecated Use $loading instead @see $loading
+   */
+  loading?: never;
   disabled?: boolean;
 }
 
 type LinkElement = JSX.IntrinsicElements["a"];
 
 export interface LinkButtonProps extends LinkElement, VProps {
-  loading?: boolean;
+  /**
+   * @deprecated Use $loading instead @see $loading
+   */
+  loading?: never;
+  disabled?: boolean;
 }
 
 const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
@@ -104,8 +111,6 @@ const getSegmentedProps = <T extends ButtonProps | LinkButtonProps>(
   ] as const;
 };
 
-// write tsdoc for this component
-
 /**
  * A button component
  *
@@ -128,7 +133,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...componentProps}
         ref={ref}
       >
-        {props.loading && (
+        {props.$loading && (
           <Loading $size={props.$size === "xs" ? "xs" : "sm"} />
         )}
         {props.children}
@@ -139,6 +144,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = "Button";
 
+/**
+ * A link component that looks like a button
+ *
+ * @param {LinkButtonProps} props
+ * @returns {JSX.Element}
+ *
+ * @example
+ * <LinkButton variant="primary" size="sm" shape="square" outline>
+ *  Hello World
+ * </LinkButton>
+ */
 export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
   (props, ref) => {
     const [classes, componentProps] = getSegmentedProps(props);
