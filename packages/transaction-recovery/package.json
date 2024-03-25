@@ -63,7 +63,7 @@
     "gh-pages": "^6.1.1",
     "rimraf": "^5.0.5",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "vitest": "^1.4.0"
   },
   "dependencies": {
@@ -72,6 +72,6 @@
     "@axelarjs/cosmos": "workspace:*",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
-    "viem": "^2.8.11"
+    "viem": "^2.8.18"
   }
 }

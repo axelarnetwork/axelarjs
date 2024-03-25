@@ -50,7 +50,7 @@
     "gh-pages": "^6.1.1",
     "rimraf": "^5.0.5",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "vitest": "1.2.1"
   },
   "dependencies": {
@@ -60,6 +60,6 @@
     "@axelarjs/proto": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "bech32": "^2.0.0",
-    "viem": "^2.8.11"
+    "viem": "^2.8.18"
   }
 }

@@ -50,13 +50,13 @@
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
     "tsx": "^4.7.1",
-    "viem": "^2.8.11",
+    "viem": "^2.8.18",
     "zx": "^7.2.3"
   },
   "devDependencies": {
     "@axelar-network/interchain-token-service": "^1.2.1",
     "@axelarjs/config": "workspace:*",
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.11.30",
     "@types/prettier": "^2.7.3",
     "commander": "^11.1.0",
     "dotenv": "^16.4.5",
@@ -65,7 +65,7 @@
     "rimraf": "^5.0.5",
     "strip-ansi": "^6.0.1",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "vitest": "^1.4.0"
   }
 }
