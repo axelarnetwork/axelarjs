@@ -143,15 +143,7 @@ export default class MaestroPostgresClient {
                 updateValue.tokenAddress ?? existingToken.tokenAddress,
               updatedAt: new Date(),
             })
-            .where(
-              and(
-                eq(remoteInterchainTokens.tokenId, updateValue.tokenId),
-                eq(
-                  remoteInterchainTokens.axelarChainId,
-                  updateValue.axelarChainId
-                )
-              )
-            );
+            .where(eq(remoteInterchainTokens.id, existingToken.id));
         }
       }
 
