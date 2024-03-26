@@ -4,6 +4,7 @@ import type {
 } from "@axelarjs/api";
 import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
+import type { EventResponse } from "../../../../proto/build/module/axelar/evm/v1beta1/query";
 import type { ChainConfig } from "../lib/helper";
 import { mapSearchGMPToEvmEvent } from "../lib/mapper";
 import type { RecoveryTxResponse } from "../types";
@@ -29,12 +30,35 @@ export async function sendAxelarConfirmTx(
   const txHash = searchGMPData.call.transactionHash;
   const srcTxBlockNumber = BigInt(searchGMPData.call.blockNumber);
 
+  const { isFinalized, currentBlockNumber, numRequiredConfirmations } =
+    await isFinalizedTx(srcTxBlockNumber, srcChainConfig, axelarQueryRpcClient);
+
+  if (!isFinalized) {
+    return {
+      skip: true,
+      error: new Error(
+        `Not enough confirmations for tx ${txHash}. Required ${numRequiredConfirmations}, got ${
+          currentBlockNumber - srcTxBlockNumber
+        }`
+      ),
+    };
+  }
+
   const { eventIndex, srcChain } = mapSearchGMPToEvmEvent(searchGMPData);
 
-  const evmEvent = await axelarQueryRpcClient.evm.Event({
-    chain: srcChain,
-    eventId: `${txHash}-${eventIndex}`,
-  });
+  let evmEvent: EventResponse | undefined;
+
+  try {
+    evmEvent = await axelarQueryRpcClient.evm.Event({
+      chain: srcChain,
+      eventId: `${txHash}-${eventIndex}`,
+    });
+  } catch (e) {
+    return {
+      skip: true,
+      error: new Error(`Failed to fetch EVM event`),
+    };
+  }
 
   // Throw error if the event is not found. This should never happen for valid GMP tx.
   if (!evmEvent.event) {
@@ -48,23 +72,12 @@ export async function sendAxelarConfirmTx(
   if (isConfirmed(evmEvent.event)) {
     return {
       skip: true,
+      skipReason: "Already confirmed",
     };
   }
 
-  const { isFinalized, currentBlockNumber, numRequiredConfirmations } =
-    await isFinalizedTx(srcTxBlockNumber, srcChainConfig, axelarQueryRpcClient);
-
-  if (isFinalized) {
-    return {
-      skip: true,
-      error: new Error(
-        `Not enough confirmations for tx ${txHash}. Required ${numRequiredConfirmations}, got ${
-          currentBlockNumber - srcTxBlockNumber
-        }`
-      ),
-    };
-  }
-
+  // TODO: Handle an error here. It's possible to get error. Here's example:
+  // Error: Bad status on response: 502
   const confirmTx = await dependencies.axelarRecoveryApiClient.confirm(
     txHash,
     "evm",

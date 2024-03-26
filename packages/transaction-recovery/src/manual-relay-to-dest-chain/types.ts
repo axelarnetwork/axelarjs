@@ -18,3 +18,26 @@ export enum RouteDir {
   EVM_TO_COSMOS = "evm_to_cosmos",
   EVM_TO_EVM = "evm_to_evm",
 }
+
+export type EvmSignerOptions = {
+  privateKey?: `0x${string}`;
+  rpcUrl?: string;
+};
+
+export type RecoveryTxType =
+  | "axelar_confirm_gateway_tx"
+  | "axelar_sign_commands"
+  | "axelar_route_message"
+  | "evm_gateway_approve";
+
+export type RecoveryTx = {
+  hash: string;
+  type: RecoveryTxType;
+};
+
+export type RecoveryTxResponse = {
+  skip: boolean;
+  skipReason?: string | undefined;
+  error?: Error | undefined;
+  tx?: RecoveryTx | undefined;
+};

@@ -5,7 +5,7 @@ describe("manualRelayToDestChain", () => {
     const response = await manualRelayToDestChain({
       environment: "mainnet",
       txHash:
-        "0x4a2f45fca07051e25407edb253b305946554054c5177e9b4d5a80d1ab858f82d",
+        "0x3f1175cee93c64b77297a4a4d929d50b7b5e7904a2e1c80d3ce7b61ab0776de2",
       escapeAfterConfirm: false,
       options: {},
     });

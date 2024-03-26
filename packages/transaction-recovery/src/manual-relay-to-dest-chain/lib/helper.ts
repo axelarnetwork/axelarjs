@@ -8,10 +8,7 @@ import {
 import { ManualRelayToDestChainError } from "../error";
 import { RouteDir } from "../types";
 
-export function getRouteDir(
-  srcChain: EVMChainConfig | CosmosChainConfig,
-  destChain: EVMChainConfig | CosmosChainConfig
-) {
+export function getRouteDir(srcChain: ChainConfig, destChain: ChainConfig) {
   if (srcChain.chain_type === "evm" && destChain.chain_type === "evm") {
     return RouteDir.EVM_TO_EVM;
   } else if (
@@ -24,15 +21,43 @@ export function getRouteDir(
   }
 }
 
+export type ChainConfig = {
+  chain_type: "evm" | "cosmos";
+  id: string;
+  name: string;
+  rpcUrl?: string | undefined;
+};
+
 export function findChainConfig(
   chainConfigs: BaseChainConfigsResponse,
   chain: string
-) {
-  const allChainConfigs = [...chainConfigs.evm, ...chainConfigs.cosmos];
-  const chainConfig = allChainConfigs.find(
+): ChainConfig | undefined {
+  const evmChainConfig = chainConfigs.evm.find(
     (config) => config.id.toLowerCase() === chain.toLowerCase()
   );
-  return chainConfig;
+
+  if (evmChainConfig) {
+    return {
+      chain_type: "evm",
+      id: evmChainConfig.id,
+      rpcUrl: evmChainConfig.endpoints?.rpc?.[0],
+      name: evmChainConfig.name,
+    };
+  }
+
+  const cosmosChainConfig = chainConfigs.cosmos.find(
+    (config) => config.id.toLowerCase() === chain.toLowerCase()
+  );
+
+  if (cosmosChainConfig) {
+    return {
+      chain_type: "cosmos",
+      id: cosmosChainConfig.id,
+      name: cosmosChainConfig.name,
+    };
+  }
+
+  return undefined;
 }
 
 export function mapSearchGMPResponse(response: SearchGMPResponse["data"]) {

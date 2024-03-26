@@ -101,15 +101,17 @@ type SearchGMPCall = {
     payload: string;
     symbol: string;
     amount: HexAmount;
+    messageId?: string;
   };
 };
 
-type SearchGMPPReceipt = {
+type SearchGMPReceipt = {
   gasUsed: string;
   blockNumber: number;
   from: `0x${string}`;
   transactionHash: `0x${string}`;
   status: number;
+  confirmations: number;
 };
 
 type SearchGMPTransaction = {
@@ -131,7 +133,7 @@ type SearchGMPExecuted = {
   blockNumber: number;
   block_timestamp: number;
   from: `0x${string}`;
-  receipt: SearchGMPPReceipt;
+  receipt: SearchGMPReceipt;
   sourceTransactionHash: `0x${string}`;
   id: string;
   event: "execute";
@@ -212,7 +214,7 @@ export type SearchGMPGasPaid = {
   };
   blockNumber: number;
   block_timestamp: number;
-  receipt: SearchGMPPReceipt;
+  receipt: SearchGMPReceipt;
   _id: string;
   id: string;
   event: string;

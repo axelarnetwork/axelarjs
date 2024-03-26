@@ -9,6 +9,7 @@ import type {
   LinkEvent,
   LinkRequestRawResponse,
   LinkRequestResponse,
+  SearchBatchesResponse,
 } from "./types";
 
 export const MODULES = {
@@ -105,6 +106,22 @@ export class AxelarscanClient extends RestService {
     const result = await this.client
       .post("", { json })
       .json<LinkRequestRawResponse>();
+
+    return result;
+  }
+
+  async searchBatchedCommands(params: {
+    commandId?: string | undefined;
+    sourceTransactionHash?: string | undefined;
+  }) {
+    const json = {
+      commandId: params.commandId,
+      sourceTransactionHash: params.sourceTransactionHash,
+    };
+
+    const result = await this.client
+      .post("token/searchBatches", { json })
+      .json<SearchBatchesResponse>();
 
     return result;
   }

@@ -2,14 +2,15 @@ import type {
   AxelarRecoveryApiClient,
   AxelarscanClient,
   SearchBatchesResponse,
+  SearchGMPResponseData,
 } from "@axelarjs/api";
 
+import type { ChainConfig } from "../lib/helper";
 import type { RecoveryTxResponse } from "../types";
 
 export type SendAxelarSignTxParams = {
-  commandId?: string | undefined;
-  sourceTransactionHash?: `0x${string}` | undefined;
-  chainId: string;
+  searchGMPData: SearchGMPResponseData;
+  srcChainConfig: ChainConfig;
 };
 
 export type SendAxelarSignTxDependencies = {
@@ -21,9 +22,11 @@ export async function sendAxelarSignTx(
   params: SendAxelarSignTxParams,
   deps: SendAxelarSignTxDependencies
 ): Promise<RecoveryTxResponse> {
-  const { commandId, chainId, sourceTransactionHash } = params;
+  const commandId = params.searchGMPData.command_id;
+  const sourceTransactionHash = params.searchGMPData.call.transactionHash;
+  const chainId = params.srcChainConfig.id;
 
-  let batchedCommands: SearchBatchesResponse | undefined;
+  let batchedCommands: SearchBatchesResponse | undefined = undefined;
 
   try {
     batchedCommands = await deps.axelarscanClient.searchBatchedCommands({
