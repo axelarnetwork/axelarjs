@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { type Address } from "viem";
 import { z } from "zod";
 
-import type { DBClient } from "~/lib/drizzle/client";
+import type { BatchItems, DBClient } from "~/lib/drizzle/client";
 import {
   AuditLogEvent,
   AuditLogEventKind,
@@ -97,35 +97,34 @@ export default class MaestroPostgresClient {
   async recordRemoteInterchainTokenDeployments(
     values: NewRemoteInterchainTokenInput[]
   ) {
-    await this.db.transaction(async (tx) => {
-      const existingTokens = await tx.query.remoteInterchainTokens.findMany({
-        where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
-      });
+    const existingTokens = await this.db.query.remoteInterchainTokens.findMany({
+      where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
+    });
 
-      const updateValues = existingTokens
-        .map(
-          (t) =>
-            [
-              t,
-              sanitizeObject(
-                values.find(
-                  (v) =>
-                    v.axelarChainId === t.axelarChainId &&
-                    v.tokenId === t.tokenId
-                ) ?? {}
-              ),
-            ] as const
-        )
-        .filter(([, v]) => Boolean(v));
+    const updateValues = existingTokens
+      .map(
+        (t) =>
+          [
+            t,
+            sanitizeObject(
+              values.find(
+                (v) =>
+                  v.axelarChainId === t.axelarChainId && v.tokenId === t.tokenId
+              ) ?? {}
+            ),
+          ] as const
+      )
+      .filter(([, v]) => Boolean(v));
 
-      const insertValues = values.filter((v) => {
-        const id = `${v.axelarChainId}:${v.tokenAddress}`;
-        return !existingTokens.some((t) => t.id === id);
-      });
+    const insertValues = values.filter((v) => {
+      const id = `${v.axelarChainId}:${v.tokenAddress}`;
+      return !existingTokens.some((t) => t.id === id);
+    });
 
-      if (updateValues.length > 0) {
-        for (const [existingToken, updateValue] of updateValues) {
-          await tx
+    if (updateValues.length > 0) {
+      const [first, ...rest] = updateValues.map(
+        ([existingToken, updateValue]) =>
+          this.db
             .update(remoteInterchainTokens)
             .set({
               id: updateValue.id ?? existingToken.id,
@@ -143,23 +142,29 @@ export default class MaestroPostgresClient {
                 updateValue.tokenAddress ?? existingToken.tokenAddress,
               updatedAt: new Date(),
             })
-            .where(eq(remoteInterchainTokens.id, existingToken.id));
-        }
-      }
-
-      if (!insertValues.length) {
-        return;
-      }
-
-      await tx.insert(remoteInterchainTokens).values(
-        insertValues.map((v) => ({
-          ...v,
-          id: `${v.axelarChainId}:${v.tokenAddress}`,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }))
+            .where(eq(remoteInterchainTokens.id, existingToken.id))
       );
-    });
+
+      // only batch if there are more than one update
+      if (!rest.length) {
+        await first;
+      } else {
+        await this.db.batch([first, ...rest] as BatchItems);
+      }
+    }
+
+    if (!insertValues.length) {
+      return;
+    }
+
+    await this.db.insert(remoteInterchainTokens).values(
+      insertValues.map((v) => ({
+        ...v,
+        id: `${v.axelarChainId}:${v.tokenAddress}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    );
   }
 
   /**
