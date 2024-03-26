@@ -562,8 +562,8 @@ importers:
         version: 7.2.3
     devDependencies:
       '@axelar-network/interchain-token-service':
-        specifier: ^1.2.1
-        version: 1.2.1
+        specifier: ^1.2.4
+        version: 1.2.4
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
@@ -1059,8 +1059,8 @@ packages:
       protobufjs: 7.2.6
     dev: false
 
-  /@axelar-network/interchain-token-service@1.2.1:
-    resolution: {integrity: sha512-l7X9xi9aveAfUts48kBsPzkWGIVdAjX2iRLWSqQkqeCvXZjDsEq54NFF2/JK7Cf2YTTJcVvFDJn9T18i5bzAfQ==}
+  /@axelar-network/interchain-token-service@1.2.4:
+    resolution: {integrity: sha512-Sgw2M4VzW5hjL9TBe2ljL5wo+paYqlL2XNQlq1dyaDAD6E7PG1MQ+0U44QnfJfhhAwcqZtKQmb92ZNwV+BEdVw==}
     engines: {node: '>=16'}
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 6.2.1
@@ -9907,6 +9907,9 @@ packages:
     resolution: {integrity: sha512-GBryCiyl+taz5DPq0expxzfMVcrpKjWvEBSAqT1tPUSthnzOWnVF77XlUAYgFZqzPsEu9lQ1dHCdqZx7WWMCXA==}
     peerDependencies:
       '@web3modal/wallet': 4.1.1
+    peerDependenciesMeta:
+      '@web3modal/siwe':
+        optional: true
     dependencies:
       '@web3modal/common': 4.1.1
       '@web3modal/core': 4.1.1(@types/react@18.2.21)(react@18.2.0)
@@ -9947,6 +9950,15 @@ packages:
       '@wagmi/connectors': '>=4.0.0'
       '@wagmi/core': '>=2.0.0'
       viem: '>=2.0.0'
+    peerDependenciesMeta:
+      '@web3modal/siwe':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      vue:
+        optional: true
     dependencies:
       '@wagmi/connectors': 4.1.18(@types/react@18.2.21)(@vercel/kv@1.0.1)(@wagmi/core@2.6.9)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)(typescript@5.4.3)(viem@2.8.18)(zod@3.22.4)
       '@wagmi/core': 2.6.9(@types/react@18.2.21)(react@18.2.0)(typescript@5.4.3)(viem@2.8.18)(zod@3.22.4)
