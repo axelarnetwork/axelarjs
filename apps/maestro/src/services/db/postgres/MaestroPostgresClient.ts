@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { type Address } from "viem";
 import { z } from "zod";
 
-import type { BatchItems, DBClient } from "~/lib/drizzle/client";
+import type { DBClient } from "~/lib/drizzle/client";
 import {
   AuditLogEvent,
   AuditLogEventKind,
@@ -122,35 +122,33 @@ export default class MaestroPostgresClient {
     });
 
     if (updateValues.length > 0) {
-      const [first, ...rest] = updateValues.map(
-        ([existingToken, updateValue]) =>
-          this.db
-            .update(remoteInterchainTokens)
-            .set({
-              id: updateValue.id ?? existingToken.id,
-              tokenManagerAddress:
-                updateValue.tokenManagerAddress ??
-                existingToken.tokenManagerAddress,
-              deploymentMessageId:
-                updateValue.deploymentMessageId ??
-                existingToken.deploymentMessageId,
-              deploymentStatus:
-                updateValue.deploymentStatus ?? existingToken.deploymentStatus,
-              tokenManagerType:
-                updateValue.tokenManagerType ?? existingToken.tokenManagerType,
-              tokenAddress:
-                updateValue.tokenAddress ?? existingToken.tokenAddress,
-              updatedAt: new Date(),
-            })
-            .where(eq(remoteInterchainTokens.id, existingToken.id))
+      const [head, ...tail] = updateValues.map(([existingToken, updateValue]) =>
+        this.db
+          .update(remoteInterchainTokens)
+          .set({
+            id: updateValue.id ?? existingToken.id,
+            tokenManagerAddress:
+              updateValue.tokenManagerAddress ??
+              existingToken.tokenManagerAddress,
+            deploymentMessageId:
+              updateValue.deploymentMessageId ??
+              existingToken.deploymentMessageId,
+            deploymentStatus:
+              updateValue.deploymentStatus ?? existingToken.deploymentStatus,
+            tokenManagerType:
+              updateValue.tokenManagerType ?? existingToken.tokenManagerType,
+            tokenAddress:
+              updateValue.tokenAddress ?? existingToken.tokenAddress,
+            updatedAt: new Date(),
+          })
+          .where(eq(remoteInterchainTokens.id, existingToken.id))
       );
 
-      // only batch if there are more than one update
-      if (!rest.length) {
-        await first;
-      } else {
-        await this.db.batch([first, ...rest] as BatchItems);
-      }
+      // only batch if there are more than one update operation,
+      // otherise run the single update
+      const update = tail.length ? this.db.batch([head, ...tail]) : head;
+
+      await update;
     }
 
     if (!insertValues.length) {
