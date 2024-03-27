@@ -323,6 +323,29 @@ export default {
       type: "function",
     },
     {
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress_",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "from",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "burnToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
       inputs: [],
       name: "contractId",
       outputs: [
@@ -479,6 +502,29 @@ export default {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress_",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "to",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "mintToken",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {

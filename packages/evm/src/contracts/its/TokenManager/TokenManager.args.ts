@@ -99,6 +99,35 @@ export const encodeTokenManagerAddFlowOutData = ({
     args: [amount],
   });
 
+export type TokenManagerBurnTokenArgs = {
+  tokenAddress_: `0x${string}`;
+  from: `0x${string}`;
+  amount: bigint;
+};
+
+/**
+ * Factory function for TokenManager.burnToken function args
+ */
+export const encodeTokenManagerBurnTokenArgs = ({
+  tokenAddress_,
+  from,
+  amount,
+}: TokenManagerBurnTokenArgs) => [tokenAddress_, from, amount] as const;
+
+/**
+ * Encoder function for TokenManager.burnToken function data
+ */
+export const encodeTokenManagerBurnTokenData = ({
+  tokenAddress_,
+  from,
+  amount,
+}: TokenManagerBurnTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "burnToken",
+    abi: ABI_FILE.abi,
+    args: [tokenAddress_, from, amount],
+  });
+
 export type TokenManagerGetTokenAddressFromParamsArgs = {
   params_: `0x${string}`;
 };
@@ -185,6 +214,35 @@ export const encodeTokenManagerIsOperatorData = ({
     functionName: "isOperator",
     abi: ABI_FILE.abi,
     args: [addr],
+  });
+
+export type TokenManagerMintTokenArgs = {
+  tokenAddress_: `0x${string}`;
+  to: `0x${string}`;
+  amount: bigint;
+};
+
+/**
+ * Factory function for TokenManager.mintToken function args
+ */
+export const encodeTokenManagerMintTokenArgs = ({
+  tokenAddress_,
+  to,
+  amount,
+}: TokenManagerMintTokenArgs) => [tokenAddress_, to, amount] as const;
+
+/**
+ * Encoder function for TokenManager.mintToken function data
+ */
+export const encodeTokenManagerMintTokenData = ({
+  tokenAddress_,
+  to,
+  amount,
+}: TokenManagerMintTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "mintToken",
+    abi: ABI_FILE.abi,
+    args: [tokenAddress_, to, amount],
   });
 
 export type TokenManagerParamsArgs = {
@@ -335,6 +393,10 @@ export const TOKEN_MANAGER_ENCODERS = {
     args: encodeTokenManagerAddFlowOutArgs,
     data: encodeTokenManagerAddFlowOutData,
   },
+  burnToken: {
+    args: encodeTokenManagerBurnTokenArgs,
+    data: encodeTokenManagerBurnTokenData,
+  },
   getTokenAddressFromParams: {
     args: encodeTokenManagerGetTokenAddressFromParamsArgs,
     data: encodeTokenManagerGetTokenAddressFromParamsData,
@@ -350,6 +412,10 @@ export const TOKEN_MANAGER_ENCODERS = {
   isOperator: {
     args: encodeTokenManagerIsOperatorArgs,
     data: encodeTokenManagerIsOperatorData,
+  },
+  mintToken: {
+    args: encodeTokenManagerMintTokenArgs,
+    data: encodeTokenManagerMintTokenData,
   },
   params: {
     args: encodeTokenManagerParamsArgs,

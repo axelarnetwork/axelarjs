@@ -63,6 +63,17 @@ export default {
       type: "error",
     },
     {
+      inputs: [
+        {
+          internalType: "enum ITokenManagerType.TokenManagerType",
+          name: "",
+          type: "uint8",
+        },
+      ],
+      name: "CannotDeploy",
+      type: "error",
+    },
+    {
       inputs: [],
       name: "EmptyData",
       type: "error",
