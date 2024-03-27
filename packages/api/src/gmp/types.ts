@@ -401,6 +401,8 @@ export type TokenUnit = {
   decimals: number;
 };
 
+export type L2Type = "op" | "mantle" | "arb" | undefined;
+
 export type Token = {
   contract_address: string;
   symbol: string;
@@ -414,7 +416,7 @@ export type Token = {
   gas_price_gwei: string;
 };
 
-type GetBaseFeesResult = {
+export type GetBaseFeesResult = {
   base_fee: number;
   base_fee_usd: number;
   source_base_fee: number;
@@ -433,9 +435,11 @@ type GetBaseFeesResult = {
   source_express_fee: ExpressFee;
   destination_express_fee: ExpressFee;
   source_token: Token;
+  l2_type: L2Type;
   destination_native_token: Token & {
     name: string;
     symbol: string;
+    l1_gas_oracle_address?: `0x${string}` | undefined;
   };
   ethereum_token: {
     name: string;
