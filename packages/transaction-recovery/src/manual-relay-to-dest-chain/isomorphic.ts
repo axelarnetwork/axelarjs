@@ -42,6 +42,7 @@ export type RecoveryDependencies = ManualRelayToDestChainDependencies & {
 export type RecoveryParams = {
   searchGMPData: SearchGMPResponseData;
   srcChainConfig: ChainConfig;
+  destChainConfig: ChainConfig;
 };
 
 export async function manualRelayToDestChain(
@@ -90,6 +91,7 @@ export async function manualRelayToDestChain(
   const recoveryParams: RecoveryParams = {
     searchGMPData: searchGMPResponse[0],
     srcChainConfig,
+    destChainConfig,
   };
 
   let recoveryResponse: RecoveryTxResponse[];
@@ -104,44 +106,46 @@ export async function manualRelayToDestChain(
     recoveryResponse = await recoverIbcToIbc(recoveryParams, recoveryDeps);
   }
 
-  console.log(recoveryResponse);
+  return recoveryResponse;
 }
 
 async function recoverEvmToEvm(
   params: RecoveryParams,
   deps: RecoveryDependencies
 ) {
-  console.log(params.searchGMPData.command_id);
   const confirmResponse = await sendAxelarConfirmTx(params, deps);
   const signResponse = await sendAxelarSignTx(params, deps);
-  await sendEvmGatewayApproveTx(params, deps);
+  const sendEvmGatewayResponse = await sendEvmGatewayApproveTx(params, deps);
 
-  console.log("confirmResponse", confirmResponse);
-  console.log("signResponse", signResponse);
-  return [confirmResponse, signResponse];
+  return [confirmResponse, signResponse, sendEvmGatewayResponse];
 }
 
 async function recoverEvmToIbc(
   params: RecoveryParams,
   deps: RecoveryDependencies
 ) {
-  await sendAxelarConfirmTx(params, deps);
-  await sendAxelarSignTx(params, deps);
-  await sendAxelarRouteMessageTx(params, deps);
+  const confirmResponse = await sendAxelarConfirmTx(params, deps);
+  const signTxResponse = await sendAxelarSignTx(params, deps);
+  const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
+
+  return [confirmResponse, signTxResponse, routeMessageTxResponse];
 }
 
 async function recoverIbcToEvm(
   params: RecoveryParams,
   deps: RecoveryDependencies
 ) {
-  await sendAxelarRouteMessageTx(params, deps);
-  await sendAxelarSignTx(params, deps);
-  await sendEvmGatewayApproveTx(params, deps);
+  const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
+  const signTxResponse = await sendAxelarSignTx(params, deps);
+  const gatewayApproveResponse = await sendEvmGatewayApproveTx(params, deps);
+
+  return [routeMessageTxResponse, signTxResponse, gatewayApproveResponse];
 }
 
 async function recoverIbcToIbc(
   params: RecoveryParams,
   deps: RecoveryDependencies
 ) {
-  await sendAxelarRouteMessageTx(params, deps);
+  const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
+  return [routeMessageTxResponse];
 }
