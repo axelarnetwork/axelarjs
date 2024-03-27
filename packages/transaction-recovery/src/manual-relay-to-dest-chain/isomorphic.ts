@@ -94,19 +94,22 @@ export async function manualRelayToDestChain(
     destChainConfig,
   };
 
-  let recoveryResponse: RecoveryTxResponse[];
+  let recoverySteps: RecoveryTxResponse[];
 
   if (dir === RouteDir.EVM_TO_EVM) {
-    recoveryResponse = await recoverEvmToEvm(recoveryParams, recoveryDeps);
+    recoverySteps = await recoverEvmToEvm(recoveryParams, recoveryDeps);
   } else if (dir === RouteDir.COSMOS_TO_EVM) {
-    recoveryResponse = await recoverEvmToIbc(recoveryParams, recoveryDeps);
+    recoverySteps = await recoverEvmToIbc(recoveryParams, recoveryDeps);
   } else if (dir === RouteDir.EVM_TO_COSMOS) {
-    recoveryResponse = await recoverIbcToEvm(recoveryParams, recoveryDeps);
+    recoverySteps = await recoverIbcToEvm(recoveryParams, recoveryDeps);
   } else {
-    recoveryResponse = await recoverIbcToIbc(recoveryParams, recoveryDeps);
+    recoverySteps = await recoverIbcToIbc(recoveryParams, recoveryDeps);
   }
 
-  return recoveryResponse;
+  return {
+    type: dir,
+    recoverySteps,
+  };
 }
 
 async function recoverEvmToEvm(

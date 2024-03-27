@@ -23,6 +23,7 @@ export async function sendAxelarRouteMessageTx(
   if (!messageId) {
     return {
       skip: true,
+      type: "axelar_route_message",
       skipReason: "No messageId found",
     };
   }
@@ -35,14 +36,15 @@ export async function sendAxelarRouteMessageTx(
 
     return {
       skip: false,
+      type: "axelar_route_message",
       tx: {
         hash: tx.transactionHash,
-        type: "axelar_route_message",
       },
     };
   } catch (e) {
     return {
       skip: true,
+      type: "axelar_route_message",
       skipReason: "Failed to send route message tx",
     };
   }

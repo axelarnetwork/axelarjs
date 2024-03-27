@@ -32,12 +32,12 @@ export type RecoveryTxType =
 
 export type RecoveryTx = {
   hash: string;
-  type: RecoveryTxType;
 };
 
 export type RecoveryTxResponse = {
   skip: boolean;
   skipReason?: string | undefined;
+  type: RecoveryTxType;
   error?: Error | undefined;
   tx?: RecoveryTx | undefined;
 };

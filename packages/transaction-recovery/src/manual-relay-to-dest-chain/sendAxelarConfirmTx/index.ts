@@ -8,6 +8,7 @@ import type { EventResponse } from "../../../../proto/build/module/axelar/evm/v1
 import type { ChainConfig } from "../lib/helper";
 import { mapSearchGMPToEvmEvent } from "../lib/mapper";
 import type { RecoveryTxResponse } from "../types";
+import { ConfirmGatewayTxError } from "./error";
 import { isConfirmed, isFinalizedTx } from "./qualifier";
 
 export type SendAxelarConfirmTxParams = {
@@ -36,15 +37,18 @@ export async function sendAxelarConfirmTx(
   if (!isFinalized) {
     return {
       skip: true,
-      error: new Error(
-        `Not enough confirmations for tx ${txHash}. Required ${numRequiredConfirmations}, got ${
-          currentBlockNumber - srcTxBlockNumber
-        }`
+      type: "axelar_confirm_gateway_tx",
+      error: ConfirmGatewayTxError.NOT_FINALIZED(
+        txHash,
+        numRequiredConfirmations,
+        currentBlockNumber,
+        srcTxBlockNumber
       ),
     };
   }
 
-  const { eventIndex, srcChain } = mapSearchGMPToEvmEvent(searchGMPData);
+  const eventIndex = searchGMPData.call.eventIndex;
+  const srcChain = searchGMPData.call.chain;
 
   let evmEvent: EventResponse | undefined;
 
@@ -56,7 +60,8 @@ export async function sendAxelarConfirmTx(
   } catch (e) {
     return {
       skip: true,
-      error: new Error(`Failed to fetch EVM event`),
+      type: "axelar_confirm_gateway_tx",
+      error: ConfirmGatewayTxError.FAILED_FETCH_EVM_EVENT,
     };
   }
 
@@ -64,7 +69,8 @@ export async function sendAxelarConfirmTx(
   if (!evmEvent.event) {
     return {
       skip: true,
-      error: new Error("EVM event not found"),
+      type: "axelar_confirm_gateway_tx",
+      error: ConfirmGatewayTxError.EVM_EVENT_NOT_FOUND,
     };
   }
 
@@ -72,6 +78,7 @@ export async function sendAxelarConfirmTx(
   if (isConfirmed(evmEvent.event)) {
     return {
       skip: true,
+      type: "axelar_confirm_gateway_tx",
       skipReason: "Already confirmed",
     };
   }
@@ -86,9 +93,9 @@ export async function sendAxelarConfirmTx(
 
   return {
     skip: false,
+    type: "axelar_confirm_gateway_tx",
     tx: {
       hash: confirmTx.transactionHash,
-      type: "axelar_confirm_gateway_tx",
     },
   };
 }
