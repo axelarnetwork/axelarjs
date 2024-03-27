@@ -6,7 +6,6 @@ import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
 import type { EventResponse } from "../../../../proto/build/module/axelar/evm/v1beta1/query";
 import type { ChainConfig } from "../lib/helper";
-import { mapSearchGMPToEvmEvent } from "../lib/mapper";
 import type { RecoveryTxResponse } from "../types";
 import { ConfirmGatewayTxError } from "./error";
 import { isConfirmed, isFinalizedTx } from "./qualifier";

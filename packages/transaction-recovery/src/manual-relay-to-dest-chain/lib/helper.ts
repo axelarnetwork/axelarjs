@@ -1,9 +1,4 @@
-import {
-  BaseChainConfigsResponse,
-  CosmosChainConfig,
-  EVMChainConfig,
-  SearchGMPResponse,
-} from "@axelarjs/api";
+import { BaseChainConfigsResponse, SearchGMPResponse } from "@axelarjs/api";
 
 import { ManualRelayToDestChainError } from "../error";
 import { RouteDir } from "../types";
