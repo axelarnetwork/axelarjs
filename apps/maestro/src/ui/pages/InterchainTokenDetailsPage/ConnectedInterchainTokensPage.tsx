@@ -402,7 +402,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetailsError && (
         <Alert $status="error">{tokenDetailsError.message}</Alert>
       )}
-
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
@@ -421,6 +420,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           )}
         </div>
       )}
+      <Alert $status={"success"} className="mb-5">
+        Anyone can send tokens to/from any of your deployed chains using the
+        link of this portal. Share with your community!
+      </Alert>
       <InterchainTokenList title="Registered Chains" tokens={registered} />
       {pendingUnregisteredTokens.length > 0 && (
         <InterchainTokenList
