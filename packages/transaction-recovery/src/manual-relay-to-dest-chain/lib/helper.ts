@@ -1,7 +1,7 @@
 import { BaseChainConfigsResponse, SearchGMPResponse } from "@axelarjs/api";
 
 import { ManualRelayToDestChainError } from "../error";
-import { RouteDir } from "../types";
+import { RouteDir, type RecoveryTxResponse } from "../types";
 
 export function getRouteDir(srcChain: ChainConfig, destChain: ChainConfig) {
   if (srcChain.chain_type === "evm" && destChain.chain_type === "evm") {
@@ -67,4 +67,42 @@ export function mapSearchGMPResponse(response: SearchGMPResponse["data"]) {
     destChain: tx.call.returnValues.destinationChain,
     eventIndex: tx.call._logIndex,
   };
+}
+
+export type RecoveryStep = Promise<RecoveryTxResponse>;
+
+export async function retry(
+  times: number = 10,
+  delay: number = 3000,
+  pendingRecoveryStep: RecoveryStep
+) {
+  let resolved;
+  for (let i = 0; i < times; i++) {
+    resolved = await pendingRecoveryStep;
+    if (resolved.skip && !resolved.error) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    } else {
+      return resolved;
+    }
+  }
+
+  return {
+    ...resolved,
+    error: new Error("Max retries reached"),
+  };
+}
+
+export async function processRecovery(pendingRecoverySteps: RecoveryStep[]) {
+  const responses = [];
+  for (const pendingRecoveryStep of pendingRecoverySteps) {
+    const response = await pendingRecoveryStep;
+
+    if (response.skip && !response.error) {
+      // retry if not error
+    }
+
+    responses.push(response);
+  }
+
+  return responses;
 }
