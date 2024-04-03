@@ -87,6 +87,25 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           </LinkButton>
         ),
       ],
+      [
+        "Whitelisting Your Token at Squid",
+        props.wasDeployedByAccount && (
+          <Tooltip
+            $as={Indicator}
+            $position="right"
+            tip="Use the wizard in the repo to whitelist your token. You can then add the Squid widget to your user interface, which will allow you to bridge your Interchain Token after it has been whitelisted"
+          >
+            <LinkButton
+              target="_blank"
+              className="ml-[-10px]"
+              $variant="link"
+              href="https://github.com/axelarnetwork/axelar-configs "
+            >
+              Link
+            </LinkButton>
+          </Tooltip>
+        ),
+      ],
     ]),
     ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
       [
