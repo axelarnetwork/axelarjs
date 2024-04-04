@@ -96,7 +96,20 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             $variant="link"
             href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
           >
-            Claim
+            Link
+          </LinkButton>
+        ),
+      ],
+      [
+        "Marketing Form",
+        props.wasDeployedByAccount && (
+          <LinkButton
+            target="_blank"
+            className="ml-[-10px]"
+            $variant="link"
+            href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+          >
+            Link
           </LinkButton>
         ),
       ],
