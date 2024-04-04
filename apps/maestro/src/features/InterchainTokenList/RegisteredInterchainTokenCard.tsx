@@ -21,7 +21,7 @@ import { TransactionExecutionError } from "viem";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { dexLinks } from "~/config/dex";
-import { shouldDisableSend } from "~/config/env";
+import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -106,6 +106,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     </Button>
   );
 
+  const isMainnet = NEXT_PUBLIC_NETWORK_ENV === "mainnet";
   const dex = dexLinks[props.chain?.id as string]?.(props.tokenAddress);
 
   return (
@@ -309,7 +310,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             })}
           </CopyToClipboardButton>
         </Card.Actions>
-        {dex && (
+        {isMainnet && dex && (
           <Card.Actions className="mt-2 flex flex-col justify-between">
             Add Liquidity
             <LinkButton
