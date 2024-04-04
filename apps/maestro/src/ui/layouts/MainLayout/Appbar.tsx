@@ -18,6 +18,7 @@ import { cn } from "@axelarjs/ui/utils";
 import { maskAddress } from "@axelarjs/utils";
 import React, { useEffect, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -150,7 +151,13 @@ const Appbar: FC<AppbarProps> = (props) => {
           onClick={() => router.push("/")}
           $variant="ghost"
         >
-          <AxelarIcon className="h-6 w-6 dark:invert" />
+          <Image
+            src="/logos/logo_axelar_full.svg"
+            width={200}
+            height={20}
+            className="h-6 w-auto dark:invert"
+            alt="axelar logo"
+          />
           <Indicator>
             <span>{APP_NAME}</span>
             {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" ? (
