@@ -39,6 +39,7 @@ export const dexLinks = {
     url: `https://app.uniswap.org/add/ETH/${tokenAddress}?chain=mainnet`,
     icon: "/icons/thruster.svg",
   }),
+  // This dex doesn't accept token address as a parameter, so we can't prefill the token for users.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   blast: (_tokenAddress: `0x${string}`) => ({
     name: "Thruster",
@@ -50,6 +51,7 @@ export const dexLinks = {
     url: `https://www.sushi.com/pool/add?chainId=314&toCurrency=${tokenAddress}&fromCurrency=NATIVE`,
     icon: "/icons/sushi.svg",
   }),
+  // This dex doesn't accept token address as a parameter, so we can't prefill the token for users.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fraxtal: (_tokenAddress: `0x${string}`) => ({
     name: "RA Exchange",
