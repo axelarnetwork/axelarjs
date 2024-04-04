@@ -45,10 +45,9 @@ export const dexLinks = {
     url: "https://app.thruster.finance/add",
     icon: "/icons/thruster.svg",
   }),
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  filecoin: (_tokenAddress: `0x${string}`) => ({
+  filecoin: (tokenAddress: `0x${string}`) => ({
     name: "SushiSwap",
-    url: "https://www.sushi.com/pool/add?chainId=314&toCurrency=${tokenAddress}&fromCurrency=NATIVE",
+    url: `https://www.sushi.com/pool/add?chainId=314&toCurrency=${tokenAddress}&fromCurrency=NATIVE`,
     icon: "/icons/sushi.svg",
   }),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
