@@ -310,10 +310,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           </CopyToClipboardButton>
         </Card.Actions>
         {dex && (
-          <Card.Actions className="mt-2 flex items-center justify-between">
+          <Card.Actions className="mt-2 flex flex-col justify-between">
             Add Liquidity
             <LinkButton
-              className="bg-base-300 dark:bg-base-100 ease-in hover:opacity-75"
+              className="bg-base-300 dark:bg-base-100 min-w-24 self-stretch py-1 ease-in hover:opacity-75"
               $size={"md"}
               href={dex.url}
               target="_blank"
