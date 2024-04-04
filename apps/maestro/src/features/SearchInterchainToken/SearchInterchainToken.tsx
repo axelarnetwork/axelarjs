@@ -122,26 +122,31 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
-            <Tooltip
-              tip={`search on ${chainName ?? "all chains"}`}
-              className="tooltip-left md:tooltip-top"
-            >
-              <EVMChainsDropdown
-                triggerClassName="btn btn-sm btn-circle"
-                contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
-                compact
-                hideLabel
-                selectedChain={defaultChain}
-                onSelectChain={
-                  !connectedChain
-                    ? (chain) =>
-                        chain
-                          ? setSelectedChainId(chain.chain_id)
-                          : setSelectedChainId(-1)
-                    : undefined
-                }
-              />
-            </Tooltip>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-700 dark:text-white">
+                Selected Chain
+              </span>
+              <Tooltip
+                tip={`search on ${chainName ?? "all chains"}`}
+                className="tooltip-left md:tooltip-top"
+              >
+                <EVMChainsDropdown
+                  triggerClassName="btn btn-sm btn-circle"
+                  contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
+                  compact
+                  hideLabel
+                  selectedChain={defaultChain}
+                  onSelectChain={
+                    !connectedChain
+                      ? (chain) =>
+                          chain
+                            ? setSelectedChainId(chain.chain_id)
+                            : setSelectedChainId(-1)
+                      : undefined
+                  }
+                />
+              </Tooltip>
+            </div>
           )}
         </div>
       </div>
