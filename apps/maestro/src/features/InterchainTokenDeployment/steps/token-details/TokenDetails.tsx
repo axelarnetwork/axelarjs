@@ -240,7 +240,6 @@ const TokenDetails: FC = () => {
           Cancel & exit
         </Dialog.CloseAction>
         <NextButton
-          $length="block"
           disabled={!isFormValid}
           onClick={() => formSubmitRef.current?.click()}
         >
