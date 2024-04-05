@@ -18,19 +18,15 @@ const Step1 = dynamic(() => import("./steps/token-details"), {
   loading: StepLoading,
 });
 
-const Step2 = dynamic(() => import("./steps/token-settings"), {
+const Step2 = dynamic(() => import("./steps/deploy-and-register"), {
   loading: StepLoading,
 });
 
-const Step3 = dynamic(() => import("./steps/deploy-and-register"), {
+const Step3 = dynamic(() => import("./steps/review"), {
   loading: StepLoading,
 });
 
-const Step4 = dynamic(() => import("./steps/review"), {
-  loading: StepLoading,
-});
-
-const STEPS = [Step1, Step2, Step3, Step4];
+const STEPS = [Step1, Step2, Step3];
 
 type InterchainTokenDeploymentProps = {
   tokenDetails?: TokenDetails;
@@ -72,7 +68,7 @@ const InterchainTokenDeployment = () => {
           />
         </Dialog.Title>
       }
-      steps={["Token details", "Token Settings", "Register & Deploy", "Review"]}
+      steps={["Token details", "Register & Deploy", "Review"]}
       step={state.step}
       showBackButton={showBackButton}
       onBackClick={actions.prevStep}
