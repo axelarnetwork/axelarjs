@@ -228,7 +228,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
   },
   {
     kind: "link",
-    label: "Report Bug",
+    label: "Report Feedback",
     href: "https://axelar.zendesk.com/hc/en-us/requests/new",
     external: true,
   },
