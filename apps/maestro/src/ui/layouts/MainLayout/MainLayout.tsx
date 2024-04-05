@@ -185,7 +185,7 @@ const LayoutFooter = () => (
             {item.kind === "link" ? (
               <Link
                 href={item.href}
-                className="hover:text-accent inline-flex hover:underline lg:uppercase"
+                className="hover:text-accent inline-flex items-center gap-1 hover:underline lg:uppercase"
                 rel={item.external ? "noopener noreferrer" : undefined}
                 target={item.external ? "_blank" : undefined}
               >
