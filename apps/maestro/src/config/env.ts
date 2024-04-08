@@ -103,3 +103,17 @@ export const shouldDisableSend = (
   };
   return shouldDisable[axelarChainId]?.[tokenAddress];
 };
+
+export const NEXT_PUBLIC_CLAIM_OWNERSHIP_FORM_LINK = Maybe.of(
+  process.env.NEXT_PUBLIC_CLAIM_OWNERSHIP_FORM_LINK
+).mapOr(
+  "https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform",
+  String
+);
+
+export const ClaimOwnershipFormFieldIds = {
+  tokenAddress: "263424059",
+  tokenType: "2010215617",
+  allChains: "414624060",
+  sourceChain: "373826717",
+};
