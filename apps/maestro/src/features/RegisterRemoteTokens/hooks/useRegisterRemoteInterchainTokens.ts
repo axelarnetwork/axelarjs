@@ -4,7 +4,10 @@ import { useMemo } from "react";
 import { zeroAddress } from "viem";
 import { useChainId } from "wagmi";
 
-import { NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT } from "~/config/env";
+import {
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
+} from "~/config/env";
 import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
@@ -50,6 +53,7 @@ export default function useRegisterRemoteInterchainTokens(
   const { data: gasFeesData } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
     sourceChainId: sourceChain?.id ?? "0",
+    executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
     gasMultiplier: "auto",
   });
