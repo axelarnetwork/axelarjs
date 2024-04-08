@@ -112,8 +112,8 @@ export const NEXT_PUBLIC_CLAIM_OWNERSHIP_FORM_LINK = Maybe.of(
 );
 
 export const ClaimOwnershipFormFieldIds = {
-  tokenAddress: "263424059",
-  tokenType: "2010215617",
-  allChains: "414624060",
-  sourceChain: "373826717",
+  tokenAddress: "entry.263424059",
+  tokenType: "entry.2010215617",
+  allChains: "entry.414624060",
+  sourceChain: "entry.373826717",
 };
