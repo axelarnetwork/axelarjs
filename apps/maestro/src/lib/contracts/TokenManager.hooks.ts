@@ -3,9 +3,9 @@
 
 import {
   createUseReadContract,
-  createUseWriteContract,
   createUseSimulateContract,
   createUseWatchContractEvent,
+  createUseWriteContract,
 } from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,6 +224,17 @@ export const tokenManagerAbi = [
     outputs: [],
   },
   {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "tokenAddress_", internalType: "address", type: "address" },
+      { name: "from", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "burnToken",
+    outputs: [],
+  },
+  {
     stateMutability: "pure",
     type: "function",
     inputs: [],
@@ -308,6 +319,17 @@ export const tokenManagerAbi = [
     inputs: [{ name: "addr", internalType: "address", type: "address" }],
     name: "isOperator",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+  },
+  {
+    stateMutability: "nonpayable",
+    type: "function",
+    inputs: [
+      { name: "tokenAddress_", internalType: "address", type: "address" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "mintToken",
+    outputs: [],
   },
   {
     stateMutability: "pure",
@@ -540,6 +562,24 @@ export const useWriteTokenManagerApproveService =
   });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"burnToken"`
+ */
+export const useWriteTokenManagerBurnToken =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
+    functionName: "burnToken",
+  });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"mintToken"`
+ */
+export const useWriteTokenManagerMintToken =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
+    functionName: "mintToken",
+  });
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
  */
 export const useWriteTokenManagerProposeOperatorship =
@@ -633,6 +673,24 @@ export const useSimulateTokenManagerApproveService =
   /*#__PURE__*/ createUseSimulateContract({
     abi: tokenManagerAbi,
     functionName: "approveService",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"burnToken"`
+ */
+export const useSimulateTokenManagerBurnToken =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "burnToken",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"mintToken"`
+ */
+export const useSimulateTokenManagerMintToken =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "mintToken",
   });
 
 /**

@@ -20,6 +20,20 @@ export * from "./ITokenManager.args";
 
 export const ITOKEN_MANAGER_ABI = ABI_FILE.abi;
 
+/**
+ * ITokenManagerClient
+ *
+ * @description Type-safe contract client for ITokenManager
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createITokenManagerClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class ITokenManagerClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {
@@ -38,3 +52,8 @@ export class ITokenManagerClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createITokenManagerClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ITokenManagerClient(options);

@@ -20,6 +20,20 @@ export * from "./IMinter.args";
 
 export const IMINTER_ABI = ABI_FILE.abi;
 
+/**
+ * IMinterClient
+ *
+ * @description Type-safe contract client for IMinter
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIMinterClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IMinterClient extends PublicContractClient<typeof ABI_FILE.abi> {
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
@@ -36,3 +50,8 @@ export class IMinterClient extends PublicContractClient<typeof ABI_FILE.abi> {
     this.reads = createReadClient(this);
   }
 }
+
+export const createIMinterClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IMinterClient(options);

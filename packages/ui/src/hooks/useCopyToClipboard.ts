@@ -5,7 +5,7 @@ type CopyFn = (text: string) => Promise<boolean>; // Return success
 
 export function useCopyToClipboard({ timeout = 3000 } = {}): [
   CopiedValue,
-  CopyFn
+  CopyFn,
 ] {
   const [copiedText, setCopiedText] = useState<CopiedValue>(null);
 

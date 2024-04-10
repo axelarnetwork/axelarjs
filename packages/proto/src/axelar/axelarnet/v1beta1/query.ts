@@ -24,30 +24,6 @@ export interface ParamsResponse {
   params?: Params | undefined;
 }
 
-/**
- * IBCPathRequest represents a message that queries the IBC path registered for
- * a given chain
- */
-export interface IBCPathRequest {
-  chain: string;
-}
-
-export interface IBCPathResponse {
-  ibcPath: string;
-}
-
-/**
- * ChainByIBCPathRequest represents a message that queries the chain that an IBC
- * path is registered to
- */
-export interface ChainByIBCPathRequest {
-  ibcPath: string;
-}
-
-export interface ChainByIBCPathResponse {
-  chain: string;
-}
-
 function createBasePendingIBCTransferCountRequest(): PendingIBCTransferCountRequest {
   return {};
 }
@@ -279,7 +255,7 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
     I extends Exact<
       DeepPartial<PendingIBCTransferCountResponse_TransfersByChainEntry>,
       I
-    >
+    >,
   >(base?: I): PendingIBCTransferCountResponse_TransfersByChainEntry {
     return PendingIBCTransferCountResponse_TransfersByChainEntry.fromPartial(
       base ?? ({} as any)
@@ -289,7 +265,7 @@ export const PendingIBCTransferCountResponse_TransfersByChainEntry = {
     I extends Exact<
       DeepPartial<PendingIBCTransferCountResponse_TransfersByChainEntry>,
       I
-    >
+    >,
   >(object: I): PendingIBCTransferCountResponse_TransfersByChainEntry {
     const message =
       createBasePendingIBCTransferCountResponse_TransfersByChainEntry();
@@ -420,280 +396,6 @@ export const ParamsResponse = {
   },
 };
 
-function createBaseIBCPathRequest(): IBCPathRequest {
-  return { chain: "" };
-}
-
-export const IBCPathRequest = {
-  encode(
-    message: IBCPathRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.chain !== "") {
-      writer.uint32(10).string(message.chain);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): IBCPathRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseIBCPathRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.chain = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): IBCPathRequest {
-    return {
-      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
-    };
-  },
-
-  toJSON(message: IBCPathRequest): unknown {
-    const obj: any = {};
-    if (message.chain !== "") {
-      obj.chain = message.chain;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<IBCPathRequest>, I>>(
-    base?: I
-  ): IBCPathRequest {
-    return IBCPathRequest.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<IBCPathRequest>, I>>(
-    object: I
-  ): IBCPathRequest {
-    const message = createBaseIBCPathRequest();
-    message.chain = object.chain ?? "";
-    return message;
-  },
-};
-
-function createBaseIBCPathResponse(): IBCPathResponse {
-  return { ibcPath: "" };
-}
-
-export const IBCPathResponse = {
-  encode(
-    message: IBCPathResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.ibcPath !== "") {
-      writer.uint32(10).string(message.ibcPath);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): IBCPathResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseIBCPathResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.ibcPath = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): IBCPathResponse {
-    return {
-      ibcPath: isSet(object.ibcPath) ? globalThis.String(object.ibcPath) : "",
-    };
-  },
-
-  toJSON(message: IBCPathResponse): unknown {
-    const obj: any = {};
-    if (message.ibcPath !== "") {
-      obj.ibcPath = message.ibcPath;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<IBCPathResponse>, I>>(
-    base?: I
-  ): IBCPathResponse {
-    return IBCPathResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<IBCPathResponse>, I>>(
-    object: I
-  ): IBCPathResponse {
-    const message = createBaseIBCPathResponse();
-    message.ibcPath = object.ibcPath ?? "";
-    return message;
-  },
-};
-
-function createBaseChainByIBCPathRequest(): ChainByIBCPathRequest {
-  return { ibcPath: "" };
-}
-
-export const ChainByIBCPathRequest = {
-  encode(
-    message: ChainByIBCPathRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.ibcPath !== "") {
-      writer.uint32(10).string(message.ibcPath);
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ChainByIBCPathRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseChainByIBCPathRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.ibcPath = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ChainByIBCPathRequest {
-    return {
-      ibcPath: isSet(object.ibcPath) ? globalThis.String(object.ibcPath) : "",
-    };
-  },
-
-  toJSON(message: ChainByIBCPathRequest): unknown {
-    const obj: any = {};
-    if (message.ibcPath !== "") {
-      obj.ibcPath = message.ibcPath;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ChainByIBCPathRequest>, I>>(
-    base?: I
-  ): ChainByIBCPathRequest {
-    return ChainByIBCPathRequest.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<ChainByIBCPathRequest>, I>>(
-    object: I
-  ): ChainByIBCPathRequest {
-    const message = createBaseChainByIBCPathRequest();
-    message.ibcPath = object.ibcPath ?? "";
-    return message;
-  },
-};
-
-function createBaseChainByIBCPathResponse(): ChainByIBCPathResponse {
-  return { chain: "" };
-}
-
-export const ChainByIBCPathResponse = {
-  encode(
-    message: ChainByIBCPathResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.chain !== "") {
-      writer.uint32(10).string(message.chain);
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ChainByIBCPathResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseChainByIBCPathResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.chain = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ChainByIBCPathResponse {
-    return {
-      chain: isSet(object.chain) ? globalThis.String(object.chain) : "",
-    };
-  },
-
-  toJSON(message: ChainByIBCPathResponse): unknown {
-    const obj: any = {};
-    if (message.chain !== "") {
-      obj.chain = message.chain;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ChainByIBCPathResponse>, I>>(
-    base?: I
-  ): ChainByIBCPathResponse {
-    return ChainByIBCPathResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<ChainByIBCPathResponse>, I>>(
-    object: I
-  ): ChainByIBCPathResponse {
-    const message = createBaseChainByIBCPathResponse();
-    message.chain = object.chain ?? "";
-    return message;
-  },
-};
-
 type Builtin =
   | Date
   | Function
@@ -706,14 +408,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

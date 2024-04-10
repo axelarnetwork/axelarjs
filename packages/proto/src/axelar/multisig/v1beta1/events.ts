@@ -481,7 +481,7 @@ export const SigningStarted = {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sigId);
     }
     if (message.keyId !== "") {
@@ -595,7 +595,7 @@ export const SigningStarted = {
     if (message.module !== "") {
       obj.module = message.module;
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       obj.sigId = (message.sigId || Long.UZERO).toString();
     }
     if (message.keyId !== "") {
@@ -747,7 +747,7 @@ export const SigningCompleted = {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sigId);
     }
     return writer;
@@ -796,7 +796,7 @@ export const SigningCompleted = {
     if (message.module !== "") {
       obj.module = message.module;
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       obj.sigId = (message.sigId || Long.UZERO).toString();
     }
     return obj;
@@ -832,7 +832,7 @@ export const SigningExpired = {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sigId);
     }
     return writer;
@@ -881,7 +881,7 @@ export const SigningExpired = {
     if (message.module !== "") {
       obj.module = message.module;
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       obj.sigId = (message.sigId || Long.UZERO).toString();
     }
     return obj;
@@ -922,7 +922,7 @@ export const SignatureSubmitted = {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sigId);
     }
     if (message.participant.length !== 0) {
@@ -997,7 +997,7 @@ export const SignatureSubmitted = {
     if (message.module !== "") {
       obj.module = message.module;
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       obj.sigId = (message.sigId || Long.UZERO).toString();
     }
     if (message.participant.length !== 0) {
@@ -1392,14 +1392,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

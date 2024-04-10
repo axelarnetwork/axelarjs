@@ -1,3 +1,5 @@
+// public contract client
+export * from "./PublicContractClient";
 // common contracts
 export * from "./common/IERC20BurnableMintable";
 // ITS contracts

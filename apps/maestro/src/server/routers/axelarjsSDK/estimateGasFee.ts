@@ -11,6 +11,7 @@ const INPUT_SCHEMA = z.object({
   gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
   isGMPExpressTransaction: z.boolean().optional(),
   minGasPrice: z.string().optional(),
+  executeData: z.string().optional(),
 });
 
 export type EstimateGasFeeInput = z.infer<typeof INPUT_SCHEMA>;
@@ -27,6 +28,7 @@ export const estimateGasFee = publicProcedure
         gasMultiplier: input.gasMultiplier,
         isGMPExpressTransaction: input.isGMPExpressTransaction,
         minGasPrice: input.minGasPrice,
+        executeData: input.executeData,
       });
 
       return response;

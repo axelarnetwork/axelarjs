@@ -14,7 +14,7 @@ const capitalize = (str: string) =>
 
 type PolymorphicVariantConfig<
   TComponent extends FC,
-  TKey extends keyof ComponentProps<TComponent>
+  TKey extends keyof ComponentProps<TComponent>,
 > =
   | {
       noChildren: true;
@@ -26,7 +26,7 @@ type PolymorphicVariantConfig<
 
 type VariantConfig<
   TComponent extends FC,
-  TKey extends keyof ComponentProps<TComponent>
+  TKey extends keyof ComponentProps<TComponent>,
 > = {
   values: ComponentProps<TComponent>[TKey][];
   description?: string;
@@ -38,7 +38,7 @@ type VariantConfigLike<TComponent extends FC> = VariantConfig<TComponent, any>;
 
 type VariantsProps<
   TComponent extends FC,
-  TComponentProps extends ComponentProps<TComponent>
+  TComponentProps extends ComponentProps<TComponent>,
 > = {
   propKey: string;
   variant: VariantConfigLike<TComponent>;
@@ -88,7 +88,7 @@ type Artboard = (typeof ARTBOARD_OPTIONS)[number];
 
 const Variants = <
   TComponent extends FC,
-  TComponentProps extends ComponentProps<TComponent>
+  TComponentProps extends ComponentProps<TComponent>,
 >(
   props: VariantsProps<TComponent, TComponentProps>
 ) => {
@@ -178,9 +178,17 @@ const Variants = <
 
 const Template: StoryFn<typeof Variants> = (args) => <Variants {...args} />;
 
+/**
+ * Configure the playground for a component
+ *
+ * @param component The component to configure the playground for
+ * @param variants The variants to configure the playground with
+ * @param defaultProps The default props for the component
+ * @returns The playground configuration
+ */
 export const configurePlayground = <
   TComponent extends FC,
-  TComponentProps extends ComponentProps<TComponent>
+  TComponentProps extends ComponentProps<TComponent>,
 >(
   component: FC<TComponentProps>,
   variants: {
@@ -188,14 +196,19 @@ export const configurePlayground = <
   },
   defaultProps?: Partial<TComponentProps>
 ) => {
-  return Object.entries(variants).reduce((acc, [propKey, variant]) => {
-    const componentStory = Template.bind({});
-    // @ts-ignore
-    componentStory.args = { propKey, variant, component, defaultProps };
+  return Object.entries(variants).reduce(
+    (acc, [propKey, variant]) => {
+      const componentStory = Template.bind({});
+      // @ts-ignore
+      componentStory.args = { propKey, variant, component, defaultProps };
 
-    return {
-      ...acc,
-      [capitalize(propKey)]: componentStory,
-    };
-  }, {} as CapitalizeKeys<Record<keyof typeof variants, StoryFn<typeof Variants>>>);
+      return {
+        ...acc,
+        [capitalize(propKey)]: componentStory,
+      };
+    },
+    {} as CapitalizeKeys<
+      Record<keyof typeof variants, StoryFn<typeof Variants>>
+    >
+  );
 };

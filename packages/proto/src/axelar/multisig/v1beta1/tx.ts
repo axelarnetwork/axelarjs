@@ -368,7 +368,7 @@ export const SubmitSignatureRequest = {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.sigId);
     }
     if (message.signature.length !== 0) {
@@ -433,7 +433,7 @@ export const SubmitSignatureRequest = {
     if (message.sender !== "") {
       obj.sender = message.sender;
     }
-    if (!message.sigId.isZero()) {
+    if (!message.sigId.equals(Long.UZERO)) {
       obj.sigId = (message.sigId || Long.UZERO).toString();
     }
     if (message.signature.length !== 0) {
@@ -945,14 +945,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

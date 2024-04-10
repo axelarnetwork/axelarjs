@@ -63,10 +63,9 @@ export const tokenManagerTypeEnum = pgEnum(
   TOKEN_MANAGER_TYPES
 );
 
-export type TokenManagerType = typeof tokenManagerTypeEnum extends PgEnum<
-  infer T
->
-  ? T extends any[]
-    ? T[number]
-    : never
-  : never;
+export type TokenManagerType =
+  typeof tokenManagerTypeEnum extends PgEnum<infer T>
+    ? T extends any[]
+      ? T[number]
+      : never
+    : never;

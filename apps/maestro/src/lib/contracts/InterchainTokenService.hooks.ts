@@ -3,9 +3,9 @@
 
 import {
   createUseReadContract,
-  createUseWriteContract,
   createUseSimulateContract,
   createUseWatchContractEvent,
+  createUseWriteContract,
 } from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +44,17 @@ export const interchainTokenServiceAbi = [
     ],
   },
   { type: "error", inputs: [], name: "AlreadyExecuted" },
+  {
+    type: "error",
+    inputs: [
+      {
+        name: "",
+        internalType: "enum ITokenManagerType.TokenManagerType",
+        type: "uint8",
+      },
+    ],
+    name: "CannotDeploy",
+  },
   { type: "error", inputs: [], name: "EmptyData" },
   {
     type: "error",

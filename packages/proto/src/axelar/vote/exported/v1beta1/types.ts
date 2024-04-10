@@ -110,7 +110,7 @@ export const PollMetadata = {
     message: PollMetadata,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.expiresAt);
     }
     if (message.result !== undefined) {
@@ -125,19 +125,19 @@ export const PollMetadata = {
     if (message.state !== 0) {
       writer.uint32(48).int32(message.state);
     }
-    if (!message.minVoterCount.isZero()) {
+    if (!message.minVoterCount.equals(Long.ZERO)) {
       writer.uint32(56).int64(message.minVoterCount);
     }
     if (message.rewardPoolName !== "") {
       writer.uint32(82).string(message.rewardPoolName);
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       writer.uint32(88).int64(message.gracePeriod);
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       writer.uint32(96).int64(message.completedAt);
     }
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(104).uint64(message.id);
     }
     if (message.snapshot !== undefined) {
@@ -288,7 +288,7 @@ export const PollMetadata = {
 
   toJSON(message: PollMetadata): unknown {
     const obj: any = {};
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
     }
     if (message.result !== undefined) {
@@ -300,19 +300,19 @@ export const PollMetadata = {
     if (message.state !== 0) {
       obj.state = pollStateToJSON(message.state);
     }
-    if (!message.minVoterCount.isZero()) {
+    if (!message.minVoterCount.equals(Long.ZERO)) {
       obj.minVoterCount = (message.minVoterCount || Long.ZERO).toString();
     }
     if (message.rewardPoolName !== "") {
       obj.rewardPoolName = message.rewardPoolName;
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       obj.completedAt = (message.completedAt || Long.ZERO).toString();
     }
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     if (message.snapshot !== undefined) {
@@ -466,7 +466,7 @@ export const PollParticipants = {
     message: PollParticipants,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.pollId);
     }
     for (const v of message.participants) {
@@ -517,7 +517,7 @@ export const PollParticipants = {
 
   toJSON(message: PollParticipants): unknown {
     const obj: any = {};
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     if (message.participants?.length) {
@@ -581,14 +581,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

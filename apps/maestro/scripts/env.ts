@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import prettier from "prettier";
 import { pipe } from "rambda";
 
-const format = (x: string) => prettier.format(x, { parser: "babel-ts" });
+const format = (x: string) => prettier.format(x, { parser: "typescript" });
 
 /**
  * Generates a TypeScript export statement for an environment variable.
@@ -35,15 +35,8 @@ const generateTsFileContent = (envVars: string[]) => `
 function tryGenerateTsFile(envFilePath: string, outputPath: string) {
   return fs
     .readFile(envFilePath)
-    .then(
-      pipe(
-        dotenv.parse,
-        Object.keys,
-        generateTsFileContent,
-        format,
-        fs.writeFile.bind(null, outputPath)
-      )
-    )
+    .then(pipe(dotenv.parse, Object.keys, generateTsFileContent, format))
+    .then(fs.writeFile.bind(null, outputPath))
     .then(() => true)
     .catch(() => false);
 }

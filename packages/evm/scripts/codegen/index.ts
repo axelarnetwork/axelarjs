@@ -140,17 +140,15 @@ async function codegenContract({
 
   // write files
   await Promise.all(
-    files.map(async ({ name, content, parser }) =>
-      fs.writeFile(
-        path.join(outputPath, name),
-        prettier.format(
-          parser === "json"
-            ? content
-            : `${GENERATED_DISCLAIMER({ abiPath })}\n\n${content}`,
-          { parser }
-        )
-      )
-    )
+    files.map(async ({ name, content, parser }) => {
+      const file = await prettier.format(
+        parser === "json"
+          ? content
+          : `${GENERATED_DISCLAIMER({ abiPath })}\n\n${content}`,
+        { parser }
+      );
+      return fs.writeFile(path.join(outputPath, name), file);
+    })
   );
 }
 

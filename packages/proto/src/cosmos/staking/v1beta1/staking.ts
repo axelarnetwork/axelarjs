@@ -742,7 +742,7 @@ export const Validator = {
     if (message.consensusPubkey !== undefined) {
       Any.encode(message.consensusPubkey, writer.uint32(18).fork()).ldelim();
     }
-    if (message.jailed === true) {
+    if (message.jailed !== false) {
       writer.uint32(24).bool(message.jailed);
     }
     if (message.status !== 0) {
@@ -760,7 +760,7 @@ export const Validator = {
         writer.uint32(58).fork()
       ).ldelim();
     }
-    if (!message.unbondingHeight.isZero()) {
+    if (!message.unbondingHeight.equals(Long.ZERO)) {
       writer.uint32(64).int64(message.unbondingHeight);
     }
     if (message.unbondingTime !== undefined) {
@@ -914,7 +914,7 @@ export const Validator = {
     if (message.consensusPubkey !== undefined) {
       obj.consensusPubkey = Any.toJSON(message.consensusPubkey);
     }
-    if (message.jailed === true) {
+    if (message.jailed !== false) {
       obj.jailed = message.jailed;
     }
     if (message.status !== 0) {
@@ -929,7 +929,7 @@ export const Validator = {
     if (message.description !== undefined) {
       obj.description = Description.toJSON(message.description);
     }
-    if (!message.unbondingHeight.isZero()) {
+    if (!message.unbondingHeight.equals(Long.ZERO)) {
       obj.unbondingHeight = (message.unbondingHeight || Long.ZERO).toString();
     }
     if (message.unbondingTime !== undefined) {
@@ -1588,7 +1588,7 @@ export const UnbondingDelegationEntry = {
     message: UnbondingDelegationEntry,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.creationHeight.isZero()) {
+    if (!message.creationHeight.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.creationHeight);
     }
     if (message.completionTime !== undefined) {
@@ -1673,7 +1673,7 @@ export const UnbondingDelegationEntry = {
 
   toJSON(message: UnbondingDelegationEntry): unknown {
     const obj: any = {};
-    if (!message.creationHeight.isZero()) {
+    if (!message.creationHeight.equals(Long.ZERO)) {
       obj.creationHeight = (message.creationHeight || Long.ZERO).toString();
     }
     if (message.completionTime !== undefined) {
@@ -1722,7 +1722,7 @@ export const RedelegationEntry = {
     message: RedelegationEntry,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.creationHeight.isZero()) {
+    if (!message.creationHeight.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.creationHeight);
     }
     if (message.completionTime !== undefined) {
@@ -1806,7 +1806,7 @@ export const RedelegationEntry = {
 
   toJSON(message: RedelegationEntry): unknown {
     const obj: any = {};
-    if (!message.creationHeight.isZero()) {
+    if (!message.creationHeight.equals(Long.ZERO)) {
       obj.creationHeight = (message.creationHeight || Long.ZERO).toString();
     }
     if (message.completionTime !== undefined) {
@@ -2494,14 +2494,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

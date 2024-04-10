@@ -47,7 +47,7 @@ export interface TransferEpoch {
   chain: string;
   amount?: Coin | undefined;
   epoch: Long;
-  /** indicates whether the rate tracking is for transfers going */
+  /** indicates whether the tracking is for transfers outgoing */
   direction: TransferDirection;
 }
 
@@ -197,7 +197,7 @@ export const ChainState = {
     if (message.chain !== undefined) {
       Chain.encode(message.chain, writer.uint32(10).fork()).ldelim();
     }
-    if (message.activated === true) {
+    if (message.activated !== false) {
       writer.uint32(24).bool(message.activated);
     }
     for (const v of message.assets) {
@@ -276,7 +276,7 @@ export const ChainState = {
     if (message.chain !== undefined) {
       obj.chain = Chain.toJSON(message.chain);
     }
-    if (message.activated === true) {
+    if (message.activated !== false) {
       obj.activated = message.activated;
     }
     if (message.assets?.length) {
@@ -531,7 +531,7 @@ export const TransferEpoch = {
     if (message.amount !== undefined) {
       Coin.encode(message.amount, writer.uint32(18).fork()).ldelim();
     }
-    if (!message.epoch.isZero()) {
+    if (!message.epoch.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.epoch);
     }
     if (message.direction !== 0) {
@@ -604,7 +604,7 @@ export const TransferEpoch = {
     if (message.amount !== undefined) {
       obj.amount = Coin.toJSON(message.amount);
     }
-    if (!message.epoch.isZero()) {
+    if (!message.epoch.equals(Long.UZERO)) {
       obj.epoch = (message.epoch || Long.UZERO).toString();
     }
     if (message.direction !== 0) {
@@ -673,14 +673,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

@@ -51,10 +51,10 @@ function createBaseProof(): Proof {
 
 export const Proof = {
   encode(message: Proof, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (!message.total.isZero()) {
+    if (!message.total.equals(Long.ZERO)) {
       writer.uint32(8).int64(message.total);
     }
-    if (!message.index.isZero()) {
+    if (!message.index.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.index);
     }
     if (message.leafHash.length !== 0) {
@@ -126,10 +126,10 @@ export const Proof = {
 
   toJSON(message: Proof): unknown {
     const obj: any = {};
-    if (!message.total.isZero()) {
+    if (!message.total.equals(Long.ZERO)) {
       obj.total = (message.total || Long.ZERO).toString();
     }
-    if (!message.index.isZero()) {
+    if (!message.index.equals(Long.ZERO)) {
       obj.index = (message.index || Long.ZERO).toString();
     }
     if (message.leafHash.length !== 0) {
@@ -531,14 +531,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

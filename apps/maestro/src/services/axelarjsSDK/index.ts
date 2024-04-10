@@ -25,7 +25,12 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
     params.minGasPrice
   );
 
-  const rawFee = typeof response === "string" ? response : response.baseFee;
+  const rawFee =
+    typeof response === "string"
+      ? response
+      : response.baseFee +
+        response.l1ExecutionFeeWithMultiplier +
+        response.executionFeeWithMultiplier;
 
   return BigInt(rawFee);
 }

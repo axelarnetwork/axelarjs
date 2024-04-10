@@ -12,6 +12,11 @@ import { mainnet } from "viem/chains";
 
 type PublicClientType = ReturnType<typeof createPublicClient>;
 
+/**
+ * Public contract client
+ *
+ * A client for interacting with public contracts
+ */
 export class PublicContractClient<TAbi extends readonly unknown[]> {
   private client: PublicClientType;
   private provider: WalletClient;
@@ -41,7 +46,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
   }
 
   public read<
-    TFunctionName extends ReadContractParameters<TAbi>["functionName"]
+    TFunctionName extends ReadContractParameters<TAbi>["functionName"],
   >(
     functionName: TFunctionName,
     params?: Omit<
@@ -71,7 +76,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
   }
 
   public write<
-    TFunctionName extends WriteContractParameters<TAbi>["functionName"]
+    TFunctionName extends WriteContractParameters<TAbi>["functionName"],
   >(
     functionName: TFunctionName,
     params?: Omit<

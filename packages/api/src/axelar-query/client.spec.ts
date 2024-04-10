@@ -1,6 +1,6 @@
 import { ENVIRONMENTS } from "@axelarjs/core";
 
-import { formatEther, pad } from "viem";
+import { formatEther } from "viem";
 
 import type {
   AxelarQueryAPIClient,
@@ -12,7 +12,7 @@ import { createAxelarQueryClient } from "./client";
 describe("axelar-query (node client)", () => {
   describe("estimateGasFee", () => {
     const requestParam: EstimateGasFeeParams = {
-      sourceChain: "ethereum-2",
+      sourceChain: "ethereum",
       destinationChain: "avalanche",
       gasLimit: 700_000n,
       gasMultiplier: 1.1,
@@ -22,14 +22,16 @@ describe("axelar-query (node client)", () => {
       amountInUnits: "1000000",
     };
 
-    let api: AxelarQueryAPIClient;
+    let mainnetApi: AxelarQueryAPIClient;
+    // let testnetApi: AxelarQueryAPIClient;
 
     beforeEach(() => {
-      api = createAxelarQueryClient(ENVIRONMENTS.testnet, {});
+      mainnetApi = createAxelarQueryClient(ENVIRONMENTS.mainnet, {});
+      // testnetApi = createAxelarQueryClient(ENVIRONMENTS.testnet, {});
     });
 
     test("It should return estimated gas amount in terms of native tokens", async () => {
-      const fees = await api.estimateGasFee({
+      const fees = await mainnetApi.estimateGasFee({
         ...requestParam,
         showDetailedFees: false,
       });
@@ -40,57 +42,37 @@ describe("axelar-query (node client)", () => {
       );
     });
 
-    test.skip("It should include the L1 gas fee", async () => {
+    test("It should include the L1 gas fee", async () => {
       const l2RequestParams: EstimateGasFeeParams = {
-        sourceChain: "avalanche",
+        sourceChain: "ethereum",
         destinationChain: "optimism",
         gasLimit: 700_000n,
         gasMultiplier: 1.1,
-        executeData: pad("0x1234", { size: 5000 }),
         amount: 1,
         amountInUnits: "1000000",
       };
 
-      const fees = (await api.estimateGasFee({
+      const fees = (await mainnetApi.estimateGasFee({
         ...l2RequestParams,
         showDetailedFees: true,
       })) as EstimateGasFeeResponse;
 
-      const l1ExecutionFeeWithMultiplier = parseInt(
+      const l1ExecutionFeeWithMultiplier = BigInt(
         fees.l1ExecutionFeeWithMultiplier
       );
-      const executionFeeWithMultiplier = parseInt(
+      const l1ExecutionFee = BigInt(fees.l1ExecutionFee);
+      const executionFee = BigInt(fees.executionFee);
+      const executionFeeWithMultiplier = BigInt(
         fees.executionFeeWithMultiplier
       );
 
       expect(fees).toBeTruthy();
-      expect(l1ExecutionFeeWithMultiplier).toBeGreaterThan(
-        executionFeeWithMultiplier
-      );
-    });
-
-    test("it should throw an error if the destination chain is L2 but not specified the executeData", async () => {
-      const l2RequestParams: EstimateGasFeeParams = {
-        sourceChain: "ethereum-2",
-        destinationChain: "optimism",
-        gasLimit: 700_000n,
-        gasMultiplier: 1.1,
-        amount: 1,
-        amountInUnits: "1000000",
-      };
-
-      await expect(
-        api.estimateGasFee({
-          ...l2RequestParams,
-          showDetailedFees: true,
-        })
-      ).rejects.toThrowError(
-        "executeData is required to calculate the L1 execution fee for optimism"
-      );
+      expect(l1ExecutionFeeWithMultiplier).toBeGreaterThan(l1ExecutionFee);
+      expect(executionFeeWithMultiplier).toBeGreaterThan(executionFee);
     });
 
     test("It should return a detailed object response with the components of the fee", async () => {
-      const res: EstimateGasFeeResponse = (await api.estimateGasFee({
+      const res: EstimateGasFeeResponse = (await mainnetApi.estimateGasFee({
         ...requestParam,
         showDetailedFees: true,
       })) as EstimateGasFeeResponse;

@@ -103,7 +103,7 @@ const content = contractFolders
   .join("\n")
   .concat("\n\n", contractConfigs);
 
-const formatted = prettier.format(content, { parser: "typescript" });
+const formatted = await prettier.format(content, { parser: "typescript" });
 
 await fs.writeFile(path.join(destFolder, "index.ts"), formatted);
 

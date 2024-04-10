@@ -17,6 +17,20 @@ export * from "./IInterchainTokenExpressExecutable.args";
 
 export const IINTERCHAIN_TOKEN_EXPRESS_EXECUTABLE_ABI = ABI_FILE.abi;
 
+/**
+ * IInterchainTokenExpressExecutableClient
+ *
+ * @description Type-safe contract client for IInterchainTokenExpressExecutable
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIInterchainTokenExpressExecutableClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IInterchainTokenExpressExecutableClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {
@@ -31,3 +45,8 @@ export class IInterchainTokenExpressExecutableClient extends PublicContractClien
     });
   }
 }
+
+export const createIInterchainTokenExpressExecutableClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IInterchainTokenExpressExecutableClient(options);

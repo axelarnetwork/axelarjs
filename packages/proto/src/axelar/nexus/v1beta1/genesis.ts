@@ -55,7 +55,7 @@ export const GenesisState = {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
     }
-    if (!message.nonce.isZero()) {
+    if (!message.nonce.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.nonce);
     }
     for (const v of message.chains) {
@@ -85,7 +85,7 @@ export const GenesisState = {
     for (const v of message.messages) {
       GeneralMessage.encode(v!, writer.uint32(90).fork()).ldelim();
     }
-    if (!message.messageNonce.isZero()) {
+    if (!message.messageNonce.equals(Long.UZERO)) {
       writer.uint32(96).uint64(message.messageNonce);
     }
     return writer;
@@ -238,7 +238,7 @@ export const GenesisState = {
     if (message.params !== undefined) {
       obj.params = Params.toJSON(message.params);
     }
-    if (!message.nonce.isZero()) {
+    if (!message.nonce.equals(Long.UZERO)) {
       obj.nonce = (message.nonce || Long.UZERO).toString();
     }
     if (message.chains?.length) {
@@ -274,7 +274,7 @@ export const GenesisState = {
     if (message.messages?.length) {
       obj.messages = message.messages.map((e) => GeneralMessage.toJSON(e));
     }
-    if (!message.messageNonce.isZero()) {
+    if (!message.messageNonce.equals(Long.UZERO)) {
       obj.messageNonce = (message.messageNonce || Long.UZERO).toString();
     }
     return obj;
@@ -336,14 +336,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

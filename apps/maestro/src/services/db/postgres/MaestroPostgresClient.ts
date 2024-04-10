@@ -26,7 +26,7 @@ export const newInterchainTokenSchema = interchainTokensZodSchemas.insert.omit({
 });
 
 const sanitizeObject = <
-  const T extends Record<string, any> = Record<string, any>
+  const T extends Record<string, any> = Record<string, any>,
 >(
   obj: T
 ) => Object.fromEntries(Object.entries(obj).filter(([, v]) => Boolean(v)));
@@ -107,7 +107,13 @@ export default class MaestroPostgresClient {
           (t) =>
             [
               t,
-              sanitizeObject(values.find((v) => v.tokenId === t.tokenId) ?? {}),
+              sanitizeObject(
+                values.find(
+                  (v) =>
+                    v.axelarChainId === t.axelarChainId &&
+                    v.tokenId === t.tokenId
+                ) ?? {}
+              ),
             ] as const
         )
         .filter(([, v]) => Boolean(v));
@@ -118,31 +124,27 @@ export default class MaestroPostgresClient {
       });
 
       if (updateValues.length > 0) {
-        await Promise.all(
-          updateValues.map(([existingToken, updateValue]) =>
-            tx
-              .update(remoteInterchainTokens)
-              .set({
-                id: updateValue.id ?? existingToken.id,
-                tokenManagerAddress:
-                  updateValue.tokenManagerAddress ??
-                  existingToken.tokenManagerAddress,
-                deploymentMessageId:
-                  updateValue.deploymentMessageId ??
-                  existingToken.deploymentMessageId,
-                deploymentStatus:
-                  updateValue.deploymentStatus ??
-                  existingToken.deploymentStatus,
-                tokenManagerType:
-                  updateValue.tokenManagerType ??
-                  existingToken.tokenManagerType,
-                tokenAddress:
-                  updateValue.tokenAddress ?? existingToken.tokenAddress,
-                updatedAt: new Date(),
-              })
-              .where(eq(remoteInterchainTokens.id, existingToken.id))
-          )
-        );
+        for (const [existingToken, updateValue] of updateValues) {
+          await tx
+            .update(remoteInterchainTokens)
+            .set({
+              id: updateValue.id ?? existingToken.id,
+              tokenManagerAddress:
+                updateValue.tokenManagerAddress ??
+                existingToken.tokenManagerAddress,
+              deploymentMessageId:
+                updateValue.deploymentMessageId ??
+                existingToken.deploymentMessageId,
+              deploymentStatus:
+                updateValue.deploymentStatus ?? existingToken.deploymentStatus,
+              tokenManagerType:
+                updateValue.tokenManagerType ?? existingToken.tokenManagerType,
+              tokenAddress:
+                updateValue.tokenAddress ?? existingToken.tokenAddress,
+              updatedAt: new Date(),
+            })
+            .where(eq(remoteInterchainTokens.id, existingToken.id));
+        }
       }
 
       if (!insertValues.length) {

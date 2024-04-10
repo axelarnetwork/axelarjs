@@ -3,6 +3,7 @@
   "include": ["src", "scripts"],
   "compilerOptions": {
     "module": "ESNext",
-    "declaration": false
+    "declaration": false,
+    "types": ["vitest/globals"]
   }
 }

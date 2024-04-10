@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { readFile, writeFile } from "fs/promises";
 
 import { rainbow } from "./lib";

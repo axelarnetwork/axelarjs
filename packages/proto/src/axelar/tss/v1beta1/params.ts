@@ -52,10 +52,10 @@ export const Params = {
     for (const v of message.keyRequirements) {
       KeyRequirement.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    if (!message.suspendDurationInBlocks.isZero()) {
+    if (!message.suspendDurationInBlocks.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.suspendDurationInBlocks);
     }
-    if (!message.heartbeatPeriodInBlocks.isZero()) {
+    if (!message.heartbeatPeriodInBlocks.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.heartbeatPeriodInBlocks);
     }
     if (message.maxMissedBlocksPerWindow !== undefined) {
@@ -64,7 +64,7 @@ export const Params = {
         writer.uint32(34).fork()
       ).ldelim();
     }
-    if (!message.unbondingLockingKeyRotationCount.isZero()) {
+    if (!message.unbondingLockingKeyRotationCount.equals(Long.ZERO)) {
       writer.uint32(40).int64(message.unbondingLockingKeyRotationCount);
     }
     if (message.externalMultisigThreshold !== undefined) {
@@ -73,13 +73,13 @@ export const Params = {
         writer.uint32(50).fork()
       ).ldelim();
     }
-    if (!message.maxSignQueueSize.isZero()) {
+    if (!message.maxSignQueueSize.equals(Long.ZERO)) {
       writer.uint32(56).int64(message.maxSignQueueSize);
     }
-    if (!message.maxSimultaneousSignShares.isZero()) {
+    if (!message.maxSimultaneousSignShares.equals(Long.ZERO)) {
       writer.uint32(64).int64(message.maxSimultaneousSignShares);
     }
-    if (!message.tssSignedBlocksWindow.isZero()) {
+    if (!message.tssSignedBlocksWindow.equals(Long.ZERO)) {
       writer.uint32(72).int64(message.tssSignedBlocksWindow);
     }
     return writer;
@@ -214,12 +214,12 @@ export const Params = {
         KeyRequirement.toJSON(e)
       );
     }
-    if (!message.suspendDurationInBlocks.isZero()) {
+    if (!message.suspendDurationInBlocks.equals(Long.ZERO)) {
       obj.suspendDurationInBlocks = (
         message.suspendDurationInBlocks || Long.ZERO
       ).toString();
     }
-    if (!message.heartbeatPeriodInBlocks.isZero()) {
+    if (!message.heartbeatPeriodInBlocks.equals(Long.ZERO)) {
       obj.heartbeatPeriodInBlocks = (
         message.heartbeatPeriodInBlocks || Long.ZERO
       ).toString();
@@ -229,7 +229,7 @@ export const Params = {
         message.maxMissedBlocksPerWindow
       );
     }
-    if (!message.unbondingLockingKeyRotationCount.isZero()) {
+    if (!message.unbondingLockingKeyRotationCount.equals(Long.ZERO)) {
       obj.unbondingLockingKeyRotationCount = (
         message.unbondingLockingKeyRotationCount || Long.ZERO
       ).toString();
@@ -239,15 +239,15 @@ export const Params = {
         message.externalMultisigThreshold
       );
     }
-    if (!message.maxSignQueueSize.isZero()) {
+    if (!message.maxSignQueueSize.equals(Long.ZERO)) {
       obj.maxSignQueueSize = (message.maxSignQueueSize || Long.ZERO).toString();
     }
-    if (!message.maxSimultaneousSignShares.isZero()) {
+    if (!message.maxSimultaneousSignShares.equals(Long.ZERO)) {
       obj.maxSimultaneousSignShares = (
         message.maxSimultaneousSignShares || Long.ZERO
       ).toString();
     }
-    if (!message.tssSignedBlocksWindow.isZero()) {
+    if (!message.tssSignedBlocksWindow.equals(Long.ZERO)) {
       obj.tssSignedBlocksWindow = (
         message.tssSignedBlocksWindow || Long.ZERO
       ).toString();
@@ -317,14 +317,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

@@ -11,10 +11,10 @@ export type CamelCaseKeys<T> = {
 export type SimplifyRequestMethod<T> = T extends `${infer First}Request`
   ? CamelCase<First> // maps SendRequest to send
   : T extends `${string}Response` | `${string}Impl`
-  ? never // excludes *Response and *Impl types
-  : T extends `Msg${infer Last}` // maps MsgSend to send
-  ? CamelCase<Last>
-  : never;
+    ? never // excludes *Response and *Impl types
+    : T extends `Msg${infer Last}` // maps MsgSend to send
+      ? CamelCase<Last>
+      : never;
 
 export type KeepOnlySimplifiedRequestMethods<T> = {
   [K in keyof T as SimplifyRequestMethod<K & string>]: T[K];

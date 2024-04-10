@@ -86,16 +86,16 @@ export const PageRequest = {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
     }
-    if (!message.offset.isZero()) {
+    if (!message.offset.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.offset);
     }
-    if (!message.limit.isZero()) {
+    if (!message.limit.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.limit);
     }
-    if (message.countTotal === true) {
+    if (message.countTotal !== false) {
       writer.uint32(32).bool(message.countTotal);
     }
-    if (message.reverse === true) {
+    if (message.reverse !== false) {
       writer.uint32(40).bool(message.reverse);
     }
     return writer;
@@ -172,16 +172,16 @@ export const PageRequest = {
     if (message.key.length !== 0) {
       obj.key = base64FromBytes(message.key);
     }
-    if (!message.offset.isZero()) {
+    if (!message.offset.equals(Long.UZERO)) {
       obj.offset = (message.offset || Long.UZERO).toString();
     }
-    if (!message.limit.isZero()) {
+    if (!message.limit.equals(Long.UZERO)) {
       obj.limit = (message.limit || Long.UZERO).toString();
     }
-    if (message.countTotal === true) {
+    if (message.countTotal !== false) {
       obj.countTotal = message.countTotal;
     }
-    if (message.reverse === true) {
+    if (message.reverse !== false) {
       obj.reverse = message.reverse;
     }
     return obj;
@@ -221,7 +221,7 @@ export const PageResponse = {
     if (message.nextKey.length !== 0) {
       writer.uint32(10).bytes(message.nextKey);
     }
-    if (!message.total.isZero()) {
+    if (!message.total.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.total);
     }
     return writer;
@@ -272,7 +272,7 @@ export const PageResponse = {
     if (message.nextKey.length !== 0) {
       obj.nextKey = base64FromBytes(message.nextKey);
     }
-    if (!message.total.isZero()) {
+    if (!message.total.equals(Long.UZERO)) {
       obj.total = (message.total || Long.UZERO).toString();
     }
     return obj;
@@ -333,14 +333,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

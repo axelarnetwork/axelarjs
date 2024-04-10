@@ -35,10 +35,13 @@
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
     "postinstall": "tsx scripts/postinstall.ts",
-    "codegen": "./scripts/codegen-its.sh && pnpm build",
+    "codegen": "./scripts/codegen-its.sh && pnpm build && pnpm docgen",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "test": "vitest run src",
+    "docgen": "typedoc",
+    "deploy:docs": "gh-pages -d docs -e evm"
   },
   "keywords": [],
   "author": "",
@@ -47,18 +50,22 @@
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
     "tsx": "^4.7.1",
-    "viem": "^2.8.11",
+    "viem": "^2.8.18",
     "zx": "^7.2.3"
   },
   "devDependencies": {
-    "@axelar-network/interchain-token-service": "^1.2.1",
+    "@axelar-network/interchain-token-service": "^1.2.4",
     "@axelarjs/config": "workspace:*",
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.11.30",
     "@types/prettier": "^2.7.3",
     "commander": "^11.1.0",
-    "prettier": "^2.8.8",
+    "dotenv": "^16.4.5",
+    "gh-pages": "^6.1.1",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "strip-ansi": "^6.0.1",
-    "typescript": "^5.4.2"
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
   }
 }

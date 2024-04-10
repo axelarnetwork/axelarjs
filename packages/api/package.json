@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "publishConfig": {
     "access": "public"
   },
@@ -73,24 +73,28 @@
     "clean": "./scripts/clean.sh",
     "test": "vitest run",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "docgen": "typedoc",
+    "deploy:docs": "gh-pages -d docs -e api"
   },
   "keywords": [],
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.11.30",
     "dotenv": "^16.4.5",
-    "fast-check": "^3.16.0",
-    "happy-dom": "^13.9.0",
+    "fast-check": "^3.17.0",
+    "gh-pages": "^6.1.1",
+    "happy-dom": "^13.10.1",
     "jsonschema": "^1.4.1",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
-    "typescript": "^5.4.2",
-    "vite": "^5.1.6",
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.3",
+    "vite": "^5.2.6",
     "vitest": "^1.4.0"
   },
   "peerDependencies": {
@@ -101,6 +105,6 @@
     "@axelarjs/utils": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
-    "viem": "^2.8.11"
+    "viem": "^2.8.18"
   }
 }
