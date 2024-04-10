@@ -40,6 +40,7 @@ export type TokenDetailsSectionProps = {
   tokenId?: `0x${string}` | null | undefined;
   tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
+  claimOwnershipFormLink: string;
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
@@ -94,7 +95,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             target="_blank"
             className="ml-[-10px]"
             $variant="link"
-            href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
+            href={props.claimOwnershipFormLink}
           >
             Link
           </LinkButton>
