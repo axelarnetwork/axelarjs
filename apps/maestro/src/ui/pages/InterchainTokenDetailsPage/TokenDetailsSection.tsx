@@ -58,6 +58,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(props.tokenAddress)}
       </CopyToClipboardButton>,
     ],
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
+      [
+        "Token Manager",
+        <CopyToClipboardButton
+          key="token-manager"
+          $size="sm"
+          $variant="ghost"
+          copyText={tokenManagerAddress}
+        >
+          {maskAddress(tokenManagerAddress)}
+        </CopyToClipboardButton>,
+      ],
+    ]),
     ...Maybe.of(props.tokenId).mapOr([], (tokenId) => [
       [
         "Token ID",
@@ -83,7 +96,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             $variant="link"
             href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
           >
-            Claim
+            Link
           </LinkButton>
         ),
       ],
@@ -107,17 +120,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         ),
       ],
     ]),
-    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], () => [
       [
-        "Token Manager",
-        <CopyToClipboardButton
-          key="token-manager"
-          $size="sm"
-          $variant="ghost"
-          copyText={tokenManagerAddress}
-        >
-          {maskAddress(tokenManagerAddress)}
-        </CopyToClipboardButton>,
+        "Marketing Form",
+        props.wasDeployedByAccount && (
+          <LinkButton
+            target="_blank"
+            className="ml-[-10px]"
+            $variant="link"
+            href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+          >
+            Link
+          </LinkButton>
+        ),
       ],
     ]),
   ];
@@ -369,7 +384,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
         <Modal.Body>
           <FormControl>
             <Label className="flex items-center justify-start gap-2">
-              Token Icon UR{" "}
+              Token Icon URL{" "}
               <Tooltip
                 tip="Provide a URL to an image to use as the token icon"
                 $position="right"
