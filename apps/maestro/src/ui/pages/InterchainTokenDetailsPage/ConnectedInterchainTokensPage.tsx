@@ -7,6 +7,10 @@ import { useEffect, useMemo, type FC } from "react";
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
 
+import {
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
+} from "~/config/env";
 import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
@@ -229,7 +233,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
       destinationChainIds,
-      gasLimit: 1_000_000,
+      executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+      gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
       gasMultiplier: "auto",
     });
 
@@ -402,7 +407,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetailsError && (
         <Alert $status="error">{tokenDetailsError.message}</Alert>
       )}
-
       {interchainTokenError && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
@@ -421,6 +425,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           )}
         </div>
       )}
+      <Alert $status={"success"} className="mb-5">
+        Anyone can send tokens to/from any of your deployed chains using the
+        link of this portal. Share with your community!
+      </Alert>
       <InterchainTokenList title="Registered Chains" tokens={registered} />
       {pendingUnregisteredTokens.length > 0 && (
         <InterchainTokenList

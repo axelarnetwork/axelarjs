@@ -8,6 +8,7 @@ const INPUT_SCHEMA = z.object({
   sourceChainId: z.string(),
   gasLimit: z.number(),
   gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
+  executeData: z.string().optional(),
   isGMPExpressTransaction: z.boolean().optional(),
   minGasPrice: z.string().optional(),
 });
@@ -24,6 +25,7 @@ export const estimateGasFeesMultipleChains = publicProcedure
           sourceChainId: input.sourceChainId,
           gasLimit: input.gasLimit,
           gasMultiplier: input.gasMultiplier,
+          executeData: input.executeData,
           isGMPExpressTransaction: input.isGMPExpressTransaction,
           minGasPrice: input.minGasPrice,
         });

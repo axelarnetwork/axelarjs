@@ -226,6 +226,12 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
       </Content.Wrapper>
     ),
   },
+  {
+    kind: "link",
+    label: "Report Feedback",
+    href: "https://axelar.zendesk.com/hc/en-us/requests/new",
+    external: true,
+  },
 ];
 
 const FAQ_ITEMS = [
