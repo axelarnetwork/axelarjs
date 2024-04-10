@@ -74,8 +74,8 @@ importers:
   apps/maestro:
     dependencies:
       '@axelar-network/axelarjs-sdk':
-        specifier: 0.15.0-alpha.5
-        version: 0.15.0-alpha.5
+        specifier: 0.15.0
+        version: 0.15.0
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -1023,8 +1023,8 @@ packages:
     engines: {node: '>=16'}
     dev: true
 
-  /@axelar-network/axelarjs-sdk@0.15.0-alpha.5:
-    resolution: {integrity: sha512-dWhTwMfbFuSX7YrNTPzkn27886eQ3r+7qXCCrYHJREXSLvt5qVmj5+TzKSaZ0LwIwEmCvvOApfYbydLsl63uKA==}
+  /@axelar-network/axelarjs-sdk@0.15.0:
+    resolution: {integrity: sha512-7DSO/loMu/3p592WZ7rXtL0uUyLgSi5c7JH26OCR2WElzhobScM6twb1JUi+Gu9u3OcrFPJZyBLd/COIVY6S7A==}
     requiresBuild: true
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 4.5.0

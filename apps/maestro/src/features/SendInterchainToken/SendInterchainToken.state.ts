@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 
 import { useAccount, useBalance } from "wagmi";
 
-import { NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT } from "~/config/env";
+import {
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+  NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
+} from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -99,6 +102,7 @@ export function useSendInterchainTokenState(props: {
     sourceChainTokenSymbol: nativeTokenSymbol,
     gasMultiplier: "auto",
     gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
+    executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   });
 
   const hasInsufficientGasBalance = useMemo(() => {
