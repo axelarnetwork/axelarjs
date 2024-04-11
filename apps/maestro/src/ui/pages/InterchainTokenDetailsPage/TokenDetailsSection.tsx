@@ -88,9 +88,9 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           </Tooltip>
         </div>,
       ],
-      props.claimOwnershipFormLink && [
+      [
         "Token Ownership Claim Request",
-        props.wasDeployedByAccount && (
+        props.wasDeployedByAccount && props.claimOwnershipFormLink && (
           <LinkButton
             target="_blank"
             className="ml-[-10px]"
