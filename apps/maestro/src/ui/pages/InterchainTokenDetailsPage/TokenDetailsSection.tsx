@@ -104,11 +104,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       [
         "Whitelisting Your Token at Squid",
         props.wasDeployedByAccount && (
-          <Tooltip
-            $as={Indicator}
-            $position="right"
-            tip="Use the wizard in the repo to whitelist your token. You can then add the Squid widget to your user interface, which will allow you to bridge your Interchain Token after it has been whitelisted"
-          >
+          <div className="flex items-center">
             <LinkButton
               target="_blank"
               className="ml-[-10px]"
@@ -117,7 +113,15 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             >
               Link
             </LinkButton>
-          </Tooltip>
+            <Tooltip
+              $as={Indicator}
+              $variant={"info"}
+              $position="right"
+              tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
+            >
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+          </div>
         ),
       ],
     ]),
