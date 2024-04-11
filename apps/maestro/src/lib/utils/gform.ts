@@ -15,6 +15,8 @@ const chainIdToGFormChainId = {
   optimism: "Optimism",
   polygon: "Polygon",
   scroll: "Scroll",
+  blast: "Blast",
+  fraxtal: "Fraxtal",
 } as any;
 
 export function getPrefilledClaimOwnershipFormLink(
@@ -31,7 +33,7 @@ export function getPrefilledClaimOwnershipFormLink(
   };
 
   const destChainsParams: string[] = allChains
-    .filter((chain) => chainIdToGFormChainId[chain])
+    .filter((chain) => chainIdToGFormChainId[chain] && chain !== sourceChain)
     .map(
       (chain) =>
         `${ClaimOwnershipFormFieldIds.allChains}=${chainIdToGFormChainId[chain]}`
