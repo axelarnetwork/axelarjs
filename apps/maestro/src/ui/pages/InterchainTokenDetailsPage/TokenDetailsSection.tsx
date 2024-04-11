@@ -123,16 +123,25 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     ]),
     ...Maybe.of(props.tokenManagerAddress).mapOr([], () => [
       [
-        "Marketing Form",
+        "Apply for coordinated marketing with Axelar",
         props.wasDeployedByAccount && (
-          <LinkButton
-            target="_blank"
-            className="ml-[-10px]"
-            $variant="link"
-            href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
-          >
-            Link
-          </LinkButton>
+          <div className="flex items-center">
+            <LinkButton
+              target="_blank"
+              className="ml-[-10px]"
+              $variant="link"
+              href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+            >
+              Link
+            </LinkButton>
+            <Tooltip
+              tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
+              $variant="info"
+              $position="bottom"
+            >
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+          </div>
         ),
       ],
     ]),
