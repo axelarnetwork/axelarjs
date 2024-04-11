@@ -6,7 +6,7 @@ import {
 const chainIdToGFormChainId = {
   arbitrum: "Arbitrum",
   base: "Base",
-  binance: "Binance Smart Chain(BSC)",
+  binance: "BNB Chain",
   celo: "Celo",
   ethereum: "Ethereum",
   fantom: "Fantom",
