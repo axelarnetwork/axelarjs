@@ -40,7 +40,7 @@ export type TokenDetailsSectionProps = {
   tokenId?: `0x${string}` | null | undefined;
   tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
-  claimOwnershipFormLink: string;
+  claimOwnershipFormLink?: string;
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
@@ -88,7 +88,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           </Tooltip>
         </div>,
       ],
-      [
+      props.claimOwnershipFormLink && [
         "Token Ownership Claim Request",
         props.wasDeployedByAccount && (
           <LinkButton
