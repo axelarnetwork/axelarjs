@@ -17,6 +17,10 @@ const chainIdToGFormChainId = {
   scroll: "Scroll",
   blast: "Blast",
   fraxtal: "Fraxtal",
+  avalanche: "Avalanche",
+  kava: "Kava",
+  filecoin: "Filecoin",
+  mantle: "Mantle",
 } as any;
 
 export function getPrefilledClaimOwnershipFormLink(
