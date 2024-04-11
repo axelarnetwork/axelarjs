@@ -10,3 +10,6 @@
 - feat: add whitelist token on squid link https://github.com/axelarnetwork/axelarjs/pull/315
 - chore: add provide liquidity button to dex for each chain in the token details page https://github.com/axelarnetwork/axelarjs/pull/317
 - chore: update ITS contracts to v1.2.4 https://github.com/axelarnetwork/axelarjs/pull/307
+- chore: add note that logo only works at ITS portal https://github.com/axelarnetwork/axelarjs/pull/336
+- chore: update squid link tooltip https://github.com/axelarnetwork/axelarjs/pull/335
+- chore: update marketing form label https://github.com/axelarnetwork/axelarjs/pull/334
