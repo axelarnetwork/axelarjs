@@ -43,8 +43,6 @@ const InterchainTokensPage: FC = () => {
       ?.filter((token) => token.isRegistered)
       ?.map((token) => token.axelarChainId) || [];
 
-  console.log("Chain Names", chainNames);
-
   return (
     <Page
       pageTitle={`Interchain Tokens - ${routeChain?.name}`}
