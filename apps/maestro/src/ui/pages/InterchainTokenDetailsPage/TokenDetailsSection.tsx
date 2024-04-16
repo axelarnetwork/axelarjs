@@ -40,7 +40,7 @@ export type TokenDetailsSectionProps = {
   tokenId?: `0x${string}` | null | undefined;
   tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
-  claimOwnershipFormLink: string;
+  claimOwnershipFormLink?: string;
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
@@ -90,7 +90,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       ],
       [
         "Token Ownership Claim Request",
-        props.wasDeployedByAccount && (
+        props.wasDeployedByAccount && props.claimOwnershipFormLink && (
           <LinkButton
             target="_blank"
             className="ml-[-10px]"
@@ -102,13 +102,9 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         ),
       ],
       [
-        "Whitelisting Your Token at Squid",
+        "Add Your Token on Squid",
         props.wasDeployedByAccount && (
-          <Tooltip
-            $as={Indicator}
-            $position="right"
-            tip="Use the wizard in the repo to whitelist your token. You can then add the Squid widget to your user interface, which will allow you to bridge your Interchain Token after it has been whitelisted"
-          >
+          <div className="flex items-center">
             <LinkButton
               target="_blank"
               className="ml-[-10px]"
@@ -117,22 +113,39 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             >
               Link
             </LinkButton>
-          </Tooltip>
+            <Tooltip
+              $as={Indicator}
+              $variant={"info"}
+              $position="right"
+              tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
+            >
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+          </div>
         ),
       ],
     ]),
     ...Maybe.of(props.tokenManagerAddress).mapOr([], () => [
       [
-        "Marketing Form",
+        "Apply for coordinated marketing with Axelar",
         props.wasDeployedByAccount && (
-          <LinkButton
-            target="_blank"
-            className="ml-[-10px]"
-            $variant="link"
-            href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
-          >
-            Link
-          </LinkButton>
+          <div className="flex items-center">
+            <LinkButton
+              target="_blank"
+              className="ml-[-10px]"
+              $variant="link"
+              href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+            >
+              Link
+            </LinkButton>
+            <Tooltip
+              tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
+              $variant="info"
+              $position="bottom"
+            >
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+          </div>
         ),
       ],
     ]),
@@ -393,6 +406,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 <InfoIcon className="text-info h-[1em]" />
               </Tooltip>
             </Label>
+
             <TextInput
               defaultValue={sanitizedUrl}
               className="bg-base-200"
@@ -403,6 +417,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 setIconUrl(e.target.value);
               }}
             />
+            <span className="mt-4 flex">
+              <p>
+                The uploaded image will only be displayed on this
+                Interchain Token Service Portal, but will not carry through to any external services
+              </p>
+            </span>
           </FormControl>
           {isReadyForPreview && (
             <div className="grid place-items-center gap-4 p-4">

@@ -43,7 +43,9 @@ const InterchainTokensPage: FC = () => {
       ?.filter((token) => token.isRegistered)
       ?.map((token) => token.axelarChainId) || [];
 
-  console.log("Chain Names", chainNames);
+  const destToken = interchainToken.matchingTokens?.find(
+    (token) => !token.isOriginToken
+  );
 
   return (
     <Page
@@ -63,12 +65,15 @@ const InterchainTokensPage: FC = () => {
           tokenId={interchainToken?.tokenId}
           tokenManagerAddress={interchainToken?.tokenManagerAddress}
           kind={interchainToken?.kind}
-          claimOwnershipFormLink={getPrefilledClaimOwnershipFormLink(
-            interchainToken.chain.name,
-            chainNames,
-            "Interchain Token Service (ITS)",
-            tokenAddress
-          )}
+          claimOwnershipFormLink={
+            destToken &&
+            getPrefilledClaimOwnershipFormLink(
+              interchainToken.chain.name,
+              chainNames,
+              "Interchain Token Service (ITS)",
+              destToken.tokenAddress as string
+            )
+          }
         />
       )}
       {routeChain && tokenDetails && (

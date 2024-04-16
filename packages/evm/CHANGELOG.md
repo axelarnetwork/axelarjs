@@ -1,5 +1,11 @@
 # @axelarjs/evm
 
+## 0.2.4
+
+### Patch Changes
+
+- [#330](https://github.com/axelarnetwork/axelarjs/pull/330) [`52da903753e7c9aa1ebd2440e91b4169afbe4c6c`](https://github.com/axelarnetwork/axelarjs/commit/52da903753e7c9aa1ebd2440e91b4169afbe4c6c) Thanks [@npty](https://github.com/npty)! - Update ITS contracts to v1.2.4
+
 ## 0.2.3
 
 ### Patch Changes
