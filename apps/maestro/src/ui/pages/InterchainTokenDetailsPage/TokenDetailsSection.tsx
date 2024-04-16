@@ -102,7 +102,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         ),
       ],
       [
-        "Whitelisting Your Token at Squid",
+        "Add Your Token on Squid",
         props.wasDeployedByAccount && (
           <div className="flex items-center">
             <LinkButton
