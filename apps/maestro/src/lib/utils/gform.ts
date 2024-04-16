@@ -6,7 +6,7 @@ import {
 const chainIdToGFormChainId = {
   arbitrum: "Arbitrum",
   base: "Base",
-  binance: "Binance Smart Chain(BSC)",
+  binance: "BNB Chain",
   celo: "Celo",
   ethereum: "Ethereum",
   fantom: "Fantom",
@@ -15,6 +15,12 @@ const chainIdToGFormChainId = {
   optimism: "Optimism",
   polygon: "Polygon",
   scroll: "Scroll",
+  blast: "Blast",
+  fraxtal: "Fraxtal",
+  avalanche: "Avalanche",
+  kava: "Kava",
+  filecoin: "Filecoin",
+  mantle: "Mantle",
 } as any;
 
 export function getPrefilledClaimOwnershipFormLink(
@@ -23,15 +29,16 @@ export function getPrefilledClaimOwnershipFormLink(
   tokenType: string,
   tokenAddress: string
 ) {
+  const srcChain = sourceChain.toLowerCase();
   const formLink = NEXT_PUBLIC_CLAIM_OWNERSHIP_FORM_LINK;
   const formFields = {
-    [ClaimOwnershipFormFieldIds.sourceChain]: sourceChain,
+    [ClaimOwnershipFormFieldIds.sourceChain]: chainIdToGFormChainId[srcChain],
     [ClaimOwnershipFormFieldIds.tokenType]: tokenType,
     [ClaimOwnershipFormFieldIds.tokenAddress]: tokenAddress,
   };
 
   const destChainsParams: string[] = allChains
-    .filter((chain) => chainIdToGFormChainId[chain])
+    .filter((chain) => chainIdToGFormChainId[chain] && chain !== srcChain)
     .map(
       (chain) =>
         `${ClaimOwnershipFormFieldIds.allChains}=${chainIdToGFormChainId[chain]}`
