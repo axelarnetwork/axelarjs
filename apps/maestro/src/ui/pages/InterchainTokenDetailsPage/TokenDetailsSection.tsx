@@ -406,6 +406,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 <InfoIcon className="text-info h-[1em]" />
               </Tooltip>
             </Label>
+
             <TextInput
               defaultValue={sanitizedUrl}
               className="bg-base-200"
@@ -416,6 +417,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 setIconUrl(e.target.value);
               }}
             />
+            <span className="mt-4 flex">
+              <p>
+                The uploaded image will only be displayed on this
+                Interchain Token Service Portal, but will not carry through to any external services
+              </p>
+            </span>
           </FormControl>
           {isReadyForPreview && (
             <div className="grid place-items-center gap-4 p-4">
