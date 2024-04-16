@@ -406,7 +406,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
             />
             <span className="mt-4 flex">
               <p>
-                The uploaded image will be displayed exclusively on this
+                The uploaded image will only be displayed on this
                 Interchain Token Service Portal
               </p>
             </span>
