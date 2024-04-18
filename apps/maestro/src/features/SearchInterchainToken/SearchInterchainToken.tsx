@@ -1,4 +1,11 @@
-import { cn, FormControl, SpinnerIcon, TextInput, Tooltip } from "@axelarjs/ui";
+import {
+  cn,
+  Dropdown,
+  FormControl,
+  SpinnerIcon,
+  TextInput,
+  Tooltip,
+} from "@axelarjs/ui";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
@@ -9,7 +16,9 @@ import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import EVMChainsDropdown, {
+  EVMChainIcon,
+} from "~/ui/components/EVMChainsDropdown";
 
 export type TokenFoundResult = {
   tokenId?: `0x${string}`;
@@ -114,7 +123,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
-          className="bg-base-200 join-item flex-1 focus:outline-none focus:ring-0"
+          className="bg-base-200 join-item flex-1 text-sm focus:outline-none focus:ring-0"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
@@ -122,31 +131,46 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-gray-700 dark:text-white">
-                Selected Chain
-              </span>
-              <Tooltip
-                tip={`search on ${chainName ?? "all chains"}`}
-                className="tooltip-left md:tooltip-top"
-              >
-                <EVMChainsDropdown
-                  triggerClassName="btn btn-sm btn-circle"
-                  contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
-                  compact
-                  hideLabel
-                  selectedChain={defaultChain}
-                  onSelectChain={
-                    !connectedChain
-                      ? (chain) =>
-                          chain
-                            ? setSelectedChainId(chain.chain_id)
-                            : setSelectedChainId(-1)
-                      : undefined
-                  }
-                />
-              </Tooltip>
-            </div>
+            <EVMChainsDropdown
+              triggerClassName="btn btn-sm btn-circle"
+              contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
+              compact
+              hideLabel
+              renderTrigger={() => (
+                <Dropdown.Trigger
+                  $as="button"
+                  role="button"
+                  aria-label="Select Chain"
+                  tabIndex={-1}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-700 dark:text-white">
+                      Selected Chain
+                    </span>
+                    <Tooltip
+                      tip={`Search on ${chainName ?? "all chains"}`}
+                      className="tooltip-left md:tooltip-top"
+                    >
+                      {/* if both selectedChain and onSelectedChain exist,
+                        operate in controlled mode
+                    */}
+                      <div className="flex items-center">
+                        <EVMChainIcon hideLabel selectedChain={defaultChain} />
+                      </div>
+                    </Tooltip>
+                  </div>
+                </Dropdown.Trigger>
+              )}
+              selectedChain={defaultChain}
+              onSelectChain={
+                !connectedChain
+                  ? (chain) =>
+                      chain
+                        ? setSelectedChainId(chain.chain_id)
+                        : setSelectedChainId(-1)
+                  : undefined
+              }
+            />
           )}
         </div>
       </div>
