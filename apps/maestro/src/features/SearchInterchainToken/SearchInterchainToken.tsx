@@ -97,7 +97,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
       <div className="pb-2 text-center">Take your token interchain</div>
       <div
         className={cn("join rounded-md transition-transform", {
-          "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
+          "ring-error ring-offset-base-200 my-2 -translate-y-1 ring-1 ring-offset-2":
             shouldRenderError,
           "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
         })}
@@ -149,16 +149,16 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
             </div>
           )}
         </div>
+        {shouldRenderError && (
+          <div
+            role="alert"
+            className="text-error absolute -bottom-8 mx-auto w-full flex-1 p-2 text-center text-sm"
+          >
+            {(searchInterchainTokenError ?? searchERC20Error)?.message ??
+              "Invalid ERC-20 token address"}
+          </div>
+        )}
       </div>
-      {shouldRenderError && (
-        <div
-          role="alert"
-          className="text-error absolute -bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm"
-        >
-          {(searchInterchainTokenError ?? searchERC20Error)?.message ??
-            "Invalid ERC-20 token address"}
-        </div>
-      )}
     </FormControl>
   );
 };
