@@ -33,7 +33,7 @@ export function rainbow(text: string = ""): string {
 
   const [pre, pos] = splitAt(rainbowRipple.length / 2, rainbowRipple) as [
     string,
-    string
+    string,
   ];
 
   return `${pre} ${text} ${pos}`;

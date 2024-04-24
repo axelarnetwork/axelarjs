@@ -2127,7 +2127,7 @@ export const CreateTransferOperatorshipRequest = {
     return CreateTransferOperatorshipRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<CreateTransferOperatorshipRequest>, I>
+    I extends Exact<DeepPartial<CreateTransferOperatorshipRequest>, I>,
   >(object: I): CreateTransferOperatorshipRequest {
     const message = createBaseCreateTransferOperatorshipRequest();
     message.sender = object.sender ?? new Uint8Array(0);
@@ -2184,7 +2184,7 @@ export const CreateTransferOperatorshipResponse = {
     return CreateTransferOperatorshipResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<CreateTransferOperatorshipResponse>, I>
+    I extends Exact<DeepPartial<CreateTransferOperatorshipResponse>, I>,
   >(_: I): CreateTransferOperatorshipResponse {
     const message = createBaseCreateTransferOperatorshipResponse();
     return message;
@@ -2729,14 +2729,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

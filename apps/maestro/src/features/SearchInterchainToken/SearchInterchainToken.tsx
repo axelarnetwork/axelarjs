@@ -93,11 +93,11 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidAddress && search.length >= 10);
 
   return (
-    <FormControl className="w-full max-w-xs md:max-w-md">
+    <FormControl className="relative w-full max-w-xs md:max-w-md">
       <div className="pb-2 text-center">Take your token interchain</div>
       <div
         className={cn("join rounded-md transition-transform", {
-          "ring-error ring-offset-base-200 -translate-y-4 ring-1 ring-offset-2":
+          "ring-error ring-offset-base-200 ring-1 ring-offset-2":
             shouldRenderError,
           "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
         })}
@@ -122,33 +122,38 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
           ) : (
-            <Tooltip
-              tip={`search on ${chainName ?? "all chains"}`}
-              className="tooltip-left md:tooltip-top"
-            >
-              <EVMChainsDropdown
-                triggerClassName="btn btn-sm btn-circle"
-                contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
-                compact
-                hideLabel
-                selectedChain={defaultChain}
-                onSelectChain={
-                  !connectedChain
-                    ? (chain) =>
-                        chain
-                          ? setSelectedChainId(chain.chain_id)
-                          : setSelectedChainId(-1)
-                    : undefined
-                }
-              />
-            </Tooltip>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-700 dark:text-white">
+                Selected Chain
+              </span>
+              <Tooltip
+                tip={`search on ${chainName ?? "all chains"}`}
+                className="tooltip-left md:tooltip-top"
+              >
+                <EVMChainsDropdown
+                  triggerClassName="btn btn-sm btn-circle"
+                  contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
+                  compact
+                  hideLabel
+                  selectedChain={defaultChain}
+                  onSelectChain={
+                    !connectedChain
+                      ? (chain) =>
+                          chain
+                            ? setSelectedChainId(chain.chain_id)
+                            : setSelectedChainId(-1)
+                      : undefined
+                  }
+                />
+              </Tooltip>
+            </div>
           )}
         </div>
       </div>
       {shouldRenderError && (
         <div
           role="alert"
-          className="text-error absolute -bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm"
+          className="text-error -bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm"
         >
           {(searchInterchainTokenError ?? searchERC20Error)?.message ??
             "Invalid ERC-20 token address"}

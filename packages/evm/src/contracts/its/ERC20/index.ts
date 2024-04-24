@@ -20,6 +20,20 @@ export * from "./ERC20.args";
 
 export const ERC20_ABI = ABI_FILE.abi;
 
+/**
+ * ERC20Client
+ *
+ * @description Type-safe contract client for ERC20
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createERC20Client({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class ERC20Client extends PublicContractClient<typeof ABI_FILE.abi> {
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
@@ -36,3 +50,8 @@ export class ERC20Client extends PublicContractClient<typeof ABI_FILE.abi> {
     this.reads = createReadClient(this);
   }
 }
+
+export const createERC20Client = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ERC20Client(options);

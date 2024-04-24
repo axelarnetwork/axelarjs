@@ -8,13 +8,10 @@ export const protobufPackage = "axelar.reward.v1beta1";
 
 /**
  * InflationRateRequest represents a message that queries the Axelar specific
- * inflation RPC method. Ideally, this would use ValAddress as the validator
- * field type. However, this makes it awkward for REST-based calls, because it
- * would expect a byte array as part of the url. So, the bech32 encoded address
- * string is used for this request instead.
+ * inflation RPC method.
  */
 export interface InflationRateRequest {
-  validator: string;
+  validator: Uint8Array;
 }
 
 export interface InflationRateResponse {
@@ -29,7 +26,7 @@ export interface ParamsResponse {
 }
 
 function createBaseInflationRateRequest(): InflationRateRequest {
-  return { validator: "" };
+  return { validator: new Uint8Array(0) };
 }
 
 export const InflationRateRequest = {
@@ -37,8 +34,8 @@ export const InflationRateRequest = {
     message: InflationRateRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.validator !== "") {
-      writer.uint32(10).string(message.validator);
+    if (message.validator.length !== 0) {
+      writer.uint32(10).bytes(message.validator);
     }
     return writer;
   },
@@ -59,7 +56,7 @@ export const InflationRateRequest = {
             break;
           }
 
-          message.validator = reader.string();
+          message.validator = reader.bytes();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -73,15 +70,15 @@ export const InflationRateRequest = {
   fromJSON(object: any): InflationRateRequest {
     return {
       validator: isSet(object.validator)
-        ? globalThis.String(object.validator)
-        : "",
+        ? bytesFromBase64(object.validator)
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: InflationRateRequest): unknown {
     const obj: any = {};
-    if (message.validator !== "") {
-      obj.validator = message.validator;
+    if (message.validator.length !== 0) {
+      obj.validator = base64FromBytes(message.validator);
     }
     return obj;
   },
@@ -95,7 +92,7 @@ export const InflationRateRequest = {
     object: I
   ): InflationRateRequest {
     const message = createBaseInflationRateRequest();
-    message.validator = object.validator ?? "";
+    message.validator = object.validator ?? new Uint8Array(0);
     return message;
   },
 };
@@ -330,14 +327,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

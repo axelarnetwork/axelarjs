@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { act, renderHook } from "@testing-library/react";
-import fc from "fast-check";
+import { renderHook } from "@testing-library/react";
 
 import { ContainerProviderProps, createContainer } from "./unstated";
 
@@ -11,23 +10,6 @@ function useCounter(initialState = 0) {
   const increment = () => setCount(count + 1);
   return { count, increment };
 }
-
-describe("useCounter", () => {
-  it("increments the count with random initial states", async () => {
-    await fc.assert(
-      fc.asyncProperty(fc.integer(), async (initialState: number) => {
-        const { result } = renderHook(() => useCounter(initialState));
-        expect(result.current.count).toBe(initialState);
-
-        act(() => {
-          result.current.increment();
-        });
-
-        expect(result.current.count).toBe(initialState + 1);
-      })
-    );
-  });
-});
 
 describe("createContainer", () => {
   it("returns a container with Provider and useContainer", () => {

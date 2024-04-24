@@ -29,14 +29,18 @@
     "clean": "./scripts/clean.sh",
     "compile": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "docgen": "typedoc",
+    "deploy:docs": "gh-pages -d docs -e core"
   },
   "keywords": [],
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
+    "gh-pages": "^6.1.1",
     "rimraf": "^5.0.5",
-    "typescript": "^5.4.2"
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.3"
   }
 }

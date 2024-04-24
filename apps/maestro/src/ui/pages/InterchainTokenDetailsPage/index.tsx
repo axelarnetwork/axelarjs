@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { isAddress } from "viem";
 
 import { useChainFromRoute } from "~/lib/hooks";
+import { getPrefilledClaimOwnershipFormLink } from "~/lib/utils/gform";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import Page from "~/ui/layouts/Page";
@@ -37,6 +38,15 @@ const InterchainTokensPage: FC = () => {
     return <Alert $status="error">Invalid token address</Alert>;
   }
 
+  const chainNames =
+    interchainToken?.matchingTokens
+      ?.filter((token) => token.isRegistered)
+      ?.map((token) => token.axelarChainId) || [];
+
+  const destToken = interchainToken.matchingTokens?.find(
+    (token) => !token.isOriginToken
+  );
+
   return (
     <Page
       pageTitle={`Interchain Tokens - ${routeChain?.name}`}
@@ -55,6 +65,15 @@ const InterchainTokensPage: FC = () => {
           tokenId={interchainToken?.tokenId}
           tokenManagerAddress={interchainToken?.tokenManagerAddress}
           kind={interchainToken?.kind}
+          claimOwnershipFormLink={
+            destToken &&
+            getPrefilledClaimOwnershipFormLink(
+              interchainToken.chain.name,
+              chainNames,
+              "Interchain Token Service (ITS)",
+              destToken.tokenAddress as string
+            )
+          }
         />
       )}
       {routeChain && tokenDetails && (

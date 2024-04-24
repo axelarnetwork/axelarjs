@@ -134,25 +134,25 @@ export const QueryValidatorsResponse_TssIllegibilityInfo = {
     message: QueryValidatorsResponse_TssIllegibilityInfo,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.tombstoned === true) {
+    if (message.tombstoned !== false) {
       writer.uint32(8).bool(message.tombstoned);
     }
-    if (message.jailed === true) {
+    if (message.jailed !== false) {
       writer.uint32(16).bool(message.jailed);
     }
-    if (message.missedTooManyBlocks === true) {
+    if (message.missedTooManyBlocks !== false) {
       writer.uint32(24).bool(message.missedTooManyBlocks);
     }
-    if (message.noProxyRegistered === true) {
+    if (message.noProxyRegistered !== false) {
       writer.uint32(32).bool(message.noProxyRegistered);
     }
-    if (message.tssSuspended === true) {
+    if (message.tssSuspended !== false) {
       writer.uint32(40).bool(message.tssSuspended);
     }
-    if (message.proxyInsuficientFunds === true) {
+    if (message.proxyInsuficientFunds !== false) {
       writer.uint32(48).bool(message.proxyInsuficientFunds);
     }
-    if (message.staleTssHeartbeat === true) {
+    if (message.staleTssHeartbeat !== false) {
       writer.uint32(56).bool(message.staleTssHeartbeat);
     }
     return writer;
@@ -253,39 +253,45 @@ export const QueryValidatorsResponse_TssIllegibilityInfo = {
 
   toJSON(message: QueryValidatorsResponse_TssIllegibilityInfo): unknown {
     const obj: any = {};
-    if (message.tombstoned === true) {
+    if (message.tombstoned !== false) {
       obj.tombstoned = message.tombstoned;
     }
-    if (message.jailed === true) {
+    if (message.jailed !== false) {
       obj.jailed = message.jailed;
     }
-    if (message.missedTooManyBlocks === true) {
+    if (message.missedTooManyBlocks !== false) {
       obj.missedTooManyBlocks = message.missedTooManyBlocks;
     }
-    if (message.noProxyRegistered === true) {
+    if (message.noProxyRegistered !== false) {
       obj.noProxyRegistered = message.noProxyRegistered;
     }
-    if (message.tssSuspended === true) {
+    if (message.tssSuspended !== false) {
       obj.tssSuspended = message.tssSuspended;
     }
-    if (message.proxyInsuficientFunds === true) {
+    if (message.proxyInsuficientFunds !== false) {
       obj.proxyInsuficientFunds = message.proxyInsuficientFunds;
     }
-    if (message.staleTssHeartbeat === true) {
+    if (message.staleTssHeartbeat !== false) {
       obj.staleTssHeartbeat = message.staleTssHeartbeat;
     }
     return obj;
   },
 
   create<
-    I extends Exact<DeepPartial<QueryValidatorsResponse_TssIllegibilityInfo>, I>
+    I extends Exact<
+      DeepPartial<QueryValidatorsResponse_TssIllegibilityInfo>,
+      I
+    >,
   >(base?: I): QueryValidatorsResponse_TssIllegibilityInfo {
     return QueryValidatorsResponse_TssIllegibilityInfo.fromPartial(
       base ?? ({} as any)
     );
   },
   fromPartial<
-    I extends Exact<DeepPartial<QueryValidatorsResponse_TssIllegibilityInfo>, I>
+    I extends Exact<
+      DeepPartial<QueryValidatorsResponse_TssIllegibilityInfo>,
+      I
+    >,
   >(object: I): QueryValidatorsResponse_TssIllegibilityInfo {
     const message = createBaseQueryValidatorsResponse_TssIllegibilityInfo();
     message.tombstoned = object.tombstoned ?? false;
@@ -405,7 +411,7 @@ export const QueryValidatorsResponse_Validator = {
     return QueryValidatorsResponse_Validator.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<QueryValidatorsResponse_Validator>, I>
+    I extends Exact<DeepPartial<QueryValidatorsResponse_Validator>, I>,
   >(object: I): QueryValidatorsResponse_Validator {
     const message = createBaseQueryValidatorsResponse_Validator();
     message.operatorAddress = object.operatorAddress ?? "";
@@ -554,14 +560,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

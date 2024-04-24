@@ -371,7 +371,7 @@ export const Http = {
     for (const v of message.rules) {
       HttpRule.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    if (message.fullyDecodeReservedExpansion === true) {
+    if (message.fullyDecodeReservedExpansion !== false) {
       writer.uint32(16).bool(message.fullyDecodeReservedExpansion);
     }
     return writer;
@@ -424,7 +424,7 @@ export const Http = {
     if (message.rules?.length) {
       obj.rules = message.rules.map((e) => HttpRule.toJSON(e));
     }
-    if (message.fullyDecodeReservedExpansion === true) {
+    if (message.fullyDecodeReservedExpansion !== false) {
       obj.fullyDecodeReservedExpansion = message.fullyDecodeReservedExpansion;
     }
     return obj;
@@ -766,14 +766,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

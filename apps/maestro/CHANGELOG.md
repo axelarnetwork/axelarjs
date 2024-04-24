@@ -1,5 +1,37 @@
 # @axelarjs/maestro
 
+## 0.3.11
+
+### Patch Changes
+
+- [#330](https://github.com/axelarnetwork/axelarjs/pull/330) [`52da903753e7c9aa1ebd2440e91b4169afbe4c6c`](https://github.com/axelarnetwork/axelarjs/commit/52da903753e7c9aa1ebd2440e91b4169afbe4c6c) Thanks [@npty](https://github.com/npty)! - - feat: prefill claim token ownership form https://github.com/axelarnetwork/axelarjs/pull/327
+  - chore: update axelarjs-sdk to 0.15.0 and pass executeData for more accurate gas estimation https://github.com/axelarnetwork/axelarjs/pull/324
+  - chore: add report bug at the footer https://github.com/axelarnetwork/axelarjs/pull/321
+  - chore: improve clarity in the root page that user can change the chain https://github.com/axelarnetwork/axelarjs/pull/320
+  - chore: update axelar logo to improve branding prominence https://github.com/axelarnetwork/axelarjs/pull/319
+  - feat: add whitelist token on squid link https://github.com/axelarnetwork/axelarjs/pull/315
+  - chore: add provide liquidity button to dex for each chain in the token details page https://github.com/axelarnetwork/axelarjs/pull/317
+  - chore: update ITS contracts to v1.2.4 https://github.com/axelarnetwork/axelarjs/pull/307
+  - chore: add note that logo only works at ITS portal https://github.com/axelarnetwork/axelarjs/pull/336
+  - chore: update squid link tooltip https://github.com/axelarnetwork/axelarjs/pull/335
+  - chore: update marketing form label https://github.com/axelarnetwork/axelarjs/pull/334
+- Updated dependencies [[`52da903753e7c9aa1ebd2440e91b4169afbe4c6c`](https://github.com/axelarnetwork/axelarjs/commit/52da903753e7c9aa1ebd2440e91b4169afbe4c6c)]:
+  - @axelarjs/evm@0.2.4
+
+## 0.3.10
+
+### Patch Changes
+
+- Updated dependencies [[`dfcf1a1a81ee298323fae4919aa254156c4f7349`](https://github.com/axelarnetwork/axelarjs/commit/dfcf1a1a81ee298323fae4919aa254156c4f7349)]:
+  - @axelarjs/api@0.3.15
+
+## 0.3.9
+
+### Patch Changes
+
+- Updated dependencies [[`a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476`](https://github.com/axelarnetwork/axelarjs/commit/a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476)]:
+  - @axelarjs/api@0.3.14
+
 ## 0.3.8
 
 ### Patch Changes

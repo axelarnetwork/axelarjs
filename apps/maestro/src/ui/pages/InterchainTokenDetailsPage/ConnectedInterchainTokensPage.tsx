@@ -7,6 +7,10 @@ import { useEffect, useMemo, type FC } from "react";
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
 
+import {
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
+} from "~/config/env";
 import CanonicalTokenDeployment from "~/features/CanonicalTokenDeployment";
 import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
@@ -125,7 +129,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             decimals: Number(tokenDetails?.decimals),
             tokenId: token.tokenId as `0x${string}`,
             tokenAddress: token.tokenAddress as `0x${string}`,
-          } as TokenInfo)
+          }) as TokenInfo
       )
     )
     .mapOr(
@@ -229,7 +233,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     useEstimateGasFeeMultipleChainsQuery({
       sourceChainId: interchainToken?.chain?.id ?? "",
       destinationChainIds,
-      gasLimit: 1_000_000,
+      executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+      gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
       gasMultiplier: "auto",
     });
 

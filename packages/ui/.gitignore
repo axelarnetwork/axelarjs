@@ -25,3 +25,6 @@ dist-ssr
 
 # storybook
 storybook-static
+
+# typedoc
+/docs

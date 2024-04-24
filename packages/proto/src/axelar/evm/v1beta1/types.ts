@@ -576,7 +576,7 @@ export const Event = {
     if (message.txId.length !== 0) {
       writer.uint32(18).bytes(message.txId);
     }
-    if (!message.index.isZero()) {
+    if (!message.index.equals(Long.UZERO)) {
       writer.uint32(24).uint64(message.index);
     }
     if (message.status !== 0) {
@@ -778,7 +778,7 @@ export const Event = {
     if (message.txId.length !== 0) {
       obj.txId = base64FromBytes(message.txId);
     }
-    if (!message.index.isZero()) {
+    if (!message.index.equals(Long.UZERO)) {
       obj.index = (message.index || Long.UZERO).toString();
     }
     if (message.status !== 0) {
@@ -1580,7 +1580,7 @@ export const EventMultisigOwnershipTransferred = {
     return EventMultisigOwnershipTransferred.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<EventMultisigOwnershipTransferred>, I>
+    I extends Exact<DeepPartial<EventMultisigOwnershipTransferred>, I>,
   >(object: I): EventMultisigOwnershipTransferred {
     const message = createBaseEventMultisigOwnershipTransferred();
     message.preOwners = object.preOwners?.map((e) => e) || [];
@@ -1689,7 +1689,7 @@ export const EventMultisigOperatorshipTransferred = {
     );
   },
   fromPartial<
-    I extends Exact<DeepPartial<EventMultisigOperatorshipTransferred>, I>
+    I extends Exact<DeepPartial<EventMultisigOperatorshipTransferred>, I>,
   >(object: I): EventMultisigOperatorshipTransferred {
     const message = createBaseEventMultisigOperatorshipTransferred();
     message.newOperators = object.newOperators?.map((e) => e) || [];
@@ -1965,7 +1965,7 @@ export const ERC20Deposit = {
     if (message.burnerAddress.length !== 0) {
       writer.uint32(42).bytes(message.burnerAddress);
     }
-    if (!message.logIndex.isZero()) {
+    if (!message.logIndex.equals(Long.UZERO)) {
       writer.uint32(48).uint64(message.logIndex);
     }
     return writer;
@@ -2068,7 +2068,7 @@ export const ERC20Deposit = {
     if (message.burnerAddress.length !== 0) {
       obj.burnerAddress = base64FromBytes(message.burnerAddress);
     }
-    if (!message.logIndex.isZero()) {
+    if (!message.logIndex.equals(Long.UZERO)) {
       obj.logIndex = (message.logIndex || Long.UZERO).toString();
     }
     return obj;
@@ -2132,7 +2132,7 @@ export const ERC20TokenMetadata = {
     if (message.status !== 0) {
       writer.uint32(56).int32(message.status);
     }
-    if (message.isExternal === true) {
+    if (message.isExternal !== false) {
       writer.uint32(64).bool(message.isExternal);
     }
     if (message.burnerCode.length !== 0) {
@@ -2257,7 +2257,7 @@ export const ERC20TokenMetadata = {
     if (message.status !== 0) {
       obj.status = statusToJSON(message.status);
     }
-    if (message.isExternal === true) {
+    if (message.isExternal !== false) {
       obj.isExternal = message.isExternal;
     }
     if (message.burnerCode.length !== 0) {
@@ -3290,14 +3290,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

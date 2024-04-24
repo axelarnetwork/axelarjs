@@ -44,18 +44,16 @@ ModalFormInput.defaultProps = {
   $bordered: true,
 };
 
-const StyledButton = tw(Button)`gap-2`;
-
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => (
-  <StyledButton {...props}>
-    {children} <ChevronRightIcon className={cn({ hidden: props.loading })} />
-  </StyledButton>
+  <Button {...props}>
+    {children} <ChevronRightIcon className={cn({ hidden: props.$loading })} />
+  </Button>
 );
 
 export const PrevButton: FC<ButtonProps> = ({ children, ...props }) => (
-  <StyledButton {...props}>
+  <Button {...props}>
     <ArrowLeftIcon /> {children}
-  </StyledButton>
+  </Button>
 );
 
 export const StepLoading = () => (

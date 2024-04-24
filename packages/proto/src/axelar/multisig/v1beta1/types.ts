@@ -352,10 +352,10 @@ export const KeygenSession = {
         writer.uint32(26).fork()
       ).ldelim();
     }
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       writer.uint32(32).int64(message.expiresAt);
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       writer.uint32(40).int64(message.completedAt);
     }
     Object.entries(message.isPubKeyReceived).forEach(([key, value]) => {
@@ -364,7 +364,7 @@ export const KeygenSession = {
         writer.uint32(50).fork()
       ).ldelim();
     });
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       writer.uint32(56).int64(message.gracePeriod);
     }
     return writer;
@@ -480,10 +480,10 @@ export const KeygenSession = {
     if (message.keygenThreshold !== undefined) {
       obj.keygenThreshold = Threshold.toJSON(message.keygenThreshold);
     }
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       obj.completedAt = (message.completedAt || Long.ZERO).toString();
     }
     if (message.isPubKeyReceived) {
@@ -495,7 +495,7 @@ export const KeygenSession = {
         });
       }
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
     }
     return obj;
@@ -555,7 +555,7 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
-    if (message.value === true) {
+    if (message.value !== false) {
       writer.uint32(16).bool(message.value);
     }
     return writer;
@@ -607,7 +607,7 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
     if (message.key !== "") {
       obj.key = message.key;
     }
-    if (message.value === true) {
+    if (message.value !== false) {
       obj.value = message.value;
     }
     return obj;
@@ -619,7 +619,7 @@ export const KeygenSession_IsPubKeyReceivedEntry = {
     return KeygenSession_IsPubKeyReceivedEntry.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<KeygenSession_IsPubKeyReceivedEntry>, I>
+    I extends Exact<DeepPartial<KeygenSession_IsPubKeyReceivedEntry>, I>,
   >(object: I): KeygenSession_IsPubKeyReceivedEntry {
     const message = createBaseKeygenSession_IsPubKeyReceivedEntry();
     message.key = object.key ?? "";
@@ -853,7 +853,7 @@ export const SigningSession = {
     message: SigningSession,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.id);
     }
     if (message.multiSig !== undefined) {
@@ -865,13 +865,13 @@ export const SigningSession = {
     if (message.key !== undefined) {
       Key.encode(message.key, writer.uint32(34).fork()).ldelim();
     }
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       writer.uint32(40).int64(message.expiresAt);
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       writer.uint32(48).int64(message.completedAt);
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       writer.uint32(56).int64(message.gracePeriod);
     }
     if (message.module !== "") {
@@ -989,7 +989,7 @@ export const SigningSession = {
 
   toJSON(message: SigningSession): unknown {
     const obj: any = {};
-    if (!message.id.isZero()) {
+    if (!message.id.equals(Long.UZERO)) {
       obj.id = (message.id || Long.UZERO).toString();
     }
     if (message.multiSig !== undefined) {
@@ -1001,13 +1001,13 @@ export const SigningSession = {
     if (message.key !== undefined) {
       obj.key = Key.toJSON(message.key);
     }
-    if (!message.expiresAt.isZero()) {
+    if (!message.expiresAt.equals(Long.ZERO)) {
       obj.expiresAt = (message.expiresAt || Long.ZERO).toString();
     }
-    if (!message.completedAt.isZero()) {
+    if (!message.completedAt.equals(Long.ZERO)) {
       obj.completedAt = (message.completedAt || Long.ZERO).toString();
     }
-    if (!message.gracePeriod.isZero()) {
+    if (!message.gracePeriod.equals(Long.ZERO)) {
       obj.gracePeriod = (message.gracePeriod || Long.ZERO).toString();
     }
     if (message.module !== "") {
@@ -1071,7 +1071,7 @@ export const KeyEpoch = {
     message: KeyEpoch,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.epoch.isZero()) {
+    if (!message.epoch.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.epoch);
     }
     if (message.chain !== "") {
@@ -1131,7 +1131,7 @@ export const KeyEpoch = {
 
   toJSON(message: KeyEpoch): unknown {
     const obj: any = {};
-    if (!message.epoch.isZero()) {
+    if (!message.epoch.equals(Long.UZERO)) {
       obj.epoch = (message.epoch || Long.UZERO).toString();
     }
     if (message.chain !== "") {
@@ -1195,14 +1195,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

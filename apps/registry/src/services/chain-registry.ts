@@ -65,8 +65,8 @@ export type CosmosChainConfig = {
 export type ChainItem<T extends NetworkKind> = T extends "evm"
   ? { network: "evm"; config: EVMChainConfig }
   : T extends "cosmos"
-  ? { network: "cosmos"; config: CosmosChainConfig }
-  : never;
+    ? { network: "cosmos"; config: CosmosChainConfig }
+    : never;
 
 export async function getNormalizedChainConfigs({
   network = "evm" as NetworkKind,
@@ -84,7 +84,7 @@ export async function getNormalizedChainConfigs({
         ({
           network,
           config,
-        } as ChainItem<typeof network>)
+        }) as ChainItem<typeof network>
     )
     .map((chain) => ({
       ...chain,

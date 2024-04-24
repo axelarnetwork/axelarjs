@@ -20,6 +20,20 @@ export * from "./IFlowLimit.args";
 
 export const IFLOW_LIMIT_ABI = ABI_FILE.abi;
 
+/**
+ * IFlowLimitClient
+ *
+ * @description Type-safe contract client for IFlowLimit
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIFlowLimitClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IFlowLimitClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {
@@ -38,3 +52,8 @@ export class IFlowLimitClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createIFlowLimitClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IFlowLimitClient(options);

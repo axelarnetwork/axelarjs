@@ -68,7 +68,7 @@ export const FeeDeducted = {
     message: FeeDeducted,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.transferId);
     }
     if (message.recipientChain !== "") {
@@ -156,7 +156,7 @@ export const FeeDeducted = {
 
   toJSON(message: FeeDeducted): unknown {
     const obj: any = {};
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.recipientChain !== "") {
@@ -214,7 +214,7 @@ export const InsufficientFee = {
     message: InsufficientFee,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       writer.uint32(8).uint64(message.transferId);
     }
     if (message.recipientChain !== "") {
@@ -302,7 +302,7 @@ export const InsufficientFee = {
 
   toJSON(message: InsufficientFee): unknown {
     const obj: any = {};
-    if (!message.transferId.isZero()) {
+    if (!message.transferId.equals(Long.UZERO)) {
       obj.transferId = (message.transferId || Long.UZERO).toString();
     }
     if (message.recipientChain !== "") {
@@ -891,14 +891,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

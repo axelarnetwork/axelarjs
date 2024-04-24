@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/transaction-recovery",
-  "version": "0.2.17",
+  "version": "0.2.19",
   "publishConfig": {
     "access": "public"
   },
@@ -50,7 +50,9 @@
     "compile": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "docgen": "typedoc",
+    "deploy:docs": "gh-pages -d docs -e transaction-recovery"
   },
   "keywords": [],
   "author": "",
@@ -58,8 +60,10 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "dotenv": "^16.4.5",
+    "gh-pages": "^6.1.1",
     "rimraf": "^5.0.5",
-    "typescript": "^5.4.2",
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.3",
     "vitest": "^1.4.0"
   },
   "dependencies": {
@@ -68,6 +72,6 @@
     "@axelarjs/cosmos": "workspace:*",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
-    "viem": "^2.8.11"
+    "viem": "^2.8.18"
   }
 }

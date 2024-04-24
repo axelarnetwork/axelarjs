@@ -4,6 +4,7 @@ import {
   type HttpClientOptions,
 } from "@axelarjs/utils/http-client";
 
+import { createAxelarscanClient } from "../axelarscan";
 import { createGMPClient } from "../gmp/client";
 import { AxelarQueryAPIClient } from "./isomorphic";
 
@@ -17,6 +18,7 @@ export const createAxelarQueryClient = (
     },
     {
       gmpClient: createGMPClient(env),
+      axelarscanClient: createAxelarscanClient(env),
     },
     env
   );

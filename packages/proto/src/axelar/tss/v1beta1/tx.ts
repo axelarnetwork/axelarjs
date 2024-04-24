@@ -1429,14 +1429,14 @@ export const RegisterExternalKeysRequest_ExternalKey = {
   },
 
   create<
-    I extends Exact<DeepPartial<RegisterExternalKeysRequest_ExternalKey>, I>
+    I extends Exact<DeepPartial<RegisterExternalKeysRequest_ExternalKey>, I>,
   >(base?: I): RegisterExternalKeysRequest_ExternalKey {
     return RegisterExternalKeysRequest_ExternalKey.fromPartial(
       base ?? ({} as any)
     );
   },
   fromPartial<
-    I extends Exact<DeepPartial<RegisterExternalKeysRequest_ExternalKey>, I>
+    I extends Exact<DeepPartial<RegisterExternalKeysRequest_ExternalKey>, I>,
   >(object: I): RegisterExternalKeysRequest_ExternalKey {
     const message = createBaseRegisterExternalKeysRequest_ExternalKey();
     message.id = object.id ?? "";
@@ -1809,7 +1809,7 @@ export const SubmitMultisigSignaturesResponse = {
     return SubmitMultisigSignaturesResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<SubmitMultisigSignaturesResponse>, I>
+    I extends Exact<DeepPartial<SubmitMultisigSignaturesResponse>, I>,
   >(_: I): SubmitMultisigSignaturesResponse {
     const message = createBaseSubmitMultisigSignaturesResponse();
     return message;
@@ -1853,14 +1853,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

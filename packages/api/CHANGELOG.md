@@ -1,5 +1,17 @@
 # @axelarjs/api
 
+## 0.3.15
+
+### Patch Changes
+
+- [#285](https://github.com/axelarnetwork/axelarjs/pull/285) [`dfcf1a1a81ee298323fae4919aa254156c4f7349`](https://github.com/axelarnetwork/axelarjs/commit/dfcf1a1a81ee298323fae4919aa254156c4f7349) Thanks [@npty](https://github.com/npty)! - Improve l1 fee calculation for estimateGasFee
+
+## 0.3.14
+
+### Patch Changes
+
+- [#298](https://github.com/axelarnetwork/axelarjs/pull/298) [`a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476`](https://github.com/axelarnetwork/axelarjs/commit/a68c1ec6956d9d7ea8d5ed0c8dc79f1a131e8476) Thanks [@canhtrinh](https://github.com/canhtrinh)! - make axelarjs/utils an explicit dependency
+
 ## 0.3.13
 
 ### Patch Changes

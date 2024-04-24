@@ -20,6 +20,20 @@ export * from "./ERC20Permit.args";
 
 export const ERC20_PERMIT_ABI = ABI_FILE.abi;
 
+/**
+ * ERC20PermitClient
+ *
+ * @description Type-safe contract client for ERC20Permit
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createERC20PermitClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class ERC20PermitClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {
@@ -38,3 +52,8 @@ export class ERC20PermitClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createERC20PermitClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new ERC20PermitClient(options);

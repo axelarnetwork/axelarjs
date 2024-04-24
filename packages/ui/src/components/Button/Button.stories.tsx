@@ -24,7 +24,7 @@ export const Default = Template.bind({});
 export const Loading = Template.bind({});
 
 Loading.args = {
-  loading: true,
+  $loading: true,
 };
 
 export const Disabled = Template.bind({});
@@ -41,6 +41,9 @@ const stories = configurePlayground(Button, {
   $size: {
     values: SIZE_VARIANTS,
   },
+  $length: {
+    values: ["block", "wide"],
+  },
   $shape: {
     values: ["circle", "square"],
     getChildren: (value) =>
@@ -55,3 +58,4 @@ const stories = configurePlayground(Button, {
 export const Variants = stories.$variant;
 export const Sizes = stories.$size;
 export const Shapes = stories.$shape;
+export const Lengths = stories.$length;

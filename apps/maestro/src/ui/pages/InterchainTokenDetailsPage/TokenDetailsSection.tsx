@@ -40,6 +40,7 @@ export type TokenDetailsSectionProps = {
   tokenId?: `0x${string}` | null | undefined;
   tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
+  claimOwnershipFormLink?: string;
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
@@ -58,6 +59,19 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(props.tokenAddress)}
       </CopyToClipboardButton>,
     ],
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
+      [
+        "Token Manager",
+        <CopyToClipboardButton
+          key="token-manager"
+          $size="sm"
+          $variant="ghost"
+          copyText={tokenManagerAddress}
+        >
+          {maskAddress(tokenManagerAddress)}
+        </CopyToClipboardButton>,
+      ],
+    ]),
     ...Maybe.of(props.tokenId).mapOr([], (tokenId) => [
       [
         "Token ID",
@@ -76,29 +90,63 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       ],
       [
         "Token Ownership Claim Request",
-        props.wasDeployedByAccount && (
+        props.wasDeployedByAccount && props.claimOwnershipFormLink && (
           <LinkButton
             target="_blank"
             className="ml-[-10px]"
             $variant="link"
-            href="https://docs.google.com/forms/u/0/d/1EoA2eYA5OK_BagoB4lgqiS67hIiDpZ7ssov1UUksD_Y/viewform?edit_requested=true"
+            href={props.claimOwnershipFormLink}
           >
-            Claim
+            Link
           </LinkButton>
         ),
       ],
-    ]),
-    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
       [
-        "Token Manager",
-        <CopyToClipboardButton
-          key="token-manager"
-          $size="sm"
-          $variant="ghost"
-          copyText={tokenManagerAddress}
-        >
-          {maskAddress(tokenManagerAddress)}
-        </CopyToClipboardButton>,
+        "Add Your Token on Squid",
+        props.wasDeployedByAccount && (
+          <div className="flex items-center">
+            <LinkButton
+              target="_blank"
+              className="ml-[-10px]"
+              $variant="link"
+              href="https://github.com/axelarnetwork/axelar-configs "
+            >
+              Link
+            </LinkButton>
+            <Tooltip
+              $as={Indicator}
+              $variant={"info"}
+              $position="right"
+              tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
+            >
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+          </div>
+        ),
+      ],
+    ]),
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], () => [
+      [
+        "Apply for coordinated marketing with Axelar",
+        props.wasDeployedByAccount && (
+          <div className="flex items-center">
+            <LinkButton
+              target="_blank"
+              className="ml-[-10px]"
+              $variant="link"
+              href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+            >
+              Link
+            </LinkButton>
+            <Tooltip
+              tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
+              $variant="info"
+              $position="bottom"
+            >
+              <InfoIcon className="text-info h-[1em] w-[1em]" />
+            </Tooltip>
+          </div>
+        ),
       ],
     ]),
   ];
@@ -350,7 +398,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
         <Modal.Body>
           <FormControl>
             <Label className="flex items-center justify-start gap-2">
-              Token Icon UR{" "}
+              Token Icon URL{" "}
               <Tooltip
                 tip="Provide a URL to an image to use as the token icon"
                 $position="right"
@@ -358,6 +406,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 <InfoIcon className="text-info h-[1em]" />
               </Tooltip>
             </Label>
+
             <TextInput
               defaultValue={sanitizedUrl}
               className="bg-base-200"
@@ -368,6 +417,12 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 setIconUrl(e.target.value);
               }}
             />
+            <span className="mt-4 flex">
+              <p>
+                The uploaded image will only be displayed on this
+                Interchain Token Service Portal, but will not carry through to any external services
+              </p>
+            </span>
           </FormControl>
           {isReadyForPreview && (
             <div className="grid place-items-center gap-4 p-4">

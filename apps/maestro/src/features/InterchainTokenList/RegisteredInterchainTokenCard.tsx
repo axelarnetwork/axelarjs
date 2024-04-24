@@ -6,6 +6,7 @@ import {
   cn,
   CopyToClipboardButton,
   InfoIcon,
+  LinkButton,
   SettingsIcon,
   SpinnerIcon,
   Tooltip,
@@ -13,12 +14,14 @@ import {
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useMemo, type FC } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
-import { shouldDisableSend } from "~/config/env";
+import { dexLinks } from "~/config/dex";
+import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -103,12 +106,14 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     </Button>
   );
 
+  const isMainnet = NEXT_PUBLIC_NETWORK_ENV === "mainnet";
+  const dex = dexLinks[props.chain?.id as string]?.(props.tokenAddress);
+
   return (
     <Card
       $compact
       className={cn(
         "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
-        "hover:opacity-75 hover:shadow-xl",
         props.className
       )}
     >
@@ -305,6 +310,22 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             })}
           </CopyToClipboardButton>
         </Card.Actions>
+        {isMainnet && dex && (
+          <Card.Actions className="mt-2 flex flex-col justify-between">
+            Add Liquidity
+            <LinkButton
+              className="bg-base-300 dark:bg-base-100 min-w-24 self-stretch py-1 ease-in hover:opacity-75"
+              $size={"md"}
+              href={dex.url}
+              target="_blank"
+            >
+              <div className="flex items-center gap-2">
+                <Image src={dex.icon} width="20" height="20" alt="uniswap" />
+                <span>{dex.name}</span>
+              </div>
+            </LinkButton>
+          </Card.Actions>
+        )}
       </Card.Body>
     </Card>
   );

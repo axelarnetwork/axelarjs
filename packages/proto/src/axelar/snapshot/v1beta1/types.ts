@@ -29,7 +29,7 @@ export const ProxiedValidator = {
     if (message.proxy.length !== 0) {
       writer.uint32(18).bytes(message.proxy);
     }
-    if (message.active === true) {
+    if (message.active !== false) {
       writer.uint32(24).bool(message.active);
     }
     return writer;
@@ -93,7 +93,7 @@ export const ProxiedValidator = {
     if (message.proxy.length !== 0) {
       obj.proxy = base64FromBytes(message.proxy);
     }
-    if (message.active === true) {
+    if (message.active !== false) {
       obj.active = message.active;
     }
     return obj;
@@ -152,14 +152,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

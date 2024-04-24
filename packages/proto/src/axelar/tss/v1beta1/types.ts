@@ -249,10 +249,10 @@ export const MultisigInfo = {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
-    if (!message.timeout.isZero()) {
+    if (!message.timeout.equals(Long.ZERO)) {
       writer.uint32(16).int64(message.timeout);
     }
-    if (!message.targetNum.isZero()) {
+    if (!message.targetNum.equals(Long.ZERO)) {
       writer.uint32(24).int64(message.targetNum);
     }
     for (const v of message.infos) {
@@ -326,10 +326,10 @@ export const MultisigInfo = {
     if (message.id !== "") {
       obj.id = message.id;
     }
-    if (!message.timeout.isZero()) {
+    if (!message.timeout.equals(Long.ZERO)) {
       obj.timeout = (message.timeout || Long.ZERO).toString();
     }
-    if (!message.targetNum.isZero()) {
+    if (!message.targetNum.equals(Long.ZERO)) {
       obj.targetNum = (message.targetNum || Long.ZERO).toString();
     }
     if (message.infos?.length) {
@@ -760,7 +760,7 @@ export const ValidatorStatus = {
     if (message.validator.length !== 0) {
       writer.uint32(10).bytes(message.validator);
     }
-    if (!message.suspendedUntil.isZero()) {
+    if (!message.suspendedUntil.equals(Long.UZERO)) {
       writer.uint32(16).uint64(message.suspendedUntil);
     }
     return writer;
@@ -813,7 +813,7 @@ export const ValidatorStatus = {
     if (message.validator.length !== 0) {
       obj.validator = base64FromBytes(message.validator);
     }
-    if (!message.suspendedUntil.isZero()) {
+    if (!message.suspendedUntil.equals(Long.UZERO)) {
       obj.suspendedUntil = (message.suspendedUntil || Long.UZERO).toString();
     }
     return obj;
@@ -874,14 +874,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

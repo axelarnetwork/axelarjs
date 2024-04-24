@@ -2,10 +2,6 @@
 import _m0 from "protobufjs/minimal";
 
 import {
-  ChainByIBCPathRequest,
-  ChainByIBCPathResponse,
-  IBCPathRequest,
-  IBCPathResponse,
   ParamsRequest,
   ParamsResponse,
   PendingIBCTransferCountRequest,
@@ -186,10 +182,6 @@ export interface QueryService {
     request: PendingIBCTransferCountRequest
   ): Promise<PendingIBCTransferCountResponse>;
   Params(request: ParamsRequest): Promise<ParamsResponse>;
-  IBCPath(request: IBCPathRequest): Promise<IBCPathResponse>;
-  ChainByIBCPath(
-    request: ChainByIBCPathRequest
-  ): Promise<ChainByIBCPathResponse>;
 }
 
 export const QueryServiceServiceName = "axelar.axelarnet.v1beta1.QueryService";
@@ -201,8 +193,6 @@ export class QueryServiceClientImpl implements QueryService {
     this.rpc = rpc;
     this.PendingIBCTransferCount = this.PendingIBCTransferCount.bind(this);
     this.Params = this.Params.bind(this);
-    this.IBCPath = this.IBCPath.bind(this);
-    this.ChainByIBCPath = this.ChainByIBCPath.bind(this);
   }
   PendingIBCTransferCount(
     request: PendingIBCTransferCountRequest
@@ -223,24 +213,6 @@ export class QueryServiceClientImpl implements QueryService {
     const promise = this.rpc.request(this.service, "Params", data);
     return promise.then((data) =>
       ParamsResponse.decode(_m0.Reader.create(data))
-    );
-  }
-
-  IBCPath(request: IBCPathRequest): Promise<IBCPathResponse> {
-    const data = IBCPathRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "IBCPath", data);
-    return promise.then((data) =>
-      IBCPathResponse.decode(_m0.Reader.create(data))
-    );
-  }
-
-  ChainByIBCPath(
-    request: ChainByIBCPathRequest
-  ): Promise<ChainByIBCPathResponse> {
-    const data = ChainByIBCPathRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ChainByIBCPath", data);
-    return promise.then((data) =>
-      ChainByIBCPathResponse.decode(_m0.Reader.create(data))
     );
   }
 }

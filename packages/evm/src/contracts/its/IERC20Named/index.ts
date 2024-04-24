@@ -20,6 +20,20 @@ export * from "./IERC20Named.args";
 
 export const IERC20_NAMED_ABI = ABI_FILE.abi;
 
+/**
+ * IERC20NamedClient
+ *
+ * @description Type-safe contract client for IERC20Named
+ *
+ * @example
+ *
+ * import { sepolia } from "viem/chains";
+ *
+ * const client = createIERC20NamedClient({
+ *  chain: sepolia,
+ *  address: "0x1234..."
+ * });
+ */
 export class IERC20NamedClient extends PublicContractClient<
   typeof ABI_FILE.abi
 > {
@@ -38,3 +52,8 @@ export class IERC20NamedClient extends PublicContractClient<
     this.reads = createReadClient(this);
   }
 }
+
+export const createIERC20NamedClient = (options: {
+  chain: Chain;
+  address: `0x${string}`;
+}) => new IERC20NamedClient(options);

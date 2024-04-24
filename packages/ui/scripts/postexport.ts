@@ -9,7 +9,7 @@ const scriptName = rainbow("postexport");
 console.log(`\nRunning ${scriptName} script...`);
 
 const nextIndexHtml = await readFile("./out/index.html", "utf-8").then((x) =>
-  x.replace(/\_next\//g, "next/")
+  x.replace(/_next\//g, "next/")
 );
 
 await Promise.all([

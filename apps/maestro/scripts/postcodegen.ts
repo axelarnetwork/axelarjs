@@ -27,7 +27,7 @@ async function prepend(prefix: string, fileName: string) {
 
   const updatedContent = [prefix, content].join("\n\n");
 
-  const formattedContent = prettier.format(updatedContent, {
+  const formattedContent = await prettier.format(updatedContent, {
     parser: "typescript",
   });
 
@@ -59,7 +59,7 @@ async function replaceContentInFile(filePath: string) {
        import ABI from "./${fileName.replace("hooks.ts", "abi")}";`
     );
 
-  const formattedContent = prettier.format(replacedContent, {
+  const formattedContent = await prettier.format(replacedContent, {
     parser: "typescript",
   });
 

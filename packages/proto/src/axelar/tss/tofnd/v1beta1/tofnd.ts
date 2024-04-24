@@ -1096,7 +1096,7 @@ export const MessageOut_CriminalList_Criminal = {
     return MessageOut_CriminalList_Criminal.fromPartial(base ?? ({} as any));
   },
   fromPartial<
-    I extends Exact<DeepPartial<MessageOut_CriminalList_Criminal>, I>
+    I extends Exact<DeepPartial<MessageOut_CriminalList_Criminal>, I>,
   >(object: I): MessageOut_CriminalList_Criminal {
     const message = createBaseMessageOut_CriminalList_Criminal();
     message.partyUid = object.partyUid ?? "";
@@ -1120,7 +1120,7 @@ export const TrafficIn = {
     if (message.payload.length !== 0) {
       writer.uint32(18).bytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       writer.uint32(24).bool(message.isBroadcast);
     }
     return writer;
@@ -1186,7 +1186,7 @@ export const TrafficIn = {
     if (message.payload.length !== 0) {
       obj.payload = base64FromBytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       obj.isBroadcast = message.isBroadcast;
     }
     return obj;
@@ -1221,7 +1221,7 @@ export const TrafficOut = {
     if (message.payload.length !== 0) {
       writer.uint32(18).bytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       writer.uint32(24).bool(message.isBroadcast);
     }
     return writer;
@@ -1287,7 +1287,7 @@ export const TrafficOut = {
     if (message.payload.length !== 0) {
       obj.payload = base64FromBytes(message.payload);
     }
-    if (message.isBroadcast === true) {
+    if (message.isBroadcast !== false) {
       obj.isBroadcast = message.isBroadcast;
     }
     return obj;
@@ -1616,14 +1616,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

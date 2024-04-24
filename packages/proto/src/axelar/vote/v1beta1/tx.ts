@@ -28,7 +28,7 @@ export const VoteRequest = {
     if (message.sender.length !== 0) {
       writer.uint32(10).bytes(message.sender);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       writer.uint32(32).uint64(message.pollId);
     }
     if (message.vote !== undefined) {
@@ -90,7 +90,7 @@ export const VoteRequest = {
     if (message.sender.length !== 0) {
       obj.sender = base64FromBytes(message.sender);
     }
-    if (!message.pollId.isZero()) {
+    if (!message.pollId.equals(Long.UZERO)) {
       obj.pollId = (message.pollId || Long.UZERO).toString();
     }
     if (message.vote !== undefined) {
@@ -221,14 +221,14 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Long
-  ? string | number | Long
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? string | number | Long
+    : T extends globalThis.Array<infer U>
+      ? globalThis.Array<DeepPartial<U>>
+      : T extends ReadonlyArray<infer U>
+        ? ReadonlyArray<DeepPartial<U>>
+        : T extends {}
+          ? { [K in keyof T]?: DeepPartial<T[K]> }
+          : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin

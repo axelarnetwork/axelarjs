@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/deposit-address",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "description": "Axelarjs Deposit Address",
   "repository": {
     "type": "git",
@@ -37,7 +37,9 @@
     "compile": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "docgen": "typedoc",
+    "deploy:docs": "gh-pages -d docs -e deposit-address"
   },
   "keywords": [],
   "author": "",
@@ -45,17 +47,19 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "dotenv": "^16.4.5",
+    "gh-pages": "^6.1.1",
     "rimraf": "^5.0.5",
-    "typescript": "^5.4.2",
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.3",
     "vitest": "1.2.1"
   },
   "dependencies": {
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
-    "@axelarjs/utils": "workspace:*",
     "@axelarjs/proto": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
     "bech32": "^2.0.0",
-    "viem": "^2.8.11"
+    "viem": "^2.8.18"
   }
 }

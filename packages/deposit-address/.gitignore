@@ -1,6 +1,8 @@
 /node_modules
 /build
 /get-deposit-address
+/docs
+
 *.d.ts
 *.js
 
