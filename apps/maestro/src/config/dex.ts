@@ -37,7 +37,7 @@ export const dexLinks = {
   ethereum: (tokenAddress: `0x${string}`) => ({
     name: "Uniswap",
     url: `https://app.uniswap.org/add/ETH/${tokenAddress}?chain=mainnet`,
-    icon: "/logos/dexes/thruster.svg",
+    icon: "/logos/dexes/uniswap.png",
   }),
   // This dex doesn't accept token address as a parameter, so we can't prefill the token for users.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
