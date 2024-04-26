@@ -31,8 +31,8 @@ export const dexLinks = {
   }),
   base: (tokenAddress: `0x${string}`) => ({
     name: "Uniswap",
-    url: `https://app.uniswap.org/add/ETH/${tokenAddress}?chain=base`,
-    icon: "/logos/dexes/uniswap.png",
+    url: `https://aerodrome.finance/pools?type=&token0=eth&token1=${tokenAddress}`,
+    icon: "/logos/dexes/aerodrome.svg",
   }),
   ethereum: (tokenAddress: `0x${string}`) => ({
     name: "Uniswap",
@@ -80,8 +80,8 @@ export const dexLinks = {
   }),
   optimism: (tokenAddress: `0x${string}`) => ({
     name: "Uniswap",
-    url: `https://app.uniswap.org/add/ETH/${tokenAddress}?chain=optimism`,
-    icon: "/logos/dexes/uniswap.png",
+    url: `https://velodrome.finance/pools?type=&token0=eth&token1=${tokenAddress}`,
+    icon: "/logos/dexes/velodrome.svg",
   }),
   scroll: (tokenAddress: `0x${string}`) => ({
     name: "SushiSwap",
