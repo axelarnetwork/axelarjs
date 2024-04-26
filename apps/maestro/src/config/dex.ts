@@ -30,7 +30,7 @@ export const dexLinks = {
     icon: "/logos/dexes/quickswap.svg",
   }),
   base: (tokenAddress: `0x${string}`) => ({
-    name: "Uniswap",
+    name: "Aerodrome",
     url: `https://aerodrome.finance/pools?type=&token0=eth&token1=${tokenAddress}`,
     icon: "/logos/dexes/aerodrome.svg",
   }),
@@ -79,7 +79,7 @@ export const dexLinks = {
     icon: "/logos/dexes/stellaswap.png",
   }),
   optimism: (tokenAddress: `0x${string}`) => ({
-    name: "Uniswap",
+    name: "Velodrome",
     url: `https://velodrome.finance/pools?type=&token0=eth&token1=${tokenAddress}`,
     icon: "/logos/dexes/velodrome.svg",
   }),
