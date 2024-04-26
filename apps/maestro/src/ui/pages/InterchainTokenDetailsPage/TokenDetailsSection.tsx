@@ -23,6 +23,8 @@ import { useMemo, useRef, useState, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
 
+import { createWalletClient, custom } from "viem";
+import { watchAsset } from "viem/actions";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
@@ -44,6 +46,13 @@ export type TokenDetailsSectionProps = {
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
+  const wallet = createWalletClient({
+    transport: custom((window as any).ethereum),
+  });
+  const { data: meta } = trpc.interchainToken.getInterchainTokenMeta.useQuery({
+    tokenId: props.tokenId?.toString() || "",
+  });
+
   const tokenDetails = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -87,6 +96,32 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
             <InfoIcon className="text-info h-[1em] w-[1em]" />
           </Tooltip>
         </div>,
+      ],
+      [
+        "Add Token to Wallet",
+        <LinkButton
+          key="add-to-wallet"
+          href="#"
+          className="ml-[-10px]"
+          $variant="link"
+          onClick={async () => {
+            try {
+              await watchAsset(wallet, {
+                type: "ERC20",
+                options: {
+                  address: props.tokenAddress,
+                  decimals: props.decimals,
+                  symbol: props.symbol,
+                  image: meta?.iconUrl,
+                },
+              });
+            } catch (_e) {
+              // noop because the error is raised when the user cancels the popup dialog
+            }
+          }}
+        >
+          Add
+        </LinkButton>,
       ],
       [
         "Token Ownership Claim Request",
@@ -419,8 +454,9 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
             />
             <span className="mt-4 flex">
               <p>
-                The uploaded image will only be displayed on this
-                Interchain Token Service Portal, but will not carry through to any external services
+                The uploaded image will only be displayed on this Interchain
+                Token Service Portal, but will not carry through to any external
+                services
               </p>
             </span>
           </FormControl>
