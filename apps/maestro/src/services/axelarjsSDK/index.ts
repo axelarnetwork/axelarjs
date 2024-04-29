@@ -22,7 +22,8 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
     params.gasLimit,
     params.gasMultiplier,
     params.sourceChainTokenSymbol,
-    params.minGasPrice
+    params.minGasPrice,
+    params.executeData as `0x${string}` | undefined
   );
 
   const rawFee =
