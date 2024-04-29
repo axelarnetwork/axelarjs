@@ -49,9 +49,14 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   const wallet = createWalletClient({
     transport: custom((window as any).ethereum),
   });
-  const { data: meta } = trpc.interchainToken.getInterchainTokenMeta.useQuery({
-    tokenId: props.tokenId?.toString() || "",
-  });
+  const { data: meta } = trpc.interchainToken.getInterchainTokenMeta.useQuery(
+    {
+      tokenId: props.tokenId!,
+    },
+    {
+      enabled: !!props.tokenId,
+    }
+  );
 
   const tokenDetails = [
     ["Name", props.name],
