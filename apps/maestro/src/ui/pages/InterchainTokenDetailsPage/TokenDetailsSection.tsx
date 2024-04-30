@@ -38,6 +38,7 @@ export type TokenDetailsSectionProps = {
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
+  deploymentMessageId?: string | undefined;
   tokenManagerAddress?: `0x${string}` | null;
   kind?: "canonical" | "interchain" | "custom";
   claimOwnershipFormLink?: string;
@@ -59,96 +60,112 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(props.tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) => [
-      [
-        "Token Manager",
-        <CopyToClipboardButton
-          key="token-manager"
-          $size="sm"
-          $variant="ghost"
-          copyText={tokenManagerAddress}
-        >
-          {maskAddress(tokenManagerAddress)}
-        </CopyToClipboardButton>,
-      ],
-    ]),
-    ...Maybe.of(props.tokenId).mapOr([], (tokenId) => [
-      [
-        "Token ID",
-        <div key="token-id" className="flex items-center">
-          <CopyToClipboardButton $size="sm" $variant="ghost" copyText={tokenId}>
-            {maskAddress(tokenId)}
-          </CopyToClipboardButton>
-          <Tooltip
-            tip="TokenId is a common key used to identify an interchain token across all chains"
-            $variant="info"
-            $position="bottom"
-          >
-            <InfoIcon className="text-info h-[1em] w-[1em]" />
-          </Tooltip>
-        </div>,
-      ],
-      [
-        "Token Ownership Claim Request",
-        props.wasDeployedByAccount && props.claimOwnershipFormLink && (
-          <LinkButton
-            target="_blank"
-            className="ml-[-10px]"
-            $variant="link"
-            href={props.claimOwnershipFormLink}
-          >
-            Link
-          </LinkButton>
-        ),
-      ],
-      [
-        "Add Your Token on Squid",
-        props.wasDeployedByAccount && (
-          <div className="flex items-center">
-            <LinkButton
-              target="_blank"
-              className="ml-[-10px]"
-              $variant="link"
-              href="https://github.com/axelarnetwork/axelar-configs "
-            >
-              Link
-            </LinkButton>
-            <Tooltip
-              $as={Indicator}
-              $variant={"info"}
-              $position="right"
-              tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
-            >
-              <InfoIcon className="text-info h-[1em] w-[1em]" />
-            </Tooltip>
-          </div>
-        ),
-      ],
-    ]),
-    ...Maybe.of(props.tokenManagerAddress).mapOr([], () => [
-      [
-        "Apply for coordinated marketing with Axelar",
-        props.wasDeployedByAccount && (
-          <div className="flex items-center">
-            <LinkButton
-              target="_blank"
-              className="ml-[-10px]"
-              $variant="link"
-              href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
-            >
-              Link
-            </LinkButton>
-            <Tooltip
-              tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
-              $variant="info"
-              $position="bottom"
-            >
-              <InfoIcon className="text-info h-[1em] w-[1em]" />
-            </Tooltip>
-          </div>
-        ),
-      ],
-    ]),
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) =>
+      !props.deploymentMessageId
+        ? [[]]
+        : [
+            [
+              "Token Manager",
+              <CopyToClipboardButton
+                key="token-manager"
+                $size="sm"
+                $variant="ghost"
+                copyText={tokenManagerAddress}
+              >
+                {maskAddress(tokenManagerAddress)}
+              </CopyToClipboardButton>,
+            ],
+          ]
+    ),
+    ...Maybe.of(props.tokenId).mapOr([], (tokenId) =>
+      !props.deploymentMessageId
+        ? [[]]
+        : [
+            [
+              "Token ID",
+              <div key="token-id" className="flex items-center">
+                <CopyToClipboardButton
+                  $size="sm"
+                  $variant="ghost"
+                  copyText={tokenId}
+                >
+                  {maskAddress(tokenId)}
+                </CopyToClipboardButton>
+                <Tooltip
+                  tip="TokenId is a common key used to identify an interchain token across all chains"
+                  $variant="info"
+                  $position="bottom"
+                >
+                  <InfoIcon className="text-info h-[1em] w-[1em]" />
+                </Tooltip>
+              </div>,
+            ],
+            [
+              "Token Ownership Claim Request",
+              props.wasDeployedByAccount && props.claimOwnershipFormLink && (
+                <LinkButton
+                  target="_blank"
+                  className="ml-[-10px]"
+                  $variant="link"
+                  href={props.claimOwnershipFormLink}
+                >
+                  Link
+                </LinkButton>
+              ),
+            ],
+            [
+              "Add Your Token on Squid",
+              props.wasDeployedByAccount && (
+                <div className="flex items-center">
+                  <LinkButton
+                    target="_blank"
+                    className="ml-[-10px]"
+                    $variant="link"
+                    href="https://github.com/axelarnetwork/axelar-configs "
+                  >
+                    Link
+                  </LinkButton>
+                  <Tooltip
+                    $as={Indicator}
+                    $variant={"info"}
+                    $position="right"
+                    tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
+                  >
+                    <InfoIcon className="text-info h-[1em] w-[1em]" />
+                  </Tooltip>
+                </div>
+              ),
+            ],
+          ]
+    ),
+    ...Maybe.of(props.tokenManagerAddress).mapOr([], () =>
+      !props.deploymentMessageId
+        ? [[]]
+        : [
+            [
+              "Apply for coordinated marketing with Axelar",
+              props.wasDeployedByAccount && (
+                <div className="flex items-center">
+                  <LinkButton
+                    target="_blank"
+                    className="ml-[-10px]"
+                    $variant="link"
+                    href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+                  >
+                    Link
+                  </LinkButton>
+                  <Tooltip
+                    tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
+                    $variant="info"
+                    $position="bottom"
+                  >
+                    <InfoIcon className="text-info h-[1em] w-[1em]" />
+                  </Tooltip>
+                </div>
+              ),
+            ],
+          ]
+    ),
   ];
 
   const sanitizedTokenDetails = tokenDetails.filter(([, value]) =>
@@ -159,7 +176,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2 text-2xl font-bold md:gap-3">
-          {props.tokenId && (
+          {props.tokenId && props.deploymentMessageId && (
             <ManageTokenIcon
               tokenId={props.tokenId}
               wasDeployedByAccount={props.wasDeployedByAccount}
@@ -189,7 +206,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         </LinkButton>
       </div>
 
-      {props.kind === "canonical" && (
+      {props.deploymentMessageId && props.kind === "canonical" && (
         <div className="italic">
           This is a pre-existing token on {props.chain.name} that was registered
           on ITS, powered by Axelar
@@ -419,8 +436,9 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
             />
             <span className="mt-4 flex">
               <p>
-                The uploaded image will only be displayed on this
-                Interchain Token Service Portal, but will not carry through to any external services
+                The uploaded image will only be displayed on this Interchain
+                Token Service Portal, but will not carry through to any external
+                services
               </p>
             </span>
           </FormControl>
