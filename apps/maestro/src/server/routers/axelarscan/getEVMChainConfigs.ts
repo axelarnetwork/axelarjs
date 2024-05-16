@@ -15,7 +15,6 @@ const evmChainConfigSchema = z.object({
   image: z.string(),
   color: z.string(),
   chain_type: z.literal("evm"),
-  gateway_address: z.string(),
   no_inflation: z.boolean(),
   endpoints: z.object({
     rpc: z.array(z.string()),

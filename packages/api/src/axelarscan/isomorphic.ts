@@ -41,6 +41,7 @@ export class AxelarscanClient extends RestService {
   }
 
   async getAssets(params?: { denoms: string[] }) {
+    // TODO: check this endpoint
     const json = {
       module: MODULES.data,
       path: null,
@@ -55,6 +56,7 @@ export class AxelarscanClient extends RestService {
   }
 
   async getAssetPrices(params: { denoms: string[] }) {
+    // TODO: check this endpoint
     const json = {
       module: MODULES.assets,
       path: null,
@@ -74,15 +76,9 @@ export class AxelarscanClient extends RestService {
       disabledChains?: string[];
     } = {}
   ) {
-    const json = {
-      module: MODULES.data,
-      collection: COLLECTIONS.chains,
-      path: null,
-    };
-
     const [evm, cosmos] = partition(
       (c) => c.chain_type === "evm",
-      await this.client.post("", { json }).json<GetChainConfigsResponse>()
+      await this.client.get("/api/getChains").json<GetChainConfigsResponse>()
     );
 
     const isEligible = (a: EVMChainConfig | CosmosChainConfig) =>
@@ -96,6 +92,7 @@ export class AxelarscanClient extends RestService {
   }
 
   async searchTransactions(params: { size: number; type: string }) {
+    // TODO: check this endpoint
     const json = {
       method: "searchTransactions",
       type: params.type,
