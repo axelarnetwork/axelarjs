@@ -11,16 +11,6 @@ import type {
   LinkRequestResponse,
 } from "./types";
 
-export const MODULES = {
-  assets: "assets",
-  data: "data",
-} as const;
-
-export const COLLECTIONS = {
-  assets: "assets",
-  chains: "chains",
-} as const;
-
 export type AxelarApiParams<T extends Record<string, unknown>> = T & {
   module: string;
   path: string | null;
@@ -40,34 +30,14 @@ export class AxelarscanClient extends RestService {
     });
   }
 
-  async getAssets(params?: { denoms: string[] }) {
-    // TODO: check this endpoint
-    const json = {
-      module: MODULES.data,
-      path: null,
-      ...params,
-    };
-
-    const result = await this.client
-      .post("", { json })
-      .json<GetAssetsResponse>();
-
-    return result;
+  async getAssets() {
+    return await this.client.get("/api/getAssets").json<GetAssetsResponse>();
   }
 
-  async getAssetPrices(params: { denoms: string[] }) {
-    // TODO: check this endpoint
-    const json = {
-      module: MODULES.assets,
-      path: null,
-      ...params,
-    };
-
-    const result = await this.client
-      .post("", { json })
+  async getAssetPrices() {
+    return await this.client
+      .get("/api/getTokensPrice")
       .json<GetAssetsPriceResponse>();
-
-    return result;
   }
 
   async getChainConfigs(
@@ -92,18 +62,8 @@ export class AxelarscanClient extends RestService {
   }
 
   async searchTransactions(params: { size: number; type: string }) {
-    // TODO: check this endpoint
-    const json = {
-      method: "searchTransactions",
-      type: params.type,
-      size: params.size,
-    };
-
-    const result = await this.client
-      .post("", { json })
-      .json<LinkRequestRawResponse>();
-
-    return result;
+    const path = `/validator/searchTransactions?size=${params.size}&type=${params.type}`;
+    return await this.client.get(path).json<LinkRequestRawResponse>();
   }
 
   async getRecentLinkTransactions(params: {
