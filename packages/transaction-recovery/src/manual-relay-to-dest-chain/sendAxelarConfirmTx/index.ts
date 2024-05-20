@@ -36,7 +36,7 @@ export async function sendAxelarConfirmTx(
   if (!isFinalized) {
     return {
       skip: true,
-      type: "axelar_confirm_gateway_tx",
+      type: "axelar.confirm_gateway_tx",
       error: ConfirmGatewayTxError.NOT_FINALIZED(
         txHash,
         numRequiredConfirmations,
@@ -59,7 +59,7 @@ export async function sendAxelarConfirmTx(
   } catch (e) {
     return {
       skip: true,
-      type: "axelar_confirm_gateway_tx",
+      type: "axelar.confirm_gateway_tx",
       error: ConfirmGatewayTxError.FAILED_FETCH_EVM_EVENT,
     };
   }
@@ -68,7 +68,7 @@ export async function sendAxelarConfirmTx(
   if (!evmEvent.event) {
     return {
       skip: true,
-      type: "axelar_confirm_gateway_tx",
+      type: "axelar.confirm_gateway_tx",
       error: ConfirmGatewayTxError.EVM_EVENT_NOT_FOUND,
     };
   }
@@ -77,7 +77,7 @@ export async function sendAxelarConfirmTx(
   if (isConfirmed(evmEvent.event)) {
     return {
       skip: true,
-      type: "axelar_confirm_gateway_tx",
+      type: "axelar.confirm_gateway_tx",
       skipReason: "Already confirmed",
     };
   }
@@ -92,7 +92,7 @@ export async function sendAxelarConfirmTx(
 
   return {
     skip: false,
-    type: "axelar_confirm_gateway_tx",
+    type: "axelar.confirm_gateway_tx",
     tx: {
       hash: confirmTx.transactionHash,
     },

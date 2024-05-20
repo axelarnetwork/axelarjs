@@ -117,7 +117,17 @@ async function recoverEvmToEvm(
   deps: RecoveryDependencies
 ) {
   const confirmResponse = await sendAxelarConfirmTx(params, deps);
+
+  if (confirmResponse.skip) {
+    return [confirmResponse];
+  }
+
   const signResponse = await sendAxelarSignTx(params, deps);
+
+  if (signResponse.skip) {
+    return [confirmResponse, signResponse];
+  }
+
   const sendEvmGatewayResponse = await sendEvmGatewayApproveTx(params, deps);
 
   return [confirmResponse, signResponse, sendEvmGatewayResponse];
@@ -128,7 +138,17 @@ async function recoverEvmToIbc(
   deps: RecoveryDependencies
 ) {
   const confirmResponse = await sendAxelarConfirmTx(params, deps);
+
+  if (confirmResponse.skip) {
+    return [confirmResponse];
+  }
+
   const signTxResponse = await sendAxelarSignTx(params, deps);
+
+  if (signTxResponse.skip) {
+    return [confirmResponse, signTxResponse];
+  }
+
   const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
 
   return [confirmResponse, signTxResponse, routeMessageTxResponse];
@@ -139,7 +159,17 @@ async function recoverIbcToEvm(
   deps: RecoveryDependencies
 ) {
   const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
+
+  if (routeMessageTxResponse.skip) {
+    return [routeMessageTxResponse];
+  }
+
   const signTxResponse = await sendAxelarSignTx(params, deps);
+
+  if (signTxResponse.skip) {
+    return [routeMessageTxResponse, signTxResponse];
+  }
+
   const gatewayApproveResponse = await sendEvmGatewayApproveTx(params, deps);
 
   return [routeMessageTxResponse, signTxResponse, gatewayApproveResponse];

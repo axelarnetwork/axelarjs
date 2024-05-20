@@ -37,7 +37,7 @@ export async function sendAxelarSignTx(
   } catch (e) {
     return {
       skip: true,
-      type: "axelar_sign_commands",
+      type: "axelar.sign_commands",
       error: SignCommandsError.SEARCH_BATCH_COMMANDS_FAILED,
     };
   }
@@ -48,7 +48,7 @@ export async function sendAxelarSignTx(
     // already sent batched tx; no need to sign
     return {
       skip: true,
-      type: "axelar_sign_commands",
+      type: "axelar.sign_commands",
       skipReason: "No batched commands found",
     };
   }
@@ -58,7 +58,7 @@ export async function sendAxelarSignTx(
   if (commands.length > 0 && commands[0]?.executed) {
     return {
       skip: true,
-      type: "axelar_sign_commands",
+      type: "axelar.sign_commands",
       error: SignCommandsError.ALREADY_EXECUTED,
     };
   }
@@ -68,14 +68,14 @@ export async function sendAxelarSignTx(
   if (tx.code !== 0) {
     return {
       skip: true,
-      type: "axelar_sign_commands",
+      type: "axelar.sign_commands",
       error: SignCommandsError.SIGN_COMMANDS_FAILED,
     };
   }
 
   return {
     skip: false,
-    type: "axelar_sign_commands",
+    type: "axelar.sign_commands",
     tx: {
       hash: tx.transactionHash,
     },

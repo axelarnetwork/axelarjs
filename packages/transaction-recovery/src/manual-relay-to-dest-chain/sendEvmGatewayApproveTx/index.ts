@@ -58,7 +58,7 @@ export async function sendEvmGatewayApproveTx(
   if (!rpcUrl) {
     return {
       skip: true,
-      type: "evm_gateway_approve",
+      type: "evm.gateway_approve",
       error: GatewayApproveError.RPC_NOT_FOUND(destChain),
     };
   }
@@ -73,7 +73,7 @@ export async function sendEvmGatewayApproveTx(
   if (!executeData) {
     return {
       skip: true,
-      type: "evm_gateway_approve",
+      type: "evm.gateway_approve",
       skipReason: "cannot find executeData from batch response",
     };
   }
@@ -96,7 +96,7 @@ export async function sendEvmGatewayApproveTx(
 
   return {
     skip: false,
-    type: "evm_gateway_approve",
+    type: "evm.gateway_approve",
     tx: {
       hash: transactionHash,
     },

@@ -25,10 +25,10 @@ export type EvmSignerOptions = {
 };
 
 export type RecoveryTxType =
-  | "axelar_confirm_gateway_tx"
-  | "axelar_sign_commands"
-  | "axelar_route_message"
-  | "evm_gateway_approve";
+  | "axelar.confirm_gateway_tx"
+  | "axelar.sign_commands"
+  | "axelar.route_message"
+  | "evm.gateway_approve";
 
 export type RecoveryTx = {
   hash: string;
@@ -36,8 +36,8 @@ export type RecoveryTx = {
 
 export type RecoveryTxResponse = {
   skip: boolean;
-  skipReason?: string | undefined;
   type: RecoveryTxType;
+  skipReason?: string | undefined;
   error?: Error | undefined;
   tx?: RecoveryTx | undefined;
 };
