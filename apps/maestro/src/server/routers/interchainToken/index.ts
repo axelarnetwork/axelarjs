@@ -5,6 +5,7 @@ import { getInterchainTokenByTokenId } from "./getInterchainTokenByTokenId";
 import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
 import { getInterchainTokenMeta } from "./getInterchainTokenMeta";
 import { getInterchainTokenRolesForAccount } from "./getInterchainTokenRolesForAccount";
+import { getInterchainTokens } from "./getInterchainTokens";
 import { getInterchainTokenServiceABI } from "./getInterchainTokenServiceABI";
 import { getMyInterchainTokens } from "./getMyInterchainTokens";
 import { getTokenManagerABI } from "./getTokenManagerABI";
@@ -23,6 +24,7 @@ export const interchainTokenRouter = router({
   getInterchainTokenRolesForAccount,
   getTokenManagerABI,
   getMyInterchainTokens,
+  getInterchainTokens,
   searchInterchainToken,
   recordInterchainTokenDeployment,
   recordRemoteTokensDeployment,

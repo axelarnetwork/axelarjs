@@ -248,6 +248,17 @@ export default class MaestroPostgresClient {
     return await query;
   }
 
+  /**
+   * Returns all the interchain tokens deployed.
+   */
+  async getAllDeployedInterchainTokens() {
+    const query = this.db.query.interchainTokens.findMany({
+      orderBy: ({ createdAt }, { desc }) => desc(createdAt),
+    });
+
+    return await query;
+  }
+
   async recordAuditLogEvent<T extends AuditLogEventKind>(
     event: AuditLogEvent<T>
   ) {
