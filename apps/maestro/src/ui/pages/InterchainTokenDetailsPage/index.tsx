@@ -66,13 +66,16 @@ const InterchainTokensPage: FC = () => {
           tokenManagerAddress={interchainToken?.tokenManagerAddress}
           kind={interchainToken?.kind}
           claimOwnershipFormLink={
-            destToken &&
-            getPrefilledClaimOwnershipFormLink(
-              interchainToken.chain.name,
-              chainNames,
-              "Interchain Token Service (ITS)",
-              destToken.tokenAddress as string
-            )
+            destToken && destToken.tokenAddress
+              ? getPrefilledClaimOwnershipFormLink(
+                  interchainToken.chain.name,
+                  chainNames,
+                  "Interchain Token Service (ITS)",
+                  destToken.tokenAddress as string,
+                  tokenDetails.name,
+                  tokenDetails.symbol
+                )
+              : undefined
           }
         />
       )}

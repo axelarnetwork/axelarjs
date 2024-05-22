@@ -132,4 +132,5 @@ export const ClaimOwnershipFormFieldIds = {
   tokenType: "entry.2010215617",
   allChains: "entry.414624060",
   sourceChain: "entry.373826717",
+  tokenName: "entry.1492946428",
 };
