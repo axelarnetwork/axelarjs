@@ -38,7 +38,6 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
   },
   image: "ethereum-logo.png",
   color: "#3C3C3D",
-  gateway_address: "0x123456789",
   deprecated: false,
   no_inflation: true,
   chain_type: "evm",
