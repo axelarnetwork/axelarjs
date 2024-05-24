@@ -73,7 +73,6 @@ export type EVMChainConfig = {
       blockExplorerUrls: string[];
     },
   ];
-  gateway_address: string;
   no_inflation: boolean;
   no_tvl: boolean;
 };
