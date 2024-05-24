@@ -35,6 +35,7 @@ type ConnectedInterchainTokensPageProps = {
   tokenSymbol: string;
   decimals: number;
   tokenId?: `0x${string}` | null;
+  deploymentMessageId: string | undefined;
 };
 
 type InterchainTokenDetailsPageSessionStorageProps = {
@@ -407,7 +408,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {interchainTokenError && tokenDetailsError && (
         <Alert $status="error">{tokenDetailsError.message}</Alert>
       )}
-      {interchainTokenError && tokenDetails && (
+      {(interchainTokenError || !props.deploymentMessageId) && tokenDetails && (
         <div className="mx-auto w-full max-w-md">
           {address ? (
             <CanonicalTokenDeployment
@@ -425,38 +426,41 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           )}
         </div>
       )}
-      <Alert $status={"success"} className="mb-5">
-        Anyone can send tokens to/from any of your deployed chains using the
-        link of this portal. Share with your community!
-      </Alert>
-      <InterchainTokenList title="Registered Chains" tokens={registered} />
-      {pendingUnregisteredTokens.length > 0 && (
-        <InterchainTokenList
-          title="Pending Chains"
-          listClassName="grid-cols-2 sm:grid-cols-3"
-          tokens={pendingUnregisteredTokens}
-        />
-      )}
-      {idleUnregisteredTokens.length > 0 && (
-        <InterchainTokenList
-          title="Unregistered Chains"
-          listClassName="grid-cols-2 sm:grid-cols-3"
-          tokens={idleUnregisteredTokens}
-          onToggleSelection={
-            isReadOnly
-              ? undefined
-              : (chainId) => {
-                  setSessionState((draft) => {
-                    draft.selectedChainIds = draft.selectedChainIds.includes(
-                      chainId
-                    )
-                      ? without([chainId], draft.selectedChainIds)
-                      : draft.selectedChainIds.concat(chainId);
-                  });
-                }
-          }
-          footer={footerContent}
-        />
+      {props.deploymentMessageId && (
+        <>
+          <Alert $status={"success"} className="mb-5">
+            Anyone can send tokens to/from any of your deployed chains using the
+            link of this portal. Share with your community!
+          </Alert>
+          <InterchainTokenList title="Registered Chains" tokens={registered} />
+          {pendingUnregisteredTokens.length > 0 && (
+            <InterchainTokenList
+              title="Pending Chains"
+              listClassName="grid-cols-2 sm:grid-cols-3"
+              tokens={pendingUnregisteredTokens}
+            />
+          )}
+          {idleUnregisteredTokens.length > 0 && (
+            <InterchainTokenList
+              title="Unregistered Chains"
+              listClassName="grid-cols-2 sm:grid-cols-3"
+              tokens={idleUnregisteredTokens}
+              onToggleSelection={
+                isReadOnly
+                  ? undefined
+                  : (chainId) => {
+                      setSessionState((draft) => {
+                        draft.selectedChainIds =
+                          draft.selectedChainIds.includes(chainId)
+                            ? without([chainId], draft.selectedChainIds)
+                            : draft.selectedChainIds.concat(chainId);
+                      });
+                    }
+              }
+              footer={footerContent}
+            />
+          )}
+        </>
       )}
     </div>
   );
