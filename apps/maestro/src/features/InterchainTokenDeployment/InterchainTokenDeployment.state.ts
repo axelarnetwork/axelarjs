@@ -151,11 +151,11 @@ function useInterchainTokenDeploymentState(
           // tokenDetailsForm.setValue("minter", address);
         });
       },
-      setTokenDetails: (detatils: Partial<TokenDetails>) => {
+      setTokenDetails: (details: Partial<TokenDetails>) => {
         setState((draft) => {
           draft.tokenDetails = {
             ...draft.tokenDetails,
-            ...detatils,
+            ...details,
           };
         });
       },
