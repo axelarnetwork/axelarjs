@@ -253,6 +253,7 @@ export default class MaestroPostgresClient {
    */
   async getAllDeployedInterchainTokens() {
     const query = this.db.query.interchainTokens.findMany({
+      where: (table, { notIlike }) => notIlike(table.deploymentMessageId, ""),
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
     });
 

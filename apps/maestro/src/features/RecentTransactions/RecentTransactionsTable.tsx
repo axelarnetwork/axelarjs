@@ -6,6 +6,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
+import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
@@ -234,12 +235,12 @@ const InterchainTokenRow: FC<{
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
-        <CopyToClipboardButton copyText={token.tokenId}>
+        <CopyToClipboardButton copyText={token.tokenId} $variant="ghost">
           {token.tokenName}{" "}
           <span className="opacity-75">({token.tokenSymbol})</span>
         </CopyToClipboardButton>
       </Table.Cell>
-      <Table.Cell>{token.kind}</Table.Cell>
+      <Table.Cell>{capitalize(token.kind)}</Table.Cell>
       <Table.Cell>{token.createdAt?.toLocaleString()}</Table.Cell>
     </Table.Row>
   );
