@@ -63,6 +63,63 @@ type Props = {
   onSelectChain?: (chain: EVMChainConfig | null) => void;
 };
 
+export const EVMChainIcon: FC<Props> = (props) => {
+  const { data: evmChains } = useEVMChainConfigsQuery();
+  const { chain } = useAccount();
+
+  const [state] = useEVMChainsDropdownContainer();
+
+  const selectedChain = useMemo(
+    () =>
+      Maybe.of(evmChains).mapOrUndefined(
+        find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
+      ),
+    [chain?.id, evmChains, state.selectedChainId]
+  );
+
+  if (props.selectedChain && props.onSelectChain) {
+    return (
+      <>
+        <ChainIcon
+          src={props.selectedChain.image}
+          alt={props.selectedChain.name}
+          size="sm"
+          className={cn(
+            { "-translate-x-1.5": !props.hideLabel },
+            props.chainIconClassName
+          )}
+        />
+        {!props.hideLabel && <span>{props.selectedChain.name}</span>}
+      </>
+    );
+  } else if (selectedChain) {
+    return (
+      <>
+        <ChainIcon
+          src={selectedChain.image}
+          alt={selectedChain.chain_name}
+          size="sm"
+          className={cn(
+            { "-translate-x-1.5": !props.hideLabel },
+            props.chainIconClassName
+          )}
+        />
+        {!props.hideLabel && <span>{selectedChain.name}</span>}
+      </>
+    );
+  } else {
+    return (
+      <HelpCircleIcon
+        size="24"
+        className={cn(
+          { "-translate-x-1.5": !props.hideLabel },
+          props.chainIconClassName
+        )}
+      />
+    );
+  }
+};
+
 const EVMChainsDropdown: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain } = useAccount();
@@ -127,44 +184,10 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           )}
           tabIndex={props.compact ? -1 : 0}
         >
-          {/* if both selectedChain and onSelectedChain exist, 
-              operate in controlled mode 
+          {/* if both selectedChain and onSelectedChain exist,
+              operate in controlled mode
           */}
-          {props.selectedChain && props.onSelectChain ? (
-            <>
-              <ChainIcon
-                src={props.selectedChain.image}
-                alt={props.selectedChain.name}
-                size="sm"
-                className={cn(
-                  { "-translate-x-1.5": !props.hideLabel },
-                  props.chainIconClassName
-                )}
-              />
-              {!props.hideLabel && <span>{props.selectedChain.name}</span>}
-            </>
-          ) : selectedChain ? (
-            <>
-              <ChainIcon
-                src={selectedChain.image}
-                alt={selectedChain.chain_name}
-                size="sm"
-                className={cn(
-                  { "-translate-x-1.5": !props.hideLabel },
-                  props.chainIconClassName
-                )}
-              />
-              {!props.hideLabel && <span>{selectedChain.name}</span>}
-            </>
-          ) : (
-            <HelpCircleIcon
-              size="24"
-              className={cn(
-                { "-translate-x-1.5": !props.hideLabel },
-                props.chainIconClassName
-              )}
-            />
-          )}
+          <EVMChainIcon {...props} />
         </Dropdown.Trigger>
       )}
 

@@ -27,7 +27,9 @@ export function getPrefilledClaimOwnershipFormLink(
   sourceChain: string,
   allChains: string[],
   tokenType: string,
-  tokenAddress: string
+  tokenAddress: string,
+  tokenName: string,
+  tokenSymbol: string
 ) {
   const srcChain = sourceChain.toLowerCase();
   const formLink = NEXT_PUBLIC_CLAIM_OWNERSHIP_FORM_LINK;
@@ -35,6 +37,7 @@ export function getPrefilledClaimOwnershipFormLink(
     [ClaimOwnershipFormFieldIds.sourceChain]: chainIdToGFormChainId[srcChain],
     [ClaimOwnershipFormFieldIds.tokenType]: tokenType,
     [ClaimOwnershipFormFieldIds.tokenAddress]: tokenAddress,
+    [ClaimOwnershipFormFieldIds.tokenName]: `${tokenName} (${tokenSymbol})`,
   };
 
   const destChainsParams: string[] = allChains
