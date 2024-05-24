@@ -8,6 +8,7 @@ import { useChainFromRoute } from "~/lib/hooks";
 import { getPrefilledClaimOwnershipFormLink } from "~/lib/utils/gform";
 import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 import Page from "~/ui/layouts/Page";
 import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
@@ -25,6 +26,11 @@ const InterchainTokensPage: FC = () => {
     isLoading,
     isError,
   } = useInterchainTokensQuery({
+    chainId: routeChain?.id,
+    tokenAddress,
+  });
+
+  const { data: interchainTokenDetails } = useInterchainTokenDetailsQuery({
     chainId: routeChain?.id,
     tokenAddress,
   });
@@ -61,6 +67,7 @@ const InterchainTokensPage: FC = () => {
           decimals={tokenDetails.decimals}
           name={tokenDetails.name}
           symbol={tokenDetails.symbol}
+          deploymentMessageId={interchainTokenDetails?.deploymentMessageId}
           wasDeployedByAccount={interchainToken.wasDeployedByAccount}
           tokenId={interchainToken?.tokenId}
           tokenManagerAddress={interchainToken?.tokenManagerAddress}
@@ -83,6 +90,7 @@ const InterchainTokensPage: FC = () => {
         <>
           <ConnectedInterchainTokensPage
             chainId={routeChain?.id}
+            deploymentMessageId={interchainTokenDetails?.deploymentMessageId}
             tokenAddress={tokenAddress}
             tokenName={tokenDetails.name}
             tokenSymbol={tokenDetails.symbol}
