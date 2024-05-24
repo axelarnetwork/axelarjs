@@ -20,13 +20,13 @@ import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
-import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
+import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
 
-export const Step3: FC = () => {
+export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
     useInterchainTokenDeploymentStateContainer();
 
-  const { state, actions } = useStep3ChainSelectionState();
+  const { state, actions } = useStep2ChainSelectionState();
 
   const chainId = useChainId();
 
@@ -51,7 +51,7 @@ export const Step3: FC = () => {
           if (txState.type === "deployed") {
             rootActions.setTxState(txState);
             rootActions.setSelectedChains(validDestinationChainIds);
-            rootActions.setStep(3);
+            rootActions.setStep(2);
             actions.setIsDeploying(false);
 
             return;
@@ -271,4 +271,4 @@ export const Step3: FC = () => {
   );
 };
 
-export default Step3;
+export default Step2;
