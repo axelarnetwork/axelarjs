@@ -80,7 +80,7 @@ export async function manualRelayToDestChain(
   };
   const recoveryParams: RecoveryParams = {
     searchGMPData: searchGMPResponse[0],
-    escapeAfterConfirm: params.options.escapeAfterConfirm,
+    escapeAfterConfirm: params.options?.escapeAfterConfirm,
     srcChainConfig,
     destChainConfig,
   };
@@ -90,9 +90,9 @@ export async function manualRelayToDestChain(
   if (dir === RouteDir.EVM_TO_EVM) {
     recoverySteps = await recoverEvmToEvm(recoveryParams, recoveryDeps);
   } else if (dir === RouteDir.COSMOS_TO_EVM) {
-    recoverySteps = await recoverEvmToIbc(recoveryParams, recoveryDeps);
-  } else if (dir === RouteDir.EVM_TO_COSMOS) {
     recoverySteps = await recoverIbcToEvm(recoveryParams, recoveryDeps);
+  } else if (dir === RouteDir.EVM_TO_COSMOS) {
+    recoverySteps = await recoverEvmToIbc(recoveryParams, recoveryDeps);
   } else {
     recoverySteps = await recoverIbcToIbc(recoveryParams, recoveryDeps);
   }

@@ -17,6 +17,7 @@ export enum RouteDir {
   COSMOS_TO_EVM = "cosmos_to_evm",
   EVM_TO_COSMOS = "evm_to_cosmos",
   EVM_TO_EVM = "evm_to_evm",
+  COSMOS_TO_COSMOS = "cosmos_to_cosmos",
 }
 
 export type EvmSignerOptions = {

@@ -11,8 +11,13 @@ export function getRouteDir(srcChain: ChainConfig, destChain: ChainConfig) {
     destChain.chain_type === "cosmos"
   ) {
     return RouteDir.EVM_TO_COSMOS;
-  } else {
+  } else if (
+    srcChain.chain_type === "cosmos" &&
+    destChain.chain_type === "evm"
+  ) {
     return RouteDir.COSMOS_TO_EVM;
+  } else {
+    return RouteDir.COSMOS_TO_COSMOS;
   }
 }
 
