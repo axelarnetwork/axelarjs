@@ -60,7 +60,6 @@ const RecentTransactionsPage = () => {
           </Tabs>
           <RecentTransactionsTable
             contractMethod={contractMethod}
-            senderAddress={address}
             maxTransactions={20}
           />
         </Suspense>
