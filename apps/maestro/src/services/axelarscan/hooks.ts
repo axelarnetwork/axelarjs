@@ -67,7 +67,6 @@ export function useAssetsQuery(denoms: string[] = []) {
   return useQuery({
     queryKey: ["axelarscan-assets", denoms],
     queryFn: axelarscanClient.getAssets.bind(
-      null,
       denoms?.length ? { denoms } : undefined
     ),
   });
@@ -76,7 +75,7 @@ export function useAssetsQuery(denoms: string[] = []) {
 export function useAssetPricesQuery(denoms: string[] = []) {
   return useQuery({
     queryKey: ["axelarscan-asset-prices", denoms],
-    queryFn: axelarscanClient.getAssetPrices.bind(null, { denoms }),
+    queryFn: axelarscanClient.getAssetPrices.bind({ denoms }),
   });
 }
 

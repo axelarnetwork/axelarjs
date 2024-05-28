@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/maestro",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -34,7 +34,7 @@
     "release": "tsx scripts/release.ts"
   },
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "0.15.0-alpha.5",
+    "@axelar-network/axelarjs-sdk": "0.15.0",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",
@@ -98,7 +98,7 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.1",
-    "drizzle-kit": "^0.20.14",
+    "drizzle-kit": "^0.20.17",
     "drizzle-zod": "^0.5.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.1.4",

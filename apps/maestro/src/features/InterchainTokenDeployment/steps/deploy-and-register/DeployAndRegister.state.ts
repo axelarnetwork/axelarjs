@@ -5,17 +5,20 @@ import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { useChainId } from "wagmi";
 
-import { NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT } from "~/config/env";
+import {
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+  NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
+} from "~/config/env";
 import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
-export type UseStep3ChainSelectionStateProps = {
+export type UseStep2ChainSelectionStateProps = {
   selectedChains: Set<string>;
 };
 
-export function useStep3ChainSelectionState() {
+export function useStep2ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const chainId = useChainId();
   const [isDeploying, setIsDeploying] = useState(false);
@@ -35,6 +38,7 @@ export function useStep3ChainSelectionState() {
     sourceChainId,
     destinationChainIds: rootState.selectedChains,
     gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT),
+    executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasMultiplier: "auto",
   });
 
