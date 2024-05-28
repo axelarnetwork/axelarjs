@@ -5,8 +5,8 @@ import type {
   SearchGMPResponseData,
 } from "@axelarjs/api";
 
-import type { ChainConfig } from "../lib/helper";
-import type { RecoveryTxResponse } from "../types";
+import type { RecoveryTxResponse } from "../../types";
+import type { ChainConfig } from "../helper";
 import { SignCommandsError } from "./error";
 
 export type SendAxelarSignTxParams = {
@@ -41,8 +41,6 @@ export async function sendAxelarSignTx(
       error: SignCommandsError.SEARCH_BATCH_COMMANDS_FAILED,
     };
   }
-
-  // TODO: try to fetch the batched commands from axelar-core as well
 
   if (batchedCommands?.data.length === 0) {
     // already sent batched tx; no need to sign

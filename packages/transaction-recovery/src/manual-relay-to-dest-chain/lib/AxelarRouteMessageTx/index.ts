@@ -3,7 +3,7 @@ import {
   type SearchGMPResponseData,
 } from "@axelarjs/api";
 
-import type { RecoveryTxResponse } from "../types";
+import type { RecoveryTxResponse } from "../../types";
 
 export type SendAxelarRouteMessageTxParams = {
   searchGMPData: SearchGMPResponseData;

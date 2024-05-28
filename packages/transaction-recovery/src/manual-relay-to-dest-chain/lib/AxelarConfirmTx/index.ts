@@ -4,9 +4,9 @@ import type {
 } from "@axelarjs/api";
 import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
-import type { EventResponse } from "../../../../proto/build/module/axelar/evm/v1beta1/query";
-import type { ChainConfig } from "../lib/helper";
-import type { RecoveryTxResponse } from "../types";
+import type { EventResponse } from "../../../../../proto/build/module/axelar/evm/v1beta1/query";
+import type { RecoveryTxResponse } from "../../types";
+import type { ChainConfig } from "../helper";
 import { ConfirmGatewayTxError } from "./error";
 import { isConfirmed, isFinalizedTx } from "./qualifier";
 

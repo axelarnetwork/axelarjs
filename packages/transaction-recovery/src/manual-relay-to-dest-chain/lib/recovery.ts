@@ -1,12 +1,14 @@
 import type { SearchGMPResponseData } from "@axelarjs/api";
 import { type AxelarQueryClientService } from "@axelarjs/cosmos";
 
+import {
+  sendAxelarConfirmTx,
+  sendAxelarRouteMessageTx,
+  sendAxelarSignTx,
+  sendEvmGatewayApproveTx,
+} from ".";
 import type { ManualRelayToDestChainDependencies } from "../isomorphic";
 import { type ChainConfig } from "../lib/helper";
-import { sendAxelarConfirmTx } from "../sendAxelarConfirmTx";
-import { sendAxelarRouteMessageTx } from "../sendAxelarRouteMessageTx";
-import { sendAxelarSignTx } from "../sendAxelarSignTx";
-import { sendEvmGatewayApproveTx } from "../sendEvmGatewayApproveTx";
 
 export type RecoveryDependencies = ManualRelayToDestChainDependencies & {
   axelarQueryRpcClient: AxelarQueryClientService;

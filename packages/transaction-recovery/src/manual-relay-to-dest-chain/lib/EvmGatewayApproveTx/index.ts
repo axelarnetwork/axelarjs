@@ -7,8 +7,8 @@ import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
 import { createPublicClient, http } from "viem";
 
-import type { ChainConfig } from "../lib/helper";
-import type { RecoveryTxResponse } from "../types";
+import type { RecoveryTxResponse } from "../../types";
+import type { ChainConfig } from "../helper";
 import { GatewayApproveError } from "./error";
 
 export type SendEvmGatewayApproveTxParams = {
