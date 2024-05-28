@@ -64,6 +64,11 @@ export const TOP_MENU_ITEMS: Menuitem[] = [
     label: "My Recent Transactions",
     href: "/recent-transactions",
   },
+  {
+    kind: "link",
+    label: "All Recent Activity",
+    href: "/recent-activity",
+  },
 ];
 
 export const BOTTOM_MENU_ITEMS: Menuitem[] = [
