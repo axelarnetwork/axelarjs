@@ -1,10 +1,4 @@
-import {
-  Card,
-  CopyToClipboardButton,
-  ExternalLinkIcon,
-  Table,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Card, ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
@@ -13,7 +7,11 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
-import type { InterchainToken } from "~/lib/drizzle/schema";
+import {
+  decodeDeploymentMessageId,
+  type DeploymentMessageId,
+  type InterchainToken,
+} from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import Pagination from "~/ui/components/Pagination";
@@ -235,10 +233,18 @@ const InterchainTokenRow: FC<{
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
-        <CopyToClipboardButton copyText={token.tokenId} $variant="ghost">
-          {token.tokenName}{" "}
-          <span className="opacity-75">({token.tokenSymbol})</span>
-        </CopyToClipboardButton>
+        <Tooltip tip="View on AxelarScan" $position="bottom">
+          <Link
+            className="group inline-flex items-center text-sm font-semibold hover:underline"
+            href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${decodeDeploymentMessageId(token?.deploymentMessageId as DeploymentMessageId).hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {token.tokenName}&nbsp;
+            <span className="opacity-75"> ({token.tokenSymbol})</span>
+            <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+          </Link>
+        </Tooltip>
       </Table.Cell>
       <Table.Cell>{capitalize(token.kind)}</Table.Cell>
       <Table.Cell>{token.createdAt?.toLocaleString()}</Table.Cell>
