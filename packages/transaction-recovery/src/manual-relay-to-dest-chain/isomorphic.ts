@@ -6,22 +6,22 @@ import type {
   GMPClient,
   SearchGMPResponseData,
 } from "@axelarjs/api";
-import {
-  createAxelarRPCQueryClient,
-  type AxelarQueryClientService,
-} from "@axelarjs/cosmos";
+import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 
 import { ManualRelayToDestChainError } from "./error";
 import {
   findChainConfig,
   getRouteDir,
   mapSearchGMPResponse,
-  type ChainConfig,
 } from "./lib/helper";
-import { sendAxelarConfirmTx } from "./sendAxelarConfirmTx";
-import { sendAxelarRouteMessageTx } from "./sendAxelarRouteMessageTx";
-import { sendAxelarSignTx } from "./sendAxelarSignTx";
-import { sendEvmGatewayApproveTx } from "./sendEvmGatewayApproveTx";
+import {
+  recoverEvmToEvm,
+  recoverEvmToIbc,
+  recoverIbcToEvm,
+  recoverIbcToIbc,
+  type RecoveryDependencies,
+  type RecoveryParams,
+} from "./lib/recovery";
 import {
   ManualRelayToDestChainParams,
   RouteDir,
@@ -33,16 +33,6 @@ export type ManualRelayToDestChainDependencies = {
   axelarscanClient: AxelarscanClient;
   axelarRecoveryApiClient: AxelarRecoveryApiClient;
   gmpClient: GMPClient;
-};
-
-export type RecoveryDependencies = ManualRelayToDestChainDependencies & {
-  axelarQueryRpcClient: AxelarQueryClientService;
-};
-
-export type RecoveryParams = {
-  searchGMPData: SearchGMPResponseData;
-  srcChainConfig: ChainConfig;
-  destChainConfig: ChainConfig;
 };
 
 export async function manualRelayToDestChain(
@@ -90,6 +80,7 @@ export async function manualRelayToDestChain(
   };
   const recoveryParams: RecoveryParams = {
     searchGMPData: searchGMPResponse[0],
+    escapeAfterConfirm: params.options.escapeAfterConfirm,
     srcChainConfig,
     destChainConfig,
   };
@@ -110,75 +101,4 @@ export async function manualRelayToDestChain(
     type: dir,
     recoverySteps,
   };
-}
-
-async function recoverEvmToEvm(
-  params: RecoveryParams,
-  deps: RecoveryDependencies
-) {
-  const confirmResponse = await sendAxelarConfirmTx(params, deps);
-
-  if (confirmResponse.skip) {
-    return [confirmResponse];
-  }
-
-  const signResponse = await sendAxelarSignTx(params, deps);
-
-  if (signResponse.skip) {
-    return [confirmResponse, signResponse];
-  }
-
-  const sendEvmGatewayResponse = await sendEvmGatewayApproveTx(params, deps);
-
-  return [confirmResponse, signResponse, sendEvmGatewayResponse];
-}
-
-async function recoverEvmToIbc(
-  params: RecoveryParams,
-  deps: RecoveryDependencies
-) {
-  const confirmResponse = await sendAxelarConfirmTx(params, deps);
-
-  if (confirmResponse.skip) {
-    return [confirmResponse];
-  }
-
-  const signTxResponse = await sendAxelarSignTx(params, deps);
-
-  if (signTxResponse.skip) {
-    return [confirmResponse, signTxResponse];
-  }
-
-  const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
-
-  return [confirmResponse, signTxResponse, routeMessageTxResponse];
-}
-
-async function recoverIbcToEvm(
-  params: RecoveryParams,
-  deps: RecoveryDependencies
-) {
-  const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
-
-  if (routeMessageTxResponse.skip) {
-    return [routeMessageTxResponse];
-  }
-
-  const signTxResponse = await sendAxelarSignTx(params, deps);
-
-  if (signTxResponse.skip) {
-    return [routeMessageTxResponse, signTxResponse];
-  }
-
-  const gatewayApproveResponse = await sendEvmGatewayApproveTx(params, deps);
-
-  return [routeMessageTxResponse, signTxResponse, gatewayApproveResponse];
-}
-
-async function recoverIbcToIbc(
-  params: RecoveryParams,
-  deps: RecoveryDependencies
-) {
-  const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
-  return [routeMessageTxResponse];
 }

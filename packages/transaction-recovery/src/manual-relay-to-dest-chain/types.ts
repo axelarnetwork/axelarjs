@@ -3,11 +3,11 @@ import { Environment } from "@axelarjs/core";
 export type ManualRelayToDestChainParams = {
   environment: Environment;
   txHash: `0x${string}`;
-  escapeAfterConfirm: boolean;
   options: ManualRelayToDestChainOptions;
 };
 
 export type ManualRelayToDestChainOptions = {
+  escapeAfterConfirm?: boolean | undefined;
   txLogIndex?: number | undefined;
   txEventIndex?: number | undefined;
   messageId?: string | undefined;
