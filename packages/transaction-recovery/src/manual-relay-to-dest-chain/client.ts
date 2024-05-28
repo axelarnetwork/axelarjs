@@ -11,12 +11,18 @@ import type { ManualRelayToDestChainParams } from "./types";
 export function manualRelayToDestChain(params: ManualRelayToDestChainParams) {
   const { environment } = params;
 
-  return baseManualRelayToDestChain(params, {
-    axelarscanClient: createAxelarscanClient(environment),
-    axelarRecoveryApiClient: createAxelarRecoveryApiClient(environment),
-    configClient: createAxelarConfigClient(environment),
-    gmpClient: createGMPClient(environment),
-  });
+  return baseManualRelayToDestChain(
+    {
+      options: {},
+      ...params,
+    },
+    {
+      axelarscanClient: createAxelarscanClient(environment),
+      axelarRecoveryApiClient: createAxelarRecoveryApiClient(environment),
+      configClient: createAxelarConfigClient(environment),
+      gmpClient: createGMPClient(environment),
+    }
+  );
 }
 
 export default manualRelayToDestChain;

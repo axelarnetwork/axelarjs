@@ -3,7 +3,7 @@ import { Environment } from "@axelarjs/core";
 export type ManualRelayToDestChainParams = {
   environment: Environment;
   txHash: `0x${string}`;
-  options: ManualRelayToDestChainOptions;
+  options?: ManualRelayToDestChainOptions;
 };
 
 export type ManualRelayToDestChainOptions = {
