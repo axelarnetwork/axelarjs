@@ -270,7 +270,6 @@ const TransactionRow: FC<{
 const InterchainTokenRow: FC<{
   token: InterchainToken;
 }> = ({ token }) => {
-  console.log("token", token);
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
