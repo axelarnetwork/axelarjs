@@ -8,7 +8,7 @@ import type { EventResponse } from "../../../../../proto/build/module/axelar/evm
 import type { RecoveryTxResponse } from "../../types";
 import type { ChainConfig } from "../helper";
 import { ConfirmGatewayTxError } from "./error";
-import { isConfirmed, isFinalizedTx } from "./qualifier";
+import { isBlockFinalized, isConfirmed } from "./qualifier";
 
 export type SendAxelarConfirmTxParams = {
   srcChainConfig: ChainConfig;
@@ -30,19 +30,13 @@ export async function sendAxelarConfirmTx(
   const txHash = searchGMPData.call.transactionHash;
   const srcTxBlockNumber = BigInt(searchGMPData.call.blockNumber);
 
-  const { isFinalized, currentBlockNumber, numRequiredConfirmations } =
-    await isFinalizedTx(srcTxBlockNumber, srcChainConfig, axelarQueryRpcClient);
+  const finalized = await isBlockFinalized(srcTxBlockNumber, srcChainConfig);
 
-  if (!isFinalized) {
+  if (!finalized) {
     return {
       skip: true,
       type: "axelar.confirm_gateway_tx",
-      error: ConfirmGatewayTxError.NOT_FINALIZED(
-        txHash,
-        numRequiredConfirmations,
-        currentBlockNumber,
-        srcTxBlockNumber
-      ),
+      error: ConfirmGatewayTxError.NOT_FINALIZED(txHash),
     };
   }
 

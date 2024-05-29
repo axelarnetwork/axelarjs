@@ -1,5 +1,3 @@
-import type { AxelarQueryClientService } from "@axelarjs/cosmos";
-
 import { createPublicClient, http } from "viem";
 
 import {
@@ -15,29 +13,17 @@ export function isConfirmed(evmEvent: Event) {
   );
 }
 
-export async function isFinalizedTx(
-  srcTxBlockNumber: bigint,
-  srcChainConfig: ChainConfig,
-  axelarQueryClientService: AxelarQueryClientService
+export async function isBlockFinalized(
+  blockNumber: bigint,
+  config: ChainConfig
 ) {
-  const confirmHeightResponse =
-    await axelarQueryClientService.evm.ConfirmationHeight({
-      chain: srcChainConfig.id,
-    });
-
-  const numRequiredConfirmations = BigInt(confirmHeightResponse.height.toInt());
-
-  // Check if the tx has enough confirmations
   const publicClient = createPublicClient({
-    transport: http(srcChainConfig.rpcUrl),
+    transport: http(config.rpcUrl),
   });
 
-  const currentBlockNumber = await publicClient.getBlockNumber();
+  const latestFinalizedBlock = await publicClient.getBlock({
+    blockTag: "finalized",
+  });
 
-  return {
-    isFinalized:
-      currentBlockNumber - srcTxBlockNumber >= numRequiredConfirmations,
-    numRequiredConfirmations,
-    currentBlockNumber,
-  };
+  return latestFinalizedBlock.number >= blockNumber;
 }
