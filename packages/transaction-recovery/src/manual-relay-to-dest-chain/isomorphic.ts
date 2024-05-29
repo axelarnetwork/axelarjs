@@ -58,16 +58,14 @@ export async function manualRelayToDestChain(
   if (!gmpData) {
     throw ManualRelayToDestChainError.TX_NOT_FOUND;
   }
-
   if (gmpData.status === "executed" || gmpData.status === "approved") {
     throw ManualRelayToDestChainError.TX_ALREADY_EXECUTED;
   }
 
-  const chainConfigs = resolvedCalls[1] as unknown as BaseChainConfigsResponse;
-
-  const { destChain, srcChain } = mapSearchGMPResponse(searchGMPResponse);
+  const { destChain, srcChain } = mapSearchGMPResponse(gmpData);
 
   // Get chains info
+  const chainConfigs = resolvedCalls[1] as unknown as BaseChainConfigsResponse;
   const srcChainConfig = findChainConfig(chainConfigs, srcChain);
   const destChainConfig = findChainConfig(chainConfigs, destChain);
 
