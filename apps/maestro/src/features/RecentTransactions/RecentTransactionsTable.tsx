@@ -1,4 +1,10 @@
-import { Card, ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
+import {
+  Card,
+  DropdownMenu,
+  ExternalLinkIcon,
+  Table,
+  Tooltip,
+} from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
@@ -24,12 +30,16 @@ type Props = {
   isTokensTable?: boolean;
 };
 
+type TokenKinds = "interchain" | "canonical";
+
 export const RecentTransactionsTable: FC<Props> = ({
   contractMethod = CONTRACT_METHODS[0],
   maxTransactions = 10,
   isTokensTable = false,
 }) => {
   const [page, setPage] = useState(0);
+  const [selectedTokenType, setSelectedTokenType] =
+    useState<TokenKinds>("interchain");
   const { address: senderAddress } = useAccount();
 
   // reset page when contract method changes
@@ -44,6 +54,7 @@ export const RecentTransactionsTable: FC<Props> = ({
       {
         limit: 20,
         offset: 20 * page,
+        tokenType: selectedTokenType,
       },
       {
         suspense: true,
@@ -99,8 +110,12 @@ export const RecentTransactionsTable: FC<Props> = ({
       accessor: isTokensTable ? "tokenType" : "hash",
     },
     {
-      label: "Timestamp",
+      label: "Date",
       accessor: "timestamp",
+    },
+    {
+      label: isTokensTable ? "Source Chain" : "",
+      accessor: isTokensTable ? "axelarChainId" : "",
     },
   ];
 
@@ -147,6 +162,31 @@ export const RecentTransactionsTable: FC<Props> = ({
                 )}
               </Table.Column>
             </Table.Row>
+            {isTokensTable && (
+              <Table.Row>
+                <div className="pb-2 pl-4">
+                  <DropdownMenu>
+                    <DropdownMenu.Trigger $size="sm" $variant="neutral">
+                      {capitalize(selectedTokenType)}
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Content className="bg-base-300 rounded-xl">
+                      {["canonical", "interchain"].map((kind) => (
+                        <DropdownMenu.Item key={kind}>
+                          <a
+                            onClick={setSelectedTokenType.bind(
+                              null,
+                              kind as TokenKinds
+                            )}
+                          >
+                            {capitalize(kind)}
+                          </a>
+                        </DropdownMenu.Item>
+                      ))}
+                    </DropdownMenu.Content>
+                  </DropdownMenu>
+                </div>
+              </Table.Row>
+            )}
             <Table.Row>
               {columns.map((column) => (
                 <Table.Column key={column.label} className={column.className}>
@@ -230,6 +270,7 @@ const TransactionRow: FC<{
 const InterchainTokenRow: FC<{
   token: InterchainToken;
 }> = ({ token }) => {
+  console.log("token", token);
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
@@ -248,6 +289,7 @@ const InterchainTokenRow: FC<{
       </Table.Cell>
       <Table.Cell>{capitalize(token.kind)}</Table.Cell>
       <Table.Cell>{token.createdAt?.toLocaleString()}</Table.Cell>
+      <Table.Cell>{capitalize(token.axelarChainId)}</Table.Cell>
     </Table.Row>
   );
 };

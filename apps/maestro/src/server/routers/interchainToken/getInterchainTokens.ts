@@ -7,11 +7,16 @@ export const getInterchainTokens = protectedProcedure
     z.object({
       limit: z.number().optional().default(10),
       offset: z.number().optional().default(0),
+      tokenType: z
+        .union([z.literal("interchain"), z.literal("canonical")])
+        .optional(),
     })
   )
   .query(async ({ ctx, input }) => {
     const tokenRecords =
-      await ctx.persistence.postgres.getAllDeployedInterchainTokens();
+      await ctx.persistence.postgres.getAllDeployedInterchainTokens(
+        input.tokenType
+      );
 
     const sorted = tokenRecords.sort(
       // sort by creation date newest to oldest
