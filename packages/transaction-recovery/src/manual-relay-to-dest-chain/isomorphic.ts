@@ -49,11 +49,18 @@ export async function manualRelayToDestChain(
     axelarscanClient.getChainConfigs(),
   ];
   const resolvedCalls = await Promise.all(calls);
+
   const searchGMPResponse =
     resolvedCalls[0] as unknown as SearchGMPResponseData[];
 
-  if (!searchGMPResponse[0]) {
+  const gmpData = searchGMPResponse[0];
+
+  if (!gmpData) {
     throw ManualRelayToDestChainError.TX_NOT_FOUND;
+  }
+
+  if (gmpData.status === "executed" || gmpData.status === "approved") {
+    throw ManualRelayToDestChainError.TX_ALREADY_EXECUTED;
   }
 
   const chainConfigs = resolvedCalls[1] as unknown as BaseChainConfigsResponse;
@@ -79,7 +86,7 @@ export async function manualRelayToDestChain(
     axelarQueryRpcClient,
   };
   const recoveryParams: RecoveryParams = {
-    searchGMPData: searchGMPResponse[0],
+    searchGMPData: gmpData,
     escapeAfterConfirm: params.options?.escapeAfterConfirm,
     srcChainConfig,
     destChainConfig,
