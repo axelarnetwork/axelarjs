@@ -38,7 +38,7 @@ export async function sendAxelarSignTx(
     return {
       skip: true,
       type: "axelar.sign_commands",
-      error: SignCommandsError.SEARCH_BATCH_COMMANDS_FAILED,
+      error: SignCommandsError.SEARCH_BATCH_COMMANDS_FAILED.message,
     };
   }
 
@@ -57,7 +57,7 @@ export async function sendAxelarSignTx(
     return {
       skip: true,
       type: "axelar.sign_commands",
-      error: SignCommandsError.ALREADY_EXECUTED,
+      error: SignCommandsError.ALREADY_EXECUTED.message,
     };
   }
 
@@ -67,7 +67,7 @@ export async function sendAxelarSignTx(
     return {
       skip: true,
       type: "axelar.sign_commands",
-      error: SignCommandsError.SIGN_COMMANDS_FAILED,
+      error: SignCommandsError.SIGN_COMMANDS_FAILED.message,
     };
   }
 

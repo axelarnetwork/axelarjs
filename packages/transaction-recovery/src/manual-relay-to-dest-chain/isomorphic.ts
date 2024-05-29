@@ -12,6 +12,7 @@ import { ManualRelayToDestChainError } from "./error";
 import {
   findChainConfig,
   getRouteDir,
+  isAlreadyExecuted,
   mapSearchGMPResponse,
 } from "./lib/helper";
 import {
@@ -58,7 +59,8 @@ export async function manualRelayToDestChain(
   if (!gmpData) {
     throw ManualRelayToDestChainError.TX_NOT_FOUND;
   }
-  if (gmpData.status === "executed" || gmpData.status === "approved") {
+
+  if (isAlreadyExecuted(gmpData.status)) {
     throw ManualRelayToDestChainError.TX_ALREADY_EXECUTED;
   }
 

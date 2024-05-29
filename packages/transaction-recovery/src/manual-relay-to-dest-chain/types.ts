@@ -39,6 +39,6 @@ export type RecoveryTxResponse = {
   skip: boolean;
   type: RecoveryTxType;
   skipReason?: string | undefined;
-  error?: Error | undefined;
+  error?: string | undefined;
   tx?: RecoveryTx | undefined;
 };

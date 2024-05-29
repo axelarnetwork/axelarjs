@@ -36,7 +36,7 @@ export async function sendAxelarConfirmTx(
     return {
       skip: true,
       type: "axelar.confirm_gateway_tx",
-      error: ConfirmGatewayTxError.NOT_FINALIZED(txHash),
+      error: ConfirmGatewayTxError.NOT_FINALIZED(txHash).message,
     };
   }
 
@@ -54,7 +54,7 @@ export async function sendAxelarConfirmTx(
     return {
       skip: true,
       type: "axelar.confirm_gateway_tx",
-      error: ConfirmGatewayTxError.FAILED_FETCH_EVM_EVENT,
+      error: ConfirmGatewayTxError.FAILED_FETCH_EVM_EVENT.message,
     };
   }
 
@@ -63,7 +63,7 @@ export async function sendAxelarConfirmTx(
     return {
       skip: true,
       type: "axelar.confirm_gateway_tx",
-      error: ConfirmGatewayTxError.EVM_EVENT_NOT_FOUND,
+      error: ConfirmGatewayTxError.EVM_EVENT_NOT_FOUND.message,
     };
   }
 

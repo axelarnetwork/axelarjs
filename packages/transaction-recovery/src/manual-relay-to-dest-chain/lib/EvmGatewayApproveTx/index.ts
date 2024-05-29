@@ -59,7 +59,7 @@ export async function sendEvmGatewayApproveTx(
     return {
       skip: true,
       type: "evm.gateway_approve",
-      error: GatewayApproveError.RPC_NOT_FOUND(destChain),
+      error: GatewayApproveError.RPC_NOT_FOUND(destChain).message,
     };
   }
 
