@@ -10,19 +10,19 @@ import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 
 import { ManualRelayToDestChainError } from "./error";
 import {
-  findChainConfig,
-  getRouteDir,
-  isAlreadyExecuted,
-  mapSearchGMPResponse,
-} from "./lib/helper";
-import {
   recoverEvmToEvm,
   recoverEvmToIbc,
   recoverIbcToEvm,
   recoverIbcToIbc,
   type RecoveryDependencies,
   type RecoveryParams,
-} from "./lib/recovery";
+} from "./lib";
+import {
+  findChainConfig,
+  getRouteDir,
+  isAlreadyExecuted,
+  mapSearchGMPResponse,
+} from "./lib/helper";
 import {
   ManualRelayToDestChainParams,
   RouteDir,
@@ -105,6 +105,7 @@ export async function manualRelayToDestChain(
   }
 
   return {
+    success: recoverySteps.every((step) => !step.error),
     type: dir,
     recoverySteps,
   };

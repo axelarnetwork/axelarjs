@@ -1,6 +1,8 @@
-import { BaseChainConfigsResponse, SearchGMPResponse } from "@axelarjs/api";
+import {
+  BaseChainConfigsResponse,
+  type SearchGMPResponseData,
+} from "@axelarjs/api";
 
-import { ManualRelayToDestChainError } from "../error";
 import { RouteDir, type RecoveryTxResponse } from "../types";
 
 export function getRouteDir(srcChain: ChainConfig, destChain: ChainConfig) {
@@ -60,13 +62,12 @@ export function findChainConfig(
   return undefined;
 }
 
-export function mapSearchGMPResponse(response: SearchGMPResponse["data"]) {
-  const tx = response[0];
+export function isAlreadyExecuted(status: string) {
+  const executedStatuses = ["executed", "approved", "error"];
+  return executedStatuses.includes(status);
+}
 
-  if (!tx) {
-    throw ManualRelayToDestChainError.TX_NOT_FOUND;
-  }
-
+export function mapSearchGMPResponse(tx: SearchGMPResponseData) {
   return {
     srcChain: tx.call.chain,
     destChain: tx.call.returnValues.destinationChain,

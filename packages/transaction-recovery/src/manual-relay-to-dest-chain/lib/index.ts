@@ -3,4 +3,4 @@ export * from "./AxelarSignTx";
 export * from "./EvmGatewayApproveTx";
 export * from "./AxelarRouteMessageTx";
 export * from "./helper";
-export * from "./recovery";
+export * from "./strategies";
