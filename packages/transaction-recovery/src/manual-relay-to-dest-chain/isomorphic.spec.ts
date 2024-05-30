@@ -9,7 +9,7 @@ import {
 } from "@axelarjs/api";
 
 import { manualRelayToDestChain as baseManualRelayToDestChain } from "./isomorphic";
-import * as Recovery from "./lib/recovery";
+import * as Recovery from "./lib/strategies";
 import type { ManualRelayToDestChainParams } from "./types";
 
 describe("manualRelayToDestChain", () => {

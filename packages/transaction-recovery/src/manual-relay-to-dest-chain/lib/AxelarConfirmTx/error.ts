@@ -5,4 +5,6 @@ export const ConfirmGatewayTxError = {
     "Failed to fetch EVM event. Please ensure the transaction has paid the gas and try again."
   ),
   EVM_EVENT_NOT_FOUND: new Error("EVM event not found"),
+  FAILED_TO_CONFIRM: (errorMsg: string) =>
+    new Error("Failed to confirm the transaction:" + errorMsg),
 };

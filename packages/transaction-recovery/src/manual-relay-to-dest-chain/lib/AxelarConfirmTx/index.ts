@@ -76,19 +76,26 @@ export async function sendAxelarConfirmTx(
     };
   }
 
-  // TODO: Handle an error here. It's possible to get error. Here's example:
-  // Error: Bad status on response: 502
-  const confirmTx = await dependencies.axelarRecoveryApiClient.confirm(
-    txHash,
-    "evm",
-    srcChain
-  );
+  try {
+    const confirmTx = await dependencies.axelarRecoveryApiClient.confirm(
+      txHash,
+      "evm",
+      srcChain
+    );
 
-  return {
-    skip: false,
-    type: "axelar.confirm_gateway_tx",
-    tx: {
-      hash: confirmTx.transactionHash,
-    },
-  };
+    return {
+      skip: false,
+      type: "axelar.confirm_gateway_tx",
+      tx: {
+        hash: confirmTx.transactionHash,
+      },
+    };
+  } catch (e) {
+    const error = e as Error;
+    return {
+      skip: true,
+      type: "axelar.confirm_gateway_tx",
+      error: ConfirmGatewayTxError.FAILED_TO_CONFIRM(error.message).message,
+    };
+  }
 }
