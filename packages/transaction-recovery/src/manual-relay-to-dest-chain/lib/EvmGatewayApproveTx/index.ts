@@ -63,6 +63,7 @@ export async function sendEvmGatewayApproveTx(
     };
   }
 
+  // TODO: add retry logic
   const batchResponse = await axelarscanClient.searchBatchedCommands({
     commandId,
     sourceTransactionHash,

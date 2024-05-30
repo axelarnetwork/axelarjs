@@ -12,7 +12,6 @@ import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 
 import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { hashMessage } from "viem";
-import type { MockInstance } from "vitest";
 
 import { sendAxelarConfirmTx, type SendAxelarConfirmTxDependencies } from ".";
 import {
@@ -37,7 +36,6 @@ describe("AxelarConfirmTx", () => {
     axelarRecoveryApiClient: createAxelarRecoveryApiClient(environment),
     configClient: createAxelarConfigClient(environment),
     gmpClient: createGMPClient(environment),
-    axelarQueryRpcClient: undefined,
   };
   let confirmDeps: SendAxelarConfirmTxDependencies;
 
