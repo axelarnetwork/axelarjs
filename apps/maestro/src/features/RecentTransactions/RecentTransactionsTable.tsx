@@ -30,7 +30,7 @@ type Props = {
   isTokensTable?: boolean;
 };
 
-type TokenKinds = "interchain" | "canonical";
+type TokenKinds = "interchain" | "canonical" | "all";
 
 export const RecentTransactionsTable: FC<Props> = ({
   contractMethod = CONTRACT_METHODS[0],
@@ -106,16 +106,16 @@ export const RecentTransactionsTable: FC<Props> = ({
         "from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none",
     },
     {
+      label: isTokensTable ? "Origin Chain" : "",
+      accessor: isTokensTable ? "axelarChainId" : "",
+    },
+    {
       label: isTokensTable ? "Token Type" : "Hash",
       accessor: isTokensTable ? "tokenType" : "hash",
     },
     {
       label: "Date",
       accessor: "timestamp",
-    },
-    {
-      label: isTokensTable ? "Source Chain" : "",
-      accessor: isTokensTable ? "axelarChainId" : "",
     },
   ];
 
@@ -163,36 +163,36 @@ export const RecentTransactionsTable: FC<Props> = ({
               </Table.Column>
             </Table.Row>
             {isTokensTable && (
-              <Table.Row>
-                <div className="pb-2 pl-4">
-                  <DropdownMenu>
-                    <DropdownMenu.Trigger $size="sm" $variant="neutral">
-                      {capitalize(selectedTokenType)}
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Content className="bg-base-300 rounded-xl">
-                      {["canonical", "interchain"].map((kind) => (
-                        <DropdownMenu.Item key={kind}>
-                          <a
-                            onClick={setSelectedTokenType.bind(
-                              null,
-                              kind as TokenKinds
-                            )}
-                          >
-                            {capitalize(kind)}
-                          </a>
-                        </DropdownMenu.Item>
-                      ))}
-                    </DropdownMenu.Content>
-                  </DropdownMenu>
-                </div>
-              </Table.Row>
+              <div className="py-2 pl-4">
+                <DropdownMenu>
+                  <DropdownMenu.Trigger $size="sm" $variant="neutral">
+                    {capitalize(selectedTokenType)}
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content className="bg-base-300 rounded-xl">
+                    {["all", "canonical", "interchain"].map((kind) => (
+                      <DropdownMenu.Item key={kind}>
+                        <a
+                          onClick={setSelectedTokenType.bind(
+                            null,
+                            kind as TokenKinds
+                          )}
+                        >
+                          {capitalize(kind)}
+                        </a>
+                      </DropdownMenu.Item>
+                    ))}
+                  </DropdownMenu.Content>
+                </DropdownMenu>
+              </div>
             )}
             <Table.Row>
-              {columns.map((column) => (
-                <Table.Column key={column.label} className={column.className}>
-                  {column.label}
-                </Table.Column>
-              ))}
+              {columns
+                .filter((column) => column.label)
+                .map((column) => (
+                  <Table.Column key={column.label} className={column.className}>
+                    {column.label}
+                  </Table.Column>
+                ))}
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -286,9 +286,9 @@ const InterchainTokenRow: FC<{
           </Link>
         </Tooltip>
       </Table.Cell>
+      <Table.Cell>{capitalize(token.axelarChainId)}</Table.Cell>
       <Table.Cell>{capitalize(token.kind)}</Table.Cell>
       <Table.Cell>{token.createdAt?.toLocaleString()}</Table.Cell>
-      <Table.Cell>{capitalize(token.axelarChainId)}</Table.Cell>
     </Table.Row>
   );
 };

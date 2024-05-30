@@ -8,7 +8,11 @@ export const getInterchainTokens = protectedProcedure
       limit: z.number().optional().default(10),
       offset: z.number().optional().default(0),
       tokenType: z
-        .union([z.literal("interchain"), z.literal("canonical")])
+        .union([
+          z.literal("interchain"),
+          z.literal("canonical"),
+          z.literal("all"),
+        ])
         .optional(),
     })
   )

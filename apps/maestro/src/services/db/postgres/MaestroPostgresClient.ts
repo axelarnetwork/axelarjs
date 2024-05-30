@@ -252,11 +252,14 @@ export default class MaestroPostgresClient {
    * Returns all the interchain tokens deployed filtering by type.
    */
   async getAllDeployedInterchainTokens(
-    tokenType: "interchain" | "canonical" = "interchain"
+    tokenType: "interchain" | "canonical" | "all" = "all"
   ) {
     const query = this.db.query.interchainTokens.findMany({
       where: (table, { notIlike, eq }) =>
-        notIlike(table.deploymentMessageId, "") && eq(table.kind, tokenType),
+        tokenType === "all"
+          ? notIlike(table.deploymentMessageId, "")
+          : notIlike(table.deploymentMessageId, "") &&
+            eq(table.kind, tokenType as "interchain" | "canonical"),
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
     });
 
