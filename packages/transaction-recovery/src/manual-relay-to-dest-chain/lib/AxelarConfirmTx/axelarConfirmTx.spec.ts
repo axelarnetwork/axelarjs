@@ -10,7 +10,6 @@ import {
 } from "@axelarjs/api";
 import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 
-import { skip } from "node:test";
 import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { hashMessage } from "viem";
 
