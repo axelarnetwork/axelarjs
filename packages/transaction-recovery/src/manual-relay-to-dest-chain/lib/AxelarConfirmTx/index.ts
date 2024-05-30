@@ -83,6 +83,14 @@ export async function sendAxelarConfirmTx(
       srcChain
     );
 
+    if (confirmTx.code !== 0) {
+      return {
+        skip: true,
+        type: "axelar.confirm_gateway_tx",
+        error: ConfirmGatewayTxError.FAILED_TO_CONFIRM("").message,
+      };
+    }
+
     return {
       skip: false,
       type: "axelar.confirm_gateway_tx",

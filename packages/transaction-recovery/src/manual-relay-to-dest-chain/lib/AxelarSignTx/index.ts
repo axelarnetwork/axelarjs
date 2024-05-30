@@ -61,21 +61,29 @@ export async function sendAxelarSignTx(
     };
   }
 
-  const tx = await deps.axelarRecoveryApiClient.signCommands(chainId, "evm");
+  try {
+    const tx = await deps.axelarRecoveryApiClient.signCommands(chainId, "evm");
 
-  if (tx.code !== 0) {
+    if (tx.code !== 0) {
+      return {
+        skip: true,
+        type: "axelar.sign_commands",
+        error: SignCommandsError.SIGN_COMMANDS_FAILED.message,
+      };
+    }
+
+    return {
+      skip: false,
+      type: "axelar.sign_commands",
+      tx: {
+        hash: tx.transactionHash,
+      },
+    };
+  } catch (e) {
     return {
       skip: true,
       type: "axelar.sign_commands",
       error: SignCommandsError.SIGN_COMMANDS_FAILED.message,
     };
   }
-
-  return {
-    skip: false,
-    type: "axelar.sign_commands",
-    tx: {
-      hash: tx.transactionHash,
-    },
-  };
 }
