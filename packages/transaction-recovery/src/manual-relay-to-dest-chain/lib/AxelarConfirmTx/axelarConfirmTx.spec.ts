@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// eslint-disable @typescript-eslint/no-unsafe-assignment
 
 import {
   createAxelarConfigClient,
@@ -12,6 +12,7 @@ import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 
 import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { hashMessage } from "viem";
+import type { MockInstance } from "vitest";
 
 import { sendAxelarConfirmTx, type SendAxelarConfirmTxDependencies } from ".";
 import {
@@ -136,19 +137,14 @@ describe("AxelarConfirmTx", () => {
       .mockResolvedValueOnce({
         event: confirmEvent,
       });
-    vitest
+
+    const mockConfirm = vitest
       .spyOn(confirmDeps.axelarRecoveryApiClient, "confirm")
       .mockResolvedValueOnce({
         transactionHash: txHash,
       } as DeliverTxResponse);
 
-    const response = await sendAxelarConfirmTx(
-      {
-        searchGMPData: searchGMPData as SearchGMPResponseData,
-        srcChainConfig: mockConfig,
-      },
-      confirmDeps
-    );
+    const response = await sendAxelarConfirmTx(params, confirmDeps);
 
     expect(response).toMatchObject({
       skip: false,
@@ -157,5 +153,6 @@ describe("AxelarConfirmTx", () => {
         hash: txHash,
       },
     });
+    expect(mockConfirm).toHaveBeenCalledOnce();
   });
 });
