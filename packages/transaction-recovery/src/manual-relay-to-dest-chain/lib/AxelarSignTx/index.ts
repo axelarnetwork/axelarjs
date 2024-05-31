@@ -1,13 +1,12 @@
 import type {
   AxelarRecoveryApiClient,
   AxelarscanClient,
-  SearchBatchesResponse,
   SearchGMPResponseData,
 } from "@axelarjs/api";
 
 import type { RecoveryTxResponse } from "../../types";
 import type { ChainConfig } from "../helper";
-import { SignCommandsError } from "./error";
+import { SignCommandsError, SignCommandsSkipReason } from "./constants";
 
 export type SendAxelarSignTxParams = {
   searchGMPData: SearchGMPResponseData;
@@ -27,37 +26,19 @@ export async function sendAxelarSignTx(
   const sourceTransactionHash = params.searchGMPData.call.transactionHash;
   const chainId = params.srcChainConfig.id;
 
-  let batchedCommands: SearchBatchesResponse | undefined = undefined;
-
-  try {
-    batchedCommands = await deps.axelarscanClient.searchBatchedCommands({
+  const batchedCommands = await deps.axelarscanClient
+    .searchBatchedCommands({
       commandId,
       sourceTransactionHash,
-    });
-  } catch (e) {
+    })
+    .catch(() => ({ data: [] }));
+
+  // If there are batched commands, skip signing
+  if (batchedCommands?.data.length > 0) {
     return {
       skip: true,
       type: "axelar.sign_commands",
-      error: SignCommandsError.SEARCH_BATCH_COMMANDS_FAILED.message,
-    };
-  }
-
-  if (batchedCommands?.data.length === 0) {
-    // already sent batched tx; no need to sign
-    return {
-      skip: true,
-      type: "axelar.sign_commands",
-      skipReason: "No batched commands found",
-    };
-  }
-
-  const commands = batchedCommands.data[0]!.commands;
-
-  if (commands.length > 0 && commands[0]?.executed) {
-    return {
-      skip: true,
-      type: "axelar.sign_commands",
-      error: SignCommandsError.ALREADY_EXECUTED.message,
+      skipReason: SignCommandsSkipReason.ALREADY_EXECUTED,
     };
   }
 

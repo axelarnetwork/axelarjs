@@ -12,7 +12,7 @@ import {
 import { hashMessage } from "viem";
 
 import { sendAxelarSignTx } from ".";
-import { SignCommandsError } from "./error";
+import { SignCommandsError, SignCommandsSkipReason } from "./constants";
 
 describe("AxelarSignTx", () => {
   const environment = "testnet";
@@ -44,30 +44,49 @@ describe("AxelarSignTx", () => {
     searchGMPData: searchGMPData as SearchGMPResponseData,
   };
 
-  test("should returns error if cannot search batched commands", async () => {
+  test("should call signCommands if there's error inside search batched commands", async () => {
     vitest
       .spyOn(deps.axelarscanClient, "searchBatchedCommands")
       .mockRejectedValueOnce(new Error("search batched commands failed"));
 
+    vitest
+      .spyOn(deps.axelarRecoveryApiClient, "signCommands")
+      .mockResolvedValueOnce({
+        code: 0,
+        transactionHash: txHash,
+      } as any);
+
     const response = await sendAxelarSignTx(params, deps);
 
     expect(response).toMatchObject({
-      skip: true,
+      skip: false,
       type: "axelar.sign_commands",
-      error: SignCommandsError.SEARCH_BATCH_COMMANDS_FAILED.message,
+      tx: {
+        hash: txHash,
+      },
     });
   });
 
-  test("should skip if batched commands are empty", async () => {
+  test("should send sign commands tx if batched commands are empty", async () => {
     vitest
       .spyOn(deps.axelarscanClient, "searchBatchedCommands")
       .mockResolvedValueOnce({ data: [] });
 
+    vitest
+      .spyOn(deps.axelarRecoveryApiClient, "signCommands")
+      .mockResolvedValueOnce({
+        code: 0,
+        transactionHash: txHash,
+      } as any);
+
     const response = await sendAxelarSignTx(params, deps);
 
     expect(response).toMatchObject({
-      skip: true,
+      skip: false,
       type: "axelar.sign_commands",
+      tx: {
+        hash: txHash,
+      },
     });
   });
 
@@ -91,7 +110,7 @@ describe("AxelarSignTx", () => {
     expect(response).toMatchObject({
       skip: true,
       type: "axelar.sign_commands",
-      error: SignCommandsError.ALREADY_EXECUTED.message,
+      skipReason: SignCommandsSkipReason.ALREADY_EXECUTED,
     });
   });
 
@@ -99,11 +118,7 @@ describe("AxelarSignTx", () => {
     vitest
       .spyOn(deps.axelarscanClient, "searchBatchedCommands")
       .mockResolvedValueOnce({
-        data: [
-          {
-            commands: [],
-          },
-        ],
+        data: [],
       } as any);
 
     vitest
@@ -118,35 +133,6 @@ describe("AxelarSignTx", () => {
       skip: true,
       type: "axelar.sign_commands",
       error: SignCommandsError.SIGN_COMMANDS_FAILED.message,
-    });
-  });
-
-  test("should returns success if all conditions are met", async () => {
-    vitest
-      .spyOn(deps.axelarscanClient, "searchBatchedCommands")
-      .mockResolvedValueOnce({
-        data: [
-          {
-            commands: [],
-          },
-        ],
-      } as any);
-
-    vitest
-      .spyOn(deps.axelarRecoveryApiClient, "signCommands")
-      .mockResolvedValueOnce({
-        code: 0,
-        transactionHash: txHash,
-      } as any);
-
-    const response = await sendAxelarSignTx(params, deps);
-
-    expect(response).toMatchObject({
-      skip: false,
-      type: "axelar.sign_commands",
-      tx: {
-        hash: txHash,
-      },
     });
   });
 });
