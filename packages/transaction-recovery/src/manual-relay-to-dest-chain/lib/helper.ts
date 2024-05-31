@@ -77,25 +77,23 @@ export function mapSearchGMPResponse(tx: SearchGMPResponseData) {
 
 export type RecoveryStep = Promise<RecoveryTxResponse>;
 
-export async function retry(
-  times: number = 10,
-  delay: number = 3000,
-  pendingRecoveryStep: RecoveryStep
-) {
-  let resolved;
-  for (let i = 0; i < times; i++) {
-    resolved = await pendingRecoveryStep;
-    if (resolved.skip && !resolved.error) {
+export async function retry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 5,
+  delay = 5000
+): Promise<T> {
+  let error: unknown;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      error = e;
       await new Promise((resolve) => setTimeout(resolve, delay));
-    } else {
-      return resolved;
     }
   }
 
-  return {
-    ...resolved,
-    error: new Error("Max retries reached"),
-  };
+  throw error;
 }
 
 export async function processRecovery(pendingRecoverySteps: RecoveryStep[]) {

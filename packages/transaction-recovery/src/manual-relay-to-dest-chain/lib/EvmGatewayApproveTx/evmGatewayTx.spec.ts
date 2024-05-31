@@ -12,11 +12,10 @@ import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 
 import { hashMessage, zeroAddress } from "viem";
 
-import {
-  sendEvmGatewayApproveTx,
-  type SendEvmGatewayApproveTxDependencies,
-} from ".";
+import { type SendEvmGatewayApproveTxDependencies } from ".";
 import { GatewayApproveError } from "./error";
+import * as EvmClient from "./txHelper";
+import { sendEvmGatewayApproveTx } from "./index";
 
 describe("EvmGatewayTx", () => {
   const environment = "testnet";
@@ -108,7 +107,31 @@ describe("EvmGatewayTx", () => {
     expect(response).toMatchObject({
       skip: true,
       type: "evm.gateway_approve",
-      skipReason: "cannot find executeData from batch response",
+      error: GatewayApproveError.EXECUTE_DATA_NOT_FOUND.message,
+    });
+  });
+
+  test("should send approve gateway tx if executeData is found", async () => {
+    vitest
+      .spyOn(approveGatewayDeps.axelarQueryRpcClient.evm, "GatewayAddress")
+      .mockResolvedValueOnce({ address: destGatewayAddress });
+    vitest
+      .spyOn(deps.axelarscanClient, "searchBatchedCommands")
+      .mockResolvedValueOnce({
+        data: [
+          {
+            execute_data: "0x",
+          } as any,
+        ],
+      });
+    vitest.spyOn(EvmClient, "executeApproveTx").mockResolvedValueOnce(txHash);
+    const response = await sendEvmGatewayApproveTx(params, approveGatewayDeps);
+    expect(response).toMatchObject({
+      skip: false,
+      type: "evm.gateway_approve",
+      tx: {
+        hash: txHash,
+      },
     });
   });
 });

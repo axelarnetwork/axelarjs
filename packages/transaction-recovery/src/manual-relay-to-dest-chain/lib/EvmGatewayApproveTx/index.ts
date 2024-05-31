@@ -5,11 +5,18 @@ import type {
 } from "@axelarjs/api";
 import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
-import { createPublicClient, http } from "viem";
+import {
+  createPublicClient,
+  http,
+  parseUnits,
+  serializeTransaction,
+  type Hex,
+} from "viem";
 
 import type { RecoveryTxResponse } from "../../types";
-import type { ChainConfig } from "../helper";
+import { retry, type ChainConfig } from "../helper";
 import { GatewayApproveError } from "./error";
+import { createEvmClient, executeApproveTx } from "./txHelper";
 
 export type SendEvmGatewayApproveTxParams = {
   searchGMPData: SearchGMPResponseData;
@@ -42,8 +49,7 @@ export async function sendEvmGatewayApproveTx(
   deps: SendEvmGatewayApproveTxDependencies
 ): Promise<RecoveryTxResponse> {
   const { destChainConfig, searchGMPData } = params;
-  const { axelarRecoveryApiClient, axelarscanClient, axelarQueryRpcClient } =
-    deps;
+  const { axelarscanClient, axelarQueryRpcClient } = deps;
 
   const { address } = await axelarQueryRpcClient.evm.GatewayAddress({
     chain: destChainConfig.id,
@@ -63,10 +69,17 @@ export async function sendEvmGatewayApproveTx(
     };
   }
 
-  // TODO: add retry logic
-  const batchResponse = await axelarscanClient.searchBatchedCommands({
-    commandId,
-    sourceTransactionHash,
+  const batchResponse = await retry(async () => {
+    const batchedCommands = await axelarscanClient.searchBatchedCommands({
+      commandId,
+      sourceTransactionHash,
+    });
+
+    if (batchedCommands.data.length === 0) {
+      throw new Error("batched commands not found. retrying...");
+    }
+
+    return batchedCommands;
   });
 
   const executeData = batchResponse.data[0]?.execute_data;
@@ -75,31 +88,30 @@ export async function sendEvmGatewayApproveTx(
     return {
       skip: true,
       type: "evm.gateway_approve",
-      skipReason: "cannot find executeData from batch response",
+      error: GatewayApproveError.EXECUTE_DATA_NOT_FOUND.message,
     };
   }
 
-  const signEvmTxResponse = await axelarRecoveryApiClient.signEvmTx(
-    destChain,
-    gatewayAddress,
-    executeData
-  );
+  try {
+    const transactionHash = await executeApproveTx(
+      rpcUrl,
+      executeData,
+      gatewayAddress,
+    );
 
-  const signedEvmTx = signEvmTxResponse as `0x${string}`;
-
-  const publicClient = createPublicClient({
-    transport: http(rpcUrl),
-  });
-
-  const transactionHash = await publicClient.sendRawTransaction({
-    serializedTransaction: signedEvmTx,
-  });
-
-  return {
-    skip: false,
-    type: "evm.gateway_approve",
-    tx: {
-      hash: transactionHash,
-    },
-  };
+    return {
+      skip: false,
+      type: "evm.gateway_approve",
+      tx: {
+        hash: transactionHash,
+      },
+    };
+  } catch (e) {
+    const error = e as Error;
+    return {
+      skip: true,
+      type: "evm.gateway_approve",
+      error: GatewayApproveError.FAILED_TX(error).message,
+    };
+  }
 }
