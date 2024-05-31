@@ -97,15 +97,4 @@ export class AxelarRecoveryApiClient extends RestService {
     });
   }
 
-  async signEvmTx(chain: string, gatewayAddress: `0x${string}`, data: string) {
-    const response = await this.client
-      .post("sign_evm_tx", {
-        chain,
-        gatewayAddress,
-        data,
-      })
-      .json<{ data: string }>();
-
-    return response.data;
-  }
 }
