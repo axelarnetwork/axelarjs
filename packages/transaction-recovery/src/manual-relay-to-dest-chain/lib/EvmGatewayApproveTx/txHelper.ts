@@ -1,5 +1,7 @@
 import { createPublicClient, http, serializeTransaction, type Hex } from "viem";
 
+import { getWalletClient } from "../../../common/client";
+
 export const createEvmClient = (rpcUrl: string) => {
   return createPublicClient({
     transport: http(rpcUrl),
@@ -44,8 +46,8 @@ export const executeApproveTx = async (
     executeData,
     gatewayAddress
   );
-  const publicClient = createEvmClient(rpcUrl);
-  const transactionHash = await publicClient.sendRawTransaction({
+  const walletClient = getWalletClient(rpcUrl);
+  const transactionHash = await walletClient.sendRawTransaction({
     serializedTransaction: serializedTx,
   });
   return transactionHash;
