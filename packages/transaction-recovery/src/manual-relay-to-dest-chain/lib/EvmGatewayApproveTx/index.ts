@@ -5,18 +5,10 @@ import type {
 } from "@axelarjs/api";
 import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
-import {
-  createPublicClient,
-  http,
-  parseUnits,
-  serializeTransaction,
-  type Hex,
-} from "viem";
-
 import type { RecoveryTxResponse } from "../../types";
 import { retry, type ChainConfig } from "../helper";
 import { GatewayApproveError } from "./error";
-import { createEvmClient, executeApproveTx } from "./txHelper";
+import { executeApproveTx } from "./txHelper";
 
 export type SendEvmGatewayApproveTxParams = {
   searchGMPData: SearchGMPResponseData;
@@ -96,7 +88,7 @@ export async function sendEvmGatewayApproveTx(
     const transactionHash = await executeApproveTx(
       rpcUrl,
       executeData,
-      gatewayAddress,
+      gatewayAddress
     );
 
     return {
