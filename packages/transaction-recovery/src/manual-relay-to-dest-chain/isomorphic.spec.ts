@@ -1,106 +1,52 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// eslint-disable @typescript-eslint/no-unsafe-assignment
+import { hashMessage } from "viem";
 
-import {
-  createAxelarConfigClient,
-  createAxelarRecoveryApiClient,
-  createAxelarscanClient,
-  createGMPClient,
-} from "@axelarjs/api";
-
-import { manualRelayToDestChain as baseManualRelayToDestChain } from "./isomorphic";
-import * as Recovery from "./lib/strategies";
-import type { ManualRelayToDestChainParams } from "./types";
+import { manualRelayToDestChain } from "./client";
+import { ManualRelayToDestChainError } from "./error";
 
 describe("manualRelayToDestChain", () => {
   const environment = "testnet";
-  const txHash =
-    "0x3f1175cee93c64b77297a4a4d929d50b7b5e7904a2e1c80d3ce7b61ab0776de2";
-  const deps = {
-    axelarscanClient: createAxelarscanClient(environment),
-    axelarRecoveryApiClient: createAxelarRecoveryApiClient(environment),
-    configClient: createAxelarConfigClient(environment),
-    gmpClient: createGMPClient(environment),
-  };
-
-  const manualRelayToDestChain = (params: ManualRelayToDestChainParams) =>
-    baseManualRelayToDestChain(params, deps);
-
-  const spySearchGMP = (sourceChain: string, destChain: string) => {
-    vitest.spyOn(deps.gmpClient, "searchGMP").mockResolvedValueOnce([
-      {
-        call: {
-          chain: sourceChain,
-          __logIndex: 0,
-          returnValues: {
-            destinationChain: destChain,
-          },
-        },
-      },
-    ] as any);
-  };
-
-  describe("EvmToIBC", () => {
-    test("should call recoverEvmToIbc tx when source chain is EVM chain, but destination chain is cosmos chain", async () => {
-      const recover = vitest.spyOn(Recovery, "recoverEvmToIbc");
-      recover.mockResolvedValueOnce([]);
-
-      spySearchGMP("ethereum-sepolia", "terra-2");
-
-      await manualRelayToDestChain({
-        environment,
+  test("should throw error when the tx is already executed", async () => {
+    // optimism -> avalanche
+    const txHash =
+      "0xfe09df5f567707c2fb0c7faf064ebd1185902d1dd73fcb8be52727d3a9cffd53";
+    await expect(
+      manualRelayToDestChain({
         txHash,
-      });
-
-      expect(recover).toHaveBeenCalledTimes(1);
-    });
+        environment,
+      })
+    ).rejects.toThrowError();
   });
 
-  describe("IBCToEvm", () => {
-    test("should call recoverIbcToEvm tx when source chain is cosmos chain, but destination chain is EVM chain", async () => {
-      const recover = vitest.spyOn(Recovery, "recoverIbcToEvm");
-      recover.mockResolvedValueOnce([]);
-
-      spySearchGMP("dymension", "avalanche");
-
-      await manualRelayToDestChain({
+  test("should throw error when the tx is non-axelar", async () => {
+    const randomTxHash = hashMessage("random tx hash");
+    await expect(
+      manualRelayToDestChain({
+        txHash: randomTxHash,
         environment,
-        txHash,
-      });
-
-      expect(recover).toHaveBeenCalledTimes(1);
-    });
+      })
+    ).rejects.toThrowError(ManualRelayToDestChainError.TX_NOT_FOUND);
   });
 
-  describe("EvmToEvm", () => {
-    test("should call recoverEvmToEvm tx when source chain and destination chain are EVM chains", async () => {
-      const recover = vitest.spyOn(Recovery, "recoverEvmToEvm");
-      recover.mockResolvedValueOnce([]);
-
-      spySearchGMP("ethereum-sepolia", "avalanche");
-
-      await manualRelayToDestChain({
-        environment,
+  test("should throw error when the tx is already approved", async () => {
+    const txHash =
+      "0x3d644feb70ec6a444394d13fc9dc145229d9c1e8453c0682a03810f9352e1664";
+    await expect(
+      manualRelayToDestChain({
         txHash,
-      });
-
-      expect(recover).toHaveBeenCalledTimes(1);
-    });
+        environment,
+      })
+    ).rejects.toThrowError();
   });
 
-  describe("IBCToIBC", () => {
-    test("should call recoverIbctoIbc tx when source chain and destination chain are cosmos chains", async () => {
-      const recover = vitest.spyOn(Recovery, "recoverIbcToIbc");
-      recover.mockResolvedValueOnce([]);
+  test("should return success: false when the tx didn't pay the gas", async () => {
+    const txHash =
+      "0xe3853baa7f08d923b5e3eef212426f0ef7418cb84feaf6938e1f7617f598f4d1";
 
-      spySearchGMP("dymension", "terra-2");
-
-      await manualRelayToDestChain({
-        environment,
-        txHash,
-      });
-
-      expect(recover).toHaveBeenCalledTimes(1);
+    const response = await manualRelayToDestChain({
+      txHash,
+      environment,
     });
+
+    expect(response.success).toEqual(false);
   });
 });
