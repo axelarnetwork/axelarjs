@@ -6,6 +6,7 @@ import {
 import type { RecoveryTxResponse } from "../../types";
 
 export type SendAxelarRouteMessageTxParams = {
+  messageId?: string | undefined;
   searchGMPData: SearchGMPResponseData;
 };
 
@@ -18,7 +19,7 @@ export async function sendAxelarRouteMessageTx(
   deps: SendAxelarRouteMessageTxDependencies
 ): Promise<RecoveryTxResponse> {
   const payload = params.searchGMPData.call.returnValues.payload;
-  const messageId = params.searchGMPData.call.returnValues.messageId;
+  const messageId = params.messageId || params.searchGMPData.call.returnValues.messageId;
 
   if (!messageId) {
     return {

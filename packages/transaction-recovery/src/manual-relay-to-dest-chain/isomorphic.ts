@@ -42,12 +42,17 @@ export async function manualRelayToDestChain(
   dependencies: ManualRelayToDestChainDependencies
 ) {
   const { environment, txHash } = params;
-  // const { txEventIndex, txLogIndex, messageId } = options;
   const { axelarscanClient, gmpClient } = dependencies;
+
+  const searchGMPParams = {
+    txHash,
+    txLogIndex: params.options?.txLogIndex,
+    messageId: params.options?.messageId,
+  };
 
   // Fetch external calls
   const calls = [
-    gmpClient.searchGMP({ txHash }),
+    gmpClient.searchGMP(searchGMPParams),
     axelarscanClient.getChainConfigs(),
   ];
   const resolvedCalls = await Promise.all(calls);
@@ -86,11 +91,13 @@ export async function manualRelayToDestChain(
     ...dependencies,
     axelarQueryRpcClient,
   };
+
   const recoveryParams: RecoveryParams = {
     searchGMPData: gmpData,
     escapeAfterConfirm: params.options?.escapeAfterConfirm,
     srcChainConfig,
     destChainConfig,
+    messageId: params.options?.messageId,
   };
 
   let recoverySteps: RecoveryTxResponse[];

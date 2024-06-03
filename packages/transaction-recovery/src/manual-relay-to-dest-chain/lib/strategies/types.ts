@@ -13,4 +13,5 @@ export type RecoveryParams = {
   srcChainConfig: ChainConfig;
   destChainConfig: ChainConfig;
   escapeAfterConfirm?: boolean | undefined;
+  messageId?: string | undefined;
 };
