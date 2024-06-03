@@ -53,8 +53,8 @@ describe("deposit address client (node)", () => {
       const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
       const dummyAccount = privateKeyToAccount(generatePrivateKey());
       const otcRes: OTC = await retryGetOtc(api, dummyAccount.address);
-      const fromChain = "osmosis-7";
-      const toChain = "ethereum-2";
+      const fromChain = "ojo";
+      const toChain = "ethereum-sepolia";
       const asset = "uaxl";
 
       const signature = await dummyAccount.signMessage({
@@ -88,7 +88,7 @@ describe("deposit address client (node)", () => {
       // retry if get http error 429 (too many requests)
       const otcRes = await retryGetOtc(api, dummyAccount.address);
       const fromChain = "Fantom";
-      const toChain = "ethereum-2";
+      const toChain = "ethereum-sepolia";
       const asset = "uaxl";
 
       const signature = await dummyAccount.signMessage({
