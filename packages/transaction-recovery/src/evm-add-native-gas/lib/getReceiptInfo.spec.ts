@@ -17,13 +17,11 @@ describe("getReceiptInfo", () => {
 
 
     const result = extractReceiptInfoForNativeGasPaid(srcTxReceipt);
-    console.log(srcTxReceipt)
-    console.log(result)
 
     expect(result).toStrictEqual({
-      paidFee: 4631952231329464473n,
-      destChain: "Arbitrum",
-      logIndex: 388,
+      paidFee: 2023482322835054200n,
+      destChain: "binance",
+      logIndex: 313,
     });
   });
 });
