@@ -16,7 +16,7 @@ import * as GatewayApproveTx from "../EvmGatewayApproveTx";
 import { recoverEvmToEvm } from "./recoverEvmToEvm";
 import { recoverEvmToIbc } from "./recoverEvmToIbc";
 import { recoverIbcToEvm } from "./recoverIbcToEvm";
-import { recoverIbcToIbc } from "./recoverIbctoIbc";
+import { recoverIbcToIbc } from "./recoverIbcToIbc";
 import type { RecoveryDependencies } from "./types";
 
 export type ChainConfig = {

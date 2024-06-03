@@ -31,6 +31,14 @@ export type EvmSignerOptions = {
   rpcUrl?: string;
 };
 
+export type RecoveryTxResponse = {
+  skip: boolean;
+  type: RecoveryTxType;
+  skipReason?: string | undefined;
+  error?: string | undefined;
+  tx?: RecoveryTx | undefined;
+};
+
 export type RecoveryTxType =
   | "axelar.confirm_gateway_tx"
   | "axelar.sign_commands"
@@ -39,14 +47,6 @@ export type RecoveryTxType =
 
 export type RecoveryTx = {
   transactionHash: string;
-};
-
-export type RecoveryTxResponse = {
-  skip: boolean;
-  type: RecoveryTxType;
-  skipReason?: string | undefined;
-  error?: string | undefined;
-  tx?: RecoveryTx | undefined;
 };
 
 export type ManualRelayToDestChainResponse = {
