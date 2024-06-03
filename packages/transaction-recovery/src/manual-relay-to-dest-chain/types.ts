@@ -16,7 +16,6 @@ export type ChainConfig = {
 export type ManualRelayToDestChainOptions = {
   escapeAfterConfirm?: boolean | undefined;
   txLogIndex?: number | undefined;
-  txEventIndex?: number | undefined;
   messageId?: string | undefined;
 };
 
