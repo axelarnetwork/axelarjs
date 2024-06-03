@@ -5,8 +5,8 @@ import type {
 } from "@axelarjs/api";
 import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
-import type { RecoveryTxResponse } from "../../types";
-import { retry, type ChainConfig } from "../helper";
+import type { RecoveryTxResponse, ChainConfig } from "../../types";
+import { retry  } from "../helper";
 import { GatewayApproveError } from "./error";
 import { executeApproveTx } from "./txHelper";
 

@@ -4,7 +4,7 @@ import {
   Event_Status,
   type Event,
 } from "../../../../../proto/build/module/axelar/evm/v1beta1/types";
-import type { ChainConfig } from "../helper";
+import type { ChainConfig } from "../../types";
 
 export function isConfirmed(evmEvent: Event) {
   return (

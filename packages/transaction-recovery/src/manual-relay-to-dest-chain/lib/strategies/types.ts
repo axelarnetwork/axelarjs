@@ -2,7 +2,7 @@ import type { SearchGMPResponseData } from "@axelarjs/api";
 import type { AxelarQueryClientService } from "@axelarjs/cosmos";
 
 import type { ManualRelayToDestChainDependencies } from "../../isomorphic";
-import { type ChainConfig } from "../helper";
+import { type ChainConfig } from "../../types";
 
 export type RecoveryDependencies = ManualRelayToDestChainDependencies & {
   axelarQueryRpcClient: AxelarQueryClientService;

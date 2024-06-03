@@ -4,8 +4,7 @@ import type {
   SearchGMPResponseData,
 } from "@axelarjs/api";
 
-import type { RecoveryTxResponse } from "../../types";
-import type { ChainConfig } from "../helper";
+import type { RecoveryTxResponse, ChainConfig } from "../../types";
 import { SignCommandsError, SignCommandsSkipReason } from "./constants";
 
 export type SendAxelarSignTxParams = {
