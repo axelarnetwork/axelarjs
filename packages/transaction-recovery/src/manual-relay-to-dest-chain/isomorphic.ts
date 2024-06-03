@@ -21,6 +21,7 @@ import {
   findChainConfig,
   getRouteDir,
   isAlreadyExecuted,
+  mapRecoveryToResponse,
   mapSearchGMPResponse,
 } from "./lib/helper";
 import {
@@ -104,9 +105,5 @@ export async function manualRelayToDestChain(
     recoverySteps = await recoverIbcToIbc(recoveryParams, recoveryDeps);
   }
 
-  return {
-    success: recoverySteps.every((step) => !step.error),
-    type: dir,
-    recoverySteps,
-  };
+  return mapRecoveryToResponse(dir, recoverySteps);
 }

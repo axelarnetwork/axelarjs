@@ -57,7 +57,7 @@ export async function sendAxelarSignTx(
       skip: false,
       type: "axelar.sign_commands",
       tx: {
-        hash: tx.transactionHash,
+        transactionHash: tx.transactionHash,
       },
     };
   } catch (e) {

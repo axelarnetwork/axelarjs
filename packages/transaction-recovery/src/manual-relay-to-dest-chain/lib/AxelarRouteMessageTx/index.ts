@@ -38,7 +38,7 @@ export async function sendAxelarRouteMessageTx(
       skip: false,
       type: "axelar.route_message",
       tx: {
-        hash: tx.transactionHash,
+        transactionHash: tx.transactionHash,
       },
     };
   } catch (e) {

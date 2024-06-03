@@ -3,7 +3,12 @@ import {
   type SearchGMPResponseData,
 } from "@axelarjs/api";
 
-import { RouteDir, type RecoveryTxResponse } from "../types";
+import {
+  RouteDir,
+  type ChainConfig,
+  type ManualRelayToDestChainResponse,
+  type RecoveryTxResponse,
+} from "../types";
 
 export function getRouteDir(srcChain: ChainConfig, destChain: ChainConfig) {
   if (srcChain.chain_type === "evm" && destChain.chain_type === "evm") {
@@ -22,13 +27,6 @@ export function getRouteDir(srcChain: ChainConfig, destChain: ChainConfig) {
     return RouteDir.COSMOS_TO_COSMOS;
   }
 }
-
-export type ChainConfig = {
-  chain_type: "evm" | "cosmos";
-  id: string;
-  name: string;
-  rpcUrl?: string | undefined;
-};
 
 export function findChainConfig(
   chainConfigs: BaseChainConfigsResponse,
@@ -75,8 +73,6 @@ export function mapSearchGMPResponse(tx: SearchGMPResponseData) {
   };
 }
 
-export type RecoveryStep = Promise<RecoveryTxResponse>;
-
 export async function retry<T>(
   fn: () => Promise<T>,
   maxRetries = 5,
@@ -96,17 +92,37 @@ export async function retry<T>(
   throw error;
 }
 
-export async function processRecovery(pendingRecoverySteps: RecoveryStep[]) {
-  const responses = [];
-  for (const pendingRecoveryStep of pendingRecoverySteps) {
-    const response = await pendingRecoveryStep;
+export function mapRecoveryToResponse(
+  type: RouteDir,
+  recoverySteps: RecoveryTxResponse[]
+): ManualRelayToDestChainResponse {
+  const response: ManualRelayToDestChainResponse = {
+    success: true,
+    error: undefined,
+    logs: [],
+    type,
+  };
 
-    if (response.skip && !response.error) {
-      // retry if not error
+  for (const step of recoverySteps) {
+    if (step.type === "axelar.confirm_gateway_tx") {
+      response["confirmTx"] = step.tx;
+    } else if (step.type === "axelar.sign_commands") {
+      response["signCommandTx"] = step.tx;
+    } else if (step.type === "axelar.route_message") {
+      response["routeMessageTx"] = step.tx;
+    } else if (step.type === "evm.gateway_approve") {
+      response["gatewayApproveTx"] = step.tx;
     }
 
-    responses.push(response);
+    if (step.skip && step.skipReason) {
+      response.logs.push(`Skipping ${step.type}: ${step.skipReason}`);
+    }
+
+    if (step.error) {
+      response.success = false;
+      response.error = step.error;
+    }
   }
 
-  return responses;
+  return response;
 }

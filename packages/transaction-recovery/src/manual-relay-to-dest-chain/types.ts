@@ -6,6 +6,13 @@ export type ManualRelayToDestChainParams = {
   options?: ManualRelayToDestChainOptions;
 };
 
+export type ChainConfig = {
+  chain_type: "evm" | "cosmos";
+  id: string;
+  name: string;
+  rpcUrl?: string | undefined;
+};
+
 export type ManualRelayToDestChainOptions = {
   escapeAfterConfirm?: boolean | undefined;
   txLogIndex?: number | undefined;
@@ -32,7 +39,7 @@ export type RecoveryTxType =
   | "evm.gateway_approve";
 
 export type RecoveryTx = {
-  hash: string;
+  transactionHash: string;
 };
 
 export type RecoveryTxResponse = {
@@ -41,4 +48,15 @@ export type RecoveryTxResponse = {
   skipReason?: string | undefined;
   error?: string | undefined;
   tx?: RecoveryTx | undefined;
+};
+
+export type ManualRelayToDestChainResponse = {
+  success: boolean;
+  type: RouteDir;
+  logs: string[];
+  error?: string | undefined;
+  confirmTx?: RecoveryTx | undefined;
+  signCommandTx?: RecoveryTx | undefined;
+  routeMessageTx?: RecoveryTx | undefined;
+  gatewayApproveTx?: RecoveryTx | undefined;
 };

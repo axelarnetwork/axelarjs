@@ -95,7 +95,7 @@ export async function sendEvmGatewayApproveTx(
       skip: false,
       type: "evm.gateway_approve",
       tx: {
-        hash: transactionHash,
+        transactionHash: transactionHash,
       },
     };
   } catch (e) {

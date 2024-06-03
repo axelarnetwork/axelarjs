@@ -95,7 +95,7 @@ export async function sendAxelarConfirmTx(
       skip: false,
       type: "axelar.confirm_gateway_tx",
       tx: {
-        hash: confirmTx.transactionHash,
+        transactionHash: confirmTx.transactionHash,
       },
     };
   } catch (e) {
