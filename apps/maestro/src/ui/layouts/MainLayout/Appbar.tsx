@@ -128,7 +128,7 @@ const Appbar: FC<AppbarProps> = (props) => {
   return (
     <Navbar
       className={cn(
-        "bg-base-100 fixed top-0 z-10 px-2 transition-all md:px-6",
+        "bg-base-200 fixed top-0 z-10 px-2 transition-all md:px-6",
         {
           "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
           "z-10": isSticky && !state.isDrawerOpen,

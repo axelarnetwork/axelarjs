@@ -44,11 +44,16 @@ ModalFormInput.defaultProps = {
   $bordered: true,
 };
 
-export const NextButton: FC<ButtonProps> = ({ children, ...props }) => (
-  <Button {...props}>
-    {children} <ChevronRightIcon className={cn({ hidden: props.$loading })} />
-  </Button>
-);
+export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
+  return (
+    <Button {...props} $variant="neutral">
+      {children}
+      <ChevronRightIcon
+        className={cn({ hidden: props.$loading }, "text-indigo-600")}
+      />
+    </Button>
+  );
+};
 
 export const PrevButton: FC<ButtonProps> = ({ children, ...props }) => (
   <Button {...props}>

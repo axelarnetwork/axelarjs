@@ -65,8 +65,8 @@ export const RecentTransactionsList: FC<Props> = ({
   });
 
   return (
-    <Card className="bg-base-100 overflow-hidden rounded-xl">
-      <Card.Body className="to-base-200/90 dark:to-base-300/90 bg-base-100 bg-gradient-to-b from-transparent">
+    <Card className="bg-base-300 overflow-hidden rounded-xl">
+      <Card.Body>
         {title && (
           <Card.Title className="grid place-items-center">
             <Link
@@ -109,7 +109,7 @@ export const RecentTransactionsList: FC<Props> = ({
                 />
               ))
             )}
-            <li className="to-base-200/90 dark:to-base-300/90 sticky bottom-0 h-16 w-full bg-gradient-to-b from-transparent md:h-20" />
+            <li className="sticky bottom-0 h-16 w-full md:h-20" />
           </ul>
         </div>
       </Card.Body>
@@ -124,16 +124,16 @@ const TransactionItem: FC<{
   const humanizedElapsedTime = useHumanizedElapsedTime(tx.timestamp);
 
   return (
-    <li className="flex items-center gap-2 pl-2">
+    <li className="flex items-center gap-2 pl-2 font-mono text-gray-500">
       {(tx.event?.event === "InterchainTransfer" ||
         tx.event?.event === "InterchainTokenDeploymentStarted") && (
         <TokenIcon tokenId={tx.event.tokenId} />
       )}
-      <div>
+      <div className="pl-2">
         <div>
           <Tooltip tip="View on AxelarScan" $position="bottom">
             <Link
-              className="group inline-flex items-center text-sm font-semibold hover:underline"
+              className="group inline-flex items-center text-sm hover:underline"
               href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -146,7 +146,7 @@ const TransactionItem: FC<{
             </Link>
           </Tooltip>
         </div>
-        <div className="p-1 pb-2 text-sm">
+        <div className="text-sm">
           {tx.event && (
             <Link
               className="hover:text-primary hover:cursor-pointer"
@@ -155,7 +155,7 @@ const TransactionItem: FC<{
               {tx.event.event === "InterchainTransfer"
                 ? tx.event.name
                 : tx.event.tokenName}{" "}
-              <span className="text-neutral opacity-50 dark:text-white">
+              <span>
                 (
                 {tx.event.event === "InterchainTransfer"
                   ? tx.event.symbol
@@ -165,7 +165,7 @@ const TransactionItem: FC<{
             </Link>
           )}
         </div>
-        <div className="font-mono text-xs">{humanizedElapsedTime}</div>
+        <div className="text-xs">{humanizedElapsedTime}</div>
       </div>
     </li>
   );

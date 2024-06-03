@@ -175,7 +175,7 @@ const PackageVersionItem = ({
 
 const LayoutFooter = () => (
   <Footer
-    className="bg-neutral text-neutral-content footer p-6 md:p-8 xl:p-10"
+    className="bg-base-300 text-neutral-content footer p-6 md:p-8 xl:p-10"
     $center={true}
   >
     <div className="w-full max-w-4xl items-center justify-evenly md:flex">
