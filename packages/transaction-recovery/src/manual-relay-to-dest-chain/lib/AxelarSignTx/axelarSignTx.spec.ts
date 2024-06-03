@@ -62,7 +62,7 @@ describe("AxelarSignTx", () => {
       skip: false,
       type: "axelar.sign_commands",
       tx: {
-        hash: txHash,
+        transactionHash: txHash,
       },
     });
   });
@@ -85,7 +85,7 @@ describe("AxelarSignTx", () => {
       skip: false,
       type: "axelar.sign_commands",
       tx: {
-        hash: txHash,
+        transactionHash: txHash,
       },
     });
   });

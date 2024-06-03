@@ -130,7 +130,7 @@ describe("EvmGatewayTx", () => {
       skip: false,
       type: "evm.gateway_approve",
       tx: {
-        hash: txHash,
+        transactionHash: txHash,
       },
     });
   });

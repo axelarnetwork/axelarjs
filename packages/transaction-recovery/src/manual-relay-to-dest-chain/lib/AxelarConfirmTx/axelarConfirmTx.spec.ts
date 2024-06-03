@@ -140,6 +140,7 @@ describe("AxelarConfirmTx", () => {
       .spyOn(confirmDeps.axelarRecoveryApiClient, "confirm")
       .mockResolvedValueOnce({
         transactionHash: txHash,
+        code: 0,
       } as DeliverTxResponse);
 
     const response = await sendAxelarConfirmTx(params, confirmDeps);
@@ -148,7 +149,7 @@ describe("AxelarConfirmTx", () => {
       skip: false,
       type: "axelar.confirm_gateway_tx",
       tx: {
-        hash: txHash,
+        transactionHash: txHash,
       },
     });
     expect(mockConfirm).toHaveBeenCalledOnce();
