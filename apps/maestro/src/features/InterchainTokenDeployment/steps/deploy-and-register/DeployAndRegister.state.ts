@@ -14,11 +14,11 @@ import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hoo
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
-export type UseStep3ChainSelectionStateProps = {
+export type UseStep2ChainSelectionStateProps = {
   selectedChains: Set<string>;
 };
 
-export function useStep3ChainSelectionState() {
+export function useStep2ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const chainId = useChainId();
   const [isDeploying, setIsDeploying] = useState(false);

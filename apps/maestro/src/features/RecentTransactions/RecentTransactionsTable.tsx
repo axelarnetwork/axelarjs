@@ -1,34 +1,62 @@
-import { Card, ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
+import {
+  Card,
+  DropdownMenu,
+  ExternalLinkIcon,
+  Table,
+  Tooltip,
+} from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
+import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
-import type { Address } from "viem";
+import { useAccount } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
+import { type InterchainToken } from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import Pagination from "~/ui/components/Pagination";
 import { CONTRACT_METHODS_LABELS } from "./RecentTransactions";
-import { type ContractMethod } from "./types";
+import { CONTRACT_METHODS, type ContractMethod } from "./types";
 
 type Props = {
-  contractMethod: ContractMethod;
-  senderAddress?: Address;
+  contractMethod?: ContractMethod;
   maxTransactions?: number;
+  isTokensTable?: boolean;
 };
 
+type TokenKinds = "interchain" | "canonical" | "all";
+
 export const RecentTransactionsTable: FC<Props> = ({
-  contractMethod,
-  senderAddress,
+  contractMethod = CONTRACT_METHODS[0],
   maxTransactions = 10,
+  isTokensTable = false,
 }) => {
   const [page, setPage] = useState(0);
+  const [selectedTokenType, setSelectedTokenType] =
+    useState<TokenKinds>("interchain");
+  const { address: senderAddress } = useAccount();
 
   // reset page when contract method changes
   useEffect(() => {
     setPage(0);
   }, [contractMethod]);
+
+  const useGetInterchainTokensQuery =
+    trpc.interchainToken.getInterchainTokens.useQuery;
+  const { data: interchainDeployments, isLoading: isLoadingTokens } =
+    useGetInterchainTokensQuery(
+      {
+        limit: 20,
+        offset: 20 * page,
+        tokenType: selectedTokenType,
+      },
+      {
+        suspense: true,
+        enabled: true,
+      }
+    );
 
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery(
     {
@@ -61,7 +89,9 @@ export const RecentTransactionsTable: FC<Props> = ({
     page: page + 1,
   });
 
-  const hasNextPage = Number(nextPageTxns?.length) > 0;
+  const hasNextPage = isTokensTable
+    ? !!interchainDeployments && interchainDeployments.totalPages > page
+    : Number(nextPageTxns?.length) > 0;
   const hasPrevPage = page > 0 && Number(prevPageTxns?.length) > 0;
 
   const columns = [
@@ -72,11 +102,15 @@ export const RecentTransactionsTable: FC<Props> = ({
         "from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none",
     },
     {
-      label: "Hash",
-      accessor: "hash",
+      label: isTokensTable ? "Origin Chain" : "",
+      accessor: isTokensTable ? "axelarChainId" : "",
     },
     {
-      label: "Timestamp",
+      label: isTokensTable ? "Token Type" : "Hash",
+      accessor: isTokensTable ? "tokenType" : "hash",
+    },
+    {
+      label: "Date",
       accessor: "timestamp",
     },
   ];
@@ -108,23 +142,57 @@ export const RecentTransactionsTable: FC<Props> = ({
                 colSpan={columns.length}
                 className="text-center text-base"
               >
-                Recent{" "}
-                <span className="text-accent">
-                  {CONTRACT_METHODS_LABELS[contractMethod]}
-                </span>{" "}
-                Transactions
+                {isTokensTable ? (
+                  <span>
+                    Recently Deployed{" "}
+                    <span className="text-accent">Interchain Tokens</span>
+                  </span>
+                ) : (
+                  <>
+                    Recent{" "}
+                    <span className="text-accent">
+                      {CONTRACT_METHODS_LABELS[contractMethod]}
+                    </span>{" "}
+                    Transactions
+                  </>
+                )}
               </Table.Column>
             </Table.Row>
+            {isTokensTable && (
+              <div className="py-2 pl-4">
+                <DropdownMenu>
+                  <DropdownMenu.Trigger $size="sm" $variant="neutral">
+                    {capitalize(selectedTokenType)}
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content className="bg-base-300 rounded-xl">
+                    {["all", "canonical", "interchain"].map((kind) => (
+                      <DropdownMenu.Item key={kind}>
+                        <a
+                          onClick={setSelectedTokenType.bind(
+                            null,
+                            kind as TokenKinds
+                          )}
+                        >
+                          {capitalize(kind)}
+                        </a>
+                      </DropdownMenu.Item>
+                    ))}
+                  </DropdownMenu.Content>
+                </DropdownMenu>
+              </div>
+            )}
             <Table.Row>
-              {columns.map((column) => (
-                <Table.Column key={column.label} className={column.className}>
-                  {column.label}
-                </Table.Column>
-              ))}
+              {columns
+                .filter((column) => column.label)
+                .map((column) => (
+                  <Table.Column key={column.label} className={column.className}>
+                    {column.label}
+                  </Table.Column>
+                ))}
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {isLoading || !txns?.length ? (
+            {(isTokensTable ? isLoadingTokens : isLoading) ? (
               <Table.Row className="grid min-h-[38px] place-items-center  text-center">
                 <Table.Cell colSpan={3}>
                   {isLoading
@@ -132,10 +200,15 @@ export const RecentTransactionsTable: FC<Props> = ({
                     : "No transactions found"}
                 </Table.Cell>
               </Table.Row>
+            ) : isTokensTable ? (
+              interchainDeployments?.items.map((token) => (
+                <InterchainTokenRow key={token.tokenId} token={token} />
+              ))
             ) : (
+              txns?.length &&
               txns.map((tx, i) => (
                 <TransactionRow
-                  key={`${tx.hash}-${i}`}
+                  key={`${tx?.hash}-${i}`}
                   tx={tx}
                   contractMethod={contractMethod}
                 />
@@ -176,7 +249,7 @@ const TransactionRow: FC<{
         <Tooltip tip="View on AxelarScan" $position="bottom">
           <Link
             className="group inline-flex items-center text-sm font-semibold hover:underline"
-            href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx.hash}`}
+            href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${tx?.hash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -186,6 +259,32 @@ const TransactionRow: FC<{
         </Tooltip>
       </Table.Cell>
       <Table.Cell>{new Date(tx.timestamp * 1000).toLocaleString()}</Table.Cell>
+    </Table.Row>
+  );
+};
+
+const InterchainTokenRow: FC<{
+  token: InterchainToken;
+}> = ({ token }) => {
+  return (
+    <Table.Row>
+      <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
+        <Tooltip tip="View on Token Page" $position="bottom">
+          <Link
+            className="group inline-flex items-center text-sm font-semibold hover:underline"
+            href={`/${token.axelarChainId}/${token.tokenAddress}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {token.tokenName}&nbsp;
+            <span className="opacity-75"> ({token.tokenSymbol})</span>
+            <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+          </Link>
+        </Tooltip>
+      </Table.Cell>
+      <Table.Cell>{capitalize(token.axelarChainId)}</Table.Cell>
+      <Table.Cell>{capitalize(token.kind)}</Table.Cell>
+      <Table.Cell>{token.createdAt?.toLocaleString()}</Table.Cell>
     </Table.Row>
   );
 };

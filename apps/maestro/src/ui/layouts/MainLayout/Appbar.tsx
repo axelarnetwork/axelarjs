@@ -142,7 +142,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           onClick={actions.toggleDrawer}
           aria-label="Toggle Drawer"
           $size="sm"
-          className="hover:bg-base-300/50 active:bg-base-300 rounded-lg transition-all md:hidden"
+          className="hover:bg-base-300/50 active:bg-base-300 rounded-lg transition-all"
         >
           <MenuIcon className="h-6 w-6" />
         </Button>
@@ -182,9 +182,6 @@ const Appbar: FC<AppbarProps> = (props) => {
           </Indicator>
         </LinkButton>
       </Navbar.Start>
-      <div className="hidden flex-none md:block">
-        {isConnected && <MainMenu $direction="horizontal" />}
-      </div>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (

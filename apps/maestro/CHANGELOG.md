@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.12
+
+### Patch Changes
+
+- [#374](https://github.com/axelarnetwork/axelarjs/pull/374) [`9dc9a7fe22f04ab9d505aa877526ee40e75e386a`](https://github.com/axelarnetwork/axelarjs/commit/9dc9a7fe22f04ab9d505aa877526ee40e75e386a) Thanks [@canhtrinh](https://github.com/canhtrinh)! - adding recent deployment tab; various bugfixes
+
 ## 0.3.11
 
 ### Patch Changes
