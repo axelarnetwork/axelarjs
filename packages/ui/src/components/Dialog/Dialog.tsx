@@ -112,7 +112,7 @@ const DialogCloseAction: FC<Omit<ButtonProps, "ref">> = ({
 
 export const Dialog = Object.assign(DialogRootWithProvider, {
   Body: tw.form`modal-box`,
-  Title: tw.h2`font-bold text-xl`,
+  Title: tw.h2`font-semibold text-xl`,
   CornerCloseAction: DialogCloseAction.bind({}),
   CloseAction: DialogCloseAction.bind({}),
   Actions: tw.div`modal-action justify-between`,
