@@ -33,7 +33,7 @@ export type Menuitem =
 
 export const Content = {
   Wrapper: tw.div`space-y-6`,
-  Header: tw.header`text-primary font-bold uppercase`,
+  Header: tw.header`text-primary font-semibold uppercase`,
   Main: tw.main`space-y-4`,
   Article: tw.article`space-y-2`,
   Paragraph: tw.p`text-base`,

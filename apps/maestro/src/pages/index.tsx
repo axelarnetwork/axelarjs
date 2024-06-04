@@ -77,7 +77,7 @@ export default function HomePage() {
           </div>
           <div className="mt-4">
             <section className="my-10 space-y-4">
-              <div className="text-center text-xl font-bold">
+              <div className="text-center text-xl font-semibold">
                 {Boolean(chain) && "MY "}RECENT{" "}
                 <span className="hidden sm:inline-block">INTERCHAIN</span>{" "}
                 TRANSACTIONS

@@ -67,7 +67,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
     <section className="grid gap-4">
       <header className="flex items-center justify-between gap-2 text-2xl">
         <div className="flex items-center gap-2">
-          <span className="font-bold">{props.title}</span>
+          <span className="font-semibold">{props.title}</span>
           <span className="font-mono text-xl opacity-50">
             ({tokens.length})
           </span>

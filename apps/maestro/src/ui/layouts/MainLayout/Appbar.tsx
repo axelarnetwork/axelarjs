@@ -147,7 +147,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           <MenuIcon className="h-6 w-6" />
         </Button>
         <LinkButton
-          className="flex items-center gap-2 text-lg font-bold uppercase"
+          className="flex items-center gap-2 text-lg font-semibold uppercase"
           onClick={() => router.push("/")}
           $variant="ghost"
         >
