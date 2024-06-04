@@ -5,12 +5,18 @@ import { toAccAddress } from "@cosmjs/stargate/build/queryclient/utils";
 
 import { STANDARD_FEE } from "../../constants";
 import {
-  createAxelarSigningClient,
+  createAxelarSigningClientWithFallback,
   getAxelarSigningClientOptions,
 } from "../stargateClient";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("stargate client", () => {
+  const fallbackRpcUrls = [
+    AXELAR_RPC_URLS.testnet,
+    "https://tm.axelar-testnet.lava.build:443",
+    "https://axelartest-rpc.quickapi.com:443",
+    "https://axelar-rpc-1.staketab.org:443",
+  ];
   test("default registry", () => {
     const { registry } = getAxelarSigningClientOptions();
 
@@ -28,8 +34,8 @@ describe("stargate client", () => {
       { prefix: "axelar" }
     );
 
-    const client = await createAxelarSigningClient(
-      AXELAR_RPC_URLS.testnet,
+    const client = await createAxelarSigningClientWithFallback(
+      fallbackRpcUrls,
       offlineSigner
     );
 
@@ -66,8 +72,8 @@ describe("stargate client", () => {
       { prefix: "axelar" }
     );
 
-    const client = await createAxelarSigningClient(
-      AXELAR_RPC_URLS.testnet,
+    const client = await createAxelarSigningClientWithFallback(
+      fallbackRpcUrls,
       offlineSigner
     );
 
