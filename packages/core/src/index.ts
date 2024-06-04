@@ -59,6 +59,11 @@ export const AXELAR_RPC_URLS = {
   mainnet: "https://rpc-axelar.imperator.co",
 } as const;
 
+export const AXELAR_LCD_URLS = {
+  testnet: "https://lcd-axelar-testnet.imperator.co",
+  mainnet: "https://lcd-axelar.imperator.co",
+} as const;
+
 export type AxelarRPCUrl = keyof typeof AXELAR_RPC_URLS;
 
 export const AXELAR_RECOVERY_API_URLS = {
