@@ -1,4 +1,4 @@
-import { AXELAR_LCD_URLS, AXELAR_RPC_URLS } from "@axelarjs/core";
+import { AXELAR_LCD_URLS, AXELAR_RPC_URLS_FALLBACK } from "@axelarjs/core";
 import type { LinkResponse } from "@axelarjs/proto/axelar/evm/v1beta1/tx";
 
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
@@ -11,18 +11,9 @@ import { RpcImpl } from "../rpcImpl";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
 describe("rpc client", () => {
-  const fallbackRpcUrls = [
-    AXELAR_RPC_URLS.testnet,
-    "https://tm.axelar-testnet.lava.build:443",
-    "https://axelartest-rpc.quickapi.com:443",
-    "https://axelar-rpc-1.staketab.org:443",
-  ];
-  const fallbackLcdUrls = [
-    AXELAR_LCD_URLS.testnet,
-    "https://rest.axelar-testnet.lava.build",
-    "https://axelartest-lcd.quickapi.com",
-    "https://axelar-rest-1.staketab.org",
-  ];
+  const fallbackRpcUrls =
+    AXELAR_RPC_URLS_FALLBACK.testnet as unknown as string[];
+  const fallbackLcdUrls = AXELAR_LCD_URLS.testnet as unknown as string[];
 
   test("broadcast link transaction with rpc client implementation", async () => {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(

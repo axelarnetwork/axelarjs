@@ -59,9 +59,43 @@ export const AXELAR_RPC_URLS = {
   mainnet: "https://rpc-axelar.imperator.co",
 } as const;
 
+export type AxelarRPCUrlFallback = typeof AXELAR_RPC_URLS_FALLBACK;
+
+export const AXELAR_RPC_URLS_FALLBACK = {
+  testnet: [
+    AXELAR_RPC_URLS.testnet,
+    "https://tm.axelar-testnet.lava.build:443",
+    "https://axelartest-rpc.quickapi.com:443",
+    "https://axelar-rpc-1.staketab.org:443",
+  ],
+  mainnet: [
+    AXELAR_RPC_URLS.mainnet,
+    "https://tm.axelar.lava.build",
+    "https://rpc-axelar.imperator.co",
+    "https://axelar-rpc.quickapi.com:443",
+  ],
+} as const;
+
 export const AXELAR_LCD_URLS = {
   testnet: "https://lcd-axelar-testnet.imperator.co",
   mainnet: "https://lcd-axelar.imperator.co",
+} as const;
+
+export type AxelarLCDUrlFallback = typeof AXELAR_LCD_URLS_FALLBACK;
+
+export const AXELAR_LCD_URLS_FALLBACK = {
+  testnet: [
+    AXELAR_LCD_URLS.testnet,
+    "https://tm.axelar-testnet.lava.build:1317",
+    "https://axelartest-lcd.quickapi.com:443",
+    "https://axelar-lcd-1.staketab.org:443",
+  ],
+  mainnet: [
+    AXELAR_LCD_URLS.mainnet,
+    "https://tm.axelar.lava.build:1317",
+    "https://lcd-axelar.imperator.co",
+    "https://axelar-lcd.quickapi.com:443",
+  ],
 } as const;
 
 export type AxelarRPCUrl = keyof typeof AXELAR_RPC_URLS;
