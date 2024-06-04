@@ -126,6 +126,29 @@ export class AxelarSigningStargateClient extends SigningStargateClient {
       tmClient !== undefined ? createQueryClient(tmClient) : undefined;
   }
 
+  static async connectToFirstAvailable(
+    endpoints: (string | HttpEndpoint)[],
+    offlineSigner?: OfflineSigner | undefined,
+    options: StargateClientOptions = {}
+  ) {
+    let tmClient: Tendermint37Client | undefined;
+
+    for (const endpoint of endpoints) {
+      try {
+        tmClient = await Tendermint37Client.connect(endpoint);
+        break;
+      } catch (error) {
+        // no-op
+      }
+    }
+
+    if (!tmClient) {
+      throw new Error("Failed to connect to any of the provided endpoints");
+    }
+
+    return new this(tmClient, offlineSigner || ({} as OfflineSigner), options);
+  }
+
   static override async connect(
     endpoint: string | HttpEndpoint,
     options: StargateClientOptions = {}
@@ -201,8 +224,26 @@ export async function createAxelarQueryClient(
   return client.query as AxelarQueryClient;
 }
 
+export async function createAxelarQueryClientWithFallback(
+  endpoints: (string | HttpEndpoint)[],
+  options: StargateClientOptions = {}
+) {
+  const client = await AxelarSigningStargateClient.connectToFirstAvailable(
+    endpoints,
+    undefined,
+    options
+  );
+
+  return client.query as AxelarQueryClient;
+}
+
 export const createAxelarSigningClient =
   AxelarSigningStargateClient.connectWithSigner.bind(
+    AxelarSigningStargateClient
+  );
+
+export const createAxelarSigningClientWithFallback =
+  AxelarSigningStargateClient.connectToFirstAvailable.bind(
     AxelarSigningStargateClient
   );
 
