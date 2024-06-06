@@ -1,6 +1,6 @@
 import {
   Alert,
-  AnimatedBlobBackground,
+  AnimatedBackground,
   Badge,
   Button,
   Card,
@@ -21,7 +21,6 @@ import tw from "@axelarjs/ui/tw";
 import React, { useEffect, type FC, type PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { ErrorBoundary, type FallbackRender } from "@sentry/nextjs";
@@ -44,10 +43,8 @@ import { BOTTOM_MENU_ITEMS } from "./MainMenu";
 import SignInModal from "./SignInModal";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
-  const router = useRouter();
   const theme = useTheme();
   const { setThemeMode } = useWeb3ModalTheme();
-
   const { data: globalMessage } = trpc.messages.getGlobalMessage.useQuery();
 
   // sync theme with web3modal
@@ -75,62 +72,63 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      {/* only render when route path is / */}
-      {router.pathname === "/" && <AnimatedBlobBackground />}
-      <Drawer>
-        <Drawer.Toggle
-          checked={isDrawerOpen}
-          name="drawer-toggle"
-          aria-label="toggle drawer"
-        />
-        <Drawer.Content
-          className={cn(
-            "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
-            {
-              "pointer-events-none": isSignInModalOpen,
-            }
-          )}
-        >
-          {globalMessage && !isGlobalBannerDismissed && (
-            <div
-              role="alert"
-              className="bg-warning text-warning-content sticky top-0 z-20 p-4 px-8 text-center"
-            >
-              <Markdown>{globalMessage.content}</Markdown>
-
-              <Tooltip
-                tip="Dismiss this messages"
-                className="text-error absolute right-4 top-4"
-                $position="left"
+      {theme === "dark" && <AnimatedBackground />}
+      <div className="relative z-10">
+        <Drawer>
+          <Drawer.Toggle
+            checked={isDrawerOpen}
+            name="drawer-toggle"
+            aria-label="toggle drawer"
+          />
+          <Drawer.Content
+            className={cn(
+              "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
+              {
+                "pointer-events-none": isSignInModalOpen,
+              }
+            )}
+          >
+            {globalMessage && !isGlobalBannerDismissed && (
+              <div
+                role="alert"
+                className="bg-warning text-warning-content sticky top-0 z-20 p-4 px-8 text-center"
               >
-                <button onClick={actions.dismissGlobalBanner}>
-                  <XCircleIcon />
-                </button>
-              </Tooltip>
-            </div>
-          )}
-          <Appbar />
+                <Markdown>{globalMessage.content}</Markdown>
 
-          <ErrorBoundary fallback={ErrorBoundaryFallback}>
-            {children}
-          </ErrorBoundary>
+                <Tooltip
+                  tip="Dismiss this messages"
+                  className="text-error absolute right-4 top-4"
+                  $position="left"
+                >
+                  <button onClick={actions.dismissGlobalBanner}>
+                    <XCircleIcon />
+                  </button>
+                </Tooltip>
+              </div>
+            )}
+            <Appbar />
 
-          <LayoutFooter />
+            <ErrorBoundary fallback={ErrorBoundaryFallback}>
+              {children}
+            </ErrorBoundary>
 
-          {shouldRenderTestnetBanner && (
-            <TestnetBanner onClose={actions.dismissTestnetBanner} />
-          )}
-          {isSignInModalOpen && (
-            <SignInModal isSignedIn={isSignedIn} signInError={signInError} />
-          )}
-        </Drawer.Content>
-        <Drawer.Side>
-          <Drawer.Overlay onClick={actions.closeDrawer} />
-          <aside className="bg-base-100 text-base-content h-full w-full max-w-xs p-4">
-            <DrawerSideContent />
-          </aside>
-        </Drawer.Side>
-      </Drawer>
+            <LayoutFooter />
+
+            {shouldRenderTestnetBanner && (
+              <TestnetBanner onClose={actions.dismissTestnetBanner} />
+            )}
+            {isSignInModalOpen && (
+              <SignInModal isSignedIn={isSignedIn} signInError={signInError} />
+            )}
+          </Drawer.Content>
+          <Drawer.Side>
+            <Drawer.Overlay onClick={actions.closeDrawer} />
+            <aside className="bg-base-100 text-base-content h-full w-full max-w-xs p-4">
+              <DrawerSideContent />
+            </aside>
+          </Drawer.Side>
+        </Drawer>
+      </div>
     </>
   );
 };
