@@ -147,7 +147,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           <MenuIcon className="h-6 w-6" />
         </Button>
         <LinkButton
-          className="flex items-center gap-2 text-lg font-semibold uppercase"
+          className="text-md flex items-center gap-2 font-semibold uppercase sm:text-lg"
           onClick={() => router.push("/")}
           $variant="ghost"
         >
@@ -165,7 +165,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                 $size="xs"
                 $variant="success"
                 $position="bottom"
-                className="translate-x-2 translate-y-2 lowercase"
+                className="translate-x-2 translate-y-4 lowercase sm:translate-y-2"
               >
                 {NEXT_PUBLIC_NETWORK_ENV}
               </Indicator.Item>

@@ -146,7 +146,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                   tabIndex={-1}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-700 dark:text-white">
+                    <span className="hidden text-gray-700 md:block dark:text-white">
                       Selected Chain
                     </span>
                     <Tooltip
@@ -157,7 +157,11 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                         operate in controlled mode
                     */}
                       <div className="flex items-center">
-                        <EVMChainIcon hideLabel selectedChain={defaultChain} />
+                        <EVMChainIcon
+                          size="md"
+                          hideLabel
+                          selectedChain={defaultChain}
+                        />
                       </div>
                     </Tooltip>
                   </div>

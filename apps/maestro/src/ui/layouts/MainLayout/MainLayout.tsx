@@ -72,7 +72,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      {theme === "dark" && <AnimatedBackground />}
+      {theme === "dark" ? (
+        <AnimatedBackground />
+      ) : (
+        <div className="fixed-bg-light" />
+      )}
       <div className="relative z-10">
         <Drawer>
           <Drawer.Toggle
@@ -147,7 +151,7 @@ WithProvider.displayName = "MainLayout";
 
 export default WithProvider;
 
-const VersionBadge = tw(Badge)`join-item hover:text-primary text-xs`;
+const VersionBadge = tw(Badge)`join-item hover:text-orange-600 text-xs`;
 
 const PackageVersionItem = ({
   name = "",
@@ -183,7 +187,7 @@ const LayoutFooter = () => (
             {item.kind === "link" ? (
               <Link
                 href={item.href}
-                className="hover:text-accent inline-flex items-center gap-1 hover:underline lg:uppercase"
+                className="inline-flex items-center gap-1 hover:text-orange-600 hover:underline lg:uppercase"
                 rel={item.external ? "noopener noreferrer" : undefined}
                 target={item.external ? "_blank" : undefined}
               >
@@ -198,7 +202,7 @@ const LayoutFooter = () => (
                   trigger={
                     <a
                       role="button"
-                      className="hover:text-accent cursor-pointer hover:underline lg:uppercase"
+                      className="cursor-pointer hover:text-orange-600 hover:underline lg:uppercase"
                       onClick={(e) => e.preventDefault()}
                     >
                       {item.label}

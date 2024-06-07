@@ -139,7 +139,7 @@ const TransactionItem: FC<{
               rel="noopener noreferrer"
             >
               {maskAddress(tx.hash, {
-                segmentA: 12,
+                segmentA: 8,
                 segmentB: 52,
               })}{" "}
               <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
