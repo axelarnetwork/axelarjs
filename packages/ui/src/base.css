@@ -38,6 +38,14 @@
   .delay-4000 {
     animation-delay: 4s;
   }
+
+  .fixed-bg-light {
+    @apply fixed inset-0 z-[-1] h-full w-full object-cover;
+    background-image: url("/gridbg.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
 }
 
 @layer base {
