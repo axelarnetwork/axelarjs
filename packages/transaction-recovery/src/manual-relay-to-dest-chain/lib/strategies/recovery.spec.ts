@@ -177,7 +177,7 @@ describe("recovery", () => {
     ]);
   });
 
-  test("recoveryEvmToIbc should return [confirm, sign, route] response", async () => {
+  test("recoveryEvmToIbc should return [confirm, route] response", async () => {
     const params = {
       searchGMPData: searchGMPData as SearchGMPResponseData,
       srcChainConfig,
@@ -190,13 +190,7 @@ describe("recovery", () => {
         transactionHash: hashMessage("tx"),
       },
     };
-    const mockSignTx = {
-      skip: false,
-      type: "axelar.sign_commands" as const,
-      tx: {
-        transactionHash: hashMessage("tx"),
-      },
-    };
+
     const mockRouteTx = {
       skip: false,
       type: "axelar.route_message" as const,
@@ -207,14 +201,13 @@ describe("recovery", () => {
     vitest
       .spyOn(ConfirmTx, "sendAxelarConfirmTx")
       .mockResolvedValueOnce(mockConfirmTx);
-    vitest.spyOn(SignTx, "sendAxelarSignTx").mockResolvedValueOnce(mockSignTx);
     vitest
       .spyOn(RouteTx, "sendAxelarRouteMessageTx")
       .mockResolvedValueOnce(mockRouteTx);
 
     const result = await recoverEvmToIbc(params, deps);
 
-    expect(result).toEqual([mockConfirmTx, mockSignTx, mockRouteTx]);
+    expect(result).toEqual([mockConfirmTx, mockRouteTx]);
   });
 
   test("recoverIbcToEvm: should return [route, sign, gateway approve] response", async () => {

@@ -1,6 +1,5 @@
 import {
   sendAxelarRouteMessageTx,
-  sendAxelarSignTx,
   shouldAbortRecovery,
   type RecoveryDependencies,
   type RecoveryParams,
@@ -17,13 +16,7 @@ export async function recoverEvmToIbc(
     return [confirmResponse];
   }
 
-  const signTxResponse = await sendAxelarSignTx(params, deps);
-
-  if (shouldAbortRecovery(signTxResponse)) {
-    return [confirmResponse, signTxResponse];
-  }
-
   const routeMessageTxResponse = await sendAxelarRouteMessageTx(params, deps);
 
-  return [confirmResponse, signTxResponse, routeMessageTxResponse];
+  return [confirmResponse, routeMessageTxResponse];
 }
