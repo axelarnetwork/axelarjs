@@ -198,6 +198,7 @@ export type SearchBatchesData = {
   command_ids: string[];
   batch_id: string;
   id: string;
+  status: string;
   execute_data: string;
   chain: string;
   commands: SearchBatchesCommands[];

@@ -38,8 +38,12 @@ export async function sendEvmGatewayApproveTx(
       sourceTransactionHash,
     });
 
-    if (batchedCommands.data.length === 0) {
-      throw new Error("batched commands not found. retrying...");
+    if (
+      batchedCommands.data.length === 0 ||
+      batchedCommands.data[0]?.command_ids.length === 0 ||
+      batchedCommands.data[0]?.status !== "BATCHED_COMMANDS_STATUS_SIGNED"
+    ) {
+      throw new Error("Batched commands not signed. Retrying...");
     }
 
     return batchedCommands;
