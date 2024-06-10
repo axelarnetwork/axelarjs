@@ -19,7 +19,7 @@ import {
   Event_Status,
 } from "../../../../../proto/build/module/axelar/evm/v1beta1/types";
 import { ConfirmGatewayTxError } from "./error";
-import * as Qualifier from "./qualifier";
+import * as Qualifier from "./verifier";
 
 describe("AxelarConfirmTx", () => {
   const environment = "testnet";
