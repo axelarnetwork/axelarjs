@@ -32,34 +32,34 @@ export async function sendEvmGatewayApproveTx(
     };
   }
 
-  const batchResponse = await retry(async () => {
-    const batchedCommands = await axelarscanClient.searchBatchedCommands({
-      commandId,
-      sourceTransactionHash,
+  try {
+    const batchResponse = await retry(async () => {
+      const batchedCommands = await axelarscanClient.searchBatchedCommands({
+        commandId,
+        sourceTransactionHash,
+      });
+
+      if (
+        batchedCommands.data.length === 0 ||
+        batchedCommands.data[0]?.command_ids.length === 0 ||
+        batchedCommands.data[0]?.status !== "BATCHED_COMMANDS_STATUS_SIGNED"
+      ) {
+        throw new Error("Cannot find batched commands or not signed yet.");
+      }
+
+      return batchedCommands;
     });
 
-    if (
-      batchedCommands.data.length === 0 ||
-      batchedCommands.data[0]?.command_ids.length === 0 ||
-      batchedCommands.data[0]?.status !== "BATCHED_COMMANDS_STATUS_SIGNED"
-    ) {
-      throw new Error("Batched commands not signed. Retrying...");
+    const executeData = batchResponse.data[0]?.execute_data;
+
+    if (!executeData) {
+      return {
+        skip: true,
+        type: "evm.gateway_approve",
+        error: GatewayApproveError.EXECUTE_DATA_NOT_FOUND.message,
+      };
     }
 
-    return batchedCommands;
-  });
-
-  const executeData = batchResponse.data[0]?.execute_data;
-
-  if (!executeData) {
-    return {
-      skip: true,
-      type: "evm.gateway_approve",
-      error: GatewayApproveError.EXECUTE_DATA_NOT_FOUND.message,
-    };
-  }
-
-  try {
     const transactionHash = await executeApproveTx(
       rpcUrl,
       executeData,

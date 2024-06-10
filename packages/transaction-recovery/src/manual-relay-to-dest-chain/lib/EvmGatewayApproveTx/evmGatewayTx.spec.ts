@@ -13,9 +13,10 @@ import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 import { hashMessage, zeroAddress } from "viem";
 
 import { type SendEvmGatewayApproveTxDependencies } from ".";
+import * as Helper from "../helper";
 import { GatewayApproveError } from "./error";
-import * as EvmClient from "./txHelper";
 import { sendEvmGatewayApproveTx } from "./index";
+import * as EvmClient from "./txHelper";
 
 describe("EvmGatewayTx", () => {
   const environment = "testnet";
@@ -97,7 +98,9 @@ describe("EvmGatewayTx", () => {
       .mockResolvedValueOnce({
         data: [
           {
+            command_ids: ["0x1"],
             execute_data: "",
+            status: "BATCHED_COMMANDS_STATUS_SIGNED",
           } as any,
         ],
       });
@@ -111,6 +114,34 @@ describe("EvmGatewayTx", () => {
     });
   });
 
+  test("should returns error if reach max retries for search batch commands", async () => {
+    const maxRetriesError = new Error("max retries");
+    vitest
+      .spyOn(approveGatewayDeps.axelarQueryRpcClient.evm, "GatewayAddress")
+      .mockResolvedValueOnce({ address: destGatewayAddress });
+    vitest
+      .spyOn(deps.axelarscanClient, "searchBatchedCommands")
+      .mockResolvedValueOnce({
+        data: [
+          {
+            commands_ids: ["0x1"],
+            execute_data: "",
+            status: "UNKNOWN",
+          } as any,
+        ],
+      });
+
+    vitest.spyOn(Helper, "retry").mockRejectedValueOnce(maxRetriesError);
+
+    const response = await sendEvmGatewayApproveTx(params, approveGatewayDeps);
+
+    expect(response).toMatchObject({
+      skip: true,
+      type: "evm.gateway_approve",
+      error: GatewayApproveError.FAILED_TX(maxRetriesError).message,
+    });
+  });
+
   test("should send approve gateway tx if executeData is found", async () => {
     vitest
       .spyOn(approveGatewayDeps.axelarQueryRpcClient.evm, "GatewayAddress")
@@ -121,6 +152,8 @@ describe("EvmGatewayTx", () => {
         data: [
           {
             execute_data: "0x",
+            command_ids: ["0x1"],
+            status: "BATCHED_COMMANDS_STATUS_SIGNED",
           } as any,
         ],
       });
