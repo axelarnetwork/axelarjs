@@ -1,6 +1,7 @@
 import {
   sendAxelarSignTx,
   sendEvmGatewayApproveTx,
+  shouldAbortRecovery,
   type RecoveryDependencies,
   type RecoveryParams,
 } from "..";
@@ -12,16 +13,13 @@ export async function recoverEvmToEvm(
 ) {
   const confirmResponse = await sendAxelarConfirmTx(params, deps);
 
-  if (
-    (confirmResponse.skip && confirmResponse.error) ||
-    params.escapeAfterConfirm
-  ) {
+  if (shouldAbortRecovery(confirmResponse) || params.escapeAfterConfirm) {
     return [confirmResponse];
   }
 
   const signResponse = await sendAxelarSignTx(params, deps);
 
-  if (signResponse.skip && signResponse.error) {
+  if (shouldAbortRecovery(signResponse)) {
     return [confirmResponse, signResponse];
   }
 

@@ -92,6 +92,10 @@ export async function retry<T>(
   throw error;
 }
 
+export function shouldAbortRecovery(recoveryTx: RecoveryTxResponse) {
+  return recoveryTx.skip && recoveryTx.error;
+}
+
 export function mapRecoveryToResponse(
   type: RouteDir,
   recoverySteps: RecoveryTxResponse[]
