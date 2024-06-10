@@ -1,5 +1,6 @@
 import type { SendAxelarSignTxDependencies, SendAxelarSignTxParams } from ".";
 import type { RecoveryTxResponse } from "../../types";
+import { retry } from "../helper";
 import { SignCommandsError, SignCommandsSkipReason } from "./constants";
 
 export async function sendAxelarSignTx(
@@ -11,14 +12,21 @@ export async function sendAxelarSignTx(
   const chainId = params.srcChainConfig.id;
 
   try {
-    const batchedCommands = await deps.axelarscanClient
-      .searchBatchedCommands({
+    // Trying to find batched commands first, if found, skip signing
+    const batchedCommands = await retry(async () => {
+      const response = await deps.axelarscanClient.searchBatchedCommands({
         commandId,
         sourceTransactionHash,
-      })
-      .catch(() => ({ data: [] }));
+      });
 
-    // If there are batched commands, skip signing
+      return response;
+    }).catch(() => {
+      return {
+        data: [],
+      };
+    });
+
+    // batch commands already signed
     if (batchedCommands?.data.length > 0) {
       return {
         skip: true,
