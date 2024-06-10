@@ -102,7 +102,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidAddress && search.length >= 10);
 
   return (
-    <FormControl className="relative w-full max-w-xs md:max-w-md">
+    <FormControl className="relative z-10 w-full max-w-xs md:max-w-md">
       <div className="pb-2 text-center font-semibold">
         TAKE YOUR TOKEN INTERCHAIN
       </div>
