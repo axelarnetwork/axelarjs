@@ -10,23 +10,23 @@ export async function sendAxelarSignTx(
   const sourceTransactionHash = params.searchGMPData.call.transactionHash;
   const chainId = params.srcChainConfig.id;
 
-  const batchedCommands = await deps.axelarscanClient
-    .searchBatchedCommands({
-      commandId,
-      sourceTransactionHash,
-    })
-    .catch(() => ({ data: [] }));
-
-  // If there are batched commands, skip signing
-  if (batchedCommands?.data.length > 0) {
-    return {
-      skip: true,
-      type: "axelar.sign_commands",
-      skipReason: SignCommandsSkipReason.ALREADY_EXECUTED,
-    };
-  }
-
   try {
+    const batchedCommands = await deps.axelarscanClient
+      .searchBatchedCommands({
+        commandId,
+        sourceTransactionHash,
+      })
+      .catch(() => ({ data: [] }));
+
+    // If there are batched commands, skip signing
+    if (batchedCommands?.data.length > 0) {
+      return {
+        skip: true,
+        type: "axelar.sign_commands",
+        skipReason: SignCommandsSkipReason.ALREADY_EXECUTED,
+      };
+    }
+
     const tx = await deps.axelarRecoveryApiClient.signCommands(chainId, "evm");
 
     if (tx.code !== 0) {
