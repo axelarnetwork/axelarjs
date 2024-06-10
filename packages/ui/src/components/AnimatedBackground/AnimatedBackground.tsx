@@ -9,6 +9,7 @@ export const AnimatedBackground: FC = () => {
         autoPlay
         muted
         loop
+        playsInline
         id="bg-video"
         className="fixed inset-0 z-[-1] h-full w-full object-cover"
       >
