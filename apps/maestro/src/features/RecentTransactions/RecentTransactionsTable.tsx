@@ -1,10 +1,4 @@
-import {
-  Card,
-  DropdownMenu,
-  ExternalLinkIcon,
-  Table,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Card, ExternalLinkIcon, Table, Tabs, Tooltip } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
@@ -34,8 +28,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   isTokensTable = false,
 }) => {
   const [page, setPage] = useState(0);
-  const [selectedTokenType, setSelectedTokenType] =
-    useState<TokenKinds>("interchain");
+  const [selectedTokenType, setSelectedTokenType] = useState<TokenKinds>("all");
   const { address: senderAddress } = useAccount();
 
   // reset page when contract method changes
@@ -135,6 +128,19 @@ export const RecentTransactionsTable: FC<Props> = ({
   return (
     <Card className="bg-base-300 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
       <Card.Body>
+        {isTokensTable && (
+          <Tabs $boxed>
+            {["all", "canonical", "interchain"].map((kind) => (
+              <Tabs.Tab
+                key={kind}
+                onClick={setSelectedTokenType.bind(null, kind as TokenKinds)}
+                active={selectedTokenType === kind}
+              >
+                {capitalize(kind)}
+              </Tabs.Tab>
+            ))}
+          </Tabs>
+        )}
         <Table className="relative space-y-4" $zebra>
           <Table.Head>
             <Table.Row>
@@ -158,29 +164,7 @@ export const RecentTransactionsTable: FC<Props> = ({
                 )}
               </Table.Column>
             </Table.Row>
-            {isTokensTable && (
-              <div className="py-2 pl-4">
-                <DropdownMenu>
-                  <DropdownMenu.Trigger $size="sm" $variant="neutral">
-                    {capitalize(selectedTokenType)}
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Content className="bg-base-300 rounded-xl">
-                    {["all", "canonical", "interchain"].map((kind) => (
-                      <DropdownMenu.Item key={kind}>
-                        <a
-                          onClick={setSelectedTokenType.bind(
-                            null,
-                            kind as TokenKinds
-                          )}
-                        >
-                          {capitalize(kind)}
-                        </a>
-                      </DropdownMenu.Item>
-                    ))}
-                  </DropdownMenu.Content>
-                </DropdownMenu>
-              </div>
-            )}
+
             <Table.Row>
               {columns
                 .filter((column) => column.label)
