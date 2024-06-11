@@ -1,5 +1,18 @@
 # @axelarjs/maestro
 
+## 0.3.13
+
+### Patch Changes
+
+- [#363](https://github.com/axelarnetwork/axelarjs/pull/363) [`234f9255090a7bc735b9229d380ab1725b2f0946`](https://github.com/axelarnetwork/axelarjs/commit/234f9255090a7bc735b9229d380ab1725b2f0946) Thanks [@npty](https://github.com/npty)! - - Added `manualRelayToDestChain` function in the `@axelarjs/transaction-recovery` module for enhanced transaction recovery capabilities.
+  - Added `searchBatchedCommands` query for the Axelarscan client in the `@axelarjs/api` module.
+  - Added Axelar Recovery client to facilitate server-side signing of Axelar transactions in the `@axelarjs/api` module.
+  - Added `AXELAR_LCD_URLS` to `@axelarjs/core` module.
+  - Added `connectToFirstAvailable` function to allow passing multiple rpc urls and connect to first available node in the `@axelarjs/cosmos` module.
+- Updated dependencies [[`234f9255090a7bc735b9229d380ab1725b2f0946`](https://github.com/axelarnetwork/axelarjs/commit/234f9255090a7bc735b9229d380ab1725b2f0946)]:
+  - @axelarjs/api@0.4.0
+  - @axelarjs/core@0.2.11
+
 ## 0.3.12
 
 ### Patch Changes
