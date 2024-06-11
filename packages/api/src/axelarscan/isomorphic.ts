@@ -9,6 +9,7 @@ import type {
   LinkEvent,
   LinkRequestRawResponse,
   LinkRequestResponse,
+  SearchBatchesResponse,
 } from "./types";
 
 export type AxelarApiParams<T extends Record<string, unknown>> = T & {
@@ -64,6 +65,22 @@ export class AxelarscanClient extends RestService {
   async searchTransactions(params: { size: number; type: string }) {
     const path = `/validator/searchTransactions?size=${params.size}&type=${params.type}`;
     return await this.client.get(path).json<LinkRequestRawResponse>();
+  }
+
+  async searchBatchedCommands(params: {
+    commandId?: string | undefined;
+    sourceTransactionHash?: string | undefined;
+  }) {
+    const json = {
+      commandId: params.commandId,
+      sourceTransactionHash: params.sourceTransactionHash,
+    };
+
+    const result = await this.client
+      .post("token/searchBatches", { json })
+      .json<SearchBatchesResponse>();
+
+    return result;
   }
 
   async getRecentLinkTransactions(params: {

@@ -12,9 +12,9 @@ import { extractReceiptInfoForNativeGasPaid } from "./lib/getReceiptInfo";
 import {
   calculateNativeGasFee,
   getGasServiceAddressFromChainConfig,
-  getWalletClient,
   isInsufficientFeeTx,
 } from "./lib/helper";
+import { getWalletClient } from "../common/client";
 import { EvmAddNativeGasParams } from "./types";
 
 export type EvmAddNativeGasDependencies = {

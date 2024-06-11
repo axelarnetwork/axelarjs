@@ -10,3 +10,5 @@ export * from "./axelar-config";
 export * from "./deposit-address";
 // deposit-service
 export * from "./deposit-service";
+// axelar-recovery
+export * from "./axelar-recovery";
