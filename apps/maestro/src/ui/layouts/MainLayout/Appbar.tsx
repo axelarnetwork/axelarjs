@@ -113,11 +113,11 @@ const Appbar: FC<AppbarProps> = (props) => {
               <ConnectWalletButton />
             )}
           </>
-          <div className="absolute right-4 top-6">
-            <ThemeSwitcher />
-          </div>
           <div className="flex-1" />
           {isConnected && <MainMenu />}
+          <div className="flex justify-end">
+            <ThemeSwitcher />
+          </div>
         </div>
       ));
     },
