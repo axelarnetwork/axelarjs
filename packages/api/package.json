@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.3.15",
+  "version": "0.4.0",
   "publishConfig": {
     "access": "public"
   },
