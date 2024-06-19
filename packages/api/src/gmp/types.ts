@@ -274,7 +274,7 @@ export type SearchGMPResponseData = {
   time_spent: number;
   gas_paid: SearchGMPGasPaid;
   gas_status: SearchGMPGasStatus;
-  express_executed?: SearchGMPExecuted;
+  express_executed?: SearchGMPExpressExecuted;
   express_executing_at?: number;
   approved: SearchGMPApprove;
   command_id?: string;
