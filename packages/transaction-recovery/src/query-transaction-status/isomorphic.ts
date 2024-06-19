@@ -4,6 +4,7 @@ import type {
   QueryTransactionStatusDependencies,
   QueryTransactionStatusError,
   QueryTransactionStatusParams,
+  QueryTransactionStatusResult,
 } from "./types";
 
 function parseTxError(
@@ -30,7 +31,7 @@ function parseTxError(
 export async function queryTransactionStatus(
   params: QueryTransactionStatusParams,
   dependencies: QueryTransactionStatusDependencies
-) {
+): Promise<QueryTransactionStatusResult> {
   const { txHash, txLogIndex } = params;
   const { gmpClient } = dependencies;
 
@@ -41,7 +42,8 @@ export async function queryTransactionStatus(
 
   if (txs.length === 0) {
     return {
-      status: "transaction not found",
+      success: false,
+      error: "Transaction not found",
     };
   }
 
@@ -53,22 +55,27 @@ export async function queryTransactionStatus(
     gas_status,
     gas_paid,
     executed,
-    express_executed,
-    approved,
     time_spent,
+    express_executed,
+    express_executing_at,
+    approved,
   } = firstTx;
 
   return {
-    status,
-    error: parseTxError(firstTx),
-    timeSpent: time_spent,
-    gasPaidInfo: {
-      status: gas_status,
-      details: gas_paid,
+    success: true,
+    data: {
+      status,
+      error: parseTxError(firstTx),
+      timeSpent: time_spent,
+      gasPaidInfo: {
+        status: gas_status,
+        details: gas_paid,
+      },
+      callTx: call,
+      executed,
+      expressExecuted: express_executed,
+      expressExecutedAt: express_executing_at,
+      approved,
     },
-    callTx: call,
-    executed,
-    expressExecuted: express_executed,
-    approved,
   };
 }

@@ -271,7 +271,7 @@ export type SearchGMPResponseData = {
   status: GMPTxStatus;
   executed?: SearchGMPExecuted;
   error?: SearchGMPDataError;
-  time_spent: number;
+  time_spent: SearchGMPTimespent;
   gas_paid: SearchGMPGasPaid;
   gas_status: SearchGMPGasStatus;
   express_executed?: SearchGMPExpressExecuted;
@@ -285,6 +285,14 @@ export type SearchGMPResponseData = {
   interchain_transfer?: InterchainTransferEvent;
   interchain_token_deployment_started?: InterchainTokenDeploymentStartedEvent;
   token_manager_deployment_started?: TokenManagerDeploymentStartedEvent;
+};
+
+export type SearchGMPTimespent = {
+  call_express_executed?: number;
+  call_confirm?: number;
+  call_approve?: number;
+  approved_executed?: number;
+  total: number;
 };
 
 export type SearchGMPExpressExecuted = {

@@ -7,6 +7,7 @@ import type {
   SearchGMPExpressExecuted,
   SearchGMPGasPaid,
   SearchGMPGasStatus,
+  SearchGMPTimespent,
 } from "@axelarjs/api";
 import type { Environment } from "@axelarjs/core";
 
@@ -21,18 +22,22 @@ export type QueryTransactionStatusDependencies = {
 };
 
 export type QueryTransactionStatusResult = {
-  status: GMPTxStatus;
-  error?: QueryTransactionStatusError;
-  timeSpent: number;
-  gasPaidInfo: {
-    status: SearchGMPGasStatus;
-    details: SearchGMPGasPaid;
+  success: boolean;
+  error?: string;
+  data?: {
+    status: GMPTxStatus;
+    error?: QueryTransactionStatusError | undefined;
+    timeSpent: SearchGMPTimespent;
+    gasPaidInfo: {
+      status: SearchGMPGasStatus;
+      details: SearchGMPGasPaid;
+    };
+    callTx: SearchGMPCall;
+    executed?: SearchGMPExecuted | undefined;
+    expressExecuted?: SearchGMPExpressExecuted | undefined;
+    expressExecutedAt?: number | undefined;
+    approved?: SearchGMPApprove | undefined;
   };
-  callTx: SearchGMPCall;
-  executed: SearchGMPExecuted;
-  expressExecuted: SearchGMPExpressExecuted;
-  expressExecutedAt: number;
-  approved: SearchGMPApprove;
 };
 
 export type QueryTransactionStatusError = {
