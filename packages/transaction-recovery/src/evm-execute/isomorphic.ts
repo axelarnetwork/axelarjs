@@ -165,7 +165,6 @@ async function shouldExecuteTransaction(
 
     return {
       needsExecution: true,
-
       tx,
     };
   }

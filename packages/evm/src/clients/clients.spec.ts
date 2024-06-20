@@ -1,13 +1,41 @@
+import { createAxelarConfigClient } from "@axelarjs/api";
+
 import { avalancheFuji } from "viem/chains";
 
 import { InterchainTokenClient } from "../contracts";
+import {
+  createPublicClient,
+  type SupportedMainnetChain,
+} from "./mainnet-client";
 import { createPublicTestnetClient } from "./testnet-client";
 
 describe("EVM Clients", () => {
   const client = createPublicTestnetClient("avalancheFuji");
 
-  it("shhould be defined", () => {
+  it("should be defined", () => {
     expect(client).toBeDefined();
+  });
+
+  it("should has all mainnet evm clients", async () => {
+    const configClient = createAxelarConfigClient("mainnet");
+    const configs = await configClient.getAxelarConfigs("mainnet");
+    const chains = Object.keys(configs.chains).filter(
+      (chainId) => configs.chains[chainId]?.chainType === "evm"
+    );
+    const supportedChains = [];
+
+    chains.forEach((chain) => {
+      try {
+        createPublicClient(chain as SupportedMainnetChain);
+        supportedChains.push(chain);
+      } catch (e) {
+        console.error(
+          `Chain ${chain} is not supported in mainnet. Please fix it.`
+        );
+      }
+    });
+
+    expect(supportedChains.length).toBe(chains.length);
   });
 });
 

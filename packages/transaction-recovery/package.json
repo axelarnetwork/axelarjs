@@ -58,6 +58,7 @@
   "author": "",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
+    "@axelarjs/api": "workspace:*",
     "@axelarjs/config": "workspace:*",
     "dotenv": "^16.4.5",
     "gh-pages": "^6.1.1",
@@ -67,7 +68,6 @@
     "vitest": "^1.4.0"
   },
   "dependencies": {
-    "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
     "@axelarjs/evm": "workspace:^",

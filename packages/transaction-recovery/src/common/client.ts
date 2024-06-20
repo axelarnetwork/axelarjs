@@ -4,7 +4,6 @@ import {
   http,
   publicActions,
   type Hex,
-  type PublicClient,
   type WalletClient,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -21,8 +20,7 @@ import "viem/window";
  */
 export function getWalletClient(
   rpcUrl: string,
-  privateKey?: string | undefined,
-  publicClient?: PublicClient | undefined
+  privateKey?: string | undefined
 ): WalletClient {
   const hasBrowserWallet = typeof window !== "undefined" && window.ethereum;
 
@@ -34,12 +32,10 @@ export function getWalletClient(
     return createWalletClient({
       account: privateKeyToAccount(privateKey as Hex),
       transport: http(rpcUrl),
-      chain: publicClient!.chain,
     }).extend(publicActions);
   } else {
     return createWalletClient({
       transport: custom(window.ethereum!),
-      chain: publicClient!.chain,
     }).extend(publicActions);
   }
 }
