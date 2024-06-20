@@ -54,7 +54,7 @@ export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
 
 export type SearchGMPParams = Omit<BaseGMPParams, "contractMethod"> & {
   contractMethod?: ContractMethod[] | ContractMethod;
-  txHash?: `0x${string}`;
+  txHash: string;
   txLogIndex?: number | undefined;
   messageId?: string | undefined;
   status?: GMPTxStatus;
@@ -74,7 +74,7 @@ type HexAmount = {
   hex: string;
 };
 
-type SearchGMPCall = {
+export type SearchGMPCall = {
   blockNumber: number;
   blockHash: `0x${string}`;
   block_timestamp: number;
@@ -122,7 +122,7 @@ type SearchGMPTransaction = {
   hash: string;
 };
 
-type SearchGMPExecuted = {
+export type SearchGMPExecuted = {
   chain: string;
   sourceTransactionIndex: number;
   sourceChain: string;
@@ -179,25 +179,36 @@ type SearchGMPFees = {
     express_gas_overhead_fee: number;
   };
 };
+
+export type SearchGMPApprove = {
+  transactionHash: string;
+  contract_address: string;
+  chain: string;
+  chain_type: string;
+};
+
 export type SearchGMPGasStatus =
   | "gas_paid"
   | "gas_paid_not_enough_gas"
   | "gas_unpaid"
   | "gas_paid_enough_gas";
+
+type GMPTxCreatedAt = {
+  week: number;
+  hour: number;
+  month: number;
+  year: number;
+  ms: number;
+  day: number;
+  quarter: number;
+};
+
 export type SearchGMPGasPaid = {
   axelarTransactionHash: string;
   chain: string;
   chain_type: string;
   logIndex: number;
-  createdAt: {
-    week: number;
-    hour: number;
-    month: number;
-    year: number;
-    ms: number;
-    day: number;
-    quarter: number;
-  };
+  created_at: GMPTxCreatedAt;
   transactionHash: string;
   returnValues: {
     refundAddress: string;
@@ -259,15 +270,47 @@ export type SearchGMPResponseData = {
   fees: SearchGMPFees;
   status: GMPTxStatus;
   executed?: SearchGMPExecuted;
+  error?: SearchGMPDataError;
+  time_spent: SearchGMPTimespent;
   gas_paid: SearchGMPGasPaid;
   gas_status: SearchGMPGasStatus;
+  express_executed?: SearchGMPExpressExecuted;
+  express_executing_at?: number;
+  approved: SearchGMPApprove;
   command_id?: string;
   is_invalid_destination_chain: boolean;
   is_call_from_relayer: boolean;
   is_invalid_call: boolean;
+  is_insufficient_fee: boolean;
   interchain_transfer?: InterchainTransferEvent;
   interchain_token_deployment_started?: InterchainTokenDeploymentStartedEvent;
   token_manager_deployment_started?: TokenManagerDeploymentStartedEvent;
+};
+
+export type SearchGMPTimespent = {
+  call_express_executed?: number;
+  call_confirm?: number;
+  call_approve?: number;
+  approved_executed?: number;
+  total: number;
+};
+
+export type SearchGMPExpressExecuted = {
+  sourceChain: string;
+  chain: string;
+  created_at: GMPTxCreatedAt;
+};
+
+export type SearchGMPDataError = {
+  chain: string;
+  sourceChain: string;
+  chain_type: string;
+  messageId: string;
+  error: {
+    reason: string;
+    message: string;
+    transactionHash: string;
+  };
 };
 
 export type SearchGMPResponse = BaseGMPResponse<{
