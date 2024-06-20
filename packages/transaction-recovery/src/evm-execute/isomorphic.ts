@@ -95,18 +95,31 @@ export async function evmExecute(
     chain: publicClient.chain,
   };
 
-  if (isContractCallWithToken) {
-    const txHash = await contract.write.executeWithToken(
-      [
-        tx.command_id as Hex,
-        tx.call.chain,
-        tx.call.address as string,
-        payload as Hex,
-        symbol,
-        BigInt(amount as unknown as string),
-      ],
-      writeOptions
-    );
+  try {
+    let txHash: string;
+    if (isContractCallWithToken) {
+      txHash = await contract.write.executeWithToken(
+        [
+          tx.command_id as Hex,
+          tx.call.chain,
+          tx.call.address as string,
+          payload as Hex,
+          symbol,
+          BigInt(amount as unknown as string),
+        ],
+        writeOptions
+      );
+    } else {
+      txHash = await contract.write.execute(
+        [
+          tx.command_id as Hex,
+          tx.call.chain,
+          tx.call.address as string,
+          payload as Hex,
+        ],
+        writeOptions
+      );
+    }
 
     return {
       success: true,
@@ -114,22 +127,17 @@ export async function evmExecute(
         txHash,
       },
     };
-  } else {
-    const txHash = await contract.write.execute(
-      [
-        tx.command_id as Hex,
-        tx.call.chain,
-        tx.call.address as string,
-        payload as Hex,
-      ],
-      writeOptions
-    );
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
 
     return {
-      success: true,
-      data: {
-        txHash,
-      },
+      success: false,
+      error: "Unknown error",
     };
   }
 }

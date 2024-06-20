@@ -25,7 +25,7 @@ export const centrifugeTestnet = defineChain({
   nativeCurrency: { name: "Centrifuge", symbol: "CFG", decimals: 18 },
   rpcUrls: {
     default: {
-      http: [""],
+      http: [""], // TODO: Add testnet RPC URL
     },
   },
 });
