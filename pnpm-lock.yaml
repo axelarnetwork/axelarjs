@@ -655,6 +655,9 @@ importers:
       '@axelarjs/cosmos':
         specifier: workspace:*
         version: link:../cosmos
+      '@axelarjs/evm':
+        specifier: workspace:^
+        version: link:../evm
       '@cosmjs/proto-signing':
         specifier: ^0.31.3
         version: 0.31.3
