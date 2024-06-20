@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.4.1
+
+### Patch Changes
+
+- [#379](https://github.com/axelarnetwork/axelarjs/pull/379) [`91125948f65e644a14c1579b6d3e71198aed0256`](https://github.com/axelarnetwork/axelarjs/commit/91125948f65e644a14c1579b6d3e71198aed0256) Thanks [@npty](https://github.com/npty)! - chore: add queryTransactionStatus to transaction-recovery package
+
 ## 0.4.0
 
 ### Minor Changes
