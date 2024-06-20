@@ -163,13 +163,12 @@ async function shouldExecuteTransaction(
       };
     }
 
-    // TODO: uncomment this when we have the approved field in the response
-    // if (!tx?.approved) {
-    //   return {
-    //     needsExecution: false,
-    //     reason: "Transaction not approved",
-    //   };
-    // }
+    if (!tx?.approved) {
+      return {
+        needsExecution: false,
+        reason: "Transaction not approved",
+      };
+    }
 
     return {
       needsExecution: true,
