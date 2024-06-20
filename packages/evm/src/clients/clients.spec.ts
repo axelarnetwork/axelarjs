@@ -7,18 +7,21 @@ import {
   createPublicClient,
   type SupportedMainnetChain,
 } from "./mainnet-client";
-import { createPublicTestnetClient } from "./testnet-client";
+import {
+  createPublicTestnetClient,
+  type SupportedTestnetChain,
+} from "./testnet-client";
 
 describe("EVM Clients", () => {
-  const client = createPublicTestnetClient("avalancheFuji");
-
   it("should be defined", () => {
+    const client = createPublicTestnetClient("avalanche");
     expect(client).toBeDefined();
   });
 
-  it("should has all mainnet evm clients", async () => {
-    const configClient = createAxelarConfigClient("mainnet");
-    const configs = await configClient.getAxelarConfigs("mainnet");
+  it("should support all mainnet chains", async () => {
+    const env = "mainnet";
+    const configClient = createAxelarConfigClient(env);
+    const configs = await configClient.getAxelarConfigs(env);
     const chains = Object.keys(configs.chains).filter(
       (chainId) => configs.chains[chainId]?.chainType === "evm"
     );
@@ -36,6 +39,29 @@ describe("EVM Clients", () => {
     });
 
     expect(supportedChains.length).toBe(chains.length);
+  });
+
+  it("should support all testnet chains", async () => {
+    const env = "testnet";
+    const configClient = createAxelarConfigClient(env);
+    const configs = await configClient.getAxelarConfigs(env);
+    const chains = Object.keys(configs.chains).filter(
+      (chainId) => configs.chains[chainId]?.chainType === "evm"
+    );
+    const supportedChains = [];
+
+    chains.forEach((chain) => {
+      try {
+        createPublicTestnetClient(chain as SupportedTestnetChain);
+        supportedChains.push(chain);
+      } catch (e) {
+        console.error(
+          `Chain ${chain} is not supported in testnet. Please fix it.`
+        );
+      }
+    });
+
+    expect(supportedChains.length).toBe(chains.length - 1); // Excluding centrifuge-2 chain because public rpc is not available
   });
 });
 

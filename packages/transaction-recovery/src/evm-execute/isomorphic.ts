@@ -193,16 +193,7 @@ async function getDestWalletClient(
   if (!destChainRpcUrl || !chainConfig) {
     return undefined;
   }
-
-  const publicClient = createPublicClient(
-    destChain.toLowerCase() as SupportedMainnetChain
-  );
-
-  const walletClient = getWalletClient(
-    destChainRpcUrl,
-    privateKey,
-    publicClient
-  );
+  const walletClient = getWalletClient(destChainRpcUrl, privateKey);
 
   return walletClient;
 }

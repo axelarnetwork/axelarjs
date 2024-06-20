@@ -1,7 +1,7 @@
 import { defineChain } from "viem";
 
 export const centrifuge = defineChain({
-  id: 2031,
+  id: 2090,
   name: "Centrifuge",
   network: "centrifuge",
   nativeCurrency: { name: "Centrifuge", symbol: "CFG", decimals: 18 },
@@ -14,6 +14,18 @@ export const centrifuge = defineChain({
     default: {
       name: "Centrifuge Explorer",
       url: "https://centrifuge.subscan.io/",
+    },
+  },
+});
+
+export const centrifugeTestnet = defineChain({
+  id: 2032,
+  name: "Centrifuge Testnet",
+  network: "centrifuge",
+  nativeCurrency: { name: "Centrifuge", symbol: "CFG", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [""],
     },
   },
 });
