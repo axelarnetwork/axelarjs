@@ -24,7 +24,9 @@ export function getWalletClient(
   privateKey?: string | undefined,
   publicClient?: PublicClient | undefined
 ): WalletClient {
-  if (!window?.ethereum && !privateKey) {
+  const hasBrowserWallet = typeof window !== "undefined" && window.ethereum;
+
+  if (!hasBrowserWallet && !privateKey) {
     throw EvmClientError.WALLET_CLIENT_NOT_FOUND;
   }
 
