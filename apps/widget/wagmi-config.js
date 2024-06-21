@@ -1,0 +1,83 @@
+import {
+  mainnet,
+  arbitrum,
+  avalanche,
+  base,
+  blast,
+  opBNB,
+  celo,
+  fantom,
+  filecoin,
+  fraxtal,
+  kava,
+  linea,
+  mantle,
+  moonbeam,
+  optimism,
+  polygon,
+  scroll,
+} from "wagmi/chains";
+import {
+  avalancheFuji,
+  sepolia,
+  blastSepolia,
+  baseSepolia,
+  opBNBTestnet,
+  celoAlfajores,
+  fantomTestnet,
+  filecoinCalibration,
+  fraxtalTestnet,
+  kavaTestnet,
+  lineaGoerli,
+  moonbaseAlpha,
+  optimismSepolia,
+  polygonMumbai,
+  scrollSepolia,
+} from "wagmi/chains";
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+
+const wagmiConfig = getDefaultConfig({
+  appName: "ITS App",
+  projectId: "ITS",
+  chains:
+    process.env.NEXT_PUBLIC_IS_TESTNET === "true"
+      ? [
+          avalancheFuji,
+          sepolia,
+          blastSepolia,
+          baseSepolia,
+          opBNBTestnet,
+          celoAlfajores,
+          fantomTestnet,
+          filecoinCalibration,
+          fraxtalTestnet,
+          kavaTestnet,
+          lineaGoerli,
+          moonbaseAlpha,
+          optimismSepolia,
+          polygonMumbai,
+          scrollSepolia,
+        ]
+      : [
+          mainnet,
+          arbitrum,
+          avalanche,
+          base,
+          blast,
+          opBNB,
+          celo,
+          fantom,
+          filecoin,
+          fraxtal,
+          kava,
+          linea,
+          mantle,
+          moonbeam,
+          optimism,
+          polygon,
+          scroll,
+        ],
+  ssr: true,
+});
+
+export default wagmiConfig;
