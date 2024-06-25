@@ -2,6 +2,7 @@ node_modules/
 build/
 /cosmos-add-gas
 /evm-add-native-gas
+/manual-relay-to-dest-chain
 /docs
 
 *.d.ts

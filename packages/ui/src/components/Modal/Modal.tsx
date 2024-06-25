@@ -139,7 +139,7 @@ export const Modal = Object.assign(ModalRootWithProvider, {
     modal-action justify-between
   `,
   Title: tw(Dialog.Title)`
-    font-bold text-xl
+    font-semibold text-xl
   `,
   Description: tw(Dialog.Description)`
     font-medium opacity-75 -mt-2
