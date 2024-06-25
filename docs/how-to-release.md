@@ -1,6 +1,6 @@
 This document describes how to release new versions of the packages in the `@axelar-network` monorepo.
 
-Table of Contents
+**Table of Contents:**
 - [Release Packages to NPM](#release-packages-to-npm)
   - [1. Update the Changeset File](#1-update-the-changeset-file)
   - [2. Commit the Changeset File](#2-commit-the-changeset-file)
