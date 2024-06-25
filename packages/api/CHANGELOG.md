@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.4.2
+
+### Patch Changes
+
+- [#383](https://github.com/axelarnetwork/axelarjs/pull/383) [`1ab5e2790918dc028af93a918c6fdd99704979d0`](https://github.com/axelarnetwork/axelarjs/commit/1ab5e2790918dc028af93a918c6fdd99704979d0) Thanks [@npty](https://github.com/npty)! - make txHash optional for searchGMP api
+
 ## 0.4.1
 
 ### Patch Changes
