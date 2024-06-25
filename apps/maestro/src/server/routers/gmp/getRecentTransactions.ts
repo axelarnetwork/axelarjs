@@ -38,7 +38,6 @@ export const getRecentTransactions = publicProcedure
   .query(async ({ input, ctx }) => {
     try {
       const response = await ctx.services.gmp.searchGMP({
-        txHash: "",
         senderAddress: input.senderAddress,
         destinationContractAddress:
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
