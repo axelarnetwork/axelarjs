@@ -54,7 +54,7 @@ export type ContractMethod = (typeof VALID_CONTRACT_METHODS)[number];
 
 export type SearchGMPParams = Omit<BaseGMPParams, "contractMethod"> & {
   contractMethod?: ContractMethod[] | ContractMethod;
-  txHash: string;
+  txHash?: string | undefined;
   txLogIndex?: number | undefined;
   messageId?: string | undefined;
   status?: GMPTxStatus;
