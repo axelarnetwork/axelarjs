@@ -1,5 +1,17 @@
 # @axelarjs/api
 
+## 0.4.2
+
+### Patch Changes
+
+- [#383](https://github.com/axelarnetwork/axelarjs/pull/383) [`1ab5e2790918dc028af93a918c6fdd99704979d0`](https://github.com/axelarnetwork/axelarjs/commit/1ab5e2790918dc028af93a918c6fdd99704979d0) Thanks [@npty](https://github.com/npty)! - make txHash optional for searchGMP api
+
+## 0.4.1
+
+### Patch Changes
+
+- [#379](https://github.com/axelarnetwork/axelarjs/pull/379) [`91125948f65e644a14c1579b6d3e71198aed0256`](https://github.com/axelarnetwork/axelarjs/commit/91125948f65e644a14c1579b6d3e71198aed0256) Thanks [@npty](https://github.com/npty)! - chore: add queryTransactionStatus to transaction-recovery package
+
 ## 0.4.0
 
 ### Minor Changes

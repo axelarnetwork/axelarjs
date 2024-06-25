@@ -1,5 +1,21 @@
 # @axelarjs/transaction-recovery
 
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`1ab5e2790918dc028af93a918c6fdd99704979d0`](https://github.com/axelarnetwork/axelarjs/commit/1ab5e2790918dc028af93a918c6fdd99704979d0)]:
+  - @axelarjs/api@0.4.2
+
+## 0.3.1
+
+### Patch Changes
+
+- [#379](https://github.com/axelarnetwork/axelarjs/pull/379) [`91125948f65e644a14c1579b6d3e71198aed0256`](https://github.com/axelarnetwork/axelarjs/commit/91125948f65e644a14c1579b6d3e71198aed0256) Thanks [@npty](https://github.com/npty)! - chore: add queryTransactionStatus to transaction-recovery package
+
+- Updated dependencies [[`91125948f65e644a14c1579b6d3e71198aed0256`](https://github.com/axelarnetwork/axelarjs/commit/91125948f65e644a14c1579b6d3e71198aed0256)]:
+  - @axelarjs/api@0.4.1
+
 ## 0.3.0
 
 ### Minor Changes
