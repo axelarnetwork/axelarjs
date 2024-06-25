@@ -13,7 +13,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ["var(--font-clash-grotesk)", ...fontFamily.sans],
       },
     },
   },

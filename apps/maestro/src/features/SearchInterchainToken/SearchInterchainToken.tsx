@@ -102,8 +102,10 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidAddress && search.length >= 10);
 
   return (
-    <FormControl className="relative w-full max-w-xs md:max-w-md">
-      <div className="pb-2 text-center">Take your token interchain</div>
+    <FormControl className="relative z-10 w-full max-w-xs md:max-w-md">
+      <div className="pb-2 text-center font-semibold">
+        TAKE YOUR TOKEN INTERCHAIN
+      </div>
       <div
         className={cn("join rounded-md transition-transform", {
           "ring-error ring-offset-base-200 ring-1 ring-offset-2":
@@ -144,7 +146,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                   tabIndex={-1}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-700 dark:text-white">
+                    <span className="hidden text-gray-700 md:block dark:text-white">
                       Selected Chain
                     </span>
                     <Tooltip
@@ -155,7 +157,11 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                         operate in controlled mode
                     */}
                       <div className="flex items-center">
-                        <EVMChainIcon hideLabel selectedChain={defaultChain} />
+                        <EVMChainIcon
+                          size="md"
+                          hideLabel
+                          selectedChain={defaultChain}
+                        />
                       </div>
                     </Tooltip>
                   </div>
