@@ -18,10 +18,10 @@ To release a new version, follow these steps after creating a PR with your chang
 
 ### 1. Update the Changeset File
 
-In your branch, run the following command to create a new changeset file:
+In your branch, at the root directory, run the following command to create a new changeset file:
 
 ```bash
-npm run cs
+pnpm cs
 ```
 
 First, you'll be prompted to specify the package you are releasing. Choose the package you are releasing from the list of packages in the monorepo.
