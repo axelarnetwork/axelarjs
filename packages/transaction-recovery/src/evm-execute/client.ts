@@ -6,6 +6,12 @@ import { createGMPClient } from "@axelarjs/api/gmp";
 import { evmExecute as baseEvmExecute } from "./isomorphic";
 import type { EvmExecuteParams } from "./types";
 
+/**
+ * A wrapper function for executing EVM transaction on the destination chain.
+ *
+ * @param params - An object containing parameters for the EVM execution, including the environment.
+ * @returns The result of the EVM execution.
+ */
 export function evmExecute(params: EvmExecuteParams) {
   const { environment } = params;
 
