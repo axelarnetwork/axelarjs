@@ -25,6 +25,13 @@ export type ExecutionDecision = {
   tx?: SearchGMPResponseData | undefined;
 };
 
+/**
+ * Executes a cross-chain transaction on an EVM-compatible blockchain.
+ *
+ * @param params - Parameters for the execution
+ * @param dependencies - External dependencies required for execution
+ * @returns A promise that resolves to the execution result
+ */
 export async function evmExecute(
   params: EvmExecuteParams,
   dependencies: EvmExecuteDependencies
@@ -33,13 +40,14 @@ export async function evmExecute(
   const { axelarscanClient, gmpClient } = dependencies;
   const { privateKey, rpcUrl } = executeOptions || {};
 
-  // Check if given tx needs to be executed
+  // Check if the transaction needs to be executed
   const executionDecision = await shouldExecuteTransaction(
     srcTxHash,
     gmpClient,
     srcTxLogIndex
   );
 
+  // If execution is not needed, return early with the reason
   if (!executionDecision.needsExecution) {
     return {
       success: false,
@@ -49,6 +57,7 @@ export async function evmExecute(
 
   const tx = executionDecision.tx as SearchGMPResponseData;
 
+  // Extract relevant data from the transaction
   const {
     destinationContractAddress,
     destinationChain,
@@ -57,6 +66,7 @@ export async function evmExecute(
     symbol,
   } = tx.call.returnValues;
 
+  // Get the wallet client for the destination chain
   const destWallet = await getDestWalletClient(
     axelarscanClient,
     destinationChain,
@@ -64,6 +74,7 @@ export async function evmExecute(
     privateKey
   );
 
+  // If we can't get a wallet client, return an error
   if (!destWallet) {
     return {
       success: false,
@@ -71,13 +82,16 @@ export async function evmExecute(
     };
   }
 
+  // Determine if this is a contract call with token
   const isContractCallWithToken =
     executionDecision.tx?.call.event === "ContractCallWithToken";
 
+  // Create a public client for the destination chain
   const publicClient = createPublicClient(
     destinationChain.toLowerCase() as SupportedMainnetChain
   );
 
+  // Set up the contract instance
   const contract = getContract({
     address: destinationContractAddress as Hex,
     abi: parseAbi([
@@ -90,6 +104,7 @@ export async function evmExecute(
     },
   });
 
+  // Prepare write options for the transaction
   const writeOptions = {
     account: destWallet.account?.address as Hex,
     chain: publicClient.chain,
@@ -97,6 +112,7 @@ export async function evmExecute(
 
   try {
     let txHash: string;
+    // Execute the appropriate function based on whether it's a contract call with token
     if (isContractCallWithToken) {
       txHash = await contract.write.executeWithToken(
         [
@@ -121,6 +137,7 @@ export async function evmExecute(
       );
     }
 
+    // Return success result with transaction hash
     return {
       success: true,
       data: {
@@ -128,6 +145,7 @@ export async function evmExecute(
       },
     };
   } catch (e) {
+    // Handle errors and return appropriate error message
     if (e instanceof Error) {
       return {
         success: false,
@@ -154,32 +172,32 @@ async function shouldExecuteTransaction(
     txLogIndex: srcTxLogIndex,
   });
 
-  if (response && response.length > 0) {
-    const tx = response[0];
-
-    if (!tx?.approved) {
-      return {
-        needsExecution: false,
-        reason: "Transaction not approved",
-      };
-    }
-
-    if (tx?.executed) {
-      return {
-        needsExecution: false,
-        reason: "Transaction already executed",
-      };
-    }
-
+  if (!response || response.length === 0) {
     return {
-      needsExecution: true,
-      tx,
+      needsExecution: false,
+      reason: "Transaction not found",
+    };
+  }
+
+  const tx = response[0];
+
+  if (!tx?.approved) {
+    return {
+      needsExecution: false,
+      reason: "Transaction not approved",
+    };
+  }
+
+  if (tx?.executed) {
+    return {
+      needsExecution: false,
+      reason: "Transaction already executed",
     };
   }
 
   return {
-    needsExecution: false,
-    reason: "Transaction not found",
+    needsExecution: true,
+    tx,
   };
 }
 
