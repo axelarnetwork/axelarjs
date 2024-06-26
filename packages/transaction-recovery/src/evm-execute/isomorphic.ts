@@ -156,17 +156,18 @@ async function shouldExecuteTransaction(
 
   if (response && response.length > 0) {
     const tx = response[0];
-    if (tx?.executed) {
-      return {
-        needsExecution: false,
-        reason: "Transaction already executed",
-      };
-    }
 
     if (!tx?.approved) {
       return {
         needsExecution: false,
         reason: "Transaction not approved",
+      };
+    }
+
+    if (tx?.executed) {
+      return {
+        needsExecution: false,
+        reason: "Transaction already executed",
       };
     }
 

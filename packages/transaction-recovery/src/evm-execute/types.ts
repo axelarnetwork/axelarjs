@@ -9,7 +9,6 @@ export type EvmExecuteParams = {
   environment: Environment;
   srcTxHash: string;
   srcTxLogIndex?: number;
-  estimatedGasUsed: number;
   executeOptions?: EvmExecuteOptions;
 };
 
