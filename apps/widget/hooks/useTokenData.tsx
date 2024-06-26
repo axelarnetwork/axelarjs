@@ -1,12 +1,27 @@
 import { erc20Abi } from "viem";
-import { useReadContract, useReadContracts } from "wagmi";
+import { useAccount, useReadContract, useReadContracts } from "wagmi";
+
 import InterchainTokenService from "../contract-abis/InterchainTokenService.abi.json";
+import InterchainToken from "../contract-abis/token.abi.json";
 import {
+  INTERCHAIN_TOKEN_ID,
   INTERCHAIN_TOKEN_SERVICE_ADDRESS,
   VALID_TOKEN_METHOD_NAME,
 } from "../utils/constants";
 
 const useTokenData = (tokenId: string) => {
+  const { chainId } = useAccount();
+
+  // Use token address to get token Id
+  const { data: tokenIdFromAddress } = useReadContract({
+    abi: InterchainToken,
+    address: tokenId as `0x${string}`,
+    functionName: INTERCHAIN_TOKEN_ID,
+    chainId: chainId,
+    args: [],
+  });
+
+  // Use token id to check if it is a valid token and get token address
   const {
     data: tokenAddress,
     error: errorGetValidTokenAddress,
@@ -15,7 +30,7 @@ const useTokenData = (tokenId: string) => {
     abi: InterchainTokenService,
     address: INTERCHAIN_TOKEN_SERVICE_ADDRESS,
     functionName: VALID_TOKEN_METHOD_NAME,
-    args: [tokenId],
+    args: [tokenIdFromAddress || tokenId],
   });
 
   const {

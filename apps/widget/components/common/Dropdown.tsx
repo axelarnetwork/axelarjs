@@ -1,25 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, Variants } from "framer-motion";
-import LoadingSpinner from "../animations/LoadingSpinner";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useChains } from "wagmi";
-import { Chain } from "viem";
-import chainsData from "../../chains/chains";
 
-type Option = "chains" | "assets";
+import { motion, Variants } from "framer-motion";
+import { Chain } from "viem";
+import { useChains } from "wagmi";
+
+import chainsData from "../../chains/chains";
+import LoadingSpinner from "../animations/LoadingSpinner";
 
 interface DropdownProps {
-  option: Option;
   onSelectValue: (value: Chain) => void;
   value: Chain | null;
   showArrow?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({
+const Dropdown = ({
   onSelectValue,
   value,
   showArrow = false,
-}) => {
+}: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownBtnRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -84,7 +83,7 @@ const Dropdown: React.FC<DropdownProps> = ({
               }}
               transition={{ duration: 0.3 }}
               style={{ originY: 0.5, originX: 0.5 }}
-              className="w-11 h-11 p-1 rounded-full border-gray-700 border-2 focus:border-blue-500 hover:border-blue-500 transition-transform duration-100"
+              className="h-11 w-11 rounded-full border-2 border-gray-700 p-1 transition-transform duration-100 hover:border-blue-500 focus:border-blue-500"
               src={`/logos/chains/${chainsData[value.id]?.image}`}
               alt="Selected user image"
             />
@@ -112,14 +111,14 @@ const Dropdown: React.FC<DropdownProps> = ({
             )}
           </div>
         ) : (
-          <div className="mt-1 ml-2">
+          <div className="ml-2 mt-1">
             <LoadingSpinner w={24} h={24} />
           </div>
         )}
       </motion.button>
 
       <motion.div
-        className="absolute z-10 bg-white rounded-lg shadow w-60 dark:bg-gray-800 right-0 top-10"
+        className="absolute right-0 top-10 z-10 w-60 rounded-lg bg-white shadow dark:bg-gray-800"
         ref={dropdownRef}
         variants={{
           open: {
@@ -143,17 +142,17 @@ const Dropdown: React.FC<DropdownProps> = ({
         }}
       >
         <motion.ul
-          className="h-48 py-2 overflow-y-auto text-gray-400 dark:text-gray-200 bg-gray-800 "
+          className="h-48 overflow-y-auto bg-gray-800 py-2 text-gray-400 dark:text-gray-200 "
           style={{ pointerEvents: isOpen ? "auto" : "none" }}
         >
           {chainsList.map((item, i) => (
             <motion.li key={item.name + i} variants={itemVariants}>
               <div
-                className="flex items-center px-4 py-2 hover:bg-black dark:hover:text-white cursor-pointer font-semibold"
+                className="flex cursor-pointer items-center px-4 py-2 font-semibold hover:bg-black dark:hover:text-white"
                 onClick={() => handleItemClick(item)}
               >
                 <Image
-                  className="mr-2 rounded-full h-6 w-6"
+                  className="mr-2 h-6 w-6 rounded-full"
                   src={`/logos/chains/${chainsData[item.id]?.image}`}
                   height={26}
                   width={26}

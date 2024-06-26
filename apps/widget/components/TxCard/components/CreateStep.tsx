@@ -27,7 +27,6 @@ interface CreateStepContentProps {
   ) => void;
   setSelectedToChain: React.Dispatch<React.SetStateAction<Chain | null>>;
   selectedToChain: Chain | null;
-  interchainTokenAddress: string;
   onClickInfo: () => void;
 }
 const CreateStepContent: React.FC<CreateStepContentProps> = ({
@@ -95,7 +94,7 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
       </motion.div>
       <label htmlFor="amount" className="mt-8 block font-medium text-white">
         <motion.div className="flex w-full justify-between">
-          <motion.p className="text-blue-400">FROM:</motion.p>
+          <motion.p className="text-pimary">FROM:</motion.p>
 
           <AnimatePresence>
             <motion.div className="h-6">
@@ -112,7 +111,7 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
         value={tokenId}
         onChange={handleTokenIdChange}
         id="tokenId"
-        placeholder="Enter Interchain Token ID"
+        placeholder="Enter Token Address or Interchain Token ID"
         autoCorrect="off"
         spellCheck="false"
         className={`text-md my-2 h-24 w-full border bg-gray-900 font-medium text-white ${
@@ -172,7 +171,6 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
           />
           <motion.div className="ml-4 mt-1">
             <Dropdown
-              option="chains"
               onSelectValue={setSelectedToChain}
               value={selectedToChain}
             />
