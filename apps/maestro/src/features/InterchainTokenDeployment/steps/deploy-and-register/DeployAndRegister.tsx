@@ -263,7 +263,7 @@ export const Step2: FC = () => {
               formSubmitRef.current?.click();
             }}
           >
-            {buttonChildren}
+            <p className="text-indigo-600">{buttonChildren}</p>
           </NextButton>
         )}
       </Dialog.Actions>

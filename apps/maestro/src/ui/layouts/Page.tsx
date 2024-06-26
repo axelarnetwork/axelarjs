@@ -124,13 +124,13 @@ const Page: FC<Props> = ({
             <div className="mb-20 w-full">
               <ConditionalRenderInterchainBanner />
             </div>
-            <div className="bg-base-100/70 grid w-full max-w-lg place-items-center rounded-2xl p-4">
+            <div className="bg-base-100 grid w-full max-w-lg place-items-center rounded-2xl p-4">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>
               <ConnectWalletButton className="w-full max-w-md" $size="md" />
             </div>
             <section className="my-10 space-y-4">
-              <div className="text-center text-xl font-bold">
+              <div className="text-center text-xl font-semibold">
                 RECENT INTERCHAIN TRANSACTIONS
               </div>
               <RecentTransactions maxTransactions={250} />
@@ -269,7 +269,7 @@ export const FullScreenLoading = ({ loadingMessage = "" }) => (
 );
 
 export default Object.assign(Page, {
-  Title: tw.h1`text-2xl font-bold`,
+  Title: tw.h1`text-2xl font-semibold`,
   Content: tw.div`flex-1 grid`,
   FullScreenLoading,
 });

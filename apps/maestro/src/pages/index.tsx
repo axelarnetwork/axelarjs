@@ -70,14 +70,14 @@ export default function HomePage() {
               </Dialog.Body>
             </Dialog>
           )}
-          <div className="bg-base-100/70 grid w-full place-items-center rounded-2xl p-4">
+          <div className="bg-base-100 grid w-full place-items-center rounded-2xl p-4">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
             <div className="divider w-full">OR</div>
             <InterchainTokenDeployment />
           </div>
           <div className="mt-4">
             <section className="my-10 space-y-4">
-              <div className="text-center text-xl font-bold">
+              <div className="text-center text-xl font-semibold">
                 {Boolean(chain) && "MY "}RECENT{" "}
                 <span className="hidden sm:inline-block">INTERCHAIN</span>{" "}
                 TRANSACTIONS

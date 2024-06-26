@@ -113,11 +113,11 @@ const Appbar: FC<AppbarProps> = (props) => {
               <ConnectWalletButton />
             )}
           </>
-          <div className="absolute right-4 top-6">
-            <ThemeSwitcher />
-          </div>
           <div className="flex-1" />
           {isConnected && <MainMenu />}
+          <div className="flex justify-end">
+            <ThemeSwitcher />
+          </div>
         </div>
       ));
     },
@@ -128,7 +128,7 @@ const Appbar: FC<AppbarProps> = (props) => {
   return (
     <Navbar
       className={cn(
-        "bg-base-100 fixed top-0 z-10 px-2 transition-all md:px-6",
+        "bg-base-200 fixed top-0 z-10 px-2 transition-all md:px-6",
         {
           "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
           "z-10": isSticky && !state.isDrawerOpen,
@@ -147,7 +147,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           <MenuIcon className="h-6 w-6" />
         </Button>
         <LinkButton
-          className="flex items-center gap-2 text-lg font-bold uppercase"
+          className="text-md flex items-center gap-2 font-semibold uppercase sm:text-lg"
           onClick={() => router.push("/")}
           $variant="ghost"
         >
@@ -165,7 +165,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                 $size="xs"
                 $variant="success"
                 $position="bottom"
-                className="translate-x-2 translate-y-2 lowercase"
+                className="translate-x-2 translate-y-4 lowercase sm:translate-y-2"
               >
                 {NEXT_PUBLIC_NETWORK_ENV}
               </Indicator.Item>
