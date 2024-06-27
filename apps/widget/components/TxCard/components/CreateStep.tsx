@@ -83,11 +83,11 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
 
   return (
     <>
-      <motion.div className="flex w-full justify-between text-xl text-blue-400">
+      <motion.div className="flex w-full justify-between items-center text-xl text-blue-400">
         <CustomConnectBtn />
         <motion.div
           onClick={onClickInfo}
-          className="border-primary text-primary mb-5 h-6 w-6 transform cursor-pointer self-end rounded-full border-2 text-center text-sm transition-transform duration-100 hover:scale-110"
+          className="border-primary text-primary h-6 w-6 transform cursor-pointer rounded-full border-2 text-center text-sm transition-transform duration-100 hover:scale-110"
         >
           i
         </motion.div>
@@ -121,9 +121,9 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
       />
       <label htmlFor="amount" className="mt-5 block font-medium text-gray-400">
         <motion.div className="flex w-full justify-between">
-          <motion.p className="flex text-gray-400">
+          <motion.div className="flex text-gray-400">
             Send&nbsp; <div className="text-primary">{symbol}</div>:
-          </motion.p>
+          </motion.div>
           {name && (
             <motion.p className="text-primary pt-1 text-xs">
               Max: {balance !== undefined ? balanceFormatted : "Loading..."}
