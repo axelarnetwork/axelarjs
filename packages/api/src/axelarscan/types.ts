@@ -187,3 +187,30 @@ export type LinkRequestResponse = {
   tokenAddress?: string | undefined;
   timestamp?: number;
 };
+
+export type BaseChainConfigsResponse = {
+  evm: EVMChainConfig[];
+  cosmos: CosmosChainConfig[];
+};
+
+export type SearchBatchesData = {
+  data: string;
+  command_ids: string[];
+  batch_id: string;
+  id: string;
+  status: string;
+  execute_data: string;
+  chain: string;
+  commands: SearchBatchesCommands[];
+};
+
+export type SearchBatchesCommands = {
+  executed: boolean;
+  id: string;
+  transactionHash: string;
+  type: string;
+};
+
+export type SearchBatchesResponse = {
+  data: SearchBatchesData[];
+};

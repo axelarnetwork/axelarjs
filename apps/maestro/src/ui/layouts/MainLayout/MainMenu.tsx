@@ -33,7 +33,7 @@ export type Menuitem =
 
 export const Content = {
   Wrapper: tw.div`space-y-6`,
-  Header: tw.header`text-primary font-bold uppercase`,
+  Header: tw.header`text-primary font-semibold uppercase`,
   Main: tw.main`space-y-4`,
   Article: tw.article`space-y-2`,
   Paragraph: tw.p`text-base`,
@@ -298,7 +298,7 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
         {item.kind === "link" ? (
           <Link
             href={item.href}
-            className="hover:text-accent inline-flex hover:underline lg:uppercase"
+            className="hover:text-accent inline-flex uppercase hover:underline"
             rel={item.external ? "noopener noreferrer" : undefined}
             target={item.external ? "_blank" : undefined}
           >
@@ -308,7 +308,7 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
         ) : (
           <Modal
             trigger={
-              <a className="hover:text-accent hover:underline lg:uppercase">
+              <a className="hover:text-accent uppercase hover:underline">
                 {item.label}
               </a>
             }

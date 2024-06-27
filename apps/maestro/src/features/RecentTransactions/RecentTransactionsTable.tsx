@@ -1,10 +1,4 @@
-import {
-  Card,
-  DropdownMenu,
-  ExternalLinkIcon,
-  Table,
-  Tooltip,
-} from "@axelarjs/ui";
+import { Card, ExternalLinkIcon, Table, Tabs, Tooltip } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
@@ -34,8 +28,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   isTokensTable = false,
 }) => {
   const [page, setPage] = useState(0);
-  const [selectedTokenType, setSelectedTokenType] =
-    useState<TokenKinds>("interchain");
+  const [selectedTokenType, setSelectedTokenType] = useState<TokenKinds>("all");
   const { address: senderAddress } = useAccount();
 
   // reset page when contract method changes
@@ -133,92 +126,88 @@ export const RecentTransactionsTable: FC<Props> = ({
   );
 
   return (
-    <Card className="bg-base-200/50 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
-      <Card.Body>
-        <Table className="relative space-y-4" $zebra>
-          <Table.Head>
-            <Table.Row>
-              <Table.Column
-                colSpan={columns.length}
-                className="text-center text-base"
-              >
-                {isTokensTable ? (
-                  <span>
-                    Recently Deployed{" "}
-                    <span className="text-accent">Interchain Tokens</span>
-                  </span>
-                ) : (
-                  <>
-                    Recent{" "}
-                    <span className="text-accent">
-                      {CONTRACT_METHODS_LABELS[contractMethod]}
-                    </span>{" "}
-                    Transactions
-                  </>
-                )}
-              </Table.Column>
-            </Table.Row>
-            {isTokensTable && (
-              <div className="py-2 pl-4">
-                <DropdownMenu>
-                  <DropdownMenu.Trigger $size="sm" $variant="neutral">
-                    {capitalize(selectedTokenType)}
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Content className="bg-base-300 rounded-xl">
-                    {["all", "canonical", "interchain"].map((kind) => (
-                      <DropdownMenu.Item key={kind}>
-                        <a
-                          onClick={setSelectedTokenType.bind(
-                            null,
-                            kind as TokenKinds
-                          )}
-                        >
-                          {capitalize(kind)}
-                        </a>
-                      </DropdownMenu.Item>
-                    ))}
-                  </DropdownMenu.Content>
-                </DropdownMenu>
-              </div>
-            )}
-            <Table.Row>
-              {columns
-                .filter((column) => column.label)
-                .map((column) => (
-                  <Table.Column key={column.label} className={column.className}>
-                    {column.label}
-                  </Table.Column>
-                ))}
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {(isTokensTable ? isLoadingTokens : isLoading) ? (
-              <Table.Row className="grid min-h-[38px] place-items-center  text-center">
-                <Table.Cell colSpan={3}>
-                  {isLoading
-                    ? "Loading transactions..."
-                    : "No transactions found"}
-                </Table.Cell>
+    <>
+      {isTokensTable && (
+        <Tabs $boxed>
+          {["all", "canonical", "interchain"].map((kind) => (
+            <Tabs.Tab
+              key={kind}
+              onClick={setSelectedTokenType.bind(null, kind as TokenKinds)}
+              active={selectedTokenType === kind}
+            >
+              {capitalize(kind)}
+            </Tabs.Tab>
+          ))}
+        </Tabs>
+      )}
+      <Card className="bg-base-300 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
+        <Card.Body>
+          <Table className="relative space-y-4" $zebra>
+            <Table.Head>
+              <Table.Row>
+                <Table.Column
+                  colSpan={columns.length}
+                  className="text-center text-base"
+                >
+                  {isTokensTable ? (
+                    <span>
+                      Recently Deployed{" "}
+                      <span className="text-accent">Interchain Tokens</span>
+                    </span>
+                  ) : (
+                    <>
+                      Recent{" "}
+                      <span className="text-accent">
+                        {CONTRACT_METHODS_LABELS[contractMethod]}
+                      </span>{" "}
+                      Transactions
+                    </>
+                  )}
+                </Table.Column>
               </Table.Row>
-            ) : isTokensTable ? (
-              interchainDeployments?.items.map((token) => (
-                <InterchainTokenRow key={token.tokenId} token={token} />
-              ))
-            ) : (
-              txns?.length &&
-              txns.map((tx, i) => (
-                <TransactionRow
-                  key={`${tx?.hash}-${i}`}
-                  tx={tx}
-                  contractMethod={contractMethod}
-                />
-              ))
-            )}
-            {paginationBlock}
-          </Table.Body>
-        </Table>
-      </Card.Body>
-    </Card>
+
+              <Table.Row>
+                {columns
+                  .filter((column) => column.label)
+                  .map((column) => (
+                    <Table.Column
+                      key={column.label}
+                      className={column.className}
+                    >
+                      {column.label}
+                    </Table.Column>
+                  ))}
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {(isTokensTable ? isLoadingTokens : isLoading) ? (
+                <Table.Row className="grid min-h-[38px] place-items-center  text-center">
+                  <Table.Cell colSpan={3}>
+                    {isLoading
+                      ? "Loading transactions..."
+                      : "No transactions found"}
+                  </Table.Cell>
+                </Table.Row>
+              ) : isTokensTable ? (
+                interchainDeployments?.items.map((token) => (
+                  <InterchainTokenRow key={token.tokenId} token={token} />
+                ))
+              ) : (
+                txns?.length &&
+                txns.map((tx, i) => (
+                  <TransactionRow
+                    key={`${tx?.hash}-${i}`}
+                    tx={tx}
+                    contractMethod={contractMethod}
+                  />
+                ))
+              )}
+              {paginationBlock}
+            </Table.Body>
+          </Table>
+        </Card.Body>
+      </Card>
+    </>
   );
 };
 

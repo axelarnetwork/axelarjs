@@ -243,7 +243,7 @@ const TokenDetails: FC = () => {
           disabled={!isFormValid}
           onClick={() => formSubmitRef.current?.click()}
         >
-          Register & Deploy
+          <p className="text-indigo-600">Register & Deploy</p>
         </NextButton>
       </Dialog.Actions>
     </>

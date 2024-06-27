@@ -133,10 +133,10 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                 </CopyToClipboardButton>
                 <Tooltip
                   tip="TokenId is a common key used to identify an interchain token across all chains"
-                  $variant="info"
+                  $variant="primary"
                   $position="bottom"
                 >
-                  <InfoIcon className="text-info h-[1em] w-[1em]" />
+                  <InfoIcon className="text-primary h-[1em] w-[1em]" />
                 </Tooltip>
               </div>,
             ],
@@ -167,11 +167,11 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                   </LinkButton>
                   <Tooltip
                     $as={Indicator}
-                    $variant={"info"}
+                    $variant="primary"
                     $position="right"
                     tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
                   >
-                    <InfoIcon className="text-info h-[1em] w-[1em]" />
+                    <InfoIcon className="text-primary h-[1em] w-[1em]" />
                   </Tooltip>
                 </div>
               ),
@@ -196,10 +196,10 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                   </LinkButton>
                   <Tooltip
                     tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
-                    $variant="info"
+                    $variant="primary"
                     $position="bottom"
                   >
-                    <InfoIcon className="text-info h-[1em] w-[1em]" />
+                    <InfoIcon className="text-primary h-[1em] w-[1em]" />
                   </Tooltip>
                 </div>
               ),
@@ -215,7 +215,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   return (
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-2 text-2xl font-bold md:gap-3">
+        <div className="flex flex-wrap items-center gap-2 text-2xl font-semibold md:gap-3">
           {props.tokenId && props.deploymentMessageId && (
             <ManageTokenIcon
               tokenId={props.tokenId}
@@ -460,7 +460,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 tip="Provide a URL to an image to use as the token icon"
                 $position="right"
               >
-                <InfoIcon className="text-info h-[1em]" />
+                <InfoIcon className="text-primary h-[1em]" />
               </Tooltip>
             </Label>
 

@@ -261,7 +261,7 @@ export const Step3: FC = () => {
             }
             onClick={() => formSubmitRef.current?.click()}
           >
-            <span>{buttonChildren}</span>
+            <p className="text-indigo-600">{buttonChildren}</p>
           </NextButton>
         )}
       </Dialog.Actions>

@@ -1,6 +1,6 @@
 import { AxelarConfigsResponse } from "@axelarjs/api";
-import { AXELAR_RPC_URLS, Environment } from "@axelarjs/core";
-import { createAxelarQueryClient } from "@axelarjs/cosmos";
+import { AXELAR_RPC_URLS_FALLBACK, Environment } from "@axelarjs/core";
+import { createAxelarQueryClientWithFallback } from "@axelarjs/cosmos";
 import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
 
 import { DepositAddressRequestConfig } from "../types";
@@ -33,9 +33,15 @@ export async function getActiveChains(
   environment: Environment,
   requestConfig?: DepositAddressRequestConfig
 ) {
-  const axelarQueryClient = await createAxelarQueryClient(
-    requestConfig?.axelarRpcUrl ?? AXELAR_RPC_URLS[environment]
-  );
+  let rpcUrls = AXELAR_RPC_URLS_FALLBACK.testnet as unknown as string[];
+  if (requestConfig?.axelarRpcUrl) {
+    rpcUrls = [
+      requestConfig.axelarRpcUrl,
+      ...AXELAR_RPC_URLS_FALLBACK[environment],
+    ];
+  }
+
+  const axelarQueryClient = await createAxelarQueryClientWithFallback(rpcUrls);
 
   return axelarQueryClient.nexus
     .chains({ status: ChainStatus.CHAIN_STATUS_ACTIVATED })

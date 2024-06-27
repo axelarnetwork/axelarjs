@@ -1,11 +1,13 @@
-import { AXELAR_RPC_URLS } from "@axelarjs/core";
+import { AXELAR_RPC_URLS_FALLBACK } from "@axelarjs/core";
 import { TokenType } from "@axelarjs/proto/axelar/evm/v1beta1/query";
 
-import { createAxelarQueryClient } from "../stargateClient";
+import { createAxelarQueryClientWithFallback } from "../stargateClient";
 
 describe("query client", () => {
   test("query erc20Tokens", async () => {
-    const client = await createAxelarQueryClient(AXELAR_RPC_URLS.testnet);
+    const client = await createAxelarQueryClientWithFallback(
+      AXELAR_RPC_URLS_FALLBACK.testnet as unknown as string[]
+    );
 
     const erc20Tokens = await client.evm.eRC20Tokens({
       chain: "fantom",

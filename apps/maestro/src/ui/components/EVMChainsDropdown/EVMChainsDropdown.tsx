@@ -61,6 +61,7 @@ type Props = {
   renderTrigger?: () => React.ReactNode;
   selectedChain?: EVMChainConfig;
   onSelectChain?: (chain: EVMChainConfig | null) => void;
+  size?: keyof typeof ICON_SIZES;
 };
 
 export const EVMChainIcon: FC<Props> = (props) => {
@@ -83,7 +84,7 @@ export const EVMChainIcon: FC<Props> = (props) => {
         <ChainIcon
           src={props.selectedChain.image}
           alt={props.selectedChain.name}
-          size="sm"
+          size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
             props.chainIconClassName
@@ -98,7 +99,7 @@ export const EVMChainIcon: FC<Props> = (props) => {
         <ChainIcon
           src={selectedChain.image}
           alt={selectedChain.chain_name}
-          size="sm"
+          size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
             props.chainIconClassName
@@ -196,7 +197,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           className={cn(
             "dark:bg-base-200 z-10 mt-2 max-h-[75vh] w-full md:w-96",
             {
-              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
+              "bg-base-200 dark:bg-base-300 broder max-h-[350px] w-80 overflow-x-scroll md:w-96":
                 props.compact,
             },
             props.contentClassName
