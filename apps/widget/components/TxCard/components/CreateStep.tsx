@@ -87,19 +87,19 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
         <CustomConnectBtn />
         <motion.div
           onClick={onClickInfo}
-          className="mb-5 h-6 w-6 transform cursor-pointer self-end rounded-full border-2 border-blue-500 text-center text-sm text-blue-500 transition-transform duration-100 hover:scale-110"
+          className="border-primary text-primary mb-5 h-6 w-6 transform cursor-pointer self-end rounded-full border-2 text-center text-sm transition-transform duration-100 hover:scale-110"
         >
           i
         </motion.div>
       </motion.div>
-      <label htmlFor="amount" className="mt-8 block font-medium text-white">
+      <label htmlFor="amount" className="mt-8 block font-medium text-gray-400">
         <motion.div className="flex w-full justify-between">
-          <motion.p className="text-pimary">FROM:</motion.p>
+          <motion.p className="text-pimary">From:</motion.p>
 
           <AnimatePresence>
             <motion.div className="h-6">
               {name && symbol && (
-                <motion.p key="token-info-content" className="text-green-400">
+                <motion.p key="token-info-content" className="text-primary">
                   {`${name} (${symbol})`}
                 </motion.p>
               )}
@@ -114,16 +114,18 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
         placeholder="Enter Token Address or Interchain Token ID"
         autoCorrect="off"
         spellCheck="false"
-        className={`text-md my-2 h-24 w-full border bg-gray-900 font-medium text-white ${
+        className={`text-md bg-secondary my-2 h-24 w-full border font-medium text-gray-400 ${
           name ? "border-green-500" : "border-gray-700"
-        } rounded-md px-4 py-2 focus:border-blue-500 focus:outline-none`}
+        } focus:border-primary rounded-md px-4 py-2 focus:outline-none`}
         style={{ resize: "none" }}
       />
-      <label htmlFor="amount" className="mt-5 block font-medium text-white">
+      <label htmlFor="amount" className="mt-5 block font-medium text-gray-400">
         <motion.div className="flex w-full justify-between">
-          <motion.p className="text-blue-400">Send {symbol}:</motion.p>
+          <motion.p className="flex text-gray-400">
+            Send&nbsp; <div className="text-primary">{symbol}</div>:
+          </motion.p>
           {name && (
-            <motion.p className="pt-1 text-xs text-gray-400">
+            <motion.p className="text-primary pt-1 text-xs">
               Max: {balance !== undefined ? balanceFormatted : "Loading..."}
             </motion.p>
           )}
@@ -140,15 +142,15 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
             onChange={handleAmountInputChange}
             id="amount"
             placeholder="Enter amount"
-            className={`w-full border bg-gray-900 text-right font-medium ${
+            className={`bg-secondary w-full border text-right font-medium ${
               isValidAmount() ? "border-gray-700" : "border-red-500"
-            } rounded-md px-4 py-2 focus:border-blue-500 focus:outline-none`}
+            } focus:border-primary rounded-md px-4 py-2 focus:outline-none`}
           />
         </motion.div>
       </motion.div>
       <label
         htmlFor="destinationAddress"
-        className="mt-4 block font-medium text-blue-400"
+        className="mt-4 block font-medium text-gray-400"
       >
         To:
       </label>
@@ -162,11 +164,11 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
             placeholder="Enter destination address"
             autoCorrect="off"
             spellCheck="false"
-            className={`h-24 w-full border bg-gray-900 font-medium ${
+            className={`bg-secondary h-24 w-full border font-medium ${
               (destinationAddressValue ? isValidAddress() : true)
                 ? "border-gray-700"
                 : "border-red-500"
-            } rounded-md px-4 py-2 focus:border-blue-500 focus:outline-none`}
+            } focus:border-primary rounded-md px-4 py-2 focus:outline-none`}
             style={{ resize: "none" }}
           />
           <motion.div className="ml-4 mt-1">

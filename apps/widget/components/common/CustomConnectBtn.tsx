@@ -51,7 +51,7 @@ export const CustomConnectBtn = () => {
               }
               return (
                 <div style={{ display: "flex", gap: 12 }}>
-                  <LoadingButton onClick={openChainModal}>
+                  <LoadingButton variant="disabled" onClick={openChainModal}>
                     <div className="flex items-center justify-between">
                       {chain.hasIcon && (
                         <div
@@ -75,7 +75,7 @@ export const CustomConnectBtn = () => {
                       )}
                     </div>
                   </LoadingButton>
-                  <LoadingButton onClick={openAccountModal}>
+                  <LoadingButton variant="disabled" onClick={openAccountModal}>
                     <Image
                       alt="avatar"
                       width={24}

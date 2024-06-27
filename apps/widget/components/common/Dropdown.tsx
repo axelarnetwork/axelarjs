@@ -83,7 +83,7 @@ const Dropdown = ({
               }}
               transition={{ duration: 0.3 }}
               style={{ originY: 0.5, originX: 0.5 }}
-              className="h-11 w-11 rounded-full border-2 border-gray-700 p-1 transition-transform duration-100 hover:border-blue-500 focus:border-blue-500"
+              className="h-11 w-11 rounded-full border-2 border-gray-700 p-1 transition-transform duration-100 hover:border-primary focus:border-primary"
               src={`/logos/chains/${chainsData[value.id]?.image}`}
               alt="Selected user image"
             />

@@ -14,7 +14,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ goBack }) => {
       <motion.div className=" w-full flex text-xl text-gray-400">
         ABOUT THIS APP
       </motion.div>
-      <motion.div className="w-full my-8 max-h-40 overflow-scroll text-xs text-gray-400">
+      <motion.div className="w-full my-8 max-h-40 overflow-scroll text-gray-400">
         <motion.p className="mb-4">
           Transfer interchain tokens using the interchain token service
           from&nbsp;
@@ -22,7 +22,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ goBack }) => {
             href={AXELAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:scale-105 transition-transform duration-100"
+            className="text-primary hover:scale-105 transition-transform duration-100"
           >
             Axelar.
           </motion.a>
@@ -37,7 +37,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ goBack }) => {
             href={getAxelarscanBaseURL()}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:scale-105 transition-transform duration-100"
+            className="text-primary hover:scale-105 transition-transform duration-100"
           >
             Axelarscan
           </motion.a>
@@ -49,7 +49,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ goBack }) => {
             href={INTERCHAIN_DOCS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="pt-4 text-blue-400 hover:scale-105 transition-transform duration-100"
+            className="pt-4 text-primary hover:scale-105 transition-transform duration-100"
           >
             docs
           </motion.a>

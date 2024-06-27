@@ -12,7 +12,7 @@ interface LoadingButtonProps {
 
 const variants: Record<string, string> = {
   primary:
-    "border-blue-500 sm:border-gray-700 focus:border-blue-500 hover:border-blue-500 border-2 border text-white px-10 py-2 rounded-md focus:outline-none transform hover:scale-105 transition-transform duration-100 font-semibold",
+    "bg-primary text-black px-10 py-2 rounded-md focus:outline-none transform hover:scale-105 transition-transform duration-100 font-semibold",
   disabled:
     "border border-gray-600 text-gray-600 px-10 py-2 rounded-md focus:outline-none transform font-semibold",
 };
