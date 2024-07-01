@@ -66,8 +66,8 @@ export const TOP_MENU_ITEMS: Menuitem[] = [
   },
   {
     kind: "link",
-    label: "All Recent Activity",
-    href: "/recent-activity",
+    label: "Recent Deployments",
+    href: "/recent-deployments",
   },
 ];
 

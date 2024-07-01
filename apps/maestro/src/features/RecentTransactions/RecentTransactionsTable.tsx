@@ -1,4 +1,10 @@
-import { Card, ExternalLinkIcon, Table, Tooltip } from "@axelarjs/ui";
+import {
+  Card,
+  DropdownMenu,
+  ExternalLinkIcon,
+  Table,
+  Tooltip,
+} from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
 import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
@@ -7,11 +13,7 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
-import {
-  decodeDeploymentMessageId,
-  type DeploymentMessageId,
-  type InterchainToken,
-} from "~/lib/drizzle/schema";
+import { type InterchainToken } from "~/lib/drizzle/schema";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import Pagination from "~/ui/components/Pagination";
@@ -24,12 +26,16 @@ type Props = {
   isTokensTable?: boolean;
 };
 
+type TokenKinds = "interchain" | "canonical" | "all";
+
 export const RecentTransactionsTable: FC<Props> = ({
   contractMethod = CONTRACT_METHODS[0],
   maxTransactions = 10,
   isTokensTable = false,
 }) => {
   const [page, setPage] = useState(0);
+  const [selectedTokenType, setSelectedTokenType] =
+    useState<TokenKinds>("interchain");
   const { address: senderAddress } = useAccount();
 
   // reset page when contract method changes
@@ -44,6 +50,7 @@ export const RecentTransactionsTable: FC<Props> = ({
       {
         limit: 20,
         offset: 20 * page,
+        tokenType: selectedTokenType,
       },
       {
         suspense: true,
@@ -95,11 +102,15 @@ export const RecentTransactionsTable: FC<Props> = ({
         "from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none",
     },
     {
+      label: isTokensTable ? "Origin Chain" : "",
+      accessor: isTokensTable ? "axelarChainId" : "",
+    },
+    {
       label: isTokensTable ? "Token Type" : "Hash",
       accessor: isTokensTable ? "tokenType" : "hash",
     },
     {
-      label: "Timestamp",
+      label: "Date",
       accessor: "timestamp",
     },
   ];
@@ -147,12 +158,37 @@ export const RecentTransactionsTable: FC<Props> = ({
                 )}
               </Table.Column>
             </Table.Row>
+            {isTokensTable && (
+              <div className="py-2 pl-4">
+                <DropdownMenu>
+                  <DropdownMenu.Trigger $size="sm" $variant="neutral">
+                    {capitalize(selectedTokenType)}
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content className="bg-base-300 rounded-xl">
+                    {["all", "canonical", "interchain"].map((kind) => (
+                      <DropdownMenu.Item key={kind}>
+                        <a
+                          onClick={setSelectedTokenType.bind(
+                            null,
+                            kind as TokenKinds
+                          )}
+                        >
+                          {capitalize(kind)}
+                        </a>
+                      </DropdownMenu.Item>
+                    ))}
+                  </DropdownMenu.Content>
+                </DropdownMenu>
+              </div>
+            )}
             <Table.Row>
-              {columns.map((column) => (
-                <Table.Column key={column.label} className={column.className}>
-                  {column.label}
-                </Table.Column>
-              ))}
+              {columns
+                .filter((column) => column.label)
+                .map((column) => (
+                  <Table.Column key={column.label} className={column.className}>
+                    {column.label}
+                  </Table.Column>
+                ))}
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -233,10 +269,10 @@ const InterchainTokenRow: FC<{
   return (
     <Table.Row>
       <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
-        <Tooltip tip="View on AxelarScan" $position="bottom">
+        <Tooltip tip="View on Token Page" $position="bottom">
           <Link
             className="group inline-flex items-center text-sm font-semibold hover:underline"
-            href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${decodeDeploymentMessageId(token?.deploymentMessageId as DeploymentMessageId).hash}`}
+            href={`/${token.axelarChainId}/${token.tokenAddress}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -246,6 +282,7 @@ const InterchainTokenRow: FC<{
           </Link>
         </Tooltip>
       </Table.Cell>
+      <Table.Cell>{capitalize(token.axelarChainId)}</Table.Cell>
       <Table.Cell>{capitalize(token.kind)}</Table.Cell>
       <Table.Cell>{token.createdAt?.toLocaleString()}</Table.Cell>
     </Table.Row>

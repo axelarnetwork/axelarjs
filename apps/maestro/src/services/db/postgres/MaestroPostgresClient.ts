@@ -249,11 +249,17 @@ export default class MaestroPostgresClient {
   }
 
   /**
-   * Returns all the interchain tokens deployed.
+   * Returns all the interchain tokens deployed filtering by type.
    */
-  async getAllDeployedInterchainTokens() {
+  async getAllDeployedInterchainTokens(
+    tokenType: "interchain" | "canonical" | "all" = "all"
+  ) {
     const query = this.db.query.interchainTokens.findMany({
-      where: (table, { notIlike }) => notIlike(table.deploymentMessageId, ""),
+      where: (table, { notIlike, eq }) =>
+        tokenType === "all"
+          ? notIlike(table.deploymentMessageId, "")
+          : notIlike(table.deploymentMessageId, "") &&
+            eq(table.kind, tokenType as "interchain" | "canonical"),
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
     });
 
