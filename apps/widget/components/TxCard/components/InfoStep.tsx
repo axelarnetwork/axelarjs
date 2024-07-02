@@ -12,7 +12,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ goBack }) => {
   return (
     <>
       <motion.div className=" w-full flex text-xl text-gray-400">
-        ABOUT THIS APP
+        AXELAR ITS WIDGET
       </motion.div>
       <motion.div className="w-full my-8 max-h-40 overflow-scroll text-gray-400">
         <motion.p className="mb-4">
@@ -28,7 +28,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ goBack }) => {
           </motion.a>
         </motion.p>
         <motion.p className="mb-4">
-          Use the interchain token id to select an existing interchain token and
+          Use the interchain token id, or the token's address to select an existing interchain token and
           transfer it to an address in any of the available chains.
         </motion.p>
         <motion.p className="mb-4">

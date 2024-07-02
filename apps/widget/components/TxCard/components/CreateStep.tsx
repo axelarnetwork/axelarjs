@@ -11,6 +11,7 @@ import useTokenData from "../../../hooks/useTokenData";
 import { CustomConnectBtn } from "../../common/CustomConnectBtn";
 import Dropdown from "../../common/Dropdown";
 import LoadingButton from "../../common/LoadingButton";
+import { BALANCE_OF } from "../../../utils/constants";
 
 type TokenData = {
   address: `0x${string}`;
@@ -48,7 +49,7 @@ const CreateStepContent: React.FC<CreateStepContentProps> = ({
   const { data: balance } = useReadContract({
     abi: tokenABI as Abi,
     address: interchainTokenAddress,
-    functionName: "balanceOf",
+    functionName: BALANCE_OF,
     args: [account.address],
   });
   function onClickSend() {
