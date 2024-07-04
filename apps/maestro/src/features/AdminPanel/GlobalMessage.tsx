@@ -52,7 +52,7 @@ export const GlobalMessageManager = () => {
         </Card.Title>
 
         {activeTab === "preview" ? (
-          <div className="bg-base-100 rounded-lg p-4">
+          <div className="rounded-lg bg-base-100 p-4">
             <Markdown>{newMessage}</Markdown>
           </div>
         ) : (

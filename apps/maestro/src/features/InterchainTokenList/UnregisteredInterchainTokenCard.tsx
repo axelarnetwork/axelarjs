@@ -17,11 +17,11 @@ export const UnregisteredInterchainTokenCard: FC<Props> = (props) => {
       $bordered
       onClick={!props.deploymentStatus ? props.onToggleSelection : undefined}
       className={cn(
-        "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
+        "overflow-hidden bg-base-200 transition-all ease-in dark:bg-base-300",
         "hover:opacity-75 hover:shadow-xl",
         {
           "cursor-pointer": props.onToggleSelection,
-          "ring-primary/50 !bg-primary/25 dark:!bg-primary/10 -translate-y-1.5 ring-4":
+          "-translate-y-1.5 !bg-primary/25 ring-4 ring-primary/50 dark:!bg-primary/10":
             props.isSelected,
         },
         props.className

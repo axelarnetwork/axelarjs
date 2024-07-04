@@ -177,7 +177,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       {showFinalityProgressBar && (
         <TxFinalityProgress txHash={txHash} chainId={chainId} />
       )}
-      <ul className="bg-base-300 rounded-box grid gap-2 p-4">
+      <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
             const chain = computed.indexedById[axelarChainId];
@@ -229,7 +229,7 @@ const CollapsedChains: FC<{
       .join(", ");
     return (
       <Tooltip tip={collapsedChainNames} $position="left">
-        <span className="bg-info text-info-content -ml-2 flex h-6 w-6 items-center justify-center rounded-full">
+        <span className="-ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-info text-info-content">
           +{chains.length - offset}
         </span>
       </Tooltip>

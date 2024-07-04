@@ -119,7 +119,7 @@ const CompetitionPage = () => {
     const startDateDistance = intlFormatDistance(COMPETITION_START_TS, now);
 
     return (
-      <Card className="bg-base-200/95 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
+      <Card className="no-scrollbar max-w-[95vw] overflow-scroll rounded-lg bg-base-200/95">
         <Card.Body>
           <Card.Title>
             <div className="flex-1">

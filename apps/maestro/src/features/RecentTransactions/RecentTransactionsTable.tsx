@@ -140,7 +140,7 @@ export const RecentTransactionsTable: FC<Props> = ({
           ))}
         </Tabs>
       )}
-      <Card className="bg-base-300 no-scrollbar max-w-[95vw] overflow-scroll rounded-lg">
+      <Card className="no-scrollbar max-w-[95vw] overflow-scroll rounded-lg bg-base-300">
         <Card.Body>
           <Table className="relative space-y-4" $zebra>
             <Table.Head>
@@ -217,9 +217,9 @@ const TransactionRow: FC<{
 }> = ({ tx }) => {
   return (
     <Table.Row>
-      <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
+      <Table.Cell className="sticky left-0 bg-gradient-to-r from-base-300 via-base-300/70 to-base-300/25 md:bg-none">
         <Link
-          className="hover:text-primary hover:cursor-pointer"
+          className="hover:cursor-pointer hover:text-primary"
           href={`/interchain-tokens/${tx.event?.tokenId}`}
         >
           {tx.event?.event === "InterchainTransfer"
@@ -243,7 +243,7 @@ const TransactionRow: FC<{
             rel="noopener noreferrer"
           >
             {maskAddress(tx.hash)}{" "}
-            <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+            <ExternalLinkIcon className="h-3 text-accent opacity-0 transition-opacity group-hover:opacity-100" />
           </Link>
         </Tooltip>
       </Table.Cell>
@@ -257,7 +257,7 @@ const InterchainTokenRow: FC<{
 }> = ({ token }) => {
   return (
     <Table.Row>
-      <Table.Cell className="from-base-300 via-base-300/70 to-base-300/25 sticky left-0 bg-gradient-to-r md:bg-none">
+      <Table.Cell className="sticky left-0 bg-gradient-to-r from-base-300 via-base-300/70 to-base-300/25 md:bg-none">
         <Tooltip tip="View on Token Page" $position="bottom">
           <Link
             className="group inline-flex items-center text-sm font-semibold hover:underline"
@@ -267,7 +267,7 @@ const InterchainTokenRow: FC<{
           >
             {token.tokenName}&nbsp;
             <span className="opacity-75"> ({token.tokenSymbol})</span>
-            <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+            <ExternalLinkIcon className="h-3 text-accent opacity-0 transition-opacity group-hover:opacity-100" />
           </Link>
         </Tooltip>
       </Table.Cell>

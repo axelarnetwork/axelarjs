@@ -45,7 +45,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
 
   return (
     <section className="space-y-4">
-      <div className="bg-base-300 grid grid-cols-2 justify-start gap-1.5 rounded-3xl p-2.5 sm:grid-cols-3 sm:gap-2">
+      <div className="grid grid-cols-2 justify-start gap-1.5 rounded-3xl bg-base-300 p-2.5 sm:grid-cols-3 sm:gap-2">
         {eligibleChains?.map((chain) => {
           const isSelected = selectedChains.includes(chain.id);
 
