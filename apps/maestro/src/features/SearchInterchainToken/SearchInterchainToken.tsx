@@ -108,9 +108,9 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
       </div>
       <div
         className={cn("join rounded-md transition-transform", {
-          "ring-error ring-offset-base-200 ring-1 ring-offset-2":
+          "ring-1 ring-error ring-offset-2 ring-offset-base-200":
             shouldRenderError,
-          "ring-offset-base-200 ring-1 ring-offset-2": isFocused,
+          "ring-1 ring-offset-2 ring-offset-base-200": isFocused,
         })}
       >
         <TextInput
@@ -125,13 +125,13 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
-          className="bg-base-200 join-item flex-1 text-sm focus:outline-none focus:ring-0"
+          className="join-item flex-1 bg-base-200 text-sm focus:outline-none focus:ring-0"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
         <div className="btn join-item bg-base-300">
           {isLoading && isAddress(search) ? (
-            <SpinnerIcon className="text-primary h-6 w-6 animate-spin" />
+            <SpinnerIcon className="h-6 w-6 animate-spin text-primary" />
           ) : (
             <EVMChainsDropdown
               triggerClassName="btn btn-sm btn-circle"
@@ -146,7 +146,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                   tabIndex={-1}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="hidden text-gray-700 md:block dark:text-white">
+                    <span className="hidden text-gray-700 dark:text-white md:block">
                       Selected Chain
                     </span>
                     <Tooltip
@@ -183,7 +183,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
       {shouldRenderError && (
         <div
           role="alert"
-          className="text-error -bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm"
+          className="-bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm text-error"
         >
           {(searchInterchainTokenError ?? searchERC20Error)?.message ??
             "Invalid ERC-20 token address"}
