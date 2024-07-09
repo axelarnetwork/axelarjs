@@ -10,12 +10,8 @@ const ShowOnceModal: FC = () => {
   );
 
   return (
-    <Modal
-      open={!hasSeenOneTimeModal}
-      hideCloseButton
-      trigger={undefined}
-    >
-      <Modal.Body className="flex flex-col gap-4 max-h-96">
+    <Modal open={!hasSeenOneTimeModal} hideCloseButton trigger={undefined}>
+      <Modal.Body className="flex max-h-96 flex-col gap-4">
         <Modal.Title className="flex">
           <p className="px-14 py-6 text-center font-medium text-white">
             CREATE A TOKEN THAT CAN SCALE TO ANY CHAIN IN A FEW CLICKS
@@ -54,16 +50,16 @@ const ShowOnceModal: FC = () => {
         </div>
         <p className="text-lg font-semibold">About</p>
         <div>
-          <p className="text-primary text-lg">BRIDGES HAVE THEIR LIMITS</p>
+          <p className="text-lg text-primary">BRIDGES HAVE THEIR LIMITS</p>
           <p>
             Web3 has gone cross-chain, with assets bridging between blockchains
             and developers deploying applications everywhere. But bridged tokens
-            lose their fungibility and their custom features. And it's costly to
-            mint tokens on multiple chains.
+            lose their fungibility and their custom features. And it&apos;s
+            costly to mint tokens on multiple chains.
           </p>
         </div>
         <div>
-          <p className="text-primary text-lg">
+          <p className="text-lg text-primary">
             WHAT IS INTERCHAIN TOKEN SERVICE?
           </p>
           <p>

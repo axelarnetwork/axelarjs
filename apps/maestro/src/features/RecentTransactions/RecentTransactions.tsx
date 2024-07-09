@@ -33,7 +33,7 @@ const RecentTransactionsTabs: FC<Props> = ({ maxTransactions = 10 }) => {
   const { address } = useAccount();
 
   return (
-    <Card className="bg-base-100 w-full rounded-3xl" $compact>
+    <Card className="w-full rounded-3xl bg-base-100" $compact>
       <Card.Body>
         <Card.Title className="grid place-items-center space-y-2 text-center md:hidden">
           <Tabs $boxed className="md:hidden">

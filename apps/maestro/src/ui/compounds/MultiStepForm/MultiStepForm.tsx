@@ -97,7 +97,7 @@ export const BackButton: FC<ButtonProps> = (props) => (
 );
 
 export const ValidationError: FC<FieldError> = ({ message }) => (
-  <div role="alert" className="text-error p-1.5 text-xs">
+  <div role="alert" className="p-1.5 text-xs text-error">
     {message}
   </div>
 );
@@ -295,7 +295,7 @@ export const TokenNameLabelWithTooltip = ({ label = "Token Name" }) => (
   <Label.Text className="inline-flex items-center gap-1">
     {label}
     <Tooltip $position="right" $variant="info" tip={TOKEN_NAME_DISCLAIMER}>
-      <AlertCircleIcon className="text-warning mr-1 h-[1em]" />
+      <AlertCircleIcon className="mr-1 h-[1em] text-warning" />
     </Tooltip>
   </Label.Text>
 );

@@ -10,13 +10,13 @@ type Props = {
 export const HeroSection: FC<Props> = ({ onCTAClick }) => {
   return (
     <section
-      className="hero animate-fade-in min-h-[100dvh] origin-center [animation-duration:1.5s]"
+      className="hero min-h-[100dvh] origin-center animate-fade-in [animation-duration:1.5s]"
       style={{
         backgroundImage: "url(/ilustrations/hero3.webp)",
       }}
     >
       <div className="hero-overlay bg-opacity-50" />
-      <div className="hero-content text-neutral-content translate-y-[30dvh] text-center md:-translate-y-[15dvh]">
+      <div className="hero-content translate-y-[30dvh] text-center text-neutral-content md:-translate-y-[15dvh]">
         <div className="max-w-lg">
           <h1 className="mb-5 text-3xl font-black text-white/75 drop-shadow-lg md:text-5xl">
             {APP_NAME}
@@ -28,7 +28,7 @@ export const HeroSection: FC<Props> = ({ onCTAClick }) => {
             $variant="ghost"
             $shape="circle"
             $size="lg"
-            className="bg-accent/25 animate-pulse"
+            className="animate-pulse bg-accent/25"
             onClick={onCTAClick}
           >
             <ChevronDownIcon size="2.5rem" className="text-black/75" />
