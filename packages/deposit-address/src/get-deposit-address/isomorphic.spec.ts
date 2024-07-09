@@ -188,7 +188,7 @@ describe("Deposit Address", () => {
   });
 });
 
-describe.only("requestConfigs", () => {
+describe("requestConfigs", () => {
   test("should allow users to customize an RPC endpoint", async () => {
     vi.spyOn(mod, "getActiveChains");
     const fallbackAxelarRpcUrls = AXELAR_RPC_URLS_FALLBACK.testnet;
