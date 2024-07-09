@@ -25,18 +25,18 @@ const SignInModal: FC<SignInModalProps> = ({
       <Dialog.Body className="grid place-items-center gap-6 py-8 md:min-h-[25vh] md:py-12">
         <div
           className={cn(
-            "swap-rotate swap relative grid h-16 w-16 place-items-center",
+            "swap swap-rotate relative grid h-16 w-16 place-items-center",
             {
               "swap-active": isSignedIn || signInError,
             }
           )}
         >
           {signInError ? (
-            <XCircleIcon className="text-error swap-on h-12 w-12 md:h-16 md:w-16" />
+            <XCircleIcon className="swap-on h-12 w-12 text-error md:h-16 md:w-16" />
           ) : (
-            <CheckCircleIcon className="text-success swap-on h-12 w-12 md:h-16 md:w-16" />
+            <CheckCircleIcon className="swap-on h-12 w-12 text-success md:h-16 md:w-16" />
           )}
-          <div className="swap-off gird h-14 w-14 place-items-center md:h-16 md:w-16">
+          <div className="gird swap-off h-14 w-14 place-items-center md:h-16 md:w-16">
             <Loading className="absolute h-14 w-14 animate-pulse md:h-20 md:w-20" />
             <KeyIcon className="absolute left-[18px] top-[18px] h-7 w-7 animate-pulse md:left-4 md:top-5 md:h-10 md:w-10" />
           </div>

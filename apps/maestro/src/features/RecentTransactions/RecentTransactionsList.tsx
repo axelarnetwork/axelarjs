@@ -65,12 +65,12 @@ export const RecentTransactionsList: FC<Props> = ({
   });
 
   return (
-    <Card className="bg-base-300 overflow-hidden rounded-xl">
+    <Card className="overflow-hidden rounded-xl bg-base-300">
       <Card.Body>
         {title && (
           <Card.Title className="grid place-items-center">
             <Link
-              className="hover:text-accent group flex items-center gap-1 hover:underline"
+              className="group flex items-center gap-1 hover:text-accent hover:underline"
               href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?contractAddress=${NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS}&contractMethod=${contractMethod}${
                 senderAddress ? `&senderAddress=${senderAddress}` : ``
               }`}
@@ -142,14 +142,14 @@ const TransactionItem: FC<{
                 segmentA: 8,
                 segmentB: 52,
               })}{" "}
-              <ExternalLinkIcon className="text-accent h-3 opacity-0 transition-opacity group-hover:opacity-100" />
+              <ExternalLinkIcon className="h-3 text-accent opacity-0 transition-opacity group-hover:opacity-100" />
             </Link>
           </Tooltip>
         </div>
         <div className="text-sm">
           {tx.event && (
             <Link
-              className="hover:text-primary hover:cursor-pointer"
+              className="hover:cursor-pointer hover:text-primary"
               href={`/interchain-tokens/${tx.event.tokenId}`}
             >
               {tx.event.event === "InterchainTransfer"

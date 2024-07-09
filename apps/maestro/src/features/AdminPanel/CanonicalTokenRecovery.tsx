@@ -216,7 +216,7 @@ export const CanonicalTokenRecovery = () => {
                 <DropdownMenu.Trigger $variant="primary" $size="sm">
                   {searchBy}
                 </DropdownMenu.Trigger>
-                <DropdownMenu.Content className="bg-base-300 rounded-xl">
+                <DropdownMenu.Content className="rounded-xl bg-base-300">
                   {SEARCH_BY_OPTIONS.map((option) => (
                     <DropdownMenu.Item
                       key={option}

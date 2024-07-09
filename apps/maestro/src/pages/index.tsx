@@ -10,6 +10,7 @@ import SearchInterchainToken, {
   TokenFoundResult,
 } from "~/features/SearchInterchainToken";
 import { ConditionalRenderInterchainBanner } from "~/ui/components/InterchainBanner";
+import ShowOnceModal from "~/ui/components/ShowOnceModal";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
 
@@ -51,6 +52,7 @@ export default function HomePage() {
         <div className="w-full">
           <ConditionalRenderInterchainBanner />
         </div>
+        <ShowOnceModal />
 
         <div
           className="flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
@@ -70,7 +72,7 @@ export default function HomePage() {
               </Dialog.Body>
             </Dialog>
           )}
-          <div className="bg-base-100 grid w-full place-items-center rounded-2xl p-4">
+          <div className="grid w-full place-items-center rounded-2xl bg-base-100 p-4">
             <SearchInterchainToken onTokenFound={handleTokenFound} />
             <div className="divider w-full">OR</div>
             <InterchainTokenDeployment />

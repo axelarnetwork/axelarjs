@@ -314,7 +314,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       {
         <div
           className={cn(
-            "bg-base-300 grid w-full items-center gap-2 rounded-xl p-4 md:flex md:justify-between md:p-2",
+            "grid w-full items-center gap-2 rounded-xl bg-base-300 p-4 md:flex md:justify-between md:p-2",
             {
               "pointer-events-none opacity-0": !shouldRenderFooter,
             }
