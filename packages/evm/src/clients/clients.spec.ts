@@ -1,13 +1,67 @@
+import { createAxelarConfigClient } from "@axelarjs/api";
+
 import { avalancheFuji } from "viem/chains";
 
 import { InterchainTokenClient } from "../contracts";
-import { createPublicTestnetClient } from "./testnet-client";
+import {
+  createPublicClient,
+  type SupportedMainnetChain,
+} from "./mainnet-client";
+import {
+  createPublicTestnetClient,
+  type SupportedTestnetChain,
+} from "./testnet-client";
 
 describe("EVM Clients", () => {
-  const client = createPublicTestnetClient("avalancheFuji");
-
-  it("shhould be defined", () => {
+  it("should be defined", () => {
+    const client = createPublicTestnetClient("avalanche");
     expect(client).toBeDefined();
+  });
+
+  it("should support all mainnet chains", async () => {
+    const env = "mainnet";
+    const configClient = createAxelarConfigClient(env);
+    const configs = await configClient.getAxelarConfigs(env);
+    const chains = Object.keys(configs.chains).filter(
+      (chainId) => configs.chains[chainId]?.chainType === "evm"
+    );
+    const supportedChains = [];
+
+    chains.forEach((chain) => {
+      try {
+        createPublicClient(chain as SupportedMainnetChain);
+        supportedChains.push(chain);
+      } catch (e) {
+        console.error(
+          `Chain ${chain} is not supported in mainnet. Please fix it.`
+        );
+      }
+    });
+
+    expect(supportedChains.length).toBe(chains.length);
+  });
+
+  it("should support all testnet chains", async () => {
+    const env = "testnet";
+    const configClient = createAxelarConfigClient(env);
+    const configs = await configClient.getAxelarConfigs(env);
+    const chains = Object.keys(configs.chains).filter(
+      (chainId) => configs.chains[chainId]?.chainType === "evm"
+    );
+    const supportedChains = [];
+
+    chains.forEach((chain) => {
+      try {
+        createPublicTestnetClient(chain as SupportedTestnetChain);
+        supportedChains.push(chain);
+      } catch (e) {
+        console.error(
+          `Chain ${chain} is not supported in testnet. Please fix it.`
+        );
+      }
+    });
+
+    expect(supportedChains.length).toBe(chains.length - 1); // Excluding centrifuge-2 chain because public rpc is not available
   });
 });
 

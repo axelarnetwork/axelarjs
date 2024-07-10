@@ -1,5 +1,15 @@
 # @axelarjs/maestro
 
+## 0.3.16
+
+### Patch Changes
+
+- [#393](https://github.com/axelarnetwork/axelarjs/pull/393) [`f7b306a04d3e5adb2b4cc0dda28c6013fc4ee47c`](https://github.com/axelarnetwork/axelarjs/commit/f7b306a04d3e5adb2b4cc0dda28c6013fc4ee47c) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - create first time visitor modal, add twitter conversion tracking code
+
+- Updated dependencies [[`1d7f53c0d521a7cb974080c3c51bd3b60fd4f762`](https://github.com/axelarnetwork/axelarjs/commit/1d7f53c0d521a7cb974080c3c51bd3b60fd4f762)]:
+  - @axelarjs/api@0.4.3
+  - @axelarjs/evm@0.2.5
+
 ## 0.3.15
 
 ### Patch Changes

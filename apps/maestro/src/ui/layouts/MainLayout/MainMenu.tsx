@@ -46,7 +46,7 @@ export const Content = {
     <Link
       rel="noopener noreferrer"
       href={href}
-      className="text-accent inline-flex items-center gap-2 hover:underline"
+      className="inline-flex items-center gap-2 text-accent hover:underline"
     >
       {children} <ExternalLinkIcon size="1em" />
     </Link>
@@ -125,7 +125,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
             <Content.Main>
               <Link
                 href={NEXT_PUBLIC_AXELAR_CONFIGS_URL}
-                className="hover:text-primary flex gap-4"
+                className="flex gap-4 hover:text-primary"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -143,7 +143,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
             <Content.Main>
               <Link
                 href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?contractAddress=${NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS}`}
-                className="hover:text-primary flex gap-4"
+                className="flex gap-4 hover:text-primary"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -161,7 +161,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
             <Content.Main>
               <Link
                 href={NEXT_PUBLIC_FILE_BUG_REPORT_URL}
-                className="hover:text-primary flex gap-4"
+                className="flex gap-4 hover:text-primary"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -204,7 +204,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
     kind: "modal",
     label: "Terms of Use",
     ModalContent: () => (
-      <article className="prose dark:prose-invert max-h-[70dvh] overflow-y-scroll">
+      <article className="prose max-h-[70dvh] overflow-y-scroll dark:prose-invert">
         <Markdown>{TERMS_OF_USE_COPY}</Markdown>
       </article>
     ),
@@ -298,7 +298,7 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
         {item.kind === "link" ? (
           <Link
             href={item.href}
-            className="hover:text-accent inline-flex uppercase hover:underline"
+            className="inline-flex uppercase hover:text-accent hover:underline"
             rel={item.external ? "noopener noreferrer" : undefined}
             target={item.external ? "_blank" : undefined}
           >
@@ -308,7 +308,7 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
         ) : (
           <Modal
             trigger={
-              <a className="hover:text-accent uppercase hover:underline">
+              <a className="uppercase hover:text-accent hover:underline">
                 {item.label}
               </a>
             }
