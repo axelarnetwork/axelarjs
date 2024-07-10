@@ -11,15 +11,23 @@ import {
   avalanche,
   base,
   blast,
+  bsc,
   celo,
   fantom,
   filecoin,
   fraxtal,
+  immutableZkEvm,
+  kava,
+  linea,
   mainnet,
   mantle,
+  moonbeam,
   optimism,
+  polygon,
   scroll,
 } from "viem/chains";
+
+import { centrifuge } from "./custom/centrifuge";
 
 /**
  * Mainnet chains
@@ -27,6 +35,11 @@ import {
 export const MAINNET_CHAINS = {
   mainnet,
   fantom,
+  centrifuge,
+  kava,
+  linea,
+  moonbeam,
+  polygon,
   filecoin,
   arbitrum,
   aurora,
@@ -38,6 +51,9 @@ export const MAINNET_CHAINS = {
   base,
   blast,
   fraxtal,
+  ethereum: mainnet,
+  binance: bsc,
+  immutable: immutableZkEvm,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;

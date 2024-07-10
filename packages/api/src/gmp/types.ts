@@ -69,11 +69,6 @@ export type SearchGMPParams = Omit<BaseGMPParams, "contractMethod"> & {
   };
 };
 
-type HexAmount = {
-  type: string;
-  hex: string;
-};
-
 export type SearchGMPCall = {
   blockNumber: number;
   blockHash: `0x${string}`;
@@ -101,7 +96,7 @@ export type SearchGMPCall = {
     payloadHash: string;
     payload: string;
     symbol: string;
-    amount: HexAmount;
+    amount: string;
     messageId?: string;
   };
 };
