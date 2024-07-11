@@ -1,6 +1,5 @@
 import {
   Alert,
-  AnimatedBackground,
   Badge,
   Button,
   Card,
@@ -34,6 +33,7 @@ import {
 } from "~/config/env";
 import { TransactionsProvider } from "~/features/Transactions";
 import { trpc } from "~/lib/trpc";
+import AnimatedBackground from "~/ui/components/BackgroundAnimation";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
