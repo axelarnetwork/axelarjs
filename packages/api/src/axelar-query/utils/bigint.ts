@@ -44,8 +44,11 @@ export function multiplyFloatByBigInt(floatNum: number, bigIntNum: bigint) {
   // Scaling factor
   const scalingFactor = 10 ** decimalPlaces;
 
+  // Rounded multiplication of the float by the scaling factor
+  const scaledFloat = Math.round(floatNum * scalingFactor);
+
   // Convert float to scaled BigInt (as before)
-  const scaledBigInt = BigInt(Math.round(floatNum * scalingFactor));
+  const scaledBigInt = BigInt(scaledFloat);
 
   // Perform the multiplication (both are now BigInts)
   const result = scaledBigInt * bigIntNum;
