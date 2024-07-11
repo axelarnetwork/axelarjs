@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.4.4
+
+### Patch Changes
+
+- [#397](https://github.com/axelarnetwork/axelarjs/pull/397) [`e987e82bfd33c23b46bdbd20b62af16e8b9581d5`](https://github.com/axelarnetwork/axelarjs/commit/e987e82bfd33c23b46bdbd20b62af16e8b9581d5) Thanks [@npty](https://github.com/npty)! - chore: fix rounding issue for estimateGasFee api
+
 ## 0.4.3
 
 ### Patch Changes
