@@ -1,6 +1,5 @@
 import {
   Alert,
-  AnimatedBackground,
   Badge,
   Button,
   Card,
@@ -34,6 +33,8 @@ import {
 } from "~/config/env";
 import { TransactionsProvider } from "~/features/Transactions";
 import { trpc } from "~/lib/trpc";
+import AnimatedBackground from "~/ui/components/BackgroundAnimation";
+import ShowOnceModal from "~/ui/components/ShowOnceModal";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -78,6 +79,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <div className="fixed-bg-light" />
       )}
       <div className="relative z-10">
+        <ShowOnceModal />
         <Drawer>
           <Drawer.Toggle
             checked={isDrawerOpen}

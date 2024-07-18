@@ -1,5 +1,21 @@
 # @axelarjs/maestro
 
+## 0.3.18
+
+### Patch Changes
+
+- [#399](https://github.com/axelarnetwork/axelarjs/pull/399) [`857e7e2cfef16ea6d023df7e188c161bb9d8c762`](https://github.com/axelarnetwork/axelarjs/commit/857e7e2cfef16ea6d023df7e188c161bb9d8c762) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - changed background animation from video to canvas
+
+- [#403](https://github.com/axelarnetwork/axelarjs/pull/403) [`805d4e04362d2e1fc648894d1d2cc8fc001530f3`](https://github.com/axelarnetwork/axelarjs/commit/805d4e04362d2e1fc648894d1d2cc8fc001530f3) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Fix first time visitors modal appearing only after connecting wallet. Update about button in footer to show the new modal.
+
+## 0.3.17
+
+### Patch Changes
+
+- Updated dependencies [[`e987e82bfd33c23b46bdbd20b62af16e8b9581d5`](https://github.com/axelarnetwork/axelarjs/commit/e987e82bfd33c23b46bdbd20b62af16e8b9581d5)]:
+  - @axelarjs/api@0.4.4
+  - @axelarjs/evm@0.2.5
+
 ## 0.3.16
 
 ### Patch Changes
