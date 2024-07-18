@@ -240,29 +240,15 @@ export class AxelarQueryAPIClient extends RestService {
   }
 
   async getDenomFromSymbol(symbol: string, chainName: string) {
-    // Cache all assets
-    if (!this.cachedChainConfig) {
-      this.cachedChainConfig = await this.axelarConfigClient.getAxelarConfigs(
-        this.env
-      );
-    }
-
-    // Throw error if failed to retrieve chain configs
-    if (!this.cachedChainConfig) {
-      throw new Error("Failed to retrieve chain configs.");
-    }
+    const axelarConfigs = await this.getAxelarConfigs();
 
     // Throw error if the chain is not supported
     // Note: chains are stored in lowercase
-    if (
-      !Object.keys(this.cachedChainConfig.chains).includes(
-        chainName.toLowerCase()
-      )
-    ) {
+    if (!Object.keys(axelarConfigs.chains).includes(chainName.toLowerCase())) {
       throw new Error(`Chain ${chainName} is not supported.`);
     }
 
-    const allDenoms = Object.keys(this.cachedChainConfig.assets);
+    const allDenoms = Object.keys(axelarConfigs.assets);
 
     // Find the target denom
     const denom = allDenoms.find((denom) => {
@@ -276,8 +262,48 @@ export class AxelarQueryAPIClient extends RestService {
       throw new Error(`Asset ${symbol} is not supported on ${chainName}.`);
     }
 
-    return this.cachedChainConfig.assets[denom]!.id;
+    return axelarConfigs.assets[denom]!.id;
   }
 
-  // async getSymbolFromDenom(denom: string, chainName: string) {}
+  async getSymbolFromDenom(denom: string, chainName: string) {
+    const axelarConfigs = await this.getAxelarConfigs();
+
+    // Throw error if the chain is not supported
+    // Note: chains are stored in lowercase
+    if (!Object.keys(axelarConfigs.chains).includes(chainName.toLowerCase())) {
+      throw new Error(`Chain ${chainName} is not supported.`);
+    }
+
+    // Find the target denom
+    const asset = axelarConfigs.assets[denom];
+
+    // Throw error if the asset is not supported
+    if (!asset) {
+      throw new Error(`Asset ${denom} is not supported.`);
+    }
+
+    const symbol = asset.chains[chainName]?.symbol;
+
+    // Throw error if the asset is not supported on the chain
+    if (!symbol) {
+      throw new Error(`Asset ${denom} is not supported on ${chainName}.`);
+    }
+
+    return symbol;
+  }
+
+  private async getAxelarConfigs(): Promise<AxelarConfigsResponse> {
+    // Cache all assets
+    if (!this.cachedChainConfig) {
+      this.cachedChainConfig = await this.axelarConfigClient.getAxelarConfigs(
+        this.env
+      );
+    }
+
+    if (!this.cachedChainConfig) {
+      throw new Error("Failed to retrieve chain configs.");
+    }
+
+    return this.cachedChainConfig;
+  }
 }
