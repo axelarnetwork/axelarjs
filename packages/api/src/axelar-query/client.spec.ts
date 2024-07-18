@@ -110,7 +110,7 @@ describe("axelar-query (node client)", () => {
     });
   });
 
-  describe.only("getSymbolFromDenom", () => {
+  describe("getSymbolFromDenom", () => {
     test("should return the correct denom for a given symbol", async () => {
       const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
       const denom = await api.getSymbolFromDenom("uusdc", "ethereum");
