@@ -57,9 +57,9 @@ export class AxelarQueryAPIClient extends RestService {
     });
   }
 
-  private async getRpcUrl(chain: string) {
+  private async getRpcUrls(chain: string) {
     const configs = await this.axelarScanClient.getChainConfigs();
-    return configs.evm.find((c) => c.id === chain)?.endpoints?.rpc?.[0];
+    return configs.evm.find((c) => c.id === chain)?.endpoints?.rpc;
   }
 
   private async _getL1FeeForL2(
@@ -79,20 +79,33 @@ export class AxelarQueryAPIClient extends RestService {
     }
 
     const actualExecuteData = executeData || DEFAULT_L1_EXECUTE_DATA;
-    const rpcUrl = await this.getRpcUrl(destinationChain);
+    const rpcUrls = await this.getRpcUrls(destinationChain);
 
-    if (!rpcUrl) {
+    if (!rpcUrls) {
       throw new Error("Failed to retrieve RPC URL for the destination chain.");
     }
 
     // Calculate the L1 execution fee. This value is in ETH.
-    const ethL1ExecutionFee = await getL1FeeForL2(rpcUrl, {
-      executeData: actualExecuteData,
-      l1GasPrice: destination_native_token.l1_gas_price_in_units,
-      l2Type: feeResponse.l2_type,
-      l1GasOracleAddress:
-        feeResponse.destination_native_token.l1_gas_oracle_address,
-    });
+    let ethL1ExecutionFee;
+
+    for (let i = 0; i < rpcUrls.length; i++) {
+      try {
+        ethL1ExecutionFee = await getL1FeeForL2(rpcUrls[i]!, {
+          executeData: actualExecuteData,
+          l1GasPrice: destination_native_token.l1_gas_price_in_units,
+          l2Type: feeResponse.l2_type,
+          l1GasOracleAddress:
+            feeResponse.destination_native_token.l1_gas_oracle_address,
+        });
+        break;
+      } catch (e) {
+        // Retry with the next RPC URL
+      }
+    }
+
+    if (!ethL1ExecutionFee) {
+      throw new Error("Failed to retrieve L1 execution fee.");
+    }
 
     // Convert the L1 execution fee to the source token
     const srcTokenPrice = Number(source_token.token_price.usd);
