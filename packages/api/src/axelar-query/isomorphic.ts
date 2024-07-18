@@ -253,6 +253,7 @@ export class AxelarQueryAPIClient extends RestService {
     }
 
     // Throw error if the chain is not supported
+    // Note: chains are stored in lowercase
     if (
       !Object.keys(this.cachedChainConfig.chains).includes(
         chainName.toLowerCase()
