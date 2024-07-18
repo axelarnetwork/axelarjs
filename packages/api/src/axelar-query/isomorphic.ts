@@ -2,6 +2,11 @@ import { Environment } from "@axelarjs/core";
 
 import { parseUnits } from "viem";
 
+import type {
+  AssetConfig,
+  AxelarConfigClient,
+  AxelarConfigsResponse,
+} from "../axelar-config";
 import type { AxelarscanClient } from "../axelarscan";
 import type { GetBaseFeesResult } from "../gmp";
 import type { GMPClient } from "../gmp/isomorphic";
@@ -16,6 +21,7 @@ import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
 
 type AxelarscanClientDependencies = {
+  axelarConfigClient: AxelarConfigClient;
   gmpClient: GMPClient;
   axelarscanClient: AxelarscanClient;
 };
@@ -23,7 +29,9 @@ type AxelarscanClientDependencies = {
 export class AxelarQueryAPIClient extends RestService {
   protected gmpClient: GMPClient;
   protected axelarScanClient: AxelarscanClient;
+  protected axelarConfigClient: AxelarConfigClient;
   protected env: Environment;
+  protected cachedChainConfig: AxelarConfigsResponse | undefined;
 
   public constructor(
     options: RestServiceOptions,
@@ -34,6 +42,7 @@ export class AxelarQueryAPIClient extends RestService {
     super(options, meta);
     this.gmpClient = dependencies.gmpClient;
     this.axelarScanClient = dependencies.axelarscanClient;
+    this.axelarConfigClient = dependencies.axelarConfigClient;
     this.env = env;
   }
 
@@ -229,4 +238,45 @@ export class AxelarQueryAPIClient extends RestService {
       isExpressSupported: express_supported,
     };
   }
+
+  async getDenomFromSymbol(symbol: string, chainName: string) {
+    // Cache all assets
+    if (!this.cachedChainConfig) {
+      this.cachedChainConfig = await this.axelarConfigClient.getAxelarConfigs(
+        this.env
+      );
+    }
+
+    // Throw error if failed to retrieve chain configs
+    if (!this.cachedChainConfig) {
+      throw new Error("Failed to retrieve chain configs.");
+    }
+
+    // Throw error if the chain is not supported
+    if (
+      !Object.keys(this.cachedChainConfig.chains).includes(
+        chainName.toLowerCase()
+      )
+    ) {
+      throw new Error(`Chain ${chainName} is not supported.`);
+    }
+
+    const allDenoms = Object.keys(this.cachedChainConfig.assets);
+
+    // Find the target denom
+    const denom = allDenoms.find((denom) => {
+      const asset = this.cachedChainConfig!.assets[denom] as AssetConfig;
+      const assetSymbol = asset.chains[chainName]?.symbol?.toLowerCase();
+      return assetSymbol?.toLowerCase() === symbol.toLowerCase();
+    });
+
+    // Throw error if the asset is not supported
+    if (!denom) {
+      throw new Error(`Asset ${symbol} is not supported on ${chainName}.`);
+    }
+
+    return this.cachedChainConfig.assets[denom]!.id;
+  }
+
+  // async getSymbolFromDenom(denom: string, chainName: string) {}
 }
