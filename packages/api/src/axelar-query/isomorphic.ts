@@ -103,7 +103,7 @@ export class AxelarQueryAPIClient extends RestService {
       }
     }
 
-    if (!ethL1ExecutionFee) {
+    if (ethL1ExecutionFee === undefined) {
       throw new Error("Failed to retrieve L1 execution fee.");
     }
 
