@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.4.5
+
+### Patch Changes
+
+- [#407](https://github.com/axelarnetwork/axelarjs/pull/407) [`e15a2ca45e3dd2148e103dced4e2dee94b65eae8`](https://github.com/axelarnetwork/axelarjs/commit/e15a2ca45e3dd2148e103dced4e2dee94b65eae8) Thanks [@npty](https://github.com/npty)! - Added `getSymbolFromDenom` and `getDenomFromSymbol` functions
+
 ## 0.4.4
 
 ### Patch Changes
