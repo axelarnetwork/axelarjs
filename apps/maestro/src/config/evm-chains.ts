@@ -20,6 +20,8 @@ import {
   filecoinCalibration,
   fraxtal,
   fraxtalTestnet,
+  immutableZkEvm,
+  immutableZkEvmTestnet,
   kava,
   kavaTestnet,
   linea,
@@ -88,6 +90,18 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     ...fantomTestnet,
     axelarChainId: "fantom",
     axelarChainName: "Fantom",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...immutableZkEvm,
+    axelarChainId: "immutable",
+    axelarChainName: "Immutable",
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...immutableZkEvmTestnet,
+    axelarChainId: "immutable",
+    axelarChainName: "Immutable",
     environment: ENVIRONMENTS.testnet,
   },
   {
