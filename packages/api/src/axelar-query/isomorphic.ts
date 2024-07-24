@@ -2,6 +2,11 @@ import { Environment } from "@axelarjs/core";
 
 import { parseUnits } from "viem";
 
+import type {
+  AssetConfig,
+  AxelarConfigClient,
+  AxelarConfigsResponse,
+} from "../axelar-config";
 import type { AxelarscanClient } from "../axelarscan";
 import type { GetBaseFeesResult } from "../gmp";
 import type { GMPClient } from "../gmp/isomorphic";
@@ -16,6 +21,7 @@ import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
 
 type AxelarscanClientDependencies = {
+  axelarConfigClient: AxelarConfigClient;
   gmpClient: GMPClient;
   axelarscanClient: AxelarscanClient;
 };
@@ -23,7 +29,9 @@ type AxelarscanClientDependencies = {
 export class AxelarQueryAPIClient extends RestService {
   protected gmpClient: GMPClient;
   protected axelarScanClient: AxelarscanClient;
+  protected axelarConfigClient: AxelarConfigClient;
   protected env: Environment;
+  protected cachedChainConfig: AxelarConfigsResponse | undefined;
 
   public constructor(
     options: RestServiceOptions,
@@ -34,6 +42,7 @@ export class AxelarQueryAPIClient extends RestService {
     super(options, meta);
     this.gmpClient = dependencies.gmpClient;
     this.axelarScanClient = dependencies.axelarscanClient;
+    this.axelarConfigClient = dependencies.axelarConfigClient;
     this.env = env;
   }
 
@@ -48,9 +57,9 @@ export class AxelarQueryAPIClient extends RestService {
     });
   }
 
-  private async getRpcUrl(chain: string) {
+  private async getRpcUrls(chain: string) {
     const configs = await this.axelarScanClient.getChainConfigs();
-    return configs.evm.find((c) => c.id === chain)?.endpoints?.rpc?.[0];
+    return configs.evm.find((c) => c.id === chain)?.endpoints?.rpc;
   }
 
   private async _getL1FeeForL2(
@@ -70,20 +79,33 @@ export class AxelarQueryAPIClient extends RestService {
     }
 
     const actualExecuteData = executeData || DEFAULT_L1_EXECUTE_DATA;
-    const rpcUrl = await this.getRpcUrl(destinationChain);
+    const rpcUrls = await this.getRpcUrls(destinationChain);
 
-    if (!rpcUrl) {
+    if (!rpcUrls) {
       throw new Error("Failed to retrieve RPC URL for the destination chain.");
     }
 
     // Calculate the L1 execution fee. This value is in ETH.
-    const ethL1ExecutionFee = await getL1FeeForL2(rpcUrl, {
-      executeData: actualExecuteData,
-      l1GasPrice: destination_native_token.l1_gas_price_in_units,
-      l2Type: feeResponse.l2_type,
-      l1GasOracleAddress:
-        feeResponse.destination_native_token.l1_gas_oracle_address,
-    });
+    let ethL1ExecutionFee;
+
+    for (let i = 0; i < rpcUrls.length; i++) {
+      try {
+        ethL1ExecutionFee = await getL1FeeForL2(rpcUrls[i]!, {
+          executeData: actualExecuteData,
+          l1GasPrice: destination_native_token.l1_gas_price_in_units,
+          l2Type: feeResponse.l2_type,
+          l1GasOracleAddress:
+            feeResponse.destination_native_token.l1_gas_oracle_address,
+        });
+        break;
+      } catch (e) {
+        // Retry with the next RPC URL
+      }
+    }
+
+    if (ethL1ExecutionFee === undefined) {
+      throw new Error("Failed to retrieve L1 execution fee.");
+    }
 
     // Convert the L1 execution fee to the source token
     const srcTokenPrice = Number(source_token.token_price.usd);
@@ -228,5 +250,73 @@ export class AxelarQueryAPIClient extends RestService {
       apiResponse: JSON.stringify(response),
       isExpressSupported: express_supported,
     };
+  }
+
+  async getDenomFromSymbol(symbol: string, chainName: string) {
+    const axelarConfigs = await this.getAxelarConfigs();
+
+    // Throw error if the chain is not supported
+    // Note: chains are stored in lowercase
+    if (!Object.keys(axelarConfigs.chains).includes(chainName.toLowerCase())) {
+      throw new Error(`Chain ${chainName} is not supported.`);
+    }
+
+    const allDenoms = Object.keys(axelarConfigs.assets);
+
+    // Find the target denom
+    const denom = allDenoms.find((denom) => {
+      const asset = this.cachedChainConfig!.assets[denom] as AssetConfig;
+      const assetSymbol = asset.chains[chainName]?.symbol?.toLowerCase();
+      return assetSymbol?.toLowerCase() === symbol.toLowerCase();
+    });
+
+    // Throw error if the asset is not supported
+    if (!denom) {
+      throw new Error(`Asset ${symbol} is not supported on ${chainName}.`);
+    }
+
+    return axelarConfigs.assets[denom]!.id;
+  }
+
+  async getSymbolFromDenom(denom: string, chainName: string) {
+    const axelarConfigs = await this.getAxelarConfigs();
+
+    // Throw error if the chain is not supported
+    // Note: chains are stored in lowercase
+    if (!Object.keys(axelarConfigs.chains).includes(chainName.toLowerCase())) {
+      throw new Error(`Chain ${chainName} is not supported.`);
+    }
+
+    // Find the target denom
+    const asset = axelarConfigs.assets[denom];
+
+    // Throw error if the asset is not supported
+    if (!asset) {
+      throw new Error(`Asset ${denom} is not supported.`);
+    }
+
+    const symbol = asset.chains[chainName]?.symbol;
+
+    // Throw error if the asset is not supported on the chain
+    if (!symbol) {
+      throw new Error(`Asset ${denom} is not supported on ${chainName}.`);
+    }
+
+    return symbol;
+  }
+
+  private async getAxelarConfigs(): Promise<AxelarConfigsResponse> {
+    // Cache all assets
+    if (!this.cachedChainConfig) {
+      this.cachedChainConfig = await this.axelarConfigClient.getAxelarConfigs(
+        this.env
+      );
+    }
+
+    if (!this.cachedChainConfig) {
+      throw new Error("Failed to retrieve chain configs.");
+    }
+
+    return this.cachedChainConfig;
   }
 }

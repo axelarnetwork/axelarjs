@@ -113,7 +113,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     <Card
       $compact
       className={cn(
-        "bg-base-200 dark:bg-base-300 overflow-hidden transition-all ease-in",
+        "overflow-hidden bg-base-200 transition-all ease-in dark:bg-base-300",
         props.className
       )}
     >
@@ -172,7 +172,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               className="flex items-center gap-0.5"
             >
               <span className="-translate-x-1">
-                <SpinnerIcon className="text-info h-2.5 w-2.5 animate-spin" />
+                <SpinnerIcon className="h-2.5 w-2.5 animate-spin text-info" />
               </span>
               <span className="-translate-y-px">{props.deploymentStatus}</span>
             </Badge>
@@ -181,12 +181,12 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
         {!balance?.tokenBalance ? (
           !address ? null : (
-            <div className="bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4">
+            <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
               <span className="mx-auto">Loading balance...</span>
             </div>
           )
         ) : (
-          <div className="bg-base-300 dark:bg-base-100 flex items-center justify-between rounded-xl p-2 pl-4">
+          <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
             {balance.tokenBalance === "0" ? (
               <div className="flex w-full items-center justify-between">
                 <span
@@ -278,7 +278,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               $position="top"
             >
               <span>Token Manager Address</span>
-              <InfoIcon className="text-info h-[1em] w-[1em]" />
+              <InfoIcon className="h-[1em] w-[1em] text-info" />
             </Tooltip>
 
             <CopyToClipboardButton
@@ -314,7 +314,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           <Card.Actions className="mt-2 flex flex-col justify-between">
             Add Liquidity
             <LinkButton
-              className="bg-base-300 dark:bg-base-100 min-w-24 self-stretch py-1 ease-in hover:opacity-75"
+              className="min-w-24 self-stretch bg-base-300 py-1 ease-in hover:opacity-75 dark:bg-base-100"
               $size={"md"}
               href={dex.url}
               target="_blank"

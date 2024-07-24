@@ -1,5 +1,23 @@
 # @axelarjs/api
 
+## 0.4.5
+
+### Patch Changes
+
+- [#407](https://github.com/axelarnetwork/axelarjs/pull/407) [`e15a2ca45e3dd2148e103dced4e2dee94b65eae8`](https://github.com/axelarnetwork/axelarjs/commit/e15a2ca45e3dd2148e103dced4e2dee94b65eae8) Thanks [@npty](https://github.com/npty)! - Added `getSymbolFromDenom` and `getDenomFromSymbol` functions
+
+## 0.4.4
+
+### Patch Changes
+
+- [#397](https://github.com/axelarnetwork/axelarjs/pull/397) [`e987e82bfd33c23b46bdbd20b62af16e8b9581d5`](https://github.com/axelarnetwork/axelarjs/commit/e987e82bfd33c23b46bdbd20b62af16e8b9581d5) Thanks [@npty](https://github.com/npty)! - chore: fix rounding issue for estimateGasFee api
+
+## 0.4.3
+
+### Patch Changes
+
+- [#380](https://github.com/axelarnetwork/axelarjs/pull/380) [`1d7f53c0d521a7cb974080c3c51bd3b60fd4f762`](https://github.com/axelarnetwork/axelarjs/commit/1d7f53c0d521a7cb974080c3c51bd3b60fd4f762) Thanks [@npty](https://github.com/npty)! - feat: add evmExecute for transaction-recovery package
+
 ## 0.4.2
 
 ### Patch Changes

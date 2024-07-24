@@ -136,7 +136,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                   $variant="primary"
                   $position="bottom"
                 >
-                  <InfoIcon className="text-primary h-[1em] w-[1em]" />
+                  <InfoIcon className="h-[1em] w-[1em] text-primary" />
                 </Tooltip>
               </div>,
             ],
@@ -171,7 +171,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                     $position="right"
                     tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
                   >
-                    <InfoIcon className="text-primary h-[1em] w-[1em]" />
+                    <InfoIcon className="h-[1em] w-[1em] text-primary" />
                   </Tooltip>
                 </div>
               ),
@@ -199,7 +199,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                     $variant="primary"
                     $position="bottom"
                   >
-                    <InfoIcon className="text-primary h-[1em] w-[1em]" />
+                    <InfoIcon className="h-[1em] w-[1em] text-primary" />
                   </Tooltip>
                 </div>
               ),
@@ -225,7 +225,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
           {Boolean(props.name && props.symbol) && (
             <div className="grid -space-y-1">
-              <span className="text-primary text-lg">{props.symbol}</span>{" "}
+              <span className="text-lg text-primary">{props.symbol}</span>{" "}
               <span className="text-base opacity-50">{props.name}</span>
             </div>
           )}
@@ -330,7 +330,7 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
     <div
       ref={containerRef}
       className={cn(
-        "ring-primary/50 ring-offset-base-100 relative grid h-9 w-9 place-items-start overflow-hidden rounded-full ring-2 ring-offset-2",
+        "relative grid h-9 w-9 place-items-start overflow-hidden rounded-full ring-2 ring-primary/50 ring-offset-2 ring-offset-base-100",
         {
           "animate-pulse": isLoading,
         }
@@ -460,7 +460,7 @@ const UpdateTokenIcon: FC<UpdateTokenIconProps> = ({
                 tip="Provide a URL to an image to use as the token icon"
                 $position="right"
               >
-                <InfoIcon className="text-primary h-[1em]" />
+                <InfoIcon className="h-[1em] text-primary" />
               </Tooltip>
             </Label>
 

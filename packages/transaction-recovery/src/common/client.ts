@@ -1,6 +1,15 @@
-import { EvmClientError } from "./error";
-import { createWalletClient, custom, http, publicActions, type WalletClient } from "viem";
+import {
+  createWalletClient,
+  custom,
+  http,
+  publicActions,
+  type Hex,
+  type WalletClient,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+
+import { EvmClientError } from "./error";
+
 import "viem/window";
 
 /**
@@ -11,18 +20,17 @@ import "viem/window";
  */
 export function getWalletClient(
   rpcUrl: string,
-  privateKey?: `0x${string}`
+  privateKey?: string | undefined
 ): WalletClient {
-  if (typeof window !== "undefined" && !window.ethereum) {
-    throw EvmClientError.WALLET_CLIENT_NOT_FOUND;
-  }
-  if (!privateKey) {
+  const hasBrowserWallet = typeof window !== "undefined" && window.ethereum;
+
+  if (!hasBrowserWallet && !privateKey) {
     throw EvmClientError.WALLET_CLIENT_NOT_FOUND;
   }
 
   if (privateKey) {
     return createWalletClient({
-      account: privateKeyToAccount(privateKey),
+      account: privateKeyToAccount(privateKey as Hex),
       transport: http(rpcUrl),
     }).extend(publicActions);
   } else {

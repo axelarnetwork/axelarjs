@@ -29,4 +29,12 @@ describe("bigint", () => {
     const result = multiplyFloatByBigInt(floatNum, bigIntNum);
     expect(result).toEqual(1234n);
   });
+
+  it("should handle floating points result", () => {
+    const floatNum = 1.16;
+    const bigIntNum = 169973114000000n;
+
+    const result = multiplyFloatByBigInt(floatNum, bigIntNum);
+    expect(result).toEqual(197168812240000n);
+  });
 });

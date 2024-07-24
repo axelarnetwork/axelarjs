@@ -165,7 +165,7 @@ const ToastElement: FC<ToastElementProps> = ({
   }, [groupedStatusesProps, onRemoveTx, txHash]);
 
   return (
-    <div className="bg-base-300 border-base-200 relative grid gap-2 rounded-md p-2 pl-4 pr-8 shadow-md shadow-black/10">
+    <div className="relative grid gap-2 rounded-md border-base-200 bg-base-300 p-2 pl-4 pr-8 shadow-md shadow-black/10">
       <Button
         className="absolute right-2 top-2"
         $size="xs"
@@ -265,10 +265,10 @@ const Transactions = () => {
     <>
       {hasPendingTransactions && (
         <button
-          className="indicator bg-base-300 rounded-full p-2"
+          className="indicator rounded-full bg-base-300 p-2"
           onClick={triggerRender}
         >
-          <span className="indicator-item badge badge-info badge-sm">
+          <span className="badge indicator-item badge-info badge-sm">
             {state.pendingTransactions.length}
           </span>
           <HourglassIcon size={16} />

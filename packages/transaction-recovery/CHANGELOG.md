@@ -1,5 +1,14 @@
 # @axelarjs/transaction-recovery
 
+## 0.3.3
+
+### Patch Changes
+
+- [#380](https://github.com/axelarnetwork/axelarjs/pull/380) [`1d7f53c0d521a7cb974080c3c51bd3b60fd4f762`](https://github.com/axelarnetwork/axelarjs/commit/1d7f53c0d521a7cb974080c3c51bd3b60fd4f762) Thanks [@npty](https://github.com/npty)! - feat: add evmExecute for transaction-recovery package
+
+- Updated dependencies [[`1d7f53c0d521a7cb974080c3c51bd3b60fd4f762`](https://github.com/axelarnetwork/axelarjs/commit/1d7f53c0d521a7cb974080c3c51bd3b60fd4f762)]:
+  - @axelarjs/evm@0.2.5
+
 ## 0.3.2
 
 ### Patch Changes

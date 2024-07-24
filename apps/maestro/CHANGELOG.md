@@ -1,5 +1,43 @@
 # @axelarjs/maestro
 
+## 0.3.19
+
+### Patch Changes
+
+- [#410](https://github.com/axelarnetwork/axelarjs/pull/410) [`775cc3c563d3b0c74b4c015fcaa50dcad974a0e3`](https://github.com/axelarnetwork/axelarjs/commit/775cc3c563d3b0c74b4c015fcaa50dcad974a0e3) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Added Immutable chain support to both testnet and mainnet.
+
+- [#409](https://github.com/axelarnetwork/axelarjs/pull/409) [`8480aa6b0d744cd13528117f934498d6576624ee`](https://github.com/axelarnetwork/axelarjs/commit/8480aa6b0d744cd13528117f934498d6576624ee) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Added cookie consent banner to interchain.axelar.dev
+
+- Updated dependencies [[`e15a2ca45e3dd2148e103dced4e2dee94b65eae8`](https://github.com/axelarnetwork/axelarjs/commit/e15a2ca45e3dd2148e103dced4e2dee94b65eae8)]:
+  - @axelarjs/api@0.4.5
+  - @axelarjs/evm@0.2.5
+
+## 0.3.18
+
+### Patch Changes
+
+- [#399](https://github.com/axelarnetwork/axelarjs/pull/399) [`857e7e2cfef16ea6d023df7e188c161bb9d8c762`](https://github.com/axelarnetwork/axelarjs/commit/857e7e2cfef16ea6d023df7e188c161bb9d8c762) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - changed background animation from video to canvas
+
+- [#403](https://github.com/axelarnetwork/axelarjs/pull/403) [`805d4e04362d2e1fc648894d1d2cc8fc001530f3`](https://github.com/axelarnetwork/axelarjs/commit/805d4e04362d2e1fc648894d1d2cc8fc001530f3) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Fix first time visitors modal appearing only after connecting wallet. Update about button in footer to show the new modal.
+
+## 0.3.17
+
+### Patch Changes
+
+- Updated dependencies [[`e987e82bfd33c23b46bdbd20b62af16e8b9581d5`](https://github.com/axelarnetwork/axelarjs/commit/e987e82bfd33c23b46bdbd20b62af16e8b9581d5)]:
+  - @axelarjs/api@0.4.4
+  - @axelarjs/evm@0.2.5
+
+## 0.3.16
+
+### Patch Changes
+
+- [#393](https://github.com/axelarnetwork/axelarjs/pull/393) [`f7b306a04d3e5adb2b4cc0dda28c6013fc4ee47c`](https://github.com/axelarnetwork/axelarjs/commit/f7b306a04d3e5adb2b4cc0dda28c6013fc4ee47c) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - create first time visitor modal, add twitter conversion tracking code
+
+- Updated dependencies [[`1d7f53c0d521a7cb974080c3c51bd3b60fd4f762`](https://github.com/axelarnetwork/axelarjs/commit/1d7f53c0d521a7cb974080c3c51bd3b60fd4f762)]:
+  - @axelarjs/api@0.4.3
+  - @axelarjs/evm@0.2.5
+
 ## 0.3.15
 
 ### Patch Changes

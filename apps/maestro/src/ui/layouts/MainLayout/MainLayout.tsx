@@ -1,6 +1,5 @@
 import {
   Alert,
-  AnimatedBackground,
   Badge,
   Button,
   Card,
@@ -34,6 +33,8 @@ import {
 } from "~/config/env";
 import { TransactionsProvider } from "~/features/Transactions";
 import { trpc } from "~/lib/trpc";
+import AnimatedBackground from "~/ui/components/BackgroundAnimation";
+import ShowOnceModal from "~/ui/components/ShowOnceModal";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -78,6 +79,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <div className="fixed-bg-light" />
       )}
       <div className="relative z-10">
+        <ShowOnceModal />
         <Drawer>
           <Drawer.Toggle
             checked={isDrawerOpen}
@@ -95,13 +97,13 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             {globalMessage && !isGlobalBannerDismissed && (
               <div
                 role="alert"
-                className="bg-warning text-warning-content sticky top-0 z-20 p-4 px-8 text-center"
+                className="sticky top-0 z-20 bg-warning p-4 px-8 text-center text-warning-content"
               >
                 <Markdown>{globalMessage.content}</Markdown>
 
                 <Tooltip
                   tip="Dismiss this messages"
-                  className="text-error absolute right-4 top-4"
+                  className="absolute right-4 top-4 text-error"
                   $position="left"
                 >
                   <button onClick={actions.dismissGlobalBanner}>
@@ -127,7 +129,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           </Drawer.Content>
           <Drawer.Side>
             <Drawer.Overlay onClick={actions.closeDrawer} />
-            <aside className="bg-base-100 text-base-content h-full w-full max-w-xs p-4">
+            <aside className="h-full w-full max-w-xs bg-base-100 p-4 text-base-content">
               <DrawerSideContent />
             </aside>
           </Drawer.Side>
@@ -177,7 +179,7 @@ const PackageVersionItem = ({
 
 const LayoutFooter = () => (
   <Footer
-    className="bg-base-300 text-neutral-content footer p-6 md:p-8 xl:p-10"
+    className="footer bg-base-300 p-6 text-neutral-content md:p-8 xl:p-10"
     $center={true}
   >
     <div className="w-full max-w-4xl items-center justify-evenly md:flex">
@@ -247,7 +249,7 @@ const LayoutFooter = () => (
 
 const TestnetBanner = ({ onClose = () => {} }) => (
   <Card
-    className="bg-base-200 fixed bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
+    className="fixed bottom-2 left-2 max-w-xs bg-base-200 sm:bottom-4 sm:left-4"
     $compact
   >
     <Card.Body>
@@ -319,7 +321,7 @@ const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
           </div>
         </Alert>
         {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-          <div className="mockup-code dark:bg-base-300 text-success/95">
+          <div className="mockup-code text-success/95 dark:bg-base-300">
             <pre className="max-w-xs overflow-x-scroll px-4 md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
               {errorContent}
             </pre>

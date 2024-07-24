@@ -188,6 +188,9 @@ importers:
       '@babel/core':
         specifier: ^7.24.3
         version: 7.24.3
+      '@ianvs/prettier-plugin-sort-imports':
+        specifier: ^4.2.1
+        version: 4.2.1(prettier@3.2.5)
       '@inquirer/prompts':
         specifier: ^3.3.2
         version: 3.3.2
@@ -287,6 +290,12 @@ importers:
       postcss:
         specifier: ^8.4.38
         version: 8.4.38
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
+      prettier-plugin-tailwindcss:
+        specifier: ^0.5.12
+        version: 0.5.12(@ianvs/prettier-plugin-sort-imports@4.2.1)(prettier@3.2.5)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1(ts-node@10.9.1)
@@ -570,6 +579,9 @@ importers:
       '@axelar-network/interchain-token-service':
         specifier: ^1.2.4
         version: 1.2.4
+      '@axelarjs/api':
+        specifier: workspace:^
+        version: link:../api
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
@@ -646,15 +658,15 @@ importers:
 
   packages/transaction-recovery:
     dependencies:
-      '@axelarjs/api':
-        specifier: workspace:*
-        version: link:../api
       '@axelarjs/core':
         specifier: workspace:*
         version: link:../core
       '@axelarjs/cosmos':
         specifier: workspace:*
         version: link:../cosmos
+      '@axelarjs/evm':
+        specifier: workspace:^
+        version: link:../evm
       '@cosmjs/proto-signing':
         specifier: ^0.31.3
         version: 0.31.3
@@ -665,6 +677,9 @@ importers:
         specifier: ^2.8.18
         version: 2.8.18(typescript@5.4.3)(zod@3.22.4)
     devDependencies:
+      '@axelarjs/api':
+        specifier: workspace:*
+        version: link:../api
       '@axelarjs/config':
         specifier: workspace:*
         version: link:../config
@@ -2477,12 +2492,12 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/code-frame': 7.23.5
-      '@babel/generator': 7.23.6
+      '@babel/generator': 7.24.1
       '@babel/helper-environment-visitor': 7.22.20
       '@babel/helper-function-name': 7.23.0
       '@babel/helper-hoist-variables': 7.22.5
       '@babel/helper-split-export-declaration': 7.22.6
-      '@babel/parser': 7.24.0
+      '@babel/parser': 7.24.1
       '@babel/types': 7.24.0
       debug: 4.3.4
       globals: 11.12.0
@@ -7410,9 +7425,9 @@ packages:
   /@storybook/csf-tools@8.0.4:
     resolution: {integrity: sha512-dMSZxWnXBhmXGOZZOAJ4DKZRCYdA0HaqqZ4/eF9MLLsI+qvW4EklcpjVY6bsIzACgubRWtRZkTpxTnjExi/N1A==}
     dependencies:
-      '@babel/generator': 7.23.6
-      '@babel/parser': 7.24.0
-      '@babel/traverse': 7.24.0
+      '@babel/generator': 7.24.1
+      '@babel/parser': 7.24.1
+      '@babel/traverse': 7.24.1
       '@babel/types': 7.24.0
       '@storybook/csf': 0.1.2
       '@storybook/types': 8.0.4
@@ -8568,7 +8583,7 @@ packages:
   /@types/babel__template@7.4.1:
     resolution: {integrity: sha512-azBFKemX6kMg5Io+/rdGT0dkGreboUVR0Cdm3fz9QJWpaQGJRQXl7C+6hOTCZcMll7KFyEQpgbYI2lHdsS4U7g==}
     dependencies:
-      '@babel/parser': 7.24.0
+      '@babel/parser': 7.24.1
       '@babel/types': 7.24.0
     dev: true
 
@@ -9296,7 +9311,7 @@ packages:
     resolution: {integrity: sha512-MjXawxZf2SbZszLPYxaFCjxfibYrzr3eYbKxwpLR9EQN+oaziSu3qKVbwBERj1IFIB8OLUewxB5m/BFzi613og==}
     requiresBuild: true
     dependencies:
-      '@babel/parser': 7.24.0
+      '@babel/parser': 7.24.1
       '@vue/shared': 3.4.21
       entities: 4.5.0
       estree-walker: 2.0.2
@@ -9315,7 +9330,7 @@ packages:
     resolution: {integrity: sha512-me7epoTxYlY+2CUM7hy9PCDdpMPfIwrOvAXud2Upk10g4YLv9UBW7kL798TvMeDhPthkZ0CONNrK2GoeI1ODiQ==}
     requiresBuild: true
     dependencies:
-      '@babel/parser': 7.24.0
+      '@babel/parser': 7.24.1
       '@vue/compiler-core': 3.4.21
       '@vue/compiler-dom': 3.4.21
       '@vue/compiler-ssr': 3.4.21
@@ -15091,7 +15106,7 @@ packages:
         optional: true
     dependencies:
       '@babel/core': 7.24.3
-      '@babel/parser': 7.24.0
+      '@babel/parser': 7.24.1
       '@babel/plugin-transform-class-properties': 7.23.3(@babel/core@7.24.3)
       '@babel/plugin-transform-modules-commonjs': 7.23.3(@babel/core@7.24.3)
       '@babel/plugin-transform-nullish-coalescing-operator': 7.23.4(@babel/core@7.24.3)
