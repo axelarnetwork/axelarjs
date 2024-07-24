@@ -5,6 +5,13 @@ export default function Document() {
   return (
     <Html lang="en" data-theme="light" className="scroll-smooth">
       <Head>
+        {/* Cookies banner code */}
+        <script
+          async
+          type="text/javascript"
+          src="//cdn.cookie-script.com/s/1dbb8c364e74a2d20f8ba281fb204aa4.js"
+        />
+        {/* End cookies banner code */}
         {/* Twitter conversion tracking base code */}
         <script
           dangerouslySetInnerHTML={{
