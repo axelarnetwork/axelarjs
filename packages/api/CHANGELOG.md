@@ -1,5 +1,51 @@
 # @axelarjs/api
 
+## 0.4.5
+
+### Patch Changes
+
+- [#407](https://github.com/axelarnetwork/axelarjs/pull/407) [`e15a2ca45e3dd2148e103dced4e2dee94b65eae8`](https://github.com/axelarnetwork/axelarjs/commit/e15a2ca45e3dd2148e103dced4e2dee94b65eae8) Thanks [@npty](https://github.com/npty)! - Added `getSymbolFromDenom` and `getDenomFromSymbol` functions
+
+## 0.4.4
+
+### Patch Changes
+
+- [#397](https://github.com/axelarnetwork/axelarjs/pull/397) [`e987e82bfd33c23b46bdbd20b62af16e8b9581d5`](https://github.com/axelarnetwork/axelarjs/commit/e987e82bfd33c23b46bdbd20b62af16e8b9581d5) Thanks [@npty](https://github.com/npty)! - chore: fix rounding issue for estimateGasFee api
+
+## 0.4.3
+
+### Patch Changes
+
+- [#380](https://github.com/axelarnetwork/axelarjs/pull/380) [`1d7f53c0d521a7cb974080c3c51bd3b60fd4f762`](https://github.com/axelarnetwork/axelarjs/commit/1d7f53c0d521a7cb974080c3c51bd3b60fd4f762) Thanks [@npty](https://github.com/npty)! - feat: add evmExecute for transaction-recovery package
+
+## 0.4.2
+
+### Patch Changes
+
+- [#383](https://github.com/axelarnetwork/axelarjs/pull/383) [`1ab5e2790918dc028af93a918c6fdd99704979d0`](https://github.com/axelarnetwork/axelarjs/commit/1ab5e2790918dc028af93a918c6fdd99704979d0) Thanks [@npty](https://github.com/npty)! - make txHash optional for searchGMP api
+
+## 0.4.1
+
+### Patch Changes
+
+- [#379](https://github.com/axelarnetwork/axelarjs/pull/379) [`91125948f65e644a14c1579b6d3e71198aed0256`](https://github.com/axelarnetwork/axelarjs/commit/91125948f65e644a14c1579b6d3e71198aed0256) Thanks [@npty](https://github.com/npty)! - chore: add queryTransactionStatus to transaction-recovery package
+
+## 0.4.0
+
+### Minor Changes
+
+- [#363](https://github.com/axelarnetwork/axelarjs/pull/363) [`234f9255090a7bc735b9229d380ab1725b2f0946`](https://github.com/axelarnetwork/axelarjs/commit/234f9255090a7bc735b9229d380ab1725b2f0946) Thanks [@npty](https://github.com/npty)! - - Added `manualRelayToDestChain` function in the `@axelarjs/transaction-recovery` module for enhanced transaction recovery capabilities.
+  - Added `searchBatchedCommands` query for the Axelarscan client in the `@axelarjs/api` module.
+  - Added Axelar Recovery client to facilitate server-side signing of Axelar transactions in the `@axelarjs/api` module.
+  - Added `AXELAR_LCD_URLS` to `@axelarjs/core` module.
+  - Added `connectToFirstAvailable` function to allow passing multiple rpc urls and connect to first available node in the `@axelarjs/cosmos` module.
+
+### Patch Changes
+
+- Updated dependencies [[`234f9255090a7bc735b9229d380ab1725b2f0946`](https://github.com/axelarnetwork/axelarjs/commit/234f9255090a7bc735b9229d380ab1725b2f0946)]:
+  - @axelarjs/cosmos@0.2.13
+  - @axelarjs/core@0.2.11
+
 ## 0.3.15
 
 ### Patch Changes

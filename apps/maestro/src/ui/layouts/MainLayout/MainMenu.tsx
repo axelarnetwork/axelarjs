@@ -8,6 +8,7 @@ import {
 import tw from "@axelarjs/ui/tw";
 import React, { type FC } from "react";
 import Markdown from "react-markdown";
+import Image from "next/image";
 import Link from "next/link";
 
 import {
@@ -33,7 +34,7 @@ export type Menuitem =
 
 export const Content = {
   Wrapper: tw.div`space-y-6`,
-  Header: tw.header`text-primary font-bold uppercase`,
+  Header: tw.header`text-primary font-semibold uppercase`,
   Main: tw.main`space-y-4`,
   Article: tw.article`space-y-2`,
   Paragraph: tw.p`text-base`,
@@ -46,7 +47,7 @@ export const Content = {
     <Link
       rel="noopener noreferrer"
       href={href}
-      className="text-accent inline-flex items-center gap-2 hover:underline"
+      className="inline-flex items-center gap-2 text-accent hover:underline"
     >
       {children} <ExternalLinkIcon size="1em" />
     </Link>
@@ -82,36 +83,57 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
     kind: "modal",
     label: "About",
     ModalContent: () => (
-      <Content.Wrapper>
-        <Content.Article>
-          <Content.Header>BRIDGES HAVE THEIR LIMITS</Content.Header>
-          <Content.Main>
-            <Content.Paragraph>
-              Web3 has gone cross-chain, with assets bridging between
-              blockchains and developers deploying applications everywhere.
-            </Content.Paragraph>
-            <Content.Paragraph>
-              But bridged tokens lose their fungibility and their custom
-              features. And it&apos;s costly to mint tokens on multiple chains.
-            </Content.Paragraph>
-          </Content.Main>
-        </Content.Article>
-        <Content.Article>
-          <Content.Header>WHAT IS INTERCHAIN TOKEN SERVICE?</Content.Header>
-          <Content.Main>
-            <Content.Paragraph>
-              Axelar introduces Interchain Token Service (ITS), supporting
-              Interchain Tokens that preserve cross-chain fungibility and custom
-              functionality.
-            </Content.Paragraph>
-            <Content.Paragraph>
-              ITS is a product suite that extends tokens cross-chain, preserving
-              native qualities while allowing teams to easily manage supply and
-              features through the creation of Interchain Tokens.
-            </Content.Paragraph>
-          </Content.Main>
-        </Content.Article>
-      </Content.Wrapper>
+      <>
+        <Modal.Title className="flex">
+          <p className="px-14 py-6 text-center font-medium text-white">
+            CREATE A TOKEN THAT CAN SCALE TO ANY CHAIN IN A FEW CLICKS
+          </p>
+        </Modal.Title>
+        <Image
+          src="/ilustrations/onboarding-image.png"
+          alt="Interchain Banner Teaser"
+          layout="responsive"
+          width={100}
+          height={50}
+          objectFit="cover"
+          className="h-auto w-full px-6 py-2"
+        />
+        <div className="flex justify-between ">
+          <p className="w-32 text-center text-sm font-normal text-white">
+            CONNECT YOUR WALLET
+          </p>
+          <p className="w-32 text-center text-sm font-normal text-white">
+            CONFIGURE TOKEN SETTINGS
+          </p>
+          <p className="w-32 text-center text-sm font-normal text-white">
+            DEPLOY TO THE PREFERRED CHAINS
+          </p>
+        </div>
+        <div className="pt-10">
+          <p className="text-lg text-primary">BRIDGES HAVE THEIR LIMITS</p>
+          <p>
+            Web3 has gone cross-chain, with assets bridging between blockchains
+            and developers deploying applications everywhere. But bridged tokens
+            lose their fungibility and their custom features. And it&apos;s
+            costly to mint tokens on multiple chains.
+          </p>
+        </div>
+        <div>
+          <p className="text-lg text-primary">
+            WHAT IS INTERCHAIN TOKEN SERVICE?
+          </p>
+          <p>
+            Axelar introduces Interchain Token Service (ITS), supporting
+            Interchain Tokens that preserve cross-chain fungibility and custom
+            functionality.
+          </p>
+        </div>
+        <p className="pb-10">
+          ITS is a product suite that extends tokens cross-chain, preserving
+          native qualities while allowing teams to easily manage supply and
+          features through the creation of Interchain Tokens.
+        </p>
+      </>
     ),
   },
   {
@@ -125,7 +147,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
             <Content.Main>
               <Link
                 href={NEXT_PUBLIC_AXELAR_CONFIGS_URL}
-                className="hover:text-primary flex gap-4"
+                className="flex gap-4 hover:text-primary"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -143,7 +165,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
             <Content.Main>
               <Link
                 href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?contractAddress=${NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS}`}
-                className="hover:text-primary flex gap-4"
+                className="flex gap-4 hover:text-primary"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -161,7 +183,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
             <Content.Main>
               <Link
                 href={NEXT_PUBLIC_FILE_BUG_REPORT_URL}
-                className="hover:text-primary flex gap-4"
+                className="flex gap-4 hover:text-primary"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -204,7 +226,7 @@ export const BOTTOM_MENU_ITEMS: Menuitem[] = [
     kind: "modal",
     label: "Terms of Use",
     ModalContent: () => (
-      <article className="prose dark:prose-invert max-h-[70dvh] overflow-y-scroll">
+      <article className="prose max-h-[70dvh] overflow-y-scroll dark:prose-invert">
         <Markdown>{TERMS_OF_USE_COPY}</Markdown>
       </article>
     ),
@@ -298,7 +320,7 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
         {item.kind === "link" ? (
           <Link
             href={item.href}
-            className="hover:text-accent inline-flex hover:underline lg:uppercase"
+            className="inline-flex uppercase hover:text-accent hover:underline"
             rel={item.external ? "noopener noreferrer" : undefined}
             target={item.external ? "_blank" : undefined}
           >
@@ -308,7 +330,7 @@ export const MenuItems = ({ items = TOP_MENU_ITEMS }) => (
         ) : (
           <Modal
             trigger={
-              <a className="hover:text-accent hover:underline lg:uppercase">
+              <a className="uppercase hover:text-accent hover:underline">
                 {item.label}
               </a>
             }

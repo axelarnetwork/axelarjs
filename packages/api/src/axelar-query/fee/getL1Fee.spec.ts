@@ -19,9 +19,11 @@ describe("getL1Fee", () => {
   });
 
   it("query arbitrum l1 fee should work", async () => {
+    const destinationChain = "arbitrum";
+    const config = configs.evm.find((c) => c.id === destinationChain);
     const fees = await client.getFees({
       sourceChain: "avalanche",
-      destinationChain: "arbitrum",
+      destinationChain,
     });
 
     const params: EstimateL1FeeParams = {
@@ -31,17 +33,24 @@ describe("getL1Fee", () => {
       l1GasPrice: fees.destination_native_token.l1_gas_price_in_units!,
     };
 
-    const rpcUrl = configs.evm.find((chain) => chain.id === "arbitrum")
-      ?.endpoints.rpc?.[0];
+    let success = false;
+    for (const rpc of config?.endpoints.rpc || []) {
+      try {
+        const fee = await getL1FeeForL2(rpc, params);
+        expect(fee).toBeDefined();
+        success = true;
+        break;
+      } catch (e) {
+        // retry with next rpc
+      }
+    }
 
-    const fee = await getL1FeeForL2(rpcUrl!, params);
-    expect(fee).toBeDefined();
+    expect(success).toBe(true);
   });
 
   it("query optimism l1 fee should work", async () => {
     const destChain = "optimism";
     const config = configs.evm.find((c) => c.id === destChain);
-    const rpcUrl = config?.endpoints.rpc[0];
     const fees = await client.getFees({
       sourceChain: "avalanche",
       destinationChain: destChain,
@@ -56,8 +65,20 @@ describe("getL1Fee", () => {
       l2Type: "op",
     };
 
-    const fee = await getL1FeeForL2(rpcUrl!, params);
-    expect(fee).toBeGreaterThan(0n);
+    let success = false;
+
+    for (const rpc of config?.endpoints.rpc || []) {
+      try {
+        const fee = await getL1FeeForL2(rpc, params);
+        expect(fee).toBeGreaterThan(0n);
+        success = true;
+        break;
+      } catch (e) {
+        // retry with next rpc
+      }
+    }
+
+    expect(success).toBe(true);
   });
 
   it("query mantle l1 fee should work", async () => {

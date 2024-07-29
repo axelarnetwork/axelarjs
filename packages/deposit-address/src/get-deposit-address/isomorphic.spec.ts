@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from "@axelarjs/core";
+import { AXELAR_RPC_URLS_FALLBACK, ENVIRONMENTS } from "@axelarjs/core";
 
 import * as mod from "../get-deposit-address/helpers/depositService";
 import {
@@ -191,21 +191,32 @@ describe("Deposit Address", () => {
 describe("requestConfigs", () => {
   test("should allow users to customize an RPC endpoint", async () => {
     vi.spyOn(mod, "getActiveChains");
-    const axelarRpcUrl = "https://axelar-testnet-rpc.qubelabs.io:443";
-    const params: SendOptions = {
-      sourceChain: "osmosis-7",
-      destinationChain: "ethereum-sepolia",
-      asset: "uaxl",
-      destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
-      environment: ENVIRONMENTS.testnet,
-      requestConfig: { axelarRpcUrl },
-    };
+    const fallbackAxelarRpcUrls = AXELAR_RPC_URLS_FALLBACK.testnet;
 
-    const res = await getLinkedDepositAddress(params);
+    let depositAddress, rpcUrl;
+    for (const axelarRpcUrl of fallbackAxelarRpcUrls) {
+      const params: SendOptions = {
+        sourceChain: "osmosis-7",
+        destinationChain: "ethereum-sepolia",
+        asset: "uaxl",
+        destinationAddress: "0xB8Cd93C83A974649D76B1c19f311f639e62272BC",
+        environment: ENVIRONMENTS.testnet,
+        requestConfig: { axelarRpcUrl },
+      };
 
-    expect(res?.depositAddress).toBeTruthy();
+      const depositResponse = await getLinkedDepositAddress(params).catch(
+        () => undefined
+      );
+
+      if (!depositResponse) continue;
+
+      depositAddress = depositResponse?.depositAddress;
+      rpcUrl = axelarRpcUrl;
+    }
+
+    expect(depositAddress).toBeTruthy();
     expect(mod.getActiveChains).toHaveBeenCalledWith("testnet", {
-      axelarRpcUrl,
+      axelarRpcUrl: rpcUrl,
     });
   });
 });

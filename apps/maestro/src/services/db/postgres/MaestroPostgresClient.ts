@@ -255,11 +255,13 @@ export default class MaestroPostgresClient {
     tokenType: "interchain" | "canonical" | "all" = "all"
   ) {
     const query = this.db.query.interchainTokens.findMany({
-      where: (table, { notIlike, eq }) =>
+      where: (table, { notIlike, eq, and }) =>
         tokenType === "all"
           ? notIlike(table.deploymentMessageId, "")
-          : notIlike(table.deploymentMessageId, "") &&
-            eq(table.kind, tokenType as "interchain" | "canonical"),
+          : and(
+              notIlike(table.deploymentMessageId, ""),
+              eq(table.kind, tokenType as "interchain" | "canonical")
+            ),
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
     });
 

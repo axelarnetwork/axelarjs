@@ -4,6 +4,7 @@ import { useEffect, useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -22,6 +23,41 @@ import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
 
 const fontSans = Cabin({ subsets: ["latin"] });
+const clashGrotesk = localFont({
+  src: [
+    {
+      path: "../../public/fonts/ClashGrotesk-Extralight.woff",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/ClashGrotesk-Light.woff",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/ClashGrotesk-Regular.woff",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/ClashGrotesk-Medium.woff",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/ClashGrotesk-Semibold.woff",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/ClashGrotesk-Bold.woff",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-clash-grotesk",
+});
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // indicate whether the app is rendered on the server
@@ -37,6 +73,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         {`
           :root {
             --font-sans: ${fontSans.style.fontFamily};
+            --font-clash-grotesk: ${clashGrotesk.style.fontFamily};
           }
         `}
       </style>

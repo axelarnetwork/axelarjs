@@ -7,37 +7,53 @@ import {
 } from "viem";
 import {
   arbitrumSepolia,
-  auroraTestnet,
   avalancheFuji,
   baseSepolia,
   blastSepolia,
+  bscTestnet,
   celoAlfajores,
   fantomTestnet,
-  filecoinHyperspace,
+  filecoinCalibration,
   fraxtalTestnet,
+  immutableZkEvmTestnet,
+  kavaTestnet,
+  lineaTestnet,
   mantleTestnet,
+  moonbaseAlpha,
   optimismSepolia,
+  polygonMumbai,
   scrollSepolia,
   sepolia,
 } from "viem/chains";
+
+import { centrifugeTestnet } from "./custom/centrifuge";
 
 /**
  * Testnet chains
  */
 export const TESTNET_CHAINS = {
-  sepolia,
-  arbitrumSepolia,
-  baseSepolia,
-  fantomTestnet,
-  filecoinHyperspace,
-  auroraTestnet,
-  avalancheFuji,
-  celoAlfajores,
-  mantleTestnet,
-  optimismSepolia,
-  scrollSepolia,
-  blastSepolia,
-  fraxtalTestnet,
+  "ethereum-sepolia": sepolia,
+  "arbitrum-sepolia": arbitrumSepolia,
+  "avalanche-fuji": avalancheFuji,
+  "base-sepolia": baseSepolia,
+  fantom: fantomTestnet,
+  "filecoin-2": filecoinCalibration,
+  "linea-sepolia": lineaTestnet,
+  "mantle-sepolia": mantleTestnet,
+  "optimism-sepolia": optimismSepolia,
+  immutable: immutableZkEvmTestnet,
+  linea: lineaTestnet,
+  moonbeam: moonbaseAlpha,
+  "polygon-sepolia": polygonMumbai,
+  polygon: polygonMumbai,
+  binance: bscTestnet,
+  avalanche: avalancheFuji,
+  "blast-sepolia": blastSepolia,
+  "centrifuge-2": centrifugeTestnet,
+  celo: celoAlfajores,
+  kava: kavaTestnet,
+  scroll: scrollSepolia,
+  fraxtal: fraxtalTestnet,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;

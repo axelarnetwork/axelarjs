@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.3.15",
+  "version": "0.4.5",
   "publishConfig": {
     "access": "public"
   },
@@ -82,7 +82,8 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
-    "@types/node": "^20.11.30",
+    "@cosmjs/stargate": "^0.31.3",
+    "@types/node": "^20.11.28",
     "dotenv": "^16.4.5",
     "fast-check": "^3.17.0",
     "gh-pages": "^6.1.1",
@@ -102,6 +103,7 @@
   },
   "dependencies": {
     "@axelarjs/core": "workspace:*",
+    "@axelarjs/cosmos": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",

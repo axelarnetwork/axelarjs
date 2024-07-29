@@ -80,4 +80,62 @@ describe("axelar-query (node client)", () => {
       expect(res.baseFee).toBeTruthy();
     });
   });
+
+  describe("getDenomFromSymbol", () => {
+    test("should return the correct denom for a given symbol", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+      const denom = await api.getDenomFromSymbol("USDC", "ethereum");
+      expect(denom).toBe("uusdc");
+    });
+
+    test("cache should work properly", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+      await api.getDenomFromSymbol("USDC", "ethereum");
+      expect(api["cachedChainConfig"]).toBeDefined();
+    });
+
+    test("should throw error if symbol is not found", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+
+      await expect(async () => {
+        await api.getDenomFromSymbol("!@#$", "avalanche");
+      }).rejects.toThrow();
+    });
+
+    test("should throw error if chain is not found", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+      await expect(async () => {
+        await api.getDenomFromSymbol("USDC", "!@#$");
+      }).rejects.toThrow();
+    });
+  });
+
+  describe("getSymbolFromDenom", () => {
+    test("should return the correct denom for a given symbol", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+      const denom = await api.getSymbolFromDenom("uusdc", "ethereum");
+      expect(denom).toBe("USDC");
+    });
+
+    test("cache should work properly", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+      await api.getSymbolFromDenom("uusdc", "ethereum");
+      expect(api["cachedChainConfig"]).toBeDefined();
+    });
+
+    test("should throw error if symbol is not found", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+
+      await expect(async () => {
+        await api.getSymbolFromDenom("!@#$", "avalanche");
+      }).rejects.toThrow();
+    });
+
+    test("should throw error if chain is not found", async () => {
+      const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
+      await expect(async () => {
+        await api.getSymbolFromDenom("uusdc", "!@#$");
+      }).rejects.toThrow();
+    });
+  });
 });

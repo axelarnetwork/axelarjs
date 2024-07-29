@@ -113,11 +113,11 @@ const Appbar: FC<AppbarProps> = (props) => {
               <ConnectWalletButton />
             )}
           </>
-          <div className="absolute right-4 top-6">
-            <ThemeSwitcher />
-          </div>
           <div className="flex-1" />
           {isConnected && <MainMenu />}
+          <div className="flex justify-end">
+            <ThemeSwitcher />
+          </div>
         </div>
       ));
     },
@@ -128,7 +128,7 @@ const Appbar: FC<AppbarProps> = (props) => {
   return (
     <Navbar
       className={cn(
-        "bg-base-100 fixed top-0 z-10 px-2 transition-all md:px-6",
+        "fixed top-0 z-10 bg-base-200 px-2 transition-all md:px-6",
         {
           "bg-base-200/80 shadow-lg backdrop-blur-sm md:shadow-xl": isSticky,
           "z-10": isSticky && !state.isDrawerOpen,
@@ -142,12 +142,12 @@ const Appbar: FC<AppbarProps> = (props) => {
           onClick={actions.toggleDrawer}
           aria-label="Toggle Drawer"
           $size="sm"
-          className="hover:bg-base-300/50 active:bg-base-300 rounded-lg transition-all"
+          className="rounded-lg transition-all hover:bg-base-300/50 active:bg-base-300"
         >
           <MenuIcon className="h-6 w-6" />
         </Button>
         <LinkButton
-          className="flex items-center gap-2 text-lg font-bold uppercase"
+          className="text-md flex items-center gap-2 font-semibold uppercase sm:text-lg"
           onClick={() => router.push("/")}
           $variant="ghost"
         >
@@ -165,7 +165,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                 $size="xs"
                 $variant="success"
                 $position="bottom"
-                className="translate-x-2 translate-y-2 lowercase"
+                className="translate-x-2 translate-y-4 lowercase sm:translate-y-2"
               >
                 {NEXT_PUBLIC_NETWORK_ENV}
               </Indicator.Item>
@@ -202,7 +202,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                     </div>
                   </button>
                 </Dropdown.Trigger>
-                <Dropdown.Content className="bg-base-100 dark:bg-base-200 mt-2 grid max-h-[80vh] w-full gap-2 p-3 md:w-48">
+                <Dropdown.Content className="mt-2 grid max-h-[80vh] w-full gap-2 bg-base-100 p-3 dark:bg-base-200 md:w-48">
                   {connectedAccountDetails}
                 </Dropdown.Content>
               </Dropdown>

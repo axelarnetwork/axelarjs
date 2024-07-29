@@ -1,6 +1,5 @@
 import {
   Alert,
-  AnimatedBlobBackground,
   Badge,
   Button,
   Card,
@@ -21,7 +20,6 @@ import tw from "@axelarjs/ui/tw";
 import React, { useEffect, type FC, type PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 import sdkPkg from "@axelar-network/axelarjs-sdk/package.json";
 import { ErrorBoundary, type FallbackRender } from "@sentry/nextjs";
@@ -35,6 +33,8 @@ import {
 } from "~/config/env";
 import { TransactionsProvider } from "~/features/Transactions";
 import { trpc } from "~/lib/trpc";
+import AnimatedBackground from "~/ui/components/BackgroundAnimation";
+import ShowOnceModal from "~/ui/components/ShowOnceModal";
 import Appbar from "./Appbar";
 import {
   LayoutStateProvider,
@@ -44,10 +44,8 @@ import { BOTTOM_MENU_ITEMS } from "./MainMenu";
 import SignInModal from "./SignInModal";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
-  const router = useRouter();
   const theme = useTheme();
   const { setThemeMode } = useWeb3ModalTheme();
-
   const { data: globalMessage } = trpc.messages.getGlobalMessage.useQuery();
 
   // sync theme with web3modal
@@ -75,62 +73,68 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      {/* only render when route path is / */}
-      {router.pathname === "/" && <AnimatedBlobBackground />}
-      <Drawer>
-        <Drawer.Toggle
-          checked={isDrawerOpen}
-          name="drawer-toggle"
-          aria-label="toggle drawer"
-        />
-        <Drawer.Content
-          className={cn(
-            "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
-            {
-              "pointer-events-none": isSignInModalOpen,
-            }
-          )}
-        >
-          {globalMessage && !isGlobalBannerDismissed && (
-            <div
-              role="alert"
-              className="bg-warning text-warning-content sticky top-0 z-20 p-4 px-8 text-center"
-            >
-              <Markdown>{globalMessage.content}</Markdown>
-
-              <Tooltip
-                tip="Dismiss this messages"
-                className="text-error absolute right-4 top-4"
-                $position="left"
+      {theme === "dark" ? (
+        <AnimatedBackground />
+      ) : (
+        <div className="fixed-bg-light" />
+      )}
+      <div className="relative z-10">
+        <ShowOnceModal />
+        <Drawer>
+          <Drawer.Toggle
+            checked={isDrawerOpen}
+            name="drawer-toggle"
+            aria-label="toggle drawer"
+          />
+          <Drawer.Content
+            className={cn(
+              "flex min-h-[100dvh] flex-1 flex-col gap-4 overflow-x-hidden lg:min-h-screen",
+              {
+                "pointer-events-none": isSignInModalOpen,
+              }
+            )}
+          >
+            {globalMessage && !isGlobalBannerDismissed && (
+              <div
+                role="alert"
+                className="sticky top-0 z-20 bg-warning p-4 px-8 text-center text-warning-content"
               >
-                <button onClick={actions.dismissGlobalBanner}>
-                  <XCircleIcon />
-                </button>
-              </Tooltip>
-            </div>
-          )}
-          <Appbar />
+                <Markdown>{globalMessage.content}</Markdown>
 
-          <ErrorBoundary fallback={ErrorBoundaryFallback}>
-            {children}
-          </ErrorBoundary>
+                <Tooltip
+                  tip="Dismiss this messages"
+                  className="absolute right-4 top-4 text-error"
+                  $position="left"
+                >
+                  <button onClick={actions.dismissGlobalBanner}>
+                    <XCircleIcon />
+                  </button>
+                </Tooltip>
+              </div>
+            )}
+            <Appbar />
 
-          <LayoutFooter />
+            <ErrorBoundary fallback={ErrorBoundaryFallback}>
+              {children}
+            </ErrorBoundary>
 
-          {shouldRenderTestnetBanner && (
-            <TestnetBanner onClose={actions.dismissTestnetBanner} />
-          )}
-          {isSignInModalOpen && (
-            <SignInModal isSignedIn={isSignedIn} signInError={signInError} />
-          )}
-        </Drawer.Content>
-        <Drawer.Side>
-          <Drawer.Overlay onClick={actions.closeDrawer} />
-          <aside className="bg-base-100 text-base-content h-full w-full max-w-xs p-4">
-            <DrawerSideContent />
-          </aside>
-        </Drawer.Side>
-      </Drawer>
+            <LayoutFooter />
+
+            {shouldRenderTestnetBanner && (
+              <TestnetBanner onClose={actions.dismissTestnetBanner} />
+            )}
+            {isSignInModalOpen && (
+              <SignInModal isSignedIn={isSignedIn} signInError={signInError} />
+            )}
+          </Drawer.Content>
+          <Drawer.Side>
+            <Drawer.Overlay onClick={actions.closeDrawer} />
+            <aside className="h-full w-full max-w-xs bg-base-100 p-4 text-base-content">
+              <DrawerSideContent />
+            </aside>
+          </Drawer.Side>
+        </Drawer>
+      </div>
     </>
   );
 };
@@ -149,7 +153,7 @@ WithProvider.displayName = "MainLayout";
 
 export default WithProvider;
 
-const VersionBadge = tw(Badge)`join-item hover:text-primary text-xs`;
+const VersionBadge = tw(Badge)`join-item hover:text-orange-600 text-xs`;
 
 const PackageVersionItem = ({
   name = "",
@@ -175,7 +179,7 @@ const PackageVersionItem = ({
 
 const LayoutFooter = () => (
   <Footer
-    className="bg-neutral text-neutral-content footer p-6 md:p-8 xl:p-10"
+    className="footer bg-base-300 p-6 text-neutral-content md:p-8 xl:p-10"
     $center={true}
   >
     <div className="w-full max-w-4xl items-center justify-evenly md:flex">
@@ -185,7 +189,7 @@ const LayoutFooter = () => (
             {item.kind === "link" ? (
               <Link
                 href={item.href}
-                className="hover:text-accent inline-flex items-center gap-1 hover:underline lg:uppercase"
+                className="inline-flex items-center gap-1 hover:text-orange-600 hover:underline lg:uppercase"
                 rel={item.external ? "noopener noreferrer" : undefined}
                 target={item.external ? "_blank" : undefined}
               >
@@ -200,7 +204,7 @@ const LayoutFooter = () => (
                   trigger={
                     <a
                       role="button"
-                      className="hover:text-accent cursor-pointer hover:underline lg:uppercase"
+                      className="cursor-pointer hover:text-orange-600 hover:underline lg:uppercase"
                       onClick={(e) => e.preventDefault()}
                     >
                       {item.label}
@@ -245,7 +249,7 @@ const LayoutFooter = () => (
 
 const TestnetBanner = ({ onClose = () => {} }) => (
   <Card
-    className="bg-base-200 fixed bottom-2 left-2 max-w-xs sm:bottom-4 sm:left-4"
+    className="fixed bottom-2 left-2 max-w-xs bg-base-200 sm:bottom-4 sm:left-4"
     $compact
   >
     <Card.Body>
@@ -317,7 +321,7 @@ const ErrorBoundaryFallback: FallbackRender = ({ error }) => {
           </div>
         </Alert>
         {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && (
-          <div className="mockup-code dark:bg-base-300 text-success/95">
+          <div className="mockup-code text-success/95 dark:bg-base-300">
             <pre className="max-w-xs overflow-x-scroll px-4 md:max-w-sm lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
               {errorContent}
             </pre>

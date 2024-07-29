@@ -144,7 +144,7 @@ const TokenDetails: FC = () => {
                 $variant="info"
                 tip="When active, the token minter will be able to mint new tokens."
               >
-                <HelpCircleIcon className="text-info mr-1 h-[1em]" />
+                <HelpCircleIcon className="mr-1 h-[1em] text-info" />
               </Tooltip>
             </Label.Text>
             <Label.AltText>
@@ -167,7 +167,7 @@ const TokenDetails: FC = () => {
                   $variant="info"
                   tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
                 >
-                  <HelpCircleIcon className="text-info mr-1 h-[1em]" />
+                  <HelpCircleIcon className="mr-1 h-[1em] text-info" />
                 </Tooltip>
               </Label.Text>
               <Label.AltText>
@@ -220,7 +220,7 @@ const TokenDetails: FC = () => {
                   type="button"
                   onClick={() => actions.generateRandomSalt()}
                 >
-                  <RefreshCwIcon className="hover:text-primary h-[1em]" />
+                  <RefreshCwIcon className="h-[1em] hover:text-primary" />
                 </button>
               </Tooltip>
             </Label.AltText>
@@ -243,7 +243,7 @@ const TokenDetails: FC = () => {
           disabled={!isFormValid}
           onClick={() => formSubmitRef.current?.click()}
         >
-          Register & Deploy
+          <p className="text-indigo-600">Register & Deploy</p>
         </NextButton>
       </Dialog.Actions>
     </>

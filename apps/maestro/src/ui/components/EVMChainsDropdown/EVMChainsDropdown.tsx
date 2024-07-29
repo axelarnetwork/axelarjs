@@ -35,12 +35,12 @@ export const ChainIcon: FC<{
   return (
     <div
       className={cn(
-        "bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2",
+        "rounded-full bg-base-200 p-0.5 shadow-black group-hover:ring-2",
         props.className
       )}
     >
       <Image
-        className="bg-base-300 overflow-hidden rounded-full"
+        className="overflow-hidden rounded-full bg-base-300"
         src={props.src}
         alt={props.alt}
         width={iconSize}
@@ -61,6 +61,7 @@ type Props = {
   renderTrigger?: () => React.ReactNode;
   selectedChain?: EVMChainConfig;
   onSelectChain?: (chain: EVMChainConfig | null) => void;
+  size?: keyof typeof ICON_SIZES;
 };
 
 export const EVMChainIcon: FC<Props> = (props) => {
@@ -83,7 +84,7 @@ export const EVMChainIcon: FC<Props> = (props) => {
         <ChainIcon
           src={props.selectedChain.image}
           alt={props.selectedChain.name}
-          size="sm"
+          size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
             props.chainIconClassName
@@ -98,7 +99,7 @@ export const EVMChainIcon: FC<Props> = (props) => {
         <ChainIcon
           src={selectedChain.image}
           alt={selectedChain.chain_name}
-          size="sm"
+          size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
             props.chainIconClassName
@@ -176,7 +177,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           role="button"
           aria-label="Select Chain"
           className={cn(
-            "btn btn-sm btn-ghost group flex w-full items-center gap-2 rounded-full",
+            "group btn btn-ghost btn-sm flex w-full items-center gap-2 rounded-full",
             {
               "pointer-events-none": props.disabled,
             },
@@ -194,9 +195,9 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
           className={cn(
-            "dark:bg-base-200 z-10 mt-2 max-h-[75vh] w-full md:w-96",
+            "z-10 mt-2 max-h-[75vh] w-full dark:bg-base-200 md:w-96",
             {
-              "bg-base-200 dark:bg-base-300 broder max-h-[300px] w-80 overflow-x-scroll md:w-96":
+              "broder max-h-[350px] w-80 overflow-x-scroll bg-base-200 dark:bg-base-300 md:w-96":
                 props.compact,
             },
             props.contentClassName
@@ -215,7 +216,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 className="group"
                 role="button"
               >
-                <div className="bg-base-200 rounded-full p-0.5 shadow-black group-hover:ring-2">
+                <div className="rounded-full bg-base-200 p-0.5 shadow-black group-hover:ring-2">
                   <HelpCircleIcon size="24" />
                 </div>
                 <div>All Chains</div>
