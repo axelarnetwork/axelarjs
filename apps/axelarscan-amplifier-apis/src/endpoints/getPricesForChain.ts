@@ -3,7 +3,7 @@ import {
   OpenAPIRouteSchema,
   Path,
 } from "@cloudflare/itty-router-openapi";
-import feesAndPrices from "configs/feesAndPrices";
+import getFeesAndPrices from "configs/feesAndPrices";
 
 import { Chain } from "../types";
 
@@ -37,14 +37,16 @@ export class ChainFetch extends OpenAPIRoute {
     },
   };
 
-  async handle(
+  handle(
     request: Request,
-    env: any,
-    context: any,
+    env: unknown,
+    context: unknown,
     data: Record<string, any>
   ) {
     const { amplifierChainId } = data.params;
-    const existing = feesAndPrices.find(
+    const isMainnet = request.url.includes('/mainnet/');
+    const chains = getFeesAndPrices(isMainnet) as (typeof Chain)[];
+    const existing = chains.find(
       (chainConfig) => chainConfig.amplifierChainId === amplifierChainId
     );
 

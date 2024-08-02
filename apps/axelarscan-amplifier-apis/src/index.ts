@@ -7,8 +7,10 @@ export const router = OpenAPIRouter({
   docs_url: "/",
 });
 
-router.get("/api/gasPrices/", ChainList);
-router.get("/api/gasPrices/:amplifierChainId/", ChainFetch);
+router.get("/api/mainnet/gasPrices/", ChainList);
+router.get("/api/testnet/gasPrices/", ChainList);
+router.get("/api/mainnet/gasPrices/:amplifierChainId/", ChainFetch);
+router.get("/api/testnet/gasPrices/:amplifierChainId/", ChainFetch);
 
 // 404 for everything else
 router.all("*", () =>
