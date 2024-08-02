@@ -33,15 +33,17 @@ const CanonicalTokenDeployment: FC = () => {
     axelarChainId: routeChain?.axelarChainId,
   });
 
-  const isGatewayToken = useMemo(
-    () =>
-      (
-        Object.values(chainInfo?.assets ?? []).map((assetId: any) =>
-          String(assetId ?? "").toLowerCase()
-        ) || []
-      ).includes(state.tokenDetails.tokenAddress.toLowerCase()),
-    [chainInfo, state.tokenDetails.tokenAddress]
-  );
+  const isGatewayToken = useMemo(() => {
+    if (!chainInfo?.assets || !state.tokenDetails?.tokenAddress) return false;
+    const tokenAddressLowerCase = state.tokenDetails.tokenAddress.toLowerCase();
+
+    return Object.entries(chainInfo.assets).some(
+      ([symbol, tokenAddress]) =>
+        !symbol.startsWith("0x") &&
+        typeof tokenAddress === "string" &&
+        tokenAddress.toLowerCase() === tokenAddressLowerCase
+    );
+  }, [chainInfo, state.tokenDetails]);
 
   const CurrentStep = useMemo(() => STEPS[state.step], [state.step]);
 
