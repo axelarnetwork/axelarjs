@@ -3,7 +3,8 @@ import {
   OpenAPIRouteSchema,
   Query,
 } from "@cloudflare/itty-router-openapi";
-import getFeesAndPrices from "configs/feesAndPrices";
+import feesAndPrices from "configs/feesAndPrices";
+import getEnvironmentFromUrl from "utils";
 
 import { Chain } from "../types";
 
@@ -38,8 +39,8 @@ export class ChainList extends OpenAPIRoute {
     context: unknown,
     data: Record<string, any>
   ) {
-    const isMainnet = request.url.includes('/mainnet/');
-    const chains = getFeesAndPrices(isMainnet) as (typeof Chain)[];
+    const environment = getEnvironmentFromUrl(request.url) as string;
+    const chains = feesAndPrices[environment] as (typeof Chain)[];
     return {
       success: true,
       chains: chains,
