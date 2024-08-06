@@ -17,7 +17,13 @@ import {
 } from "../lib/rest-service";
 import { DEFAULT_L1_EXECUTE_DATA } from "./constant";
 import { getL1FeeForL2 } from "./fee";
-import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
+import type {
+  BaseFeeResponse,
+  EstimateGasFeeParams,
+  EstimateGasFeeResponse,
+  EvmChain,
+  GasToken,
+} from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
 
 type AxelarscanClientDependencies = {
@@ -318,5 +324,99 @@ export class AxelarQueryAPIClient extends RestService {
     }
 
     return this.cachedChainConfig;
+  }
+
+  /**
+   * Gets the base fee in native token wei for a given source and destination chain combination
+   * @param sourceChainName
+   * @param destinationChainName
+   * @param sourceTokenSymbol (optional)
+   * @returns base fee in native token in wei, translated into the native gas token of choice
+   */
+  public async getNativeGasBaseFee(
+    sourceChainId: EvmChain,
+    destinationChainId: EvmChain,
+    sourceTokenSymbol?: GasToken,
+    symbol?: string,
+    destinationContractAddress?: string,
+    sourceContractAddress?: string,
+    amount?: number,
+    amountInUnits?: BigNumber | string
+  ): Promise<BaseFeeResponse> {
+    await throwIfInvalidChainIds(
+      [sourceChainId, destinationChainId],
+      this.environment
+    );
+    await this.throwIfInactiveChains([sourceChainId, destinationChainId]);
+
+    const params: {
+      method: string;
+      destinationChain: EvmChain;
+      sourceChain: EvmChain;
+      sourceTokenSymbol?: string;
+      symbol?: string;
+      amount?: number;
+      amountInUnits?: BigNumber | string;
+      destinationContractAddress?: string;
+      sourceContractAddress?: string;
+    } = {
+      method: "getFees",
+      destinationChain: destinationChainId,
+      sourceChain: sourceChainId,
+    };
+    if (sourceTokenSymbol) params.sourceTokenSymbol = sourceTokenSymbol;
+    if (symbol) params.symbol = symbol;
+    if (destinationContractAddress)
+      params.destinationContractAddress = destinationContractAddress;
+    if (sourceContractAddress)
+      params.sourceContractAddress = sourceContractAddress;
+    if (amount) {
+      params.amount = amount;
+    } else if (amountInUnits) {
+      params.amountInUnits = amountInUnits;
+    }
+
+    return this.axelarGMPServiceApi.post("", params).then((response) => {
+      const {
+        source_base_fee_string,
+        source_token,
+        ethereum_token,
+        destination_native_token,
+        express_fee_string,
+        express_supported,
+        l2_type,
+      } = response.result;
+      const execute_gas_multiplier = response.result
+        .execute_gas_multiplier as number;
+      const { decimals: sourceTokenDecimals } = source_token;
+      const baseFee = parseUnits(
+        source_base_fee_string,
+        sourceTokenDecimals
+      ).toString();
+      const expressFee = express_fee_string
+        ? parseUnits(express_fee_string, sourceTokenDecimals).toString()
+        : "0";
+
+      return {
+        baseFee,
+        expressFee,
+        sourceToken: source_token as BaseFeeResponse["sourceToken"],
+        executeGasMultiplier: parseFloat(execute_gas_multiplier.toFixed(2)),
+        destToken: {
+          gas_price: destination_native_token.gas_price,
+          decimals: destination_native_token.decimals,
+          token_price: destination_native_token.token_price,
+          name: destination_native_token.name,
+          symbol: destination_native_token.symbol,
+          l1_gas_oracle_address: destination_native_token.l1_gas_oracle_address,
+          l1_gas_price_in_units: destination_native_token.l1_gas_price_in_units,
+        },
+        l2_type,
+        ethereumToken: ethereum_token as BaseFeeResponse["ethereumToken"],
+        apiResponse: response,
+        success: true,
+        expressSupported: express_supported,
+      };
+    });
   }
 }
