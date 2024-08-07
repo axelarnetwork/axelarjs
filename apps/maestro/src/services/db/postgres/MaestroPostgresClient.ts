@@ -97,69 +97,72 @@ export default class MaestroPostgresClient {
   async recordRemoteInterchainTokenDeployments(
     values: NewRemoteInterchainTokenInput[]
   ) {
-    await this.db.transaction(async (tx) => {
-      const existingTokens = await tx.query.remoteInterchainTokens.findMany({
-        where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
-      });
-
-      const updateValues = existingTokens
-        .map(
-          (t) =>
-            [
-              t,
-              sanitizeObject(
-                values.find(
-                  (v) =>
-                    v.axelarChainId === t.axelarChainId &&
-                    v.tokenId === t.tokenId
-                ) ?? {}
-              ),
-            ] as const
-        )
-        .filter(([, v]) => Boolean(v));
-
-      const insertValues = values.filter((v) => {
-        const id = `${v.axelarChainId}:${v.tokenAddress}`;
-        return !existingTokens.some((t) => t.id === id);
-      });
-
-      if (updateValues.length > 0) {
-        for (const [existingToken, updateValue] of updateValues) {
-          await tx
-            .update(remoteInterchainTokens)
-            .set({
-              id: updateValue.id ?? existingToken.id,
-              tokenManagerAddress:
-                updateValue.tokenManagerAddress ??
-                existingToken.tokenManagerAddress,
-              deploymentMessageId:
-                updateValue.deploymentMessageId ??
-                existingToken.deploymentMessageId,
-              deploymentStatus:
-                updateValue.deploymentStatus ?? existingToken.deploymentStatus,
-              tokenManagerType:
-                updateValue.tokenManagerType ?? existingToken.tokenManagerType,
-              tokenAddress:
-                updateValue.tokenAddress ?? existingToken.tokenAddress,
-              updatedAt: new Date(),
-            })
-            .where(eq(remoteInterchainTokens.id, existingToken.id));
-        }
-      }
-
-      if (!insertValues.length) {
-        return;
-      }
-
-      await tx.insert(remoteInterchainTokens).values(
-        insertValues.map((v) => ({
-          ...v,
-          id: `${v.axelarChainId}:${v.tokenAddress}`,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }))
-      );
+    const existingTokens = await this.db.query.remoteInterchainTokens.findMany({
+      where: (table, { eq }) => eq(table.tokenId, values[0].tokenId),
     });
+
+    const updateValues = existingTokens
+      .map(
+        (t) =>
+          [
+            t,
+            sanitizeObject(
+              values.find(
+                (v) =>
+                  v.axelarChainId === t.axelarChainId && v.tokenId === t.tokenId
+              ) ?? {}
+            ),
+          ] as const
+      )
+      .filter(([, v]) => Boolean(v));
+
+    const insertValues = values.filter((v) => {
+      const id = `${v.axelarChainId}:${v.tokenAddress}`;
+      return !existingTokens.some((t) => t.id === id);
+    });
+
+    if (updateValues.length > 0) {
+      const [head, ...tail] = updateValues.map(([existingToken, updateValue]) =>
+        this.db
+          .update(remoteInterchainTokens)
+          .set({
+            id: updateValue.id ?? existingToken.id,
+            tokenManagerAddress:
+              updateValue.tokenManagerAddress ??
+              existingToken.tokenManagerAddress,
+            deploymentMessageId:
+              updateValue.deploymentMessageId ??
+              existingToken.deploymentMessageId,
+            deploymentStatus:
+              updateValue.deploymentStatus ?? existingToken.deploymentStatus,
+            tokenManagerType:
+              updateValue.tokenManagerType ?? existingToken.tokenManagerType,
+            tokenAddress:
+              updateValue.tokenAddress ?? existingToken.tokenAddress,
+            updatedAt: new Date(),
+          })
+          .where(eq(remoteInterchainTokens.id, existingToken.id))
+      );
+
+      // only batch if there are more than one update operation,
+      // otherise run the single update
+      const update = tail.length ? this.db.batch([head, ...tail]) : head;
+
+      await update;
+    }
+
+    if (!insertValues.length) {
+      return;
+    }
+
+    await this.db.insert(remoteInterchainTokens).values(
+      insertValues.map((v) => ({
+        ...v,
+        id: `${v.axelarChainId}:${v.tokenAddress}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    );
   }
 
   /**
