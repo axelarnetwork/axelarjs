@@ -90,7 +90,7 @@ export enum GasToken {
   LINEA_SEPOLIA = "ETH",
 }
 
-export type TokenUnit = {
+type TokenUnit = {
   value: string;
   decimals: number;
 };
@@ -129,3 +129,47 @@ export interface BaseFeeResponse {
 }
 
 export type Environment = "devnet" | "testnet" | "mainnet";
+
+export interface AxelarQueryClientConfig {
+  axelarRpcUrl?: string;
+  environment: Environment;
+}
+
+export interface TokenPrice {
+  usd: number;
+}
+
+export interface GasPriceInUnits {
+  value: string;
+  decimals: number;
+}
+
+export interface BaseToken {
+  name: string;
+  symbol: string;
+  decimals: number;
+  token_price: TokenPrice;
+  l1_gas_oracle_address: string;
+  l1_gas_price_in_units: GasPriceInUnits;
+}
+
+export interface NativeToken extends BaseToken {
+  contract_address: string;
+  gas_price: string;
+  gas_price_gwei: string;
+  gas_price_in_units: GasPriceInUnits;
+}
+
+export interface AxelarGMPResult {
+  source_base_fee_string: string;
+  source_token: NativeToken;
+  ethereum_token: BaseToken;
+  destination_native_token: NativeToken;
+  express_fee_string: string;
+  express_supported: boolean;
+  l2_type: "op" | "arb" | "mantle" | undefined;
+}
+
+export interface AxelarGMPResponse {
+  result: AxelarGMPResult;
+}

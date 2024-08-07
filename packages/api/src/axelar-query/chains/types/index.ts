@@ -1,6 +1,5 @@
-import { Environment } from "../../libs";
+import type { Environment } from "../../..";
 import { AssetInfo } from "../../assets/types";
-
 import { SourceOrDestination } from "../../services/types";
 
 export interface Chain {

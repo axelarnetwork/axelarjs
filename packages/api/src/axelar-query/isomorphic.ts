@@ -1,4 +1,5 @@
 import { Environment } from "@axelarjs/core";
+import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
 
 import { parseUnits } from "viem";
 
@@ -15,9 +16,16 @@ import {
   type ClientMeta,
   type RestServiceOptions,
 } from "../lib/rest-service";
+import {
+  AxelarQueryClient,
+  type AxelarQueryClientType,
+} from "./AxelarQueryClient";
 import { DEFAULT_L1_EXECUTE_DATA } from "./constant";
+import { EnvironmentConfigs, getConfigs } from "./constants";
 import { getL1FeeForL2 } from "./fee";
+import { RestService as RestServiceClass } from "./services";
 import type {
+  AxelarGMPResponse,
   BaseFeeResponse,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
@@ -25,6 +33,7 @@ import type {
   GasToken,
 } from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
+import { throwIfInvalidChainIds } from "./utils/validateChain";
 
 type AxelarscanClientDependencies = {
   axelarConfigClient: AxelarConfigClient;
@@ -39,6 +48,12 @@ export class AxelarQueryAPIClient extends RestService {
   protected env: Environment;
   protected cachedChainConfig: AxelarConfigsResponse | undefined;
 
+  private axelarQueryClient: AxelarQueryClientType | null;
+
+  readonly axelarGMPServiceUrl: string;
+  readonly axelarGMPServiceApi: RestServiceClass;
+  readonly axelarRpcUrl: string;
+
   public constructor(
     options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
@@ -46,10 +61,15 @@ export class AxelarQueryAPIClient extends RestService {
     meta?: ClientMeta
   ) {
     super(options, meta);
+    const links: EnvironmentConfigs = getConfigs(env);
+    this.axelarQueryClient = null;
+    this.axelarGMPServiceUrl = links.axelarGMPApiUrl;
+    this.axelarRpcUrl = links.axelarRpcUrl;
     this.gmpClient = dependencies.gmpClient;
     this.axelarScanClient = dependencies.axelarscanClient;
     this.axelarConfigClient = dependencies.axelarConfigClient;
     this.env = env;
+    this.axelarGMPServiceApi = new RestServiceClass(this.axelarGMPServiceUrl);
   }
 
   static init(
@@ -327,6 +347,53 @@ export class AxelarQueryAPIClient extends RestService {
   }
 
   /**
+   * Get a list of active chains.
+   * @returns an array of active chains
+   */
+  public async getActiveChains(): Promise<string[]> {
+    if (!this.axelarQueryClient) {
+      this.axelarQueryClient =
+        await AxelarQueryClient.initOrGetAxelarQueryClient({
+          environment: this.env,
+          axelarRpcUrl: this.axelarRpcUrl,
+        });
+    }
+
+    return this.axelarQueryClient.nexus
+      .Chains({ status: ChainStatus.CHAIN_STATUS_ACTIVATED })
+      .then((resp) => resp.chains);
+  }
+
+  /**
+   * Check if a chain is active.
+   * @param chainId the chain id to check
+   * @returns true if the chain is active, false otherwise
+   */
+  public isChainActive(chainId: EvmChain | string): Promise<boolean> {
+    return this.getActiveChains()
+      .then((chains) => chains.map((chain) => chain.toLowerCase()))
+      .then((chains) => chains.includes(chainId.toLowerCase()));
+  }
+
+  /**
+   * Throw an error if any chain in the list is inactive.
+   * @param chainIds A list of chainIds to check
+   */
+  public async throwIfInactiveChains(chainIds: EvmChain[] | string[]) {
+    const results = await Promise.all(
+      chainIds.map((chainId) => this.isChainActive(chainId))
+    );
+
+    for (let i = 0; i < chainIds.length; i++) {
+      if (!results[i]) {
+        throw new Error(
+          `Chain ${chainIds[i]} is not active. Please check the list of active chains using the getActiveChains() method.`
+        );
+      }
+    }
+  }
+
+  /**
    * Gets the base fee in native token wei for a given source and destination chain combination
    * @param sourceChainName
    * @param destinationChainName
@@ -341,12 +408,9 @@ export class AxelarQueryAPIClient extends RestService {
     destinationContractAddress?: string,
     sourceContractAddress?: string,
     amount?: number,
-    amountInUnits?: BigNumber | string
+    amountInUnits?: bigint | string
   ): Promise<BaseFeeResponse> {
-    await throwIfInvalidChainIds(
-      [sourceChainId, destinationChainId],
-      this.environment
-    );
+    await throwIfInvalidChainIds([sourceChainId, destinationChainId], this.env);
     await this.throwIfInactiveChains([sourceChainId, destinationChainId]);
 
     const params: {
@@ -356,7 +420,7 @@ export class AxelarQueryAPIClient extends RestService {
       sourceTokenSymbol?: string;
       symbol?: string;
       amount?: number;
-      amountInUnits?: BigNumber | string;
+      amountInUnits?: bigint | string;
       destinationContractAddress?: string;
       sourceContractAddress?: string;
     } = {
@@ -377,6 +441,7 @@ export class AxelarQueryAPIClient extends RestService {
     }
 
     return this.axelarGMPServiceApi.post("", params).then((response) => {
+      const typedResponse = response as AxelarGMPResponse;
       const {
         source_base_fee_string,
         source_token,
@@ -385,7 +450,8 @@ export class AxelarQueryAPIClient extends RestService {
         express_fee_string,
         express_supported,
         l2_type,
-      } = response.result;
+      } = typedResponse.result;
+
       const execute_gas_multiplier = response.result
         .execute_gas_multiplier as number;
       const { decimals: sourceTokenDecimals } = source_token;
@@ -413,7 +479,7 @@ export class AxelarQueryAPIClient extends RestService {
         },
         l2_type,
         ethereumToken: ethereum_token as BaseFeeResponse["ethereumToken"],
-        apiResponse: response,
+        apiResponse: typedResponse,
         success: true,
         expressSupported: express_supported,
       };

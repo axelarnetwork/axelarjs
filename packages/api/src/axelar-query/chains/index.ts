@@ -1,32 +1,36 @@
-export * from "./supported-chains-list";
-
+import cloneDeep from "clone-deep";
 import fetch from "cross-fetch";
+
+import type { Environment } from "../..";
 import { loadAssets } from "../assets";
 import { AssetConfig, AssetInfo } from "../assets/types";
 import { ChainInfo, LoadChainConfig } from "./types";
-import cloneDeep from "clone-deep";
-import { Environment } from "../libs";
+
+export * from "./supported-chains-list";
 
 export async function loadChains(config: LoadChainConfig) {
   const allAssets = await loadAssets(config);
   const _environment = config.environment as Environment;
 
-  const rawChains: ChainInfo[] = await importChains({ environment: _environment });
+  const rawChains: ChainInfo[] = await importChains({
+    environment: _environment,
+  });
 
   /*push assets to supported chains*/
   rawChains.forEach((chainInfo) => {
     const filteredAssetList: AssetConfig[] = allAssets.filter(
       ({ chain_aliases }) =>
-        Object.keys(chain_aliases).indexOf(chainInfo.chainName.toLowerCase()) > -1
+        Object.keys(chain_aliases).indexOf(chainInfo.chainName.toLowerCase()) >
+        -1
     );
 
     const assetsList: AssetInfo[] = [];
 
     filteredAssetList.forEach((asset) => {
-      const assetToPush: AssetInfo = cloneDeep(
+      const assetToPush = cloneDeep(
         asset.chain_aliases[chainInfo.chainName.toLowerCase()]
-      );
-      assetToPush.common_key = asset.common_key[_environment];
+      ) as AssetInfo;
+      assetToPush.common_key = asset.common_key[_environment] as string;
       assetToPush.native_chain = asset.native_chain;
       assetToPush.decimals = asset.decimals;
       assetToPush.fullySupported = asset.fully_supported;
@@ -40,18 +44,24 @@ export async function loadChains(config: LoadChainConfig) {
 }
 
 const urlMap: Record<Environment, string> = {
-  devnet: "https://axelar-testnet.s3.us-east-2.amazonaws.com/devnet-chain-config.json",
-  testnet: "https://axelar-testnet.s3.us-east-2.amazonaws.com/testnet-chain-config.json",
-  mainnet: "https://axelar-mainnet.s3.us-east-2.amazonaws.com/mainnet-chain-config.json",
+  devnet:
+    "https://axelar-testnet.s3.us-east-2.amazonaws.com/devnet-chain-config.json",
+  testnet:
+    "https://axelar-testnet.s3.us-east-2.amazonaws.com/testnet-chain-config.json",
+  mainnet:
+    "https://axelar-mainnet.s3.us-east-2.amazonaws.com/mainnet-chain-config.json",
 };
-const chainMap: Record<Environment, any> = { devnet: null, testnet: null, mainnet: null };
 
-export async function importChains(config: LoadChainConfig): Promise<ChainInfo[]> {
-  if (chainMap[config.environment]) return Object.values(chainMap[config.environment]);
+export async function importChains(
+  config: LoadChainConfig
+): Promise<ChainInfo[]> {
+  const chainsForEnv = (await execGet(urlMap[config.environment])) as Record<
+    Environment,
+    ChainInfo
+  >;
+  if (chainsForEnv) return Object.values(chainsForEnv);
 
-  chainMap[config.environment] = await execGet(urlMap[config.environment]);
-
-  return Object.values(chainMap[config.environment]);
+  return Object.values(chainsForEnv);
 }
 
 async function execGet(url: string) {

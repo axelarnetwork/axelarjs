@@ -83,7 +83,10 @@
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "@cosmjs/stargate": "^0.31.3",
+    "@cosmjs/tendermint-rpc": "0.31.0-alpha.1",
+    "@types/standard-http-error": "^2.0.1",
     "@types/node": "^20.11.28",
+    "@types/clone-deep": "^4.0.1",
     "dotenv": "^16.4.5",
     "fast-check": "^3.17.0",
     "gh-pages": "^6.1.1",
@@ -105,12 +108,14 @@
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
     "@axelarjs/utils": "workspace:*",
+    "@axelarjs/proto": "workspace:*",
     "clone-deep": "^4.0.1",
     "cross-fetch": "^4.0.0",
     "ethers": "^6.13.2",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
     "string-similarity-js": "^2.1.4",
+    "standard-http-error": "^2.0.1",
     "viem": "^2.8.18"
   }
 }
