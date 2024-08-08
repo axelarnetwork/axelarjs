@@ -140,11 +140,13 @@ interface NativeToken extends BaseToken {
 }
 
 export interface BaseFeeResponse {
-  baseFee: string;
-  expressFee: string;
-  sourceToken: NativeToken;
-  executeGasMultiplier: number;
-  destToken: {
+  success: boolean;
+  error: unknown;
+  baseFee?: string;
+  expressFee?: string;
+  sourceToken?: NativeToken;
+  executeGasMultiplier?: number;
+  destToken?: {
     gas_price: string;
     decimals: number;
     token_price: TokenPrice;
@@ -153,11 +155,10 @@ export interface BaseFeeResponse {
     l1_gas_oracle_address?: string;
     l1_gas_price_in_units: GasPriceInUnits;
   };
-  l2_type: "op" | "arb" | "mantle" | undefined;
-  ethereumToken: BaseToken;
-  apiResponse: AxelarGMPResponse;
-  success: boolean;
-  expressSupported: boolean;
+  l2_type?: "op" | "arb" | "mantle" | undefined;
+  ethereumToken?: BaseToken;
+  apiResponse?: AxelarGMPResponse;
+  expressSupported?: boolean;
 }
 
 export interface GetNativeGasBaseFeeOptions {
@@ -177,20 +178,9 @@ export interface AxelarGMPResult {
   express_fee_string: string;
   express_supported: boolean;
   l2_type: "op" | "arb" | "mantle" | undefined;
+  execute_gas_multiplier: number;
 }
 
 export interface AxelarGMPResponse {
   result: AxelarGMPResult;
-}
-
-export interface GetNativeGasBaseFeeParams {
-  method: string;
-  destinationChain: EvmChain;
-  sourceChain: EvmChain;
-  sourceTokenSymbol: string | undefined;
-  symbol: string | undefined;
-  amount: number | undefined;
-  amountInUnits: bigint | string | undefined;
-  destinationContractAddress: string | undefined;
-  sourceContractAddress: string | undefined;
 }

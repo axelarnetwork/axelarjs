@@ -1,5 +1,6 @@
 import { Environment } from "@axelarjs/core";
 import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
+import { HttpClient } from "@axelarjs/utils/http-client";
 
 import { parseUnits } from "viem";
 
@@ -23,7 +24,6 @@ import {
 import { DEFAULT_L1_EXECUTE_DATA } from "./constant";
 import { EnvironmentConfigs, getConfigs } from "./constants";
 import { getL1FeeForL2 } from "./fee";
-import { RestService as RestServiceClass } from "./services";
 import type {
   AxelarGMPResponse,
   BaseFeeResponse,
@@ -31,7 +31,6 @@ import type {
   EstimateGasFeeResponse,
   EvmChain,
   GetNativeGasBaseFeeOptions,
-  GetNativeGasBaseFeeParams,
 } from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
 import { throwIfInvalidChainIds } from "./utils/validateChain";
@@ -52,7 +51,7 @@ export class AxelarQueryAPIClient extends RestService {
   private axelarQueryClient: AxelarQueryClientType | null;
 
   readonly axelarGMPServiceUrl: string;
-  readonly axelarGMPServiceApi: RestServiceClass;
+  readonly axelarGMPServiceApi: HttpClient;
   readonly axelarRpcUrl: string;
 
   public constructor(
@@ -70,7 +69,9 @@ export class AxelarQueryAPIClient extends RestService {
     this.axelarScanClient = dependencies.axelarscanClient;
     this.axelarConfigClient = dependencies.axelarConfigClient;
     this.env = env;
-    this.axelarGMPServiceApi = new RestServiceClass(this.axelarGMPServiceUrl);
+    this.axelarGMPServiceApi = new HttpClient({
+      prefixUrl: this.axelarGMPServiceUrl,
+    });
   }
 
   static init(
@@ -412,64 +413,76 @@ export class AxelarQueryAPIClient extends RestService {
     destinationChainId: EvmChain,
     options?: GetNativeGasBaseFeeOptions
   ): Promise<BaseFeeResponse> {
-    await throwIfInvalidChainIds([sourceChainId, destinationChainId], this.env);
-    await this.throwIfInactiveChains([sourceChainId, destinationChainId]);
+    let response: Promise<BaseFeeResponse>;
+    try {
+      await throwIfInvalidChainIds(
+        [sourceChainId, destinationChainId],
+        this.env
+      );
+      await this.throwIfInactiveChains([sourceChainId, destinationChainId]);
 
-    const params: GetNativeGasBaseFeeParams = {
-      method: "getFees",
-      destinationChain: destinationChainId,
-      sourceChain: sourceChainId,
-      sourceTokenSymbol: options?.sourceTokenSymbol,
-      symbol: options?.symbol,
-      destinationContractAddress: options?.destinationContractAddress,
-      sourceContractAddress: options?.sourceContractAddress,
-      amount: options?.amount,
-      amountInUnits: options?.amountInUnits,
-    };
+      response = this.axelarGMPServiceApi
+        .post("", {
+          method: "getFees",
+          destinationChain: destinationChainId,
+          sourceChain: sourceChainId,
+          sourceTokenSymbol: options?.sourceTokenSymbol,
+          symbol: options?.symbol,
+          destinationContractAddress: options?.destinationContractAddress,
+          sourceContractAddress: options?.sourceContractAddress,
+          amount: options?.amount,
+          amountInUnits: options?.amountInUnits,
+        })
+        .json()
+        .then((response) => {
+          const typedResponse = response as AxelarGMPResponse;
+          const {
+            source_base_fee_string,
+            source_token,
+            ethereum_token,
+            destination_native_token,
+            express_fee_string,
+            express_supported,
+            l2_type,
+            execute_gas_multiplier,
+          } = typedResponse.result;
 
-    return this.axelarGMPServiceApi.post("", params).then((response) => {
-      const typedResponse = response as AxelarGMPResponse;
-      const {
-        source_base_fee_string,
-        source_token,
-        ethereum_token,
-        destination_native_token,
-        express_fee_string,
-        express_supported,
-        l2_type,
-      } = typedResponse.result;
+          const { decimals: sourceTokenDecimals } = source_token;
+          const baseFee = parseUnits(
+            source_base_fee_string,
+            sourceTokenDecimals
+          ).toString();
+          const expressFee = express_fee_string
+            ? parseUnits(express_fee_string, sourceTokenDecimals).toString()
+            : "0";
 
-      const execute_gas_multiplier = response.result
-        .execute_gas_multiplier as number;
-      const { decimals: sourceTokenDecimals } = source_token;
-      const baseFee = parseUnits(
-        source_base_fee_string,
-        sourceTokenDecimals
-      ).toString();
-      const expressFee = express_fee_string
-        ? parseUnits(express_fee_string, sourceTokenDecimals).toString()
-        : "0";
-
-      return {
-        baseFee,
-        expressFee,
-        sourceToken: source_token,
-        executeGasMultiplier: parseFloat(execute_gas_multiplier.toFixed(2)),
-        destToken: {
-          gas_price: destination_native_token.gas_price,
-          decimals: destination_native_token.decimals,
-          token_price: destination_native_token.token_price,
-          name: destination_native_token.name,
-          symbol: destination_native_token.symbol,
-          l1_gas_oracle_address: destination_native_token.l1_gas_oracle_address,
-          l1_gas_price_in_units: destination_native_token.l1_gas_price_in_units,
-        },
-        l2_type,
-        ethereumToken: ethereum_token as BaseFeeResponse["ethereumToken"],
-        apiResponse: typedResponse,
-        success: true,
-        expressSupported: express_supported,
-      };
-    });
+          return {
+            baseFee,
+            expressFee,
+            sourceToken: source_token,
+            executeGasMultiplier: parseFloat(execute_gas_multiplier.toFixed(2)),
+            destToken: {
+              gas_price: destination_native_token.gas_price,
+              decimals: destination_native_token.decimals,
+              token_price: destination_native_token.token_price,
+              name: destination_native_token.name,
+              symbol: destination_native_token.symbol,
+              l1_gas_oracle_address:
+                destination_native_token.l1_gas_oracle_address,
+              l1_gas_price_in_units:
+                destination_native_token.l1_gas_price_in_units,
+            },
+            l2_type,
+            ethereumToken: ethereum_token,
+            apiResponse: typedResponse,
+            success: true,
+            expressSupported: express_supported,
+            error: null,
+          };
+        });
+    } catch (e) {
+      return { success: false, error: e };
+    }
+    return response;
   }
 }

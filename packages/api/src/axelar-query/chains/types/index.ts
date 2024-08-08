@@ -1,6 +1,5 @@
 import type { Environment } from "../../..";
 import { AssetInfo } from "../../assets/types";
-import { SourceOrDestination } from "../../services/types";
 
 export interface Chain {
   chainInfo: ChainInfo;
@@ -47,6 +46,8 @@ export interface AssetInfoWithTrace extends AssetInfo {
   traceId: string;
   assetInfo: AssetInfo;
 }
+
+export type SourceOrDestination = "source" | "destination";
 
 export interface AssetInfoResponse extends AssetInfo {
   sourceOrDestChain: SourceOrDestination;

@@ -96,9 +96,24 @@ describe("axelar-query (node client)", () => {
         CHAINS.TESTNET.AVALANCHE as EvmChain,
         CHAINS.TESTNET.SEPOLIA as EvmChain
       );
+
       expect(gasResult.success).toBeTruthy();
       expect(gasResult.baseFee).toBeDefined();
-      expect(gasResult.error).toBeUndefined();
+      expect(gasResult.error).toBeFalsy();
+    });
+
+    test("It should return an error if the chain a does not exist", async () => {
+      vitest
+        .spyOn(testnetApi, "getActiveChains")
+        .mockResolvedValueOnce(activeChainsStub());
+      const gasResult = await testnetApi.getNativeGasBaseFee(
+        "not existing chain" as EvmChain,
+        CHAINS.TESTNET.SEPOLIA as EvmChain
+      );
+
+      expect(gasResult.success).toBeFalsy();
+      expect(gasResult.baseFee).toBeUndefined();
+      expect(gasResult.error).toBeDefined();
     });
   });
 
