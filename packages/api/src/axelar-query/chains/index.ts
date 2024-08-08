@@ -1,20 +1,31 @@
-import cloneDeep from "clone-deep";
-import fetch from "cross-fetch";
+import type { Environment } from "@axelarjs/core";
 
-import type { Environment } from "../..";
-import { loadAssets } from "../assets";
-import { AssetConfig, AssetInfo } from "../assets/types";
-import { ChainInfo, LoadChainConfig } from "./types";
+import cloneDeep from "clone-deep";
+
+import { createAxelarConfigClient } from "../..";
+import { AssetConfig, AssetInfo, ChainInfo, LoadChainConfig } from "./types";
 
 export * from "./supported-chains-list";
 
 export async function loadChains(config: LoadChainConfig) {
-  const allAssets = await loadAssets(config);
+  const axelarConfigClient = createAxelarConfigClient(
+    config.environment as Environment
+  );
+  const allAssets = Object.values(
+    (await axelarConfigClient.getAxelarAssetConfigs(
+      config.environment as Environment
+    )) as {
+      [key: string]: AssetConfig;
+    }
+  );
+
   const _environment = config.environment as Environment;
 
-  const rawChains: ChainInfo[] = await importChains({
-    environment: _environment,
-  });
+  const rawChains = Object.values(
+    (await axelarConfigClient.getAxelarChainConfigs(
+      config.environment as Environment
+    )) as ChainInfo
+  ) as ChainInfo[];
 
   /*push assets to supported chains*/
   rawChains.forEach((chainInfo) => {
@@ -41,36 +52,4 @@ export async function loadChains(config: LoadChainConfig) {
   });
 
   return rawChains;
-}
-
-const urlMap: Record<Environment, string> = {
-  devnet:
-    "https://axelar-testnet.s3.us-east-2.amazonaws.com/devnet-chain-config.json",
-  testnet:
-    "https://axelar-testnet.s3.us-east-2.amazonaws.com/testnet-chain-config.json",
-  mainnet:
-    "https://axelar-mainnet.s3.us-east-2.amazonaws.com/mainnet-chain-config.json",
-};
-
-export async function importChains(
-  config: LoadChainConfig
-): Promise<ChainInfo[]> {
-  const chainsForEnv = (await execGet(urlMap[config.environment])) as Record<
-    Environment,
-    ChainInfo
-  >;
-  if (chainsForEnv) return Object.values(chainsForEnv);
-
-  return Object.values(chainsForEnv);
-}
-
-async function execGet(url: string) {
-  return fetch(url, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((res) => res.json())
-    .catch((error) => {
-      throw error;
-    });
 }
