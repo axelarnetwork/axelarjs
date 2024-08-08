@@ -107,27 +107,6 @@ export type FeeToken = {
   };
 };
 
-export interface BaseFeeResponse {
-  success: boolean;
-  apiResponse?: unknown;
-  error?: string;
-  baseFee: string;
-  expressFee: string;
-  executeGasMultiplier: number;
-  sourceToken: FeeToken;
-  destToken: FeeToken;
-  l2_type: "op" | "arb" | "mantle" | undefined;
-  ethereumToken: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    token_price: {
-      usd: number;
-    };
-  };
-  expressSupported: boolean;
-}
-
 export type Environment = "devnet" | "testnet" | "mainnet";
 
 export interface AxelarQueryClientConfig {
@@ -135,29 +114,59 @@ export interface AxelarQueryClientConfig {
   environment: Environment;
 }
 
-export interface TokenPrice {
+interface TokenPrice {
   usd: number;
 }
 
-export interface GasPriceInUnits {
+interface GasPriceInUnits {
   value: string;
   decimals: number;
 }
 
-export interface BaseToken {
+interface BaseToken {
   name: string;
   symbol: string;
   decimals: number;
   token_price: TokenPrice;
-  l1_gas_oracle_address: string;
-  l1_gas_price_in_units: GasPriceInUnits;
 }
 
-export interface NativeToken extends BaseToken {
+interface NativeToken extends BaseToken {
   contract_address: string;
   gas_price: string;
   gas_price_gwei: string;
   gas_price_in_units: GasPriceInUnits;
+  l1_gas_oracle_address: string;
+  l1_gas_price_in_units: GasPriceInUnits;
+}
+
+export interface BaseFeeResponse {
+  baseFee: string;
+  expressFee: string;
+  sourceToken: NativeToken;
+  executeGasMultiplier: number;
+  destToken: {
+    gas_price: string;
+    decimals: number;
+    token_price: TokenPrice;
+    name: string;
+    symbol: string;
+    l1_gas_oracle_address?: string;
+    l1_gas_price_in_units: GasPriceInUnits;
+  };
+  l2_type: "op" | "arb" | "mantle" | undefined;
+  ethereumToken: BaseToken;
+  apiResponse: AxelarGMPResponse;
+  success: boolean;
+  expressSupported: boolean;
+}
+
+export interface GetNativeGasBaseFeeOptions {
+  sourceTokenSymbol?: GasToken;
+  symbol?: string;
+  destinationContractAddress?: string;
+  sourceContractAddress?: string;
+  amount?: number;
+  amountInUnits?: bigint | string;
 }
 
 export interface AxelarGMPResult {
@@ -172,4 +181,16 @@ export interface AxelarGMPResult {
 
 export interface AxelarGMPResponse {
   result: AxelarGMPResult;
+}
+
+export interface GetNativeGasBaseFeeParams {
+  method: string;
+  destinationChain: EvmChain;
+  sourceChain: EvmChain;
+  sourceTokenSymbol: string | undefined;
+  symbol: string | undefined;
+  amount: number | undefined;
+  amountInUnits: bigint | string | undefined;
+  destinationContractAddress: string | undefined;
+  sourceContractAddress: string | undefined;
 }
