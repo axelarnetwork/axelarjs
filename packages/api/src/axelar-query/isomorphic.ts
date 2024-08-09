@@ -409,8 +409,8 @@ export class AxelarQueryAPIClient extends RestService {
    * @returns A `BaseFeeResponse` object containing the base fee, express fee, source token information, execute gas multiplier, destination token information, L2 type, Ethereum token information, and success status.
    */
   public async getNativeGasBaseFee(
-    sourceChainId: EvmChain,
-    destinationChainId: EvmChain,
+    sourceChainId: string,
+    destinationChainId: string,
     options?: GetNativeGasBaseFeeOptions
   ): Promise<BaseFeeResponse> {
     let response: Promise<BaseFeeResponse>;
