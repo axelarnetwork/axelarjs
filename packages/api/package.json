@@ -84,7 +84,6 @@
     "@axelarjs/config": "workspace:*",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "0.31.0-alpha.1",
-    "@types/standard-http-error": "^2.0.1",
     "@types/node": "^20.11.28",
     "dotenv": "^16.4.5",
     "fast-check": "^3.17.0",
