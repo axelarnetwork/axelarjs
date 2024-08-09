@@ -22,91 +22,6 @@ export type EstimateGasFeeResponse = {
   isExpressSupported: boolean;
 };
 
-export enum EvmChain {
-  ETHEREUM = "ethereum",
-  AVALANCHE = "avalanche",
-  FANTOM = "fantom",
-  POLYGON = "polygon",
-  POLYGON_ZKEVM = "polygon-zkevm",
-  MOONBEAM = "moonbeam",
-  AURORA = "aurora",
-  BINANCE = "binance",
-  BNBCHAIN = "binance",
-  ARBITRUM = "arbitrum",
-  ARBITRUM_SEPOLIA = "arbitrum-sepolia",
-  CELO = "celo",
-  KAVA = "kava",
-  BASE = "base",
-  FILECOIN = "filecoin",
-  OPTIMISM = "optimism",
-  LINEA = "linea",
-  MANTLE = "mantle",
-  SCROLL = "scroll",
-  SEPOLIA = "ethereum-sepolia",
-  IMMUTABLE = "immutable",
-  CENTRIFUGE_TESTNET = "centrifuge-2",
-  CENTRIFUGE = "centrifuge",
-  FRAXTAL = "fraxtal",
-  BLAST_SEPOLIA = "blast-sepolia",
-  OPTIMISM_SEPOLIA = "optimism-sepolia",
-  MANTLE_SEPOLIA = "mantle-sepolia",
-  BASE_SEPOLIA = "base-sepolia",
-  BLAST = "blast",
-  POLYGON_SEPOLIA = "polygon-sepolia",
-  LINEA_SEPOLIA = "linea-sepolia",
-}
-
-export enum GasToken {
-  ETH = "ETH",
-  AVAX = "AVAX",
-  GLMR = "GLMR",
-  FTM = "FTM",
-  MATIC = "MATIC",
-  USDC = "USDC",
-  aUSDC = "aUSDC",
-  axlUSDC = "axlUSDC",
-  AURORA = "aETH",
-  BINANCE = "BNB",
-  BNBCHAIN = "BNB",
-  CELO = "CELO",
-  KAVA = "KAVA",
-  BASE = "ETH",
-  FILECOIN = "FIL",
-  OSMO = "OSMO",
-  AXL = "AXL",
-  POLYGON_ZKEVM = "ETH",
-  MANTLE = "MNT",
-  SCROLL = "ETH",
-  IMMUTABLE = "IMX",
-  SEPOLIA = "ETH",
-  ARBITRUM_SEPOLIA = "ETH",
-  CENTRIFUGE = "CFG",
-  FRAXTAL = "frxETH",
-  BLAST_SEPOLIA = "ETH",
-  OPTIMISM_SEPOLIA = "ETH",
-  MANTLE_SEPOLIA = "ETH",
-  BASE_SEPOLIA = "ETH",
-  BLAST = "ETH",
-  LINEA_SEPOLIA = "ETH",
-}
-
-type TokenUnit = {
-  value: string;
-  decimals: number;
-};
-
-export type FeeToken = {
-  gas_price: string;
-  decimals: number;
-  name: string;
-  l1_gas_oracle_address?: string;
-  l1_gas_price_in_units?: TokenUnit;
-  symbol: string;
-  token_price: {
-    usd: number;
-  };
-};
-
 export type Environment = "devnet" | "testnet" | "mainnet";
 
 export interface AxelarQueryClientConfig {
@@ -162,7 +77,7 @@ export interface BaseFeeResponse {
 }
 
 export interface GetNativeGasBaseFeeOptions {
-  sourceTokenSymbol?: GasToken;
+  sourceTokenSymbol?: string;
   symbol?: string;
   destinationContractAddress?: string;
   sourceContractAddress?: string;

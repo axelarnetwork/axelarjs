@@ -29,7 +29,6 @@ import type {
   BaseFeeResponse,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
-  EvmChain,
   GetNativeGasBaseFeeOptions,
 } from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
@@ -371,7 +370,7 @@ export class AxelarQueryAPIClient extends RestService {
    * @param chainId the chain id to check
    * @returns true if the chain is active, false otherwise
    */
-  public isChainActive(chainId: EvmChain | string): Promise<boolean> {
+  public isChainActive(chainId: string): Promise<boolean> {
     return this.getActiveChains()
       .then((chains) => chains.map((chain) => chain.toLowerCase()))
       .then((chains) => chains.includes(chainId.toLowerCase()));
@@ -381,7 +380,7 @@ export class AxelarQueryAPIClient extends RestService {
    * Throw an error if any chain in the list is inactive.
    * @param chainIds A list of chainIds to check
    */
-  public async throwIfInactiveChains(chainIds: EvmChain[] | string[]) {
+  public async throwIfInactiveChains(chainIds: string[]) {
     const results = await Promise.all(
       chainIds.map((chainId) => this.isChainActive(chainId))
     );

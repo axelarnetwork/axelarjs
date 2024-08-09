@@ -31,8 +31,7 @@ export async function loadChains(config: LoadChainConfig) {
   rawChains.forEach((chainInfo) => {
     const filteredAssetList: AssetConfig[] = allAssets.filter(
       ({ chain_aliases }) =>
-        Object.keys(chain_aliases).indexOf(chainInfo.chainName.toLowerCase()) >
-        -1
+        Object.keys(chain_aliases).includes(chainInfo.chainName.toLowerCase())
     );
 
     const assetsList: AssetInfo[] = [];

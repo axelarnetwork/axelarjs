@@ -6,7 +6,6 @@ import type {
   AxelarQueryAPIClient,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
-  EvmChain,
 } from "../axelar-query";
 import { CHAINS } from "./chains";
 import { createAxelarQueryClient } from "./client";
@@ -93,8 +92,8 @@ describe("axelar-query (node client)", () => {
         .spyOn(testnetApi, "getActiveChains")
         .mockResolvedValueOnce(activeChainsStub());
       const gasResult = await testnetApi.getNativeGasBaseFee(
-        CHAINS.TESTNET.AVALANCHE as EvmChain,
-        CHAINS.TESTNET.SEPOLIA as EvmChain
+        CHAINS.TESTNET.AVALANCHE,
+        CHAINS.TESTNET.SEPOLIA
       );
 
       expect(gasResult.success).toBeTruthy();
@@ -107,8 +106,8 @@ describe("axelar-query (node client)", () => {
         .spyOn(testnetApi, "getActiveChains")
         .mockResolvedValueOnce(activeChainsStub());
       const gasResult = await testnetApi.getNativeGasBaseFee(
-        "not existing chain" as EvmChain,
-        CHAINS.TESTNET.SEPOLIA as EvmChain
+        "not existing chain",
+        CHAINS.TESTNET.SEPOLIA
       );
 
       expect(gasResult.success).toBeFalsy();
