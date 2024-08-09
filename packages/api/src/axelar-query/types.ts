@@ -31,11 +31,6 @@ export type EstimateGasFeeResponse = {
 
 export type Environment = "devnet" | "testnet" | "mainnet";
 
-export interface AxelarQueryClientConfig {
-  axelarRpcUrl?: string;
-  environment: Environment;
-}
-
 interface TokenPrice {
   usd: number;
 }
