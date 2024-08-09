@@ -1,7 +1,5 @@
 import type { Environment } from "@axelarjs/core";
 
-import cloneDeep from "clone-deep";
-
 import { createAxelarConfigClient } from "../..";
 import { AssetConfig, AssetInfo, ChainInfo, LoadChainConfig } from "./types";
 
@@ -35,13 +33,13 @@ export async function loadChains(config: LoadChainConfig) {
     const assetsList: AssetInfo[] = [];
 
     filteredAssetList.forEach((asset) => {
-      const assetToPush = cloneDeep(
-        asset.chain_aliases[chainInfo.chainName.toLowerCase()]
-      ) as AssetInfo;
-      assetToPush.common_key = asset.common_key[_environment] as string;
-      assetToPush.native_chain = asset.native_chain;
-      assetToPush.decimals = asset.decimals;
-      assetToPush.fullySupported = asset.fully_supported;
+      const assetToPush = {
+        ...asset.chain_aliases[chainInfo.chainName.toLowerCase()],
+        common_key: asset.common_key[_environment] as string,
+        native_chain: asset.native_chain,
+        decimals: asset.decimals,
+        fullySupported: asset.fully_supported,
+      };
       assetsList.push(assetToPush);
     });
 
