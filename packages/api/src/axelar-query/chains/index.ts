@@ -5,8 +5,6 @@ import cloneDeep from "clone-deep";
 import { createAxelarConfigClient } from "../..";
 import { AssetConfig, AssetInfo, ChainInfo, LoadChainConfig } from "./types";
 
-export * from "./supported-chains-list";
-
 export async function loadChains(config: LoadChainConfig) {
   const axelarConfigClient = createAxelarConfigClient(
     config.environment as Environment
