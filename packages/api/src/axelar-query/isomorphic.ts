@@ -1,4 +1,5 @@
 import { Environment } from "@axelarjs/core";
+import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
 import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
 import { HttpClient } from "@axelarjs/utils/http-client";
 
@@ -17,15 +18,12 @@ import {
   type ClientMeta,
   type RestServiceOptions,
 } from "../lib/rest-service";
-import {
-  AxelarQueryClient,
-  type AxelarQueryClientType,
-} from "./AxelarQueryClient";
 import { DEFAULT_L1_EXECUTE_DATA } from "./constant";
 import { EnvironmentConfigs, getConfigs } from "./constants";
 import { getL1FeeForL2 } from "./fee";
 import type {
   AxelarGMPResponse,
+  AxelarQueryClientType,
   BaseFeeResponse,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
@@ -47,8 +45,6 @@ export class AxelarQueryAPIClient extends RestService {
   protected env: Environment;
   protected cachedChainConfig: AxelarConfigsResponse | undefined;
 
-  private axelarQueryClient: AxelarQueryClientType | null;
-
   readonly axelarGMPServiceUrl: string;
   readonly axelarGMPServiceApi: HttpClient;
   readonly axelarRpcUrl: string;
@@ -61,7 +57,6 @@ export class AxelarQueryAPIClient extends RestService {
   ) {
     super(options, meta);
     const links: EnvironmentConfigs = getConfigs(env);
-    this.axelarQueryClient = null;
     this.axelarGMPServiceUrl = links.axelarGMPApiUrl;
     this.axelarRpcUrl = links.axelarRpcUrl;
     this.gmpClient = dependencies.gmpClient;
@@ -352,17 +347,13 @@ export class AxelarQueryAPIClient extends RestService {
    * @returns an array of active chains
    */
   public async getActiveChains(): Promise<string[]> {
-    if (!this.axelarQueryClient) {
-      this.axelarQueryClient =
-        await AxelarQueryClient.initOrGetAxelarQueryClient({
-          environment: this.env,
-          axelarRpcUrl: this.axelarRpcUrl,
-        });
-    }
+    const axelarQueryRpcClient = (await createAxelarRPCQueryClient({
+      environment: this.env,
+    })) as AxelarQueryClientType;
 
-    return this.axelarQueryClient.nexus
+    return axelarQueryRpcClient.nexus
       .Chains({ status: ChainStatus.CHAIN_STATUS_ACTIVATED })
-      .then((resp) => resp.chains);
+      .then((resp: { chains: string[] }) => resp.chains);
   }
 
   /**
@@ -370,10 +361,10 @@ export class AxelarQueryAPIClient extends RestService {
    * @param chainId the chain id to check
    * @returns true if the chain is active, false otherwise
    */
-  public isChainActive(chainId: string): Promise<boolean> {
-    return this.getActiveChains()
-      .then((chains) => chains.map((chain) => chain.toLowerCase()))
-      .then((chains) => chains.includes(chainId.toLowerCase()));
+  public async isChainActive(chainId: string): Promise<boolean> {
+    const chains = await this.getActiveChains();
+    const chains_1 = chains.map((chain) => chain.toLowerCase());
+    return chains_1.includes(chainId.toLowerCase());
   }
 
   /**
