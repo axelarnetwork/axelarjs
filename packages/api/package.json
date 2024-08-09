@@ -110,7 +110,6 @@
     "@axelarjs/utils": "workspace:*",
     "@axelarjs/proto": "workspace:*",
     "clone-deep": "^4.0.1",
-    "ethers": "^6.13.2",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
     "string-similarity-js": "^2.1.4",
