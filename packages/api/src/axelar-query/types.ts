@@ -1,11 +1,4 @@
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
-import { QueryService as AxelarnetQS } from "@axelarjs/proto/axelar/axelarnet/v1beta1/service";
-import { QueryService as EvmQS } from "@axelarjs/proto/axelar/evm/v1beta1/service";
-import { QueryService as NexusQS } from "@axelarjs/proto/axelar/nexus/v1beta1/service";
-import { QueryService as TSSQS } from "@axelarjs/proto/axelar/tss/v1beta1/service";
-
-import type { QueryClient } from "@cosmjs/stargate";
-
 import type { GetFeesParams } from "..";
 
 export type EstimateGasFeeParams = GetFeesParams & {
@@ -28,8 +21,6 @@ export type EstimateGasFeeResponse = {
   apiResponse: string;
   isExpressSupported: boolean;
 };
-
-export type Environment = "devnet" | "testnet" | "mainnet";
 
 interface TokenPrice {
   usd: number;
@@ -101,10 +92,3 @@ export interface AxelarGMPResult {
 export interface AxelarGMPResponse {
   result: AxelarGMPResult;
 }
-export interface AxelarQueryService {
-  readonly evm: EvmQS;
-  readonly axelarnet: AxelarnetQS;
-  readonly nexus: NexusQS;
-  readonly tss: TSSQS;
-}
-export type AxelarQueryClientType = QueryClient & AxelarQueryService;

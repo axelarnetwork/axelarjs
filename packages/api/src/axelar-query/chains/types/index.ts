@@ -1,4 +1,4 @@
-import type { Environment } from "../../..";
+import type { Environment } from "@axelarjs/cosmos";
 
 export interface ChainInfo {
   id: string;

@@ -1,6 +1,7 @@
+import type { Environment } from "@axelarjs/cosmos";
+
 import { stringSimilarity } from "string-similarity-js";
 
-import type { Environment } from "../..";
 import { loadChains } from "../chains";
 
 export async function validateChainIdentifier(

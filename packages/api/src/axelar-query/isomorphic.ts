@@ -1,5 +1,6 @@
 import { Environment } from "@axelarjs/core";
 import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
+import { AxelarQueryService } from "@axelarjs/cosmos/src/rpc/types";
 import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
 import { HttpClient } from "@axelarjs/utils/http-client";
 
@@ -23,7 +24,6 @@ import { EnvironmentConfigs, getConfigs } from "./constants";
 import { getL1FeeForL2 } from "./fee";
 import type {
   AxelarGMPResponse,
-  AxelarQueryClientType,
   BaseFeeResponse,
   EstimateGasFeeParams,
   EstimateGasFeeResponse,
@@ -349,7 +349,7 @@ export class AxelarQueryAPIClient extends RestService {
   public async getActiveChains(): Promise<string[]> {
     const axelarQueryRpcClient = (await createAxelarRPCQueryClient({
       environment: this.env,
-    })) as AxelarQueryClientType;
+    })) as AxelarQueryService;
 
     return axelarQueryRpcClient.nexus
       .Chains({ status: ChainStatus.CHAIN_STATUS_ACTIVATED })
