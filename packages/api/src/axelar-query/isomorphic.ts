@@ -1,4 +1,8 @@
 import { Environment } from "@axelarjs/core";
+import { createAxelarRPCQueryClient } from "@axelarjs/cosmos";
+import { AxelarQueryService } from "@axelarjs/cosmos/src/rpc/types";
+import { ChainStatus } from "@axelarjs/proto/axelar/nexus/v1beta1/query";
+import { HttpClient } from "@axelarjs/utils/http-client";
 
 import { parseUnits } from "viem";
 
@@ -16,9 +20,17 @@ import {
   type RestServiceOptions,
 } from "../lib/rest-service";
 import { DEFAULT_L1_EXECUTE_DATA } from "./constant";
+import { EnvironmentConfigs, getConfigs } from "./constants";
 import { getL1FeeForL2 } from "./fee";
-import type { EstimateGasFeeParams, EstimateGasFeeResponse } from "./types";
+import type {
+  AxelarGMPResponse,
+  BaseFeeResponse,
+  EstimateGasFeeParams,
+  EstimateGasFeeResponse,
+  GetNativeGasBaseFeeOptions,
+} from "./types";
 import { gasToWei, multiplyFloatByBigInt } from "./utils/bigint";
+import { throwIfInvalidChainIds } from "./utils/validateChain";
 
 type AxelarscanClientDependencies = {
   axelarConfigClient: AxelarConfigClient;
@@ -33,6 +45,10 @@ export class AxelarQueryAPIClient extends RestService {
   protected env: Environment;
   protected cachedChainConfig: AxelarConfigsResponse | undefined;
 
+  readonly axelarGMPServiceUrl: string;
+  readonly axelarGMPServiceApi: HttpClient;
+  readonly axelarRpcUrl: string;
+
   public constructor(
     options: RestServiceOptions,
     dependencies: AxelarscanClientDependencies,
@@ -40,10 +56,16 @@ export class AxelarQueryAPIClient extends RestService {
     meta?: ClientMeta
   ) {
     super(options, meta);
+    const links: EnvironmentConfigs = getConfigs(env);
+    this.axelarGMPServiceUrl = links.axelarGMPApiUrl;
+    this.axelarRpcUrl = links.axelarRpcUrl;
     this.gmpClient = dependencies.gmpClient;
     this.axelarScanClient = dependencies.axelarscanClient;
     this.axelarConfigClient = dependencies.axelarConfigClient;
     this.env = env;
+    this.axelarGMPServiceApi = new HttpClient({
+      prefixUrl: this.axelarGMPServiceUrl,
+    });
   }
 
   static init(
@@ -318,5 +340,139 @@ export class AxelarQueryAPIClient extends RestService {
     }
 
     return this.cachedChainConfig;
+  }
+
+  /**
+   * Get a list of active chains.
+   * @returns an array of active chains
+   */
+  public async getActiveChains(): Promise<string[]> {
+    const axelarQueryRpcClient = (await createAxelarRPCQueryClient({
+      environment: this.env,
+    })) as AxelarQueryService;
+
+    return axelarQueryRpcClient.nexus
+      .Chains({ status: ChainStatus.CHAIN_STATUS_ACTIVATED })
+      .then((resp: { chains: string[] }) => resp.chains);
+  }
+
+  /**
+   * Check if a chain is active.
+   * @param chainId the chain id to check
+   * @returns true if the chain is active, false otherwise
+   */
+  public async isChainActive(chainId: string): Promise<boolean> {
+    const chains = await this.getActiveChains();
+    const chains_1 = chains.map((chain) => chain.toLowerCase());
+    return chains_1.includes(chainId.toLowerCase());
+  }
+
+  /**
+   * Throw an error if any chain in the list is inactive.
+   * @param chainIds A list of chainIds to check
+   */
+  public async throwIfInactiveChains(chainIds: string[]) {
+    const results = await Promise.all(
+      chainIds.map((chainId) => this.isChainActive(chainId))
+    );
+
+    for (let i = 0; i < chainIds.length; i++) {
+      if (!results[i]) {
+        throw new Error(
+          `Chain ${chainIds[i]} is not active. Please check the list of active chains using the getActiveChains() method.`
+        );
+      }
+    }
+  }
+
+  /**
+   * Gets the base fee in native token wei for a given source and destination chain combination.
+   * @param sourceChainId
+   * @param destinationChainId
+   * @param options - Optional parameters:
+   *   - sourceTokenSymbol
+   *   - symbol
+   *   - destinationContractAddress
+   *   - sourceContractAddress
+   *   - amount
+   *   - amountInUnits
+   * @returns A `BaseFeeResponse` object containing the base fee, express fee, source token information, execute gas multiplier, destination token information, L2 type, Ethereum token information, and success status.
+   */
+  public async getNativeGasBaseFee(
+    sourceChainId: string,
+    destinationChainId: string,
+    options?: GetNativeGasBaseFeeOptions
+  ): Promise<BaseFeeResponse> {
+    let response: Promise<BaseFeeResponse>;
+    try {
+      await throwIfInvalidChainIds(
+        [sourceChainId, destinationChainId],
+        this.env
+      );
+      await this.throwIfInactiveChains([sourceChainId, destinationChainId]);
+
+      response = this.axelarGMPServiceApi
+        .post("", {
+          method: "getFees",
+          destinationChain: destinationChainId,
+          sourceChain: sourceChainId,
+          sourceTokenSymbol: options?.sourceTokenSymbol,
+          symbol: options?.symbol,
+          destinationContractAddress: options?.destinationContractAddress,
+          sourceContractAddress: options?.sourceContractAddress,
+          amount: options?.amount,
+          amountInUnits: options?.amountInUnits,
+        })
+        .json()
+        .then((response) => {
+          const typedResponse = response as AxelarGMPResponse;
+          const {
+            source_base_fee_string,
+            source_token,
+            ethereum_token,
+            destination_native_token,
+            express_fee_string,
+            express_supported,
+            l2_type,
+            execute_gas_multiplier,
+          } = typedResponse.result;
+
+          const { decimals: sourceTokenDecimals } = source_token;
+          const baseFee = parseUnits(
+            source_base_fee_string,
+            sourceTokenDecimals
+          ).toString();
+          const expressFee = express_fee_string
+            ? parseUnits(express_fee_string, sourceTokenDecimals).toString()
+            : "0";
+
+          return {
+            baseFee,
+            expressFee,
+            sourceToken: source_token,
+            executeGasMultiplier: parseFloat(execute_gas_multiplier.toFixed(2)),
+            destToken: {
+              gas_price: destination_native_token.gas_price,
+              decimals: destination_native_token.decimals,
+              token_price: destination_native_token.token_price,
+              name: destination_native_token.name,
+              symbol: destination_native_token.symbol,
+              l1_gas_oracle_address:
+                destination_native_token.l1_gas_oracle_address,
+              l1_gas_price_in_units:
+                destination_native_token.l1_gas_price_in_units,
+            },
+            l2_type,
+            ethereumToken: ethereum_token,
+            apiResponse: typedResponse,
+            success: true,
+            expressSupported: express_supported,
+            error: null,
+          };
+        });
+    } catch (e) {
+      return { success: false, error: e };
+    }
+    return response;
   }
 }
