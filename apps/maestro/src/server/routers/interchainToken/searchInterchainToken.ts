@@ -276,24 +276,34 @@ async function scanChains(
   tokenAddress: `0x${string}`,
   ctx: Context
 ) {
-  for (const chainConfig of chainConfigs) {
-    const tokenDetails = await getTokenDetails(chainConfig, tokenAddress, ctx);
+  const promises = chainConfigs.map((chainConfig) => {
+    getTokenDetails(chainConfig, tokenAddress, ctx)
+      .then((tokenDetails) => {
+        if (tokenDetails) {
+          const result = getInterchainToken(
+            tokenDetails,
+            chainConfig,
+            chainConfigs,
+            ctx
+          );
+          if (result) {
+            return result;
+          }
+          return null;
+        }
+      })
+      .catch(() => {
+        console.log(
+          `Token not found for chain: ${chainConfig.axelarChainName}`
+        );
+        return null;
+      });
+  });
 
-    if (tokenDetails) {
-      const result = getInterchainToken(
-        tokenDetails,
-        chainConfig,
-        chainConfigs,
-        ctx
-      );
+  const results = await Promise.all(promises);
+  const validResult = results.find((result) => result !== null);
 
-      if (result) {
-        return result;
-      }
-    }
-  }
-
-  return null;
+  return validResult || null;
 }
 
 async function getTokenDetails(
