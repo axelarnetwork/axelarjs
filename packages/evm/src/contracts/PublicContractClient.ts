@@ -96,7 +96,7 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
       address,
       functionName,
       abi: this.abi,
-    } as WriteContractParameters<TAbi, TFunctionName>;
+    } as unknown as WriteContractParameters<TAbi, TFunctionName>;
 
     if (params?.args) {
       contractParams["args"] = params.args;
