@@ -214,6 +214,8 @@ describe("requestConfigs", () => {
       rpcUrl = axelarRpcUrl;
     }
 
+    console.log("depositAddress", depositAddress);
+
     expect(depositAddress).toBeTruthy();
     expect(mod.getActiveChains).toHaveBeenCalledWith("testnet", {
       axelarRpcUrl: rpcUrl,
