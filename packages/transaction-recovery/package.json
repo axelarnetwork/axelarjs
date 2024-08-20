@@ -73,6 +73,6 @@
     "@axelarjs/evm": "workspace:^",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
-    "viem": "^2.19.8"
+    "viem": "^2.8.18"
   }
 }

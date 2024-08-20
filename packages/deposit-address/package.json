@@ -60,6 +60,6 @@
     "@axelarjs/proto": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "bech32": "^2.0.0",
-    "viem": "^2.19.8"
+    "viem": "^2.8.18"
   }
 }

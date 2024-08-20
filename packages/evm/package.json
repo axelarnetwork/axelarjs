@@ -50,7 +50,7 @@
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
     "tsx": "^4.7.1",
-    "viem": "^2.19.8",
+    "viem": "^2.8.18",
     "zx": "^7.2.3"
   },
   "devDependencies": {

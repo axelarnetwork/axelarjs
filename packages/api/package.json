@@ -110,6 +110,6 @@
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
     "string-similarity-js": "^2.1.4",
-    "viem": "^2.19.8"
+    "viem": "^2.8.18"
   }
 }
