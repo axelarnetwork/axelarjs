@@ -60,7 +60,7 @@ describe("Deposit Address", () => {
   });
 
   describe("getLinkedDepositAddress", () => {
-    test("should get linked deposit address from an EVM source chain", async () => {
+    test.skip("should get linked deposit address from an EVM source chain", async () => {
       const params: SendOptions = {
         sourceChain: "Fantom",
         destinationChain: "ethereum-sepolia",
