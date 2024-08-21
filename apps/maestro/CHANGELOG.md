@@ -1,5 +1,15 @@
 # @axelarjs/maestro
 
+## 0.3.20
+
+### Patch Changes
+
+- [#418](https://github.com/axelarnetwork/axelarjs/pull/418) [`35bd4f6c6266bdbeb809c12a9aba5fb8c2a241f2`](https://github.com/axelarnetwork/axelarjs/commit/35bd4f6c6266bdbeb809c12a9aba5fb8c2a241f2) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Change search erc20 query config so it does not retry on error, make RPC calls in getERC20TokenDetails and searchInterchainToken methods concurrent..
+
+- Updated dependencies [[`d735846abf98f9960311b21c523360f40d6e55e3`](https://github.com/axelarnetwork/axelarjs/commit/d735846abf98f9960311b21c523360f40d6e55e3)]:
+  - @axelarjs/api@0.4.6
+  - @axelarjs/evm@0.2.5
+
 ## 0.3.19
 
 ### Patch Changes
