@@ -1,0 +1,92 @@
+const feesAndPrices = {
+  testnet: [],
+  stagenet: [
+    {
+      name: "test-avalanche",
+      amplifierChainId: "test-avalanche",
+      description: null,
+      gasPriceGwei: 25,
+      approvalCost: 425000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "test-sepolia",
+      amplifierChainId: "test-sepolia",
+      description: null,
+      gasPriceGwei: 5.02,
+      approvalCost: 1300000,
+      updated: "2024-08-05",
+    },
+  ],
+  "devnet-verifiers": [
+    {
+      name: "Avalanche",
+      amplifierChainId: "avalanche",
+      description: null,
+      gasPriceGwei: 25,
+      approvalCost: 425000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "fantom",
+      amplifierChainId: "fantom",
+      description: null,
+      gasPriceGwei: 1.03,
+      approvalCost: 1300000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "ethereum-sepolia",
+      amplifierChainId: "ethereum-sepolia",
+      description: null,
+      gasPriceGwei: 11.5,
+      approvalCost: 200000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "op-sepolia",
+      amplifierChainId: "op-sepolia",
+      description: null,
+      gasPriceGwei: 0.001,
+      approvalCost: 300000,
+      updated: "2024-08-05",
+    },
+  ],
+  "devnet-amplifier": [
+    {
+      name: "Avalanche",
+      amplifierChainId: "avalanche",
+      description: null,
+      gasPriceGwei: 25,
+      approvalCost: 425000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "fantom",
+      amplifierChainId: "fantom",
+      description: null,
+      gasPriceGwei: 1.03,
+      approvalCost: 1300000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "ethereum-sepolia",
+      amplifierChainId: "ethereum-sepolia",
+      description: null,
+      gasPriceGwei: 6.4,
+      approvalCost: 200000,
+      updated: "2024-08-05",
+    },
+    {
+      name: "op-sepolia",
+      amplifierChainId: "op-sepolia",
+      description: null,
+      gasPriceGwei: 0.001,
+      approvalCost: 300000,
+      updated: "2024-08-05",
+    },
+  ],
+  mainnet: [],
+};
+
+export default feesAndPrices;

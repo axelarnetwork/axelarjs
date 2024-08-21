@@ -32,32 +32,45 @@ export const getERC20TokenDetails = publicProcedure
       );
 
       if (!chainConfig) {
-        for (const config of chainConfigs) {
+        const promises = chainConfigs.map((config) => {
           const client = ctx.contracts.createERC20Client(
             config,
             input.tokenAddress
           );
 
-          try {
-            const details = await getTokenPublicDetails(
-              client,
+          return getTokenPublicDetails(client, config, input.tokenAddress)
+            .then((details) => ({
+              success: true,
+              details,
               config,
-              input.tokenAddress
-            );
+            }))
+            .catch(() => ({
+              success: false,
+              config,
+              details: null,
+            }));
+        });
 
-            if (details) {
-              return details;
-            }
-          } catch (error) {
-            console.log(
-              `Token ${input.tokenAddress} not found on ${config.name}`
-            );
-          }
+        const results = await Promise.all(promises);
+
+        const successfulResult = results.find((result) => result.success);
+
+        if (successfulResult) {
+          return successfulResult.details;
         }
 
+        // Log errors
+        results.forEach((result) => {
+          if (!result.success) {
+            console.error(
+              `Token ${input.tokenAddress} not found on chain: ${result.config.axelarChainName}`
+            );
+          }
+        });
+
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `Invalid chainId: ${input.chainId}`,
+          code: "NOT_FOUND",
+          message: `Token not found on any chain.`,
         });
       }
 
@@ -76,6 +89,7 @@ export const getERC20TokenDetails = publicProcedure
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: `Failed to get ERC20 token details for ${input.tokenAddress} on ${input.chainId}`,
+        cause: error,
       });
     }
   });
