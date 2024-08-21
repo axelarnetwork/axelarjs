@@ -1,5 +1,11 @@
 # @axelarjs/api
 
+## 0.4.6
+
+### Patch Changes
+
+- [#416](https://github.com/axelarnetwork/axelarjs/pull/416) [`d735846abf98f9960311b21c523360f40d6e55e3`](https://github.com/axelarnetwork/axelarjs/commit/d735846abf98f9960311b21c523360f40d6e55e3) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Add getNativeGasBaseFee to the axelar-query API, migrated it from axelarjs-sdk.
+
 ## 0.4.5
 
 ### Patch Changes

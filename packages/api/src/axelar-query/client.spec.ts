@@ -8,8 +8,14 @@ import type {
   EstimateGasFeeResponse,
 } from "../axelar-query";
 import { createAxelarQueryClient } from "./client";
+import { activeChainsStub } from "./stubs";
 
 describe("axelar-query (node client)", () => {
+  const testnetApi: AxelarQueryAPIClient = createAxelarQueryClient(
+    ENVIRONMENTS.testnet,
+    {}
+  );
+
   describe("estimateGasFee", () => {
     const requestParam: EstimateGasFeeParams = {
       sourceChain: "ethereum",
@@ -23,11 +29,9 @@ describe("axelar-query (node client)", () => {
     };
 
     let mainnetApi: AxelarQueryAPIClient;
-    // let testnetApi: AxelarQueryAPIClient;
 
     beforeEach(() => {
       mainnetApi = createAxelarQueryClient(ENVIRONMENTS.mainnet, {});
-      // testnetApi = createAxelarQueryClient(ENVIRONMENTS.testnet, {});
     });
 
     test("It should return estimated gas amount in terms of native tokens", async () => {
@@ -78,6 +82,36 @@ describe("axelar-query (node client)", () => {
       })) as EstimateGasFeeResponse;
       expect(res).toBeTruthy();
       expect(res.baseFee).toBeTruthy();
+    });
+  });
+
+  describe("getNativeGasBaseFee", () => {
+    test("It should return base fee for a certain source chain / destination chain combination", async () => {
+      vitest
+        .spyOn(testnetApi, "getActiveChains")
+        .mockResolvedValueOnce(activeChainsStub());
+      const gasResult = await testnetApi.getNativeGasBaseFee(
+        "Avalanche",
+        "ethereum-sepolia"
+      );
+
+      expect(gasResult.success).toBeTruthy();
+      expect(gasResult.baseFee).toBeDefined();
+      expect(gasResult.error).toBeFalsy();
+    });
+
+    test("It should return an error if the chain a does not exist", async () => {
+      vitest
+        .spyOn(testnetApi, "getActiveChains")
+        .mockResolvedValueOnce(activeChainsStub());
+      const gasResult = await testnetApi.getNativeGasBaseFee(
+        "not-existing-chain",
+        "ethereum-sepolia"
+      );
+
+      expect(gasResult.success).toBeFalsy();
+      expect(gasResult.baseFee).toBeUndefined();
+      expect(gasResult.error).toBeDefined();
     });
   });
 
