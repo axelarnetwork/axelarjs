@@ -277,7 +277,7 @@ async function scanChains(
   ctx: Context
 ) {
   const promises = chainConfigs.map((chainConfig) => {
-    getTokenDetails(chainConfig, tokenAddress, ctx)
+    return getTokenDetails(chainConfig, tokenAddress, ctx)
       .then((tokenDetails) => {
         if (tokenDetails) {
           const result = getInterchainToken(
