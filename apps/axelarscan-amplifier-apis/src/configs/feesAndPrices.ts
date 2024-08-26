@@ -1,5 +1,22 @@
 const feesAndPrices = {
-  testnet: [],
+  testnet: [
+    {
+      name: "test-avalanche",
+      amplifierChainId: "test-avalanche",
+      description: null,
+      gasPriceGwei: 25,
+      approvalCost: 425000,
+      updated: "2024-08-26",
+    },
+    {
+      name: "test-sepolia",
+      amplifierChainId: "test-sepolia",
+      description: null,
+      gasPriceGwei: 5.02,
+      approvalCost: 1300000,
+      updated: "2024-08-26",
+    },
+  ],
   stagenet: [
     {
       name: "test-avalanche",
