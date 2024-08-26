@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.21
+
+### Patch Changes
+
+- [#424](https://github.com/axelarnetwork/axelarjs/pull/424) [`6f38bf8c9e1df3090e86d5b240f6e5c9d7df8146`](https://github.com/axelarnetwork/axelarjs/commit/6f38bf8c9e1df3090e86d5b240f6e5c9d7df8146) Thanks [@npty](https://github.com/npty)! - fix: token details disappear
+
 ## 0.3.20
 
 ### Patch Changes
