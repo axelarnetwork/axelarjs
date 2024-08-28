@@ -110,11 +110,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress,
   });
 
-  const { data: tokenDetails, error: tokenDetailsError } =
-    trpc.erc20.getERC20TokenDetails.useQuery({
-      chainId: props.chainId,
-      tokenAddress: props.tokenAddress,
-    });
+  const {
+    data: tokenDetails,
+    error: tokenDetailsError,
+    refetch: refetchTokenDetails,
+  } = trpc.erc20.getERC20TokenDetails.useQuery({
+    chainId: props.chainId,
+    tokenAddress: props.tokenAddress,
+  });
 
   const [sessionState, setSessionState] = useInterchainTokenDetailsPageState({
     chainId: props.chainId,
@@ -188,6 +191,34 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
   }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
+
+  const utils = trpc.useUtils();
+
+  const { mutateAsync, isPending } =
+    trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
+
+  // Try to recover deployment message id if it's missing
+  useEffect(() => {
+    if (!props.deploymentMessageId && props.tokenId && !isPending) {
+      void mutateAsync({ tokenId: props.tokenId }).then((result) => {
+        if (result === "updated") {
+          void utils.erc20.invalidate().then(() => void refetchTokenDetails());
+          void utils.interchainToken
+            .invalidate()
+            .then(() => void refetchInterchainToken());
+        }
+      });
+    }
+  }, [
+    isPending,
+    mutateAsync,
+    props.deploymentMessageId,
+    props.tokenId,
+    refetchInterchainToken,
+    refetchTokenDetails,
+    utils.erc20,
+    utils.interchainToken,
+  ]);
 
   const remoteChainsExecuted = useMemo(
     () =>
