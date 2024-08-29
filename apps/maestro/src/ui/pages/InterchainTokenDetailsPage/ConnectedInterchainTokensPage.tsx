@@ -2,7 +2,7 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
-import { useEffect, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
@@ -197,8 +197,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { mutateAsync, isPending } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
 
-  // Try to recover deployment message id if it's missing
-  useEffect(() => {
+  // If the token does not have a deployment message id, try to
+  // recover it and store it in the db then update the token details
+  const recoverMessageId = useCallback(() => {
     if (!props.deploymentMessageId && props.tokenId && !isPending) {
       void mutateAsync({ tokenId: props.tokenId }).then((result) => {
         if (result === "updated") {
@@ -219,6 +220,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     utils.erc20,
     utils.interchainToken,
   ]);
+
+  // Try to recover deployment message id if it's missing
+  useEffect(() => {
+    recoverMessageId();
+  }, [recoverMessageId]);
 
   const remoteChainsExecuted = useMemo(
     () =>
