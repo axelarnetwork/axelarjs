@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.22
+
+### Patch Changes
+
+- [#431](https://github.com/axelarnetwork/axelarjs/pull/431) [`d55c7cf40167ce6092461e2dc42a48686817d687`](https://github.com/axelarnetwork/axelarjs/commit/d55c7cf40167ce6092461e2dc42a48686817d687) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - create a trpc to recover deployment message ids and use it in token details page to automatically check and recover the missing ids.
+
 ## 0.3.21
 
 ### Patch Changes
