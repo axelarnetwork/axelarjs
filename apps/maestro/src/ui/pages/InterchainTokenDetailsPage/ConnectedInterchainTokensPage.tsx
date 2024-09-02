@@ -2,7 +2,7 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
-import { useEffect, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
@@ -110,11 +110,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress,
   });
 
-  const { data: tokenDetails, error: tokenDetailsError } =
-    trpc.erc20.getERC20TokenDetails.useQuery({
-      chainId: props.chainId,
-      tokenAddress: props.tokenAddress,
-    });
+  const {
+    data: tokenDetails,
+    error: tokenDetailsError,
+    refetch: refetchTokenDetails,
+  } = trpc.erc20.getERC20TokenDetails.useQuery({
+    chainId: props.chainId,
+    tokenAddress: props.tokenAddress,
+  });
 
   const [sessionState, setSessionState] = useInterchainTokenDetailsPageState({
     chainId: props.chainId,
@@ -188,6 +191,40 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
   }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
+
+  const utils = trpc.useUtils();
+
+  const { mutateAsync, isPending } =
+    trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
+
+  // If the token does not have a deployment message id, try to
+  // recover it and store it in the db then update the token details
+  const recoverMessageId = useCallback(() => {
+    if (!props.deploymentMessageId && props.tokenId && !isPending) {
+      void mutateAsync({ tokenId: props.tokenId }).then((result) => {
+        if (result === "updated") {
+          void utils.erc20.invalidate().then(() => void refetchTokenDetails());
+          void utils.interchainToken
+            .invalidate()
+            .then(() => void refetchInterchainToken());
+        }
+      });
+    }
+  }, [
+    isPending,
+    mutateAsync,
+    props.deploymentMessageId,
+    props.tokenId,
+    refetchInterchainToken,
+    refetchTokenDetails,
+    utils.erc20,
+    utils.interchainToken,
+  ]);
+
+  // Try to recover deployment message id if it's missing
+  useEffect(() => {
+    recoverMessageId();
+  }, [recoverMessageId]);
 
   const remoteChainsExecuted = useMemo(
     () =>

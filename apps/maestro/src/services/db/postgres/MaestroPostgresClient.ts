@@ -196,6 +196,32 @@ export default class MaestroPostgresClient {
     return await query;
   }
 
+  async updateInterchainTokenDeploymentMessageId(
+    tokenId: string,
+    deploymentMessageId: string
+  ) {
+    await this.db
+      .update(interchainTokens)
+      .set({ deploymentMessageId, updatedAt: new Date() })
+      .where(eq(interchainTokens.tokenId, tokenId));
+  }
+
+  async updateRemoteInterchainTokenDeploymentMessageId(
+    tokenId: string,
+    axealrChainId: string,
+    deploymentMessageId: string
+  ) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({ deploymentMessageId, updatedAt: new Date() })
+      .where(
+        and(
+          eq(remoteInterchainTokens.tokenId, tokenId),
+          eq(remoteInterchainTokens.axelarChainId, axealrChainId)
+        )
+      );
+  }
+
   /**
    * Returns the interchain token with the given `chainId` and `tokenAddress`,
    * including its remote interchain tokens.
