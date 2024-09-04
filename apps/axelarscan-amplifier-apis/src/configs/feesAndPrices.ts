@@ -16,6 +16,14 @@ const feesAndPrices = {
       approvalCost: 1300000,
       updated: "2024-08-26",
     },
+    {
+      name: "flow",
+      amplifierChainId: "flow",
+      description: null,
+      gasPriceGwei: 0.1,
+      approvalCost: 3500000,
+      updated: "2024-08-26",
+    },
   ],
   stagenet: [
     {
@@ -33,6 +41,14 @@ const feesAndPrices = {
       gasPriceGwei: 5.02,
       approvalCost: 1300000,
       updated: "2024-08-05",
+    },
+    {
+      name: "flow",
+      amplifierChainId: "flow",
+      description: null,
+      gasPriceGwei: 0.1,
+      approvalCost: 3500000,
+      updated: "2024-08-26",
     },
   ],
   "devnet-verifiers": [
