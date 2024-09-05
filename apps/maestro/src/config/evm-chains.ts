@@ -25,6 +25,7 @@ import {
   kava,
   kavaTestnet,
   linea,
+  lineaSepolia,
   lineaTestnet,
   mainnet,
   mantle,
@@ -34,6 +35,7 @@ import {
   optimism,
   optimismSepolia,
   polygon,
+  polygonAmoy,
   polygonMumbai,
   polygonZkEvm,
   polygonZkEvmTestnet,
@@ -121,6 +123,12 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "polygon",
     axelarChainName: "Polygon",
     environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...polygonAmoy,
+    axelarChainId: "polygon-amoy",
+    axelarChainName: "polygon-amoy",
+    environment: ENVIRONMENTS.testnet,
   },
   {
     ...polygonMumbai,
@@ -238,6 +246,12 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     ...baseSepolia,
     axelarChainId: "base-sepolia",
     axelarChainName: "base-sepolia",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...lineaSepolia,
+    axelarChainId: "linea-sepolia",
+    axelarChainName: "linea-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {

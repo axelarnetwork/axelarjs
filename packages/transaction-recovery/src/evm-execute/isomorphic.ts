@@ -7,7 +7,13 @@ import type {
 } from "@axelarjs/api";
 import { createPublicClient, type SupportedMainnetChain } from "@axelarjs/evm";
 
-import { getContract, parseAbi, type Hex, type WalletClient } from "viem";
+import {
+  getContract,
+  parseAbi,
+  type Chain,
+  type Hex,
+  type WalletClient,
+} from "viem";
 
 import { getWalletClient } from "../common/client";
 import type { EvmExecuteParams, EvmExecuteResult } from "./types";
@@ -104,16 +110,10 @@ export async function evmExecute(
     },
   });
 
-  // Prepare write options for the transaction
-  const writeOptions = {
-    account: destWallet.account?.address as Hex,
-    chain: publicClient.chain,
-  };
-
   try {
-    let txHash: string;
+    let txHash: string = "";
     // Execute the appropriate function based on whether it's a contract call with token
-    if (isContractCallWithToken) {
+    if (isContractCallWithToken && destWallet.account) {
       txHash = await contract.write.executeWithToken(
         [
           tx.command_id as Hex,
@@ -123,9 +123,12 @@ export async function evmExecute(
           symbol,
           BigInt(amount as unknown as string),
         ],
-        writeOptions
+        {
+          chain: publicClient.chain as Chain,
+          account: destWallet.account.address,
+        }
       );
-    } else {
+    } else if (destWallet.account) {
       txHash = await contract.write.execute(
         [
           tx.command_id as Hex,
@@ -133,7 +136,10 @@ export async function evmExecute(
           tx.call.address as string,
           payload as Hex,
         ],
-        writeOptions
+        {
+          chain: publicClient.chain as Chain,
+          account: destWallet.account.address,
+        }
       );
     }
 
