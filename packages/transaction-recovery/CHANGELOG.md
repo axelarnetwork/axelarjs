@@ -1,5 +1,14 @@
 # @axelarjs/transaction-recovery
 
+## 0.3.4
+
+### Patch Changes
+
+- [#437](https://github.com/axelarnetwork/axelarjs/pull/437) [`517aa840340bc6132f7f4f7bc8ad3ffd01d483aa`](https://github.com/axelarnetwork/axelarjs/commit/517aa840340bc6132f7f4f7bc8ad3ffd01d483aa) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - add support for polygon amoy and linea sepolia, update viem dependency
+
+- Updated dependencies [[`517aa840340bc6132f7f4f7bc8ad3ffd01d483aa`](https://github.com/axelarnetwork/axelarjs/commit/517aa840340bc6132f7f4f7bc8ad3ffd01d483aa)]:
+  - @axelarjs/evm@0.2.6
+
 ## 0.3.3
 
 ### Patch Changes
