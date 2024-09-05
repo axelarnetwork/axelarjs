@@ -5,8 +5,8 @@ const feesAndPrices = {
       amplifierChainId: "test-avalanche",
       description: null,
       gasPriceGwei: 25,
-      approvalCost: 425000,
-      updated: "2024-08-26",
+      approvalCost: 250000,
+      updated: "2024-09-05",
     },
     {
       name: "test-sepolia",
@@ -21,8 +21,8 @@ const feesAndPrices = {
       amplifierChainId: "flow",
       description: null,
       gasPriceGwei: 0.1,
-      approvalCost: 425000,
-      updated: "2024-08-26",
+      approvalCost: 250000,
+      updated: "2024-09-05",
     },
   ],
   stagenet: [
@@ -31,8 +31,8 @@ const feesAndPrices = {
       amplifierChainId: "test-avalanche",
       description: null,
       gasPriceGwei: 25,
-      approvalCost: 425000,
-      updated: "2024-08-05",
+      approvalCost: 250000,
+      updated: "2024-09-05",
     },
     {
       name: "test-sepolia",
@@ -47,8 +47,8 @@ const feesAndPrices = {
       amplifierChainId: "flow",
       description: null,
       gasPriceGwei: 0.1,
-      approvalCost: 425000,
-      updated: "2024-08-26",
+      approvalCost: 250000,
+      updated: "2024-09-05",
     },
   ],
   "devnet-verifiers": [
