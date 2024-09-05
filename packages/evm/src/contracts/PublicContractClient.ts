@@ -93,7 +93,6 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
     }
 
     const contractParams = {
-      address,
       functionName,
       abi: this.abi,
     } as WriteContractParameters<TAbi, TFunctionName>;
@@ -104,6 +103,10 @@ export class PublicContractClient<TAbi extends readonly unknown[]> {
 
     if (params?.account) {
       contractParams["account"] = params.account;
+    }
+
+    if (address) {
+      contractParams["address"] = address;
     }
 
     return this.provider.writeContract(contractParams);
