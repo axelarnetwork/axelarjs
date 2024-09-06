@@ -57,9 +57,18 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
+function createRpcUrlConfig(chain: Chain, additionalUrls: string[] = []) {
+  const httpUrls = [...chain.rpcUrls.default.http, ...additionalUrls];
+  return {
+    default: { http: httpUrls },
+    public: { http: httpUrls },
+  };
+}
+
 export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
+    rpcUrls: createRpcUrlConfig(mainnet, ["https://eth.llamarpc.com"]),
     axelarChainId: "ethereum",
     axelarChainName: "ethereum",
     environment: ENVIRONMENTS.mainnet,
