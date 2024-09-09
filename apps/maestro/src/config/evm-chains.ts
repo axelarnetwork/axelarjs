@@ -81,6 +81,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...moonbeam,
+    rpcUrls: createRpcUrlConfig(moonbeam, ["https://moonbeam.drpc.org"]),
     axelarChainId: "moonbeam",
     axelarChainName: "Moonbeam",
     environment: ENVIRONMENTS.mainnet,
@@ -93,6 +94,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fantom,
+    rpcUrls: createRpcUrlConfig(fantom, ["https://fantom.drpc.org"]),
     axelarChainId: "fantom",
     axelarChainName: "Fantom",
     environment: ENVIRONMENTS.mainnet,
@@ -105,6 +107,9 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...immutableZkEvm,
+    rpcUrls: createRpcUrlConfig(immutableZkEvm, [
+      "https://immutable-zkevm.drpc.org",
+    ]),
     axelarChainId: "immutable",
     axelarChainName: "Immutable",
     environment: ENVIRONMENTS.mainnet,
@@ -117,6 +122,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...avalanche,
+    rpcUrls: createRpcUrlConfig(avalanche, ["https://1rpc.io/avax/c"]),
     axelarChainId: "avalanche",
     axelarChainName: "Avalanche",
     environment: ENVIRONMENTS.mainnet,
@@ -129,6 +135,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygon,
+    rpcUrls: createRpcUrlConfig(polygon, ["https://polygon.llamarpc.com"]),
     axelarChainId: "polygon",
     axelarChainName: "Polygon",
     environment: ENVIRONMENTS.mainnet,
@@ -151,6 +158,9 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygonZkEvm,
+    rpcUrls: createRpcUrlConfig(polygonZkEvm, [
+      "https://polygon-zkevm.drpc.org",
+    ]),
     axelarChainId: "polygon-zkevm",
     axelarChainName: "polygon-zkevm",
     environment: ENVIRONMENTS.mainnet,
@@ -163,6 +173,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...bsc,
+    rpcUrls: createRpcUrlConfig(bsc, ["https://binance.llamarpc.com"]),
     axelarChainId: "binance",
     axelarChainName: "binance",
     environment: ENVIRONMENTS.mainnet,
@@ -175,6 +186,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...arbitrum,
+    rpcUrls: createRpcUrlConfig(arbitrum, ["https://arbitrum.drpc.org"]),
     axelarChainId: "arbitrum",
     axelarChainName: "arbitrum",
     environment: ENVIRONMENTS.mainnet,
@@ -187,6 +199,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...celo,
+    rpcUrls: createRpcUrlConfig(celo, ["https://1rpc.io/celo"]),
     axelarChainId: "celo",
     axelarChainName: "celo",
     environment: ENVIRONMENTS.mainnet,
@@ -199,6 +212,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...aurora,
+    rpcUrls: createRpcUrlConfig(aurora, ["https://1rpc.io/aurora"]),
     axelarChainId: "aurora",
     axelarChainName: "aurora",
     environment: ENVIRONMENTS.mainnet,
@@ -223,6 +237,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...kava,
+    rpcUrls: createRpcUrlConfig(kava, ["https://kava.drpc.org"]),
     axelarChainId: "kava",
     axelarChainName: "kava",
     environment: ENVIRONMENTS.mainnet,
@@ -241,12 +256,14 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...filecoin,
+    rpcUrls: createRpcUrlConfig(filecoin, ["https://rpc.ankr.com/filecoin"]),
     axelarChainId: "filecoin",
     axelarChainName: "filecoin",
     environment: ENVIRONMENTS.mainnet,
   },
   {
     ...base,
+    rpcUrls: createRpcUrlConfig(base, ["https://base.llamarpc.com"]),
     axelarChainId: "base",
     axelarChainName: "base",
     environment: ENVIRONMENTS.mainnet,
@@ -271,12 +288,14 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...linea,
+    rpcUrls: createRpcUrlConfig(linea, ["https://1rpc.io/linea"]),
     axelarChainId: "linea",
     axelarChainName: "linea",
     environment: ENVIRONMENTS.mainnet,
   },
   {
     ...mantle,
+    rpcUrls: createRpcUrlConfig(mantle, ["https://rpc.mantle.xyz"]),
     axelarChainId: "mantle",
     axelarChainName: "mantle",
     environment: ENVIRONMENTS.mainnet,
@@ -289,6 +308,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...scroll,
+    rpcUrls: createRpcUrlConfig(scroll, ["https://scroll.drpc.org"]),
     axelarChainId: "scroll",
     axelarChainName: "scroll",
     environment: ENVIRONMENTS.mainnet,
@@ -301,6 +321,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fraxtal,
+    rpcUrls: createRpcUrlConfig(fraxtal, ["https://fraxtal.drpc.org"]),
     axelarChainId: "fraxtal",
     axelarChainName: "fraxtal",
     environment: ENVIRONMENTS.mainnet,
@@ -313,6 +334,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...blast,
+    rpcUrls: createRpcUrlConfig(blast, ["https://rpc.envelop.is/blast"]),
     axelarChainId: "blast",
     axelarChainName: "blast",
     environment: ENVIRONMENTS.mainnet,
