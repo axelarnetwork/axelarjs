@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.24
+
+### Patch Changes
+
+- [#443](https://github.com/axelarnetwork/axelarjs/pull/443) [`1dc6b79a47c8cad509b7c061bba47117232745ce`](https://github.com/axelarnetwork/axelarjs/commit/1dc6b79a47c8cad509b7c061bba47117232745ce) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - add backup rpc urls to all mainnet chains
+
 ## 0.3.23
 
 ### Patch Changes
