@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.25
+
+### Patch Changes
+
+- [#447](https://github.com/axelarnetwork/axelarjs/pull/447) [`590054af2f65d980e23494d607623a2e8aac9107`](https://github.com/axelarnetwork/axelarjs/commit/590054af2f65d980e23494d607623a2e8aac9107) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - only try to recover deployment message id once
+
 ## 0.3.24
 
 ### Patch Changes
