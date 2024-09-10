@@ -194,13 +194,18 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const utils = trpc.useUtils();
 
-  const { mutateAsync, isPending } =
+  const { mutateAsync, isPending, isSuccess } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
 
   // If the token does not have a deployment message id, try to
   // recover it and store it in the db then update the token details
   const recoverMessageId = useCallback(() => {
-    if (!props.deploymentMessageId && props.tokenId && !isPending) {
+    if (
+      !props.deploymentMessageId &&
+      props.tokenId &&
+      !isPending &&
+      !isSuccess
+    ) {
       void mutateAsync({ tokenId: props.tokenId }).then((result) => {
         if (result === "updated") {
           void utils.erc20.invalidate().then(() => void refetchTokenDetails());
@@ -211,6 +216,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
   }, [
+    isSuccess,
     isPending,
     mutateAsync,
     props.deploymentMessageId,
