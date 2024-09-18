@@ -24,6 +24,14 @@ const feesAndPrices = {
       approvalCost: 250000,
       updated: "2024-09-05",
     },
+    {
+      name: "test-hedera",
+      amplifierChainId: "test-hedera",
+      description: null,
+      gasPriceGwei: 1730,
+      approvalCost: 250000,
+      updated: "2024-09-18",
+    },
   ],
   stagenet: [
     {
@@ -49,6 +57,14 @@ const feesAndPrices = {
       gasPriceGwei: 0.1,
       approvalCost: 250000,
       updated: "2024-09-05",
+    },
+    {
+      name: "test-hedera",
+      amplifierChainId: "test-hedera",
+      description: null,
+      gasPriceGwei: 1730,
+      approvalCost: 250000,
+      updated: "2024-09-18",
     },
   ],
   "devnet-verifiers": [
