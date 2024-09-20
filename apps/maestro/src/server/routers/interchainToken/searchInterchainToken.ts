@@ -299,9 +299,8 @@ async function scanChains(
         return null;
       });
   });
-
   const results = await Promise.all(promises);
-  const validResult = results.find((result) => result !== null);
+  const validResult = results.find((result) => result);
 
   return validResult || null;
 }
