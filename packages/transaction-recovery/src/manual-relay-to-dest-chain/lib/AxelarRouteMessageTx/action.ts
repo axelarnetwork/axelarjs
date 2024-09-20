@@ -9,8 +9,7 @@ export async function sendAxelarRouteMessageTx(
   deps: SendAxelarRouteMessageTxDependencies
 ): Promise<RecoveryTxResponse> {
   const payload = params.searchGMPData.call.returnValues.payload;
-  const messageId =
-    params.messageId || params.searchGMPData.call.returnValues.messageId;
+  const messageId = params.messageId || params.searchGMPData.message_id;
 
   if (!messageId) {
     return {
