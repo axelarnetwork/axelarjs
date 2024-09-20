@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.26
+
+### Patch Changes
+
+- [#454](https://github.com/axelarnetwork/axelarjs/pull/454) [`649ec35ad543c44fd6eb73ee18a184952b9e7598`](https://github.com/axelarnetwork/axelarjs/commit/649ec35ad543c44fd6eb73ee18a184952b9e7598) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - fix search interchain tokens query issue where it was only looking at the results for the first chain searched
+
 ## 0.3.25
 
 ### Patch Changes
