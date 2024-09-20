@@ -300,9 +300,7 @@ async function scanChains(
       });
   });
   const results = await Promise.all(promises);
-  const validResult = results.find(
-    (result) => result !== null && result !== undefined
-  );
+  const validResult = results.find((result) => result);
 
   return validResult || null;
 }
