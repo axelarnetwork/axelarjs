@@ -156,6 +156,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount }) => {
+      // allow token transfers with decimals === 0 but not undefined
       if (!(decimals !== undefined && address && config.gas)) {
         return;
       }
