@@ -156,7 +156,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount }) => {
-      if (!(decimals && address && config.gas)) {
+      if (!(decimals !== undefined && address && config.gas)) {
         return;
       }
 
