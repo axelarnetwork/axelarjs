@@ -1,5 +1,11 @@
 # @axelarjs/maestro
 
+## 0.3.27
+
+### Patch Changes
+
+- [#460](https://github.com/axelarnetwork/axelarjs/pull/460) [`2212d30216b3af7b6d2c2bfce0318bb3de62678b`](https://github.com/axelarnetwork/axelarjs/commit/2212d30216b3af7b6d2c2bfce0318bb3de62678b) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - allow making transfers for tokens with 0 decimals
+
 ## 0.3.26
 
 ### Patch Changes
