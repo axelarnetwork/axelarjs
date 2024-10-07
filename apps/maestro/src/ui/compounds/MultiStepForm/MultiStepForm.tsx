@@ -29,12 +29,11 @@ import {
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
-import { useAccount } from "wagmi";
-
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
-import ConnectWalletButton from "../ConnectWalletButton";
+import ConnectWalletModal from "../ConnectWalletModal/ConnectWalletModal";
 
 type ButtonProps = ComponentProps<typeof Button>;
 
@@ -212,7 +211,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
           </Dialog.Title>
         )}
         <StepsSummary currentStep={props.step} steps={steps} />
-        {isSignedIn ? props.children : <ConnectWalletButton />}
+        {isSignedIn ? props.children : <ConnectWalletModal />}
       </Dialog.Body>
     </Dialog>
   );

@@ -73,6 +73,26 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "ethereum",
     environment: ENVIRONMENTS.mainnet,
   },
+  // TODO: correct this
+  {
+    id: 101,
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    environment: ENVIRONMENTS.mainnet,
+    name: "Sui",
+    nativeCurrency: {
+      name: "SUI",
+      symbol: "SUI",
+      decimals: 9,
+    },
+    rpcUrls: {
+      default: { http: ["https://sui-rpc.publicnode.com"] },
+      public: { http: ["https://sui-rpc.publicnode.com"] },
+    },
+    blockExplorers: {
+      default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
+    },
+  },
   {
     ...sepolia,
     axelarChainId: "ethereum-sepolia",
@@ -338,6 +358,12 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "blast",
     axelarChainName: "blast",
     environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...blastSepolia,
+    axelarChainId: "blast-sepolia",
+    axelarChainName: "blast-sepolia",
+    environment: ENVIRONMENTS.testnet,
   },
   {
     ...blastSepolia,

@@ -26,7 +26,7 @@ import {
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
+import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
@@ -463,9 +463,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               }}
             />
           ) : (
-            <ConnectWalletButton className="w-full" $size="md">
+            <ConnectWalletModal>
               Connect wallet to register this token
-            </ConnectWalletButton>
+            </ConnectWalletModal>
           )}
         </div>
       )}
