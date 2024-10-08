@@ -11,11 +11,12 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useBalance, useChainId } from "wagmi";
+import { useBalance, useChainId } from "wagmi";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { useTransactionsContainer } from "~/features/Transactions";
+import { useAccount } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";

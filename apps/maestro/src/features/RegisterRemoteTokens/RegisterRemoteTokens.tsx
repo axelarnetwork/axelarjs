@@ -4,9 +4,10 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import type { TransactionReceipt } from "viem";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
 
+import { useAccount } from "~/lib/hooks";
 import {
   useTransactionState,
   type TransactionState,
@@ -97,7 +98,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     reset: resetCanonical,
   } = useRegisterRemoteCanonicalTokens({
     chainIds: props.chainIds,
-    deployerAddress: deployerAddress as `0x${string}`,
+    deployerAddress: deployerAddress,
     tokenAddress: props.tokenAddress,
     originChainId: props.originChainId ?? -1,
   });

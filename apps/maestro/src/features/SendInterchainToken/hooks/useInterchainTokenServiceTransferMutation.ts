@@ -9,7 +9,6 @@ import { useCallback, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 import {
-  useAccount,
   useBlockNumber,
   useChainId,
   useWaitForTransactionReceipt,
@@ -22,6 +21,7 @@ import {
   useWriteInterchainTokenApprove,
 } from "~/lib/contracts/InterchainToken.hooks";
 import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useAccount } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 

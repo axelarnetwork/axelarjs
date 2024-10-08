@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
-import { useAccount } from "wagmi";
 import { z } from "zod";
 
+import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   hex64Literal,

@@ -1,8 +1,7 @@
 import { Card, Tabs } from "@axelarjs/ui";
 import { useState, type FC, type ReactNode } from "react";
 
-import { useAccount } from "wagmi";
-
+import { useAccount } from "~/lib/hooks";
 import RecentTransactionsList from "./RecentTransactionsList";
 import { CONTRACT_METHODS, type ContractMethod } from "./types";
 

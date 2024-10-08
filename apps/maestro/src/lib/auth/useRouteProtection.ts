@@ -3,8 +3,7 @@ import { useCallback, useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
-import { useAccount, useDisconnect } from "wagmi";
-
+import { useAccount, useDisconnect } from "~/lib/hooks";
 import type { AccountStatus } from "~/services/db/kv";
 import { logger } from "../logger";
 
@@ -28,7 +27,7 @@ export function useRouteProtection({
   accountStatuses = ["enabled", "privileged"],
 }: UseRouteProtectionProps) {
   const { address } = useAccount();
-  const { disconnectAsync } = useDisconnect();
+  const { disconnect } = useDisconnect();
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
 
@@ -36,8 +35,8 @@ export function useRouteProtection({
 
   const handleSignout = useCallback(async () => {
     await signOut({ callbackUrl: "/" });
-    await disconnectAsync();
-  }, [disconnectAsync]);
+    disconnect();
+  }, [disconnect]);
 
   /**
    * redirect rules rules:

@@ -8,10 +8,11 @@ import {
 } from "next-auth/react";
 
 import { useMutation } from "@tanstack/react-query";
-import { useDisconnect, useSignMessage } from "wagmi";
+import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
 import { wagmiConfig } from "~/config/wagmi";
+import { useDisconnect } from "~/lib/hooks";
 import { trpc } from "../trpc";
 
 export type UseWeb3SignInOptions = {
@@ -41,7 +42,7 @@ export function useWeb3SignIn({
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
   const { signMessageAsync } = useSignMessage();
-  const { disconnectAsync } = useDisconnect();
+  const { disconnect } = useDisconnect();
 
   const signInAddressRef = useRef<`0x${string}` | null>(null);
 
@@ -79,7 +80,7 @@ export function useWeb3SignIn({
         isSigningInRef.current = false;
       } catch (error) {
         if (error instanceof Error) {
-          await disconnectAsync();
+          disconnect();
           await signOut();
 
           signInAddressRef.current = null;

@@ -10,9 +10,7 @@ import { maskAddress, Maybe } from "@axelarjs/utils";
 import { useCallback, useEffect, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { useAccount } from "wagmi";
-
-import { useChainFromRoute } from "~/lib/hooks";
+import { useAccount, useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
