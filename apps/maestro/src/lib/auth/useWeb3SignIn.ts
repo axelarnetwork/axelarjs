@@ -7,6 +7,7 @@ import {
   type SignInResponse,
 } from "next-auth/react";
 
+import { useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
@@ -43,6 +44,7 @@ export function useWeb3SignIn({
   const { data: session, status: sessionStatus } = useSession();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
+  const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
 
   const signInAddressRef = useRef<`0x${string}` | null>(null);
 
@@ -68,9 +70,23 @@ export function useWeb3SignIn({
         const { message } = await createSignInMessage({ address });
 
         onSignInStart?.(address);
-        const signature = await signMessageAsync({ message });
-        const response = await signIn("credentials", { address, signature });
+        let signature;
+        // 42 is the length of an EVM address
+        if (address.length === 42) {
+          signature = await signMessageAsync({ message });
+        }
+        // 66 is the length of a sui address
+        else if (address.length === 66) {
+          const resp = await signSuiMessageAsync({
+            message: new TextEncoder().encode(message),
+          });
+          signature = resp.signature;
+        }
 
+        const response = await signIn("credentials", {
+          address,
+          signature,
+        });
         if (response?.error) {
           throw new Error(response.error);
         }

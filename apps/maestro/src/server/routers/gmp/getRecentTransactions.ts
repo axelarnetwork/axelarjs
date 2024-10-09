@@ -5,13 +5,13 @@ import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
-import { hex40Literal } from "~/lib/utils/validation";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
   pageSize: z.number().optional().default(20),
   page: z.number().optional().default(0),
-  senderAddress: hex40Literal().optional(),
+  senderAddress: z.union([hex40Literal(), hex64Literal()]).optional(),
   contractMethod: z.union([
     z.literal("InterchainTransfer"),
     z.literal("InterchainTokenDeploymentStarted"),

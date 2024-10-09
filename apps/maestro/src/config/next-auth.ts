@@ -2,8 +2,9 @@ import { Maybe } from "@axelarjs/utils";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { kv } from "@vercel/kv";
-import { getAddress, verifyMessage } from "viem";
+import { verifyMessage } from "viem";
 
 import db from "~/lib/drizzle/client";
 import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
@@ -43,15 +44,14 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
       async authorize(credentials, req) {
         if (
           !credentials?.address ||
-          !getAddress(credentials?.address) ||
+          // !getAddress(credentials?.address) ||
           !credentials?.signature
         ) {
           return null;
         }
-
-        const address = getAddress(credentials.address);
+        //TODO: revert
+        const address = credentials.address as `0x${string}`;
         const signature = credentials.signature as `0x${string}`;
-
         const [accountNonce, accountStatus] = await Promise.all([
           kvClient.getAccountNonce(address),
           kvClient.getAccountStatus(address),
@@ -79,21 +79,30 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           }
           return null;
         }
-
+        let isMessageSigned;
         const message = getSignInMessage(accountNonce ?? 0);
-
-        const isMessageSigned = await verifyMessage({
-          message,
-          signature,
-          address,
-        });
+        // is SUI address
+        if (address.length === 66) {
+          const suiPublicKey = await verifyPersonalMessageSignature(
+            new TextEncoder().encode(message),
+            signature
+          );
+          isMessageSigned = suiPublicKey.toSuiAddress() === address;
+        }
+        // is EVM address
+        else if (address.length === 42) {
+          isMessageSigned = await verifyMessage({
+            message,
+            signature,
+            address,
+          });
+        }
 
         if (!isMessageSigned) {
           return null;
         }
 
         // increment nonce
-
         await kvClient.incrementAccountNonce(address);
 
         return {
@@ -110,7 +119,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   },
   callbacks: {
     async session({ session, token }) {
-      const address = getAddress(token.sub ?? "");
+      const address = token.sub as `0x${string}`;
 
       session.address = address;
       session.accountStatus = await kvClient

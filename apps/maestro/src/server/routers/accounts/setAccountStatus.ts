@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/validation";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
-  accountAddress: hex40Literal(),
+  accountAddress: z.union([hex40Literal(), hex64Literal()]),
   status: z.enum(["enabled", "disabled", "privileged"]),
 });
 
