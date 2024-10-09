@@ -69,8 +69,8 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
     rpcUrls: {
-      default: { http: ["https://eth.llamarpc.com"] }, // Temporarily using this url
-      public: { http: ["https://eth.llamarpc.com"] },
+      default: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] }, // Temporarily using this url
+      public: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] },
     },
     axelarChainId: "ethereum",
     axelarChainName: "ethereum",
