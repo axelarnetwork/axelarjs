@@ -68,7 +68,10 @@ function createRpcUrlConfig(chain: Chain, additionalUrls: string[] = []) {
 export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
-    rpcUrls: createRpcUrlConfig(mainnet, ["https://eth.llamarpc.com"]),
+    rpcUrls: {
+      default: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] }, // Temporarily using this url
+      public: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] },
+    },
     axelarChainId: "ethereum",
     axelarChainName: "ethereum",
     environment: ENVIRONMENTS.mainnet,

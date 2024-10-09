@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/maestro",
-  "version": "0.3.26",
+  "version": "0.3.28",
   "private": true,
   "publishConfig": {
     "access": "restricted"
