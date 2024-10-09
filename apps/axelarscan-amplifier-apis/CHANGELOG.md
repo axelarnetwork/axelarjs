@@ -1,5 +1,11 @@
 # axelarscan-amplifier-apis
 
+## 0.0.4
+
+### Patch Changes
+
+- [#451](https://github.com/axelarnetwork/axelarjs/pull/451) [`89680a5b273e46465e3387346415beaad8e67c8c`](https://github.com/axelarnetwork/axelarjs/commit/89680a5b273e46465e3387346415beaad8e67c8c) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - add hedera to fees and prices file testnet and stagenet
+
 ## 0.0.3
 
 ### Patch Changes

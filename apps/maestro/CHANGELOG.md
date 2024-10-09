@@ -1,5 +1,23 @@
 # @axelarjs/maestro
 
+## 0.3.28
+
+### Patch Changes
+
+- [#467](https://github.com/axelarnetwork/axelarjs/pull/467) [`f5764a714a0c7ddf27f9972f8f16ffbe1e3282a1`](https://github.com/axelarnetwork/axelarjs/commit/f5764a714a0c7ddf27f9972f8f16ffbe1e3282a1) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - change ethereum rpc urls
+
+## 0.3.27
+
+### Patch Changes
+
+- [#460](https://github.com/axelarnetwork/axelarjs/pull/460) [`2212d30216b3af7b6d2c2bfce0318bb3de62678b`](https://github.com/axelarnetwork/axelarjs/commit/2212d30216b3af7b6d2c2bfce0318bb3de62678b) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - allow making transfers for tokens with 0 decimals
+
+## 0.3.26
+
+### Patch Changes
+
+- [#454](https://github.com/axelarnetwork/axelarjs/pull/454) [`649ec35ad543c44fd6eb73ee18a184952b9e7598`](https://github.com/axelarnetwork/axelarjs/commit/649ec35ad543c44fd6eb73ee18a184952b9e7598) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - fix search interchain tokens query issue where it was only looking at the results for the first chain searched
+
 ## 0.3.25
 
 ### Patch Changes
