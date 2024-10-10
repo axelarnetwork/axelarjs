@@ -1,0 +1,45 @@
+{
+  "name": "@axelarjs/sui",
+  "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Sui clients & utils",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
+  "files": [
+    "./types"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
+  "scripts": {
+    "compile": "tsc",
+    "codegen:testnet": "pnpm typemove-sui --network testnet --target-dir=./src/types --abi-dir=./src/abis",
+    "codegen:mainnet": "pnpm typemove-sui --target-dir=./src/types --abi-dir=./src/abis"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LicenseRef-LICENSE",
+  "dependencies": {
+    "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.48b321a",
+    "@typemove/sui": "^1.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/prettier": "^2.7.3",
+    "dotenv": "^16.4.5",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
+  }
+}
