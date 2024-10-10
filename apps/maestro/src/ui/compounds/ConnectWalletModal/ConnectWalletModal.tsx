@@ -7,12 +7,15 @@ import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
 
 const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, ...props }, ref) => {
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
     return (
       <Modal
+        open={isModalOpen}
         // reset pointer events, fixes modal closing before child modal interactivity issue
-        onOpenChange={() =>
-          setTimeout(() => (document.body.style.pointerEvents = ""), 1)
-        }
+        onOpenChange={(a) => {
+          setTimeout(() => (document.body.style.pointerEvents = ""), 1);
+          setIsModalOpen(a);
+        }}
         trigger={
           <Button
             $variant="primary"
