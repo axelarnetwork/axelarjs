@@ -9,7 +9,10 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, ...props }, ref) => {
     return (
       <Modal
-        onOpenChange={() => (document.body.style.pointerEvents = "")} // reset pointer events, fixes library issue
+        // reset pointer events, fixes modal closing before child modal interactivity issue
+        onOpenChange={() =>
+          setTimeout(() => (document.body.style.pointerEvents = ""), 1)
+        }
         trigger={
           <Button
             $variant="primary"

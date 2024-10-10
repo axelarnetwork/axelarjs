@@ -12,6 +12,48 @@ import axelarscanClient from ".";
 
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
+const suiChainMockData = {
+  id: "sui",
+  chain_id: 101,
+  chain_name: "sui",
+  maintainer_id: "sui",
+  name: "Sui",
+  image: "/logos/chains/sui.svg",
+  color: "#6fbcf0",
+  chain_type: "sui",
+  no_inflation: false,
+  endpoints: {
+    rpc: ["https://sui-rpc.publicnode.com"],
+  },
+  native_token: {
+    name: "SUI",
+    symbol: "SUI",
+    decimals: 9,
+  },
+  explorer: {
+    name: "Sui Explorer",
+    url: "https://suiexplorer.com/",
+    icon: "/logos/explorers/suiexplorer.png",
+    block_path: "/block/{block}",
+    address_path: "/address/{address}",
+    contract_path: "/object/{address}",
+    transaction_path: "/txblock/{tx}",
+  },
+  provider_params: [
+    {
+      chainId: "0x65",
+      chainName: "Sui Mainnet",
+      rpcUrls: ["https://sui-rpc.publicnode.com"],
+      nativeCurrency: {
+        name: "SUI",
+        symbol: "SUI",
+        decimals: 9,
+      },
+      blockExplorerUrls: ["https://suiexplorer.com/"],
+    },
+  ],
+};
+
 export function useEVMChainConfigsQuery() {
   const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<
     EVMChainConfig[]
@@ -50,7 +92,7 @@ export function useEVMChainConfigsQuery() {
 
   return {
     ...queryResult,
-    data: configured,
+    data: [...configured, suiChainMockData],
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
