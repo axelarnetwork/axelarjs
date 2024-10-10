@@ -1,5 +1,5 @@
 import { Button, Modal, type ButtonProps } from "@axelarjs/ui";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef } from "react";
 
 import { ConnectModal } from "@mysten/dapp-kit";
 
@@ -7,16 +7,9 @@ import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
 
 const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, ...props }, ref) => {
-    const [isMainModalOpen, setIsMainModalOpen] = useState(false);
-    // Enable pointer events on body when modal is closed, the library is not handling this properly
-    useEffect(() => {
-      if (!isMainModalOpen) {
-        document.body.style.pointerEvents = "";
-      }
-    }, [isMainModalOpen]);
     return (
       <Modal
-        onOpenChange={setIsMainModalOpen}
+        onOpenChange={() => (document.body.style.pointerEvents = "")} // reset pointer events, fixes library issue
         trigger={
           <Button
             $variant="primary"
