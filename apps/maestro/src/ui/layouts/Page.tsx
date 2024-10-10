@@ -6,18 +6,18 @@ import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { useAccount, useSwitchChain } from "wagmi";
+import { useSwitchChain } from "wagmi";
 
 import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useChainFromRoute } from "~/lib/hooks";
+import { useAccount, useChainFromRoute } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import EVMChainsDropdown, {
   ChainIcon,
 } from "~/ui/components/EVMChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
-import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletModal from "../compounds/ConnectWalletModal/ConnectWalletModal";
 
 type PageState =
   | "loading"
@@ -73,13 +73,15 @@ const Page: FC<Props> = ({
       return "disconnected";
     }
 
-    if (chain && evmChains.length && !evmChain) {
-      return "unsupported-network";
-    }
+    // TODO: uncomment this when we have a way to handle multiple chains
 
-    if (!evmChain) {
-      return "loading";
-    }
+    // if (chain && evmChains.length && !evmChain) {
+    //   return "unsupported-network";
+    // }
+
+    // if (!evmChain) {
+    //   return "loading";
+    // }
 
     if (chainFromRoute && evmChain?.chain_id !== chainFromRoute.id) {
       return "network-mismatch";
@@ -89,8 +91,8 @@ const Page: FC<Props> = ({
   }, [
     mustBeConnected,
     isConnected,
-    chain,
-    evmChains.length,
+    // chain,
+    // evmChains.length,
     evmChain,
     chainFromRoute,
   ]);
@@ -127,7 +129,7 @@ const Page: FC<Props> = ({
             <div className="grid w-full max-w-lg place-items-center rounded-2xl bg-base-100 p-4">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>
-              <ConnectWalletButton className="w-full max-w-md" $size="md" />
+              <ConnectWalletModal className="w-full max-w-md" />
             </div>
             <section className="my-10 space-y-4">
               <div className="text-center text-xl font-semibold">

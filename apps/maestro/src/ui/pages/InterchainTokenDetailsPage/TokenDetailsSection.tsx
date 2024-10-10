@@ -25,9 +25,9 @@ import Image from "next/image";
 
 import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
-import { useAccount } from "wagmi";
 import { z } from "zod";
 
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -288,7 +288,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({
     trpc.interchainToken.getInterchainTokenRolesForAccount.useQuery(
       {
         tokenId,
-        accountAddress: address as `0x${string}`,
+        accountAddress: address,
       },
       {
         enabled: Boolean(address),

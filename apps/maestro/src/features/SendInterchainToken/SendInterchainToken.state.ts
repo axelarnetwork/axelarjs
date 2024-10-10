@@ -2,12 +2,13 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
-import { useAccount, useBalance } from "wagmi";
+import { useBalance } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
 } from "~/config/env";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";

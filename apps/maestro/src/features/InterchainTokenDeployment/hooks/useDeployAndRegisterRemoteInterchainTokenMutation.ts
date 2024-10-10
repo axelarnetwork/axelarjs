@@ -3,7 +3,7 @@ import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { zeroAddress, type TransactionReceipt } from "viem";
-import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useChainId, useWaitForTransactionReceipt } from "wagmi";
 
 import {
   useReadInterchainTokenFactoryInterchainTokenAddress,
@@ -15,6 +15,7 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
@@ -59,7 +60,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { data: tokenId } = useReadInterchainTokenFactoryInterchainTokenId({
     args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
       salt: input?.salt as `0x${string}`,
-      deployer: deployerAddress as `0x${string}`,
+      deployer: deployerAddress,
     }),
     query: {
       enabled:
@@ -71,7 +72,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     useReadInterchainTokenFactoryInterchainTokenAddress({
       args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenAddress.args({
         salt: input?.salt as `0x${string}`,
-        deployer: deployerAddress as `0x${string}`,
+        deployer: deployerAddress,
       }),
       query: {
         enabled: Boolean(tokenId && input?.salt && deployerAddress),

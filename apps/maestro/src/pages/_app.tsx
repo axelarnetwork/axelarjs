@@ -12,8 +12,12 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
+import "@mysten/dapp-kit/dist/index.css";
 import "~/lib/polyfills";
 import "~/styles/globals.css";
+
+import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
+import { getFullnodeUrl } from "@mysten/sui.js/client";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
@@ -21,6 +25,15 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
+
+import "@tanstack/react-query";
+
+const networks = {
+  localnet: { url: getFullnodeUrl("localnet") },
+  devnet: { url: getFullnodeUrl("devnet") },
+  testnet: { url: getFullnodeUrl("testnet") },
+  mainnet: { url: getFullnodeUrl("mainnet") },
+};
 
 const fontSans = Cabin({ subsets: ["latin"] });
 const clashGrotesk = localFont({
@@ -86,13 +99,17 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <SessionProvider session={pageProps.session}>
           <ThemeProvider>
             <WagmiConfigPropvider>
-              {!isSSR && (
-                <MainLayout>
-                  <Component {...pageProps} />
-                </MainLayout>
-              )}
-              <ReactQueryDevtools />
-              <Toaster />
+              <SuiClientProvider networks={networks} defaultNetwork="mainnet">
+                <WalletProvider autoConnect>
+                  {!isSSR && (
+                    <MainLayout>
+                      <Component {...pageProps} />
+                    </MainLayout>
+                  )}
+                  <ReactQueryDevtools />
+                  <Toaster />
+                </WalletProvider>
+              </SuiClientProvider>
             </WagmiConfigPropvider>
           </ThemeProvider>
         </SessionProvider>

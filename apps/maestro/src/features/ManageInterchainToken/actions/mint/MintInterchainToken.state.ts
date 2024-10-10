@@ -2,9 +2,10 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect } from "react";
 
 import { isAddress, type TransactionReceipt } from "viem";
-import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useChainId, useWaitForTransactionReceipt } from "wagmi";
 
 import { useWriteIerc20MintableBurnableMint } from "~/lib/contracts/IERC20MintableBurnable.hooks";
+import { useAccount } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
@@ -46,7 +47,7 @@ export function useMintInterchainTokenState() {
       await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
         chainId,
         tokenAddress: managerState.tokenAddress,
-        owner: accountAddress as `0x${string}`,
+        owner: accountAddress,
       });
 
       setTxState({

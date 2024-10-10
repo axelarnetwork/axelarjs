@@ -18,10 +18,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useChainId, useSwitchChain } from "wagmi";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
+import { useAccount } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -203,7 +204,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 {balance.isTokenPendingOwner && (
                   <>
                     <AcceptInterchainTokenOwnership
-                      accountAddress={address as `0x${string}`}
+                      accountAddress={address}
                       tokenAddress={props.tokenAddress}
                       sourceChain={props.chain as EVMChainConfig}
                       tokenId={props.tokenId}
@@ -229,7 +230,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                   <>
                     {balance.isTokenPendingOwner ? (
                       <AcceptInterchainTokenOwnership
-                        accountAddress={address as `0x${string}`}
+                        accountAddress={address}
                         tokenAddress={props.tokenAddress}
                         sourceChain={props.chain as EVMChainConfig}
                         tokenId={props.tokenId}
