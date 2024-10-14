@@ -5,7 +5,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
+import { useSwitchChain } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
@@ -16,6 +16,7 @@ import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
+import { useAccount, useBalance, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -26,7 +27,7 @@ import {
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
+import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
@@ -271,7 +272,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     setSessionState,
   ]);
 
-  const { data: userGasBalance } = useBalance({ address });
+  const userGasBalance = useBalance();
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
@@ -463,9 +464,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               }}
             />
           ) : (
-            <ConnectWalletButton className="w-full" $size="md">
+            <ConnectWalletModal>
               Connect wallet to register this token
-            </ConnectWalletButton>
+            </ConnectWalletModal>
           )}
         </div>
       )}

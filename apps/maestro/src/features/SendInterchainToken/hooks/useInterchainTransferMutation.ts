@@ -3,12 +3,12 @@ import { toast } from "@axelarjs/ui/toaster";
 
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useAccount, useChainId } from "wagmi";
 
 import {
   useReadInterchainTokenDecimals,
   useWriteInterchainTokenInterchainTransfer,
 } from "~/lib/contracts/InterchainToken.hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 

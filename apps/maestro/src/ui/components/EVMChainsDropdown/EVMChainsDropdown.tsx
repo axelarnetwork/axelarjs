@@ -8,8 +8,9 @@ import Image from "next/image";
 
 import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
-import { useAccount, useSwitchChain } from "wagmi";
+import { useSwitchChain } from "wagmi";
 
+import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {

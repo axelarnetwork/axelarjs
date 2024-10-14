@@ -11,11 +11,11 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { useTransactionsContainer } from "~/features/Transactions";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
@@ -143,9 +143,7 @@ export const Step3: FC = () => {
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
-  const { address } = useAccount();
-
-  const { data: balance } = useBalance({ address });
+  const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(state.sourceChainId);
 
