@@ -2,10 +2,10 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect } from "react";
 
 import { isAddress, type TransactionReceipt } from "viem";
-import { useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useWriteIerc20MintableBurnableMint } from "~/lib/contracts/IERC20MintableBurnable.hooks";
-import { useAccount } from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";

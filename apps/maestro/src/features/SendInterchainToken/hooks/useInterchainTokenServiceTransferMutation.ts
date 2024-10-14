@@ -8,11 +8,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
-import {
-  useBlockNumber,
-  useChainId,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useBlockNumber, useWaitForTransactionReceipt } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
@@ -21,8 +17,7 @@ import {
   useWriteInterchainTokenApprove,
 } from "~/lib/contracts/InterchainToken.hooks";
 import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
-import { useAccount } from "~/lib/hooks";
-import { useTransactionState } from "~/lib/hooks/useTransactionState";
+import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 
 export type UseSendInterchainTokenConfig = {

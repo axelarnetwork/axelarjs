@@ -15,10 +15,10 @@ import {
   TransactionExecutionError,
   type TransactionReceipt,
 } from "viem";
-import { useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useWriteTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
-import { useTransactionState } from "~/lib/hooks/useTransactionState";
+import { useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";

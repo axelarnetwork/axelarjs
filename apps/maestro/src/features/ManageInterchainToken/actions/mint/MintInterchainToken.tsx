@@ -5,8 +5,8 @@ import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useChainId } from "wagmi";
 
+import { useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";

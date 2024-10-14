@@ -5,9 +5,10 @@ import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
 import { clamp, splitAt } from "rambda";
-import { useBlockNumber, useChainId, useTransaction } from "wagmi";
+import { useBlockNumber, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
+import { useChainId } from "~/lib/hooks";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";

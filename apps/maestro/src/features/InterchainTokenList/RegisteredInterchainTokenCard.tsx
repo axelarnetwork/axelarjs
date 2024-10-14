@@ -18,11 +18,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
-import { useChainId, useSwitchChain } from "wagmi";
+import { useSwitchChain } from "wagmi";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
-import { useAccount } from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
