@@ -5,7 +5,7 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useBalance, useSwitchChain } from "wagmi";
+import { useSwitchChain } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
@@ -16,7 +16,7 @@ import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { useAccount, useChainId } from "~/lib/hooks";
+import { useAccount, useBalance, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -272,7 +272,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     setSessionState,
   ]);
 
-  const { data: userGasBalance } = useBalance({ address });
+  const userGasBalance = useBalance();
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
