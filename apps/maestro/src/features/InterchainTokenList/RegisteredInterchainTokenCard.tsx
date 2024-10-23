@@ -18,11 +18,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
-import { useSwitchChain } from "wagmi";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
-import { useAccount, useChainId } from "~/lib/hooks";
+import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
@@ -78,17 +77,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     };
   }, [props.chain, props.tokenAddress]);
 
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
-  const handleSwitchChain = useCallback(async () => {
+  const handleSwitchChain = useCallback(() => {
     try {
-      await switchChainAsync?.({ chainId: props.chainId });
+      switchChain?.({ chainId: props.chainId });
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Failed to switch chain: ${error.cause.shortMessage}`);
       }
     }
-  }, [props.chainId, switchChainAsync]);
+  }, [props.chainId, switchChain]);
 
   const isSourceChain = chainId === props.chainId;
 

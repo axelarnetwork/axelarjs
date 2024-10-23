@@ -5,7 +5,6 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useSwitchChain } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
@@ -16,7 +15,12 @@ import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { useAccount, useBalance, useChainId } from "~/lib/hooks";
+import {
+  useAccount,
+  useBalance,
+  useChainId,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -160,7 +164,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     });
 
   const { computed } = useEVMChainConfigsQuery();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
   const statusesByChain = useMemo(() => {
     return (
@@ -430,11 +434,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               $variant="accent"
               onClick={() => {
                 if (originToken) {
-                  switchChainAsync?.({ chainId: originToken.chainId }).catch(
-                    () => {
-                      logger.error("Failed to switch network");
-                    }
-                  );
+                  switchChain?.({ chainId: originToken.chainId });
                 }
               }}
             >

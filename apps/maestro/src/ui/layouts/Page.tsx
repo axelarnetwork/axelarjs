@@ -6,12 +6,10 @@ import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { useSwitchChain } from "wagmi";
-
 import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useAccount, useChainFromRoute } from "~/lib/hooks";
+import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import EVMChainsDropdown, {
   ChainIcon,

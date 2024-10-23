@@ -34,6 +34,7 @@
     "release": "tsx scripts/release.ts"
   },
   "dependencies": {
+    "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.424bc13",
     "@axelar-network/axelarjs-sdk": "0.15.0",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
@@ -41,6 +42,7 @@
     "@axelarjs/ui": "workspace:*",
     "@axelarjs/utils": "workspace:*",
     "@hookform/resolvers": "^3.3.4",
+    "@mysten/bcs": "^1.1.0",
     "@mysten/dapp-kit": "^0.14.24",
     "@mysten/sui": "^1.11.0",
     "@mysten/sui.js": "^0.54.1",
@@ -54,6 +56,7 @@
     "@vercel/postgres": "^0.7.2",
     "@web3modal/wagmi": "^4.1.1",
     "drizzle-orm": "^0.29.5",
+    "hardhat": "^2.22.13",
     "lucide-react": "^0.265.0",
     "next": "^14.1.4",
     "nextjs-cors": "^2.2.0",

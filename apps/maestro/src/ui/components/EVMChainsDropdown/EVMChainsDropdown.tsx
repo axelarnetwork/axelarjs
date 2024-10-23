@@ -8,9 +8,8 @@ import Image from "next/image";
 
 import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
-import { useSwitchChain } from "wagmi";
 
-import { useAccount } from "~/lib/hooks";
+import { useAccount, useSwitchChain } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
@@ -125,7 +124,7 @@ export const EVMChainIcon: FC<Props> = (props) => {
 const EVMChainsDropdown: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
   const [state, actions] = useEVMChainsDropdownContainer();
 
@@ -143,14 +142,14 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 
-  const handleChainChange = async (chainId: number) => {
+  const handleChainChange = (chainId: number) => {
     try {
       if (props.onSelectChain) {
         props.onSelectChain(
           eligibleChains.find(propEq(chainId, "chain_id")) ?? null
         );
       } else {
-        await switchChainAsync?.({ chainId });
+        switchChain?.({ chainId });
         if (!chain) {
           // only update state if not connected to a chain
           actions.selectChainId(chainId);
