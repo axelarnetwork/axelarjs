@@ -1,8 +1,9 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { useChainId, useDisconnect } from "~/lib/hooks";
 
-const CHAIN_ID_SUI = 101;
+const CHAIN_ID_SUI = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
 
 export function useSwitchChain() {
   const { switchChain: switchChainWagmi } = useWagmiSwitchChain();

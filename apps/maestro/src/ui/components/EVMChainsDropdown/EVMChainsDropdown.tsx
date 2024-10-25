@@ -144,6 +144,9 @@ const EVMChainsDropdown: FC<Props> = (props) => {
 
   const handleChainChange = (chainId: number) => {
     try {
+      console.log("chainId", chainId);
+      console.log("eligibleChains", eligibleChains);
+      console.log("props.onSelectChain", props.onSelectChain);
       if (props.onSelectChain) {
         props.onSelectChain(
           eligibleChains.find(propEq(chainId, "chain_id")) ?? null
@@ -209,7 +212,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-
                   props.onSelectChain?.(null);
                   actions.selectChainId(null);
                 }}
@@ -235,9 +237,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleChainChange(chain.chain_id).catch((error) => {
-                    logger.error(error);
-                  });
+                  handleChainChange(chain.chain_id);
                 }}
                 className="group"
               >

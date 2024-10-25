@@ -1,0 +1,32 @@
+[package]
+name = "Example"
+version = "0.1.0"
+edition = "2024.beta"
+published-at = "0xcac1c8adbd029b6ec27f99a6aee3459325f70131f167c7e716482ac1abe499e4"
+
+[dependencies]
+[dependencies.Sui]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-framework"
+rev = "mainnet-v1.32.2"
+
+[dependencies.AxelarGateway]
+local = "../axelar_gateway"
+
+[dependencies.GasService]
+local = "../gas_service"
+
+[dependencies.Utils]
+local = "../utils"
+
+[dependencies.VersionControl]
+local = "../version_control"
+
+[dependencies.ITS]
+local = "../its"
+
+[dependencies.RelayerDiscovery]
+local = "../relayer_discovery"
+
+[addresses]
+example = "0xcac1c8adbd029b6ec27f99a6aee3459325f70131f167c7e716482ac1abe499e4"

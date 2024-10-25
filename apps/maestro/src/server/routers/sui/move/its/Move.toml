@@ -1,0 +1,29 @@
+[package]
+name = "ITS"
+version = "0.1.0"
+edition = "2024.beta"
+published-at = "0x6c2803e6e49eaf0fc4319f8bfc1fce3ed68d83425c1e148daaf882237ef67005"
+
+[dependencies]
+[dependencies.Sui]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-framework"
+rev = "mainnet-v1.32.2"
+
+[dependencies.AxelarGateway]
+local = "../axelar_gateway"
+
+[dependencies.Abi]
+local = "../abi"
+
+[dependencies.Utils]
+local = "../utils"
+
+[dependencies.VersionControl]
+local = "../version_control"
+
+[dependencies.RelayerDiscovery]
+local = "../relayer_discovery"
+
+[addresses]
+its = "0x6c2803e6e49eaf0fc4319f8bfc1fce3ed68d83425c1e148daaf882237ef67005"

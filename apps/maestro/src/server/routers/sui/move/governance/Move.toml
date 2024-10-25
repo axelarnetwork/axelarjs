@@ -1,0 +1,26 @@
+[package]
+name = "Governance"
+version = "0.1.0"
+edition = "2024.beta"
+published-at = "0x8774c51ee2fa5bc8bbed849dc87b739a18d58fd3242d2edf14864df4f43e55af"
+
+[dependencies]
+[dependencies.Sui]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-framework"
+rev = "mainnet-v1.32.2"
+
+[dependencies.AxelarGateway]
+local = "../axelar_gateway"
+
+[dependencies.Abi]
+local = "../abi"
+
+[dependencies.Utils]
+local = "../utils"
+
+[dependencies.VersionControl]
+local = "../version_control"
+
+[addresses]
+governance = "0x8774c51ee2fa5bc8bbed849dc87b739a18d58fd3242d2edf14864df4f43e55af"

@@ -97,6 +97,25 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     },
   },
   {
+    id: 103,
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    environment: ENVIRONMENTS.testnet,
+    name: "Sui Testnet",
+    nativeCurrency: {
+      name: "SUI",
+      symbol: "SUI",
+      decimals: 9,
+    },
+    rpcUrls: {
+      default: { http: ["https://fullnode.testnet.sui.io:443"] },
+      public: { http: ["https://fullnode.testnet.sui.io:443"] },
+    },
+    blockExplorers: {
+      default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
+    },
+  },
+  {
     ...sepolia,
     axelarChainId: "ethereum-sepolia",
     axelarChainName: "ethereum-sepolia",

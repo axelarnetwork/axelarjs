@@ -1,0 +1,14 @@
+[package]
+name = "InterchainToken"
+version = "0.1.0"
+edition = "2024.beta"
+published-at = "0x0"
+
+[dependencies]
+[dependencies.Sui]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-framework"
+rev = "mainnet-v1.32.2"
+
+[addresses]
+interchain_token = "0x0"

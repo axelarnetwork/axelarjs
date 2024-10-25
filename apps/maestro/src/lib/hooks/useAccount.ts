@@ -4,6 +4,7 @@ import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
 
 interface CombinedAccountInfo {
@@ -34,25 +35,47 @@ export function useAccount(): CombinedAccountInfo {
     address: wagmiAccount.address || (mystenAccount?.address as `0x${string}`),
     isConnected: isWagmiConnected || isMystenConnected,
     isDisconnected: !isWagmiConnected && !isMystenConnected,
-    chain: wagmiAccount.chain || {
-      id: 101,
-      name: "Sui",
-      nativeCurrency: {
-        name: "SUI",
-        symbol: "SUI",
-        decimals: 9,
-      },
-      rpcUrls: {
-        default: { http: ["https://sui-rpc.publicnode.com"] },
-        public: { http: ["https://sui-rpc.publicnode.com"] },
-      },
-      blockExplorers: {
-        default: {
-          name: "Sui Explorer",
-          url: "https://suiscan.xyz",
-        },
-      },
-    },
+    chain:
+      wagmiAccount.chain ||
+      (NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+        ? {
+            id: 101,
+            name: "Sui",
+            nativeCurrency: {
+              name: "SUI",
+              symbol: "SUI",
+              decimals: 9,
+            },
+            rpcUrls: {
+              default: { http: ["https://sui-rpc.publicnode.com"] },
+              public: { http: ["https://sui-rpc.publicnode.com"] },
+            },
+            blockExplorers: {
+              default: {
+                name: "Sui Explorer",
+                url: "https://suiexplorer.com",
+              },
+            },
+          }
+        : {
+            id: 103,
+            name: "Sui Testnet",
+            nativeCurrency: {
+              name: "SUI",
+              symbol: "SUI",
+              decimals: 9,
+            },
+            rpcUrls: {
+              default: { http: ["https://fullnode.testnet.sui.io:443"] },
+              public: { http: ["https://fullnode.testnet.sui.io:443"] },
+            },
+            blockExplorers: {
+              default: {
+                name: "Sui Explorer",
+                url: "https://suiscan.xyz/testnet",
+              },
+            },
+          }),
     isEvmChain: !!evmChain,
     chainName: evmChain?.chain_name || "Sui",
   };
