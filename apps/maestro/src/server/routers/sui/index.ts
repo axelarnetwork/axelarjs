@@ -1,17 +1,13 @@
-import path from "path";
-import { copyMovePackage, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import { SuiClient } from "@mysten/sui.js/client";
 import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
 import config from "./config/testnet.json";
 
-const moveDir = path.resolve("./src/server/routers/sui/move");
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
   url: config.sui.rpc,
 });
-
 export const suiRouter = router({
   deployToken: publicProcedure
     .input(
@@ -25,29 +21,34 @@ export const suiRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
-        const { symbol, name, decimals, skipRegister, walletAddress } = input;
-        copyMovePackage("interchain_token", null, moveDir);
-
-        // Define token options
-        const interchainTokenOptions = {
-          symbol,
-          name,
-          decimals,
-        };
-
-        // Create transaction builder
-        const txBuilder = new TxBuilder(suiClient);
-
-        const cap = await txBuilder.publishInterchainToken(
-          moveDir,
-          interchainTokenOptions
+        const { symbol, name, decimals, walletAddress } = input;
+        // TODO: create a service client if we plan to keep this
+        const response = await fetch(
+          "https://melted-fayth-nptytn-57e5d396.koyeb.app/deploy-token",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sender: walletAddress,
+              name,
+              symbol,
+              decimals,
+            }),
+          }
         );
-        txBuilder.tx.transferObjects([cap], walletAddress);
 
-        // Serialize the transaction
-        const serializedTx = await txBuilder.tx.toJSON();
+        if (!response.ok) {
+          throw new Error(
+            `Deploy token request failed: ${response.statusText}`
+          );
+        }
 
-        return { cap, serializedTx };
+        const respJSON = await response.json();
+        const txBytes = respJSON.data.txBytes;
+
+        return txBytes;
       } catch (error) {
         console.error("Failed to prepare token deployment:", error);
         throw new Error(
@@ -55,7 +56,8 @@ export const suiRouter = router({
         );
       }
     }),
-
+  // Everything after this point is for the finalization of the deployment
+  // And is not yet implemented
   finalizeDeployment: publicProcedure
     .input(
       z.object({
@@ -66,12 +68,12 @@ export const suiRouter = router({
         objectChanges: z.array(z.any()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(({ input }) => {
       // TODO: Implement this
       try {
-        const { symbol, decimals, skipRegister, objectChanges } = input;
+        // const { symbol, decimals, skipRegister, objectChanges } = input;
 
-        return;
+        return input;
       } catch (error) {
         console.error("Failed to finalize deployment:", error);
         throw new Error(`Deployment finalization failed: ${error.message}`);

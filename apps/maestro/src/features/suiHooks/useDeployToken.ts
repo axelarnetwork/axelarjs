@@ -2,14 +2,32 @@ import {
   useCurrentAccount,
   useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
+import { getFullnodeUrl } from "@mysten/sui.js/client";
+import { fromHEX } from "@mysten/sui.js/utils";
+import { SuiClient } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
 import { trpc } from "~/lib/trpc";
 
 export default function useTokenDeploy() {
   const currentAccount = useCurrentAccount();
+  const client = new SuiClient({ url: getFullnodeUrl("testnet") });
   const { mutateAsync: signAndExecuteTransaction } =
-    useSignAndExecuteTransaction();
+    useSignAndExecuteTransaction({
+      execute: async ({ bytes, signature }) => {
+        const result = await client.executeTransactionBlock({
+          transactionBlock: bytes,
+          signature,
+          options: {
+            // Raw effects are required so the effects can be reported back to the wallet
+            showRawEffects: true,
+            // Select additional data to return
+            showObjectChanges: true,
+          },
+        });
+        return result;
+      },
+    });
   // 1. Get prepared deployment transaction
   const { mutateAsync } = trpc.sui.deployToken.useMutation({
     onError(error) {
@@ -45,30 +63,26 @@ export default function useTokenDeploy() {
     }
 
     try {
-      const { serializedTx: txJSON } = await mutateAsync({
+      const txBytes = await mutateAsync({
         symbol,
         name,
         decimals,
         skipRegister,
         walletAddress: currentAccount.address,
       });
-
-      // Deserialize the transaction from JSON
-      console.log("txJSON", txJSON);
-      const tx = Transaction.from(txJSON);
-      console.log("tx", tx);
+      // Create transaction from txBytes
+      const tx = Transaction.from(fromHEX(txBytes));
       const result = await signAndExecuteTransaction({
         transaction: tx,
         chain: "sui:testnet",
       });
-      console.log("result of signAndExecuteTransaction", result);
 
       return finalizeDeployment({
         symbol,
         decimals,
         skipRegister,
-        txDigest: deployResult.digest,
-        objectChanges: deployResult.objectChanges || [],
+        txDigest: result.digest,
+        objectChanges: result.objectChanges || [],
       });
     } catch (error) {
       console.error("Token deployment failed:", error);
