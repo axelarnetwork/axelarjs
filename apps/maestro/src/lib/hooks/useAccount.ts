@@ -37,45 +37,47 @@ export function useAccount(): CombinedAccountInfo {
     isDisconnected: !isWagmiConnected && !isMystenConnected,
     chain:
       wagmiAccount.chain ||
-      (NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-        ? {
-            id: 101,
-            name: "Sui",
-            nativeCurrency: {
-              name: "SUI",
-              symbol: "SUI",
-              decimals: 9,
-            },
-            rpcUrls: {
-              default: { http: ["https://sui-rpc.publicnode.com"] },
-              public: { http: ["https://sui-rpc.publicnode.com"] },
-            },
-            blockExplorers: {
-              default: {
-                name: "Sui Explorer",
-                url: "https://suiexplorer.com",
+      (isMystenConnected
+        ? NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+          ? {
+              id: 101,
+              name: "Sui",
+              nativeCurrency: {
+                name: "SUI",
+                symbol: "SUI",
+                decimals: 9,
               },
-            },
-          }
-        : {
-            id: 103,
-            name: "Sui Testnet",
-            nativeCurrency: {
-              name: "SUI",
-              symbol: "SUI",
-              decimals: 9,
-            },
-            rpcUrls: {
-              default: { http: ["https://fullnode.testnet.sui.io:443"] },
-              public: { http: ["https://fullnode.testnet.sui.io:443"] },
-            },
-            blockExplorers: {
-              default: {
-                name: "Sui Explorer",
-                url: "https://suiscan.xyz/testnet",
+              rpcUrls: {
+                default: { http: ["https://sui-rpc.publicnode.com"] },
+                public: { http: ["https://sui-rpc.publicnode.com"] },
               },
-            },
-          }),
+              blockExplorers: {
+                default: {
+                  name: "Sui Explorer",
+                  url: "https://suiexplorer.com",
+                },
+              },
+            }
+          : {
+              id: 103,
+              name: "Sui Testnet",
+              nativeCurrency: {
+                name: "SUI",
+                symbol: "SUI",
+                decimals: 9,
+              },
+              rpcUrls: {
+                default: { http: ["https://fullnode.testnet.sui.io:443"] },
+                public: { http: ["https://fullnode.testnet.sui.io:443"] },
+              },
+              blockExplorers: {
+                default: {
+                  name: "Sui Explorer",
+                  url: "https://suiscan.xyz/testnet",
+                },
+              },
+            }
+        : undefined),
     isEvmChain: !!evmChain,
     chainName: evmChain?.chain_name || "Sui",
   };

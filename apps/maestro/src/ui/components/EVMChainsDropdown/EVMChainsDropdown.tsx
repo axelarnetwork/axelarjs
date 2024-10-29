@@ -10,7 +10,6 @@ import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
 
 import { useAccount, useSwitchChain } from "~/lib/hooks";
-import { logger } from "~/lib/logger";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useEVMChainsDropdownContainer,
@@ -144,9 +143,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
 
   const handleChainChange = (chainId: number) => {
     try {
-      console.log("chainId", chainId);
-      console.log("eligibleChains", eligibleChains);
-      console.log("props.onSelectChain", props.onSelectChain);
       if (props.onSelectChain) {
         props.onSelectChain(
           eligibleChains.find(propEq(chainId, "chain_id")) ?? null
