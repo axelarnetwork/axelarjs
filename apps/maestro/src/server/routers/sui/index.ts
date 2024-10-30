@@ -1,15 +1,21 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { SuiClient } from "@mysten/sui/client";
 import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
 import config from "./config/testnet.json";
+import {
+  buildTx,
+  findPublishedObject,
+  getObjectIdsByObjectTypes,
+} from "./utils/utils";
 
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
   url: config.sui.rpc,
 });
 export const suiRouter = router({
-  deployToken: publicProcedure
+  getDeployTokenTxBytes: publicProcedure
     .input(
       z.object({
         symbol: z.string(),
@@ -52,65 +58,150 @@ export const suiRouter = router({
       } catch (error) {
         console.error("Failed to prepare token deployment:", error);
         throw new Error(
-          `Token deployment preparation failed: ${error.message}`
+          `Token deployment preparation failed: ${(error as Error).message}`
         );
       }
     }),
-  // Everything after this point is for the finalization of the deployment
-  // And is not yet implemented
-  finalizeDeployment: publicProcedure
+  getRegisterTokenTx: publicProcedure
     .input(
       z.object({
+        sender: z.string(),
         symbol: z.string(),
-        decimals: z.number(),
-        skipRegister: z.boolean().optional(),
-        txDigest: z.string(),
-        objectChanges: z.array(z.any()),
-      })
-    )
-    .mutation(({ input }) => {
-      // TODO: Implement this
-      try {
-        // const { symbol, decimals, skipRegister, objectChanges } = input;
-
-        return input;
-      } catch (error) {
-        console.error("Failed to finalize deployment:", error);
-        throw new Error(`Deployment finalization failed: ${error.message}`);
-      }
-    }),
-
-  completeRegistration: publicProcedure
-    .input(
-      z.object({
-        txDigest: z.string(),
+        transaction: z.any(),
       })
     )
     .mutation(async ({ input }) => {
       try {
-        const result = await suiClient.getTransactionBlock({
-          digest: input.txDigest,
-          options: {
-            showEvents: true,
-          },
+        //TODO: use chain config from ui
+        const response = await fetch(
+          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/testnet"
+        );
+        const { data: chainConfig } = await response.json();
+        const { sender, symbol, transaction } = input;
+
+        if (!transaction) return undefined;
+
+        const publishedObject = findPublishedObject(transaction.objectChanges);
+
+        if (!publishedObject) return undefined;
+
+        const packageId = publishedObject?.packageId;
+        const tokenType = `${packageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+        const [Metadata] = getObjectIdsByObjectTypes(
+          transaction.objectChanges,
+          [`Metadata<${tokenType}>`]
+        );
+
+        const txBuilder = new TxBuilder(suiClient);
+
+        txBuilder.tx.setSenderIfNotSet(sender);
+        const itsObjectId = chainConfig.contracts.ITS.objects?.ITS;
+        const examplePackageId = chainConfig.contracts.Example.address;
+
+        if (!itsObjectId || !examplePackageId) return undefined;
+
+        await txBuilder.moveCall({
+          target: `${examplePackageId}::its::register_coin`,
+          typeArguments: [tokenType],
+          arguments: [itsObjectId, Metadata],
+        });
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error("Failed to finalize deployment:", error);
+        throw new Error(
+          `Deployment finalization failed: ${(error as Error).message}`
+        );
+      }
+    }),
+
+  getSendTokenDeploymentTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+
+        symbol: z.string(),
+        registerTokenTx: z.any(),
+        deployTokenTx: z.any(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const { sender, symbol, registerTokenTx, deployTokenTx } = input;
+        //TODO: use chain config from ui
+        const response = await fetch(
+          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/testnet"
+        );
+        const { data: chainConfig } = await response.json();
+        if (!registerTokenTx) return undefined;
+
+        const tokenId = registerTokenTx?.events[0]?.parsedJson?.token_id?.id;
+        if (!tokenId) return undefined;
+
+        if (!deployTokenTx) return undefined;
+
+        const publishedObject = findPublishedObject(
+          deployTokenTx.objectChanges
+        );
+        if (!publishedObject) return undefined;
+
+        const packageId = publishedObject?.packageId;
+        const tokenType = `${packageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+        // Fixed fee to 0.05 SUI for now
+        const feeUnitAmount = 5e7;
+        const ITS = chainConfig.contracts.ITS;
+        const Example = chainConfig.contracts.Example;
+        const AxelarGateway = chainConfig.contracts.AxelarGateway;
+        const GasService = chainConfig.contracts.GasService;
+
+        if (!ITS.trustedAddresses) return undefined;
+
+        const destinationChain = Object.keys(ITS.trustedAddresses)[0];
+
+        if (
+          !ITS?.objects ||
+          !Example?.objects ||
+          !AxelarGateway?.objects ||
+          !GasService?.objects
+        )
+          return undefined;
+
+        if (!destinationChain) return undefined;
+
+        const txBuilder = new TxBuilder(suiClient);
+        const tx = txBuilder.tx;
+        const gas = tx.splitCoins(tx.gas, [feeUnitAmount]);
+
+        const TokenId = await txBuilder.moveCall({
+          target: `${ITS.address}::token_id::from_u256`,
+          arguments: [tokenId],
         });
 
-        let tokenId;
-
-        if (result.events) {
-          const registerEvent = result.events.find((event) =>
-            event.type.includes("::its::RegisterTokenEvent")
-          );
-
-          if (registerEvent?.parsedJson) {
-            tokenId = registerEvent.parsedJson.token_id.id;
-          }
-        }
-
-        return { tokenId };
+        await txBuilder.moveCall({
+          target: `${Example.address}::its::deploy_remote_interchain_token`,
+          arguments: [
+            ITS.objects.ITS,
+            AxelarGateway.objects.Gateway,
+            GasService.objects.GasService,
+            destinationChain,
+            TokenId,
+            gas,
+            "0x",
+            sender,
+          ],
+          typeArguments: [tokenType],
+        });
+        const transaction = await buildTx(sender, txBuilder);
+        const txJSON = transaction.toJSON();
+        return txJSON;
       } catch (error) {
-        console.error("Failed to complete registration:", error);
-        throw new Error(`Registration completion failed: ${error.message}`);
+        console.error("Failed to send token deployment:", error);
+        throw new Error(
+          `Token deployment send failed: ${(error as Error).message}`
+        );
       }
     }),
 });

@@ -309,8 +309,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         enabled: Boolean(tokenId && input?.salt && deployerAddress),
       },
     });
-  // console.log("tokenId", tokenId);
-  // console.log("tokenAddress", tokenAddress);
   const { originalChainName, destinationChainNames } = useMemo(() => {
     const index = updatedComputed.indexedById;
     const originalChainName =
@@ -330,8 +328,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     input?.destinationChainIds,
     input?.sourceChainId,
   ]);
-  // console.log("originalChainName", originalChainName);
-  // console.log("destinationChainNames", destinationChainNames);
 
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {
@@ -368,9 +364,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainNames, originalChainName]);
-  // console.log("multicallArgs", multicallArgs);
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
-  // console.log("totalGasFee", totalGasFee);
   const isMutationReady =
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
@@ -388,7 +382,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
-  // console.log("multicall", multicall);
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: multicall?.data,
@@ -492,26 +485,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
   const writeAsync = useCallback(async () => {
     const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
-    if (chainId === SUI_CHAIN_ID) {
-      console.log(
-        "chain is sui",
-        input?.tokenSymbol,
-        input?.tokenName,
-        input?.decimals
-      );
+    if (chainId === SUI_CHAIN_ID && input) {
       const result = await deployToken({
-        symbol: input?.tokenSymbol,
-        name: input?.tokenName,
-        decimals: input?.decimals,
+        symbol: input.tokenSymbol,
+        name: input.tokenName,
+        decimals: input.decimals,
       });
       console.log("result deployToken", result);
-      // const result = await deployToken(
-      //   input?.tokenSymbol,
-      //   input?.tokenName,
-      //   input?.decimals
-      // ).catch((e) => {
-      //   console.log("error", e);
-      // });
     }
     invariant(
       prepareMulticall?.request !== undefined,
@@ -523,9 +503,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     return await multicall.writeContractAsync(prepareMulticall.request);
   }, [
     chainId,
-    input?.decimals,
-    input?.tokenName,
-    input?.tokenSymbol,
+    deployToken,
+    input,
     multicall,
     prepareMulticall?.request,
     recordDeploymentDraft,
