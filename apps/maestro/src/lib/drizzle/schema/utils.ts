@@ -6,13 +6,13 @@ export function decodeDeploymentMessageId(
   const [hash, index] = deploymentMessageId.split("-");
 
   return {
-    hash: hash as `0x${string}`,
+    hash: hash,
     index: parseInt(index),
   };
 }
 
 export function encodeDeploymentMessageId(
-  hash: `0x${string}`,
+  hash: `${string}`,
   index: number
 ): DeploymentMessageId {
   return `${hash}-${index}`;
