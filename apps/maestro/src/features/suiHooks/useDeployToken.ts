@@ -7,6 +7,13 @@ import { Transaction } from "@mysten/sui/transactions";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
+const findCoinDataObject = (registerTokenResult: any) => {
+  return registerTokenResult.objectChanges.find(
+    (change) =>
+      change.type === "created" && change.objectType.includes("coin_data")
+  ).objectId;
+};
+
 export default function useTokenDeploy() {
   const currentAccount = useAccount();
   const client = new SuiClient({ url: getFullnodeUrl("testnet") });
@@ -31,24 +38,15 @@ export default function useTokenDeploy() {
       onError(error) {
         console.log("error in usedeploytoken", error.message);
       },
-      onSuccess() {
-        console.log("success in usedeploytoken");
-      },
     });
   const { mutateAsync: getRegisterTokenTx } =
     trpc.sui.getRegisterTokenTx.useMutation({
-      onSuccess() {
-        console.log("success in getRegisterTokenTx");
-      },
       onError(error) {
         console.log("error in getRegisterTokenTx", error.message);
       },
     });
   const { mutateAsync: getSendTokenDeploymentTxBytes } =
     trpc.sui.getSendTokenDeploymentTx.useMutation({
-      onSuccess() {
-        console.log("success in getSendTokenDeploymentTxBytes");
-      },
       onError(error) {
         console.log("error in getSendTokenDeploymentTxBytes", error.message);
       },
@@ -84,6 +82,24 @@ export default function useTokenDeploy() {
         chain: "sui:testnet",
       });
 
+      // get coin package id and treasury cap
+      // TODO: check if this works for lock/unlock
+      const treasuryCaps = deployTokenResult?.objectChanges
+        .filter(
+          (change) =>
+            change.type === "created" &&
+            change.objectType.includes("TreasuryCap")
+        )
+        .map((cap) => ({
+          packageId: cap.objectType?.split("<")[1].split(">")[0].split(":")[0], // equivalent to token address
+          treasuryCapId: cap.objectId,
+        }));
+      const tokenAddress = treasuryCaps[0].packageId;
+      // if treasury cap is null then it is lock/unlock, otherwise it is mint/burn
+      const tokenManagerType = treasuryCaps[0].treasuryCapId
+        ? "mint/burn"
+        : "lock/unlock";
+
       // Second step, register the token
       const registerTokenTxJSON = await getRegisterTokenTx({
         sender: currentAccount.address,
@@ -95,6 +111,8 @@ export default function useTokenDeploy() {
         transaction: registerTokenTx,
         chain: "sui:testnet",
       });
+      const coinManagementObjectId = findCoinDataObject(registerTokenResult);
+
       // Third step, send the token
       const sendTokenTxJSON = await getSendTokenDeploymentTxBytes({
         sender: currentAccount.address,
@@ -103,10 +121,16 @@ export default function useTokenDeploy() {
         deployTokenTx: deployTokenResult,
       });
       const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
-      await signAndExecuteTransaction({
+      const sendTokenResult = await signAndExecuteTransaction({
         transaction: sendTokenTx,
         chain: "sui:testnet",
       });
+      return {
+        ...sendTokenResult,
+        tokenManagerAddress: coinManagementObjectId,
+        tokenAddress,
+        tokenManagerType,
+      };
     } catch (error) {
       console.error("Token deployment failed:", error);
       throw error;

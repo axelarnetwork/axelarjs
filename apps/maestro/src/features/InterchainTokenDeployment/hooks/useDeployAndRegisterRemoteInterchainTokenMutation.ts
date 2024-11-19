@@ -419,6 +419,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         axelarChainId: input.sourceChainId,
         originalMinterAddress: input.minterAddress,
         destinationAxelarChainIds: input.destinationChainIds,
+        tokenManagerAddress: "",
       });
     },
     [deployerAddress, input, tokenAddress, tokenId]
@@ -481,29 +482,50 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       originalMinterAddress: input.minterAddress,
       destinationAxelarChainIds: input.destinationChainIds,
       deploymentMessageId: "",
+      tokenManagerAddress: "",
     });
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
   const writeAsync = useCallback(async () => {
     const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
+
+    await recordDeploymentDraft();
     if (chainId === SUI_CHAIN_ID && input) {
       const result = await deployToken({
         symbol: input.tokenSymbol,
         name: input.tokenName,
         decimals: input.decimals,
       });
-      console.log("result deployToken", result);
+      if (result?.digest) {
+        setRecordDeploymentArgs({
+          kind: "interchain",
+          deploymentMessageId: `${result?.digest}-${0}`,
+          tokenId: result?.events?.[0]?.parsedJson?.token_id?.id,
+          tokenAddress: result?.tokenAddress,
+          tokenManagerAddress: result?.tokenManagerAddress,
+          deployerAddress,
+          salt: input.salt,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          axelarChainId: input.sourceChainId,
+          originalMinterAddress: input.minterAddress,
+          destinationAxelarChainIds: input.destinationChainIds,
+        });
+
+        return result;
+      }
+    } else {
+      invariant(
+        prepareMulticall?.request !== undefined,
+        "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+      );
+
+      return await multicall.writeContractAsync(prepareMulticall.request);
     }
-    invariant(
-      prepareMulticall?.request !== undefined,
-      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
-    );
-
-    await recordDeploymentDraft();
-
-    return await multicall.writeContractAsync(prepareMulticall.request);
   }, [
     chainId,
     deployToken,
+    deployerAddress,
     input,
     multicall,
     prepareMulticall?.request,

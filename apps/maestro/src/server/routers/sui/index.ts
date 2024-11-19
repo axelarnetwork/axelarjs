@@ -76,9 +76,8 @@ export const suiRouter = router({
         const response = await fetch(
           "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/testnet"
         );
-        const { data: chainConfig } = await response.json();
+        const chainConfig = await response.json();
         const { sender, symbol, transaction } = input;
-
         if (!transaction) return undefined;
 
         const publishedObject = findPublishedObject(transaction.objectChanges);
@@ -134,7 +133,7 @@ export const suiRouter = router({
         const response = await fetch(
           "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/testnet"
         );
-        const { data: chainConfig } = await response.json();
+        const chainConfig = await response.json();
         if (!registerTokenTx) return undefined;
 
         const tokenId = registerTokenTx?.events[0]?.parsedJson?.token_id?.id;

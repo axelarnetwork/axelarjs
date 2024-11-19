@@ -12,6 +12,7 @@ import React, {
 
 import { parseUnits } from "viem";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { useTransactionsContainer } from "~/features/Transactions";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
@@ -100,6 +101,38 @@ export const Step2: FC = () => {
       });
 
       const txPromise = deployInterchainTokenAsync();
+      console.log("rootState.selectedChains", rootState.selectedChains);
+
+      // Sui will return a digest equivalent to the txHash
+      const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
+      if (sourceChain.chain_id === SUI_CHAIN_ID) {
+        const result = await txPromise;
+        // if tx is successful, we will get a digest
+        if (result?.digest) {
+          console.log("IT IS SUI: txPromise", result);
+          rootActions.setTxState({
+            status: "submitted",
+            suiTx: result,
+            txHash: result.digest,
+            chainId: sourceChain.chain_id,
+          });
+          console.log("rootState", rootState);
+          if (rootState.selectedChains.length > 0) {
+            addTransaction({
+              status: "submitted",
+              suiTx: result,
+              hash: result.digest,
+              chainId: sourceChain.chain_id,
+              txType: "INTERCHAIN_DEPLOYMENT",
+            });
+          }
+          return;
+        } else {
+          rootActions.setTxState({
+            type: "idle",
+          });
+        }
+      }
 
       await handleTransactionResult(txPromise, {
         onSuccess(txHash) {

@@ -7,13 +7,9 @@ import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
 import { newInterchainTokenSchema } from "~/services/db/postgres";
 
-const recordInterchainTokenDeploymentInput = newInterchainTokenSchema
-  .extend({
-    destinationAxelarChainIds: z.array(z.string()),
-  })
-  .omit({
-    tokenManagerAddress: true,
-  });
+const recordInterchainTokenDeploymentInput = newInterchainTokenSchema.extend({
+  destinationAxelarChainIds: z.array(z.string()),
+});
 
 export type RecordInterchainTokenDeploymentInput = z.infer<
   typeof recordInterchainTokenDeploymentInput
@@ -23,36 +19,44 @@ export const recordInterchainTokenDeployment = protectedProcedure
   .input(recordInterchainTokenDeploymentInput)
   .mutation(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "ctx.session.address is required");
+    let tokenManagerAddress;
+    let tokenManagerType;
 
-    const chains = await ctx.configs.evmChains();
-    const configs = chains[input.axelarChainId];
+    if (input.axelarChainId !== "sui") {
+      const chains = await ctx.configs.evmChains();
+      const configs = chains[input.axelarChainId];
 
-    const originChainServiceClient =
-      ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
+      const originChainServiceClient =
+        ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
 
-    const tokenManagerAddress = await originChainServiceClient.reads
-      .tokenManagerAddress({
-        tokenId: input.tokenId as `0x${string}`,
-      })
-      .catch(() => null);
+      tokenManagerAddress = await originChainServiceClient.reads
+        .tokenManagerAddress({
+          tokenId: input.tokenId as `0x${string}`,
+        })
+        .catch(() => null);
 
-    const tokenManagerClient = !tokenManagerAddress
-      ? null
-      : ctx.contracts.createTokenManagerClient(
-          configs.wagmi,
-          tokenManagerAddress
-        );
+      const tokenManagerClient = !tokenManagerAddress
+        ? null
+        : ctx.contracts.createTokenManagerClient(
+            configs.wagmi,
+            tokenManagerAddress
+          );
 
-    const tokenManagerTypeCode = !tokenManagerClient
-      ? null
-      : await tokenManagerClient.reads.implementationType().catch(() => null);
+      const tokenManagerTypeCode = !tokenManagerClient
+        ? null
+        : await tokenManagerClient.reads.implementationType().catch(() => null);
 
-    const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOr(
-      // default to mint_burn for interchain tokens
-      // and lock_unlock for canonical tokens
-      input.kind === "canonical" ? "lock_unlock" : "mint_burn",
-      getTokenManagerTypeFromBigInt
-    );
+      tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOr(
+        // default to mint_burn for interchain tokens
+        // and lock_unlock for canonical tokens
+        input.kind === "canonical" ? "lock_unlock" : "mint_burn",
+        getTokenManagerTypeFromBigInt
+      );
+    } else {
+      // TODO: verify this info on chain
+      tokenManagerAddress = input.tokenManagerAddress;
+      tokenManagerType = input.tokenManagerType;
+    }
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,

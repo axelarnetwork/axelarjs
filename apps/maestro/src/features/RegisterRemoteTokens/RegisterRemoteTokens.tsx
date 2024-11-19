@@ -82,6 +82,47 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     hash: txState.status === "submitted" ? txState.hash : undefined,
   });
 
+  const onSuiTxComplete = useCallback(async () => {
+    console.log("onSuiTxComplete", txState.suiTx);
+    const { digest, transactionIndex: txIndex } = txState.suiTx;
+
+    const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
+      ...remoteToken,
+      deploymentTxHash: digest,
+    }));
+    console.log("remoteTokens", remoteTokens);
+    await recordRemoteTokenDeployment({
+      tokenAddress: props.tokenAddress,
+      chainId: props.originChainId ?? -1,
+      deploymentMessageId: `${digest}-${txIndex}`,
+      remoteTokens,
+    });
+    console.log("setTxState");
+    setTxState({
+      status: "confirmed",
+      receipt: txState.suiTx,
+    });
+  }, [
+    baseRemoteTokens,
+    props.originChainId,
+    props.tokenAddress,
+    recordRemoteTokenDeployment,
+    setTxState,
+    txState.suiTx,
+  ]);
+
+  useEffect(
+    () => {
+      console.log("useEffect", txState.suiTx);
+      if (!txState.suiTx) return;
+      onSuiTxComplete(receipt).catch((error) => {
+        logger.error("Failed to record remote token deployment", error);
+        toast.error("Failed to record remote token deployment");
+      });
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [txState.suiTx]
+  );
+
   useEffect(
     () => {
       if (!receipt) return;

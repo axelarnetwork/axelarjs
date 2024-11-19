@@ -14,6 +14,7 @@ import { invariant } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
+import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { formatUnits, parseUnits } from "viem";
 
 import { logger } from "~/lib/logger";
@@ -175,6 +176,28 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [actions, props.sourceChain, state.txState, txHash]);
 
+  const suiTxDigest = useMemo(() => {
+    console.log("MEMO@@@ state.txState", state.txState);
+    return state.txState.status === "submitted"
+      ? state.txState.suiTx?.digest
+      : undefined;
+  }, [state.txState]);
+
+  useEffect(() => {
+    console.log("ENTERING USEEFF suiTxDigest", suiTxDigest);
+    if (!suiTxDigest) return;
+    console.log(" past if state.txState.suiTx", state.txState.suiTx);
+    actions.trackTransaction({
+      status: "submitted",
+      hash: suiTxDigest as `0x${string}`,
+      // digest: suiTxDigest,
+      suiTx: state.txState.suiTx,
+      chainId: 103, //todo change
+      txType: "INTERCHAIN_TRANSFER",
+    });
+    void handleSuiTransactionComplete(state.txState.suiTx);
+  }, [actions, suiTxDigest]);
+
   const handleAllChainsExecuted = useCallback(async () => {
     await actions.refetchBalances();
     resetForm();
@@ -202,6 +225,28 @@ export const SendInterchainToken: FC<Props> = (props) => {
       shouldValidate: true,
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
+
+  const handleSuiTransactionComplete = useCallback(
+    async (result: SuiTransactionBlockResponse) => {
+      // Check if transaction was successful
+      console.log(
+        "handleSuiTransactionComplete",
+        result,
+        "and result.effects.status.status ",
+        result.effects?.status?.status
+      );
+      if (result.effects?.status?.status === "success") {
+        await actions.refetchBalances();
+        resetForm();
+        actions.resetTxState();
+        actions.setIsModalOpen(false);
+        toast.success("Tokens sent successfully!", {
+          id: `token-sent:${result.digest}`,
+        });
+      }
+    },
+    [actions, resetForm]
+  );
 
   return (
     <Modal

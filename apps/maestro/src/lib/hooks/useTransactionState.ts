@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import type { TransactionReceipt } from "viem";
 
 export type UnsubmittedTransactionState =
@@ -15,6 +16,7 @@ export type SubmittedTransactionState<TError = Error> =
       txType?: TxType;
       chainId: number;
       isGMP?: boolean;
+      suiTx?: SuiTransactionBlockResponse;
     }
   | {
       status: "confirmed";
@@ -23,6 +25,7 @@ export type SubmittedTransactionState<TError = Error> =
       txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
+      suiTx?: SuiTransactionBlockResponse;
     }
   | {
       status: "reverted";
@@ -31,6 +34,7 @@ export type SubmittedTransactionState<TError = Error> =
       txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
+      suiTx?: SuiTransactionBlockResponse;
     };
 
 export type TransactionState<TError = Error> =
