@@ -352,15 +352,25 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       // early return case, no remote chains
       return [deployTxData];
     }
+    console.log("destinationChainNames", destinationChainNames);
 
-    const registerTxData = destinationChainNames.map((destinationChain, i) =>
-      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
-        ...commonArgs,
-        originalChainName,
-        destinationChain,
-        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
-      })
-    );
+    const registerTxData = destinationChainNames.map((destinationChain, i) => {
+      console.log("destinationChain", destinationChain);
+      // if (destinationChain === "sui") {
+      //   destinationChain = "sui-test2";
+      // }
+      const registerData =
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+          ...commonArgs,
+          originalChainName,
+          destinationChain,
+          gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
+        });
+      console.log("registerData for", destinationChain, registerData);
+      return registerData;
+    });
+    console.log("deployTxData", deployTxData);
+    console.log("registerTxData", registerTxData);
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainNames, originalChainName]);
@@ -369,7 +379,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
     (!destinationChainNames.length || totalGasFee > 0n);
-
+  console.log("multicallArgs", [multicallArgs]);
+  console.log("isMutationReady", isMutationReady);
   const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
     {
       chainId,
@@ -380,7 +391,15 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     }
   );
-
+  console.log("args", {
+    chainId,
+    value: totalGasFee,
+    args: [multicallArgs],
+    query: {
+      enabled: isMutationReady,
+    },
+  });
+  console.log("prepareMulticall", prepareMulticall);
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
   const { data: receipt } = useWaitForTransactionReceipt({

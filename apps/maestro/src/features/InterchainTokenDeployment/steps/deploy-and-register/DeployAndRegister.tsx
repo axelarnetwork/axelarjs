@@ -160,7 +160,7 @@ export const Step2: FC = () => {
       });
     },
     [
-      rootState.selectedChains.length,
+      rootState,
       state.totalGasFee,
       state.isEstimatingGasFees,
       state.hasGasFeesEstimationError,

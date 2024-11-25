@@ -96,8 +96,8 @@ importers:
         specifier: 0.0.0-snapshot.424bc13
         version: 0.0.0-snapshot.424bc13(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       '@axelar-network/axelarjs-sdk':
-        specifier: 0.15.0
-        version: 0.15.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+        specifier: 0.17.0
+        version: 0.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -1079,24 +1079,28 @@ packages:
     peerDependencies:
       zod: ^3.20.2
 
-  '@axelar-network/axelar-cgp-solidity@4.5.0':
-    resolution: {integrity: sha512-4F4rmHei0cmzeUR7/mW4Bap5rc/KlPV2crD9HA7HTRfl15mVcN6/3z8p+pAm9We6bOrQplNW9KBZ3HJFP3C1Gw==}
-    engines: {node: ^16.0.0 || ^18.0.0}
-
   '@axelar-network/axelar-cgp-solidity@6.2.1':
     resolution: {integrity: sha512-0RaxLYmsp3elXBytn7+eZUil1KFS6jjHR/ECrN/3IC7TeTDPUYunyy6JDxCdNYNtiD6EKgUAfQ7G4DrBb6hRxg==}
     engines: {node: '>=16'}
 
+  '@axelar-network/axelar-cgp-solidity@6.4.0':
+    resolution: {integrity: sha512-Xnw5xi234B1cmTCzgudV8zq+DDjJ1d1U362CM0vKH1FWmZprKIdqgmOYkiRyu+QiVhnznKiBURiSEHVrNjtYpw==}
+    engines: {node: '>=18'}
+
   '@axelar-network/axelar-cgp-sui@0.0.0-snapshot.424bc13':
     resolution: {integrity: sha512-fAErtcvtc+dOQZR0BAuvBxgFaiZ1kvpiXplLi8pV/NlU4VRBtu4GU2y8IldBS8fCqsYDXsuLsF6yTyIhdeQwyA==}
+    engines: {node: '>=18'}
+
+  '@axelar-network/axelar-gmp-sdk-solidity@5.10.0':
+    resolution: {integrity: sha512-s8SImALvYB+5AeiT3tbfWNBI2Mhqw1x91i/zM3DNpVUCnAR2HKtsB9T84KnUn/OJjOVgb4h0lv7q9smeYniRPw==}
     engines: {node: '>=18'}
 
   '@axelar-network/axelar-gmp-sdk-solidity@5.6.4':
     resolution: {integrity: sha512-PQjV+HeJynmSRMhyM3SexwnbFNruSaiRUeNCWjV8/7CkdPsDqypoqIXVRVU8Zk92DUUHeqZZzL/3qP2LYuvlnA==}
     engines: {node: '>=16'}
 
-  '@axelar-network/axelarjs-sdk@0.15.0':
-    resolution: {integrity: sha512-7DSO/loMu/3p592WZ7rXtL0uUyLgSi5c7JH26OCR2WElzhobScM6twb1JUi+Gu9u3OcrFPJZyBLd/COIVY6S7A==}
+  '@axelar-network/axelarjs-sdk@0.17.0':
+    resolution: {integrity: sha512-VdD1uwNuh2s6a/UcEZK08pGur4lWwsQDqhW/duPJS6UibnM5K6RTqWhOHd/Yvb4ivOhJugB9RQO62SybLakJXw==}
 
   '@axelar-network/axelarjs-types@0.33.0':
     resolution: {integrity: sha512-aCbX/5G+tgWPjr9tl3dQfJftWwRMkILz61ytach7dKqxtO9G9jlxpNvELJQ6gKVOodUtSY8qBCO/fWU19v4hdQ==}
@@ -12246,11 +12250,13 @@ snapshots:
       openapi3-ts: 4.4.0
       zod: 3.23.8
 
-  '@axelar-network/axelar-cgp-solidity@4.5.0': {}
-
   '@axelar-network/axelar-cgp-solidity@6.2.1':
     dependencies:
       '@axelar-network/axelar-gmp-sdk-solidity': 5.6.4
+
+  '@axelar-network/axelar-cgp-solidity@6.4.0':
+    dependencies:
+      '@axelar-network/axelar-gmp-sdk-solidity': 5.10.0
 
   '@axelar-network/axelar-cgp-sui@0.0.0-snapshot.424bc13(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
     dependencies:
@@ -12267,11 +12273,13 @@ snapshots:
       - debug
       - utf-8-validate
 
+  '@axelar-network/axelar-gmp-sdk-solidity@5.10.0': {}
+
   '@axelar-network/axelar-gmp-sdk-solidity@5.6.4': {}
 
-  '@axelar-network/axelarjs-sdk@0.15.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
+  '@axelar-network/axelarjs-sdk@0.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
     dependencies:
-      '@axelar-network/axelar-cgp-solidity': 4.5.0
+      '@axelar-network/axelar-cgp-solidity': 6.4.0
       '@axelar-network/axelarjs-types': 0.33.0
       '@cosmjs/json-rpc': 0.30.1
       '@cosmjs/stargate': 0.31.0-alpha.1(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -13406,7 +13414,7 @@ snapshots:
       '@types/node': 20.5.1
       chalk: 4.1.2
       cosmiconfig: 8.3.6(typescript@5.6.3)
-      cosmiconfig-typescript-loader: 4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@20.16.11)(typescript@5.6.3))(typescript@5.6.3)
+      cosmiconfig-typescript-loader: 4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@20.5.1)(typescript@5.6.3))(typescript@5.6.3)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -19755,7 +19763,7 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  cosmiconfig-typescript-loader@4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@20.16.11)(typescript@5.6.3))(typescript@5.6.3):
+  cosmiconfig-typescript-loader@4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.6.3))(ts-node@10.9.2(@types/node@20.5.1)(typescript@5.6.3))(typescript@5.6.3):
     dependencies:
       '@types/node': 20.5.1
       cosmiconfig: 8.3.6(typescript@5.6.3)

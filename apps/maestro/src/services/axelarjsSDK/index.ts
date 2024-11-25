@@ -16,15 +16,20 @@ export const client = new AxelarQueryAPI({
 });
 
 async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
-  const response = await client.estimateGasFee(
-    params.sourceChainId,
-    params.destinationChainId,
-    params.gasLimit,
-    params.gasMultiplier,
-    params.sourceChainTokenSymbol,
-    params.minGasPrice,
-    params.executeData as `0x${string}` | undefined
-  );
+  let response;
+  // TODO: remove when sdk support for sui is ready
+  if (params.destinationChainId === "sui") {
+    response = "20000000000000000";
+  } else
+    response = await client.estimateGasFee(
+      params.sourceChainId,
+      params.destinationChainId,
+      params.gasLimit,
+      params.gasMultiplier,
+      params.sourceChainTokenSymbol,
+      params.minGasPrice,
+      params.executeData as `0x${string}` | undefined
+    );
 
   const rawFee =
     typeof response === "string"

@@ -72,23 +72,30 @@ export const recordInterchainTokenDeployment = protectedProcedure
       input.destinationAxelarChainIds.map(async (axelarChainId) => {
         const chains = await ctx.configs.evmChains();
         const configs = chains[axelarChainId];
+        let tokenAddress;
+        let tokenManagerAddress;
 
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          configs.wagmi
-        );
+        if (axelarChainId !== "sui") {
+          const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+            configs.wagmi
+          );
 
-        const [tokenManagerAddress, tokenAddress] = await Promise.all([
-          itsClient.reads
-            .tokenManagerAddress({
-              tokenId: input.tokenId as `0x${string}`,
-            })
-            .catch(always("0x")),
-          itsClient.reads
-            .interchainTokenAddress({
-              tokenId: input.tokenId as `0x${string}`,
-            })
-            .catch(always("0x")),
-        ]);
+          [tokenManagerAddress, tokenAddress] = await Promise.all([
+            itsClient.reads
+              .tokenManagerAddress({
+                tokenId: input.tokenId as `0x${string}`,
+              })
+              .catch(always("0x")),
+            itsClient.reads
+              .interchainTokenAddress({
+                tokenId: input.tokenId as `0x${string}`,
+              })
+              .catch(always("0x")),
+          ]);
+        } else {
+          tokenAddress = input.tokenAddress;
+          tokenManagerAddress = input.tokenManagerAddress;
+        }
 
         return {
           tokenAddress,
