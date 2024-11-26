@@ -186,6 +186,8 @@ export const Step2: FC = () => {
     : undefined;
 
   const hasInsufficientGasBalance = useMemo(() => {
+    console.log("state.remoteDeploymentGasFees", state.remoteDeploymentGasFees);
+    console.log("balance", balance);
     if (!balance || !state.remoteDeploymentGasFees) {
       return false;
     }

@@ -56,7 +56,7 @@ const suiChainMockData =
         ],
       }
     : {
-        id: "sui",
+        id: "sui-test2",
         chain_id: 103,
         chain_name: "sui",
         maintainer_id: "sui",
