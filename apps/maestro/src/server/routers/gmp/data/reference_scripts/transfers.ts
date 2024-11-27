@@ -1,7 +1,7 @@
 const payload = {
   method: "searchGMP",
   size: 25000,
-  destinationContractAddress: "0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C",
+  destinationContractAddress: "0x144c3d7A5f5198EF3B46A8258b35E903cf197A66",
   contractMethod: "InterchainTransfer",
   _source: {
     includes: [

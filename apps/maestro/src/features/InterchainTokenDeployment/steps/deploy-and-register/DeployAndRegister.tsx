@@ -181,9 +181,13 @@ export const Step2: FC = () => {
 
   const balance = useBalance();
 
-  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+  const nativeTokenSymbol = state.sourceChainId
+    ? getNativeToken(state.sourceChainId)
+    : undefined;
 
   const hasInsufficientGasBalance = useMemo(() => {
+    console.log("state.remoteDeploymentGasFees", state.remoteDeploymentGasFees);
+    console.log("balance", balance);
     if (!balance || !state.remoteDeploymentGasFees) {
       return false;
     }
@@ -241,6 +245,10 @@ export const Step2: FC = () => {
     sourceChain?.native_token.decimals,
     nativeTokenSymbol,
   ]);
+
+  if (!sourceChain) {
+    return;
+  }
 
   const isCTADisabled =
     state.isEstimatingGasFees ||

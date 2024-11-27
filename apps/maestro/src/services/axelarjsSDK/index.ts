@@ -17,6 +17,7 @@ export const client = new AxelarQueryAPI({
 
 async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
   let response;
+  console.log("params estimateGasFee", params);
   // TODO: remove when sdk support for sui is ready
   if (params.destinationChainId === "sui") {
     response = "20000000000000000";
@@ -37,6 +38,8 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
       : response.baseFee +
         response.l1ExecutionFeeWithMultiplier +
         response.executionFeeWithMultiplier;
+
+  console.log("rawFee", rawFee);
 
   return BigInt(rawFee);
 }

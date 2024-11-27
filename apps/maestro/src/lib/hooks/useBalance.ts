@@ -38,6 +38,8 @@ export function useBalance(): BalanceResult | undefined {
   );
 
   const balance = useMemo(() => {
+    console.log("suiBalance", suiBalance);
+    console.log("wagmiBalance", wagmiBalance);
     if (wagmiBalance) {
       return wagmiBalance;
     }
