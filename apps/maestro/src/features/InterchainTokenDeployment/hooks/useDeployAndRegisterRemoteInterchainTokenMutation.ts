@@ -309,7 +309,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         enabled: Boolean(tokenId && input?.salt && deployerAddress),
       },
     });
-  const { originalChainName, destinationChainNames } = useMemo(() => {
+  const { destinationChainNames } = useMemo(() => {
     const index = updatedComputed.indexedById;
     const originalChainName =
       index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
@@ -348,6 +348,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
       });
 
+    console.log("deployInterchainToken Params", {
+      ...commonArgs,
+      initialSupply: input.initialSupply || 0n,
+      name: input.tokenName,
+      symbol: input.tokenSymbol,
+      decimals: input.decimals,
+    });
+
     if (!input.destinationChainIds.length) {
       // early return case, no remote chains
       return [deployTxData];
@@ -356,31 +364,39 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     const registerTxData = destinationChainNames.map((destinationChain, i) => {
       console.log("destinationChain", destinationChain);
-      // if (destinationChain === "sui") {
-      //   destinationChain = "sui-test2";
-      // }
+      if (destinationChain === "sui") {
+        destinationChain = "sui-test2";
+      }
       const registerData =
         INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
           ...commonArgs,
-          originalChainName,
+          originalChainName: "",
           destinationChain,
           gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
         });
       console.log("registerData for", destinationChain, registerData);
+      console.log("Register Params", {
+        ...commonArgs,
+        originalChainName: "",
+        destinationChain,
+        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
+      });
       return registerData;
     });
     console.log("deployTxData", deployTxData);
     console.log("registerTxData", registerTxData);
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames, originalChainName]);
+  }, [input, tokenId, destinationChainNames]);
+
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
   const isMutationReady =
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
     (!destinationChainNames.length || totalGasFee > 0n);
-  console.log("multicallArgs", [multicallArgs]);
-  console.log("isMutationReady", isMutationReady);
+  console.log("multicallArgs", multicallArgs);
+  console.log("isMutationReady", isMutationReady, totalGasFee);
+  console.log("chainId", chainId);
   const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
     {
       chainId,
