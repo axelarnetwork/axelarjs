@@ -14,6 +14,8 @@ import {
 const suiClient = new SuiClient({
   url: config["sui-test2"].rpc,
 });
+const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
+
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
     .input(
@@ -29,21 +31,18 @@ export const suiRouter = router({
       try {
         const { symbol, name, decimals, walletAddress } = input;
         // TODO: create a service client if we plan to keep this
-        const response = await fetch(
-          "https://melted-fayth-nptytn-57e5d396.koyeb.app/deploy-token",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              sender: walletAddress,
-              name,
-              symbol,
-              decimals,
-            }),
-          }
-        );
+        const response = await fetch(`${suiServiceBaseUrl}/deploy-token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sender: walletAddress,
+            name,
+            symbol,
+            decimals,
+          }),
+        });
 
         if (!response.ok) {
           throw new Error(
@@ -75,7 +74,7 @@ export const suiRouter = router({
       try {
         //TODO: use chain config from ui
         const response = await fetch(
-          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/devnet-amplifier"
+          `${suiServiceBaseUrl}/chain/devnet-amplifier`
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains["sui-test2"];
@@ -133,7 +132,7 @@ export const suiRouter = router({
         const { sender, symbol, registerTokenTx, deployTokenTx } = input;
         //TODO: use chain config from ui
         const response = await fetch(
-          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/devnet-amplifier"
+          `${suiServiceBaseUrl}/chain/devnet-amplifier`
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains["sui-test2"];
