@@ -4,11 +4,7 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
 import config from "./config/devnet-amplifier.json";
-import {
-  buildTx,
-  findPublishedObject,
-  getObjectIdsByObjectTypes,
-} from "./utils/utils";
+import { buildTx } from "./utils/utils";
 
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
@@ -62,12 +58,14 @@ export const suiRouter = router({
         );
       }
     }),
-  getRegisterTokenTx: publicProcedure
+
+  getRegisterAndDeployTokenTx: publicProcedure
     .input(
       z.object({
         sender: z.string(),
         symbol: z.string(),
-        transaction: z.any(),
+        tokenPackageId: z.string(),
+        metadataId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -78,80 +76,16 @@ export const suiRouter = router({
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains["sui-test2"];
-        const { sender, symbol, transaction } = input;
-        if (!transaction) return undefined;
+        const { sender, symbol, tokenPackageId, metadataId } = input;
 
-        const publishedObject = findPublishedObject(transaction.objectChanges);
-
-        if (!publishedObject) return undefined;
-
-        const packageId = publishedObject?.packageId;
-        const tokenType = `${packageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-        const [Metadata] = getObjectIdsByObjectTypes(
-          transaction.objectChanges,
-          [`Metadata<${tokenType}>`]
-        );
+        const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
         const txBuilder = new TxBuilder(suiClient);
 
         txBuilder.tx.setSenderIfNotSet(sender);
         const itsObjectId = chainConfig.contracts.ITS.objects?.ITS;
         const examplePackageId = chainConfig.contracts.Example.address;
-
         if (!itsObjectId || !examplePackageId) return undefined;
-
-        await txBuilder.moveCall({
-          target: `${examplePackageId}::its::register_coin`,
-          typeArguments: [tokenType],
-          arguments: [itsObjectId, Metadata],
-        });
-        const tx = await buildTx(sender, txBuilder);
-        const txJSON = await tx.toJSON();
-        return txJSON;
-      } catch (error) {
-        console.error("Failed to finalize deployment:", error);
-        throw new Error(
-          `Deployment finalization failed: ${(error as Error).message}`
-        );
-      }
-    }),
-
-  getSendTokenDeploymentTx: publicProcedure
-    .input(
-      z.object({
-        sender: z.string(),
-
-        symbol: z.string(),
-        registerTokenTx: z.any(),
-        deployTokenTx: z.any(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      try {
-        const { sender, symbol, registerTokenTx, deployTokenTx } = input;
-        //TODO: use chain config from ui
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains["sui-test2"];
-        if (!registerTokenTx) return undefined;
-
-        const tokenId = registerTokenTx?.events[0]?.parsedJson?.token_id?.id;
-        if (!tokenId) return undefined;
-
-        if (!deployTokenTx) return undefined;
-
-        const publishedObject = findPublishedObject(
-          deployTokenTx.objectChanges
-        );
-        if (!publishedObject) return undefined;
-
-        const packageId = publishedObject?.packageId;
-        const tokenType = `${packageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-        // Fixed fee to 0.05 SUI for now
         const feeUnitAmount = 5e7;
         const ITS = chainConfig.contracts.ITS;
         const Example = chainConfig.contracts.Example;
@@ -161,24 +95,16 @@ export const suiRouter = router({
         if (!ITS.trustedAddresses) return undefined;
 
         const destinationChain = Object.keys(ITS.trustedAddresses)[0];
-
-        if (
-          !ITS?.objects ||
-          !Example?.objects ||
-          !AxelarGateway?.objects ||
-          !GasService?.objects
-        )
-          return undefined;
-
         if (!destinationChain) return undefined;
 
-        const txBuilder = new TxBuilder(suiClient);
-        const tx = txBuilder.tx;
-        const gas = tx.splitCoins(tx.gas, [feeUnitAmount]);
+        if (!itsObjectId || !examplePackageId) return undefined;
 
-        const TokenId = await txBuilder.moveCall({
-          target: `${ITS.address}::token_id::from_u256`,
-          arguments: [tokenId],
+        const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
+
+        const [TokenId] = await txBuilder.moveCall({
+          target: `${examplePackageId}::its::register_coin`,
+          typeArguments: [tokenType],
+          arguments: [itsObjectId, metadataId],
         });
 
         await txBuilder.moveCall({
@@ -195,13 +121,14 @@ export const suiRouter = router({
           ],
           typeArguments: [tokenType],
         });
-        const transaction = await buildTx(sender, txBuilder);
-        const txJSON = transaction.toJSON();
+
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
         return txJSON;
       } catch (error) {
-        console.error("Failed to send token deployment:", error);
+        console.error("Failed to finalize deployment:", error);
         throw new Error(
-          `Token deployment send failed: ${(error as Error).message}`
+          `Deployment finalization failed: ${(error as Error).message}`
         );
       }
     }),
