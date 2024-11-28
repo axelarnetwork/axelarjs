@@ -305,8 +305,8 @@ export const interchainTokenFactoryAbi = [
   },
 ] as const;
 
-export const interchainTokenFactoryAddress =
-  "0x6Ae8C8498d5FDA930e6ABeB0E15E5A00471702a7" as const;
+export const interchainTokenFactoryAddress = process.env
+  .NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS as `0x${string}`;
 
 export const interchainTokenFactoryConfig = {
   address: interchainTokenFactoryAddress,

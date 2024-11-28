@@ -1,7 +1,8 @@
 const deployPayload = {
   method: "searchGMP",
   size: 25000,
-  destinationContractAddress: "0x144c3d7A5f5198EF3B46A8258b35E903cf197A66",
+  destinationContractAddress: process.env
+    .NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS as `0x${string}`,
   contractMethod:
     "InterchainTokenDeploymentStarted,TokenManagerDeploymentStarted",
   _source: {
