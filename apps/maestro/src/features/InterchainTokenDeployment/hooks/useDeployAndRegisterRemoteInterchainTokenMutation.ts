@@ -348,22 +348,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
       });
 
-    console.log("deployInterchainToken Params", {
-      ...commonArgs,
-      initialSupply: input.initialSupply || 0n,
-      name: input.tokenName,
-      symbol: input.tokenSymbol,
-      decimals: input.decimals,
-    });
-
     if (!input.destinationChainIds.length) {
       // early return case, no remote chains
       return [deployTxData];
     }
-    console.log("destinationChainNames", destinationChainNames);
 
     const registerTxData = destinationChainNames.map((destinationChain, i) => {
-      console.log("destinationChain", destinationChain);
       if (destinationChain === "sui") {
         destinationChain = "sui-test2";
       }
@@ -374,17 +364,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           destinationChain,
           gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
         });
-      console.log("registerData for", destinationChain, registerData);
-      console.log("Register Params", {
-        ...commonArgs,
-        originalChainName: "",
-        destinationChain,
-        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
-      });
       return registerData;
     });
-    console.log("deployTxData", deployTxData);
-    console.log("registerTxData", registerTxData);
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainNames]);
@@ -394,9 +375,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
     (!destinationChainNames.length || totalGasFee > 0n);
-  console.log("multicallArgs", multicallArgs);
-  console.log("isMutationReady", isMutationReady, totalGasFee);
-  console.log("chainId", chainId);
   const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
     {
       chainId,
@@ -407,15 +385,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     }
   );
-  console.log("args", {
-    chainId,
-    value: totalGasFee,
-    args: [multicallArgs],
-    query: {
-      enabled: isMutationReady,
-    },
-  });
-  console.log("prepareMulticall", prepareMulticall);
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
   const { data: receipt } = useWaitForTransactionReceipt({
@@ -520,6 +489,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       tokenManagerAddress: "",
     });
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
+
   const writeAsync = useCallback(async () => {
     const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
 
@@ -529,6 +499,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         symbol: input.tokenSymbol,
         name: input.tokenName,
         decimals: input.decimals,
+        destinationChainIds: input.destinationChainIds,
       });
       if (result?.digest) {
         setRecordDeploymentArgs({

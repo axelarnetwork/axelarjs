@@ -19,7 +19,10 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
   let response;
   console.log("params estimateGasFee", params);
   // TODO: remove when sdk support for sui is ready
-  if (params.destinationChainId === "sui") {
+  if (
+    params.destinationChainId.includes("sui") ||
+    params.sourceChainId.includes("sui")
+  ) {
     response = "20000000000000000";
   } else
     response = await client.estimateGasFee(
