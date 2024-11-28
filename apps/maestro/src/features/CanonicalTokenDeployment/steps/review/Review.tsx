@@ -45,7 +45,7 @@ const Review: FC = () => {
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) => computed.indexedById[axelarChainId].chain_id
+          (axelarChainId) => computed.indexedById[axelarChainId]?.chain_id
         )
       );
     }

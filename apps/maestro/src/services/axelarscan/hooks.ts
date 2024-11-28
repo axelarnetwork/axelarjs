@@ -135,10 +135,14 @@ export function useEVMChainConfigsQuery() {
 
   return {
     ...queryResult,
+    // TODO: remove this once we have the sui chain data
     data: [...configured, suiChainMockData],
     computed: {
-      indexedByChainId: indexBy(prop("chain_id"), configured),
-      indexedById: indexBy(prop("id"), configured),
+      indexedByChainId: indexBy(prop("chain_id"), [
+        ...configured,
+        suiChainMockData,
+      ]),
+      indexedById: indexBy(prop("id"), [...configured, suiChainMockData]),
       wagmiChains,
     },
   };
