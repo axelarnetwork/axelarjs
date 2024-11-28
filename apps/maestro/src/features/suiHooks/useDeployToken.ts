@@ -104,19 +104,6 @@ export default function useTokenDeploy() {
           !objectChange.objectType.includes("q::Q")
       ); // exclude the template token that included with this package
 
-      // get coin package id and treasury cap
-      // TODO: check if this works for lock/unlock
-      // const treasuryCaps = deployTokenResult?.objectChanges
-      //   .filter(
-      //     (change) =>
-      //       change.type === "created" &&
-      //       change.objectType.includes("TreasuryCap")
-      //   )
-      //   .map((cap) => ({
-      //     packageId: cap.objectType?.split("<")[1].split(">")[0].split(":")[0], // equivalent to token address
-      //     treasuryCapId: cap.objectId,
-      //   }));
-
       const treasuryCap = findObjectByType(
         deploymentCreatedObjects,
         "TreasuryCap"
@@ -133,21 +120,6 @@ export default function useTokenDeploy() {
       // if treasury cap is null then it is lock/unlock, otherwise it is mint/burn
       const tokenManagerType = treasuryCap ? "mint/burn" : "lock/unlock";
 
-      // // Second step, register the token
-      // const registerTokenTxJSON = await getRegisterTokenTx({
-      //   sender: currentAccount.address,
-      //   symbol,
-      //   tokenPackageId: tokenAddress,
-      //   metadataId: metadata.objectId,
-      // });
-
-      // const registerTokenTx = Transaction.from(registerTokenTxJSON as string);
-      // const registerTokenResult = await signAndExecuteTransaction({
-      //   transaction: registerTokenTx,
-      //   chain: "sui:testnet",
-      // });
-
-      // Third step, send the token
       const sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
         sender: currentAccount.address,
         symbol,
