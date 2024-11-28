@@ -3,7 +3,7 @@ import { SuiClient } from "@mysten/sui/client";
 import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
-import config from "./config/testnet.json";
+import config from "./config/devnet-amplifier.json";
 import {
   buildTx,
   findPublishedObject,
@@ -12,7 +12,7 @@ import {
 
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
-  url: config.sui.rpc,
+  url: config["sui-test2"].rpc,
 });
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -52,6 +52,7 @@ export const suiRouter = router({
         }
 
         const respJSON = await response.json();
+
         const txBytes = respJSON.data.txBytes;
 
         return txBytes;
@@ -74,9 +75,10 @@ export const suiRouter = router({
       try {
         //TODO: use chain config from ui
         const response = await fetch(
-          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/testnet"
+          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/devnet-amplifier"
         );
-        const chainConfig = await response.json();
+        const _chainConfig = await response.json();
+        const chainConfig = _chainConfig.chains["sui-test2"];
         const { sender, symbol, transaction } = input;
         if (!transaction) return undefined;
 
@@ -131,9 +133,10 @@ export const suiRouter = router({
         const { sender, symbol, registerTokenTx, deployTokenTx } = input;
         //TODO: use chain config from ui
         const response = await fetch(
-          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/testnet"
+          "https://melted-fayth-nptytn-57e5d396.koyeb.app/chain/devnet-amplifier"
         );
-        const chainConfig = await response.json();
+        const _chainConfig = await response.json();
+        const chainConfig = _chainConfig.chains["sui-test2"];
         if (!registerTokenTx) return undefined;
 
         const tokenId = registerTokenTx?.events[0]?.parsedJson?.token_id?.id;
