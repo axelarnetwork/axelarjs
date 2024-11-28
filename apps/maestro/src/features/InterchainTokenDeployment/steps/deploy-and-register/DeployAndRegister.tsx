@@ -101,7 +101,6 @@ export const Step2: FC = () => {
       });
 
       const txPromise = deployInterchainTokenAsync();
-      console.log("rootState.selectedChains", rootState.selectedChains);
 
       // Sui will return a digest equivalent to the txHash
       const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
@@ -109,14 +108,12 @@ export const Step2: FC = () => {
         const result = await txPromise;
         // if tx is successful, we will get a digest
         if (result?.digest) {
-          console.log("IT IS SUI: txPromise", result);
           rootActions.setTxState({
             status: "submitted",
             suiTx: result,
             txHash: result.digest,
             chainId: sourceChain.chain_id,
           });
-          console.log("rootState", rootState);
           if (rootState.selectedChains.length > 0) {
             addTransaction({
               status: "submitted",
@@ -186,8 +183,6 @@ export const Step2: FC = () => {
     : undefined;
 
   const hasInsufficientGasBalance = useMemo(() => {
-    console.log("state.remoteDeploymentGasFees", state.remoteDeploymentGasFees);
-    console.log("balance", balance);
     if (!balance || !state.remoteDeploymentGasFees) {
       return false;
     }
