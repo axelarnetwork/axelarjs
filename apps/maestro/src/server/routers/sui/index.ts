@@ -64,6 +64,7 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         symbol: z.string(),
+        destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
         metadataId: z.string(),
       })
@@ -75,7 +76,13 @@ export const suiRouter = router({
           `${suiServiceBaseUrl}/chain/devnet-amplifier`
         );
         const chainConfig = await response.json();
-        const { sender, symbol, tokenPackageId, metadataId } = input;
+        const {
+          sender,
+          symbol,
+          tokenPackageId,
+          metadataId,
+          destinationChains,
+        } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -84,7 +91,6 @@ export const suiRouter = router({
         txBuilder.tx.setSenderIfNotSet(sender);
         const itsObjectId = chainConfig.contracts.ITS.objects?.ITS;
         const examplePackageId = chainConfig.contracts.Example.address;
-        if (!itsObjectId || !examplePackageId) return undefined;
         const feeUnitAmount = 5e7;
         const ITS = chainConfig.contracts.ITS;
         const Example = chainConfig.contracts.Example;
@@ -93,8 +99,12 @@ export const suiRouter = router({
 
         if (!ITS.trustedAddresses) return undefined;
 
-        const destinationChain = Object.keys(ITS.trustedAddresses)[0];
-        if (!destinationChain) return undefined;
+        const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
+        for (const destinationChain of destinationChains) {
+          if (!trustedDestinationChains.includes(destinationChain))
+            console.log(`destination chain ${destinationChain} not trusted`);
+          return undefined;
+        }
 
         if (!itsObjectId || !examplePackageId) return undefined;
 
@@ -105,21 +115,29 @@ export const suiRouter = router({
           typeArguments: [tokenType],
           arguments: [itsObjectId, metadataId],
         });
+        //
+        // const [TokenIdU256] = await txBuilder.moveCall({
+        //   target: `${examplePackageId}::its::register_coin_u256`,
+        //   typeArguments: [tokenType],
+        //   arguments: [itsObjectId, metadataId],
+        // });
 
-        await txBuilder.moveCall({
-          target: `${Example.address}::its::deploy_remote_interchain_token`,
-          arguments: [
-            ITS.objects.ITS,
-            AxelarGateway.objects.Gateway,
-            GasService.objects.GasService,
-            destinationChain,
-            TokenId,
-            gas,
-            "0x",
-            sender,
-          ],
-          typeArguments: [tokenType],
-        });
+        for (const destinationChain of destinationChains) {
+          await txBuilder.moveCall({
+            target: `${Example.address}::its::deploy_remote_interchain_token`,
+            arguments: [
+              ITS.objects.ITS,
+              AxelarGateway.objects.Gateway,
+              GasService.objects.GasService,
+              destinationChain,
+              TokenId,
+              gas,
+              "0x",
+              sender,
+            ],
+            typeArguments: [tokenType],
+          });
+        }
 
         const tx = await buildTx(sender, txBuilder);
         const txJSON = await tx.toJSON();

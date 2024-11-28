@@ -14,6 +14,14 @@ const findCoinDataObject = (registerTokenResult: any) => {
   ).objectId;
 };
 
+export type DeployTokenParams = {
+  symbol: string;
+  name: string;
+  decimals: number;
+  destinationChainIds: string[];
+  skipRegister?: boolean;
+};
+
 type SuiObjectCreated =
   | Extract<SuiObjectChange, { type: "created" }>
   | undefined;
@@ -45,18 +53,14 @@ export default function useTokenDeploy() {
         return result;
       },
     });
+
   const { mutateAsync: getDeployTokenTxBytes } =
     trpc.sui.getDeployTokenTxBytes.useMutation({
       onError(error) {
         console.log("error in usedeploytoken", error.message);
       },
     });
-  // const { mutateAsync: getRegisterTokenTx } =
-  //   trpc.sui.getRegisterTokenTx.useMutation({
-  //     onError(error) {
-  //       console.log("error in getRegisterTokenTx", error.message);
-  //     },
-  //   });
+
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
       onError(error) {
@@ -68,13 +72,10 @@ export default function useTokenDeploy() {
     symbol,
     name,
     decimals,
+    destinationChainIds,
     skipRegister = false,
-  }: {
-    symbol: string;
-    name: string;
-    decimals: number;
-    skipRegister?: boolean;
-  }) => {
+  }: DeployTokenParams) => {
+    console.log("deployToken", symbol, name, decimals, destinationChainIds);
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
@@ -125,6 +126,7 @@ export default function useTokenDeploy() {
         symbol,
         tokenPackageId: tokenAddress,
         metadataId: metadata.objectId,
+        destinationChains: destinationChainIds,
       });
       const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
       const sendTokenResult = await signAndExecuteTransaction({
