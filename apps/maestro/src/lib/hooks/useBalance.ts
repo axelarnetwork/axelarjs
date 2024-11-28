@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
-import { SUI_TYPE_ARG } from "@mysten/sui.js/utils";
 import { formatUnits } from "viem";
 import {
   useAccount as useWagmiAccount,
@@ -19,7 +18,6 @@ interface BalanceResult {
 export function useBalance(): BalanceResult | undefined {
   const wagmiAccount = useWagmiAccount();
   const suiAccount = useCurrentAccount();
-
   // Wagmi balance hook
   const { data: wagmiBalance } = useWagmiBalance({
     address: wagmiAccount.address,
@@ -30,7 +28,6 @@ export function useBalance(): BalanceResult | undefined {
     "getBalance",
     {
       owner: suiAccount?.address ?? "",
-      coinType: SUI_TYPE_ARG,
     },
     {
       enabled: !!suiAccount,
@@ -38,8 +35,6 @@ export function useBalance(): BalanceResult | undefined {
   );
 
   const balance = useMemo(() => {
-    console.log("suiBalance", suiBalance);
-    console.log("wagmiBalance", wagmiBalance);
     if (wagmiBalance) {
       return wagmiBalance;
     }
