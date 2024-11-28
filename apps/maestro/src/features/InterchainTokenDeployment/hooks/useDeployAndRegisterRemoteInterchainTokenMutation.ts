@@ -495,7 +495,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     await recordDeploymentDraft();
     if (chainId === SUI_CHAIN_ID && input) {
-      if (input.destinationChainIds.length === 0) return;
       const result = await deployToken({
         symbol: input.tokenSymbol,
         name: input.tokenName,
