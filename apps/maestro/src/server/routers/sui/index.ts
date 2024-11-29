@@ -74,8 +74,7 @@ export const suiRouter = router({
         const response = await fetch(
           `${suiServiceBaseUrl}/chain/devnet-amplifier`
         );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains["sui-test2"];
+        const chainConfig = await response.json();
         const { sender, symbol, tokenPackageId, metadataId } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
