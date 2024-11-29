@@ -395,7 +395,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.testnet,
   },
   {
-    ...avalanche,
+    ...avalancheFuji,
     axelarChainId: "avalanche-fuji",
     axelarChainName: "avalanche-fuji",
     environment: ENVIRONMENTS.devnet,
