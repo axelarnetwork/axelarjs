@@ -10,6 +10,7 @@ import { buildTx } from "./utils/utils";
 const suiClient = new SuiClient({
   url: config["sui-test2"].rpc,
 });
+
 const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 
 export const suiRouter = router({
@@ -89,7 +90,6 @@ export const suiRouter = router({
         const txBuilder = new TxBuilder(suiClient);
 
         txBuilder.tx.setSenderIfNotSet(sender);
-        const itsObjectId = chainConfig.contracts.ITS.objects?.ITS;
         const examplePackageId = chainConfig.contracts.Example.address;
         const feeUnitAmount = 5e7;
         const ITS = chainConfig.contracts.ITS;
@@ -97,32 +97,49 @@ export const suiRouter = router({
         const AxelarGateway = chainConfig.contracts.AxelarGateway;
         const GasService = chainConfig.contracts.GasService;
 
-        if (!ITS.trustedAddresses) return undefined;
+        const itsObjectId = ITS.objects.ITS;
 
         const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
         for (const destinationChain of destinationChains) {
-          if (!trustedDestinationChains.includes(destinationChain))
+          if (!trustedDestinationChains.includes(destinationChain)) {
             console.log(`destination chain ${destinationChain} not trusted`);
+            return undefined;
+          }
+        }
+
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: tokenType,
+        });
+
+        if (!coinMetadata) {
           return undefined;
         }
 
-        if (!itsObjectId || !examplePackageId) return undefined;
-
-        const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
-
-        const [TokenId] = await txBuilder.moveCall({
+        await txBuilder.moveCall({
           target: `${examplePackageId}::its::register_coin`,
           typeArguments: [tokenType],
           arguments: [itsObjectId, metadataId],
         });
-        //
-        // const [TokenIdU256] = await txBuilder.moveCall({
-        //   target: `${examplePackageId}::its::register_coin_u256`,
-        //   typeArguments: [tokenType],
-        //   arguments: [itsObjectId, metadataId],
-        // });
 
         for (const destinationChain of destinationChains) {
+          const [TokenId] = await txBuilder.moveCall({
+            target: `${ITS.address}::token_id::from_info`,
+            typeArguments: [tokenType],
+            // TODO: once the sui contract is updated, remove the duplicated decimals
+            arguments: [
+              coinMetadata.name,
+              coinMetadata.symbol,
+              txBuilder.tx.pure.u8(coinMetadata.decimals),
+              txBuilder.tx.pure.u8(coinMetadata.decimals),
+              txBuilder.tx.pure.bool(false),
+              txBuilder.tx.pure.bool(false),
+            ],
+          });
+
+          const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [
+            feeUnitAmount,
+          ]);
+
           await txBuilder.moveCall({
             target: `${Example.address}::its::deploy_remote_interchain_token`,
             arguments: [
@@ -141,6 +158,7 @@ export const suiRouter = router({
 
         const tx = await buildTx(sender, txBuilder);
         const txJSON = await tx.toJSON();
+        console.log("txJSON", txJSON);
         return txJSON;
       } catch (error) {
         console.error("Failed to finalize deployment:", error);

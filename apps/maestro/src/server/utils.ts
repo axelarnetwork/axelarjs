@@ -56,6 +56,11 @@ export async function evmChains<TCacheKey extends string>(
         wagmi: wagmiConfig,
       };
 
+      // TODO: remove this once we have ITS hub on testnet
+      if (NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier") {
+        entry.info.id = wagmiConfig.axelarChainId;
+      }
+
       return {
         ...acc,
         [chain.id]: entry,
