@@ -49,11 +49,12 @@ import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
 export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
   axelarChainName: string;
-  environment: "mainnet" | "testnet";
+  environment: "mainnet" | "testnet" | "devnet-amplifier";
 }
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
+  devnet: "devnet-amplifier",
   testnet: "testnet",
 } as const;
 
@@ -100,7 +101,7 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     id: 103,
     axelarChainId: "sui",
     axelarChainName: "sui",
-    environment: ENVIRONMENTS.testnet,
+    environment: ENVIRONMENTS.devnet,
     name: "Sui Testnet",
     nativeCurrency: {
       name: "SUI",
@@ -392,6 +393,24 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "blast-sepolia",
     axelarChainName: "blast-sepolia",
     environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...avalancheFuji,
+    axelarChainId: "avalanche-fuji",
+    axelarChainName: "avalanche-fuji",
+    environment: ENVIRONMENTS.devnet,
+  },
+  {
+    ...optimismSepolia,
+    axelarChainId: "optimism-sepolia",
+    axelarChainName: "optimism-sepolia",
+    environment: ENVIRONMENTS.devnet,
+  },
+  {
+    ...sepolia,
+    axelarChainId: "eth-sepolia",
+    axelarChainName: "eth-sepolia",
+    environment: ENVIRONMENTS.devnet,
   },
 ] as const;
 

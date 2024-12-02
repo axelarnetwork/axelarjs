@@ -20,8 +20,8 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
   console.log("params estimateGasFee", params);
   // TODO: remove when sdk support for sui is ready
   if (
-    params.destinationChainId.includes("sui") ||
-    params.sourceChainId.includes("sui")
+    params.sourceChainId.includes("sui") ||
+    params.destinationChainId.includes("sui")
   ) {
     response = "20000000000000000";
   } else
@@ -85,6 +85,8 @@ async function getChainInfo(params: GetChainInfoInput) {
   const chains = await getChainConfigs({
     environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
   });
+
+  console.log("chains", chains);
 
   const chainConfig = chains.find((chain) => chain.id === params.axelarChainId);
 

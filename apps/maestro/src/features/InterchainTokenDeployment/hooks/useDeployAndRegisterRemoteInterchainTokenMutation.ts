@@ -354,9 +354,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
 
     const registerTxData = destinationChainNames.map((destinationChain, i) => {
-      if (destinationChain === "sui") {
-        destinationChain = "sui-test2";
-      }
       const registerData =
         INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
           ...commonArgs,

@@ -28,7 +28,7 @@ import NProgressBar from "~/ui/layouts/NProgressBar";
 
 import "@tanstack/react-query";
 
-type NetworkEnv = "mainnet" | "testnet" | "devnet" | "localnet";
+// type NetworkEnv = "mainnet" | "testnet" | "devnet" | "localnet";
 
 const networks = {
   localnet: { url: getFullnodeUrl("localnet") },
@@ -103,7 +103,11 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
             <WagmiConfigPropvider>
               <SuiClientProvider
                 networks={networks}
-                network={process.env.NEXT_PUBLIC_NETWORK_ENV as NetworkEnv}
+                network={
+                  process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+                    ? "mainnet"
+                    : "testnet"
+                }
               >
                 <WalletProvider autoConnect>
                   {!isSSR && (

@@ -8,8 +8,9 @@ import { buildTx } from "./utils/utils";
 
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
-  url: config["sui-test2"].rpc,
+  url: config["sui"].rpc,
 });
+
 const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 
 export const suiRouter = router({
@@ -64,6 +65,7 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         symbol: z.string(),
+        destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
         metadataId: z.string(),
       })
@@ -74,56 +76,87 @@ export const suiRouter = router({
         const response = await fetch(
           `${suiServiceBaseUrl}/chain/devnet-amplifier`
         );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains["sui-test2"];
-        const { sender, symbol, tokenPackageId, metadataId } = input;
+        const chainConfig = await response.json();
+        const {
+          sender,
+          symbol,
+          tokenPackageId,
+          metadataId,
+          destinationChains,
+        } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
         const txBuilder = new TxBuilder(suiClient);
 
         txBuilder.tx.setSenderIfNotSet(sender);
-        const itsObjectId = chainConfig.contracts.ITS.objects?.ITS;
         const examplePackageId = chainConfig.contracts.Example.address;
-        if (!itsObjectId || !examplePackageId) return undefined;
         const feeUnitAmount = 5e7;
         const ITS = chainConfig.contracts.ITS;
         const Example = chainConfig.contracts.Example;
         const AxelarGateway = chainConfig.contracts.AxelarGateway;
         const GasService = chainConfig.contracts.GasService;
 
-        if (!ITS.trustedAddresses) return undefined;
+        const itsObjectId = ITS.objects.ITS;
 
-        const destinationChain = Object.keys(ITS.trustedAddresses)[0];
-        if (!destinationChain) return undefined;
+        // const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
+        // for (const destinationChain of destinationChains) {
+        //   if (!trustedDestinationChains.includes(destinationChain)) {
+        //     console.log(`destination chain ${destinationChain} not trusted`);
+        //     return undefined;
+        //   }
+        // }
 
-        if (!itsObjectId || !examplePackageId) return undefined;
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: tokenType,
+        });
 
-        const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
+        if (!coinMetadata) {
+          return undefined;
+        }
 
-        const [TokenId] = await txBuilder.moveCall({
+        await txBuilder.moveCall({
           target: `${examplePackageId}::its::register_coin`,
           typeArguments: [tokenType],
           arguments: [itsObjectId, metadataId],
         });
 
-        await txBuilder.moveCall({
-          target: `${Example.address}::its::deploy_remote_interchain_token`,
-          arguments: [
-            ITS.objects.ITS,
-            AxelarGateway.objects.Gateway,
-            GasService.objects.GasService,
-            destinationChain,
-            TokenId,
-            gas,
-            "0x",
-            sender,
-          ],
-          typeArguments: [tokenType],
-        });
+        for (const destinationChain of destinationChains) {
+          const [TokenId] = await txBuilder.moveCall({
+            target: `${ITS.address}::token_id::from_info`,
+            typeArguments: [tokenType],
+            arguments: [
+              coinMetadata.name,
+              coinMetadata.symbol,
+              txBuilder.tx.pure.u8(coinMetadata.decimals),
+              txBuilder.tx.pure.bool(false),
+              txBuilder.tx.pure.bool(false),
+            ],
+          });
+
+          const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [
+            feeUnitAmount,
+          ]);
+
+          await txBuilder.moveCall({
+            target: `${Example.address}::its::deploy_remote_interchain_token`,
+            arguments: [
+              ITS.objects.ITS,
+              AxelarGateway.objects.Gateway,
+              GasService.objects.GasService,
+              destinationChain,
+              TokenId,
+              gas,
+              "0x",
+              sender,
+            ],
+            typeArguments: [tokenType],
+          });
+        }
 
         const tx = await buildTx(sender, txBuilder);
         const txJSON = await tx.toJSON();
+        console.log("txJSON", txJSON);
         return txJSON;
       } catch (error) {
         console.error("Failed to finalize deployment:", error);

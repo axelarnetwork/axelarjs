@@ -49,9 +49,11 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const axelarQueryClient = createAxelarQueryClient(NEXT_PUBLIC_NETWORK_ENV);
+  const networkEnv =
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : "testnet";
 
-  const axelarConfigClient = createAxelarConfigClient(NEXT_PUBLIC_NETWORK_ENV);
+  const axelarQueryClient = createAxelarQueryClient(networkEnv);
+  const axelarConfigClient = createAxelarConfigClient(networkEnv);
 
   return {
     req,
