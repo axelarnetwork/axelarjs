@@ -8,7 +8,7 @@ import { buildTx } from "./utils/utils";
 
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
-  url: config["sui-test2"].rpc,
+  url: config["sui"].rpc,
 });
 
 const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
@@ -99,13 +99,13 @@ export const suiRouter = router({
 
         const itsObjectId = ITS.objects.ITS;
 
-        const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
-        for (const destinationChain of destinationChains) {
-          if (!trustedDestinationChains.includes(destinationChain)) {
-            console.log(`destination chain ${destinationChain} not trusted`);
-            return undefined;
-          }
-        }
+        // const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
+        // for (const destinationChain of destinationChains) {
+        //   if (!trustedDestinationChains.includes(destinationChain)) {
+        //     console.log(`destination chain ${destinationChain} not trusted`);
+        //     return undefined;
+        //   }
+        // }
 
         const coinMetadata = await suiClient.getCoinMetadata({
           coinType: tokenType,
@@ -125,11 +125,9 @@ export const suiRouter = router({
           const [TokenId] = await txBuilder.moveCall({
             target: `${ITS.address}::token_id::from_info`,
             typeArguments: [tokenType],
-            // TODO: once the sui contract is updated, remove the duplicated decimals
             arguments: [
               coinMetadata.name,
               coinMetadata.symbol,
-              txBuilder.tx.pure.u8(coinMetadata.decimals),
               txBuilder.tx.pure.u8(coinMetadata.decimals),
               txBuilder.tx.pure.bool(false),
               txBuilder.tx.pure.bool(false),
