@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { ComponentRef, useEffect, useMemo, useRef, type FC } from "react";
+import { ComponentRef, useMemo, useRef, type FC } from "react";
 import { type FieldError, type SubmitHandler } from "react-hook-form";
 
 import "~/features/InterchainTokenDeployment";
@@ -44,18 +44,7 @@ const TokenDetails: FC = () => {
   const isMintable = watch("isMintable");
   const minter = watch("minter");
   const supply = watch("initialSupply");
-
-  useEffect(() => {
-    console.log("ChainId", chainId);
-    if (chainId === SUI_CHAIN_ID) {
-      console.log("Max uint64 for Sui", MAX_UINT64);
-      actions.setTokenDetails({
-        ...state.tokenDetails,
-        tokenDecimals: 9,
-      });
-      // set default decimals to 9 for Sui
-    }
-  }, [chainId, actions, state.tokenDetails]);
+  const tokenDecimals = watch("tokenDecimals");
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
@@ -88,7 +77,18 @@ const TokenDetails: FC = () => {
         message: "Fixed supply token requires an initial balance",
       };
     }
-  }, [isMintable, minter, supply]);
+
+    if (
+      chainId === SUI_CHAIN_ID &&
+      supply &&
+      BigInt(supply) * BigInt(10) ** BigInt(tokenDecimals) > MAX_UINT64
+    ) {
+      return {
+        type: "validate",
+        message: "Supply must be less than 2^64 - 1 for Sui",
+      };
+    }
+  }, [isMintable, minter, supply, chainId, tokenDecimals]);
 
   const isFormValid = useMemo(() => {
     if (minterErrorMessage || initialSupplyErrorMessage) {

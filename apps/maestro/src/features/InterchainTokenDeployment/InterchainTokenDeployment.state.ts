@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
 import { z } from "zod";
 
-import { useAccount } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   hex64Literal,
@@ -26,6 +26,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
 });
 
 export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
+const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -86,6 +87,7 @@ function useInterchainTokenDeploymentState(
   });
 
   const { address } = useAccount();
+  const chainId = useChainId();
 
   /**
    * Generate a random salt on first render
@@ -97,6 +99,10 @@ function useInterchainTokenDeploymentState(
       const salt = generateRandomHash();
 
       tokenDetailsForm.setValue("salt", salt);
+
+      if (chainId === SUI_CHAIN_ID) {
+        tokenDetailsForm.setValue("tokenDecimals", 9);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [address]
@@ -146,6 +152,10 @@ function useInterchainTokenDeploymentState(
 
           // reset form
           tokenDetailsForm.reset(initialState.tokenDetails);
+
+          if (chainId === SUI_CHAIN_ID) {
+            tokenDetailsForm.setValue("tokenDecimals", 9);
+          }
 
           tokenDetailsForm.setValue("salt", generateRandomHash());
           // tokenDetailsForm.setValue("minter", address);
