@@ -14,7 +14,7 @@ export function useERC20TokenDetailsQuery(input: {
       tokenAddress: String(input.tokenAddress),
     },
     {
-      enabled: isAddress(input.tokenAddress ?? ""),
+      enabled: !!input.tokenAddress,
       retry: false,
       staleTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,

@@ -1,5 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 
+import { getFullnodeUrl } from "@mysten/sui.js/client";
+import { SuiClient } from "@mysten/sui/client";
 import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
@@ -14,18 +16,28 @@ export function useInterchainTokenDetailsQuery(input: {
       tokenAddress: String(input.tokenAddress),
     },
     {
-      enabled: isAddress(input.tokenAddress ?? ""),
+      enabled: !!input.tokenAddress,
       staleTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,
     }
   );
 }
 
-export function useInterchainTokenBalanceForOwnerQuery(input: {
+export async function useInterchainTokenBalanceForOwnerQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
   owner?: `0x${string}`;
 }) {
+  // TODO: WIP
+  if (input.chainId === 103) {
+    const coinType = `${input.tokenAddress}::sui::SUI`;
+    const client = new SuiClient({ url: getFullnodeUrl("testnet") });
+    const coins = await client.getCoins({
+      owner: input.owner as string,
+      coinType,
+    });
+    return coins;
+  }
   return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),

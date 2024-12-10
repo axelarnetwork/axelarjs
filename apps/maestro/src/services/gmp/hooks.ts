@@ -1,8 +1,6 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { isAddress } from "viem";
-
 import { trpc } from "~/lib/trpc";
 import { hex64 } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
@@ -22,7 +20,7 @@ export function useInterchainTokensQuery(input: {
         strict: input.strict,
       },
       {
-        enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
+        enabled: Maybe.of(input.tokenAddress).mapOr(false, Boolean),
         retry: false,
         refetchOnWindowFocus: false,
       }
