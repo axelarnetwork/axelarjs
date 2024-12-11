@@ -1,11 +1,12 @@
 import { z } from "zod";
 
+import { hex64Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
 
 export const recoverDeploymentMessageIdByTokenId = protectedProcedure
   .input(
     z.object({
-      tokenId: z.string(),
+      tokenId: hex64Literal(),
     })
   )
   .mutation(async ({ ctx, input }) => {
