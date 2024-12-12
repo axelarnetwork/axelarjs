@@ -14,7 +14,6 @@ import {
 
 export const interchainTokenServiceAbi = [
   {
-    stateMutability: "nonpayable",
     type: "constructor",
     inputs: [
       {
@@ -42,6 +41,7 @@ export const interchainTokenServiceAbi = [
       },
       { name: "tokenHandler_", internalType: "address", type: "address" },
     ],
+    stateMutability: "nonpayable",
   },
   { type: "error", inputs: [], name: "AlreadyExecuted" },
   {
@@ -753,23 +753,22 @@ export const interchainTokenServiceAbi = [
     name: "Upgraded",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "fromOperator", internalType: "address", type: "address" },
     ],
     name: "acceptOperatorship",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [],
     name: "acceptOwnership",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "tokenId", internalType: "bytes32", type: "bytes32" },
@@ -781,23 +780,23 @@ export const interchainTokenServiceAbi = [
     ],
     name: "callContractWithInterchainToken",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "chainName",
     outputs: [{ name: "chainName_", internalType: "string", type: "string" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "chainNameHash",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "sourceChain", internalType: "string", type: "string" },
@@ -809,9 +808,9 @@ export const interchainTokenServiceAbi = [
       { name: "", internalType: "address", type: "address" },
       { name: "", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "", internalType: "string", type: "string" },
@@ -825,16 +824,16 @@ export const interchainTokenServiceAbi = [
       { name: "", internalType: "address", type: "address" },
       { name: "", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [],
     name: "contractId",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "salt", internalType: "bytes32", type: "bytes32" },
@@ -847,9 +846,9 @@ export const interchainTokenServiceAbi = [
     ],
     name: "deployInterchainToken",
     outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "salt", internalType: "bytes32", type: "bytes32" },
@@ -864,9 +863,9 @@ export const interchainTokenServiceAbi = [
     ],
     name: "deployTokenManager",
     outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "commandId", internalType: "bytes32", type: "bytes32" },
@@ -876,9 +875,9 @@ export const interchainTokenServiceAbi = [
     ],
     name: "execute",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [
       { name: "", internalType: "bytes32", type: "bytes32" },
@@ -890,9 +889,9 @@ export const interchainTokenServiceAbi = [
     ],
     name: "executeWithToken",
     outputs: [],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "commandId", internalType: "bytes32", type: "bytes32" },
@@ -902,9 +901,9 @@ export const interchainTokenServiceAbi = [
     ],
     name: "expressExecute",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "", internalType: "bytes32", type: "bytes32" },
@@ -916,52 +915,52 @@ export const interchainTokenServiceAbi = [
     ],
     name: "expressExecuteWithToken",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "flowInAmount",
     outputs: [
       { name: "flowInAmount_", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "flowLimit",
     outputs: [{ name: "flowLimit_", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "flowOutAmount",
     outputs: [
       { name: "flowOutAmount_", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "gasService",
     outputs: [
       { name: "", internalType: "contract IAxelarGasService", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "gateway",
     outputs: [
       { name: "", internalType: "contract IAxelarGateway", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "commandId", internalType: "bytes32", type: "bytes32" },
@@ -973,9 +972,9 @@ export const interchainTokenServiceAbi = [
     outputs: [
       { name: "expressExecutor", internalType: "address", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "commandId", internalType: "bytes32", type: "bytes32" },
@@ -989,9 +988,9 @@ export const interchainTokenServiceAbi = [
     outputs: [
       { name: "expressExecutor", internalType: "address", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "account", internalType: "address", type: "address" },
@@ -999,41 +998,41 @@ export const interchainTokenServiceAbi = [
     ],
     name: "hasRole",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "implementation",
     outputs: [
       { name: "implementation_", internalType: "address", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "interchainTokenAddress",
     outputs: [
       { name: "tokenAddress", internalType: "address", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "interchainTokenDeployer",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "interchainTokenFactory",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [
       { name: "sender", internalType: "address", type: "address" },
@@ -1041,9 +1040,9 @@ export const interchainTokenServiceAbi = [
     ],
     name: "interchainTokenId",
     outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "tokenId", internalType: "bytes32", type: "bytes32" },
@@ -1055,16 +1054,16 @@ export const interchainTokenServiceAbi = [
     ],
     name: "interchainTransfer",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "addr", internalType: "address", type: "address" }],
     name: "isOperator",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "chain", internalType: "string", type: "string" },
@@ -1072,58 +1071,58 @@ export const interchainTokenServiceAbi = [
     ],
     name: "isTrustedAddress",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
     name: "multicall",
     outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "owner",
     outputs: [{ name: "owner_", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "paused",
     outputs: [{ name: "paused_", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "pendingOwner",
     outputs: [{ name: "owner_", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "operator", internalType: "address", type: "address" }],
     name: "proposeOperatorship",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
     name: "proposeOwnership",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "chain", internalType: "string", type: "string" }],
     name: "removeTrustedAddress",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "tokenIds", internalType: "bytes32[]", type: "bytes32[]" },
@@ -1131,16 +1130,16 @@ export const interchainTokenServiceAbi = [
     ],
     name: "setFlowLimits",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "paused", internalType: "bool", type: "bool" }],
     name: "setPauseStatus",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "chain", internalType: "string", type: "string" },
@@ -1148,30 +1147,30 @@ export const interchainTokenServiceAbi = [
     ],
     name: "setTrustedAddress",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
     name: "setup",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "tokenHandler",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "tokenManager",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "tokenManagerAddress",
@@ -1182,37 +1181,37 @@ export const interchainTokenServiceAbi = [
         type: "address",
       },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "tokenManagerDeployer",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     name: "tokenManagerImplementation",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "operator", internalType: "address", type: "address" }],
     name: "transferOperatorship",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
     name: "transferOwnership",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "tokenId", internalType: "bytes32", type: "bytes32" },
@@ -1224,27 +1223,27 @@ export const interchainTokenServiceAbi = [
     ],
     name: "transmitInterchainTransfer",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "chain", internalType: "string", type: "string" }],
     name: "trustedAddress",
     outputs: [
       { name: "trustedAddress_", internalType: "string", type: "string" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "chain", internalType: "string", type: "string" }],
     name: "trustedAddressHash",
     outputs: [
       { name: "trustedAddressHash_", internalType: "bytes32", type: "bytes32" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "newImplementation", internalType: "address", type: "address" },
@@ -1257,18 +1256,18 @@ export const interchainTokenServiceAbi = [
     ],
     name: "upgrade",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "validTokenAddress",
     outputs: [
       { name: "tokenAddress", internalType: "address", type: "address" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     name: "validTokenManagerAddress",
@@ -1279,11 +1278,12 @@ export const interchainTokenServiceAbi = [
         type: "address",
       },
     ],
+    stateMutability: "view",
   },
 ] as const;
 
-export const interchainTokenServiceAddress = process.env
-  .NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS as `0x${string}`;
+export const interchainTokenServiceAddress =
+  "0x144c3d7A5f5198EF3B46A8258b35E903cf197A66" as const;
 
 export const interchainTokenServiceConfig = {
   address: interchainTokenServiceAddress,
