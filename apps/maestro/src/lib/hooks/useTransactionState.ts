@@ -12,7 +12,7 @@ export type TxType = "INTERCHAIN_DEPLOYMENT" | "INTERCHAIN_TRANSFER";
 export type SubmittedTransactionState<TError = Error> =
   | {
       status: "submitted";
-      hash: `0x${string}`;
+      hash: string;
       txType?: TxType;
       chainId: number;
       isGMP?: boolean;
@@ -21,7 +21,7 @@ export type SubmittedTransactionState<TError = Error> =
   | {
       status: "confirmed";
       receipt: TransactionReceipt;
-      hash?: `0x${string}`;
+      hash?: string;
       txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
@@ -30,7 +30,7 @@ export type SubmittedTransactionState<TError = Error> =
   | {
       status: "reverted";
       error: TError;
-      hash?: `0x${string}`;
+      hash?: string;
       txType?: TxType;
       chainId?: number;
       isGMP?: boolean;

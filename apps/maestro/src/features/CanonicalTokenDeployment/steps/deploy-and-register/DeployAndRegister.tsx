@@ -1,3 +1,4 @@
+import { EVMChainConfig } from "@axelarjs/api";
 import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
@@ -137,7 +138,7 @@ export const Step3: FC = () => {
   );
 
   const eligibleChains = useMemo(
-    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
+    () => state.evmChains.filter((chain) => chain.chain_id !== chainId),
     [state.evmChains, chainId]
   );
 
@@ -228,7 +229,7 @@ export const Step3: FC = () => {
             )}
           </Label>
           <ChainPicker
-            eligibleChains={eligibleChains}
+            eligibleChains={eligibleChains as EVMChainConfig[]}
             selectedChains={rootState.selectedChains}
             onChainClick={rootActions.toggleAdditionalChain}
             disabled={
