@@ -26,7 +26,6 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
 });
 
 export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
-const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
 
 export type DeployAndRegisterTransactionState =
   | {
