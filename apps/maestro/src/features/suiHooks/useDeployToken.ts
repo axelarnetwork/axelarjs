@@ -1,8 +1,7 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { getFullnodeUrl } from "@mysten/sui.js/client";
-import { fromHEX } from "@mysten/sui.js/utils";
-import { SuiClient, SuiObjectChange } from "@mysten/sui/client";
+import { getFullnodeUrl, SuiClient, SuiObjectChange } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
+import { fromHEX } from "@mysten/sui/utils";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
