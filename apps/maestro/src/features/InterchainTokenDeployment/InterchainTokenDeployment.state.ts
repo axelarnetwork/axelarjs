@@ -36,11 +36,11 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "deploying";
-      txHash: `0x${string}`;
+      txHash: string;
     }
   | {
       type: "deployed";
-      txHash: `0x${string}`;
+      txHash: string;
       tokenAddress: `0x${string}`;
     };
 

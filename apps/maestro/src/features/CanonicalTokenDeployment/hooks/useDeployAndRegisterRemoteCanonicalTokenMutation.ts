@@ -166,6 +166,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
+        tokenManagerAddress: "",
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },
@@ -195,7 +196,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
           onStatusUpdate({
             type: "deployed",
             tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
-            txHash: tx.hash,
+            txHash: tx.hash as `0x${string}`,
           });
         })
         .catch((e) => {
@@ -226,6 +227,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       tokenDecimals: input.decimals,
       axelarChainId: input.sourceChainId,
       tokenAddress: input.tokenAddress,
+      tokenManagerAddress: "",
       destinationAxelarChainIds: input.destinationChainIds,
       deploymentMessageId: "",
     });

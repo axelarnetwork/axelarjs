@@ -278,7 +278,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         environment: NEXT_PUBLIC_NETWORK_ENV,
       },
     ],
-  };
+  } as const;
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -311,15 +311,17 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     });
   const { destinationChainNames } = useMemo(() => {
     const index = updatedComputed.indexedById;
-    const originalChainName =
-      index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
+    type IndexedChainId = keyof typeof index;
+    const originalChain =
+      index[(input?.sourceChainId ?? chainId) as IndexedChainId];
+    const originalChainName = originalChain?.chain_name ?? "Unknown";
 
     return {
       originalChainName,
       destinationChainNames:
         input?.destinationChainIds.map(
           (destinationChainId) =>
-            index[destinationChainId]?.chain_name ?? "Unknown"
+            index[destinationChainId as IndexedChainId]?.chain_name ?? "Unknown"
         ) ?? [],
     };
   }, [
@@ -447,7 +449,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             onStatusUpdate({
               type: "deployed",
               tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
-              txHash: tx.hash,
+              txHash: tx.hash as `0x${string}`,
             });
           })
           .catch((e) => {
@@ -499,10 +501,11 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         destinationChainIds: input.destinationChainIds,
       });
       if (result?.digest) {
+        const token: any = result?.events?.[0]?.parsedJson;
         setRecordDeploymentArgs({
           kind: "interchain",
           deploymentMessageId: `${result?.digest}-${0}`,
-          tokenId: result?.events?.[0]?.parsedJson?.token_id?.id,
+          tokenId: token.token_id?.id,
           tokenAddress: result?.tokenAddress,
           tokenManagerAddress: result?.tokenManagerAddress,
           deployerAddress,
@@ -515,7 +518,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           destinationAxelarChainIds: input.destinationChainIds,
         });
 
-        return result;
+        return result?.digest;
       }
     } else {
       invariant(
