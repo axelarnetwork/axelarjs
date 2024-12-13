@@ -14,11 +14,11 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "deploying";
-      txHash: `0x${string}`;
+      txHash: string;
     }
   | {
       type: "deployed";
-      txHash: `0x${string}`;
+      txHash: string;
       tokenAddress: `0x${string}`;
     };
 
@@ -32,7 +32,7 @@ export const INITIAL_STATE = {
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
-  onDeployTxHash: (txHash: `0x${string}`) => {
+  onDeployTxHash: (txHash: string) => {
     logger.log("onDeployTxHash", txHash);
   },
 };

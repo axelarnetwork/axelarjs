@@ -24,6 +24,8 @@ const suiChainMockData =
         color: "#6fbcf0",
         chain_type: "sui",
         no_inflation: false,
+        no_tvl: true,
+        deprecated: false,
         endpoints: {
           rpc: ["https://sui-rpc.publicnode.com"],
         },
@@ -39,6 +41,7 @@ const suiChainMockData =
           block_path: "/block/{block}",
           address_path: "/address/{address}",
           contract_path: "/object/{address}",
+          contract_0_path: "/object/{address}",
           transaction_path: "/txblock/{tx}",
         },
         provider_params: [
@@ -65,6 +68,8 @@ const suiChainMockData =
         color: "#6fbcf0",
         chain_type: "sui",
         no_inflation: false,
+        no_tvl: true,
+        deprecated: false,
         endpoints: {
           rpc: ["https://fullnode.testnet.sui.io:443"],
         },
@@ -80,6 +85,7 @@ const suiChainMockData =
           block_path: "/block/{block}",
           address_path: "/address/{address}",
           contract_path: "/object/{address}",
+          contract_0_path: "/object/{address}",
           transaction_path: "/txblock/{tx}",
         },
         provider_params: [

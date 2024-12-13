@@ -1,14 +1,14 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { getFullnodeUrl, SuiClient, SuiObjectChange } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
-import { fromHEX } from "@mysten/sui/utils";
+import { fromHex } from "@mysten/sui/utils";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
 const findCoinDataObject = (registerTokenResult: any) => {
   return registerTokenResult.objectChanges.find(
-    (change) =>
+    (change: SuiObjectChange) =>
       change.type === "created" && change.objectType.includes("coin_data")
   ).objectId;
 };
@@ -88,7 +88,7 @@ export default function useTokenDeploy() {
         walletAddress: currentAccount.address,
       });
       // First step, deploy the token
-      const deployTokenTx = Transaction.from(fromHEX(deployTokenTxBytes));
+      const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
         transaction: deployTokenTx,
         chain: "sui:testnet",

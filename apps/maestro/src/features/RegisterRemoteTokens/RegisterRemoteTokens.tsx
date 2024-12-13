@@ -79,12 +79,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
-    hash: txState.status === "submitted" ? txState.hash : undefined,
+    hash:
+      txState.status === "submitted"
+        ? (txState.hash as `0x${string}`)
+        : undefined,
   });
 
   const onSuiTxComplete = useCallback(async () => {
-    console.log("onSuiTxComplete", txState.suiTx);
-    const { digest, transactionIndex: txIndex } = txState.suiTx;
+    console.log("onSuiTxComplete", txState.txHash);
+    const { digest, transactionIndex: txIndex } = txState.txHash;
 
     const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
       ...remoteToken,

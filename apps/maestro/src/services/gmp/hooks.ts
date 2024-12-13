@@ -55,7 +55,7 @@ export function useInterchainTokensQuery(input: {
 
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
-    txHash?: `0x${string}`;
+    txHash?: string;
   },
   options?: {
     enabled?: boolean;
@@ -93,7 +93,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
 
 export function useGetTransactionsStatusesOnDestinationChainsQuery(
   input: {
-    txHashes?: `0x${string}`[];
+    txHashes?: string[];
   },
   options?: {
     enabled?: boolean;

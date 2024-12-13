@@ -55,14 +55,14 @@ export const getInterchainTokenDetailsPageSessionStorageKey = (
   `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
 
 export type InterchainTokenDetailsPageState = {
-  deployTokensTxHashes: `0x${string}`[];
+  deployTokensTxHashes: string[];
   selectedChainIds: number[];
 };
 
 export function persistTokenDeploymentTxHash(
   tokenAddress: `0x${string}`,
   chainId: number,
-  deployTokensTxHash: `0x${string}`,
+  deployTokensTxHash: string,
   selectedChainIds: number[]
 ) {
   const key = getInterchainTokenDetailsPageSessionStorageKey({

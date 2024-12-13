@@ -107,18 +107,18 @@ export const Step2: FC = () => {
       if (sourceChain.chain_id === SUI_CHAIN_ID) {
         const result = await txPromise;
         // if tx is successful, we will get a digest
-        if (result?.digest) {
+        if (result) {
           rootActions.setTxState({
-            status: "submitted",
-            suiTx: result,
-            txHash: result.digest,
-            chainId: sourceChain.chain_id,
+            type: "deployed",
+            txHash: result,
+            // TODO: get token address
+            tokenAddress: "0x",
+            // chainId: sourceChain.chain_id,
           });
           if (rootState.selectedChains.length > 0) {
             addTransaction({
               status: "submitted",
-              suiTx: result,
-              hash: result.digest,
+              hash: result,
               chainId: sourceChain.chain_id,
               txType: "INTERCHAIN_DEPLOYMENT",
             });

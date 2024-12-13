@@ -2,7 +2,7 @@ import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 
 import type { SubmittedTransactionState } from "~/lib/hooks/useTransactionState";
 
-type TransactionsByHash = Record<`0x${string}`, SubmittedTransactionState>;
+type TransactionsByHash = Record<string, SubmittedTransactionState>;
 
 export const {
   Provider: TransactionsProvider,

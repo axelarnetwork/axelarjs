@@ -14,8 +14,9 @@ const evmChainConfigSchema = z.object({
   name: z.string(),
   image: z.string(),
   color: z.string(),
-  chain_type: z.literal("evm"),
+  chain_type: z.string(),
   no_inflation: z.boolean(),
+  no_tvl: z.boolean().optional(),
   endpoints: z.object({
     rpc: z.array(z.string()),
   }),
@@ -31,7 +32,7 @@ const evmChainConfigSchema = z.object({
     block_path: z.string(),
     address_path: z.string(),
     contract_path: z.string(),
-    contract_0_path: z.string().optional(),
+    contract_0_path: z.string(),
     transaction_path: z.string(),
   }),
   provider_params: z.array(
