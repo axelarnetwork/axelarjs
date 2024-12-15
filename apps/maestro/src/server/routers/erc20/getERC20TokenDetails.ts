@@ -1,6 +1,8 @@
 import type { IERC20BurnableMintableClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
+import { getFullnodeUrl } from "@mysten/sui.js/client";
+import { SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
@@ -15,6 +17,20 @@ const overrides: Record<`0x${string}`, Record<string, string>> = {
   },
 };
 
+async function getSuiTokenDetails(tokenAddress: string) {
+  const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
+
+  const modules = await client.getNormalizedMoveModulesByPackage({
+    package: tokenAddress,
+  });
+  const coinSymbol = Object.keys(modules).find((module) => module !== "q");
+
+  const coinType = `${tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
+
+  const metadata = await client.getCoinMetadata({ coinType });
+  return metadata;
+}
+
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
@@ -23,6 +39,10 @@ export const getERC20TokenDetails = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
+    // Enter here if the token is a Sui token
+    if (input.tokenAddress.length === 66) {
+      return await getSuiTokenDetails(input.tokenAddress);
+    }
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
       const chainConfig = chainConfigs.find(
