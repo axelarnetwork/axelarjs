@@ -1,5 +1,8 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { getFullnodeUrl } from "@mysten/sui.js/client";
+import {
+  getFullnodeUrl,
+  type SuiTransactionBlockResponse,
+} from "@mysten/sui.js/client";
 import { fromHEX } from "@mysten/sui.js/utils";
 import { SuiClient, SuiObjectChange } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
@@ -7,14 +10,19 @@ import { Transaction } from "@mysten/sui/transactions";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
-const findCoinDataObject = (registerTokenResult: any) => {
-  return registerTokenResult.objectChanges.find(
-    (change) =>
-      change.type === "created" && change.objectType.includes("coin_data")
-  ).objectId;
+const findCoinDataObject = (
+  registerTokenResult: SuiTransactionBlockResponse
+) => {
+  return (
+    registerTokenResult?.objectChanges?.find(
+      (change) =>
+        change.type === "created" && change.objectType.includes("coin_data")
+    ) as SuiObjectCreated
+  )?.objectId;
 };
 
 export type DeployTokenParams = {
+  initialSupply: bigint;
   symbol: string;
   name: string;
   decimals: number;
@@ -61,6 +69,12 @@ export default function useTokenDeploy() {
       },
     });
 
+  const { mutateAsync: getMintTx } = trpc.sui.getMintTx.useMutation({
+    onError(error) {
+      console.log("error in getMintTx", error.message);
+    },
+  });
+
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
       onError(error) {
@@ -69,6 +83,7 @@ export default function useTokenDeploy() {
     });
 
   const deployToken = async ({
+    initialSupply,
     symbol,
     name,
     decimals,
@@ -131,9 +146,28 @@ export default function useTokenDeploy() {
       const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
       const sendTokenResult = await signAndExecuteTransaction({
         transaction: sendTokenTx,
-        chain: "sui:testnet",
+        chain: "sui:testnet", //TODO: make this dynamic
       });
-      const coinManagementObjectId = findCoinDataObject(sendTokenResult);
+      const coinManagementObjectId = findCoinDataObject(
+        sendTokenResult as SuiTransactionBlockResponse
+      );
+
+      // Mint tokens
+      if (treasuryCap) {
+        const mintTxJSON = await getMintTx({
+          sender: currentAccount.address,
+          tokenTreasuryCap: treasuryCap?.objectId,
+          amount: initialSupply,
+          tokenPackageId: tokenAddress,
+          symbol,
+        });
+        const mintTx = Transaction.from(mintTxJSON as string);
+        await signAndExecuteTransaction({
+          transaction: mintTx,
+          chain: "sui:testnet",
+        });
+      }
+
       return {
         ...sendTokenResult,
         tokenManagerAddress: coinManagementObjectId,

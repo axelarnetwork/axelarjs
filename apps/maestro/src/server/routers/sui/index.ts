@@ -1,4 +1,4 @@
-import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import { SuiClient } from "@mysten/sui/client";
 import { z } from "zod";
 
@@ -156,7 +156,6 @@ export const suiRouter = router({
 
         const tx = await buildTx(sender, txBuilder);
         const txJSON = await tx.toJSON();
-        console.log("txJSON", txJSON);
         return txJSON;
       } catch (error) {
         console.error("Failed to finalize deployment:", error);
@@ -164,5 +163,33 @@ export const suiRouter = router({
           `Deployment finalization failed: ${(error as Error).message}`
         );
       }
+    }),
+
+  getMintTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+        tokenTreasuryCap: z.string(),
+        amount: z.bigint(),
+        tokenPackageId: z.string(),
+        symbol: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { sender, tokenTreasuryCap, amount, tokenPackageId, symbol } =
+        input;
+      const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+      const txBuilder = new TxBuilder(suiClient);
+      const [coin] = await txBuilder.moveCall({
+        target: `${SUI_PACKAGE_ID}::coin::mint`,
+        typeArguments: [tokenType],
+        arguments: [tokenTreasuryCap, amount],
+      });
+      txBuilder.tx.transferObjects([coin], txBuilder.tx.pure.address(sender));
+
+      const tx = await buildTx(sender, txBuilder);
+      const txJSON = await tx.toJSON();
+      return txJSON;
     }),
 });
