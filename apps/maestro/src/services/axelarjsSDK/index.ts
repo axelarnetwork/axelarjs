@@ -86,8 +86,6 @@ async function getChainInfo(params: GetChainInfoInput) {
     environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
   });
 
-  console.log("chains", chains);
-
   const chainConfig = chains.find((chain) => chain.id === params.axelarChainId);
 
   if (!chainConfig) {

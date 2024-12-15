@@ -1,8 +1,9 @@
+import { getFullnodeUrl } from "@mysten/sui.js/client";
+import { SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
@@ -16,11 +17,43 @@ export const getERC20TokenBalanceForOwner = publicProcedure
   .input(
     z.object({
       chainId: z.number(),
-      tokenAddress: hex40Literal(),
-      owner: hex40Literal(),
+      tokenAddress: z.string(),
+      owner: z.string(),
     })
   )
   .query(async ({ input, ctx }) => {
+    // Sui address length is 66
+    if (input.tokenAddress?.length === 66) {
+      const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
+
+      const modules = await client.getNormalizedMoveModulesByPackage({
+        package: input.tokenAddress,
+      });
+      const coinSymbol = Object.keys(modules).find((module) => module !== "q");
+
+      const coinType = `${input.tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
+
+      const coins = await client.getCoins({
+        owner: input.owner,
+        coinType: coinType,
+      });
+      const metadata = await client.getCoinMetadata({ coinType });
+
+      // TODO: hardcoded values for now
+      const result = {
+        isTokenOwner: true,
+        isTokenMinter: true,
+        tokenBalance: coins.data[0].balance.toString(),
+        decimals: metadata?.decimals ?? 0,
+        isTokenPendingOwner: false,
+        hasPendingOwner: false,
+        hasMinterRole: true,
+        hasOperatorRole: true,
+        hasFlowLimiterRole: true,
+      };
+      return result;
+    }
+
     const chainConfig = ctx.configs.wagmiChainConfigs.find(
       (chain) => chain.id === input.chainId
     );
