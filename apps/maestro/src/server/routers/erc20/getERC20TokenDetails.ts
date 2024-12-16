@@ -25,7 +25,7 @@ async function getSuiTokenDetails(tokenAddress: string) {
   });
   const coinSymbol = Object.keys(modules)[0];
 
-  const coinType = `${tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
+  const coinType = `${tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
 
   const metadata = await client.getCoinMetadata({ coinType });
   return metadata;
