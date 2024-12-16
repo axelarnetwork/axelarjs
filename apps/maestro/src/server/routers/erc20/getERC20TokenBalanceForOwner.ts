@@ -24,32 +24,57 @@ export const getERC20TokenBalanceForOwner = publicProcedure
   .query(async ({ input, ctx }) => {
     // Sui address length is 66
     if (input.tokenAddress?.length === 66) {
+      let isTokenOwner = false;
+
       const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
 
+      // Get the coin type
       const modules = await client.getNormalizedMoveModulesByPackage({
         package: input.tokenAddress,
       });
       const coinSymbol = Object.keys(modules)[0];
-
       const coinType = `${input.tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
 
+      // Get the coin balance
       const coins = await client.getCoins({
         owner: input.owner,
         coinType: coinType,
       });
+      const balance = coins.data[0].balance.toString();
+
+      // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
 
-      // TODO: hardcoded values for now
+      // Get the token owner
+      const object = await client.getObject({
+        id: input.tokenAddress,
+        options: {
+          showOwner: true,
+          showPreviousTransaction: true,
+        },
+      });
+      if (object.data && "Immutable" === object.data.owner) {
+        const previousTx = object.data.previousTransaction;
+
+        // Fetch the transaction details to find the sender
+        const transactionDetails = await client.getTransactionBlock({
+          digest: previousTx as string,
+          options: { showInput: true, showEffects: true },
+        });
+        isTokenOwner =
+          transactionDetails.transaction?.data.sender === input.owner;
+      }
+
       const result = {
-        isTokenOwner: true,
-        isTokenMinter: true,
-        tokenBalance: coins.data[0].balance.toString(),
+        isTokenOwner,
+        isTokenMinter: isTokenOwner,
+        tokenBalance: balance,
         decimals: metadata?.decimals ?? 0,
         isTokenPendingOwner: false,
         hasPendingOwner: false,
-        hasMinterRole: true,
-        hasOperatorRole: true,
-        hasFlowLimiterRole: true,
+        hasMinterRole: isTokenOwner,
+        hasOperatorRole: isTokenOwner,
+        hasFlowLimiterRole: isTokenOwner, // TODO: check if this is correct
       };
       return result;
     }
