@@ -23,7 +23,7 @@ async function getSuiTokenDetails(tokenAddress: string) {
   const modules = await client.getNormalizedMoveModulesByPackage({
     package: tokenAddress,
   });
-  const coinSymbol = Object.keys(modules).find((module) => module !== "q");
+  const coinSymbol = Object.keys(modules)[0];
 
   const coinType = `${tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
 

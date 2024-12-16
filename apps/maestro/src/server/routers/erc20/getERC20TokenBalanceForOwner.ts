@@ -29,7 +29,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       const modules = await client.getNormalizedMoveModulesByPackage({
         package: input.tokenAddress,
       });
-      const coinSymbol = Object.keys(modules).find((module) => module !== "q");
+      const coinSymbol = Object.keys(modules)[0];
 
       const coinType = `${input.tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
 
