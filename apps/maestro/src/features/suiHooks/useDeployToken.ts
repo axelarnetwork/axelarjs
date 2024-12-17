@@ -100,7 +100,7 @@ export default function useTokenDeploy() {
       // First step, deploy the token
       const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
-        transaction: deployTokenTx,
+        transaction: await deployTokenTx.toJSON(),
         chain: "sui:testnet",
       });
 
