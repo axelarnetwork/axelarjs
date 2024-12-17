@@ -5,6 +5,8 @@ import {
   SuiObjectChange,
   type SuiTransactionBlockResponse,
 } from "@mysten/sui/client";
+import { Transaction } from "@mysten/sui/transactions";
+import { fromHex } from "@mysten/sui/utils";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
@@ -83,7 +85,6 @@ export default function useTokenDeploy() {
     destinationChainIds,
     skipRegister = false,
   }: DeployTokenParams): Promise<DeployTokenResult> => {
-    console.log("deployToken", symbol, name, decimals, destinationChainIds);
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
@@ -97,9 +98,9 @@ export default function useTokenDeploy() {
         walletAddress: currentAccount.address,
       });
       // First step, deploy the token
-      // const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
+      const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
-        transaction: deployTokenTxBytes,
+        transaction: deployTokenTx,
         chain: "sui:testnet",
       });
 
@@ -108,10 +109,8 @@ export default function useTokenDeploy() {
       }
 
       const deploymentCreatedObjects = deployTokenResult.objectChanges.filter(
-        (objectChange: SuiObjectChange) =>
-          objectChange.type === "created" &&
-          !objectChange.objectType.includes("q::Q")
-      ); // exclude the template token that included with this package
+        (objectChange: SuiObjectChange) => objectChange.type === "created"
+      );
 
       const treasuryCap = findObjectByType(
         deploymentCreatedObjects,
