@@ -32,7 +32,7 @@ const evmChainConfigSchema = z.object({
     block_path: z.string(),
     address_path: z.string(),
     contract_path: z.string(),
-    contract_0_path: z.string(),
+    contract_0_path: z.string().optional(),
     transaction_path: z.string(),
   }),
   provider_params: z.array(

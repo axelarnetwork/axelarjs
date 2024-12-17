@@ -32,6 +32,8 @@ export const Step3: FC = () => {
 
   const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
 
+  console.log("state", state.evmChains);
+
   const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
       (state.remoteDeploymentGasFees?.gasFees ?? []).reduce(
@@ -140,6 +142,12 @@ export const Step3: FC = () => {
     () => state.evmChains.filter((chain) => chain.chain_id !== chainId),
     [state.evmChains, chainId]
   );
+
+  console.log(
+    "state.evmChains",
+    state.evmChains.map((x) => x.chain_id)
+  );
+  console.log("chainId", chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

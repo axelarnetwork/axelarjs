@@ -173,9 +173,16 @@ export const Step2: FC = () => {
     ]
   );
 
+  console.log("all evm chains", state.evmChains);
+
   const eligibleChains = useMemo(
     () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
     [state.evmChains, chainId]
+  );
+
+  console.log(
+    "chain ids",
+    state.evmChains.map((x) => x.chain_id)
   );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);

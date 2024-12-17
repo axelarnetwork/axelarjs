@@ -57,7 +57,7 @@ export function useStep2ChainSelectionState() {
     );
     if (!candidateChain || candidateChain.chain_name === sourceChainId) return;
 
-    setSourceChainId(candidateChain.id);
+    setSourceChainId(candidateChain.chain_name);
   }, [evmChains, chainId, sourceChainId]);
 
   return {
