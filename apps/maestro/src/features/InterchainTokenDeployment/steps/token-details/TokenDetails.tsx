@@ -17,6 +17,7 @@ import {
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
+import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import {
   isValidEVMAddress,
   preventNonHexInput,
@@ -29,8 +30,11 @@ import {
   ValidationError,
 } from "~/ui/compounds/MultiStepForm";
 
+const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
+
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
+  const chainId = useChainId();
 
   const { register, handleSubmit, formState, watch } = state.tokenDetailsForm;
 
@@ -40,6 +44,7 @@ const TokenDetails: FC = () => {
   const isMintable = watch("isMintable");
   const minter = watch("minter");
   const supply = watch("initialSupply");
+  const tokenDecimals = watch("tokenDecimals");
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
@@ -72,7 +77,18 @@ const TokenDetails: FC = () => {
         message: "Fixed supply token requires an initial balance",
       };
     }
-  }, [isMintable, minter, supply]);
+
+    if (
+      chainId === SUI_CHAIN_ID &&
+      supply &&
+      BigInt(supply) * BigInt(10) ** BigInt(tokenDecimals) > MAX_UINT64
+    ) {
+      return {
+        type: "validate",
+        message: "Supply must be less than 2^64 - 1 for Sui",
+      };
+    }
+  }, [isMintable, minter, supply, chainId, tokenDecimals]);
 
   const isFormValid = useMemo(() => {
     if (minterErrorMessage || initialSupplyErrorMessage) {
