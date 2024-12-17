@@ -30,13 +30,13 @@ export const {
     });
   };
 
-  const removeTransaction = (hash: `0x${string}`) => {
+  const removeTransaction = (hash: string) => {
     setTransactions((draft) => {
       delete draft[hash];
     });
   };
 
-  const getTransaction = (hash: `0x${string}`) => transactions[hash];
+  const getTransaction = (hash: string) => transactions[hash];
 
   return [
     {

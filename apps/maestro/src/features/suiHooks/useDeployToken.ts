@@ -1,7 +1,10 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { getFullnodeUrl, SuiClient, SuiObjectChange } from "@mysten/sui/client";
-import { Transaction } from "@mysten/sui/transactions";
-import { fromHex } from "@mysten/sui/utils";
+import {
+  getFullnodeUrl,
+  SuiClient,
+  SuiObjectChange,
+  type SuiTransactionBlockResponse,
+} from "@mysten/sui/client";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
@@ -19,6 +22,12 @@ export type DeployTokenParams = {
   decimals: number;
   destinationChainIds: string[];
   skipRegister?: boolean;
+};
+
+export type DeployTokenResult = SuiTransactionBlockResponse & {
+  tokenManagerAddress: string;
+  tokenAddress: string;
+  tokenManagerType: "mint/burn" | "lock/unlock";
 };
 
 type SuiObjectCreated =
@@ -73,7 +82,7 @@ export default function useTokenDeploy() {
     decimals,
     destinationChainIds,
     skipRegister = false,
-  }: DeployTokenParams) => {
+  }: DeployTokenParams): Promise<DeployTokenResult> => {
     console.log("deployToken", symbol, name, decimals, destinationChainIds);
     if (!currentAccount) {
       throw new Error("Wallet not connected");
@@ -88,9 +97,9 @@ export default function useTokenDeploy() {
         walletAddress: currentAccount.address,
       });
       // First step, deploy the token
-      const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
+      // const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
-        transaction: deployTokenTx,
+        transaction: deployTokenTxBytes,
         chain: "sui:testnet",
       });
 
@@ -127,9 +136,9 @@ export default function useTokenDeploy() {
         metadataId: metadata.objectId,
         destinationChains: destinationChainIds,
       });
-      const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
+      // const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
       const sendTokenResult = await signAndExecuteTransaction({
-        transaction: sendTokenTx,
+        transaction: sendTokenTxJSON as string,
         chain: "sui:testnet",
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);

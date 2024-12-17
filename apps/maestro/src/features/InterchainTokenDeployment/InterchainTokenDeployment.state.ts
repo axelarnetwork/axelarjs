@@ -14,6 +14,7 @@ import {
   numericString,
   optionalHex40Literal,
 } from "~/lib/utils/validation";
+import { DeployTokenResult } from "../suiHooks/useDeployToken";
 
 const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenName: z.string().min(1).max(32),
@@ -40,6 +41,7 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "deployed";
+      suiTx?: DeployTokenResult;
       txHash: string;
       tokenAddress: `0x${string}`;
     };

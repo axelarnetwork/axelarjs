@@ -449,7 +449,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             onStatusUpdate({
               type: "deployed",
               tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
-              txHash: tx.hash as `0x${string}`,
+              txHash: tx.hash,
             });
           })
           .catch((e) => {
@@ -518,7 +518,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           destinationAxelarChainIds: input.destinationChainIds,
         });
 
-        return result?.digest;
+        return result;
       }
     } else {
       invariant(

@@ -11,8 +11,10 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
+import { WriteContractData } from "wagmi/query";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
@@ -105,12 +107,13 @@ export const Step2: FC = () => {
       // Sui will return a digest equivalent to the txHash
       const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
       if (sourceChain.chain_id === SUI_CHAIN_ID) {
-        const result = await txPromise;
+        const result = (await txPromise) as DeployTokenResult;
         // if tx is successful, we will get a digest
         if (result) {
           rootActions.setTxState({
             type: "deployed",
-            txHash: result,
+            suiTx: result,
+            txHash: result.digest,
             // TODO: get token address
             tokenAddress: "0x",
             // chainId: sourceChain.chain_id,
@@ -118,7 +121,8 @@ export const Step2: FC = () => {
           if (rootState.selectedChains.length > 0) {
             addTransaction({
               status: "submitted",
-              hash: result,
+              suiTx: result,
+              hash: result.digest,
               chainId: sourceChain.chain_id,
               txType: "INTERCHAIN_DEPLOYMENT",
             });
@@ -131,7 +135,7 @@ export const Step2: FC = () => {
         }
       }
 
-      await handleTransactionResult(txPromise, {
+      await handleTransactionResult(txPromise as Promise<WriteContractData>, {
         onSuccess(txHash) {
           rootActions.setTxState({
             type: "deploying",

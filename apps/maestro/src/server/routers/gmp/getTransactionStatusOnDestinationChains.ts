@@ -65,7 +65,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
           {} as {
             [chainId: string]: {
               status: GMPTxStatus;
-              txHash: `0x${string}`;
+              txHash: string;
               txId: string;
               logIndex: number;
             };

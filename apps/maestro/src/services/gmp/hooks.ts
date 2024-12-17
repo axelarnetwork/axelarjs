@@ -55,7 +55,7 @@ export function useInterchainTokensQuery(input: {
 
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
-    txHash?: string;
+    txHash: string;
   },
   options?: {
     enabled?: boolean;
@@ -65,15 +65,14 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   const { data, ...query } =
     trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
       {
-        txHash: input.txHash as `0x${string}`,
+        txHash: input.txHash,
       },
       {
-        refetchInterval: 1000 * 10, // 10 seconds
+        refetchInterval: options?.refetchInterval ?? 1000 * 10, // 10 seconds
         enabled:
-          input.txHash &&
+          !!input.txHash &&
           hex64().safeParse(input.txHash).success &&
-          // apply the default value if the option is not provided
-          Maybe.of(options?.enabled).mapOr(true, Boolean),
+          (options?.enabled || true),
       }
     );
 

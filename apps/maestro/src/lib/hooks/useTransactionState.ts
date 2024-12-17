@@ -20,7 +20,7 @@ export type SubmittedTransactionState<TError = Error> =
     }
   | {
       status: "confirmed";
-      receipt: TransactionReceipt;
+      receipt?: TransactionReceipt;
       hash?: string;
       txType?: TxType;
       chainId?: number;
