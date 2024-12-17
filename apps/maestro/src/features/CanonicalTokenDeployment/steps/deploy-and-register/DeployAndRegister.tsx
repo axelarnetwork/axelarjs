@@ -1,4 +1,3 @@
-import { EVMChainConfig } from "@axelarjs/api";
 import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
@@ -229,7 +228,7 @@ export const Step3: FC = () => {
             )}
           </Label>
           <ChainPicker
-            eligibleChains={eligibleChains as EVMChainConfig[]}
+            eligibleChains={eligibleChains}
             selectedChains={rootState.selectedChains}
             onChainClick={rootActions.toggleAdditionalChain}
             disabled={
