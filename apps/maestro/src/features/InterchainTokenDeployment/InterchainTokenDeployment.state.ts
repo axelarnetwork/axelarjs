@@ -9,11 +9,7 @@ import { z } from "zod";
 
 import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
-import {
-  hex64Literal,
-  numericString,
-  optionalHex40Literal,
-} from "~/lib/utils/validation";
+import { hex64Literal, numericString } from "~/lib/utils/validation";
 import { DeployTokenResult } from "../suiHooks/useDeployToken";
 
 const TOKEN_DETAILS_FORM_SCHEMA = z.object({
@@ -22,7 +18,7 @@ const TOKEN_DETAILS_FORM_SCHEMA = z.object({
   tokenDecimals: z.coerce.number().min(0).max(18),
   initialSupply: numericString(),
   isMintable: z.boolean(),
-  minter: optionalHex40Literal(),
+  minter: z.string().optional(),
   salt: hex64Literal(),
 });
 
@@ -43,7 +39,7 @@ export type DeployAndRegisterTransactionState =
       type: "deployed";
       suiTx?: DeployTokenResult;
       txHash: string;
-      tokenAddress: `0x${string}`;
+      tokenAddress: string;
     };
 
 export const INITIAL_STATE = {
@@ -52,15 +48,15 @@ export const INITIAL_STATE = {
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
-    tokenAddress: undefined as `0x${string}` | undefined,
+    tokenAddress: undefined as string | undefined,
     initialSupply: "0",
     isMintable: false,
-    minter: "" as `0x${string}` | undefined,
+    minter: "" as string | undefined,
     salt: undefined as `0x${string}` | undefined,
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
-  onDeployTxHash(txHash: `0x${string}`) {
+  onDeployTxHash(txHash: string) {
     logger.log("onDeployTxHash", txHash);
   },
 };
@@ -229,8 +225,8 @@ function useInterchainTokenDeploymentState(
       },
       resetMinter: () => {
         setState((draft) => {
-          draft.tokenDetails.minter = "" as `0x${string}`;
-          tokenDetailsForm.setValue("minter", "" as `0x${string}`);
+          draft.tokenDetails.minter = "" as string;
+          tokenDetailsForm.setValue("minter", "" as string);
         });
       },
     },

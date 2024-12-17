@@ -35,7 +35,7 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   remoteDeploymentGasFees?: EstimateGasFeeMultipleChainsOutput;
   initialSupply?: bigint;
   salt: `0x${string}`;
-  minterAddress?: `0x${string}`;
+  minterAddress?: string;
 }
 
 export interface UseDeployAndRegisterRemoteInterchainTokenConfig {

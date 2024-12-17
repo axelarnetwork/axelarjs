@@ -114,8 +114,7 @@ export const Step2: FC = () => {
             type: "deployed",
             suiTx: result,
             txHash: result.digest,
-            // TODO: get token address
-            tokenAddress: "0x",
+            tokenAddress: result.tokenAddress,
             // chainId: sourceChain.chain_id,
           });
           if (rootState.selectedChains.length > 0) {
