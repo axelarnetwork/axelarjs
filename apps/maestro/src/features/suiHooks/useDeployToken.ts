@@ -30,6 +30,7 @@ export type DeployTokenResult = SuiTransactionBlockResponse & {
   tokenManagerAddress: string;
   tokenAddress: string;
   tokenManagerType: "mint/burn" | "lock/unlock";
+  deploymentMessageId?: string;
 };
 
 type SuiObjectCreated =
@@ -66,14 +67,14 @@ export default function useTokenDeploy() {
 
   const { mutateAsync: getDeployTokenTxBytes } =
     trpc.sui.getDeployTokenTxBytes.useMutation({
-      onError(error) {
+      onError(error: Error) {
         console.log("error in usedeploytoken", error.message);
       },
     });
 
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
-      onError(error) {
+      onError(error: Error) {
         console.log("error in getSendTokenDeploymentTxBytes", error.message);
       },
     });
@@ -135,14 +136,16 @@ export default function useTokenDeploy() {
         metadataId: metadata.objectId,
         destinationChains: destinationChainIds,
       });
-      // const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
       const sendTokenResult = await signAndExecuteTransaction({
         transaction: sendTokenTxJSON as string,
         chain: "sui:testnet",
       });
+      const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
+      const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
       return {
         ...sendTokenResult,
+        deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId,
         tokenAddress,
         tokenManagerType,

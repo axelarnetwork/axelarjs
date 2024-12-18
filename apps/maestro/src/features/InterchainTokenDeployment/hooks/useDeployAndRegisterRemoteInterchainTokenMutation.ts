@@ -504,10 +504,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         const token: any = result?.events?.[0]?.parsedJson;
         setRecordDeploymentArgs({
           kind: "interchain",
-          deploymentMessageId: `${result?.digest}-${0}`,
+          deploymentMessageId: result.deploymentMessageId,
           tokenId: token.token_id?.id,
-          tokenAddress: result?.tokenAddress,
-          tokenManagerAddress: result?.tokenManagerAddress,
+          tokenAddress: result.tokenAddress,
+          tokenManagerAddress: result.tokenManagerAddress,
           deployerAddress,
           salt: input.salt,
           tokenName: input.tokenName,
