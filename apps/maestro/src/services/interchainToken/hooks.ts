@@ -1,7 +1,6 @@
 import { Maybe } from "@axelarjs/utils";
 
-import { getFullnodeUrl } from "@mysten/sui.js/client";
-import { SuiClient } from "@mysten/sui/client";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
@@ -25,7 +24,7 @@ export function useInterchainTokenDetailsQuery(input: {
 
 export async function useInterchainTokenBalanceForOwnerQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}`;
+  tokenAddress?: string;
   owner?: `0x${string}`;
 }) {
   // TODO: WIP
