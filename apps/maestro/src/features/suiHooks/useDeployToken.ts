@@ -116,10 +116,8 @@ export default function useTokenDeploy() {
       }
 
       const deploymentCreatedObjects = deployTokenResult.objectChanges.filter(
-        (objectChange: SuiObjectChange) =>
-          objectChange.type === "created" &&
-          !objectChange.objectType.includes("q::Q")
-      ); // exclude the template token that included with this package
+        (objectChange: SuiObjectChange) => objectChange.type === "created"
+      );
 
       const treasuryCap = findObjectByType(
         deploymentCreatedObjects,
@@ -132,6 +130,22 @@ export default function useTokenDeploy() {
 
       if (!tokenAddress) {
         throw new Error("Failed to deploy token");
+      }
+
+      // Mint tokens before registering, as the treasury cap will be transferred to the ITS contract
+      if (treasuryCap) {
+        const mintTxJSON = await getMintTx({
+          sender: currentAccount.address,
+          tokenTreasuryCap: treasuryCap?.objectId,
+          amount: initialSupply,
+          tokenPackageId: tokenAddress,
+          symbol,
+        });
+        const mintTx = Transaction.from(mintTxJSON);
+        await signAndExecuteTransaction({
+          transaction: mintTx,
+          chain: "sui:testnet", //TODO: make this dynamic
+        });
       }
 
       // if treasury cap is null then it is lock/unlock, otherwise it is mint/burn
@@ -150,22 +164,14 @@ export default function useTokenDeploy() {
         chain: "sui:testnet", //TODO: make this dynamic
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
-
-      // Mint tokens
-      if (treasuryCap) {
-        const mintTxJSON = await getMintTx({
-          sender: currentAccount.address,
-          tokenTreasuryCap: treasuryCap?.objectId,
-          amount: initialSupply,
-          tokenPackageId: tokenAddress,
-          symbol,
-        });
-        const mintTx = Transaction.from(mintTxJSON);
-        await signAndExecuteTransaction({
-          transaction: mintTx,
-          chain: "sui:testnet",
-        });
-      }
+      // find treasury cap in the sendTokenResult
+      const sendTokenObjects = sendTokenResult?.objectChanges;
+      console.log("sendTokenObjects", sendTokenObjects);
+      const treasuryCapSendTokenResult = findObjectByType(
+        sendTokenObjects,
+        "TreasuryCap"
+      );
+      console.log("treasuryCapSendTokenResult", treasuryCapSendTokenResult);
 
       return {
         ...sendTokenResult,
