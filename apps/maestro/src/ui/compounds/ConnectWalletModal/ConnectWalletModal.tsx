@@ -43,7 +43,8 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
           <ConnectModal
             trigger={
               <Button
-                $variant="primary"
+                $size={$size}
+                $variant={$variant}
                 className="w-full"
                 aria-label="Open wallet connection modal for SUI chains"
               >
