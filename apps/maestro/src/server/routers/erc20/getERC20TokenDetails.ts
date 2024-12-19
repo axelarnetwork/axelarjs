@@ -6,7 +6,6 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
-import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 //TODO: migrate to kv store?
@@ -20,13 +19,12 @@ export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex40Literal(),
+      tokenAddress: z.string(),
     })
   )
   .query(async ({ input, ctx }) => {
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
-
       const chainConfig = chainConfigs.find(
         (chain) => chain.id === input.chainId
       );

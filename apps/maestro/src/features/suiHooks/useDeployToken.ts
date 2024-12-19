@@ -11,14 +11,19 @@ import { fromHex } from "@mysten/sui/utils";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
-const findCoinDataObject = (registerTokenResult: any) => {
-  return registerTokenResult.objectChanges.find(
-    (change: SuiObjectChange) =>
-      change.type === "created" && change.objectType.includes("coin_data")
-  ).objectId;
+const findCoinDataObject = (
+  registerTokenResult: SuiTransactionBlockResponse
+) => {
+  return (
+    registerTokenResult?.objectChanges?.find(
+      (change) =>
+        change.type === "created" && change.objectType.includes("coin_data")
+    ) as SuiObjectCreated
+  )?.objectId;
 };
 
 export type DeployTokenParams = {
+  initialSupply: bigint;
   symbol: string;
   name: string;
   decimals: number;
@@ -72,6 +77,12 @@ export default function useTokenDeploy() {
       },
     });
 
+  const { mutateAsync: getMintTx } = trpc.sui.getMintTx.useMutation({
+    onError(error) {
+      console.log("error in getMintTx", error.message);
+    },
+  });
+
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
       onError(error) {
@@ -80,6 +91,7 @@ export default function useTokenDeploy() {
     });
 
   const deployToken = async ({
+    initialSupply,
     symbol,
     name,
     decimals,
@@ -136,14 +148,37 @@ export default function useTokenDeploy() {
         metadataId: metadata.objectId,
         destinationChains: destinationChainIds,
       });
+
+      if (!sendTokenTxJSON) {
+        throw new Error(
+          "Failed to get register and send token deployment tx bytes"
+        );
+      }
+
       const sendTokenResult = await signAndExecuteTransaction({
-        transaction: sendTokenTxJSON as string,
-        chain: "sui:testnet",
+        transaction: sendTokenTxJSON,
+        chain: "sui:testnet", //TODO: make this dynamic
       });
       // TODO:: handle txIndex properly
       const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
+
+      // Mint tokens
+      if (treasuryCap) {
+        const mintTxJSON = await getMintTx({
+          sender: currentAccount.address,
+          tokenTreasuryCap: treasuryCap?.objectId,
+          amount: initialSupply,
+          tokenPackageId: tokenAddress,
+          symbol,
+        });
+        await signAndExecuteTransaction({
+          transaction: mintTxJSON,
+          chain: "sui:testnet",
+        });
+      }
+
       return {
         ...sendTokenResult,
         deploymentMessageId,

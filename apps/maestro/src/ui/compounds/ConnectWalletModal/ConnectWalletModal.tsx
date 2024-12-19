@@ -6,7 +6,15 @@ import { ConnectModal } from "@mysten/dapp-kit";
 import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
 
 const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, ...props }, ref) => {
+  (
+    {
+      $size = "md",
+      $variant = "primary",
+      children = "Connect Wallet",
+      ...props
+    },
+    ref
+  ) => {
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     return (
       <Modal
@@ -18,7 +26,7 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
         }}
         trigger={
           <Button
-            $variant="primary"
+            $variant={$variant}
             {...props}
             ref={ref}
             aria-label="Open wallet connection modal"
@@ -31,7 +39,7 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
           <span>Select Chain Type</span>
         </Modal.Title>
         <Modal.Body className="flex flex-col gap-4">
-          <ConnectWalletButton $size="md">EVM Chains</ConnectWalletButton>
+          <ConnectWalletButton $size={$size}>EVM Chains</ConnectWalletButton>
           <ConnectModal
             trigger={
               <Button
@@ -51,9 +59,4 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
 
 ConnectWalletModal.displayName = "ConnectWalletButton";
 
-ConnectWalletModal.defaultProps = {
-  $size: "md",
-  $variant: "primary",
-  children: "Connect Wallet",
-};
 export default ConnectWalletModal;
