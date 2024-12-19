@@ -60,7 +60,7 @@ export type InterchainTokenDetailsPageState = {
 };
 
 export function persistTokenDeploymentTxHash(
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   chainId: number,
   deployTokensTxHash: string,
   selectedChainIds: number[]

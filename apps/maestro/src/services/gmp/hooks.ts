@@ -9,7 +9,7 @@ import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}`;
+  tokenAddress?: string;
   strict?: boolean;
 }) {
   const { computed, ...evmChainsQuery } = useEVMChainConfigsQuery();
