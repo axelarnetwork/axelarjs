@@ -26,7 +26,7 @@ export interface UseDeployAndRegisterCanonicalTokenInput {
   sourceChainId: string;
   tokenName: string;
   tokenSymbol: string;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   decimals: number;
   destinationChainIds: string[];
   remoteDeploymentGasFees: bigint[];
@@ -93,7 +93,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
-        tokenAddress: input.tokenAddress,
+        tokenAddress: input.tokenAddress as `0x${string}`,
       });
 
     if (!input.destinationChainIds.length) {
@@ -106,7 +106,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
       const args = {
         originalChain: originalChainName,
-        originalTokenAddress: input.tokenAddress,
+        originalTokenAddress: input.tokenAddress as `0x${string}`,
         destinationChain,
         gasValue,
       };

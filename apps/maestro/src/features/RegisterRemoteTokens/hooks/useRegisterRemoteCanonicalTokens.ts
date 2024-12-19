@@ -16,7 +16,7 @@ import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
   deployerAddress: `0x${string}`;
 };

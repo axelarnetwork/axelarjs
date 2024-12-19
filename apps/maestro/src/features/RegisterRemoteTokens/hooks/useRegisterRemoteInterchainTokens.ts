@@ -18,7 +18,7 @@ import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks
 
 export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
 };
 

@@ -6,7 +6,7 @@ import { trpc } from "~/lib/trpc";
 
 export function useInterchainTokenDetailsQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}` | null;
+  tokenAddress?: string | null;
 }) {
   return trpc.interchainToken.getInterchainTokenDetails.useQuery(
     {

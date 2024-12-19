@@ -19,7 +19,7 @@ export type DeployAndRegisterTransactionState =
   | {
       type: "deployed";
       txHash: string;
-      tokenAddress: `0x${string}`;
+      tokenAddress: string;
     };
 
 export const INITIAL_STATE = {
@@ -28,7 +28,7 @@ export const INITIAL_STATE = {
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
-    tokenAddress: "0x" as `0x${string}`,
+    tokenAddress: "0x",
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],

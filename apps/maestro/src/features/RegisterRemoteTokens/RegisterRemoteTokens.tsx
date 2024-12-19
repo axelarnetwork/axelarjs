@@ -20,7 +20,7 @@ import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonical
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
 export type RegisterRemoteTokensProps = {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   chainIds: number[];
   originChainId?: number;
   originChain?: EVMChainConfig;
