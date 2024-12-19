@@ -140,6 +140,7 @@ export default function useTokenDeploy() {
         transaction: sendTokenTxJSON as string,
         chain: "sui:testnet",
       });
+      // TODO:: handle txIndex properly
       const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
