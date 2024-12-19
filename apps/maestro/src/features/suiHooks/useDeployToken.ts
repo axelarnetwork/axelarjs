@@ -91,7 +91,6 @@ export default function useTokenDeploy() {
     destinationChainIds,
     skipRegister = false,
   }: DeployTokenParams) => {
-    console.log("deployToken", symbol, name, decimals, destinationChainIds);
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
@@ -148,9 +147,6 @@ export default function useTokenDeploy() {
         });
       }
 
-      // if treasury cap is null then it is lock/unlock, otherwise it is mint/burn
-      const tokenManagerType = treasuryCap ? "mint/burn" : "lock/unlock";
-
       const sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
         sender: currentAccount.address,
         symbol,
@@ -164,14 +160,16 @@ export default function useTokenDeploy() {
         chain: "sui:testnet", //TODO: make this dynamic
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
-      // find treasury cap in the sendTokenResult
+
+      // find treasury cap in the sendTokenResult to determine the token manager type
       const sendTokenObjects = sendTokenResult?.objectChanges;
-      console.log("sendTokenObjects", sendTokenObjects);
       const treasuryCapSendTokenResult = findObjectByType(
-        sendTokenObjects,
+        sendTokenObjects as SuiObjectChange[],
         "TreasuryCap"
       );
-      console.log("treasuryCapSendTokenResult", treasuryCapSendTokenResult);
+      const tokenManagerType = treasuryCapSendTokenResult
+        ? "mint/burn"
+        : "lock/unlock";
 
       return {
         ...sendTokenResult,
