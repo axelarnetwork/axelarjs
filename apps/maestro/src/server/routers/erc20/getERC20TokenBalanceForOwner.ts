@@ -77,6 +77,9 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       };
       return result;
     }
+    // This is for ERC20 tokens
+    const balanceOwner = input.owner as `0x${string}`;
+    const tokenAddress = input.tokenAddress as `0x${string}`;
 
     const chainConfig = ctx.configs.wagmiChainConfigs.find(
       (chain) => chain.id === input.chainId
@@ -96,7 +99,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       );
 
       const [tokenBalance, decimals, owner, pendingOwner] = await Promise.all([
-        client.reads.balanceOf({ account: input.owner }),
+        client.reads.balanceOf({ account: balanceOwner }),
         client.reads.decimals(),
         client.reads.owner().catch(always(null)),
         client.reads.pendingOwner().catch(always(null)),
@@ -104,7 +107,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
 
       const itClient = ctx.contracts.createInterchainTokenClient(
         chainConfig,
-        input.tokenAddress
+        tokenAddress
       );
 
       const [
@@ -115,31 +118,31 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       ] = await Promise.all(
         [
           itClient.reads.isMinter({
-            addr: input.owner,
+            addr: balanceOwner,
           }),
           itClient.reads.hasRole({
             role: getRoleIndex("MINTER"),
-            account: input.owner,
+            account: balanceOwner,
           }),
           itClient.reads.hasRole({
             role: getRoleIndex("OPERATOR"),
-            account: input.owner,
+            account: balanceOwner,
           }),
           itClient.reads.hasRole({
             role: getRoleIndex("FLOW_LIMITER"),
-            account: input.owner,
+            account: balanceOwner,
           }),
         ].map((p) => p.catch(always(false)))
       );
 
-      const isTokenOwner = owner === input.owner;
+      const isTokenOwner = owner === balanceOwner;
 
       return {
         isTokenOwner,
         isTokenMinter,
         tokenBalance: tokenBalance.toString(),
         decimals,
-        isTokenPendingOwner: pendingOwner === input.owner,
+        isTokenPendingOwner: pendingOwner === balanceOwner,
         hasPendingOwner: pendingOwner !== null,
         hasMinterRole,
         hasOperatorRole,
