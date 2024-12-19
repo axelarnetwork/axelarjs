@@ -35,17 +35,17 @@ import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletM
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
-  tokenId?: `0x${string}` | null;
+  tokenId?: string | null;
   deploymentMessageId: string | undefined;
 };
 
 type InterchainTokenDetailsPageSessionStorageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
 };
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (

@@ -67,14 +67,14 @@ export default function useTokenDeploy() {
 
   const { mutateAsync: getDeployTokenTxBytes } =
     trpc.sui.getDeployTokenTxBytes.useMutation({
-      onError(error: Error) {
+      onError(error) {
         console.log("error in usedeploytoken", error.message);
       },
     });
 
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
-      onError(error: Error) {
+      onError(error) {
         console.log("error in getSendTokenDeploymentTxBytes", error.message);
       },
     });
