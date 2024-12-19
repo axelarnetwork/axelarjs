@@ -46,16 +46,23 @@ async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
   });
   const tokenOwner = transactionDetails.transaction?.data.sender;
 
+  if (!metadata) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Token metadata not found for ${tokenAddress} on chain ${chainId}`,
+    });
+  }
+
   return {
-    name: metadata?.name,
-    decimals: metadata?.decimals,
+    name: metadata.name,
+    decimals: metadata.decimals,
     owner: tokenOwner,
     pendingOwner: null,
     chainId: chainId,
     chainName: "Sui",
     axelarChainId: "sui",
     axelarChainName: "sui",
-    symbol: metadata?.symbol,
+    symbol: metadata.symbol,
   };
 }
 
