@@ -273,10 +273,10 @@ async function getInterchainToken(
  */
 async function scanChains(
   chainConfigs: ExtendedWagmiChainConfig[],
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   ctx: Context
 ) {
-  const promises = chainConfigs.map((chainConfig) => {
+  const promises = chainConfigs.map(async (chainConfig) => {
     return getTokenDetails(chainConfig, tokenAddress, ctx)
       .then((tokenDetails) => {
         if (tokenDetails) {
@@ -307,7 +307,7 @@ async function scanChains(
 
 async function getTokenDetails(
   chainConfig: ExtendedWagmiChainConfig,
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   ctx: Context
 ) {
   const tokenDetails =

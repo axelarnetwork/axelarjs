@@ -137,7 +137,7 @@ export const Step3: FC = () => {
   );
 
   const eligibleChains = useMemo(
-    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
+    () => state.evmChains.filter((chain) => chain.chain_id !== chainId),
     [state.evmChains, chainId]
   );
 

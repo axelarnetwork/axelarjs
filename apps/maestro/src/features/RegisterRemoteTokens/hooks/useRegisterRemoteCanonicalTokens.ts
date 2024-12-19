@@ -16,7 +16,7 @@ import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
   deployerAddress: `0x${string}`;
 };
@@ -66,7 +66,7 @@ export default function useRegisterRemoteCanonicalTokens(
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
           originalChain: sourceChain?.chain_name ?? "0x",
-          originalTokenAddress: tokenDetails.tokenAddress,
+          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
           destinationChain: axelarChainId,
           gasValue,
         }

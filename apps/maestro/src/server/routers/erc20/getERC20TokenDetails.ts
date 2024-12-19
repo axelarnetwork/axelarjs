@@ -10,7 +10,7 @@ import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
 import { publicProcedure } from "~/server/trpc";
 
 //TODO: migrate to kv store?
-const overrides: Record<`0x${string}`, Record<string, string>> = {
+const overrides: Record<string, Record<string, string>> = {
   "0x4200000000000000000000000000000000000042": {
     symbol: "axlOP",
   },
@@ -49,7 +49,7 @@ export const getERC20TokenDetails = publicProcedure
       );
 
       if (!chainConfig) {
-        const promises = chainConfigs.map((config) => {
+        const promises = chainConfigs.map(async (config) => {
           const client = ctx.contracts.createERC20Client(
             config,
             input.tokenAddress
@@ -114,7 +114,7 @@ export const getERC20TokenDetails = publicProcedure
 async function getTokenPublicDetails(
   client: IERC20BurnableMintableClient,
   chainConfig: ExtendedWagmiChainConfig,
-  tokenAddress: `0x${string}`
+  tokenAddress: string
 ) {
   invariant(client.chain, "client.chain must be defined");
 

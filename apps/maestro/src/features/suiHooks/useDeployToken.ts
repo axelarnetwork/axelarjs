@@ -31,6 +31,13 @@ export type DeployTokenParams = {
   skipRegister?: boolean;
 };
 
+export type DeployTokenResult = SuiTransactionBlockResponse & {
+  tokenManagerAddress: string;
+  tokenAddress: string;
+  tokenManagerType: "mint/burn" | "lock/unlock";
+  deploymentMessageId?: string;
+};
+
 type SuiObjectCreated =
   | Extract<SuiObjectChange, { type: "created" }>
   | undefined;
@@ -90,7 +97,7 @@ export default function useTokenDeploy() {
     decimals,
     destinationChainIds,
     skipRegister = false,
-  }: DeployTokenParams) => {
+  }: DeployTokenParams): Promise<DeployTokenResult> => {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
@@ -106,7 +113,7 @@ export default function useTokenDeploy() {
       // First step, deploy the token
       const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
-        transaction: deployTokenTx,
+        transaction: await deployTokenTx.toJSON(),
         chain: "sui:testnet",
       });
 
@@ -132,7 +139,16 @@ export default function useTokenDeploy() {
       }
 
       // Mint tokens before registering, as the treasury cap will be transferred to the ITS contract
+      // TODO: should merge this with above to avoid multiple transactions.
+      // we can do this once we know whether the token is mint/burn or lock/unlock
       if (treasuryCap) {
+        console.log("DATA", {
+          sender: currentAccount.address,
+          tokenTreasuryCap: treasuryCap?.objectId,
+          amount: initialSupply,
+          tokenPackageId: tokenAddress,
+          symbol,
+        });
         const mintTxJSON = await getMintTx({
           sender: currentAccount.address,
           tokenTreasuryCap: treasuryCap?.objectId,
@@ -154,9 +170,15 @@ export default function useTokenDeploy() {
         metadataId: metadata.objectId,
         destinationChains: destinationChainIds,
       });
-      const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
+
+      if (!sendTokenTxJSON) {
+        throw new Error(
+          "Failed to get register and send token deployment tx bytes"
+        );
+      }
+
       const sendTokenResult = await signAndExecuteTransaction({
-        transaction: sendTokenTx,
+        transaction: sendTokenTxJSON,
         chain: "sui:testnet", //TODO: make this dynamic
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
@@ -170,9 +192,16 @@ export default function useTokenDeploy() {
       const tokenManagerType = treasuryCapSendTokenResult
         ? "mint/burn"
         : "lock/unlock";
+      // TODO:: handle txIndex properly
+      const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
+      const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
 
+      if (!coinManagementObjectId) {
+        throw new Error("Failed to find coin management object id");
+      }
       return {
         ...sendTokenResult,
+        deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId,
         tokenAddress,
         tokenManagerType,

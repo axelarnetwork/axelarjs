@@ -222,7 +222,7 @@ export const ShareHaikuButton: FC<{
   originChainName: string;
   additionalChainNames: string[];
   originAxelarChainId: string;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   haikuType: "deployment" | "send";
 }> = (props) => {
   const { mutateAsync, isPending, isSuccess } =

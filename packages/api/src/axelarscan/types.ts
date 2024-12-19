@@ -36,7 +36,7 @@ export type EVMChainConfig = {
   chain_id: number;
   chain_name: string;
   maintainer_id: string;
-  deprecated: boolean;
+  deprecated?: boolean;
   endpoints: {
     rpc: string[];
   };
@@ -59,22 +59,20 @@ export type EVMChainConfig = {
     transaction_path: string;
   };
   id: string;
-  chain_type: "evm";
-  provider_params: [
-    {
-      chainId: string;
-      chainName: string;
-      rpcUrls: string[];
-      nativeCurrency: {
-        name: string;
-        symbol: string;
-        decimals: number;
-      };
-      blockExplorerUrls: string[];
-    },
-  ];
+  chain_type: string;
+  provider_params: {
+    chainId: string;
+    chainName: string;
+    rpcUrls: string[];
+    nativeCurrency: {
+      name: string;
+      symbol: string;
+      decimals: number;
+    };
+    blockExplorerUrls: string[];
+  }[];
   no_inflation: boolean;
-  no_tvl: boolean;
+  no_tvl?: boolean;
 };
 
 export type CosmosChainConfig = {

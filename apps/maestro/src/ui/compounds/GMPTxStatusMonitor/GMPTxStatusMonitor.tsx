@@ -42,10 +42,10 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
-export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
+export function useGMPTxProgress(txHash: string, chainId: number) {
   const { computed } = useEVMChainConfigsQuery();
   const { data: txInfo } = useTransaction({
-    hash: txHash,
+    hash: txHash as `0x${string}`,
     chainId,
   });
 
@@ -95,11 +95,11 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
 }
 
 type Props = {
-  txHash: `0x${string}`;
+  txHash: string;
   onAllChainsExecuted?: () => void;
 };
 
-const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
+const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
   txHash,
   chainId,
 }) => {
@@ -203,7 +203,7 @@ export default GMPTxStatusMonitor;
 
 export type ChainStatusItemProps = {
   status: ExtendedGMPTxStatus;
-  txHash: `0x${string}`;
+  txHash: string;
   logIndex: number;
   chain: EVMChainConfig;
   className?: string;
@@ -308,7 +308,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
 };
 
 export type StatusIndicatorProps = {
-  txHash: `0x${string}` | `0x${string}:${number}`;
+  txHash: string;
   status: ExtendedGMPTxStatus;
 };
 

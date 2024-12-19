@@ -35,17 +35,17 @@ import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletM
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
-  tokenId?: `0x${string}` | null;
+  tokenId?: string | null;
   deploymentMessageId: string | undefined;
 };
 
 type InterchainTokenDetailsPageSessionStorageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
 };
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (
@@ -55,14 +55,14 @@ export const getInterchainTokenDetailsPageSessionStorageKey = (
   `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
 
 export type InterchainTokenDetailsPageState = {
-  deployTokensTxHashes: `0x${string}`[];
+  deployTokensTxHashes: string[];
   selectedChainIds: number[];
 };
 
 export function persistTokenDeploymentTxHash(
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   chainId: number,
-  deployTokensTxHash: `0x${string}`,
+  deployTokensTxHash: string,
   selectedChainIds: number[]
 ) {
   const key = getInterchainTokenDetailsPageSessionStorageKey({

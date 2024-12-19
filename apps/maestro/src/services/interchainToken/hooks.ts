@@ -4,7 +4,7 @@ import { trpc } from "~/lib/trpc";
 
 export function useInterchainTokenDetailsQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}` | null;
+  tokenAddress?: string | null;
 }) {
   return trpc.interchainToken.getInterchainTokenDetails.useQuery(
     {
@@ -21,8 +21,8 @@ export function useInterchainTokenDetailsQuery(input: {
 
 export function useInterchainTokenBalanceForOwnerQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}`;
-  owner?: `0x${string}`;
+  tokenAddress?: string;
+  owner?: string;
 }) {
   return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
     {
