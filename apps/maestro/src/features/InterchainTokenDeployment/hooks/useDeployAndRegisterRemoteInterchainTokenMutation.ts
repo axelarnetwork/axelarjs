@@ -501,7 +501,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
       });
-      if (result?.digest) {
+      if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
         setRecordDeploymentArgs({
           kind: "interchain",
