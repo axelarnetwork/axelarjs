@@ -29,7 +29,7 @@ const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_TRANSFER: "Interchain Transfer",
 } as const;
 
-function useGroupedStatuses(txHash: `0x${string}`) {
+function useGroupedStatuses(txHash: string) {
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash,
   });
@@ -61,10 +61,10 @@ function useGroupedStatuses(txHash: `0x${string}`) {
 }
 
 type ToastElementProps = {
-  txHash: `0x${string}`;
+  txHash: string;
   chainId: number;
   txType: TxType;
-  onRemoveTx?: (txHash: `0x${string}`) => void;
+  onRemoveTx?: (txHash: string) => void;
 };
 
 const ToastElement: FC<ToastElementProps> = ({
@@ -184,7 +184,7 @@ const ToastElement: FC<ToastElementProps> = ({
 };
 
 type GMPTxStatusProps = {
-  txHash: `0x${string}`;
+  txHash: string;
   chainId: number;
   txType: keyof typeof TX_LABEL_MAP;
 };

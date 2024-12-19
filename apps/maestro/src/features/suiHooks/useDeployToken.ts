@@ -1,11 +1,12 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import {
   getFullnodeUrl,
+  SuiClient,
+  SuiObjectChange,
   type SuiTransactionBlockResponse,
-} from "@mysten/sui.js/client";
-import { fromHEX } from "@mysten/sui.js/utils";
-import { SuiClient, SuiObjectChange } from "@mysten/sui/client";
+} from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
+import { fromHex } from "@mysten/sui/utils";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
@@ -28,6 +29,13 @@ export type DeployTokenParams = {
   decimals: number;
   destinationChainIds: string[];
   skipRegister?: boolean;
+};
+
+export type DeployTokenResult = SuiTransactionBlockResponse & {
+  tokenManagerAddress: string;
+  tokenAddress: string;
+  tokenManagerType: "mint/burn" | "lock/unlock";
+  deploymentMessageId?: string;
 };
 
 type SuiObjectCreated =
@@ -89,8 +97,7 @@ export default function useTokenDeploy() {
     decimals,
     destinationChainIds,
     skipRegister = false,
-  }: DeployTokenParams) => {
-    console.log("deployToken", symbol, name, decimals, destinationChainIds);
+  }: DeployTokenParams): Promise<DeployTokenResult> => {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
@@ -104,9 +111,9 @@ export default function useTokenDeploy() {
         walletAddress: currentAccount.address,
       });
       // First step, deploy the token
-      const deployTokenTx = Transaction.from(fromHEX(deployTokenTxBytes));
+      const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
-        transaction: deployTokenTx,
+        transaction: await deployTokenTx.toJSON(),
         chain: "sui:testnet",
       });
 
@@ -115,10 +122,8 @@ export default function useTokenDeploy() {
       }
 
       const deploymentCreatedObjects = deployTokenResult.objectChanges.filter(
-        (objectChange: SuiObjectChange) =>
-          objectChange.type === "created" &&
-          !objectChange.objectType.includes("q::Q")
-      ); // exclude the template token that included with this package
+        (objectChange: SuiObjectChange) => objectChange.type === "created"
+      );
 
       const treasuryCap = findObjectByType(
         deploymentCreatedObjects,
@@ -143,16 +148,29 @@ export default function useTokenDeploy() {
         metadataId: metadata.objectId,
         destinationChains: destinationChainIds,
       });
-      const sendTokenTx = Transaction.from(sendTokenTxJSON as string);
+
+      if (!sendTokenTxJSON) {
+        throw new Error(
+          "Failed to get register and send token deployment tx bytes"
+        );
+      }
+
       const sendTokenResult = await signAndExecuteTransaction({
-        transaction: sendTokenTx,
+        transaction: sendTokenTxJSON,
         chain: "sui:testnet", //TODO: make this dynamic
       });
-      const coinManagementObjectId = findCoinDataObject(
-        sendTokenResult as SuiTransactionBlockResponse
-      );
+      // TODO:: handle txIndex properly
+      const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
+      const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
+      const coinManagementObjectId = findCoinDataObject(sendTokenResult);
+
+      if (!coinManagementObjectId) {
+        throw new Error("Failed to find coin management object id");
+      }
 
       // Mint tokens
+      // TODO: should merge this with above to avoid multiple transactions.
+      // we can do this once we know whether the token is mint/burn or lock/unlock
       if (treasuryCap) {
         const mintTxJSON = await getMintTx({
           sender: currentAccount.address,
@@ -161,15 +179,15 @@ export default function useTokenDeploy() {
           tokenPackageId: tokenAddress,
           symbol,
         });
-        const mintTx = Transaction.from(mintTxJSON as string);
         await signAndExecuteTransaction({
-          transaction: mintTx,
+          transaction: mintTxJSON,
           chain: "sui:testnet",
         });
       }
 
       return {
         ...sendTokenResult,
+        deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId,
         tokenAddress,
         tokenManagerType,

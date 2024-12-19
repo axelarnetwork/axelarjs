@@ -41,7 +41,7 @@ export type TokenDetailsSectionProps = {
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
   deploymentMessageId?: string | undefined;
-  tokenManagerAddress?: `0x${string}` | null;
+  tokenManagerAddress?: string | null;
   kind?: "canonical" | "interchain" | "custom";
   claimOwnershipFormLink?: string;
 };

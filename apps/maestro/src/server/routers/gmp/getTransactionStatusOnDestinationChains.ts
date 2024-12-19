@@ -3,7 +3,6 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 export const SEARCHGMP_SOURCE = {
@@ -37,7 +36,7 @@ export const SEARCHGMP_SOURCE = {
 };
 
 const INPUT_SCHEMA = z.object({
-  txHash: hex64Literal(),
+  txHash: z.string(),
 });
 
 /**
@@ -66,7 +65,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
           {} as {
             [chainId: string]: {
               status: GMPTxStatus;
-              txHash: `0x${string}`;
+              txHash: string;
               txId: string;
               logIndex: number;
             };

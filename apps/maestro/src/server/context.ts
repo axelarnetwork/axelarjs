@@ -95,8 +95,11 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       postgres: maestroPostgresClient,
     },
     contracts: {
-      createERC20Client(chain: Chain, address: `0x${string}`) {
-        return new IERC20BurnableMintableClient({ chain, address });
+      createERC20Client(chain: Chain, address: string) {
+        return new IERC20BurnableMintableClient({
+          chain,
+          address: address as `0x${string}`,
+        });
       },
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });

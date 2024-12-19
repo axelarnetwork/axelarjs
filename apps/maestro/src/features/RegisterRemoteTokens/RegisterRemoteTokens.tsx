@@ -20,7 +20,7 @@ import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonical
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
 export type RegisterRemoteTokensProps = {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   chainIds: number[];
   originChainId?: number;
   originChain?: EVMChainConfig;
@@ -79,12 +79,18 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
-    hash: txState.status === "submitted" ? txState.hash : undefined,
+    hash:
+      txState.status === "submitted"
+        ? (txState.hash as `0x${string}`)
+        : undefined,
   });
 
   const onSuiTxComplete = useCallback(async () => {
-    console.log("onSuiTxComplete", txState.suiTx);
-    const { digest, transactionIndex: txIndex } = txState.suiTx;
+    if (txState.status !== "submitted") return;
+    if (!txState.suiTx) return;
+
+    console.log("onSuiTxComplete", txState.hash);
+    const { digest } = txState.suiTx;
 
     const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
       ...remoteToken,
@@ -94,13 +100,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     await recordRemoteTokenDeployment({
       tokenAddress: props.tokenAddress,
       chainId: props.originChainId ?? -1,
-      deploymentMessageId: `${digest}-${txIndex}`,
+      // TODO: find event Txindex correctly
+      deploymentMessageId: `${digest}`,
       remoteTokens,
     });
     console.log("setTxState");
     setTxState({
       status: "confirmed",
-      receipt: txState.suiTx,
+      hash: digest,
+      suiTx: txState.suiTx,
     });
   }, [
     baseRemoteTokens,
@@ -108,19 +116,19 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     props.tokenAddress,
     recordRemoteTokenDeployment,
     setTxState,
-    txState.suiTx,
+    txState,
   ]);
 
   useEffect(
     () => {
-      console.log("useEffect", txState.suiTx);
-      if (!txState.suiTx) return;
-      onSuiTxComplete(receipt).catch((error) => {
+      if (txState.status !== "submitted") return;
+
+      onSuiTxComplete().catch((error) => {
         logger.error("Failed to record remote token deployment", error);
         toast.error("Failed to record remote token deployment");
       });
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [txState.suiTx]
+    [txState.status]
   );
 
   useEffect(

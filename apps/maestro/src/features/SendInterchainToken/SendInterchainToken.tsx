@@ -185,18 +185,30 @@ export const SendInterchainToken: FC<Props> = (props) => {
 
   useEffect(() => {
     console.log("ENTERING USEEFF suiTxDigest", suiTxDigest);
-    if (!suiTxDigest) return;
-    console.log(" past if state.txState.suiTx", state.txState.suiTx);
-    actions.trackTransaction({
-      status: "submitted",
-      hash: suiTxDigest as `0x${string}`,
-      // digest: suiTxDigest,
-      suiTx: state.txState.suiTx,
-      chainId: 103, //todo change
-      txType: "INTERCHAIN_TRANSFER",
-    });
-    void handleSuiTransactionComplete(state.txState.suiTx);
-  }, [actions, suiTxDigest]);
+    async function trackTransaction() {
+      if (state.txState.status !== "submitted") return;
+      if (!state.txState.suiTx) return;
+      if (!suiTxDigest) return;
+
+      actions.trackTransaction({
+        status: "submitted",
+        hash: suiTxDigest,
+        suiTx: state.txState.suiTx,
+        chainId: 103, //todo change
+        txType: "INTERCHAIN_TRANSFER",
+      });
+
+      console.log(" past if state.txState.suiTx", state.txState.suiTx);
+
+      await handleSuiTransactionComplete(state.txState.suiTx);
+    }
+
+    if (suiTxDigest && state.txState.status === "submitted") {
+      trackTransaction().catch((error) => {
+        logger.error("Failed to track transaction", error);
+      });
+    }
+  }, [actions, suiTxDigest, state.txState.status]);
 
   const handleAllChainsExecuted = useCallback(async () => {
     await actions.refetchBalances();

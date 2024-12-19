@@ -35,7 +35,7 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   remoteDeploymentGasFees?: EstimateGasFeeMultipleChainsOutput;
   initialSupply?: bigint;
   salt: `0x${string}`;
-  minterAddress?: `0x${string}`;
+  minterAddress?: string;
 }
 
 export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
@@ -278,7 +278,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         environment: NEXT_PUBLIC_NETWORK_ENV,
       },
     ],
-  };
+  } as const;
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -311,15 +311,17 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     });
   const { destinationChainNames } = useMemo(() => {
     const index = updatedComputed.indexedById;
-    const originalChainName =
-      index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
+    type IndexedChainId = keyof typeof index;
+    const originalChain =
+      index[(input?.sourceChainId ?? chainId) as IndexedChainId];
+    const originalChainName = originalChain?.chain_name ?? "Unknown";
 
     return {
       originalChainName,
       destinationChainNames:
         input?.destinationChainIds.map(
           (destinationChainId) =>
-            index[destinationChainId]?.chain_name ?? "Unknown"
+            index[destinationChainId as IndexedChainId]?.chain_name ?? "Unknown"
         ) ?? [],
     };
   }, [
@@ -334,8 +336,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [];
     }
 
+    const minter = input?.minterAddress ?? zeroAddress;
     const commonArgs = {
-      minter: input?.minterAddress ?? zeroAddress,
+      minter: minter as `0x${string}`,
       salt: input.salt,
     };
 
@@ -499,13 +502,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
       });
-      if (result?.digest) {
+      if (result?.digest && result.deploymentMessageId) {
+        const token: any = result?.events?.[0]?.parsedJson;
         setRecordDeploymentArgs({
           kind: "interchain",
-          deploymentMessageId: `${result?.digest}-${0}`,
-          tokenId: result?.events?.[0]?.parsedJson?.token_id?.id,
-          tokenAddress: result?.tokenAddress,
-          tokenManagerAddress: result?.tokenManagerAddress,
+          deploymentMessageId: result.deploymentMessageId,
+          tokenId: token.token_id?.id,
+          tokenAddress: result.tokenAddress,
+          tokenManagerAddress: result.tokenManagerAddress,
           deployerAddress,
           salt: input.salt,
           tokenName: input.tokenName,

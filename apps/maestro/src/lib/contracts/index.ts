@@ -18,14 +18,12 @@ export const contracts = [
   {
     name: INTERCHAIN_TOKEN_FACTORY_ABI.contractName,
     abi: INTERCHAIN_TOKEN_FACTORY_ABI.abi,
-    address: process.env
-      .NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS as `0x${string}`,
+    address: "0x6Ae8C8498d5FDA930e6ABeB0E15E5A00471702a7" as `0x${string}`, // read from .env.local (NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS)
   },
   {
     name: INTERCHAIN_TOKEN_SERVICE_ABI.contractName,
     abi: INTERCHAIN_TOKEN_SERVICE_ABI.abi,
-    address: process.env
-      .NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS as `0x${string}`,
+    address: "0x144c3d7A5f5198EF3B46A8258b35E903cf197A66" as `0x${string}`, // read from .env.local (NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS)
   },
   {
     name: TOKEN_MANAGER_ABI.contractName,

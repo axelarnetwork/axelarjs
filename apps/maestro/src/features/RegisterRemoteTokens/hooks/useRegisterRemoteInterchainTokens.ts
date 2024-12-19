@@ -18,7 +18,7 @@ import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks
 
 export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
 };
 
@@ -66,11 +66,13 @@ export default function useRegisterRemoteInterchainTokens(
     )
       return [];
 
+    const minter = tokenDeployment.originalMinterAddress ?? zeroAddress;
+
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
         originalChainName: sourceChain?.chain_name ?? "",
-        minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
+        minter: minter as `0x${string}`,
         destinationChain: chainId,
         gasValue: gasFeesData.gasFees[i].fee,
       })

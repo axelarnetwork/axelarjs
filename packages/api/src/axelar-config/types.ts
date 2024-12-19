@@ -32,7 +32,7 @@ export interface AssetConfig {
   };
 }
 
-export type CHAIN_TYPE = "axelarnet" | "evm";
+export type CHAIN_TYPE = "axelarnet" | "evm" | "sui";
 
 export interface ChainEvmSubconfig {
   contracts?: {
