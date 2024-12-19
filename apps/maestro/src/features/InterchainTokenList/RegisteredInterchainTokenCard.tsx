@@ -56,11 +56,13 @@ export type Props = TokenInfo & {
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
   const chainId = useChainId();
-  const { data: balance } = useInterchainTokenBalanceForOwnerQuery({
+  const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
   });
+  // TODO: remove any
+  const balance = (result as any).data.balance;
 
   const { explorerUrl, explorerName } = useMemo(() => {
     if (!props.tokenAddress || !props.chain) {
