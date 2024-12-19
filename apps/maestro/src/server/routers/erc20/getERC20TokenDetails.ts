@@ -16,7 +16,7 @@ const overrides: Record<string, Record<string, string>> = {
   },
 };
 
-async function getSuiTokenDetails(tokenAddress: string) {
+async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
   const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
 
   const modules = await client.getNormalizedMoveModulesByPackage({
@@ -27,7 +27,36 @@ async function getSuiTokenDetails(tokenAddress: string) {
   const coinType = `${tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
 
   const metadata = await client.getCoinMetadata({ coinType });
-  return metadata;
+
+  // Get the token owner
+  const object = await client.getObject({
+    id: tokenAddress,
+    options: {
+      showOwner: true,
+      showPreviousTransaction: true,
+    },
+  });
+
+  const previousTx = object?.data?.previousTransaction;
+
+  // Fetch the transaction details to find the sender
+  const transactionDetails = await client.getTransactionBlock({
+    digest: previousTx as string,
+    options: { showInput: true, showEffects: true },
+  });
+  const tokenOwner = transactionDetails.transaction?.data.sender;
+
+  return {
+    name: metadata?.name,
+    decimals: metadata?.decimals,
+    owner: tokenOwner,
+    pendingOwner: null,
+    chainId: chainId,
+    chainName: "Sui",
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    symbol: metadata?.symbol,
+  };
 }
 
 export const getERC20TokenDetails = publicProcedure
@@ -40,7 +69,10 @@ export const getERC20TokenDetails = publicProcedure
   .query(async ({ input, ctx }) => {
     // Enter here if the token is a Sui token
     if (input.tokenAddress.length === 66) {
-      return await getSuiTokenDetails(input.tokenAddress);
+      return await getSuiTokenDetails(
+        input.tokenAddress,
+        input.chainId as number
+      );
     }
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
