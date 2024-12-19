@@ -1,8 +1,5 @@
 import { Maybe } from "@axelarjs/utils";
 
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
-import { isAddress } from "viem";
-
 import { trpc } from "~/lib/trpc";
 
 export function useInterchainTokenDetailsQuery(input: {
@@ -22,21 +19,11 @@ export function useInterchainTokenDetailsQuery(input: {
   );
 }
 
-export async function useInterchainTokenBalanceForOwnerQuery(input: {
+export function useInterchainTokenBalanceForOwnerQuery(input: {
   chainId?: number;
   tokenAddress?: string;
-  owner?: `0x${string}`;
+  owner?: string;
 }) {
-  // TODO: WIP
-  if (input.chainId === 103) {
-    const coinType = `${input.tokenAddress}::sui::SUI`;
-    const client = new SuiClient({ url: getFullnodeUrl("testnet") });
-    const coins = await client.getCoins({
-      owner: input.owner as string,
-      coinType,
-    });
-    return coins;
-  }
   return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),
@@ -46,8 +33,6 @@ export async function useInterchainTokenBalanceForOwnerQuery(input: {
     {
       enabled:
         Boolean(input.chainId) &&
-        isAddress(input.tokenAddress ?? "") &&
-        isAddress(input.owner ?? "") &&
         parseInt(String(input.tokenAddress), 16) !== 0,
     }
   );

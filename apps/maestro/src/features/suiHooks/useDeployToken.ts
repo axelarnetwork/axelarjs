@@ -138,8 +138,22 @@ export default function useTokenDeploy() {
         throw new Error("Failed to deploy token");
       }
 
-      // if treasury cap is null then it is lock/unlock, otherwise it is mint/burn
-      const tokenManagerType = treasuryCap ? "mint/burn" : "lock/unlock";
+      // Mint tokens before registering, as the treasury cap will be transferred to the ITS contract
+      // TODO: should merge this with above to avoid multiple transactions.
+      // we can do this once we know whether the token is mint/burn or lock/unlock
+      if (treasuryCap) {
+        const mintTxJSON = await getMintTx({
+          sender: currentAccount.address,
+          tokenTreasuryCap: treasuryCap?.objectId,
+          amount: initialSupply,
+          tokenPackageId: tokenAddress,
+          symbol,
+        });
+        await signAndExecuteTransaction({
+          transaction: mintTxJSON,
+          chain: "sui:testnet", //TODO: make this dynamic
+        });
+      }
 
       const sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
         sender: currentAccount.address,
@@ -159,32 +173,24 @@ export default function useTokenDeploy() {
         transaction: sendTokenTxJSON,
         chain: "sui:testnet", //TODO: make this dynamic
       });
+      const coinManagementObjectId = findCoinDataObject(sendTokenResult);
+
+      // find treasury cap in the sendTokenResult to determine the token manager type
+      const sendTokenObjects = sendTokenResult?.objectChanges;
+      const treasuryCapSendTokenResult = findObjectByType(
+        sendTokenObjects as SuiObjectChange[],
+        "TreasuryCap"
+      );
+      const tokenManagerType = treasuryCapSendTokenResult
+        ? "mint/burn"
+        : "lock/unlock";
       // TODO:: handle txIndex properly
       const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
-      const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
       if (!coinManagementObjectId) {
         throw new Error("Failed to find coin management object id");
       }
-
-      // Mint tokens
-      // TODO: should merge this with above to avoid multiple transactions.
-      // we can do this once we know whether the token is mint/burn or lock/unlock
-      if (treasuryCap) {
-        const mintTxJSON = await getMintTx({
-          sender: currentAccount.address,
-          tokenTreasuryCap: treasuryCap?.objectId,
-          amount: initialSupply,
-          tokenPackageId: tokenAddress,
-          symbol,
-        });
-        await signAndExecuteTransaction({
-          transaction: mintTxJSON,
-          chain: "sui:testnet",
-        });
-      }
-
       return {
         ...sendTokenResult,
         deploymentMessageId,

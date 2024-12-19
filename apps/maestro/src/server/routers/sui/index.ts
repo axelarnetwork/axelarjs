@@ -185,7 +185,7 @@ export const suiRouter = router({
       const [coin] = await txBuilder.moveCall({
         target: `${SUI_PACKAGE_ID}::coin::mint`,
         typeArguments: [tokenType],
-        arguments: [tokenTreasuryCap, txBuilder.tx.pure.u64(amount)],
+        arguments: [tokenTreasuryCap, amount.toString()],
       });
       txBuilder.tx.transferObjects([coin], txBuilder.tx.pure.address(sender));
 

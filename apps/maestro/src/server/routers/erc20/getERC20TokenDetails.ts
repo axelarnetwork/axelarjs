@@ -1,6 +1,7 @@
 import type { IERC20BurnableMintableClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
@@ -15,6 +16,56 @@ const overrides: Record<string, Record<string, string>> = {
   },
 };
 
+async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
+  const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
+
+  const modules = await client.getNormalizedMoveModulesByPackage({
+    package: tokenAddress,
+  });
+  const coinSymbol = Object.keys(modules)[0];
+
+  const coinType = `${tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
+
+  const metadata = await client.getCoinMetadata({ coinType });
+
+  // Get the token owner
+  const object = await client.getObject({
+    id: tokenAddress,
+    options: {
+      showOwner: true,
+      showPreviousTransaction: true,
+    },
+  });
+
+  const previousTx = object?.data?.previousTransaction;
+
+  // Fetch the transaction details to find the sender
+  const transactionDetails = await client.getTransactionBlock({
+    digest: previousTx as string,
+    options: { showInput: true, showEffects: true },
+  });
+  const tokenOwner = transactionDetails.transaction?.data.sender;
+
+  if (!metadata) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Token metadata not found for ${tokenAddress} on chain ${chainId}`,
+    });
+  }
+
+  return {
+    name: metadata.name,
+    decimals: metadata.decimals,
+    owner: tokenOwner,
+    pendingOwner: null,
+    chainId: chainId,
+    chainName: "Sui",
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    symbol: metadata.symbol,
+  };
+}
+
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
@@ -23,6 +74,13 @@ export const getERC20TokenDetails = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
+    // Enter here if the token is a Sui token
+    if (input.tokenAddress.length === 66) {
+      return await getSuiTokenDetails(
+        input.tokenAddress,
+        input.chainId as number
+      );
+    }
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
       const chainConfig = chainConfigs.find(
