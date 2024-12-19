@@ -115,6 +115,7 @@ export const suiRouter = router({
           return undefined;
         }
 
+        // TODO: handle register type properly, whether it's mint/burn or lock/unlock.
         await txBuilder.moveCall({
           target: `${examplePackageId}::its::register_coin`,
           typeArguments: [tokenType],
