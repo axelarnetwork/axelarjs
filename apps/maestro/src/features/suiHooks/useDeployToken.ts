@@ -164,7 +164,13 @@ export default function useTokenDeploy() {
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
+      if (!coinManagementObjectId) {
+        throw new Error("Failed to find coin management object id");
+      }
+
       // Mint tokens
+      // TODO: should merge this with above to avoid multiple transactions.
+      // we can do this once we know whether the token is mint/burn or lock/unlock
       if (treasuryCap) {
         const mintTxJSON = await getMintTx({
           sender: currentAccount.address,
