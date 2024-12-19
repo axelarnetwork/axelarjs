@@ -336,8 +336,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [];
     }
 
+    const minter = input?.minterAddress ?? zeroAddress;
     const commonArgs = {
-      minter: input?.minterAddress ?? zeroAddress,
+      minter: minter as `0x${string}`,
       salt: input.salt,
     };
 
