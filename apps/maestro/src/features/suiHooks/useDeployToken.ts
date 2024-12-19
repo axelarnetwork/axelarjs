@@ -142,13 +142,6 @@ export default function useTokenDeploy() {
       // TODO: should merge this with above to avoid multiple transactions.
       // we can do this once we know whether the token is mint/burn or lock/unlock
       if (treasuryCap) {
-        console.log("DATA", {
-          sender: currentAccount.address,
-          tokenTreasuryCap: treasuryCap?.objectId,
-          amount: initialSupply,
-          tokenPackageId: tokenAddress,
-          symbol,
-        });
         const mintTxJSON = await getMintTx({
           sender: currentAccount.address,
           tokenTreasuryCap: treasuryCap?.objectId,
@@ -156,9 +149,8 @@ export default function useTokenDeploy() {
           tokenPackageId: tokenAddress,
           symbol,
         });
-        const mintTx = Transaction.from(mintTxJSON);
         await signAndExecuteTransaction({
-          transaction: mintTx,
+          transaction: mintTxJSON,
           chain: "sui:testnet", //TODO: make this dynamic
         });
       }
