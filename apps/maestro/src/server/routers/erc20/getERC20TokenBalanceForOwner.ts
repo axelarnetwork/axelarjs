@@ -1,5 +1,4 @@
-import { getFullnodeUrl } from "@mysten/sui.js/client";
-import { SuiClient } from "@mysten/sui/client";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
@@ -33,14 +32,13 @@ export const getERC20TokenBalanceForOwner = publicProcedure
         package: input.tokenAddress,
       });
       const coinSymbol = Object.keys(modules)[0];
-      const coinType = `${input.tokenAddress}::${coinSymbol?.toLocaleLowerCase()}::${coinSymbol?.toUpperCase()}`;
-
+      const coinType = `${input.tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
       // Get the coin balance
       const coins = await client.getCoins({
         owner: input.owner,
         coinType: coinType,
       });
-      const balance = coins.data[0].balance.toString();
+      const balance = coins.data?.[0]?.balance?.toString() ?? "0";
 
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
@@ -53,7 +51,8 @@ export const getERC20TokenBalanceForOwner = publicProcedure
           showPreviousTransaction: true,
         },
       });
-      if (object.data && "Immutable" === object.data.owner) {
+
+      if (object?.data?.owner === "Immutable") {
         const previousTx = object.data.previousTransaction;
 
         // Fetch the transaction details to find the sender

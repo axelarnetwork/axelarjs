@@ -1,8 +1,7 @@
 import type { IERC20BurnableMintableClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
-import { getFullnodeUrl } from "@mysten/sui.js/client";
-import { SuiClient } from "@mysten/sui/client";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";

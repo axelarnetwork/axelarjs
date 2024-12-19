@@ -1,11 +1,12 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import {
   getFullnodeUrl,
+  SuiClient,
+  SuiObjectChange,
   type SuiTransactionBlockResponse,
-} from "@mysten/sui.js/client";
-import { fromHEX } from "@mysten/sui.js/utils";
-import { SuiClient, SuiObjectChange } from "@mysten/sui/client";
+} from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
+import { fromHex } from "@mysten/sui/utils";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
@@ -104,7 +105,7 @@ export default function useTokenDeploy() {
         walletAddress: currentAccount.address,
       });
       // First step, deploy the token
-      const deployTokenTx = Transaction.from(fromHEX(deployTokenTxBytes));
+      const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
         transaction: deployTokenTx,
         chain: "sui:testnet",
@@ -148,9 +149,7 @@ export default function useTokenDeploy() {
         transaction: sendTokenTx,
         chain: "sui:testnet", //TODO: make this dynamic
       });
-      const coinManagementObjectId = findCoinDataObject(
-        sendTokenResult as SuiTransactionBlockResponse
-      );
+      const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
       // Mint tokens
       if (treasuryCap) {
@@ -161,7 +160,7 @@ export default function useTokenDeploy() {
           tokenPackageId: tokenAddress,
           symbol,
         });
-        const mintTx = Transaction.from(mintTxJSON as string);
+        const mintTx = Transaction.from(mintTxJSON);
         await signAndExecuteTransaction({
           transaction: mintTx,
           chain: "sui:testnet",

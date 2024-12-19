@@ -17,7 +17,7 @@ import "~/lib/polyfills";
 import "~/styles/globals.css";
 
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
-import { getFullnodeUrl } from "@mysten/sui.js/client";
+import { getFullnodeUrl } from "@mysten/sui/client";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
