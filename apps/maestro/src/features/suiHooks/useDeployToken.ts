@@ -188,13 +188,10 @@ export default function useTokenDeploy() {
       const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
 
-      if (!coinManagementObjectId) {
-        throw new Error("Failed to find coin management object id");
-      }
       return {
         ...sendTokenResult,
         deploymentMessageId,
-        tokenManagerAddress: coinManagementObjectId,
+        tokenManagerAddress: coinManagementObjectId || "0x",
         tokenAddress,
         tokenManagerType,
       };
