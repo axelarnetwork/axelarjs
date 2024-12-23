@@ -76,7 +76,8 @@ export const suiRouter = router({
         const response = await fetch(
           `${suiServiceBaseUrl}/chain/devnet-amplifier`
         );
-        const chainConfig = await response.json();
+        const _chainConfig = await response.json();
+        const chainConfig = _chainConfig.chains.sui;
         const {
           sender,
           symbol,
