@@ -49,9 +49,11 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const axelarQueryClient = createAxelarQueryClient(NEXT_PUBLIC_NETWORK_ENV);
+  const networkEnv =
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : "testnet";
 
-  const axelarConfigClient = createAxelarConfigClient(NEXT_PUBLIC_NETWORK_ENV);
+  const axelarQueryClient = createAxelarQueryClient(networkEnv);
+  const axelarConfigClient = createAxelarConfigClient(networkEnv);
 
   return {
     req,
@@ -93,8 +95,11 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       postgres: maestroPostgresClient,
     },
     contracts: {
-      createERC20Client(chain: Chain, address: `0x${string}`) {
-        return new IERC20BurnableMintableClient({ chain, address });
+      createERC20Client(chain: Chain, address: string) {
+        return new IERC20BurnableMintableClient({
+          chain,
+          address: address as `0x${string}`,
+        });
       },
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });

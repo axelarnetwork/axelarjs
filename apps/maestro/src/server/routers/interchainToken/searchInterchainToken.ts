@@ -7,7 +7,7 @@ import { z } from "zod";
 import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import { hex40Literal, hexLiteral } from "~/lib/utils/validation";
+import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 
@@ -17,8 +17,8 @@ const tokenDetailsSchema = z.object({
   axelarChainId: z.string(),
   // nullable fields
   tokenId: hexLiteral().nullable(),
-  tokenAddress: hex40Literal().nullable(),
-  tokenManagerAddress: hex40Literal().optional().nullable(),
+  tokenAddress: z.string().nullable(),
+  tokenManagerAddress: z.string().optional().nullable(),
   tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   isOriginToken: z.boolean().nullable(),
   isRegistered: z.boolean(),
@@ -27,7 +27,7 @@ const tokenDetailsSchema = z.object({
 
 export const inputSchema = z.object({
   chainId: z.number().optional(),
-  tokenAddress: hex40Literal(),
+  tokenAddress: z.string(),
   strict: z.boolean().optional(),
 });
 
@@ -273,10 +273,10 @@ async function getInterchainToken(
  */
 async function scanChains(
   chainConfigs: ExtendedWagmiChainConfig[],
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   ctx: Context
 ) {
-  const promises = chainConfigs.map((chainConfig) => {
+  const promises = chainConfigs.map(async (chainConfig) => {
     return getTokenDetails(chainConfig, tokenAddress, ctx)
       .then((tokenDetails) => {
         if (tokenDetails) {
@@ -307,7 +307,7 @@ async function scanChains(
 
 async function getTokenDetails(
   chainConfig: ExtendedWagmiChainConfig,
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   ctx: Context
 ) {
   const tokenDetails =

@@ -2,19 +2,15 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import {
-  hex0xLiteral,
-  hex40Literal,
-  hex64Literal,
-} from "~/lib/utils/validation";
+import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const remoteTokenSchema = z.object({
   id: z.string(),
   tokenId: z.string(),
   axelarChainId: z.string(),
-  tokenAddress: hex40Literal(),
-  tokenManagerAddress: hex40Literal().nullable(),
+  tokenAddress: z.string(),
+  tokenManagerAddress: z.string().nullable(),
   tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
   deploymentMessageId: z.string(),
   deploymentStatus: z.string().nullable(),
@@ -24,21 +20,21 @@ const remoteTokenSchema = z.object({
 
 export const inputSchema = z.object({
   chainId: z.number(),
-  tokenAddress: hex40Literal(),
+  tokenAddress: z.string(),
 });
 
 const outputSchema = z.object({
   tokenId: z.string(),
-  tokenAddress: hex40Literal(),
+  tokenAddress: z.string(),
   axelarChainId: z.string(),
   tokenName: z.string(),
   tokenSymbol: z.string(),
   tokenDecimals: z.number(),
   deploymentMessageId: z.string(),
-  deployerAddress: hex40Literal(),
-  tokenManagerAddress: hex40Literal().nullable(),
+  deployerAddress: z.string(),
+  tokenManagerAddress: z.string().nullable(),
   tokenManagerType: z.enum(TOKEN_MANAGER_TYPES).nullable(),
-  originalMinterAddress: hex40Literal().nullable(),
+  originalMinterAddress: z.string().nullable(),
   kind: z.string(),
   createdAt: z.date().nullable(),
   updatedAt: z.date().nullable(),
@@ -62,10 +58,11 @@ export const getInterchainTokenDetails = publicProcedure
   .query(async ({ input, ctx }) => {
     const chains = await ctx.configs.evmChains();
     const configs = chains[input.chainId];
-
+    // TODO: remove this once we have sui in the chains object
+    const axelarChainId = input.chainId === 103 ? "sui" : configs.info.id;
     const tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-        configs.info.id,
+        axelarChainId,
         input.tokenAddress
       );
 

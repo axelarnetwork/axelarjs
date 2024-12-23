@@ -5,9 +5,10 @@ import { useEffect, useMemo, type FC } from "react";
 import Link from "next/link";
 
 import { clamp, splitAt } from "rambda";
-import { useBlockNumber, useChainId, useTransaction } from "wagmi";
+import { useBlockNumber, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
+import { useChainId } from "~/lib/hooks";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
@@ -41,10 +42,10 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
-export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
+export function useGMPTxProgress(txHash: string, chainId: number) {
   const { computed } = useEVMChainConfigsQuery();
   const { data: txInfo } = useTransaction({
-    hash: txHash,
+    hash: txHash as `0x${string}`,
     chainId,
   });
 
@@ -94,11 +95,11 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
 }
 
 type Props = {
-  txHash: `0x${string}`;
+  txHash: string;
   onAllChainsExecuted?: () => void;
 };
 
-const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
+const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
   txHash,
   chainId,
 }) => {
@@ -202,7 +203,7 @@ export default GMPTxStatusMonitor;
 
 export type ChainStatusItemProps = {
   status: ExtendedGMPTxStatus;
-  txHash: `0x${string}`;
+  txHash: string;
   logIndex: number;
   chain: EVMChainConfig;
   className?: string;
@@ -307,7 +308,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
 };
 
 export type StatusIndicatorProps = {
-  txHash: `0x${string}` | `0x${string}:${number}`;
+  txHash: string;
   status: ExtendedGMPTxStatus;
 };
 

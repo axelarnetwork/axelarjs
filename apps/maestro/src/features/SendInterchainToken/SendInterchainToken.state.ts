@@ -2,12 +2,11 @@ import type { EVMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
-import { useAccount, useBalance } from "wagmi";
-
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
 } from "~/config/env";
+import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -89,9 +88,7 @@ export function useSendInterchainTokenState(props: {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
-  const { address } = useAccount();
-
-  const { data: balance } = useBalance({ address });
+  const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(
     props.sourceChain.chain_name.toLowerCase()

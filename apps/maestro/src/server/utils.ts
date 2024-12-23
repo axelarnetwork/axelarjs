@@ -56,6 +56,11 @@ export async function evmChains<TCacheKey extends string>(
         wagmi: wagmiConfig,
       };
 
+      // TODO: remove this once we have ITS hub on testnet
+      if (NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier") {
+        entry.info.id = wagmiConfig.axelarChainId;
+      }
+
       return {
         ...acc,
         [chain.id]: entry,
@@ -91,7 +96,7 @@ export async function axelarConfigs<TCacheKey extends string>(
   }
 
   const chainConfigs = await axelarConfigClient.getAxelarConfigs(
-    NEXT_PUBLIC_NETWORK_ENV
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : "testnet"
   );
 
   // cache for 1 hour

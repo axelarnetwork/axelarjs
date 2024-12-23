@@ -1,15 +1,13 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { isAddress } from "viem";
-
 import { trpc } from "~/lib/trpc";
 import { hex64 } from "~/lib/utils/validation";
 import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}`;
+  tokenAddress?: string;
   strict?: boolean;
 }) {
   const { computed, ...evmChainsQuery } = useEVMChainConfigsQuery();
@@ -22,7 +20,7 @@ export function useInterchainTokensQuery(input: {
         strict: input.strict,
       },
       {
-        enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
+        enabled: Maybe.of(input.tokenAddress).mapOr(false, Boolean),
         retry: false,
         refetchOnWindowFocus: false,
       }
@@ -55,7 +53,7 @@ export function useInterchainTokensQuery(input: {
 
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
-    txHash?: `0x${string}`;
+    txHash: string;
   },
   options?: {
     enabled?: boolean;
@@ -65,15 +63,14 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   const { data, ...query } =
     trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
       {
-        txHash: input.txHash as `0x${string}`,
+        txHash: input.txHash,
       },
       {
-        refetchInterval: 1000 * 10, // 10 seconds
+        refetchInterval: options?.refetchInterval ?? 1000 * 10, // 10 seconds
         enabled:
-          input.txHash &&
+          !!input.txHash &&
           hex64().safeParse(input.txHash).success &&
-          // apply the default value if the option is not provided
-          Maybe.of(options?.enabled).mapOr(true, Boolean),
+          (options?.enabled || true),
       }
     );
 
@@ -93,7 +90,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
 
 export function useGetTransactionsStatusesOnDestinationChainsQuery(
   input: {
-    txHashes?: `0x${string}`[];
+    txHashes?: string[];
   },
   options?: {
     enabled?: boolean;

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
-import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import {
   useReadInterchainTokenFactoryCanonicalInterchainTokenId,
@@ -15,6 +15,7 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -25,7 +26,7 @@ export interface UseDeployAndRegisterCanonicalTokenInput {
   sourceChainId: string;
   tokenName: string;
   tokenSymbol: string;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   decimals: number;
   destinationChainIds: string[];
   remoteDeploymentGasFees: bigint[];
@@ -92,7 +93,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
-        tokenAddress: input.tokenAddress,
+        tokenAddress: input.tokenAddress as `0x${string}`,
       });
 
     if (!input.destinationChainIds.length) {
@@ -105,7 +106,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
       const args = {
         originalChain: originalChainName,
-        originalTokenAddress: input.tokenAddress,
+        originalTokenAddress: input.tokenAddress as `0x${string}`,
         destinationChain,
         gasValue,
       };
@@ -165,6 +166,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         tokenSymbol: input.tokenSymbol,
         tokenDecimals: input.decimals,
         axelarChainId: input.sourceChainId,
+        tokenManagerAddress: "",
         destinationAxelarChainIds: input.destinationChainIds,
       });
     },
@@ -194,7 +196,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
           onStatusUpdate({
             type: "deployed",
             tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
-            txHash: tx.hash,
+            txHash: tx.hash as `0x${string}`,
           });
         })
         .catch((e) => {
@@ -225,6 +227,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       tokenDecimals: input.decimals,
       axelarChainId: input.sourceChainId,
       tokenAddress: input.tokenAddress,
+      tokenManagerAddress: "",
       destinationAxelarChainIds: input.destinationChainIds,
       deploymentMessageId: "",
     });

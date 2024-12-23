@@ -8,9 +8,8 @@ import Image from "next/image";
 
 import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
-import { useAccount, useSwitchChain } from "wagmi";
 
-import { logger } from "~/lib/logger";
+import { useAccount, useSwitchChain } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useEVMChainsDropdownContainer,
@@ -124,7 +123,7 @@ export const EVMChainIcon: FC<Props> = (props) => {
 const EVMChainsDropdown: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const { chain } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
   const [state, actions] = useEVMChainsDropdownContainer();
 
@@ -142,14 +141,14 @@ const EVMChainsDropdown: FC<Props> = (props) => {
       chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 
-  const handleChainChange = async (chainId: number) => {
+  const handleChainChange = (chainId: number) => {
     try {
       if (props.onSelectChain) {
         props.onSelectChain(
           eligibleChains.find(propEq(chainId, "chain_id")) ?? null
         );
       } else {
-        await switchChainAsync?.({ chainId });
+        switchChain?.({ chainId });
         if (!chain) {
           // only update state if not connected to a chain
           actions.selectChainId(chainId);
@@ -209,7 +208,6 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-
                   props.onSelectChain?.(null);
                   actions.selectChainId(null);
                 }}
@@ -235,9 +233,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleChainChange(chain.chain_id).catch((error) => {
-                    logger.error(error);
-                  });
+                  handleChainChange(chain.chain_id);
                 }}
                 className="group"
               >

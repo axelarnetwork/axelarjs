@@ -4,9 +4,10 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import type { TransactionReceipt } from "viem";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
 
+import { useAccount } from "~/lib/hooks";
 import {
   useTransactionState,
   type TransactionState,
@@ -19,7 +20,7 @@ import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonical
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
 export type RegisterRemoteTokensProps = {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   chainIds: number[];
   originChainId?: number;
   originChain?: EVMChainConfig;
@@ -78,8 +79,57 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   );
 
   const { data: receipt } = useWaitForTransactionReceipt({
-    hash: txState.status === "submitted" ? txState.hash : undefined,
+    hash:
+      txState.status === "submitted"
+        ? (txState.hash as `0x${string}`)
+        : undefined,
   });
+
+  const onSuiTxComplete = useCallback(async () => {
+    if (txState.status !== "submitted") return;
+    if (!txState.suiTx) return;
+
+    console.log("onSuiTxComplete", txState.hash);
+    const { digest } = txState.suiTx;
+
+    const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
+      ...remoteToken,
+      deploymentTxHash: digest,
+    }));
+    console.log("remoteTokens", remoteTokens);
+    await recordRemoteTokenDeployment({
+      tokenAddress: props.tokenAddress,
+      chainId: props.originChainId ?? -1,
+      // TODO: find event Txindex correctly
+      deploymentMessageId: `${digest}`,
+      remoteTokens,
+    });
+    console.log("setTxState");
+    setTxState({
+      status: "confirmed",
+      hash: digest,
+      suiTx: txState.suiTx,
+    });
+  }, [
+    baseRemoteTokens,
+    props.originChainId,
+    props.tokenAddress,
+    recordRemoteTokenDeployment,
+    setTxState,
+    txState,
+  ]);
+
+  useEffect(
+    () => {
+      if (txState.status !== "submitted") return;
+
+      onSuiTxComplete().catch((error) => {
+        logger.error("Failed to record remote token deployment", error);
+        toast.error("Failed to record remote token deployment");
+      });
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [txState.status]
+  );
 
   useEffect(
     () => {
@@ -97,7 +147,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     reset: resetCanonical,
   } = useRegisterRemoteCanonicalTokens({
     chainIds: props.chainIds,
-    deployerAddress: deployerAddress as `0x${string}`,
+    deployerAddress: deployerAddress,
     tokenAddress: props.tokenAddress,
     originChainId: props.originChainId ?? -1,
   });
