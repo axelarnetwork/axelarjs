@@ -7,7 +7,7 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
-import { useChainId } from "~/lib/hooks";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -20,6 +20,7 @@ export type UseStep2ChainSelectionStateProps = {
 export function useStep2ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const chainId = useChainId();
+  const userBalance = useBalance();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, setTotalGasFee] = useState(formatEther(0n));
   const [sourceChainId, setSourceChainId] = useState(
@@ -40,11 +41,13 @@ export function useStep2ChainSelectionState() {
     gasMultiplier: "auto",
   });
 
+  console.log("remoteDeploymentGasFees", remoteDeploymentGasFees);
+
   useEffect(() => {
     Maybe.of(remoteDeploymentGasFees?.totalGasFee)
-      .map(toNumericString)
+      .map((value) => toNumericString(value, userBalance?.decimals || 18))
       .map(setTotalGasFee);
-  }, [remoteDeploymentGasFees, setTotalGasFee]);
+  }, [remoteDeploymentGasFees, setTotalGasFee, userBalance?.decimals]);
 
   const resetState = () => {
     setIsDeploying(false);
@@ -59,6 +62,8 @@ export function useStep2ChainSelectionState() {
 
     setSourceChainId(candidateChain.chain_name);
   }, [evmChains, chainId, sourceChainId]);
+
+  console.log("totalGasFee", totalGasFee);
 
   return {
     state: {
