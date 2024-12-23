@@ -74,7 +74,7 @@ export function useStep3ChainSelectionState() {
     actions: {
       resetState,
       setIsDeploying,
-      setTotalGasFee,
+      $setTotalGasFee,
       setSourceChainId,
     },
   };
