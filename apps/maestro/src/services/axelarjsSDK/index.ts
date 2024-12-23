@@ -16,52 +16,24 @@ export const client = new AxelarQueryAPI({
 });
 
 async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
-  // TODO: remove when sdk support for sui is ready
-  if (
-    params.sourceChainId.includes("sui") ||
-    params.destinationChainId.includes("sui")
-  ) {
-    const hopParams = [
-      {
-        ...params,
-        sourceChain: params.sourceChainId,
-        destinationChain: "axelar",
-        gasLimit: params.gasLimit.toString(),
-      },
-      {
-        ...params,
-        sourceChain: "axelar",
-        destinationChain: params.destinationChainId,
-        gasLimit: params.gasLimit.toString(),
-      },
-    ];
+  const hopParams = [
+    {
+      ...params,
+      sourceChain: params.sourceChainId,
+      destinationChain: "axelar",
+      gasLimit: params.gasLimit.toString(),
+    },
+    {
+      ...params,
+      sourceChain: "axelar",
+      destinationChain: params.destinationChainId,
+      gasLimit: params.gasLimit.toString(),
+    },
+  ];
 
-    const fee = await client.estimateMultihopFee(hopParams);
+  const fee = await client.estimateMultihopFee(hopParams);
 
-    console.log("estimateMultihopFee", fee);
-    return BigInt(fee as string);
-  }
-
-  const response = await client.estimateGasFee(
-    params.sourceChainId,
-    params.destinationChainId,
-    params.gasLimit,
-    params.gasMultiplier,
-    params.sourceChainTokenSymbol,
-    params.minGasPrice,
-    params.executeData as `0x${string}` | undefined
-  );
-
-  const rawFee =
-    typeof response === "string"
-      ? response
-      : response.baseFee +
-        response.l1ExecutionFeeWithMultiplier +
-        response.executionFeeWithMultiplier;
-
-  console.log("rawFee", rawFee);
-
-  return BigInt(rawFee);
+  return BigInt(fee as string);
 }
 
 async function estimateGasFeeMultipleChains(

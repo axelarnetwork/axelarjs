@@ -41,8 +41,6 @@ export function useStep2ChainSelectionState() {
     gasMultiplier: "auto",
   });
 
-  console.log("remoteDeploymentGasFees", remoteDeploymentGasFees);
-
   useEffect(() => {
     Maybe.of(remoteDeploymentGasFees?.totalGasFee)
       .map((value) => toNumericString(value, userBalance?.decimals || 18))
@@ -62,8 +60,6 @@ export function useStep2ChainSelectionState() {
 
     setSourceChainId(candidateChain.chain_name);
   }, [evmChains, chainId, sourceChainId]);
-
-  console.log("totalGasFee", totalGasFee);
 
   return {
     state: {
