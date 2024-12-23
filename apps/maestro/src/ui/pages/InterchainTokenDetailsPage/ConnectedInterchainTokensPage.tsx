@@ -382,7 +382,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
                 ≈{" "}
                 <BigNumberText
-                  decimals={18}
+                  decimals={userGasBalance?.decimals || 18}
                   localeOptions={{
                     style: "decimal",
                     maximumFractionDigits: 4,

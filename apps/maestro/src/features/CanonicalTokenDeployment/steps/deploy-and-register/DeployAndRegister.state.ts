@@ -1,3 +1,4 @@
+import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
@@ -6,7 +7,8 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
-import { useChainId } from "~/lib/hooks";
+import { useBalance, useChainId } from "~/lib/hooks";
+import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
@@ -18,6 +20,7 @@ export type UseStep3ChainSelectionStateProps = {
 export function useStep3ChainSelectionState() {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const chainId = useChainId();
+  const userBalance = useBalance();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, $setTotalGasFee] = useState(formatEther(0n));
   const [sourceChainId, setSourceChainId] = useState(
@@ -38,21 +41,15 @@ export function useStep3ChainSelectionState() {
     gasMultiplier: "auto",
   });
 
-  useEffect(
-    () =>
-      remoteDeploymentGasFees &&
-      setTotalGasFee(remoteDeploymentGasFees.totalGasFee),
-    [remoteDeploymentGasFees]
-  );
+  useEffect(() => {
+    Maybe.of(remoteDeploymentGasFees?.totalGasFee)
+      .map((value) => toNumericString(value, userBalance?.decimals || 18))
+      .map($setTotalGasFee);
+  }, [remoteDeploymentGasFees, $setTotalGasFee, userBalance?.decimals]);
 
   const resetState = () => {
     setIsDeploying(false);
     $setTotalGasFee(formatEther(0n));
-  };
-
-  const setTotalGasFee = (total: bigint) => {
-    const num = Number(formatEther(total));
-    $setTotalGasFee(num.toFixed(4));
   };
 
   useEffect(() => {
@@ -77,7 +74,7 @@ export function useStep3ChainSelectionState() {
     actions: {
       resetState,
       setIsDeploying,
-      setTotalGasFee,
+      $setTotalGasFee,
       setSourceChainId,
     },
   };
