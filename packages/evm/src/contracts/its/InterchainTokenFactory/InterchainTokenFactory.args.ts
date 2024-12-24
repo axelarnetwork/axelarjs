@@ -543,7 +543,7 @@ export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
 };
 
 export function createInterchainTokenFactoryReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     canonicalInterchainTokenDeploySalt(

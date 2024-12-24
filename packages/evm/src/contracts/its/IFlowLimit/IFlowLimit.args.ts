@@ -9,11 +9,12 @@
  */
 
 import type { PublicContractClient } from "../../PublicContractClient";
-import ABI_FILE from "./IFlowLimit.abi";
 
 export const IFLOW_LIMIT_ENCODERS = {};
 
-export function createIFlowLimitReadClient(publicClient: PublicContractClient) {
+export function createIFlowLimitReadClient(
+  publicClient: PublicContractClient<any>
+) {
   return {
     flowInAmount() {
       return publicClient.read("flowInAmount");

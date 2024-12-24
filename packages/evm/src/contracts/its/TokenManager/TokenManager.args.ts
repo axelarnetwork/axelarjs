@@ -499,7 +499,7 @@ export const TOKEN_MANAGER_ENCODERS = {
 };
 
 export function createTokenManagerReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     contractId() {

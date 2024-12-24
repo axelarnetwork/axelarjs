@@ -94,7 +94,7 @@ export const INTERCHAIN_TOKEN_STANDARD_ENCODERS = {
 };
 
 export function createInterchainTokenStandardReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     interchainTokenId() {

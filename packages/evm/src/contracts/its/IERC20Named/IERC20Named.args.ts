@@ -162,7 +162,7 @@ export const IERC20_NAMED_ENCODERS = {
 };
 
 export function createIERC20NamedReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     allowance(allowanceArgs: IERC20NamedAllowanceArgs) {

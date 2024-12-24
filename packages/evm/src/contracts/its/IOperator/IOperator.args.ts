@@ -143,7 +143,9 @@ export const IOPERATOR_ENCODERS = {
   },
 };
 
-export function createIOperatorReadClient(publicClient: PublicContractClient) {
+export function createIOperatorReadClient(
+  publicClient: PublicContractClient<any>
+) {
   return {
     hasRole(hasRoleArgs: IOperatorHasRoleArgs) {
       const encoder = IOPERATOR_ENCODERS["hasRole"];

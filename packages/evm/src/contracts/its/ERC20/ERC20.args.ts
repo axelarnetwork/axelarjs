@@ -216,7 +216,7 @@ export const ERC20_ENCODERS = {
   },
 };
 
-export function createERC20ReadClient(publicClient: PublicContractClient) {
+export function createERC20ReadClient(publicClient: PublicContractClient<any>) {
   return {
     allowance(allowanceArgs: ERC20AllowanceArgs) {
       const encoder = ERC20_ENCODERS["allowance"];

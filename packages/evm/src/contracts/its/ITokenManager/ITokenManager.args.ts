@@ -446,7 +446,7 @@ export const ITOKEN_MANAGER_ENCODERS = {
 };
 
 export function createITokenManagerReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     contractId() {

@@ -1130,7 +1130,7 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
 };
 
 export function createIInterchainTokenServiceReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     chainName() {

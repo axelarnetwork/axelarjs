@@ -47,7 +47,7 @@ export const ITOKEN_MANAGER_IMPLEMENTATION_ENCODERS = {
 };
 
 export function createITokenManagerImplementationReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     tokenManagerImplementation(

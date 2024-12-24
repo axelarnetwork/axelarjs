@@ -12,7 +12,6 @@ import {
 
 export const ierc20MintableBurnableAbi = [
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "from", internalType: "address", type: "address" },
@@ -20,9 +19,9 @@ export const ierc20MintableBurnableAbi = [
     ],
     name: "burn",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "to", internalType: "address", type: "address" },
@@ -30,6 +29,7 @@ export const ierc20MintableBurnableAbi = [
     ],
     name: "mint",
     outputs: [],
+    stateMutability: "nonpayable",
   },
 ] as const;
 

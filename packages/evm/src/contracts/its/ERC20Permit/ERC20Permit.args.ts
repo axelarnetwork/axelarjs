@@ -293,7 +293,7 @@ export const ERC20_PERMIT_ENCODERS = {
 };
 
 export function createERC20PermitReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     DOMAIN_SEPARATOR() {

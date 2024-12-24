@@ -49,7 +49,7 @@ export class ITokenManagerProxyClient extends PublicContractClient<
       chain: options.chain,
     });
 
-    this.reads = createReadClient(this);
+    this.reads = createReadClient(this as PublicContractClient<any>);
   }
 }
 

@@ -142,7 +142,9 @@ export const IMINTER_ENCODERS = {
   },
 };
 
-export function createIMinterReadClient(publicClient: PublicContractClient) {
+export function createIMinterReadClient(
+  publicClient: PublicContractClient<any>
+) {
   return {
     hasRole(hasRoleArgs: IMinterHasRoleArgs) {
       const encoder = IMINTER_ENCODERS["hasRole"];

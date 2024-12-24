@@ -1,4 +1,7 @@
-import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
+import {
+  INTERCHAIN_TOKEN_FACTORY_ENCODERS,
+  INTERCHAIN_TOKEN_SERVICE_ENCODERS,
+} from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -6,11 +9,11 @@ import { zeroAddress, type TransactionReceipt } from "viem";
 import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
 
 import {
-  useReadInterchainTokenFactoryInterchainTokenAddress,
   useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
+import { useReadInterchainTokenServiceInterchainTokenAddress } from "~/lib/contracts/InterchainTokenService.hooks";
 import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
@@ -68,13 +71,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   });
 
   const { data: tokenAddress } =
-    useReadInterchainTokenFactoryInterchainTokenAddress({
-      args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenAddress.args({
-        salt: input?.salt as `0x${string}`,
-        deployer: deployerAddress as `0x${string}`,
+    useReadInterchainTokenServiceInterchainTokenAddress({
+      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTokenAddress.args({
+        tokenId: tokenId as `0x${string}`,
       }),
       query: {
-        enabled: Boolean(tokenId && input?.salt && deployerAddress),
+        enabled: Boolean(tokenId),
       },
     });
 

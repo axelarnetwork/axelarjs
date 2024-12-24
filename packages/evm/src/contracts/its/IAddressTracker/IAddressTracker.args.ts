@@ -152,7 +152,7 @@ export const IADDRESS_TRACKER_ENCODERS = {
 };
 
 export function createIAddressTrackerReadClient(
-  publicClient: PublicContractClient
+  publicClient: PublicContractClient<any>
 ) {
   return {
     chainName() {

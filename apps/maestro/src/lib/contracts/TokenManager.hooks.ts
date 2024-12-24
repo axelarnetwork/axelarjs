@@ -14,7 +14,6 @@ import {
 
 export const tokenManagerAbi = [
   {
-    stateMutability: "nonpayable",
     type: "constructor",
     inputs: [
       {
@@ -23,6 +22,7 @@ export const tokenManagerAbi = [
         type: "address",
       },
     ],
+    stateMutability: "nonpayable",
   },
   {
     type: "error",
@@ -32,11 +32,29 @@ export const tokenManagerAbi = [
   {
     type: "error",
     inputs: [
+      { name: "flowAmount", internalType: "uint256", type: "uint256" },
+      { name: "flowToAdd", internalType: "uint256", type: "uint256" },
+      { name: "tokenManager", internalType: "address", type: "address" },
+    ],
+    name: "FlowAdditionOverflow",
+  },
+  {
+    type: "error",
+    inputs: [
       { name: "limit", internalType: "uint256", type: "uint256" },
       { name: "flowAmount", internalType: "uint256", type: "uint256" },
       { name: "tokenManager", internalType: "address", type: "address" },
     ],
     name: "FlowLimitExceeded",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "flowLimit", internalType: "uint256", type: "uint256" },
+      { name: "flowToCompare", internalType: "uint256", type: "uint256" },
+      { name: "tokenManager", internalType: "address", type: "address" },
+    ],
+    name: "FlowLimitOverflow",
   },
   { type: "error", inputs: [], name: "GiveTokenFailed" },
   {
@@ -77,6 +95,7 @@ export const tokenManagerAbi = [
     ],
     name: "MissingRole",
   },
+  { type: "error", inputs: [], name: "MulticallFailed" },
   {
     type: "error",
     inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
@@ -187,44 +206,43 @@ export const tokenManagerAbi = [
     name: "RolesRemoved",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "fromOperator", internalType: "address", type: "address" },
     ],
     name: "acceptOperatorship",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "addFlowIn",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
     name: "addFlowLimiter",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
     name: "addFlowOut",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [],
     name: "approveService",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "tokenAddress_", internalType: "address", type: "address" },
@@ -233,50 +251,50 @@ export const tokenManagerAbi = [
     ],
     name: "burnToken",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [],
     name: "contractId",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "flowInAmount",
     outputs: [
       { name: "flowInAmount_", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "flowLimit",
     outputs: [{ name: "flowLimit_", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "flowOutAmount",
     outputs: [
       { name: "flowOutAmount_", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
     name: "getTokenAddressFromParams",
     outputs: [
       { name: "tokenAddress_", internalType: "address", type: "address" },
     ],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "account", internalType: "address", type: "address" },
@@ -284,44 +302,44 @@ export const tokenManagerAbi = [
     ],
     name: "hasRole",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [],
     name: "implementationType",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "pure",
     type: "function",
     inputs: [],
     name: "interchainTokenId",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "interchainTokenService",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "addr", internalType: "address", type: "address" }],
     name: "isFlowLimiter",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "addr", internalType: "address", type: "address" }],
     name: "isOperator",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "tokenAddress_", internalType: "address", type: "address" },
@@ -330,9 +348,16 @@ export const tokenManagerAbi = [
     ],
     name: "mintToken",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "pure",
+    type: "function",
+    inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
+    name: "multicall",
+    outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
+    stateMutability: "payable",
+  },
+  {
     type: "function",
     inputs: [
       { name: "operator_", internalType: "bytes", type: "bytes" },
@@ -340,48 +365,59 @@ export const tokenManagerAbi = [
     ],
     name: "params",
     outputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
+    stateMutability: "pure",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "operator", internalType: "address", type: "address" }],
     name: "proposeOperatorship",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
     name: "removeFlowLimiter",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "flowLimit_", internalType: "uint256", type: "uint256" }],
     name: "setFlowLimit",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "params_", internalType: "bytes", type: "bytes" }],
     name: "setup",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "tokenAddress",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
+    type: "function",
+    inputs: [
+      { name: "from", internalType: "address", type: "address" },
+      { name: "to", internalType: "address", type: "address" },
+    ],
+    name: "transferFlowLimiter",
+    outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
     type: "function",
     inputs: [{ name: "operator", internalType: "address", type: "address" }],
     name: "transferOperatorship",
     outputs: [],
+    stateMutability: "nonpayable",
   },
 ] as const;
 
@@ -580,6 +616,15 @@ export const useWriteTokenManagerMintToken =
   });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"multicall"`
+ */
+export const useWriteTokenManagerMulticall =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
+    functionName: "multicall",
+  });
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
  */
 export const useWriteTokenManagerProposeOperatorship =
@@ -613,6 +658,15 @@ export const useWriteTokenManagerSetup = /*#__PURE__*/ createUseWriteContract({
   abi: tokenManagerAbi,
   functionName: "setup",
 });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferFlowLimiter"`
+ */
+export const useWriteTokenManagerTransferFlowLimiter =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
+    functionName: "transferFlowLimiter",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferOperatorship"`
@@ -694,6 +748,15 @@ export const useSimulateTokenManagerMintToken =
   });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"multicall"`
+ */
+export const useSimulateTokenManagerMulticall =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "multicall",
+  });
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
  */
 export const useSimulateTokenManagerProposeOperatorship =
@@ -727,6 +790,15 @@ export const useSimulateTokenManagerSetup =
   /*#__PURE__*/ createUseSimulateContract({
     abi: tokenManagerAbi,
     functionName: "setup",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferFlowLimiter"`
+ */
+export const useSimulateTokenManagerTransferFlowLimiter =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "transferFlowLimiter",
   });
 
 /**
