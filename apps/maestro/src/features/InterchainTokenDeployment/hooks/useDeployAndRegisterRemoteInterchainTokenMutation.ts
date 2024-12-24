@@ -78,25 +78,17 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     });
 
-  const { originalChainName, destinationChainNames } = useMemo(() => {
+  const { destinationChainNames } = useMemo(() => {
     const index = computed.indexedById;
-    const originalChainName =
-      index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
 
     return {
-      originalChainName,
       destinationChainNames:
         input?.destinationChainIds.map(
           (destinationChainId) =>
             index[destinationChainId]?.chain_name ?? "Unknown"
         ) ?? [],
     };
-  }, [
-    chainId,
-    computed.indexedById,
-    input?.destinationChainIds,
-    input?.sourceChainId,
-  ]);
+  }, [computed.indexedById, input?.destinationChainIds]);
 
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {
@@ -125,14 +117,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     const registerTxData = destinationChainNames.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
-        originalChainName,
+        originalChainName: "",
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames, originalChainName]);
+  }, [input, tokenId, destinationChainNames]);
 
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
 

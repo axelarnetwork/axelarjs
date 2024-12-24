@@ -8,7 +8,7 @@
  * DO NOT EDIT MANUALLY
  */
 
-import { encodeFunctionData, Hex } from "viem";
+import { encodeFunctionData } from "viem";
 
 import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainTokenFactory.abi";
@@ -548,7 +548,7 @@ export function createInterchainTokenFactoryReadClient(
   return {
     canonicalInterchainTokenDeploySalt(
       canonicalInterchainTokenDeploySaltArgs: InterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs
-    ): Promise {
+    ) {
       const encoder =
         INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenDeploySalt"];
       const encodedArgs = encoder.args(canonicalInterchainTokenDeploySaltArgs);
@@ -560,7 +560,7 @@ export function createInterchainTokenFactoryReadClient(
 
     canonicalInterchainTokenId(
       canonicalInterchainTokenIdArgs: InterchainTokenFactoryCanonicalInterchainTokenIdArgs
-    ): Promise {
+    ) {
       const encoder =
         INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenId"];
       const encodedArgs = encoder.args(canonicalInterchainTokenIdArgs);
