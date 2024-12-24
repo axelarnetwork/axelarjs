@@ -5,7 +5,10 @@ import { z } from "zod";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
-import { newInterchainTokenSchema } from "~/services/db/postgres";
+import {
+  newInterchainTokenSchema,
+  type NewRemoteInterchainTokenInput,
+} from "~/services/db/postgres";
 
 const recordInterchainTokenDeploymentInput = newInterchainTokenSchema
   .extend({
@@ -30,11 +33,11 @@ export const recordInterchainTokenDeployment = protectedProcedure
     const originChainServiceClient =
       ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
 
-    const tokenManagerAddress = await originChainServiceClient.reads
+    const tokenManagerAddress = (await originChainServiceClient.reads
       .tokenManagerAddress({
         tokenId: input.tokenId as `0x${string}`,
       })
-      .catch(() => null);
+      .catch(() => null)) as `0x${string}`;
 
     const tokenManagerClient = !tokenManagerAddress
       ? null
@@ -51,12 +54,12 @@ export const recordInterchainTokenDeployment = protectedProcedure
       // default to mint_burn for interchain tokens
       // and lock_unlock for canonical tokens
       input.kind === "canonical" ? "lock_unlock" : "mint_burn",
-      getTokenManagerTypeFromBigInt
+      (value) => getTokenManagerTypeFromBigInt(value as bigint)
     );
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
-      tokenManagerAddress: tokenManagerAddress as `0x${string}`,
+      tokenManagerAddress: tokenManagerAddress,
       tokenManagerType,
     });
 
@@ -116,6 +119,6 @@ export const recordInterchainTokenDeployment = protectedProcedure
     }
 
     await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      validTokens
+      validTokens as NewRemoteInterchainTokenInput[]
     );
   });
