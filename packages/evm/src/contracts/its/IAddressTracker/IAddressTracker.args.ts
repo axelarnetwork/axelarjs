@@ -152,7 +152,7 @@ export const IADDRESS_TRACKER_ENCODERS = {
 };
 
 export function createIAddressTrackerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient
 ) {
   return {
     chainName() {

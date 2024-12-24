@@ -143,9 +143,7 @@ export const IOPERATOR_ENCODERS = {
   },
 };
 
-export function createIOperatorReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
-) {
+export function createIOperatorReadClient(publicClient: PublicContractClient) {
   return {
     hasRole(hasRoleArgs: IOperatorHasRoleArgs) {
       const encoder = IOPERATOR_ENCODERS["hasRole"];

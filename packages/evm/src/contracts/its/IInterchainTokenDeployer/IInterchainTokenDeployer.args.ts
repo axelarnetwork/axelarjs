@@ -87,7 +87,7 @@ export const IINTERCHAIN_TOKEN_DEPLOYER_ENCODERS = {
 };
 
 export function createIInterchainTokenDeployerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient
 ) {
   return {
     deployedAddress(

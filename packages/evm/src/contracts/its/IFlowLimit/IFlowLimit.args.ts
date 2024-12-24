@@ -13,9 +13,7 @@ import ABI_FILE from "./IFlowLimit.abi";
 
 export const IFLOW_LIMIT_ENCODERS = {};
 
-export function createIFlowLimitReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
-) {
+export function createIFlowLimitReadClient(publicClient: PublicContractClient) {
   return {
     flowInAmount() {
       return publicClient.read("flowInAmount");

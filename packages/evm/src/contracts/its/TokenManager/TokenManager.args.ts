@@ -245,6 +245,27 @@ export const encodeTokenManagerMintTokenData = ({
     args: [tokenAddress_, to, amount],
   });
 
+export type TokenManagerMulticallArgs = { data: any };
+
+/**
+ * Factory function for TokenManager.multicall function args
+ */
+export const encodeTokenManagerMulticallArgs = ({
+  data,
+}: TokenManagerMulticallArgs) => [data] as const;
+
+/**
+ * Encoder function for TokenManager.multicall function data
+ */
+export const encodeTokenManagerMulticallData = ({
+  data,
+}: TokenManagerMulticallArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "multicall",
+    abi: ABI_FILE.abi,
+    args: [data],
+  });
+
 export type TokenManagerParamsArgs = {
   operator_: `0x${string}`;
   tokenAddress_: `0x${string}`;
@@ -355,6 +376,32 @@ export const encodeTokenManagerSetupData = ({
     args: [params_],
   });
 
+export type TokenManagerTransferFlowLimiterArgs = {
+  from: `0x${string}`;
+  to: `0x${string}`;
+};
+
+/**
+ * Factory function for TokenManager.transferFlowLimiter function args
+ */
+export const encodeTokenManagerTransferFlowLimiterArgs = ({
+  from,
+  to,
+}: TokenManagerTransferFlowLimiterArgs) => [from, to] as const;
+
+/**
+ * Encoder function for TokenManager.transferFlowLimiter function data
+ */
+export const encodeTokenManagerTransferFlowLimiterData = ({
+  from,
+  to,
+}: TokenManagerTransferFlowLimiterArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "transferFlowLimiter",
+    abi: ABI_FILE.abi,
+    args: [from, to],
+  });
+
 export type TokenManagerTransferOperatorshipArgs = { operator: `0x${string}` };
 
 /**
@@ -417,6 +464,10 @@ export const TOKEN_MANAGER_ENCODERS = {
     args: encodeTokenManagerMintTokenArgs,
     data: encodeTokenManagerMintTokenData,
   },
+  multicall: {
+    args: encodeTokenManagerMulticallArgs,
+    data: encodeTokenManagerMulticallData,
+  },
   params: {
     args: encodeTokenManagerParamsArgs,
     data: encodeTokenManagerParamsData,
@@ -437,6 +488,10 @@ export const TOKEN_MANAGER_ENCODERS = {
     args: encodeTokenManagerSetupArgs,
     data: encodeTokenManagerSetupData,
   },
+  transferFlowLimiter: {
+    args: encodeTokenManagerTransferFlowLimiterArgs,
+    data: encodeTokenManagerTransferFlowLimiterData,
+  },
   transferOperatorship: {
     args: encodeTokenManagerTransferOperatorshipArgs,
     data: encodeTokenManagerTransferOperatorshipData,
@@ -444,7 +499,7 @@ export const TOKEN_MANAGER_ENCODERS = {
 };
 
 export function createTokenManagerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient
 ) {
   return {
     contractId() {
