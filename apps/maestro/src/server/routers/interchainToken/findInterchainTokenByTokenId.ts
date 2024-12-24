@@ -53,10 +53,10 @@ export async function scanInterchainTokenOnChainByTokenId(
         tokenManagerAddress
       );
 
-      const [tokenManagerTypeCode, originTokenAddress] = await Promise.all([
+      const [tokenManagerTypeCode, originTokenAddress] = (await Promise.all([
         tokenManagerClient.reads.implementationType().catch(() => null),
         tokenManagerClient.reads.tokenAddress().catch(() => null),
-      ]);
+      ])) as [bigint | null, `0x${string}` | null];
 
       const tokenManagerType = Maybe.of(
         tokenManagerTypeCode as bigint
