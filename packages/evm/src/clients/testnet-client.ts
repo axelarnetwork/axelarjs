@@ -14,6 +14,7 @@ import {
   celoAlfajores,
   fantomTestnet,
   filecoinCalibration,
+  flowTestnet,
   fraxtalTestnet,
   immutableZkEvmTestnet,
   kavaTestnet,
@@ -57,6 +58,7 @@ export const TESTNET_CHAINS = {
   kava: kavaTestnet,
   scroll: scrollSepolia,
   fraxtal: fraxtalTestnet,
+  flow: flowTestnet,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
