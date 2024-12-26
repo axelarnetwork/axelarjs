@@ -468,7 +468,7 @@ export const IINTERCHAIN_TOKEN_ENCODERS = {
 };
 
 export function createIInterchainTokenReadClient(
-  publicClient: PublicContractClient<any>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>
 ) {
   return {
     allowance(allowanceArgs: IInterchainTokenAllowanceArgs) {
