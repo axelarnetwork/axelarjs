@@ -13,9 +13,7 @@ import { encodeFunctionData } from "viem";
 import ABI_FILE from "./TokenHandler.abi";
 
 export type TokenHandlerGiveTokenArgs = {
-  tokenManagerType: bigint;
-  tokenAddress: `0x${string}`;
-  tokenManager: `0x${string}`;
+  tokenId: `0x${string}`;
   to: `0x${string}`;
   amount: bigint;
 };
@@ -24,34 +22,55 @@ export type TokenHandlerGiveTokenArgs = {
  * Factory function for TokenHandler.giveToken function args
  */
 export const encodeTokenHandlerGiveTokenArgs = ({
-  tokenManagerType,
-  tokenAddress,
-  tokenManager,
+  tokenId,
   to,
   amount,
-}: TokenHandlerGiveTokenArgs) =>
-  [tokenManagerType, tokenAddress, tokenManager, to, amount] as const;
+}: TokenHandlerGiveTokenArgs) => [tokenId, to, amount] as const;
 
 /**
  * Encoder function for TokenHandler.giveToken function data
  */
 export const encodeTokenHandlerGiveTokenData = ({
-  tokenManagerType,
-  tokenAddress,
-  tokenManager,
+  tokenId,
   to,
   amount,
 }: TokenHandlerGiveTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "giveToken",
     abi: ABI_FILE.abi,
-    args: [tokenManagerType, tokenAddress, tokenManager, to, amount],
+    args: [tokenId, to, amount],
+  });
+
+export type TokenHandlerPostTokenManagerDeployArgs = {
+  tokenManagerType: bigint;
+  tokenManager: `0x${string}`;
+};
+
+/**
+ * Factory function for TokenHandler.postTokenManagerDeploy function args
+ */
+export const encodeTokenHandlerPostTokenManagerDeployArgs = ({
+  tokenManagerType,
+  tokenManager,
+}: TokenHandlerPostTokenManagerDeployArgs) =>
+  [tokenManagerType, tokenManager] as const;
+
+/**
+ * Encoder function for TokenHandler.postTokenManagerDeploy function data
+ */
+export const encodeTokenHandlerPostTokenManagerDeployData = ({
+  tokenManagerType,
+  tokenManager,
+}: TokenHandlerPostTokenManagerDeployArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "postTokenManagerDeploy",
+    abi: ABI_FILE.abi,
+    args: [tokenManagerType, tokenManager],
   });
 
 export type TokenHandlerTakeTokenArgs = {
-  tokenManagerType: bigint;
-  tokenAddress: `0x${string}`;
-  tokenManager: `0x${string}`;
+  tokenId: `0x${string}`;
+  tokenOnly: boolean;
   from: `0x${string}`;
   amount: bigint;
 };
@@ -60,33 +79,29 @@ export type TokenHandlerTakeTokenArgs = {
  * Factory function for TokenHandler.takeToken function args
  */
 export const encodeTokenHandlerTakeTokenArgs = ({
-  tokenManagerType,
-  tokenAddress,
-  tokenManager,
+  tokenId,
+  tokenOnly,
   from,
   amount,
-}: TokenHandlerTakeTokenArgs) =>
-  [tokenManagerType, tokenAddress, tokenManager, from, amount] as const;
+}: TokenHandlerTakeTokenArgs) => [tokenId, tokenOnly, from, amount] as const;
 
 /**
  * Encoder function for TokenHandler.takeToken function data
  */
 export const encodeTokenHandlerTakeTokenData = ({
-  tokenManagerType,
-  tokenAddress,
-  tokenManager,
+  tokenId,
+  tokenOnly,
   from,
   amount,
 }: TokenHandlerTakeTokenArgs): `0x${string}` =>
   encodeFunctionData({
     functionName: "takeToken",
     abi: ABI_FILE.abi,
-    args: [tokenManagerType, tokenAddress, tokenManager, from, amount],
+    args: [tokenId, tokenOnly, from, amount],
   });
 
 export type TokenHandlerTransferTokenFromArgs = {
-  tokenManagerType: bigint;
-  tokenAddress: `0x${string}`;
+  tokenId: `0x${string}`;
   from: `0x${string}`;
   to: `0x${string}`;
   amount: bigint;
@@ -96,20 +111,17 @@ export type TokenHandlerTransferTokenFromArgs = {
  * Factory function for TokenHandler.transferTokenFrom function args
  */
 export const encodeTokenHandlerTransferTokenFromArgs = ({
-  tokenManagerType,
-  tokenAddress,
+  tokenId,
   from,
   to,
   amount,
-}: TokenHandlerTransferTokenFromArgs) =>
-  [tokenManagerType, tokenAddress, from, to, amount] as const;
+}: TokenHandlerTransferTokenFromArgs) => [tokenId, from, to, amount] as const;
 
 /**
  * Encoder function for TokenHandler.transferTokenFrom function data
  */
 export const encodeTokenHandlerTransferTokenFromData = ({
-  tokenManagerType,
-  tokenAddress,
+  tokenId,
   from,
   to,
   amount,
@@ -117,13 +129,17 @@ export const encodeTokenHandlerTransferTokenFromData = ({
   encodeFunctionData({
     functionName: "transferTokenFrom",
     abi: ABI_FILE.abi,
-    args: [tokenManagerType, tokenAddress, from, to, amount],
+    args: [tokenId, from, to, amount],
   });
 
 export const TOKEN_HANDLER_ENCODERS = {
   giveToken: {
     args: encodeTokenHandlerGiveTokenArgs,
     data: encodeTokenHandlerGiveTokenData,
+  },
+  postTokenManagerDeploy: {
+    args: encodeTokenHandlerPostTokenManagerDeployArgs,
+    data: encodeTokenHandlerPostTokenManagerDeployData,
   },
   takeToken: {
     args: encodeTokenHandlerTakeTokenArgs,

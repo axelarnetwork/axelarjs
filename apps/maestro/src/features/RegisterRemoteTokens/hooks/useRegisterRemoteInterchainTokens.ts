@@ -69,18 +69,13 @@ export default function useRegisterRemoteInterchainTokens(
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        originalChainName: sourceChain?.chain_name ?? "",
+        originalChainName: "",
         minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
         destinationChain: chainId,
         gasValue: gasFeesData.gasFees[i].fee,
       })
     );
-  }, [
-    destinationChainIds,
-    gasFeesData,
-    sourceChain?.chain_name,
-    tokenDeployment,
-  ]);
+  }, [destinationChainIds, gasFeesData, tokenDeployment]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 

@@ -446,7 +446,7 @@ export const ITOKEN_MANAGER_ENCODERS = {
 };
 
 export function createITokenManagerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<any>
 ) {
   return {
     contractId() {

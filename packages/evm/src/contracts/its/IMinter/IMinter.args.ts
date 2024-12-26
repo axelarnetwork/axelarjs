@@ -143,7 +143,7 @@ export const IMINTER_ENCODERS = {
 };
 
 export function createIMinterReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<any>
 ) {
   return {
     hasRole(hasRoleArgs: IMinterHasRoleArgs) {
