@@ -155,7 +155,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               balance={BigInt(balance.tokenBalance)}
               isTokenOwner={balance.isTokenOwner}
               isTokenPendingOnwer={balance.isTokenPendingOwner}
-              isTokenMinter={balance.isTokenMinter}
+              isTokenMinter={balance.isTokenMinter as boolean}
               hasPendingOwner={balance.hasPendingOwner}
               tokenId={props.tokenId}
             />
