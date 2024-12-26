@@ -1,5 +1,14 @@
 # @axelarjs/maestro
 
+## 0.3.29
+
+### Patch Changes
+
+- [#481](https://github.com/axelarnetwork/axelarjs/pull/481) [`05e33d7645700fee93cbca0b84117fe3b26b0be2`](https://github.com/axelarnetwork/axelarjs/commit/05e33d7645700fee93cbca0b84117fe3b26b0be2) Thanks [@npty](https://github.com/npty)! - updated its and factory contract functions
+
+- Updated dependencies [[`05e33d7645700fee93cbca0b84117fe3b26b0be2`](https://github.com/axelarnetwork/axelarjs/commit/05e33d7645700fee93cbca0b84117fe3b26b0be2)]:
+  - @axelarjs/evm@0.2.7
+
 ## 0.3.28
 
 ### Patch Changes
