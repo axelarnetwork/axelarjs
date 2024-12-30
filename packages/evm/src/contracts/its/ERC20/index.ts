@@ -47,7 +47,7 @@ export class ERC20Client extends PublicContractClient<typeof ABI_FILE.abi> {
       chain: options.chain,
     });
 
-    this.reads = createReadClient(this);
+    this.reads = createReadClient(this as PublicContractClient<any>);
   }
 }
 

@@ -116,10 +116,10 @@ export const getTopTransactions = publicProcedure
       );
 
       const filtered = Object.entries(grouped).filter(
-        ([, txs]) => txs.length >= input.minTxCount
+        ([, txs]) => txs && txs.length >= input.minTxCount
       );
 
-      const results = filtered
+      const results = (filtered as [string, any[]][])
         .map(([tokenId, [tx, ...txs]]) => {
           const transfer = tx.interchain_transfer;
 

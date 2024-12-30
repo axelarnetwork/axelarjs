@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
+import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
 
 const remoteInterchainTokenSchema = z.object({
   axelarChainId: z.string(),
@@ -87,6 +88,6 @@ export const recordRemoteTokensDeployment = protectedProcedure
     );
 
     return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      remoteTokens
+      remoteTokens as NewRemoteInterchainTokenInput[]
     );
   });

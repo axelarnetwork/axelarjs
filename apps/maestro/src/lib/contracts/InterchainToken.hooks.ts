@@ -14,7 +14,6 @@ import {
 
 export const interchainTokenAbi = [
   {
-    stateMutability: "nonpayable",
     type: "constructor",
     inputs: [
       {
@@ -23,6 +22,7 @@ export const interchainTokenAbi = [
         type: "address",
       },
     ],
+    stateMutability: "nonpayable",
   },
   { type: "error", inputs: [], name: "AlreadyInitialized" },
   { type: "error", inputs: [], name: "InterchainTokenServiceAddressZero" },
@@ -171,21 +171,20 @@ export const interchainTokenAbi = [
     name: "Transfer",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "DOMAIN_SEPARATOR",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "fromMinter", internalType: "address", type: "address" }],
     name: "acceptMintership",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "", internalType: "address", type: "address" },
@@ -193,9 +192,9 @@ export const interchainTokenAbi = [
     ],
     name: "allowance",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "spender", internalType: "address", type: "address" },
@@ -203,16 +202,16 @@ export const interchainTokenAbi = [
     ],
     name: "approve",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "", internalType: "address", type: "address" }],
     name: "balanceOf",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "account", internalType: "address", type: "address" },
@@ -220,16 +219,16 @@ export const interchainTokenAbi = [
     ],
     name: "burn",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "decimals",
     outputs: [{ name: "", internalType: "uint8", type: "uint8" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "spender", internalType: "address", type: "address" },
@@ -237,9 +236,9 @@ export const interchainTokenAbi = [
     ],
     name: "decreaseAllowance",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [
       { name: "account", internalType: "address", type: "address" },
@@ -247,9 +246,9 @@ export const interchainTokenAbi = [
     ],
     name: "hasRole",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "spender", internalType: "address", type: "address" },
@@ -257,9 +256,9 @@ export const interchainTokenAbi = [
     ],
     name: "increaseAllowance",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "tokenId_", internalType: "bytes32", type: "bytes32" },
@@ -270,23 +269,23 @@ export const interchainTokenAbi = [
     ],
     name: "init",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "interchainTokenId",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "interchainTokenService",
     outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "destinationChain", internalType: "string", type: "string" },
@@ -296,9 +295,9 @@ export const interchainTokenAbi = [
     ],
     name: "interchainTransfer",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "payable",
     type: "function",
     inputs: [
       { name: "sender", internalType: "address", type: "address" },
@@ -309,16 +308,16 @@ export const interchainTokenAbi = [
     ],
     name: "interchainTransferFrom",
     outputs: [],
+    stateMutability: "payable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "addr", internalType: "address", type: "address" }],
     name: "isMinter",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "account", internalType: "address", type: "address" },
@@ -326,30 +325,30 @@ export const interchainTokenAbi = [
     ],
     name: "mint",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "name",
     outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "nameHash",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [{ name: "", internalType: "address", type: "address" }],
     name: "nonces",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "issuer", internalType: "address", type: "address" },
@@ -362,30 +361,30 @@ export const interchainTokenAbi = [
     ],
     name: "permit",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "minter_", internalType: "address", type: "address" }],
     name: "proposeMintership",
     outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "symbol",
     outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "view",
     type: "function",
     inputs: [],
     name: "totalSupply",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "recipient", internalType: "address", type: "address" },
@@ -393,9 +392,9 @@ export const interchainTokenAbi = [
     ],
     name: "transfer",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [
       { name: "sender", internalType: "address", type: "address" },
@@ -404,13 +403,14 @@ export const interchainTokenAbi = [
     ],
     name: "transferFrom",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
+    stateMutability: "nonpayable",
   },
   {
-    stateMutability: "nonpayable",
     type: "function",
     inputs: [{ name: "minter_", internalType: "address", type: "address" }],
     name: "transferMintership",
     outputs: [],
+    stateMutability: "nonpayable",
   },
 ] as const;
 

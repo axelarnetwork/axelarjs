@@ -23,17 +23,6 @@ export default {
       type: "constructor",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
-        },
-      ],
-      name: "GatewayToken",
-      type: "error",
-    },
-    {
       inputs: [],
       name: "InvalidChainName",
       type: "error",
@@ -49,6 +38,17 @@ export default {
       type: "error",
     },
     {
+      inputs: [
+        {
+          internalType: "address",
+          name: "minter",
+          type: "address",
+        },
+      ],
+      name: "InvalidMinter",
+      type: "error",
+    },
+    {
       inputs: [],
       name: "InvalidOwner",
       type: "error",
@@ -56,6 +56,22 @@ export default {
     {
       inputs: [],
       name: "InvalidOwnerAddress",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "bytes32",
+          name: "expectedTokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "InvalidTokenId",
       type: "error",
     },
     {
@@ -96,6 +112,27 @@ export default {
       type: "error",
     },
     {
+      inputs: [
+        {
+          internalType: "address",
+          name: "sender",
+          type: "address",
+        },
+      ],
+      name: "NotServiceOwner",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "NotSupported",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "RemoteDeploymentNotApproved",
+      type: "error",
+    },
+    {
       inputs: [],
       name: "SetupFailed",
       type: "error",
@@ -104,6 +141,43 @@ export default {
       inputs: [],
       name: "ZeroAddress",
       type: "error",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "minter",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          indexed: false,
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          indexed: false,
+          internalType: "bytes",
+          name: "destinationMinter",
+          type: "bytes",
+        },
+      ],
+      name: "DeployRemoteInterchainTokenApproval",
+      type: "event",
     },
     {
       anonymous: false,
@@ -137,6 +211,37 @@ export default {
         {
           indexed: true,
           internalType: "address",
+          name: "minter",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          indexed: false,
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+      ],
+      name: "RevokedDeployRemoteInterchainTokenApproval",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
           name: "newImplementation",
           type: "address",
         },
@@ -149,6 +254,53 @@ export default {
       name: "acceptOwnership",
       outputs: [],
       stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationMinter",
+          type: "bytes",
+        },
+      ],
+      name: "approveDeployRemoteInterchainToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+      ],
+      name: "canonicalInterchainTokenDeploySalt",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "deploySalt",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
     {
@@ -168,30 +320,6 @@ export default {
         },
       ],
       stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "chainNameHash_",
-          type: "bytes32",
-        },
-        {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
-        },
-      ],
-      name: "canonicalInterchainTokenSalt",
-      outputs: [
-        {
-          internalType: "bytes32",
-          name: "salt",
-          type: "bytes32",
-        },
-      ],
-      stateMutability: "pure",
       type: "function",
     },
     {
@@ -301,6 +429,35 @@ export default {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "originalTokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
+      ],
+      name: "deployRemoteCanonicalInterchainToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "string",
           name: "originalChainName",
           type: "string",
@@ -338,16 +495,76 @@ export default {
       type: "function",
     },
     {
-      inputs: [],
-      name: "gateway",
-      outputs: [
+      inputs: [
         {
-          internalType: "contract IAxelarGateway",
-          name: "",
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "address",
+          name: "minter",
           type: "address",
         },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
       ],
-      stateMutability: "view",
+      name: "deployRemoteInterchainToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "address",
+          name: "minter",
+          type: "address",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationMinter",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
+      ],
+      name: "deployRemoteInterchainTokenWithMinter",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
       type: "function",
     },
     {
@@ -376,12 +593,12 @@ export default {
           type: "bytes32",
         },
       ],
-      name: "interchainTokenAddress",
+      name: "interchainTokenDeploySalt",
       outputs: [
         {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
+          internalType: "bytes32",
+          name: "deploySalt",
+          type: "bytes32",
         },
       ],
       stateMutability: "view",
@@ -409,35 +626,6 @@ export default {
         },
       ],
       stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "chainNameHash_",
-          type: "bytes32",
-        },
-        {
-          internalType: "address",
-          name: "deployer",
-          type: "address",
-        },
-        {
-          internalType: "bytes32",
-          name: "salt",
-          type: "bytes32",
-        },
-      ],
-      name: "interchainTokenSalt",
-      outputs: [
-        {
-          internalType: "bytes32",
-          name: "",
-          type: "bytes32",
-        },
-      ],
-      stateMutability: "pure",
       type: "function",
     },
     {
@@ -528,6 +716,29 @@ export default {
         },
       ],
       stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+      ],
+      name: "revokeDeployRemoteInterchainToken",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
