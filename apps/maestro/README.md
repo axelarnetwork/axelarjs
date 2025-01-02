@@ -54,6 +54,6 @@ pnpm test:e2e
 
 - [lib](/apps/maestro/src/lib/) libraries and application specific utilities
   - [auth](/apps/maestro/src/lib/auth) auth utilities and hooks
-  - [drizle](/apps/maestro/src/lib/drizzle) drizzle setup
+  - [drizzle](/apps/maestro/src/lib/drizzle) drizzle setup
     - [schema](/apps/maestro/src/lib/drizzle/schema) relational db schema
 - [server](/apps/maestro/src/server/) tRPC routers/procedures
