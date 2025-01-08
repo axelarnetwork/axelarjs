@@ -5,17 +5,24 @@ import { z } from "zod";
 import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
 import { publicProcedure } from "~/server/trpc";
 
-const evmChainConfigSchema = z.object({
+const vmChainConfigSchema = z.object({
   id: z.string(),
-  deprecated: z.boolean().optional(),
   chain_id: z.number(),
   chain_name: z.string(),
   maintainer_id: z.string(),
+  multisig_prover: z.object({
+    address: z.string(),
+  }),
+  voting_verifier: z.object({
+    address: z.string(),
+  }),
   name: z.string(),
+  short_name: z.string(),
   image: z.string(),
   color: z.string(),
-  chain_type: z.literal("evm"),
+  chain_type: z.literal("vm"),
   no_inflation: z.boolean(),
+  no_tvl: z.boolean(),
   endpoints: z.object({
     rpc: z.array(z.string()),
   }),
@@ -31,7 +38,6 @@ const evmChainConfigSchema = z.object({
     block_path: z.string(),
     address_path: z.string(),
     contract_path: z.string(),
-    contract_0_path: z.string().optional(),
     transaction_path: z.string(),
   }),
   provider_params: z.array(
@@ -49,13 +55,13 @@ const evmChainConfigSchema = z.object({
   ),
 });
 
-export const getEVMChainConfigs = publicProcedure
+export const getVMChainConfigs = publicProcedure
   .meta({
     openapi: {
-      summary: "Get EVM chain configs",
-      description: "Get EVM chain configs",
+      summary: "Get VM chain configs",
+      description: "Get VM chain configs",
       method: "GET",
-      path: "/chain-configs/evm",
+      path: "/chain-configs/vm",
       tags: ["chain-configs"],
     },
   })
@@ -67,23 +73,22 @@ export const getEVMChainConfigs = publicProcedure
       })
       .optional()
   )
-  .output(z.array(evmChainConfigSchema))
+  .output(z.array(vmChainConfigSchema))
   .query(async ({ ctx, input }) => {
     try {
-      const chainsMap = await ctx.configs.evmChains();
+      const chainsMap = await ctx.configs.vmChains();
       const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
       const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
       const validChainInfos = uniqueChainInfos.filter(
-        (chain) => evmChainConfigSchema.safeParse(chain).success
+        (chain) => vmChainConfigSchema.safeParse(chain).success
       );
 
       return validChainInfos
         .filter(
           (chain) =>
-            !chain.deprecated &&
-            // filter also by axelarChainId if provided
+            // filter by axelarChainId if provided
             (!input?.axelarChainId || chain.id === input?.axelarChainId) &&
-            // filter also by chainId if provided
+            // filter by chainId if provided
             (!input?.chainId || chain.chain_id === input?.chainId) &&
             // filter out disabled chains
             !NEXT_PUBLIC_DISABLED_CHAINS.includes(chain.id)
@@ -97,7 +102,7 @@ export const getEVMChainConfigs = publicProcedure
       // otherwise, we throw an internal server error
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get chain config",
+        message: "Failed to get VM chain config",
       });
     }
   });

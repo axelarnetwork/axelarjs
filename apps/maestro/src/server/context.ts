@@ -29,7 +29,7 @@ import axelarscanClient from "~/services/axelarscan";
 import MaestroKVClient from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
-import { axelarConfigs, evmChains } from "./utils";
+import { axelarConfigs, evmChains, vmChains } from "./utils";
 
 export interface ContextConfig {
   req: NextApiRequest;
@@ -73,6 +73,12 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         maestroKVClient,
         axelarscanClient,
         "evmChains" as const
+      ),
+      vmChains: vmChains.bind(
+        null,
+        maestroKVClient,
+        axelarscanClient,
+        "vmChains" as const
       ),
       axelarConfigs: axelarConfigs.bind(
         null,
