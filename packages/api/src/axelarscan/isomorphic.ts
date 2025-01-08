@@ -1,5 +1,3 @@
-import { partition } from "rambda";
-
 import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type {
   AxelarAssetPrice,
@@ -10,6 +8,7 @@ import type {
   LinkRequestRawResponse,
   LinkRequestResponse,
   SearchBatchesResponse,
+  VMChainConfig,
 } from "./types";
 
 export type AxelarApiParams<T extends Record<string, unknown>> = T & {
@@ -21,7 +20,7 @@ export type GetAssetsResponse = AxelarScanAsset[];
 
 export type GetAssetsPriceResponse = AxelarAssetPrice[];
 
-export type GetChainConfigsResponse = (EVMChainConfig | CosmosChainConfig)[];
+export type GetChainConfigsResponse = (EVMChainConfig | CosmosChainConfig | VMChainConfig)[];
 
 export class AxelarscanClient extends RestService {
   static init(options: RestServiceOptions) {
@@ -47,18 +46,26 @@ export class AxelarscanClient extends RestService {
       disabledChains?: string[];
     } = {}
   ) {
-    const [evm, cosmos] = partition(
-      (c) => c.chain_type === "evm",
-      await this.client.get("/api/getChains").json<GetChainConfigsResponse>()
-    );
+    const chains = await this.client
+      .get("/api/getChains")
+      .json<GetChainConfigsResponse>();
 
-    const isEligible = (a: EVMChainConfig | CosmosChainConfig) =>
+    const isEligible = (
+      a: EVMChainConfig | CosmosChainConfig | VMChainConfig
+    ) =>
       (!a?.deprecated || params.isStaging) &&
       !params.disabledChains?.includes(a.id);
 
     return {
-      evm: evm.filter(isEligible) as EVMChainConfig[],
-      cosmos: cosmos.filter(isEligible) as CosmosChainConfig[],
+      evm: chains.filter(
+        (c) => c.chain_type === "evm" && isEligible(c)
+      ) as EVMChainConfig[],
+      cosmos: chains.filter(
+        (c) => c.chain_type === "cosmos" && isEligible(c)
+      ) as CosmosChainConfig[],
+      vm: chains.filter(
+        (c) => c.chain_type === "vm" && isEligible(c)
+      ) as VMChainConfig[],
     };
   }
 
