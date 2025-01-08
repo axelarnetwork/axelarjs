@@ -31,6 +31,16 @@ export const getChainInfo = publicProcedure
   )
   .query(async ({ ctx, input }) => {
     try {
+      // TODO: remove this once we have the sui chain data
+      if (input.axelarChainId === "sui") {
+        return {
+          id: "sui",
+          chainName: "Sui",
+          blockConfirmations: 1,
+          estimatedWaitTimeInMinutes: 1,
+        };
+      }
+
       const chainInfo = await ctx.services.axelarjsSDK.getChainInfo({
         axelarChainId: input.axelarChainId,
       });

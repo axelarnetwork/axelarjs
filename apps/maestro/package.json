@@ -111,6 +111,7 @@
     "happy-dom": "^13.10.1",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "next-auth": "^4.24.7",
+    "npm-run-path": "^6.0.0",
     "patch-package": "^8.0.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
@@ -120,6 +121,7 @@
     "typescript": "^5.4.3",
     "vite": "^5.2.6",
     "vitest": "^1.4.0",
+    "web-streams-polyfill": "^4.1.0",
     "zx": "^7.2.3"
   }
 }
