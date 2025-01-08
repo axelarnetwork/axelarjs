@@ -12,10 +12,13 @@ import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useChainFromRoute } from "~/lib/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import EVMChainsDropdown, {
+import {
+  useEVMChainConfigsQuery,
+  useVMChainConfigsQuery,
+} from "~/services/axelarscan/hooks";
+import ChainsDropdown, {
   ChainIcon,
-} from "~/ui/components/EVMChainsDropdown";
+} from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
 import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
 
@@ -53,15 +56,26 @@ const Page: FC<Props> = ({
   const chainFromRoute = useChainFromRoute();
   const { switchChain } = useSwitchChain();
   const { data: evmChains } = useEVMChainConfigsQuery();
+  const { data: vmChains } = useVMChainConfigsQuery();
 
   const evmChain = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === chain?.id),
     [chain, evmChains]
   );
 
+  const vmChain = useMemo(
+    () => vmChains?.find?.((x) => x.chain_id === chain?.id),
+    [chain, vmChains]
+  );
+
   const evmChainFromRoute = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === chainFromRoute?.id),
     [chainFromRoute, evmChains]
+  );
+
+  const vmChainFromRoute = useMemo(
+    () => vmChains?.find?.((x) => x.chain_id === chainFromRoute?.id),
+    [chainFromRoute, vmChains]
   );
 
   const pageState = useMemo<PageState>(() => {
@@ -73,15 +87,18 @@ const Page: FC<Props> = ({
       return "disconnected";
     }
 
-    if (chain && evmChains.length && !evmChain) {
+    const currentChain = evmChain || vmChain;
+    const chainFromRoute = evmChainFromRoute || vmChainFromRoute;
+
+    if (chain && evmChains?.length && vmChains?.length && !currentChain) {
       return "unsupported-network";
     }
 
-    if (!evmChain) {
+    if (!currentChain) {
       return "loading";
     }
 
-    if (chainFromRoute && evmChain?.chain_id !== chainFromRoute.id) {
+    if (chainFromRoute && currentChain?.chain_id !== chainFromRoute.chain_id) {
       return "network-mismatch";
     }
 
@@ -90,9 +107,12 @@ const Page: FC<Props> = ({
     mustBeConnected,
     isConnected,
     chain,
-    evmChains.length,
+    evmChains?.length,
+    vmChains?.length,
     evmChain,
-    chainFromRoute,
+    vmChain,
+    evmChainFromRoute,
+    vmChainFromRoute,
   ]);
 
   const router = useRouter();
@@ -167,7 +187,7 @@ const Page: FC<Props> = ({
                   </div>
                 )}
               </div>
-              <EVMChainsDropdown
+              <ChainsDropdown
                 renderTrigger={() => (
                   <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}

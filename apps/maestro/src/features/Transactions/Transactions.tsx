@@ -16,7 +16,7 @@ import { groupBy } from "rambda";
 import type { TxType } from "~/lib/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import {
   CollapsedChainStatusGroup,
   ExtendedGMPTxStatus,

@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
 import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
@@ -11,11 +11,14 @@ import { TransactionExecutionError } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 
 import { logger } from "~/lib/logger";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
-  useEVMChainsDropdownContainer,
-  withEVMChainsDropdownProvider,
-} from "./EVMChainsDropdown.state";
+  useEVMChainConfigsQuery,
+  useVMChainConfigsQuery,
+} from "~/services/axelarscan/hooks";
+import {
+  useChainsDropdownContainer,
+  withChainsDropdownProvider,
+} from "./ChainsDropdown.state";
 
 const ICON_SIZES = {
   xs: 14,
@@ -50,8 +53,10 @@ export const ChainIcon: FC<{
   );
 };
 
+type ChainConfig = EVMChainConfig | VMChainConfig;
+
 type Props = {
-  chains?: EVMChainConfig[];
+  chains?: ChainConfig[];
   compact?: boolean;
   hideLabel?: boolean;
   disabled?: boolean;
@@ -59,23 +64,31 @@ type Props = {
   chainIconClassName?: string;
   contentClassName?: string;
   renderTrigger?: () => React.ReactNode;
-  selectedChain?: EVMChainConfig;
-  onSelectChain?: (chain: EVMChainConfig | null) => void;
+  selectedChain?: ChainConfig;
+  onSelectChain?: (chain: ChainConfig | null) => void;
   size?: keyof typeof ICON_SIZES;
+  chainType?: "evm" | "vm";
 };
 
-export const EVMChainIcon: FC<Props> = (props) => {
+export const ChainIconComponent: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
+  const { data: vmChains } = useVMChainConfigsQuery();
   const { chain } = useAccount();
 
-  const [state] = useEVMChainsDropdownContainer();
+  const [state] = useChainsDropdownContainer();
+
+  const chains = useMemo(() => {
+    if (props.chainType === "vm") return vmChains;
+    if (props.chainType === "evm") return evmChains;
+    return [...(evmChains ?? []), ...(vmChains ?? [])];
+  }, [evmChains, vmChains, props.chainType]);
 
   const selectedChain = useMemo(
     () =>
-      Maybe.of(evmChains).mapOrUndefined(
+      Maybe.of(chains).mapOrUndefined(
         find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
       ),
-    [chain?.id, evmChains, state.selectedChainId]
+    [chain?.id, chains, state.selectedChainId]
   );
 
   if (props.selectedChain && props.onSelectChain) {
@@ -121,26 +134,52 @@ export const EVMChainIcon: FC<Props> = (props) => {
   }
 };
 
-const EVMChainsDropdown: FC<Props> = (props) => {
+const ChainsDropdown: FC<Props> = (props) => {
   const { data: evmChains } = useEVMChainConfigsQuery();
+  const { data: vmChains } = useVMChainConfigsQuery();
   const { chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
 
-  const [state, actions] = useEVMChainsDropdownContainer();
+  const [state, actions] = useChainsDropdownContainer();
+
+  const chains = useMemo(() => {
+    // Create a lookup map using chain_id as the key
+    const chainMap = new Map();
+
+    // Process EVM chains first
+    evmChains?.forEach((chain) => {
+      chainMap.set(chain.chain_id, {
+        ...chain,
+        displayName: chain.name, // Store original name
+      });
+    });
+
+    // Process VM chains, only add if not already present or if it's a special case
+    vmChains?.forEach((chain) => {
+      const existingChain = chainMap.get(chain.chain_id);
+      if (!existingChain) {
+        chainMap.set(chain.chain_id, {
+          ...chain,
+          displayName: `${chain.name} (VM)`, // Add VM suffix to differentiate
+        });
+      }
+    });
+
+    return Array.from(chainMap.values());
+  }, [evmChains, vmChains, props.chainType]);
 
   const selectedChain = useMemo(
     () =>
-      Maybe.of(evmChains).mapOrUndefined(
+      Maybe.of(chains).mapOrUndefined(
         find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
       ),
-    [chain?.id, evmChains, state.selectedChainId]
+    [chain?.id, chains, state.selectedChainId]
   );
 
-  const eligibleChains = Maybe.of(props.chains ?? evmChains).mapOr(
-    [],
-    (chains) =>
-      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
-  );
+  // const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) =>
+  //   chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
+  // );
+  const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) => chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id));
 
   const handleChainChange = async (chainId: number) => {
     try {
@@ -149,9 +188,17 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           eligibleChains.find(propEq(chainId, "chain_id")) ?? null
         );
       } else {
-        await switchChainAsync?.({ chainId });
-        if (!chain) {
-          // only update state if not connected to a chain
+        // Only attempt to switch chain if it's an EVM chain
+        const isEVMChain = evmChains?.some(
+          (chain) => chain.chain_id === chainId
+        );
+        if (isEVMChain) {
+          await switchChainAsync?.({ chainId });
+          if (!chain) {
+            actions.selectChainId(chainId);
+          }
+        } else {
+          // Handle VM chain selection
           actions.selectChainId(chainId);
         }
       }
@@ -185,10 +232,7 @@ const EVMChainsDropdown: FC<Props> = (props) => {
           )}
           tabIndex={props.compact ? -1 : 0}
         >
-          {/* if both selectedChain and onSelectedChain exist,
-              operate in controlled mode
-          */}
-          <EVMChainIcon {...props} />
+          <ChainIconComponent {...props} />
         </Dropdown.Trigger>
       )}
 
@@ -205,22 +249,20 @@ const EVMChainsDropdown: FC<Props> = (props) => {
         >
           {!chain && (
             <Dropdown.Item className="text-base-content">
-              <a
-                href="#"
-                onClick={(e) => {
+              <button
+                onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
-
                   props.onSelectChain?.(null);
                   actions.selectChainId(null);
                 }}
-                className="group"
+                className="group flex w-full items-center gap-2"
                 role="button"
               >
                 <div className="rounded-full bg-base-200 p-0.5 shadow-black group-hover:ring-2">
                   <HelpCircleIcon size="24" />
                 </div>
                 <div>All Chains</div>
-              </a>
+              </button>
             </Dropdown.Item>
           )}
           {eligibleChains.map((chain) => (
@@ -231,19 +273,18 @@ const EVMChainsDropdown: FC<Props> = (props) => {
                   chain.chain_id === selectedChain?.chain_id,
               })}
             >
-              <a
-                href="#"
-                onClick={(e) => {
+              <button
+                onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
                   handleChainChange(chain.chain_id).catch((error) => {
                     logger.error(error);
                   });
                 }}
-                className="group"
+                className="group flex w-full items-center gap-2"
               >
                 <ChainIcon src={chain.image} alt={chain.name} size="md" />
                 <div>{chain.name}</div>
-              </a>
+              </button>
             </Dropdown.Item>
           ))}
         </Dropdown.Content>
@@ -251,4 +292,5 @@ const EVMChainsDropdown: FC<Props> = (props) => {
     </Dropdown>
   );
 };
-export default withEVMChainsDropdownProvider(EVMChainsDropdown);
+
+export default withChainsDropdownProvider(ChainsDropdown);

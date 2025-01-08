@@ -11,7 +11,7 @@ import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 

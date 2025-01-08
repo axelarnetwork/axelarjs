@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
 
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
+const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useEVMChainConfigsQuery() {
   const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<
@@ -55,6 +56,50 @@ export function useEVMChainConfigsQuery() {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
       wagmiChains,
+    },
+  };
+}
+
+export function useVMChainConfigsQuery() {
+  const { data, ...queryResult } = trpc.axelarscan.getVMChainConfigs.useQuery<VMChainConfig[]>(undefined, {
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnWindowFocus: false,
+  });
+
+  // Filter out chains that are not configured in the app
+  const [configured, unconfigured] = useMemo(
+    () => partition((x) => x.chain_id in VM_CHAIN_CONFIGS_BY_ID, data ?? []),
+    [data]
+  );
+
+  if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
+    logger.once.info(
+      `excluded ${unconfigured?.length} VM chain configs:\n${unconfigured
+        ?.map((x) =>
+          JSON.stringify(
+            {
+              chain_id: x.chain_id,
+              name: x.name,
+            },
+            null,
+            2
+          )
+        )
+        .join("\n")}`
+    );
+  }
+
+  const vmChains = configured.map(
+    (x) => VM_CHAIN_CONFIGS_BY_ID[x.chain_id]
+  );
+
+  return {
+    ...queryResult,
+    data: configured,
+    computed: {
+      indexedByChainId: indexBy(prop("chain_id"), configured),
+      indexedById: indexBy(prop("id"), configured),
+      vmChains,
     },
   };
 }

@@ -10,7 +10,7 @@ import { filter, map } from "rambda";
 import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import Pagination from "~/ui/components/Pagination";
 import Page from "~/ui/layouts/Page";
 

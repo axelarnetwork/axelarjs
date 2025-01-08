@@ -16,9 +16,9 @@ import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
-import EVMChainsDropdown, {
-  EVMChainIcon,
-} from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdown, {
+  ChainIcon,
+} from "~/ui/components/ChainsDropdown";
 
 export type TokenFoundResult = {
   tokenId?: `0x${string}`;
@@ -133,7 +133,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="h-6 w-6 animate-spin text-primary" />
           ) : (
-            <EVMChainsDropdown
+            <ChainsDropdown
               triggerClassName="btn btn-sm btn-circle"
               contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
               compact
@@ -157,7 +157,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                         operate in controlled mode
                     */}
                       <div className="flex items-center">
-                        <EVMChainIcon
+                        <ChainIcon
                           size="md"
                           hideLabel
                           selectedChain={defaultChain}

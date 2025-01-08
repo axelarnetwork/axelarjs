@@ -33,7 +33,7 @@ import { useAccount } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
 import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
 import ConnectWalletButton from "../ConnectWalletButton";
 
 type ButtonProps = ComponentProps<typeof Button>;
@@ -126,7 +126,7 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
 ) => {
   const { width } = useWindowSize();
   return (
-    <EVMChainsDropdown
+    <ChainsDropdownComponent
       compact
       disabled={props.disabled}
       triggerClassName={cn("-translate-y-1.5", {
