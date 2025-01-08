@@ -20,7 +20,7 @@ const mainnetConfigs: EnvironmentConfigs = {
 };
 
 const configsMap: Record<Environment, EnvironmentConfigs> = {
-  devnet: testnetConfigs,
+  "devnet-amplifier": testnetConfigs,
   testnet: testnetConfigs,
   mainnet: mainnetConfigs,
 };

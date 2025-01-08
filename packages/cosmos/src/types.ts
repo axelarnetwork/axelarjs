@@ -1,6 +1,6 @@
 import { StdFee } from "@cosmjs/stargate";
 
-export type Environment = "devnet" | "testnet" | "mainnet";
+export type Environment = "devnet-amplifier" | "testnet" | "mainnet";
 
 export interface AxelarRpcClientConfig {
   axelarRpcUrl?: string;
