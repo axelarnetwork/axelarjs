@@ -105,8 +105,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });
       },
-      createTokenManagerClient(chain: Chain, address: `0x${string}`) {
-        return new TokenManagerClient({ chain, address });
+      createTokenManagerClient(chain: Chain, address: string) {
+        return new TokenManagerClient({ chain, address: address as `0x${string}` });
       },
       createInterchainTokenServiceClient(
         chain: Chain,
