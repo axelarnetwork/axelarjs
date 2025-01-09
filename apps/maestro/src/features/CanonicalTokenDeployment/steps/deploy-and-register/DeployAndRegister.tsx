@@ -30,7 +30,13 @@ export const Step3: FC = () => {
 
   const chainId = useChainId();
 
-  const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
+  // Support both EVM and VM chains
+  const sourceChain = useMemo(() => {
+    return (
+      state.evmChains?.find((x) => x.chain_id === chainId) ||
+      state.vmChains?.find((x) => x.chain_id === chainId)
+    );
+  }, [state.evmChains, state.vmChains, chainId]);
 
   const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
@@ -135,11 +141,24 @@ export const Step3: FC = () => {
       addTransaction,
     ]
   );
+  const eligibleChains = useMemo(() => {
+    const uniqueChains = new Map();
 
-  const eligibleChains = useMemo(
-    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
-    [state.evmChains, chainId]
-  );
+    // Add EVM chains
+    state.evmChains?.forEach((chain) => {
+      uniqueChains.set(chain.chain_id, chain);
+    });
+
+    // Add VM chains
+    state.vmChains?.forEach((chain) => {
+      uniqueChains.set(chain.chain_id, chain);
+    });
+
+    // Convert to array and filter out current chain
+    return Array.from(uniqueChains.values()).filter(
+      (chain) => chain.chain_id !== chainId
+    );
+  }, [state.evmChains, state.vmChains, chainId]);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
@@ -147,7 +166,12 @@ export const Step3: FC = () => {
 
   const { data: balance } = useBalance({ address });
 
-  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+  const nativeTokenSymbol = useMemo(() => {
+    if (sourceChain?.chain_type === 'vm') {
+      return sourceChain.native_token.symbol;
+    }
+    return getNativeToken(state.sourceChainId);
+  }, [sourceChain, state.sourceChainId]);
 
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !state.remoteDeploymentGasFees) {

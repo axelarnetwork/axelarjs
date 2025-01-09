@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, cn, Progress, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
@@ -9,11 +9,12 @@ import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
+type ChainConfig = EVMChainConfig | VMChainConfig;
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
   called: "Initialized",
@@ -42,14 +43,24 @@ const STATUS_COLORS: Partial<
 };
 
 export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+  
+  // Combine the chain configs
+  const chainConfigs = useMemo(() => ({
+    indexedByChainId: {
+      ...evmComputed.indexedByChainId,
+      ...vmComputed.indexedByChainId,
+    }
+  }), [evmComputed, vmComputed]);
+
   const { data: txInfo } = useTransaction({
     hash: txHash,
     chainId,
   });
 
   const { data: chainInfo } = useChainInfoQuery({
-    axelarChainId: computed.indexedByChainId[chainId]?.id,
+    axelarChainId: chainConfigs.indexedByChainId[chainId]?.id,
   });
 
   const { data: currentBlockNumber } = useBlockNumber({
@@ -136,7 +147,20 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
 
   const chainId = useChainId();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+
+  // Combine the chain configs
+  const chainConfigs = useMemo(() => ({
+    indexedById: {
+      ...evmComputed.indexedById,
+      ...vmComputed.indexedById,
+    },
+    indexedByChainId: {
+      ...evmComputed.indexedByChainId,
+      ...vmComputed.indexedByChainId,
+    }
+  }), [evmComputed, vmComputed]);
 
   const statusList = Object.values(statuses ?? {});
 
@@ -180,7 +204,11 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-            const chain = computed.indexedById[axelarChainId];
+            const chain = chainConfigs.indexedById[axelarChainId];
+            console.log('chainConfigs', chainConfigs)
+            console.log("axelarChainId", axelarChainId)
+
+            console.log("chainnnn", chain)
 
             return (
               <ChainStatusItem
@@ -204,7 +232,7 @@ export type ChainStatusItemProps = {
   status: ExtendedGMPTxStatus;
   txHash: `0x${string}`;
   logIndex: number;
-  chain: EVMChainConfig;
+  chain: ChainConfig;
   className?: string;
   compact?: boolean;
   offset?: number;
@@ -215,11 +243,11 @@ export type ChainStatusItemsProps = Omit<
   "chain" | "logIndex"
 > & {
   logIndexes: number[];
-  chains: EVMChainConfig[];
+  chains: ChainConfig[];
 };
 
 const CollapsedChains: FC<{
-  chains: EVMChainConfig[];
+  chains: ChainConfig[];
   offset: number;
 }> = ({ chains, offset }) => {
   if (chains.length > offset) {
@@ -289,6 +317,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   className,
   compact,
 }) => {
+  console.log("chain", chain)
   return (
     <li className={cn("flex items-center justify-between", className)}>
       <span className="flex items-center gap-2">

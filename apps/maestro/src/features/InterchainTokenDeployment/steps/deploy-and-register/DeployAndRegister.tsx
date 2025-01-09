@@ -146,8 +146,22 @@ export const Step2: FC = () => {
 
   // Combine EVM and VM chains for eligible chains
   const eligibleChains = useMemo(() => {
-    const allChains = [...(state.evmChains || []), ...(state.vmChains || [])];
-    return allChains.filter((chain) => chain.chain_id !== chainId);
+    const uniqueChains = new Map();
+
+    // Add VM chains first (they will be overwritten by VM chains if there are duplicates)
+    state.vmChains?.forEach((chain) => {
+      uniqueChains.set(chain.chain_id, chain);
+    });
+
+    // Add EVM chains
+    state.evmChains?.forEach((chain) => {
+      uniqueChains.set(chain.chain_id, chain);
+    });
+
+    // Convert back to array and filter out current chainId
+    return Array.from(uniqueChains.values()).filter(
+      (chain) => chain.chain_id !== chainId
+    );
   }, [state.evmChains, state.vmChains, chainId]);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
