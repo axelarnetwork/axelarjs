@@ -166,7 +166,7 @@ const ChainsDropdown: FC<Props> = (props) => {
     });
 
     return Array.from(chainMap.values());
-  }, [evmChains, vmChains, props.chainType]);
+  }, [evmChains, vmChains]);
 
   const selectedChain = useMemo(
     () =>
@@ -179,7 +179,9 @@ const ChainsDropdown: FC<Props> = (props) => {
   // const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) =>
   //   chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   // );
-  const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) => chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id));
+  const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) =>
+    chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
+  );
 
   const handleChainChange = async (chainId: number) => {
     try {
@@ -188,18 +190,19 @@ const ChainsDropdown: FC<Props> = (props) => {
           eligibleChains.find(propEq(chainId, "chain_id")) ?? null
         );
       } else {
-        // Only attempt to switch chain if it's an EVM chain
-        const isEVMChain = evmChains?.some(
+        const selectedChain = eligibleChains.find(
           (chain) => chain.chain_id === chainId
         );
-        if (isEVMChain) {
-          await switchChainAsync?.({ chainId });
-          if (!chain) {
-            actions.selectChainId(chainId);
-          }
-        } else {
-          // Handle VM chain selection
-          actions.selectChainId(chainId);
+
+        if (!selectedChain) {
+          toast.error("Chain not found");
+          return;
+        }
+
+        // Determine chain type and handle accordingly
+        await switchChainAsync?.({ chainId });
+        if (!chain) {
+          actions.selectChainId(chainId, "evm");
         }
       }
     } catch (error) {
