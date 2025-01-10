@@ -47,9 +47,7 @@ export function useInterchainTokensQuery(input: {
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
         chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
-        wagmiConfig: token.chainType === 'evm' 
-          ? combinedComputed.wagmiChains?.find((x) => x?.id === Number(token.chainId))
-          : undefined,
+        wagmiConfig: combinedComputed.wagmiChains?.find((x) => x?.id === Number(token.chainId))
       })),
       chain: Maybe.of(input.chainId).mapOrUndefined(
         (x) => combinedComputed.indexedByChainId[x]
