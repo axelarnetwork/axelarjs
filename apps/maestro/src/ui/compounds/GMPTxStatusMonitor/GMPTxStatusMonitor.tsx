@@ -205,10 +205,6 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
             const chain = chainConfigs.indexedById[axelarChainId];
-            console.log('chainConfigs', chainConfigs)
-            console.log("axelarChainId", axelarChainId)
-
-            console.log("chainnnn", chain)
 
             return (
               <ChainStatusItem
