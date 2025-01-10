@@ -20,8 +20,21 @@ export const recordRemoteTokensDeployment = protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const chains = await ctx.configs.evmChains();
-    const configs = chains[input.chainId];
+    // Get both EVM and VM chains
+    const [evmChains, vmChains] = await Promise.all([
+      ctx.configs.evmChains(),
+      ctx.configs.vmChains(),
+    ]);
+
+    // Try to find config in either chain type
+    const configs = evmChains[input.chainId] || vmChains[input.chainId];
+
+    if (!configs) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No configuration found for chain ID ${input.chainId}`,
+      });
+    }
 
     const originToken =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
@@ -55,12 +68,27 @@ export const recordRemoteTokensDeployment = protectedProcedure
 
     const remoteTokens = await Promise.all(
       input.remoteTokens.map(async (remoteToken) => {
-        const chains = await ctx.configs.evmChains();
-        const configs = chains[remoteToken.axelarChainId];
+        // Get configs for remote chain
+        const remoteEvmConfig = evmChains[remoteToken.axelarChainId];
+        const remoteVmConfig = vmChains[remoteToken.axelarChainId];
+        const remoteConfig = remoteEvmConfig || remoteVmConfig;
 
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          configs.wagmi
-        );
+        if (!remoteConfig) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `No configuration found for remote chain ${remoteToken.axelarChainId}`,
+          });
+        }
+
+        // Create appropriate client based on chain type
+        const itsClient = ctx.contracts.createInterchainTokenServiceClient(remoteConfig.wagmi);
+
+        if (!itsClient) {
+          throw new TRPCError({
+            code: "NOT_IMPLEMENTED",
+            message: `Chain type ${remoteConfig.info.chain_name} not supported yet`,
+          });
+        }
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
           itsClient.reads
