@@ -1,5 +1,6 @@
 import { invariant, Maybe } from "@axelarjs/utils";
-import { always } from "rambda";
+
+import { always, chain } from "rambda";
 import { z } from "zod";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
@@ -24,9 +25,13 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     const evmChains = await ctx.configs.evmChains();
     const vmChains = await ctx.configs.vmChains();
-    const configs = evmChains[input.axelarChainId] || vmChains[input.axelarChainId];
+    const configs =
+      evmChains[input.axelarChainId] || vmChains[input.axelarChainId];
 
-    invariant(configs, `No configuration found for chain ${input.axelarChainId}`);
+    invariant(
+      configs,
+      `No configuration found for chain ${input.axelarChainId}`
+    );
 
     // Handle different chain types
     const createServiceClient = () => {
@@ -70,16 +75,45 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     const remoteTokens = await Promise.all(
       input.destinationAxelarChainIds.map(async (axelarChainId) => {
-        const chains = {
-          ...await ctx.configs.evmChains(),
-          ...await ctx.configs.vmChains(),
-        };
+        // Fetch both chain types
+        const vmChains = await ctx.configs.vmChains();
+        const evmChains = await ctx.configs.evmChains();
+
+        // Create a Map using chain_id as the key to ensure uniqueness
+        const uniqueChains = new Map();
+
+        // Add VM chains first, accessing the 'info' property
+        Object.values(vmChains).forEach((chainConfig) => {
+          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
+        });
+
+        // Add EVM chains, overwriting any duplicates
+        Object.values(evmChains).forEach((chainConfig) => {
+          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
+        });
+
+        // Convert back to an object with axelarChainId as keys
+        const chains = Array.from(uniqueChains.values()).reduce(
+          (acc, chainConfig) => {
+            acc[chainConfig.info.id] = chainConfig;
+            return acc;
+          },
+          {} as Record<string, typeof chain>
+        );
+
         const chainConfig = chains[axelarChainId];
-        invariant(chainConfig, `No configuration found for chain ${axelarChainId}`);
+        invariant(
+          chainConfig,
+          `No configuration found for chain ${axelarChainId}`
+        );
+        invariant(
+          chainConfig.wagmi,
+          `No wagmi configuration found for chain ${axelarChainId}`
+        );
 
-        invariant(chainConfig.wagmi, `No wagmi configuration found for chain ${axelarChainId}`);
-
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(chainConfig.wagmi);
+        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+          chainConfig.wagmi
+        );
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
           itsClient.reads
