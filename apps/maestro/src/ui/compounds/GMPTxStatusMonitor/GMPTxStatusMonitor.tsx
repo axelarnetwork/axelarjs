@@ -172,20 +172,20 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   );
 
   const statusList = Object.values(statuses ?? {});
-  const isItsHubTx = Object.keys(statuses).includes("axelarnet");
+  const pendingItsHubTx = Object.keys(statuses).includes("axelarnet") || Object.keys(statuses).includes("axelar");
 
   useEffect(() => {
     if (
       statusList.length &&
-      !isItsHubTx &&
+      !pendingItsHubTx &&
       statusList?.every((s) => s.status === "executed")
     ) {
       onAllChainsExecuted?.();
     }
-  }, [isItsHubTx, statusList, onAllChainsExecuted]);
+  }, [pendingItsHubTx, statusList, onAllChainsExecuted]);
 
-  if (!statuses || Object.keys(statuses).length === 0 || isItsHubTx) {
-    if (!isLoading && !isItsHubTx) {
+  if (!statuses || Object.keys(statuses).length === 0 || pendingItsHubTx) {
+    if (!isLoading && !pendingItsHubTx) {
       // nothing to show
       return null;
     }
@@ -291,7 +291,7 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
         {leading.map((chain, i) => (
           <span key={chain.id} className="-ml-2 flex items-center">
             <Tooltip
-              tip={`${chain.name} - view tx on Axelarscan`}
+              tip={chain ? `${chain?.name} - view tx on Axelarscan` : "View tx on Axelarscan"}
               $position="left"
             >
               <Link
@@ -302,7 +302,7 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
                 <ChainIcon
                   src={chain.image}
                   size={compact ? "sm" : "md"}
-                  alt={chain.name}
+                  alt={chain?.name || "chain"}
                 />
               </Link>
             </Tooltip>{" "}
@@ -324,17 +324,18 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   className,
   compact,
 }) => {
+  const chainName = chain?.name || "chain";
   return (
     <li className={cn("flex items-center justify-between", className)}>
       <span className="flex items-center gap-2">
-        <Tooltip tip={chain.name}>
+        <Tooltip tip={chainName}>
           <ChainIcon
             src={chain.image}
             size={compact ? "sm" : "md"}
-            alt={chain.name}
+            alt={chainName}
           />
         </Tooltip>{" "}
-        {!compact && chain.name}
+        {!compact && chainName}
       </span>
       <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
     </li>
