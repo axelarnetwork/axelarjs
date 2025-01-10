@@ -93,8 +93,8 @@ importers:
   apps/maestro:
     dependencies:
       '@axelar-network/axelarjs-sdk':
-        specifier: 0.17.1-alpha.10
-        version: 0.17.1-alpha.10(bufferutil@4.0.8)(typescript@5.4.3)(utf-8-validate@6.0.3)
+        specifier: 0.17.1-alpha.12
+        version: 0.17.1-alpha.12(bufferutil@4.0.8)(typescript@5.4.3)(utf-8-validate@6.0.3)
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -1083,8 +1083,8 @@ packages:
     resolution: {integrity: sha512-o8pv+krIAlEwzid0Ac8qwykDsavc+1DRPvyFQ3V0R0zTQFtYLJIIXXXt7FRb8b+LJDAuX+E0bB3N2X+hlcxk/g==}
     engines: {node: '>=18'}
 
-  '@axelar-network/axelarjs-sdk@0.17.1-alpha.10':
-    resolution: {integrity: sha512-ZWpTAfnIPsc37UZuZJeobYErq0d9J27n9GDgv/D60cTFdLi06wak8/7zIt0v0HJnzgKVSUG1J27qDum4nbPRKQ==}
+  '@axelar-network/axelarjs-sdk@0.17.1-alpha.12':
+    resolution: {integrity: sha512-yQz3zFOfMjYlAzl1/sN/p6nIkKpDbFu9XjA4ynMCR4EqZav8alscRpRLDNrxZP3LPk1cvB1Ppx6jRBHfRFupzA==}
 
   '@axelar-network/axelarjs-types@0.33.0':
     resolution: {integrity: sha512-aCbX/5G+tgWPjr9tl3dQfJftWwRMkILz61ytach7dKqxtO9G9jlxpNvELJQ6gKVOodUtSY8qBCO/fWU19v4hdQ==}
@@ -12463,7 +12463,7 @@ snapshots:
 
   '@axelar-network/axelar-gmp-sdk-solidity@6.0.4': {}
 
-  '@axelar-network/axelarjs-sdk@0.17.1-alpha.10(bufferutil@4.0.8)(typescript@5.4.3)(utf-8-validate@6.0.3)':
+  '@axelar-network/axelarjs-sdk@0.17.1-alpha.12(bufferutil@4.0.8)(typescript@5.4.3)(utf-8-validate@6.0.3)':
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 6.4.0
       '@axelar-network/axelarjs-types': 0.33.0
