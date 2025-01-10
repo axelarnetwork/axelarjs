@@ -16,12 +16,12 @@ export function useInterchainTokensQuery(input: {
 
   const combinedComputed = useMemo(() => ({
     indexedById: {
-      ...evmComputed.indexedById,
       ...vmComputed.indexedById,
+      ...evmComputed.indexedById,
     },
     indexedByChainId: {
-      ...evmComputed.indexedByChainId,
       ...vmComputed.indexedByChainId,
+      ...evmComputed.indexedByChainId,
     },
     wagmiChains: evmComputed.wagmiChains, // Keep wagmiChains for EVM compatibility
   }), [evmComputed, vmComputed]);
