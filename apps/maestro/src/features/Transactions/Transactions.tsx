@@ -96,8 +96,8 @@ const ToastElement: FC<ToastElementProps> = ({
   const combinedComputed = useMemo(
     () => ({
       indexedByChainId: {
-        ...evmComputed.indexedByChainId,
         ...vmComputed.indexedByChainId,
+        ...evmComputed.indexedByChainId,
       },
       wagmiChains: evmComputed.wagmiChains,
     }),

@@ -32,12 +32,12 @@ const Review: FC = () => {
   // Combine EVM and VM chain configs
   const combinedChainConfigs = useMemo(() => ({
     indexedById: {
-      ...evmComputed.indexedById,
       ...vmComputed.indexedById,
+      ...evmComputed.indexedById,
     },
     indexedByChainId: {
-      ...evmComputed.indexedByChainId,
       ...vmComputed.indexedByChainId,
+      ...evmComputed.indexedByChainId,
     }
   }), [evmComputed, vmComputed]);
 
