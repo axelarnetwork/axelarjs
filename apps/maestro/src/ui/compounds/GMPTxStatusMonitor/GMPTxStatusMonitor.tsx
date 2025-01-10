@@ -9,7 +9,10 @@ import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import {
+  useEVMChainConfigsQuery,
+  useVMChainConfigsQuery,
+} from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
@@ -45,14 +48,17 @@ const STATUS_COLORS: Partial<
 export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
   const { computed: evmComputed } = useEVMChainConfigsQuery();
   const { computed: vmComputed } = useVMChainConfigsQuery();
-  
+
   // Combine the chain configs
-  const chainConfigs = useMemo(() => ({
-    indexedByChainId: {
-      ...evmComputed.indexedByChainId,
-      ...vmComputed.indexedByChainId,
-    }
-  }), [evmComputed, vmComputed]);
+  const chainConfigs = useMemo(
+    () => ({
+      indexedByChainId: {
+        ...vmComputed.indexedByChainId,
+        ...evmComputed.indexedByChainId,
+      },
+    }),
+    [evmComputed, vmComputed]
+  );
 
   const { data: txInfo } = useTransaction({
     hash: txHash,
@@ -151,30 +157,35 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const { computed: vmComputed } = useVMChainConfigsQuery();
 
   // Combine the chain configs
-  const chainConfigs = useMemo(() => ({
-    indexedById: {
-      ...evmComputed.indexedById,
-      ...vmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...evmComputed.indexedByChainId,
-      ...vmComputed.indexedByChainId,
-    }
-  }), [evmComputed, vmComputed]);
+  const chainConfigs = useMemo(
+    () => ({
+      indexedById: {
+        ...vmComputed.indexedById,
+        ...evmComputed.indexedById,
+      },
+      indexedByChainId: {
+        ...vmComputed.indexedByChainId,
+        ...evmComputed.indexedByChainId,
+      },
+    }),
+    [evmComputed, vmComputed]
+  );
 
   const statusList = Object.values(statuses ?? {});
+  const isItsHubTx = Object.keys(statuses).includes("axelarnet");
 
   useEffect(() => {
     if (
       statusList.length &&
+      !isItsHubTx &&
       statusList?.every((s) => s.status === "executed")
     ) {
       onAllChainsExecuted?.();
     }
-  }, [statusList, onAllChainsExecuted]);
+  }, [isItsHubTx, statusList, onAllChainsExecuted]);
 
-  if (!statuses || Object.keys(statuses).length === 0) {
-    if (!isLoading) {
+  if (!statuses || Object.keys(statuses).length === 0 || isItsHubTx) {
+    if (!isLoading && !isItsHubTx) {
       // nothing to show
       return null;
     }
