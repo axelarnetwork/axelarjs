@@ -172,7 +172,9 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   );
 
   const statusList = Object.values(statuses ?? {});
-  const pendingItsHubTx = Object.keys(statuses).includes("axelarnet") || Object.keys(statuses).includes("axelar");
+  const pendingItsHubTx =
+    Object.keys(statuses).includes("axelarnet") ||
+    Object.keys(statuses).includes("axelar");
 
   useEffect(() => {
     if (
@@ -289,9 +291,13 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />
       <div className="flex translate-x-5 items-center">
         {leading.map((chain, i) => (
-          <span key={chain.id} className="-ml-2 flex items-center">
+          <span key={chain?.id || i} className="-ml-2 flex items-center">
             <Tooltip
-              tip={chain ? `${chain?.name} - view tx on Axelarscan` : "View tx on Axelarscan"}
+              tip={
+                chain
+                  ? `${chain?.name} - view tx on Axelarscan`
+                  : "View tx on Axelarscan"
+              }
               $position="left"
             >
               <Link
@@ -299,11 +305,13 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <ChainIcon
-                  src={chain.image}
-                  size={compact ? "sm" : "md"}
-                  alt={chain?.name || "chain"}
-                />
+                {chain && (
+                  <ChainIcon
+                    src={chain.image}
+                    size={compact ? "sm" : "md"}
+                    alt={chain?.name || "chain"}
+                  />
+                )}
               </Link>
             </Tooltip>{" "}
           </span>
