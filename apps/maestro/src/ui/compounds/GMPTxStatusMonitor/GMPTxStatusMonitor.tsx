@@ -313,7 +313,6 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   className,
   compact,
 }) => {
-  console.log("chain", chain)
   return (
     <li className={cn("flex items-center justify-between", className)}>
       <span className="flex items-center gap-2">
