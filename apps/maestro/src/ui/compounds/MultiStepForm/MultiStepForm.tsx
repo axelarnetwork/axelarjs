@@ -32,7 +32,7 @@ import { useSession } from "next-auth/react";
 import { useAccount } from "wagmi";
 
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
 import ConnectWalletButton from "../ConnectWalletButton";
 
@@ -229,14 +229,26 @@ export const ShareHaikuButton: FC<{
   const { mutateAsync, isPending, isSuccess } =
     trpc.openai.generateInterchainDeploymentHaiku.useMutation();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+
+  const combinedComputed = useMemo(() => ({
+    indexedById: {
+      ...vmComputed.indexedById,
+      ...evmComputed.indexedById,
+    },
+    indexedByChainId: {
+      ...vmComputed.indexedByChainId,
+      ...evmComputed.indexedByChainId,
+    },
+  }), [evmComputed, vmComputed]);
 
   const additionalChainNames = useMemo(() => {
     return props.additionalChainNames.map((chainName) => {
-      const chain = computed.indexedById[chainName];
+      const chain = combinedComputed.indexedById[chainName];
       return chain?.name ?? "";
     });
-  }, [computed, props.additionalChainNames]);
+  }, [combinedComputed.indexedById, props.additionalChainNames]);
 
   const handleShareHaiku = useCallback(async () => {
     try {

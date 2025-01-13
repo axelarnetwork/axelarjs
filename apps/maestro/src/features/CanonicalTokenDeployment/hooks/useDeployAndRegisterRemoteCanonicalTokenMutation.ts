@@ -18,7 +18,7 @@ import {
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
 
 export interface UseDeployAndRegisterCanonicalTokenInput {
@@ -43,7 +43,19 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+
+  const combinedComputed = useMemo(() => ({
+    indexedById: {
+      ...vmComputed.indexedById,
+      ...evmComputed.indexedById,
+    },
+    indexedByChainId: {
+      ...vmComputed.indexedByChainId,
+      ...evmComputed.indexedByChainId,
+    },
+  }), [evmComputed, vmComputed]);
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -64,7 +76,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
   const { originalChainName, destinationChainNames } = useMemo(() => {
-    const index = computed.indexedById;
+    const index = combinedComputed.indexedById;
     const originalChainName =
       index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
 
@@ -80,7 +92,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     };
   }, [
     chainId,
-    computed.indexedById,
+    combinedComputed.indexedById,
     input?.destinationChainIds,
     input?.sourceChainId,
   ]);

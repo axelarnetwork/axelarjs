@@ -35,7 +35,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   const { chain: connectedChain } = useAccount();
 
-    const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
   const { computed: vmComputed } = useVMChainConfigsQuery();
 
   // Combine computed data

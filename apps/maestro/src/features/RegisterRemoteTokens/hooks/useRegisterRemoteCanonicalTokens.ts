@@ -25,15 +25,27 @@ export type RegisterRemoteCanonicalTokensInput = {
 export default function useRegisterRemoteCanonicalTokens(
   input: RegisterRemoteCanonicalTokensInput
 ) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+  const combinedComputed = useMemo(() => ({
+    indexedById: {
+      ...vmComputed.indexedById,
+      ...evmComputed.indexedById,
+    },
+    indexedByChainId: {
+      ...vmComputed.indexedByChainId,
+      ...evmComputed.indexedByChainId,
+    },
+  }), [evmComputed, vmComputed]);
+
   const chainId = useChainId();
 
   const destinationChains = useMemo(
     () =>
       input.chainIds
-        .map((chainId) => computed.indexedByChainId[chainId])
+        .map((chainId) => combinedComputed.indexedByChainId[chainId])
         .filter(Boolean),
-    [input.chainIds, computed.indexedByChainId]
+    [input.chainIds, combinedComputed.indexedByChainId]
   );
 
   const destinationChainIds = destinationChains.map(
@@ -41,8 +53,8 @@ export default function useRegisterRemoteCanonicalTokens(
   );
 
   const sourceChain = useMemo(
-    () => computed.indexedByChainId[chainId],
-    [chainId, computed.indexedByChainId]
+    () => combinedComputed.indexedByChainId[chainId],
+    [chainId, combinedComputed.indexedByChainId]
   );
 
   const { data: tokenDetails } = useInterchainTokenDetailsQuery({
