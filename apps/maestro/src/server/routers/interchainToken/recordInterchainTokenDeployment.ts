@@ -18,6 +18,10 @@ const recordInterchainTokenDeploymentInput = newInterchainTokenSchema
     tokenManagerAddress: true,
   });
 
+export type RecordInterchainTokenDeploymentInput = z.infer<
+  typeof recordInterchainTokenDeploymentInput
+>;
+
 export const recordInterchainTokenDeployment = protectedProcedure
   .input(recordInterchainTokenDeploymentInput)
   .mutation(async ({ ctx, input }) => {

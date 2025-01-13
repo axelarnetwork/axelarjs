@@ -13,11 +13,11 @@ import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useEVMChainConfigsQuery, useVMChainConfigsQuery} from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import ChainsDropdown, {
-  ChainIcon,
+  ChainIconComponent,
 } from "~/ui/components/ChainsDropdown";
 
 export type TokenFoundResult = {
@@ -35,15 +35,25 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   const { chain: connectedChain } = useAccount();
 
-  const { computed } = useEVMChainConfigsQuery();
+    const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+
+  // Combine computed data
+  const combinedComputed = useMemo(() => ({
+    indexedByChainId: {
+      ...evmComputed.indexedByChainId,
+      ...vmComputed.indexedByChainId,
+    }
+  }), [evmComputed, vmComputed]);
 
   const [selectedChainId, setSelectedChainId] = useSessionStorageState(
     "@maestro/SearchInterchainToken.selectedChainId",
     connectedChain?.id ?? -1
   );
+
   const defaultChain = useMemo(
-    () => computed.indexedByChainId[selectedChainId],
-    [computed.indexedByChainId, selectedChainId]
+    () => combinedComputed.indexedByChainId[selectedChainId],
+    [combinedComputed.indexedByChainId, selectedChainId]
   );
 
   const isValidAddress = isAddress(search as `0x${string}`);
@@ -157,7 +167,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                         operate in controlled mode
                     */}
                       <div className="flex items-center">
-                        <ChainIcon
+                        <ChainIconComponent
                           size="md"
                           hideLabel
                           selectedChain={defaultChain}

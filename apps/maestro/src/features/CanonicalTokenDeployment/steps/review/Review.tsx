@@ -6,7 +6,7 @@ import {
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress, Maybe } from "@axelarjs/utils";
+import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useState, useMemo, type FC } from "react";
 import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
