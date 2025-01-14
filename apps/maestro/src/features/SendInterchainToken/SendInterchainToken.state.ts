@@ -14,7 +14,7 @@ import {
   useChainInfoQuery,
   useEstimateGasFeeQuery,
 } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useTransactionsContainer } from "../Transactions";
@@ -32,19 +32,8 @@ export function useSendInterchainTokenState(props: {
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
 }) {
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
 
-  const combinedComputed = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    }
-  }), [evmComputed, vmComputed]);
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   // Only query ERC20 details for EVM chains
   const { data: tokenDetails } = useERC20TokenDetailsQuery({

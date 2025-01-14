@@ -10,8 +10,7 @@ import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import {
-  useEVMChainConfigsQuery,
-  useVMChainConfigsQuery,
+  useAllChainConfigsQuery,
 } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -46,19 +45,7 @@ const STATUS_COLORS: Partial<
 };
 
 export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  // Combine the chain configs
-  const chainConfigs = useMemo(
-    () => ({
-      indexedByChainId: {
-        ...vmComputed.indexedByChainId,
-        ...evmComputed.indexedByChainId,
-      },
-    }),
-    [evmComputed, vmComputed]
-  );
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const { data: txInfo } = useTransaction({
     hash: txHash,
@@ -66,7 +53,7 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
   });
 
   const { data: chainInfo } = useChainInfoQuery({
-    axelarChainId: chainConfigs.indexedByChainId[chainId]?.id,
+    axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
 
   const { data: currentBlockNumber } = useBlockNumber({
@@ -153,23 +140,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
 
   const chainId = useChainId();
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  // Combine the chain configs
-  const chainConfigs = useMemo(
-    () => ({
-      indexedById: {
-        ...vmComputed.indexedById,
-        ...evmComputed.indexedById,
-      },
-      indexedByChainId: {
-        ...vmComputed.indexedByChainId,
-        ...evmComputed.indexedByChainId,
-      },
-    }),
-    [evmComputed, vmComputed]
-  );
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const statusList = Object.values(statuses ?? {});
   const pendingItsHubTx =
@@ -217,7 +188,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-            const chain = chainConfigs.indexedById[axelarChainId];
+            const chain = combinedComputed.indexedById[axelarChainId];
 
             return (
               <ChainStatusItem

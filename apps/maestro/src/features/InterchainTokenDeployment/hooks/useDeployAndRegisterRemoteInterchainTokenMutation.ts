@@ -22,7 +22,7 @@ import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
@@ -49,19 +49,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  const combinedComputed = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    },
-  }), [evmComputed, vmComputed]);
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();

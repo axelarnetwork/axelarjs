@@ -3,9 +3,9 @@
 
 import {
   createUseReadContract,
+  createUseWriteContract,
   createUseSimulateContract,
   createUseWatchContractEvent,
-  createUseWriteContract,
 } from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,7 +427,7 @@ export const interchainTokenFactoryAbi = [
 ] as const;
 
 export const interchainTokenFactoryAddress =
-  "0x83a93500d23Fbc3e82B410aD07A6a9F7A0670D66" as const;
+  "0x6Ae8C8498d5FDA930e6ABeB0E15E5A00471702a7" as const;
 
 export const interchainTokenFactoryConfig = {
   address: interchainTokenFactoryAddress,

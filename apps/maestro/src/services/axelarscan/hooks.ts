@@ -13,6 +13,26 @@ import axelarscanClient from ".";
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
+export function useAllChainConfigsQuery() {
+  const { computed: evmComputed } = useEVMChainConfigsQuery();
+  const { computed: vmComputed } = useVMChainConfigsQuery();
+  const combinedComputed = useMemo(
+    () => ({
+      indexedById: {
+        ...vmComputed.indexedById,
+        ...evmComputed.indexedById,
+      },
+      indexedByChainId: {
+        ...vmComputed.indexedByChainId,
+        ...evmComputed.indexedByChainId,
+      },
+    }),
+    [evmComputed, vmComputed]
+  );
+
+  return {combinedComputed, evmComputed, vmComputed};
+}
+
 export function useEVMChainConfigsQuery() {
   const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<
     EVMChainConfig[]
@@ -61,7 +81,9 @@ export function useEVMChainConfigsQuery() {
 }
 
 export function useVMChainConfigsQuery() {
-  const { data, ...queryResult } = trpc.axelarscan.getVMChainConfigs.useQuery<VMChainConfig[]>(undefined, {
+  const { data, ...queryResult } = trpc.axelarscan.getVMChainConfigs.useQuery<
+    VMChainConfig[]
+  >(undefined, {
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnWindowFocus: false,
   });
@@ -89,9 +111,7 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const vmChains = configured.map(
-    (x) => VM_CHAIN_CONFIGS_BY_ID[x.chain_id]
-  );
+  const vmChains = configured.map((x) => VM_CHAIN_CONFIGS_BY_ID[x.chain_id]);
 
   return {
     ...queryResult,

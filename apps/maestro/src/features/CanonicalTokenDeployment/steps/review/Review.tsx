@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
 
 import { useChainFromRoute } from "~/lib/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
@@ -25,20 +25,7 @@ const Review: FC = () => {
   const { chain } = useAccount();
   const routeChain = useChainFromRoute();
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  // Combine EVM and VM chain configs
-  const combinedComputed = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    }
-  }), [evmComputed, vmComputed]);
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const [shouldFetch, setShouldFetch] = useState(false);
 

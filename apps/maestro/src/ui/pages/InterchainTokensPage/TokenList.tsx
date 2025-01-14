@@ -9,7 +9,7 @@ import { filter, map } from "rambda";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import Pagination from "~/ui/components/Pagination";
 import Page from "~/ui/layouts/Page";
@@ -53,20 +53,8 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
     }
   );
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  const combinedComputed = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    },
-  }), [evmComputed, vmComputed]);
-
+  const { combinedComputed } = useAllChainConfigsQuery();
+ 
   const maybeTokens = Maybe.of(data).map((data) => data.items);
   const totalPages = Maybe.of(data).mapOr(0, (data) => data.totalPages);
 

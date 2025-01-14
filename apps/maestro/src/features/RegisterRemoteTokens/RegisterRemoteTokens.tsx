@@ -15,8 +15,7 @@ import { logger } from "~/lib/logger";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { trpc } from "~/lib/trpc";
 import {
-  useEVMChainConfigsQuery,
-  useVMChainConfigsQuery,
+  useAllChainConfigsQuery,
 } from "~/services/axelarscan/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
@@ -39,23 +38,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const { mutateAsync: recordRemoteTokenDeployment } =
     trpc.interchainToken.recordRemoteTokensDeployment.useMutation();
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  const combinedComputed = useMemo(
-    () => ({
-      indexedById: {
-        ...evmComputed.indexedById,
-        ...vmComputed.indexedById,
-      },
-      indexedByChainId: {
-        ...evmComputed.indexedByChainId,
-        ...vmComputed.indexedByChainId,
-      },
-      wagmiChains: evmComputed.wagmiChains,
-    }),
-    [evmComputed, vmComputed]
-  );
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const baseRemoteTokens = props.chainIds.map((chainId) => ({
     chainId,

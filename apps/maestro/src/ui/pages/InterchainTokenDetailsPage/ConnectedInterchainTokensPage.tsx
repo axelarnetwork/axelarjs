@@ -21,8 +21,7 @@ import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import {
-  useEVMChainConfigsQuery,
-  useVMChainConfigsQuery,
+  useAllChainConfigsQuery,
 } from "~/services/axelarscan/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
@@ -161,22 +160,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       txHashes: sessionState.deployTokensTxHashes,
     });
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  const combinedComputed = useMemo(
-    () => ({
-      indexedById: {
-        ...evmComputed.indexedById,
-        ...vmComputed.indexedById,
-      },
-      indexedByChainId: {
-        ...evmComputed.indexedByChainId,
-        ...vmComputed.indexedByChainId,
-      },
-    }),
-    [evmComputed, vmComputed]
-  );
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const { switchChainAsync } = useSwitchChain();
 

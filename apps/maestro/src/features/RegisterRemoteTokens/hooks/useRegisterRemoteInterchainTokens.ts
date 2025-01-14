@@ -13,7 +13,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
 export type RegisterRemoteInterchainTokensInput = {
@@ -25,19 +25,8 @@ export type RegisterRemoteInterchainTokensInput = {
 export default function useRegisterRemoteInterchainTokens(
   input: RegisterRemoteInterchainTokensInput
 ) {
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
 
-  const combinedComputed = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    },
-  }), [evmComputed, vmComputed]);
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const chainId = useChainId();
 

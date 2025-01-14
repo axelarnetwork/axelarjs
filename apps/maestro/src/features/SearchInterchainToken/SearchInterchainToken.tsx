@@ -13,7 +13,9 @@ import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery} from "~/services/axelarscan/hooks";
+import {
+  useAllChainConfigsQuery,
+} from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import ChainsDropdown, {
@@ -35,16 +37,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   const { chain: connectedChain } = useAccount();
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  // Combine computed data
-  const combinedComputed = useMemo(() => ({
-    indexedByChainId: {
-      ...evmComputed.indexedByChainId,
-      ...vmComputed.indexedByChainId,
-    }
-  }), [evmComputed, vmComputed]);
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const [selectedChainId, setSelectedChainId] = useSessionStorageState(
     "@maestro/SearchInterchainToken.selectedChainId",

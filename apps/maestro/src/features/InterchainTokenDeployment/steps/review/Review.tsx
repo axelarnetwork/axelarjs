@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
 
 import { useChainFromRoute } from "~/lib/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
@@ -26,20 +26,7 @@ const Review: FC = () => {
   const { chain } = useAccount();
   const routeChain = useChainFromRoute();
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  // Combine EVM and VM chain configs
-  const combinedChainConfigs = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    }
-  }), [evmComputed, vmComputed]);
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
@@ -60,16 +47,16 @@ const Review: FC = () => {
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) => combinedChainConfigs.indexedById[axelarChainId].chain_id
+          (axelarChainId) => combinedComputed.indexedById[axelarChainId].chain_id
         )
       );
     }
-  }, [chain, combinedChainConfigs.indexedById, state.selectedChains, state.txState]);
+  }, [chain, combinedComputed.indexedById, state.selectedChains, state.txState]);
 
   const chainConfig = useMemo(() => {
     if (!chain) return undefined;
-    return combinedChainConfigs.indexedByChainId[chain.id];
-  }, [chain, combinedChainConfigs.indexedByChainId]);
+    return combinedComputed.indexedByChainId[chain.id];
+  }, [chain, combinedComputed.indexedByChainId]);
 
   const handleGoToTokenPage = useCallback(async () => {
     console.log("handleGoToTokenPage", chainConfig, state.txState.type === "deployed");
