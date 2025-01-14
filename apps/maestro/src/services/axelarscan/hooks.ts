@@ -14,8 +14,8 @@ const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
+  const { computed: evmComputed, data: evmChains, isLoading: isLoadingEVM } = useEVMChainConfigsQuery();
+  const { computed: vmComputed, data: vmChains, isLoading: isLoadingVM } = useVMChainConfigsQuery();
   const combinedComputed = useMemo(
     () => ({
       indexedById: {
@@ -26,11 +26,42 @@ export function useAllChainConfigsQuery() {
         ...vmComputed.indexedByChainId,
         ...evmComputed.indexedByChainId,
       },
+      wagmiChains: [
+        ...vmComputed.wagmiChains,
+        ...evmComputed.wagmiChains
+      ]
     }),
     [evmComputed, vmComputed]
   );
 
-  return {combinedComputed, evmComputed, vmComputed};
+  const allChains = useMemo(() => {
+    // Create a lookup map using chain_id as the key
+    const chainMap = new Map();
+
+    // Process EVM chains first
+    evmChains?.forEach((chain) => {
+      chainMap.set(chain.chain_id, {
+        ...chain,
+        displayName: chain.name, // Store original name
+      });
+    });
+
+    // Process VM chains, only add if not already present or if it's a special case
+    vmChains?.forEach((chain) => {
+      const existingChain = chainMap.get(chain.chain_id);
+      if (!existingChain) {
+        chainMap.set(chain.chain_id, {
+          ...chain,
+          displayName: `${chain.name} (VM)`, // Add VM suffix to differentiate
+        });
+      }
+    });
+
+    return Array.from(chainMap.values());
+  }, [evmChains, vmChains]);
+
+
+  return {combinedComputed, allChains, isLoading: isLoadingEVM || isLoadingVM};
 }
 
 export function useEVMChainConfigsQuery() {
@@ -111,7 +142,7 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const vmChains = configured.map((x) => VM_CHAIN_CONFIGS_BY_ID[x.chain_id]);
+  const wagmiChains = configured.map((x) => VM_CHAIN_CONFIGS_BY_ID[x.chain_id]);
 
   return {
     ...queryResult,
@@ -119,7 +150,7 @@ export function useVMChainConfigsQuery() {
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
-      vmChains,
+      wagmiChains
     },
   };
 }

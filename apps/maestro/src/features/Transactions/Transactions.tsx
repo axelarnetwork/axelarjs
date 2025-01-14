@@ -15,8 +15,7 @@ import { groupBy } from "rambda";
 
 import type { TxType } from "~/lib/hooks";
 import {
-  useEVMChainConfigsQuery,
-  useVMChainConfigsQuery,
+  useAllChainConfigsQuery,
 } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -37,17 +36,10 @@ function useGroupedStatuses(txHash: `0x${string}`) {
     txHash,
   });
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   return useMemo(() => {
-    const combinedIndexedById = {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    };
-
-    console.log("statuses", statuses)
-    console.log("axelarChainId", statuses)
+    const combinedIndexedById = combinedComputed.indexedById;
 
     const statusValues = Object.entries(statuses ?? {}).map(
       ([axelarChainId, entry]) => ({
@@ -69,7 +61,7 @@ function useGroupedStatuses(txHash: `0x${string}`) {
       groupedStatusesProps,
       hasStatus: statusValues.length > 0,
     };
-  }, [evmComputed.indexedById, vmComputed.indexedById, statuses, txHash]);
+  }, [combinedComputed.indexedById, statuses, txHash]);
 }
 
 type ToastElementProps = {
@@ -90,19 +82,7 @@ const ToastElement: FC<ToastElementProps> = ({
     chainId
   );
 
-  const { computed: evmComputed } = useEVMChainConfigsQuery();
-  const { computed: vmComputed } = useVMChainConfigsQuery();
-
-  const combinedComputed = useMemo(
-    () => ({
-      indexedByChainId: {
-        ...vmComputed.indexedByChainId,
-        ...evmComputed.indexedByChainId,
-      },
-      wagmiChains: evmComputed.wagmiChains,
-    }),
-    [evmComputed, vmComputed]
-  );
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
@@ -111,8 +91,6 @@ const ToastElement: FC<ToastElementProps> = ({
   );
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
-
-  console.log("groupedStatusesProps", groupedStatusesProps);
 
   const chainConfig = Maybe.of(combinedComputed.indexedByChainId[chainId]);
 

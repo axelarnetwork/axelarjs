@@ -1,6 +1,6 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
 import { Maybe } from "@axelarjs/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
 import { useChainId } from "wagmi";
@@ -11,7 +11,7 @@ import {
 } from "~/config/env";
 import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
 type ChainConfig = EVMChainConfig | VMChainConfig;
@@ -21,16 +21,10 @@ export type UseStep2ChainSelectionStateProps = {
 };
 
 export function useStep2ChainSelectionState() {
-  const { data: evmChains } = useEVMChainConfigsQuery();
-  const { data: vmChains } = useVMChainConfigsQuery();
+  const { allChains } = useAllChainConfigsQuery();
   const chainId = useChainId();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, setTotalGasFee] = useState(formatEther(0n));
-  
-  // Combine VM and EVM chains
-  const allChains = useMemo(() => {
-    return [...(evmChains || []), ...(vmChains || [])];
-  }, [evmChains, vmChains]);
 
   const [sourceChainId, setSourceChainId] = useState<string>(() => {
     const chain = allChains?.find((chain: ChainConfig) => chain.chain_id === chainId);
@@ -77,8 +71,6 @@ export function useStep2ChainSelectionState() {
       totalGasFee,
       sourceChainId,
       chains: allChains,
-      evmChains,
-      vmChains,
       isEstimatingGasFees: isRemoteDeploymentGasFeeLoading,
       hasGasFeesEstimationError: isRemoteDeploymentGasFeeError,
       remoteDeploymentGasFees,

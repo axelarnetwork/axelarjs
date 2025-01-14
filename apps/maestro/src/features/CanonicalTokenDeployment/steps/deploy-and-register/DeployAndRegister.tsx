@@ -31,14 +31,9 @@ export const Step3: FC = () => {
   const chainId = useChainId();
 
   // Support both EVM and VM chains
-  const sourceChain = useMemo(() => {
-    return (
-      state.evmChains?.find((x) => x.chain_id === chainId) ||
-      state.vmChains?.find((x) => x.chain_id === chainId)
-    );
-  }, [state.evmChains, state.vmChains, chainId]);
+  const sourceChain = state.allChains?.find((chain) => chain.chain_id === chainId);
 
-  const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
+    const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
       (state.remoteDeploymentGasFees?.gasFees ?? []).reduce(
         ([succeeded, errored], x): [string[], string[]] =>
@@ -141,25 +136,7 @@ export const Step3: FC = () => {
       addTransaction,
     ]
   );
-  const eligibleChains = useMemo(() => {
-    const uniqueChains = new Map();
-
-    // Add EVM chains
-    state.evmChains?.forEach((chain) => {
-      uniqueChains.set(chain.chain_id, chain);
-    });
-
-    // Add VM chains
-    state.vmChains?.forEach((chain) => {
-      uniqueChains.set(chain.chain_id, chain);
-    });
-
-    // Convert to array and filter out current chain
-    return Array.from(uniqueChains.values()).filter(
-      (chain) => chain.chain_id !== chainId
-    );
-  }, [state.evmChains, state.vmChains, chainId]);
-
+  const eligibleChains = state.allChains;
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const { address } = useAccount();

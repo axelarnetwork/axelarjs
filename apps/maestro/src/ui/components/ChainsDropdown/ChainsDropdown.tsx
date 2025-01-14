@@ -12,8 +12,7 @@ import { useAccount, useSwitchChain } from "wagmi";
 
 import { logger } from "~/lib/logger";
 import {
-  useEVMChainConfigsQuery,
-  useVMChainConfigsQuery,
+  useAllChainConfigsQuery,
 } from "~/services/axelarscan/hooks";
 import {
   useChainsDropdownContainer,
@@ -71,17 +70,10 @@ type Props = {
 };
 
 export const ChainIconComponent: FC<Props> = (props) => {
-  const { data: evmChains } = useEVMChainConfigsQuery();
-  const { data: vmChains } = useVMChainConfigsQuery();
+  const { allChains: chains } = useAllChainConfigsQuery();
   const { chain } = useAccount();
 
   const [state] = useChainsDropdownContainer();
-
-  const chains = useMemo(() => {
-    if (props.chainType === "vm") return vmChains;
-    if (props.chainType === "evm") return evmChains;
-    return [...(evmChains ?? []), ...(vmChains ?? [])];
-  }, [evmChains, vmChains, props.chainType]);
 
   const selectedChain = useMemo(
     () =>
@@ -135,51 +127,24 @@ export const ChainIconComponent: FC<Props> = (props) => {
 };
 
 const ChainsDropdown: FC<Props> = (props) => {
-  const { data: evmChains } = useEVMChainConfigsQuery();
-  const { data: vmChains } = useVMChainConfigsQuery();
+  const { allChains } = useAllChainConfigsQuery();
   const { chain } = useAccount();
   const { switchChainAsync } = useSwitchChain();
 
   const [state, actions] = useChainsDropdownContainer();
 
-  const chains = useMemo(() => {
-    // Create a lookup map using chain_id as the key
-    const chainMap = new Map();
-
-    // Process EVM chains first
-    evmChains?.forEach((chain) => {
-      chainMap.set(chain.chain_id, {
-        ...chain,
-        displayName: chain.name, // Store original name
-      });
-    });
-
-    // Process VM chains, only add if not already present or if it's a special case
-    vmChains?.forEach((chain) => {
-      const existingChain = chainMap.get(chain.chain_id);
-      if (!existingChain) {
-        chainMap.set(chain.chain_id, {
-          ...chain,
-          displayName: `${chain.name} (VM)`, // Add VM suffix to differentiate
-        });
-      }
-    });
-
-    return Array.from(chainMap.values());
-  }, [evmChains, vmChains]);
-
   const selectedChain = useMemo(
     () =>
-      Maybe.of(chains).mapOrUndefined(
+      Maybe.of(allChains).mapOrUndefined(
         find((x) => [chain?.id, state.selectedChainId].includes(x.chain_id))
       ),
-    [chain?.id, chains, state.selectedChainId]
+    [chain?.id, allChains, state.selectedChainId]
   );
 
   // const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) =>
   //   chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   // );
-  const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) =>
+  const eligibleChains = Maybe.of(props.chains ?? allChains).mapOr([], (chains) =>
     chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 

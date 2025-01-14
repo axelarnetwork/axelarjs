@@ -1,5 +1,5 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
 import { useChainId } from "wagmi";
@@ -9,7 +9,7 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
 
 export type UseStep3ChainSelectionStateProps = {
@@ -17,18 +17,13 @@ export type UseStep3ChainSelectionStateProps = {
 };
 
 export function useStep3ChainSelectionState() {
-  const { data: evmChains } = useEVMChainConfigsQuery();
-  const { data: vmChains } = useVMChainConfigsQuery();
+  const { allChains } = useAllChainConfigsQuery();
   const chainId = useChainId();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, $setTotalGasFee] = useState(formatEther(0n));
   
   // Find source chain from both EVM and VM chains
-  const currentChain = useMemo(() => {
-    const evmChain = evmChains?.find((chain: EVMChainConfig) => chain.chain_id === chainId);
-    const vmChain = vmChains?.find((chain: VMChainConfig) => chain.chain_id === chainId);
-    return evmChain || vmChain;
-  }, [evmChains, vmChains, chainId]);
+  const currentChain = allChains?.find((chain: EVMChainConfig | VMChainConfig) => chain.chain_id === chainId);
 
   const [sourceChainId, setSourceChainId] = useState<string>(
     currentChain?.id || ""
@@ -66,21 +61,17 @@ export function useStep3ChainSelectionState() {
   };
 
   useEffect(() => {
-    const candidateChain = [...(evmChains || []), ...(vmChains || [])]
-      .find(chain => chain.chain_id === chainId);
-      
-    if (!candidateChain || candidateChain.chain_name === sourceChainId) return;
+    if (!currentChain || currentChain.chain_name === sourceChainId) return;
 
-    setSourceChainId(candidateChain.chain_name);
-  }, [evmChains, vmChains, chainId, sourceChainId]);
+    setSourceChainId(currentChain.chain_name);
+  }, [currentChain, chainId, sourceChainId]);
 
   return {
     state: {
       isDeploying,
       totalGasFee,
       sourceChainId,
-      evmChains,
-      vmChains,
+      allChains,
       isEstimatingGasFees: isRemoteDeploymentGasFeeLoading,
       hasGasFeesEstimationError: isRemoteDeploymentGasFeeError,
       remoteDeploymentGasFees,
