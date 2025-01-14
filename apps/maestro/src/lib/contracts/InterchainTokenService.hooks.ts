@@ -1141,7 +1141,7 @@ export const interchainTokenServiceAbi = [
 ] as const;
 
 export const interchainTokenServiceAddress =
-  "0x144c3d7A5f5198EF3B46A8258b35E903cf197A66" as const;
+  "0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C" as const;
 
 export const interchainTokenServiceConfig = {
   address: interchainTokenServiceAddress,
