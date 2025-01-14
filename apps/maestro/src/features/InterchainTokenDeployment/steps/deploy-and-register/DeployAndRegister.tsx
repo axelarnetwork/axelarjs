@@ -140,8 +140,7 @@ export const Step2: FC = () => {
     ]
   );
 
-  // Combine EVM and VM chains for eligible chains
-  const eligibleChains = state.chains;
+  const eligibleChains = state.chains.filter(chain => chain.chain_id !== chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

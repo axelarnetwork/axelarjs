@@ -46,7 +46,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
   }, [eligibleChains, onChainClick, selectedChains]);
 
   const getChainName = (chain: ChainConfig) => {
-    return chain.chain_name
+    return chain.name
   };
 
   return (

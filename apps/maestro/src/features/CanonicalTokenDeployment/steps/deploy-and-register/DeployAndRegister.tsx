@@ -136,7 +136,7 @@ export const Step3: FC = () => {
       addTransaction,
     ]
   );
-  const eligibleChains = state.allChains;
+  const eligibleChains = state.allChains.filter(chain => chain.chain_id !== chainId);
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const { address } = useAccount();
