@@ -3,6 +3,7 @@ import {
   AxelarConfigsResponse,
   AxelarscanClient,
   EVMChainConfig,
+  VMChainConfig,
 } from "@axelarjs/api";
 import { invariant } from "@axelarjs/utils";
 
@@ -20,6 +21,60 @@ export type EVMChainsMap = Record<
   }
 >;
 
+export type VMChainsMap = Record<
+  string | number,
+  {
+    info: VMChainConfig;
+    wagmi?: ExtendedWagmiChainConfig;
+  }
+>;
+
+export async function vmChains<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarscanClient: AxelarscanClient,
+  cacheKey: TCacheKey
+): Promise<VMChainsMap> {
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<VMChainsMap>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
+  const chainConfigs = await axelarscanClient.getChainConfigs();
+
+  // Add flow config to the list of eligible chains
+  const vmChainsMap = chainConfigs.vm.reduce((acc, chain) => {
+      const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
+        (config) => config.id === chain.chain_id
+      );
+
+      const entry = {
+        info: chain,
+        wagmi: wagmiConfig,
+      };
+
+      return {
+        ...acc,
+        [chain.id]: entry,
+        [chain.chain_id]: entry,
+      };
+    },
+    {} as Record<
+      string | number,
+      {
+        info: VMChainConfig;
+        wagmi?: ExtendedWagmiChainConfig;
+      }
+    >
+  );
+
+  // cache for 1 hour
+  await kvClient.setCached<VMChainsMap>(cacheKey, vmChainsMap, 3600);
+
+  return vmChainsMap;
+}
 export async function evmChains<TCacheKey extends string>(
   kvClient: MaestroKVClient,
   axelarscanClient: AxelarscanClient,
@@ -37,11 +92,9 @@ export async function evmChains<TCacheKey extends string>(
 
   const configuredIDs = WAGMI_CHAIN_CONFIGS.map((chain) => chain.id);
 
-  const eligibleChains = chainConfigs.evm.filter((chain) =>
-    // filter out chains that are do not have a wagmi config
-    configuredIDs.includes(chain.chain_id)
-  );
+  const eligibleChains = chainConfigs.evm.filter((chain) => configuredIDs.includes(chain.chain_id));
 
+  // Add flow config to the list of eligible chains
   const evmChainsMap = eligibleChains.reduce(
     (acc, chain) => {
       const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(

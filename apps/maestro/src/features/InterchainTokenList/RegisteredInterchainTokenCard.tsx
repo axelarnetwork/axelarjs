@@ -24,7 +24,7 @@ import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";

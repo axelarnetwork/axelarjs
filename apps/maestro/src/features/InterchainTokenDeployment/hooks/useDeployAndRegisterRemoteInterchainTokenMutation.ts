@@ -22,7 +22,7 @@ import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
@@ -49,7 +49,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -81,7 +81,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     });
 
   const { destinationChainNames } = useMemo(() => {
-    const index = computed.indexedById;
+    const index = combinedComputed.indexedById;
 
     return {
       destinationChainNames:
@@ -90,7 +90,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             index[destinationChainId]?.chain_name ?? "Unknown"
         ) ?? [],
     };
-  }, [computed.indexedById, input?.destinationChainIds]);
+  }, [combinedComputed.indexedById, input?.destinationChainIds]);
 
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {

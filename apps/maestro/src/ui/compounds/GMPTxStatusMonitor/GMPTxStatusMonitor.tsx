@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, cn, Progress, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
@@ -9,11 +9,14 @@ import { useBlockNumber, useChainId, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import {
+  useAllChainConfigsQuery,
+} from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
+type ChainConfig = EVMChainConfig | VMChainConfig;
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
   called: "Initialized",
@@ -42,14 +45,15 @@ const STATUS_COLORS: Partial<
 };
 
 export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
+
   const { data: txInfo } = useTransaction({
     hash: txHash,
     chainId,
   });
 
   const { data: chainInfo } = useChainInfoQuery({
-    axelarChainId: computed.indexedByChainId[chainId]?.id,
+    axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
 
   const { data: currentBlockNumber } = useBlockNumber({
@@ -136,21 +140,25 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
 
   const chainId = useChainId();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const statusList = Object.values(statuses ?? {});
+  const pendingItsHubTx =
+    Object.keys(statuses).includes("axelarnet") ||
+    Object.keys(statuses).includes("axelar");
 
   useEffect(() => {
     if (
       statusList.length &&
+      !pendingItsHubTx &&
       statusList?.every((s) => s.status === "executed")
     ) {
       onAllChainsExecuted?.();
     }
-  }, [statusList, onAllChainsExecuted]);
+  }, [pendingItsHubTx, statusList, onAllChainsExecuted]);
 
-  if (!statuses || Object.keys(statuses).length === 0) {
-    if (!isLoading) {
+  if (!statuses || Object.keys(statuses).length === 0 || pendingItsHubTx) {
+    if (!isLoading && !pendingItsHubTx) {
       // nothing to show
       return null;
     }
@@ -180,7 +188,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-            const chain = computed.indexedById[axelarChainId];
+            const chain = combinedComputed.indexedById[axelarChainId];
 
             return (
               <ChainStatusItem
@@ -204,7 +212,7 @@ export type ChainStatusItemProps = {
   status: ExtendedGMPTxStatus;
   txHash: `0x${string}`;
   logIndex: number;
-  chain: EVMChainConfig;
+  chain: ChainConfig;
   className?: string;
   compact?: boolean;
   offset?: number;
@@ -215,11 +223,11 @@ export type ChainStatusItemsProps = Omit<
   "chain" | "logIndex"
 > & {
   logIndexes: number[];
-  chains: EVMChainConfig[];
+  chains: ChainConfig[];
 };
 
 const CollapsedChains: FC<{
-  chains: EVMChainConfig[];
+  chains: ChainConfig[];
   offset: number;
 }> = ({ chains, offset }) => {
   if (chains.length > offset) {
@@ -254,9 +262,13 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />
       <div className="flex translate-x-5 items-center">
         {leading.map((chain, i) => (
-          <span key={chain.id} className="-ml-2 flex items-center">
+          <span key={chain?.id || i} className="-ml-2 flex items-center">
             <Tooltip
-              tip={`${chain.name} - view tx on Axelarscan`}
+              tip={
+                chain
+                  ? `${chain?.name} - view tx on Axelarscan`
+                  : "View tx on Axelarscan"
+              }
               $position="left"
             >
               <Link
@@ -264,11 +276,13 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <ChainIcon
-                  src={chain.image}
-                  size={compact ? "sm" : "md"}
-                  alt={chain.name}
-                />
+                {chain && (
+                  <ChainIcon
+                    src={chain.image}
+                    size={compact ? "sm" : "md"}
+                    alt={chain?.name || "chain"}
+                  />
+                )}
               </Link>
             </Tooltip>{" "}
           </span>
@@ -289,17 +303,18 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   className,
   compact,
 }) => {
+  const chainName = chain?.name || "chain";
   return (
     <li className={cn("flex items-center justify-between", className)}>
       <span className="flex items-center gap-2">
-        <Tooltip tip={chain.name}>
+        <Tooltip tip={chainName}>
           <ChainIcon
             src={chain.image}
             size={compact ? "sm" : "md"}
-            alt={chain.name}
+            alt={chainName}
           />
         </Tooltip>{" "}
-        {!compact && chain.name}
+        {!compact && chainName}
       </span>
       <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
     </li>

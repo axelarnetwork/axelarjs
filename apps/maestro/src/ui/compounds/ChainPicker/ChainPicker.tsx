@@ -1,10 +1,12 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Button, cn, Loading, Tooltip } from "@axelarjs/ui";
 import { useCallback, type FC } from "react";
 import Image from "next/image";
 
+type ChainConfig = EVMChainConfig | VMChainConfig;
+
 export type ChainPickerProps = {
-  eligibleChains: EVMChainConfig[];
+  eligibleChains: ChainConfig[];
   selectedChains: string[];
   erroredChains?: string[];
   onChainClick: (chainId: string) => void;
@@ -43,11 +45,16 @@ const ChainPicker: FC<ChainPickerProps> = ({
     );
   }, [eligibleChains, onChainClick, selectedChains]);
 
+  const getChainName = (chain: ChainConfig) => {
+    return chain.name
+  };
+
   return (
     <section className="space-y-4">
       <div className="grid grid-cols-2 justify-start gap-1.5 rounded-3xl bg-base-300 p-2.5 sm:grid-cols-3 sm:gap-2">
         {eligibleChains?.map((chain) => {
           const isSelected = selectedChains.includes(chain.id);
+          const chainName = getChainName(chain);
 
           const buttonVariant = isSelected
             ? erroredChains?.includes(chain.id)
@@ -60,15 +67,17 @@ const ChainPicker: FC<ChainPickerProps> = ({
               key={chain.chain_name}
               tip={
                 buttonVariant !== "error"
-                  ? `Deploy on ${chain.name}`
+                  ? `Deploy on ${chainName}`
                   : "Failed to estimate gas fees"
               }
               $variant={buttonVariant === "error" ? "warning" : undefined}
               $position="top"
             >
               <Button
-                disabled={disabled}
-                className="w-full rounded-2xl hover:ring"
+                disabled={disabled || (chain.chain_type === "vm" && !chain.id)} // Add additional VM-specific conditions if needed
+                className={cn("w-full rounded-2xl hover:ring", {
+                  "opacity-50": chain.chain_type === "vm" && !chain.id, // Visual indicator for unsupported VM chains
+                })}
                 $size="sm"
                 role="button"
                 $variant={buttonVariant}
@@ -84,7 +93,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
                   src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
                   width={24}
                   height={24}
-                  alt={`${chain.name} logo`}
+                  alt={`${chainName} logo`}
                 />
                 <Loading
                   className={cn("absolute left-3 -translate-x-2 rounded-full", {
@@ -92,14 +101,19 @@ const ChainPicker: FC<ChainPickerProps> = ({
                   })}
                   $size="sm"
                 />
-                <span className="ml-4">{chain.name}</span>
+                <span className="ml-4">{chainName}</span>
               </Button>
             </Tooltip>
           );
         })}
       </div>
       <div className="grid place-content-center">
-        <Button $size="sm" $variant="ghost" onClick={handleToggleAll}>
+        <Button 
+          $size="sm" 
+          $variant="ghost" 
+          onClick={handleToggleAll}
+          disabled={disabled || eligibleChains.length === 0}
+        >
           Toggle All
         </Button>
       </div>
