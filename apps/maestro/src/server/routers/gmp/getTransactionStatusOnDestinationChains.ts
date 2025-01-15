@@ -13,6 +13,7 @@ export const SEARCHGMP_SOURCE = {
     "approved",
     "confirm",
     "executed",
+    "callback",
   ],
   excludes: [
     "call.transaction",
@@ -54,15 +55,21 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
 
       if (data.length) {
         const result = data.reduce(
-          (acc, { call, status }) => ({
-            ...acc,
-            [call.returnValues.destinationChain.toLowerCase()]: {
-              status,
-              txHash: call.transactionHash,
-              logIndex: call.logIndex ?? call._logIndex ?? 0,
-              txId: call.id,
-            },
-          }),
+          (acc, gmpData) => {
+            const { call, status } = gmpData;
+            const destinationChain =
+              gmpData.callback?.returnValues.destinationChain.toLowerCase() ||
+              call.returnValues.destinationChain.toLowerCase();
+            return {
+              ...acc,
+              [destinationChain]: {
+                status,
+                txHash: call.transactionHash,
+                logIndex: call.logIndex ?? call._logIndex ?? 0,
+                txId: call.id,
+              },
+            };
+          },
           {} as {
             [chainId: string]: {
               status: GMPTxStatus;

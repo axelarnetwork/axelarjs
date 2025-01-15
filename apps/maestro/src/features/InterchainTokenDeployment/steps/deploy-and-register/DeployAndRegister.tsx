@@ -30,7 +30,8 @@ export const Step2: FC = () => {
 
   const chainId = useChainId();
 
-  const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
+  // Handle both EVM and VM chains
+  const sourceChain = state.chains.find((chain) => chain.chain_id === chainId);
 
   const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
@@ -139,9 +140,8 @@ export const Step2: FC = () => {
     ]
   );
 
-  const eligibleChains = useMemo(
-    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
-    [state.evmChains, chainId]
+  const eligibleChains = state.chains.filter(
+    (chain) => chain.chain_id !== chainId
   );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
