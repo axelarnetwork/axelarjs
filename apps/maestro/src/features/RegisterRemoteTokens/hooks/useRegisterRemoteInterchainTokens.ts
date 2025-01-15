@@ -13,7 +13,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
 export type RegisterRemoteInterchainTokensInput = {
@@ -25,15 +25,17 @@ export type RegisterRemoteInterchainTokensInput = {
 export default function useRegisterRemoteInterchainTokens(
   input: RegisterRemoteInterchainTokensInput
 ) {
-  const { computed } = useEVMChainConfigsQuery();
+
+  const { combinedComputed } = useAllChainConfigsQuery();
+
   const chainId = useChainId();
 
   const destinationChains = useMemo(
     () =>
       input.chainIds
-        .map((chainId) => computed.indexedByChainId[chainId])
+        .map((chainId) => combinedComputed.indexedByChainId[chainId])
         .filter(Boolean),
-    [input.chainIds, computed.indexedByChainId]
+    [input.chainIds, combinedComputed.indexedByChainId]
   );
 
   const destinationChainIds = destinationChains.map(
@@ -41,8 +43,8 @@ export default function useRegisterRemoteInterchainTokens(
   );
 
   const sourceChain = useMemo(
-    () => computed.indexedByChainId[chainId],
-    [chainId, computed.indexedByChainId]
+    () => combinedComputed.indexedByChainId[chainId],
+    [chainId, combinedComputed.indexedByChainId]
   );
 
   const { data: tokenDeployment } = useInterchainTokenDetailsQuery({

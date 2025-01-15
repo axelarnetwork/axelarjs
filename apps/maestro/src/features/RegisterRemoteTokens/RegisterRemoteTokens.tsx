@@ -1,4 +1,4 @@
-import { EVMChainConfig } from "@axelarjs/api";
+import { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Alert, Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
@@ -14,7 +14,9 @@ import {
 import { logger } from "~/lib/logger";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import {
+  useAllChainConfigsQuery,
+} from "~/services/axelarscan/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
@@ -22,7 +24,7 @@ export type RegisterRemoteTokensProps = {
   tokenAddress: `0x${string}`;
   chainIds: number[];
   originChainId?: number;
-  originChain?: EVMChainConfig;
+  originChain?: EVMChainConfig | VMChainConfig;
   userGasBalance: GetBalanceReturnType | undefined;
   gasFees: bigint[] | undefined;
   onTxStateChange?: (status: TransactionState) => void;
@@ -36,7 +38,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const { mutateAsync: recordRemoteTokenDeployment } =
     trpc.interchainToken.recordRemoteTokensDeployment.useMutation();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const baseRemoteTokens = props.chainIds.map((chainId) => ({
     chainId,
@@ -44,7 +46,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     tokenAddress: props.tokenAddress,
     deploymentStatus: "pending",
     deploymentTxHash: "0x",
-    axelarChainId: computed.indexedByChainId[chainId].id,
+    axelarChainId: combinedComputed.indexedByChainId[chainId].id,
   }));
 
   const onReceipt = useCallback(

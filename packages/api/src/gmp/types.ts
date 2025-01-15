@@ -101,6 +101,36 @@ export type SearchGMPCall = {
   };
 };
 
+export type SearchGMPCallback = {
+  chain: string;
+  chain_type: ChainType;
+  destination_chain_type: ChainType;
+  created_at: GMPTxCreatedAt;
+  eventIndex: number;
+  returnValues: {
+    sourceChain: string;
+    destinationChain: string;
+    sourceAddress: string;
+    destinationAddress: string;
+    destinationContractAddress: string;
+    sender: string;
+    payload: string;
+    messageID: string;
+    messageId: string;
+    payloadHash: string;
+  };
+  messageIdIndex: number;
+  blockNumber: number;
+  block_timestamp: number;
+  parentMessageID: string;
+  receipt: SearchGMPReceipt;
+  _id: string;
+  id: string;
+  messageIdHash: string;
+  event: string;
+  transaction: SearchGMPTransaction;
+};
+
 type SearchGMPReceipt = {
   gasUsed: string;
   blockNumber: number;
@@ -280,6 +310,7 @@ export type SearchGMPResponseData = {
   interchain_transfer?: InterchainTransferEvent;
   interchain_token_deployment_started?: InterchainTokenDeploymentStartedEvent;
   token_manager_deployment_started?: TokenManagerDeploymentStartedEvent;
+  callback?: SearchGMPCallback;
 };
 
 export type SearchGMPTimespent = {

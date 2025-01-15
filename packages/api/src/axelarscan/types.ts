@@ -32,6 +32,57 @@ export type AxelarAssetPrice = Pick<
   updated_at: number;
 };
 
+export type VMChainConfig = {
+  chain_id: number;
+  chain_name: string;
+  maintainer_id: string;
+  deprecated?: boolean;
+  multisig_prover: {
+    address: string;
+  };
+  voting_verifier: {
+    address: string;
+  };
+  endpoints: {
+    rpc: string[];
+  };
+  native_token: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+  name: string;
+  short_name: string;
+  image: string;
+  color: string;
+  explorer: {
+    name: string;
+    url: string;
+    icon: string;
+    block_path: string;
+    address_path: string;
+    contract_path: string;
+    transaction_path: string;
+  };
+  id: string;
+  chain_type: "vm";
+  provider_params: [
+    {
+      chainId: string;
+      chainName: string;
+      rpcUrls: string[];
+      nativeCurrency: {
+        name: string;
+        symbol: string;
+        decimals: number;
+      };
+      blockExplorerUrls: string[];
+    },
+  ];
+  no_inflation: boolean;
+  no_tvl: boolean;
+};
+
 export type EVMChainConfig = {
   chain_id: number;
   chain_name: string;
