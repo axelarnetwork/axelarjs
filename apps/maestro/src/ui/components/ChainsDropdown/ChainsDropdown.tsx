@@ -141,9 +141,6 @@ const ChainsDropdown: FC<Props> = (props) => {
     [chain?.id, allChains, state.selectedChainId]
   );
 
-  // const eligibleChains = Maybe.of(props.chains ?? chains).mapOr([], (chains) =>
-  //   chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
-  // );
   const eligibleChains = Maybe.of(props.chains ?? allChains).mapOr([], (chains) =>
     chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );

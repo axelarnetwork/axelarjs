@@ -59,7 +59,6 @@ const Review: FC = () => {
   }, [chain, combinedComputed.indexedByChainId]);
 
   const handleGoToTokenPage = useCallback(async () => {
-    console.log("handleGoToTokenPage", chainConfig, state.txState.type === "deployed");
     if (chainConfig && state.txState.type === "deployed") {
       actions.reset();
 
