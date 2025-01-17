@@ -1,6 +1,6 @@
 import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { invariant, Maybe } from "@axelarjs/utils";
+import { invariant, invariant, Maybe } from "@axelarjs/utils";
 import React, {
   ComponentRef,
   useCallback,
@@ -21,6 +21,8 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
+import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env"
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -139,8 +141,9 @@ export const Step2: FC = () => {
       addTransaction,
     ]
   );
-
-  const eligibleChains = state.chains.filter(chain => chain.chain_id !== chainId);
+  
+  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(',').map(chain => chain.trim());
+  const eligibleChains = filterEligibleChains(state.chains, chainId, whitelistedChains);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

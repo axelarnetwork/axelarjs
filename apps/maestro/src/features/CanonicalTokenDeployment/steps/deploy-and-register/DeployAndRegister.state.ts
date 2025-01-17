@@ -71,7 +71,7 @@ export function useStep3ChainSelectionState() {
       isDeploying,
       totalGasFee,
       sourceChainId,
-      allChains,
+      chains: allChains,
       isEstimatingGasFees: isRemoteDeploymentGasFeeLoading,
       hasGasFeesEstimationError: isRemoteDeploymentGasFeeError,
       remoteDeploymentGasFees,
