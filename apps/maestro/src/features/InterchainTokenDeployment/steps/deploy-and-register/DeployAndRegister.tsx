@@ -21,7 +21,6 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
-import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env"
 import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
@@ -142,8 +141,7 @@ export const Step2: FC = () => {
     ]
   );
   
-  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(',').map(chain => chain.trim());
-  const eligibleChains = filterEligibleChains(state.chains, chainId, whitelistedChains);
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

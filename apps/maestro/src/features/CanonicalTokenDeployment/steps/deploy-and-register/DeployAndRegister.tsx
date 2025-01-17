@@ -21,7 +21,6 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
-import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env";
 import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step3: FC = () => {
@@ -139,8 +138,7 @@ export const Step3: FC = () => {
     ]
   );
 
-  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(',').map(chain => chain.trim());
-  const eligibleChains = filterEligibleChains(state.chains, chainId, whitelistedChains);
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
