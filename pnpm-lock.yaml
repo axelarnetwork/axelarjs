@@ -56,7 +56,7 @@ importers:
         specifier: ^8.1.1
         version: 8.1.1
       prettier:
-        specifier: ^3.2.5
+        specifier: ^3.4.2
         version: 3.4.2
       pretty-quick:
         specifier: ^4.0.0
@@ -96,8 +96,8 @@ importers:
         specifier: 0.0.0-snapshot.424bc13
         version: 0.0.0-snapshot.424bc13(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       '@axelar-network/axelarjs-sdk':
-        specifier: 0.17.1-alpha.10
-        version: 0.17.1-alpha.10(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)
+        specifier: 0.17.1-alpha.12
+        version: 0.17.1-alpha.12(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)
       '@axelarjs/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -620,8 +620,8 @@ importers:
         version: 7.2.3
     devDependencies:
       '@axelar-network/interchain-token-service':
-        specifier: ^1.2.4
-        version: 1.2.4
+        specifier: ^2.0.1
+        version: 2.0.1
       '@axelarjs/api':
         specifier: workspace:^
         version: link:../api
@@ -1076,10 +1076,6 @@ packages:
     peerDependencies:
       zod: ^3.20.2
 
-  '@axelar-network/axelar-cgp-solidity@6.2.1':
-    resolution: {integrity: sha512-0RaxLYmsp3elXBytn7+eZUil1KFS6jjHR/ECrN/3IC7TeTDPUYunyy6JDxCdNYNtiD6EKgUAfQ7G4DrBb6hRxg==}
-    engines: {node: '>=16'}
-
   '@axelar-network/axelar-cgp-solidity@6.4.0':
     resolution: {integrity: sha512-Xnw5xi234B1cmTCzgudV8zq+DDjJ1d1U362CM0vKH1FWmZprKIdqgmOYkiRyu+QiVhnznKiBURiSEHVrNjtYpw==}
     engines: {node: '>=18'}
@@ -1092,19 +1088,19 @@ packages:
     resolution: {integrity: sha512-s8SImALvYB+5AeiT3tbfWNBI2Mhqw1x91i/zM3DNpVUCnAR2HKtsB9T84KnUn/OJjOVgb4h0lv7q9smeYniRPw==}
     engines: {node: '>=18'}
 
-  '@axelar-network/axelar-gmp-sdk-solidity@5.6.4':
-    resolution: {integrity: sha512-PQjV+HeJynmSRMhyM3SexwnbFNruSaiRUeNCWjV8/7CkdPsDqypoqIXVRVU8Zk92DUUHeqZZzL/3qP2LYuvlnA==}
-    engines: {node: '>=16'}
+  '@axelar-network/axelar-gmp-sdk-solidity@6.0.4':
+    resolution: {integrity: sha512-o8pv+krIAlEwzid0Ac8qwykDsavc+1DRPvyFQ3V0R0zTQFtYLJIIXXXt7FRb8b+LJDAuX+E0bB3N2X+hlcxk/g==}
+    engines: {node: '>=18'}
 
-  '@axelar-network/axelarjs-sdk@0.17.1-alpha.10':
-    resolution: {integrity: sha512-ZWpTAfnIPsc37UZuZJeobYErq0d9J27n9GDgv/D60cTFdLi06wak8/7zIt0v0HJnzgKVSUG1J27qDum4nbPRKQ==}
+  '@axelar-network/axelarjs-sdk@0.17.1-alpha.12':
+    resolution: {integrity: sha512-yQz3zFOfMjYlAzl1/sN/p6nIkKpDbFu9XjA4ynMCR4EqZav8alscRpRLDNrxZP3LPk1cvB1Ppx6jRBHfRFupzA==}
 
   '@axelar-network/axelarjs-types@0.33.0':
     resolution: {integrity: sha512-aCbX/5G+tgWPjr9tl3dQfJftWwRMkILz61ytach7dKqxtO9G9jlxpNvELJQ6gKVOodUtSY8qBCO/fWU19v4hdQ==}
 
-  '@axelar-network/interchain-token-service@1.2.4':
-    resolution: {integrity: sha512-Sgw2M4VzW5hjL9TBe2ljL5wo+paYqlL2XNQlq1dyaDAD6E7PG1MQ+0U44QnfJfhhAwcqZtKQmb92ZNwV+BEdVw==}
-    engines: {node: '>=16'}
+  '@axelar-network/interchain-token-service@2.0.1':
+    resolution: {integrity: sha512-5m4ocCIx9qfH1xODPAmhnGPGBl0ytKUzIwvJ94zgTlj0IUmsRkr93ON8/6dRjg+HK8RgfYNwQD1r4Gdy6kaU1w==}
+    engines: {node: '>=18'}
 
   '@babel/code-frame@7.25.7':
     resolution: {integrity: sha512-0xZJFNE5XMpENsgfHYTw8FbX4kv53mFLn2i3XPoq69LyhYSCBJtitaHx9QnsVTrsogI4Z3+HtEfZ2/GFPOtf5g==}
@@ -12146,10 +12142,6 @@ snapshots:
       openapi3-ts: 4.4.0
       zod: 3.24.1
 
-  '@axelar-network/axelar-cgp-solidity@6.2.1':
-    dependencies:
-      '@axelar-network/axelar-gmp-sdk-solidity': 5.6.4
-
   '@axelar-network/axelar-cgp-solidity@6.4.0':
     dependencies:
       '@axelar-network/axelar-gmp-sdk-solidity': 5.10.0
@@ -12171,9 +12163,9 @@ snapshots:
 
   '@axelar-network/axelar-gmp-sdk-solidity@5.10.0': {}
 
-  '@axelar-network/axelar-gmp-sdk-solidity@5.6.4': {}
+  '@axelar-network/axelar-gmp-sdk-solidity@6.0.4': {}
 
-  '@axelar-network/axelarjs-sdk@0.17.1-alpha.10(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)':
+  '@axelar-network/axelarjs-sdk@0.17.1-alpha.12(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)':
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 6.4.0
       '@axelar-network/axelarjs-types': 0.33.0
@@ -12209,10 +12201,10 @@ snapshots:
       long: 5.2.3
       protobufjs: 7.4.0
 
-  '@axelar-network/interchain-token-service@1.2.4':
+  '@axelar-network/interchain-token-service@2.0.1':
     dependencies:
-      '@axelar-network/axelar-cgp-solidity': 6.2.1
-      '@axelar-network/axelar-gmp-sdk-solidity': 5.6.4
+      '@axelar-network/axelar-cgp-solidity': 6.4.0
+      '@axelar-network/axelar-gmp-sdk-solidity': 6.0.4
 
   '@babel/code-frame@7.25.7':
     dependencies:
@@ -13496,7 +13488,7 @@ snapshots:
       '@types/node': 20.5.1
       chalk: 4.1.2
       cosmiconfig: 8.3.6(typescript@5.7.2)
-      cosmiconfig-typescript-loader: 4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.7.2))(ts-node@10.9.2(@types/node@20.17.10)(typescript@5.7.2))(typescript@5.7.2)
+      cosmiconfig-typescript-loader: 4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.7.2))(ts-node@10.9.2(@types/node@20.5.1)(typescript@5.7.2))(typescript@5.7.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -19809,7 +19801,7 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  cosmiconfig-typescript-loader@4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.7.2))(ts-node@10.9.2(@types/node@20.17.10)(typescript@5.7.2))(typescript@5.7.2):
+  cosmiconfig-typescript-loader@4.4.0(@types/node@20.5.1)(cosmiconfig@8.3.6(typescript@5.7.2))(ts-node@10.9.2(@types/node@20.5.1)(typescript@5.7.2))(typescript@5.7.2):
     dependencies:
       '@types/node': 20.5.1
       cosmiconfig: 8.3.6(typescript@5.7.2)
@@ -20682,7 +20674,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -20704,7 +20696,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
