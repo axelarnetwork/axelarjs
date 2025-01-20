@@ -6,12 +6,12 @@ import {
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress, Maybe } from "@axelarjs/utils";
-import { useCallback, useEffect, useState, type FC } from "react";
+import { maskAddress } from "@axelarjs/utils";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
 import { useAccount, useChainFromRoute } from "~/lib/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
@@ -24,7 +24,7 @@ const Review: FC = () => {
   const { chain } = useAccount();
   const routeChain = useChainFromRoute();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
@@ -45,25 +45,33 @@ const Review: FC = () => {
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) => computed.indexedById[axelarChainId]?.chain_id
+          (axelarChainId) =>
+            combinedComputed.indexedById[axelarChainId].chain_id
         )
       );
     }
-  }, [chain, computed.indexedById, state.selectedChains, state.txState]);
+  }, [
+    chain,
+    combinedComputed.indexedById,
+    state.selectedChains,
+    state.txState,
+  ]);
 
-  const chainConfig = Maybe.of(chain).mapOrUndefined(
-    (chain) => computed.indexedByChainId[chain.id]
-  );
+  const chainConfig = useMemo(() => {
+    if (!chain) return undefined;
+    return combinedComputed.indexedByChainId[chain.id];
+  }, [chain, combinedComputed.indexedByChainId]);
 
   const handleGoToTokenPage = useCallback(async () => {
     if (chainConfig && state.txState.type === "deployed") {
       actions.reset();
-
       await router.push(
         `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
       );
     }
   }, [actions, chainConfig, router, state.txState]);
+
+  const isVMChain = chainConfig?.chain_type === "vm";
 
   return (
     <>
@@ -103,32 +111,33 @@ const Review: FC = () => {
             {state.selectedChains.length > 0 ? (
               <GMPTxStatusMonitor txHash={state.txState.txHash} />
             ) : (
-              <LinkButton
-                $size="sm"
-                href={`${chain?.blockExplorers?.default.url}/tx/${state.txState.txHash}`}
-                className="flex items-center gap-2"
-                target="_blank"
-              >
-                View transaction{" "}
-                <span className="hidden md:inline">
-                  {maskAddress(state.txState.txHash ?? "")}
-                </span>{" "}
-                on {chain?.blockExplorers?.default.name}{" "}
-                <ExternalLinkIcon className="h-4 w-4" />
-              </LinkButton>
+              !isVMChain &&
+              chain?.blockExplorers?.default && (
+                <LinkButton
+                  $size="sm"
+                  href={`${chain.blockExplorers.default.url}/tx/${state.txState.txHash}`}
+                  className="flex items-center gap-2"
+                  target="_blank"
+                >
+                  View transaction{" "}
+                  <span className="hidden md:inline">
+                    {maskAddress(state.txState.txHash ?? "")}
+                  </span>{" "}
+                  on {chain.blockExplorers.default.name}{" "}
+                  <ExternalLinkIcon className="h-4 w-4" />
+                </LinkButton>
+              )
             )}
           </>
         )}
       </div>
       <Dialog.Actions>
         {routeChain ? (
-          // if the chain is not the same as the route, we need to refresh the page
           <Dialog.CloseAction
             $length="block"
             $variant="primary"
             onClick={async () => {
               setShouldFetch(true);
-              // refresh the page to show the new token
               await router.replace(router.asPath);
             }}
           >
@@ -138,7 +147,7 @@ const Review: FC = () => {
           <Button
             $length="block"
             $variant="primary"
-            disabled={!chain?.name || state.txState.type !== "deployed"}
+            disabled={!chainConfig || state.txState.type !== "deployed"}
             onClick={handleGoToTokenPage}
           >
             Go to token page!
