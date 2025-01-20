@@ -14,6 +14,22 @@ export default {
     {
       inputs: [
         {
+          internalType: "address",
+          name: "caller",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "token",
+          type: "address",
+        },
+      ],
+      name: "NotToken",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
           internalType: "uint256",
           name: "tokenManagerType",
           type: "uint256",
@@ -25,19 +41,9 @@ export default {
     {
       inputs: [
         {
-          internalType: "uint256",
-          name: "tokenManagerType",
-          type: "uint256",
-        },
-        {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
-        },
-        {
-          internalType: "address",
-          name: "tokenManager",
-          type: "address",
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
         },
         {
           internalType: "address",
@@ -57,8 +63,13 @@ export default {
           name: "",
           type: "uint256",
         },
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
       ],
-      stateMutability: "payable",
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
@@ -70,13 +81,26 @@ export default {
         },
         {
           internalType: "address",
-          name: "tokenAddress",
-          type: "address",
-        },
-        {
-          internalType: "address",
           name: "tokenManager",
           type: "address",
+        },
+      ],
+      name: "postTokenManagerDeploy",
+      outputs: [],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          internalType: "bool",
+          name: "tokenOnly",
+          type: "bool",
         },
         {
           internalType: "address",
@@ -103,14 +127,9 @@ export default {
     {
       inputs: [
         {
-          internalType: "uint256",
-          name: "tokenManagerType",
-          type: "uint256",
-        },
-        {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
         },
         {
           internalType: "address",
@@ -135,8 +154,13 @@ export default {
           name: "",
           type: "uint256",
         },
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
       ],
-      stateMutability: "payable",
+      stateMutability: "nonpayable",
       type: "function",
     },
   ],

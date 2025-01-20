@@ -40,6 +40,7 @@ export const interchainTokenServiceAbi = [
         type: "address",
       },
       { name: "tokenHandler_", internalType: "address", type: "address" },
+      { name: "gatewayCaller_", internalType: "address", type: "address" },
     ],
     stateMutability: "nonpayable",
   },
@@ -55,7 +56,12 @@ export const interchainTokenServiceAbi = [
     ],
     name: "CannotDeploy",
   },
+  { type: "error", inputs: [], name: "CannotDeployRemotelyToSelf" },
   { type: "error", inputs: [], name: "EmptyData" },
+  { type: "error", inputs: [], name: "EmptyDestinationAddress" },
+  { type: "error", inputs: [], name: "EmptyParams" },
+  { type: "error", inputs: [], name: "EmptyTokenName" },
+  { type: "error", inputs: [], name: "EmptyTokenSymbol" },
   {
     type: "error",
     inputs: [
@@ -63,7 +69,6 @@ export const interchainTokenServiceAbi = [
     ],
     name: "ExecuteWithInterchainTokenFailed",
   },
-  { type: "error", inputs: [], name: "ExecuteWithTokenNotSupported" },
   {
     type: "error",
     inputs: [
@@ -72,7 +77,11 @@ export const interchainTokenServiceAbi = [
     name: "ExpressExecuteWithInterchainTokenFailed",
   },
   { type: "error", inputs: [], name: "ExpressExecutorAlreadySet" },
-  { type: "error", inputs: [], name: "GatewayToken" },
+  {
+    type: "error",
+    inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
+    name: "GatewayCallFailed",
+  },
   {
     type: "error",
     inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
@@ -110,6 +119,7 @@ export const interchainTokenServiceAbi = [
   },
   { type: "error", inputs: [], name: "InvalidOwner" },
   { type: "error", inputs: [], name: "InvalidOwnerAddress" },
+  { type: "error", inputs: [], name: "InvalidPayload" },
   {
     type: "error",
     inputs: [
@@ -157,15 +167,13 @@ export const interchainTokenServiceAbi = [
   { type: "error", inputs: [], name: "NotPaused" },
   { type: "error", inputs: [], name: "NotProxy" },
   { type: "error", inputs: [], name: "NotRemoteService" },
+  { type: "error", inputs: [], name: "NotSupported" },
+  { type: "error", inputs: [], name: "Pause" },
   {
     type: "error",
-    inputs: [
-      { name: "caller", internalType: "address", type: "address" },
-      { name: "token", internalType: "address", type: "address" },
-    ],
-    name: "NotToken",
+    inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
+    name: "PostDeployFailed",
   },
-  { type: "error", inputs: [], name: "Pause" },
   { type: "error", inputs: [], name: "SetupFailed" },
   {
     type: "error",
@@ -189,6 +197,7 @@ export const interchainTokenServiceAbi = [
   },
   { type: "error", inputs: [], name: "UntrustedChain" },
   { type: "error", inputs: [], name: "ZeroAddress" },
+  { type: "error", inputs: [], name: "ZeroAmount" },
   { type: "error", inputs: [], name: "ZeroStringLength" },
   {
     type: "event",
@@ -256,55 +265,6 @@ export const interchainTokenServiceAbi = [
         indexed: false,
       },
       {
-        name: "symbol",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-      {
-        name: "expressExecutor",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-    ],
-    name: "ExpressExecutedWithToken",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "commandId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "sourceChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "sourceAddress",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "payloadHash",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: false,
-      },
-      {
         name: "expressExecutor",
         internalType: "address",
         type: "address",
@@ -312,55 +272,6 @@ export const interchainTokenServiceAbi = [
       },
     ],
     name: "ExpressExecutionFulfilled",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "commandId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "sourceChain",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "sourceAddress",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "payloadHash",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: false,
-      },
-      {
-        name: "symbol",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "amount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true,
-      },
-      {
-        name: "expressExecutor",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-    ],
-    name: "ExpressExecutionWithTokenFulfilled",
   },
   {
     type: "event",
@@ -812,22 +723,6 @@ export const interchainTokenServiceAbi = [
   },
   {
     type: "function",
-    inputs: [
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "bytes", type: "bytes" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "uint256", type: "uint256" },
-    ],
-    name: "contractCallWithTokenValue",
-    outputs: [
-      { name: "", internalType: "address", type: "address" },
-      { name: "", internalType: "uint256", type: "uint256" },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     inputs: [],
     name: "contractId",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
@@ -867,6 +762,19 @@ export const interchainTokenServiceAbi = [
   },
   {
     type: "function",
+    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    name: "deployedTokenManager",
+    outputs: [
+      {
+        name: "tokenManager_",
+        internalType: "contract ITokenManager",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     inputs: [
       { name: "commandId", internalType: "bytes32", type: "bytes32" },
       { name: "sourceChain", internalType: "string", type: "string" },
@@ -880,40 +788,12 @@ export const interchainTokenServiceAbi = [
   {
     type: "function",
     inputs: [
-      { name: "", internalType: "bytes32", type: "bytes32" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "bytes", type: "bytes" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "uint256", type: "uint256" },
-    ],
-    name: "executeWithToken",
-    outputs: [],
-    stateMutability: "pure",
-  },
-  {
-    type: "function",
-    inputs: [
       { name: "commandId", internalType: "bytes32", type: "bytes32" },
       { name: "sourceChain", internalType: "string", type: "string" },
       { name: "sourceAddress", internalType: "string", type: "string" },
       { name: "payload", internalType: "bytes", type: "bytes" },
     ],
     name: "expressExecute",
-    outputs: [],
-    stateMutability: "payable",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "", internalType: "bytes32", type: "bytes32" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "bytes", type: "bytes" },
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "uint256", type: "uint256" },
-    ],
-    name: "expressExecuteWithToken",
     outputs: [],
     stateMutability: "payable",
   },
@@ -962,16 +842,9 @@ export const interchainTokenServiceAbi = [
   },
   {
     type: "function",
-    inputs: [
-      { name: "commandId", internalType: "bytes32", type: "bytes32" },
-      { name: "sourceChain", internalType: "string", type: "string" },
-      { name: "sourceAddress", internalType: "string", type: "string" },
-      { name: "payloadHash", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "getExpressExecutor",
-    outputs: [
-      { name: "expressExecutor", internalType: "address", type: "address" },
-    ],
+    inputs: [],
+    name: "gatewayCaller",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
     stateMutability: "view",
   },
   {
@@ -981,10 +854,8 @@ export const interchainTokenServiceAbi = [
       { name: "sourceChain", internalType: "string", type: "string" },
       { name: "sourceAddress", internalType: "string", type: "string" },
       { name: "payloadHash", internalType: "bytes32", type: "bytes32" },
-      { name: "symbol", internalType: "string", type: "string" },
-      { name: "amount", internalType: "uint256", type: "uint256" },
     ],
-    name: "getExpressExecutorWithToken",
+    name: "getExpressExecutor",
     outputs: [
       { name: "expressExecutor", internalType: "address", type: "address" },
     ],
@@ -1114,6 +985,15 @@ export const interchainTokenServiceAbi = [
     name: "proposeOwnership",
     outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    name: "registeredTokenAddress",
+    outputs: [
+      { name: "tokenAddress", internalType: "address", type: "address" },
+    ],
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -1258,28 +1138,6 @@ export const interchainTokenServiceAbi = [
     outputs: [],
     stateMutability: "nonpayable",
   },
-  {
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "validTokenAddress",
-    outputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
-    name: "validTokenManagerAddress",
-    outputs: [
-      {
-        name: "tokenManagerAddress_",
-        internalType: "address",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-  },
 ] as const;
 
 export const interchainTokenServiceAddress =
@@ -1334,16 +1192,6 @@ export const useReadInterchainTokenServiceContractCallValue =
   });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"contractCallWithTokenValue"`
- */
-export const useReadInterchainTokenServiceContractCallWithTokenValue =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    functionName: "contractCallWithTokenValue",
-  });
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"contractId"`
  */
 export const useReadInterchainTokenServiceContractId =
@@ -1354,13 +1202,13 @@ export const useReadInterchainTokenServiceContractId =
   });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"executeWithToken"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"deployedTokenManager"`
  */
-export const useReadInterchainTokenServiceExecuteWithToken =
+export const useReadInterchainTokenServiceDeployedTokenManager =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
     address: interchainTokenServiceAddress,
-    functionName: "executeWithToken",
+    functionName: "deployedTokenManager",
   });
 
 /**
@@ -1414,6 +1262,16 @@ export const useReadInterchainTokenServiceGateway =
   });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"gatewayCaller"`
+ */
+export const useReadInterchainTokenServiceGatewayCaller =
+  /*#__PURE__*/ createUseReadContract({
+    abi: interchainTokenServiceAbi,
+    address: interchainTokenServiceAddress,
+    functionName: "gatewayCaller",
+  });
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"getExpressExecutor"`
  */
 export const useReadInterchainTokenServiceGetExpressExecutor =
@@ -1421,16 +1279,6 @@ export const useReadInterchainTokenServiceGetExpressExecutor =
     abi: interchainTokenServiceAbi,
     address: interchainTokenServiceAddress,
     functionName: "getExpressExecutor",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"getExpressExecutorWithToken"`
- */
-export const useReadInterchainTokenServiceGetExpressExecutorWithToken =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    functionName: "getExpressExecutorWithToken",
   });
 
 /**
@@ -1544,6 +1392,16 @@ export const useReadInterchainTokenServicePendingOwner =
   });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"registeredTokenAddress"`
+ */
+export const useReadInterchainTokenServiceRegisteredTokenAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: interchainTokenServiceAbi,
+    address: interchainTokenServiceAddress,
+    functionName: "registeredTokenAddress",
+  });
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"tokenHandler"`
  */
 export const useReadInterchainTokenServiceTokenHandler =
@@ -1611,26 +1469,6 @@ export const useReadInterchainTokenServiceTrustedAddressHash =
     abi: interchainTokenServiceAbi,
     address: interchainTokenServiceAddress,
     functionName: "trustedAddressHash",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"validTokenAddress"`
- */
-export const useReadInterchainTokenServiceValidTokenAddress =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    functionName: "validTokenAddress",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"validTokenManagerAddress"`
- */
-export const useReadInterchainTokenServiceValidTokenManagerAddress =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    functionName: "validTokenManagerAddress",
   });
 
 /**
@@ -1710,16 +1548,6 @@ export const useWriteInterchainTokenServiceExpressExecute =
     abi: interchainTokenServiceAbi,
     address: interchainTokenServiceAddress,
     functionName: "expressExecute",
-  });
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"expressExecuteWithToken"`
- */
-export const useWriteInterchainTokenServiceExpressExecuteWithToken =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    functionName: "expressExecuteWithToken",
   });
 
 /**
@@ -1932,16 +1760,6 @@ export const useSimulateInterchainTokenServiceExpressExecute =
   });
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"expressExecuteWithToken"`
- */
-export const useSimulateInterchainTokenServiceExpressExecuteWithToken =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    functionName: "expressExecuteWithToken",
-  });
-
-/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"interchainTransfer"`
  */
 export const useSimulateInterchainTokenServiceInterchainTransfer =
@@ -2091,16 +1909,6 @@ export const useWatchInterchainTokenServiceExpressExecutedEvent =
   });
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `eventName` set to `"ExpressExecutedWithToken"`
- */
-export const useWatchInterchainTokenServiceExpressExecutedWithTokenEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    eventName: "ExpressExecutedWithToken",
-  });
-
-/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `eventName` set to `"ExpressExecutionFulfilled"`
  */
 export const useWatchInterchainTokenServiceExpressExecutionFulfilledEvent =
@@ -2108,16 +1916,6 @@ export const useWatchInterchainTokenServiceExpressExecutionFulfilledEvent =
     abi: interchainTokenServiceAbi,
     address: interchainTokenServiceAddress,
     eventName: "ExpressExecutionFulfilled",
-  });
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `eventName` set to `"ExpressExecutionWithTokenFulfilled"`
- */
-export const useWatchInterchainTokenServiceExpressExecutionWithTokenFulfilledEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-    eventName: "ExpressExecutionWithTokenFulfilled",
   });
 
 /**

@@ -32,11 +32,29 @@ export const tokenManagerAbi = [
   {
     type: "error",
     inputs: [
+      { name: "flowAmount", internalType: "uint256", type: "uint256" },
+      { name: "flowToAdd", internalType: "uint256", type: "uint256" },
+      { name: "tokenManager", internalType: "address", type: "address" },
+    ],
+    name: "FlowAdditionOverflow",
+  },
+  {
+    type: "error",
+    inputs: [
       { name: "limit", internalType: "uint256", type: "uint256" },
       { name: "flowAmount", internalType: "uint256", type: "uint256" },
       { name: "tokenManager", internalType: "address", type: "address" },
     ],
     name: "FlowLimitExceeded",
+  },
+  {
+    type: "error",
+    inputs: [
+      { name: "flowLimit", internalType: "uint256", type: "uint256" },
+      { name: "flowToCompare", internalType: "uint256", type: "uint256" },
+      { name: "tokenManager", internalType: "address", type: "address" },
+    ],
+    name: "FlowLimitOverflow",
   },
   { type: "error", inputs: [], name: "GiveTokenFailed" },
   {
@@ -77,6 +95,7 @@ export const tokenManagerAbi = [
     ],
     name: "MissingRole",
   },
+  { type: "error", inputs: [], name: "MulticallFailed" },
   {
     type: "error",
     inputs: [{ name: "flowLimiter", internalType: "address", type: "address" }],
@@ -333,6 +352,13 @@ export const tokenManagerAbi = [
   },
   {
     type: "function",
+    inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
+    name: "multicall",
+    outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
     inputs: [
       { name: "operator_", internalType: "bytes", type: "bytes" },
       { name: "tokenAddress_", internalType: "address", type: "address" },
@@ -375,6 +401,16 @@ export const tokenManagerAbi = [
     name: "tokenAddress",
     outputs: [{ name: "", internalType: "address", type: "address" }],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "from", internalType: "address", type: "address" },
+      { name: "to", internalType: "address", type: "address" },
+    ],
+    name: "transferFlowLimiter",
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -580,6 +616,15 @@ export const useWriteTokenManagerMintToken =
   });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"multicall"`
+ */
+export const useWriteTokenManagerMulticall =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
+    functionName: "multicall",
+  });
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
  */
 export const useWriteTokenManagerProposeOperatorship =
@@ -613,6 +658,15 @@ export const useWriteTokenManagerSetup = /*#__PURE__*/ createUseWriteContract({
   abi: tokenManagerAbi,
   functionName: "setup",
 });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferFlowLimiter"`
+ */
+export const useWriteTokenManagerTransferFlowLimiter =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: tokenManagerAbi,
+    functionName: "transferFlowLimiter",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferOperatorship"`
@@ -694,6 +748,15 @@ export const useSimulateTokenManagerMintToken =
   });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"multicall"`
+ */
+export const useSimulateTokenManagerMulticall =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "multicall",
+  });
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"proposeOperatorship"`
  */
 export const useSimulateTokenManagerProposeOperatorship =
@@ -727,6 +790,15 @@ export const useSimulateTokenManagerSetup =
   /*#__PURE__*/ createUseSimulateContract({
     abi: tokenManagerAbi,
     functionName: "setup",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenManagerAbi}__ and `functionName` set to `"transferFlowLimiter"`
+ */
+export const useSimulateTokenManagerTransferFlowLimiter =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenManagerAbi,
+    functionName: "transferFlowLimiter",
   });
 
 /**

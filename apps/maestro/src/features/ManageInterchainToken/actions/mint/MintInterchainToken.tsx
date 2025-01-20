@@ -9,7 +9,7 @@ import { parseUnits, TransactionExecutionError } from "viem";
 import { useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
@@ -95,7 +95,7 @@ export const MintInterchainToken: FC = () => {
     <>
       <Dialog.Title className="flex">
         <span>Mint interchain tokens on</span>
-        <EVMChainsDropdown disabled compact />
+        <ChainsDropdown disabled compact />
       </Dialog.Title>
       <form
         className="flex flex-1 flex-col justify-between gap-4"

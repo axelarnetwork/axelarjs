@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
@@ -14,24 +14,27 @@ import {
   useChainInfoQuery,
   useEstimateGasFeeQuery,
 } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
 
+type ChainConfig = EVMChainConfig | VMChainConfig;
+
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
   tokenId: `0x${string}`;
-  sourceChain: EVMChainConfig;
+  sourceChain: ChainConfig;
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
 }) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
+  // Only query ERC20 details for EVM chains
   const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: props.sourceChain.chain_id,
     tokenAddress: props.tokenAddress,
@@ -49,7 +52,6 @@ export function useSendInterchainTokenState(props: {
 
   const isApprovalRequired = useMemo(
     () =>
-      // is canonical token && origin token
       props.kind === "canonical" &&
       interchainToken.chainId !== undefined &&
       interchainToken.chainId === props.originTokenChainId,
@@ -70,19 +72,18 @@ export function useSendInterchainTokenState(props: {
 
     return matchingTokens
       .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
-      .map((x) => computed.indexedByChainId[x.chainId ?? 0])
+      .map((x) => combinedComputed.indexedByChainId[x.chainId ?? 0])
       .filter(Boolean);
   }, [
     originInterchainToken?.matchingTokens,
     props.sourceChain.chain_id,
-    computed.indexedByChainId,
+    combinedComputed.indexedByChainId,
   ]);
 
   const selectedToChain = useMemo(
     () =>
       eligibleTargetChains.find((c) => c.chain_id === toChainId) ??
       eligibleTargetChains[0],
-
     [toChainId, eligibleTargetChains]
   );
 
@@ -93,6 +94,7 @@ export function useSendInterchainTokenState(props: {
   const nativeTokenSymbol = getNativeToken(
     props.sourceChain.chain_name.toLowerCase()
   );
+
   const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.chain_name,
     destinationChainId: selectedToChain?.chain_name,
@@ -106,7 +108,6 @@ export function useSendInterchainTokenState(props: {
     if (!balance || !gas) {
       return false;
     }
-
     return gas > balance.value;
   }, [balance, gas]);
 
@@ -199,6 +200,5 @@ export function useSendInterchainTokenState(props: {
 export type UseSendInterchainTokenState = ReturnType<
   typeof useSendInterchainTokenState
 >;
-
 export type State = UseSendInterchainTokenState[0];
 export type Actions = UseSendInterchainTokenState[1];

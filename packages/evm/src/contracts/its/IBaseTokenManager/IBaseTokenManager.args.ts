@@ -44,7 +44,7 @@ export const IBASE_TOKEN_MANAGER_ENCODERS = {
 };
 
 export function createIBaseTokenManagerReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<any>
 ) {
   return {
     getTokenAddressFromParams(

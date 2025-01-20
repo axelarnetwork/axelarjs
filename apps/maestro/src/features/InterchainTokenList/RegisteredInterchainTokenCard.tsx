@@ -24,7 +24,7 @@ import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
@@ -156,7 +156,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               balance={BigInt(balance.tokenBalance)}
               isTokenOwner={balance.isTokenOwner}
               isTokenPendingOnwer={balance.isTokenPendingOwner}
-              isTokenMinter={balance.isTokenMinter}
+              isTokenMinter={balance.isTokenMinter as boolean}
               hasPendingOwner={balance.hasPendingOwner}
               tokenId={props.tokenId}
             />

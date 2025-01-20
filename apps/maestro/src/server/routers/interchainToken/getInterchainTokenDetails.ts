@@ -56,10 +56,24 @@ export const getInterchainTokenDetails = publicProcedure
   .output(outputSchema)
   .input(inputSchema)
   .query(async ({ input, ctx }) => {
-    const chains = await ctx.configs.evmChains();
-    const configs = chains[input.chainId];
+    // Get both EVM and VM chains
+    const [evmChains, vmChains] = await Promise.all([
+      ctx.configs.evmChains(),
+      ctx.configs.vmChains(),
+    ]);
+
+    // Combine chains and look for config
+    const configs = evmChains[input.chainId] || vmChains[input.chainId];
+
     // TODO: remove this once we have sui in the chains object
     const axelarChainId = input.chainId === 103 ? "sui" : configs.info.id;
+    // if (!configs) {
+    //   throw new TRPCError({
+    //     code: "NOT_FOUND",
+    //     message: `Chain configuration not found for chain ID ${input.chainId}`,
+    //   });
+    // }
+
     const tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         axelarChainId,

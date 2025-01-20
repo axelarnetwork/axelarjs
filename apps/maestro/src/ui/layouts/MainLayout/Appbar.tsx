@@ -26,7 +26,7 @@ import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
 import { useAccount, useDisconnect } from "~/lib/hooks";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 import { useLayoutStateContainer } from "./MainLayout.state";
 import MainMenu from "./MainMenu";
@@ -99,7 +99,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           <>
             {isConnected && address ? (
               <>
-                <EVMChainsDropdown
+                <ChainsDropdown
                   contentClassName="max-h-[70dvh] w-[300px] translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
@@ -184,7 +184,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
-              <EVMChainsDropdown />
+              <ChainsDropdown />
               <Dropdown $align="end">
                 <Dropdown.Trigger>
                   <button

@@ -29,7 +29,7 @@ import axelarscanClient from "~/services/axelarscan";
 import MaestroKVClient from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
-import { axelarConfigs, evmChains } from "./utils";
+import { axelarConfigs, evmChains, vmChains } from "./utils";
 
 export interface ContextConfig {
   req: NextApiRequest;
@@ -76,6 +76,12 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         axelarscanClient,
         "evmChains" as const
       ),
+      vmChains: vmChains.bind(
+        null,
+        maestroKVClient,
+        axelarscanClient,
+        "vmChains" as const
+      ),
       axelarConfigs: axelarConfigs.bind(
         null,
         maestroKVClient,
@@ -104,8 +110,11 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });
       },
-      createTokenManagerClient(chain: Chain, address: `0x${string}`) {
-        return new TokenManagerClient({ chain, address });
+      createTokenManagerClient(chain: Chain, address: string) {
+        return new TokenManagerClient({
+          chain,
+          address: address as `0x${string}`,
+        });
       },
       createInterchainTokenServiceClient(
         chain: Chain,

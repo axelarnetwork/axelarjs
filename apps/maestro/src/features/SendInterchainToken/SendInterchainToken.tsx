@@ -20,7 +20,7 @@ import { formatUnits, parseUnits } from "viem";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
@@ -283,7 +283,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         <div className="grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
-            <EVMChainsDropdown
+            <ChainsDropdown
               disabled
               compact
               selectedChain={props.sourceChain}
@@ -294,7 +294,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           </div>
           <div className="flex items-center gap-2">
             <label className="text-md align-top">To:</label>
-            <EVMChainsDropdown
+            <ChainsDropdown
               compact
               hideLabel={false}
               selectedChain={state.selectedToChain}

@@ -10,10 +10,8 @@ import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import EVMChainsDropdown, {
-  ChainIcon,
-} from "~/ui/components/EVMChainsDropdown";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import ChainsDropdown, { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
 import ConnectWalletModal from "../compounds/ConnectWalletModal/ConnectWalletModal";
 
@@ -50,16 +48,16 @@ const Page: FC<Props> = ({
   const { chain } = useAccount();
   const chainFromRoute = useChainFromRoute();
   const { switchChain } = useSwitchChain();
-  const { data: evmChains } = useEVMChainConfigsQuery();
+  const { allChains } = useAllChainConfigsQuery();
 
-  const evmChain = useMemo(
-    () => evmChains?.find?.((x) => x.chain_id === chain?.id),
-    [chain, evmChains]
+  const currentChain = useMemo(
+    () => allChains.find((x) => x.chain_id === chain?.id),
+    [chain, allChains]
   );
 
-  const evmChainFromRoute = useMemo(
-    () => evmChains?.find?.((x) => x.chain_id === chainFromRoute?.id),
-    [chainFromRoute, evmChains]
+  const currentChainFromRoute = useMemo(
+    () => allChains.find((x) => x.chain_id === chainFromRoute?.id),
+    [chainFromRoute, allChains]
   );
 
   const pageState = useMemo<PageState>(() => {
@@ -73,15 +71,18 @@ const Page: FC<Props> = ({
 
     // TODO: uncomment this when we have a way to handle multiple chains
 
-    // if (chain && evmChains.length && !evmChain) {
+    // if (chain && allChains?.length && !currentChain) {
     //   return "unsupported-network";
     // }
 
-    // if (!evmChain) {
+    // if (!currentChain) {
     //   return "loading";
     // }
 
-    if (chainFromRoute && evmChain?.chain_id !== chainFromRoute.id) {
+    if (
+      chainFromRoute &&
+      currentChain?.chain_id !== currentChainFromRoute?.chain_id
+    ) {
       return "network-mismatch";
     }
 
@@ -89,10 +90,9 @@ const Page: FC<Props> = ({
   }, [
     mustBeConnected,
     isConnected,
-    // chain,
-    // evmChains.length,
-    evmChain,
     chainFromRoute,
+    currentChainFromRoute,
+    currentChain,
   ]);
 
   const router = useRouter();
@@ -167,7 +167,7 @@ const Page: FC<Props> = ({
                   </div>
                 )}
               </div>
-              <EVMChainsDropdown
+              <ChainsDropdown
                 renderTrigger={() => (
                   <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}
@@ -181,29 +181,29 @@ const Page: FC<Props> = ({
         );
       }
       case "network-mismatch":
-        return !evmChain ? null : (
+        return !currentChain ? null : (
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">
               <div className="flex items-center gap-1 text-xl font-semibold">
-                {`You're currently connected to ${evmChain.name} `}
+                {`You're currently connected to ${currentChain.name} `}
                 <ChainIcon
                   size="md"
-                  src={String(evmChain.image)}
-                  alt={evmChain.name}
+                  src={String(currentChain.image)}
+                  alt={currentChain.name}
                 />
               </div>
-              {evmChainFromRoute && (
+              {currentChainFromRoute && (
                 <Button
                   $variant="primary"
                   $length="block"
                   className="max-w-md"
                   onClick={() =>
                     switchChain?.({
-                      chainId: evmChainFromRoute.chain_id,
+                      chainId: currentChainFromRoute.chain_id,
                     })
                   }
                 >
-                  Switch to {evmChainFromRoute.name}
+                  Switch to {currentChainFromRoute.name}
                 </Button>
               )}
             </div>
@@ -218,8 +218,8 @@ const Page: FC<Props> = ({
     mustBeConnected,
     handleTokenFound,
     children,
-    evmChain,
-    evmChainFromRoute,
+    currentChain,
+    currentChainFromRoute,
     chain?.id,
     switchChain,
   ]);

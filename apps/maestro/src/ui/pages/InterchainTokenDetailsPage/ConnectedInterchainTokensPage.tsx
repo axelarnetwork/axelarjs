@@ -25,7 +25,7 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
@@ -163,8 +163,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       txHashes: sessionState.deployTokensTxHashes,
     });
 
-  const { computed } = useEVMChainConfigsQuery();
   const { switchChain } = useSwitchChain();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const statusesByChain = useMemo(() => {
     return (
@@ -292,16 +292,17 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [interchainToken]
   );
 
-  const runninChainIds = useMemo(
+  const runningChainIds = useMemo(
     () =>
       Object.entries(statusesByChain).map(
-        ([axelarChainId]) => computed.indexedById[axelarChainId]?.chain_id
+        ([axelarChainId]) =>
+          combinedComputed.indexedById[axelarChainId]?.chain_id
       ),
-    [computed.indexedById, statusesByChain]
+    [combinedComputed.indexedById, statusesByChain]
   );
 
   const nonRunningSelectedChainIds = sessionState.selectedChainIds.filter(
-    (x) => !runninChainIds.includes(x)
+    (x) => !runningChainIds.includes(x)
   );
 
   const isRestrictedToDeployer =

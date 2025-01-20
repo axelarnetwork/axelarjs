@@ -1,7 +1,7 @@
 import { Card, cn, Indicator } from "@axelarjs/ui";
 import { type FC } from "react";
 
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { GMPStatusIndicator } from "~/ui/compounds/GMPTxStatusMonitor";
 import type { TokenInfo } from "./types";
 

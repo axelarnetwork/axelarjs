@@ -1,4 +1,7 @@
-import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
+import {
+  INTERCHAIN_TOKEN_FACTORY_ENCODERS,
+  INTERCHAIN_TOKEN_SERVICE_ENCODERS,
+} from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -8,11 +11,11 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
 import {
-  useReadInterchainTokenFactoryInterchainTokenAddress,
   useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
+import { useReadInterchainTokenServiceInterchainTokenAddress } from "~/lib/contracts/InterchainTokenService.hooks";
 import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
@@ -22,8 +25,7 @@ import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-// import { deployToken } from "~/server/routers/sui/ITSFunctions";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
@@ -50,12 +52,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
   const { deployToken } = useDeployToken();
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
+
   // TODO: remove when axelarscan's api is ready
   const updatedComputed = {
-    ...computed,
+    ...combinedComputed,
     indexedByChainId: {
-      ...computed.indexedByChainId,
+      ...combinedComputed.indexedByChainId,
       ...(NEXT_PUBLIC_NETWORK_ENV === "mainnet"
         ? {
             id: "sui",
@@ -145,7 +148,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           }),
     },
     indexedById: {
-      ...computed.indexedById,
+      ...combinedComputed.indexedById,
       sui:
         NEXT_PUBLIC_NETWORK_ENV === "mainnet"
           ? {
@@ -236,7 +239,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             },
     },
     wagmiChains: [
-      ...computed.wagmiChains,
+      ...combinedComputed.wagmiChains,
       {
         id: NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103,
         name: NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "Sui" : "Sui Testnet",
@@ -300,15 +303,15 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   });
 
   const { data: tokenAddress } =
-    useReadInterchainTokenFactoryInterchainTokenAddress({
-      args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenAddress.args({
-        salt: input?.salt as `0x${string}`,
-        deployer: deployerAddress,
+    useReadInterchainTokenServiceInterchainTokenAddress({
+      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTokenAddress.args({
+        tokenId: tokenId as `0x${string}`,
       }),
       query: {
-        enabled: Boolean(tokenId && input?.salt && deployerAddress),
+        enabled: Boolean(tokenId),
       },
     });
+
   const { destinationChainNames } = useMemo(() => {
     const index = updatedComputed.indexedById;
     type IndexedChainId = keyof typeof index;
@@ -326,9 +329,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     };
   }, [
     chainId,
-    updatedComputed.indexedById,
     input?.destinationChainIds,
     input?.sourceChainId,
+    updatedComputed.indexedById,
   ]);
 
   const multicallArgs = useMemo(() => {
@@ -356,16 +359,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [deployTxData];
     }
 
-    const registerTxData = destinationChainNames.map((destinationChain, i) => {
-      const registerData =
-        INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
-          ...commonArgs,
-          originalChainName: "",
-          destinationChain,
-          gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
-        });
-      return registerData;
-    });
+    const registerTxData = destinationChainNames.map((destinationChain, i) =>
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+        ...commonArgs,
+        originalChainName: "",
+        destinationChain,
+        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
+      })
+    );
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainNames]);
@@ -413,7 +414,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       setRecordDeploymentArgs({
         kind: "interchain",
         deploymentMessageId: `${txHash}-${txIndex}`,
-        tokenId,
+        tokenId: tokenId as string,
         tokenAddress,
         deployerAddress,
         salt: input.salt,
@@ -475,7 +476,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     return await recordDeploymentAsync({
       kind: "interchain",
-      tokenId,
+      tokenId: tokenId as string,
       deployerAddress,
       tokenAddress,
       tokenName: input.tokenName,

@@ -24,18 +24,24 @@ export const interchainTokenFactoryAbi = [
     ],
     stateMutability: "nonpayable",
   },
-  {
-    type: "error",
-    inputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
-    name: "GatewayToken",
-  },
   { type: "error", inputs: [], name: "InvalidChainName" },
   { type: "error", inputs: [], name: "InvalidCodeHash" },
   { type: "error", inputs: [], name: "InvalidImplementation" },
+  {
+    type: "error",
+    inputs: [{ name: "minter", internalType: "address", type: "address" }],
+    name: "InvalidMinter",
+  },
   { type: "error", inputs: [], name: "InvalidOwner" },
   { type: "error", inputs: [], name: "InvalidOwnerAddress" },
+  {
+    type: "error",
+    inputs: [
+      { name: "tokenId", internalType: "bytes32", type: "bytes32" },
+      { name: "expectedTokenId", internalType: "bytes32", type: "bytes32" },
+    ],
+    name: "InvalidTokenId",
+  },
   { type: "error", inputs: [], name: "MulticallFailed" },
   {
     type: "error",
@@ -49,8 +55,52 @@ export const interchainTokenFactoryAbi = [
   },
   { type: "error", inputs: [], name: "NotOwner" },
   { type: "error", inputs: [], name: "NotProxy" },
+  {
+    type: "error",
+    inputs: [{ name: "sender", internalType: "address", type: "address" }],
+    name: "NotServiceOwner",
+  },
+  { type: "error", inputs: [], name: "NotSupported" },
+  { type: "error", inputs: [], name: "RemoteDeploymentNotApproved" },
   { type: "error", inputs: [], name: "SetupFailed" },
   { type: "error", inputs: [], name: "ZeroAddress" },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "minter",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "deployer",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "tokenId",
+        internalType: "bytes32",
+        type: "bytes32",
+        indexed: true,
+      },
+      {
+        name: "destinationChain",
+        internalType: "string",
+        type: "string",
+        indexed: false,
+      },
+      {
+        name: "destinationMinter",
+        internalType: "bytes",
+        type: "bytes",
+        indexed: false,
+      },
+    ],
+    name: "DeployRemoteInterchainTokenApproval",
+  },
   {
     type: "event",
     anonymous: false,
@@ -82,6 +132,37 @@ export const interchainTokenFactoryAbi = [
     anonymous: false,
     inputs: [
       {
+        name: "minter",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "deployer",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "tokenId",
+        internalType: "bytes32",
+        type: "bytes32",
+        indexed: true,
+      },
+      {
+        name: "destinationChain",
+        internalType: "string",
+        type: "string",
+        indexed: false,
+      },
+    ],
+    name: "RevokedDeployRemoteInterchainTokenApproval",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
         name: "newImplementation",
         internalType: "address",
         type: "address",
@@ -100,21 +181,32 @@ export const interchainTokenFactoryAbi = [
   {
     type: "function",
     inputs: [
+      { name: "deployer", internalType: "address", type: "address" },
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+      { name: "destinationChain", internalType: "string", type: "string" },
+      { name: "destinationMinter", internalType: "bytes", type: "bytes" },
+    ],
+    name: "approveDeployRemoteInterchainToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [
       { name: "tokenAddress", internalType: "address", type: "address" },
     ],
-    name: "canonicalInterchainTokenId",
-    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    name: "canonicalInterchainTokenDeploySalt",
+    outputs: [{ name: "deploySalt", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "view",
   },
   {
     type: "function",
     inputs: [
-      { name: "chainNameHash_", internalType: "bytes32", type: "bytes32" },
       { name: "tokenAddress", internalType: "address", type: "address" },
     ],
-    name: "canonicalInterchainTokenSalt",
-    outputs: [{ name: "salt", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "pure",
+    name: "canonicalInterchainTokenId",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -163,6 +255,21 @@ export const interchainTokenFactoryAbi = [
   {
     type: "function",
     inputs: [
+      {
+        name: "originalTokenAddress",
+        internalType: "address",
+        type: "address",
+      },
+      { name: "destinationChain", internalType: "string", type: "string" },
+      { name: "gasValue", internalType: "uint256", type: "uint256" },
+    ],
+    name: "deployRemoteCanonicalInterchainToken",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    inputs: [
       { name: "originalChainName", internalType: "string", type: "string" },
       { name: "salt", internalType: "bytes32", type: "bytes32" },
       { name: "minter", internalType: "address", type: "address" },
@@ -175,12 +282,28 @@ export const interchainTokenFactoryAbi = [
   },
   {
     type: "function",
-    inputs: [],
-    name: "gateway",
-    outputs: [
-      { name: "", internalType: "contract IAxelarGateway", type: "address" },
+    inputs: [
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+      { name: "minter", internalType: "address", type: "address" },
+      { name: "destinationChain", internalType: "string", type: "string" },
+      { name: "gasValue", internalType: "uint256", type: "uint256" },
     ],
-    stateMutability: "view",
+    name: "deployRemoteInterchainToken",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+      { name: "minter", internalType: "address", type: "address" },
+      { name: "destinationChain", internalType: "string", type: "string" },
+      { name: "destinationMinter", internalType: "bytes", type: "bytes" },
+      { name: "gasValue", internalType: "uint256", type: "uint256" },
+    ],
+    name: "deployRemoteInterchainTokenWithMinter",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
   },
   {
     type: "function",
@@ -197,10 +320,8 @@ export const interchainTokenFactoryAbi = [
       { name: "deployer", internalType: "address", type: "address" },
       { name: "salt", internalType: "bytes32", type: "bytes32" },
     ],
-    name: "interchainTokenAddress",
-    outputs: [
-      { name: "tokenAddress", internalType: "address", type: "address" },
-    ],
+    name: "interchainTokenDeploySalt",
+    outputs: [{ name: "deploySalt", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "view",
   },
   {
@@ -212,17 +333,6 @@ export const interchainTokenFactoryAbi = [
     name: "interchainTokenId",
     outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "chainNameHash_", internalType: "bytes32", type: "bytes32" },
-      { name: "deployer", internalType: "address", type: "address" },
-      { name: "salt", internalType: "bytes32", type: "bytes32" },
-    ],
-    name: "interchainTokenSalt",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "pure",
   },
   {
     type: "function",
@@ -273,6 +383,17 @@ export const interchainTokenFactoryAbi = [
     name: "registerCanonicalInterchainToken",
     outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "payable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "deployer", internalType: "address", type: "address" },
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+      { name: "destinationChain", internalType: "string", type: "string" },
+    ],
+    name: "revokeDeployRemoteInterchainToken",
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -327,6 +448,16 @@ export const useReadInterchainTokenFactory =
   });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"canonicalInterchainTokenDeploySalt"`
+ */
+export const useReadInterchainTokenFactoryCanonicalInterchainTokenDeploySalt =
+  /*#__PURE__*/ createUseReadContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "canonicalInterchainTokenDeploySalt",
+  });
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"canonicalInterchainTokenId"`
  */
 export const useReadInterchainTokenFactoryCanonicalInterchainTokenId =
@@ -334,16 +465,6 @@ export const useReadInterchainTokenFactoryCanonicalInterchainTokenId =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     functionName: "canonicalInterchainTokenId",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"canonicalInterchainTokenSalt"`
- */
-export const useReadInterchainTokenFactoryCanonicalInterchainTokenSalt =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-    functionName: "canonicalInterchainTokenSalt",
   });
 
 /**
@@ -367,16 +488,6 @@ export const useReadInterchainTokenFactoryContractId =
   });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"gateway"`
- */
-export const useReadInterchainTokenFactoryGateway =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-    functionName: "gateway",
-  });
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"implementation"`
  */
 export const useReadInterchainTokenFactoryImplementation =
@@ -387,13 +498,13 @@ export const useReadInterchainTokenFactoryImplementation =
   });
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"interchainTokenAddress"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"interchainTokenDeploySalt"`
  */
-export const useReadInterchainTokenFactoryInterchainTokenAddress =
+export const useReadInterchainTokenFactoryInterchainTokenDeploySalt =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
-    functionName: "interchainTokenAddress",
+    functionName: "interchainTokenDeploySalt",
   });
 
 /**
@@ -404,16 +515,6 @@ export const useReadInterchainTokenFactoryInterchainTokenId =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     functionName: "interchainTokenId",
-  });
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"interchainTokenSalt"`
- */
-export const useReadInterchainTokenFactoryInterchainTokenSalt =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-    functionName: "interchainTokenSalt",
   });
 
 /**
@@ -466,6 +567,16 @@ export const useWriteInterchainTokenFactoryAcceptOwnership =
   });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"approveDeployRemoteInterchainToken"`
+ */
+export const useWriteInterchainTokenFactoryApproveDeployRemoteInterchainToken =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "approveDeployRemoteInterchainToken",
+  });
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"deployInterchainToken"`
  */
 export const useWriteInterchainTokenFactoryDeployInterchainToken =
@@ -496,6 +607,16 @@ export const useWriteInterchainTokenFactoryDeployRemoteInterchainToken =
   });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"deployRemoteInterchainTokenWithMinter"`
+ */
+export const useWriteInterchainTokenFactoryDeployRemoteInterchainTokenWithMinter =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "deployRemoteInterchainTokenWithMinter",
+  });
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"multicall"`
  */
 export const useWriteInterchainTokenFactoryMulticall =
@@ -523,6 +644,16 @@ export const useWriteInterchainTokenFactoryRegisterCanonicalInterchainToken =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
+  });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"revokeDeployRemoteInterchainToken"`
+ */
+export const useWriteInterchainTokenFactoryRevokeDeployRemoteInterchainToken =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "revokeDeployRemoteInterchainToken",
   });
 
 /**
@@ -575,6 +706,16 @@ export const useSimulateInterchainTokenFactoryAcceptOwnership =
   });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"approveDeployRemoteInterchainToken"`
+ */
+export const useSimulateInterchainTokenFactoryApproveDeployRemoteInterchainToken =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "approveDeployRemoteInterchainToken",
+  });
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"deployInterchainToken"`
  */
 export const useSimulateInterchainTokenFactoryDeployInterchainToken =
@@ -605,6 +746,16 @@ export const useSimulateInterchainTokenFactoryDeployRemoteInterchainToken =
   });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"deployRemoteInterchainTokenWithMinter"`
+ */
+export const useSimulateInterchainTokenFactoryDeployRemoteInterchainTokenWithMinter =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "deployRemoteInterchainTokenWithMinter",
+  });
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"multicall"`
  */
 export const useSimulateInterchainTokenFactoryMulticall =
@@ -632,6 +783,16 @@ export const useSimulateInterchainTokenFactoryRegisterCanonicalInterchainToken =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"revokeDeployRemoteInterchainToken"`
+ */
+export const useSimulateInterchainTokenFactoryRevokeDeployRemoteInterchainToken =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "revokeDeployRemoteInterchainToken",
   });
 
 /**
@@ -674,6 +835,16 @@ export const useWatchInterchainTokenFactoryEvent =
   });
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `eventName` set to `"DeployRemoteInterchainTokenApproval"`
+ */
+export const useWatchInterchainTokenFactoryDeployRemoteInterchainTokenApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    eventName: "DeployRemoteInterchainTokenApproval",
+  });
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `eventName` set to `"OwnershipTransferStarted"`
  */
 export const useWatchInterchainTokenFactoryOwnershipTransferStartedEvent =
@@ -691,6 +862,16 @@ export const useWatchInterchainTokenFactoryOwnershipTransferredEvent =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     eventName: "OwnershipTransferred",
+  });
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `eventName` set to `"RevokedDeployRemoteInterchainTokenApproval"`
+ */
+export const useWatchInterchainTokenFactoryRevokedDeployRemoteInterchainTokenApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    eventName: "RevokedDeployRemoteInterchainTokenApproval",
   });
 
 /**

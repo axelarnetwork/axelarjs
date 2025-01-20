@@ -603,7 +603,7 @@ export const INTERCHAIN_TOKEN_ENCODERS = {
 };
 
 export function createInterchainTokenReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<any>
 ) {
   return {
     DOMAIN_SEPARATOR() {

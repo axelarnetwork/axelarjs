@@ -29,7 +29,32 @@ export default {
     },
     {
       inputs: [],
+      name: "CannotDeployRemotelyToSelf",
+      type: "error",
+    },
+    {
+      inputs: [],
       name: "EmptyData",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "EmptyDestinationAddress",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "EmptyParams",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "EmptyTokenName",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "EmptyTokenSymbol",
       type: "error",
     },
     {
@@ -44,11 +69,6 @@ export default {
       type: "error",
     },
     {
-      inputs: [],
-      name: "ExecuteWithTokenNotSupported",
-      type: "error",
-    },
-    {
       inputs: [
         {
           internalType: "address",
@@ -60,13 +80,14 @@ export default {
       type: "error",
     },
     {
-      inputs: [],
-      name: "ExpressExecutorAlreadySet",
-      type: "error",
-    },
-    {
-      inputs: [],
-      name: "GatewayToken",
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+      ],
+      name: "GatewayCallFailed",
       type: "error",
     },
     {
@@ -157,6 +178,11 @@ export default {
     {
       inputs: [],
       name: "InvalidOwnerAddress",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "InvalidPayload",
       type: "error",
     },
     {
@@ -275,24 +301,24 @@ export default {
       type: "error",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "caller",
-          type: "address",
-        },
-        {
-          internalType: "address",
-          name: "token",
-          type: "address",
-        },
-      ],
-      name: "NotToken",
+      inputs: [],
+      name: "NotSupported",
       type: "error",
     },
     {
       inputs: [],
       name: "Pause",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes",
+          name: "data",
+          type: "bytes",
+        },
+      ],
+      name: "PostDeployFailed",
       type: "error",
     },
     {
@@ -352,6 +378,11 @@ export default {
     {
       inputs: [],
       name: "ZeroAddress",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "ZeroAmount",
       type: "error",
     },
     {
@@ -424,55 +455,6 @@ export default {
           type: "bytes32",
         },
         {
-          indexed: false,
-          internalType: "string",
-          name: "symbol",
-          type: "string",
-        },
-        {
-          indexed: true,
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          indexed: true,
-          internalType: "address",
-          name: "expressExecutor",
-          type: "address",
-        },
-      ],
-      name: "ExpressExecutedWithToken",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "bytes32",
-          name: "commandId",
-          type: "bytes32",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "sourceAddress",
-          type: "string",
-        },
-        {
-          indexed: false,
-          internalType: "bytes32",
-          name: "payloadHash",
-          type: "bytes32",
-        },
-        {
           indexed: true,
           internalType: "address",
           name: "expressExecutor",
@@ -480,55 +462,6 @@ export default {
         },
       ],
       name: "ExpressExecutionFulfilled",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "bytes32",
-          name: "commandId",
-          type: "bytes32",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "sourceAddress",
-          type: "string",
-        },
-        {
-          indexed: false,
-          internalType: "bytes32",
-          name: "payloadHash",
-          type: "bytes32",
-        },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "symbol",
-          type: "string",
-        },
-        {
-          indexed: true,
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          indexed: true,
-          internalType: "address",
-          name: "expressExecutor",
-          type: "address",
-        },
-      ],
-      name: "ExpressExecutionWithTokenFulfilled",
       type: "event",
     },
     {
@@ -1075,50 +1008,6 @@ export default {
       type: "function",
     },
     {
-      inputs: [
-        {
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          internalType: "string",
-          name: "sourceAddress",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "payload",
-          type: "bytes",
-        },
-        {
-          internalType: "string",
-          name: "symbol",
-          type: "string",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "contractCallWithTokenValue",
-      outputs: [
-        {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
-        },
-        {
-          internalType: "uint256",
-          name: "value",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
       inputs: [],
       name: "contractId",
       outputs: [
@@ -1223,6 +1112,25 @@ export default {
       inputs: [
         {
           internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "deployedTokenManager",
+      outputs: [
+        {
+          internalType: "contract ITokenManager",
+          name: "tokenManager_",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
           name: "commandId",
           type: "bytes32",
         },
@@ -1269,84 +1177,8 @@ export default {
           name: "payload",
           type: "bytes",
         },
-        {
-          internalType: "string",
-          name: "tokenSymbol",
-          type: "string",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "executeWithToken",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "commandId",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          internalType: "string",
-          name: "sourceAddress",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "payload",
-          type: "bytes",
-        },
       ],
       name: "expressExecute",
-      outputs: [],
-      stateMutability: "payable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "commandId",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          internalType: "string",
-          name: "sourceAddress",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "payload",
-          type: "bytes",
-        },
-        {
-          internalType: "string",
-          name: "symbol",
-          type: "string",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "expressExecuteWithToken",
       outputs: [],
       stateMutability: "payable",
       type: "function",
@@ -1445,50 +1277,6 @@ export default {
         },
       ],
       name: "getExpressExecutor",
-      outputs: [
-        {
-          internalType: "address",
-          name: "expressExecutor",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "commandId",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "sourceChain",
-          type: "string",
-        },
-        {
-          internalType: "string",
-          name: "sourceAddress",
-          type: "string",
-        },
-        {
-          internalType: "bytes32",
-          name: "payloadHash",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "symbol",
-          type: "string",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-      ],
-      name: "getExpressExecutorWithToken",
       outputs: [
         {
           internalType: "address",
@@ -1773,6 +1561,25 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "registeredTokenAddress",
+      outputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "string",
           name: "chain",
           type: "string",
@@ -2045,44 +1852,6 @@ export default {
       name: "upgrade",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-      ],
-      name: "validTokenAddress",
-      outputs: [
-        {
-          internalType: "address",
-          name: "tokenAddress",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-      ],
-      name: "validTokenManagerAddress",
-      outputs: [
-        {
-          internalType: "address",
-          name: "tokenManagerAddress_",
-          type: "address",
-        },
-      ],
-      stateMutability: "view",
       type: "function",
     },
   ],
