@@ -18,6 +18,8 @@ import {
   fantomTestnet,
   filecoin,
   filecoinCalibration,
+  flowMainnet,
+  flowTestnet,
   fraxtal,
   fraxtalTestnet,
   immutableZkEvm,
@@ -144,6 +146,18 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     },
     axelarChainId: "ethereum-sepolia",
     axelarChainName: "ethereum-sepolia",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...flowMainnet,
+    axelarChainId: "flow",
+    axelarChainName: "Flow",
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...flowTestnet,
+    axelarChainId: "flow",
+    axelarChainName: "Flow",
     environment: ENVIRONMENTS.testnet,
   },
   {
