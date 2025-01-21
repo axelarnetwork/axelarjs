@@ -11,9 +11,12 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useBalance, useChainId } from "wagmi";
+import { WriteContractData } from "wagmi/query";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
@@ -102,7 +105,37 @@ export const Step2: FC = () => {
 
       const txPromise = deployInterchainTokenAsync();
 
-      await handleTransactionResult(txPromise, {
+      // Sui will return a digest equivalent to the txHash
+      const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
+      if (sourceChain.chain_id === SUI_CHAIN_ID) {
+        const result = (await txPromise) as DeployTokenResult;
+        // if tx is successful, we will get a digest
+        if (result) {
+          rootActions.setTxState({
+            type: "deployed",
+            suiTx: result,
+            txHash: result.digest,
+            tokenAddress: result.tokenAddress,
+            // chainId: sourceChain.chain_id,
+          });
+          if (rootState.selectedChains.length > 0) {
+            addTransaction({
+              status: "submitted",
+              suiTx: result,
+              hash: result.digest,
+              chainId: sourceChain.chain_id,
+              txType: "INTERCHAIN_DEPLOYMENT",
+            });
+          }
+          return;
+        } else {
+          rootActions.setTxState({
+            type: "idle",
+          });
+        }
+      }
+
+      await handleTransactionResult(txPromise as Promise<WriteContractData>, {
         onSuccess(txHash) {
           rootActions.setTxState({
             type: "deploying",
@@ -128,7 +161,7 @@ export const Step2: FC = () => {
       });
     },
     [
-      rootState.selectedChains.length,
+      rootState,
       state.totalGasFee,
       state.isEstimatingGasFees,
       state.hasGasFeesEstimationError,
@@ -140,15 +173,17 @@ export const Step2: FC = () => {
     ]
   );
 
-  const eligibleChains = state.chains.filter(chain => chain.chain_id !== chainId);
+  const eligibleChains = state.chains.filter(
+    (chain) => chain.chain_id !== chainId
+  );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
-  const { address } = useAccount();
+  const balance = useBalance();
 
-  const { data: balance } = useBalance({ address });
-
-  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+  const nativeTokenSymbol = state.sourceChainId
+    ? getNativeToken(state.sourceChainId)
+    : undefined;
 
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !state.remoteDeploymentGasFees) {
@@ -208,6 +243,10 @@ export const Step2: FC = () => {
     sourceChain?.native_token.decimals,
     nativeTokenSymbol,
   ]);
+
+  if (!sourceChain) {
+    return;
+  }
 
   const isCTADisabled =
     state.isEstimatingGasFees ||

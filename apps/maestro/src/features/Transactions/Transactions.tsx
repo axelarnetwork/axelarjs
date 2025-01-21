@@ -14,9 +14,7 @@ import Link from "next/link";
 import { groupBy } from "rambda";
 
 import type { TxType } from "~/lib/hooks";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import {
@@ -31,7 +29,7 @@ const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_TRANSFER: "Interchain Transfer",
 } as const;
 
-function useGroupedStatuses(txHash: `0x${string}`) {
+function useGroupedStatuses(txHash: string) {
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash,
   });
@@ -65,10 +63,10 @@ function useGroupedStatuses(txHash: `0x${string}`) {
 }
 
 type ToastElementProps = {
-  txHash: `0x${string}`;
+  txHash: string;
   chainId: number;
   txType: TxType;
-  onRemoveTx?: (txHash: `0x${string}`) => void;
+  onRemoveTx?: (txHash: string) => void;
 };
 
 const ToastElement: FC<ToastElementProps> = ({
@@ -134,7 +132,7 @@ const ToastElement: FC<ToastElementProps> = ({
           />
         )}
         <div className="mx-2 flex flex-col items-start">
-         <span className="text-sm">{txTypeText}</span>
+          <span className="text-sm">{txTypeText}</span>
           {showFinalityProgressBar ? (
             <Tooltip
               tip={`Waiting for finality on ${combinedComputed.indexedByChainId[chainId]?.name}`}
@@ -199,7 +197,7 @@ const ToastElement: FC<ToastElementProps> = ({
 };
 
 type GMPTxStatusProps = {
-  txHash: `0x${string}`;
+  txHash: string;
   chainId: number;
   txType: keyof typeof TX_LABEL_MAP;
 };

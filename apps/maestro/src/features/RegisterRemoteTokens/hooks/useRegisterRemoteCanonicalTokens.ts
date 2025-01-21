@@ -1,8 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { useChainId } from "wagmi";
-
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -11,13 +9,14 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
+import { useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
   deployerAddress: `0x${string}`;
 };
@@ -26,7 +25,7 @@ export default function useRegisterRemoteCanonicalTokens(
   input: RegisterRemoteCanonicalTokensInput
 ) {
   const { combinedComputed } = useAllChainConfigsQuery();
- 
+
   const chainId = useChainId();
 
   const destinationChains = useMemo(
@@ -68,7 +67,7 @@ export default function useRegisterRemoteCanonicalTokens(
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
           originalChain: sourceChain?.chain_name ?? "0x",
-          originalTokenAddress: tokenDetails.tokenAddress,
+          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
           destinationChain: axelarChainId,
           gasValue,
         }

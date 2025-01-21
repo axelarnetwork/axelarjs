@@ -2,14 +2,13 @@ import { invariant } from "@axelarjs/utils";
 
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
 
 export const getMyInterchainTokens = protectedProcedure
   .input(
     z.object({
       // only for cache invalidation on account change
-      sessionAddress: hex40Literal(),
+      sessionAddress: z.string(),
       // pagination
       limit: z.number().optional().default(10),
       offset: z.number().optional().default(0),

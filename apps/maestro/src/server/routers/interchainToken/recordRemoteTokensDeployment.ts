@@ -81,7 +81,9 @@ export const recordRemoteTokensDeployment = protectedProcedure
         }
 
         // Create appropriate client based on chain type
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(remoteConfig.wagmi);
+        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+          remoteConfig.wagmi
+        );
 
         if (!itsClient) {
           throw new TRPCError({

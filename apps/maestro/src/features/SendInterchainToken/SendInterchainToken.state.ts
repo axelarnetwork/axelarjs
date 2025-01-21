@@ -1,12 +1,12 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
-import { useAccount, useBalance } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
 } from "~/config/env";
+import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -32,7 +32,6 @@ export function useSendInterchainTokenState(props: {
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
 }) {
-
   const { combinedComputed } = useAllChainConfigsQuery();
 
   // Only query ERC20 details for EVM chains
@@ -90,12 +89,11 @@ export function useSendInterchainTokenState(props: {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
-  const { address } = useAccount();
-  const { data: balance } = useBalance({ 
-    address,
-  });
+  const balance = useBalance();
 
-  const nativeTokenSymbol = getNativeToken(props.sourceChain.chain_name.toLowerCase());
+  const nativeTokenSymbol = getNativeToken(
+    props.sourceChain.chain_name.toLowerCase()
+  );
 
   const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.chain_name,
@@ -113,7 +111,7 @@ export function useSendInterchainTokenState(props: {
     return gas > balance.value;
   }, [balance, gas]);
 
-    const {
+  const {
     mutateAsync: interchainTransferAsync,
     isPending: isInterchainTransferSending,
     txState: interchainTransferTxState,
@@ -148,7 +146,7 @@ export function useSendInterchainTokenState(props: {
     resetTokenServiceTxState();
   };
 
-   const { sendTokenAsync, isSending, txState } = useMemo(
+  const { sendTokenAsync, isSending, txState } = useMemo(
     () =>
       isApprovalRequired
         ? {
@@ -199,6 +197,8 @@ export function useSendInterchainTokenState(props: {
   ] as const;
 }
 
-export type UseSendInterchainTokenState = ReturnType<typeof useSendInterchainTokenState>;
+export type UseSendInterchainTokenState = ReturnType<
+  typeof useSendInterchainTokenState
+>;
 export type State = UseSendInterchainTokenState[0];
 export type Actions = UseSendInterchainTokenState[1];

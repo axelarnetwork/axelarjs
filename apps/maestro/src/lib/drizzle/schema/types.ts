@@ -1,1 +1,1 @@
-export type DeploymentMessageId = `0x${string}-${number}`;
+export type DeploymentMessageId = `${string}-${number}`;

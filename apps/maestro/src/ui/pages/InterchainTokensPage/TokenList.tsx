@@ -54,7 +54,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   );
 
   const { combinedComputed } = useAllChainConfigsQuery();
- 
+
   const maybeTokens = Maybe.of(data).map((data) => data.items);
   const totalPages = Maybe.of(data).mapOr(0, (data) => data.totalPages);
 
@@ -64,7 +64,10 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, combinedComputed.indexedById[token.axelarChainId]] as const
+              [
+                token,
+                combinedComputed.indexedById[token.axelarChainId],
+              ] as const
           )
         )
         .mapOr(

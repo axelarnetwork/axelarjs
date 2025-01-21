@@ -5,7 +5,6 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
@@ -16,33 +15,37 @@ import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
+import {
+  useAccount,
+  useBalance,
+  useChainId,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
+import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
-  tokenId?: `0x${string}` | null;
+  tokenId?: string | null;
   deploymentMessageId: string | undefined;
 };
 
 type InterchainTokenDetailsPageSessionStorageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
 };
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (
@@ -52,14 +55,14 @@ export const getInterchainTokenDetailsPageSessionStorageKey = (
   `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
 
 export type InterchainTokenDetailsPageState = {
-  deployTokensTxHashes: `0x${string}`[];
+  deployTokensTxHashes: string[];
   selectedChainIds: number[];
 };
 
 export function persistTokenDeploymentTxHash(
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   chainId: number,
-  deployTokensTxHash: `0x${string}`,
+  deployTokensTxHash: string,
   selectedChainIds: number[]
 ) {
   const key = getInterchainTokenDetailsPageSessionStorageKey({
@@ -160,9 +163,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       txHashes: sessionState.deployTokensTxHashes,
     });
 
+  const { switchChain } = useSwitchChain();
   const { combinedComputed } = useAllChainConfigsQuery();
-
-  const { switchChainAsync } = useSwitchChain();
 
   const statusesByChain = useMemo(() => {
     return (
@@ -274,7 +276,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     setSessionState,
   ]);
 
-  const { data: userGasBalance } = useBalance({ address });
+  const userGasBalance = useBalance();
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
@@ -293,7 +295,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const runningChainIds = useMemo(
     () =>
       Object.entries(statusesByChain).map(
-        ([axelarChainId]) => combinedComputed.indexedById[axelarChainId]?.chain_id
+        ([axelarChainId]) =>
+          combinedComputed.indexedById[axelarChainId]?.chain_id
       ),
     [combinedComputed.indexedById, statusesByChain]
   );
@@ -380,7 +383,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
                 ≈{" "}
                 <BigNumberText
-                  decimals={18}
+                  decimals={userGasBalance?.decimals || 18}
                   localeOptions={{
                     style: "decimal",
                     maximumFractionDigits: 4,
@@ -432,11 +435,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               $variant="accent"
               onClick={() => {
                 if (originToken) {
-                  switchChainAsync?.({ chainId: originToken.chainId }).catch(
-                    () => {
-                      logger.error("Failed to switch network");
-                    }
-                  );
+                  switchChain?.({ chainId: originToken.chainId });
                 }
               }}
             >
@@ -466,9 +465,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               }}
             />
           ) : (
-            <ConnectWalletButton className="w-full" $size="md">
+            <ConnectWalletModal>
               Connect wallet to register this token
-            </ConnectWalletButton>
+            </ConnectWalletModal>
           )}
         </div>
       )}

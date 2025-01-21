@@ -1,30 +1,36 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
-import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
 import { hex64 } from "~/lib/utils/validation";
-import { useEVMChainConfigsQuery, useVMChainConfigsQuery } from "../axelarscan/hooks";
+import {
+  useEVMChainConfigsQuery,
+  useVMChainConfigsQuery,
+} from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}`;
+  tokenAddress?: string;
   strict?: boolean;
 }) {
-  const { computed: evmComputed, ...evmChainsQuery } = useEVMChainConfigsQuery();
+  const { computed: evmComputed, ...evmChainsQuery } =
+    useEVMChainConfigsQuery();
   const { computed: vmComputed, ...vmChainsQuery } = useVMChainConfigsQuery();
 
-  const combinedComputed = useMemo(() => ({
-    indexedById: {
-      ...vmComputed.indexedById,
-      ...evmComputed.indexedById,
-    },
-    indexedByChainId: {
-      ...vmComputed.indexedByChainId,
-      ...evmComputed.indexedByChainId,
-    },
-    wagmiChains: evmComputed.wagmiChains, // Keep wagmiChains for EVM compatibility
-  }), [evmComputed, vmComputed]);
+  const combinedComputed = useMemo(
+    () => ({
+      indexedById: {
+        ...vmComputed.indexedById,
+        ...evmComputed.indexedById,
+      },
+      indexedByChainId: {
+        ...vmComputed.indexedByChainId,
+        ...evmComputed.indexedByChainId,
+      },
+      wagmiChains: evmComputed.wagmiChains, // Keep wagmiChains for EVM compatibility
+    }),
+    [evmComputed, vmComputed]
+  );
 
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(
@@ -34,7 +40,7 @@ export function useInterchainTokensQuery(input: {
         strict: input.strict,
       },
       {
-        enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
+        enabled: Maybe.of(input.tokenAddress).mapOr(false, Boolean),
         retry: false,
         refetchOnWindowFocus: false,
       }
@@ -47,27 +53,36 @@ export function useInterchainTokensQuery(input: {
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
         chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
-        wagmiConfig: combinedComputed.wagmiChains?.find((x) => x?.id === Number(token.chainId))
+        wagmiConfig: combinedComputed.wagmiChains?.find(
+          (x) => x?.id === Number(token.chainId)
+        ),
       })),
       chain: Maybe.of(input.chainId).mapOrUndefined(
         (x) => combinedComputed.indexedByChainId[x]
       ),
       wagmiConfig: Maybe.of(input.chainId)
         .map(Number)
-        .mapOrUndefined((chainId) => 
+        .mapOrUndefined((chainId) =>
           combinedComputed.wagmiChains?.find((x) => x?.id === chainId)
         ),
     },
-    isLoading: evmChainsQuery.isLoading || vmChainsQuery.isLoading || queryResult.isLoading,
-    isFetching: evmChainsQuery.isFetching || vmChainsQuery.isFetching || queryResult.isFetching,
-    isError: evmChainsQuery.isError || vmChainsQuery.isError || queryResult.isError,
+    isLoading:
+      evmChainsQuery.isLoading ||
+      vmChainsQuery.isLoading ||
+      queryResult.isLoading,
+    isFetching:
+      evmChainsQuery.isFetching ||
+      vmChainsQuery.isFetching ||
+      queryResult.isFetching,
+    isError:
+      evmChainsQuery.isError || vmChainsQuery.isError || queryResult.isError,
     error: evmChainsQuery.error || vmChainsQuery.error || queryResult.error,
   };
 }
 
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
-    txHash?: `0x${string}`;
+    txHash: string;
   },
   options?: {
     enabled?: boolean;
@@ -77,14 +92,14 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   const { data, ...query } =
     trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
       {
-        txHash: input.txHash as `0x${string}`,
+        txHash: input.txHash,
       },
       {
-        refetchInterval: 1000 * 10,
+        refetchInterval: options?.refetchInterval ?? 1000 * 10, // 10 seconds
         enabled:
-          input.txHash &&
+          !!input.txHash &&
           hex64().safeParse(input.txHash).success &&
-          Maybe.of(options?.enabled).mapOr(true, Boolean),
+          (options?.enabled || true),
       }
     );
 
@@ -104,7 +119,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
 
 export function useGetTransactionsStatusesOnDestinationChainsQuery(
   input: {
-    txHashes?: `0x${string}`[];
+    txHashes?: string[];
   },
   options?: {
     enabled?: boolean;

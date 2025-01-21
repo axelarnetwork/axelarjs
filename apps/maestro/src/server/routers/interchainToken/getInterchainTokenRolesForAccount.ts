@@ -33,7 +33,9 @@ export const getInterchainTokenRolesForAccount = publicProcedure
     ]);
 
     // Try to find config in either chain type
-    const configs = evmChains[tokenDetails.axelarChainId] || vmChains[tokenDetails.axelarChainId];
+    const configs =
+      evmChains[tokenDetails.axelarChainId] ||
+      vmChains[tokenDetails.axelarChainId];
 
     if (!configs) {
       return {
@@ -81,8 +83,6 @@ export const getInterchainTokenRolesForAccount = publicProcedure
       tokenManager: tokenManagerRoles
         .filter(([, hasRole]) => hasRole)
         .map(([role]) => role),
-      token: tokenRoles
-        .filter(([, hasRole]) => hasRole)
-        .map(([role]) => role),
+      token: tokenRoles.filter(([, hasRole]) => hasRole).map(([role]) => role),
     };
   });

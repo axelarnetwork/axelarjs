@@ -49,7 +49,7 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
     symbol: "ETH",
     decimals: 18,
   },
-  no_tvl: true,
+  // no_tvl: true,
 };
 
 const mocks = {

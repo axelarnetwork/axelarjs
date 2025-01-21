@@ -12,7 +12,8 @@ const TokenDetailsRedirectPage = () => {
   );
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { combinedComputed, isLoading: isLoadingChains } = useAllChainConfigsQuery();
+  const { combinedComputed, isLoading: isLoadingChains } =
+    useAllChainConfigsQuery();
 
   const { tokenId } = router.query;
 

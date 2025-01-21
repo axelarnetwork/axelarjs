@@ -6,18 +6,14 @@ import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { useAccount, useSwitchChain } from "wagmi";
-
 import { ALL_CHAINS } from "~/config/evm-chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useChainFromRoute } from "~/lib/hooks";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdown, { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
-import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletModal from "../compounds/ConnectWalletModal/ConnectWalletModal";
 
 type PageState =
   | "loading"
@@ -73,13 +69,15 @@ const Page: FC<Props> = ({
       return "disconnected";
     }
 
-    if (chain && allChains?.length && !currentChain) {
-      return "unsupported-network";
-    }
+    // TODO: uncomment this when we have a way to handle multiple chains
 
-    if (!currentChain) {
-      return "loading";
-    }
+    // if (chain && allChains?.length && !currentChain) {
+    //   return "unsupported-network";
+    // }
+
+    // if (!currentChain) {
+    //   return "loading";
+    // }
 
     if (
       chainFromRoute &&
@@ -92,8 +90,6 @@ const Page: FC<Props> = ({
   }, [
     mustBeConnected,
     isConnected,
-    allChains,
-    chain,
     chainFromRoute,
     currentChainFromRoute,
     currentChain,
@@ -131,7 +127,7 @@ const Page: FC<Props> = ({
             <div className="grid w-full max-w-lg place-items-center rounded-2xl bg-base-100 p-4">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>
-              <ConnectWalletButton className="w-full max-w-md" $size="md" />
+              <ConnectWalletModal className="w-full max-w-md" />
             </div>
             <section className="my-10 space-y-4">
               <div className="text-center text-xl font-semibold">

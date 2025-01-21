@@ -10,12 +10,10 @@ import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
 import { isAddress } from "viem";
-import { useAccount } from "wagmi";
 
+import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import ChainsDropdown, {
@@ -105,7 +103,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidAddress && search.length >= 10);
 
   return (
-    <FormControl className="relative z-10 w-full max-w-xs md:max-w-md">
+    <FormControl className="relative w-full max-w-xs md:max-w-md">
       <div className="pb-2 text-center font-semibold">
         TAKE YOUR TOKEN INTERCHAIN
       </div>

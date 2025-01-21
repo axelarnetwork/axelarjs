@@ -228,7 +228,7 @@ export default class MaestroPostgresClient {
    */
   async getInterchainTokenByChainIdAndTokenAddress(
     axelarChainId: string,
-    tokenAddress: Address
+    tokenAddress: string
   ) {
     const query = this.db.query.interchainTokens.findFirst({
       where: (table, { ilike, and }) =>
@@ -249,7 +249,7 @@ export default class MaestroPostgresClient {
    */
   async getRemoteInterchainTokenByChainIdAndTokenAddress(
     axelarChainId: string,
-    tokenAddress: Address
+    tokenAddress: string
   ) {
     const query = this.db.query.remoteInterchainTokens.findFirst({
       where: (table, { ilike, and }) =>

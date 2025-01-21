@@ -45,7 +45,8 @@ export async function vmChains<TCacheKey extends string>(
   const chainConfigs = await axelarscanClient.getChainConfigs();
 
   // Add flow config to the list of eligible chains
-  const vmChainsMap = chainConfigs.vm.reduce((acc, chain) => {
+  const vmChainsMap = chainConfigs.vm.reduce(
+    (acc, chain) => {
       const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
         (config) => config.id === chain.chain_id
       );
@@ -92,7 +93,9 @@ export async function evmChains<TCacheKey extends string>(
 
   const configuredIDs = WAGMI_CHAIN_CONFIGS.map((chain) => chain.id);
 
-  const eligibleChains = chainConfigs.evm.filter((chain) => configuredIDs.includes(chain.chain_id));
+  const eligibleChains = chainConfigs.evm.filter((chain) =>
+    configuredIDs.includes(chain.chain_id)
+  );
 
   // Add flow config to the list of eligible chains
   const evmChainsMap = eligibleChains.reduce(
@@ -108,6 +111,11 @@ export async function evmChains<TCacheKey extends string>(
         info: chain,
         wagmi: wagmiConfig,
       };
+
+      // TODO: remove this once we have ITS hub on testnet
+      if (NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier") {
+        entry.info.id = wagmiConfig.axelarChainId;
+      }
 
       return {
         ...acc,
@@ -144,7 +152,7 @@ export async function axelarConfigs<TCacheKey extends string>(
   }
 
   const chainConfigs = await axelarConfigClient.getAxelarConfigs(
-    NEXT_PUBLIC_NETWORK_ENV
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : "testnet"
   );
 
   // cache for 1 hour

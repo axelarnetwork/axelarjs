@@ -18,10 +18,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
+import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -56,11 +56,12 @@ export type Props = TokenInfo & {
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
   const chainId = useChainId();
-  const { data: balance } = useInterchainTokenBalanceForOwnerQuery({
+  const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
   });
+  const balance = result?.data;
 
   const { explorerUrl, explorerName } = useMemo(() => {
     if (!props.tokenAddress || !props.chain) {
@@ -77,17 +78,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     };
   }, [props.chain, props.tokenAddress]);
 
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
-  const handleSwitchChain = useCallback(async () => {
+  const handleSwitchChain = useCallback(() => {
     try {
-      await switchChainAsync?.({ chainId: props.chainId });
+      switchChain?.({ chainId: props.chainId });
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Failed to switch chain: ${error.cause.shortMessage}`);
       }
     }
-  }, [props.chainId, switchChainAsync]);
+  }, [props.chainId, switchChain]);
 
   const isSourceChain = chainId === props.chainId;
 
@@ -203,7 +204,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 {balance.isTokenPendingOwner && (
                   <>
                     <AcceptInterchainTokenOwnership
-                      accountAddress={address as `0x${string}`}
+                      accountAddress={address}
                       tokenAddress={props.tokenAddress}
                       sourceChain={props.chain as EVMChainConfig}
                       tokenId={props.tokenId}
@@ -229,7 +230,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                   <>
                     {balance.isTokenPendingOwner ? (
                       <AcceptInterchainTokenOwnership
-                        accountAddress={address as `0x${string}`}
+                        accountAddress={address}
                         tokenAddress={props.tokenAddress}
                         sourceChain={props.chain as EVMChainConfig}
                         tokenId={props.tokenId}

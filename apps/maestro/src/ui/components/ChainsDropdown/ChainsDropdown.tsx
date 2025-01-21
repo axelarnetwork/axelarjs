@@ -8,12 +8,9 @@ import Image from "next/image";
 
 import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
-import { useAccount, useSwitchChain } from "wagmi";
 
-import { logger } from "~/lib/logger";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useAccount, useSwitchChain } from "~/lib/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,
@@ -129,7 +126,7 @@ export const ChainIconComponent: FC<Props> = (props) => {
 const ChainsDropdown: FC<Props> = (props) => {
   const { allChains } = useAllChainConfigsQuery();
   const { chain } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
   const [state, actions] = useChainsDropdownContainer();
 
@@ -141,11 +138,13 @@ const ChainsDropdown: FC<Props> = (props) => {
     [chain?.id, allChains, state.selectedChainId]
   );
 
-  const eligibleChains = Maybe.of(props.chains ?? allChains).mapOr([], (chains) =>
-    chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
+  const eligibleChains = Maybe.of(props.chains ?? allChains).mapOr(
+    [],
+    (chains) =>
+      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
   );
 
-  const handleChainChange = async (chainId: number) => {
+  const handleChainChange = (chainId: number) => {
     try {
       if (props.onSelectChain) {
         props.onSelectChain(
@@ -160,9 +159,8 @@ const ChainsDropdown: FC<Props> = (props) => {
           toast.error("Chain not found");
           return;
         }
+        switchChain?.({ chainId });
 
-        // Determine chain type and handle accordingly
-        await switchChainAsync?.({ chainId });
         if (!chain) {
           actions.selectChainId(chainId, "evm");
         }
@@ -241,9 +239,7 @@ const ChainsDropdown: FC<Props> = (props) => {
               <button
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
-                  handleChainChange(chain.chain_id).catch((error) => {
-                    logger.error(error);
-                  });
+                  handleChainChange(chain.chain_id);
                 }}
                 className="group flex w-full items-center gap-2"
               >

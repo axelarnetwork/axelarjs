@@ -2,7 +2,7 @@ import { createContainer, useSessionStorageState } from "@axelarjs/utils/react";
 
 import type { SubmittedTransactionState } from "~/lib/hooks/useTransactionState";
 
-type TransactionsByHash = Record<`0x${string}`, SubmittedTransactionState>;
+type TransactionsByHash = Record<string, SubmittedTransactionState>;
 
 export const {
   Provider: TransactionsProvider,
@@ -30,13 +30,13 @@ export const {
     });
   };
 
-  const removeTransaction = (hash: `0x${string}`) => {
+  const removeTransaction = (hash: string) => {
     setTransactions((draft) => {
       delete draft[hash];
     });
   };
 
-  const getTransaction = (hash: `0x${string}`) => transactions[hash];
+  const getTransaction = (hash: string) => transactions[hash];
 
   return [
     {

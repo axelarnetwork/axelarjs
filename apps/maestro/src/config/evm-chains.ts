@@ -51,11 +51,12 @@ import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
 export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
   axelarChainName: string;
-  environment: "mainnet" | "testnet";
+  environment: "mainnet" | "testnet" | "devnet-amplifier";
 }
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
+  devnet: "devnet-amplifier",
   testnet: "testnet",
 } as const;
 
@@ -78,11 +79,70 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "ethereum",
     environment: ENVIRONMENTS.mainnet,
   },
+  // TODO: correct this
+  {
+    id: 101,
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    environment: ENVIRONMENTS.mainnet,
+    name: "Sui",
+    nativeCurrency: {
+      name: "SUI",
+      symbol: "SUI",
+      decimals: 9,
+    },
+    rpcUrls: {
+      default: { http: ["https://sui-rpc.publicnode.com"] },
+      public: { http: ["https://sui-rpc.publicnode.com"] },
+    },
+    blockExplorers: {
+      default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
+    },
+  },
+  {
+    id: 103,
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    environment: ENVIRONMENTS.devnet,
+    name: "Sui Testnet",
+    nativeCurrency: {
+      name: "SUI",
+      symbol: "SUI",
+      decimals: 9,
+    },
+    rpcUrls: {
+      default: { http: ["https://fullnode.testnet.sui.io:443"] },
+      public: { http: ["https://fullnode.testnet.sui.io:443"] },
+    },
+    blockExplorers: {
+      default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
+    },
+  },
+  //TODO: check if this is ok
+  {
+    id: 103,
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+    environment: ENVIRONMENTS.testnet,
+    name: "Sui Testnet",
+    nativeCurrency: {
+      name: "SUI",
+      symbol: "SUI",
+      decimals: 9,
+    },
+    rpcUrls: {
+      default: { http: ["https://fullnode.testnet.sui.io:443"] },
+      public: { http: ["https://fullnode.testnet.sui.io:443"] },
+    },
+    blockExplorers: {
+      default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
+    },
+  },
   {
     ...sepolia,
     rpcUrls: {
-      default: { http: ["https://endpoints.omniatech.io/v1/eth/sepolia/public", "https://1rpc.io/sepolia"] }, // Temporarily using this url
-      public: { http: ["https://endpoints.omniatech.io/v1/eth/sepolia/public", "https://1rpc.io/sepolia"] },
+      default: { http: ["https://rpc-sepolia.rockx.com"] },
+      public: { http: ["https://rpc-sepolia.rockx.com"] },
     },
     axelarChainId: "ethereum-sepolia",
     axelarChainName: "ethereum-sepolia",
@@ -365,6 +425,30 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "blast-sepolia",
     axelarChainName: "blast-sepolia",
     environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...blastSepolia,
+    axelarChainId: "blast-sepolia",
+    axelarChainName: "blast-sepolia",
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...avalancheFuji,
+    axelarChainId: "avalanche-fuji",
+    axelarChainName: "avalanche-fuji",
+    environment: ENVIRONMENTS.devnet,
+  },
+  {
+    ...optimismSepolia,
+    axelarChainId: "optimism-sepolia",
+    axelarChainName: "optimism-sepolia",
+    environment: ENVIRONMENTS.devnet,
+  },
+  {
+    ...sepolia,
+    axelarChainId: "eth-sepolia",
+    axelarChainName: "eth-sepolia",
+    environment: ENVIRONMENTS.devnet,
   },
 ] as const;
 

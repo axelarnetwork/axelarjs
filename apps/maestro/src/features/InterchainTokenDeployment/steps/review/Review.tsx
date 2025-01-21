@@ -6,13 +6,11 @@ import {
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress} from "@axelarjs/utils";
-import { useCallback, useEffect, useState, useMemo, type FC } from "react";
+import { maskAddress } from "@axelarjs/utils";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { useAccount } from "wagmi";
-
-import { useChainFromRoute } from "~/lib/hooks";
+import { useAccount, useChainFromRoute } from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -47,11 +45,17 @@ const Review: FC = () => {
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) => combinedComputed.indexedById[axelarChainId].chain_id
+          (axelarChainId) =>
+            combinedComputed.indexedById[axelarChainId].chain_id
         )
       );
     }
-  }, [chain, combinedComputed.indexedById, state.selectedChains, state.txState]);
+  }, [
+    chain,
+    combinedComputed.indexedById,
+    state.selectedChains,
+    state.txState,
+  ]);
 
   const chainConfig = useMemo(() => {
     if (!chain) return undefined;
@@ -68,7 +72,7 @@ const Review: FC = () => {
     }
   }, [actions, chainConfig, router, state.txState]);
 
-  const isVMChain = chainConfig?.chain_type === 'vm';
+  const isVMChain = chainConfig?.chain_type === "vm";
 
   return (
     <>
