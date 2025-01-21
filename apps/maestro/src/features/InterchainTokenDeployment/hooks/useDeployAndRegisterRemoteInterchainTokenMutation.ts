@@ -54,235 +54,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
 
-  // TODO: remove when axelarscan's api is ready
-  const updatedComputed = {
-    ...combinedComputed,
-    indexedByChainId: {
-      ...combinedComputed.indexedByChainId,
-      ...(NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-        ? {
-            id: "sui",
-            chain_id: 101,
-            axelarChainId: "sui",
-            axelarChainName: "sui",
-            chain_name: "sui",
-            maintainer_id: "sui",
-            name: "Sui",
-            image: "/logos/chains/sui.svg",
-            color: "#6fbcf0",
-            chain_type: "sui",
-            no_inflation: false,
-            endpoints: {
-              rpc: ["https://sui-rpc.publicnode.com"],
-            },
-            native_token: {
-              name: "SUI",
-              symbol: "SUI",
-              decimals: 9,
-            },
-            explorer: {
-              name: "Sui Explorer",
-              url: "https://suiexplorer.com",
-              icon: "/logos/explorers/sui.png",
-              block_path: "/block/{block}",
-              address_path: "/address/{address}",
-              contract_path: "/object/{address}",
-              transaction_path: "/txblock/{tx}",
-            },
-            provider_params: [
-              {
-                chainId: "0x65", // Hexadecimal representation of 101
-                chainName: "Sui Mainnet",
-                rpcUrls: ["https://sui-rpc.publicnode.com"],
-                nativeCurrency: {
-                  name: "SUI",
-                  symbol: "SUI",
-                  decimals: 9,
-                },
-                blockExplorerUrls: ["https://suiexplorer.com"],
-              },
-            ],
-          }
-        : {
-            id: "sui",
-            chain_id: 103,
-            axelarChainId: "sui",
-            axelarChainName: "sui",
-            chain_name: "sui",
-            maintainer_id: "sui",
-            name: "Sui Testnet",
-            image: "/logos/chains/sui.svg",
-            color: "#6fbcf0",
-            chain_type: "sui",
-            no_inflation: false,
-            endpoints: {
-              rpc: ["https://fullnode.testnet.sui.io:443"],
-            },
-            native_token: {
-              name: "SUI",
-              symbol: "SUI",
-              decimals: 9,
-            },
-            explorer: {
-              name: "Sui Explorer",
-              url: "https://suiscan.xyz/testnet",
-              icon: "/logos/explorers/sui.png",
-              block_path: "/block/{block}",
-              address_path: "/address/{address}",
-              contract_path: "/object/{address}",
-              transaction_path: "/txblock/{tx}",
-            },
-            provider_params: [
-              {
-                chainId: "0x67", // Hexadecimal representation of 103
-                chainName: "Sui Testnet",
-                rpcUrls: ["https://fullnode.testnet.sui.io:443"],
-                nativeCurrency: {
-                  name: "SUI",
-                  symbol: "SUI",
-                  decimals: 9,
-                },
-                blockExplorerUrls: ["https://suiscan.xyz/testnet"],
-              },
-            ],
-          }),
-    },
-    indexedById: {
-      ...combinedComputed.indexedById,
-      sui:
-        NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-          ? {
-              id: "sui",
-              axelarChainId: "sui",
-              axelarChainName: "sui",
-              chain_id: 101,
-              chain_name: "sui",
-              maintainer_id: "sui",
-              name: "Sui",
-              image: "/logos/chains/sui.svg",
-              color: "#6fbcf0",
-              chain_type: "sui",
-              no_inflation: false,
-              endpoints: {
-                rpc: ["https://sui-rpc.publicnode.com"],
-              },
-              native_token: {
-                name: "SUI",
-                symbol: "SUI",
-                decimals: 9,
-              },
-              explorer: {
-                name: "Sui Explorer",
-                url: "https://suiexplorer.com",
-                icon: "/logos/explorers/sui.png",
-                block_path: "/block/{block}",
-                address_path: "/address/{address}",
-                contract_path: "/object/{address}",
-                transaction_path: "/txblock/{tx}",
-              },
-              provider_params: [
-                {
-                  chainId: "0x65", // Hexadecimal representation of 101
-                  chainName: "Sui Mainnet",
-                  rpcUrls: ["https://sui-rpc.publicnode.com"],
-                  nativeCurrency: {
-                    name: "SUI",
-                    symbol: "SUI",
-                    decimals: 9,
-                  },
-                  blockExplorerUrls: ["https://suiexplorer.com"],
-                },
-              ],
-            }
-          : {
-              id: "sui",
-              axelarChainId: "sui",
-              axelarChainName: "sui",
-              chain_id: 103,
-              chain_name: "sui",
-              maintainer_id: "sui",
-              name: "Sui Testnet",
-              image: "/logos/chains/sui.svg",
-              color: "#6fbcf0",
-              chain_type: "sui",
-              no_inflation: false,
-              endpoints: {
-                rpc: ["https://fullnode.testnet.sui.io:443"],
-              },
-              native_token: {
-                name: "SUI",
-                symbol: "SUI",
-                decimals: 9,
-              },
-              explorer: {
-                name: "Sui Explorer",
-                url: "https://suiscan.xyz/testnet",
-                icon: "/logos/explorers/sui.png",
-                block_path: "/block/{block}",
-                address_path: "/address/{address}",
-                contract_path: "/object/{address}",
-                transaction_path: "/txblock/{tx}",
-              },
-              provider_params: [
-                {
-                  chainId: "0x67", // Hexadecimal representation of 103
-                  chainName: "Sui Testnet",
-                  rpcUrls: ["https://fullnode.testnet.sui.io:443"],
-                  nativeCurrency: {
-                    name: "SUI",
-                    symbol: "SUI",
-                    decimals: 9,
-                  },
-                  blockExplorerUrls: ["https://suiscan.xyz/testnet"],
-                },
-              ],
-            },
-    },
-    wagmiChains: [
-      ...combinedComputed.wagmiChains,
-      {
-        id: NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103,
-        name: NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "Sui" : "Sui Testnet",
-        nativeCurrency: {
-          name: "SUI",
-          symbol: "SUI",
-          decimals: 9,
-        },
-        rpcUrls: {
-          default: {
-            http: [
-              NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-                ? "https://sui-rpc.publicnode.com"
-                : "https://fullnode.testnet.sui.io:443",
-            ],
-          },
-          public: {
-            http: [
-              NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-                ? "https://sui-rpc.publicnode.com"
-                : "https://fullnode.testnet.sui.io:443",
-            ],
-          },
-        },
-        blockExplorers: {
-          default: {
-            name: "Sui Explorer",
-            url:
-              NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-                ? "https://suiexplorer.com"
-                : "https://suiscan.xyz/testnet",
-          },
-        },
-        contracts: {
-          // Add Sui-specific contracts here if applicable
-        },
-        axelarChainId: "sui",
-        axelarChainName: "sui",
-        environment: NEXT_PUBLIC_NETWORK_ENV,
-      },
-    ],
-  } as const;
-
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
 
@@ -313,10 +84,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     });
 
   const { destinationChainNames } = useMemo(() => {
-    const index = updatedComputed.indexedById;
-    type IndexedChainId = keyof typeof index;
-    const originalChain =
-      index[(input?.sourceChainId ?? chainId) as IndexedChainId];
+    const index = combinedComputed.indexedById;
+    const originalChain = index[input?.sourceChainId ?? chainId];
     const originalChainName = originalChain?.chain_name ?? "Unknown";
 
     return {
@@ -324,14 +93,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       destinationChainNames:
         input?.destinationChainIds.map(
           (destinationChainId) =>
-            index[destinationChainId as IndexedChainId]?.chain_name ?? "Unknown"
+            index[destinationChainId]?.chain_name ?? "Unknown"
         ) ?? [],
     };
   }, [
     chainId,
     input?.destinationChainIds,
     input?.sourceChainId,
-    updatedComputed.indexedById,
+    combinedComputed.indexedById,
   ]);
 
   const multicallArgs = useMemo(() => {
@@ -454,7 +223,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
               txHash: tx.hash,
             });
           })
-          .catch((e) => {
+          .catch((e: Error) => {
             console.error(
               "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
               e
@@ -549,7 +318,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     recordDeploymentDraft()
       .then(() => multicall.writeContract(prepareMulticall.request))
-      .catch((e) => {
+      .catch((e: Error) => {
         console.error(
           "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
           e
