@@ -18,6 +18,7 @@ export const getTransactionStatusesOnDestinationChains = publicProcedure
   .input(INPUT_SCHEMA)
   .query(async ({ ctx, input }) => {
     try {
+      // Fetch all first hop transactions
       const results = await Promise.all(
         input.txHashes.map((txHash) =>
           ctx.services.gmp.searchGMP({
@@ -27,15 +28,52 @@ export const getTransactionStatusesOnDestinationChains = publicProcedure
         )
       );
 
-      return results.flat().reduce(
-        (acc, { call, status }) => ({
+      // Process all transactions and their second hops
+      const processedResults = await Promise.all(
+        results.flat().map(async (gmpData) => {
+          const {
+            call,
+            status: firstHopStatus,
+            interchain_token_deployment_started: tokenDeployment,
+          } = gmpData;
+
+          const chainType = gmpData.call.chain_type;
+          let secondHopStatus = "pending" as GMPTxStatus;
+
+          // Check for second hop if callback exists
+          if (gmpData.callback) {
+            const secondHopMessageId = gmpData.callback.returnValues.messageId;
+            const secondHopData = await ctx.services.gmp.searchGMP({
+              txHash: secondHopMessageId,
+              _source: SEARCHGMP_SOURCE,
+            });
+
+            if (secondHopData.length > 0) {
+              secondHopStatus = secondHopData[0].status;
+            }
+          }
+
+          const destinationChain =
+            tokenDeployment?.destinationChain?.toLowerCase() ||
+            call.returnValues.destinationChain.toLowerCase();
+
+          return {
+            destinationChain,
+            data: {
+              status: chainType === "evm" ? firstHopStatus : secondHopStatus,
+              txHash: call.transactionHash,
+              logIndex: call.logIndex ?? call._logIndex ?? 0,
+              txId: gmpData.message_id,
+            },
+          };
+        })
+      );
+
+      // Combine all results into a single object
+      return processedResults.reduce(
+        (acc, { destinationChain, data }) => ({
           ...acc,
-          [call.returnValues.destinationChain.toLowerCase()]: {
-            status,
-            txHash: call.transactionHash,
-            logIndex: call.logIndex ?? call._logIndex ?? 0,
-            txId: call.id,
-          },
+          [destinationChain]: data,
         }),
         {} as {
           [chainId: string]: {

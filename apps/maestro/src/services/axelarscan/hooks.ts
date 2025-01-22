@@ -14,8 +14,16 @@ const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
-  const { computed: evmComputed, data: evmChains, isLoading: isLoadingEVM } = useEVMChainConfigsQuery();
-  const { computed: vmComputed, data: vmChains, isLoading: isLoadingVM } = useVMChainConfigsQuery();
+  const {
+    computed: evmComputed,
+    data: evmChains,
+    ...evmChainsQuery
+  } = useEVMChainConfigsQuery();
+  const {
+    computed: vmComputed,
+    data: vmChains,
+    ...vmChainsQuery
+  } = useVMChainConfigsQuery();
   const combinedComputed = useMemo(
     () => ({
       indexedById: {
@@ -26,10 +34,7 @@ export function useAllChainConfigsQuery() {
         ...vmComputed.indexedByChainId,
         ...evmComputed.indexedByChainId,
       },
-      wagmiChains: [
-        ...vmComputed.wagmiChains,
-        ...evmComputed.wagmiChains
-      ]
+      wagmiChains: [...vmComputed.wagmiChains, ...evmComputed.wagmiChains],
     }),
     [evmComputed, vmComputed]
   );
@@ -60,8 +65,15 @@ export function useAllChainConfigsQuery() {
     return Array.from(chainMap.values());
   }, [evmChains, vmChains]);
 
-
-  return {combinedComputed, allChains, isLoading: isLoadingEVM || isLoadingVM};
+  return {
+    combinedComputed,
+    allChains,
+    isLoading: evmChainsQuery.isLoading || vmChainsQuery.isLoading,
+    isError: evmChainsQuery.isError || vmChainsQuery.isError,
+    error: evmChainsQuery.error || vmChainsQuery.error,
+    isFetching: evmChainsQuery.isFetching || vmChainsQuery.isFetching,
+    isSuccess: evmChainsQuery.isSuccess || vmChainsQuery.isSuccess,
+  };
 }
 
 export function useEVMChainConfigsQuery() {
@@ -150,7 +162,7 @@ export function useVMChainConfigsQuery() {
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
-      wagmiChains
+      wagmiChains,
     },
   };
 }
