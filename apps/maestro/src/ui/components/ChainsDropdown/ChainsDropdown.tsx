@@ -215,7 +215,7 @@ const ChainsDropdown: FC<Props> = (props) => {
               <button
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
-                  props.onSelectChain?.(null);
+                  props.onSelectChain?.(undefined);
                   actions.selectChainId(null);
                 }}
                 className="group flex w-full items-center gap-2"

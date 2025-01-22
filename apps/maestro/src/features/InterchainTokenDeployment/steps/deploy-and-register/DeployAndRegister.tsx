@@ -1,6 +1,6 @@
 import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
-import { invariant, invariant, Maybe } from "@axelarjs/utils";
+import { invariant, Maybe } from "@axelarjs/utils";
 import React, {
   ComponentRef,
   useCallback,
