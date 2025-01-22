@@ -67,14 +67,14 @@ export default function useRegisterRemoteCanonicalTokens(
 
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
-          originalChain: sourceChain?.chain_name ?? "0x",
+          originalChain: "",
           originalTokenAddress: tokenDetails.tokenAddress,
           destinationChain: axelarChainId,
           gasValue,
         }
       );
     });
-  }, [destinationChainIds, gasFeesData, sourceChain?.chain_name, tokenDetails]);
+  }, [destinationChainIds, gasFeesData, tokenDetails]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 

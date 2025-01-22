@@ -14,6 +14,7 @@ export const SEARCHGMP_SOURCE = {
     "confirm",
     "executed",
     "callback",
+    "interchain_token_deployment_started.destinationChain",
   ],
   excludes: [
     "call.transaction",
@@ -54,33 +55,52 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
       });
 
       if (data.length) {
-        const result = data.reduce(
-          (acc, gmpData) => {
-            const { call, status } = gmpData;
+        const pendingResult = data.reduce(
+          async (acc, gmpData) => {
+            const {
+              call,
+              status: firstHopStatus,
+              interchain_token_deployment_started: tokenDeployment,
+            } = gmpData;
+
+            const chainType = gmpData.call.chain_type;
+            let secondHopStatus = "pending"
+
+            if (gmpData.callback) {
+              const secondHopMessageId = gmpData.callback.returnValues.messageId;
+              const secondHopData = await ctx.services.gmp.searchGMP({
+                txHash: secondHopMessageId,
+                _source: SEARCHGMP_SOURCE,
+              });
+
+              secondHopStatus = secondHopData[0].status;
+            }
+
             const destinationChain =
-              gmpData.callback?.returnValues.destinationChain.toLowerCase() ||
+              tokenDeployment?.destinationChain?.toLowerCase() ||
               call.returnValues.destinationChain.toLowerCase();
+
             return {
               ...acc,
               [destinationChain]: {
-                status,
+                status: chainType === "evm" ? firstHopStatus : secondHopStatus,
                 txHash: call.transactionHash,
                 logIndex: call.logIndex ?? call._logIndex ?? 0,
-                txId: call.id,
+                txId: gmpData.message_id,
               },
             };
           },
-          {} as {
+          {} as Promise<{
             [chainId: string]: {
               status: GMPTxStatus;
               txHash: `0x${string}`;
               txId: string;
               logIndex: number;
             };
-          }
+          }>
         );
 
-        return result;
+        return await pendingResult;
       }
 
       // If we don't find the transaction, we throw a 404 error

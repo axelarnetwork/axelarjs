@@ -21,6 +21,7 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -139,10 +140,8 @@ export const Step2: FC = () => {
       addTransaction,
     ]
   );
-
-  const eligibleChains = state.chains.filter(
-    (chain) => chain.chain_id !== chainId
-  );
+  
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

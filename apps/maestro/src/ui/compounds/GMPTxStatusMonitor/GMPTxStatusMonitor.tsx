@@ -130,36 +130,31 @@ const TxFinalityProgress: FC<{ txHash: `0x${string}`; chainId: number }> = ({
 };
 
 const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
+  const chainId = useChainId();
+  const { combinedComputed } = useAllChainConfigsQuery();
   const {
     data: statuses,
     computed: { chains: total, executed },
     isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({ txHash });
 
-  const chainId = useChainId();
-
-  const { combinedComputed } = useAllChainConfigsQuery();
-
   const statusList = Object.values(statuses ?? {});
-  const pendingItsHubTx =
-    Object.keys(statuses).includes("axelarnet") ||
-    Object.keys(statuses).includes("axelar");
 
   useEffect(() => {
     if (
       statusList.length &&
-      !pendingItsHubTx &&
       statusList?.every((s) => s.status === "executed")
     ) {
       onAllChainsExecuted?.();
     }
-  }, [pendingItsHubTx, statusList, onAllChainsExecuted]);
+  }, [statusList, onAllChainsExecuted]);
 
-  if (!statuses || Object.keys(statuses).length === 0 || pendingItsHubTx) {
-    if (!isLoading && !pendingItsHubTx) {
+  if (!statuses || Object.keys(statuses).length === 0) {
+    if (!isLoading) {
       // nothing to show
       return null;
     }
+
     return (
       <div className="grid place-items-center gap-4">
         <div className="flex">Loading transaction status...</div>

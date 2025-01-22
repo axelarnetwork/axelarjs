@@ -32,6 +32,8 @@ export type AxelarAssetPrice = Pick<
   updated_at: number;
 };
 
+export type ITSChainConfig = VMChainConfig | EVMChainConfig;
+
 export type VMChainConfig = {
   chain_id: number;
   chain_name: string;

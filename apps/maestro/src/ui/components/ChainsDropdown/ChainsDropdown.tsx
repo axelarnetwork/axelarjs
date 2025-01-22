@@ -1,5 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
-import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
@@ -16,6 +14,8 @@ import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,
 } from "./ChainsDropdown.state";
+import { ITSChainConfig } from "@axelarjs/api";
+import { HelpCircleIcon, Dropdown } from "@axelarjs/ui";
 
 const ICON_SIZES = {
   xs: 14,
@@ -50,10 +50,8 @@ export const ChainIcon: FC<{
   );
 };
 
-type ChainConfig = EVMChainConfig | VMChainConfig;
-
 type Props = {
-  chains?: ChainConfig[];
+  chains?: ITSChainConfig[];
   compact?: boolean;
   hideLabel?: boolean;
   disabled?: boolean;
@@ -61,8 +59,8 @@ type Props = {
   chainIconClassName?: string;
   contentClassName?: string;
   renderTrigger?: () => React.ReactNode;
-  selectedChain?: ChainConfig;
-  onSelectChain?: (chain: ChainConfig | null) => void;
+  selectedChain?: ITSChainConfig;
+  onSelectChain?: (chain?: ITSChainConfig) => void;
   size?: keyof typeof ICON_SIZES;
   chainType?: "evm" | "vm";
 };
@@ -217,7 +215,7 @@ const ChainsDropdown: FC<Props> = (props) => {
               <button
                 onClick={(e: React.MouseEvent) => {
                   e.preventDefault();
-                  props.onSelectChain?.(null);
+                  props.onSelectChain?.(undefined);
                   actions.selectChainId(null);
                 }}
                 className="group flex w-full items-center gap-2"
