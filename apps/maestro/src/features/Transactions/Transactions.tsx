@@ -14,9 +14,9 @@ import Link from "next/link";
 import { groupBy } from "rambda";
 
 import type { TxType } from "~/lib/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import {
   CollapsedChainStatusGroup,
   ExtendedGMPTxStatus,
@@ -34,13 +34,15 @@ function useGroupedStatuses(txHash: `0x${string}`) {
     txHash,
   });
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   return useMemo(() => {
+    const combinedIndexedById = combinedComputed.indexedById;
+
     const statusValues = Object.entries(statuses ?? {}).map(
       ([axelarChainId, entry]) => ({
         ...entry,
-        chain: computed.indexedById[axelarChainId],
+        chain: combinedIndexedById[axelarChainId],
       })
     );
 
@@ -57,7 +59,7 @@ function useGroupedStatuses(txHash: `0x${string}`) {
       groupedStatusesProps,
       hasStatus: statusValues.length > 0,
     };
-  }, [computed.indexedById, statuses, txHash]);
+  }, [combinedComputed.indexedById, statuses, txHash]);
 }
 
 type ToastElementProps = {
@@ -78,7 +80,7 @@ const ToastElement: FC<ToastElementProps> = ({
     chainId
   );
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
 
@@ -88,11 +90,14 @@ const ToastElement: FC<ToastElementProps> = ({
 
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
-  const chainConfig = Maybe.of(computed.indexedByChainId[chainId]);
+  const chainConfig = Maybe.of(combinedComputed.indexedByChainId[chainId]);
 
   const wagmiChain = useMemo(
-    () => computed.wagmiChains.find((wagmiChain) => wagmiChain.id === chainId),
-    [computed.wagmiChains, chainId]
+    () =>
+      combinedComputed.wagmiChains.find(
+        (wagmiChain) => wagmiChain.id === chainId
+      ),
+    [combinedComputed.wagmiChains, chainId]
   );
 
   const showFinalityProgressBar =
@@ -102,27 +107,35 @@ const ToastElement: FC<ToastElementProps> = ({
   const content = (
     <>
       <div className="flex items-center">
-        <Tooltip
-          tip={`View on ${wagmiChain?.blockExplorers?.default.name}`}
-          $position="left"
-        >
-          <Link
-            href={`${wagmiChain?.blockExplorers?.default.url}/tx/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
+        {wagmiChain ? (
+          <Tooltip
+            tip={`View on ${wagmiChain.blockExplorers?.default.name}`}
+            $position="left"
           >
-            <ChainIcon
-              src={chainConfig.mapOr("", (config) => config.image)}
-              alt={chainConfig.mapOr("", (config) => config.name)}
-              size="md"
-            />
-          </Link>
-        </Tooltip>
+            <Link
+              href={`${wagmiChain.blockExplorers?.default.url}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ChainIcon
+                src={chainConfig.mapOr("", (config) => config.image)}
+                alt={chainConfig.mapOr("", (config) => config.name)}
+                size="md"
+              />
+            </Link>
+          </Tooltip>
+        ) : (
+          <ChainIcon
+            src={chainConfig.mapOr("", (config) => config.image)}
+            alt={chainConfig.mapOr("", (config) => config.name)}
+            size="md"
+          />
+        )}
         <div className="mx-2 flex flex-col items-start">
           <span className="text-sm">{txTypeText}</span>
           {showFinalityProgressBar ? (
             <Tooltip
-              tip={`Waiting for finality on ${computed.indexedByChainId[chainId]?.name}`}
+              tip={`Waiting for finality on ${combinedComputed.indexedByChainId[chainId]?.name}`}
               $position="top"
             >
               <div className="text-xs">

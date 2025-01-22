@@ -21,6 +21,7 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -30,7 +31,8 @@ export const Step2: FC = () => {
 
   const chainId = useChainId();
 
-  const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
+  // Handle both EVM and VM chains
+  const sourceChain = state.chains.find((chain) => chain.chain_id === chainId);
 
   const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
@@ -138,11 +140,8 @@ export const Step2: FC = () => {
       addTransaction,
     ]
   );
-
-  const eligibleChains = useMemo(
-    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
-    [state.evmChains, chainId]
-  );
+  
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

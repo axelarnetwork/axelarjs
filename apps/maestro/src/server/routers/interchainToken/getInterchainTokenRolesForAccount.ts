@@ -26,8 +26,16 @@ export const getInterchainTokenRolesForAccount = publicProcedure
       };
     }
 
-    const chains = await ctx.configs.evmChains();
-    const configs = chains[tokenDetails.axelarChainId];
+    // Get both chain types
+    const [evmChains, vmChains] = await Promise.all([
+      ctx.configs.evmChains(),
+      ctx.configs.vmChains(),
+    ]);
+
+    // Try to find config in either chain type
+    const configs =
+      evmChains[tokenDetails.axelarChainId] ||
+      vmChains[tokenDetails.axelarChainId];
 
     if (!configs) {
       return {
@@ -46,29 +54,30 @@ export const getInterchainTokenRolesForAccount = publicProcedure
       tokenDetails.tokenAddress as `0x${string}`
     );
 
-    const tokenRoles = await Promise.all(
-      ROLES_ENUM.map((role) =>
-        tokenClient.reads
-          .hasRole({
-            account: input.accountAddress,
-            role: getRoleIndex(role),
-          })
-          .then((hasRole) => [role, hasRole] as const)
-          .catch(() => [role, false] as const)
-      )
-    );
-
-    const tokenManagerRoles = await Promise.all(
-      ROLES_ENUM.map((role) =>
-        tokenManagerClient.reads
-          .hasRole({
-            account: input.accountAddress,
-            role: getRoleIndex(role),
-          })
-          .then((hasRole) => [role, hasRole] as const)
-          .catch(() => [role, false] as const)
-      )
-    );
+    const [tokenRoles, tokenManagerRoles] = await Promise.all([
+      Promise.all(
+        ROLES_ENUM.map((role) =>
+          tokenClient.reads
+            .hasRole({
+              account: input.accountAddress,
+              role: getRoleIndex(role),
+            })
+            .then((hasRole) => [role, hasRole] as const)
+            .catch(() => [role, false] as const)
+        )
+      ),
+      Promise.all(
+        ROLES_ENUM.map((role) =>
+          tokenManagerClient.reads
+            .hasRole({
+              account: input.accountAddress,
+              role: getRoleIndex(role),
+            })
+            .then((hasRole) => [role, hasRole] as const)
+            .catch(() => [role, false] as const)
+        )
+      ),
+    ]);
 
     return {
       tokenManager: tokenManagerRoles

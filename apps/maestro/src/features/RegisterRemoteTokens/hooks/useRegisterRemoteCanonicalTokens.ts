@@ -12,7 +12,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 
 export type RegisterRemoteCanonicalTokensInput = {
@@ -25,15 +25,16 @@ export type RegisterRemoteCanonicalTokensInput = {
 export default function useRegisterRemoteCanonicalTokens(
   input: RegisterRemoteCanonicalTokensInput
 ) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
+
   const chainId = useChainId();
 
   const destinationChains = useMemo(
     () =>
       input.chainIds
-        .map((chainId) => computed.indexedByChainId[chainId])
+        .map((chainId) => combinedComputed.indexedByChainId[chainId])
         .filter(Boolean),
-    [input.chainIds, computed.indexedByChainId]
+    [input.chainIds, combinedComputed.indexedByChainId]
   );
 
   const destinationChainIds = destinationChains.map(
@@ -41,8 +42,8 @@ export default function useRegisterRemoteCanonicalTokens(
   );
 
   const sourceChain = useMemo(
-    () => computed.indexedByChainId[chainId],
-    [chainId, computed.indexedByChainId]
+    () => combinedComputed.indexedByChainId[chainId],
+    [chainId, combinedComputed.indexedByChainId]
   );
 
   const { data: tokenDetails } = useInterchainTokenDetailsQuery({
@@ -66,14 +67,14 @@ export default function useRegisterRemoteCanonicalTokens(
 
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
-          originalChain: sourceChain?.chain_name ?? "0x",
+          originalChain: "",
           originalTokenAddress: tokenDetails.tokenAddress,
           destinationChain: axelarChainId,
           gasValue,
         }
       );
     });
-  }, [destinationChainIds, gasFeesData, sourceChain?.chain_name, tokenDetails]);
+  }, [destinationChainIds, gasFeesData, tokenDetails]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 

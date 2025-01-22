@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Badge,
@@ -30,12 +30,12 @@ import { z } from "zod";
 
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
-  chain: EVMChainConfig;
+  chain: EVMChainConfig | VMChainConfig;
   tokenAddress: `0x${string}`;
   wasDeployedByAccount?: boolean;
   decimals: number;

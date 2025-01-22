@@ -5,14 +5,14 @@ import { isAddress } from "viem";
 
 import { trpc } from "~/lib/trpc";
 import { hex64 } from "~/lib/utils/validation";
-import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
+import { useAllChainConfigsQuery } from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
   tokenAddress?: `0x${string}`;
   strict?: boolean;
 }) {
-  const { computed, ...evmChainsQuery } = useEVMChainConfigsQuery();
+  const { combinedComputed, isLoading, isError, error, isFetching } = useAllChainConfigsQuery();
 
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(
@@ -34,22 +34,24 @@ export function useInterchainTokensQuery(input: {
       ...data,
       matchingTokens: data?.matchingTokens.map((token) => ({
         ...token,
-        chain: computed.indexedById[token.axelarChainId ?? ""],
-        wagmiConfig: computed.wagmiChains?.find(
+        chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
+        wagmiConfig: combinedComputed.wagmiChains?.find(
           (x) => x?.id === Number(token.chainId)
         ),
       })),
       chain: Maybe.of(input.chainId).mapOrUndefined(
-        (x) => computed.indexedByChainId[x]
+        (x) => combinedComputed.indexedByChainId[x]
       ),
-      wagmiConfig: computed.wagmiChains?.find(
-        (x) => x?.id === Number(input.chainId)
-      ),
+      wagmiConfig: Maybe.of(input.chainId)
+        .map(Number)
+        .mapOrUndefined((chainId) =>
+          combinedComputed.wagmiChains?.find((x) => x?.id === chainId)
+        ),
     },
-    isLoading: evmChainsQuery.isLoading || queryResult.isLoading,
-    isFetching: evmChainsQuery.isFetching || queryResult.isFetching,
-    isError: evmChainsQuery.isError || queryResult.isError,
-    error: evmChainsQuery.error || queryResult.error,
+    isLoading,
+    isFetching,
+    isError,
+    error,
   };
 }
 
@@ -68,11 +70,10 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
         txHash: input.txHash as `0x${string}`,
       },
       {
-        refetchInterval: 1000 * 10, // 10 seconds
+        refetchInterval: 1000 * 10,
         enabled:
           input.txHash &&
           hex64().safeParse(input.txHash).success &&
-          // apply the default value if the option is not provided
           Maybe.of(options?.enabled).mapOr(true, Boolean),
       }
     );
@@ -109,7 +110,7 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
         enabled: Boolean(
           input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
         ),
-        refetchInterval: 1000 * 10, // 10 seconds
+        refetchInterval: 1000 * 10,
         ...options,
       }
     );

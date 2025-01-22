@@ -21,6 +21,7 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -30,7 +31,8 @@ export const Step3: FC = () => {
 
   const chainId = useChainId();
 
-  const sourceChain = state.evmChains.find((x) => x.chain_id === chainId);
+  // Support both EVM and VM chains
+  const sourceChain = state.chains?.find((chain) => chain.chain_id === chainId);
 
   const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
@@ -136,10 +138,7 @@ export const Step3: FC = () => {
     ]
   );
 
-  const eligibleChains = useMemo(
-    () => state.evmChains?.filter((chain) => chain.chain_id !== chainId),
-    [state.evmChains, chainId]
-  );
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
@@ -147,7 +146,12 @@ export const Step3: FC = () => {
 
   const { data: balance } = useBalance({ address });
 
-  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+  const nativeTokenSymbol = useMemo(() => {
+    if (sourceChain?.chain_type === "vm") {
+      return sourceChain.native_token.symbol;
+    }
+    return getNativeToken(state.sourceChainId);
+  }, [sourceChain, state.sourceChainId]);
 
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !state.remoteDeploymentGasFees) {

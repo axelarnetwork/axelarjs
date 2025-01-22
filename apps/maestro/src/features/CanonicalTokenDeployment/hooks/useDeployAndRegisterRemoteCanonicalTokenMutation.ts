@@ -18,7 +18,7 @@ import {
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
 
 export interface UseDeployAndRegisterCanonicalTokenInput {
@@ -43,7 +43,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const { address: deployerAddress } = useAccount();
   const chainId = useChainId();
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -63,10 +63,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       },
     });
 
-  const { originalChainName, destinationChainNames } = useMemo(() => {
-    const index = computed.indexedById;
-    const originalChainName =
-      index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
+  const { destinationChainNames } = useMemo(() => {
+    const index = combinedComputed.indexedById;
 
     const destinationChainNames =
       input?.destinationChainIds.map(
@@ -75,12 +73,11 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       ) ?? [];
 
     return {
-      originalChainName,
       destinationChainNames,
     };
   }, [
     chainId,
-    computed.indexedById,
+    combinedComputed.indexedById,
     input?.destinationChainIds,
     input?.sourceChainId,
   ]);
@@ -104,7 +101,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       const gasValue = input.remoteDeploymentGasFees[i] ?? 0n;
 
       const args = {
-        originalChain: originalChainName,
+        originalChain: "",
         originalTokenAddress: input.tokenAddress,
         destinationChain,
         gasValue,
@@ -116,7 +113,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames, originalChainName]);
+  }, [input, tokenId, destinationChainNames]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
