@@ -39,9 +39,9 @@ export class GMPClient extends RestService {
       .post("", {
         json: {
           ...params,
-          contractMethod: Array.isArray(params.contractMethod)
-            ? params.contractMethod.join(",")
-            : params.contractMethod,
+          event: Array.isArray(params.event)
+            ? params.event.join(",")
+            : params.event,
           method: "searchGMP",
         },
       })

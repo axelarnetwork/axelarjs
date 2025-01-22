@@ -28,7 +28,7 @@ export const recoverDeploymentMessageIdByTokenId = protectedProcedure
       const toTime = fromTime + bufferLength;
 
       const deployments = await ctx.services.gmp.searchGMP({
-        contractMethod: ["InterchainTokenDeploymentStarted"],
+        event: ["InterchainTokenDeploymentStarted"],
         _source: {
           excludes: [
             "refunded",

@@ -43,7 +43,7 @@ export const getRecentTransactions = publicProcedure
           NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         size: input.pageSize,
         from: input.page * input.pageSize,
-        contractMethod: input.contractMethod,
+        event: input.contractMethod,
         _source: {
           includes: [
             "call.transactionHash",
