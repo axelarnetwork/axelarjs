@@ -63,10 +63,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       },
     });
 
-  const { originalChainName, destinationChainNames } = useMemo(() => {
+  const { destinationChainNames } = useMemo(() => {
     const index = combinedComputed.indexedById;
-    const originalChainName =
-      index[input?.sourceChainId ?? chainId]?.chain_name ?? "Unknown";
 
     const destinationChainNames =
       input?.destinationChainIds.map(
@@ -75,7 +73,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       ) ?? [];
 
     return {
-      originalChainName,
       destinationChainNames,
     };
   }, [
@@ -104,7 +101,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       const gasValue = input.remoteDeploymentGasFees[i] ?? 0n;
 
       const args = {
-        originalChain: originalChainName,
+        originalChain: "",
         originalTokenAddress: input.tokenAddress,
         destinationChain,
         gasValue,
@@ -116,7 +113,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames, originalChainName]);
+  }, [input, tokenId, destinationChainNames]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
