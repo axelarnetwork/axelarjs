@@ -17,12 +17,12 @@ export function useAllChainConfigsQuery() {
   const {
     computed: evmComputed,
     data: evmChains,
-    isLoading: isLoadingEVM,
+    ...evmChainsQuery
   } = useEVMChainConfigsQuery();
   const {
     computed: vmComputed,
     data: vmChains,
-    isLoading: isLoadingVM,
+    ...vmChainsQuery
   } = useVMChainConfigsQuery();
   const combinedComputed = useMemo(
     () => ({
@@ -68,7 +68,11 @@ export function useAllChainConfigsQuery() {
   return {
     combinedComputed,
     allChains,
-    isLoading: isLoadingEVM || isLoadingVM,
+    isLoading: evmChainsQuery.isLoading || vmChainsQuery.isLoading,
+    isError: evmChainsQuery.isError || vmChainsQuery.isError,
+    error: evmChainsQuery.error || vmChainsQuery.error,
+    isFetching: evmChainsQuery.isFetching || vmChainsQuery.isFetching,
+    isSuccess: evmChainsQuery.isSuccess || vmChainsQuery.isSuccess,
   };
 }
 

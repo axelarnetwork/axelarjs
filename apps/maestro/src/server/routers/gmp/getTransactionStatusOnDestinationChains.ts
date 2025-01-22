@@ -13,6 +13,8 @@ export const SEARCHGMP_SOURCE = {
     "confirm",
     "executed",
     "callback",
+    "interchain_token_deployment_started.destinationChain",
+    "interchain_transfer.destinationChain",
   ],
   excludes: [
     "call.transaction",
@@ -53,33 +55,63 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
       });
 
       if (data.length) {
+<<<<<<< HEAD
         const result = data.reduce(
           (acc, gmpData) => {
             const { call, status } = gmpData;
             const destinationChain =
               gmpData.callback?.returnValues.destinationChain.toLowerCase() ||
               call.returnValues.destinationChain.toLowerCase();
+=======
+        const pendingResult = data.reduce(
+          async (acc, gmpData) => {
+            const {
+              call,
+              status: firstHopStatus,
+              interchain_token_deployment_started: tokenDeployment,
+              interchain_transfer: tokenTransfer,
+            } = gmpData;
+
+            const chainType = gmpData.call.chain_type;
+            let secondHopStatus = "pending"
+
+            if (gmpData.callback) {
+              const secondHopMessageId = gmpData.callback.returnValues.messageId;
+              const secondHopData = await ctx.services.gmp.searchGMP({
+                txHash: secondHopMessageId,
+                _source: SEARCHGMP_SOURCE,
+              });
+
+              secondHopStatus = secondHopData[0].status;
+            }
+
+            const destinationChain =
+              tokenTransfer?.destinationChain?.toLowerCase() ||
+              tokenDeployment?.destinationChain?.toLowerCase() ||
+              call.returnValues.destinationChain.toLowerCase();
+
+>>>>>>> 5ee1a720 (feat: fix tx progress for its hub tx (#489))
             return {
               ...acc,
               [destinationChain]: {
-                status,
+                status: chainType === "evm" ? firstHopStatus : secondHopStatus,
                 txHash: call.transactionHash,
                 logIndex: call.logIndex ?? call._logIndex ?? 0,
-                txId: call.id,
+                txId: gmpData.message_id,
               },
             };
           },
-          {} as {
+          {} as Promise<{
             [chainId: string]: {
               status: GMPTxStatus;
               txHash: string;
               txId: string;
               logIndex: number;
             };
-          }
+          }>
         );
 
-        return result;
+        return await pendingResult;
       }
 
       // If we don't find the transaction, we throw a 404 error

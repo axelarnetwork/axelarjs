@@ -92,17 +92,15 @@ function useCanonicalTokenDeploymentState(
     },
     actions: {
       reset: () => {
-        console.log("reset");
         setState((draft) => {
           Object.assign(draft, initialState);
         });
       },
-      setTokenDetails: (detatils: Partial<TokenDetails>) => {
-        console.log("setTokenDetails", detatils);
+      setTokenDetails: (details: Partial<TokenDetails>) => {
         setState((draft) => {
           draft.tokenDetails = {
             ...draft.tokenDetails,
-            ...detatils,
+            ...details,
           };
         });
       },

@@ -55,7 +55,7 @@ export const recoverDeploymentMessageIdByTokenId = protectedProcedure
         },
         fromTime: fromTime,
         toTime: toTime,
-        size: 1000,
+        size: 200,
       });
 
       const validEntries = deployments.filter(

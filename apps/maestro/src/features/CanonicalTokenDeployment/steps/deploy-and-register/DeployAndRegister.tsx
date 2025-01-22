@@ -21,6 +21,7 @@ import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -31,9 +32,7 @@ export const Step3: FC = () => {
   const chainId = useChainId();
 
   // Support both EVM and VM chains
-  const sourceChain = state.allChains?.find(
-    (chain) => chain.chain_id === chainId
-  );
+  const sourceChain = state.chains?.find((chain) => chain.chain_id === chainId);
 
   const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
@@ -138,9 +137,9 @@ export const Step3: FC = () => {
       addTransaction,
     ]
   );
-  const eligibleChains = state.allChains.filter(
-    (chain) => chain.chain_id !== chainId
-  );
+
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
+
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
   const balance = useBalance();
