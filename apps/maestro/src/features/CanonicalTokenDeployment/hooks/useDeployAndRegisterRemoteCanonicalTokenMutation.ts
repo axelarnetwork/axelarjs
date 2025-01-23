@@ -76,10 +76,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       destinationChainNames,
     };
   }, [
-    chainId,
     combinedComputed.indexedById,
     input?.destinationChainIds,
-    input?.sourceChainId,
   ]);
 
   const multicallArgs = useMemo(() => {
