@@ -189,11 +189,14 @@ async function getInterchainToken(
         }
 
         const isRegistered = await itsClient.reads
-          .interchainTokenAddress({
+          .registeredTokenAddress({
             tokenId: tokenDetails.tokenId as `0x${string}`,
           })
           .then(() => true)
-          .catch(() => false);
+          .catch((e) => {
+            console.log("error in isRegistered", e);
+            return false;
+          });
 
         return {
           ...remoteTokenDetails,
