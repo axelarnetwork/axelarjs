@@ -4,6 +4,7 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
+import { getCoinType, getTokenOwner } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
 
@@ -27,12 +28,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
 
       const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
 
-      // Get the coin type
-      const modules = await client.getNormalizedMoveModulesByPackage({
-        package: input.tokenAddress,
-      });
-      const coinSymbol = Object.keys(modules)[0];
-      const coinType = `${input.tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
+      const coinType = await getCoinType(input.tokenAddress);
       // Get the coin balance
       const coins = await client.getCoins({
         owner: input.owner,
@@ -43,26 +39,9 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
 
-      // Get the token owner
-      const object = await client.getObject({
-        id: input.tokenAddress,
-        options: {
-          showOwner: true,
-          showPreviousTransaction: true,
-        },
-      });
+      const tokenOwner = await getTokenOwner(input.tokenAddress);
 
-      if (object?.data?.owner === "Immutable") {
-        const previousTx = object.data.previousTransaction;
-
-        // Fetch the transaction details to find the sender
-        const transactionDetails = await client.getTransactionBlock({
-          digest: previousTx as string,
-          options: { showInput: true, showEffects: true },
-        });
-        isTokenOwner =
-          transactionDetails.transaction?.data.sender === input.owner;
-      }
+      isTokenOwner = tokenOwner === input.owner;
 
       const result = {
         isTokenOwner,
