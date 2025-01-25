@@ -1,4 +1,8 @@
-import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import {
+  CLOCK_PACKAGE_ID,
+  SUI_PACKAGE_ID,
+  TxBuilder,
+} from "@axelar-network/axelar-cgp-sui";
 import { SuiClient } from "@mysten/sui/client";
 import { z } from "zod";
 
@@ -193,5 +197,89 @@ export const suiRouter = router({
       const tx = await buildTx(sender, txBuilder);
       const txJSON = await tx.toJSON();
       return txJSON;
+    }),
+
+  getSendTokenTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+        tokenId: z.string(),
+        tokenAddress: z.string(),
+        amount: z.string(),
+        destinationChain: z.string(),
+        destinationAddress: z.string(),
+        gas: z.string(),
+        coinObjectId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const response = await fetch(
+          `${suiServiceBaseUrl}/chain/devnet-amplifier`
+        );
+        const _chainConfig = await response.json();
+        const chainConfig = _chainConfig.chains.sui;
+
+        const txBuilder = new TxBuilder(suiClient);
+        const tx = txBuilder.tx;
+
+        // Split coins for gas
+        const Gas = tx.splitCoins(tx.gas, [BigInt(input.gas)]);
+        // keep from the object id everything before the first :
+        const coinObjectId = input.coinObjectId.split(":")[0];
+
+        // Split token to transfer to the destination chain
+        const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
+
+        const [TokenId] = await txBuilder.moveCall({
+          target: `${chainConfig.contracts.ITS.address}::token_id::from_u256`,
+          arguments: [input.tokenId],
+        });
+        console.log(
+          "chainConfig.contracts.Example.objects.ItsSingleton",
+          chainConfig.contracts.Example.objects.ItsSingleton
+        );
+        console.log(
+          "chainConfig.contracts.ITS.objects.ITS",
+          chainConfig.contracts.ITS.objects.ITS
+        );
+        console.log(
+          "chainConfig.contracts.AxelarGateway.objects.Gateway",
+          chainConfig.contracts.AxelarGateway.objects.Gateway
+        );
+        console.log(
+          "chainConfig.contracts.GasService.objects.GasService",
+          chainConfig.contracts.GasService.objects.GasService
+        );
+
+        await txBuilder.moveCall({
+          target: `${chainConfig.contracts.Example.address}::its::send_interchain_transfer_call`,
+          arguments: [
+            chainConfig.contracts.Example.objects.ItsSingleton,
+            chainConfig.contracts.ITS.objects.ITS,
+            chainConfig.contracts.AxelarGateway.objects.Gateway,
+            chainConfig.contracts.GasService.objects.GasService,
+            TokenId,
+            Coin,
+            input.destinationChain,
+            input.destinationAddress,
+            "0x",
+            input.sender,
+            Gas,
+            "0x",
+            CLOCK_PACKAGE_ID,
+          ],
+          typeArguments: [input.tokenType],
+        });
+
+        const tx2 = await buildTx(input.sender, txBuilder);
+        const txJSON = await tx2.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error("Failed to prepare send token transaction:", error);
+        throw new Error(
+          `Send token transaction preparation failed: ${(error as Error).message}`
+        );
+      }
     }),
 });

@@ -17,6 +17,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { formatUnits, parseUnits } from "viem";
 
+import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -27,6 +28,7 @@ import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
   amountToTransfer: string;
+  destinationAddress: string;
 };
 
 type Props = {
@@ -46,6 +48,7 @@ type Props = {
 };
 
 export const SendInterchainToken: FC<Props> = (props) => {
+  const { address } = useAccount();
   const [state, actions] = useSendInterchainTokenState({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
@@ -79,9 +82,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
       {
         tokenAddress: props.tokenAddress,
         amount: data.amountToTransfer,
+        tokenId: props.tokenId,
+        destinationAddress: data.destinationAddress,
+        decimals: Number(props.balance.decimals),
       },
       {
-        // handles unhandled errors in the mutation
         onError(error) {
           if (error instanceof Error) {
             toast.error("Failed to transfer token. Please try again.");
@@ -121,7 +126,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
           return {
             children:
               formState.errors.amountToTransfer?.message ??
-              "Amount is required",
+              formState.errors.destinationAddress?.message ??
+              "Please fill in all required fields",
             status: "error",
           };
         }
@@ -146,6 +152,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [
     amountToTransfer,
     formState.errors.amountToTransfer?.message,
+    formState.errors.destinationAddress?.message,
     formState.isValid,
     state.hasInsufficientGasBalance,
     state.nativeTokenSymbol,
@@ -208,7 +215,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         logger.error("Failed to track transaction", error);
       });
     }
-  }, [actions, suiTxDigest, state.txState.status]);
+  }, [actions, suiTxDigest, state.txState.status, address]);
 
   const handleAllChainsExecuted = useCallback(async () => {
     await actions.refetchBalances();
@@ -259,6 +266,32 @@ export const SendInterchainToken: FC<Props> = (props) => {
     },
     [actions, resetForm]
   );
+
+  const isEvmChainsOnly = useMemo(() => {
+    return (
+      state.selectedToChain?.chain_type === "evm" &&
+      props.sourceChain.chain_type === "evm"
+    );
+  }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
+
+  useEffect(() => {
+    console.log(
+      "chain_type",
+      state.selectedToChain?.chain_type,
+      props.sourceChain.chain_type
+    );
+    if (isEvmChainsOnly) {
+      setValue("destinationAddress", address ?? "", {
+        shouldValidate: true,
+      });
+    }
+  }, [
+    state.selectedToChain?.chain_type,
+    props.sourceChain.chain_type,
+    address,
+    setValue,
+    isEvmChainsOnly,
+  ]);
 
   return (
     <Modal
@@ -369,6 +402,31 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Insufficient balance";
                   }
 
+                  return true;
+                },
+              })}
+            />
+          </FormControl>
+
+          <FormControl>
+            <Label htmlFor="destinationAddress">
+              <Label.Text>Destination Address</Label.Text>
+              {isEvmChainsOnly && (
+                <Label.AltText>(Using connected wallet address)</Label.AltText>
+              )}
+            </Label>
+            <TextInput
+              id="destinationAddress"
+              $bordered
+              placeholder="Enter destination address"
+              className="bg-base-200"
+              disabled={isEvmChainsOnly}
+              {...register("destinationAddress", {
+                required: "Destination address is required",
+                validate: (value) => {
+                  if (value.length < 42) {
+                    return "Invalid address length";
+                  }
                   return true;
                 },
               })}

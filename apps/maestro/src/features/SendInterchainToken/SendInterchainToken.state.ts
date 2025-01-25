@@ -31,6 +31,7 @@ export function useSendInterchainTokenState(props: {
   sourceChain: ChainConfig;
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
+  destinationAddress?: string;
 }) {
   const { combinedComputed } = useAllChainConfigsQuery();
 
@@ -121,6 +122,8 @@ export function useSendInterchainTokenState(props: {
     destinationChainName: selectedToChain?.chain_name,
     sourceChainName: props.sourceChain.chain_name,
     gas,
+    tokenId: props.tokenId,
+    destinationAddress: props.destinationAddress,
   });
 
   const {
