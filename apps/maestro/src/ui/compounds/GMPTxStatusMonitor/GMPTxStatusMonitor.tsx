@@ -43,37 +43,54 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
-export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
+export function useGMPTxProgress(txHash: string, chainId: number) {
   const { combinedComputed } = useAllChainConfigsQuery();
-
-  const { data: txInfo } = useTransaction({
-    hash: txHash,
-    chainId,
-  });
 
   const { data: chainInfo } = useChainInfoQuery({
     axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
+  });
+
+  const isNonEvm = chainInfo?.id === "sui";
+     
+  // Make sure this supports sui as well
+  const { data: txInfo } = useTransaction({
+    hash: txHash as `0x${string}`,
+    chainId,
+    query: {
+      enabled: !isNonEvm,
+    }
   });
 
   const { data: currentBlockNumber } = useBlockNumber({
     chainId,
     watch: true,
     query: {
-      enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+      enabled: !isNonEvm && Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
     },
   });
 
   const elapsedBlocks = useMemo(
-    () =>
-      currentBlockNumber && txInfo?.blockNumber
+    () => {
+      return isNonEvm ? 1 : currentBlockNumber && txInfo?.blockNumber
         ? Number(currentBlockNumber - txInfo.blockNumber)
-        : 0,
-    [currentBlockNumber, txInfo?.blockNumber]
+        : 0
+      },
+    [currentBlockNumber, isNonEvm, txInfo?.blockNumber]
   );
 
-  const expectedConfirmations = Number(chainInfo?.blockConfirmations ?? 1);
+  const expectedConfirmations = useMemo(() => {
+    return isNonEvm ? 1 : Number(chainInfo?.blockConfirmations ?? 1);
+  }, [isNonEvm, chainInfo?.blockConfirmations]);
+
 
   const { progress, progressRatio } = useMemo(() => {
+   if (isNonEvm) {
+      return {
+        progress: '100%',
+        progressRatio: 100,
+      };
+    }
+
     const ratio = elapsedBlocks / expectedConfirmations;
     const clampedRatio = clamp(0, 1, ratio);
 
@@ -84,7 +101,7 @@ export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
       progress,
       progressRatio: clampedRatio * 100,
     };
-  }, [elapsedBlocks, expectedConfirmations]);
+  }, [elapsedBlocks, isNonEvm, expectedConfirmations]);
 
   return {
     progress,
