@@ -51,6 +51,16 @@ export const getChainInfo = publicProcedure
 
       return output;
     } catch (error) {
+
+      // Remove this once we have sui supported in the urlMap from the axelarjs-sdk
+      if(input.axelarChainId === "sui"){
+        return {
+          id: "sui",
+          chainName: "sui",
+          blockConfirmations: 1,
+          estimatedWaitTimeInMinutes: 1,
+        }
+      }
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {
         throw error;
