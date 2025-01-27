@@ -69,7 +69,7 @@ export function useInterchainTransferMutation(
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount, tokenId, destinationAddress, decimals }) => {
-      if (!(decimals && address && config.gas)) {
+      if (!(decimals && address && config.gas && tokenId && destinationAddress)) {
         return;
       }
 
@@ -81,7 +81,6 @@ export function useInterchainTransferMutation(
         let txHash: any;
         if (config.sourceChainName === "sui") {
           const coinObjectId = await getCoinType(config.tokenAddress);
-          console.log("coinObjectId", coinObjectId);
           const sendTokenTxJSON = await getSendTokenTx({
             sender: address,
             tokenId: tokenId,

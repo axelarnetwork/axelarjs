@@ -269,7 +269,8 @@ export const suiRouter = router({
             "0x",
             CLOCK_PACKAGE_ID,
           ],
-          typeArguments: [input.tokenType],
+          typeArguments: [""],
+          // typeArguments: [input.tokenType],
         });
 
         const tx2 = await buildTx(input.sender, txBuilder);

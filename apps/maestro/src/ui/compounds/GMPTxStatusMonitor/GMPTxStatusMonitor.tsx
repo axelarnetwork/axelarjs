@@ -43,17 +43,31 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
-export function useGMPTxProgress(txHash: `0x${string}`, chainId: number) {
+export function useGMPTxProgress(txHash: string, chainId: number) {
   const { combinedComputed } = useAllChainConfigsQuery();
-
-  const { data: txInfo } = useTransaction({
-    hash: txHash,
-    chainId,
-  });
 
   const { data: chainInfo } = useChainInfoQuery({
     axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
+
+  if (chainInfo?.id === "sui") {
+    console.log("TODO: handle sui", chainInfo);
+    return {
+      progress: 0,
+      progressRatio: 0,
+      elapsedBlocks: 1,
+      expectedConfirmations: 1,
+      isReady: true,
+      isConfirmed: true,
+    };
+  }
+   
+  // Make sure this supports sui as well
+  const { data: txInfo } = useTransaction({
+    hash: txHash as `0x${string}`,
+    chainId,
+  });
+
 
   const { data: currentBlockNumber } = useBlockNumber({
     chainId,
