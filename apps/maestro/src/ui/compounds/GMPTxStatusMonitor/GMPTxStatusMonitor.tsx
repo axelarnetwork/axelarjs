@@ -50,44 +50,47 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
     axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
 
-  if (chainInfo?.id === "sui") {
-    console.log("TODO: handle sui", chainInfo);
-    return {
-      progress: 0,
-      progressRatio: 0,
-      elapsedBlocks: 1,
-      expectedConfirmations: 1,
-      isReady: true,
-      isConfirmed: true,
-    };
-  }
-   
+  const isNonEvm = chainInfo?.id === "sui";
+     
   // Make sure this supports sui as well
   const { data: txInfo } = useTransaction({
     hash: txHash as `0x${string}`,
     chainId,
+    query: {
+      enabled: !isNonEvm,
+    }
   });
-
 
   const { data: currentBlockNumber } = useBlockNumber({
     chainId,
     watch: true,
     query: {
-      enabled: Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+      enabled: !isNonEvm && Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
     },
   });
 
   const elapsedBlocks = useMemo(
-    () =>
-      currentBlockNumber && txInfo?.blockNumber
+    () => {
+      return isNonEvm ? 1 : currentBlockNumber && txInfo?.blockNumber
         ? Number(currentBlockNumber - txInfo.blockNumber)
-        : 0,
-    [currentBlockNumber, txInfo?.blockNumber]
+        : 0
+      },
+    [currentBlockNumber, isNonEvm, txInfo?.blockNumber]
   );
 
-  const expectedConfirmations = Number(chainInfo?.blockConfirmations ?? 1);
+  const expectedConfirmations = useMemo(() => {
+    return isNonEvm ? 1 : Number(chainInfo?.blockConfirmations ?? 1);
+  }, [isNonEvm, chainInfo?.blockConfirmations]);
+
 
   const { progress, progressRatio } = useMemo(() => {
+   if (isNonEvm) {
+      return {
+        progress: '100%',
+        progressRatio: 100,
+      };
+    }
+
     const ratio = elapsedBlocks / expectedConfirmations;
     const clampedRatio = clamp(0, 1, ratio);
 
@@ -98,7 +101,7 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
       progress,
       progressRatio: clampedRatio * 100,
     };
-  }, [elapsedBlocks, expectedConfirmations]);
+  }, [elapsedBlocks, isNonEvm, expectedConfirmations]);
 
   return {
     progress,
