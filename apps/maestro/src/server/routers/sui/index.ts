@@ -209,7 +209,7 @@ export const suiRouter = router({
         destinationChain: z.string(),
         destinationAddress: z.string(),
         gas: z.string(),
-        coinObjectId: z.string(),
+        coinType: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -225,8 +225,12 @@ export const suiRouter = router({
 
         // Split coins for gas
         const Gas = tx.splitCoins(tx.gas, [BigInt(input.gas)]);
-        // keep from the object id everything before the first :
-        const coinObjectId = input.coinObjectId.split(":")[0];
+
+        const coins = await suiClient.getCoins({
+          owner: input.sender,
+          coinType: input.coinType,
+        });
+        const coinObjectId = coins.data[0].coinObjectId;
 
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
@@ -235,22 +239,6 @@ export const suiRouter = router({
           target: `${chainConfig.contracts.ITS.address}::token_id::from_u256`,
           arguments: [input.tokenId],
         });
-        console.log(
-          "chainConfig.contracts.Example.objects.ItsSingleton",
-          chainConfig.contracts.Example.objects.ItsSingleton
-        );
-        console.log(
-          "chainConfig.contracts.ITS.objects.ITS",
-          chainConfig.contracts.ITS.objects.ITS
-        );
-        console.log(
-          "chainConfig.contracts.AxelarGateway.objects.Gateway",
-          chainConfig.contracts.AxelarGateway.objects.Gateway
-        );
-        console.log(
-          "chainConfig.contracts.GasService.objects.GasService",
-          chainConfig.contracts.GasService.objects.GasService
-        );
 
         await txBuilder.moveCall({
           target: `${chainConfig.contracts.Example.address}::its::send_interchain_transfer_call`,
@@ -269,7 +257,7 @@ export const suiRouter = router({
             "0x",
             CLOCK_PACKAGE_ID,
           ],
-          typeArguments: [input.coinObjectId],
+          typeArguments: [input.coinType],
         });
 
         const tx2 = await buildTx(input.sender, txBuilder);
