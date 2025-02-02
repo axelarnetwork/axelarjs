@@ -1,5 +1,14 @@
 # @axelarjs/maestro
 
+## 0.3.30
+
+### Patch Changes
+
+- [#484](https://github.com/axelarnetwork/axelarjs/pull/484) [`1d05d568cfed5ab89ca19eadd2961bdfffa91a80`](https://github.com/axelarnetwork/axelarjs/commit/1d05d568cfed5ab89ca19eadd2961bdfffa91a80) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - add flow support to portal
+
+- Updated dependencies [[`1d05d568cfed5ab89ca19eadd2961bdfffa91a80`](https://github.com/axelarnetwork/axelarjs/commit/1d05d568cfed5ab89ca19eadd2961bdfffa91a80)]:
+  - @axelarjs/evm@0.2.8
+
 ## 0.3.29
 
 ### Patch Changes
