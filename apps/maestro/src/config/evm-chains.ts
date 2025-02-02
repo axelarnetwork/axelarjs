@@ -115,7 +115,10 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fantom,
-    rpcUrls: createRpcUrlConfig(fantom, ["https://fantom.drpc.org"]),
+    rpcUrls: {
+      default: { http: ["https://fantom.drpc.org"] },
+      public: { http: ["https://fantom.drpc.org"] },
+    },
     axelarChainId: "fantom",
     axelarChainName: "Fantom",
     environment: ENVIRONMENTS.mainnet,
