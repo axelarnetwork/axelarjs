@@ -178,7 +178,7 @@ async function getInterchainToken(
 
         if (tokenDetails.kind === "canonical") {
           const remoteTokenAddress = (await itsClient.reads
-            .interchainTokenAddress({
+            .registeredTokenAddress({
               tokenId: tokenDetails.tokenId as `0x${string}`,
             })
             .catch(() => null)) as `0x${string}`;

@@ -278,19 +278,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
 
-        const { destinationTxHash, destinationChainAddress: address } =
-          await getDestinationTxHashAndAddress({
-            deploymentMessageId: result.deploymentMessageId,
-            chainIds: input.destinationChainIds,
-            tokenId: token.token_id?.id,
-          });
-
         setRecordDeploymentArgs({
           kind: "interchain",
           deploymentMessageId: result.deploymentMessageId,
           tokenId: token.token_id?.id,
-          tokenAddress: address,
-          tokenManagerAddress: result.tokenManagerAddress,
           deployerAddress,
           salt: input.salt,
           tokenName: input.tokenName,
@@ -299,13 +290,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           axelarChainId: input.sourceChainId,
           originalMinterAddress: input.minterAddress,
           destinationAxelarChainIds: input.destinationChainIds,
-          destinationTxHash: destinationTxHash,
+          tokenManagerAddress: result.tokenManagerAddress,
+          tokenAddress: result.tokenAddress,
         });
 
         return {
           ...result,
-          destinationTxHash: destinationTxHash,
-          destinationTokenAddress: tokenAddress,
         };
       }
     } else {

@@ -25,12 +25,12 @@ export async function scanInterchainTokenOnChainByTokenId(
 
       const [tokenAddress, tokenManagerAddress] = (await Promise.all([
         serviceClient.reads
-          .interchainTokenAddress({
+          .registeredTokenAddress({
             tokenId,
           })
           .catch(() => null),
         serviceClient.reads
-          .tokenManagerAddress({
+          .deployedTokenManager({
             tokenId,
           })
           .catch(() => null),

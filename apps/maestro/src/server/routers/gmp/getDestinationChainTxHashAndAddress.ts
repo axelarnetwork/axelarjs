@@ -71,10 +71,15 @@ export const getDestinationChainTxHashAndAddress = publicProcedure
                 console.log("error in isRegistered", e);
                 return false;
               });
+            const deployedTokenManagerAddress =
+              await itsClient.reads.deployedTokenManager({
+                tokenId: input.tokenId as `0x${string}`,
+              });
             if (destinationTxHash) {
               const result = {
                 destinationTxHash,
                 destinationChainAddress,
+                destinationTokenManagerAddress: deployedTokenManagerAddress,
               };
               return result;
             }
@@ -89,5 +94,6 @@ export const getDestinationChainTxHashAndAddress = publicProcedure
     return {
       destinationTxHash: "",
       destinationChainAddress: "",
+      destinationTokenManagerAddress: "",
     };
   });
