@@ -103,7 +103,7 @@ export function useInterchainTransferMutation(
             value: config.gas ?? 0n,
             args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
               destinationChain: config.destinationChainName,
-              recipient: address,
+              recipient: destinationAddress ?? address,
               amount: bnAmount,
               metadata: "0x",
             }),
