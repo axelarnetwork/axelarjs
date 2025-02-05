@@ -57,6 +57,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
 
+  const { mutateAsync: getDestinationTxHashAndAddress } =
+    trpc.gmp.getDestinationChainTxHashAndAddress.useMutation();
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
@@ -272,13 +274,22 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
       });
+
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
+
+        const { destinationTxHash, destinationChainAddress: address } =
+          await getDestinationTxHashAndAddress({
+            deploymentMessageId: result.deploymentMessageId,
+            chainIds: input.destinationChainIds,
+            tokenId: token.token_id?.id,
+          });
+
         setRecordDeploymentArgs({
           kind: "interchain",
           deploymentMessageId: result.deploymentMessageId,
           tokenId: token.token_id?.id,
-          tokenAddress: result.tokenAddress,
+          tokenAddress: address,
           tokenManagerAddress: result.tokenManagerAddress,
           deployerAddress,
           salt: input.salt,
@@ -288,9 +299,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           axelarChainId: input.sourceChainId,
           originalMinterAddress: input.minterAddress,
           destinationAxelarChainIds: input.destinationChainIds,
+          destinationTxHash: destinationTxHash,
         });
 
-        return result;
+        return {
+          ...result,
+          destinationTxHash: destinationTxHash,
+          destinationTokenAddress: tokenAddress,
+        };
       }
     } else {
       invariant(
@@ -308,6 +324,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     multicall,
     prepareMulticall?.request,
     recordDeploymentDraft,
+    getDestinationTxHashAndAddress,
   ]);
 
   const write = useCallback(() => {

@@ -184,10 +184,8 @@ export default function useTokenDeploy() {
       const tokenManagerType = treasuryCapSendTokenResult
         ? "mint/burn"
         : "lock/unlock";
-      // TODO:: handle txIndex properly
-      const txIndex = sendTokenResult?.events?.[0]?.id?.eventSeq ?? 0;
+      const txIndex = sendTokenResult?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
-
       return {
         ...sendTokenResult,
         deploymentMessageId,

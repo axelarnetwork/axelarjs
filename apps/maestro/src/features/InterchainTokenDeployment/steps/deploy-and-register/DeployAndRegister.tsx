@@ -114,15 +114,14 @@ export const Step2: FC = () => {
           rootActions.setTxState({
             type: "deployed",
             suiTx: result,
-            txHash: result.digest,
+            txHash: result.deploymentMessageId as string,
             tokenAddress: result.tokenAddress,
-            // chainId: sourceChain.chain_id,
           });
           if (rootState.selectedChains.length > 0) {
             addTransaction({
               status: "submitted",
               suiTx: result,
-              hash: result.digest,
+              hash: result.deploymentMessageId as string,
               chainId: sourceChain.chain_id,
               txType: "INTERCHAIN_DEPLOYMENT",
             });
