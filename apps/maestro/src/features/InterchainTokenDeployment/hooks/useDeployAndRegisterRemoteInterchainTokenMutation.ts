@@ -57,8 +57,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
 
-  const { mutateAsync: getDestinationTxHashAndAddress } =
-    trpc.gmp.getDestinationChainTxHashAndAddress.useMutation();
   const onStatusUpdate = throttle(config.onStatusUpdate ?? (() => {}), 150);
 
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
@@ -314,7 +312,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     multicall,
     prepareMulticall?.request,
     recordDeploymentDraft,
-    getDestinationTxHashAndAddress,
   ]);
 
   const write = useCallback(() => {
