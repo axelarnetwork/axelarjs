@@ -272,10 +272,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
       });
-
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
-
         setRecordDeploymentArgs({
           kind: "interchain",
           deploymentMessageId: result.deploymentMessageId,
@@ -291,10 +289,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           tokenManagerAddress: result.tokenManagerAddress,
           tokenAddress: result.tokenAddress,
         });
-
-        return {
-          ...result,
-        };
+        return result;
       }
     } else {
       invariant(
