@@ -116,14 +116,14 @@ export const recordInterchainTokenDeployment = protectedProcedure
           chainConfig,
           `No configuration found for chain ${axelarChainId}`
         );
-        invariant(
-          chainConfig.wagmi,
-          `No wagmi configuration found for chain ${axelarChainId}`
-        );
         let tokenAddress;
         let tokenManagerAddress;
 
         if (axelarChainId !== "sui") {
+          invariant(
+            chainConfig.wagmi,
+            `No wagmi configuration found for chain ${axelarChainId}`
+          );
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
             chainConfig.wagmi
           );
