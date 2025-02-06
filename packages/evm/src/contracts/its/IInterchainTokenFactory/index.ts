@@ -49,7 +49,7 @@ export class IInterchainTokenFactoryClient extends PublicContractClient<
       chain: options.chain,
     });
 
-    this.reads = createReadClient(this as PublicContractClient<any>);
+    this.reads = createReadClient(this);
   }
 }
 
