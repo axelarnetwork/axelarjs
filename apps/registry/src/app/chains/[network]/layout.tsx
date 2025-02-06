@@ -60,7 +60,8 @@ const ChainsLayout: FC<Props> = (props) => {
           {CHAIN_TABS.map((tab) => (
             <Tabs.Tab
               active={tab.value === props.params.network}
-              key={tab.value as string}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              key={tab.value}
               $as={Link}
               href={`/chains/${tab.value}`}
             >
