@@ -94,7 +94,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
 
         const [tokenManagerAddress, tokenAddress] = await Promise.all([
           itsClient.reads
-            .deployedTokenManager({
+            .tokenManagerAddress({
               tokenId: originToken.tokenId as `0x${string}`,
             })
             .catch(always("0x")),

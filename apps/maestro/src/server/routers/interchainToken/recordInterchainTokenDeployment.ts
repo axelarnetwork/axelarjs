@@ -43,8 +43,8 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
       const originChainServiceClient = createServiceClient();
 
-      const tokenManagerAddress = (await originChainServiceClient.reads
-        .deployedTokenManager({
+      tokenManagerAddress = (await originChainServiceClient.reads
+        .tokenManagerAddress({
           tokenId: input.tokenId as `0x${string}`,
         })
         .catch(() => null)) as `0x${string}`;
@@ -130,7 +130,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
           [tokenManagerAddress, tokenAddress] = await Promise.all([
             itsClient.reads
-              .deployedTokenManager({
+              .tokenManagerAddress({
                 tokenId: input.tokenId as `0x${string}`,
               })
               .catch(always("0x")),

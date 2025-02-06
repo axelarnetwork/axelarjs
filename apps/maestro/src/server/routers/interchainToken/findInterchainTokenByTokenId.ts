@@ -30,7 +30,7 @@ export async function scanInterchainTokenOnChainByTokenId(
           })
           .catch(() => null),
         serviceClient.reads
-          .deployedTokenManager({
+          .tokenManagerAddress({
             tokenId,
           })
           .catch(() => null),
