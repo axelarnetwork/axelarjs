@@ -29,7 +29,7 @@ const ChainsLayout: FC<Props> = (props) => {
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams);
+      const params = new URLSearchParams(searchParams.toString());
       params.set(name, value);
 
       return params.toString();
@@ -60,7 +60,7 @@ const ChainsLayout: FC<Props> = (props) => {
           {CHAIN_TABS.map((tab) => (
             <Tabs.Tab
               active={tab.value === props.params.network}
-              key={tab.value}
+              key={tab.value as string}
               $as={Link}
               href={`/chains/${tab.value}`}
             >
