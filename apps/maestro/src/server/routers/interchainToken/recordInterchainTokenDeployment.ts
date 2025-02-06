@@ -75,7 +75,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
-      tokenManagerAddress: tokenManagerAddress as string,
+      tokenManagerAddress,
       tokenManagerType,
     });
 

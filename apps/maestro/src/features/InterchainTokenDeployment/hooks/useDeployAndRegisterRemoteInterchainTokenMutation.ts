@@ -131,7 +131,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     const registerTxData = destinationChainNames.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
-        originalChainName: "",
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })

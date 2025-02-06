@@ -1,8 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { zeroAddress } from "viem";
-
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -67,13 +65,9 @@ export default function useRegisterRemoteInterchainTokens(
     )
       return [];
 
-    const minter = tokenDeployment.originalMinterAddress ?? zeroAddress;
-
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        originalChainName: sourceChain?.chain_name ?? "",
-        minter: minter as `0x${string}`,
         destinationChain: chainId,
         gasValue: gasFeesData.gasFees[i].fee,
       })
