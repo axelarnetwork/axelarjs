@@ -91,17 +91,6 @@ export default {
       type: "error",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "operator",
-          type: "address",
-        },
-      ],
-      name: "NotOperator",
-      type: "error",
-    },
-    {
       inputs: [],
       name: "NotOwner",
       type: "error",
@@ -112,19 +101,19 @@ export default {
       type: "error",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "sender",
-          type: "address",
-        },
-      ],
-      name: "NotServiceOwner",
+      inputs: [],
+      name: "NotSupported",
       type: "error",
     },
     {
-      inputs: [],
-      name: "NotSupported",
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+      ],
+      name: "NotToken",
       type: "error",
     },
     {
@@ -140,6 +129,11 @@ export default {
     {
       inputs: [],
       name: "ZeroAddress",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "ZeroSupplyToken",
       type: "error",
     },
     {
@@ -458,19 +452,9 @@ export default {
     {
       inputs: [
         {
-          internalType: "string",
-          name: "originalChainName",
-          type: "string",
-        },
-        {
           internalType: "bytes32",
           name: "salt",
           type: "bytes32",
-        },
-        {
-          internalType: "address",
-          name: "minter",
-          type: "address",
         },
         {
           internalType: "string",
@@ -496,6 +480,11 @@ export default {
     },
     {
       inputs: [
+        {
+          internalType: "string",
+          name: "originalChainName",
+          type: "string",
+        },
         {
           internalType: "bytes32",
           name: "salt",
@@ -644,6 +633,98 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationTokenAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "enum ITokenManagerType.TokenManagerType",
+          name: "tokenManagerType",
+          type: "uint8",
+        },
+        {
+          internalType: "bytes",
+          name: "linkParams",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
+      ],
+      name: "linkToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+      ],
+      name: "linkedTokenDeploySalt",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "deploySalt",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "deployer",
+          type: "address",
+        },
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+      ],
+      name: "linkedTokenId",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "bytes[]",
           name: "data",
           type: "bytes[]",
@@ -708,6 +789,40 @@ export default {
         },
       ],
       name: "registerCanonicalInterchainToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "enum ITokenManagerType.TokenManagerType",
+          name: "tokenManagerType",
+          type: "uint8",
+        },
+        {
+          internalType: "address",
+          name: "operator",
+          type: "address",
+        },
+      ],
+      name: "registerCustomToken",
       outputs: [
         {
           internalType: "bytes32",
