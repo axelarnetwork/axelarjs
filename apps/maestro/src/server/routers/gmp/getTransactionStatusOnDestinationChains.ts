@@ -15,6 +15,7 @@ export const SEARCHGMP_SOURCE = {
     "executed",
     "callback",
     "interchain_token_deployment_started.destinationChain",
+    "interchain_transfer.destinationChain",
   ],
   excludes: [
     "call.transaction",
@@ -61,6 +62,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
               call,
               status: firstHopStatus,
               interchain_token_deployment_started: tokenDeployment,
+              interchain_transfer: tokenTransfer,
             } = gmpData;
 
             const chainType = gmpData.call.chain_type;
@@ -77,6 +79,7 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             }
 
             const destinationChain =
+              tokenTransfer?.destinationChain?.toLowerCase() ||
               tokenDeployment?.destinationChain?.toLowerCase() ||
               call.returnValues.destinationChain.toLowerCase();
 
