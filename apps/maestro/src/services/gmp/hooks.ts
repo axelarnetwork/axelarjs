@@ -88,7 +88,6 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
     refetchInterval?: number;
   }
 ) {
-  console.log("enabled", !!input.txHash, options?.enabled || true);
   const { data, ...query } =
     trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
       {
@@ -99,7 +98,6 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
         enabled: !!input.txHash && (options?.enabled || true),
       }
     );
-  console.log("data", data);
 
   return {
     ...query,
