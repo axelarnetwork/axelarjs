@@ -96,10 +96,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
       },
       {
         refetchInterval: options?.refetchInterval ?? 1000 * 10, // 10 seconds
-        enabled:
-          !!input.txHash &&
-          hex64().safeParse(input.txHash).success &&
-          (options?.enabled || true),
+        enabled: !!input.txHash && (options?.enabled || true),
       }
     );
 
@@ -133,7 +130,7 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
       },
       {
         enabled: Boolean(
-          input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
+          input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]+/i))
         ),
         refetchInterval: 1000 * 10,
         ...options,

@@ -8,14 +8,12 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
 import config from "./config/devnet-amplifier.json";
-import { buildTx } from "./utils/utils";
+import { buildTx, suiServiceBaseUrl } from "./utils/utils";
 
 // Initialize SuiClient directly with RPC from config
 const suiClient = new SuiClient({
   url: config["sui"].rpc,
 });
-
-const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure

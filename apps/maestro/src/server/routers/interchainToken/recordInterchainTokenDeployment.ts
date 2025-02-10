@@ -140,7 +140,9 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always("0x")),
           ]);
-        } else {
+        } else if (axelarChainId === "sui") {
+          // the address should be different from the address in the origin chain
+          // but this will be updated later in tokens page
           tokenAddress = input.tokenAddress;
           tokenManagerAddress = input.tokenManagerAddress;
         }
