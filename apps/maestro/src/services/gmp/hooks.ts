@@ -2,7 +2,6 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { trpc } from "~/lib/trpc";
-import { hex64 } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
@@ -10,7 +9,8 @@ export function useInterchainTokensQuery(input: {
   tokenAddress?: string;
   strict?: boolean;
 }) {
-  const { combinedComputed, isLoading, isError, error, isFetching } = useAllChainConfigsQuery();
+  const { combinedComputed, isLoading, isError, error, isFetching } =
+    useAllChainConfigsQuery();
 
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(

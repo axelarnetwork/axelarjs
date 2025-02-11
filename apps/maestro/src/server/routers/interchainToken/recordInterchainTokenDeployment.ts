@@ -136,9 +136,10 @@ export const recordInterchainTokenDeployment = protectedProcedure
               .catch(always("0x")),
             itsClient.reads
               .registeredTokenAddress({
+                // this method will not always return the token address because it is not always already registered so we will have to update it later in the token details page
                 tokenId: input.tokenId as `0x${string}`,
               })
-              .catch(always("0x")),
+              .catch(always(input.tokenAddress)),
           ]);
         } else if (axelarChainId === "sui") {
           // the address should be different from the address in the origin chain
@@ -161,22 +162,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
       })
     );
 
-    const validTokens = remoteTokens.filter(
-      (token) => token.tokenAddress !== "0x"
-    );
-
-    if (validTokens.length !== remoteTokens.length) {
-      console.log(
-        "recordInterchainTokenDeployment: some tokens are not valid",
-        {
-          invalidTokens: remoteTokens.filter(
-            (token) => token.tokenAddress === "0x"
-          ),
-        }
-      );
-    }
-
     await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      validTokens as NewRemoteInterchainTokenInput[]
+      remoteTokens as NewRemoteInterchainTokenInput[]
     );
   });
