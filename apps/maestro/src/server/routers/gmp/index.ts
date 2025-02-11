@@ -1,4 +1,5 @@
 import { router } from "~/server/trpc";
+import { getDestinationChainTxHashAndAddress } from "./getDestinationChainTxHashAndAddress";
 import { getRecentTransactions } from "./getRecentTransactions";
 import { getTopTransactions } from "./getTopTransactions";
 import { getTransactionStatus } from "./getTransactionStatus";
@@ -11,6 +12,7 @@ export const gmpRouter = router({
   getTransactionStatusesOnDestinationChains,
   getRecentTransactions,
   getTopTransactions,
+  getDestinationChainTxHashAndAddress,
 });
 
 // export type definition of API

@@ -43,7 +43,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
       const originChainServiceClient = createServiceClient();
 
-      const tokenManagerAddress = (await originChainServiceClient.reads
+      tokenManagerAddress = (await originChainServiceClient.reads
         .tokenManagerAddress({
           tokenId: input.tokenId as `0x${string}`,
         })
@@ -75,7 +75,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
-      tokenManagerAddress: tokenManagerAddress as string,
+      tokenManagerAddress,
       tokenManagerType,
     });
 
@@ -116,14 +116,14 @@ export const recordInterchainTokenDeployment = protectedProcedure
           chainConfig,
           `No configuration found for chain ${axelarChainId}`
         );
-        invariant(
-          chainConfig.wagmi,
-          `No wagmi configuration found for chain ${axelarChainId}`
-        );
         let tokenAddress;
         let tokenManagerAddress;
 
         if (axelarChainId !== "sui") {
+          invariant(
+            chainConfig.wagmi,
+            `No wagmi configuration found for chain ${axelarChainId}`
+          );
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
             chainConfig.wagmi
           );
@@ -135,12 +135,14 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always("0x")),
             itsClient.reads
-              .interchainTokenAddress({
+              .registeredTokenAddress({
                 tokenId: input.tokenId as `0x${string}`,
               })
               .catch(always("0x")),
           ]);
-        } else {
+        } else if (axelarChainId === "sui") {
+          // the address should be different from the address in the origin chain
+          // but this will be updated later in tokens page
           tokenAddress = input.tokenAddress;
           tokenManagerAddress = input.tokenManagerAddress;
         }

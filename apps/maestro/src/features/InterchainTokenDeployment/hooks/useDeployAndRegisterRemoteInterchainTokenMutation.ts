@@ -131,7 +131,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     const registerTxData = destinationChainNames.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
-        originalChainName: "",
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })
@@ -278,8 +277,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           kind: "interchain",
           deploymentMessageId: result.deploymentMessageId,
           tokenId: token.token_id?.id,
-          tokenAddress: result.tokenAddress,
-          tokenManagerAddress: result.tokenManagerAddress,
           deployerAddress,
           salt: input.salt,
           tokenName: input.tokenName,
@@ -288,8 +285,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           axelarChainId: input.sourceChainId,
           originalMinterAddress: input.minterAddress,
           destinationAxelarChainIds: input.destinationChainIds,
+          tokenManagerAddress: result.tokenManagerAddress,
+          tokenAddress: result.tokenAddress,
         });
-
         return result;
       }
     } else {

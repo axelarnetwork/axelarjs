@@ -98,12 +98,13 @@ export function useInterchainTransferMutation(
             chain: "sui:testnet", //TODO: make this dynamic
           });
         } else {
+          const recipient = (destinationAddress ?? address) as `0x${string}`;
           txHash = await transferAsync({
             address: config.tokenAddress,
             value: config.gas ?? 0n,
             args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
               destinationChain: config.destinationChainName,
-              recipient: address,
+              recipient,
               amount: bnAmount,
               metadata: "0x",
             }),

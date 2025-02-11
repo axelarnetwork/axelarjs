@@ -12,6 +12,7 @@ import {
   remoteInterchainTokens,
   remoteInterchainTokensZodSchemas,
 } from "~/lib/drizzle/schema";
+import { getCoinAddressAndManagerByTokenId } from "~/server/routers/sui/utils/utils";
 
 export const newRemoteInterchainTokenSchema =
   remoteInterchainTokensZodSchemas.insert.omit({
@@ -318,5 +319,34 @@ export default class MaestroPostgresClient {
     });
 
     return await query;
+  }
+
+  async updateSuiRemoteTokenAddresses(tokenId: string) {
+    try {
+      const response = await getCoinAddressAndManagerByTokenId({ tokenId });
+
+      if (!response) {
+        throw new Error("Failed to retrieve token details");
+      }
+
+      const { address: tokenAddress, tokenManager } = response;
+
+      await this.db
+        .update(remoteInterchainTokens)
+        .set({
+          tokenAddress,
+          tokenManagerAddress: tokenManager,
+          deploymentStatus: "confirmed",
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(remoteInterchainTokens.tokenId, tokenId),
+            eq(remoteInterchainTokens.axelarChainId, "sui")
+          )
+        );
+    } catch (error) {
+      console.error("Failed to update Sui remote token addresses:", error);
+    }
   }
 }

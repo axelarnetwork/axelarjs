@@ -99,7 +99,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
             })
             .catch(always("0x")),
           itsClient.reads
-            .interchainTokenAddress({
+            .registeredTokenAddress({
               tokenId: originToken.tokenId as `0x${string}`,
             })
             .catch(always("0x")),

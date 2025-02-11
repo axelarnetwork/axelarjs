@@ -67,11 +67,48 @@ export const INDEX_FILE = ({
   export const create${pascalName}Client = (options: { chain: Chain; address: \`0x\${string}\` }) => new ${pascalName}Client(options);
   `;
 
+// Helper function to handle overloaded functions
+function handleOverloadedFunctions(abi: ABIItem[]) {
+  const functionGroups = new Map<string, ABIItem[]>();
+  
+  abi.forEach((item) => {
+    if (item.type === 'function') {
+      const existing = functionGroups.get(item.name) || [];
+      functionGroups.set(item.name, [...existing, item]);
+    }
+  });
+
+  // Create mapping for unique names
+  const uniqueFunctionNames = new Map<string, {baseName: string, suffix: string}>();
+  
+  functionGroups.forEach((items, functionName) => {
+    if (items.length > 1) {
+      // Sort by number of inputs (fewer inputs get lower numbers)
+      const sortedItems = [...items].sort((a, b) => a.inputs.length - b.inputs.length);
+      
+      sortedItems.forEach((item, index) => {
+        const key = JSON.stringify({ name: item.name, inputs: item.inputs });
+        const suffix = index === 0 ? '' : String(index + 1);
+        uniqueFunctionNames.set(key, {
+          baseName: functionName,
+          suffix
+        });
+      });
+    }
+  });
+
+  return {
+    getUniqueName: (item: ABIItem) => {
+      const key = JSON.stringify({ name: item.name, inputs: item.inputs });
+      return uniqueFunctionNames.get(key) || { baseName: item.name, suffix: '' };
+    }
+  };
+}
+
 function getDefaultArgName(functionName: string, argIndex: number) {
   if (functionName === "allowance") {
     return ["owner", "spender"][argIndex];
   }
-
   return `${functionName}Arg${argIndex}`;
 }
 
@@ -83,6 +120,8 @@ export const ARGS_FILE = ({
   constantName = "",
   clientPath = "",
 }) => {
+  const { getUniqueName } = handleOverloadedFunctions(abiFns);
+
   const toABIFnEncoder = ({ name, inputs }: ABIItem) => {
     const argNames = inputs
       .map((input, i) => input.name || getDefaultArgName(name, i))
@@ -97,8 +136,11 @@ export const ARGS_FILE = ({
       )
       .join("; ");
 
-    const fnName = capitalize(name);
-    const typeName = `${pascalName}${fnName}Args`;
+    const { baseName, suffix } = getUniqueName({ name, inputs, type: 'function' });
+    
+    const fnName = capitalize(baseName);
+    const typeName = `${pascalName}${fnName}Args${suffix}`;
+    const encoderName = `${fnName}${suffix}`;
 
     return `
       export type ${typeName} = {${argsType}}
@@ -106,12 +148,12 @@ export const ARGS_FILE = ({
       /**
        * Factory function for ${pascalName}.${name} function args
        */
-      export const encode${pascalName}${fnName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
+      export const encode${pascalName}${encoderName}Args = ({${argNames}}: ${typeName}) => [${argNames}] as const;
       
       /**
        * Encoder function for ${pascalName}.${name} function data
        */
-      export const encode${pascalName}${fnName}Data = ({${argNames}}: ${typeName}): \`0x\${string}\` => encodeFunctionData({
+      export const encode${pascalName}${encoderName}Data = ({${argNames}}: ${typeName}): \`0x\${string}\` => encodeFunctionData({
         functionName: "${name}",
         abi: ABI_FILE.abi,
         args: [${argNames}]
@@ -124,20 +166,21 @@ export const ARGS_FILE = ({
       ) {
         return {
           ${readFns
-            .map(({ name, inputs }) =>
-              inputs.length > 0
-                ? `"${name}"(${name}Args: ${pascalName}${capitalize(
-                    name
-                  )}Args) {
-                  const encoder = ${constantName}_ENCODERS["${name}"];
-                  const encodedArgs = encoder.args(${name}Args);
+            .map(({ name, inputs }) => {
+              const { baseName, suffix } = getUniqueName({ name, inputs, type: 'function' });
+              const encoderName = `${baseName}${suffix}`;
+              
+              return inputs.length > 0
+                ? `"${encoderName}"(${name}Args: ${pascalName}${capitalize(baseName)}Args${suffix}) {
+                    const encoder = ${constantName}_ENCODERS["${encoderName}"];
+                    const encodedArgs = encoder.args(${name}Args);
 
-                  return publicClient.read("${name}", { args: encodedArgs });
-                }`
+                    return publicClient.read("${name}", { args: encodedArgs });
+                  }`
                 : `"${name}"() {
-                  return publicClient.read("${name}");
-                }`
-            )
+                    return publicClient.read("${name}");
+                  }`;
+            })
             .join(",\n")}
         }
       }`
@@ -146,12 +189,9 @@ export const ARGS_FILE = ({
   const abiFnsWithInputs = abiFns.filter((x) => x.inputs.length > 0);
 
   return `
-    ${
-      abiFnsWithInputs.length ? `import { encodeFunctionData } from "viem"` : ""
-    };
+    ${abiFnsWithInputs.length ? `import { encodeFunctionData } from "viem"` : ""};
     
-    ${
-      readFns.length > 0
+    ${readFns.length > 0
         ? `import type { PublicContractClient } from "${
             clientPath.startsWith(".")
               ? "../../PublicContractClient"
@@ -165,13 +205,14 @@ export const ARGS_FILE = ({
       
     export const ${constantName}_ENCODERS = {
       ${abiFnsWithInputs
-        .map(
-          ({ name }) =>
-            `"${name}": {
-              args: encode${pascalName}${capitalize(name)}Args,
-              data: encode${pascalName}${capitalize(name)}Data,
-            }`
-        )
+        .map(({ name, inputs }) => {
+          const { baseName, suffix } = getUniqueName({ name, inputs, type: 'function' });
+          const encoderName = `${baseName}${suffix}`;
+          return `"${encoderName}": {
+              args: encode${pascalName}${capitalize(encoderName)}Args,
+              data: encode${pascalName}${capitalize(encoderName)}Data,
+            }`;
+        })
         .join(",\n")}
     }
     

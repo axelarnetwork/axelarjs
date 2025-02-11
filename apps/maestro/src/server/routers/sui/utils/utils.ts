@@ -1,6 +1,16 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
-import { getFullnodeUrl, SuiClient, SuiObjectChange } from "@mysten/sui/client";
+import {
+  getFullnodeUrl,
+  SuiClient,
+  SuiObjectChange,
+  type DynamicFieldPage,
+} from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
+
+import config from "../config/devnet-amplifier.json";
+
+export const suiServiceBaseUrl =
+  "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
   return objectChanges.find((change) => change.type === "published");
@@ -72,3 +82,78 @@ export const getTokenOwner = async (tokenAddress: string) => {
     throw new Error("Coin owner not found");
   }
 };
+
+export const getCoinAddressAndManagerByTokenId = async (input: {
+  tokenId: string;
+}) => {
+  let cursor = null;
+  let filteredResult = [];
+  let result = {
+    hasNextPage: true,
+    nextCursor: null,
+    data: [],
+  } as DynamicFieldPage;
+  try {
+    const suiClient = new SuiClient({
+      url: config["sui"].rpc,
+    });
+    const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
+    const _chainConfig = await response.json();
+    const chainConfig = _chainConfig.chains.sui;
+
+    const registeredCoinsObject = await suiClient.getObject({
+      id: chainConfig.contracts.ITS.objects.ITSv0,
+      options: {
+        showStorageRebate: true,
+        showContent: true,
+      },
+    });
+    const registeredCoinsBagId = (registeredCoinsObject.data?.content as any)
+      ?.fields?.value?.fields.registered_coins.fields.id.id;
+
+    do {
+      result = await suiClient.getDynamicFields({
+        parentId: registeredCoinsBagId,
+        cursor: cursor,
+      });
+      cursor = result.nextCursor;
+      filteredResult = result.data.filter((item: any) => {
+        return (
+          item.name.value.id.toString().toLowerCase() ===
+          input.tokenId.toLowerCase()
+        );
+      });
+      if (filteredResult.length) {
+        break;
+      }
+    } while (result?.hasNextPage && !filteredResult?.length);
+
+    if (filteredResult.length > 0) {
+      return extractTokenDetails(filteredResult);
+    } else {
+      console.log("Token ID not found.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Failed to get token address:", error);
+    throw new Error(
+      `Failed to retrieve token address: ${(error as Error).message}`
+    );
+  }
+};
+
+function extractTokenDetails(filteredResult: any[]) {
+  return filteredResult.map((item) => {
+    // Extract the token manager (objectId)
+    const tokenManager = item.objectId;
+
+    // Extract the address from the objectType
+    const objectType = item.objectType;
+    const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
+    const address = addressMatch ? addressMatch[1] : null;
+    return {
+      tokenManager,
+      address,
+    };
+  })[0];
+}

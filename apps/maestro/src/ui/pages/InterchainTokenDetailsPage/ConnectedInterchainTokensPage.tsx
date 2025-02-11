@@ -2,7 +2,7 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
-import { useCallback, useEffect, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 
@@ -103,6 +103,8 @@ export function useInterchainTokenDetailsPageState(
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
+  const [isAlreadyUpdatingRemoteSui, setAlreadyUpdatingRemoteSui] =
+    useState(false);
   const { address } = useAccount();
   const chainId = useChainId();
   const {
@@ -236,6 +238,34 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   useEffect(() => {
     recoverMessageId();
   }, [recoverMessageId]);
+
+  const { mutateAsync: updateSuiAddresses } =
+    trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
+
+  useEffect(() => {
+    if (
+      !isAlreadyUpdatingRemoteSui &&
+      interchainToken?.matchingTokens?.some(
+        (x) => x.chain?.id === "sui" && x.tokenAddress === props.tokenAddress
+      ) &&
+      props.tokenId
+    ) {
+      setAlreadyUpdatingRemoteSui(true);
+      updateSuiAddresses({ tokenId: props.tokenId })
+        .then(() => {
+          setAlreadyUpdatingRemoteSui(false);
+        })
+        .catch((error) => {
+          setAlreadyUpdatingRemoteSui(false);
+          console.error("Failed to update Sui remote token addresses:", error);
+        });
+    }
+  }, [
+    interchainToken?.matchingTokens,
+    props.tokenAddress,
+    props.tokenId,
+    updateSuiAddresses,
+  ]);
 
   const remoteChainsExecuted = useMemo(
     () =>

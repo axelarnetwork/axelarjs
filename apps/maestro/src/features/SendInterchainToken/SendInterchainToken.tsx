@@ -184,14 +184,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [actions, props.sourceChain, state.txState, txHash]);
 
   const suiTxDigest = useMemo(() => {
-    console.log("MEMO@@@ state.txState", state.txState);
     return state.txState.status === "submitted"
       ? state.txState.suiTx?.digest
       : undefined;
   }, [state.txState]);
 
   useEffect(() => {
-    console.log("ENTERING USEEFF suiTxDigest", suiTxDigest);
     async function trackTransaction() {
       if (state.txState.status !== "submitted") return;
       if (!state.txState.suiTx) return;
@@ -204,8 +202,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
         chainId: 103, //todo change
         txType: "INTERCHAIN_TRANSFER",
       });
-
-      console.log(" past if state.txState.suiTx", state.txState.suiTx);
 
       await handleSuiTransactionComplete(state.txState.suiTx);
     }
@@ -248,12 +244,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const handleSuiTransactionComplete = useCallback(
     async (result: SuiTransactionBlockResponse) => {
       // Check if transaction was successful
-      console.log(
-        "handleSuiTransactionComplete",
-        result,
-        "and result.effects.status.status ",
-        result.effects?.status?.status
-      );
       if (result.effects?.status?.status === "success") {
         await actions.refetchBalances();
         resetForm();
@@ -275,11 +265,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
 
   useEffect(() => {
-    console.log(
-      "chain_type",
-      state.selectedToChain?.chain_type,
-      props.sourceChain.chain_type
-    );
     if (isEvmChainsOnly) {
       setValue("destinationAddress", address ?? "", {
         shouldValidate: true,

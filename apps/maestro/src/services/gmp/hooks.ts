@@ -2,7 +2,6 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { trpc } from "~/lib/trpc";
-import { hex64 } from "~/lib/utils/validation";
 import {
   useEVMChainConfigsQuery,
   useVMChainConfigsQuery,
@@ -96,10 +95,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
       },
       {
         refetchInterval: options?.refetchInterval ?? 1000 * 10, // 10 seconds
-        enabled:
-          !!input.txHash &&
-          hex64().safeParse(input.txHash).success &&
-          (options?.enabled || true),
+        enabled: !!input.txHash && (options?.enabled || true),
       }
     );
 
