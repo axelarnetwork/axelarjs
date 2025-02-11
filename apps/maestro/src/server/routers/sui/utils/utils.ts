@@ -92,7 +92,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
     hasNextPage: true,
     nextCursor: null,
     data: [],
-  } as DynamicFieldPage;
+  } as DynamicFieldPage | null;
   try {
     const suiClient = new SuiClient({
       url: config["sui"].rpc,
@@ -112,10 +112,18 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
       ?.fields?.value?.fields.registered_coins.fields.id.id;
 
     do {
-      result = await suiClient.getDynamicFields({
-        parentId: registeredCoinsBagId,
-        cursor: cursor,
-      });
+      result = await suiClient
+        .getDynamicFields({
+          parentId: registeredCoinsBagId,
+          cursor: cursor,
+        })
+        .catch((error) => {
+          console.error("Failed to get dynamic fields:", error);
+          return null;
+        });
+      if (!result) {
+        return null;
+      }
       cursor = result.nextCursor;
       filteredResult = result.data.filter((item: any) => {
         return (
@@ -131,7 +139,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
     if (filteredResult.length > 0) {
       return extractTokenDetails(filteredResult);
     } else {
-      console.log("Token ID not found.");
+      console.log("getCoinAddressAndManagerByTokenId: Token ID not found.");
       return null;
     }
   } catch (error) {
