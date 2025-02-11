@@ -7,9 +7,9 @@ import { publicProcedure } from "~/server/trpc";
 
 const vmChainConfigSchema = z.object({
   id: z.string(),
-  chain_id: z.number(),
   chain_name: z.string(),
-  maintainer_id: z.string(),
+  chain_id: z.number().optional(),
+  maintainer_id: z.string().optional(),
   multisig_prover: z.object({
     address: z.string(),
   }),
@@ -20,9 +20,9 @@ const vmChainConfigSchema = z.object({
   short_name: z.string(),
   image: z.string(),
   color: z.string(),
-  chain_type: z.literal("vm"),
-  no_inflation: z.boolean(),
-  no_tvl: z.boolean(),
+  chain_type: z.literal("vm"), 
+  no_inflation: z.boolean().optional(),
+  no_tvl: z.boolean().optional(),
   endpoints: z.object({
     rpc: z.array(z.string()),
   }),
@@ -52,7 +52,7 @@ const vmChainConfigSchema = z.object({
       }),
       blockExplorerUrls: z.array(z.string()),
     })
-  ),
+  ).optional(),
 });
 
 export const getVMChainConfigs = publicProcedure
@@ -78,7 +78,7 @@ export const getVMChainConfigs = publicProcedure
     try {
       const chainsMap = await ctx.configs.vmChains();
       const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
-      const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
+      const uniqueChainInfos = uniqBy((x) => x.id, chainInfos);
       const validChainInfos = uniqueChainInfos.filter(
         (chain) => vmChainConfigSchema.safeParse(chain).success
       );
