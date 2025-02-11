@@ -16,6 +16,7 @@ import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
 import {
+  SUI_CHAIN_ID,
   useAccount,
   useBalance,
   useChainId,
@@ -199,7 +200,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     }
   }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
 
-  const utils = trpc.useUtils();
+  const refetchPageData = useCallback(() => {
+    void refetchTokenDetails();
+    void refetchInterchainToken();
+  }, [refetchTokenDetails, refetchInterchainToken]);
 
   const { mutateAsync, isPending, isSuccess } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
@@ -215,10 +219,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     ) {
       void mutateAsync({ tokenId: props.tokenId }).then((result) => {
         if (result === "updated") {
-          void utils.erc20.invalidate().then(() => void refetchTokenDetails());
-          void utils.interchainToken
-            .invalidate()
-            .then(() => void refetchInterchainToken());
+          refetchPageData();
         }
       });
     }
@@ -228,10 +229,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     mutateAsync,
     props.deploymentMessageId,
     props.tokenId,
-    refetchInterchainToken,
-    refetchTokenDetails,
-    utils.erc20,
-    utils.interchainToken,
+    refetchPageData,
   ]);
 
   // Try to recover deployment message id if it's missing
@@ -241,6 +239,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const { mutateAsync: updateSuiAddresses } =
     trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
+
+  const { mutateAsync: updateEVMAddresses } =
+    trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
 
   useEffect(() => {
     if (
@@ -254,6 +255,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       updateSuiAddresses({ tokenId: props.tokenId })
         .then(() => {
           setAlreadyUpdatingRemoteSui(false);
+          refetchPageData();
         })
         .catch((error) => {
           setAlreadyUpdatingRemoteSui(false);
@@ -262,9 +264,51 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     }
   }, [
     interchainToken?.matchingTokens,
+    isAlreadyUpdatingRemoteSui,
     props.tokenAddress,
     props.tokenId,
     updateSuiAddresses,
+    refetchPageData,
+  ]);
+
+  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    interchainToken?.matchingTokens?.forEach((x) => {
+      // check if the EVM token address is the same as sui, which is wrong
+      if (
+        props.chainId === SUI_CHAIN_ID &&
+        x.chain?.id !== "sui" &&
+        x.tokenAddress === props.tokenAddress &&
+        !isUpdating[x.chain?.id ?? ""]
+      ) {
+        setIsUpdating((prev) => ({ ...prev, [x.chain?.id ?? ""]: true }));
+        updateEVMAddresses({
+          tokenId: props?.tokenId as `0x${string}`,
+          axelarChainId: x.chain?.id,
+        })
+          .then(() => {
+            refetchPageData();
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to update EVM remote token addresses:",
+              error
+            );
+          })
+          .finally(() => {
+            setIsUpdating((prev) => ({ ...prev, [x.chain?.id ?? ""]: false }));
+          });
+      }
+    });
+  }, [
+    interchainToken?.matchingTokens,
+    props.chainId,
+    props.tokenAddress,
+    props?.tokenId,
+    updateEVMAddresses,
+    isUpdating,
+    refetchPageData,
   ]);
 
   const remoteChainsExecuted = useMemo(
