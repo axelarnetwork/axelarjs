@@ -55,14 +55,6 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
       });
 
       if (data.length) {
-<<<<<<< HEAD
-        const result = data.reduce(
-          (acc, gmpData) => {
-            const { call, status } = gmpData;
-            const destinationChain =
-              gmpData.callback?.returnValues.destinationChain.toLowerCase() ||
-              call.returnValues.destinationChain.toLowerCase();
-=======
         const pendingResult = data.reduce(
           async (acc, gmpData) => {
             const {
@@ -90,7 +82,6 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
               tokenDeployment?.destinationChain?.toLowerCase() ||
               call.returnValues.destinationChain.toLowerCase();
 
->>>>>>> 5ee1a720 (feat: fix tx progress for its hub tx (#489))
             return {
               ...acc,
               [destinationChain]: {
