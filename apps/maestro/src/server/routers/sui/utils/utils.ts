@@ -1,10 +1,5 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
-import {
-  getFullnodeUrl,
-  SuiClient,
-  SuiObjectChange,
-  type DynamicFieldPage,
-} from "@mysten/sui/client";
+import { getFullnodeUrl, SuiClient, SuiObjectChange } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
 import config from "../config/devnet-amplifier.json";
@@ -86,13 +81,6 @@ export const getTokenOwner = async (tokenAddress: string) => {
 export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
 }) => {
-  let cursor = null;
-  let filteredResult = [];
-  let result = {
-    hasNextPage: true,
-    nextCursor: null,
-    data: [],
-  } as DynamicFieldPage | null;
   try {
     const suiClient = new SuiClient({
       url: config["sui"].rpc,
@@ -111,32 +99,15 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
     const registeredCoinsBagId = (registeredCoinsObject.data?.content as any)
       ?.fields?.value?.fields.registered_coins.fields.id.id;
 
-    do {
-      result = await suiClient
-        .getDynamicFields({
-          parentId: registeredCoinsBagId,
-          cursor: cursor,
-        })
-        .catch((error) => {
-          console.error("Failed to get dynamic fields:", error);
-          return null;
-        });
-      if (!result) {
-        return null;
-      }
-      cursor = result.nextCursor;
-      filteredResult = result.data.filter((item: any) => {
-        return (
-          item.name.value.id.toString().toLowerCase() ===
-          input.tokenId.toLowerCase()
-        );
-      });
-      if (filteredResult.length) {
-        break;
-      }
-    } while (result?.hasNextPage && !filteredResult?.length);
+    const filteredResult = await findInPaginatedDynamicFields(
+      suiClient,
+      registeredCoinsBagId,
+      (item: any) =>
+        item.name.value.id.toString().toLowerCase() ===
+        input.tokenId.toLowerCase()
+    );
 
-    if (filteredResult.length > 0) {
+    if (filteredResult) {
       return extractTokenDetails(filteredResult);
     } else {
       console.log("getCoinAddressAndManagerByTokenId: Token ID not found.");
@@ -149,6 +120,32 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
     );
   }
 };
+
+export async function findInPaginatedDynamicFields<T>(
+  suiClient: SuiClient,
+  parentId: string,
+  filterFn: (item: any) => boolean
+): Promise<T[] | null> {
+  let cursor: string | null = null;
+  let result;
+  let filteredResult: any[] = [];
+
+  do {
+    result = await suiClient
+      .getDynamicFields({
+        parentId,
+        cursor: cursor,
+      })
+      .catch((error) => {
+        console.error("Failed to get dynamic fields:", error);
+        return null;
+      });
+
+    cursor = result?.nextCursor ?? null;
+    filteredResult = result?.data?.filter(filterFn) ?? [];
+  } while (result?.hasNextPage && !filteredResult?.length);
+  return filteredResult?.length ? filteredResult : null;
+}
 
 function extractTokenDetails(filteredResult: any[]) {
   return filteredResult.map((item) => {
