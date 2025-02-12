@@ -1,5 +1,11 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
-import { getFullnodeUrl, SuiClient, SuiObjectChange } from "@mysten/sui/client";
+import {
+  getFullnodeUrl,
+  SuiClient,
+  SuiObjectChange,
+  type DynamicFieldInfo,
+  type DynamicFieldPage,
+} from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
 import config from "../config/devnet-amplifier.json";
@@ -97,7 +103,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
       },
     });
     const registeredCoinsBagId = (registeredCoinsObject.data?.content as any)
-      ?.fields?.value?.fields.registered_coins.fields.id.id;
+      ?.fields?.value?.fields.registered_coins.fields.id.id as string;
 
     const filteredResult = await findInPaginatedDynamicFields(
       suiClient,
@@ -121,14 +127,14 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   }
 };
 
-export async function findInPaginatedDynamicFields<T>(
+export async function findInPaginatedDynamicFields(
   suiClient: SuiClient,
   parentId: string,
-  filterFn: (item: any) => boolean
-): Promise<T[] | null> {
+  filterFn: (item: DynamicFieldInfo) => boolean
+): Promise<DynamicFieldInfo | null> {
   let cursor: string | null = null;
-  let result;
-  let filteredResult: any[] = [];
+  let result: DynamicFieldPage | null;
+  let filteredResult: DynamicFieldInfo[] = [];
 
   do {
     result = await suiClient
@@ -144,21 +150,19 @@ export async function findInPaginatedDynamicFields<T>(
     cursor = result?.nextCursor ?? null;
     filteredResult = result?.data?.filter(filterFn) ?? [];
   } while (result?.hasNextPage && !filteredResult?.length);
-  return filteredResult?.length ? filteredResult : null;
+  return filteredResult?.length ? filteredResult[0] : null;
 }
 
-function extractTokenDetails(filteredResult: any[]) {
-  return filteredResult.map((item) => {
-    // Extract the token manager (objectId)
-    const tokenManager = item.objectId;
+function extractTokenDetails(filteredResult: DynamicFieldInfo) {
+  // Extract the token manager (objectId)
+  const tokenManager = filteredResult.objectId;
 
-    // Extract the address from the objectType
-    const objectType = item.objectType;
-    const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
-    const address = addressMatch ? addressMatch[1] : null;
-    return {
-      tokenManager,
-      address,
-    };
-  })[0];
+  // Extract the address from the objectType
+  const objectType = filteredResult.objectType;
+  const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
+  const address = addressMatch ? addressMatch[1] : null;
+  return {
+    tokenManager,
+    address,
+  };
 }
