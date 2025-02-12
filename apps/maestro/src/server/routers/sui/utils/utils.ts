@@ -160,7 +160,7 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
   // Extract the address from the objectType
   const objectType = filteredResult.objectType;
   const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
-  const address = addressMatch ? addressMatch[1] : null;
+  const address = addressMatch?.[1] as string;
   return {
     tokenManager,
     address,
