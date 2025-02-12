@@ -76,10 +76,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     return {
       destinationChainNames,
     };
-  }, [
-    combinedComputed.indexedById,
-    input?.destinationChainIds,
-  ]);
+  }, [combinedComputed.indexedById, input?.destinationChainIds]);
 
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {
@@ -100,7 +97,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       const gasValue = input.remoteDeploymentGasFees[i] ?? 0n;
 
       const args = {
-        originalChain: "",
         originalTokenAddress: input.tokenAddress as `0x{string}`,
         destinationChain,
         gasValue,
