@@ -263,7 +263,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         .catch(() => {
           setTimeout(() => {
             setAlreadyUpdatingRemoteSui(false);
-          }, 5000);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on sui chain
         });
     }
   }, [
