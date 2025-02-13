@@ -18,6 +18,7 @@ import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
+import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "~/ui/compounds/MultiStepForm";
@@ -108,29 +109,39 @@ export const Step2: FC = () => {
       // Sui will return a digest equivalent to the txHash
       const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
       if (sourceChain.chain_id === SUI_CHAIN_ID) {
-        const result = (await txPromise) as DeployTokenResult;
-        // if tx is successful, we will get a digest
-        if (result) {
-          rootActions.setTxState({
-            type: "deployed",
-            suiTx: result,
-            txHash: result.deploymentMessageId as string,
-            tokenAddress: result.tokenAddress,
-          });
-          if (rootState.selectedChains.length > 0) {
-            addTransaction({
-              status: "submitted",
+        try {
+          const result = (await txPromise) as DeployTokenResult;
+          // if tx is successful, we will get a digest
+          if (result) {
+            rootActions.setTxState({
+              type: "deployed",
               suiTx: result,
-              hash: result.deploymentMessageId as string,
-              chainId: sourceChain.chain_id,
-              txType: "INTERCHAIN_DEPLOYMENT",
+              txHash: result.digest,
+              tokenAddress: result.tokenAddress,
+            });
+            if (rootState.selectedChains.length > 0) {
+              addTransaction({
+                status: "submitted",
+                suiTx: result,
+                hash: result.digest,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+            }
+            return;
+          } else {
+            rootActions.setTxState({
+              type: "idle",
             });
           }
-          return;
-        } else {
-          rootActions.setTxState({
-            type: "idle",
-          });
+        } catch (e: any) {
+          // Handle user rejection from Sui wallet
+          if (e.message.includes("User rejected")) {
+            rootActions.setTxState({
+              type: "idle",
+            });
+            return;
+          }
         }
       }
 
@@ -172,9 +183,7 @@ export const Step2: FC = () => {
     ]
   );
 
-  const eligibleChains = state.chains.filter(
-    (chain) => chain.chain_id !== chainId
-  );
+  const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 

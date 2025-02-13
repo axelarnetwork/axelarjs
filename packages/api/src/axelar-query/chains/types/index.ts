@@ -11,7 +11,7 @@ export interface ChainInfo {
   module: "axelarnet" | "evm";
   confirmLevel?: number;
   chainIdentifier: {
-    devnet: string;
+    ["devnet-amplifier"]: string;
     testnet: string;
     mainnet: string;
   };

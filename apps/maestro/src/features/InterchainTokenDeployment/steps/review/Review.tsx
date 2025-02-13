@@ -39,14 +39,15 @@ const Review: FC = () => {
 
   // persist token deployment tx hash
   useEffect(() => {
-    if (chain && state.txState.type === "deployed") {
+    if (chain && Object.keys(combinedComputed.indexedById).length > 0 && state.txState.type === "deployed") {
       persistTokenDeploymentTxHash(
         state.txState.tokenAddress,
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) =>
-            combinedComputed.indexedById[axelarChainId].chain_id
+          (axelarChainId) => {
+            return combinedComputed.indexedById[axelarChainId].chain_id
+          }
         )
       );
     }

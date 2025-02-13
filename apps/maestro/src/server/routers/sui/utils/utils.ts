@@ -3,6 +3,7 @@ import {
   getFullnodeUrl,
   SuiClient,
   SuiObjectChange,
+  type DynamicFieldInfo,
   type DynamicFieldPage,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
@@ -86,13 +87,6 @@ export const getTokenOwner = async (tokenAddress: string) => {
 export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
 }) => {
-  let cursor = null;
-  let filteredResult = [];
-  let result = {
-    hasNextPage: true,
-    nextCursor: null,
-    data: [],
-  } as DynamicFieldPage;
   try {
     const suiClient = new SuiClient({
       url: config["sui"].rpc,
@@ -109,29 +103,20 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
       },
     });
     const registeredCoinsBagId = (registeredCoinsObject.data?.content as any)
-      ?.fields?.value?.fields.registered_coins.fields.id.id;
+      ?.fields?.value?.fields.registered_coins.fields.id.id as string;
 
-    do {
-      result = await suiClient.getDynamicFields({
-        parentId: registeredCoinsBagId,
-        cursor: cursor,
-      });
-      cursor = result.nextCursor;
-      filteredResult = result.data.filter((item: any) => {
-        return (
-          item.name.value.id.toString().toLowerCase() ===
-          input.tokenId.toLowerCase()
-        );
-      });
-      if (filteredResult.length) {
-        break;
-      }
-    } while (result?.hasNextPage && !filteredResult?.length);
+    const filteredResult = await findInPaginatedDynamicFields(
+      suiClient,
+      registeredCoinsBagId,
+      (item: any) =>
+        item.name.value.id.toString().toLowerCase() ===
+        input.tokenId.toLowerCase()
+    );
 
-    if (filteredResult.length > 0) {
+    if (filteredResult) {
       return extractTokenDetails(filteredResult);
     } else {
-      console.log("Token ID not found.");
+      console.log("getCoinAddressAndManagerByTokenId: Token ID not found.");
       return null;
     }
   } catch (error) {
@@ -142,18 +127,42 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   }
 };
 
-function extractTokenDetails(filteredResult: any[]) {
-  return filteredResult.map((item) => {
-    // Extract the token manager (objectId)
-    const tokenManager = item.objectId;
+export async function findInPaginatedDynamicFields(
+  suiClient: SuiClient,
+  parentId: string,
+  filterFn: (item: DynamicFieldInfo) => boolean
+): Promise<DynamicFieldInfo | null> {
+  let cursor: string | null = null;
+  let result: DynamicFieldPage | null;
+  let filteredResult: DynamicFieldInfo[] = [];
 
-    // Extract the address from the objectType
-    const objectType = item.objectType;
-    const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
-    const address = addressMatch ? addressMatch[1] : null;
-    return {
-      tokenManager,
-      address,
-    };
-  })[0];
+  do {
+    result = await suiClient
+      .getDynamicFields({
+        parentId,
+        cursor: cursor,
+      })
+      .catch((error) => {
+        console.error("Failed to get dynamic fields:", error);
+        return null;
+      });
+
+    cursor = result?.nextCursor ?? null;
+    filteredResult = result?.data?.filter(filterFn) ?? [];
+  } while (result?.hasNextPage && !filteredResult?.length);
+  return filteredResult?.length ? filteredResult[0] : null;
+}
+
+function extractTokenDetails(filteredResult: DynamicFieldInfo) {
+  // Extract the token manager (objectId)
+  const tokenManager = filteredResult.objectId;
+
+  // Extract the address from the objectType
+  const objectType = filteredResult.objectType;
+  const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
+  const address = addressMatch?.[1] as string;
+  return {
+    tokenManager,
+    address,
+  };
 }

@@ -22,6 +22,21 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
+    // If the token address and owner address are not the same length, the balance is 0
+    // This is because a sui address can't have evm balances and vice versa
+    if (input.tokenAddress?.length !== input.owner?.length) {
+      return {
+        isTokenOwner: false,
+        isTokenMinter: false,
+        tokenBalance: "0",
+        decimals: 0,
+        isTokenPendingOwner: false,
+        hasPendingOwner: false,
+        hasMinterRole: false,
+        hasOperatorRole: false,
+        hasFlowLimiterRole: false,
+      };
+    }
     // Sui address length is 66
     if (input.tokenAddress?.length === 66) {
       let isTokenOwner = false;

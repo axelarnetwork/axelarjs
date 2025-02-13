@@ -349,4 +349,11 @@ export default class MaestroPostgresClient {
       console.error("Failed to update Sui remote token addresses:", error);
     }
   }
+
+  async updateEVMRemoteTokenAddress(tokenId: string, tokenAddress: string) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({ tokenAddress, updatedAt: new Date() })
+      .where(eq(remoteInterchainTokens.tokenId, tokenId));
+  }
 }

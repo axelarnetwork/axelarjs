@@ -2,34 +2,15 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { trpc } from "~/lib/trpc";
-import {
-  useEVMChainConfigsQuery,
-  useVMChainConfigsQuery,
-} from "../axelarscan/hooks";
+import { useAllChainConfigsQuery } from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
   tokenAddress?: string;
   strict?: boolean;
 }) {
-  const { computed: evmComputed, ...evmChainsQuery } =
-    useEVMChainConfigsQuery();
-  const { computed: vmComputed, ...vmChainsQuery } = useVMChainConfigsQuery();
-
-  const combinedComputed = useMemo(
-    () => ({
-      indexedById: {
-        ...vmComputed.indexedById,
-        ...evmComputed.indexedById,
-      },
-      indexedByChainId: {
-        ...vmComputed.indexedByChainId,
-        ...evmComputed.indexedByChainId,
-      },
-      wagmiChains: evmComputed.wagmiChains, // Keep wagmiChains for EVM compatibility
-    }),
-    [evmComputed, vmComputed]
-  );
+  const { combinedComputed, isLoading, isError, error, isFetching } =
+    useAllChainConfigsQuery();
 
   const { data, ...queryResult } =
     trpc.interchainToken.searchInterchainToken.useQuery(
@@ -65,17 +46,10 @@ export function useInterchainTokensQuery(input: {
           combinedComputed.wagmiChains?.find((x) => x?.id === chainId)
         ),
     },
-    isLoading:
-      evmChainsQuery.isLoading ||
-      vmChainsQuery.isLoading ||
-      queryResult.isLoading,
-    isFetching:
-      evmChainsQuery.isFetching ||
-      vmChainsQuery.isFetching ||
-      queryResult.isFetching,
-    isError:
-      evmChainsQuery.isError || vmChainsQuery.isError || queryResult.isError,
-    error: evmChainsQuery.error || vmChainsQuery.error || queryResult.error,
+    isLoading,
+    isFetching,
+    isError,
+    error,
   };
 }
 

@@ -11,17 +11,29 @@ export class AxelarConfigClient extends RestService {
     });
   }
 
+  private normalizeEnvironment(env: Environment) {
+    return env === 'devnet-amplifier' ? 'testnet' : env;
+  }
+
   async getAxelarConfigs(env: Environment) {
+    const _env = this.normalizeEnvironment(env);
+
     return this.client
-      .get(`configs/${env}-config-1.x.json`)
+      .get(`configs/${_env}-config-1.x.json`)
       .json<AxelarConfigsResponse>();
   }
 
   async getAxelarAssetConfigs(env: Environment) {
-    return this.client.get(`/${env}-asset-config.json`).json();
+    const _env = this.normalizeEnvironment(env);
+
+    return this.client.get(`/${_env}-asset-config.json`).json();
   }
 
   async getAxelarChainConfigs(env: Environment) {
+    if(env === 'devnet-amplifier') {
+      return this.client.get("").json();
+    }
+
     return this.client.get(`/${env}-chain-config.json`).json();
   }
 }
