@@ -281,7 +281,6 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
   // hiddenChains are the chains that are hidden (collapsed) due to space constraints
   const [visibleChains, hiddenChains] = splitAt(offset, chains);
 
-  // TODO: Fix chain icon for axelar
   return (
     <li className={cn("flex flex-1 items-center justify-between", className)}>
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />

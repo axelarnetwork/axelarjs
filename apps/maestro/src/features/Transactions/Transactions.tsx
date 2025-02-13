@@ -32,8 +32,6 @@ function useGroupedStatuses(txHash: string) {
   const chainId = useChainId();
 
   return useMemo(() => {
-
-    // if chain is axelar then get the chain config from connected src chain then override id, name and image url
     const statusValues = Object.entries(statuses ?? {}).map(
       ([axelarChainId, entry]) => ({
         ...entry,
@@ -44,8 +42,6 @@ function useGroupedStatuses(txHash: string) {
         ),
       })
     );
-
-    console.log("statusValues", statusValues);
 
     const groupedStatusesProps = Object.entries(
       groupBy((x) => x.status, statusValues)
@@ -92,7 +88,6 @@ const ToastElement: FC<ToastElementProps> = ({
     (txType) => TX_LABEL_MAP[txType]
   );
 
-  // TODO: Fix group statuses
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
   const chainConfig = Maybe.of(combinedComputed.indexedByChainId[chainId]);
