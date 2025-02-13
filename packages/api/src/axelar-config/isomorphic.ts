@@ -11,8 +11,12 @@ export class AxelarConfigClient extends RestService {
     });
   }
 
+  private normalizeEnvironment(env: Environment) {
+    return env === 'devnet-amplifier' ? 'testnet' : env;
+  }
+
   async getAxelarConfigs(env: Environment) {
-    const _env = env === 'devnet-amplifier' ? 'testnet' : env;
+    const _env = this.normalizeEnvironment(env);
 
     return this.client
       .get(`configs/${_env}-config-1.x.json`)
@@ -20,7 +24,7 @@ export class AxelarConfigClient extends RestService {
   }
 
   async getAxelarAssetConfigs(env: Environment) {
-    const _env = env === 'devnet-amplifier' ? 'testnet' : env;
+    const _env = this.normalizeEnvironment(env);
 
     return this.client.get(`/${_env}-asset-config.json`).json();
   }
