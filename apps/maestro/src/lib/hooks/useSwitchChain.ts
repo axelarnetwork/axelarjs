@@ -3,6 +3,7 @@ import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { useChainId, useDisconnect } from "~/lib/hooks";
 
+// TODO: fixing this once we have the sui chain data
 const CHAIN_ID_SUI = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
 
 export function useSwitchChain() {
