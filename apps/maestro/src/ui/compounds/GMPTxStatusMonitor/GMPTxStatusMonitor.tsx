@@ -343,7 +343,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
         </Tooltip>{" "}
         {!compact && chainName}
       </span>
-      <GMPStatusIndicator txHash={`${txHash}:${logIndex}`} status={status} />
+      <GMPStatusIndicator txHash={`${txHash}-${logIndex}`} status={status} />
     </li>
   );
 };
