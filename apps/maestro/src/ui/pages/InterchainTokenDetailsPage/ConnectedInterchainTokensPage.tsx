@@ -243,6 +243,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { mutateAsync: updateEVMAddresses } =
     trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
 
+  // Update Sui remote token addresses
+  // the address is wrong on the Sui chain on deployment because it's the EVM address,
+  // we wait for the tx to be executed then we update the address on the Sui chain
   useEffect(() => {
     if (
       !isAlreadyUpdatingRemoteSui &&
@@ -257,9 +260,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           setAlreadyUpdatingRemoteSui(false);
           refetchPageData();
         })
-        .catch((error) => {
-          setAlreadyUpdatingRemoteSui(false);
-          console.error("Failed to update Sui remote token addresses:", error);
+        .catch(() => {
+          setTimeout(() => {
+            setAlreadyUpdatingRemoteSui(false);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on sui chain
         });
     }
   }, [
@@ -273,6 +277,13 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
 
+  const setChainUpdateStatus = useCallback(
+    (chainId: string | undefined, status: boolean) => {
+      setIsUpdating((prev) => ({ ...prev, [chainId ?? ""]: status }));
+    },
+    []
+  );
+
   useEffect(() => {
     interchainToken?.matchingTokens?.forEach((x) => {
       // check if the EVM token address is the same as sui, which is wrong
@@ -282,22 +293,19 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         x.tokenAddress === props.tokenAddress &&
         !isUpdating[x.chain?.id ?? ""]
       ) {
-        setIsUpdating((prev) => ({ ...prev, [x.chain?.id ?? ""]: true }));
+        setChainUpdateStatus(x.chain?.id, true);
         updateEVMAddresses({
           tokenId: props?.tokenId as `0x${string}`,
           axelarChainId: x.chain?.id,
         })
           .then(() => {
+            setChainUpdateStatus(x.chain?.id, false);
             refetchPageData();
           })
-          .catch((error) => {
-            console.error(
-              "Failed to update EVM remote token addresses:",
-              error
-            );
-          })
-          .finally(() => {
-            setIsUpdating((prev) => ({ ...prev, [x.chain?.id ?? ""]: false }));
+          .catch(() => {
+            setTimeout(() => {
+              setChainUpdateStatus(x.chain?.id, false);
+            }, 5000);
           });
       }
     });
@@ -309,6 +317,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     updateEVMAddresses,
     isUpdating,
     refetchPageData,
+    setChainUpdateStatus,
   ]);
 
   const remoteChainsExecuted = useMemo(
