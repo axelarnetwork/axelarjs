@@ -49,7 +49,7 @@ export function getNormalizedTwoHopChainConfig(
   axelarChainId: string,
   combinedComputed: ChainConfigIndex,
   chainId: number
-): ChainConfig | undefined {
+): ChainConfig {
   const { indexedById, indexedByChainId } = combinedComputed;
 
   if (axelarChainId !== "axelar") {
