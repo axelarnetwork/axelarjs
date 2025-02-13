@@ -88,7 +88,7 @@ export const AXELAR_RPC_URLS_FALLBACK = {
 } as const;
 
 export const AXELAR_LCD_URLS = {
-  testnet: "https://lc-axelar-testnet.imperator.co",
+  testnet: "https://lcd-axelar-testnet.imperator.co",
   mainnet: "https://lcd-axelar.imperator.co",
   'devnet-amplifier': 'http://devnet-amplifier.axelar.dev:1317"',
 } as const;
