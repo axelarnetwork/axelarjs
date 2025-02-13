@@ -84,6 +84,7 @@ const ToastElement: FC<ToastElementProps> = ({
     (txType) => TX_LABEL_MAP[txType]
   );
 
+  // TODO: Fix group statuses
   const { groupedStatusesProps, hasStatus } = useGroupedStatuses(txHash);
 
   const chainConfig = Maybe.of(combinedComputed.indexedByChainId[chainId]);
@@ -287,10 +288,13 @@ const Transactions = () => {
         if (!tx.hash || !tx.chainId || !tx.txType) {
           return null;
         }
+
+        const normalizedTxHash = tx.hash.split("-")[0];
+
         return (
           <GMPTransaction
-            key={tx.hash}
-            txHash={tx.hash}
+            key={normalizedTxHash}
+            txHash={normalizedTxHash}
             chainId={tx.chainId}
             txType={tx.txType}
           />
