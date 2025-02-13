@@ -13,6 +13,7 @@ import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
+import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 type ChainConfig = EVMChainConfig | VMChainConfig;
@@ -199,19 +200,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-            const chain =
-              axelarChainId !== "axelar"
-                ? combinedComputed.indexedById[axelarChainId]
-                : {
-                    // Workaround: When a 2-hop tx is submitted, the axelarChainId will be "axelar"
-                    // because no Axelar chain is configured in our API. Since we only use
-                    // id, name, and image, we can copy other properties from any other chain.
-                    ...combinedComputed.indexedByChainId[chainId],
-                    id: "axelar",
-                    name: "Axelar",
-                    image: "/logos/chains/axelar.svg",
-                  };
 
+            const chain = getNormalizedTwoHopChainConfig(
+              axelarChainId,
+              combinedComputed,
+              chainId
+            );
+             
             if (!chain) {
               console.log("chain not found", axelarChainId);
               return undefined;
@@ -282,13 +277,16 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
   compact,
   offset = 3,
 }) => {
-  const [leading, trailing] = splitAt(offset, chains);
+  // visibleChains are the chains that are displayed directly because they fit within the UI's visible area
+  // hiddenChains are the chains that are hidden (collapsed) due to space constraints
+  const [visibleChains, hiddenChains] = splitAt(offset, chains);
 
+  // TODO: Fix chain icon for axelar
   return (
     <li className={cn("flex flex-1 items-center justify-between", className)}>
       <GMPStatusIndicator txHash={`${txHash}`} status={status} />
       <div className="flex translate-x-5 items-center">
-        {leading.map((chain, i) => (
+        {visibleChains.map((chain, i) => (
           <span key={chain?.id || i} className="-ml-2 flex items-center">
             <Tooltip
               tip={
@@ -314,7 +312,7 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
             </Tooltip>{" "}
           </span>
         ))}
-        {trailing.length > 0 && (
+        {hiddenChains.length > 0 && (
           <CollapsedChains chains={chains} offset={offset} />
         )}
       </div>

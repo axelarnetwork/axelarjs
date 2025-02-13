@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { groupBy } from "rambda";
 
-import type { TxType } from "~/lib/hooks";
+import { useChainId, type TxType } from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -16,6 +16,7 @@ import {
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
+import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 
 const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
@@ -28,16 +29,23 @@ function useGroupedStatuses(txHash: string) {
   });
 
   const { combinedComputed } = useAllChainConfigsQuery();
+  const chainId = useChainId();
 
   return useMemo(() => {
-    const combinedIndexedById = combinedComputed.indexedById;
 
+    // if chain is axelar then get the chain config from connected src chain then override id, name and image url
     const statusValues = Object.entries(statuses ?? {}).map(
       ([axelarChainId, entry]) => ({
         ...entry,
-        chain: combinedIndexedById[axelarChainId],
+        chain: getNormalizedTwoHopChainConfig(
+          axelarChainId,
+          combinedComputed,
+          chainId
+        ),
       })
     );
+
+    console.log("statusValues", statusValues);
 
     const groupedStatusesProps = Object.entries(
       groupBy((x) => x.status, statusValues)
@@ -52,7 +60,7 @@ function useGroupedStatuses(txHash: string) {
       groupedStatusesProps,
       hasStatus: statusValues.length > 0,
     };
-  }, [combinedComputed.indexedById, statuses, txHash]);
+  }, [combinedComputed, chainId, statuses, txHash]);
 }
 
 type ToastElementProps = {
@@ -162,7 +170,6 @@ const ToastElement: FC<ToastElementProps> = ({
   );
 
   const handleDismiss = useCallback(() => {
-
     // Clear the interval *before* dismissing
     if (intervalId) {
       window.clearInterval(intervalId);
@@ -216,24 +223,27 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const intervalRef = useRef<number>();
   const toastIdRef = useRef<string>();
 
-  const watchTxToCompletion = useCallback(async () =>
-    new Promise((resolve) => {
-      intervalRef.current = window.setInterval(() => {
-        if (isLoading) {
-          return;
-        }
+  const watchTxToCompletion = useCallback(
+    async () =>
+      new Promise((resolve) => {
+        intervalRef.current = window.setInterval(() => {
+          if (isLoading) {
+            return;
+          }
 
-        if (total > 0 && executed >= total) {
-          window.clearInterval(intervalRef.current);
+          if (total > 0 && executed >= total) {
+            window.clearInterval(intervalRef.current);
 
-          resolve({
-            status: "success",
-            executed,
-            total,
-          });
-        }
-      }, 5000);
-    }), [isLoading, total, executed]);
+            resolve({
+              status: "success",
+              executed,
+              total,
+            });
+          }
+        }, 5000);
+      }),
+    [isLoading, total, executed]
+  );
 
   useEffect(() => {
     // Create the toast *once* and store the ID.
@@ -275,9 +285,7 @@ const Transactions = () => {
   return (
     <>
       {hasPendingTransactions && (
-        <button
-          className="indicator rounded-full bg-base-300 p-2"
-        >
+        <button className="indicator rounded-full bg-base-300 p-2">
           <span className="badge indicator-item badge-info badge-sm">
             {state.pendingTransactions.length}
           </span>
