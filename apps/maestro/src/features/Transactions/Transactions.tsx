@@ -1,14 +1,7 @@
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { Maybe } from "@axelarjs/utils";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FC,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, type FC } from "react";
 import Link from "next/link";
 
 import { groupBy } from "rambda";
@@ -67,6 +60,7 @@ type ToastElementProps = {
   chainId: number;
   txType: TxType;
   onRemoveTx?: (txHash: string) => void;
+  intervalId?: number;
 };
 
 const ToastElement: FC<ToastElementProps> = ({
@@ -74,6 +68,7 @@ const ToastElement: FC<ToastElementProps> = ({
   chainId,
   txType,
   onRemoveTx,
+  intervalId,
 }) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
@@ -82,7 +77,8 @@ const ToastElement: FC<ToastElementProps> = ({
 
   const { combinedComputed } = useAllChainConfigsQuery();
 
-  const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
+  const isLoading =
+    !expectedConfirmations || expectedConfirmations < elapsedBlocks;
 
   const txTypeText = Maybe.of(txType).mapOrNull(
     (txType) => TX_LABEL_MAP[txType]
@@ -165,6 +161,12 @@ const ToastElement: FC<ToastElementProps> = ({
   );
 
   const handleDismiss = useCallback(() => {
+
+    // Clear the interval *before* dismissing
+    if (intervalId) {
+      window.clearInterval(intervalId);
+    }
+
     toast.dismiss(txHash);
 
     // dismiss permanently if tx status is error or insufficient_fee
@@ -175,7 +177,7 @@ const ToastElement: FC<ToastElementProps> = ({
     ) {
       onRemoveTx?.(txHash);
     }
-  }, [groupedStatusesProps, onRemoveTx, txHash]);
+  }, [groupedStatusesProps, onRemoveTx, txHash, intervalId]);
 
   return (
     <div className="relative grid gap-2 rounded-md border-base-200 bg-base-300 p-2 pl-4 pr-8 shadow-md shadow-black/10">
@@ -211,51 +213,55 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const [, actions] = useTransactionsContainer();
 
   const intervalRef = useRef<number>();
+  const toastIdRef = useRef<string>();
 
-  const watchTxToCompletion = useCallback(
-    async () =>
-      new Promise((resolve) => {
-        intervalRef.current = window.setInterval(() => {
-          if (isLoading) {
-            return;
-          }
+  const watchTxToCompletion = useCallback(async () =>
+    new Promise((resolve) => {
+      intervalRef.current = window.setInterval(() => {
+        if (isLoading) {
+          return;
+        }
 
-          if (total > 0 && executed >= total) {
-            window.clearInterval(intervalRef.current);
+        if (total > 0 && executed >= total) {
+          window.clearInterval(intervalRef.current);
 
-            resolve({
-              status: "success",
-              executed,
-              total,
-            });
-          }
-        }, 5000);
-      }),
-    [executed, isLoading, total]
-  );
+          resolve({
+            status: "success",
+            executed,
+            total,
+          });
+        }
+      }, 5000);
+    }), [isLoading, total, executed]);
 
   useEffect(() => {
-    async function task(toastId: string) {
-      await watchTxToCompletion();
-      toast.dismiss(toastId);
-      actions.removeTransaction(props.txHash);
-    }
-
+    // Create the toast *once* and store the ID.
+    toastIdRef.current = props.txHash;
     toast.custom(
-      <ToastElement {...props} onRemoveTx={actions.removeTransaction} />,
+      <ToastElement
+        {...props}
+        onRemoveTx={actions.removeTransaction}
+        intervalId={intervalRef.current}
+      />,
       {
-        id: props.txHash,
+        id: toastIdRef.current,
         duration: Infinity,
       }
     );
 
+    async function task() {
+      await watchTxToCompletion();
+      toast.dismiss(toastIdRef.current);
+      actions.removeTransaction(props.txHash);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    task(props.txHash);
+    task();
 
     return () => {
       window.clearInterval(intervalRef.current);
     };
-  }, [actions, props, watchTxToCompletion]);
+  }, [props, actions, watchTxToCompletion]);
 
   return <></>;
 };
@@ -263,23 +269,13 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
 const Transactions = () => {
   const [state] = useTransactionsContainer();
 
-  // hack to trigger re-render of <GMPTransaction /> components
-  // this is necessary because the toast isn't re-rendered unless GMPTransaction mounts again
-  const [, setRenderCount] = useState(0);
-
   const hasPendingTransactions = state.pendingTransactions.length > 0;
-
-  const triggerRender = useCallback(
-    () => setRenderCount((renderCount) => renderCount + 1),
-    []
-  );
 
   return (
     <>
       {hasPendingTransactions && (
         <button
           className="indicator rounded-full bg-base-300 p-2"
-          onClick={triggerRender}
         >
           <span className="badge indicator-item badge-info badge-sm">
             {state.pendingTransactions.length}
