@@ -58,11 +58,12 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
             const { call, callback, status: firstHopStatus } = gmpData;
 
             const chainType = gmpData.call.chain_type;
-            let secondHopStatus = "pending";
+            let secondHopStatus: GMPTxStatus = "confirming";
 
             if (gmpData.callback) {
               const secondHopMessageId =
                 gmpData.callback.returnValues.messageId;
+
               const secondHopData = await ctx.services.gmp.searchGMP({
                 txHash: secondHopMessageId,
                 _source: SEARCHGMP_SOURCE,
@@ -76,8 +77,10 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
               callback?.returnValues.destinationChain?.toLowerCase() ||
               call.returnValues.destinationChain.toLowerCase();
 
+            const awaitedAcc = await acc;
+
             return {
-              ...acc,
+              ...awaitedAcc,
               [destinationChain]: {
                 status: chainType === "evm" ? firstHopStatus : secondHopStatus,
                 txHash: call.transactionHash,
@@ -86,17 +89,21 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
               },
             };
           },
-          {} as Promise<{
-            [chainId: string]: {
-              status: GMPTxStatus;
-              txHash: string;
-              txId: string;
-              logIndex: number;
-            };
-          }>
+          Promise.resolve(
+            {} as {
+              [chainId: string]: {
+                status: GMPTxStatus;
+                txHash: string;
+                txId: string;
+                logIndex: number;
+              };
+            }
+          )
         );
 
-        return await pendingResult;
+        const result = await pendingResult;
+
+        return result;
       }
 
       // If we don't find the transaction, we throw a 404 error
