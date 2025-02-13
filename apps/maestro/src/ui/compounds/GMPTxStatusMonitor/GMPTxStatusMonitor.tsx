@@ -51,42 +51,42 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
   });
 
   const isNonEvm = chainInfo?.id === "sui";
-     
+
   // Make sure this supports sui as well
   const { data: txInfo } = useTransaction({
     hash: txHash as `0x${string}`,
     chainId,
     query: {
       enabled: !isNonEvm,
-    }
+    },
   });
 
   const { data: currentBlockNumber } = useBlockNumber({
     chainId,
     watch: true,
     query: {
-      enabled: !isNonEvm && Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
+      enabled:
+        !isNonEvm &&
+        Boolean(chainInfo?.blockConfirmations && txInfo?.blockNumber),
     },
   });
 
-  const elapsedBlocks = useMemo(
-    () => {
-      return isNonEvm ? 1 : currentBlockNumber && txInfo?.blockNumber
+  const elapsedBlocks = useMemo(() => {
+    return isNonEvm
+      ? 1
+      : currentBlockNumber && txInfo?.blockNumber
         ? Number(currentBlockNumber - txInfo.blockNumber)
-        : 0
-      },
-    [currentBlockNumber, isNonEvm, txInfo?.blockNumber]
-  );
+        : 0;
+  }, [currentBlockNumber, isNonEvm, txInfo?.blockNumber]);
 
   const expectedConfirmations = useMemo(() => {
     return isNonEvm ? 1 : Number(chainInfo?.blockConfirmations ?? 1);
   }, [isNonEvm, chainInfo?.blockConfirmations]);
 
-
   const { progress, progressRatio } = useMemo(() => {
-   if (isNonEvm) {
+    if (isNonEvm) {
       return {
-        progress: '100%',
+        progress: "100%",
         progressRatio: 100,
       };
     }
@@ -200,6 +200,13 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
             const chain = combinedComputed.indexedById[axelarChainId];
+
+            // TODO: this usually happens when the axelarChainId is axelar, for 2-hops tx. 
+            // We should be either render the axelar chain info properly or make sure that axelarChainId is not axelar (intemediary chain)
+            if (!chain) {
+              console.log("chain not found", axelarChainId);
+              return undefined;
+            }
 
             return (
               <ChainStatusItem
