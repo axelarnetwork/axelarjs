@@ -34,8 +34,7 @@ export const getTransactionStatusesOnDestinationChains = publicProcedure
           const {
             call,
             status: firstHopStatus,
-            interchain_token_deployment_started: tokenDeployment,
-            interchain_transfer: tokenTransfer,
+            callback,
           } = gmpData;
 
           const chainType = gmpData.call.chain_type;
@@ -55,8 +54,7 @@ export const getTransactionStatusesOnDestinationChains = publicProcedure
           }
 
           const destinationChain =
-            tokenTransfer?.destinationChain?.toLowerCase() ||
-            tokenDeployment?.destinationChain?.toLowerCase() ||
+            callback?.returnValues.destinationChain?.toLowerCase() ||
             call.returnValues.destinationChain.toLowerCase();
 
           return {

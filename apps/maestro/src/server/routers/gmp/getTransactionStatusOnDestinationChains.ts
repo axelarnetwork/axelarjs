@@ -13,8 +13,6 @@ export const SEARCHGMP_SOURCE = {
     "confirm",
     "executed",
     "callback",
-    "interchain_token_deployment_started.destinationChain",
-    "interchain_transfer.destinationChain",
   ],
   excludes: [
     "call.transaction",
@@ -57,18 +55,14 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
       if (data.length) {
         const pendingResult = data.reduce(
           async (acc, gmpData) => {
-            const {
-              call,
-              status: firstHopStatus,
-              interchain_token_deployment_started: tokenDeployment,
-              interchain_transfer: tokenTransfer,
-            } = gmpData;
+            const { call, callback, status: firstHopStatus } = gmpData;
 
             const chainType = gmpData.call.chain_type;
-            let secondHopStatus = "pending"
+            let secondHopStatus = "pending";
 
             if (gmpData.callback) {
-              const secondHopMessageId = gmpData.callback.returnValues.messageId;
+              const secondHopMessageId =
+                gmpData.callback.returnValues.messageId;
               const secondHopData = await ctx.services.gmp.searchGMP({
                 txHash: secondHopMessageId,
                 _source: SEARCHGMP_SOURCE,
@@ -77,9 +71,9 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
               secondHopStatus = secondHopData[0].status;
             }
 
+            // For 2-hops transaction, the destination chain in callback is the final destination chain, which only exist after the transaction is already executed at the Axelar chain.
             const destinationChain =
-              tokenTransfer?.destinationChain?.toLowerCase() ||
-              tokenDeployment?.destinationChain?.toLowerCase() ||
+              callback?.returnValues.destinationChain?.toLowerCase() ||
               call.returnValues.destinationChain.toLowerCase();
 
             return {

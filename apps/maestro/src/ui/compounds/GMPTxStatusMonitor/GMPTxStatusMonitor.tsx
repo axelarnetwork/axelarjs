@@ -199,10 +199,19 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-            const chain = combinedComputed.indexedById[axelarChainId];
+            const chain =
+              axelarChainId !== "axelar"
+                ? combinedComputed.indexedById[axelarChainId]
+                : {
+                    // Workaround: When a 2-hop tx is submitted, the axelarChainId will be "axelar"
+                    // because no Axelar chain is configured in our API. Since we only use
+                    // id, name, and image, we can copy other properties from any other chain.
+                    ...combinedComputed.indexedByChainId[chainId],
+                    id: "axelar",
+                    name: "Axelar",
+                    image: "/logos/chains/axelar.svg",
+                  };
 
-            // TODO: this usually happens when the axelarChainId is axelar, for 2-hops tx. 
-            // We should be either render the axelar chain info properly or make sure that axelarChainId is not axelar (intemediary chain)
             if (!chain) {
               console.log("chain not found", axelarChainId);
               return undefined;
