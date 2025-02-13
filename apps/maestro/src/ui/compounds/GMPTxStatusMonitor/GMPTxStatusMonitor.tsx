@@ -299,7 +299,7 @@ export const CollapsedChainStatusGroup: FC<ChainStatusItemsProps> = ({
               $position="left"
             >
               <Link
-                href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}:${logIndexes[i]}`}
+                href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/${txHash}-${logIndexes[i]}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
