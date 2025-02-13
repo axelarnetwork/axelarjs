@@ -9,9 +9,10 @@ import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
+import { VM_CHAIN_CONFIGS } from "~/config/vm-chains";
 
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
-const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
+const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), VM_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
   const {
@@ -19,11 +20,13 @@ export function useAllChainConfigsQuery() {
     data: evmChains,
     ...evmChainsQuery
   } = useEVMChainConfigsQuery();
+
   const {
     computed: vmComputed,
     data: vmChains,
     ...vmChainsQuery
   } = useVMChainConfigsQuery();
+
   const combinedComputed = useMemo(
     () => ({
       indexedById: {
@@ -76,96 +79,96 @@ export function useAllChainConfigsQuery() {
   };
 }
 
-const suiChainMockData =
-  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-    ? {
-        id: "sui",
-        chain_id: 101,
-        chain_name: "sui",
-        maintainer_id: "sui",
-        name: "Sui",
-        image: "/logos/chains/sui.svg",
-        color: "#6fbcf0",
-        chain_type: "sui",
-        no_inflation: false,
-        no_tvl: true,
-        deprecated: false,
-        endpoints: {
-          rpc: ["https://sui-rpc.publicnode.com"],
-        },
-        native_token: {
-          name: "SUI",
-          symbol: "SUI",
-          decimals: 9,
-        },
-        explorer: {
-          name: "Sui Explorer",
-          url: "https://suiexplorer.com/",
-          icon: "/logos/explorers/suiexplorer.png",
-          block_path: "/block/{block}",
-          address_path: "/address/{address}",
-          contract_path: "/object/{address}",
-          contract_0_path: "/object/{address}",
-          transaction_path: "/txblock/{tx}",
-        },
-        provider_params: [
-          {
-            chainId: "0x65",
-            chainName: "Sui Mainnet",
-            rpcUrls: ["https://sui-rpc.publicnode.com"],
-            nativeCurrency: {
-              name: "SUI",
-              symbol: "SUI",
-              decimals: 9,
-            },
-            blockExplorerUrls: ["https://suiexplorer.com/"],
-          },
-        ],
-      }
-    : {
-        id: "sui",
-        chain_id: 103,
-        chain_name: "sui",
-        maintainer_id: "sui",
-        name: "Sui Testnet",
-        image: "/logos/chains/sui.svg",
-        color: "#6fbcf0",
-        chain_type: "sui",
-        no_inflation: false,
-        no_tvl: true,
-        deprecated: false,
-        endpoints: {
-          rpc: ["https://fullnode.testnet.sui.io:443"],
-        },
-        native_token: {
-          name: "SUI",
-          symbol: "SUI",
-          decimals: 9,
-        },
-        explorer: {
-          name: "Sui Explorer",
-          url: "https://suiscan.xyz/testnet",
-          icon: "/logos/explorers/sui.png",
-          block_path: "/block/{block}",
-          address_path: "/address/{address}",
-          contract_path: "/object/{address}",
-          contract_0_path: "/object/{address}",
-          transaction_path: "/txblock/{tx}",
-        },
-        provider_params: [
-          {
-            chainId: "0x67", // Hexadecimal representation of 103
-            chainName: "Sui Testnet",
-            rpcUrls: ["https://fullnode.testnet.sui.io:443"],
-            nativeCurrency: {
-              name: "SUI",
-              symbol: "SUI",
-              decimals: 9,
-            },
-            blockExplorerUrls: ["https://suiscan.xyz/testnet"],
-          },
-        ],
-      };
+// const suiChainMockData =
+//   NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+//     ? {
+//         id: "sui",
+//         chain_id: 101,
+//         chain_name: "sui",
+//         maintainer_id: "sui",
+//         name: "Sui",
+//         image: "/logos/chains/sui.svg",
+//         color: "#6fbcf0",
+//         chain_type: "sui",
+//         no_inflation: false,
+//         no_tvl: true,
+//         deprecated: false,
+//         endpoints: {
+//           rpc: ["https://sui-rpc.publicnode.com"],
+//         },
+//         native_token: {
+//           name: "SUI",
+//           symbol: "SUI",
+//           decimals: 9,
+//         },
+//         explorer: {
+//           name: "Sui Explorer",
+//           url: "https://suiexplorer.com/",
+//           icon: "/logos/explorers/suiexplorer.png",
+//           block_path: "/block/{block}",
+//           address_path: "/address/{address}",
+//           contract_path: "/object/{address}",
+//           contract_0_path: "/object/{address}",
+//           transaction_path: "/txblock/{tx}",
+//         },
+//         provider_params: [
+//           {
+//             chainId: "0x65",
+//             chainName: "Sui Mainnet",
+//             rpcUrls: ["https://sui-rpc.publicnode.com"],
+//             nativeCurrency: {
+//               name: "SUI",
+//               symbol: "SUI",
+//               decimals: 9,
+//             },
+//             blockExplorerUrls: ["https://suiexplorer.com/"],
+//           },
+//         ],
+//       }
+//     : {
+//         id: "sui",
+//         chain_id: 103,
+//         chain_name: "sui",
+//         maintainer_id: "sui",
+//         name: "Sui Testnet",
+//         image: "/logos/chains/sui.svg",
+//         color: "#6fbcf0",
+//         chain_type: "sui",
+//         no_inflation: false,
+//         no_tvl: true,
+//         deprecated: false,
+//         endpoints: {
+//           rpc: ["https://fullnode.testnet.sui.io:443"],
+//         },
+//         native_token: {
+//           name: "SUI",
+//           symbol: "SUI",
+//           decimals: 9,
+//         },
+//         explorer: {
+//           name: "Sui Explorer",
+//           url: "https://suiscan.xyz/testnet",
+//           icon: "/logos/explorers/sui.png",
+//           block_path: "/block/{block}",
+//           address_path: "/address/{address}",
+//           contract_path: "/object/{address}",
+//           contract_0_path: "/object/{address}",
+//           transaction_path: "/txblock/{tx}",
+//         },
+//         provider_params: [
+//           {
+//             chainId: "0x67", // Hexadecimal representation of 103
+//             chainName: "Sui Testnet",
+//             rpcUrls: ["https://fullnode.testnet.sui.io:443"],
+//             nativeCurrency: {
+//               name: "SUI",
+//               symbol: "SUI",
+//               decimals: 9,
+//             },
+//             blockExplorerUrls: ["https://suiscan.xyz/testnet"],
+//           },
+//         ],
+//       };
 
 export function useEVMChainConfigsQuery() {
   const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<
@@ -206,13 +209,10 @@ export function useEVMChainConfigsQuery() {
   return {
     ...queryResult,
     // TODO: remove this once we have the sui chain data
-    data: [...configured, suiChainMockData],
+    data: configured,
     computed: {
-      indexedByChainId: indexBy(prop("chain_id"), [
-        ...configured,
-        suiChainMockData,
-      ]),
-      indexedById: indexBy(prop("id"), [...configured, suiChainMockData]),
+      indexedByChainId: indexBy(prop("chain_id"), configured),
+      indexedById: indexBy(prop("id"), configured),
       wagmiChains,
     },
   };
@@ -226,9 +226,17 @@ export function useVMChainConfigsQuery() {
     refetchOnWindowFocus: false,
   });
 
+  for (const chain of data ?? []) {
+    if(chain.id === 'sui') {
+      chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
+    }
+  }
+
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.chain_id in VM_CHAIN_CONFIGS_BY_ID, data ?? []),
+    () => {
+      return partition((x) => x.id in VM_CHAIN_CONFIGS_BY_ID || x.chain_id in EVM_CHAIN_CONFIGS_BY_ID, data ?? [])
+    },
     [data]
   );
 
@@ -249,7 +257,7 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const wagmiChains = configured.map((x) => VM_CHAIN_CONFIGS_BY_ID[x.chain_id]);
+  const wagmiChains = configured.map((x) => EVM_CHAIN_CONFIGS_BY_ID[x.chain_id]).filter(chain => chain);
 
   return {
     ...queryResult,
