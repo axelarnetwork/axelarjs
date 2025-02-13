@@ -50,7 +50,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
   });
 
   const networkEnv =
-    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : "testnet";
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" :  NEXT_PUBLIC_NETWORK_ENV === "testnet" ? "testnet" : "devnet-amplifier";
 
   const axelarQueryClient = createAxelarQueryClient(networkEnv);
   const axelarConfigClient = createAxelarConfigClient(networkEnv);
