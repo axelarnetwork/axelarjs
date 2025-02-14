@@ -4,7 +4,6 @@ import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
@@ -39,8 +38,6 @@ export const getRecentTransactions = publicProcedure
     try {
       const response = await ctx.services.gmp.searchGMP({
         senderAddress: input.senderAddress,
-        destinationContractAddress:
-          NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         size: input.pageSize,
         from: input.page * input.pageSize,
         contractMethod: input.contractMethod,
