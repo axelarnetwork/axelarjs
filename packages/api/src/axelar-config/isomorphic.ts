@@ -1,4 +1,4 @@
-import type { Environment } from "@axelarjs/core";
+import { type Environment } from "@axelarjs/core";
 
 import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type { AxelarConfigsResponse } from "./types";
@@ -11,29 +11,17 @@ export class AxelarConfigClient extends RestService {
     });
   }
 
-  private normalizeEnvironment(env: Environment) {
-    return env === 'devnet-amplifier' ? 'testnet' : env;
-  }
-
   async getAxelarConfigs(env: Environment) {
-    const _env = this.normalizeEnvironment(env);
-
     return this.client
-      .get(`configs/${_env}-config-1.x.json`)
+      .get(`configs/${env}-config-1.x.json`)
       .json<AxelarConfigsResponse>();
   }
 
   async getAxelarAssetConfigs(env: Environment) {
-    const _env = this.normalizeEnvironment(env);
-
-    return this.client.get(`/${_env}-asset-config.json`).json();
+    return this.client.get(`/${env}-asset-config.json`).json();
   }
 
   async getAxelarChainConfigs(env: Environment) {
-    if(env === 'devnet-amplifier') {
-      return this.client.get("").json();
-    }
-
     return this.client.get(`/${env}-chain-config.json`).json();
   }
 }
