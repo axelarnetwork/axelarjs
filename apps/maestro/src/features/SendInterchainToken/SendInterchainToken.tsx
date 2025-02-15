@@ -431,7 +431,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               additionalChainNames={[state.selectedToChain.id]}
               originChainName={props.sourceChain.chain_name}
               tokenName={state.tokenSymbol ?? ""}
-              originAxelarChainId={props.sourceChain.chain_name}
+              originAxelarChainId={props.sourceChain.id}
               tokenAddress={props.tokenAddress}
               haikuType="send"
             />
