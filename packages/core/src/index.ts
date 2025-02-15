@@ -38,7 +38,7 @@ export const GMP_API_URLS = {
 export type GMPAPIUrl = keyof typeof GMP_API_URLS;
 
 export const AXELAR_CONFIG_API_URLS = {
-  ['devnet-amplifier']: 'https://static.npty.online/files/axelar',
+  ['devnet-amplifier']: 'https://static.npty.online/axelar',
   testnet: "https://axelar-testnet.s3.us-east-2.amazonaws.com",
   mainnet: "https://axelar-mainnet.s3.us-east-2.amazonaws.com",
 } as const;
