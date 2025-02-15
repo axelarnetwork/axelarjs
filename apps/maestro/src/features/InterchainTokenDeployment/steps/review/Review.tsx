@@ -68,7 +68,7 @@ const Review: FC = () => {
       actions.reset();
 
       await router.push(
-        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
+        `/${chainConfig.id.toLowerCase()}/${state.txState.tokenAddress}`
       );
     }
   }, [actions, chainConfig, router, state.txState]);
