@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@axelarjs/ui";
 import { Toaster } from "@axelarjs/ui/toaster";
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
