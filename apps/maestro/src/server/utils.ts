@@ -152,7 +152,7 @@ export async function axelarConfigs<TCacheKey extends string>(
   }
 
   const chainConfigs = await axelarConfigClient.getAxelarConfigs(
-    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : "testnet"
+    NEXT_PUBLIC_NETWORK_ENV
   );
 
   // cache for 1 hour
