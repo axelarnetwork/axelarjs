@@ -1,9 +1,13 @@
-import { ITSChainConfig } from "@axelarjs/api";
-import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env";
-import type {
-  EVMChainConfig,
-  VMChainConfig,
+import {
+  ITSChainConfig,
+  type EVMChainConfig,
+  type VMChainConfig,
 } from "@axelarjs/api";
+
+import {
+  NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM,
+  NEXT_PUBLIC_WHITELISTED_VM_CHAINS,
+} from "~/config/env";
 
 type ChainConfig = EVMChainConfig | VMChainConfig;
 
@@ -12,32 +16,65 @@ type ChainConfigIndex = {
   indexedByChainId: Record<number, ChainConfig>;
 };
 
+/**
+ * Filters out destination chains that are not eligible for the current chain vm chain.
+ * Currently, only VM chains are eligible for the current chain type.
+ * @param destinationChains - The list of chains to filter.
+ * @param currentChainId - The ID of the current chain.
+ * @returns A filtered list of chains.
+ */
 export const filterEligibleChains = (
-  chains: ITSChainConfig[],
-  currentChainId: number,
+  destinationChains: ITSChainConfig[],
+  currentChainId: number
 ): ITSChainConfig[] => {
   // Early return if no chains to filter
-  if (!chains.length) return [];
+  if (!destinationChains.length) return [];
 
-  const currentChain = chains.find((chain) => chain.chain_id === currentChainId);
-  const isCurrentChainVM = currentChain?.chain_type === 'vm';
+  const currentChain = destinationChains.find(
+    (chain) => chain.chain_id === currentChainId
+  );
+  const isCurrentChainVM = currentChain?.chain_type === "vm";
 
-  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(',').map(chain => chain.trim());
+  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(
+    ","
+  ).map((chain) => chain.trim());
 
   // Normalize whitelist check
-  const isAllChainsWhitelisted = whitelistedChains[0] === 'all';
+  const isAllChainsWhitelisted = whitelistedChains[0] === "all";
 
-  return chains.filter((chain) => {
+  return destinationChains.filter((chain) => {
     // Always filter out current chain
     if (chain.chain_id === currentChainId) return false;
 
     // For EVM chains, check whitelist
-    if (isCurrentChainVM && chain.chain_type === 'evm') {
+    if (isCurrentChainVM && chain.chain_type === "evm") {
       return isAllChainsWhitelisted || whitelistedChains.includes(chain.id);
     }
 
     // Non-EVM chains are always included
     return true;
+  });
+};
+
+export const filterEligibleVMChains = (
+  vmChains: VMChainConfig[],
+  currentChainId: number
+): VMChainConfig[] => {
+  // Early return if no chains to filter
+  if (!vmChains.length) return [];
+
+  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_VM_CHAINS.split(",").map(
+    (chain) => chain.trim()
+  );
+
+  const isAllChainsWhitelisted = whitelistedChains[0] === "all";
+
+  return vmChains.filter((chain) => {
+    // Always filter out current chain
+    if (chain.chain_id === currentChainId) return false;
+
+    // For EVM chains, check whitelist
+    return isAllChainsWhitelisted || whitelistedChains.includes(chain.id);
   });
 };
 
@@ -66,4 +103,3 @@ export function getNormalizedTwoHopChainConfig(
     image: "/logos/chains/axelar.svg",
   };
 }
-

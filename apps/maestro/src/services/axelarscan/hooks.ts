@@ -9,8 +9,10 @@ import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
+import { VM_CHAIN_CONFIGS } from "~/config/vm-chains";
 
 const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
+const VM_CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("axelarChainId"), VM_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
   const {
@@ -143,7 +145,7 @@ export function useVMChainConfigsQuery() {
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
     () => {
-      return partition((x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID || x.chain_type === 'vm' , data ?? [])
+      return partition((x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID || x.id in VM_CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? [])
     },
     [data]
   );
