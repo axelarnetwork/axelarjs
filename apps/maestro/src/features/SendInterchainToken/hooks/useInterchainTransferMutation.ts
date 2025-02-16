@@ -94,7 +94,6 @@ export function useInterchainTransferMutation(
           });
           txHash = await signAndExecuteTransaction({
             transaction: sendTokenTxJSON,
-            chain: "sui:testnet", //TODO: make this dynamic
           });
         } else {
           const recipient = (destinationAddress ?? address) as `0x${string}`;

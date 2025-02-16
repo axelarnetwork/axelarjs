@@ -112,7 +112,6 @@ export default function useTokenDeploy() {
       const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
         transaction: await deployTokenTx.toJSON(),
-        chain: "sui:testnet",
       });
 
       if (!deployTokenResult?.objectChanges) {
@@ -149,7 +148,6 @@ export default function useTokenDeploy() {
         });
         await signAndExecuteTransaction({
           transaction: mintTxJSON,
-          chain: "sui:testnet", //TODO: make this dynamic
         });
       }
 
@@ -169,7 +167,6 @@ export default function useTokenDeploy() {
 
       const sendTokenResult = await signAndExecuteTransaction({
         transaction: sendTokenTxJSON,
-        chain: "sui:testnet", //TODO: make this dynamic
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
