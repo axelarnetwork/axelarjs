@@ -189,6 +189,7 @@ export const Step2: FC = () => {
 
   const balance = useBalance();
 
+  // TODO: Fetch it from the axelarscan chains API
   const nativeTokenSymbol = state.sourceChainId
     ? getNativeToken(state.sourceChainId)
     : undefined;

@@ -1,13 +1,13 @@
 import type { IERC20BurnableMintableClient } from "@axelarjs/evm";
 import { invariant } from "@axelarjs/utils";
 
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
 import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
 import { publicProcedure } from "~/server/trpc";
+import { suiClient as client } from "../sui";
 
 //TODO: migrate to kv store?
 const overrides: Record<string, Record<string, string>> = {
@@ -17,8 +17,6 @@ const overrides: Record<string, Record<string, string>> = {
 };
 
 async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
-
   const modules = await client.getNormalizedMoveModulesByPackage({
     package: tokenAddress,
   });

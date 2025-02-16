@@ -7,12 +7,13 @@ import { SuiClient } from "@mysten/sui/client";
 import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
-import config from "./config/devnet-amplifier.json";
+import { SUI_RPC_URLS } from '@axelarjs/core'
 import { buildTx, suiServiceBaseUrl } from "./utils/utils";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 
 // Initialize SuiClient directly with RPC from config
-const suiClient = new SuiClient({
-  url: config["sui"].rpc,
+export const suiClient = new SuiClient({
+  url: SUI_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV],
 });
 
 export const suiRouter = router({

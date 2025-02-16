@@ -1,18 +1,14 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import {
-  getFullnodeUrl,
   SuiClient,
   SuiObjectChange,
   type DynamicFieldInfo,
   type DynamicFieldPage,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
+import { suiClient as client } from "../";
 
-import config from "../config/devnet-amplifier.json";
-
-export const suiServiceBaseUrl =
-  "https://melted-fayth-nptytn-57e5d396.koyeb.app";
-
+export const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
   return objectChanges.find((change) => change.type === "published");
 };
@@ -50,7 +46,6 @@ export async function buildTx(walletAddress: string, txBuilder: TxBuilder) {
 
 // get coin type from token address
 export const getCoinType = async (tokenAddress: string) => {
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
   const modules = await client.getNormalizedMoveModulesByPackage({
     package: tokenAddress,
   });
@@ -61,7 +56,6 @@ export const getCoinType = async (tokenAddress: string) => {
 
 // get token owner from token address
 export const getTokenOwner = async (tokenAddress: string) => {
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
   const object = await client.getObject({
     id: tokenAddress,
     options: {
@@ -88,14 +82,11 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
 }) => {
   try {
-    const suiClient = new SuiClient({
-      url: config["sui"].rpc,
-    });
     const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
     const _chainConfig = await response.json();
     const chainConfig = _chainConfig.chains.sui;
 
-    const registeredCoinsObject = await suiClient.getObject({
+    const registeredCoinsObject = await client.getObject({
       id: chainConfig.contracts.ITS.objects.ITSv0,
       options: {
         showStorageRebate: true,

@@ -23,6 +23,7 @@ export const getNativeToken = memoize((axelarChainId: string) => {
     return NATIVE_TOKEN_OVERRIDES[axelarChainId];
   }
 
+  // TODO: Wagmi chains are only supported for EVM chains. We should have a dynamic way to get the native token symbol
   const chainConfig = WAGMI_CHAIN_CONFIGS.find(
     (chain) => chain.axelarChainId.toLowerCase() === axelarChainId.toLowerCase()
   );

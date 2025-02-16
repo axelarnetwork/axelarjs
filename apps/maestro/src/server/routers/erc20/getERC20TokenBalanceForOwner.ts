@@ -1,9 +1,9 @@
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
+import { suiClient as client } from "../sui";
 import { getCoinType, getTokenOwner } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
@@ -40,8 +40,6 @@ export const getERC20TokenBalanceForOwner = publicProcedure
     // Sui address length is 66
     if (input.tokenAddress?.length === 66) {
       let isTokenOwner = false;
-
-      const client = new SuiClient({ url: getFullnodeUrl("testnet") }); // TODO: make this configurable
 
       const coinType = await getCoinType(input.tokenAddress);
       // Get the coin balance

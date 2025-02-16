@@ -4,7 +4,6 @@ import {
   type Environment,
 } from "@axelar-network/axelarjs-sdk";
 
-import { getNativeToken } from "~/lib/utils/getNativeToken";
 import type {
   EstimateGasFeeInput,
   EstimateGasFeeMultipleChainsInput,
@@ -44,7 +43,6 @@ async function estimateGasFeeMultipleChains(
       estimateGasFee({
         ...params,
         destinationChainId,
-        sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
       })
         .then((fee) => ({
           status: "success" as const,
@@ -70,6 +68,7 @@ async function estimateGasFeeMultipleChains(
   };
 }
 
+// TODO: Find out why do we need chain configs from axelarjs-sdk while we already have them in axelarscan API
 async function getChainInfo(params: GetChainInfoInput) {
   const chains = await getChainConfigs({
     environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,

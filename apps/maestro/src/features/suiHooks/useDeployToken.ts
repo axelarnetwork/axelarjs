@@ -1,13 +1,12 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import {
-  getFullnodeUrl,
-  SuiClient,
   SuiObjectChange,
   type SuiTransactionBlockResponse,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex } from "@mysten/sui/utils";
 
+import { suiClient as client } from "~/server/routers/sui";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
@@ -52,7 +51,6 @@ const findObjectByType = (
 
 export default function useTokenDeploy() {
   const currentAccount = useAccount();
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") });
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
       execute: async ({ bytes, signature }) => {

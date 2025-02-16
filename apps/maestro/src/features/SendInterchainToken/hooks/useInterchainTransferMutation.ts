@@ -2,13 +2,13 @@ import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
+import { suiClient as client } from "~/server/routers/sui";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getCoinType } from "~/server/routers/sui/utils/utils";
@@ -48,7 +48,6 @@ export function useInterchainTransferMutation(
     },
   });
 
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") });
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
