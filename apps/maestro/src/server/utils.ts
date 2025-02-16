@@ -44,7 +44,7 @@ export async function vmChains<TCacheKey extends string>(
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
 
-  // Add flow config to the list of eligible chains
+  // Add evm-compatible chains to the list of eligible chains
   const vmChainsMap = chainConfigs.vm.reduce(
     (acc, chain) => {
       const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
