@@ -37,11 +37,12 @@ import ConnectWalletModal from "../ConnectWalletModal/ConnectWalletModal";
 
 type ButtonProps = ComponentProps<typeof Button>;
 
-const ModalFormInputBase: FC<ComponentProps<typeof TextInput>> = (props) => (
-   <TextInput {...props} $bordered={props["$bordered"] ?? true} />
-);
+export const ModalFormInput = tw(TextInput)`bg-base-200`;
 
-export const ModalFormInput = tw(ModalFormInputBase)`bg-base-200`;
+ModalFormInput.defaultProps = {
+  $bordered: true,
+};
+
 
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
   return (
