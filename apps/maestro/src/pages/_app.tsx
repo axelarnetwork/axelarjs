@@ -28,6 +28,7 @@ import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
 
 import "@tanstack/react-query";
+import { SUI_RPC_URLS } from "@axelarjs/core";
 
 // Dynamically import WalletProvider with ssr disabled
 const WalletProviderClient = dynamic(
@@ -42,8 +43,8 @@ const WalletProviderClient = dynamic(
 const networks = {
   localnet: { url: getFullnodeUrl("localnet") },
   devnet: { url: getFullnodeUrl("devnet") },
-  testnet: { url: getFullnodeUrl("testnet") },
-  mainnet: { url: getFullnodeUrl("mainnet") },
+  testnet: { url: SUI_RPC_URLS.testnet },
+  mainnet: { url: SUI_RPC_URLS.mainnet },
 };
 
 const fontSans = Cabin({ subsets: ["latin"] });
