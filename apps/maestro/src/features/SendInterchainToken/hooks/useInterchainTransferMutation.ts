@@ -93,9 +93,10 @@ export function useInterchainTransferMutation(
             gas: config.gas.toString() ?? "0",
             coinType: coinType,
           });
-          txHash = await signAndExecuteTransaction({
+          const receipt = await signAndExecuteTransaction({
             transaction: sendTokenTxJSON,
           });
+          txHash = receipt.digest;
         } else {
           const recipient = (destinationAddress ?? address) as `0x${string}`;
           txHash = await transferAsync({
