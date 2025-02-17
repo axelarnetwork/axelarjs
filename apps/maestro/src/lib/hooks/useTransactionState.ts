@@ -9,6 +9,7 @@ export type UnsubmittedTransactionState =
   | { status: "awaiting_approval" };
 
 export type TxType = "INTERCHAIN_DEPLOYMENT" | "INTERCHAIN_TRANSFER";
+// TODO: is suiTx type needed? The object is quite large and it's being recorded to the session storage.
 export type SubmittedTransactionState<TError = Error> =
   | {
       status: "submitted";
