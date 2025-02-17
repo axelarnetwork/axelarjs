@@ -93,12 +93,12 @@ export function useSendInterchainTokenState(props: {
   const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(
-    props.sourceChain.chain_name.toLowerCase()
+    props.sourceChain.id.toLowerCase()
   );
 
   const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: props.sourceChain.chain_name,
-    destinationChainId: selectedToChain?.chain_name,
+    sourceChainId: props.sourceChain.id,
+    destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
     gasMultiplier: "auto",
     gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,

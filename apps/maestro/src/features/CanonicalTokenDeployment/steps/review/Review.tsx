@@ -66,7 +66,7 @@ const Review: FC = () => {
     if (chainConfig && state.txState.type === "deployed") {
       actions.reset();
       await router.push(
-        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
+        `/${chainConfig.id.toLowerCase()}/${state.txState.tokenAddress}`
       );
     }
   }, [actions, chainConfig, router, state.txState]);

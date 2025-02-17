@@ -36,7 +36,7 @@ export default function useRegisterRemoteInterchainTokens(
   );
 
   const destinationChainIds = destinationChains.map(
-    (chain) => chain.chain_name
+    (chain) => chain.id
   );
 
   const sourceChain = useMemo(

@@ -171,6 +171,8 @@ async function getInterchainToken(
 
         invariant(chainConfig, "Chain config not found");
 
+
+        // TODO: handle if the chain does not support evm query
         const itsClient =
           ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 

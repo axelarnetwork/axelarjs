@@ -60,9 +60,9 @@ export function useStep3ChainSelectionState() {
   };
 
   useEffect(() => {
-    if (!currentChain || currentChain.chain_name === sourceChainId) return;
+    if (!currentChain || currentChain.id === sourceChainId) return;
 
-    setSourceChainId(currentChain.chain_name);
+    setSourceChainId(currentChain.id);
   }, [currentChain, chainId, sourceChainId]);
 
   return {

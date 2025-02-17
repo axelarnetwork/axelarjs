@@ -1,11 +1,12 @@
 import { ThemeProvider } from "@axelarjs/ui";
 import { Toaster } from "@axelarjs/ui/toaster";
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { Cabin } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
+import dynamic from 'next/dynamic';
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -16,7 +17,7 @@ import "@mysten/dapp-kit/dist/index.css";
 import "~/lib/polyfills";
 import "~/styles/globals.css";
 
-import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
+import { SuiClientProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
@@ -28,7 +29,15 @@ import NProgressBar from "~/ui/layouts/NProgressBar";
 
 import "@tanstack/react-query";
 
-// type NetworkEnv = "mainnet" | "testnet" | "devnet" | "localnet";
+// Dynamically import WalletProvider with ssr disabled
+const WalletProviderClient = dynamic(
+  () => import('@mysten/dapp-kit').then(mod => ({ 
+    default: ({ children }: { children: React.ReactNode }) => (
+      <mod.WalletProvider autoConnect>{children}</mod.WalletProvider>
+    )
+  })),
+  { ssr: false }
+);
 
 const networks = {
   localnet: { url: getFullnodeUrl("localnet") },
@@ -75,12 +84,7 @@ const clashGrotesk = localFont({
 });
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
-  // indicate whether the app is rendered on the server
-  const [isSSR, setIsSSR] = useState(true);
   const [queryClient] = useState(() => wagmiQueryClient);
-
-  // set isSSR to false on the first client-side render
-  useEffect(() => setIsSSR(false), []);
 
   return (
     <>
@@ -109,15 +113,13 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                     : "testnet"
                 }
               >
-                <WalletProvider autoConnect>
-                  {!isSSR && (
-                    <MainLayout>
-                      <Component {...pageProps} />
-                    </MainLayout>
-                  )}
+                <WalletProviderClient>
+                  <MainLayout>
+                    <Component {...pageProps} />
+                  </MainLayout>
                   <ReactQueryDevtools />
                   <Toaster />
-                </WalletProvider>
+                </WalletProviderClient>
               </SuiClientProvider>
             </WagmiConfigPropvider>
           </ThemeProvider>
