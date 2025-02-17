@@ -97,7 +97,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
       ?.fields?.value?.fields.registered_coins.fields.id.id as string;
 
     const filteredResult = await findInPaginatedDynamicFields(
-      suiClient,
+      client,
       registeredCoinsBagId,
       (item: any) =>
         item.name.value.id.toString().toLowerCase() ===
