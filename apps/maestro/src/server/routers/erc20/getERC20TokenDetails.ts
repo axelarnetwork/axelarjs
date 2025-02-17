@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
+import { ExtendedWagmiChainConfig } from "~/config/chains";
 import { publicProcedure } from "~/server/trpc";
 import { suiClient as client } from "~/lib/clients/suiClient";
 
