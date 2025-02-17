@@ -211,7 +211,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         logger.error("Failed to track transaction", error);
       });
     }
-  }, [actions, suiTxDigest, state.txState.status, address]);
+  }, [actions, suiTxDigest, state.txState.status, address, handleSuiTransactionComplete, sui.txState.suiTx]);
 
   const handleAllChainsExecuted = useCallback(async () => {
     await actions.refetchBalances();
