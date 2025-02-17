@@ -1,6 +1,6 @@
 import { SUI_RPC_URLS } from "@axelarjs/core";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
+import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
 import { ExtendedWagmiChainConfig } from "./evm-chains";
 
 const ENVIRONMENTS = {

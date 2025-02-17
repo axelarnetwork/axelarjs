@@ -46,7 +46,7 @@ import {
   sepolia,
 } from "viem/chains";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
+import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
 
 export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
@@ -396,6 +396,6 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
 ] as const;
 
-export const WAGMI_CHAIN_CONFIGS = EVM_CHAINS.filter(
+export const EVM_CHAIN_CONFIGS = EVM_CHAINS.filter(
   (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
 ) as [ExtendedWagmiChainConfig, ...ExtendedWagmiChainConfig[]];
