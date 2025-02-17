@@ -6,8 +6,7 @@ import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { EVM_CHAINS } from "~/config/evm-chains";
-import { VM_CHAINS } from "~/config/vm-chains";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
 import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
@@ -141,7 +140,7 @@ const Page: FC<Props> = ({
           children
         );
       case "unsupported-network": {
-        const selectedChain = EVM_CHAINS.find((t) => t.id === chain?.id) || VM_CHAINS.find((t) => t.id === chain?.id);
+        const selectedChain = CHAIN_CONFIGS.find((t) => t.id === chain?.id);
         return (
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">

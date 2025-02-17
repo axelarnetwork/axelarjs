@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useRouter } from "next/router";
 
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS } from "~/config/chains";
 
 export function useChainFromRoute() {
   const { chainName } = useRouter().query;
@@ -9,7 +9,7 @@ export function useChainFromRoute() {
   // get default chain from url
   return useMemo(() => {
     if (typeof chainName === "string") {
-      return WAGMI_CHAIN_CONFIGS.find(
+      return CHAIN_CONFIGS.find(
         (chain) =>
           chain.axelarChainName === chainName ||
           chain.axelarChainId === chainName
