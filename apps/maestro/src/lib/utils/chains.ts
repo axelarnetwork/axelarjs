@@ -6,7 +6,6 @@ import {
 
 import {
   NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM,
-  NEXT_PUBLIC_WHITELISTED_VM_CHAINS,
 } from "~/config/env";
 
 type ChainConfig = EVMChainConfig | VMChainConfig;
@@ -53,28 +52,6 @@ export const filterEligibleChains = (
 
     // Non-EVM chains are always included
     return true;
-  });
-};
-
-export const filterEligibleVMChains = (
-  vmChains: VMChainConfig[],
-  currentChainId: number
-): VMChainConfig[] => {
-  // Early return if no chains to filter
-  if (!vmChains.length) return [];
-
-  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_VM_CHAINS.split(",").map(
-    (chain) => chain.trim()
-  );
-
-  const isAllChainsWhitelisted = whitelistedChains[0] === "all";
-
-  return vmChains.filter((chain) => {
-    // Always filter out current chain
-    if (chain.chain_id === currentChainId) return false;
-
-    // For EVM chains, check whitelist
-    return isAllChainsWhitelisted || whitelistedChains.includes(chain.id);
   });
 };
 
