@@ -222,7 +222,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
       await handleSuiTransactionComplete(state.txState.suiTx);
     }
 
-    if (suiTxDigest && state.txState.status === "submitted") {
+    if (state.txState.status === "submitted") {
       trackTransaction().catch((error) => {
         logger.error("Failed to track transaction", error);
       });
@@ -230,7 +230,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [
     actions,
     suiTxDigest,
-    state.txState.status,
+    state.txState,
     address,
     handleSuiTransactionComplete,
   ]);
