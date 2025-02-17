@@ -6,7 +6,7 @@ import {
   type DynamicFieldPage,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
-import { suiClient as client } from "../";
+import { suiClient as client } from "~/lib/clients/suiClient";
 
 export const suiServiceBaseUrl = "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {

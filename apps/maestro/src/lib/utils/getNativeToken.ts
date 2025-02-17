@@ -1,6 +1,7 @@
 import { memoize } from "@axelarjs/utils";
 
 import { WAGMI_CHAIN_CONFIGS } from "~/config/evm-chains";
+import { VM_CHAIN_CONFIGS } from "~/config/vm-chains";
 
 /**
  * Overrides for native tokens that have a symbol mismatch with the gas estimation API
@@ -23,8 +24,7 @@ export const getNativeToken = memoize((axelarChainId: string) => {
     return NATIVE_TOKEN_OVERRIDES[axelarChainId];
   }
 
-  // TODO: Wagmi chains are only supported for EVM chains. We should have a dynamic way to get the native token symbol
-  const chainConfig = WAGMI_CHAIN_CONFIGS.find(
+  const chainConfig = [...WAGMI_CHAIN_CONFIGS, ...VM_CHAIN_CONFIGS].find(
     (chain) => chain.axelarChainId.toLowerCase() === axelarChainId.toLowerCase()
   );
 

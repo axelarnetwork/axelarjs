@@ -7,7 +7,7 @@ import { z } from "zod";
 
 import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
 import { publicProcedure } from "~/server/trpc";
-import { suiClient as client } from "../sui";
+import { suiClient as client } from "~/lib/clients/suiClient";
 
 //TODO: migrate to kv store?
 const overrides: Record<string, Record<string, string>> = {

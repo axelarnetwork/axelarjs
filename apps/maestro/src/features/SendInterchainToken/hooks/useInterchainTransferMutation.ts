@@ -8,7 +8,8 @@ import { parseUnits, TransactionExecutionError } from "viem";
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
-import { suiClient as client } from "~/server/routers/sui";
+import { suiClient as client } from "~/lib/clients/suiClient";
+
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getCoinType } from "~/server/routers/sui/utils/utils";

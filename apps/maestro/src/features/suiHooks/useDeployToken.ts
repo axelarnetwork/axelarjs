@@ -6,7 +6,7 @@ import {
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex } from "@mysten/sui/utils";
 
-import { suiClient as client } from "~/server/routers/sui";
+import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 

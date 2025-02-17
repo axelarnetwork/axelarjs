@@ -2,8 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
+import { suiClient as client } from "~/lib/clients/suiClient";
 import { publicProcedure } from "~/server/trpc";
-import { suiClient as client } from "../sui";
 import { getCoinType, getTokenOwner } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
