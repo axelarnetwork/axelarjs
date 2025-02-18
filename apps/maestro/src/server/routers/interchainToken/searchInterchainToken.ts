@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { partition, pluck, propEq } from "rambda";
 import { z } from "zod";
 
-import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
+import type { ExtendedWagmiChainConfig } from "~/config/chains";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hexLiteral } from "~/lib/utils/validation";

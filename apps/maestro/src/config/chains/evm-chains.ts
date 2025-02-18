@@ -46,7 +46,7 @@ import {
   sepolia,
 } from "viem/chains";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "./env";
+import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
 
 export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
@@ -68,7 +68,7 @@ function createRpcUrlConfig(chain: Chain, additionalUrls: string[] = []) {
   };
 }
 
-export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
+export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
     rpcUrls: {
@@ -78,65 +78,6 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "ethereum",
     axelarChainName: "ethereum",
     environment: ENVIRONMENTS.mainnet,
-  },
-  // TODO: correct this
-  {
-    id: 101,
-    axelarChainId: "sui",
-    axelarChainName: "sui",
-    environment: ENVIRONMENTS.mainnet,
-    name: "Sui",
-    nativeCurrency: {
-      name: "SUI",
-      symbol: "SUI",
-      decimals: 9,
-    },
-    rpcUrls: {
-      default: { http: ["https://sui-rpc.publicnode.com"] },
-      public: { http: ["https://sui-rpc.publicnode.com"] },
-    },
-    blockExplorers: {
-      default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
-    },
-  },
-  {
-    id: 103,
-    axelarChainId: "sui",
-    axelarChainName: "sui",
-    environment: ENVIRONMENTS.devnet,
-    name: "Sui Testnet",
-    nativeCurrency: {
-      name: "SUI",
-      symbol: "SUI",
-      decimals: 9,
-    },
-    rpcUrls: {
-      default: { http: ["https://fullnode.testnet.sui.io:443"] },
-      public: { http: ["https://fullnode.testnet.sui.io:443"] },
-    },
-    blockExplorers: {
-      default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
-    },
-  },
-  //TODO: check if this is ok
-  {
-    id: 103,
-    axelarChainId: "sui",
-    axelarChainName: "sui",
-    environment: ENVIRONMENTS.testnet,
-    name: "Sui Testnet",
-    nativeCurrency: {
-      name: "SUI",
-      symbol: "SUI",
-      decimals: 9,
-    },
-    rpcUrls: {
-      default: { http: ["https://fullnode.testnet.sui.io:443"] },
-      public: { http: ["https://fullnode.testnet.sui.io:443"] },
-    },
-    blockExplorers: {
-      default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
-    },
   },
   {
     ...sepolia,
@@ -455,6 +396,6 @@ export const ALL_CHAINS: ExtendedWagmiChainConfig[] = [
   },
 ] as const;
 
-export const WAGMI_CHAIN_CONFIGS = ALL_CHAINS.filter(
+export const EVM_CHAIN_CONFIGS = EVM_CHAINS.filter(
   (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
 ) as [ExtendedWagmiChainConfig, ...ExtendedWagmiChainConfig[]];

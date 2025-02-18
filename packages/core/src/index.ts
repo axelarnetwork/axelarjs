@@ -119,3 +119,9 @@ export const AXELAR_RECOVERY_API_URLS = {
 };
 
 export type AxelarRecoveryAPIUrl = keyof typeof AXELAR_RECOVERY_API_URLS;
+
+export const SUI_RPC_URLS = {
+  'devnet-amplifier': 'https://sui-testnet-rpc.publicnode.com',
+  testnet: "https://sui-testnet-rpc.publicnode.com",
+  mainnet: "https://sui-rpc.publicnode.com",
+}

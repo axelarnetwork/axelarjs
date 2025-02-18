@@ -119,8 +119,8 @@ export function useSendInterchainTokenState(props: {
     reset: resetInterchainTransferTxState,
   } = useInterchainTransferMutation({
     tokenAddress: props.tokenAddress,
-    destinationChainName: selectedToChain?.chain_name,
-    sourceChainName: props.sourceChain.chain_name,
+    destinationChainName: selectedToChain?.id,
+    sourceChainName: props.sourceChain.id,
     gas,
     tokenId: props.tokenId,
     destinationAddress: props.destinationAddress,
@@ -134,8 +134,8 @@ export function useSendInterchainTokenState(props: {
   } = useInterchainTokenServiceTransferMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
-    destinationChainName: selectedToChain?.chain_name,
-    sourceChainName: props.sourceChain.chain_name,
+    destinationChainName: selectedToChain?.id,
+    sourceChainName: props.sourceChain.id,
     gas,
   });
 

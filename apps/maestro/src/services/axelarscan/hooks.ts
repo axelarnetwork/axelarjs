@@ -5,14 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { indexBy, partition, prop } from "rambda";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
-import { VM_CHAIN_CONFIGS } from "~/config/vm-chains";
 
-const EVM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
-const VM_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), VM_CHAIN_CONFIGS);
+const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("axelarChainId"), CHAIN_CONFIGS);
+const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
   const {
@@ -89,7 +88,7 @@ export function useEVMChainConfigsQuery() {
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.chain_id in EVM_CHAIN_CONFIGS_BY_ID, data ?? []),
+    () => partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? []),
     [data]
   );
 
@@ -112,12 +111,11 @@ export function useEVMChainConfigsQuery() {
   }
 
   const wagmiChains = configured.map(
-    (x) => EVM_CHAIN_CONFIGS_BY_ID[x.chain_id]
+    (x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id]
   );
 
   return {
     ...queryResult,
-    // TODO: remove this once we have the sui chain data
     data: configured,
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
@@ -135,6 +133,7 @@ export function useVMChainConfigsQuery() {
     refetchOnWindowFocus: false,
   });
 
+  // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
     if(chain.id === 'sui') {
       chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
@@ -144,7 +143,7 @@ export function useVMChainConfigsQuery() {
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
     () => {
-      return partition((x) => x.id in VM_CHAIN_CONFIGS_BY_ID || x.chain_id in EVM_CHAIN_CONFIGS_BY_ID, data ?? [])
+        return partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? [])
     },
     [data]
   );
@@ -166,7 +165,7 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const wagmiChains = configured.map((x) => EVM_CHAIN_CONFIGS_BY_ID[x.chain_id]).filter(chain => chain);
+  const wagmiChains = configured.map((x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id]).filter(chain => chain);
 
   return {
     ...queryResult,

@@ -3,17 +3,11 @@ import {
   SUI_PACKAGE_ID,
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
-import { SuiClient } from "@mysten/sui/client";
 import { z } from "zod";
 
+import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
-import config from "./config/devnet-amplifier.json";
 import { buildTx, suiServiceBaseUrl } from "./utils/utils";
-
-// Initialize SuiClient directly with RPC from config
-const suiClient = new SuiClient({
-  url: config["sui"].rpc,
-});
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure

@@ -9,9 +9,7 @@ import {
   NEXT_PUBLIC_NETWORK_ENV,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
 } from "./env";
-import { ExtendedWagmiChainConfig, WAGMI_CHAIN_CONFIGS } from "./evm-chains";
-
-export * from "./evm-chains";
+import { ExtendedWagmiChainConfig, WAGMI_CHAIN_CONFIGS } from "./chains";
 
 if (typeof window !== "undefined") {
   logger.once.info({
@@ -20,13 +18,11 @@ if (typeof window !== "undefined") {
   });
 }
 
-export { WAGMI_CHAIN_CONFIGS as EVM_CHAIN_CONFIGS };
-
 export const queryClient = new QueryClient();
 
 export const wagmiConfig = defaultWagmiConfig({
   projectId: NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  chains: WAGMI_CHAIN_CONFIGS.filter(config => config.axelarChainId !== 'sui') as [ExtendedWagmiChainConfig, ...ExtendedWagmiChainConfig[]],
+  chains: WAGMI_CHAIN_CONFIGS as [ExtendedWagmiChainConfig, ...ExtendedWagmiChainConfig[]],
   ssr: true,
   metadata: {
     name: APP_NAME,

@@ -189,6 +189,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
       : undefined;
   }, [state.txState]);
 
+  const handleSuiTransactionComplete = useCallback(
+    async (result: SuiTransactionBlockResponse) => {
+      // Check if transaction was successful
+      if (result.effects?.status?.status === "success") {
+        await actions.refetchBalances();
+        resetForm();
+        actions.resetTxState();
+        actions.setIsModalOpen(false);
+        toast.success("Tokens sent successfully!", {
+          id: `token-sent:${result.digest}`,
+        });
+      }
+    },
+    [actions, resetForm]
+  );
+
   useEffect(() => {
     async function trackTransaction() {
       if (state.txState.status !== "submitted") return;
@@ -206,12 +222,18 @@ export const SendInterchainToken: FC<Props> = (props) => {
       await handleSuiTransactionComplete(state.txState.suiTx);
     }
 
-    if (suiTxDigest && state.txState.status === "submitted") {
+    if (state.txState.status === "submitted") {
       trackTransaction().catch((error) => {
         logger.error("Failed to track transaction", error);
       });
     }
-  }, [actions, suiTxDigest, state.txState.status, address]);
+  }, [
+    actions,
+    suiTxDigest,
+    state.txState,
+    address,
+    handleSuiTransactionComplete,
+  ]);
 
   const handleAllChainsExecuted = useCallback(async () => {
     await actions.refetchBalances();
@@ -240,22 +262,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
       shouldValidate: true,
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
-
-  const handleSuiTransactionComplete = useCallback(
-    async (result: SuiTransactionBlockResponse) => {
-      // Check if transaction was successful
-      if (result.effects?.status?.status === "success") {
-        await actions.refetchBalances();
-        resetForm();
-        actions.resetTxState();
-        actions.setIsModalOpen(false);
-        toast.success("Tokens sent successfully!", {
-          id: `token-sent:${result.digest}`,
-        });
-      }
-    },
-    [actions, resetForm]
-  );
 
   const isEvmChainsOnly = useMemo(() => {
     return (

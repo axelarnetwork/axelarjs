@@ -22,7 +22,7 @@ import {
   NEXT_PUBLIC_NETWORK_ENV,
 } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
@@ -87,7 +87,8 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
         axelarConfigClient,
         "axelarConfigs" as const
       ),
-      wagmiChainConfigs: WAGMI_CHAIN_CONFIGS,
+      // TODO: rename this to chainConfigs
+      wagmiChainConfigs: CHAIN_CONFIGS,
     },
     persistence: {
       /**

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import { filter, map } from "rambda";
 
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -18,7 +18,7 @@ const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
 function getChainNameSlug(chainId: number) {
-  const chain = WAGMI_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
+  const chain = CHAIN_CONFIGS.find((chain) => chain.id === chainId);
 
   return chain?.axelarChainName.toLowerCase() ?? "";
 }

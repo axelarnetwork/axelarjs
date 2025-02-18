@@ -1,13 +1,12 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import {
-  getFullnodeUrl,
-  SuiClient,
   SuiObjectChange,
   type SuiTransactionBlockResponse,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 import { fromHex } from "@mysten/sui/utils";
 
+import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
@@ -52,7 +51,6 @@ const findObjectByType = (
 
 export default function useTokenDeploy() {
   const currentAccount = useAccount();
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") });
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
       execute: async ({ bytes, signature }) => {
@@ -114,7 +112,6 @@ export default function useTokenDeploy() {
       const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
         transaction: await deployTokenTx.toJSON(),
-        chain: "sui:testnet",
       });
 
       if (!deployTokenResult?.objectChanges) {
@@ -151,7 +148,6 @@ export default function useTokenDeploy() {
         });
         await signAndExecuteTransaction({
           transaction: mintTxJSON,
-          chain: "sui:testnet", //TODO: make this dynamic
         });
       }
 
@@ -171,7 +167,6 @@ export default function useTokenDeploy() {
 
       const sendTokenResult = await signAndExecuteTransaction({
         transaction: sendTokenTxJSON,
-        chain: "sui:testnet", //TODO: make this dynamic
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 

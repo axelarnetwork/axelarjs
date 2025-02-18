@@ -2,13 +2,14 @@ import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
+import { suiClient as client } from "~/lib/clients/suiClient";
+
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getCoinType } from "~/server/routers/sui/utils/utils";
@@ -48,7 +49,6 @@ export function useInterchainTransferMutation(
     },
   });
 
-  const client = new SuiClient({ url: getFullnodeUrl("testnet") });
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
@@ -93,10 +93,10 @@ export function useInterchainTransferMutation(
             gas: config.gas.toString() ?? "0",
             coinType: coinType,
           });
-          txHash = await signAndExecuteTransaction({
+          const receipt = await signAndExecuteTransaction({
             transaction: sendTokenTxJSON,
-            chain: "sui:testnet", //TODO: make this dynamic
           });
+          txHash = receipt.digest;
         } else {
           const recipient = (destinationAddress ?? address) as `0x${string}`;
           txHash = await transferAsync({

@@ -43,6 +43,7 @@ ModalFormInput.defaultProps = {
   $bordered: true,
 };
 
+
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
   return (
     <Button {...props} $variant="neutral">
