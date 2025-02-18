@@ -54,13 +54,22 @@ export const getRecentTransactions = publicProcedure
 
       const deduped = uniqBy((tx) => tx.call.transactionHash, response);
 
-      return deduped.map(({ call, status, ...tx }) => ({
-        status,
-        hash: call.transactionHash,
-        blockHash: call.blockHash,
-        timestamp: call.block_timestamp,
-        event: extractEvent(tx, input.contractMethod),
-      })) as RecentTransactionsOutput;
+      return deduped.map(({ call, status, ...tx }) => {
+        const event = extractEvent(tx, input.contractMethod);
+
+        // Ensure tokenId starts with 0x if present, this is a workaround for the api
+        if (event?.tokenId && !event.tokenId.startsWith("0x")) {
+          event.tokenId = `0x${event.tokenId}`;
+        }
+
+        return {
+          status,
+          hash: call.transactionHash,
+          blockHash: call.blockHash,
+          timestamp: call.block_timestamp,
+          event: extractEvent(tx, input.contractMethod),
+        };
+      }) as RecentTransactionsOutput;
     } catch (error) {
       if (error instanceof TRPCError) {
         throw error;
