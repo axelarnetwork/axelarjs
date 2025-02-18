@@ -3,13 +3,14 @@ import { Toaster } from "@axelarjs/ui/toaster";
 import { useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
+import dynamic from "next/dynamic";
 import { Cabin } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
-import dynamic from 'next/dynamic';
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
@@ -28,15 +29,17 @@ import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
 
 import "@tanstack/react-query";
+
 import { SUI_RPC_URLS } from "@axelarjs/core";
 
 // Dynamically import WalletProvider with ssr disabled
 const WalletProviderClient = dynamic(
-  () => import('@mysten/dapp-kit').then(mod => ({ 
-    default: ({ children }: { children: React.ReactNode }) => (
-      <mod.WalletProvider autoConnect>{children}</mod.WalletProvider>
-    )
-  })),
+  () =>
+    import("@mysten/dapp-kit").then((mod) => ({
+      default: ({ children }: { children: React.ReactNode }) => (
+        <mod.WalletProvider autoConnect>{children}</mod.WalletProvider>
+      ),
+    })),
   { ssr: false }
 );
 
@@ -99,6 +102,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       </style>
 
       <GoogleAnalytics measurementId={NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      <SpeedInsights/>
 
       <NProgressBar />
 
