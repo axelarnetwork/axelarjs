@@ -1,29 +1,29 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { suiChainConfig } from "~/config/chains";
 import { useChainId, useDisconnect } from "~/lib/hooks";
-
-// TODO: fixing this once we have the sui chain data
-const CHAIN_ID_SUI = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
+import useConnectWallet from "./useConnectWallet";
 
 export function useSwitchChain() {
   const { switchChain: switchChainWagmi } = useWagmiSwitchChain();
   const { disconnect } = useDisconnect();
   const currentChainId = useChainId();
+  const connectWallet = useConnectWallet();
 
   function switchChain({ chainId }: { chainId: number }) {
-    const isTargetChainSui = chainId === CHAIN_ID_SUI;
-    const isCurrentChainSui = currentChainId === CHAIN_ID_SUI;
-
-    if (isTargetChainSui && !isCurrentChainSui) {
-      disconnect();
-    } else if (!isTargetChainSui && isCurrentChainSui) {
-      disconnect();
-      switchChainWagmi({ chainId });
-    } else if (!isTargetChainSui && !isCurrentChainSui) {
-      switchChainWagmi({ chainId });
+    if (chainId) {
+      const isTargetChainSui = chainId === suiChainConfig.id;
+      const isCurrentChainSui = currentChainId === suiChainConfig.id;
+      const evmToEvm = !isTargetChainSui && !isCurrentChainSui;
+      if (evmToEvm) {
+        switchChainWagmi({ chainId });
+      } else if (chainId) {
+        disconnect();
+        connectWallet({ chainId });
+      }
     }
   }
+
   return {
     switchChain,
   };

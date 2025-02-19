@@ -47,14 +47,12 @@ const suiTestnet = {
   },
 };
 
-export const VM_CHAINS: VMChainConfig[] = [
-  sui,
-  suiTestnet,
-  {
-    ...suiTestnet,
-    environment: ENVIRONMENTS.devnet,
-  },
-] as const;
+const suiDevnet = {
+  ...suiTestnet,
+  environment: ENVIRONMENTS.devnet,
+};
+
+export const VM_CHAINS: VMChainConfig[] = [sui, suiTestnet, suiDevnet] as const;
 
 export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
   (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
@@ -63,3 +61,7 @@ export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
 export const WAGMI_VM_CHAIN_CONFIGS = VM_CHAIN_CONFIGS.filter(
   (chain) => chain.supportWagmi
 );
+
+export const suiChainConfig = VM_CHAIN_CONFIGS.find(
+  (chain) => chain.axelarChainId === "sui"
+) as VMChainConfig;
