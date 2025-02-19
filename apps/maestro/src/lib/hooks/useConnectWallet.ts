@@ -12,6 +12,8 @@ import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 import { suiChainConfig } from "~/config/chains";
 import { isValidEVMAddress } from "../utils/validation";
 
+type WalletHandler = (chainId: number) => void;
+
 export function useConnectWallet() {
   const wallets = useWallets();
   const { mutate: connect } = useSuiConnectWallet();
@@ -46,19 +48,20 @@ export function useConnectWallet() {
         continue;
       }
     }
-    return false;
+  };
+
+  const chainHandlers: Record<number, WalletHandler> = {
+    [suiChainConfig.id]: () => tryConnectSuiWallet(),
+  };
+
+  const defaultHandler: WalletHandler = (chainId) => {
+    setPendingChainId(chainId);
+    void openWeb3Modal();
   };
 
   const connectWallet = ({ chainId }: { chainId: number }) => {
-    const isTargetChainSui = chainId === suiChainConfig.id;
-
-    if (isTargetChainSui) {
-      return tryConnectSuiWallet();
-    } else {
-      setPendingChainId(chainId);
-      void openWeb3Modal();
-      return true;
-    }
+    const handler = chainHandlers[chainId] ?? defaultHandler;
+    return handler(chainId);
   };
 
   return connectWallet;
