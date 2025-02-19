@@ -7,6 +7,12 @@ import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
+import {
+  deployRemoteInterchainToken,
+  getChainConfig,
+  getTokenId,
+  setupTxBuilder,
+} from "./utils/txUtils";
 import { buildTx, suiServiceBaseUrl } from "./utils/utils";
 
 export const suiRouter = router({
@@ -68,12 +74,7 @@ export const suiRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
-        //TODO: use chain config from ui
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = await getChainConfig();
         const {
           sender,
           symbol,
@@ -83,26 +84,11 @@ export const suiRouter = router({
         } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-        const txBuilder = new TxBuilder(suiClient);
-
-        txBuilder.tx.setSenderIfNotSet(sender);
-        const examplePackageId = chainConfig.contracts.Example.address;
         const feeUnitAmount = 5e7;
-        const ITS = chainConfig.contracts.ITS;
-        const Example = chainConfig.contracts.Example;
-        const AxelarGateway = chainConfig.contracts.AxelarGateway;
-        const GasService = chainConfig.contracts.GasService;
-
-        const itsObjectId = ITS.objects.ITS;
-
-        // const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
-        // for (const destinationChain of destinationChains) {
-        //   if (!trustedDestinationChains.includes(destinationChain)) {
-        //     console.log(`destination chain ${destinationChain} not trusted`);
-        //     return undefined;
-        //   }
-        // }
+        const { txBuilder, ITS, AxelarGateway, GasService } = setupTxBuilder(
+          sender,
+          chainConfig
+        );
 
         const coinMetadata = await suiClient.getCoinMetadata({
           coinType: tokenType,
@@ -111,7 +97,8 @@ export const suiRouter = router({
         if (!coinMetadata) {
           return undefined;
         }
-
+        const examplePackageId = chainConfig.contracts.Example.address;
+        const itsObjectId = ITS.objects.ITS;
         // TODO: handle register type properly, whether it's mint/burn or lock/unlock.
         await txBuilder.moveCall({
           target: `${examplePackageId}::its::register_coin`,
@@ -120,36 +107,24 @@ export const suiRouter = router({
         });
 
         for (const destinationChain of destinationChains) {
-          const [TokenId] = await txBuilder.moveCall({
-            target: `${ITS.address}::token_id::from_info`,
-            typeArguments: [tokenType],
-            arguments: [
-              coinMetadata.name,
-              coinMetadata.symbol,
-              txBuilder.tx.pure.u8(coinMetadata.decimals),
-              txBuilder.tx.pure.bool(false),
-              txBuilder.tx.pure.bool(false),
-            ],
-          });
+          const TokenId = await getTokenId(
+            txBuilder,
+            tokenType,
+            ITS,
+            coinMetadata
+          );
 
-          const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [
+          await deployRemoteInterchainToken(
+            txBuilder,
+            ITS,
+            AxelarGateway,
+            GasService,
+            destinationChain,
+            TokenId,
             feeUnitAmount,
-          ]);
-
-          await txBuilder.moveCall({
-            target: `${Example.address}::its::deploy_remote_interchain_token`,
-            arguments: [
-              ITS.objects.ITS,
-              AxelarGateway.objects.Gateway,
-              GasService.objects.GasService,
-              destinationChain,
-              TokenId,
-              gas,
-              "0x",
-              sender,
-            ],
-            typeArguments: [tokenType],
-          });
+            sender,
+            tokenType
+          );
         }
 
         const tx = await buildTx(sender, txBuilder);
@@ -212,7 +187,8 @@ export const suiRouter = router({
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;
 
-        const txBuilder = new TxBuilder(suiClient);
+        const { txBuilder, ITS, Example, AxelarGateway, GasService } =
+          setupTxBuilder(input.sender, chainConfig);
         const tx = txBuilder.tx;
 
         // Split coins for gas
@@ -227,18 +203,15 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
 
-        const [TokenId] = await txBuilder.moveCall({
-          target: `${chainConfig.contracts.ITS.address}::token_id::from_u256`,
-          arguments: [input.tokenId],
-        });
+        const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
         await txBuilder.moveCall({
-          target: `${chainConfig.contracts.Example.address}::its::send_interchain_transfer_call`,
+          target: `${Example.address}::its::send_interchain_transfer_call`,
           arguments: [
-            chainConfig.contracts.Example.objects.ItsSingleton,
-            chainConfig.contracts.ITS.objects.ITS,
-            chainConfig.contracts.AxelarGateway.objects.Gateway,
-            chainConfig.contracts.GasService.objects.GasService,
+            Example.objects.ItsSingleton,
+            ITS.objects.ITS,
+            AxelarGateway.objects.Gateway,
+            GasService.objects.GasService,
             TokenId,
             Coin,
             input.destinationChain,
@@ -263,7 +236,7 @@ export const suiRouter = router({
       }
     }),
 
-  getRegisterRemoteInterchainTokenTxBytes: publicProcedure
+  getRegisterRemoteInterchainTokenTx: publicProcedure
     .input(
       z.object({
         tokenAddress: z.string(),
@@ -287,7 +260,6 @@ export const suiRouter = router({
         txBuilder.tx.setSenderIfNotSet(sender);
         const feeUnitAmount = 5e7;
         const ITS = chainConfig.contracts.ITS;
-        const Example = chainConfig.contracts.Example;
         const AxelarGateway = chainConfig.contracts.AxelarGateway;
         const GasService = chainConfig.contracts.GasService;
 
@@ -302,52 +274,28 @@ export const suiRouter = router({
         }
 
         for (const destinationChain of destinationChainIds) {
-          const [TokenId] = await txBuilder.moveCall({
-            target: `${ITS.address}::token_id::from_info`,
-            typeArguments: [tokenType],
-            arguments: [
-              coinMetadata.name,
-              coinMetadata.symbol,
-              txBuilder.tx.pure.u8(coinMetadata.decimals),
-              txBuilder.tx.pure.bool(false),
-              txBuilder.tx.pure.bool(false),
-            ],
-          });
+          const TokenId = await getTokenId(
+            txBuilder,
+            tokenType,
+            ITS,
+            coinMetadata
+          );
 
-          const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [
-            feeUnitAmount,
-          ]);
-
-          console.log("arguments for deploy remote token", [
-            ITS.objects.ITS,
-            AxelarGateway.objects.Gateway,
-            GasService.objects.GasService,
+          await deployRemoteInterchainToken(
+            txBuilder,
+            ITS,
+            AxelarGateway,
+            GasService,
             destinationChain,
             TokenId,
-            gas,
-            "0x",
+            feeUnitAmount,
             sender,
-          ]);
-
-          await txBuilder.moveCall({
-            target: `${Example.address}::its::deploy_remote_interchain_token`,
-            arguments: [
-              ITS.objects.ITS,
-              AxelarGateway.objects.Gateway,
-              GasService.objects.GasService,
-              destinationChain,
-              TokenId,
-              gas,
-              "0x",
-              sender,
-            ],
-            typeArguments: [tokenType],
-          });
+            tokenType
+          );
         }
 
         const tx = await buildTx(sender, txBuilder);
         const txJSON = await tx.toJSON();
-
         return txJSON;
       } catch (error) {
         console.error(
