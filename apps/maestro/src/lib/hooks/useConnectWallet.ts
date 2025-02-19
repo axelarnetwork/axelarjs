@@ -49,14 +49,14 @@ export function useConnectWallet() {
     return false;
   };
 
-  const connectWallet = async ({ chainId }: { chainId: number }) => {
+  const connectWallet = ({ chainId }: { chainId: number }) => {
     const isTargetChainSui = chainId === suiChainConfig.id;
 
     if (isTargetChainSui) {
       return tryConnectSuiWallet();
     } else {
       setPendingChainId(chainId);
-      await openWeb3Modal();
+      void openWeb3Modal();
       return true;
     }
   };
