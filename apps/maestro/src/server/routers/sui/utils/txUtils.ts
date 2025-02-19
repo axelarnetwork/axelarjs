@@ -10,16 +10,11 @@ export async function getChainConfig() {
   return _chainConfig.chains.sui;
 }
 
-export function setupTxBuilder(sender: string, chainConfig: any) {
+export function setupTxBuilder(sender: string) {
   const txBuilder = new TxBuilder(suiClient);
   txBuilder.tx.setSenderIfNotSet(sender);
 
-  const ITS = chainConfig.contracts.ITS;
-  const Example = chainConfig.contracts.Example;
-  const AxelarGateway = chainConfig.contracts.AxelarGateway;
-  const GasService = chainConfig.contracts.GasService;
-
-  return { txBuilder, ITS, Example, AxelarGateway, GasService };
+  return { txBuilder };
 }
 
 export async function getTokenId(
@@ -44,17 +39,17 @@ export async function getTokenId(
 
 export async function deployRemoteInterchainToken(
   txBuilder: TxBuilder,
-  ITS: any,
-  AxelarGateway: any,
-  GasService: any,
-  Example: any,
+  chainConfig: any,
   destinationChain: string,
-  TokenId: any,
+  coinMetadata: any,
   feeUnitAmount: number,
   sender: string,
   tokenType: string
 ) {
+  const { Example, ITS, AxelarGateway, GasService } = chainConfig.contracts;
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
+
+  const TokenId = await getTokenId(txBuilder, tokenType, ITS, coinMetadata);
 
   await txBuilder.moveCall({
     target: `${Example.address}::its::deploy_remote_interchain_token`,

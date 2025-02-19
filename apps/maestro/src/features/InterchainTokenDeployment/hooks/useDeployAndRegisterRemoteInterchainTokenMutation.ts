@@ -8,7 +8,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { zeroAddress, type TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
@@ -20,7 +19,7 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { useAccount, useChainId } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
@@ -260,8 +259,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
   const writeAsync = useCallback(async () => {
-    const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
-
     await recordDeploymentDraft();
     if (chainId === SUI_CHAIN_ID && input) {
       const result = await deployToken({

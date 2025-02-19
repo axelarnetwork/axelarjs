@@ -85,9 +85,8 @@ export const suiRouter = router({
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const feeUnitAmount = 5e7;
-        const { txBuilder, ITS, AxelarGateway, GasService } = setupTxBuilder(
-          sender,
-          chainConfig
+        const { txBuilder } = setupTxBuilder(
+          sender
         );
 
         const coinMetadata = await suiClient.getCoinMetadata({
@@ -97,8 +96,10 @@ export const suiRouter = router({
         if (!coinMetadata) {
           return undefined;
         }
-        const Example = chainConfig.contracts.Example;
+
+        const { Example, ITS } = chainConfig.contracts;
         const itsObjectId = ITS.objects.ITS;
+
         // TODO: handle register type properly, whether it's mint/burn or lock/unlock.
         await txBuilder.moveCall({
           target: `${Example.address}::its::register_coin`,
@@ -107,21 +108,11 @@ export const suiRouter = router({
         });
 
         for (const destinationChain of destinationChains) {
-          const TokenId = await getTokenId(
-            txBuilder,
-            tokenType,
-            ITS,
-            coinMetadata
-          );
-
           await deployRemoteInterchainToken(
             txBuilder,
-            ITS,
-            AxelarGateway,
-            GasService,
-            Example,
+            chainConfig,
             destinationChain,
-            TokenId,
+            coinMetadata,
             feeUnitAmount,
             sender,
             tokenType
@@ -188,8 +179,8 @@ export const suiRouter = router({
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;
 
-        const { txBuilder, ITS, Example, AxelarGateway, GasService } =
-          setupTxBuilder(input.sender, chainConfig);
+        const { txBuilder } =
+          setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
 
         // Split coins for gas
@@ -211,6 +202,8 @@ export const suiRouter = router({
         if (!coinMetadata) {
           throw new Error(`Coin metadata not found for ${input.coinType}`);
         }
+
+        const { Example, AxelarGateway, GasService, ITS } = chainConfig.contracts;
 
         const TokenId = await getTokenId(
           txBuilder,
@@ -273,10 +266,6 @@ export const suiRouter = router({
 
         txBuilder.tx.setSenderIfNotSet(sender);
         const feeUnitAmount = 5e7;
-        const ITS = chainConfig.contracts.ITS;
-        const AxelarGateway = chainConfig.contracts.AxelarGateway;
-        const GasService = chainConfig.contracts.GasService;
-        const Example = chainConfig.contracts.Example;
 
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -289,21 +278,11 @@ export const suiRouter = router({
         }
 
         for (const destinationChain of destinationChainIds) {
-          const TokenId = await getTokenId(
-            txBuilder,
-            tokenType,
-            ITS,
-            coinMetadata
-          );
-
           await deployRemoteInterchainToken(
             txBuilder,
-            ITS,
-            AxelarGateway,
-            GasService,
-            Example,
+            chainConfig,
             destinationChain,
-            TokenId,
+            coinMetadata,
             feeUnitAmount,
             sender,
             tokenType
