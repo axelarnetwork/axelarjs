@@ -10,7 +10,7 @@ export function useSwitchChain() {
   const currentChainId = useChainId();
   const connectWallet = useConnectWallet();
 
-  async function switchChain({ chainId }: { chainId: number }) {
+  function switchChain({ chainId }: { chainId: number }) {
     if (chainId) {
       const isTargetChainSui = chainId === suiChainConfig.id;
       const isCurrentChainSui = currentChainId === suiChainConfig.id;
@@ -19,7 +19,7 @@ export function useSwitchChain() {
         switchChainWagmi({ chainId });
       } else if (chainId) {
         disconnect();
-        await connectWallet({ chainId });
+        connectWallet({ chainId });
       }
     }
   }
