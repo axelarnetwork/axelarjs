@@ -47,14 +47,19 @@ const suiTestnet = {
   },
 };
 
-export const VM_CHAINS: VMChainConfig[] = [
-  sui,
-  suiTestnet,
-  {
-    ...suiTestnet,
-    environment: ENVIRONMENTS.devnet,
-  },
-] as const;
+const suiDevnet = {
+  ...sui,
+  environment: ENVIRONMENTS.devnet,
+};
+
+export const suiChainConfig =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+    ? sui
+    : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
+      ? suiDevnet
+      : suiTestnet;
+
+export const VM_CHAINS: VMChainConfig[] = [sui, suiTestnet, suiDevnet] as const;
 
 export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
   (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
