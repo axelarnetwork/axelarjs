@@ -56,7 +56,9 @@ export function useConnectWallet() {
 
   const defaultHandler: WalletHandler = (chainId) => {
     setPendingChainId(chainId);
-    void openWeb3Modal();
+    openWeb3Modal().catch((error) => {
+      console.error("Error opening Web3Modal", error);
+    });
   };
 
   const connectWallet = ({ chainId }: { chainId: number }) => {
