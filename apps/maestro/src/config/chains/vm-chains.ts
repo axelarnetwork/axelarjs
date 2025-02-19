@@ -52,13 +52,6 @@ const suiDevnet = {
   environment: ENVIRONMENTS.devnet,
 };
 
-export const suiChainConfig =
-  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-    ? sui
-    : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
-      ? suiDevnet
-      : suiTestnet;
-
 export const VM_CHAINS: VMChainConfig[] = [sui, suiTestnet, suiDevnet] as const;
 
 export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
@@ -67,4 +60,8 @@ export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
 
 export const WAGMI_VM_CHAIN_CONFIGS = VM_CHAIN_CONFIGS.filter(
   (chain) => chain.supportWagmi
+);
+
+export const suiChainConfig = VM_CHAIN_CONFIGS.find(
+  (chain) => chain.axelarChainId === "sui"
 );
