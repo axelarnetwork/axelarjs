@@ -34,8 +34,10 @@ export function useAccount(): CombinedAccountInfo {
     address: wagmiAccount.address || (mystenAccount?.address as `0x${string}`),
     isConnected: isWagmiConnected || isMystenConnected,
     isDisconnected: !isWagmiConnected && !isMystenConnected,
-    chain: wagmiAccount.chain || suiChainConfig,
+    chain:
+      wagmiAccount.chain || (isMystenConnected && suiChainConfig) || undefined,
     isEvmChain: !!evmChain,
-    chainName: evmChain?.chain_name || "Sui",
+    chainName:
+      evmChain?.chain_name || (isMystenConnected && "Sui") || undefined,
   };
 }
