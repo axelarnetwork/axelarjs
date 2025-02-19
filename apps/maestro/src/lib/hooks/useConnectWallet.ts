@@ -36,24 +36,11 @@ export function useConnectWallet() {
     }
   }, [sessionData, pendingChainId, switchChainWagmi, setPendingChainId]);
 
-  const tryConnectSuiWallet = async () => {
+  const tryConnectSuiWallet = () => {
     for (const wallet of wallets) {
       try {
-        await new Promise<void>((resolve, reject) => {
-          connect(
-            { wallet },
-            {
-              onSuccess: () => {
-                console.log("Connected to", wallet.name);
-                resolve();
-              },
-              onError: (error) => {
-                console.log("Failed to connect to", wallet.name, error);
-                reject(error);
-              },
-            }
-          );
-        });
+        // Attempt to connect to each wallet
+        connect({ wallet });
         return true;
       } catch (error) {
         continue;
