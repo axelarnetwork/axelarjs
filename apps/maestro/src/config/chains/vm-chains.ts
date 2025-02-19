@@ -48,7 +48,7 @@ const suiTestnet = {
 };
 
 const suiDevnet = {
-  ...sui,
+  ...suiTestnet,
   environment: ENVIRONMENTS.devnet,
 };
 

@@ -30,7 +30,6 @@ export function useAccount(): CombinedAccountInfo {
     [wagmiAccount?.chain, evmChains]
   );
 
-  // TODO: do it more generic
   return {
     address: wagmiAccount.address || (mystenAccount?.address as `0x${string}`),
     isConnected: isWagmiConnected || isMystenConnected,

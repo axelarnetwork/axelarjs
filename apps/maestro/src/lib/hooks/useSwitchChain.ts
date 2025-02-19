@@ -34,19 +34,11 @@ export function useSwitchChain() {
     }
   }, [sessionData, pendingChainId, switchChainWagmi, setPendingChainId]);
 
-  const tryConnectSuiWallet = async () => {
+  const tryConnectSuiWallet = () => {
     for (const wallet of wallets) {
       try {
         // Attempt to connect to each wallet
-        await new Promise<void>((resolve, reject) => {
-          connect(
-            { wallet },
-            {
-              onSuccess: () => resolve(),
-              onError: (error) => reject(error),
-            }
-          );
-        });
+        connect({ wallet });
         return true;
       } catch (error) {
         continue;
@@ -56,24 +48,25 @@ export function useSwitchChain() {
   };
 
   async function switchChain({ chainId }: { chainId: number }) {
-    const isTargetChainSui = chainId === suiChainConfig.id;
-    const isCurrentChainSui = currentChainId === suiChainConfig.id;
-    const evmToEvm = !isTargetChainSui && !isCurrentChainSui;
-    const evmToSui = isTargetChainSui && !isCurrentChainSui;
-    const suiToEvm = !isTargetChainSui && isCurrentChainSui;
-
-    if (evmToSui) {
-      // EVM to Sui
-      disconnect();
-      await tryConnectSuiWallet();
-    } else if (suiToEvm) {
-      // Sui to EVM
-      disconnect();
-      setPendingChainId(chainId);
-      await openWeb3Modal();
-    } else if (evmToEvm && chainId) {
-      // EVM to EVM
-      switchChainWagmi({ chainId });
+    if (chainId) {
+      const isTargetChainSui = chainId === suiChainConfig.id;
+      const isCurrentChainSui = currentChainId === suiChainConfig.id;
+      const evmToEvm = !isTargetChainSui && !isCurrentChainSui;
+      const evmToSui = isTargetChainSui && !isCurrentChainSui;
+      const suiToEvm = !isTargetChainSui && isCurrentChainSui;
+      if (evmToSui) {
+        // EVM to Sui
+        disconnect();
+        tryConnectSuiWallet();
+      } else if (suiToEvm) {
+        // Sui to EVM
+        disconnect();
+        setPendingChainId(chainId);
+        await openWeb3Modal();
+      } else if (evmToEvm && chainId) {
+        // EVM to EVM
+        switchChainWagmi({ chainId });
+      }
     }
   }
 
