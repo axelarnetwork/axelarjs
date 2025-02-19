@@ -262,4 +262,103 @@ export const suiRouter = router({
         );
       }
     }),
+
+  getRegisterRemoteInterchainTokenTxBytes: publicProcedure
+    .input(
+      z.object({
+        tokenAddress: z.string(),
+        destinationChainIds: z.array(z.string()),
+        originChainId: z.number(),
+        sender: z.string(),
+        symbol: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const response = await fetch(
+          `${suiServiceBaseUrl}/chain/devnet-amplifier`
+        );
+        const _chainConfig = await response.json();
+        const chainConfig = _chainConfig.chains.sui;
+        const { sender, symbol, tokenAddress, destinationChainIds } = input;
+
+        const txBuilder = new TxBuilder(suiClient);
+
+        txBuilder.tx.setSenderIfNotSet(sender);
+        const feeUnitAmount = 5e7;
+        const ITS = chainConfig.contracts.ITS;
+        const Example = chainConfig.contracts.Example;
+        const AxelarGateway = chainConfig.contracts.AxelarGateway;
+        const GasService = chainConfig.contracts.GasService;
+
+        const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: tokenType,
+        });
+
+        if (!coinMetadata) {
+          throw new Error(`Coin metadata not found for ${tokenType}`);
+        }
+
+        for (const destinationChain of destinationChainIds) {
+          const [TokenId] = await txBuilder.moveCall({
+            target: `${ITS.address}::token_id::from_info`,
+            typeArguments: [tokenType],
+            arguments: [
+              coinMetadata.name,
+              coinMetadata.symbol,
+              txBuilder.tx.pure.u8(coinMetadata.decimals),
+              txBuilder.tx.pure.bool(false),
+              txBuilder.tx.pure.bool(false),
+            ],
+          });
+
+          const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [
+            feeUnitAmount,
+          ]);
+
+          console.log("arguments for deploy remote token", [
+            ITS.objects.ITS,
+            AxelarGateway.objects.Gateway,
+            GasService.objects.GasService,
+            destinationChain,
+            TokenId,
+            gas,
+            "0x",
+            sender,
+          ]);
+
+          await txBuilder.moveCall({
+            target: `${Example.address}::its::deploy_remote_interchain_token`,
+            arguments: [
+              ITS.objects.ITS,
+              AxelarGateway.objects.Gateway,
+              GasService.objects.GasService,
+              destinationChain,
+              TokenId,
+              gas,
+              "0x",
+              sender,
+            ],
+            typeArguments: [tokenType],
+          });
+        }
+
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
+
+        return txJSON;
+      } catch (error) {
+        console.error(
+          "Failed to prepare register remote token transaction:",
+          error
+        );
+        throw new Error(
+          `Register remote token transaction preparation failed: ${
+            (error as Error).message
+          }`
+        );
+      }
+    }),
 });
