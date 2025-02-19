@@ -97,11 +97,11 @@ export const suiRouter = router({
         if (!coinMetadata) {
           return undefined;
         }
-        const examplePackageId = chainConfig.contracts.Example.address;
+        const Example = chainConfig.contracts.Example;
         const itsObjectId = ITS.objects.ITS;
         // TODO: handle register type properly, whether it's mint/burn or lock/unlock.
         await txBuilder.moveCall({
-          target: `${examplePackageId}::its::register_coin`,
+          target: `${Example.address}::its::register_coin`,
           typeArguments: [tokenType],
           arguments: [itsObjectId, metadataId],
         });
@@ -119,6 +119,7 @@ export const suiRouter = router({
             ITS,
             AxelarGateway,
             GasService,
+            Example,
             destinationChain,
             TokenId,
             feeUnitAmount,
@@ -203,7 +204,20 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
 
-        const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: input.coinType,
+        });
+
+        if (!coinMetadata) {
+          throw new Error(`Coin metadata not found for ${input.coinType}`);
+        }
+
+        const TokenId = await getTokenId(
+          txBuilder,
+          input.tokenId,
+          ITS,
+          coinMetadata
+        );
 
         await txBuilder.moveCall({
           target: `${Example.address}::its::send_interchain_transfer_call`,
@@ -262,6 +276,7 @@ export const suiRouter = router({
         const ITS = chainConfig.contracts.ITS;
         const AxelarGateway = chainConfig.contracts.AxelarGateway;
         const GasService = chainConfig.contracts.GasService;
+        const Example = chainConfig.contracts.Example;
 
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -286,6 +301,7 @@ export const suiRouter = router({
             ITS,
             AxelarGateway,
             GasService,
+            Example,
             destinationChain,
             TokenId,
             feeUnitAmount,

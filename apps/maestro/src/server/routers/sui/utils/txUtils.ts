@@ -47,6 +47,7 @@ export async function deployRemoteInterchainToken(
   ITS: any,
   AxelarGateway: any,
   GasService: any,
+  Example: any,
   destinationChain: string,
   TokenId: any,
   feeUnitAmount: number,
@@ -56,7 +57,7 @@ export async function deployRemoteInterchainToken(
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
   await txBuilder.moveCall({
-    target: `${ITS.address}::its::deploy_remote_interchain_token`,
+    target: `${Example.address}::its::deploy_remote_interchain_token`,
     arguments: [
       ITS.objects.ITS,
       AxelarGateway.objects.Gateway,
