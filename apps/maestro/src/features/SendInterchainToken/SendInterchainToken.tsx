@@ -267,23 +267,24 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
-  const isEvmChainsOnly = useMemo(() => {
+  const isSameChainType = useMemo(() => {
     return (
-      state.selectedToChain?.chain_type === "evm" &&
-      props.sourceChain.chain_type === "evm"
+      state.selectedToChain?.chain_type === props.sourceChain.chain_type
     );
   }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
 
   useEffect(() => {
-    setValue("destinationAddress", address ?? "", {
+    const defaultAddress = isSameChainType ? (address ?? "") : "";
+
+    setValue("destinationAddress", defaultAddress, {
       shouldValidate: true,
     });
   }, [
     state.selectedToChain?.chain_type,
-    props.sourceChain.chain_type,
+    props.sourceChain?.chain_type,
     address,
     setValue,
-    isEvmChainsOnly,
+    isSameChainType,
   ]);
 
   return (
@@ -404,7 +405,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <FormControl>
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
-              {isEvmChainsOnly && (
+              {isSameChainType && (
                 <Label.AltText>(Using connected wallet address)</Label.AltText>
               )}
             </Label>
@@ -413,7 +414,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               $bordered
               placeholder="Enter destination address"
               className="bg-base-200"
-              disabled={isEvmChainsOnly}
+              disabled={isSameChainType}
               {...register("destinationAddress", {
                 required: "Destination address is required",
                 validate: (value) => {
