@@ -15,11 +15,15 @@ import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import { isValidSuiAddress } from "@mysten/sui/utils";
 import { formatUnits, parseUnits } from "viem";
 
 import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
-import { preventNonNumericInput } from "~/lib/utils/validation";
+import {
+  isValidEVMAddress,
+  preventNonNumericInput,
+} from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -271,11 +275,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
 
   useEffect(() => {
-    if (isEvmChainsOnly) {
-      setValue("destinationAddress", address ?? "", {
-        shouldValidate: true,
-      });
-    }
+    setValue("destinationAddress", address ?? "", {
+      shouldValidate: true,
+    });
   }, [
     state.selectedToChain?.chain_type,
     props.sourceChain.chain_type,
@@ -415,9 +417,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
               {...register("destinationAddress", {
                 required: "Destination address is required",
                 validate: (value) => {
-                  if (value.length < 42) {
-                    return "Invalid address length";
+                  // TODO handle sui address length
+                  console.log("select to chain", state.selectedToChain);
+                  if (
+                    state.selectedToChain.id === "sui" &&
+                    !isValidSuiAddress(value)
+                  ) {
+                    return "Invalid SUI address";
                   }
+
+                  if (
+                    state.selectedToChain.chain_type === "evm" &&
+                    !isValidEVMAddress(value)
+                  ) {
+                    return "Invalid EVM address";
+                  }
+
                   return true;
                 },
               })}
