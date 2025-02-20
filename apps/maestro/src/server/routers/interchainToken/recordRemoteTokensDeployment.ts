@@ -28,8 +28,8 @@ export const recordRemoteTokensDeployment = protectedProcedure
 
     // Try to find config in either chain type
     // TODO: fix hardcoded value
-    const configs = evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui"];
-
+    const configs =
+      evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui"];
     if (!configs) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -104,7 +104,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
               })
               .catch(always("0x")),
             itsClient.reads
-              .registeredTokenAddress({
+              .interchainTokenAddress({
                 tokenId: originToken.tokenId as `0x${string}`,
               })
               .catch(always("0x")),
@@ -126,7 +126,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         };
       })
     );
-     
+
     return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
       remoteTokens as NewRemoteInterchainTokenInput[]
     );

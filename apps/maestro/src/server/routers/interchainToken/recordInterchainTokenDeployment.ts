@@ -135,8 +135,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always("0x")),
             itsClient.reads
-              .registeredTokenAddress({
-                // this method will not always return the token address because it is not always already registered so we will have to update it later in the token details page
+              .interchainTokenAddress({
                 tokenId: input.tokenId as `0x${string}`,
               })
               .catch(always(input.tokenAddress)),
