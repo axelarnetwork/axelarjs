@@ -6,7 +6,7 @@ import {
   getRoleIndex,
   ROLES_ENUM,
   type TokenRole,
-} from "../erc20/getERC20TokenBalanceForOwner";
+} from "./getInterchainTokenBalanceForOwner";
 
 export const getInterchainTokenRolesForAccount = publicProcedure
   .input(

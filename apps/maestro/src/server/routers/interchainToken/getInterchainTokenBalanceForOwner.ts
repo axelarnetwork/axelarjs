@@ -1,3 +1,4 @@
+import type { PaginatedCoins } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
@@ -13,7 +14,7 @@ export type TokenRole = (typeof ROLES_ENUM)[number];
 export const getRoleIndex = (role: (typeof ROLES_ENUM)[number]) =>
   ROLES_ENUM.indexOf(role);
 
-export const getERC20TokenBalanceForOwner = publicProcedure
+export const getInterchainTokenBalanceForOwner = publicProcedure
   .input(
     z.object({
       chainId: z.number(),
@@ -42,12 +43,22 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       let isTokenOwner = false;
 
       const coinType = await getCoinType(input.tokenAddress);
-      // Get the coin balance
-      const coins = await client.getCoins({
-        owner: input.owner,
-        coinType: coinType,
-      });
-      const balance = coins.data?.[0]?.balance?.toString() ?? "0";
+      let coins: PaginatedCoins | null = null;
+      let balance = 0;
+      let cursor: string | null | undefined = null;
+
+      // Get the coin balance, we need to sum all the balances to get the total balance
+      do {
+        coins = await client.getCoins({
+          cursor: cursor,
+          owner: input.owner,
+          coinType: coinType,
+        });
+        balance =
+          balance +
+          coins.data?.reduce((acc, coin) => acc + Number(coin.balance), 0);
+        cursor = coins.nextCursor;
+      } while (coins.hasNextPage);
 
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
@@ -59,7 +70,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       const result = {
         isTokenOwner,
         isTokenMinter: isTokenOwner,
-        tokenBalance: balance,
+        tokenBalance: balance.toString(),
         decimals: metadata?.decimals ?? 0,
         isTokenPendingOwner: false,
         hasPendingOwner: false,
