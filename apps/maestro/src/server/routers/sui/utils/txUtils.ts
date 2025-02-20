@@ -1,5 +1,4 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
-import { CoinMetadata } from "@mysten/sui/client";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import { suiServiceBaseUrl } from "./utils";
@@ -19,13 +18,28 @@ export function setupTxBuilder(sender: string) {
 
 export async function getTokenId(
   txBuilder: TxBuilder,
-  tokenType: string,
+  tokenId: string,
   ITS: any,
-  coinMetadata: CoinMetadata
 ) {
-  const [TokenId] = await txBuilder.moveCall({
+    const [TokenId] = await txBuilder.moveCall({
+    target: `${ITS.address}::token_id::from_u256`,
+    arguments: [
+      tokenId.toString(),
+    ],
+  })
+
+  return TokenId;
+}
+
+export async function getTokenIdByCoinMetadata(
+  txBuilder: TxBuilder,
+  coinType: string,
+  ITS: any,
+  coinMetadata: any,
+) {
+ const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
-    typeArguments: [tokenType],
+    typeArguments: [coinType],
     arguments: [
       coinMetadata.name,
       coinMetadata.symbol,
@@ -49,7 +63,12 @@ export async function deployRemoteInterchainToken(
   const { Example, ITS, AxelarGateway, GasService } = chainConfig.contracts;
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
-  const TokenId = await getTokenId(txBuilder, tokenType, ITS, coinMetadata);
+  const TokenId = await getTokenIdByCoinMetadata(
+    txBuilder,
+    tokenType,
+    ITS,
+    coinMetadata
+  );
 
   await txBuilder.moveCall({
     target: `${Example.address}::its::deploy_remote_interchain_token`,

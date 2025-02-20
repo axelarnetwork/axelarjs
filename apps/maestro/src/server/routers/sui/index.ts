@@ -192,16 +192,10 @@ export const suiRouter = router({
         });
         const coinObjectId = coins.data[0].coinObjectId;
 
+
+
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
-
-        const coinMetadata = await suiClient.getCoinMetadata({
-          coinType: input.coinType,
-        });
-
-        if (!coinMetadata) {
-          throw new Error(`Coin metadata not found for ${input.coinType}`);
-        }
 
         const { Example, AxelarGateway, GasService, ITS } = chainConfig.contracts;
 
@@ -209,7 +203,6 @@ export const suiRouter = router({
           txBuilder,
           input.tokenId,
           ITS,
-          coinMetadata
         );
 
         await txBuilder.moveCall({
