@@ -52,7 +52,12 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
 
-      const tokenOwner = await getTokenOwner(input.tokenAddress);
+      let tokenOwner = null;
+      try {
+        tokenOwner = await getTokenOwner(input.tokenAddress);
+      } catch (error) {
+        console.log("getERC20TokenBalanceForOwner", error);
+      }
 
       isTokenOwner = tokenOwner === input.owner;
 
