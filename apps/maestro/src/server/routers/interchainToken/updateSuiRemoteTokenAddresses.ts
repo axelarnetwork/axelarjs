@@ -8,8 +8,6 @@ export const updateSuiRemoteTokenAddresses = protectedProcedure
       tokenId: z.string(),
     })
   )
-  .mutation(async ({ ctx, input }) => {
-    return ctx.persistence.postgres.updateSuiRemoteTokenAddresses(
-      input.tokenId
-    );
-  });
+  .mutation(({ ctx, input }) =>
+    ctx.persistence.postgres.updateSuiRemoteTokenAddresses(input.tokenId)
+  );
