@@ -53,7 +53,7 @@ async function processGMPData(
 export const getTransactionStatusesOnDestinationChains = publicProcedure
   .input(
     z.object({
-      txHashes: z.array(hex64Literal()),
+      txHashes: z.array(z.string()),
     })
   )
   .query(async ({ ctx, input }) => {
