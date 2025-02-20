@@ -53,6 +53,7 @@ export const getERC20TokenBalanceForOwner = publicProcedure
       const metadata = await client.getCoinMetadata({ coinType });
 
       let tokenOwner = null;
+      // TODO: address this properly
       try {
         tokenOwner = await getTokenOwner(input.tokenAddress);
       } catch (error) {
