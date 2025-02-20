@@ -56,10 +56,12 @@ export type Props = TokenInfo & {
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
   const chainId = useChainId();
+  const isIncompatibleChain = props.tokenAddress?.length !== address?.length;
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
+    disabled: !props.isRegistered || isIncompatibleChain,
   });
   const balance = result?.data;
 
@@ -182,8 +184,26 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
         {!balance?.tokenBalance ? (
           !address ? null : (
-            <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-              <span className="mx-auto">Loading balance...</span>
+            <div>
+              {isIncompatibleChain ? (
+                <Button
+                  $size="xs"
+                  $variant="primary"
+                  className="my-1 flex w-full"
+                  onClick={handleSwitchChain}
+                >
+                  Connect to {props.chain?.name ?? "chain"} to see your balance{" "}
+                  <ChainIcon
+                    src={props.chain?.image ?? ""}
+                    size="xs"
+                    alt={props.chain?.name ?? ""}
+                  />
+                </Button>
+              ) : (
+                <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+                  <span className="mx-auto">Loading balance...</span>
+                </div>
+              )}
             </div>
           )
         ) : (
