@@ -268,9 +268,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
   const isSameChainType = useMemo(() => {
-    return (
-      state.selectedToChain?.chain_type === props.sourceChain.chain_type
-    );
+    return state.selectedToChain?.chain_type === props.sourceChain.chain_type;
   }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
 
   useEffect(() => {
@@ -414,6 +412,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
               $bordered
               placeholder="Enter destination address"
               className="bg-base-200"
+              autoComplete="off"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              aria-autocomplete="none"
               disabled={isSameChainType}
               {...register("destinationAddress", {
                 required: "Destination address is required",
