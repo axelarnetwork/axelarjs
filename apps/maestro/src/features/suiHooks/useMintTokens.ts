@@ -47,7 +47,7 @@ export default function useMintTokens() {
       throw new Error("Wallet not connected");
     }
     const treasuryCapId = await getTreasuryCap(tokenAddress);
-
+    if (!treasuryCapId) throw new Error("Treasury cap not found");
     try {
       const mintTxJSON = await getMintTx({
         sender: currentAccount.address,
