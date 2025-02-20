@@ -270,5 +270,5 @@ function extractCoinInfo(coin: SuiObjectResponse) {
     symbol: coinInfo.symbol,
     totalSupply: coinManagement.treasury_cap.fields.total_supply.fields.value,
     treasuryCap: coinManagement.treasury_cap.fields.id.id,
-  }
+  };
 }

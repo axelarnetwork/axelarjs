@@ -13,7 +13,7 @@ import {
   getTokenId,
   setupTxBuilder,
 } from "./utils/txUtils";
-import { buildTx, suiServiceBaseUrl } from "./utils/utils";
+import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -85,9 +85,7 @@ export const suiRouter = router({
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const feeUnitAmount = 5e7;
-        const { txBuilder } = setupTxBuilder(
-          sender
-        );
+        const { txBuilder } = setupTxBuilder(sender);
 
         const coinMetadata = await suiClient.getCoinMetadata({
           coinType: tokenType,
@@ -179,8 +177,7 @@ export const suiRouter = router({
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;
 
-        const { txBuilder } =
-          setupTxBuilder(input.sender);
+        const { txBuilder } = setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
 
         // Split coins for gas
@@ -192,18 +189,13 @@ export const suiRouter = router({
         });
         const coinObjectId = coins.data[0].coinObjectId;
 
-
-
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
 
-        const { Example, AxelarGateway, GasService, ITS } = chainConfig.contracts;
+        const { Example, AxelarGateway, GasService, ITS } =
+          chainConfig.contracts;
 
-        const TokenId = await getTokenId(
-          txBuilder,
-          input.tokenId,
-          ITS,
-        );
+        const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
         await txBuilder.moveCall({
           target: `${Example.address}::its::send_interchain_transfer_call`,
@@ -292,6 +284,46 @@ export const suiRouter = router({
         );
         throw new Error(
           `Register remote token transaction preparation failed: ${
+            (error as Error).message
+          }`
+        );
+      }
+    }),
+
+  getTransferTreasuryCapTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+        tokenId: z.string(),
+        recipientAddress: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const { sender, tokenId, recipientAddress } = input;
+        const treasuryCap = await getTreasuryCap(tokenId);
+
+        if (!treasuryCap) {
+          throw new Error("Treasury cap not found");
+        }
+
+        const txBuilder = new TxBuilder(suiClient);
+
+        await txBuilder.moveCall({
+          target: `${SUI_PACKAGE_ID}::transfer::transfer`,
+          arguments: [treasuryCap, recipientAddress],
+        });
+
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error(
+          "Failed to prepare transfer treasury cap transaction:",
+          error
+        );
+        throw new Error(
+          `Transfer treasury cap transaction preparation failed: ${
             (error as Error).message
           }`
         );

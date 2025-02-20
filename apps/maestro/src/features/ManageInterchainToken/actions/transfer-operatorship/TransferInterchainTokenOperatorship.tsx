@@ -18,9 +18,10 @@ import {
 import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useWriteTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
-import { useChainId, useTransactionState } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { useTransferTreasuryCapMutation } from "../../hooks/useTransferTreasuryCapMutation";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 
 type FormState = {
@@ -60,52 +61,59 @@ export const TransferInterchainTokenOperatorship: FC = () => {
 
   const trpcContext = trpc.useUtils();
 
-  const onReceipt = useCallback(
-    async (receipt: TransactionReceipt) => {
-      if (!transferTxHash) {
-        return;
-      }
-
-      await Promise.all([
+  const onSuccess = useCallback(
+    (receipt?: TransactionReceipt) => {
+      Promise.all([
         trpcContext.interchainToken.searchInterchainToken.invalidate(),
         trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
-      ]);
+      ]).catch((error) => {
+        logger.error("Failed to invalidate queries", error);
+      });
 
-      await Promise.all([
+      Promise.all([
         trpcContext.interchainToken.searchInterchainToken.refetch(),
         trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
-      ]);
+      ]).catch((error) => {
+        logger.error("Failed to refetch queries", error);
+      });
 
       setTxState({
         status: "confirmed",
-        receipt,
+        receipt: receipt ?? undefined,
       });
 
       toast.success("Successfully transferred token operatorship");
     },
     [
       setTxState,
-      transferTxHash,
       trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
       trpcContext.interchainToken.searchInterchainToken,
     ]
   );
 
+  const onReceipt = useCallback(
+    (receipt?: TransactionReceipt) => {
+      if (!transferTxHash) {
+        return;
+      }
+
+      onSuccess(receipt);
+    },
+    [onSuccess, transferTxHash]
+  );
+
+  const { transferTreasuryCap } = useTransferTreasuryCapMutation();
+
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: transferTxHash,
   });
 
-  useEffect(
-    () => {
-      if (receipt) {
-        onReceipt(receipt).catch((error) => {
-          logger.error("Failed to process receipt", error);
-        });
-      }
-    },
+  useEffect(() => {
+    if (receipt) {
+      onReceipt(receipt);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
-  );
+  }, [receipt]);
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(
     async (data, e) => {
@@ -116,17 +124,34 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       });
 
       try {
-        const txHash = await transferOperatorshipAsync({
-          address: tokenDetails?.tokenManagerAddress as `0x${string}`,
-          args: [data.recipientAddress],
-        });
+        if (chainId === SUI_CHAIN_ID) {
+          const result = await transferTreasuryCap(
+            state.tokenId,
+            data.recipientAddress
+          );
 
-        if (txHash) {
-          setTxState({
-            status: "submitted",
-            chainId,
-            hash: txHash,
+          if (result?.digest) {
+            setTxState({
+              status: "submitted",
+              hash: result.digest,
+              chainId,
+              suiTx: result,
+            });
+            onSuccess();
+          }
+        } else {
+          const txHash = await transferOperatorshipAsync({
+            address: tokenDetails?.tokenManagerAddress as `0x${string}`,
+            args: [data.recipientAddress],
           });
+
+          if (txHash) {
+            setTxState({
+              status: "submitted",
+              chainId,
+              hash: txHash,
+            });
+          }
         }
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
@@ -150,10 +175,13 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       }
     },
     [
-      chainId,
       setTxState,
-      tokenDetails?.tokenManagerAddress,
+      chainId,
+      transferTreasuryCap,
+      state.tokenId,
+      onSuccess,
       transferOperatorshipAsync,
+      tokenDetails?.tokenManagerAddress,
     ]
   );
 
