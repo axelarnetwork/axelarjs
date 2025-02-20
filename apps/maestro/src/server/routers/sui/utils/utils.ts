@@ -125,7 +125,6 @@ export const getTreasuryCap = async (tokenAddress: string) => {
         showEvents: true,
       },
     });
-    console.log("txs", txs);
     treasuryCap = await findTreasuryCap(txs);
     cursor = txs.nextCursor;
   } while (txs.hasNextPage && !treasuryCap && cursor);
