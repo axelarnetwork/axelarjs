@@ -208,8 +208,8 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
 }
 
 function extractCoinInfo(coin: SuiObjectResponse) {
-  // Extract the token manager (objectId)
-  const fields = coin.data?.content?.fields?.value?.fields;
+  const content = coin.data?.content as any;
+  const fields = content?.fields?.value?.fields;
   const coinInfo = fields?.coin_info.fields;
   const coinManagement = fields?.coin_management.fields;
 
