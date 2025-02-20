@@ -43,12 +43,14 @@ export function useMintInterchainTokenState() {
         return;
       }
 
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate();
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
-        chainId,
-        tokenAddress: managerState.tokenAddress,
-        owner: accountAddress,
-      });
+      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
+      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(
+        {
+          chainId,
+          tokenAddress: managerState.tokenAddress,
+          owner: accountAddress,
+        }
+      );
 
       setTxState({
         status: "confirmed",
@@ -59,7 +61,7 @@ export function useMintInterchainTokenState() {
     },
     [
       mintTxHash,
-      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
       chainId,
       managerState.tokenAddress,
       accountAddress,

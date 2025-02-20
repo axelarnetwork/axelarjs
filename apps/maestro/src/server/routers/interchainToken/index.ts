@@ -1,6 +1,7 @@
 import { router } from "~/server/trpc";
 import { findInterchainTokenByTokenId } from "./findInterchainTokenByTokenId";
 import { getInterchainTokenABI } from "./getInterchainTokenABI";
+import { getInterchainTokenBalanceForOwner } from "./getInterchainTokenBalanceForOwner";
 import { getInterchainTokenByTokenId } from "./getInterchainTokenByTokenId";
 import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
 import { getInterchainTokenMeta } from "./getInterchainTokenMeta";
@@ -37,6 +38,7 @@ export const interchainTokenRouter = router({
   setInterchainTokenIconUrl,
   updateEVMRemoteTokenAddress,
   updateSuiRemoteTokenAddresses,
+  getInterchainTokenBalanceForOwner,
 });
 
 // export type definition of API

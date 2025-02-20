@@ -5,6 +5,7 @@ import {
   SuiObjectResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
+  type PaginatedTransactionResponse,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
@@ -82,6 +83,56 @@ export const getTokenOwner = async (tokenAddress: string) => {
   }
 };
 
+function findTreasuryCap(txData: PaginatedTransactionResponse) {
+  // Find the mint transaction
+  const mintTx = txData.data.find((tx) => {
+    const transactions = (tx.transaction?.data?.transaction as any)
+      .transactions;
+    return transactions?.some(
+      (t: any) =>
+        t.MoveCall?.module === "coin" && t.MoveCall?.function === "mint"
+    );
+  });
+
+  if (!mintTx) {
+    console.log("No mint transaction found");
+    return null;
+  }
+
+  // Get the treasury cap input from the mint transaction
+  const treasuryCapInput = (mintTx?.transaction?.data?.transaction as any)
+    .inputs[0];
+
+  if (treasuryCapInput?.type === "object") {
+    return treasuryCapInput.objectId;
+  }
+
+  return null;
+}
+
+export const getTreasuryCap = async (tokenAddress: string) => {
+  let cursor: string | null | undefined = null;
+  let txs: PaginatedTransactionResponse | null;
+  let treasuryCap: string | null = null;
+
+  do {
+    txs = await client.queryTransactionBlocks({
+      filter: {
+        InputObject: tokenAddress,
+      },
+      cursor: cursor,
+      options: {
+        showInput: true,
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    treasuryCap = await findTreasuryCap(txs);
+    cursor = txs.nextCursor;
+  } while (txs.hasNextPage && !treasuryCap && cursor);
+  return treasuryCap;
+};
+
 export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
 }) => {
@@ -97,6 +148,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
         showContent: true,
       },
     });
+
     const registeredCoinsBagId = (registeredCoinsObject.data?.content as any)
       ?.fields?.value?.fields.registered_coins.fields.id.id as string;
 
@@ -186,7 +238,6 @@ export async function findInPaginatedDynamicFields(
         console.error("Failed to get dynamic fields:", error);
         return null;
       });
-
     cursor = result?.nextCursor ?? null;
     filteredResult = result?.data?.filter(filterFn) ?? [];
   } while (result?.hasNextPage && !filteredResult?.length);
