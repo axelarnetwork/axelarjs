@@ -100,7 +100,7 @@ export default function useRegisterRemoteInterchainTokens(
     ...mutation,
     writeContract: () => {
       if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainToken(suiInput).then(receipt => receipt.digest);
+        return registerRemoteInterchainToken(suiInput).then(receipt => receipt);
       }
 
       if (!config) return;
@@ -109,7 +109,7 @@ export default function useRegisterRemoteInterchainTokens(
     },
     writeContractAsync: async () => {
       if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainToken(suiInput).then(receipt => receipt.digest);
+        return registerRemoteInterchainToken(suiInput).then(receipt => receipt);
       }
 
       if (!config) return;

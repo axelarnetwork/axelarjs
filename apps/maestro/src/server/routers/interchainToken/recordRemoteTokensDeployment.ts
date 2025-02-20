@@ -2,7 +2,6 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { hex40Literal } from "~/lib/utils/validation";
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
 
@@ -14,8 +13,9 @@ export const recordRemoteTokensDeployment = protectedProcedure
   .input(
     z.object({
       chainId: z.number(),
+      axelarChainId: z.string().optional(),
       deploymentMessageId: z.string(),
-      tokenAddress: hex40Literal(),
+      tokenAddress: z.string(),
       remoteTokens: z.array(remoteInterchainTokenSchema),
     })
   )
@@ -27,7 +27,8 @@ export const recordRemoteTokensDeployment = protectedProcedure
     ]);
 
     // Try to find config in either chain type
-    const configs = evmChains[input.chainId] || vmChains[input.chainId];
+    // TODO: fix hardcoded value
+    const configs = evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui"];
 
     if (!configs) {
       throw new TRPCError({
@@ -92,18 +93,27 @@ export const recordRemoteTokensDeployment = protectedProcedure
           });
         }
 
-        const [tokenManagerAddress, tokenAddress] = await Promise.all([
-          itsClient.reads
-            .tokenManagerAddress({
-              tokenId: originToken.tokenId as `0x${string}`,
-            })
-            .catch(always("0x")),
-          itsClient.reads
-            .registeredTokenAddress({
-              tokenId: originToken.tokenId as `0x${string}`,
-            })
-            .catch(always("0x")),
-        ]);
+        let tokenManagerAddress: string = "0x";
+        let tokenAddress: string = "0x";
+
+        if (remoteToken.axelarChainId !== "sui") {
+          [tokenManagerAddress, tokenAddress] = await Promise.all([
+            itsClient.reads
+              .tokenManagerAddress({
+                tokenId: originToken.tokenId as `0x${string}`,
+              })
+              .catch(always("0x")),
+            itsClient.reads
+              .registeredTokenAddress({
+                tokenId: originToken.tokenId as `0x${string}`,
+              })
+              .catch(always("0x")),
+          ]);
+        } else {
+          // Use placeholders for Sui, to be updated later
+          tokenAddress = originToken.tokenAddress;
+          tokenManagerAddress = originToken.tokenManagerAddress ?? "0x";
+        }
 
         return {
           tokenManagerAddress,
@@ -116,7 +126,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         };
       })
     );
-
+     
     return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
       remoteTokens as NewRemoteInterchainTokenInput[]
     );

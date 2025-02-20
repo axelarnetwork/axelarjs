@@ -97,11 +97,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       deploymentTxHash: digest,
     }));
     console.log("remoteTokens", remoteTokens);
+   const txIndex = txState.suiTx?.events?.[2]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
+
+    // fix hardcoded value
     await recordRemoteTokenDeployment({
       tokenAddress: props.tokenAddress,
       chainId: props.originChainId ?? -1,
+      axelarChainId: "sui",
       // TODO: find event Txindex correctly
-      deploymentMessageId: `${digest}`,
+      deploymentMessageId: `${digest}-${txIndex}`,
       remoteTokens,
     });
     console.log("setTxState");
@@ -199,10 +203,11 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     const txPromise = registerTokensAsync();
 
     await handleTransactionResult(txPromise, {
-      onSuccess(txHash) {
+      onSuccess(result) {
         setTxState({
           status: "submitted",
-          hash: txHash,
+          hash: result?.digest || txHash,
+          suiTx: result,
           chainId: props.originChainId ?? -1,
           txType: "INTERCHAIN_DEPLOYMENT",
         });
