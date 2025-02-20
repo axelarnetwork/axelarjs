@@ -25,7 +25,7 @@ export function useInterchainTokenBalanceForOwnerQuery(input: {
   owner?: string;
   disabled?: boolean;
 }) {
-  return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
+  return trpc.interchainToken.getInterchainTokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),
       tokenAddress: String(input.tokenAddress),

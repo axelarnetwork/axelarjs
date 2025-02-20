@@ -92,9 +92,7 @@ export function useSendInterchainTokenState(props: {
 
   const balance = useBalance();
 
-  const nativeTokenSymbol = getNativeToken(
-    props.sourceChain.id.toLowerCase()
-  );
+  const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
   const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
@@ -142,7 +140,7 @@ export function useSendInterchainTokenState(props: {
   const trpcContext = trpc.useUtils();
 
   const refetchBalances = () =>
-    trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+    trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch();
 
   const resetTxState = () => {
     resetInterchainTransferTxState();

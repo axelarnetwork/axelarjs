@@ -56,12 +56,12 @@ export const TransferInterchainTokenMintership: FC = () => {
 
       await Promise.all([
         trpcContext.interchainToken.searchInterchainToken.invalidate(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
       ]);
 
       await Promise.all([
         trpcContext.interchainToken.searchInterchainToken.refetch(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
       ]);
 
       setTxState({
@@ -74,7 +74,7 @@ export const TransferInterchainTokenMintership: FC = () => {
     [
       setTxState,
       transferTxHash,
-      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
       trpcContext.interchainToken.searchInterchainToken,
     ]
   );
