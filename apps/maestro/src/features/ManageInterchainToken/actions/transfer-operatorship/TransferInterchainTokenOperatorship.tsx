@@ -10,6 +10,7 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
+import { isValidSuiAddress } from "@mysten/sui/utils";
 import {
   isAddress,
   TransactionExecutionError,
@@ -126,7 +127,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       try {
         if (chainId === SUI_CHAIN_ID) {
           const result = await transferTreasuryCap(
-            state.tokenId,
+            tokenDetails?.tokenAddress as string,
             data.recipientAddress
           );
 
@@ -178,10 +179,10 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       setTxState,
       chainId,
       transferTreasuryCap,
-      state.tokenId,
+      tokenDetails?.tokenAddress,
+      tokenDetails?.tokenManagerAddress,
       onSuccess,
       transferOperatorshipAsync,
-      tokenDetails?.tokenManagerAddress,
     ]
   );
 
@@ -226,8 +227,16 @@ export const TransferInterchainTokenOperatorship: FC = () => {
               {...register("recipientAddress", {
                 disabled: isTransfering,
                 validate(value) {
-                  if (!value || !isAddress(value)) {
-                    return "Invalid address";
+                  if (!value) return "Address is required";
+
+                  if (chainId === SUI_CHAIN_ID) {
+                    if (!isValidSuiAddress(value)) {
+                      return "Invalid Sui address";
+                    }
+                  } else {
+                    if (!isAddress(value)) {
+                      return "Invalid EVM address";
+                    }
                   }
 
                   return true;

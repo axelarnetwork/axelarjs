@@ -12,7 +12,7 @@ export function useTransferTreasuryCapMutation() {
 
   const { mutateAsync: getTransferTreasuryCapTx } =
     trpc.sui.getTransferTreasuryCapTx.useMutation({
-      onError(error) {
+      onError(error: any) {
         console.log("error in getTransferTreasuryCapTx", error.message);
       },
     });
@@ -37,7 +37,10 @@ export function useTransferTreasuryCapMutation() {
   return {
     txState,
     setTxState,
-    transferTreasuryCap: async (tokenId: string, recipientAddress: string) => {
+    transferTreasuryCap: async (
+      tokenAddress: string,
+      recipientAddress: string
+    ) => {
       if (!address) return;
 
       try {
@@ -46,7 +49,7 @@ export function useTransferTreasuryCapMutation() {
         });
 
         const treasuryCapTxJSON = await getTransferTreasuryCapTx({
-          tokenId,
+          tokenAddress,
           recipientAddress,
           sender: address,
         });

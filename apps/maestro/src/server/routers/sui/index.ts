@@ -294,27 +294,22 @@ export const suiRouter = router({
     .input(
       z.object({
         sender: z.string(),
-        tokenId: z.string(),
+        tokenAddress: z.string(),
         recipientAddress: z.string(),
       })
     )
     .mutation(async ({ input }) => {
       try {
-        const { sender, tokenId, recipientAddress } = input;
-        const treasuryCap = await getTreasuryCap(tokenId);
-
+        const { sender, tokenAddress, recipientAddress } = input;
+        const treasuryCap = await getTreasuryCap(tokenAddress);
         if (!treasuryCap) {
           throw new Error("Treasury cap not found");
         }
 
         const txBuilder = new TxBuilder(suiClient);
 
-        await txBuilder.moveCall({
-          target: `${SUI_PACKAGE_ID}::transfer::transfer`,
-          arguments: [treasuryCap, recipientAddress],
-        });
-
         const tx = await buildTx(sender, txBuilder);
+        tx.transferObjects([treasuryCap], tx.pure.address(recipientAddress));
         const txJSON = await tx.toJSON();
         return txJSON;
       } catch (error) {
