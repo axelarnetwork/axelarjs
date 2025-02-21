@@ -7,7 +7,7 @@ const mock = {
 describe("loadChains()", () => {
   beforeEach(() => {
     vitest.clearAllMocks();
-    vitest.spyOn(mock, "loadChains");
+    vitest.spyOn(mock, "loadChains").mockResolvedValue([]);
   });
 
   describe("when loadChains is called with known env, but not mainnet", () => {

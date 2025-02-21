@@ -100,6 +100,11 @@ export default {
     },
     {
       inputs: [],
+      name: "EmptyTokenAddress",
+      type: "error",
+    },
+    {
+      inputs: [],
       name: "EmptyTokenName",
       type: "error",
     },
@@ -274,17 +279,6 @@ export default {
       type: "error",
     },
     {
-      inputs: [
-        {
-          internalType: "address",
-          name: "implementation",
-          type: "address",
-        },
-      ],
-      name: "InvalidTokenManagerImplementationType",
-      type: "error",
-    },
-    {
       inputs: [],
       name: "LengthMismatch",
       type: "error",
@@ -345,6 +339,17 @@ export default {
     {
       inputs: [],
       name: "NotApprovedByGateway",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "sender",
+          type: "address",
+        },
+      ],
+      name: "NotInterchainTokenFactory",
       type: "error",
     },
     {
@@ -739,6 +744,49 @@ export default {
       inputs: [
         {
           indexed: true,
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+        {
+          indexed: false,
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          indexed: false,
+          internalType: "bytes",
+          name: "sourceTokenAddress",
+          type: "bytes",
+        },
+        {
+          indexed: false,
+          internalType: "bytes",
+          name: "destinationTokenAddress",
+          type: "bytes",
+        },
+        {
+          indexed: true,
+          internalType: "enum ITokenManagerType.TokenManagerType",
+          name: "tokenManagerType",
+          type: "uint8",
+        },
+        {
+          indexed: false,
+          internalType: "bytes",
+          name: "params",
+          type: "bytes",
+        },
+      ],
+      name: "LinkTokenStarted",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
           internalType: "address",
           name: "newOwner",
           type: "address",
@@ -872,30 +920,18 @@ export default {
       inputs: [
         {
           indexed: true,
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
         },
         {
           indexed: false,
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          indexed: true,
-          internalType: "enum ITokenManagerType.TokenManagerType",
-          name: "tokenManagerType",
+          internalType: "uint8",
+          name: "decimals",
           type: "uint8",
         },
-        {
-          indexed: false,
-          internalType: "bytes",
-          name: "params",
-          type: "bytes",
-        },
       ],
-      name: "TokenManagerDeploymentStarted",
+      name: "TokenMetadataRegistered",
       type: "event",
     },
     {
@@ -974,44 +1010,6 @@ export default {
       name: "acceptOwnership",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          internalType: "bytes",
-          name: "destinationAddress",
-          type: "bytes",
-        },
-        {
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256",
-        },
-        {
-          internalType: "bytes",
-          name: "data",
-          type: "bytes",
-        },
-        {
-          internalType: "uint256",
-          name: "gasValue",
-          type: "uint256",
-        },
-      ],
-      name: "callContractWithInterchainToken",
-      outputs: [],
-      stateMutability: "payable",
       type: "function",
     },
     {
@@ -1140,45 +1138,6 @@ export default {
       inputs: [
         {
           internalType: "bytes32",
-          name: "salt",
-          type: "bytes32",
-        },
-        {
-          internalType: "string",
-          name: "destinationChain",
-          type: "string",
-        },
-        {
-          internalType: "enum ITokenManagerType.TokenManagerType",
-          name: "tokenManagerType",
-          type: "uint8",
-        },
-        {
-          internalType: "bytes",
-          name: "params",
-          type: "bytes",
-        },
-        {
-          internalType: "uint256",
-          name: "gasValue",
-          type: "uint256",
-        },
-      ],
-      name: "deployTokenManager",
-      outputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-      ],
-      stateMutability: "payable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
           name: "tokenId",
           type: "bytes32",
         },
@@ -1248,63 +1207,6 @@ export default {
       name: "expressExecute",
       outputs: [],
       stateMutability: "payable",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-      ],
-      name: "flowInAmount",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "flowInAmount_",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-      ],
-      name: "flowLimit",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "flowLimit_",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "bytes32",
-          name: "tokenId",
-          type: "bytes32",
-        },
-      ],
-      name: "flowOutAmount",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "flowOutAmount_",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
       type: "function",
     },
     {
@@ -1570,6 +1472,63 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "string",
+          name: "destinationChain",
+          type: "string",
+        },
+        {
+          internalType: "bytes",
+          name: "destinationTokenAddress",
+          type: "bytes",
+        },
+        {
+          internalType: "enum ITokenManagerType.TokenManagerType",
+          name: "tokenManagerType",
+          type: "uint8",
+        },
+        {
+          internalType: "bytes",
+          name: "linkParams",
+          type: "bytes",
+        },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
+      ],
+      name: "linkToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      name: "migrateInterchainToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "bytes[]",
           name: "data",
           type: "bytes[]",
@@ -1649,6 +1608,58 @@ export default {
       name: "proposeOwnership",
       outputs: [],
       stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "bytes32",
+          name: "salt",
+          type: "bytes32",
+        },
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "enum ITokenManagerType.TokenManagerType",
+          name: "tokenManagerType",
+          type: "uint8",
+        },
+        {
+          internalType: "bytes",
+          name: "linkParams",
+          type: "bytes",
+        },
+      ],
+      name: "registerCustomToken",
+      outputs: [
+        {
+          internalType: "bytes32",
+          name: "tokenId",
+          type: "bytes32",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "tokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "gasValue",
+          type: "uint256",
+        },
+      ],
+      name: "registerTokenMetadata",
+      outputs: [],
+      stateMutability: "payable",
       type: "function",
     },
     {

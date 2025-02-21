@@ -13,11 +13,6 @@ export default {
   abi: [
     {
       inputs: [],
-      name: "AddressZero",
-      type: "error",
-    },
-    {
-      inputs: [],
       name: "TokenManagerDeploymentFailed",
       type: "error",
     },

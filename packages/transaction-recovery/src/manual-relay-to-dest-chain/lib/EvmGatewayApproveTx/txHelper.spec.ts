@@ -3,8 +3,7 @@ import { hashMessage } from "viem";
 import * as TxHelper from "./txHelper";
 
 describe("TxHelper", () => {
-  const rpcUrl =
-    "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
+  const rpcUrl = "https://1rpc.io/eth";
   test("should be able to create the approve transaction correctly", async () => {
     const gatewayAddress = "0x4F4495243837681061C4743b74B3eEdf548D56A5";
     const serializedTx = await TxHelper.createApproveTx(
@@ -23,5 +22,4 @@ describe("TxHelper", () => {
     expect(chainId).toBe(1);
     expect(maxPriorityFeePerGas).toBeDefined();
   });
-
 });
