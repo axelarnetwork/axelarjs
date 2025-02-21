@@ -3,9 +3,11 @@ import type { GMPTxStatus } from "@axelarjs/api";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
-import { SEARCHGMP_SOURCE, ChainStatus } from "./getTransactionStatusOnDestinationChains";
+import {
+  ChainStatus,
+  SEARCHGMP_SOURCE,
+} from "./getTransactionStatusOnDestinationChains";
 
 async function getSecondHopStatus(
   messageId: string,
