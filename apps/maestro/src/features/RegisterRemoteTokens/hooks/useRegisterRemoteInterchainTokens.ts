@@ -1,7 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { zeroAddress } from "viem";
 import { useChainId } from "wagmi";
 
 import {
@@ -71,8 +70,6 @@ export default function useRegisterRemoteInterchainTokens(
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        originalChainName: "",
-        minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
         destinationChain: chainId,
         gasValue: gasFeesData.gasFees[i].fee,
       })
