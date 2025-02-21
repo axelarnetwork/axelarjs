@@ -27,7 +27,7 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { useAccount } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -74,32 +74,36 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(props.tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    [
-      "Add Token to Wallet",
-      <LinkButton
-        key="add-to-wallet"
-        href="#"
-        className="ml-[-10px]"
-        $variant="link"
-        onClick={async () => {
-          try {
-            await watchAsset(wallet, {
-              type: "ERC20",
-              options: {
-                address: props.tokenAddress,
-                decimals: props.decimals,
-                symbol: props.symbol,
-                image: meta?.iconUrl,
-              },
-            });
-          } catch (_e) {
-            // noop because the error is raised when the user cancels the popup dialog
-          }
-        }}
-      >
-        Add
-      </LinkButton>,
-    ],
+    ...(props.chain.chain_id !== SUI_CHAIN_ID
+      ? [
+          [
+            "Add Token to Wallet",
+            <LinkButton
+              key="add-to-wallet"
+              href="#"
+              className="ml-[-10px]"
+              $variant="link"
+              onClick={async () => {
+                try {
+                  await watchAsset(wallet, {
+                    type: "ERC20",
+                    options: {
+                      address: props.tokenAddress,
+                      decimals: props.decimals,
+                      symbol: props.symbol,
+                      image: meta?.iconUrl,
+                    },
+                  });
+                } catch (_e) {
+                  // noop because the error is raised when the user cancels the popup dialog
+                }
+              }}
+            >
+              Add
+            </LinkButton>,
+          ],
+        ]
+      : []),
     ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) =>
       !props.deploymentMessageId
         ? [[]]

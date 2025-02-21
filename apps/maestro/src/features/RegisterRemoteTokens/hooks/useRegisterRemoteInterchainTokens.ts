@@ -9,10 +9,11 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { useChainId } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
 export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
@@ -35,9 +36,7 @@ export default function useRegisterRemoteInterchainTokens(
     [input.chainIds, combinedComputed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map(
-    (chain) => chain.id
-  );
+  const destinationChainIds = destinationChains.map((chain) => chain.id);
 
   const sourceChain = useMemo(
     () => combinedComputed.indexedByChainId[chainId],
@@ -80,20 +79,39 @@ export default function useRegisterRemoteInterchainTokens(
     value: totalGasFee,
     args: [multicallArgs],
     query: {
-      enabled: multicallArgs.length > 0,
+      enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
     },
   });
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
+  const { registerRemoteInterchainToken } =
+    useRegisterRemoteInterchainTokenOnSui();
+
+  if (!tokenDeployment) return;
+  const suiInput = {
+    axelarChainIds: destinationChainIds,
+    originChainId: input.originChainId,
+    tokenAddress: input.tokenAddress,
+    symbol: tokenDeployment.tokenSymbol,
+  };
+
   return {
     ...mutation,
     writeContract: () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
+
       if (!config) return;
 
       return mutation.writeContract(config.request);
     },
     writeContractAsync: async () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
+
       if (!config) return;
 
       return await mutation.writeContractAsync(config.request);

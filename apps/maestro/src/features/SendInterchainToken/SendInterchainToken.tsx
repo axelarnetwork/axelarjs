@@ -15,11 +15,15 @@ import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import { isValidSuiAddress } from "@mysten/sui/utils";
 import { formatUnits, parseUnits } from "viem";
 
 import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
-import { preventNonNumericInput } from "~/lib/utils/validation";
+import {
+  isValidEVMAddress,
+  preventNonNumericInput,
+} from "~/lib/utils/validation";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -263,25 +267,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
-  const isEvmChainsOnly = useMemo(() => {
-    return (
-      state.selectedToChain?.chain_type === "evm" &&
-      props.sourceChain.chain_type === "evm"
-    );
+  const isSameChainType = useMemo(() => {
+    return state.selectedToChain?.chain_type === props.sourceChain.chain_type;
   }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
 
   useEffect(() => {
-    if (isEvmChainsOnly) {
-      setValue("destinationAddress", address ?? "", {
-        shouldValidate: true,
-      });
-    }
+    const defaultAddress = isSameChainType ? (address ?? "") : "";
+
+    setValue("destinationAddress", defaultAddress, {
+      shouldValidate: true,
+    });
   }, [
     state.selectedToChain?.chain_type,
-    props.sourceChain.chain_type,
+    props.sourceChain?.chain_type,
     address,
     setValue,
-    isEvmChainsOnly,
+    isSameChainType,
   ]);
 
   return (
@@ -402,7 +403,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <FormControl>
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
-              {isEvmChainsOnly && (
+              {isSameChainType && (
                 <Label.AltText>(Using connected wallet address)</Label.AltText>
               )}
             </Label>
@@ -411,13 +412,31 @@ export const SendInterchainToken: FC<Props> = (props) => {
               $bordered
               placeholder="Enter destination address"
               className="bg-base-200"
-              disabled={isEvmChainsOnly}
+              autoComplete="off"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              aria-autocomplete="none"
+              disabled={isSameChainType}
               {...register("destinationAddress", {
                 required: "Destination address is required",
                 validate: (value) => {
-                  if (value.length < 42) {
-                    return "Invalid address length";
+                  // TODO handle sui address length
+                  console.log("select to chain", state.selectedToChain);
+                  if (
+                    state.selectedToChain.id === "sui" &&
+                    !isValidSuiAddress(value)
+                  ) {
+                    return "Invalid SUI address";
                   }
+
+                  if (
+                    state.selectedToChain.chain_type === "evm" &&
+                    !isValidEVMAddress(value)
+                  ) {
+                    return "Invalid EVM address";
+                  }
+
                   return true;
                 },
               })}

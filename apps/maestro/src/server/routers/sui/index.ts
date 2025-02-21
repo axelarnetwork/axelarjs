@@ -7,7 +7,13 @@ import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
-import { buildTx, suiServiceBaseUrl } from "./utils/utils";
+import {
+  deployRemoteInterchainToken,
+  getChainConfig,
+  getTokenId,
+  setupTxBuilder,
+} from "./utils/txUtils";
+import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -68,12 +74,7 @@ export const suiRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
-        //TODO: use chain config from ui
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = await getChainConfig();
         const {
           sender,
           symbol,
@@ -83,26 +84,8 @@ export const suiRouter = router({
         } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-        const txBuilder = new TxBuilder(suiClient);
-
-        txBuilder.tx.setSenderIfNotSet(sender);
-        const examplePackageId = chainConfig.contracts.Example.address;
         const feeUnitAmount = 5e7;
-        const ITS = chainConfig.contracts.ITS;
-        const Example = chainConfig.contracts.Example;
-        const AxelarGateway = chainConfig.contracts.AxelarGateway;
-        const GasService = chainConfig.contracts.GasService;
-
-        const itsObjectId = ITS.objects.ITS;
-
-        // const trustedDestinationChains = Object.keys(ITS.trustedAddresses);
-        // for (const destinationChain of destinationChains) {
-        //   if (!trustedDestinationChains.includes(destinationChain)) {
-        //     console.log(`destination chain ${destinationChain} not trusted`);
-        //     return undefined;
-        //   }
-        // }
+        const { txBuilder } = setupTxBuilder(sender);
 
         const coinMetadata = await suiClient.getCoinMetadata({
           coinType: tokenType,
@@ -112,44 +95,26 @@ export const suiRouter = router({
           return undefined;
         }
 
+        const { Example, ITS } = chainConfig.contracts;
+        const itsObjectId = ITS.objects.ITS;
+
         // TODO: handle register type properly, whether it's mint/burn or lock/unlock.
         await txBuilder.moveCall({
-          target: `${examplePackageId}::its::register_coin`,
+          target: `${Example.address}::its::register_coin`,
           typeArguments: [tokenType],
           arguments: [itsObjectId, metadataId],
         });
 
         for (const destinationChain of destinationChains) {
-          const [TokenId] = await txBuilder.moveCall({
-            target: `${ITS.address}::token_id::from_info`,
-            typeArguments: [tokenType],
-            arguments: [
-              coinMetadata.name,
-              coinMetadata.symbol,
-              txBuilder.tx.pure.u8(coinMetadata.decimals),
-              txBuilder.tx.pure.bool(false),
-              txBuilder.tx.pure.bool(false),
-            ],
-          });
-
-          const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [
+          await deployRemoteInterchainToken(
+            txBuilder,
+            chainConfig,
+            destinationChain,
+            coinMetadata,
             feeUnitAmount,
-          ]);
-
-          await txBuilder.moveCall({
-            target: `${Example.address}::its::deploy_remote_interchain_token`,
-            arguments: [
-              ITS.objects.ITS,
-              AxelarGateway.objects.Gateway,
-              GasService.objects.GasService,
-              destinationChain,
-              TokenId,
-              gas,
-              "0x",
-              sender,
-            ],
-            typeArguments: [tokenType],
-          });
+            sender,
+            tokenType
+          );
         }
 
         const tx = await buildTx(sender, txBuilder);
@@ -212,7 +177,7 @@ export const suiRouter = router({
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;
 
-        const txBuilder = new TxBuilder(suiClient);
+        const { txBuilder } = setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
 
         // Split coins for gas
@@ -227,18 +192,18 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
 
-        const [TokenId] = await txBuilder.moveCall({
-          target: `${chainConfig.contracts.ITS.address}::token_id::from_u256`,
-          arguments: [input.tokenId],
-        });
+        const { Example, AxelarGateway, GasService, ITS } =
+          chainConfig.contracts;
+
+        const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
         await txBuilder.moveCall({
-          target: `${chainConfig.contracts.Example.address}::its::send_interchain_transfer_call`,
+          target: `${Example.address}::its::send_interchain_transfer_call`,
           arguments: [
-            chainConfig.contracts.Example.objects.ItsSingleton,
-            chainConfig.contracts.ITS.objects.ITS,
-            chainConfig.contracts.AxelarGateway.objects.Gateway,
-            chainConfig.contracts.GasService.objects.GasService,
+            Example.objects.ItsSingleton,
+            ITS.objects.ITS,
+            AxelarGateway.objects.Gateway,
+            GasService.objects.GasService,
             TokenId,
             Coin,
             input.destinationChain,
@@ -259,6 +224,103 @@ export const suiRouter = router({
         console.error("Failed to prepare send token transaction:", error);
         throw new Error(
           `Send token transaction preparation failed: ${(error as Error).message}`
+        );
+      }
+    }),
+
+  getRegisterRemoteInterchainTokenTx: publicProcedure
+    .input(
+      z.object({
+        tokenAddress: z.string(),
+        destinationChainIds: z.array(z.string()),
+        originChainId: z.number(),
+        sender: z.string(),
+        symbol: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const response = await fetch(
+          `${suiServiceBaseUrl}/chain/devnet-amplifier`
+        );
+        const _chainConfig = await response.json();
+        const chainConfig = _chainConfig.chains.sui;
+        const { sender, symbol, tokenAddress, destinationChainIds } = input;
+
+        const txBuilder = new TxBuilder(suiClient);
+
+        txBuilder.tx.setSenderIfNotSet(sender);
+        const feeUnitAmount = 5e7;
+
+        const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: tokenType,
+        });
+
+        if (!coinMetadata) {
+          throw new Error(`Coin metadata not found for ${tokenType}`);
+        }
+
+        for (const destinationChain of destinationChainIds) {
+          await deployRemoteInterchainToken(
+            txBuilder,
+            chainConfig,
+            destinationChain,
+            coinMetadata,
+            feeUnitAmount,
+            sender,
+            tokenType
+          );
+        }
+
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error(
+          "Failed to prepare register remote token transaction:",
+          error
+        );
+        throw new Error(
+          `Register remote token transaction preparation failed: ${
+            (error as Error).message
+          }`
+        );
+      }
+    }),
+
+  getTransferTreasuryCapTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+        tokenAddress: z.string(),
+        recipientAddress: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const { sender, tokenAddress, recipientAddress } = input;
+        const treasuryCap = await getTreasuryCap(tokenAddress);
+        if (!treasuryCap) {
+          throw new Error("Treasury cap not found");
+        }
+
+        const txBuilder = new TxBuilder(suiClient);
+
+        const tx = await buildTx(sender, txBuilder);
+        tx.transferObjects([treasuryCap], tx.pure.address(recipientAddress));
+        const txJSON = await tx.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error(
+          "Failed to prepare transfer treasury cap transaction:",
+          error
+        );
+        throw new Error(
+          `Transfer treasury cap transaction preparation failed: ${
+            (error as Error).message
+          }`
         );
       }
     }),

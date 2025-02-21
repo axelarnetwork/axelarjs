@@ -5,7 +5,11 @@ import { z } from "zod";
 
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { publicProcedure } from "~/server/trpc";
-import { getCoinType, getTokenOwner } from "../sui/utils/utils";
+import {
+  getCoinInfoByCoinType,
+  getCoinType,
+  getTokenOwner,
+} from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
 
@@ -62,8 +66,22 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
+      let decimals;
 
-      const tokenOwner = await getTokenOwner(input.tokenAddress);
+      // This happens when the token is deployed on sui as a remote chain
+      if (!metadata) {
+        const coinInfo = await getCoinInfoByCoinType(client, coinType);
+        console.log("coinInfo", coinInfo);
+        decimals = coinInfo?.decimals;
+      }
+
+      let tokenOwner = null;
+      // TODO: address this properly
+      try {
+        tokenOwner = await getTokenOwner(input.tokenAddress);
+      } catch (error) {
+        // console.log("getERC20TokenBalanceForOwner", error);
+      }
 
       isTokenOwner = tokenOwner === input.owner;
 
@@ -71,7 +89,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         isTokenOwner,
         isTokenMinter: isTokenOwner,
         tokenBalance: balance.toString(),
-        decimals: metadata?.decimals ?? 0,
+        decimals: metadata?.decimals ?? decimals,
         isTokenPendingOwner: false,
         hasPendingOwner: false,
         hasMinterRole: isTokenOwner,

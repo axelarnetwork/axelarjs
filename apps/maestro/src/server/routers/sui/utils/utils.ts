@@ -2,6 +2,7 @@ import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import {
   SuiClient,
   SuiObjectChange,
+  SuiObjectResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
   type PaginatedTransactionResponse,
@@ -58,6 +59,7 @@ export const getCoinType = async (tokenAddress: string) => {
 };
 
 // get token owner from token address
+// TODO: this is wrong the the destination chain is sui where the token owner is axelar relayer
 export const getTokenOwner = async (tokenAddress: string) => {
   const object = await client.getObject({
     id: tokenAddress,
@@ -172,6 +174,51 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   }
 };
 
+export const getCoinInfoByCoinType = async (
+  client: SuiClient,
+  coinType: string
+) => {
+  try {
+    const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
+    const _chainConfig = await response.json();
+    const chainConfig = _chainConfig.chains.sui;
+
+    const registeredCoinsObject = await client.getObject({
+      id: chainConfig.contracts.ITS.objects.ITSv0,
+      options: {
+        showStorageRebate: true,
+        showContent: true,
+      },
+    });
+    const registeredCoinsBagId = (registeredCoinsObject.data?.content as any)
+      ?.fields?.value?.fields.registered_coins.fields.id.id as string;
+
+    const filteredResult = await findInPaginatedDynamicFields(
+      client,
+      registeredCoinsBagId,
+      (item: any) => item.objectType.includes(coinType)
+    );
+
+    if (filteredResult) {
+      const coin = await client.getObject({
+        id: filteredResult?.objectId,
+        options: {
+          showContent: true,
+        },
+      });
+      return extractCoinInfo(coin);
+    } else {
+      console.log("Token not found.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Failed to get token address:", error);
+    throw new Error(
+      `Failed to retrieve token address: ${(error as Error).message}`
+    );
+  }
+};
+
 export async function findInPaginatedDynamicFields(
   suiClient: SuiClient,
   parentId: string,
@@ -208,5 +255,20 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
   return {
     tokenManager,
     address,
+  };
+}
+
+function extractCoinInfo(coin: SuiObjectResponse) {
+  const content = coin.data?.content as any;
+  const fields = content?.fields?.value?.fields;
+  const coinInfo = fields?.coin_info.fields;
+  const coinManagement = fields?.coin_management.fields;
+
+  return {
+    decimals: coinInfo.decimals,
+    name: coinInfo.name,
+    symbol: coinInfo.symbol,
+    totalSupply: coinManagement.treasury_cap.fields.total_supply.fields.value,
+    treasuryCap: coinManagement.treasury_cap.fields.id.id,
   };
 }

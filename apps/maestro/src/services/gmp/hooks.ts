@@ -103,7 +103,7 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
       },
       {
         enabled: Boolean(
-          input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
+          input.txHashes?.every((txHash) => txHash)
         ),
         refetchInterval: 1000 * 10,
         ...options,
