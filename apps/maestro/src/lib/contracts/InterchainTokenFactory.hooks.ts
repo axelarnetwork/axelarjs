@@ -48,22 +48,20 @@ export const interchainTokenFactoryAbi = [
     inputs: [{ name: "minter", internalType: "address", type: "address" }],
     name: "NotMinter",
   },
-  {
-    type: "error",
-    inputs: [{ name: "operator", internalType: "address", type: "address" }],
-    name: "NotOperator",
-  },
   { type: "error", inputs: [], name: "NotOwner" },
   { type: "error", inputs: [], name: "NotProxy" },
+  { type: "error", inputs: [], name: "NotSupported" },
   {
     type: "error",
-    inputs: [{ name: "sender", internalType: "address", type: "address" }],
-    name: "NotServiceOwner",
+    inputs: [
+      { name: "tokenAddress", internalType: "address", type: "address" },
+    ],
+    name: "NotToken",
   },
-  { type: "error", inputs: [], name: "NotSupported" },
   { type: "error", inputs: [], name: "RemoteDeploymentNotApproved" },
   { type: "error", inputs: [], name: "SetupFailed" },
   { type: "error", inputs: [], name: "ZeroAddress" },
+  { type: "error", inputs: [], name: "ZeroSupplyToken" },
   {
     type: "event",
     anonymous: false,
@@ -270,9 +268,7 @@ export const interchainTokenFactoryAbi = [
   {
     type: "function",
     inputs: [
-      { name: "originalChainName", internalType: "string", type: "string" },
       { name: "salt", internalType: "bytes32", type: "bytes32" },
-      { name: "minter", internalType: "address", type: "address" },
       { name: "destinationChain", internalType: "string", type: "string" },
       { name: "gasValue", internalType: "uint256", type: "uint256" },
     ],
@@ -283,6 +279,7 @@ export const interchainTokenFactoryAbi = [
   {
     type: "function",
     inputs: [
+      { name: "originalChainName", internalType: "string", type: "string" },
       { name: "salt", internalType: "bytes32", type: "bytes32" },
       { name: "minter", internalType: "address", type: "address" },
       { name: "destinationChain", internalType: "string", type: "string" },
@@ -349,6 +346,44 @@ export const interchainTokenFactoryAbi = [
   },
   {
     type: "function",
+    inputs: [
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+      { name: "destinationChain", internalType: "string", type: "string" },
+      { name: "destinationTokenAddress", internalType: "bytes", type: "bytes" },
+      {
+        name: "tokenManagerType",
+        internalType: "enum ITokenManagerType.TokenManagerType",
+        type: "uint8",
+      },
+      { name: "linkParams", internalType: "bytes", type: "bytes" },
+      { name: "gasValue", internalType: "uint256", type: "uint256" },
+    ],
+    name: "linkToken",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "deployer", internalType: "address", type: "address" },
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+    ],
+    name: "linkedTokenDeploySalt",
+    outputs: [{ name: "deploySalt", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "deployer", internalType: "address", type: "address" },
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+    ],
+    name: "linkedTokenId",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
     name: "multicall",
     outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
@@ -381,6 +416,22 @@ export const interchainTokenFactoryAbi = [
       { name: "tokenAddress", internalType: "address", type: "address" },
     ],
     name: "registerCanonicalInterchainToken",
+    outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "salt", internalType: "bytes32", type: "bytes32" },
+      { name: "tokenAddress", internalType: "address", type: "address" },
+      {
+        name: "tokenManagerType",
+        internalType: "enum ITokenManagerType.TokenManagerType",
+        type: "uint8",
+      },
+      { name: "operator", internalType: "address", type: "address" },
+    ],
+    name: "registerCustomToken",
     outputs: [{ name: "tokenId", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "payable",
   },
@@ -528,6 +579,26 @@ export const useReadInterchainTokenFactoryInterchainTokenService =
   });
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"linkedTokenDeploySalt"`
+ */
+export const useReadInterchainTokenFactoryLinkedTokenDeploySalt =
+  /*#__PURE__*/ createUseReadContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "linkedTokenDeploySalt",
+  });
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"linkedTokenId"`
+ */
+export const useReadInterchainTokenFactoryLinkedTokenId =
+  /*#__PURE__*/ createUseReadContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "linkedTokenId",
+  });
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"owner"`
  */
 export const useReadInterchainTokenFactoryOwner =
@@ -617,6 +688,16 @@ export const useWriteInterchainTokenFactoryDeployRemoteInterchainTokenWithMinter
   });
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"linkToken"`
+ */
+export const useWriteInterchainTokenFactoryLinkToken =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "linkToken",
+  });
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"multicall"`
  */
 export const useWriteInterchainTokenFactoryMulticall =
@@ -644,6 +725,16 @@ export const useWriteInterchainTokenFactoryRegisterCanonicalInterchainToken =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
+  });
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"registerCustomToken"`
+ */
+export const useWriteInterchainTokenFactoryRegisterCustomToken =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "registerCustomToken",
   });
 
 /**
@@ -756,6 +847,16 @@ export const useSimulateInterchainTokenFactoryDeployRemoteInterchainTokenWithMin
   });
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"linkToken"`
+ */
+export const useSimulateInterchainTokenFactoryLinkToken =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "linkToken",
+  });
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"multicall"`
  */
 export const useSimulateInterchainTokenFactoryMulticall =
@@ -783,6 +884,16 @@ export const useSimulateInterchainTokenFactoryRegisterCanonicalInterchainToken =
     abi: interchainTokenFactoryAbi,
     address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
+  });
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"registerCustomToken"`
+ */
+export const useSimulateInterchainTokenFactoryRegisterCustomToken =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: interchainTokenFactoryAbi,
+    address: interchainTokenFactoryAddress,
+    functionName: "registerCustomToken",
   });
 
 /**
