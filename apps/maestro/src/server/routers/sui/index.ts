@@ -3,6 +3,7 @@ import {
   SUI_PACKAGE_ID,
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
+import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
@@ -183,14 +184,33 @@ export const suiRouter = router({
         // Split coins for gas
         const Gas = tx.splitCoins(tx.gas, [BigInt(input.gas)]);
 
-        const coins = await suiClient.getCoins({
-          owner: input.sender,
-          coinType: input.coinType,
-        });
-        const coinObjectId = coins.data[0].coinObjectId;
+        // Get all coins of the specified type
+        let primaryCoin: string = "";
+        let coins: PaginatedCoins;
+        let otherCoins: string[] = [];
+        do {
+          coins = await suiClient.getCoins({
+            owner: input.sender,
+            coinType: input.coinType,
+          });
+
+          if (coins.data.length === 0) {
+            throw new Error("No coins found");
+          }
+
+          // If there are multiple coins, merge them first
+          primaryCoin = !primaryCoin ? coins.data[0].coinObjectId : primaryCoin;
+          if (coins.data.length > 1) {
+            otherCoins = [
+              ...otherCoins,
+              ...coins.data.slice(1).map((coin: any) => coin.coinObjectId),
+            ];
+          }
+        } while (coins.hasNextPage);
+        tx.mergeCoins(primaryCoin, otherCoins);
 
         // Split token to transfer to the destination chain
-        const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
+        const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
         const { Example, AxelarGateway, GasService, ITS } =
           chainConfig.contracts;
