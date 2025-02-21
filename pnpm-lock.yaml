@@ -344,7 +344,7 @@ importers:
         version: link:../../packages/utils
       next:
         specifier: ^14.1.4
-        version: 14.1.4(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.1.4(@babel/core@7.24.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -605,8 +605,8 @@ importers:
         version: 7.2.3
     devDependencies:
       '@axelar-network/interchain-token-service':
-        specifier: ^2.0.1
-        version: 2.0.1
+        specifier: ^2.1.0
+        version: 2.1.0
       '@axelarjs/api':
         specifier: workspace:^
         version: link:../api
@@ -1086,8 +1086,8 @@ packages:
   '@axelar-network/axelarjs-types@0.33.0':
     resolution: {integrity: sha512-aCbX/5G+tgWPjr9tl3dQfJftWwRMkILz61ytach7dKqxtO9G9jlxpNvELJQ6gKVOodUtSY8qBCO/fWU19v4hdQ==}
 
-  '@axelar-network/interchain-token-service@2.0.1':
-    resolution: {integrity: sha512-5m4ocCIx9qfH1xODPAmhnGPGBl0ytKUzIwvJ94zgTlj0IUmsRkr93ON8/6dRjg+HK8RgfYNwQD1r4Gdy6kaU1w==}
+  '@axelar-network/interchain-token-service@2.1.0':
+    resolution: {integrity: sha512-eRaDL7otxqZixzsSu3rYtMkFQ1buopNGAmc8fEHvJPPD1WYiRARx24z+61OTJjCHcRygBljl9oIlqmqiM6SAYg==}
     engines: {node: '>=18'}
 
   '@babel/code-frame@7.23.5':
@@ -12492,7 +12492,7 @@ snapshots:
       long: 5.2.3
       protobufjs: 7.4.0
 
-  '@axelar-network/interchain-token-service@2.0.1':
+  '@axelar-network/interchain-token-service@2.1.0':
     dependencies:
       '@axelar-network/axelar-cgp-solidity': 6.4.0
       '@axelar-network/axelar-gmp-sdk-solidity': 6.0.4
@@ -23442,6 +23442,31 @@ snapshots:
 
   next-tick@1.1.0: {}
 
+  next@14.1.4(@babel/core@7.24.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@next/env': 14.1.4
+      '@swc/helpers': 0.5.2
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001687
+      graceful-fs: 4.2.11
+      postcss: 8.4.31
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      styled-jsx: 5.1.1(@babel/core@7.24.0)(react@18.3.1)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 14.1.4
+      '@next/swc-darwin-x64': 14.1.4
+      '@next/swc-linux-arm64-gnu': 14.1.4
+      '@next/swc-linux-arm64-musl': 14.1.4
+      '@next/swc-linux-x64-gnu': 14.1.4
+      '@next/swc-linux-x64-musl': 14.1.4
+      '@next/swc-win32-arm64-msvc': 14.1.4
+      '@next/swc-win32-ia32-msvc': 14.1.4
+      '@next/swc-win32-x64-msvc': 14.1.4
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
   next@14.1.4(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.1.4
@@ -25362,6 +25387,13 @@ snapshots:
     dependencies:
       clsx: 2.1.1
       typescript: 5.4.3
+
+  styled-jsx@5.1.1(@babel/core@7.24.0)(react@18.3.1):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.24.0
 
   styled-jsx@5.1.1(@babel/core@7.26.0)(react@18.3.1):
     dependencies:
