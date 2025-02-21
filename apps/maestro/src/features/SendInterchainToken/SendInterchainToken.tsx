@@ -422,7 +422,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 required: "Destination address is required",
                 validate: (value) => {
                   // TODO handle sui address length
-                  console.log("select to chain", state.selectedToChain);
                   if (
                     state.selectedToChain.id === "sui" &&
                     !isValidSuiAddress(value)
