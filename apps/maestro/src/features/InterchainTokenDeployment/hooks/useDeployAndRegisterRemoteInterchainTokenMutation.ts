@@ -267,6 +267,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         name: input.tokenName,
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
+        minterAddress: input.minterAddress,
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
@@ -279,8 +280,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           tokenName: input.tokenName,
           tokenSymbol: input.tokenSymbol,
           tokenDecimals: input.decimals,
+          tokenManagerType: result.tokenManagerType,
           axelarChainId: input.sourceChainId,
-          originalMinterAddress: input.minterAddress,
+          originalMinterAddress: result.minterAddress,
           destinationAxelarChainIds: input.destinationChainIds,
           tokenManagerAddress: result.tokenManagerAddress,
           tokenAddress: result.tokenAddress,

@@ -61,26 +61,15 @@ export const getCoinType = async (tokenAddress: string) => {
 // get token owner from token address
 // TODO: this is wrong the the destination chain is sui where the token owner is axelar relayer
 export const getTokenOwner = async (tokenAddress: string) => {
+  const treasuryCap = await getTreasuryCap(tokenAddress);
   const object = await client.getObject({
-    id: tokenAddress,
+    id: treasuryCap as string,
     options: {
       showOwner: true,
       showPreviousTransaction: true,
     },
   });
-
-  if (object?.data?.owner === "Immutable") {
-    const previousTx = object.data.previousTransaction;
-
-    // Fetch the transaction details to find the sender
-    const transactionDetails = await client.getTransactionBlock({
-      digest: previousTx as string,
-      options: { showInput: true, showEffects: true },
-    });
-    return transactionDetails.transaction?.data.sender;
-  } else {
-    throw new Error("Coin owner not found");
-  }
+  return object?.data?.owner?.AddressOwner;
 };
 
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
