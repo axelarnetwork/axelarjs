@@ -28,13 +28,15 @@ export type DeployTokenParams = {
   decimals: number;
   destinationChainIds: string[];
   skipRegister?: boolean;
+  minterAddress?: string;
 };
 
 export type DeployTokenResult = SuiTransactionBlockResponse & {
   tokenManagerAddress: string;
   tokenAddress: string;
-  tokenManagerType: "mint/burn" | "lock/unlock";
+  tokenManagerType: "mint_burn" | "lock_unlock";
   deploymentMessageId?: string;
+  minterAddress?: string;
 };
 
 type SuiObjectCreated =
@@ -95,6 +97,7 @@ export default function useTokenDeploy() {
     decimals,
     destinationChainIds,
     skipRegister = false,
+    minterAddress,
   }: DeployTokenParams): Promise<DeployTokenResult> => {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
@@ -135,9 +138,6 @@ export default function useTokenDeploy() {
         throw new Error("Failed to deploy token");
       }
 
-      // Mint tokens before registering, as the treasury cap will be transferred to the ITS contract
-      // TODO: should merge this with above to avoid multiple transactions.
-      // we can do this once we know whether the token is mint/burn or lock/unlock
       if (treasuryCap) {
         const mintTxJSON = await getMintTx({
           sender: currentAccount.address,
@@ -157,6 +157,7 @@ export default function useTokenDeploy() {
         tokenPackageId: tokenAddress,
         metadataId: metadata.objectId,
         destinationChains: destinationChainIds,
+        minterAddress: minterAddress,
       });
 
       if (!sendTokenTxJSON) {
@@ -170,15 +171,7 @@ export default function useTokenDeploy() {
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
-      // find treasury cap in the sendTokenResult to determine the token manager type
-      const sendTokenObjects = sendTokenResult?.objectChanges;
-      const treasuryCapSendTokenResult = findObjectByType(
-        sendTokenObjects as SuiObjectChange[],
-        "TreasuryCap"
-      );
-      const tokenManagerType = treasuryCapSendTokenResult
-        ? "mint/burn"
-        : "lock/unlock";
+      const tokenManagerType = minterAddress ? "lock_unlock" : "mint_burn";
       const txIndex = sendTokenResult?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       return {
@@ -187,6 +180,7 @@ export default function useTokenDeploy() {
         tokenManagerAddress: coinManagementObjectId || "0x",
         tokenAddress,
         tokenManagerType,
+        minterAddress,
       };
     } catch (error) {
       console.error("Token deployment failed:", error);

@@ -71,12 +71,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       // This happens when the token is deployed on sui as a remote chain
       if (!metadata) {
         const coinInfo = await getCoinInfoByCoinType(client, coinType);
-        console.log("coinInfo", coinInfo);
         decimals = coinInfo?.decimals;
       }
 
       let tokenOwner = null;
-      // TODO: address this properly
       try {
         tokenOwner = await getTokenOwner(input.tokenAddress);
       } catch (error) {
