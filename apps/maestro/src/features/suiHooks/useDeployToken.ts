@@ -90,6 +90,13 @@ export default function useTokenDeploy() {
       },
     });
 
+  const { mutateAsync: getMintAndRegisterAndDeployTokenTx } =
+    trpc.sui.getMintAndRegisterAndDeployTokenTx.useMutation({
+      onError(error) {
+        console.log("error in getSendTokenDeploymentTxBytes", error.message);
+      },
+    });
+
   const deployToken = async ({
     initialSupply,
     symbol,
@@ -138,27 +145,27 @@ export default function useTokenDeploy() {
         throw new Error("Failed to deploy token");
       }
 
+      let sendTokenTxJSON;
       if (treasuryCap) {
-        const mintTxJSON = await getMintTx({
+        sendTokenTxJSON = await getMintAndRegisterAndDeployTokenTx({
           sender: currentAccount.address,
-          tokenTreasuryCap: treasuryCap?.objectId,
-          amount: initialSupply,
-          tokenPackageId: tokenAddress,
           symbol,
+          tokenPackageId: tokenAddress,
+          metadataId: metadata.objectId,
+          destinationChains: destinationChainIds,
+          amount: initialSupply,
+          minterAddress: minterAddress,
         });
-        await signAndExecuteTransaction({
-          transaction: mintTxJSON,
+      } else {
+        sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
+          sender: currentAccount.address,
+          symbol,
+          tokenPackageId: tokenAddress,
+          metadataId: metadata.objectId,
+          destinationChains: destinationChainIds,
+          minterAddress: minterAddress,
         });
       }
-
-      const sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
-        sender: currentAccount.address,
-        symbol,
-        tokenPackageId: tokenAddress,
-        metadataId: metadata.objectId,
-        destinationChains: destinationChainIds,
-        minterAddress: minterAddress,
-      });
 
       if (!sendTokenTxJSON) {
         throw new Error(

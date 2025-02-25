@@ -1,11 +1,7 @@
-import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 
 import { suiClient } from "~/lib/clients/suiClient";
-import {
-  getCoinAddressFromType,
-  getTokenOwner,
-  suiServiceBaseUrl,
-} from "./utils";
+import { suiServiceBaseUrl } from "./utils";
 
 export async function getChainConfig() {
   const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
@@ -23,12 +19,14 @@ export function setupTxBuilder(sender: string) {
 export async function getTokenId(
   txBuilder: TxBuilder,
   tokenId: string,
-  ITS: any
+  ITS: any,
 ) {
-  const [TokenId] = await txBuilder.moveCall({
+    const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_u256`,
-    arguments: [tokenId.toString()],
-  });
+    arguments: [
+      tokenId.toString(),
+    ],
+  })
 
   return TokenId;
 }
@@ -37,11 +35,9 @@ export async function getTokenIdByCoinMetadata(
   txBuilder: TxBuilder,
   coinType: string,
   ITS: any,
-  coinMetadata: any
+  coinMetadata: any,
 ) {
-  const address = getCoinAddressFromType(coinType);
-  const tokenOwner = await getTokenOwner(address);
-  const [TokenId] = await txBuilder.moveCall({
+ const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
     typeArguments: [coinType],
     arguments: [
@@ -49,10 +45,26 @@ export async function getTokenIdByCoinMetadata(
       coinMetadata.symbol,
       txBuilder.tx.pure.u8(coinMetadata.decimals),
       txBuilder.tx.pure.bool(false),
-      txBuilder.tx.pure.bool(!tokenOwner), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
+      txBuilder.tx.pure.bool(false),
     ],
   });
   return TokenId;
+}
+
+export async function mintToken(
+  txBuilder: TxBuilder,
+  tokenType: string,
+  treasuryCap: any,
+  amount: bigint,
+  sender: string
+) {
+  const [coin] = await txBuilder.moveCall({
+    target: `${SUI_PACKAGE_ID}::coin::mint`,
+    typeArguments: [tokenType],
+    arguments: [treasuryCap, amount.toString()],
+  });
+  txBuilder.tx.transferObjects([coin], txBuilder.tx.pure.address(sender));
+  return coin;
 }
 
 export async function deployRemoteInterchainToken(
@@ -88,4 +100,36 @@ export async function deployRemoteInterchainToken(
     ],
     typeArguments: [tokenType],
   });
+}
+
+export async function registerToken(
+  txBuilder: TxBuilder,
+  chainConfig: any,
+  tokenType: string,
+  metadataId: string,
+  treasuryCap: any,
+  minterAddress?: string,
+) {
+  const { Example, ITS } = chainConfig.contracts;
+  const itsObjectId = ITS.objects.ITS;
+
+  if (minterAddress) {
+    // Register coin and transfer cap to minter
+    await txBuilder.moveCall({
+      target: `${Example.address}::its::register_coin`,
+      typeArguments: [tokenType],
+      arguments: [itsObjectId, metadataId],
+    });
+    txBuilder.tx.transferObjects(
+      [treasuryCap as string],
+      txBuilder.tx.pure.address(minterAddress)
+    );
+  } else {
+    // Register with cap
+    await txBuilder.moveCall({
+      target: `${Example.address}::its::register_coin_with_cap`,
+      typeArguments: [tokenType],
+      arguments: [itsObjectId, metadataId, treasuryCap],
+    });
+  }
 }
