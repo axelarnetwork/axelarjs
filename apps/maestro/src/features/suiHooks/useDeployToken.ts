@@ -77,12 +77,6 @@ export default function useTokenDeploy() {
       },
     });
 
-  const { mutateAsync: getMintTx } = trpc.sui.getMintTx.useMutation({
-    onError(error) {
-      console.log("error in getMintTx", error.message);
-    },
-  });
-
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
       onError(error) {
