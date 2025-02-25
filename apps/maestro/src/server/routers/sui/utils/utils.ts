@@ -118,15 +118,14 @@ export const getTreasuryCap = async (tokenAddress: string) => {
   do {
     txs = await client.queryTransactionBlocks({
       filter: {
-        InputObject: tokenAddress,
+        ChangedObject: tokenAddress,
       },
-      cursor: cursor,
+      cursor,
       options: {
-        showInput: true,
-        showEffects: true,
-        showEvents: true,
+        showObjectChanges: true
       },
     });
+    console.log("txs", txs);
     treasuryCap = await findTreasuryCap(txs);
     cursor = txs.nextCursor;
   } while (txs.hasNextPage && !treasuryCap && cursor);
