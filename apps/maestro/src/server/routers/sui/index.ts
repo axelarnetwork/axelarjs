@@ -204,8 +204,11 @@ export const suiRouter = router({
         let primaryCoin: string = "";
         let coins: PaginatedCoins;
         let otherCoins: string[] = [];
+        let cursor: string | null | undefined;
+
         do {
           coins = await suiClient.getCoins({
+            cursor: cursor,
             owner: input.sender,
             coinType: input.coinType,
           });
@@ -215,14 +218,23 @@ export const suiRouter = router({
           }
 
           // If there are multiple coins, merge them first
-          primaryCoin = !primaryCoin ? coins.data[0].coinObjectId : primaryCoin;
-          if (coins.data.length > 1) {
+          if (!primaryCoin) {
+            const [first, ...rest] = coins.data;
+            primaryCoin = first.coinObjectId;
             otherCoins = [
               ...otherCoins,
-              ...coins.data.slice(1).map((coin: any) => coin.coinObjectId),
+              ...rest.map((coin: any) => coin.coinObjectId),
+            ];
+          } else {
+            otherCoins = [
+              ...otherCoins,
+              ...coins.data.map((coin: any) => coin.coinObjectId),
             ];
           }
+
+          cursor = coins.nextCursor;
         } while (coins.hasNextPage);
+
         tx.mergeCoins(primaryCoin, otherCoins);
 
         // Split token to transfer to the destination chain

@@ -97,6 +97,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
             logger.always.error(error);
           }
         },
+        onSuccess() {
+          void actions.refetchBalances();
+        },
       }
     );
   };
