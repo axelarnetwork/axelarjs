@@ -27,19 +27,27 @@ export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
 export type DeployAndRegisterTransactionState =
   | {
       type: "idle";
+      step?: number;
+      totalSteps?: number;
     }
   | {
       type: "pending_approval";
+      step?: number;
+      totalSteps?: number;
     }
   | {
       type: "deploying";
       txHash: string;
+      step?: number;
+      totalSteps?: number;
     }
   | {
       type: "deployed";
       suiTx?: DeployTokenResult;
       txHash: string;
       tokenAddress: string;
+      step?: number;
+      totalSteps?: number;
     };
 
 export const INITIAL_STATE = {

@@ -9,6 +9,7 @@ import { fromHex } from "@mysten/sui/utils";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+import { useInterchainTokenDeploymentStateContainer } from "../InterchainTokenDeployment";
 
 const findCoinDataObject = (
   registerTokenResult: SuiTransactionBlockResponse
@@ -53,6 +54,7 @@ const findObjectByType = (
 
 export default function useTokenDeploy() {
   const currentAccount = useAccount();
+  const { actions: rootActions } = useInterchainTokenDeploymentStateContainer();
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
       execute: async ({ bytes, signature }) => {
@@ -103,6 +105,12 @@ export default function useTokenDeploy() {
       throw new Error("Wallet not connected");
     }
 
+    // First step, deploy the token
+    rootActions.setTxState({
+      type: "pending_approval",
+      step: 1,
+      totalSteps: 3,
+    });
     try {
       const deployTokenTxBytes = await getDeployTokenTxBytes({
         symbol,
@@ -111,7 +119,6 @@ export default function useTokenDeploy() {
         skipRegister,
         walletAddress: currentAccount.address,
       });
-      // First step, deploy the token
       const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
         transaction: await deployTokenTx.toJSON(),
@@ -137,6 +144,12 @@ export default function useTokenDeploy() {
       if (!tokenAddress) {
         throw new Error("Failed to deploy token");
       }
+
+      rootActions.setTxState({
+        type: "pending_approval",
+        step: 2,
+        totalSteps: 3,
+      });
 
       if (treasuryCap) {
         const mintTxJSON = await getMintTx({
@@ -166,6 +179,11 @@ export default function useTokenDeploy() {
         );
       }
 
+      rootActions.setTxState({
+        type: "pending_approval",
+        step: 3,
+        totalSteps: 3,
+      });
       const sendTokenResult = await signAndExecuteTransaction({
         transaction: sendTokenTxJSON,
       });
