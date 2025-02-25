@@ -84,30 +84,17 @@ export const getCoinAddressFromType = (coinType: string) => {
 };
 
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
-  // Find the mint transaction
-  const mintTx = txData.data.find((tx) => {
-    const transactions = (tx.objectChanges?.data?.transaction as any)
-      .transactions;
-    return transactions?.some(
-      (t: any) =>
-        t.MoveCall?.module === "coin" && t.MoveCall?.function === "mint"
-    );
+  // Find the treasury cap object
+  const treasuryCapObject = txData.data.find((tx) => {
+    return tx.objectChanges?.objectTypes.includes("TreasuryCap");
   });
 
-  if (!mintTx) {
-    console.log("No mint transaction found");
+  if (!treasuryCapObject) {
+    console.log("No treasury cap object found");
     return null;
   }
 
-  // Get the treasury cap input from the mint transaction
-  const treasuryCapInput = (mintTx?.transaction?.data?.transaction as any)
-    .inputs[0];
-
-  if (treasuryCapInput?.type === "object") {
-    return treasuryCapInput.objectId;
-  }
-
-  return null;
+  return treasuryCapObject.objectId;
 }
 
 export const getTreasuryCap = async (tokenAddress: string) => {
