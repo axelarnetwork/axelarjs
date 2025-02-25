@@ -69,7 +69,9 @@ export const getTokenOwner = async (tokenAddress: string) => {
       showPreviousTransaction: true,
     },
   });
-  return object?.data?.owner?.AddressOwner;
+
+  const owner = object?.data?.owner as { AddressOwner: string } | undefined;
+  return owner?.AddressOwner;
 };
 
 export const getCoinAddressFromType = (coinType: string) => {
