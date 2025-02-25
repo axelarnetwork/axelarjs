@@ -6,6 +6,7 @@ import {
 import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
@@ -71,6 +72,7 @@ export const suiRouter = router({
         destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
         metadataId: z.string(),
+        minterAddress: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -98,13 +100,27 @@ export const suiRouter = router({
 
         const { Example, ITS } = chainConfig.contracts;
         const itsObjectId = ITS.objects.ITS;
+        const treasuryCap = await getTreasuryCap(tokenPackageId);
 
-        // TODO: handle register type properly, whether it's mint/burn or lock/unlock.
-        await txBuilder.moveCall({
-          target: `${Example.address}::its::register_coin`,
-          typeArguments: [tokenType],
-          arguments: [itsObjectId, metadataId],
-        });
+        if (input.minterAddress) {
+          await txBuilder.moveCall({
+            target: `${Example.address}::its::register_coin`,
+            typeArguments: [tokenType],
+            arguments: [itsObjectId, metadataId],
+          });
+          txBuilder.tx.transferObjects(
+            [treasuryCap as string],
+            txBuilder.tx.pure.address(input.minterAddress)
+          );
+        } else {
+          await txBuilder
+            .moveCall({
+              target: `${Example.address}::its::register_coin_with_cap`,
+              typeArguments: [tokenType],
+              arguments: [itsObjectId, metadataId, treasuryCap],
+            })
+            .catch((e) => console.log("error with register coin treasury", e));
+        }
 
         for (const destinationChain of destinationChains) {
           await deployRemoteInterchainToken(
@@ -261,7 +277,7 @@ export const suiRouter = router({
     .mutation(async ({ input }) => {
       try {
         const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
+          `${suiServiceBaseUrl}/chain/${NEXT_PUBLIC_NETWORK_ENV}`
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;

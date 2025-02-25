@@ -61,26 +61,26 @@ export const getCoinType = async (tokenAddress: string) => {
 // get token owner from token address
 // TODO: this is wrong the the destination chain is sui where the token owner is axelar relayer
 export const getTokenOwner = async (tokenAddress: string) => {
+  const treasuryCap = await getTreasuryCap(tokenAddress);
   const object = await client.getObject({
-    id: tokenAddress,
+    id: treasuryCap as string,
     options: {
       showOwner: true,
       showPreviousTransaction: true,
     },
   });
 
-  if (object?.data?.owner === "Immutable") {
-    const previousTx = object.data.previousTransaction;
+  const owner = object?.data?.owner as { AddressOwner: string } | undefined;
+  return owner?.AddressOwner;
+};
 
-    // Fetch the transaction details to find the sender
-    const transactionDetails = await client.getTransactionBlock({
-      digest: previousTx as string,
-      options: { showInput: true, showEffects: true },
-    });
-    return transactionDetails.transaction?.data.sender;
-  } else {
-    throw new Error("Coin owner not found");
-  }
+export const getCoinAddressFromType = (coinType: string) => {
+  // check for long format
+  let addressMatch = coinType.match(/CoinData<(0x[^:]+)/);
+  if (addressMatch) return addressMatch?.[1];
+  // check for the shorter format {address}::{symbol}::{SYMBOL}
+  addressMatch = coinType.match(/0x[^:]+/);
+  return addressMatch?.[0] as string;
 };
 
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
@@ -250,8 +250,7 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
 
   // Extract the address from the objectType
   const objectType = filteredResult.objectType;
-  const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
-  const address = addressMatch?.[1] as string;
+  const address = getCoinAddressFromType(objectType);
   return {
     tokenManager,
     address,
