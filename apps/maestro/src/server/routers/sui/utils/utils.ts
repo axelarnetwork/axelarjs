@@ -86,7 +86,7 @@ export const getCoinAddressFromType = (coinType: string) => {
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
   // Find the mint transaction
   const mintTx = txData.data.find((tx) => {
-    const transactions = (tx.transaction?.data?.transaction as any)
+    const transactions = (tx.objectChanges?.data?.transaction as any)
       .transactions;
     return transactions?.some(
       (t: any) =>
@@ -125,7 +125,7 @@ export const getTreasuryCap = async (tokenAddress: string) => {
         showObjectChanges: true
       },
     });
-    console.log("txs", txs);
+    console.log("txs", txs.data[0].objectChanges);
     treasuryCap = await findTreasuryCap(txs);
     cursor = txs.nextCursor;
   } while (txs.hasNextPage && !treasuryCap && cursor);
