@@ -1,7 +1,11 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 
 import { suiClient } from "~/lib/clients/suiClient";
-import { suiServiceBaseUrl } from "./utils";
+import {
+  getCoinAddressFromType,
+  getTokenOwner,
+  suiServiceBaseUrl,
+} from "./utils";
 
 export async function getChainConfig() {
   const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
@@ -19,14 +23,12 @@ export function setupTxBuilder(sender: string) {
 export async function getTokenId(
   txBuilder: TxBuilder,
   tokenId: string,
-  ITS: any,
+  ITS: any
 ) {
-    const [TokenId] = await txBuilder.moveCall({
+  const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_u256`,
-    arguments: [
-      tokenId.toString(),
-    ],
-  })
+    arguments: [tokenId.toString()],
+  });
 
   return TokenId;
 }
@@ -35,9 +37,11 @@ export async function getTokenIdByCoinMetadata(
   txBuilder: TxBuilder,
   coinType: string,
   ITS: any,
-  coinMetadata: any,
+  coinMetadata: any
 ) {
- const [TokenId] = await txBuilder.moveCall({
+  const address = getCoinAddressFromType(coinType);
+  const tokenOwner = await getTokenOwner(address);
+  const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
     typeArguments: [coinType],
     arguments: [
@@ -45,7 +49,7 @@ export async function getTokenIdByCoinMetadata(
       coinMetadata.symbol,
       txBuilder.tx.pure.u8(coinMetadata.decimals),
       txBuilder.tx.pure.bool(false),
-      txBuilder.tx.pure.bool(false),
+      txBuilder.tx.pure.bool(!tokenOwner), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
   return TokenId;

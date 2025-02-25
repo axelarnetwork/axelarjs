@@ -4,7 +4,7 @@ import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
-type RegisterRemoteInterchainTokenOnSuiInput ={
+type RegisterRemoteInterchainTokenOnSuiInput = {
   axelarChainIds: string[];
   originChainId: number;
   tokenAddress: string;
@@ -48,14 +48,13 @@ export function useRegisterRemoteInterchainTokenOnSui() {
     }
 
     try {
-      const registerTokenTxJSON =
-        await getRegisterRemoteInterchainTokenTx({
-          tokenAddress: input.tokenAddress,
-          destinationChainIds: input.axelarChainIds,
-          originChainId: input.originChainId,
-          sender: currentAccount.address,
-          symbol: input.symbol,
-        });
+      const registerTokenTxJSON = await getRegisterRemoteInterchainTokenTx({
+        tokenAddress: input.tokenAddress,
+        destinationChainIds: input.axelarChainIds,
+        originChainId: input.originChainId,
+        sender: currentAccount.address,
+        symbol: input.symbol,
+      });
 
       const registerTokenResult = await signAndExecuteTransaction({
         transaction: registerTokenTxJSON,
@@ -74,4 +73,3 @@ export function useRegisterRemoteInterchainTokenOnSui() {
     account: currentAccount,
   };
 }
-

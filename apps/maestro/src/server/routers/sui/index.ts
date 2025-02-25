@@ -5,6 +5,7 @@ import {
 } from "@axelar-network/axelar-cgp-sui";
 import { z } from "zod";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
@@ -256,7 +257,7 @@ export const suiRouter = router({
     .mutation(async ({ input }) => {
       try {
         const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
+          `${suiServiceBaseUrl}/chain/${NEXT_PUBLIC_NETWORK_ENV}`
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;

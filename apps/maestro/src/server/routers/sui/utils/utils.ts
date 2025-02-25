@@ -72,6 +72,15 @@ export const getTokenOwner = async (tokenAddress: string) => {
   return object?.data?.owner?.AddressOwner;
 };
 
+export const getCoinAddressFromType = (coinType: string) => {
+  // check for long format
+  let addressMatch = coinType.match(/CoinData<(0x[^:]+)/);
+  if (addressMatch) return addressMatch?.[1];
+  // check for the shorter format {address}::{symbol}::{SYMBOL}
+  addressMatch = coinType.match(/0x[^:]+/);
+  return addressMatch?.[0] as string;
+};
+
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
   // Find the mint transaction
   const mintTx = txData.data.find((tx) => {
@@ -239,8 +248,7 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
 
   // Extract the address from the objectType
   const objectType = filteredResult.objectType;
-  const addressMatch = objectType.match(/CoinData<(0x[^:]+)/);
-  const address = addressMatch?.[1] as string;
+  const address = getCoinAddressFromType(objectType);
   return {
     tokenManager,
     address,
