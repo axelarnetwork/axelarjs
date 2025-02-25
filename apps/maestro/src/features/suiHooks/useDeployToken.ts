@@ -201,6 +201,9 @@ export default function useTokenDeploy() {
         minterAddress,
       };
     } catch (error) {
+      rootActions.setTxState({
+        type: "idle",
+      });
       console.error("Token deployment failed:", error);
       throw error;
     }
