@@ -77,14 +77,15 @@ export default function useTokenDeploy() {
       },
     });
 
-  const { mutateAsync: getMintTx } = trpc.sui.getMintTx.useMutation({
-    onError(error) {
-      console.log("error in getMintTx", error.message);
-    },
-  });
-
   const { mutateAsync: getRegisterAndSendTokenDeploymentTxBytes } =
     trpc.sui.getRegisterAndDeployTokenTx.useMutation({
+      onError(error) {
+        console.log("error in getSendTokenDeploymentTxBytes", error.message);
+      },
+    });
+
+  const { mutateAsync: getMintAndRegisterAndDeployTokenTx } =
+    trpc.sui.getMintAndRegisterAndDeployTokenTx.useMutation({
       onError(error) {
         console.log("error in getSendTokenDeploymentTxBytes", error.message);
       },
@@ -138,27 +139,27 @@ export default function useTokenDeploy() {
         throw new Error("Failed to deploy token");
       }
 
+      let sendTokenTxJSON;
       if (treasuryCap) {
-        const mintTxJSON = await getMintTx({
+        sendTokenTxJSON = await getMintAndRegisterAndDeployTokenTx({
           sender: currentAccount.address,
-          tokenTreasuryCap: treasuryCap?.objectId,
-          amount: initialSupply,
-          tokenPackageId: tokenAddress,
           symbol,
+          tokenPackageId: tokenAddress,
+          metadataId: metadata.objectId,
+          destinationChains: destinationChainIds,
+          amount: initialSupply,
+          minterAddress: minterAddress,
         });
-        await signAndExecuteTransaction({
-          transaction: mintTxJSON,
+      } else {
+        sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
+          sender: currentAccount.address,
+          symbol,
+          tokenPackageId: tokenAddress,
+          metadataId: metadata.objectId,
+          destinationChains: destinationChainIds,
+          minterAddress: minterAddress,
         });
       }
-
-      const sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
-        sender: currentAccount.address,
-        symbol,
-        tokenPackageId: tokenAddress,
-        metadataId: metadata.objectId,
-        destinationChains: destinationChainIds,
-        minterAddress: minterAddress,
-      });
 
       if (!sendTokenTxJSON) {
         throw new Error(

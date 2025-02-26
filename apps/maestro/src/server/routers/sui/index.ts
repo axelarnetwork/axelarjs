@@ -13,6 +13,8 @@ import {
   deployRemoteInterchainToken,
   getChainConfig,
   getTokenId,
+  mintToken,
+  registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
 import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
@@ -367,6 +369,87 @@ export const suiRouter = router({
         );
         throw new Error(
           `Transfer treasury cap transaction preparation failed: ${
+            (error as Error).message
+          }`
+        );
+      }
+    }),
+  getMintAndRegisterAndDeployTokenTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+        symbol: z.string(),
+        tokenPackageId: z.string(),
+        metadataId: z.string(),
+        destinationChains: z.array(z.string()),
+        amount: z.bigint(),
+        minterAddress: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const {
+          sender,
+          symbol,
+          tokenPackageId,
+          metadataId,
+          destinationChains,
+          amount,
+          minterAddress,
+        } = input;
+
+        const chainConfig = await getChainConfig();
+        const txBuilder = new TxBuilder(suiClient);
+        txBuilder.tx.setSenderIfNotSet(sender);
+        const feeUnitAmount = 5e7;
+
+        const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: tokenType,
+        });
+
+        if (!coinMetadata) {
+          throw new Error(`Coin metadata not found for ${tokenType}`);
+        }
+
+        const treasuryCap = await getTreasuryCap(tokenPackageId);
+
+        // Mint coins
+        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
+
+        // Register coin
+        await registerToken(
+          txBuilder,
+          chainConfig,
+          tokenType,
+          metadataId,
+          treasuryCap,
+          minterAddress
+        );
+
+        for (const destinationChain of destinationChains) {
+          await deployRemoteInterchainToken(
+            txBuilder,
+            chainConfig,
+            destinationChain,
+            coinMetadata,
+            feeUnitAmount,
+            sender,
+            tokenType
+          );
+        }
+
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error(
+          "Failed to finalize combined mint and deployment:",
+          error
+        );
+        throw new Error(
+          `Combined mint, register, and deploy failed: ${
             (error as Error).message
           }`
         );
