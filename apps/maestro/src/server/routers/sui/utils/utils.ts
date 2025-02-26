@@ -84,17 +84,18 @@ export const getCoinAddressFromType = (coinType: string) => {
 };
 
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
-  // Find the treasury cap object
-  const treasuryCapObject = txData.data.find((tx) => {
-    return tx.objectChanges?.objectTypes.includes("TreasuryCap");
-  });
-
-  if (!treasuryCapObject) {
-    console.log("No treasury cap object found");
-    return null;
+  for (const tx of txData.data) {
+    if (tx.objectChanges) {
+      for (const obj of tx.objectChanges) {
+        if (obj.type === "created" && obj.objectType.includes("TreasuryCap")) {
+          return obj.objectId;
+        }
+      }
+    }
   }
 
-  return treasuryCapObject.objectId;
+  console.log("No treasury cap object found");
+  return null;
 }
 
 export const getTreasuryCap = async (tokenAddress: string) => {
@@ -109,11 +110,11 @@ export const getTreasuryCap = async (tokenAddress: string) => {
       },
       cursor,
       options: {
-        showObjectChanges: true
+        showObjectChanges: true,
       },
     });
     console.log("txs", txs.data[0].objectChanges);
-    treasuryCap = await findTreasuryCap(txs);
+    treasuryCap = findTreasuryCap(txs);
     cursor = txs.nextCursor;
   } while (txs.hasNextPage && !treasuryCap && cursor);
   return treasuryCap;
