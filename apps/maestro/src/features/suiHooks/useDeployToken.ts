@@ -9,6 +9,7 @@ import { fromHex } from "@mysten/sui/utils";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+import { useInterchainTokenDeploymentStateContainer } from "../InterchainTokenDeployment";
 
 const findCoinDataObject = (
   registerTokenResult: SuiTransactionBlockResponse
@@ -53,6 +54,7 @@ const findObjectByType = (
 
 export default function useTokenDeploy() {
   const currentAccount = useAccount();
+  const { actions: rootActions } = useInterchainTokenDeploymentStateContainer();
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
       execute: async ({ bytes, signature }) => {
@@ -104,6 +106,12 @@ export default function useTokenDeploy() {
       throw new Error("Wallet not connected");
     }
 
+    // First step, deploy the token
+    rootActions.setTxState({
+      type: "pending_approval",
+      step: 1,
+      totalSteps: 2,
+    });
     try {
       const deployTokenTxBytes = await getDeployTokenTxBytes({
         symbol,
@@ -112,7 +120,6 @@ export default function useTokenDeploy() {
         skipRegister,
         walletAddress: currentAccount.address,
       });
-      // First step, deploy the token
       const deployTokenTx = Transaction.from(fromHex(deployTokenTxBytes));
       const deployTokenResult = await signAndExecuteTransaction({
         transaction: await deployTokenTx.toJSON(),
@@ -138,6 +145,12 @@ export default function useTokenDeploy() {
       if (!tokenAddress) {
         throw new Error("Failed to deploy token");
       }
+
+      rootActions.setTxState({
+        type: "pending_approval",
+        step: 2,
+        totalSteps: 2,
+      });
 
       let sendTokenTxJSON;
       if (treasuryCap) {
@@ -184,6 +197,9 @@ export default function useTokenDeploy() {
         minterAddress,
       };
     } catch (error) {
+      rootActions.setTxState({
+        type: "idle",
+      });
       console.error("Token deployment failed:", error);
       throw error;
     }
