@@ -37,10 +37,9 @@ export async function getTokenIdByCoinMetadata(
   txBuilder: TxBuilder,
   coinType: string,
   ITS: any,
-  coinMetadata: any
+  coinMetadata: any,
+  isCanonical: boolean = false
 ) {
-  const address = getCoinAddressFromType(coinType);
-  const tokenOwner = await getTokenOwner(address);
   const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
     typeArguments: [coinType],
@@ -49,7 +48,7 @@ export async function getTokenIdByCoinMetadata(
       coinMetadata.symbol,
       txBuilder.tx.pure.u8(coinMetadata.decimals),
       txBuilder.tx.pure.bool(false),
-      txBuilder.tx.pure.bool(!tokenOwner), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
+      txBuilder.tx.pure.bool(!isCanonical), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
   return TokenId;
@@ -113,21 +112,25 @@ export async function registerToken(
   metadataId: string,
   treasuryCap: any,
   minterAddress?: string,
+  isCanonical: boolean = false
 ) {
   const { Example, ITS } = chainConfig.contracts;
   const itsObjectId = ITS.objects.ITS;
 
-  if (minterAddress) {
+  if (isCanonical) {
     // Register coin and transfer cap to minter
     await txBuilder.moveCall({
       target: `${Example.address}::its::register_coin`,
       typeArguments: [tokenType],
       arguments: [itsObjectId, metadataId],
     });
-    txBuilder.tx.transferObjects(
-      [treasuryCap as string],
-      txBuilder.tx.pure.address(minterAddress)
-    );
+
+    if(minterAddress) {
+      txBuilder.tx.transferObjects(
+        [treasuryCap as string],
+        txBuilder.tx.pure.address(minterAddress)
+      );
+    }
   } else {
     // Register with cap
     await txBuilder.moveCall({
