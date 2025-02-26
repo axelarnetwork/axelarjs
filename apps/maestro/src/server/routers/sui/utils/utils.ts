@@ -94,7 +94,6 @@ function findTreasuryCap(txData: PaginatedTransactionResponse) {
     }
   }
 
-  console.log("No treasury cap object found");
   return null;
 }
 
@@ -113,7 +112,6 @@ export const getTreasuryCap = async (tokenAddress: string) => {
         showObjectChanges: true,
       },
     });
-    console.log("txs", txs.data[0].objectChanges);
     treasuryCap = findTreasuryCap(txs);
     cursor = txs.nextCursor;
   } while (txs.hasNextPage && !treasuryCap && cursor);
