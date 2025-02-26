@@ -2,8 +2,6 @@ import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import {
-  getCoinAddressFromType,
-  getTokenOwner,
   suiServiceBaseUrl,
 } from "./utils";
 
