@@ -14,6 +14,7 @@ interface MintTokensParams {
 
 export default function useMintTokens() {
   const currentAccount = useAccount();
+  const utils = trpc.useUtils();
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
@@ -60,6 +61,9 @@ export default function useMintTokens() {
       const result = await signAndExecuteTransaction({
         transaction: mintTxJSON,
       });
+
+      // Invalidate all balance queries
+      await utils.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
 
       return result;
     } catch (error) {
