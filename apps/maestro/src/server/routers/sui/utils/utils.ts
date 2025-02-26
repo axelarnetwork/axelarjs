@@ -84,27 +84,14 @@ export const getCoinAddressFromType = (coinType: string) => {
 };
 
 function findTreasuryCap(txData: PaginatedTransactionResponse) {
-  // Find the mint transaction
-  const mintTx = txData.data.find((tx) => {
-    const transactions = (tx.transaction?.data?.transaction as any)
-      .transactions;
-    return transactions?.some(
-      (t: any) =>
-        t.MoveCall?.module === "coin" && t.MoveCall?.function === "mint"
-    );
-  });
-
-  if (!mintTx) {
-    console.log("No mint transaction found");
-    return null;
-  }
-
-  // Get the treasury cap input from the mint transaction
-  const treasuryCapInput = (mintTx?.transaction?.data?.transaction as any)
-    .inputs[0];
-
-  if (treasuryCapInput?.type === "object") {
-    return treasuryCapInput.objectId;
+  for (const tx of txData.data) {
+    if (tx.objectChanges) {
+      for (const obj of tx.objectChanges) {
+        if (obj.type === "created" && obj.objectType.includes("TreasuryCap")) {
+          return obj.objectId;
+        }
+      }
+    }
   }
 
   return null;
@@ -118,16 +105,14 @@ export const getTreasuryCap = async (tokenAddress: string) => {
   do {
     txs = await client.queryTransactionBlocks({
       filter: {
-        InputObject: tokenAddress,
+        ChangedObject: tokenAddress,
       },
-      cursor: cursor,
+      cursor,
       options: {
-        showInput: true,
-        showEffects: true,
-        showEvents: true,
+        showObjectChanges: true,
       },
     });
-    treasuryCap = await findTreasuryCap(txs);
+    treasuryCap = findTreasuryCap(txs);
     cursor = txs.nextCursor;
   } while (txs.hasNextPage && !treasuryCap && cursor);
   return treasuryCap;

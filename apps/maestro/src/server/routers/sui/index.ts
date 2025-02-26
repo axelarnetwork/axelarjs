@@ -3,6 +3,7 @@ import {
   SUI_PACKAGE_ID,
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
+import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -12,6 +13,8 @@ import {
   deployRemoteInterchainToken,
   getChainConfig,
   getTokenId,
+  mintToken,
+  registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
 import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
@@ -199,14 +202,45 @@ export const suiRouter = router({
         // Split coins for gas
         const Gas = tx.splitCoins(tx.gas, [BigInt(input.gas)]);
 
-        const coins = await suiClient.getCoins({
-          owner: input.sender,
-          coinType: input.coinType,
-        });
-        const coinObjectId = coins.data[0].coinObjectId;
+        // Get all coins of the specified type
+        let primaryCoin: string = "";
+        let coins: PaginatedCoins;
+        let otherCoins: string[] = [];
+        let cursor: string | null | undefined;
+
+        do {
+          coins = await suiClient.getCoins({
+            cursor: cursor,
+            owner: input.sender,
+            coinType: input.coinType,
+          });
+
+          if (coins.data.length === 0) {
+            throw new Error("No coins found");
+          }
+
+          // If there are multiple coins, merge them first
+          if (!primaryCoin) {
+            const [first, ...rest] = coins.data;
+            primaryCoin = first.coinObjectId;
+            otherCoins = [
+              ...otherCoins,
+              ...rest.map((coin: any) => coin.coinObjectId),
+            ];
+          } else {
+            otherCoins = [
+              ...otherCoins,
+              ...coins.data.map((coin: any) => coin.coinObjectId),
+            ];
+          }
+
+          cursor = coins.nextCursor;
+        } while (coins.hasNextPage);
+
+        tx.mergeCoins(primaryCoin, otherCoins);
 
         // Split token to transfer to the destination chain
-        const Coin = tx.splitCoins(coinObjectId, [BigInt(input.amount)]);
+        const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
         const { Example, AxelarGateway, GasService, ITS } =
           chainConfig.contracts;
@@ -335,6 +369,87 @@ export const suiRouter = router({
         );
         throw new Error(
           `Transfer treasury cap transaction preparation failed: ${
+            (error as Error).message
+          }`
+        );
+      }
+    }),
+  getMintAndRegisterAndDeployTokenTx: publicProcedure
+    .input(
+      z.object({
+        sender: z.string(),
+        symbol: z.string(),
+        tokenPackageId: z.string(),
+        metadataId: z.string(),
+        destinationChains: z.array(z.string()),
+        amount: z.bigint(),
+        minterAddress: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const {
+          sender,
+          symbol,
+          tokenPackageId,
+          metadataId,
+          destinationChains,
+          amount,
+          minterAddress,
+        } = input;
+
+        const chainConfig = await getChainConfig();
+        const txBuilder = new TxBuilder(suiClient);
+        txBuilder.tx.setSenderIfNotSet(sender);
+        const feeUnitAmount = 5e7;
+
+        const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
+        const coinMetadata = await suiClient.getCoinMetadata({
+          coinType: tokenType,
+        });
+
+        if (!coinMetadata) {
+          throw new Error(`Coin metadata not found for ${tokenType}`);
+        }
+
+        const treasuryCap = await getTreasuryCap(tokenPackageId);
+
+        // Mint coins
+        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
+
+        // Register coin
+        await registerToken(
+          txBuilder,
+          chainConfig,
+          tokenType,
+          metadataId,
+          treasuryCap,
+          minterAddress
+        );
+
+        for (const destinationChain of destinationChains) {
+          await deployRemoteInterchainToken(
+            txBuilder,
+            chainConfig,
+            destinationChain,
+            coinMetadata,
+            feeUnitAmount,
+            sender,
+            tokenType
+          );
+        }
+
+        const tx = await buildTx(sender, txBuilder);
+        const txJSON = await tx.toJSON();
+        return txJSON;
+      } catch (error) {
+        console.error(
+          "Failed to finalize combined mint and deployment:",
+          error
+        );
+        throw new Error(
+          `Combined mint, register, and deploy failed: ${
             (error as Error).message
           }`
         );

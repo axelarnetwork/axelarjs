@@ -1,4 +1,3 @@
-import type { PaginatedCoins } from "@mysten/sui/client";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
@@ -47,22 +46,11 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       let isTokenOwner = false;
 
       const coinType = await getCoinType(input.tokenAddress);
-      let coins: PaginatedCoins | null = null;
-      let balance = 0;
-      let cursor: string | null | undefined = null;
 
-      // Get the coin balance, we need to sum all the balances to get the total balance
-      do {
-        coins = await client.getCoins({
-          cursor: cursor,
-          owner: input.owner,
-          coinType: coinType,
-        });
-        balance =
-          balance +
-          coins.data?.reduce((acc, coin) => acc + Number(coin.balance), 0);
-        cursor = coins.nextCursor;
-      } while (coins.hasNextPage);
+      const { totalBalance: balance } = await client.getBalance({
+        owner: input.owner,
+        coinType: coinType,
+      });
 
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
@@ -78,7 +66,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       try {
         tokenOwner = await getTokenOwner(input.tokenAddress);
       } catch (error) {
-        // console.log("getERC20TokenBalanceForOwner", error);
+        console.log("getERC20TokenBalanceForOwner", error);
       }
 
       isTokenOwner = tokenOwner === input.owner;
