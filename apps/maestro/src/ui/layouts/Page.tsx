@@ -20,7 +20,8 @@ type PageState =
   | "connected"
   | "disconnected"
   | "network-mismatch"
-  | "unsupported-network";
+  | "unsupported-network"
+  | "wrong-sui-network";
 
 interface Props extends ComponentProps<typeof Clamp> {
   pageTitle?: string;
@@ -44,7 +45,7 @@ const Page: FC<Props> = ({
   style,
   ...props
 }) => {
-  const { isConnected } = useAccount();
+  const { isConnected, isWrongSuiNetwork } = useAccount();
   const { chain } = useAccount();
   const chainFromRoute = useChainFromRoute();
   const { switchChain } = useSwitchChain();
@@ -67,6 +68,10 @@ const Page: FC<Props> = ({
 
     if (!isConnected) {
       return "disconnected";
+    }
+
+    if (isWrongSuiNetwork) {
+      return "wrong-sui-network";
     }
 
     // TODO: uncomment this when we have a way to handle multiple chains
@@ -93,6 +98,7 @@ const Page: FC<Props> = ({
     chainFromRoute,
     currentChainFromRoute,
     currentChain,
+    isWrongSuiNetwork,
   ]);
 
   const router = useRouter();
@@ -206,6 +212,22 @@ const Page: FC<Props> = ({
                   Switch to {currentChainFromRoute.name}
                 </Button>
               )}
+            </div>
+          </div>
+        );
+      case "wrong-sui-network":
+        return (
+          <div className="grid w-full flex-1 place-items-center">
+            <div className="grid w-full place-items-center gap-4">
+              <div className="flex items-center gap-1 text-center text-xl font-semibold">
+                {`You're currently connected to the wrong Sui network.`}
+                <br />
+                {`Please switch to ${
+                  process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+                    ? "mainnet"
+                    : "testnet"
+                } inside your wallet and refresh the page.`}
+              </div>
             </div>
           </div>
         );

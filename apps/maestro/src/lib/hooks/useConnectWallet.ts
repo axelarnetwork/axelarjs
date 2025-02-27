@@ -16,7 +16,7 @@ type WalletHandler = (chainId: number) => void;
 
 export function useConnectWallet() {
   const wallets = useWallets();
-  const { mutate: connect } = useSuiConnectWallet();
+  const { mutateAsync: connectAsync } = useSuiConnectWallet();
   const { open: openWeb3Modal } = useWeb3Modal();
 
   const { data: sessionData } = useSession();
@@ -38,16 +38,18 @@ export function useConnectWallet() {
     }
   }, [sessionData, pendingChainId, switchChainWagmi, setPendingChainId]);
 
-  const tryConnectSuiWallet = () => {
+  const tryConnectSuiWallet = async () => {
     for (const wallet of wallets) {
       try {
         // Attempt to connect to each wallet
-        connect({ wallet });
+        await connectAsync({ wallet });
         return true;
       } catch (error) {
+        console.error(`Failed to connect to wallet:`, error);
         continue;
       }
     }
+    return false;
   };
 
   const chainHandlers: Record<number, WalletHandler> = {

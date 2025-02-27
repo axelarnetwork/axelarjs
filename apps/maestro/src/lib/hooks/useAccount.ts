@@ -5,6 +5,7 @@ import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { suiChainConfig } from "~/config/chains/vm-chains";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
 
 interface CombinedAccountInfo {
@@ -14,13 +15,15 @@ interface CombinedAccountInfo {
   chain?: Chain;
   isEvmChain: boolean;
   chainName?: string;
+  isWrongSuiNetwork?: boolean;
 }
 
 export function useAccount(): CombinedAccountInfo {
   const wagmiAccount = useWagmiAccount();
   const mystenAccount = useMystenAccount();
-
   const { data: evmChains } = useEVMChainConfigsQuery();
+  const APP_SUI_NETWORK =
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "sui:mainnet" : "sui:testnet";
 
   const isWagmiConnected = wagmiAccount.isConnected;
   const isMystenConnected = !!mystenAccount;
@@ -39,5 +42,7 @@ export function useAccount(): CombinedAccountInfo {
     isEvmChain: !!evmChain,
     chainName:
       evmChain?.chain_name || (isMystenConnected && "Sui") || undefined,
+    isWrongSuiNetwork:
+      isMystenConnected && mystenAccount?.chains[0] !== APP_SUI_NETWORK,
   };
 }
