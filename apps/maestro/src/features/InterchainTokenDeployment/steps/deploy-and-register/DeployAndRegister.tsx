@@ -13,10 +13,9 @@ import React, {
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { useBalance, useChainId } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -102,12 +101,13 @@ export const Step2: FC = () => {
 
       rootActions.setTxState({
         type: "pending_approval",
+        step: 1,
+        totalSteps: 1,
       });
 
       const txPromise = deployInterchainTokenAsync();
 
       // Sui will return a digest equivalent to the txHash
-      const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
       if (sourceChain.chain_id === SUI_CHAIN_ID) {
         try {
           const result = (await txPromise) as DeployTokenResult;
@@ -206,6 +206,12 @@ export const Step2: FC = () => {
 
   const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
+      if (rootState.txState.step && rootState.txState.totalSteps) {
+        return {
+          children: `Check your wallet - Signature ${rootState.txState.step}/${rootState.txState.totalSteps}`,
+          status: "loading",
+        };
+      }
       return { children: "Check your wallet", status: "loading" };
     }
     if (rootState.txState.type === "deploying") {
@@ -243,7 +249,7 @@ export const Step2: FC = () => {
       status: "idle",
     };
   }, [
-    rootState.txState.type,
+    rootState.txState,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
     state.totalGasFee,

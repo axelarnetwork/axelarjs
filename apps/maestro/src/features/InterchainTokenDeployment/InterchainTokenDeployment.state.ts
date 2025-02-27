@@ -30,6 +30,8 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "pending_approval";
+      step: number;
+      totalSteps: number;
     }
   | {
       type: "deploying";
