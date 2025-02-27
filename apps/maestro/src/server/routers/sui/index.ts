@@ -237,7 +237,10 @@ export const suiRouter = router({
           cursor = coins.nextCursor;
         } while (coins.hasNextPage);
 
-        tx.mergeCoins(primaryCoin, otherCoins);
+        // TODO: checks if this work properly. I'll comment mergeCoins for now
+        // if (otherCoins.length > 0) {
+        //   tx.mergeCoins(primaryCoin, otherCoins);
+        // }
 
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
