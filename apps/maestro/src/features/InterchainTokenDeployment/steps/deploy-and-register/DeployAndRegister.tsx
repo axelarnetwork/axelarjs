@@ -101,6 +101,8 @@ export const Step2: FC = () => {
 
       rootActions.setTxState({
         type: "pending_approval",
+        step: 1,
+        totalSteps: 1,
       });
 
       const txPromise = deployInterchainTokenAsync();
@@ -247,9 +249,7 @@ export const Step2: FC = () => {
       status: "idle",
     };
   }, [
-    rootState.txState.type,
-    rootState.txState.step,
-    rootState.txState.totalSteps,
+    rootState.txState,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
     state.totalGasFee,
