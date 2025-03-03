@@ -5,7 +5,6 @@ import { z } from "zod";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
-import { EvmChainsValue, VMChainsValue } from "~/server/utils";
 import {
   newInterchainTokenSchema,
   type NewRemoteInterchainTokenInput,
