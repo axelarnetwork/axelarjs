@@ -89,17 +89,18 @@ export const recordInterchainTokenDeployment = protectedProcedure
         const vmChains = await ctx.configs.vmChains();
         const evmChains = await ctx.configs.evmChains();
 
+
         // Create a Map using chain_id as the key to ensure uniqueness
         const uniqueChains = new Map();
 
         // Add VM chains first, accessing the 'info' property
         Object.values(vmChains).forEach((chainConfig) => {
-          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
+          uniqueChains.set(chainConfig.info.id, chainConfig);
         });
 
         // Add EVM chains, overwriting any duplicates
         Object.values(evmChains).forEach((chainConfig) => {
-          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
+          uniqueChains.set(chainConfig.info.id, chainConfig);
         });
 
         // Convert back to an object with axelarChainId as keys
