@@ -84,7 +84,6 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     const remoteTokens = await Promise.all(
       input.destinationAxelarChainIds.map(async (axelarChainId) => {
-        // Fetch both chain types
         const chainConfig = chains[axelarChainId];
         invariant(
           chainConfig,
