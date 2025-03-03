@@ -2,6 +2,7 @@ import { invariant, Maybe } from "@axelarjs/utils";
 
 import { always } from "rambda";
 import { z } from "zod";
+import { ExtendedWagmiChainConfig } from "~/config/chains";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
@@ -34,9 +35,14 @@ export const recordInterchainTokenDeployment = protectedProcedure
         `No configuration found for chain ${input.axelarChainId}`
       );
 
+      invariant(
+        configs.wagmi,
+        `No wagmi configuration found for chain ${input.axelarChainId}`
+      );
+
       // Handle different chain types
       const createServiceClient = () => {
-        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
+        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi as ExtendedWagmiChainConfig);
       };
 
       const originChainServiceClient = createServiceClient();
@@ -48,7 +54,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         .catch(() => null)) as `0x${string}`;
 
       const createTokenManagerClient = (address: string) => {
-        return ctx.contracts.createTokenManagerClient(configs.wagmi, address);
+        return ctx.contracts.createTokenManagerClient(configs.wagmi as ExtendedWagmiChainConfig, address);
       };
 
       const tokenManagerClient = !tokenManagerAddress

@@ -25,7 +25,7 @@ export type EVMChainsMap = Record<
 
 export type VMChainsValue = {
   info: VMChainConfig,
-  wagmi: ExtendedWagmiChainConfig
+  wagmi?: ExtendedWagmiChainConfig
 }
 
 export type VMChainsMap = Record<
