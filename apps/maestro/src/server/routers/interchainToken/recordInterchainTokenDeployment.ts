@@ -1,7 +1,8 @@
 import { invariant, Maybe } from "@axelarjs/utils";
 
-import { always, chain } from "rambda";
+import { always } from "rambda";
 import { z } from "zod";
+import { ExtendedWagmiChainConfig } from "~/config/chains";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
@@ -24,21 +25,24 @@ export const recordInterchainTokenDeployment = protectedProcedure
     invariant(ctx.session?.address, "ctx.session.address is required");
     let tokenManagerAddress;
     let tokenManagerType;
+    const chains = await ctx.configs.chains();
 
     if (input.axelarChainId !== "sui") {
-      const evmChains = await ctx.configs.evmChains();
-      const vmChains = await ctx.configs.vmChains();
-      const configs =
-        evmChains[input.axelarChainId] || vmChains[input.axelarChainId];
+      const configs = chains[input.axelarChainId];
 
       invariant(
         configs,
         `No configuration found for chain ${input.axelarChainId}`
       );
 
+      invariant(
+        configs.wagmi,
+        `No wagmi configuration found for chain ${input.axelarChainId}`
+      );
+
       // Handle different chain types
       const createServiceClient = () => {
-        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
+        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi as ExtendedWagmiChainConfig);
       };
 
       const originChainServiceClient = createServiceClient();
@@ -50,7 +54,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         .catch(() => null)) as `0x${string}`;
 
       const createTokenManagerClient = (address: string) => {
-        return ctx.contracts.createTokenManagerClient(configs.wagmi, address);
+        return ctx.contracts.createTokenManagerClient(configs.wagmi as ExtendedWagmiChainConfig, address);
       };
 
       const tokenManagerClient = !tokenManagerAddress
@@ -85,32 +89,6 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     const remoteTokens = await Promise.all(
       input.destinationAxelarChainIds.map(async (axelarChainId) => {
-        // Fetch both chain types
-        const vmChains = await ctx.configs.vmChains();
-        const evmChains = await ctx.configs.evmChains();
-
-        // Create a Map using chain_id as the key to ensure uniqueness
-        const uniqueChains = new Map();
-
-        // Add VM chains first, accessing the 'info' property
-        Object.values(vmChains).forEach((chainConfig) => {
-          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
-        });
-
-        // Add EVM chains, overwriting any duplicates
-        Object.values(evmChains).forEach((chainConfig) => {
-          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
-        });
-
-        // Convert back to an object with axelarChainId as keys
-        const chains = Array.from(uniqueChains.values()).reduce(
-          (acc, chainConfig) => {
-            acc[chainConfig.info.id] = chainConfig;
-            return acc;
-          },
-          {} as Record<string, typeof chain>
-        );
-
         const chainConfig = chains[axelarChainId];
         invariant(
           chainConfig,

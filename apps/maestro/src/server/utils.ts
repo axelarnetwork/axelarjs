@@ -13,21 +13,27 @@ import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { ExtendedWagmiChainConfig, CHAIN_CONFIGS } from "~/config/chains";
 import MaestroKVClient from "~/services/db/kv";
 
+export type EvmChainsValue = {
+  info: EVMChainConfig;
+  wagmi: ExtendedWagmiChainConfig;
+}
+
 export type EVMChainsMap = Record<
   string | number,
-  {
-    info: EVMChainConfig;
-    wagmi: ExtendedWagmiChainConfig;
-  }
+  EvmChainsValue 
 >;
+
+export type VMChainsValue = {
+  info: VMChainConfig,
+  wagmi?: ExtendedWagmiChainConfig
+}
 
 export type VMChainsMap = Record<
   string | number,
-  {
-    info: VMChainConfig;
-    wagmi?: ExtendedWagmiChainConfig;
-  }
+  VMChainsValue 
 >;
+
+export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
 
 export async function vmChains<TCacheKey extends string>(
   kvClient: MaestroKVClient,
@@ -186,4 +192,43 @@ export function generateInterchainTokenSalt(
   const hash = keccak256(buffer);
 
   return `${hash}`;
+}
+
+export async function chains<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarscanClient: AxelarscanClient,
+  cacheKey: TCacheKey
+): Promise<ChainsMap> {
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<ChainsMap>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
+  const [evmChainsMap, vmChainsMap] = await Promise.all([
+    evmChains(kvClient, axelarscanClient, `${cacheKey}-evm`),
+    vmChains(kvClient, axelarscanClient, `${cacheKey}-vm`),
+  ]);
+
+  const combinedChainsMap: Record<
+    string,
+    EvmChainsValue | VMChainsValue
+  > = {};
+
+  for (const chain of Object.values(evmChainsMap)) {
+    combinedChainsMap[chain.info.id] = chain;
+    combinedChainsMap[chain.info.chain_id] = chain;
+  }
+
+  for (const chain of Object.values(vmChainsMap)) {
+    combinedChainsMap[chain.info.id] = chain;
+    combinedChainsMap[chain.info.chain_id] = chain;
+  }
+
+  // cache for 1 hour
+  await kvClient.setCached(cacheKey, combinedChainsMap, 3600);
+
+  return combinedChainsMap;
 }
