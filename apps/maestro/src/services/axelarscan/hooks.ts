@@ -57,7 +57,7 @@ export function useAllChainConfigsQuery() {
       if (!existingChain) {
         chainMap.set(chain.chain_id, {
           ...chain,
-          displayName: `${chain.name} (VM)`, // Add VM suffix to differentiate
+          displayName: `${chain.name}`,
         });
       }
     });
