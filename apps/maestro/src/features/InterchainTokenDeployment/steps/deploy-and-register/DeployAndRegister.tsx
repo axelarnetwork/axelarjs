@@ -105,7 +105,16 @@ export const Step2: FC = () => {
         totalSteps: 1,
       });
 
-      const txPromise = deployInterchainTokenAsync();
+      const txPromise = deployInterchainTokenAsync().catch((e) => {
+        // Handle user rejection from any wallet
+        if (e.message?.toLowerCase().includes("reject")) {
+          toast.error("Transaction rejected by user");
+          rootActions.setTxState({
+            type: "idle",
+          });
+          return;
+        }
+      });
 
       // Sui will return a digest equivalent to the txHash
       if (sourceChain.chain_id === SUI_CHAIN_ID) {
@@ -135,13 +144,8 @@ export const Step2: FC = () => {
             });
           }
         } catch (e: any) {
-          // Handle user rejection from Sui wallet
-          if (e.message.includes("User rejected")) {
-            rootActions.setTxState({
-              type: "idle",
-            });
-            return;
-          }
+          // We're catching the error above
+          console.log("error in sui tx", e?.message);
         }
       }
 
@@ -160,13 +164,6 @@ export const Step2: FC = () => {
               txType: "INTERCHAIN_DEPLOYMENT",
             });
           }
-        },
-        onTransactionError(txError) {
-          rootActions.setTxState({
-            type: "idle",
-          });
-
-          toast.error(txError.shortMessage);
         },
       });
     },
