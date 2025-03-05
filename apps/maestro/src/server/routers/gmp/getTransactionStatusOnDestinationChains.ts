@@ -4,17 +4,20 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
+import { suiClient } from "~/lib/clients/suiClient";
 
 export type ChainStatus = {
   status: GMPTxStatus;
   txHash: string;
   txId: string;
+  finalDestinationChain: string;
   logIndex: number;
 };
 
 export const SEARCHGMP_SOURCE = {
   includes: [
-    "call.returnValues.destinationChain",
+    "call.returnValues",
+    "call.receipt.transactionHash",
     "status",
     "approved",
     "confirm",
@@ -41,7 +44,44 @@ const INPUT_SCHEMA = z.object({
   txHash: z.string(),
 });
 
-async function processGMPData(
+async function findFinalDestinationChain(txHash: string, sourceChainId: string) : Promise<string | undefined> {
+  console.log("findFinalDestinationChain", txHash, sourceChainId);
+  if(sourceChainId === 'sui') {
+    const eventData = await suiClient.queryEvents({
+      query: {
+        Transaction: txHash
+      }
+    }).catch(() => null);
+
+    if(eventData) {
+      const deploymentEvent = eventData.data.find((event: any) => event.type.includes("InterchainTokenDeploymentStarted"));
+
+      if(deploymentEvent) {
+        const eventDetails = deploymentEvent.parsedJson as any;
+        const destinationChainId: string = eventDetails.destination_chain;
+        return destinationChainId;
+      }
+    }
+  } else {
+    // TODO: implement get events using viem
+  }
+
+  return undefined;
+}
+
+export async function getSecondHopStatus(
+  messageId: string,
+  ctx: any
+): Promise<GMPTxStatus> {
+  const secondHopData = await ctx.services.gmp.searchGMP({
+    txHash: messageId,
+    _source: SEARCHGMP_SOURCE,
+  });
+
+  return secondHopData.length > 0 ? secondHopData[0].status : "pending";
+}
+
+export async function processGMPData(
   gmpData: any,
   ctx: any
 ): Promise<[string, ChainStatus]> {
@@ -52,14 +92,15 @@ async function processGMPData(
   ).toLowerCase();
 
   let status = firstHopStatus;
+  let finalDestinationChain: string = destinationChain;
 
   // Handle second hop for non-EVM chains
   if (call.chain_type !== "evm" && callback) {
-    const secondHopData = await ctx.services.gmp.searchGMP({
-      txHash: callback.returnValues.messageId,
-      _source: SEARCHGMP_SOURCE,
-    });
-    status = secondHopData[0].status;
+    status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
+  }
+
+  if (call.chain_type !== 'evm' && !callback) {
+    finalDestinationChain = await findFinalDestinationChain(call.receipt.transactionHash, call.returnValues.sourceChain) ?? finalDestinationChain;
   }
 
   return [
@@ -68,6 +109,7 @@ async function processGMPData(
       status,
       txHash: call.transactionHash,
       logIndex: call.logIndex ?? call._logIndex ?? 0,
+      finalDestinationChain: finalDestinationChain ?? destinationChain,
       txId: gmpData.message_id,
     },
   ];

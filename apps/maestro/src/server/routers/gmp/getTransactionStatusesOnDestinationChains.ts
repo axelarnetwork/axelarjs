@@ -1,53 +1,12 @@
-import type { GMPTxStatus } from "@axelarjs/api";
 
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { publicProcedure } from "~/server/trpc";
 import {
-  ChainStatus,
   SEARCHGMP_SOURCE,
+  processGMPData,
 } from "./getTransactionStatusOnDestinationChains";
-
-async function getSecondHopStatus(
-  messageId: string,
-  ctx: any
-): Promise<GMPTxStatus> {
-  const secondHopData = await ctx.services.gmp.searchGMP({
-    txHash: messageId,
-    _source: SEARCHGMP_SOURCE,
-  });
-
-  return secondHopData.length > 0 ? secondHopData[0].status : "pending";
-}
-
-async function processGMPData(
-  gmpData: any,
-  ctx: any
-): Promise<[string, ChainStatus]> {
-  const { call, callback, status: firstHopStatus } = gmpData;
-  const destinationChain = (
-    callback?.returnValues.destinationChain ??
-    call.returnValues.destinationChain
-  ).toLowerCase();
-
-  let status = firstHopStatus;
-
-  // Handle second hop for non-EVM chains
-  if (call.chain_type !== "evm" && callback) {
-    status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
-  }
-
-  return [
-    destinationChain,
-    {
-      status,
-      txHash: call.transactionHash,
-      logIndex: call.logIndex ?? call._logIndex ?? 0,
-      txId: gmpData.message_id,
-    },
-  ];
-}
 
 /**
  * Get the statuses of one or more GMP transactions on destination chains
