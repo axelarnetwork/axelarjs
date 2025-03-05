@@ -101,6 +101,35 @@ export function useInterchainTokenDetailsPageState(
   });
 }
 
+function getDeploymentStatus(
+  chainId: string | undefined,
+  statusesByChain: Record<string, "pending" | GMPTxStatus>
+) {
+  if (!chainId) {
+    return undefined;
+  }
+
+  const directStatus = statusesByChain[chainId];
+
+  if (directStatus) {
+    return directStatus;
+  }
+
+  // Handle two-hop transactions via Axelar
+  const axelarStatus = statusesByChain["axelar"];
+  if (
+    axelarStatus &&
+    axelarStatus.finalDestinationChain === chainId
+  ) {
+    return {
+      ...axelarStatus,
+      status: "pending"
+    }
+  }
+
+  return undefined;
+}
+
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
@@ -410,11 +439,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             x.chain && !remoteChainsExecuted.includes(x.chain.id)
         )
         .map((token) => {
-          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
-            (id) =>
-              statusesByChain[id] ||
-              (statusesByChain["axelar"]?.finalDestinationChain === id &&
-                statusesByChain["axelar"])
+          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined((id) =>
+            getDeploymentStatus(id, statusesByChain)
           );
 
           const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
@@ -423,12 +449,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             ...token,
             isSelected,
             isRegistered: false,
-            deploymentStatus:
-              statusesByChain["axelar"] &&
-              statusesByChain["axelar"].finalDestinationChain ===
-                token.chain?.id
-                ? "pending"
-                : gmpInfo?.status,
+            deploymentStatus: gmpInfo?.status ?? undefined,
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
               ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),
