@@ -411,7 +411,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         )
         .map((token) => {
           const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
-            (id) => statusesByChain[id]
+            (id) =>
+              statusesByChain[id] ||
+              (statusesByChain["axelar"]?.finalDestinationChain === id &&
+                statusesByChain["axelar"])
           );
 
           const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
@@ -420,7 +423,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             ...token,
             isSelected,
             isRegistered: false,
-            deploymentStatus: gmpInfo?.status,
+            deploymentStatus:
+              statusesByChain["axelar"] &&
+              statusesByChain["axelar"].finalDestinationChain ===
+                token.chain?.id
+                ? "pending"
+                : gmpInfo?.status,
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
               ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),
