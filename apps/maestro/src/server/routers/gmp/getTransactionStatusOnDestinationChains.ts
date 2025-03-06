@@ -25,6 +25,7 @@ export const SEARCHGMP_SOURCE = {
     "confirm",
     "executed",
     "callback",
+    "interchain_token_deployment_started",
   ],
   excludes: [
     "call.transaction",
@@ -51,7 +52,6 @@ async function findFinalDestinationChain(
   sourceChainId: string,
   ctx: Context
 ): Promise<string | undefined> {
-  console.log("findFinalDestinationChain", txHash, sourceChainId);
   const kvClient: MaestroKVClient = ctx.persistence.kv;
 
   const cacheKey = `final_destination-${txHash}-${sourceChainId}`;
@@ -85,10 +85,9 @@ async function findFinalDestinationChain(
         return destinationChainId;
       }
     }
-  } else {
-    // TODO: implement get events using viem
   }
 
+  // For EVM, seems like the final destination chain is provided in the searchGMP response, in interchain_token_deployment_started event.
   return undefined;
 }
 
@@ -108,21 +107,31 @@ export async function processGMPData(
   gmpData: any,
   ctx: Context
 ): Promise<[string, ChainStatus]> {
-  const { call, callback, status: firstHopStatus } = gmpData;
+  const {
+    call,
+    callback,
+    status: firstHopStatus,
+    interchain_token_deployment_started,
+  } = gmpData;
   const destinationChain = (
     callback?.returnValues.destinationChain ??
     call.returnValues.destinationChain
   ).toLowerCase();
 
   let status = firstHopStatus;
-  let finalDestinationChain: string = destinationChain;
+  let finalDestinationChain: string =
+    interchain_token_deployment_started.destinationChain || destinationChain;
 
   // Handle second hop for non-EVM chains
   if (call.chain_type !== "evm" && callback) {
     status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
   }
 
-  if (call.chain_type !== "evm" && !callback) {
+  if (
+    call.chain_type !== "evm" &&
+    !callback &&
+    !interchain_token_deployment_started
+  ) {
     finalDestinationChain =
       (await findFinalDestinationChain(
         call.receipt.transactionHash,
