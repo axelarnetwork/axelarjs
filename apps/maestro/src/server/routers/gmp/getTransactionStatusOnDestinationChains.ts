@@ -1,10 +1,12 @@
-import type { GMPTxStatus } from "@axelarjs/api/gmp";
+import { GMPTxStatus } from "@axelarjs/api";
 
+import { Context } from "vm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { publicProcedure } from "~/server/trpc";
 import { suiClient } from "~/lib/clients/suiClient";
+import { publicProcedure } from "~/server/trpc";
+import MaestroKVClient from "~/services/db/kv";
 
 export type ChainStatus = {
   status: GMPTxStatus;
@@ -44,21 +46,42 @@ const INPUT_SCHEMA = z.object({
   txHash: z.string(),
 });
 
-async function findFinalDestinationChain(txHash: string, sourceChainId: string) : Promise<string | undefined> {
+async function findFinalDestinationChain(
+  txHash: string,
+  sourceChainId: string,
+  ctx: Context
+): Promise<string | undefined> {
   console.log("findFinalDestinationChain", txHash, sourceChainId);
-  if(sourceChainId === 'sui') {
-    const eventData = await suiClient.queryEvents({
-      query: {
-        Transaction: txHash
-      }
-    }).catch(() => null);
+  const kvClient: MaestroKVClient = ctx.persistence.kv;
 
-    if(eventData) {
-      const deploymentEvent = eventData.data.find((event: any) => event.type.includes("InterchainTokenDeploymentStarted"));
+  const cacheKey = `final_destination-${txHash}-${sourceChainId}`;
 
-      if(deploymentEvent) {
+  const cachedValue = await kvClient.getCached<string>(cacheKey);
+
+  if (cachedValue) {
+    return cachedValue;
+  }
+
+  if (sourceChainId === "sui") {
+    const eventData = await suiClient
+      .queryEvents({
+        query: {
+          Transaction: txHash,
+        },
+      })
+      .catch(() => null);
+
+    if (eventData) {
+      const deploymentEvent = eventData.data.find((event: any) =>
+        event.type.includes("InterchainTokenDeploymentStarted")
+      );
+
+      if (deploymentEvent) {
         const eventDetails = deploymentEvent.parsedJson as any;
         const destinationChainId: string = eventDetails.destination_chain;
+
+        kvClient.setCached(cacheKey, destinationChainId, 3600);
+
         return destinationChainId;
       }
     }
@@ -71,7 +94,7 @@ async function findFinalDestinationChain(txHash: string, sourceChainId: string) 
 
 export async function getSecondHopStatus(
   messageId: string,
-  ctx: any
+  ctx: Context
 ): Promise<GMPTxStatus> {
   const secondHopData = await ctx.services.gmp.searchGMP({
     txHash: messageId,
@@ -83,7 +106,7 @@ export async function getSecondHopStatus(
 
 export async function processGMPData(
   gmpData: any,
-  ctx: any
+  ctx: Context
 ): Promise<[string, ChainStatus]> {
   const { call, callback, status: firstHopStatus } = gmpData;
   const destinationChain = (
@@ -99,8 +122,13 @@ export async function processGMPData(
     status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
   }
 
-  if (call.chain_type !== 'evm' && !callback) {
-    finalDestinationChain = await findFinalDestinationChain(call.receipt.transactionHash, call.returnValues.sourceChain) ?? finalDestinationChain;
+  if (call.chain_type !== "evm" && !callback) {
+    finalDestinationChain =
+      (await findFinalDestinationChain(
+        call.receipt.transactionHash,
+        call.returnValues.sourceChain,
+        ctx
+      )) ?? finalDestinationChain;
   }
 
   return [
