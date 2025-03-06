@@ -195,8 +195,7 @@ async function getInterchainToken(
             tokenId: tokenDetails.tokenId as `0x${string}`,
           })
           .then(() => true)
-          .catch((e) => {
-            console.log("error in isRegistered", e);
+          .catch(() => {
             return false;
           });
 
