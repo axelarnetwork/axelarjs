@@ -80,7 +80,7 @@ async function findFinalDestinationChain(
         const eventDetails = deploymentEvent.parsedJson as any;
         const destinationChainId: string = eventDetails.destination_chain;
 
-        kvClient.setCached(cacheKey, destinationChainId, 3600);
+        await kvClient.setCached(cacheKey, destinationChainId, 3600);
 
         return destinationChainId;
       }
@@ -113,32 +113,30 @@ export async function processGMPData(
     status: firstHopStatus,
     interchain_token_deployment_started,
   } = gmpData;
-  const destinationChain = (
-    callback?.returnValues.destinationChain ??
-    call.returnValues.destinationChain
-  ).toLowerCase();
+
+  let finalDestinationChain: string | undefined =
+    interchain_token_deployment_started?.destinationChain;
 
   let status = firstHopStatus;
-  let finalDestinationChain: string =
-    interchain_token_deployment_started.destinationChain || destinationChain;
 
   // Handle second hop for non-EVM chains
   if (call.chain_type !== "evm" && callback) {
     status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
   }
 
-  if (
-    call.chain_type !== "evm" &&
-    !callback &&
-    !interchain_token_deployment_started
-  ) {
-    finalDestinationChain =
-      (await findFinalDestinationChain(
-        call.receipt.transactionHash,
-        call.returnValues.sourceChain,
-        ctx
-      )) ?? finalDestinationChain;
+  // Only call findFinalDestinationChain if necessary
+  if (call.chain_type !== "evm" && !finalDestinationChain) {
+    finalDestinationChain = await findFinalDestinationChain(
+      call.receipt.transactionHash,
+      call.returnValues.sourceChain,
+      ctx
+    );
   }
+
+  const destinationChain = (
+    callback?.returnValues.destinationChain ??
+    call.returnValues.destinationChain
+  ).toLowerCase();
 
   return [
     destinationChain,
