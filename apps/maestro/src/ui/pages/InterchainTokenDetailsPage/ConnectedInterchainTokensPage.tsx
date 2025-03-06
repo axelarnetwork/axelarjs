@@ -33,6 +33,7 @@ import {
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
+import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
@@ -103,7 +104,7 @@ export function useInterchainTokenDetailsPageState(
 
 function getDeploymentStatus(
   chainId: string | undefined,
-  statusesByChain: Record<string, "pending" | GMPTxStatus>
+  statusesByChain: Record<string, ChainStatus>
 ) {
   if (!chainId) {
     return undefined;
