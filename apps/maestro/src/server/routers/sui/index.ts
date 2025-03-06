@@ -75,6 +75,7 @@ export const suiRouter = router({
         tokenPackageId: z.string(),
         metadataId: z.string(),
         minterAddress: z.string().optional(),
+        totalGasFee: z.number()
       })
     )
     .mutation(async ({ input }) => {
@@ -86,10 +87,10 @@ export const suiRouter = router({
           tokenPackageId,
           metadataId,
           destinationChains,
+          totalGasFee
         } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-        const feeUnitAmount = 5e7;
         const { txBuilder } = setupTxBuilder(sender);
 
         const coinMetadata = await suiClient.getCoinMetadata({
@@ -130,7 +131,7 @@ export const suiRouter = router({
             chainConfig,
             destinationChain,
             coinMetadata,
-            feeUnitAmount,
+            totalGasFee,
             sender,
             tokenType
           );
@@ -289,6 +290,7 @@ export const suiRouter = router({
         originChainId: z.number(),
         sender: z.string(),
         symbol: z.string(),
+        totalGasFee: z.number()
       })
     )
     .mutation(async ({ input }) => {
@@ -298,12 +300,11 @@ export const suiRouter = router({
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;
-        const { sender, symbol, tokenAddress, destinationChainIds } = input;
+        const { sender, symbol, tokenAddress, destinationChainIds, totalGasFee } = input;
 
         const txBuilder = new TxBuilder(suiClient);
 
         txBuilder.tx.setSenderIfNotSet(sender);
-        const feeUnitAmount = 5e7;
 
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -321,7 +322,7 @@ export const suiRouter = router({
             chainConfig,
             destinationChain,
             coinMetadata,
-            feeUnitAmount,
+            totalGasFee,
             sender,
             tokenType
           );
@@ -387,6 +388,7 @@ export const suiRouter = router({
         destinationChains: z.array(z.string()),
         amount: z.bigint(),
         minterAddress: z.string().optional(),
+        totalGasFee: z.number()
       })
     )
     .mutation(async ({ input }) => {
@@ -399,12 +401,12 @@ export const suiRouter = router({
           destinationChains,
           amount,
           minterAddress,
+          totalGasFee
         } = input;
 
         const chainConfig = await getChainConfig();
         const txBuilder = new TxBuilder(suiClient);
         txBuilder.tx.setSenderIfNotSet(sender);
-        const feeUnitAmount = 5e7;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -437,7 +439,7 @@ export const suiRouter = router({
             chainConfig,
             destinationChain,
             coinMetadata,
-            feeUnitAmount,
+            totalGasFee,
             sender,
             tokenType
           );

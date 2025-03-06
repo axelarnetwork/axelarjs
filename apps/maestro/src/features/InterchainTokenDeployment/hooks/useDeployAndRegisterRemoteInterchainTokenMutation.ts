@@ -268,6 +268,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
         minterAddress: input.minterAddress,
+        totalGasFee: parseInt(totalGasFee.toString())
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
@@ -303,6 +304,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     deployerAddress,
     input,
     multicall,
+    totalGasFee,
     prepareMulticall?.request,
     recordDeploymentDraft,
   ]);
