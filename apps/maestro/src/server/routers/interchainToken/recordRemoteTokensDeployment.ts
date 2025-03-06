@@ -81,22 +81,23 @@ export const recordRemoteTokensDeployment = protectedProcedure
           });
         }
 
-        // Create appropriate client based on chain type
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          remoteConfig.wagmi
-        );
-
-        if (!itsClient) {
-          throw new TRPCError({
-            code: "NOT_IMPLEMENTED",
-            message: `Chain type ${remoteConfig.info.chain_name} not supported yet`,
-          });
-        }
 
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
         if (remoteToken.axelarChainId !== "sui") {
+          // Create appropriate client based on chain type
+          const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+            remoteConfig.wagmi
+          );
+
+          if (!itsClient) {
+            throw new TRPCError({
+              code: "NOT_IMPLEMENTED",
+              message: `Chain type ${remoteConfig.info.chain_name} not supported yet`,
+            });
+          }
+
           [tokenManagerAddress, tokenAddress] = await Promise.all([
             itsClient.reads
               .tokenManagerAddress({
