@@ -12,14 +12,13 @@ export type ChainStatus = {
   status: GMPTxStatus;
   txHash: string;
   txId: string;
-  finalDestinationChain: string;
+  lastHop: boolean;
   logIndex: number;
 };
 
 export const SEARCHGMP_SOURCE = {
   includes: [
-    "call.returnValues",
-    "call.receipt.transactionHash",
+    "call",
     "status",
     "approved",
     "confirm",
@@ -47,14 +46,14 @@ const INPUT_SCHEMA = z.object({
   txHash: z.string(),
 });
 
-async function findFinalDestinationChain(
+async function findDestinationChainFromEvent(
   txHash: string,
   sourceChainId: string,
   ctx: Context
 ): Promise<string | undefined> {
   const kvClient: MaestroKVClient = ctx.persistence.kv;
 
-  const cacheKey = `final_destination-${txHash}-${sourceChainId}`;
+  const cacheKey = `event_dest_chain-${txHash}-${sourceChainId}`;
 
   const cachedValue = await kvClient.getCached<string>(cacheKey);
 
@@ -96,7 +95,7 @@ export async function getSecondHopStatus(
   ctx: Context
 ): Promise<GMPTxStatus> {
   const secondHopData = await ctx.services.gmp.searchGMP({
-    txHash: messageId,
+    messageId,
     _source: SEARCHGMP_SOURCE,
   });
 
@@ -114,19 +113,17 @@ export async function processGMPData(
     interchain_token_deployment_started,
   } = gmpData;
 
-  let finalDestinationChain: string | undefined =
-    interchain_token_deployment_started?.destinationChain;
-
   let status = firstHopStatus;
+  const logIndex = call.logIndex ?? call._logIndex ?? call.messageIdIndex ?? 0;
+  let destinationChainFromSrcEvent: string | undefined;
 
   // Handle second hop for non-EVM chains
   if (call.chain_type !== "evm" && callback) {
     status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
   }
 
-  // Only call findFinalDestinationChain if necessary
-  if (call.chain_type !== "evm" && !finalDestinationChain) {
-    finalDestinationChain = await findFinalDestinationChain(
+  if (call.chain_type !== "evm") {
+    destinationChainFromSrcEvent = await findDestinationChainFromEvent(
       call.receipt.transactionHash,
       call.returnValues.sourceChain,
       ctx
@@ -134,6 +131,8 @@ export async function processGMPData(
   }
 
   const destinationChain = (
+    interchain_token_deployment_started?.destinationChain ??
+    destinationChainFromSrcEvent ??
     callback?.returnValues.destinationChain ??
     call.returnValues.destinationChain
   ).toLowerCase();
@@ -143,9 +142,9 @@ export async function processGMPData(
     {
       status,
       txHash: call.transactionHash,
-      logIndex: call.logIndex ?? call._logIndex ?? 0,
-      finalDestinationChain: finalDestinationChain ?? destinationChain,
+      logIndex,
       txId: gmpData.message_id,
+      lastHop: call.chain_type === "evm" || !!callback,
     },
   ];
 }

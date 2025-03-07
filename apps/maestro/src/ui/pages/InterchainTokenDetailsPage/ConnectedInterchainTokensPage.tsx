@@ -25,6 +25,7 @@ import {
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
@@ -33,7 +34,6 @@ import {
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
-import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
@@ -106,29 +106,15 @@ function getDeploymentStatus(
   chainId: string | undefined,
   statusesByChain: Record<string, ChainStatus>
 ) {
-  if (!chainId) {
+  const deploymentStatus = chainId ? statusesByChain[chainId] : undefined;
+
+  if (!deploymentStatus) {
     return undefined;
   }
 
-  const directStatus = statusesByChain[chainId];
-
-  if (directStatus) {
-    return directStatus;
-  }
-
-  // Handle two-hop transactions via Axelar
-  const axelarStatus = statusesByChain["axelar"];
-  if (
-    axelarStatus &&
-    axelarStatus.finalDestinationChain === chainId
-  ) {
-    return {
-      ...axelarStatus,
-      status: "pending"
-    }
-  }
-
-  return undefined;
+  return deploymentStatus.lastHop
+    ? deploymentStatus
+    : { ...deploymentStatus, status: "pending" };
 }
 
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
