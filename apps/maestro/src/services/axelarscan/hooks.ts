@@ -135,7 +135,7 @@ export function useVMChainConfigsQuery() {
 
   // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
-    if(chain.id === 'sui') {
+    if(chain.id.includes("sui-2")) {
       chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
     }
   }

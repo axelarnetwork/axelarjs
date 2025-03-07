@@ -53,9 +53,9 @@ export const getChainInfo = publicProcedure
     } catch (error) {
 
       // Remove this once we have sui supported in the urlMap from the axelarjs-sdk
-      if(input.axelarChainId === "sui"){
+      if(input.axelarChainId.includes("sui")){
         return {
-          id: "sui",
+          id: "sui-2",
           chainName: "sui",
           blockConfirmations: 1,
           estimatedWaitTimeInMinutes: 1,

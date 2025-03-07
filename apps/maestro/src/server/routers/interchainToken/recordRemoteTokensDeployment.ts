@@ -26,10 +26,9 @@ export const recordRemoteTokensDeployment = protectedProcedure
       ctx.configs.vmChains(),
     ]);
 
-    // Try to find config in either chain type
-    // TODO: fix hardcoded value
+    // TODO: fix hardcoded value. check why the axelarChainId is optional
     const configs =
-      evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui"];
+      evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui-2"];
     if (!configs) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -85,7 +84,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
-        if (remoteToken.axelarChainId !== "sui") {
+        if (!remoteToken.axelarChainId.includes("sui")) {
           // Create appropriate client based on chain type
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
             remoteConfig.wagmi

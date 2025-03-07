@@ -266,7 +266,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     if (
       !isAlreadyUpdatingRemoteSui &&
       interchainToken?.matchingTokens?.some(
-        (x) => x.chain?.id === "sui" && x.tokenAddress === props.tokenAddress
+        (x) => x.chain?.id.includes("sui") && x.tokenAddress === props.tokenAddress
       ) &&
       props.tokenId
     ) {
@@ -305,7 +305,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       // check if the EVM token address is the same as sui, which is wrong
       if (
         props.chainId === SUI_CHAIN_ID &&
-        x.chain?.id !== "sui" &&
+        !x.chain?.id.includes("sui") &&
         x.tokenAddress === props.tokenAddress &&
         !isUpdating[x.chain?.id ?? ""]
       ) {

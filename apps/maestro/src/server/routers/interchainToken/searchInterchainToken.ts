@@ -210,7 +210,7 @@ async function getInterchainToken(
             tokenAddress,
             isRegistered,
           };
-        } else if (chainConfig?.axelarChainId === "sui") {
+        } else if (chainConfig?.axelarChainId.includes("sui")) {
           const eventDetails = await getSuiEventsByTxHash(
             suiClient,
             tokenDetails.deploymentMessageId.split("-")[0]

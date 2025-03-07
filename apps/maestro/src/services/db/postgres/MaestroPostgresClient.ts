@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, ilike, inArray } from "drizzle-orm";
 import { type Address } from "viem";
 import { z } from "zod";
 
@@ -342,7 +342,7 @@ export default class MaestroPostgresClient {
         .where(
           and(
             eq(remoteInterchainTokens.tokenId, tokenId),
-            eq(remoteInterchainTokens.axelarChainId, "sui")
+            ilike(remoteInterchainTokens.axelarChainId, "%sui%")
           )
         );
     } catch (error) {

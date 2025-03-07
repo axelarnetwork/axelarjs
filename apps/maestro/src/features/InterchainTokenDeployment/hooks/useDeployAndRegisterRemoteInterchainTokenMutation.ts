@@ -86,7 +86,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   useEffect(() => {
     if (!tokenId || !tokenAddress) {
       if (input) {
-        if (input.sourceChainId !== "sui") {
+        if (!input.sourceChainId.includes("sui")) {
           setIsReady(false);
           return;
         }
@@ -258,7 +258,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
-    if (input && tokenAddress && input.sourceChainId !== "sui") {
+    if (input && tokenAddress && !input.sourceChainId.includes("sui")) {
       return await recordDeploymentAsync({
         kind: "interchain",
         tokenId: tokenId as string,

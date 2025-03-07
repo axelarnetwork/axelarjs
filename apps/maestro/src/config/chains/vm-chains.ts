@@ -45,6 +45,7 @@ const suiTestnet = {
 
 const suiDevnet = {
   ...suiTestnet,
+  axelarChainId: "sui-2",
   environment: ENVIRONMENTS.devnet,
 };
 
@@ -59,5 +60,5 @@ export const WAGMI_VM_CHAIN_CONFIGS = VM_CHAIN_CONFIGS.filter(
 );
 
 export const suiChainConfig = VM_CHAIN_CONFIGS.find(
-  (chain) => chain.axelarChainId === "sui"
+  (chain) => chain.axelarChainId.includes("sui")
 ) as ExtendedWagmiChainConfig;

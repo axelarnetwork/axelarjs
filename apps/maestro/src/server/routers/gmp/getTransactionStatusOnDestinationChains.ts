@@ -63,7 +63,7 @@ async function findDestinationChainFromEvent(
     return cachedValue;
   }
 
-  if (sourceChainId === "sui") {
+  if (sourceChainId.includes("sui")) {
     const eventData = await getSuiEventsByTxHash(suiClient, txHash);
     if (eventData) {
       for (const event of eventData.data.slice(0, logIndex).reverse()) {

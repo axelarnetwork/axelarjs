@@ -51,7 +51,7 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
     axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
 
-  const isNonEvm = chainInfo?.id === "sui";
+  const isNonEvm = chainInfo?.id.includes("sui");
 
   // Make sure this supports sui as well
   const { data: txInfo } = useTransaction({
