@@ -49,11 +49,12 @@ const INPUT_SCHEMA = z.object({
 async function findDestinationChainFromEvent(
   txHash: string,
   sourceChainId: string,
+  logIndex: number,
   ctx: Context
 ): Promise<string | undefined> {
   const kvClient: MaestroKVClient = ctx.persistence.kv;
 
-  const cacheKey = `event_dest_chain-${txHash}-${sourceChainId}`;
+  const cacheKey = `event_dest_chain-${txHash}:${logIndex}-${sourceChainId}`;
 
   const cachedValue = await kvClient.getCached<string>(cacheKey);
 
@@ -71,17 +72,15 @@ async function findDestinationChainFromEvent(
       .catch(() => null);
 
     if (eventData) {
-      const deploymentEvent = eventData.data.find((event: any) =>
-        event.type.includes("InterchainTokenDeploymentStarted")
-      );
+      for (const event of eventData.data.slice(0, logIndex).reverse()) {
+        if (event.type.includes("InterchainTokenDeploymentStarted")) {
+          const eventDetails = event.parsedJson as any;
+          const destinationChainId: string = eventDetails.destination_chain;
 
-      if (deploymentEvent) {
-        const eventDetails = deploymentEvent.parsedJson as any;
-        const destinationChainId: string = eventDetails.destination_chain;
+          await kvClient.setCached(cacheKey, destinationChainId, 3600);
 
-        await kvClient.setCached(cacheKey, destinationChainId, 3600);
-
-        return destinationChainId;
+          return destinationChainId;
+        }
       }
     }
   }
@@ -126,6 +125,7 @@ export async function processGMPData(
     destinationChainFromSrcEvent = await findDestinationChainFromEvent(
       call.receipt.transactionHash,
       call.returnValues.sourceChain,
+      call._logIndex,
       ctx
     );
   }
