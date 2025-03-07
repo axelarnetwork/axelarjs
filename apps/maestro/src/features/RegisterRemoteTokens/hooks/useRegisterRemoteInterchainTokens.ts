@@ -94,7 +94,7 @@ export default function useRegisterRemoteInterchainTokens(
     originChainId: input.originChainId,
     tokenAddress: input.tokenAddress,
     symbol: tokenDeployment.tokenSymbol,
-    totalGasFee
+    totalGasFee: parseInt(totalGasFee.toString())
   };
 
   return {
