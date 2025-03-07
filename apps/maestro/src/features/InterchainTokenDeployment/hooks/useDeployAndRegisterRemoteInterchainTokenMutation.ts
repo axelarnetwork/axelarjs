@@ -258,7 +258,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
-    if (input.sourceChainId !== "sui") {
+    if (input && tokenAddress && input.sourceChainId !== "sui") {
       return await recordDeploymentAsync({
         kind: "interchain",
         tokenId: tokenId as string,
