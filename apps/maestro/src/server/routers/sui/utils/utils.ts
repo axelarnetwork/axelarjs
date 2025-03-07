@@ -159,6 +159,18 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   }
 };
 
+export const getSuiEventsByTxHash = async (suiClient: SuiClient, txHash: string) => {
+  const eventData = await suiClient
+    .queryEvents({
+      query: {
+        Transaction: txHash,
+      },
+    })
+    .catch(() => null);
+
+    return eventData;
+};
+
 export const getCoinInfoByCoinType = async (
   client: SuiClient,
   coinType: string
