@@ -52,6 +52,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const chainId = useChainId();
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
+  const [isReady, setIsReady] = useState(false);
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -81,6 +82,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         enabled: Boolean(tokenId),
       },
     });
+
+  useEffect(() => {
+    if (!input || !tokenId || !deployerAddress || !tokenAddress) {
+      setIsReady(false);
+    }
+    setIsReady(true);
+  }, [input, tokenId, deployerAddress, tokenAddress]);
 
   const { destinationChainNames } = useMemo(() => {
     const index = combinedComputed.indexedById;
@@ -238,7 +246,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
   const recordDeploymentDraft = useCallback(async () => {
     if (!input || !tokenId || !deployerAddress || !tokenAddress) {
-      return;
+      throw new Error("Input parameters are not yet available.");
     }
 
     return await recordDeploymentAsync({
@@ -268,7 +276,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
         minterAddress: input.minterAddress,
-        totalGasFee: parseInt(totalGasFee.toString())
+        totalGasFee: parseInt(totalGasFee.toString()),
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
@@ -333,5 +341,5 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     recordDeploymentDraft,
   ]);
 
-  return { ...multicall, writeAsync, write };
+  return { ...multicall, writeAsync, write, isReady };
 }
