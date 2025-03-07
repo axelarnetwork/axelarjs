@@ -84,11 +84,24 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     });
 
   useEffect(() => {
-    if (!input || !tokenId || !deployerAddress || !tokenAddress) {
-      setIsReady(false);
+    if (!tokenId || !tokenAddress) {
+      if (input) {
+        if (input.sourceChainId !== "sui") {
+          setIsReady(false);
+          return;
+        }
+      }
     }
+
     setIsReady(true);
-  }, [input, tokenId, deployerAddress, tokenAddress]);
+  }, [
+    input,
+    tokenId,
+    deployerAddress,
+    tokenAddress,
+    input?.sourceChainId,
+    combinedComputed,
+  ]);
 
   const { destinationChainNames } = useMemo(() => {
     const index = combinedComputed.indexedById;
@@ -245,25 +258,23 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
-    if (!input || !tokenId || !deployerAddress || !tokenAddress) {
-      throw new Error("Input parameters are not yet available.");
+    if (input.sourceChainId !== "sui") {
+      return await recordDeploymentAsync({
+        kind: "interchain",
+        tokenId: tokenId as string,
+        deployerAddress,
+        tokenAddress,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        axelarChainId: input.sourceChainId,
+        salt: input.salt,
+        originalMinterAddress: input.minterAddress,
+        destinationAxelarChainIds: input.destinationChainIds,
+        deploymentMessageId: "",
+        tokenManagerAddress: "",
+      });
     }
-
-    return await recordDeploymentAsync({
-      kind: "interchain",
-      tokenId: tokenId as string,
-      deployerAddress,
-      tokenAddress,
-      tokenName: input.tokenName,
-      tokenSymbol: input.tokenSymbol,
-      tokenDecimals: input.decimals,
-      axelarChainId: input.sourceChainId,
-      salt: input.salt,
-      originalMinterAddress: input.minterAddress,
-      destinationAxelarChainIds: input.destinationChainIds,
-      deploymentMessageId: "",
-      tokenManagerAddress: "",
-    });
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
   const writeAsync = useCallback(async () => {
