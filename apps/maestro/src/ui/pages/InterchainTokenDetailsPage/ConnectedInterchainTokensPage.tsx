@@ -412,7 +412,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isRestrictedToDeployer ||
     !address ||
     isGasPriceQueryLoading ||
-    (sessionState.deployTokensTxHashes.length && !hasFetchedStatuses);
+    (!!sessionState.deployTokensTxHashes.length && !hasFetchedStatuses);
 
   const shouldRenderFooter =
     !isReadOnly && nonRunningSelectedChainIds.length > 0;
