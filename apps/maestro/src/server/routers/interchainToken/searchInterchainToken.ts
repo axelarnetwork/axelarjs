@@ -5,11 +5,16 @@ import { partition, pluck, propEq } from "rambda";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
+import { suiClient } from "~/lib/clients/suiClient";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
+import {
+  getCoinAddressFromType,
+  getSuiEventsByTxHash,
+} from "../sui/utils/utils";
 
 const tokenDetailsSchema = z.object({
   chainId: z.number(),
@@ -171,40 +176,61 @@ async function getInterchainToken(
 
         invariant(chainConfig, "Chain config not found");
 
-
         // TODO: handle if the chain does not support evm query
-        const itsClient =
-          ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+        if (chainConfig?.supportWagmi) {
+          const itsClient =
+            ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-        let tokenAddress = tokenDetails.tokenAddress as `0x${string}`;
+          let tokenAddress = tokenDetails.tokenAddress as `0x${string}`;
 
-        if (tokenDetails.kind === "canonical") {
-          const remoteTokenAddress = (await itsClient.reads
+          if (tokenDetails.kind === "canonical") {
+            const remoteTokenAddress = (await itsClient.reads
+              .registeredTokenAddress({
+                tokenId: tokenDetails.tokenId as `0x${string}`,
+              })
+              .catch(() => null)) as `0x${string}`;
+
+            if (remoteTokenAddress) {
+              tokenAddress = remoteTokenAddress;
+            }
+          }
+
+          const isRegistered = await itsClient.reads
             .registeredTokenAddress({
               tokenId: tokenDetails.tokenId as `0x${string}`,
             })
-            .catch(() => null)) as `0x${string}`;
+            .then(() => true)
+            .catch(() => {
+              return false;
+            });
 
-          if (remoteTokenAddress) {
-            tokenAddress = remoteTokenAddress;
-          }
+          return {
+            ...remoteTokenDetails,
+            // derive the token address from the interchain token contract client
+            tokenAddress,
+            isRegistered,
+          };
+        } else if (chainConfig?.axelarChainId === "sui") {
+          const eventDetails = await getSuiEventsByTxHash(
+            suiClient,
+            tokenDetails.deploymentMessageId.split("-")[0]
+          );
+
+          const registeredEvent = eventDetails?.data.find((event) =>
+            event.type.includes("CoinRegistered")
+          );
+
+          const tokenAddress = registeredEvent
+            ? getCoinAddressFromType(registeredEvent.type, "CoinRegistered")
+            : remoteTokenDetails.tokenAddress;
+          return {
+            ...remoteTokenDetails,
+            tokenAddress,
+            isRegistered: Boolean(registeredEvent),
+          };
+        } else {
+          return remoteTokenDetails;
         }
-
-        const isRegistered = await itsClient.reads
-          .registeredTokenAddress({
-            tokenId: tokenDetails.tokenId as `0x${string}`,
-          })
-          .then(() => true)
-          .catch(() => {
-            return false;
-          });
-
-        return {
-          ...remoteTokenDetails,
-          // derive the token address from the interchain token contract client
-          tokenAddress,
-          isRegistered,
-        };
       })
   );
 

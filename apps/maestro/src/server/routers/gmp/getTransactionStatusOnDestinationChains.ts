@@ -7,7 +7,7 @@ import { z } from "zod";
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure } from "~/server/trpc";
 import MaestroKVClient from "~/services/db/kv";
-import { getEventsByTxHash } from "../sui/utils/utils";
+import { getSuiEventsByTxHash } from "../sui/utils/utils";
 
 export type ChainStatus = {
   status: GMPTxStatus;
@@ -64,7 +64,7 @@ async function findDestinationChainFromEvent(
   }
 
   if (sourceChainId === "sui") {
-    const eventData = await getEventsByTxHash(suiClient, txHash);
+    const eventData = await getSuiEventsByTxHash(suiClient, txHash);
     if (eventData) {
       for (const event of eventData.data.slice(0, logIndex).reverse()) {
         if (event.type.includes("InterchainTokenDeploymentStarted")) {

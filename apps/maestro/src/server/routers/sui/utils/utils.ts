@@ -74,9 +74,9 @@ export const getTokenOwner = async (tokenAddress: string) => {
   return owner?.AddressOwner;
 };
 
-export const getCoinAddressFromType = (coinType: string) => {
+export const getCoinAddressFromType = (coinType: string, prefix: string = "CoinData") => {
   // check for long format
-  let addressMatch = coinType.match(/CoinData<(0x[^:]+)/);
+  let addressMatch = coinType.match(new RegExp(`${prefix}<(0x[^:]+)`));
   if (addressMatch) return addressMatch?.[1];
   // check for the shorter format {address}::{symbol}::{SYMBOL}
   addressMatch = coinType.match(/0x[^:]+/);
