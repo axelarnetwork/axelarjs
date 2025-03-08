@@ -9,7 +9,7 @@ type RegisterRemoteInterchainTokenOnSuiInput = {
   originChainId: number;
   tokenAddress: string;
   symbol: string;
-  totalGasFee: number;
+  gasValues: bigint[];
 };
 
 export function useRegisterRemoteInterchainTokenOnSui() {
@@ -55,7 +55,7 @@ export function useRegisterRemoteInterchainTokenOnSui() {
         originChainId: input.originChainId,
         sender: currentAccount.address,
         symbol: input.symbol,
-        totalGasFee: parseInt(input.totalGasFee.toString())
+        gasValues: input.gasValues
       });
 
       const registerTokenResult = await signAndExecuteTransaction({

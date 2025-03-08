@@ -280,6 +280,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
     if (chainId === SUI_CHAIN_ID && input) {
+      const gasValues = input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
       const result = await deployToken({
         initialSupply: input.initialSupply as bigint,
         symbol: input.tokenSymbol,
@@ -287,7 +288,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
         minterAddress: input.minterAddress,
-        totalGasFee: parseInt(totalGasFee.toString()),
+        gasValues,
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
@@ -323,7 +324,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     deployerAddress,
     input,
     multicall,
-    totalGasFee,
     prepareMulticall?.request,
     recordDeploymentDraft,
   ]);

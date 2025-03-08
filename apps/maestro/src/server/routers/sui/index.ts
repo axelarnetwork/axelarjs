@@ -75,7 +75,7 @@ export const suiRouter = router({
         tokenPackageId: z.string(),
         metadataId: z.string(),
         minterAddress: z.string().optional(),
-        totalGasFee: z.number()
+        gasValues: z.array(z.bigint()),
       })
     )
     .mutation(async ({ input }) => {
@@ -87,7 +87,7 @@ export const suiRouter = router({
           tokenPackageId,
           metadataId,
           destinationChains,
-          totalGasFee
+          gasValues,
         } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
@@ -125,13 +125,13 @@ export const suiRouter = router({
             .catch((e) => console.log("error with register coin treasury", e));
         }
 
-        for (const destinationChain of destinationChains) {
+        for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
             chainConfig,
-            destinationChain,
+            destinationChains[i],
             coinMetadata,
-            totalGasFee,
+            Number(gasValues[i]),
             sender,
             tokenType
           );
@@ -290,7 +290,7 @@ export const suiRouter = router({
         originChainId: z.number(),
         sender: z.string(),
         symbol: z.string(),
-        totalGasFee: z.number()
+        gasValues: z.array(z.bigint()),
       })
     )
     .mutation(async ({ input }) => {
@@ -300,7 +300,8 @@ export const suiRouter = router({
         );
         const _chainConfig = await response.json();
         const chainConfig = _chainConfig.chains.sui;
-        const { sender, symbol, tokenAddress, destinationChainIds, totalGasFee } = input;
+        const { sender, symbol, tokenAddress, destinationChainIds, gasValues } =
+          input;
 
         const txBuilder = new TxBuilder(suiClient);
 
@@ -316,13 +317,14 @@ export const suiRouter = router({
           throw new Error(`Coin metadata not found for ${tokenType}`);
         }
 
-        for (const destinationChain of destinationChainIds) {
+        for (let i = 0; i < destinationChainIds.length; i++) {
+          const destinationChain = destinationChainIds[i];
           await deployRemoteInterchainToken(
             txBuilder,
             chainConfig,
             destinationChain,
             coinMetadata,
-            totalGasFee,
+            Number(gasValues[i]),
             sender,
             tokenType
           );
@@ -388,7 +390,7 @@ export const suiRouter = router({
         destinationChains: z.array(z.string()),
         amount: z.bigint(),
         minterAddress: z.string().optional(),
-        totalGasFee: z.number()
+        gasValues: z.array(z.bigint()),
       })
     )
     .mutation(async ({ input }) => {
@@ -401,7 +403,7 @@ export const suiRouter = router({
           destinationChains,
           amount,
           minterAddress,
-          totalGasFee
+          gasValues,
         } = input;
 
         const chainConfig = await getChainConfig();
@@ -433,13 +435,13 @@ export const suiRouter = router({
           minterAddress
         );
 
-        for (const destinationChain of destinationChains) {
+        for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
             chainConfig,
-            destinationChain,
+            destinationChains[i],
             coinMetadata,
-            totalGasFee,
+            Number(gasValues[i]),
             sender,
             tokenType
           );
