@@ -39,16 +39,18 @@ const Review: FC = () => {
 
   // persist token deployment tx hash
   useEffect(() => {
-    if (chain && Object.keys(combinedComputed.indexedById).length > 0 && state.txState.type === "deployed") {
+    if (
+      chain &&
+      Object.keys(combinedComputed.indexedById).length > 0 &&
+      state.txState.type === "deployed"
+    ) {
       persistTokenDeploymentTxHash(
         state.txState.tokenAddress,
         chain.id,
         state.txState.txHash,
-        state.selectedChains.map(
-          (axelarChainId) => {
-            return combinedComputed.indexedById[axelarChainId].chain_id
-          }
-        )
+        state.selectedChains.map((axelarChainId) => {
+          return combinedComputed.indexedById[axelarChainId].chain_id;
+        })
       );
     }
   }, [
@@ -133,27 +135,21 @@ const Review: FC = () => {
         )}
       </div>
       <Dialog.Actions>
-        {routeChain ? (
-          <Dialog.CloseAction
-            $length="block"
-            $variant="primary"
-            onClick={async () => {
-              setShouldFetch(true);
+        <Dialog.CloseAction
+          $length="block"
+          $variant="primary"
+          disabled={!routeChain && (!chainConfig || state.txState.type !== "deployed")}
+          onClick={async () => {
+            setShouldFetch(true);
+            if (routeChain) {
               await router.replace(router.asPath);
-            }}
-          >
-            View token page!
-          </Dialog.CloseAction>
-        ) : (
-          <Button
-            $length="block"
-            $variant="primary"
-            disabled={!chainConfig || state.txState.type !== "deployed"}
-            onClick={handleGoToTokenPage}
-          >
-            Go to token page!
-          </Button>
-        )}
+            } else {
+              await handleGoToTokenPage();
+            }
+          }}
+        >
+          {routeChain ? "View token page!" : "Go to token page!"}
+        </Dialog.CloseAction>
       </Dialog.Actions>
     </>
   );
