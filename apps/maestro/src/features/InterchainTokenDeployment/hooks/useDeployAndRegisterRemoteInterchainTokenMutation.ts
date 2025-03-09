@@ -103,17 +103,17 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     combinedComputed,
   ]);
 
-  const { destinationChainNames } = useMemo(() => {
+  const { destinationChainIds } = useMemo(() => {
     const index = combinedComputed.indexedById;
     const originalChain = index[input?.sourceChainId ?? chainId];
     const originalChainName = originalChain?.chain_name ?? "Unknown";
 
     return {
       originalChainName,
-      destinationChainNames:
+      destinationChainIds:
         input?.destinationChainIds.map(
           (destinationChainId) =>
-            index[destinationChainId]?.chain_name ?? "Unknown"
+            index[destinationChainId]?.id ?? "Unknown"
         ) ?? [],
     };
   }, [
@@ -122,6 +122,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     input?.sourceChainId,
     combinedComputed.indexedById,
   ]);
+
+  console.log("destinationChainIds", destinationChainIds);
 
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {
@@ -148,7 +150,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [deployTxData];
     }
 
-    const registerTxData = destinationChainNames.map((destinationChain, i) =>
+    const registerTxData = destinationChainIds.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
         destinationChain,
@@ -157,13 +159,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames]);
+  }, [input, tokenId, destinationChainIds]);
 
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
   const isMutationReady =
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-    (!destinationChainNames.length || totalGasFee > 0n);
+    (!destinationChainIds.length || totalGasFee > 0n);
   const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
     {
       chainId,

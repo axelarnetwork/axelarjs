@@ -56,10 +56,10 @@ export function useAllChainConfigsQuery() {
     // Process VM chains, only add if not already present or if it's a special case
     vmChains?.forEach((chain) => {
       const existingChain = chainMap.get(chain.chain_id);
-      if (!existingChain) {
+      if (!existingChain || existingChain.id === chain.id) {
         chainMap.set(chain.chain_id, {
           ...chain,
-          displayName: `${chain.name} (VM)`, // Add VM suffix to differentiate
+          displayName: chain.name, 
         });
       }
     });
