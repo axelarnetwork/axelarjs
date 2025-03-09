@@ -22,7 +22,6 @@ import {
   useChainId,
   useSwitchChain,
 } from "~/lib/hooks";
-import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
@@ -128,7 +127,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     data: interchainToken,
     refetch: refetchInterchainToken,
     error: interchainTokenError,
-    isLoading: isInterchainTokenLoading,
+    isFetching: isInterchainTokenFetching,
   } = useInterchainTokensQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
@@ -137,7 +136,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const {
     data: tokenDetails,
     error: tokenDetailsError,
-    refetch: refetchTokenDetails,
+    isFetching: isTokenDetailsFetching,
   } = trpc.erc20.getERC20TokenDetails.useQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
@@ -177,12 +176,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [interchainToken?.matchingTokens, sessionState.selectedChainIds]
   );
 
-  const {
-    data: statuses,
-    isSuccess: hasFetchedStatuses,
-  } = useGetTransactionsStatusesOnDestinationChainsQuery({
-    txHashes: sessionState.deployTokensTxHashes,
-  });
+  const { data: statuses, isSuccess: hasFetchedStatuses } =
+    useGetTransactionsStatusesOnDestinationChainsQuery({
+      txHashes: sessionState.deployTokensTxHashes,
+    });
 
   const { switchChain } = useSwitchChain();
   const { combinedComputed } = useAllChainConfigsQuery();
@@ -199,28 +196,23 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )
     );
   }, [statuses, destinationChainIds]);
-
+  const utils = trpc.useUtils();
   const refetchPageData = useCallback(() => {
-    void refetchTokenDetails();
-    void refetchInterchainToken();
-  }, [refetchTokenDetails, refetchInterchainToken]);
+    if (!isInterchainTokenFetching && !isTokenDetailsFetching) {
+      utils.interchainToken.searchInterchainToken.invalidate();
+      utils.erc20.getERC20TokenDetails.invalidate();
+    }
+  }, [
+    isInterchainTokenFetching,
+    isTokenDetailsFetching,
+    utils.erc20.getERC20TokenDetails,
+    utils.interchainToken.searchInterchainToken,
+  ]);
 
   // reset state when all txs are executed or errored
   useEffect(() => {
     if (!hasFetchedStatuses || !statusesByChain || isEmpty(statusesByChain)) {
       return;
-    }
-
-    if (
-      Object.values(statusesByChain).some(
-        ({ status, lastHop }) => status === "executed" && lastHop
-      )
-    ) {
-      // Retrigger the page data refetch
-      refetchPageData();
-      setSessionState((draft) => {
-        draft.deployTokensTxHashes = [...sessionState.deployTokensTxHashes];
-      });
     }
 
     if (
@@ -289,7 +281,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       !isAlreadyUpdatingRemoteSui &&
       interchainToken?.matchingTokens?.some(
         (x) =>
-          x.chain?.id.includes("sui") && x.tokenAddress === props.tokenAddress
+          x.chain?.id.includes("sui") &&
+          x.tokenAddress === props.tokenAddress &&
+          x.isRegistered
       ) &&
       props.tokenId
     ) {
@@ -371,7 +365,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     if (
       destinationChainIds.length === 0 ||
       remoteChainsExecuted.length === 0 ||
-      isInterchainTokenLoading
+      isInterchainTokenFetching
     ) {
       return;
     }
@@ -383,9 +377,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
 
-    refetchInterchainToken().catch(() => {
-      logger.error("Failed to refetch interchain token");
-    });
+    refetchPageData();
   }, [
     address,
     remoteChainsExecuted,
@@ -394,7 +386,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     props.chainId,
     props.tokenAddress,
     refetchInterchainToken,
-    isInterchainTokenLoading,
+    isInterchainTokenFetching,
     setSessionState,
   ]);
 

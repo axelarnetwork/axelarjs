@@ -112,8 +112,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       originalChainName,
       destinationChainIds:
         input?.destinationChainIds.map(
-          (destinationChainId) =>
-            index[destinationChainId]?.id ?? "Unknown"
+          (destinationChainId) => index[destinationChainId]?.id ?? "Unknown"
         ) ?? [],
     };
   }, [
@@ -122,8 +121,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     input?.sourceChainId,
     combinedComputed.indexedById,
   ]);
-
-  console.log("destinationChainIds", destinationChainIds);
 
   const multicallArgs = useMemo(() => {
     if (!input || !tokenId) {
@@ -282,7 +279,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
     if (chainId === SUI_CHAIN_ID && input) {
-      const gasValues = input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
+      const gasValues =
+        input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
       const result = await deployToken({
         initialSupply: input.initialSupply as bigint,
         symbol: input.tokenSymbol,
