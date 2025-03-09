@@ -177,7 +177,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [interchainToken?.matchingTokens, sessionState.selectedChainIds]
   );
 
-  const { data: statuses, isSuccess: hasFetchedStatuses } =
+  const { data: statuses, isSuccess: hasFetchedStatuses, refetch: refetchStatuses } =
     useGetTransactionsStatusesOnDestinationChainsQuery({
       txHashes: sessionState.deployTokensTxHashes,
     });
@@ -198,10 +198,19 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     );
   }, [statuses, destinationChainIds]);
 
+  const refetchPageData = useCallback(() => {
+    void refetchTokenDetails();
+    void refetchInterchainToken();
+  }, [refetchTokenDetails, refetchInterchainToken]);
+
   // reset state when all txs are executed or errored
   useEffect(() => {
     if (!hasFetchedStatuses || !statusesByChain || isEmpty(statusesByChain)) {
       return;
+    }
+
+    if(Object.values(statusesByChain).some(({ status }) => status === "executed")) {
+      refetchPageData();
     }
 
     if (
@@ -214,12 +223,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         draft.selectedChainIds = [];
       });
     }
-  }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
-
-  const refetchPageData = useCallback(() => {
-    void refetchTokenDetails();
-    void refetchInterchainToken();
-  }, [refetchTokenDetails, refetchInterchainToken]);
+  }, [hasFetchedStatuses, setSessionState, statuses, refetchPageData, statusesByChain]);
 
   const { mutateAsync, isPending, isSuccess } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
