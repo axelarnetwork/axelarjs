@@ -177,10 +177,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [interchainToken?.matchingTokens, sessionState.selectedChainIds]
   );
 
-  const { data: statuses, isSuccess: hasFetchedStatuses } =
-    useGetTransactionsStatusesOnDestinationChainsQuery({
-      txHashes: sessionState.deployTokensTxHashes,
-    });
+  const {
+    data: statuses,
+    isSuccess: hasFetchedStatuses,
+  } = useGetTransactionsStatusesOnDestinationChainsQuery({
+    txHashes: sessionState.deployTokensTxHashes,
+  });
 
   const { switchChain } = useSwitchChain();
   const { combinedComputed } = useAllChainConfigsQuery();
@@ -209,8 +211,16 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       return;
     }
 
-    if(Object.values(statusesByChain).some(({ status }) => status === "executed")) {
+    if (
+      Object.values(statusesByChain).some(
+        ({ status, lastHop }) => status === "executed" && lastHop
+      )
+    ) {
+      // Retrigger the page data refetch
       refetchPageData();
+      setSessionState((draft) => {
+        draft.deployTokensTxHashes = [...sessionState.deployTokensTxHashes];
+      });
     }
 
     if (
@@ -224,7 +234,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         draft.selectedChainIds = [];
       });
     }
-  }, [hasFetchedStatuses, setSessionState, statuses, refetchPageData, statusesByChain]);
+  }, [
+    hasFetchedStatuses,
+    setSessionState,
+    statuses,
+    refetchPageData,
+    statusesByChain,
+    sessionState,
+  ]);
 
   const { mutateAsync, isPending, isSuccess } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
@@ -271,7 +288,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     if (
       !isAlreadyUpdatingRemoteSui &&
       interchainToken?.matchingTokens?.some(
-        (x) => x.chain?.id.includes("sui") && x.tokenAddress === props.tokenAddress
+        (x) =>
+          x.chain?.id.includes("sui") && x.tokenAddress === props.tokenAddress
       ) &&
       props.tokenId
     ) {
