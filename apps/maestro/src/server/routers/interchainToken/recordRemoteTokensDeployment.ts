@@ -80,7 +80,6 @@ export const recordRemoteTokensDeployment = protectedProcedure
           });
         }
 
-
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
@@ -127,7 +126,21 @@ export const recordRemoteTokensDeployment = protectedProcedure
       })
     );
 
-    return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      remoteTokens as NewRemoteInterchainTokenInput[]
-    );
+    try {
+      return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
+        remoteTokens as NewRemoteInterchainTokenInput[]
+      );
+    } catch (error: any) {
+      if (error.message.includes("duplicate key")) {
+        console.warn(
+          `Remote tokens for ${input.tokenAddress} on chain ${input.chainId} already recorded`
+        );
+        return;
+      }
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to record remote tokens deployment: ${error.message}`,
+      });
+    }
   });
