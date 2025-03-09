@@ -101,8 +101,8 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { Example, ITS } = chainConfig.contracts;
-        const itsObjectId = ITS.objects.ITS;
+        const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
+        const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
         if (input.minterAddress) {
@@ -246,7 +246,7 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
-        const { Example, AxelarGateway, GasService, ITS } =
+        const { Example, AxelarGateway, GasService, InterchainTokenService: ITS } =
           chainConfig.contracts;
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
@@ -255,7 +255,7 @@ export const suiRouter = router({
           target: `${Example.address}::its::send_interchain_transfer_call`,
           arguments: [
             Example.objects.ItsSingleton,
-            ITS.objects.ITS,
+            ITS.objects.InterchainTokenService,
             AxelarGateway.objects.Gateway,
             GasService.objects.GasService,
             TokenId,

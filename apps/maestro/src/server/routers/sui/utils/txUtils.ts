@@ -1,14 +1,13 @@
 import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { keccak256, stringToHex } from "viem";
 
 import { suiClient } from "~/lib/clients/suiClient";
-import {
-  suiServiceBaseUrl,
-} from "./utils";
 
 export async function getChainConfig() {
-  const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
+  // TODO: fix this to use chain configs from the s3 instead of the hardcoded url
+  const response = await fetch(`https://static.npty.online/axelar/devnet-amplifier-config-1.0.x.json`);
   const _chainConfig = await response.json();
-  return _chainConfig.chains.sui;
+  return _chainConfig.chains['sui-2'];
 }
 
 export function setupTxBuilder(sender: string) {
@@ -34,14 +33,23 @@ export async function getTokenId(
 export async function getTokenIdByCoinMetadata(
   txBuilder: TxBuilder,
   coinType: string,
-  ITS: any,
   coinMetadata: any,
+  suiChainConfig: any,
   isCanonical: boolean = false
 ) {
+  const { InterchainTokenService: ITS, AxelarGateway } = suiChainConfig.contracts;
+  const suiChainId = suiChainConfig.axelarId
+  const [ChainNameHash] = await txBuilder.moveCall({
+    target: `${AxelarGateway.address}::bytes32::from_bytes`,
+    arguments: [
+      keccak256(stringToHex(suiChainId)),
+    ],
+  });
   const [TokenId] = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
     typeArguments: [coinType],
     arguments: [
+      ChainNameHash,
       coinMetadata.name,
       coinMetadata.symbol,
       txBuilder.tx.pure.u8(coinMetadata.decimals),
@@ -77,20 +85,20 @@ export async function deployRemoteInterchainToken(
   sender: string,
   tokenType: string
 ) {
-  const { Example, ITS, AxelarGateway, GasService } = chainConfig.contracts;
+  const { Example, InterchainTokenService: ITS, AxelarGateway, GasService } = chainConfig.contracts;
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
   const TokenId = await getTokenIdByCoinMetadata(
     txBuilder,
     tokenType,
-    ITS,
-    coinMetadata
+    coinMetadata,
+    chainConfig,
   );
 
   await txBuilder.moveCall({
     target: `${Example.address}::its::deploy_remote_interchain_token`,
     arguments: [
-      ITS.objects.ITS,
+      ITS.objects.InterchainTokenService,
       AxelarGateway.objects.Gateway,
       GasService.objects.GasService,
       destinationChain,
@@ -112,8 +120,8 @@ export async function registerToken(
   minterAddress?: string,
   isCanonical: boolean = false
 ) {
-  const { Example, ITS } = chainConfig.contracts;
-  const itsObjectId = ITS.objects.ITS;
+  const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
+  const itsObjectId = ITS.objects.InterchainTokenService;
 
   if (isCanonical) {
     // Register coin and transfer cap to minter

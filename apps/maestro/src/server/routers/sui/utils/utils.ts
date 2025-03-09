@@ -127,7 +127,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
     const chainConfig = _chainConfig.chains.sui;
 
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.ITS.objects.ITSv0,
+      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
         showContent: true,
@@ -181,7 +181,7 @@ export const getCoinInfoByCoinType = async (
     const chainConfig = _chainConfig.chains.sui;
 
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.ITS.objects.ITSv0,
+      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
         showContent: true,
