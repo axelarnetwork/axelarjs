@@ -438,6 +438,10 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...sepolia,
+    rpcUrls: {
+      default: { http: ["https://rpc-sepolia.rockx.com"] },
+      public: { http: ["https://rpc-sepolia.rockx.com"] },
+    },
     axelarChainId: "eth-sepolia",
     axelarChainName: "eth-sepolia",
     supportWagmi: true,
