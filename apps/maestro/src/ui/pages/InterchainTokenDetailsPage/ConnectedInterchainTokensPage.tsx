@@ -177,7 +177,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     [interchainToken?.matchingTokens, sessionState.selectedChainIds]
   );
 
-  const { data: statuses, isSuccess: hasFetchedStatuses, refetch: refetchStatuses } =
+  const { data: statuses, isSuccess: hasFetchedStatuses } =
     useGetTransactionsStatusesOnDestinationChainsQuery({
       txHashes: sessionState.deployTokensTxHashes,
     });
@@ -218,6 +218,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         ({ status }) => status === "executed" || status === "error"
       )
     ) {
+      refetchPageData();
       setSessionState((draft) => {
         draft.deployTokensTxHashes = [];
         draft.selectedChainIds = [];

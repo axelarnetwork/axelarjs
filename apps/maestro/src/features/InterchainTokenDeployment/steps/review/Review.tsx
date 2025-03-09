@@ -1,6 +1,5 @@
 import {
   Alert,
-  Button,
   CopyToClipboardButton,
   Dialog,
   ExternalLinkIcon,
