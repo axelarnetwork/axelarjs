@@ -199,8 +199,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const utils = trpc.useUtils();
   const refetchPageData = useCallback(() => {
     if (!isInterchainTokenFetching && !isTokenDetailsFetching) {
-      utils.interchainToken.searchInterchainToken.invalidate();
-      utils.erc20.getERC20TokenDetails.invalidate();
+      void utils.interchainToken.searchInterchainToken.invalidate();
+      void utils.erc20.getERC20TokenDetails.invalidate();
     }
   }, [
     isInterchainTokenFetching,
@@ -380,6 +380,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     refetchPageData();
   }, [
     address,
+    refetchPageData,
     remoteChainsExecuted,
     destinationChainIds,
     interchainToken.tokenId,
