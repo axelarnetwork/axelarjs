@@ -214,14 +214,22 @@ async function getInterchainToken(
 
           // Find the sui executed tx hash from the searchGMP response
           const txHash = tokenDetails.deploymentMessageId.split("-")[0]
-          const calls = await ctx.services.gmp.searchGMP({
+          const firstHopCalls = await ctx.services.gmp.searchGMP({
             txHash,
+            _source: {
+              includes: ["callback"],
+            }
+          })
+
+          const gmpData = firstHopCalls.find(({ callback }) => callback?.returnValues?.destinationChain?.includes("sui"))
+          const axelarTxHash = gmpData?.callback?.transaction?.hash
+          const secondHopCall = await ctx.services.gmp.searchGMP({
+            txHash: axelarTxHash,
             _source: {
               includes: ["executed"],
             }
           })
-          const gmpData = calls.find(({ executed }) => executed?.chain?.includes("sui"))
-          const suiTxHash = gmpData?.executed?.transactionHash
+          const suiTxHash = secondHopCall?.find(({ executed }) => executed?.chain?.includes("sui"))?.executed?.transaction?.hash
 
           if (!suiTxHash) {
             return {
@@ -232,7 +240,7 @@ async function getInterchainToken(
 
           const eventDetails = await getSuiEventsByTxHash(
             suiClient,
-            suiTxHash
+            suiTxHash,
           );
 
           const registeredEvent = eventDetails?.data.find((event) =>
