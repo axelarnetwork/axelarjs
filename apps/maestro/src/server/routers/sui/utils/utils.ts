@@ -122,9 +122,9 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
 }) => {
   try {
-    const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
+    const response = await fetch(`https://static.npty.online/axelar/devnet-amplifier-config-1.0.x.json`);
     const _chainConfig = await response.json();
-    const chainConfig = _chainConfig.chains.sui;
+    const chainConfig = _chainConfig.chains['sui-2'];
 
     const registeredCoinsObject = await client.getObject({
       id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
