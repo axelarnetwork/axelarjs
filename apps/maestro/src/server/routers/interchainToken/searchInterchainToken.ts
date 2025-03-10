@@ -211,49 +211,25 @@ async function getInterchainToken(
             isRegistered,
           };
         } else if (chainConfig?.axelarChainId.includes("sui")) {
-
-          // Find the sui executed tx hash from the searchGMP response
-          const txHash = tokenDetails.deploymentMessageId.split("-")[0]
-          const firstHopCalls = await ctx.services.gmp.searchGMP({
-            txHash,
-            _source: {
-              includes: ["callback"],
-            }
-          })
-
-          const gmpData = firstHopCalls.find(({ callback }) => callback?.returnValues?.destinationChain?.includes("sui"))
-          const axelarTxHash = gmpData?.callback?.transaction?.hash
-          const secondHopCall = await ctx.services.gmp.searchGMP({
-            txHash: axelarTxHash,
-            _source: {
-              includes: ["executed"],
-            }
-          })
-          const suiTxHash = secondHopCall?.find(({ executed }) => executed?.chain?.includes("sui"))?.executed?.transaction?.hash
+          const suiTxHash = await findSuiTxHashFromGmp(
+            ctx,
+            tokenDetails.deploymentMessageId
+          );
 
           if (!suiTxHash) {
             return {
               ...remoteTokenDetails,
               isRegistered: false,
-            }
+            };
           }
 
-          const eventDetails = await getSuiEventsByTxHash(
-            suiClient,
-            suiTxHash,
-          );
+          const { isRegistered, tokenAddress } =
+            await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
 
-          const registeredEvent = eventDetails?.data.find((event) =>
-            event.type.includes("CoinRegistered")
-          );
-
-          const tokenAddress = registeredEvent
-            ? getCoinAddressFromType(registeredEvent.type, "CoinRegistered")
-            : remoteTokenDetails.tokenAddress;
           return {
             ...remoteTokenDetails,
             tokenAddress,
-            isRegistered: Boolean(registeredEvent),
+            isRegistered,
           };
         } else {
           return remoteTokenDetails;
@@ -360,6 +336,71 @@ async function scanChains(
   const validResult = results.find((result) => result);
 
   return validResult || null;
+}
+
+/**
+ * Finds the Sui transaction hash from the GMP response.
+ * @param ctx
+ * @param deploymentMessageId
+ * @returns
+ */
+async function findSuiTxHashFromGmp(
+  ctx: Context,
+  deploymentMessageId: string
+) {
+  const initialTxHash = deploymentMessageId.split("-")[0];
+  const firstHopCalls = await ctx.services.gmp.searchGMP({
+    txHash: initialTxHash,
+    _source: {
+      includes: ["callback"],
+    },
+  });
+
+  const suiBoundCalls = firstHopCalls.filter(
+    (call) => call.callback?.returnValues?.destinationChain?.includes("sui")
+  );
+
+  const axelarTxHash = suiBoundCalls[0]?.callback?.transaction?.hash;
+
+  if (!axelarTxHash) {
+    return undefined;
+  }
+
+  const secondHopCalls = await ctx.services.gmp.searchGMP({
+    txHash: axelarTxHash,
+    _source: {
+      includes: ["executed"],
+    },
+  });
+
+  const suiExecutedCalls = secondHopCalls.filter((call) =>
+    call.executed?.chain?.includes("sui")
+  );
+
+  return suiExecutedCalls[0]?.executed?.transaction?.hash;
+}
+
+/**
+ * Gets the Sui token registration details from the Sui transaction hash.
+ */
+async function getSuiTokenRegistrationDetails(
+  suiTxHash: string,
+  remoteTokenDetails: { tokenAddress: string | null }
+) {
+  const eventDetails = await getSuiEventsByTxHash(suiClient, suiTxHash);
+
+  const registeredEvent = eventDetails?.data.find((event) =>
+    event.type.includes("CoinRegistered")
+  );
+
+  const tokenAddress = registeredEvent
+    ? getCoinAddressFromType(registeredEvent.type, "CoinRegistered")
+    : remoteTokenDetails.tokenAddress;
+
+  return {
+    isRegistered: Boolean(registeredEvent),
+    tokenAddress,
+  };
 }
 
 async function getTokenDetails(
