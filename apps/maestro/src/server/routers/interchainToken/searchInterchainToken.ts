@@ -216,13 +216,13 @@ async function getInterchainToken(
           const txHash = tokenDetails.deploymentMessageId.split("-")[0]
           const response = await ctx.services.gmp.searchGMP({
             txHash,
-            destinationChain: chainConfig.axelarChainId,
+            destinationChain: 'axelar',
             _source: {
               includes: ["executed"],
             }
           })
           const gmpData = response[0]
-          const suiTxHash = gmpData.executed?.transactionHash
+          const suiTxHash = gmpData?.executed?.transactionHash
 
           if (!suiTxHash) {
             return {
