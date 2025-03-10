@@ -9,10 +9,6 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-export type VMChainConfig = ExtendedWagmiChainConfig & {
-  supportWagmi?: boolean;
-};
-
 const sui = {
   id: 101,
   axelarChainId: "sui",
@@ -49,10 +45,11 @@ const suiTestnet = {
 
 const suiDevnet = {
   ...suiTestnet,
+  axelarChainId: "sui-2",
   environment: ENVIRONMENTS.devnet,
 };
 
-export const VM_CHAINS: VMChainConfig[] = [sui, suiTestnet, suiDevnet] as const;
+export const VM_CHAINS: ExtendedWagmiChainConfig[] = [sui, suiTestnet, suiDevnet] as const;
 
 export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
   (chain) => chain.environment === NEXT_PUBLIC_NETWORK_ENV
@@ -63,5 +60,5 @@ export const WAGMI_VM_CHAIN_CONFIGS = VM_CHAIN_CONFIGS.filter(
 );
 
 export const suiChainConfig = VM_CHAIN_CONFIGS.find(
-  (chain) => chain.axelarChainId === "sui"
-) as VMChainConfig;
+  (chain) => chain.axelarChainId.includes("sui")
+) as ExtendedWagmiChainConfig;

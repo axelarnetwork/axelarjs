@@ -48,7 +48,7 @@ export const Step2: FC = () => {
     [state.remoteDeploymentGasFees?.gasFees]
   );
 
-  const { writeAsync: deployInterchainTokenAsync } =
+  const { writeAsync: deployInterchainTokenAsync, isReady } =
     useDeployAndRegisterRemoteInterchainTokenMutation(
       {
         onStatusUpdate(txState) {
@@ -82,8 +82,8 @@ export const Step2: FC = () => {
   const [, { addTransaction }] = useTransactionsContainer();
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-    async (e) => {
-      e.preventDefault();
+    async (ev) => {
+      ev.preventDefault();
 
       const hasGasfees =
         !rootState.selectedChains.length ||
@@ -114,6 +114,13 @@ export const Step2: FC = () => {
           });
           return;
         }
+
+        toast.error(e.message);
+        rootActions.setTxState({
+          type: "idle",
+        });
+
+        return;
       });
 
       // Sui will return a digest equivalent to the txHash
@@ -211,6 +218,9 @@ export const Step2: FC = () => {
       }
       return { children: "Check your wallet", status: "loading" };
     }
+    if (rootState.txState.type === "idle" && !isReady) { 
+      return { children: "Initializing", status: "loading" };
+    }
     if (rootState.txState.type === "deploying") {
       return { children: "Deploying interchain token", status: "loading" };
     }
@@ -246,6 +256,7 @@ export const Step2: FC = () => {
       status: "idle",
     };
   }, [
+    isReady,
     rootState.txState,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
@@ -304,6 +315,7 @@ export const Step2: FC = () => {
           <NextButton
             $length="block"
             $loading={
+              buttonStatus === "loading" ||
               rootState.txState.type === "pending_approval" ||
               rootState.txState.type === "deploying"
             }

@@ -26,10 +26,9 @@ export const recordRemoteTokensDeployment = protectedProcedure
       ctx.configs.vmChains(),
     ]);
 
-    // Try to find config in either chain type
-    // TODO: fix hardcoded value
+    // TODO: fix hardcoded value. check why the axelarChainId is optional
     const configs =
-      evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui"];
+      evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui-2"];
     if (!configs) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -81,22 +80,22 @@ export const recordRemoteTokensDeployment = protectedProcedure
           });
         }
 
-        // Create appropriate client based on chain type
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          remoteConfig.wagmi
-        );
-
-        if (!itsClient) {
-          throw new TRPCError({
-            code: "NOT_IMPLEMENTED",
-            message: `Chain type ${remoteConfig.info.chain_name} not supported yet`,
-          });
-        }
-
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
-        if (remoteToken.axelarChainId !== "sui") {
+        if (!remoteToken.axelarChainId.includes("sui")) {
+          // Create appropriate client based on chain type
+          const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+            remoteConfig.wagmi
+          );
+
+          if (!itsClient) {
+            throw new TRPCError({
+              code: "NOT_IMPLEMENTED",
+              message: `Chain type ${remoteConfig.info.chain_name} not supported yet`,
+            });
+          }
+
           [tokenManagerAddress, tokenAddress] = await Promise.all([
             itsClient.reads
               .tokenManagerAddress({
@@ -127,7 +126,21 @@ export const recordRemoteTokensDeployment = protectedProcedure
       })
     );
 
-    return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      remoteTokens as NewRemoteInterchainTokenInput[]
-    );
+    try {
+      return ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
+        remoteTokens as NewRemoteInterchainTokenInput[]
+      );
+    } catch (error: any) {
+      if (error.message.includes("duplicate key")) {
+        console.warn(
+          `Remote tokens for ${input.tokenAddress} on chain ${input.chainId} already recorded`
+        );
+        return;
+      }
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to record remote tokens deployment: ${error.message}`,
+      });
+    }
   });

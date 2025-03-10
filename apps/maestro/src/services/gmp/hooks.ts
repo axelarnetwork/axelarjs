@@ -12,19 +12,22 @@ export function useInterchainTokensQuery(input: {
   const { combinedComputed, isLoading, isError, error, isFetching } =
     useAllChainConfigsQuery();
 
-  const { data, ...queryResult } =
-    trpc.interchainToken.searchInterchainToken.useQuery(
-      {
-        chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
-        tokenAddress: input.tokenAddress as `0x${string}`,
-        strict: input.strict,
-      },
-      {
-        enabled: Maybe.of(input.tokenAddress).mapOr(false, Boolean),
-        retry: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+  const {
+    data,
+    isFetching: isFetchingSearch,
+    ...queryResult
+  } = trpc.interchainToken.searchInterchainToken.useQuery(
+    {
+      chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
+      tokenAddress: input.tokenAddress as `0x${string}`,
+      strict: input.strict,
+    },
+    {
+      enabled: Maybe.of(input.tokenAddress).mapOr(false, Boolean),
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  );
 
   return {
     ...queryResult,
@@ -47,7 +50,7 @@ export function useInterchainTokensQuery(input: {
         ),
     },
     isLoading,
-    isFetching,
+    isFetching: isFetching || isFetchingSearch,
     isError,
     error,
   };
@@ -102,9 +105,7 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
         txHashes: input.txHashes as `0x${string}`[],
       },
       {
-        enabled: Boolean(
-          input.txHashes?.every((txHash) => txHash)
-        ),
+        enabled: Boolean(input.txHashes?.every((txHash) => txHash)),
         refetchInterval: 1000 * 10,
         ...options,
       }

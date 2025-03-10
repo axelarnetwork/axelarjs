@@ -89,11 +89,13 @@ export default function useRegisterRemoteInterchainTokens(
     useRegisterRemoteInterchainTokenOnSui();
 
   if (!tokenDeployment) return;
+
   const suiInput = {
     axelarChainIds: destinationChainIds,
     originChainId: input.originChainId,
     tokenAddress: input.tokenAddress,
     symbol: tokenDeployment.tokenSymbol,
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? []
   };
 
   return {

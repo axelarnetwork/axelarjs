@@ -66,7 +66,7 @@ export const getInterchainTokenDetails = publicProcedure
     const configs = evmChains[input.chainId] || vmChains[input.chainId];
 
     // TODO: remove this once we have sui in the chains object
-    const axelarChainId = input.chainId === 103 ? "sui" : configs.info.id;
+    const axelarChainId = input.chainId === 103 ? "sui-2" : configs.info.id;
     // if (!configs) {
     //   throw new TRPCError({
     //     code: "NOT_FOUND",

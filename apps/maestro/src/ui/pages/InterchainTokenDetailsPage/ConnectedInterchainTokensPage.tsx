@@ -22,9 +22,9 @@ import {
   useChainId,
   useSwitchChain,
 } from "~/lib/hooks";
-import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
@@ -101,6 +101,21 @@ export function useInterchainTokenDetailsPageState(
   });
 }
 
+function getDeploymentStatus(
+  chainId: string | undefined,
+  statusesByChain: Record<string, ChainStatus>
+) {
+  const deploymentStatus = chainId ? statusesByChain[chainId] : undefined;
+
+  if (!deploymentStatus) {
+    return undefined;
+  }
+
+  return deploymentStatus.lastHop
+    ? deploymentStatus
+    : { ...deploymentStatus, status: "pending" };
+}
+
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
@@ -112,7 +127,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     data: interchainToken,
     refetch: refetchInterchainToken,
     error: interchainTokenError,
-    isLoading: isInterchainTokenLoading,
+    isFetching: isInterchainTokenFetching,
   } = useInterchainTokensQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
@@ -121,7 +136,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const {
     data: tokenDetails,
     error: tokenDetailsError,
-    refetch: refetchTokenDetails,
+    isFetching: isTokenDetailsFetching,
   } = trpc.erc20.getERC20TokenDetails.useQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
@@ -181,6 +196,18 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )
     );
   }, [statuses, destinationChainIds]);
+  const utils = trpc.useUtils();
+  const refetchPageData = useCallback(() => {
+    if (!isInterchainTokenFetching && !isTokenDetailsFetching) {
+      void utils.interchainToken.searchInterchainToken.invalidate();
+      void utils.erc20.getERC20TokenDetails.invalidate();
+    }
+  }, [
+    isInterchainTokenFetching,
+    isTokenDetailsFetching,
+    utils.erc20.getERC20TokenDetails,
+    utils.interchainToken.searchInterchainToken,
+  ]);
 
   // reset state when all txs are executed or errored
   useEffect(() => {
@@ -193,17 +220,20 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         ({ status }) => status === "executed" || status === "error"
       )
     ) {
+      refetchPageData();
       setSessionState((draft) => {
         draft.deployTokensTxHashes = [];
         draft.selectedChainIds = [];
       });
     }
-  }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
-
-  const refetchPageData = useCallback(() => {
-    void refetchTokenDetails();
-    void refetchInterchainToken();
-  }, [refetchTokenDetails, refetchInterchainToken]);
+  }, [
+    hasFetchedStatuses,
+    setSessionState,
+    statuses,
+    refetchPageData,
+    statusesByChain,
+    sessionState,
+  ]);
 
   const { mutateAsync, isPending, isSuccess } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
@@ -250,7 +280,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     if (
       !isAlreadyUpdatingRemoteSui &&
       interchainToken?.matchingTokens?.some(
-        (x) => x.chain?.id === "sui" && x.tokenAddress === props.tokenAddress
+        (x) =>
+          x.chain?.id.includes("sui") &&
+          x.tokenAddress === props.tokenAddress &&
+          x.isRegistered
       ) &&
       props.tokenId
     ) {
@@ -289,7 +322,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       // check if the EVM token address is the same as sui, which is wrong
       if (
         props.chainId === SUI_CHAIN_ID &&
-        x.chain?.id !== "sui" &&
+        !x.chain?.id.includes("sui") &&
         x.tokenAddress === props.tokenAddress &&
         !isUpdating[x.chain?.id ?? ""]
       ) {
@@ -332,7 +365,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     if (
       destinationChainIds.length === 0 ||
       remoteChainsExecuted.length === 0 ||
-      isInterchainTokenLoading
+      isInterchainTokenFetching
     ) {
       return;
     }
@@ -344,18 +377,17 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
 
-    refetchInterchainToken().catch(() => {
-      logger.error("Failed to refetch interchain token");
-    });
+    refetchPageData();
   }, [
     address,
+    refetchPageData,
     remoteChainsExecuted,
     destinationChainIds,
     interchainToken.tokenId,
     props.chainId,
     props.tokenAddress,
     refetchInterchainToken,
-    isInterchainTokenLoading,
+    isInterchainTokenFetching,
     setSessionState,
   ]);
 
@@ -396,7 +428,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isRestrictedToDeployer ||
     !address ||
     isGasPriceQueryLoading ||
-    (sessionState.deployTokensTxHashes.length && !hasFetchedStatuses);
+    (!!sessionState.deployTokensTxHashes.length && !hasFetchedStatuses);
 
   const shouldRenderFooter =
     !isReadOnly && nonRunningSelectedChainIds.length > 0;
@@ -410,8 +442,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             x.chain && !remoteChainsExecuted.includes(x.chain.id)
         )
         .map((token) => {
-          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
-            (id) => statusesByChain[id]
+          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined((id) =>
+            getDeploymentStatus(id, statusesByChain)
           );
 
           const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
@@ -420,7 +452,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             ...token,
             isSelected,
             isRegistered: false,
-            deploymentStatus: gmpInfo?.status,
+            deploymentStatus: gmpInfo?.status ?? undefined,
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
               ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),

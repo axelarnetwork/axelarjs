@@ -74,9 +74,9 @@ export const getTokenOwner = async (tokenAddress: string) => {
   return owner?.AddressOwner;
 };
 
-export const getCoinAddressFromType = (coinType: string) => {
+export const getCoinAddressFromType = (coinType: string, prefix: string = "CoinData") => {
   // check for long format
-  let addressMatch = coinType.match(/CoinData<(0x[^:]+)/);
+  let addressMatch = coinType.match(new RegExp(`${prefix}<(0x[^:]+)`));
   if (addressMatch) return addressMatch?.[1];
   // check for the shorter format {address}::{symbol}::{SYMBOL}
   addressMatch = coinType.match(/0x[^:]+/);
@@ -127,7 +127,7 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
     const chainConfig = _chainConfig.chains.sui;
 
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.ITS.objects.ITSv0,
+      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
         showContent: true,
@@ -159,6 +159,18 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   }
 };
 
+export const getSuiEventsByTxHash = async (suiClient: SuiClient, txHash: string) => {
+  const eventData = await suiClient
+    .queryEvents({
+      query: {
+        Transaction: txHash,
+      },
+    })
+    .catch(() => null);
+
+    return eventData;
+};
+
 export const getCoinInfoByCoinType = async (
   client: SuiClient,
   coinType: string
@@ -169,7 +181,7 @@ export const getCoinInfoByCoinType = async (
     const chainConfig = _chainConfig.chains.sui;
 
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.ITS.objects.ITSv0,
+      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
         showContent: true,
