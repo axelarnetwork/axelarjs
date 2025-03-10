@@ -211,9 +211,29 @@ async function getInterchainToken(
             isRegistered,
           };
         } else if (chainConfig?.axelarChainId.includes("sui")) {
+
+          // Find the sui executed tx hash from the searchGMP response
+          const txHash = tokenDetails.deploymentMessageId.split("-")[0]
+          const response = await ctx.services.gmp.searchGMP({
+            txHash,
+            destinationChain: chainConfig.axelarChainId,
+            _source: {
+              includes: ["executed"],
+            }
+          })
+          const gmpData = response[0]
+          const suiTxHash = gmpData.executed?.transactionHash
+
+          if (!suiTxHash) {
+            return {
+              ...remoteTokenDetails,
+              isRegistered: false,
+            }
+          }
+
           const eventDetails = await getSuiEventsByTxHash(
             suiClient,
-            tokenDetails.deploymentMessageId.split("-")[0]
+            suiTxHash
           );
 
           const registeredEvent = eventDetails?.data.find((event) =>
