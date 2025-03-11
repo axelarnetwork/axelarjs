@@ -69,10 +69,20 @@ export interface ChainCosmosSubconfig {
   grpc: string[];
 }
 
-export interface ChainConfig {
+export interface BaseContracts {
+  [contractName: string]: { address: string };
+}
+
+export interface SuiContracts {
+  [contractName: string]: {
+    address: string;
+    objects: Record<string, string>;
+  };
+}
+
+interface BaseChainConfig {
   id: string;
   displayName: string;
-  chainType: CHAIN_TYPE;
   externalChainId: string | number;
   iconUrl: string;
   nativeCurrency: {
@@ -83,9 +93,30 @@ export interface ChainConfig {
     iconUrl: string;
   } | null;
   blockExplorers: { name: string; url: string }[] | null;
-  config: ChainCosmosSubconfig | ChainEvmSubconfig;
   assets: { [assetId: string]: string };
 }
+
+// Chain configs for each chain type with associated contracts
+export interface EvmChainConfig extends BaseChainConfig {
+  chainType: "evm";
+  config: ChainEvmSubconfig;
+  contracts?: BaseContracts;
+}
+
+interface AxelarChainConfig extends BaseChainConfig {
+  chainType: "axelarnet";
+  config: ChainCosmosSubconfig;
+  contracts?: BaseContracts;
+}
+
+export interface SuiChainConfig extends BaseChainConfig {
+  chainType: "sui";
+  config: ChainEvmSubconfig | ChainCosmosSubconfig;
+  contracts?: SuiContracts;
+}
+
+// Union type of all possible chain configs
+export type ChainConfig = EvmChainConfig | AxelarChainConfig | SuiChainConfig;
 
 export interface AxelarConfigsResponse {
   chains: { [chainId: string]: ChainConfig };
