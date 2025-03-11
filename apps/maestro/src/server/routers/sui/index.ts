@@ -6,7 +6,6 @@ import {
 import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
@@ -195,7 +194,7 @@ export const suiRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const chainConfig = getSuiChainConfig(ctx);
+        const chainConfig = await getSuiChainConfig(ctx);
 
         const { txBuilder } = setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
@@ -297,13 +296,9 @@ export const suiRouter = router({
         gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/${NEXT_PUBLIC_NETWORK_ENV}`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = await getSuiChainConfig(ctx);
         const { sender, symbol, tokenAddress, destinationChainIds, gasValues } =
           input;
 
