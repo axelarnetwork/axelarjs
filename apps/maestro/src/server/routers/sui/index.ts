@@ -18,6 +18,7 @@ import {
   setupTxBuilder,
 } from "./utils/txUtils";
 import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
+import { suiChainConfig } from "~/config/chains"
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -78,9 +79,11 @@ export const suiRouter = router({
         gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const chainConfig = await getChainConfig();
+        const chainConfigs = await ctx.configs.axelarConfigs();
+        const chainConfig = chainConfigs.chains[suiChainConfig.id];
+
         const {
           sender,
           symbol,
@@ -97,13 +100,17 @@ export const suiRouter = router({
           coinType: tokenType,
         });
 
-        if (!coinMetadata) {
+        if (!coinMetadata || !chainConfig?.contracts || chainConfig.chainType !== "sui") {
           return undefined;
         }
 
         const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
+
+        if (!treasuryCap) {
+          throw new Error("Treasury cap not found");
+        }
 
         if (input.minterAddress) {
           await txBuilder.moveCall({
@@ -112,7 +119,7 @@ export const suiRouter = router({
             arguments: [itsObjectId, metadataId],
           });
           txBuilder.tx.transferObjects(
-            [treasuryCap as string],
+            [treasuryCap],
             txBuilder.tx.pure.address(input.minterAddress)
           );
         } else {
@@ -246,8 +253,12 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
-        const { Example, AxelarGateway, GasService, InterchainTokenService: ITS } =
-          chainConfig.contracts;
+        const {
+          Example,
+          AxelarGateway,
+          GasService,
+          InterchainTokenService: ITS,
+        } = chainConfig.contracts;
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
