@@ -294,8 +294,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     ) {
       setAlreadyUpdatingRemoteSui(true);
       updateSuiAddresses({
-        tokenId: props.tokenId,
-        suiChainId: suiChain.chain.id,
+        tokenId: props.tokenId
       })
         .then(() => {
           setAlreadyUpdatingRemoteSui(false);

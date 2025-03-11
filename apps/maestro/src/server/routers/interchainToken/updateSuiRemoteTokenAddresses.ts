@@ -1,19 +1,17 @@
 import { z } from "zod";
 
 import { protectedProcedure } from "~/server/trpc";
-import { getCoinAddressAndManagerByTokenId } from "../sui/utils/utils";
+import { getCoinAddressAndManagerByTokenId, getSuiChainConfig } from "../sui/utils/utils";
 
 export const updateSuiRemoteTokenAddresses = protectedProcedure
   .input(
     z.object({
-      tokenId: z.string(),
-      suiChainId: z.string(),
+      tokenId: z.string()
     })
   )
   .mutation(async ({ ctx, input }) => {
-    const { suiChainId, tokenId } = input;
-    const chainConfigs = await ctx.configs.axelarConfigs();
-    const chainConfig = chainConfigs.chains[suiChainId];
+    const { tokenId } = input;
+    const chainConfig = await getSuiChainConfig(ctx);
     const response = await getCoinAddressAndManagerByTokenId({
         tokenId,
         suiChainConfig: chainConfig,

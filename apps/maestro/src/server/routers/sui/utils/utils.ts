@@ -138,10 +138,15 @@ export const getTreasuryCap = async (tokenAddress: string) => {
 
 export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
-  suiChainConfig: any;
+  suiChainConfig: SuiChainConfig;
 }) => {
   try {
     const { suiChainConfig } = input;
+
+    if (!suiChainConfig.contracts) {
+      throw new Error("Invalid chain config");
+    }
+
     const registeredCoinsObject = await client.getObject({
       id: suiChainConfig.contracts.InterchainTokenService.objects
         .InterchainTokenServicev0,
