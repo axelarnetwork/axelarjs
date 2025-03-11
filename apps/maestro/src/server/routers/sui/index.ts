@@ -17,7 +17,6 @@ import {
   setupTxBuilder,
 } from "./utils/txUtils";
 import { buildTx, getSuiChainConfig, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
-import { suiChainConfig } from "~/config/chains"
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
