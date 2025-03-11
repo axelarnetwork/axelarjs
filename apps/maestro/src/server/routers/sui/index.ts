@@ -11,13 +11,12 @@ import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
   deployRemoteInterchainToken,
-  getChainConfig,
   getTokenId,
   mintToken,
   registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
-import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
+import { buildTx, getSuiChainConfig, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
 import { suiChainConfig } from "~/config/chains"
 
 export const suiRouter = router({
@@ -81,9 +80,6 @@ export const suiRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const chainConfigs = await ctx.configs.axelarConfigs();
-        const chainConfig = chainConfigs.chains[suiChainConfig.id];
-
         const {
           sender,
           symbol,
@@ -100,7 +96,9 @@ export const suiRouter = router({
           coinType: tokenType,
         });
 
-        if (!coinMetadata || !chainConfig?.contracts || chainConfig.chainType !== "sui") {
+        const chainConfig = await getSuiChainConfig(ctx);
+
+        if (!coinMetadata || !chainConfig.contracts) {
           return undefined;
         }
 
@@ -196,13 +194,9 @@ export const suiRouter = router({
         coinType: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = getSuiChainConfig(ctx);
 
         const { txBuilder } = setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
@@ -404,8 +398,10 @@ export const suiRouter = router({
         gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
+        const chainConfig = await getSuiChainConfig(ctx);
+
         const {
           sender,
           symbol,
@@ -417,7 +413,6 @@ export const suiRouter = router({
           gasValues,
         } = input;
 
-        const chainConfig = await getChainConfig();
         const txBuilder = new TxBuilder(suiClient);
         txBuilder.tx.setSenderIfNotSet(sender);
 
