@@ -245,6 +245,10 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
+        if(!chainConfig.contracts) {
+          throw new Error("Invalid chain config");
+        }
+
         const {
           Example,
           AxelarGateway,
