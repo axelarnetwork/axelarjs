@@ -120,14 +120,12 @@ export const getTreasuryCap = async (tokenAddress: string) => {
 
 export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
+  suiChainConfig: any;
 }) => {
   try {
-    const response = await fetch(`https://static.npty.online/axelar/devnet-amplifier-config-1.0.x.json`);
-    const _chainConfig = await response.json();
-    const chainConfig = _chainConfig.chains['sui-2'];
-
+    const { suiChainConfig } = input;
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
+      id: suiChainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
         showContent: true,
@@ -247,10 +245,10 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
 
   // Extract the address from the objectType
   const objectType = filteredResult.objectType;
-  const address = getCoinAddressFromType(objectType);
+  const tokenAddress = getCoinAddressFromType(objectType);
   return {
     tokenManager,
-    address,
+    tokenAddress,
   };
 }
 
