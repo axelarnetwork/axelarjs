@@ -36,9 +36,7 @@ export default function useRegisterRemoteCanonicalTokens(
     [input.chainIds, combinedComputed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map(
-    (chain) => chain.id
-  );
+  const destinationChainIds = destinationChains.map((chain) => chain.id);
 
   const sourceChain = useMemo(
     () => combinedComputed.indexedByChainId[chainId],

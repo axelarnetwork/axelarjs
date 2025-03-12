@@ -4,13 +4,20 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { indexBy, partition, prop } from "rambda";
 
+import {
+  CHAIN_CONFIGS,
+  suiChainConfig,
+  WAGMI_CHAIN_CONFIGS,
+} from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { CHAIN_CONFIGS, suiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
 
-const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("axelarChainId"), CHAIN_CONFIGS);
+const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(
+  prop("axelarChainId"),
+  CHAIN_CONFIGS
+);
 const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
@@ -19,13 +26,11 @@ export function useAllChainConfigsQuery() {
     data: evmChains,
     ...evmChainsQuery
   } = useEVMChainConfigsQuery();
-
   const {
     computed: vmComputed,
     data: vmChains,
     ...vmChainsQuery
   } = useVMChainConfigsQuery();
-
   const combinedComputed = useMemo(
     () => ({
       indexedById: {
@@ -59,7 +64,7 @@ export function useAllChainConfigsQuery() {
       if (!existingChain || existingChain.id === chain.id) {
         chainMap.set(chain.chain_id, {
           ...chain,
-          displayName: chain.name, 
+          displayName: chain.name,
         });
       }
     });
@@ -88,7 +93,8 @@ export function useEVMChainConfigsQuery() {
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? []),
+    () =>
+      partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? []),
     [data]
   );
 
@@ -135,18 +141,18 @@ export function useVMChainConfigsQuery() {
 
   // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
-    if(chain.id.includes(suiChainConfig.axelarChainId)) {
-      chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
+    if (chain.id.includes(suiChainConfig.axelarChainId)) {
+      chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
     }
   }
 
   // Filter out chains that are not configured in the app
-  const [configured, unconfigured] = useMemo(
-    () => {
-        return partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? [])
-    },
-    [data]
-  );
+  const [configured, unconfigured] = useMemo(() => {
+    return partition(
+      (x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
+      data ?? []
+    );
+  }, [data]);
 
   if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
     logger.once.info(
@@ -165,7 +171,9 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const wagmiChains = configured.map((x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id]).filter(chain => chain);
+  const wagmiChains = configured
+    .map((x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id])
+    .filter((chain) => chain);
 
   return {
     ...queryResult,
