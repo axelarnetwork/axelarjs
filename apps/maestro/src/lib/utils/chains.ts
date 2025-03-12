@@ -42,6 +42,7 @@ export const filterEligibleChains = (
   const isAllChainsWhitelisted = whitelistedChains[0] === "all";
 
   return destinationChains.filter((chain) => {
+
     // Always filter out current chain
     if (chain.chain_id === currentChainId) return false;
 
