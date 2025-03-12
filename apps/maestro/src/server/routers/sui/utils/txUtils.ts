@@ -1,5 +1,6 @@
 import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import { keccak256, stringToHex } from "viem";
+import type { SuiChainConfig } from "@axelarjs/api";
 
 import { suiClient } from "~/lib/clients/suiClient";
 
@@ -71,14 +72,14 @@ export async function mintToken(
 
 export async function deployRemoteInterchainToken(
   txBuilder: TxBuilder,
-  chainConfig: any,
+  chainConfig: SuiChainConfig,
   destinationChain: string,
   coinMetadata: any,
   feeUnitAmount: number,
   sender: string,
   tokenType: string
 ) {
-  const { Example, InterchainTokenService: ITS, AxelarGateway, GasService } = chainConfig.contracts;
+  const { Example, InterchainTokenService: ITS, AxelarGateway, GasService } = chainConfig.config.contracts;
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
   const TokenId = await getTokenIdByCoinMetadata(
@@ -106,14 +107,14 @@ export async function deployRemoteInterchainToken(
 
 export async function registerToken(
   txBuilder: TxBuilder,
-  chainConfig: any,
+  chainConfig: SuiChainConfig,
   tokenType: string,
   metadataId: string,
   treasuryCap: any,
   minterAddress?: string,
   isCanonical: boolean = false
 ) {
-  const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
+  const { Example, InterchainTokenService: ITS } = chainConfig.config.contracts;
   const itsObjectId = ITS.objects.InterchainTokenService;
 
   if (isCanonical) {

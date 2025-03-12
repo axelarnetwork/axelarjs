@@ -61,7 +61,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       // This happens when the token is deployed on sui as a remote chain
       if (!metadata) {
-        const InterchainTokenServiceV0 = chainConfig.contracts?.InterchainTokenService.objects.InterchainTokenServicev0;
+        const InterchainTokenServiceV0 = chainConfig.config.contracts?.InterchainTokenService.objects.InterchainTokenServicev0;
 
         if(!InterchainTokenServiceV0) {
           throw new Error("Invalid chain config");
