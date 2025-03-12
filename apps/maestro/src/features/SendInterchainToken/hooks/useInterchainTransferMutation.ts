@@ -79,7 +79,7 @@ export function useInterchainTransferMutation(
           status: "awaiting_approval",
         });
         let txHash: any;
-        if (config.sourceChainName === "sui") {
+        if (config.sourceChainName.toLowerCase().includes("sui")) {
           const coinType = await getCoinType(config.tokenAddress);
           const sendTokenTxJSON = await getSendTokenTx({
             sender: address,

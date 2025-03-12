@@ -27,7 +27,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
     let tokenManagerType;
     const chains = await ctx.configs.chains();
 
-    if (input.axelarChainId !== "sui") {
+    if (!input.axelarChainId.includes("sui")) {
       const configs = chains[input.axelarChainId];
 
       invariant(
@@ -97,7 +97,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         let tokenAddress;
         let tokenManagerAddress;
 
-        if (axelarChainId !== "sui") {
+        if (!axelarChainId.includes("sui")) {
           invariant(
             chainConfig.wagmi,
             `No wagmi configuration found for chain ${axelarChainId}`
@@ -118,7 +118,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always(input.tokenAddress)),
           ]);
-        } else if (axelarChainId === "sui") {
+        } else if (axelarChainId.includes("sui")) {
           // the address should be different from the address in the origin chain
           // but this will be updated later in tokens page
           tokenAddress = input.tokenAddress;

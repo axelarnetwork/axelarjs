@@ -5,11 +5,16 @@ import { partition, pluck, propEq } from "rambda";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
+import { suiClient } from "~/lib/clients/suiClient";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
+import {
+  getCoinAddressFromType,
+  getSuiEventsByTxHash,
+} from "../sui/utils/utils";
 
 const tokenDetailsSchema = z.object({
   chainId: z.number(),
@@ -171,41 +176,64 @@ async function getInterchainToken(
 
         invariant(chainConfig, "Chain config not found");
 
-
         // TODO: handle if the chain does not support evm query
-        const itsClient =
-          ctx.contracts.createInterchainTokenServiceClient(chainConfig);
+        if (chainConfig?.supportWagmi) {
+          const itsClient =
+            ctx.contracts.createInterchainTokenServiceClient(chainConfig);
 
-        let tokenAddress = tokenDetails.tokenAddress as `0x${string}`;
+          let tokenAddress = tokenDetails.tokenAddress as `0x${string}`;
 
-        if (tokenDetails.kind === "canonical") {
-          const remoteTokenAddress = (await itsClient.reads
+          if (tokenDetails.kind === "canonical") {
+            const remoteTokenAddress = (await itsClient.reads
+              .registeredTokenAddress({
+                tokenId: tokenDetails.tokenId as `0x${string}`,
+              })
+              .catch(() => null)) as `0x${string}`;
+
+            if (remoteTokenAddress) {
+              tokenAddress = remoteTokenAddress;
+            }
+          }
+
+          const isRegistered = await itsClient.reads
             .registeredTokenAddress({
               tokenId: tokenDetails.tokenId as `0x${string}`,
             })
-            .catch(() => null)) as `0x${string}`;
+            .then(() => true)
+            .catch(() => {
+              return false;
+            });
 
-          if (remoteTokenAddress) {
-            tokenAddress = remoteTokenAddress;
+          return {
+            ...remoteTokenDetails,
+            // derive the token address from the interchain token contract client
+            tokenAddress,
+            isRegistered,
+          };
+        } else if (chainConfig?.axelarChainId.includes("sui")) {
+          const suiTxHash = await findSuiTxHashFromGmp(
+            ctx,
+            tokenDetails.deploymentMessageId
+          );
+
+          if (!suiTxHash) {
+            return {
+              ...remoteTokenDetails,
+              isRegistered: false,
+            };
           }
+
+          const { isRegistered, tokenAddress } =
+            await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
+
+          return {
+            ...remoteTokenDetails,
+            tokenAddress,
+            isRegistered,
+          };
+        } else {
+          return remoteTokenDetails;
         }
-
-        const isRegistered = await itsClient.reads
-          .registeredTokenAddress({
-            tokenId: tokenDetails.tokenId as `0x${string}`,
-          })
-          .then(() => true)
-          .catch((e) => {
-            console.log("error in isRegistered", e);
-            return false;
-          });
-
-        return {
-          ...remoteTokenDetails,
-          // derive the token address from the interchain token contract client
-          tokenAddress,
-          isRegistered,
-        };
       })
   );
 
@@ -308,6 +336,71 @@ async function scanChains(
   const validResult = results.find((result) => result);
 
   return validResult || null;
+}
+
+/**
+ * Finds the Sui transaction hash from the GMP response.
+ * @param ctx
+ * @param deploymentMessageId
+ * @returns
+ */
+async function findSuiTxHashFromGmp(
+  ctx: Context,
+  deploymentMessageId: string
+) {
+  const initialTxHash = deploymentMessageId.split("-")[0];
+  const firstHopCalls = await ctx.services.gmp.searchGMP({
+    txHash: initialTxHash,
+    _source: {
+      includes: ["callback"],
+    },
+  });
+
+  const suiBoundCalls = firstHopCalls.filter(
+    (call) => call.callback?.returnValues?.destinationChain?.includes("sui")
+  );
+
+  const axelarTxHash = suiBoundCalls[0]?.callback?.transaction?.hash;
+
+  if (!axelarTxHash) {
+    return undefined;
+  }
+
+  const secondHopCalls = await ctx.services.gmp.searchGMP({
+    txHash: axelarTxHash,
+    _source: {
+      includes: ["executed"],
+    },
+  });
+
+  const suiExecutedCalls = secondHopCalls.filter((call) =>
+    call.executed?.chain?.includes("sui")
+  );
+
+  return suiExecutedCalls[0]?.executed?.transaction?.hash;
+}
+
+/**
+ * Gets the Sui token registration details from the Sui transaction hash.
+ */
+async function getSuiTokenRegistrationDetails(
+  suiTxHash: string,
+  remoteTokenDetails: { tokenAddress: string | null }
+) {
+  const eventDetails = await getSuiEventsByTxHash(suiClient, suiTxHash);
+
+  const registeredEvent = eventDetails?.data.find((event) =>
+    event.type.includes("CoinRegistered")
+  );
+
+  const tokenAddress = registeredEvent
+    ? getCoinAddressFromType(registeredEvent.type, "CoinRegistered")
+    : remoteTokenDetails.tokenAddress;
+
+  return {
+    isRegistered: Boolean(registeredEvent),
+    tokenAddress,
+  };
 }
 
 async function getTokenDetails(

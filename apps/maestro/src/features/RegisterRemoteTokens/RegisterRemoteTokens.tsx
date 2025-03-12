@@ -45,7 +45,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     tokenAddress: props.tokenAddress,
     deploymentStatus: "pending",
     deploymentTxHash: "0x",
-    axelarChainId: combinedComputed.indexedByChainId[chainId].id,
+    axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   }));
 
   const onReceipt = useCallback(
@@ -101,8 +101,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     await recordRemoteTokenDeployment({
       tokenAddress: props.tokenAddress,
       chainId: props.originChainId ?? -1,
-      axelarChainId: "sui",
-      // TODO: find event Txindex correctly
+      axelarChainId: "sui-2",
       deploymentMessageId: `${digest}-${txIndex}`,
       remoteTokens,
     });

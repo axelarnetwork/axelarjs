@@ -52,6 +52,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const chainId = useChainId();
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
+  const [isReady, setIsReady] = useState(false);
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -82,17 +83,36 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     });
 
-  const { destinationChainNames } = useMemo(() => {
+  useEffect(() => {
+    if (!tokenId || !tokenAddress) {
+      if (input) {
+        if (!input.sourceChainId.includes("sui")) {
+          setIsReady(false);
+          return;
+        }
+      }
+    }
+
+    setIsReady(true);
+  }, [
+    input,
+    tokenId,
+    deployerAddress,
+    tokenAddress,
+    input?.sourceChainId,
+    combinedComputed,
+  ]);
+
+  const { destinationChainIds } = useMemo(() => {
     const index = combinedComputed.indexedById;
     const originalChain = index[input?.sourceChainId ?? chainId];
     const originalChainName = originalChain?.chain_name ?? "Unknown";
 
     return {
       originalChainName,
-      destinationChainNames:
+      destinationChainIds:
         input?.destinationChainIds.map(
-          (destinationChainId) =>
-            index[destinationChainId]?.chain_name ?? "Unknown"
+          (destinationChainId) => index[destinationChainId]?.id ?? "Unknown"
         ) ?? [],
     };
   }, [
@@ -127,7 +147,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [deployTxData];
     }
 
-    const registerTxData = destinationChainNames.map((destinationChain, i) =>
+    const registerTxData = destinationChainIds.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
         destinationChain,
@@ -136,13 +156,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames]);
+  }, [input, tokenId, destinationChainIds]);
 
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
   const isMutationReady =
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-    (!destinationChainNames.length || totalGasFee > 0n);
+    (!destinationChainIds.length || totalGasFee > 0n);
   const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
     {
       chainId,
@@ -237,30 +257,30 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
-    if (!input || !tokenId || !deployerAddress || !tokenAddress) {
-      return;
+    if (input && tokenAddress && !input.sourceChainId.includes("sui")) {
+      return await recordDeploymentAsync({
+        kind: "interchain",
+        tokenId: tokenId as string,
+        deployerAddress,
+        tokenAddress,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        axelarChainId: input.sourceChainId,
+        salt: input.salt,
+        originalMinterAddress: input.minterAddress,
+        destinationAxelarChainIds: input.destinationChainIds,
+        deploymentMessageId: "",
+        tokenManagerAddress: "",
+      });
     }
-
-    return await recordDeploymentAsync({
-      kind: "interchain",
-      tokenId: tokenId as string,
-      deployerAddress,
-      tokenAddress,
-      tokenName: input.tokenName,
-      tokenSymbol: input.tokenSymbol,
-      tokenDecimals: input.decimals,
-      axelarChainId: input.sourceChainId,
-      salt: input.salt,
-      originalMinterAddress: input.minterAddress,
-      destinationAxelarChainIds: input.destinationChainIds,
-      deploymentMessageId: "",
-      tokenManagerAddress: "",
-    });
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
     if (chainId === SUI_CHAIN_ID && input) {
+      const gasValues =
+        input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
       const result = await deployToken({
         initialSupply: input.initialSupply as bigint,
         symbol: input.tokenSymbol,
@@ -268,6 +288,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
         minterAddress: input.minterAddress,
+        gasValues,
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
@@ -331,5 +352,5 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     recordDeploymentDraft,
   ]);
 
-  return { ...multicall, writeAsync, write };
+  return { ...multicall, writeAsync, write, isReady };
 }

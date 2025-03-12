@@ -6,18 +6,16 @@ import {
 import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
   deployRemoteInterchainToken,
-  getChainConfig,
   getTokenId,
   mintToken,
   registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
-import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
+import { buildTx, getSuiChainConfig, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -75,34 +73,40 @@ export const suiRouter = router({
         tokenPackageId: z.string(),
         metadataId: z.string(),
         minterAddress: z.string().optional(),
+        gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const chainConfig = await getChainConfig();
         const {
           sender,
           symbol,
           tokenPackageId,
           metadataId,
           destinationChains,
+          gasValues,
         } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-        const feeUnitAmount = 5e7;
         const { txBuilder } = setupTxBuilder(sender);
 
         const coinMetadata = await suiClient.getCoinMetadata({
           coinType: tokenType,
         });
 
-        if (!coinMetadata) {
+        const chainConfig = await getSuiChainConfig(ctx);
+
+        if (!coinMetadata || !chainConfig.contracts) {
           return undefined;
         }
 
-        const { Example, ITS } = chainConfig.contracts;
-        const itsObjectId = ITS.objects.ITS;
+        const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
+        const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
+
+        if (!treasuryCap) {
+          throw new Error("Treasury cap not found");
+        }
 
         if (input.minterAddress) {
           await txBuilder.moveCall({
@@ -111,7 +115,7 @@ export const suiRouter = router({
             arguments: [itsObjectId, metadataId],
           });
           txBuilder.tx.transferObjects(
-            [treasuryCap as string],
+            [treasuryCap],
             txBuilder.tx.pure.address(input.minterAddress)
           );
         } else {
@@ -124,13 +128,13 @@ export const suiRouter = router({
             .catch((e) => console.log("error with register coin treasury", e));
         }
 
-        for (const destinationChain of destinationChains) {
+        for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
             chainConfig,
-            destinationChain,
+            destinationChains[i],
             coinMetadata,
-            feeUnitAmount,
+            Number(gasValues[i]),
             sender,
             tokenType
           );
@@ -188,13 +192,9 @@ export const suiRouter = router({
         coinType: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = await getSuiChainConfig(ctx);
 
         const { txBuilder } = setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
@@ -245,8 +245,16 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
-        const { Example, AxelarGateway, GasService, ITS } =
-          chainConfig.contracts;
+        if(!chainConfig.contracts) {
+          throw new Error("Invalid chain config");
+        }
+
+        const {
+          Example,
+          AxelarGateway,
+          GasService,
+          InterchainTokenService: ITS,
+        } = chainConfig.contracts;
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
@@ -254,7 +262,7 @@ export const suiRouter = router({
           target: `${Example.address}::its::send_interchain_transfer_call`,
           arguments: [
             Example.objects.ItsSingleton,
-            ITS.objects.ITS,
+            ITS.objects.InterchainTokenService,
             AxelarGateway.objects.Gateway,
             GasService.objects.GasService,
             TokenId,
@@ -289,21 +297,18 @@ export const suiRouter = router({
         originChainId: z.number(),
         sender: z.string(),
         symbol: z.string(),
+        gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/${NEXT_PUBLIC_NETWORK_ENV}`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
-        const { sender, symbol, tokenAddress, destinationChainIds } = input;
+        const chainConfig = await getSuiChainConfig(ctx);
+        const { sender, symbol, tokenAddress, destinationChainIds, gasValues } =
+          input;
 
         const txBuilder = new TxBuilder(suiClient);
 
         txBuilder.tx.setSenderIfNotSet(sender);
-        const feeUnitAmount = 5e7;
 
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -315,13 +320,14 @@ export const suiRouter = router({
           throw new Error(`Coin metadata not found for ${tokenType}`);
         }
 
-        for (const destinationChain of destinationChainIds) {
+        for (let i = 0; i < destinationChainIds.length; i++) {
+          const destinationChain = destinationChainIds[i];
           await deployRemoteInterchainToken(
             txBuilder,
             chainConfig,
             destinationChain,
             coinMetadata,
-            feeUnitAmount,
+            Number(gasValues[i]),
             sender,
             tokenType
           );
@@ -387,10 +393,13 @@ export const suiRouter = router({
         destinationChains: z.array(z.string()),
         amount: z.bigint(),
         minterAddress: z.string().optional(),
+        gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
+        const chainConfig = await getSuiChainConfig(ctx);
+
         const {
           sender,
           symbol,
@@ -399,12 +408,11 @@ export const suiRouter = router({
           destinationChains,
           amount,
           minterAddress,
+          gasValues,
         } = input;
 
-        const chainConfig = await getChainConfig();
         const txBuilder = new TxBuilder(suiClient);
         txBuilder.tx.setSenderIfNotSet(sender);
-        const feeUnitAmount = 5e7;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
@@ -431,13 +439,13 @@ export const suiRouter = router({
           minterAddress
         );
 
-        for (const destinationChain of destinationChains) {
+        for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
             chainConfig,
-            destinationChain,
+            destinationChains[i],
             coinMetadata,
-            feeUnitAmount,
+            Number(gasValues[i]),
             sender,
             tokenType
           );

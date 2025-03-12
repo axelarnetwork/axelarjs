@@ -56,10 +56,10 @@ export function useAllChainConfigsQuery() {
     // Process VM chains, only add if not already present or if it's a special case
     vmChains?.forEach((chain) => {
       const existingChain = chainMap.get(chain.chain_id);
-      if (!existingChain) {
+      if (!existingChain || existingChain.id === chain.id) {
         chainMap.set(chain.chain_id, {
           ...chain,
-          displayName: `${chain.name} (VM)`, // Add VM suffix to differentiate
+          displayName: chain.name, 
         });
       }
     });
@@ -135,7 +135,7 @@ export function useVMChainConfigsQuery() {
 
   // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
-    if(chain.id === 'sui') {
+    if(chain.id.includes("sui-2")) {
       chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
     }
   }

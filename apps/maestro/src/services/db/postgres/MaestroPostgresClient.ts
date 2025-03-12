@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, ilike, inArray } from "drizzle-orm";
 import { type Address } from "viem";
 import { z } from "zod";
 
@@ -12,7 +12,6 @@ import {
   remoteInterchainTokens,
   remoteInterchainTokensZodSchemas,
 } from "~/lib/drizzle/schema";
-import { getCoinAddressAndManagerByTokenId } from "~/server/routers/sui/utils/utils";
 
 export const newRemoteInterchainTokenSchema =
   remoteInterchainTokensZodSchemas.insert.omit({
@@ -321,15 +320,13 @@ export default class MaestroPostgresClient {
     return await query;
   }
 
-  async updateSuiRemoteTokenAddresses(tokenId: string) {
+  async updateSuiRemoteTokenAddresses(inputs: {
+    tokenId: string;
+    tokenAddress: string;
+    tokenManager: string;
+  }) {
     try {
-      const response = await getCoinAddressAndManagerByTokenId({ tokenId });
-
-      if (!response) {
-        throw new Error("Failed to retrieve token details");
-      }
-
-      const { address: tokenAddress, tokenManager } = response;
+      const { tokenId, tokenAddress, tokenManager } = inputs;
 
       await this.db
         .update(remoteInterchainTokens)
@@ -342,7 +339,7 @@ export default class MaestroPostgresClient {
         .where(
           and(
             eq(remoteInterchainTokens.tokenId, tokenId),
-            eq(remoteInterchainTokens.axelarChainId, "sui")
+            ilike(remoteInterchainTokens.axelarChainId, "%sui%")
           )
         );
     } catch (error) {

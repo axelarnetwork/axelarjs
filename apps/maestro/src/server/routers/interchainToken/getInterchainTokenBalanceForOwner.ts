@@ -7,6 +7,7 @@ import { publicProcedure } from "~/server/trpc";
 import {
   getCoinInfoByCoinType,
   getCoinType,
+  getSuiChainConfig,
   getTokenOwner,
 } from "../sui/utils/utils";
 
@@ -43,6 +44,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     }
     // Sui address length is 66
     if (input.tokenAddress?.length === 66) {
+      const chainConfig = await getSuiChainConfig(ctx);
+
       let isTokenOwner = false;
 
       const coinType = await getCoinType(input.tokenAddress);
@@ -58,7 +61,13 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       // This happens when the token is deployed on sui as a remote chain
       if (!metadata) {
-        const coinInfo = await getCoinInfoByCoinType(client, coinType);
+        const InterchainTokenServiceV0 = chainConfig.contracts?.InterchainTokenService.objects.InterchainTokenServicev0;
+
+        if(!InterchainTokenServiceV0) {
+          throw new Error("Invalid chain config");
+        }
+
+        const coinInfo = await getCoinInfoByCoinType(client, coinType, InterchainTokenServiceV0);
         decimals = coinInfo?.decimals;
       }
 

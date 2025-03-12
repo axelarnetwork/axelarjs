@@ -426,7 +426,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 validate: (value) => {
                   // TODO handle sui address length
                   if (
-                    state.selectedToChain.id === "sui" &&
+                    state.selectedToChain.id.includes("sui") &&
                     !isValidSuiAddress(value)
                   ) {
                     return "Invalid SUI address";

@@ -28,6 +28,7 @@ export type DeployTokenParams = {
   name: string;
   decimals: number;
   destinationChainIds: string[];
+  gasValues: bigint[];
   skipRegister?: boolean;
   minterAddress?: string;
 };
@@ -99,6 +100,7 @@ export default function useTokenDeploy() {
     name,
     decimals,
     destinationChainIds,
+    gasValues,
     skipRegister = false,
     minterAddress,
   }: DeployTokenParams): Promise<DeployTokenResult> => {
@@ -162,6 +164,7 @@ export default function useTokenDeploy() {
           destinationChains: destinationChainIds,
           amount: initialSupply,
           minterAddress: minterAddress,
+          gasValues
         });
       } else {
         sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
@@ -171,6 +174,7 @@ export default function useTokenDeploy() {
           metadataId: metadata.objectId,
           destinationChains: destinationChainIds,
           minterAddress: minterAddress,
+          gasValues
         });
       }
 
