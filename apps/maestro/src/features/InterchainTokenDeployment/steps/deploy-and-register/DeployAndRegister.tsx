@@ -24,7 +24,6 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
-import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -187,7 +186,7 @@ export const Step2: FC = () => {
       addTransaction,
     ]
   );
-  
+
   const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
@@ -219,7 +218,7 @@ export const Step2: FC = () => {
       }
       return { children: "Check your wallet", status: "loading" };
     }
-    if (rootState.txState.type === "idle" && !isReady) { 
+    if (rootState.txState.type === "idle" && !isReady) {
       return { children: "Initializing", status: "loading" };
     }
     if (rootState.txState.type === "deploying") {
