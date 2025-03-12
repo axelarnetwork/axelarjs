@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
+import { suiChainConfig } from "~/config/chains";
 
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
@@ -26,9 +27,8 @@ export const recordRemoteTokensDeployment = protectedProcedure
       ctx.configs.vmChains(),
     ]);
 
-    // TODO: fix hardcoded value. check why the axelarChainId is optional
     const configs =
-      evmChains[input.chainId] || vmChains[input?.axelarChainId || "sui-2"];
+      evmChains[input.chainId] || vmChains[input?.axelarChainId || suiChainConfig.axelarChainId];
     if (!configs) {
       throw new TRPCError({
         code: "NOT_FOUND",

@@ -7,22 +7,12 @@ import { publicProcedure } from "~/server/trpc";
 
 const vmChainConfigSchema = z.object({
   id: z.string(),
-  chain_name: z.string(),
   chain_id: z.number().optional(),
-  maintainer_id: z.string().optional(),
-  multisig_prover: z.object({
-    address: z.string(),
-  }),
-  voting_verifier: z.object({
-    address: z.string(),
-  }),
+  chain_name: z.string(),
   name: z.string(),
-  short_name: z.string(),
   image: z.string(),
   color: z.string(),
-  chain_type: z.literal("vm"), 
-  no_inflation: z.boolean().optional(),
-  no_tvl: z.boolean().optional(),
+  chain_type: z.literal("vm"),
   endpoints: z.object({
     rpc: z.array(z.string()),
   }),
@@ -40,19 +30,6 @@ const vmChainConfigSchema = z.object({
     contract_path: z.string(),
     transaction_path: z.string(),
   }),
-  provider_params: z.array(
-    z.object({
-      chainId: z.string(),
-      chainName: z.string(),
-      rpcUrls: z.array(z.string()),
-      nativeCurrency: z.object({
-        name: z.string(),
-        symbol: z.string(),
-        decimals: z.number(),
-      }),
-      blockExplorerUrls: z.array(z.string()),
-    })
-  ).optional(),
 });
 
 export const getVMChainConfigs = publicProcedure

@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { indexBy, partition, prop } from "rambda";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { CHAIN_CONFIGS, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
+import { CHAIN_CONFIGS, suiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
@@ -135,7 +135,7 @@ export function useVMChainConfigsQuery() {
 
   // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
-    if(chain.id.includes("sui-2")) {
+    if(chain.id.includes(suiChainConfig.axelarChainId)) {
       chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
     }
   }
