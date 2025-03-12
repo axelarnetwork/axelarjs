@@ -52,6 +52,21 @@ export interface ChainEvmSubconfig {
   rpc: string[];
 }
 
+export interface ChainSuiSubconfig {
+  contracts: {
+    Utils: SuiContract;
+    VersionControl: SuiContract;
+    AxelarGateway: SuiContract;
+    RelayerDiscovery: SuiContract;
+    Operators: SuiContract;
+    GasService: SuiContract;
+    Abi: SuiContract;
+    InterchainTokenService: SuiContract;
+    Example: SuiContract;
+  };
+  rpc: string[];
+}
+
 export interface ChainCosmosSubconfig {
   addressPrefix: string;
   ibc: {
@@ -73,11 +88,9 @@ export interface BaseContracts {
   [contractName: string]: { address: string };
 }
 
-export interface SuiContracts {
-  [contractName: string]: {
-    address: string;
-    objects: Record<string, string>;
-  };
+export interface SuiContract {
+  address: string;
+  objects: Record<string, string>;
 }
 
 interface BaseChainConfig {
@@ -100,19 +113,16 @@ interface BaseChainConfig {
 export interface EvmChainConfig extends BaseChainConfig {
   chainType: "evm";
   config: ChainEvmSubconfig;
-  contracts?: BaseContracts;
 }
 
 interface AxelarChainConfig extends BaseChainConfig {
   chainType: "axelarnet";
   config: ChainCosmosSubconfig;
-  contracts?: BaseContracts;
 }
 
 export interface SuiChainConfig extends BaseChainConfig {
   chainType: "sui";
-  config: ChainEvmSubconfig | ChainCosmosSubconfig;
-  contracts?: SuiContracts;
+  config: ChainSuiSubconfig;
 }
 
 // Union type of all possible chain configs

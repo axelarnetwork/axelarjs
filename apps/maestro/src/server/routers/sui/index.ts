@@ -96,11 +96,11 @@ export const suiRouter = router({
 
         const chainConfig = await getSuiChainConfig(ctx);
 
-        if (!coinMetadata || !chainConfig.contracts) {
+        if (!coinMetadata) {
           return undefined;
         }
 
-        const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
+        const { Example, InterchainTokenService: ITS } = chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
@@ -245,16 +245,12 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
-        if(!chainConfig.contracts) {
-          throw new Error("Invalid chain config");
-        }
-
         const {
           Example,
           AxelarGateway,
           GasService,
           InterchainTokenService: ITS,
-        } = chainConfig.contracts;
+        } = chainConfig.config.contracts;
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 

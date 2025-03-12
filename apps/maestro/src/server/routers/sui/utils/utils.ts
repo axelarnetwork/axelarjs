@@ -19,9 +19,9 @@ export const suiServiceBaseUrl =
 
 export const getSuiChainConfig = async (ctx: Context): Promise<SuiChainConfig> => {
   const chainConfigs = await ctx.configs.axelarConfigs();
-  const chainConfig = chainConfigs.chains[suiChainConfig.id];
+  const chainConfig = chainConfigs.chains[suiChainConfig.axelarChainId];
 
-  if (!chainConfig?.contracts || chainConfig.chainType !== "sui") {
+  if (chainConfig.chainType !== "sui") {
     throw new Error("Invalid chain config");
   }
 
@@ -143,12 +143,8 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   try {
     const { suiChainConfig } = input;
 
-    if (!suiChainConfig.contracts) {
-      throw new Error("Invalid chain config");
-    }
-
     const registeredCoinsObject = await client.getObject({
-      id: suiChainConfig.contracts.InterchainTokenService.objects
+      id: suiChainConfig.config.contracts.InterchainTokenService.objects
         .InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
