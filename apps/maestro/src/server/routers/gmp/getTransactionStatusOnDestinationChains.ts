@@ -25,7 +25,8 @@ export const SEARCHGMP_SOURCE = {
     "confirm",
     "executed",
     "callback",
-    "interchain_token_deployment_started",
+    "interchain_token_deployment_started.destinationChain",
+    "interchain_transfer.destinationChain",
   ],
   excludes: [
     "call.transaction",
