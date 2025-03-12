@@ -19,7 +19,7 @@ export const suiServiceBaseUrl =
 
 export const getSuiChainConfig = async (ctx: Context): Promise<SuiChainConfig> => {
   const chainConfigs = await ctx.configs.axelarConfigs();
-  const chainConfig = chainConfigs.chains[suiChainConfig.id];
+  const chainConfig = chainConfigs.chains[suiChainConfig.axelarChainId];
 
   if (!chainConfig?.contracts || chainConfig.chainType !== "sui") {
     throw new Error("Invalid chain config");

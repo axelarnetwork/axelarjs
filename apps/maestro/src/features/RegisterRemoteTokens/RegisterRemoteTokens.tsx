@@ -18,6 +18,7 @@ import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
+import { suiChainConfig } from "~/config/chains";
 
 export type RegisterRemoteTokensProps = {
   tokenAddress: string;
@@ -101,7 +102,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     await recordRemoteTokenDeployment({
       tokenAddress: props.tokenAddress,
       chainId: props.originChainId ?? -1,
-      axelarChainId: "sui-2",
+      axelarChainId: suiChainConfig.axelarChainId,
       deploymentMessageId: `${digest}-${txIndex}`,
       remoteTokens,
     });
