@@ -1,4 +1,5 @@
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { SuiChainConfig } from "@axelarjs/api";
 import {
   SuiClient,
   SuiObjectChange,
@@ -9,10 +10,24 @@ import {
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
+import { suiChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
+import type { Context } from "~/server/context";
 
 export const suiServiceBaseUrl =
   "https://melted-fayth-nptytn-57e5d396.koyeb.app";
+
+export const getSuiChainConfig = async (ctx: Context): Promise<SuiChainConfig> => {
+  const chainConfigs = await ctx.configs.axelarConfigs();
+  const chainConfig = chainConfigs.chains[suiChainConfig.id];
+
+  if (!chainConfig?.contracts || chainConfig.chainType !== "sui") {
+    throw new Error("Invalid chain config");
+  }
+
+  return chainConfig;
+};
+
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
   return objectChanges.find((change) => change.type === "published");
 };
@@ -74,7 +89,10 @@ export const getTokenOwner = async (tokenAddress: string) => {
   return owner?.AddressOwner;
 };
 
-export const getCoinAddressFromType = (coinType: string, prefix: string = "CoinData") => {
+export const getCoinAddressFromType = (
+  coinType: string,
+  prefix: string = "CoinData"
+) => {
   // check for long format
   let addressMatch = coinType.match(new RegExp(`${prefix}<(0x[^:]+)`));
   if (addressMatch) return addressMatch?.[1];
@@ -120,14 +138,18 @@ export const getTreasuryCap = async (tokenAddress: string) => {
 
 export const getCoinAddressAndManagerByTokenId = async (input: {
   tokenId: string;
+  suiChainConfig: SuiChainConfig;
 }) => {
   try {
-    const response = await fetch(`https://static.npty.online/axelar/devnet-amplifier-config-1.0.x.json`);
-    const _chainConfig = await response.json();
-    const chainConfig = _chainConfig.chains['sui-2'];
+    const { suiChainConfig } = input;
+
+    if (!suiChainConfig.contracts) {
+      throw new Error("Invalid chain config");
+    }
 
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
+      id: suiChainConfig.contracts.InterchainTokenService.objects
+        .InterchainTokenServicev0,
       options: {
         showStorageRebate: true,
         showContent: true,
@@ -159,7 +181,10 @@ export const getCoinAddressAndManagerByTokenId = async (input: {
   }
 };
 
-export const getSuiEventsByTxHash = async (suiClient: SuiClient, txHash: string) => {
+export const getSuiEventsByTxHash = async (
+  suiClient: SuiClient,
+  txHash: string
+) => {
   const eventData = await suiClient
     .queryEvents({
       query: {
@@ -168,20 +193,17 @@ export const getSuiEventsByTxHash = async (suiClient: SuiClient, txHash: string)
     })
     .catch(() => null);
 
-    return eventData;
+  return eventData;
 };
 
 export const getCoinInfoByCoinType = async (
   client: SuiClient,
-  coinType: string
+  coinType: string,
+  ITSv0: string
 ) => {
   try {
-    const response = await fetch(`${suiServiceBaseUrl}/chain/devnet-amplifier`);
-    const _chainConfig = await response.json();
-    const chainConfig = _chainConfig.chains.sui;
-
     const registeredCoinsObject = await client.getObject({
-      id: chainConfig.contracts.InterchainTokenService.objects.InterchainTokenServicev0,
+      id: ITSv0,
       options: {
         showStorageRebate: true,
         showContent: true,
@@ -247,10 +269,10 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
 
   // Extract the address from the objectType
   const objectType = filteredResult.objectType;
-  const address = getCoinAddressFromType(objectType);
+  const tokenAddress = getCoinAddressFromType(objectType);
   return {
     tokenManager,
-    address,
+    tokenAddress,
   };
 }
 

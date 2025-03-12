@@ -6,18 +6,16 @@ import {
 import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
   deployRemoteInterchainToken,
-  getChainConfig,
   getTokenId,
   mintToken,
   registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
-import { buildTx, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
+import { buildTx, getSuiChainConfig, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -78,9 +76,8 @@ export const suiRouter = router({
         gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const chainConfig = await getChainConfig();
         const {
           sender,
           symbol,
@@ -97,13 +94,19 @@ export const suiRouter = router({
           coinType: tokenType,
         });
 
-        if (!coinMetadata) {
+        const chainConfig = await getSuiChainConfig(ctx);
+
+        if (!coinMetadata || !chainConfig.contracts) {
           return undefined;
         }
 
         const { Example, InterchainTokenService: ITS } = chainConfig.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
+
+        if (!treasuryCap) {
+          throw new Error("Treasury cap not found");
+        }
 
         if (input.minterAddress) {
           await txBuilder.moveCall({
@@ -112,7 +115,7 @@ export const suiRouter = router({
             arguments: [itsObjectId, metadataId],
           });
           txBuilder.tx.transferObjects(
-            [treasuryCap as string],
+            [treasuryCap],
             txBuilder.tx.pure.address(input.minterAddress)
           );
         } else {
@@ -189,13 +192,9 @@ export const suiRouter = router({
         coinType: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/devnet-amplifier`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = await getSuiChainConfig(ctx);
 
         const { txBuilder } = setupTxBuilder(input.sender);
         const tx = txBuilder.tx;
@@ -246,8 +245,16 @@ export const suiRouter = router({
         // Split token to transfer to the destination chain
         const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
 
-        const { Example, AxelarGateway, GasService, InterchainTokenService: ITS } =
-          chainConfig.contracts;
+        if(!chainConfig.contracts) {
+          throw new Error("Invalid chain config");
+        }
+
+        const {
+          Example,
+          AxelarGateway,
+          GasService,
+          InterchainTokenService: ITS,
+        } = chainConfig.contracts;
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
@@ -293,13 +300,9 @@ export const suiRouter = router({
         gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const response = await fetch(
-          `${suiServiceBaseUrl}/chain/${NEXT_PUBLIC_NETWORK_ENV}`
-        );
-        const _chainConfig = await response.json();
-        const chainConfig = _chainConfig.chains.sui;
+        const chainConfig = await getSuiChainConfig(ctx);
         const { sender, symbol, tokenAddress, destinationChainIds, gasValues } =
           input;
 
@@ -393,8 +396,10 @@ export const suiRouter = router({
         gasValues: z.array(z.bigint()),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
+        const chainConfig = await getSuiChainConfig(ctx);
+
         const {
           sender,
           symbol,
@@ -406,7 +411,6 @@ export const suiRouter = router({
           gasValues,
         } = input;
 
-        const chainConfig = await getChainConfig();
         const txBuilder = new TxBuilder(suiClient);
         txBuilder.tx.setSenderIfNotSet(sender);
 

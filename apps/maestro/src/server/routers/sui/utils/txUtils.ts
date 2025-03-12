@@ -3,13 +3,6 @@ import { keccak256, stringToHex } from "viem";
 
 import { suiClient } from "~/lib/clients/suiClient";
 
-export async function getChainConfig() {
-  // TODO: fix this to use chain configs from the s3 instead of the hardcoded url
-  const response = await fetch(`https://static.npty.online/axelar/devnet-amplifier-config-1.0.x.json`);
-  const _chainConfig = await response.json();
-  return _chainConfig.chains['sui-2'];
-}
-
 export function setupTxBuilder(sender: string) {
   const txBuilder = new TxBuilder(suiClient);
   txBuilder.tx.setSenderIfNotSet(sender);

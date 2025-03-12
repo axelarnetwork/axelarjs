@@ -277,18 +277,25 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   // the address is wrong on the Sui chain on deployment because it's the EVM address,
   // we wait for the tx to be executed then we update the address on the Sui chain
   useEffect(() => {
+    const suiChain = interchainToken?.matchingTokens?.find((x) =>
+      x.chain?.id.includes("sui")
+    );
+
     if (
       !isAlreadyUpdatingRemoteSui &&
+      suiChain &&
       interchainToken?.matchingTokens?.some(
         (x) =>
-          x.chain?.id.includes("sui") &&
+          x.chain?.id === suiChain?.chain?.id &&
           x.tokenAddress === props.tokenAddress &&
           x.isRegistered
       ) &&
       props.tokenId
     ) {
       setAlreadyUpdatingRemoteSui(true);
-      updateSuiAddresses({ tokenId: props.tokenId })
+      updateSuiAddresses({
+        tokenId: props.tokenId
+      })
         .then(() => {
           setAlreadyUpdatingRemoteSui(false);
           refetchPageData();
