@@ -1,7 +1,6 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { pgEnum, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { Address } from "viem";
 
 export const AUDIT_EVENT_KINDS = [
   "unauthorized_access_attempt",
@@ -12,7 +11,7 @@ export type AuditLogEventKind = (typeof AUDIT_EVENT_KINDS)[number];
 
 export type EVENT_KIND_MAP = {
   unauthorized_access_attempt: {
-    accountAddress: Address;
+    accountAddress: string;
     ip: string;
     userAgent: string;
   };

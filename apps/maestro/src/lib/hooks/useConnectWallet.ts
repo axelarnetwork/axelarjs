@@ -6,6 +6,7 @@ import {
   useConnectWallet as useSuiConnectWallet,
   useWallets,
 } from "@mysten/dapp-kit";
+import { isBrowser, setAllowed } from "@stellar/freighter-api";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
@@ -52,8 +53,25 @@ export function useConnectWallet() {
     return false;
   };
 
+  const tryConnectStellarWallet = async () => {
+    console.log("trying to connect to stellar wallet");
+    if (!isBrowser) {
+      console.error("Stellar wallet is not available in this environment");
+      return false;
+    }
+    try {
+      const a = await setAllowed();
+      console.log("the result is", a);
+      return true;
+    } catch (error) {
+      console.error(`Failed to connect to Stellar wallet:`, error);
+      return false;
+    }
+  };
+
   const chainHandlers: Record<number, WalletHandler> = {
     [suiChainConfig.id]: () => tryConnectSuiWallet(),
+    [102]: () => tryConnectStellarWallet(), // Stellar chain ID
   };
 
   const defaultHandler: WalletHandler = (chainId) => {
