@@ -3,6 +3,7 @@ import { keccak256, stringToHex } from "viem";
 import type { SuiChainConfig } from "@axelarjs/api";
 
 import { suiClient } from "~/lib/clients/suiClient";
+import { suiChainConfig } from "~/config/chains";
 
 export function setupTxBuilder(sender: string) {
   const txBuilder = new TxBuilder(suiClient);
@@ -28,15 +29,14 @@ export async function getTokenIdByCoinMetadata(
   txBuilder: TxBuilder,
   coinType: string,
   coinMetadata: any,
-  suiChainConfig: any,
+  chainConfig: SuiChainConfig,
   isCanonical: boolean = false
 ) {
-  const { InterchainTokenService: ITS, AxelarGateway } = suiChainConfig.contracts;
-  const suiChainId = suiChainConfig.axelarId
+  const { InterchainTokenService: ITS, AxelarGateway } = chainConfig.config.contracts;
   const [ChainNameHash] = await txBuilder.moveCall({
     target: `${AxelarGateway.address}::bytes32::from_bytes`,
     arguments: [
-      keccak256(stringToHex(suiChainId)),
+      keccak256(stringToHex(suiChainConfig.axelarChainId)),
     ],
   });
   const [TokenId] = await txBuilder.moveCall({
