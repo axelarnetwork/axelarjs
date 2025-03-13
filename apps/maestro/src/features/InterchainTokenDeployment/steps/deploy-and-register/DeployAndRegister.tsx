@@ -24,6 +24,7 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
