@@ -17,7 +17,6 @@ import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
-import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "~/ui/compounds/MultiStepForm";
