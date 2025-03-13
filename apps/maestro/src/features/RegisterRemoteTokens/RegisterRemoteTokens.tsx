@@ -8,6 +8,7 @@ import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
 
+import { suiChainConfig } from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import {
   useTransactionState,
@@ -18,7 +19,6 @@ import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
-import { suiChainConfig } from "~/config/chains";
 
 export type RegisterRemoteTokensProps = {
   tokenAddress: string;
@@ -191,15 +191,17 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   ]);
 
   const handleClick = useCallback(async () => {
-    if (!registerTokensAsync) return;
-
-    setTxState({
-      status: "awaiting_approval",
-    });
-
-    const txPromise = registerTokensAsync();
-
     try {
+      if (!registerTokensAsync) {
+        throw new Error("registerTokensAsync is not defined");
+      }
+
+      setTxState({
+        status: "awaiting_approval",
+      });
+
+      const txPromise = registerTokensAsync();
+
       const result = await txPromise;
       setTxState({
         status: "submitted",
