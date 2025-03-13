@@ -12,8 +12,14 @@ export class AxelarConfigClient extends RestService {
   }
 
   async getAxelarConfigs(env: Environment) {
+    // TODO: use 1.x for all envs once ayush fixes the config
+    const fileName =
+      env === "devnet-amplifier"
+        ? `configs/${env}-config-1.0.x.json`
+        : `configs/${env}-config-1.x.json`;
+
     return this.client
-      .get(`configs/${env}-config-1.x.json`)
+      .get(fileName)
       .json<AxelarConfigsResponse>();
   }
 
