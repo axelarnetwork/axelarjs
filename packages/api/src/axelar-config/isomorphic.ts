@@ -13,7 +13,7 @@ export class AxelarConfigClient extends RestService {
 
   async getAxelarConfigs(env: Environment) {
     return this.client
-      .get(`configs/${env}-config-1.x.json`)
+      .get(`configs/${env}-config-1.0.x.json`)
       .json<AxelarConfigsResponse>();
   }
 
