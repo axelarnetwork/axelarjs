@@ -22,14 +22,14 @@ import {
   NEXT_PUBLIC_NETWORK_ENV,
 } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
 import axelarscanClient from "~/services/axelarscan";
 import MaestroKVClient from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
-import { axelarConfigs, evmChains, vmChains } from "./utils";
+import { axelarConfigs, evmChains, vmChains, chains } from "./utils";
 
 export interface ContextConfig {
   req: NextApiRequest;
@@ -49,9 +49,10 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const axelarQueryClient = createAxelarQueryClient(NEXT_PUBLIC_NETWORK_ENV);
+  const networkEnv = NEXT_PUBLIC_NETWORK_ENV
 
-  const axelarConfigClient = createAxelarConfigClient(NEXT_PUBLIC_NETWORK_ENV);
+  const axelarQueryClient = createAxelarQueryClient(networkEnv);
+  const axelarConfigClient = createAxelarConfigClient(networkEnv);
 
   return {
     req,
@@ -66,27 +67,29 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     },
     configs: {
       /**
-       * Cached accessor for EVM chain configs
+       * Cached accessor for chain configs
        */
       evmChains: evmChains.bind(
         null,
         maestroKVClient,
         axelarscanClient,
-        "evmChains" as const
+        "chains-evm" as const
       ),
       vmChains: vmChains.bind(
         null,
         maestroKVClient,
         axelarscanClient,
-        "vmChains" as const
+        "chains-vm" as const
       ),
+      chains: chains.bind(null, maestroKVClient, axelarscanClient, "chains" as const),
       axelarConfigs: axelarConfigs.bind(
         null,
         maestroKVClient,
         axelarConfigClient,
         "axelarConfigs" as const
       ),
-      wagmiChainConfigs: WAGMI_CHAIN_CONFIGS,
+      // TODO: rename this to chainConfigs
+      wagmiChainConfigs: CHAIN_CONFIGS,
     },
     persistence: {
       /**
@@ -99,14 +102,20 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       postgres: maestroPostgresClient,
     },
     contracts: {
-      createERC20Client(chain: Chain, address: `0x${string}`) {
-        return new IERC20BurnableMintableClient({ chain, address });
+      createERC20Client(chain: Chain, address: string) {
+        return new IERC20BurnableMintableClient({
+          chain,
+          address: address as `0x${string}`,
+        });
       },
       createInterchainTokenClient(chain: Chain, address: `0x${string}`) {
         return new InterchainTokenClient({ chain, address });
       },
       createTokenManagerClient(chain: Chain, address: string) {
-        return new TokenManagerClient({ chain, address: address as `0x${string}` });
+        return new TokenManagerClient({
+          chain,
+          address: address as `0x${string}`,
+        });
       },
       createInterchainTokenServiceClient(
         chain: Chain,

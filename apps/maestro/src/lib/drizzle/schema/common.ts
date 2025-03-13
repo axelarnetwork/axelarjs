@@ -1,44 +1,33 @@
 import { PgEnum, pgEnum, timestamp, varchar } from "drizzle-orm/pg-core";
 
-export const ADDRESS_LENGTH = 42;
 export const HASH_LENGTH = 66;
 
 // common fields
 
 /**
- * This is a composite field. Format: `0x${string)-${number}`
+ * This is a composite field. Format: `${string)-${number}`
  */
-export const deploymentMessageId = varchar("deployment_message_id", {
-  length: HASH_LENGTH + 5, // up to 10k indexes
-});
+export const deploymentMessageId = varchar("deployment_message_id");
 
 /**
- * Token address. Format: `0x${string}`
+ * Token address. Format: `${string}`
  */
-export const tokenAddress = varchar("token_address", {
-  length: ADDRESS_LENGTH,
-});
+export const tokenAddress = varchar("token_address");
 
 /**
- * This is the address of the account. Format: `0x${string}`
+ * This is the address of the account. Format: `${string}`
  */
-export const accountAddress = varchar("account_address", {
-  length: ADDRESS_LENGTH,
-});
+export const accountAddress = varchar("account_address");
 
 /**
- * This is the address of the token manager contract. Format: `0x${string}`
+ * This is the address of the token manager contract. Format: `${string}`
  */
-export const tokenManagerAddress = varchar("token_manager_address", {
-  length: ADDRESS_LENGTH,
-});
+export const tokenManagerAddress = varchar("token_manager_address");
 
 /**
  * This is an internal identifier for the chain. Format: `${string}`
  */
-export const axelarChainId = varchar("axelar_chain_id", {
-  length: HASH_LENGTH,
-});
+export const axelarChainId = varchar("axelar_chain_id");
 
 export const createdAt = timestamp("created_at").defaultNow();
 

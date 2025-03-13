@@ -42,7 +42,7 @@ export const ITOKEN_MANAGER_PROXY_ENCODERS = {
 };
 
 export function createITokenManagerProxyReadClient(
-  publicClient: PublicContractClient<any>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     getImplementationTypeAndTokenAddress() {

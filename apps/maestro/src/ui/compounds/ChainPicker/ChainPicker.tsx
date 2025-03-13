@@ -46,7 +46,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
   }, [eligibleChains, onChainClick, selectedChains]);
 
   const getChainName = (chain: ChainConfig) => {
-    return chain.name
+    return chain.name;
   };
 
   return (
@@ -108,9 +108,9 @@ const ChainPicker: FC<ChainPickerProps> = ({
         })}
       </div>
       <div className="grid place-content-center">
-        <Button 
-          $size="sm" 
-          $variant="ghost" 
+        <Button
+          $size="sm"
+          $variant="ghost"
           onClick={handleToggleAll}
           disabled={disabled || eligibleChains.length === 0}
         >

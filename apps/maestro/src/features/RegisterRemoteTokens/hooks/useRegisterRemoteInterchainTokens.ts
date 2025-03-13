@@ -1,9 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { zeroAddress } from "viem";
-import { useChainId } from "wagmi";
-
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -12,20 +9,21 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
+import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
 export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
 };
 
 export default function useRegisterRemoteInterchainTokens(
   input: RegisterRemoteInterchainTokensInput
 ) {
-
   const { combinedComputed } = useAllChainConfigsQuery();
 
   const chainId = useChainId();
@@ -38,9 +36,7 @@ export default function useRegisterRemoteInterchainTokens(
     [input.chainIds, combinedComputed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map(
-    (chain) => chain.chain_name
-  );
+  const destinationChainIds = destinationChains.map((chain) => chain.id);
 
   const sourceChain = useMemo(
     () => combinedComputed.indexedByChainId[chainId],
@@ -71,8 +67,6 @@ export default function useRegisterRemoteInterchainTokens(
     return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        originalChainName: "",
-        minter: tokenDeployment.originalMinterAddress ?? zeroAddress,
         destinationChain: chainId,
         gasValue: gasFeesData.gasFees[i].fee,
       })
@@ -85,20 +79,41 @@ export default function useRegisterRemoteInterchainTokens(
     value: totalGasFee,
     args: [multicallArgs],
     query: {
-      enabled: multicallArgs.length > 0,
+      enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
     },
   });
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
+  const { registerRemoteInterchainToken } =
+    useRegisterRemoteInterchainTokenOnSui();
+
+  if (!tokenDeployment) return;
+
+  const suiInput = {
+    axelarChainIds: destinationChainIds,
+    originChainId: input.originChainId,
+    tokenAddress: input.tokenAddress,
+    symbol: tokenDeployment.tokenSymbol,
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? []
+  };
+
   return {
     ...mutation,
     writeContract: () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
+
       if (!config) return;
 
       return mutation.writeContract(config.request);
     },
     writeContractAsync: async () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
+
       if (!config) return;
 
       return await mutation.writeContractAsync(config.request);

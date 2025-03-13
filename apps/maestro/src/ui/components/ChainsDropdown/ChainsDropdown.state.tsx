@@ -13,7 +13,10 @@ function useChainsDropdownState(initialState = INITIAL_STATE) {
   );
 
   const actions = {
-    selectChainId: (chainId: number | null, chainType?: "evm" | "vm" | null) => {
+    selectChainId: (
+      chainId: number | null,
+      chainType?: "evm" | "vm" | null
+    ) => {
       setState((state) => {
         state.selectedChainId = chainId;
         if (chainType !== undefined) {

@@ -15,7 +15,7 @@ export const NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID = Maybe.of(
 
 export const NEXT_PUBLIC_NETWORK_ENV = String(
   process.env.NEXT_PUBLIC_NETWORK_ENV ?? "testnet"
-) as "mainnet" | "testnet";
+) as "mainnet" | "testnet" | "devnet-amplifier";
 
 export const NEXT_PUBLIC_AXELAR_CONFIGS_URL = Maybe.of(
   process.env.NEXT_PUBLIC_AXELAR_CONFIGS_URL

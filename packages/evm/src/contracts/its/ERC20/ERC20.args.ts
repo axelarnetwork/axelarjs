@@ -216,7 +216,9 @@ export const ERC20_ENCODERS = {
   },
 };
 
-export function createERC20ReadClient(publicClient: PublicContractClient<any>) {
+export function createERC20ReadClient(
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
+) {
   return {
     allowance(allowanceArgs: ERC20AllowanceArgs) {
       const encoder = ERC20_ENCODERS["allowance"];

@@ -1,18 +1,15 @@
 import {
   Alert,
-  Button,
   CopyToClipboardButton,
   Dialog,
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress} from "@axelarjs/utils";
-import { useCallback, useEffect, useState, useMemo, type FC } from "react";
+import { maskAddress } from "@axelarjs/utils";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
-import { useAccount } from "wagmi";
-
-import { useChainFromRoute } from "~/lib/hooks";
+import { useAccount, useChainFromRoute } from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -41,17 +38,26 @@ const Review: FC = () => {
 
   // persist token deployment tx hash
   useEffect(() => {
-    if (chain && state.txState.type === "deployed") {
+    if (
+      chain &&
+      Object.keys(combinedComputed.indexedById).length > 0 &&
+      state.txState.type === "deployed"
+    ) {
       persistTokenDeploymentTxHash(
         state.txState.tokenAddress,
         chain.id,
         state.txState.txHash,
-        state.selectedChains.map(
-          (axelarChainId) => combinedComputed.indexedById[axelarChainId].chain_id
-        )
+        state.selectedChains.map((axelarChainId) => {
+          return combinedComputed.indexedById[axelarChainId].chain_id;
+        })
       );
     }
-  }, [chain, combinedComputed.indexedById, state.selectedChains, state.txState]);
+  }, [
+    chain,
+    combinedComputed.indexedById,
+    state.selectedChains,
+    state.txState,
+  ]);
 
   const chainConfig = useMemo(() => {
     if (!chain) return undefined;
@@ -63,12 +69,12 @@ const Review: FC = () => {
       actions.reset();
 
       await router.push(
-        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
+        `/${chainConfig.id.toLowerCase()}/${state.txState.tokenAddress}`
       );
     }
   }, [actions, chainConfig, router, state.txState]);
 
-  const isVMChain = chainConfig?.chain_type === 'vm';
+  const isVMChain = chainConfig?.chain_type === "vm";
 
   return (
     <>
@@ -128,27 +134,21 @@ const Review: FC = () => {
         )}
       </div>
       <Dialog.Actions>
-        {routeChain ? (
-          <Dialog.CloseAction
-            $length="block"
-            $variant="primary"
-            onClick={async () => {
-              setShouldFetch(true);
+        <Dialog.CloseAction
+          $length="block"
+          $variant="primary"
+          disabled={!routeChain && (!chainConfig || state.txState.type !== "deployed")}
+          onClick={async () => {
+            setShouldFetch(true);
+            if (routeChain) {
               await router.replace(router.asPath);
-            }}
-          >
-            View token page!
-          </Dialog.CloseAction>
-        ) : (
-          <Button
-            $length="block"
-            $variant="primary"
-            disabled={!chainConfig || state.txState.type !== "deployed"}
-            onClick={handleGoToTokenPage}
-          >
-            Go to token page!
-          </Button>
-        )}
+            } else {
+              await handleGoToTokenPage();
+            }
+          }}
+        >
+          {routeChain ? "View token page!" : "Go to token page!"}
+        </Dialog.CloseAction>
       </Dialog.Actions>
     </>
   );

@@ -4,7 +4,6 @@ import {
   type Environment,
 } from "@axelar-network/axelarjs-sdk";
 
-import { getNativeToken } from "~/lib/utils/getNativeToken";
 import type {
   EstimateGasFeeInput,
   EstimateGasFeeMultipleChainsInput,
@@ -16,24 +15,24 @@ export const client = new AxelarQueryAPI({
 });
 
 async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
-  const response = await client.estimateGasFee(
-    params.sourceChainId,
-    params.destinationChainId,
-    params.gasLimit,
-    params.gasMultiplier,
-    params.sourceChainTokenSymbol,
-    params.minGasPrice,
-    params.executeData as `0x${string}` | undefined
-  );
+  const hopParams = [
+    {
+      ...params,
+      sourceChain: params.sourceChainId,
+      destinationChain: "axelar",
+      gasLimit: params.gasLimit.toString(),
+    },
+    {
+      ...params,
+      sourceChain: "axelar",
+      destinationChain: params.destinationChainId,
+      gasLimit: params.gasLimit.toString(),
+    },
+  ];
 
-  const rawFee =
-    typeof response === "string"
-      ? response
-      : response.baseFee +
-        response.l1ExecutionFeeWithMultiplier +
-        response.executionFeeWithMultiplier;
+  const fee = await client.estimateMultihopFee(hopParams);
 
-  return BigInt(rawFee);
+  return BigInt(fee as string);
 }
 
 async function estimateGasFeeMultipleChains(
@@ -44,7 +43,6 @@ async function estimateGasFeeMultipleChains(
       estimateGasFee({
         ...params,
         destinationChainId,
-        sourceChainTokenSymbol: getNativeToken(params.sourceChainId),
       })
         .then((fee) => ({
           status: "success" as const,
@@ -70,6 +68,7 @@ async function estimateGasFeeMultipleChains(
   };
 }
 
+// TODO: Find out why do we need chain configs from axelarjs-sdk while we already have them in axelarscan API
 async function getChainInfo(params: GetChainInfoInput) {
   const chains = await getChainConfigs({
     environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,

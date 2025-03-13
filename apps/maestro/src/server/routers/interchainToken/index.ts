@@ -1,6 +1,7 @@
 import { router } from "~/server/trpc";
 import { findInterchainTokenByTokenId } from "./findInterchainTokenByTokenId";
 import { getInterchainTokenABI } from "./getInterchainTokenABI";
+import { getInterchainTokenBalanceForOwner } from "./getInterchainTokenBalanceForOwner";
 import { getInterchainTokenByTokenId } from "./getInterchainTokenByTokenId";
 import { getInterchainTokenDetails } from "./getInterchainTokenDetails";
 import { getInterchainTokenMeta } from "./getInterchainTokenMeta";
@@ -15,6 +16,8 @@ import { recoverCanonicalTokenByTokenId } from "./recoverCanonicalTokenByTokenId
 import { recoverDeploymentMessageIdByTokenId } from "./recoverDeploymentMessageIdByTokenId";
 import { searchInterchainToken } from "./searchInterchainToken";
 import { setInterchainTokenIconUrl } from "./setInterchainTokenIconUrl";
+import { updateEVMRemoteTokenAddress } from "./updateEVMRemoteAddresses";
+import { updateSuiRemoteTokenAddresses } from "./updateSuiRemoteTokenAddresses";
 
 export const interchainTokenRouter = router({
   getInterchainTokenABI,
@@ -33,6 +36,9 @@ export const interchainTokenRouter = router({
   recoverCanonicalTokenByTokenId,
   recoverDeploymentMessageIdByTokenId,
   setInterchainTokenIconUrl,
+  updateEVMRemoteTokenAddress,
+  updateSuiRemoteTokenAddresses,
+  getInterchainTokenBalanceForOwner,
 });
 
 // export type definition of API

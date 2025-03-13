@@ -22,13 +22,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { useAccount, useDisconnect } from "wagmi";
-
 import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
+import { useAccount, useDisconnect } from "~/lib/hooks";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
-import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
+import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 import { useLayoutStateContainer } from "./MainLayout.state";
 import MainMenu from "./MainMenu";
 
@@ -40,7 +39,6 @@ const Appbar: FC<AppbarProps> = (props) => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const { chain } = useAccount();
-
   const router = useRouter();
 
   const isSticky = useIsSticky(100);
@@ -110,7 +108,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                 </Card>
               </>
             ) : (
-              <ConnectWalletButton />
+              <ConnectWalletModal />
             )}
           </>
           <div className="flex-1" />
@@ -208,7 +206,7 @@ const Appbar: FC<AppbarProps> = (props) => {
               </Dropdown>
             </>
           ) : (
-            <ConnectWalletButton />
+            <ConnectWalletModal $size="sm" />
           )}
           <ThemeSwitcher />
 
