@@ -213,7 +213,7 @@ async function getInterchainToken(
         } else if (chainConfig?.axelarChainId.includes("sui")) {
           const suiTxHash = await findSuiTxHashFromGmp(
             ctx,
-            tokenDetails.deploymentMessageId
+            remoteToken.deploymentMessageId
           );
 
           if (!suiTxHash) {
@@ -224,7 +224,7 @@ async function getInterchainToken(
           }
 
           const { isRegistered, tokenAddress } =
-            await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
+          await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
 
           return {
             ...remoteTokenDetails,
