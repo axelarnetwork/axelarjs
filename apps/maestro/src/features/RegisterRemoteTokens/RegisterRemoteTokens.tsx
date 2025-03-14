@@ -3,7 +3,6 @@ import { Alert, Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
