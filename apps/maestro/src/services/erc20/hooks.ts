@@ -14,7 +14,7 @@ export function useERC20TokenDetailsQuery(input: {
       tokenAddress: String(input.tokenAddress),
     },
     {
-      enabled: isAddress(input.tokenAddress ?? ""),
+      enabled: !!input.tokenAddress,
       retry: false,
       staleTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,
@@ -27,7 +27,7 @@ export function useERC20TokenBalanceForOwnerQuery(input: {
   tokenAddress?: `0x${string}`;
   owner?: `0x${string}`;
 }) {
-  return trpc.erc20.getERC20TokenBalanceForOwner.useQuery(
+  return trpc.interchainToken.getInterchainTokenBalanceForOwner.useQuery(
     {
       chainId: Number(input.chainId),
       tokenAddress: String(input.tokenAddress),

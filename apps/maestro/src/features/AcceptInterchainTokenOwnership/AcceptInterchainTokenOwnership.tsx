@@ -43,13 +43,13 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     await Promise.all([
       trpcContext.interchainToken.searchInterchainToken.invalidate(),
       trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
-      trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
     ]);
 
     await Promise.all([
       trpcContext.interchainToken.searchInterchainToken.refetch(),
       trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
-      trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
     ]);
 
     setTxState({
@@ -62,7 +62,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     acceptTxHash,
     receipt,
     setTxState,
-    trpcContext.erc20.getERC20TokenBalanceForOwner,
+    trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
     trpcContext.interchainToken.getInterchainTokenDetails,
     trpcContext.interchainToken.searchInterchainToken,
   ]);

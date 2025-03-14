@@ -80,7 +80,7 @@ export default {
           type: "uint256",
         },
         {
-          internalType: "address",
+          internalType: "contract ITokenManager",
           name: "tokenManager",
           type: "address",
         },

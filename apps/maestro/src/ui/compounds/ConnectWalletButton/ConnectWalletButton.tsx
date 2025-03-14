@@ -6,7 +6,15 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 type Props = ButtonProps;
 
 const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
-  (props, ref) => {
+  (
+    {
+      $size = "sm",
+      $variant = "primary",
+      children = "Connect Wallet",
+      ...props
+    },
+    ref
+  ) => {
     const { open } = useWeb3Modal();
 
     return (
@@ -15,17 +23,15 @@ const ConnectWalletButton = forwardRef<HTMLButtonElement, Props>(
         {...props}
         onClick={open.bind(null, { view: "Connect" })}
         ref={ref}
-      />
+        $size={$size}
+        $variant={$variant}
+      >
+        {children}
+      </Button>
     );
   }
 );
 
 ConnectWalletButton.displayName = "ConnectWalletButton";
-
-ConnectWalletButton.defaultProps = {
-  $size: "sm",
-  $variant: "primary",
-  children: "Connect Wallet",
-};
 
 export default ConnectWalletButton;

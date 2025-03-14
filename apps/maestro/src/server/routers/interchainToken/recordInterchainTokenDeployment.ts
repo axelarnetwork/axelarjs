@@ -1,7 +1,8 @@
 import { invariant, Maybe } from "@axelarjs/utils";
 
-import { always, chain } from "rambda";
+import { always } from "rambda";
 import { z } from "zod";
+import { ExtendedWagmiChainConfig } from "~/config/chains";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
@@ -10,13 +11,9 @@ import {
   type NewRemoteInterchainTokenInput,
 } from "~/services/db/postgres";
 
-const recordInterchainTokenDeploymentInput = newInterchainTokenSchema
-  .extend({
-    destinationAxelarChainIds: z.array(z.string()),
-  })
-  .omit({
-    tokenManagerAddress: true,
-  });
+const recordInterchainTokenDeploymentInput = newInterchainTokenSchema.extend({
+  destinationAxelarChainIds: z.array(z.string()),
+});
 
 export type RecordInterchainTokenDeploymentInput = z.infer<
   typeof recordInterchainTokenDeploymentInput
@@ -26,50 +23,63 @@ export const recordInterchainTokenDeployment = protectedProcedure
   .input(recordInterchainTokenDeploymentInput)
   .mutation(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "ctx.session.address is required");
+    let tokenManagerAddress;
+    let tokenManagerType;
+    const chains = await ctx.configs.chains();
 
-    const evmChains = await ctx.configs.evmChains();
-    const vmChains = await ctx.configs.vmChains();
-    const configs =
-      evmChains[input.axelarChainId] || vmChains[input.axelarChainId];
+    if (!input.axelarChainId.includes("sui")) {
+      const configs = chains[input.axelarChainId];
 
-    invariant(
-      configs,
-      `No configuration found for chain ${input.axelarChainId}`
-    );
+      invariant(
+        configs,
+        `No configuration found for chain ${input.axelarChainId}`
+      );
 
-    // Handle different chain types
-    const createServiceClient = () => {
-      return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
-    };
+      invariant(
+        configs.wagmi,
+        `No wagmi configuration found for chain ${input.axelarChainId}`
+      );
 
-    const originChainServiceClient = createServiceClient();
+      // Handle different chain types
+      const createServiceClient = () => {
+        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi as ExtendedWagmiChainConfig);
+      };
 
-    const tokenManagerAddress = (await originChainServiceClient.reads
-      .tokenManagerAddress({
-        tokenId: input.tokenId as `0x${string}`,
-      })
-      .catch(() => null)) as `0x${string}`;
+      const originChainServiceClient = createServiceClient();
 
-    const createTokenManagerClient = (address: string) => {
-      return ctx.contracts.createTokenManagerClient(configs.wagmi, address);
-    };
+      tokenManagerAddress = (await originChainServiceClient.reads
+        .tokenManagerAddress({
+          tokenId: input.tokenId as `0x${string}`,
+        })
+        .catch(() => null)) as `0x${string}`;
 
-    const tokenManagerClient = !tokenManagerAddress
-      ? null
-      : createTokenManagerClient(tokenManagerAddress);
+      const createTokenManagerClient = (address: string) => {
+        return ctx.contracts.createTokenManagerClient(configs.wagmi as ExtendedWagmiChainConfig, address);
+      };
 
-    const tokenManagerTypeCode = !tokenManagerClient
-      ? null
-      : await tokenManagerClient.reads.implementationType().catch(() => null);
+      const tokenManagerClient = !tokenManagerAddress
+        ? null
+        : createTokenManagerClient(tokenManagerAddress);
 
-    const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOr(
-      input.kind === "canonical" ? "lock_unlock" : "mint_burn",
-      (value) => getTokenManagerTypeFromBigInt(value as bigint)
-    );
+      const tokenManagerTypeCode = !tokenManagerClient
+        ? null
+        : await tokenManagerClient.reads.implementationType().catch(() => null);
+
+      tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOr(
+        // default to mint_burn for interchain tokens
+        // and lock_unlock for canonical tokens
+        input.kind === "canonical" ? "lock_unlock" : "mint_burn",
+        (value) => getTokenManagerTypeFromBigInt(value as bigint)
+      );
+    } else {
+      // TODO: verify this info on chain
+      tokenManagerAddress = input.tokenManagerAddress;
+      tokenManagerType = input.tokenManagerType;
+    }
 
     await ctx.persistence.postgres.recordInterchainTokenDeployment({
       ...input,
-      tokenManagerAddress: tokenManagerAddress,
+      tokenManagerAddress,
       tokenManagerType,
     });
 
@@ -79,58 +89,41 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
     const remoteTokens = await Promise.all(
       input.destinationAxelarChainIds.map(async (axelarChainId) => {
-        // Fetch both chain types
-        const vmChains = await ctx.configs.vmChains();
-        const evmChains = await ctx.configs.evmChains();
-
-        // Create a Map using chain_id as the key to ensure uniqueness
-        const uniqueChains = new Map();
-
-        // Add VM chains first, accessing the 'info' property
-        Object.values(vmChains).forEach((chainConfig) => {
-          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
-        });
-
-        // Add EVM chains, overwriting any duplicates
-        Object.values(evmChains).forEach((chainConfig) => {
-          uniqueChains.set(chainConfig.info.chain_id, chainConfig);
-        });
-
-        // Convert back to an object with axelarChainId as keys
-        const chains = Array.from(uniqueChains.values()).reduce(
-          (acc, chainConfig) => {
-            acc[chainConfig.info.id] = chainConfig;
-            return acc;
-          },
-          {} as Record<string, typeof chain>
-        );
-
         const chainConfig = chains[axelarChainId];
         invariant(
           chainConfig,
           `No configuration found for chain ${axelarChainId}`
         );
-        invariant(
-          chainConfig.wagmi,
-          `No wagmi configuration found for chain ${axelarChainId}`
-        );
+        let tokenAddress;
+        let tokenManagerAddress;
 
-        const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-          chainConfig.wagmi
-        );
+        if (!axelarChainId.includes("sui")) {
+          invariant(
+            chainConfig.wagmi,
+            `No wagmi configuration found for chain ${axelarChainId}`
+          );
+          const itsClient = ctx.contracts.createInterchainTokenServiceClient(
+            chainConfig.wagmi
+          );
 
-        const [tokenManagerAddress, tokenAddress] = await Promise.all([
-          itsClient.reads
-            .tokenManagerAddress({
-              tokenId: input.tokenId as `0x${string}`,
-            })
-            .catch(always("0x")),
-          itsClient.reads
-            .interchainTokenAddress({
-              tokenId: input.tokenId as `0x${string}`,
-            })
-            .catch(always("0x")),
-        ]);
+          [tokenManagerAddress, tokenAddress] = await Promise.all([
+            itsClient.reads
+              .tokenManagerAddress({
+                tokenId: input.tokenId as `0x${string}`,
+              })
+              .catch(always("0x")),
+            itsClient.reads
+              .interchainTokenAddress({
+                tokenId: input.tokenId as `0x${string}`,
+              })
+              .catch(always(input.tokenAddress)),
+          ]);
+        } else if (axelarChainId.includes("sui")) {
+          // the address should be different from the address in the origin chain
+          // but this will be updated later in tokens page
+          tokenAddress = input.tokenAddress;
+          tokenManagerAddress = input.tokenManagerAddress;
+        }
 
         return {
           tokenAddress,
@@ -146,22 +139,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
       })
     );
 
-    const validTokens = remoteTokens.filter(
-      (token) => token.tokenAddress !== "0x"
-    );
-
-    if (validTokens.length !== remoteTokens.length) {
-      console.log(
-        "recordInterchainTokenDeployment: some tokens are not valid",
-        {
-          invalidTokens: remoteTokens.filter(
-            (token) => token.tokenAddress === "0x"
-          ),
-        }
-      );
-    }
-
     await ctx.persistence.postgres.recordRemoteInterchainTokenDeployments(
-      validTokens as NewRemoteInterchainTokenInput[]
+      remoteTokens as NewRemoteInterchainTokenInput[]
     );
   });

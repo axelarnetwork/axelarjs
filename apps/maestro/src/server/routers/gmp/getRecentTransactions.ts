@@ -4,14 +4,13 @@ import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
-import { hex40Literal } from "~/lib/utils/validation";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
   pageSize: z.number().optional().default(20),
   page: z.number().optional().default(0),
-  senderAddress: hex40Literal().optional(),
+  senderAddress: z.union([hex40Literal(), hex64Literal()]).optional(),
   contractMethod: z.union([
     z.literal("InterchainTransfer"),
     z.literal("InterchainTokenDeploymentStarted"),
@@ -39,8 +38,6 @@ export const getRecentTransactions = publicProcedure
     try {
       const response = await ctx.services.gmp.searchGMP({
         senderAddress: input.senderAddress,
-        destinationContractAddress:
-          NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
         size: input.pageSize,
         from: input.page * input.pageSize,
         contractMethod: input.contractMethod,
@@ -57,13 +54,22 @@ export const getRecentTransactions = publicProcedure
 
       const deduped = uniqBy((tx) => tx.call.transactionHash, response);
 
-      return deduped.map(({ call, status, ...tx }) => ({
-        status,
-        hash: call.transactionHash,
-        blockHash: call.blockHash,
-        timestamp: call.block_timestamp,
-        event: extractEvent(tx, input.contractMethod),
-      })) as RecentTransactionsOutput;
+      return deduped.map(({ call, status, ...tx }) => {
+        const event = extractEvent(tx, input.contractMethod);
+
+        // Ensure tokenId starts with 0x if present, this is a workaround for the api
+        if (event?.tokenId && !event.tokenId.startsWith("0x")) {
+          event.tokenId = `0x${event.tokenId}`;
+        }
+
+        return {
+          status,
+          hash: call.transactionHash,
+          blockHash: call.blockHash,
+          timestamp: call.block_timestamp,
+          event: extractEvent(tx, input.contractMethod),
+        };
+      }) as RecentTransactionsOutput;
     } catch (error) {
       if (error instanceof TRPCError) {
         throw error;

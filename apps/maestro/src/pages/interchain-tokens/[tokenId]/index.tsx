@@ -12,7 +12,8 @@ const TokenDetailsRedirectPage = () => {
   );
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { combinedComputed, isLoading: isLoadingChains } = useAllChainConfigsQuery();
+  const { combinedComputed, isLoading: isLoadingChains } =
+    useAllChainConfigsQuery();
 
   const { tokenId } = router.query;
 
@@ -34,20 +35,18 @@ const TokenDetailsRedirectPage = () => {
     const wagmiChain = combinedComputed.wagmiChains.find(
       (c) => c.axelarChainId === interchainToken.axelarChainId
     );
+    const vmChain = combinedComputed.indexedById[interchainToken.axelarChainId];
+    const chainName = wagmiChain?.axelarChainName || vmChain?.chain_name;
 
     setLoadingMessage("Redirecting...");
 
-    if (!wagmiChain) {
+    if (!chainName) {
       setErrorMessage("Axelar chain not found");
       return;
     }
 
     router
-      .push(
-        `/${wagmiChain.axelarChainName.toLowerCase()}/${
-          interchainToken.tokenAddress
-        }`
-      )
+      .push(`/${chainName.toLowerCase()}/${interchainToken.tokenAddress}`)
       .catch(() => {
         setErrorMessage("Error redirecting to token details page");
       });

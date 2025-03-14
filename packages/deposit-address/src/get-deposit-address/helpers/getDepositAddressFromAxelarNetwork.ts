@@ -48,7 +48,7 @@ export async function getDepositAddressFromAxelarNetwork(
 
 function findLinkRequest(
   params: ListenerParams,
-  module: "evm" | "axelarnet" | undefined,
+  module: "evm" | "axelarnet" | "sui" | undefined,
   results: LinkRequestResponse[]
 ) {
   return results.find((linkRequest) => {
@@ -81,13 +81,13 @@ async function waitForDepositAddress(
   axelarscanClient: AxelarscanClient
 ) {
   const srcChainConfig = chainConfigs.chains[params.sourceChain.toLowerCase()];
+  const chainType = srcChainConfig?.chainType;
   return findLinkRequest(
     params,
-    srcChainConfig?.chainType,
+    chainType,
     await poll(
       () => axelarscanClient.getRecentLinkTransactions({ size: 10 }),
-      (res: LinkRequestResponse[]) =>
-        !findLinkRequest(params, srcChainConfig?.chainType, res),
+      (res: LinkRequestResponse[]) => !findLinkRequest(params, chainType, res),
       5_000,
       5
     )

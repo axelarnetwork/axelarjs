@@ -3,12 +3,12 @@ import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
-import { useChainId } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -23,11 +23,14 @@ export type UseStep2ChainSelectionStateProps = {
 export function useStep2ChainSelectionState() {
   const { allChains } = useAllChainConfigsQuery();
   const chainId = useChainId();
+  const userBalance = useBalance();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, setTotalGasFee] = useState(formatEther(0n));
 
   const [sourceChainId, setSourceChainId] = useState<string>(() => {
-    const chain = allChains?.find((chain: ChainConfig) => chain.chain_id === chainId);
+    const chain = allChains?.find(
+      (chain: ChainConfig) => chain.chain_id === chainId
+    );
     return chain?.id || "";
   });
 
@@ -47,9 +50,9 @@ export function useStep2ChainSelectionState() {
 
   useEffect(() => {
     Maybe.of(remoteDeploymentGasFees?.totalGasFee)
-      .map(toNumericString)
+      .map((value) => toNumericString(value, userBalance?.decimals || 18))
       .map(setTotalGasFee);
-  }, [remoteDeploymentGasFees, setTotalGasFee]);
+  }, [remoteDeploymentGasFees, setTotalGasFee, userBalance?.decimals]);
 
   const resetState = () => {
     setIsDeploying(false);
@@ -62,7 +65,7 @@ export function useStep2ChainSelectionState() {
     );
     if (!candidateChain || candidateChain.chain_name === sourceChainId) return;
 
-    setSourceChainId(candidateChain.chain_name);
+    setSourceChainId(candidateChain.id);
   }, [allChains, chainId, sourceChainId]);
 
   return {

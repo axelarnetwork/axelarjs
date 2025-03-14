@@ -94,7 +94,7 @@ export const INTERCHAIN_TOKEN_STANDARD_ENCODERS = {
 };
 
 export function createInterchainTokenStandardReadClient(
-  publicClient: PublicContractClient<any>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     interchainTokenId() {
