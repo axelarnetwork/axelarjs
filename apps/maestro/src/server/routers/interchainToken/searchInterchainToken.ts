@@ -223,8 +223,7 @@ async function getInterchainToken(
             };
           }
 
-          const { isRegistered, tokenAddress } =
-          await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
+          const { isRegistered, tokenAddress } = await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
 
           return {
             ...remoteTokenDetails,
