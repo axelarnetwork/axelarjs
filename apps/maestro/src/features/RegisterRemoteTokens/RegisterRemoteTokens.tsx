@@ -222,7 +222,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         setTxState({
           status: "submitted",
           hash: result.digest,
-          suiTx: result as SuiTransactionBlockResponse,
+          suiTx: result, 
           chainId: props.originChainId ?? -1,
           txType: "INTERCHAIN_DEPLOYMENT",
         });
