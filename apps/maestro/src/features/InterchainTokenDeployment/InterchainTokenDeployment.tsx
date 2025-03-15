@@ -2,6 +2,7 @@ import { cn, Dialog } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
+import { STELAR_CHAIN_ID } from "~/lib/hooks";
 import {
   BackButton,
   ChainsDropdown,
