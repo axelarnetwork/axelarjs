@@ -17,6 +17,7 @@ import { recoverDeploymentMessageIdByTokenId } from "./recoverDeploymentMessageI
 import { searchInterchainToken } from "./searchInterchainToken";
 import { setInterchainTokenIconUrl } from "./setInterchainTokenIconUrl";
 import { updateEVMRemoteTokenAddress } from "./updateEVMRemoteAddresses";
+import { updateStellarRemoteTokenAddresses } from "./updateStellarRemoteTokenAddresses";
 import { updateSuiRemoteTokenAddresses } from "./updateSuiRemoteTokenAddresses";
 
 export const interchainTokenRouter = router({
@@ -39,6 +40,7 @@ export const interchainTokenRouter = router({
   updateEVMRemoteTokenAddress,
   updateSuiRemoteTokenAddresses,
   getInterchainTokenBalanceForOwner,
+  updateStellarRemoteTokenAddresses,
 });
 
 // export type definition of API

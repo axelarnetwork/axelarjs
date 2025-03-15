@@ -236,7 +236,11 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         </div>
         <LinkButton
           className="flex items-center gap-2 text-lg"
-          href={`${props.chain.explorer.url}/token/${props.tokenAddress}`}
+          href={
+            props.chain.chain_name.includes("stellar")
+              ? `${props.chain.explorer.url}/contract/${props.tokenAddress}`
+              : `${props.chain.explorer.url}/token/${props.tokenAddress}`
+          }
           target="_blank"
           rel="noopener noreferrer"
           $size="sm"

@@ -2,8 +2,8 @@ import { invariant, Maybe } from "@axelarjs/utils";
 
 import { always } from "rambda";
 import { z } from "zod";
-import { ExtendedWagmiChainConfig } from "~/config/chains";
 
+import { ExtendedWagmiChainConfig } from "~/config/chains";
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { protectedProcedure } from "~/server/trpc";
 import {
@@ -26,6 +26,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
     let tokenManagerAddress;
     let tokenManagerType;
     const chains = await ctx.configs.chains();
+    console.log("input", input);
 
     if (!input.axelarChainId.includes("sui")) {
       const configs = chains[input.axelarChainId];
@@ -42,7 +43,9 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
       // Handle different chain types
       const createServiceClient = () => {
-        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi as ExtendedWagmiChainConfig);
+        return ctx.contracts.createInterchainTokenServiceClient(
+          configs.wagmi as ExtendedWagmiChainConfig
+        );
       };
 
       const originChainServiceClient = createServiceClient();
@@ -54,7 +57,10 @@ export const recordInterchainTokenDeployment = protectedProcedure
         .catch(() => null)) as `0x${string}`;
 
       const createTokenManagerClient = (address: string) => {
-        return ctx.contracts.createTokenManagerClient(configs.wagmi as ExtendedWagmiChainConfig, address);
+        return ctx.contracts.createTokenManagerClient(
+          configs.wagmi as ExtendedWagmiChainConfig,
+          address
+        );
       };
 
       const tokenManagerClient = !tokenManagerAddress
@@ -96,8 +102,12 @@ export const recordInterchainTokenDeployment = protectedProcedure
         );
         let tokenAddress;
         let tokenManagerAddress;
+        console.log("axelarChainId", axelarChainId);
 
-        if (!axelarChainId.includes("sui")) {
+        if (
+          !axelarChainId.includes("sui") &&
+          !axelarChainId.includes("stellar")
+        ) {
           invariant(
             chainConfig.wagmi,
             `No wagmi configuration found for chain ${axelarChainId}`
@@ -118,7 +128,10 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always(input.tokenAddress)),
           ]);
-        } else if (axelarChainId.includes("sui")) {
+        } else if (
+          axelarChainId.includes("sui") ||
+          axelarChainId.includes("stellar")
+        ) {
           // the address should be different from the address in the origin chain
           // but this will be updated later in tokens page
           tokenAddress = input.tokenAddress;

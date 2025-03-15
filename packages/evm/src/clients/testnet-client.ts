@@ -36,7 +36,7 @@ import { centrifugeTestnet } from "./custom/centrifuge";
  * Testnet chains
  */
 export const TESTNET_CHAINS = {
-  "ethereum-sepolia": sepolia,
+  "eth-sepolia": sepolia,
   "arbitrum-sepolia": arbitrumSepolia,
   "avalanche-fuji": avalancheFuji,
   "base-sepolia": baseSepolia,
