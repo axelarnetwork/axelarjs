@@ -99,8 +99,7 @@ export function useInterchainTransferMutation(
           let encodedRecipient: `0x${string}`;
           // Encode the recipient address for Stellar since it's a base64 string
           if (config.destinationChainName.toLowerCase().includes("stellar")) {
-            encodedRecipient =
-              `0x${Buffer.from(destinationAddress).toString("hex")}` as `0x${string}`;
+            encodedRecipient = `0x${Buffer.from(destinationAddress).toString("hex")}`;
           } else {
             encodedRecipient = destinationAddress as `0x${string}`;
           }
