@@ -461,8 +461,8 @@ export async function getStellarTokenRegistrationDetails(
   tokenId: string
 ): Promise<{
   isRegistered: boolean;
-  tokenAddress?: string;
-  tokenManagerAddress?: string;
+  tokenAddress: string | null;
+  tokenManagerAddress: string | null;
 }> {
   try {
     // Create a network-configured Stellar contract client
@@ -490,13 +490,15 @@ export async function getStellarTokenRegistrationDetails(
 
     return {
       isRegistered: Boolean(tokenAddress),
-      tokenAddress: tokenAddress || undefined,
-      tokenManagerAddress: tokenManagerAddress || undefined,
+      tokenAddress: tokenAddress,
+      tokenManagerAddress: tokenManagerAddress || null,
     };
   } catch (error) {
     console.error("Error checking Stellar token registration:", error);
     return {
       isRegistered: false,
+      tokenAddress: null,
+      tokenManagerAddress: null,
     };
   }
 }
