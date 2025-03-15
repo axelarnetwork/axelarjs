@@ -125,6 +125,7 @@ export const SUI_RPC_URLS = {
 };
 
 export const STELLAR_RPC_URLS = {
+  "devnet-amplifier": "https://soroban-testnet.stellar.org",
   testnet: "https://soroban-testnet.stellar.org",
   mainnet: "https://soroban-rpc.stellar.org",
 };
