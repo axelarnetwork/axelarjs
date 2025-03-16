@@ -271,12 +271,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
-  const isSameChainType = useMemo(() => {
+  const isSameAddress = useMemo(() => {
+    // EVM chains have the same address
+    // If origin chain type is "vm", always return true as they have different addresses between chains
+    if (props.sourceChain.chain_type === "vm") {
+      return false;
+    }
     return state.selectedToChain?.chain_type === props.sourceChain.chain_type;
   }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
 
   useEffect(() => {
-    const defaultAddress = isSameChainType ? (address ?? "") : "";
+    const defaultAddress = isSameAddress ? (address ?? "") : "";
 
     setValue("destinationAddress", defaultAddress, {
       shouldValidate: true,
@@ -286,7 +291,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     props.sourceChain?.chain_type,
     address,
     setValue,
-    isSameChainType,
+    isSameAddress,
   ]);
 
   return (
@@ -407,7 +412,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <FormControl>
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
-              {isSameChainType && (
+              {isSameAddress && (
                 <Label.AltText>(Using connected wallet address)</Label.AltText>
               )}
             </Label>
@@ -421,11 +426,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
               data-lpignore="true"
               data-form-type="other"
               aria-autocomplete="none"
-              disabled={isSameChainType}
+              disabled={isSameAddress}
               {...register("destinationAddress", {
                 required: "Destination address is required",
                 validate: (value) => {
-                  // TODO handle sui address length
                   if (
                     state.selectedToChain.id.includes("sui") &&
                     !isValidSuiAddress(value)
