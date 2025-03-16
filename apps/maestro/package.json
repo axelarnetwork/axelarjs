@@ -12,7 +12,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "tsc --noEmit --skipLibCheck --excludeFiles stellarContracts/**/* && next build",
+    "build": "scripts/build.sh",
     "build:analyze": "ANALYZE=true pnpm build",
     "start": "next start",
     "lint": "next lint",

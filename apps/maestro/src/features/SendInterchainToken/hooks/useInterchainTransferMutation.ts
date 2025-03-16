@@ -11,6 +11,7 @@ import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 import { getCoinType } from "~/server/routers/sui/utils/utils";
 
 export type UseSendInterchainTokenConfig = {
@@ -99,7 +100,7 @@ export function useInterchainTransferMutation(
           let encodedRecipient: `0x${string}`;
           // Encode the recipient address for Stellar since it's a base64 string
           if (config.destinationChainName.toLowerCase().includes("stellar")) {
-            encodedRecipient = `0x${Buffer.from(destinationAddress).toString("hex")}`;
+            encodedRecipient = stellarEncodedRecipient(destinationAddress);
           } else {
             encodedRecipient = destinationAddress as `0x${string}`;
           }

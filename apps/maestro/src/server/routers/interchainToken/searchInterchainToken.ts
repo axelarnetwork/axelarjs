@@ -3,6 +3,8 @@ import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { partition, pluck, propEq } from "rambda";
+// import { Client } from "../../../../stellarContracts/src";
+import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
@@ -13,11 +15,24 @@ import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
-import { Client } from "../../../../stellarContracts/src";
+import {
+  formatTokenId,
+  stellarITSContractId,
+  stellarNetworkPassphrase,
+} from "../stellar/utils";
 import {
   getCoinAddressFromType,
   getSuiEventsByTxHash,
 } from "../sui/utils/utils";
+
+interface StellarITSContractClient {
+  interchain_token_address: (params: {
+    token_id: Buffer;
+  }) => Promise<{ result: string }>;
+  token_manager_address: (params: {
+    token_id: Buffer;
+  }) => Promise<{ result: string | null }>;
+}
 
 const tokenDetailsSchema = z.object({
   chainId: z.number(),
@@ -466,19 +481,14 @@ export async function getStellarTokenRegistrationDetails(
 }> {
   try {
     // Create a network-configured Stellar contract client
-    // TODO: get the contract id from the chain config
-    const contractId =
-      "CCD7JXLHOJKQDPKOXQTK6PYACFYQPRC25IVKHQDOMP3ANFMBWO5FZZAN";
-    const stellarContractClient = new Client({
-      contractId,
-      networkPassphrase: "Test SDF Network ; September 2015",
+    const stellarContractClient = (await Client.from({
+      contractId: stellarITSContractId,
+      networkPassphrase: stellarNetworkPassphrase,
       rpcUrl: STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV],
-    });
+    })) as unknown as StellarITSContractClient;
 
     // Format the token ID properly (32 bytes)
-    const hex = tokenId.replace(/^0x/, "").padStart(64, "0");
-    const tokenIdBuffer = Buffer.from(hex, "hex");
-
+    const tokenIdBuffer = formatTokenId(tokenId);
     const { result: tokenAddress } =
       await stellarContractClient.interchain_token_address({
         token_id: tokenIdBuffer,
@@ -487,7 +497,6 @@ export async function getStellarTokenRegistrationDetails(
       await stellarContractClient.token_manager_address({
         token_id: tokenIdBuffer,
       });
-
     return {
       isRegistered: Boolean(tokenAddress),
       tokenAddress: tokenAddress,

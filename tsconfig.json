@@ -2,6 +2,5 @@
   "extends": "./packages/config/tsconfig.strictest.json",
   "compilerOptions": {
     "noEmit": true
-  },
-  "exclude": ["stellarContracts", "stellarContracts/**/*"]
+  }
 }
