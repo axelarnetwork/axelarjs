@@ -187,7 +187,22 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         {!balance?.tokenBalance ? (
           !address ? null : (
             <div>
-              {isIncompatibleChain ? (
+              {props.chain?.chain_name?.toLowerCase().includes("stellar") ? (
+                <LinkButton
+                  $size="xs"
+                  $variant="primary"
+                  className="my-1 flex w-full items-center justify-center gap-2"
+                  href={explorerUrl}
+                  target="_blank"
+                >
+                  View on Stellar Explorer{" "}
+                  <ChainIcon
+                    src={props.chain?.image ?? ""}
+                    size="xs"
+                    alt={props.chain?.name ?? ""}
+                  />
+                </LinkButton>
+              ) : isIncompatibleChain ? (
                 <Button
                   $size="xs"
                   $variant="primary"
