@@ -3,7 +3,6 @@ import { Alert, Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 
-import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
@@ -203,15 +202,32 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       const txPromise = registerTokensAsync();
 
       const result = await txPromise;
-      setTxState({
-        status: "submitted",
-        hash:
-          (result as SuiTransactionBlockResponse)?.digest ||
-          (result as `0x${string}`),
-        suiTx: result as SuiTransactionBlockResponse,
-        chainId: props.originChainId ?? -1,
-        txType: "INTERCHAIN_DEPLOYMENT",
-      });
+
+      if (!result) {
+        throw new Error("registerTokensAsync returned undefined");
+      }
+
+      if (typeof result === "string") {
+        // only evm returns result as string of transaction hash
+        setTxState({
+          status: "submitted",
+          hash: result,
+          suiTx: undefined,
+          chainId: props.originChainId ?? -1,
+          txType: "INTERCHAIN_DEPLOYMENT",
+        });
+      } else if (result.digest) {
+        // only sui returns result as SuiTransactionBlockResponse where digest is present
+        setTxState({
+          status: "submitted",
+          hash: result.digest,
+          suiTx: result, 
+          chainId: props.originChainId ?? -1,
+          txType: "INTERCHAIN_DEPLOYMENT",
+        });
+      } else {
+        throw new Error("registerTokensAsync: unknown result type");
+      }
     } catch (error: any) {
       setTxState({
         status: "idle",
