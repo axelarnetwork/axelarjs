@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
+import { stellarEncodedRecipient } from "../stellar/utils";
 import {
   deployRemoteInterchainToken,
   getTokenId,
@@ -15,7 +16,12 @@ import {
   registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
-import { buildTx, getSuiChainConfig, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
+import {
+  buildTx,
+  getSuiChainConfig,
+  getTreasuryCap,
+  suiServiceBaseUrl,
+} from "./utils/utils";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -100,7 +106,8 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { Example, InterchainTokenService: ITS } = chainConfig.config.contracts;
+        const { Example, InterchainTokenService: ITS } =
+          chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
@@ -254,6 +261,12 @@ export const suiRouter = router({
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
 
+        const formattedDestinationAddress = input.destinationChain
+          .toLowerCase()
+          .includes("stellar")
+          ? stellarEncodedRecipient(input.destinationAddress)
+          : input.destinationAddress;
+
         await txBuilder.moveCall({
           target: `${Example.address}::its::send_interchain_transfer_call`,
           arguments: [
@@ -264,7 +277,7 @@ export const suiRouter = router({
             TokenId,
             Coin,
             input.destinationChain,
-            input.destinationAddress,
+            formattedDestinationAddress,
             "0x",
             input.sender,
             Gas,

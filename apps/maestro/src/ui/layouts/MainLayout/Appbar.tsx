@@ -25,7 +25,7 @@ import { useRouter } from "next/router";
 import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
-import { useAccount, useDisconnect } from "~/lib/hooks";
+import { STELAR_CHAIN_ID, useAccount, useDisconnect } from "~/lib/hooks";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 import { useLayoutStateContainer } from "./MainLayout.state";
@@ -100,6 +100,7 @@ const Appbar: FC<AppbarProps> = (props) => {
             {isConnected && address ? (
               <>
                 <ChainsDropdown
+                  excludeChainIds={[STELAR_CHAIN_ID]}
                   contentClassName="max-h-[70dvh] w-[300px] translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
@@ -184,7 +185,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
-              <ChainsDropdown />
+              <ChainsDropdown excludeChainIds={[STELAR_CHAIN_ID]} />
               <Dropdown $align="end">
                 <Dropdown.Trigger>
                   <button
@@ -206,7 +207,7 @@ const Appbar: FC<AppbarProps> = (props) => {
               </Dropdown>
             </>
           ) : (
-            <ConnectWalletModal $size="sm" />
+            <ConnectWalletModal />
           )}
           <ThemeSwitcher />
 

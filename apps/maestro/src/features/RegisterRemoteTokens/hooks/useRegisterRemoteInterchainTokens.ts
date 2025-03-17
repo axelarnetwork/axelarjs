@@ -95,7 +95,7 @@ export default function useRegisterRemoteInterchainTokens(
     originChainId: input.originChainId,
     tokenAddress: input.tokenAddress,
     symbol: tokenDeployment.tokenSymbol,
-    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? []
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
   };
 
   return {

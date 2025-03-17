@@ -1,10 +1,14 @@
+import { STELLAR_RPC_URLS } from "@axelarjs/core";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { partition, pluck, propEq } from "rambda";
+// import { Client } from "../../../../stellarContracts/src";
+import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
@@ -12,9 +16,23 @@ import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 import {
+  formatTokenId,
+  stellarITSContractId,
+  stellarNetworkPassphrase,
+} from "../stellar/utils";
+import {
   getCoinAddressFromType,
   getSuiEventsByTxHash,
 } from "../sui/utils/utils";
+
+interface StellarITSContractClient {
+  interchain_token_address: (params: {
+    token_id: Buffer;
+  }) => Promise<{ result: string }>;
+  token_manager_address: (params: {
+    token_id: Buffer;
+  }) => Promise<{ result: string | null }>;
+}
 
 const tokenDetailsSchema = z.object({
   chainId: z.number(),
@@ -223,11 +241,33 @@ async function getInterchainToken(
             };
           }
 
-          const { isRegistered, tokenAddress } = await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
+          const { isRegistered, tokenAddress } =
+            await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
 
           return {
             ...remoteTokenDetails,
             tokenAddress,
+            isRegistered,
+          };
+        } else if (chainConfig?.axelarChainId.includes("stellar")) {
+          // Get the token ID from the token details
+          const tokenId = remoteTokenDetails.tokenId || tokenDetails.tokenId;
+
+          if (!tokenId) {
+            return {
+              ...remoteTokenDetails,
+              isRegistered: false,
+            };
+          }
+
+          // Check if the token is registered on Stellar by directly querying the contract
+          const { isRegistered, tokenAddress, tokenManagerAddress } =
+            await getStellarTokenRegistrationDetails(tokenId);
+
+          return {
+            ...remoteTokenDetails,
+            tokenAddress,
+            tokenManagerAddress,
             isRegistered,
           };
         } else {
@@ -343,10 +383,7 @@ async function scanChains(
  * @param deploymentMessageId
  * @returns
  */
-async function findSuiTxHashFromGmp(
-  ctx: Context,
-  deploymentMessageId: string
-) {
+async function findSuiTxHashFromGmp(ctx: Context, deploymentMessageId: string) {
   const initialTxHash = deploymentMessageId.split("-")[0];
   const firstHopCalls = await ctx.services.gmp.searchGMP({
     txHash: initialTxHash,
@@ -355,8 +392,8 @@ async function findSuiTxHashFromGmp(
     },
   });
 
-  const suiBoundCalls = firstHopCalls.filter(
-    (call) => call.callback?.returnValues?.destinationChain?.includes("sui")
+  const suiBoundCalls = firstHopCalls.filter((call) =>
+    call.callback?.returnValues?.destinationChain?.includes("sui")
   );
 
   const axelarTxHash = suiBoundCalls[0]?.callback?.transaction?.hash;
@@ -430,4 +467,47 @@ async function getTokenDetails(
   }
 
   return null;
+}
+
+/**
+ * Check if a token is registered on Stellar by directly querying the Stellar contract
+ */
+export async function getStellarTokenRegistrationDetails(
+  tokenId: string
+): Promise<{
+  isRegistered: boolean;
+  tokenAddress: string | null;
+  tokenManagerAddress: string | null;
+}> {
+  try {
+    // Create a network-configured Stellar contract client
+    const stellarContractClient = (await Client.from({
+      contractId: stellarITSContractId,
+      networkPassphrase: stellarNetworkPassphrase,
+      rpcUrl: STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV],
+    })) as unknown as StellarITSContractClient;
+
+    // Format the token ID properly (32 bytes)
+    const tokenIdBuffer = formatTokenId(tokenId);
+    const { result: tokenAddress } =
+      await stellarContractClient.interchain_token_address({
+        token_id: tokenIdBuffer,
+      });
+    const { result: tokenManagerAddress } =
+      await stellarContractClient.token_manager_address({
+        token_id: tokenIdBuffer,
+      });
+    return {
+      isRegistered: Boolean(tokenAddress),
+      tokenAddress: tokenAddress,
+      tokenManagerAddress: tokenManagerAddress || null,
+    };
+  } catch (error) {
+    console.error("Error checking Stellar token registration:", error);
+    return {
+      isRegistered: false,
+      tokenAddress: null,
+      tokenManagerAddress: null,
+    };
+  }
 }
