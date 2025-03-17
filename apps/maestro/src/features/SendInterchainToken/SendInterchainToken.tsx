@@ -307,6 +307,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
           props.onClose?.();
           resetForm();
           actions.resetTxState();
+        } else if (isSameAddress) {
+          setValue("destinationAddress", address ?? "");
         }
         actions.setIsModalOpen(isOpen);
       }}
