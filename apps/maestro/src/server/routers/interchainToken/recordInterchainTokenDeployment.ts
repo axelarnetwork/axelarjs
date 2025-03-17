@@ -102,10 +102,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         let tokenAddress;
         let tokenManagerAddress;
 
-        if (
-          !axelarChainId.includes("sui") &&
-          !axelarChainId.includes("stellar")
-        ) {
+        if (chainConfig.wagmi?.supportWagmi) {
           invariant(
             chainConfig.wagmi,
             `No wagmi configuration found for chain ${axelarChainId}`
@@ -126,10 +123,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always(input.tokenAddress)),
           ]);
-        } else if (
-          axelarChainId.includes("sui") ||
-          axelarChainId.includes("stellar")
-        ) {
+        } else {
           // the address should be different from the address in the origin chain
           // but this will be updated later in tokens page
           tokenAddress = input.tokenAddress;

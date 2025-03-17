@@ -50,16 +50,32 @@ const suiDevnet = {
 };
 
 export const stellar = {
-  id: 110,
-  axelarChainId: "stellar-2024-q4",
+  id: 109,
+  axelarChainId: "stellar",
   axelarChainName: "stellar",
-  environment: ENVIRONMENTS.devnet,
+  environment: ENVIRONMENTS.mainnet,
   name: "Stellar",
   nativeCurrency: {
     name: "XLM",
     symbol: "XLM",
     decimals: 7,
   },
+  rpcUrls: {
+    default: { http: [STELLAR_RPC_URLS.mainnet] },
+    public: { http: [STELLAR_RPC_URLS.mainnet] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Stellar Explorer",
+      url: "https://stellar.expert/explorer/public",
+    },
+  },
+  supportWagmi: false,
+};
+
+const stellarTestnet = {
+  ...stellar,
+  id: 110,
   rpcUrls: {
     default: { http: [STELLAR_RPC_URLS.testnet] },
     public: { http: [STELLAR_RPC_URLS.testnet] },
@@ -70,7 +86,13 @@ export const stellar = {
       url: "https://stellar.expert/explorer/testnet",
     },
   },
-  supportWagmi: false,
+  axelarChainId: "stellar-2024-q4",
+  environment: ENVIRONMENTS.testnet,
+};
+
+const stellarDevnet = {
+  ...stellarTestnet,
+  environment: ENVIRONMENTS.devnet,
 };
 
 export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
@@ -78,6 +100,8 @@ export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
   suiTestnet,
   suiDevnet,
   stellar,
+  stellarTestnet,
+  stellarDevnet,
 ] as const;
 
 export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(

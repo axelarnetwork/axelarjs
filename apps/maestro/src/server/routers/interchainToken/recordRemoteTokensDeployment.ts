@@ -84,10 +84,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
-        if (
-          !remoteToken.axelarChainId.includes("sui") &&
-          !remoteToken.axelarChainId.includes("stellar")
-        ) {
+        if (remoteConfig.wagmi?.supportWagmi) {
           // Create appropriate client based on chain type
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
             remoteConfig.wagmi
@@ -113,7 +110,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
               .catch(always("0x")),
           ]);
         } else {
-          // Use placeholders for Sui, to be updated later
+          // Use placeholders for Sui and Stellar, to be updated later
           tokenAddress = originToken.tokenAddress;
           tokenManagerAddress = originToken.tokenManagerAddress ?? "0x";
         }
