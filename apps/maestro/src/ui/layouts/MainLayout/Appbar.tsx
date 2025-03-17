@@ -207,7 +207,7 @@ const Appbar: FC<AppbarProps> = (props) => {
               </Dropdown>
             </>
           ) : (
-            <ConnectWalletModal $size="sm" />
+            <ConnectWalletModal />
           )}
           <ThemeSwitcher />
 
