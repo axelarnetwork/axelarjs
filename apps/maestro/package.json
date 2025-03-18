@@ -69,7 +69,6 @@
     "react-jazzicon": "^1.0.4",
     "react-markdown": "^9.0.1",
     "react-spinners": "^0.13.8",
-    "stellar-sdk": "^13.1.0",
     "superjson": "^2.2.1",
     "swagger-ui-react": "^5.12.0",
     "trpc-openapi": "^1.2.0",

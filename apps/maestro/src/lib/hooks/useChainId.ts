@@ -7,8 +7,6 @@ import { useChainId as useWagmiChainId } from "wagmi";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 
 export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
-export const STELAR_CHAIN_ID =
-  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 109 : 110;
 
 // TODO: check if this is the best way to use chain ids, maybe we should combine it with chain type
 export function useChainId(): number {

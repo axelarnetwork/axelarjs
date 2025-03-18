@@ -76,9 +76,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
     return {
       explorerName: explorer.name,
-      explorerUrl: props.chain.chain_name.includes("stellar")
-        ? `${explorer.url}/contract/${props.tokenAddress}`
-        : `${explorer.url}/token/${props.tokenAddress}`,
+      explorerUrl: `${explorer.url}/token/${props.tokenAddress}`,
     };
   }, [props.chain, props.tokenAddress]);
 
@@ -187,22 +185,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         {!balance?.tokenBalance ? (
           !address ? null : (
             <div>
-              {props.chain?.chain_name?.toLowerCase().includes("stellar") ? (
-                <LinkButton
-                  $size="xs"
-                  $variant="primary"
-                  className="my-1 flex w-full items-center justify-center gap-2"
-                  href={explorerUrl}
-                  target="_blank"
-                >
-                  View on Stellar Explorer{" "}
-                  <ChainIcon
-                    src={props.chain?.image ?? ""}
-                    size="xs"
-                    alt={props.chain?.name ?? ""}
-                  />
-                </LinkButton>
-              ) : isIncompatibleChain ? (
+              {isIncompatibleChain ? (
                 <Button
                   $size="xs"
                   $variant="primary"
