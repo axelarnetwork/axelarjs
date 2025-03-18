@@ -129,13 +129,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     const minter = input?.minterAddress ?? zeroAddress;
     const commonArgs = {
-      minter: minter as `0x${string}`,
       salt: input.salt,
     };
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...commonArgs,
+        minter: minter as `0x${string}`,
         initialSupply: input.initialSupply || 0n,
         name: input.tokenName,
         symbol: input.tokenSymbol,
@@ -148,8 +148,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
 
     const registerTxData = destinationChainIds.map((destinationChain, i) =>
-      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken2.data({
         ...commonArgs,
+        originalChainName: "",
+        minter: minter as `0x${string}`,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })
