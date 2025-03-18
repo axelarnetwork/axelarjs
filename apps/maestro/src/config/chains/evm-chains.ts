@@ -134,7 +134,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fantomTestnet,
-    axelarChainId: "fantom",
+    axelarChainId: "Fantom",
     axelarChainName: "Fantom",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
@@ -166,7 +166,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...avalancheFuji,
-    axelarChainId: "avalanche",
+    axelarChainId: "Avalanche",
     axelarChainName: "Avalanche",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
