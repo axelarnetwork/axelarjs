@@ -197,6 +197,9 @@ importers:
       react-spinners:
         specifier: ^0.13.8
         version: 0.13.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      stellar-sdk:
+        specifier: ^13.1.0
+        version: 13.1.0
       superjson:
         specifier: ^2.2.1
         version: 2.2.2
@@ -10799,6 +10802,10 @@ packages:
 
   std-env@3.8.0:
     resolution: {integrity: sha512-Bc3YwwCB+OzldMxOXJIIvC6cPRWr/LxOp48CdQTOkPyk/t4JWWJbrilwBd7RJzKV8QW7tJkcgAmeuLLJugl5/w==}
+
+  stellar-sdk@13.1.0:
+    resolution: {integrity: sha512-b7fYK9kX4ljulXckt63jSwzAzTW43RlitSIJH4CHTft7Fce8zNqWuNwJ29FALt258SKlxiL0qKn58LcOA9iJIw==}
+    deprecated: ⚠️ This package has moved to @stellar/stellar-sdk! 🚚
 
   stop-iteration-iterator@1.0.0:
     resolution: {integrity: sha512-iCGQj+0l0HOdZ2AEeBADlsRC+vsnDsZsbdSiH1yNSjcfKM7fdpCMfqAL/dwF5BLiw/XhRft/Wax6zQbhq2BcjQ==}
@@ -24942,6 +24949,19 @@ snapshots:
   statuses@2.0.1: {}
 
   std-env@3.8.0: {}
+
+  stellar-sdk@13.1.0:
+    dependencies:
+      '@stellar/stellar-base': 13.0.1
+      axios: 1.7.9
+      bignumber.js: 9.1.2
+      eventsource: 2.0.2
+      feaxios: 0.0.23
+      randombytes: 2.1.0
+      toml: 3.0.0
+      urijs: 1.19.11
+    transitivePeerDependencies:
+      - debug
 
   stop-iteration-iterator@1.0.0:
     dependencies:
