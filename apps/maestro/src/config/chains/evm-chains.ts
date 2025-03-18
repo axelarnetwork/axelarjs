@@ -87,9 +87,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       default: { http: ["https://rpc-sepolia.rockx.com"] },
       public: { http: ["https://rpc-sepolia.rockx.com"] },
     },
-    axelarChainId: "eth-sepolia",
+    axelarChainId: "ethereum-sepolia",
     supportWagmi: true,
-    axelarChainName: "eth-sepolia",
+    axelarChainName: "ethereum-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {

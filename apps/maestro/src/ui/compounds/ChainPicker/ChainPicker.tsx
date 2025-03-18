@@ -1,8 +1,7 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Button, cn, Loading, Tooltip } from "@axelarjs/ui";
 import { useCallback, type FC } from "react";
-
-import { ChainIcon } from "~/ui/components/ChainsDropdown";
+import Image from "next/image";
 
 type ChainConfig = EVMChainConfig | VMChainConfig;
 
@@ -84,13 +83,17 @@ const ChainPicker: FC<ChainPickerProps> = ({
                 $variant={buttonVariant}
                 onClick={onChainClick.bind(null, chain.id)}
               >
-                <ChainIcon
-                  src={chain.image}
+                <Image
+                  className={cn(
+                    "pointer-events-none absolute left-3 -translate-x-2 rounded-full",
+                    {
+                      hidden: isSelected && loading,
+                    }
+                  )}
+                  src={`${process.env.NEXT_PUBLIC_EXPLORER_URL}${chain.image}`}
+                  width={24}
+                  height={24}
                   alt={`${chainName} logo`}
-                  size="md"
-                  className={cn("absolute left-3 -translate-x-2", {
-                    hidden: isSelected && loading,
-                  })}
                 />
                 <Loading
                   className={cn("absolute left-3 -translate-x-2 rounded-full", {

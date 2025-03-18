@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
-
 import { suiChainConfig } from "~/config/chains";
+
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
 
@@ -28,8 +28,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
     ]);
 
     const configs =
-      evmChains[input.chainId] ||
-      vmChains[input?.axelarChainId || suiChainConfig.axelarChainId];
+      evmChains[input.chainId] || vmChains[input?.axelarChainId || suiChainConfig.axelarChainId];
     if (!configs) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -84,7 +83,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
-        if (remoteConfig.wagmi?.supportWagmi) {
+        if (!remoteToken.axelarChainId.includes("sui")) {
           // Create appropriate client based on chain type
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
             remoteConfig.wagmi
@@ -110,7 +109,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
               .catch(always("0x")),
           ]);
         } else {
-          // Use placeholders for Sui and Stellar, to be updated later
+          // Use placeholders for Sui, to be updated later
           tokenAddress = originToken.tokenAddress;
           tokenManagerAddress = originToken.tokenManagerAddress ?? "0x";
         }
