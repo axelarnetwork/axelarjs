@@ -158,7 +158,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
   useEffect(() => {
-    if (!prepareMulticall?.request) {
+    if (isValidEVMAddress(deployerAddress) && !prepareMulticall?.request) {
       setIsReady(false);
       console.warn("Failed to simulate multicall for deploying remote tokens");
       return;
