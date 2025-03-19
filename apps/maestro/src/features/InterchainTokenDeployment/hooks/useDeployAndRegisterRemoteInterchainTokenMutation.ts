@@ -83,26 +83,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     });
 
-  useEffect(() => {
-    if (!tokenId || !tokenAddress) {
-      if (input) {
-        if (!input.sourceChainId.includes("sui")) {
-          setIsReady(false);
-          return;
-        }
-      }
-    }
-
-    setIsReady(true);
-  }, [
-    input,
-    tokenId,
-    deployerAddress,
-    tokenAddress,
-    input?.sourceChainId,
-    combinedComputed,
-  ]);
-
   const { destinationChainIds } = useMemo(() => {
     const index = combinedComputed.indexedById;
     const originalChain = index[input?.sourceChainId ?? chainId];
@@ -176,6 +156,32 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
   );
   const multicall = useWriteInterchainTokenFactoryMulticall();
+
+  useEffect(() => {
+    if (!prepareMulticall?.request) {
+      setIsReady(false);
+      console.warn("Failed to simulate multicall for deploying remote tokens");
+      return;
+    }
+    if (!tokenId || !tokenAddress) {
+      if (input) {
+        if (!input.sourceChainId.includes("sui")) {
+          setIsReady(false);
+          return;
+        }
+      }
+    }
+
+    setIsReady(true);
+  }, [
+    input,
+    tokenId,
+    deployerAddress,
+    tokenAddress,
+    input?.sourceChainId,
+    combinedComputed,
+    prepareMulticall?.request,
+  ]);
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: multicall?.data,
