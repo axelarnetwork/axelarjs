@@ -2,14 +2,13 @@ import { Tabs } from "@axelarjs/ui";
 import { invert } from "@axelarjs/utils";
 import { Suspense } from "react";
 
-import { useAccount } from "wagmi";
-
 import { CONTRACT_METHODS_LABELS } from "~/features/RecentTransactions";
 import RecentTransactionsTable from "~/features/RecentTransactions/RecentTransactionsTable";
 import {
   CONTRACT_METHODS,
   ContractMethod,
 } from "~/features/RecentTransactions/types";
+import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import Page from "~/ui/layouts/Page";
 

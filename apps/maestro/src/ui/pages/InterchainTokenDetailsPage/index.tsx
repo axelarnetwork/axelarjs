@@ -1,8 +1,5 @@
-import { Alert } from "@axelarjs/ui";
 import type { FC } from "react";
 import { useRouter } from "next/router";
-
-import { isAddress } from "viem";
 
 import { useChainFromRoute } from "~/lib/hooks";
 import { getPrefilledClaimOwnershipFormLink } from "~/lib/utils/gform";
@@ -40,10 +37,9 @@ const InterchainTokensPage: FC = () => {
     tokenAddress,
   });
 
-  if (!isAddress(tokenAddress)) {
-    return <Alert $status="error">Invalid token address</Alert>;
-  }
-
+  // if (!isAddress(tokenAddress)) {
+  //   return <Alert $status="error">Invalid token address</Alert>;
+  // }
   const chainNames =
     interchainToken?.matchingTokens
       ?.filter((token) => token.isRegistered)
@@ -78,7 +74,7 @@ const InterchainTokensPage: FC = () => {
                   interchainToken.chain.name,
                   chainNames,
                   "Interchain Token Service (ITS)",
-                  destToken.tokenAddress as string,
+                  destToken.tokenAddress,
                   tokenDetails.name,
                   tokenDetails.symbol
                 )

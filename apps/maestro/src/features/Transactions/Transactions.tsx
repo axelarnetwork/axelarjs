@@ -1,22 +1,13 @@
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { Maybe } from "@axelarjs/utils";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FC,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, type FC } from "react";
 import Link from "next/link";
 
 import { groupBy } from "rambda";
 
-import type { TxType } from "~/lib/hooks";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useChainId, type TxType } from "~/lib/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import {
@@ -25,26 +16,30 @@ import {
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
+import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 
 const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
   INTERCHAIN_TRANSFER: "Interchain Transfer",
 } as const;
 
-function useGroupedStatuses(txHash: `0x${string}`) {
+function useGroupedStatuses(txHash: string) {
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash,
   });
 
   const { combinedComputed } = useAllChainConfigsQuery();
+  const chainId = useChainId();
 
   return useMemo(() => {
-    const combinedIndexedById = combinedComputed.indexedById;
-
     const statusValues = Object.entries(statuses ?? {}).map(
       ([axelarChainId, entry]) => ({
         ...entry,
-        chain: combinedIndexedById[axelarChainId],
+        chain: getNormalizedTwoHopChainConfig(
+          axelarChainId,
+          combinedComputed,
+          chainId
+        ),
       })
     );
 
@@ -61,14 +56,15 @@ function useGroupedStatuses(txHash: `0x${string}`) {
       groupedStatusesProps,
       hasStatus: statusValues.length > 0,
     };
-  }, [combinedComputed.indexedById, statuses, txHash]);
+  }, [combinedComputed, chainId, statuses, txHash]);
 }
 
 type ToastElementProps = {
-  txHash: `0x${string}`;
+  txHash: string;
   chainId: number;
   txType: TxType;
-  onRemoveTx?: (txHash: `0x${string}`) => void;
+  onRemoveTx?: (txHash: string) => void;
+  intervalId?: number;
 };
 
 const ToastElement: FC<ToastElementProps> = ({
@@ -76,6 +72,7 @@ const ToastElement: FC<ToastElementProps> = ({
   chainId,
   txType,
   onRemoveTx,
+  intervalId,
 }) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
@@ -84,7 +81,8 @@ const ToastElement: FC<ToastElementProps> = ({
 
   const { combinedComputed } = useAllChainConfigsQuery();
 
-  const isLoading = !expectedConfirmations || expectedConfirmations <= 1;
+  const isLoading =
+    !expectedConfirmations || expectedConfirmations < elapsedBlocks;
 
   const txTypeText = Maybe.of(txType).mapOrNull(
     (txType) => TX_LABEL_MAP[txType]
@@ -134,7 +132,7 @@ const ToastElement: FC<ToastElementProps> = ({
           />
         )}
         <div className="mx-2 flex flex-col items-start">
-         <span className="text-sm">{txTypeText}</span>
+          <span className="text-sm">{txTypeText}</span>
           {showFinalityProgressBar ? (
             <Tooltip
               tip={`Waiting for finality on ${combinedComputed.indexedByChainId[chainId]?.name}`}
@@ -167,6 +165,11 @@ const ToastElement: FC<ToastElementProps> = ({
   );
 
   const handleDismiss = useCallback(() => {
+    // Clear the interval *before* dismissing
+    if (intervalId) {
+      window.clearInterval(intervalId);
+    }
+
     toast.dismiss(txHash);
 
     // dismiss permanently if tx status is error or insufficient_fee
@@ -177,7 +180,7 @@ const ToastElement: FC<ToastElementProps> = ({
     ) {
       onRemoveTx?.(txHash);
     }
-  }, [groupedStatusesProps, onRemoveTx, txHash]);
+  }, [groupedStatusesProps, onRemoveTx, txHash, intervalId]);
 
   return (
     <div className="relative grid gap-2 rounded-md border-base-200 bg-base-300 p-2 pl-4 pr-8 shadow-md shadow-black/10">
@@ -199,7 +202,7 @@ const ToastElement: FC<ToastElementProps> = ({
 };
 
 type GMPTxStatusProps = {
-  txHash: `0x${string}`;
+  txHash: string;
   chainId: number;
   txType: keyof typeof TX_LABEL_MAP;
 };
@@ -213,6 +216,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const [, actions] = useTransactionsContainer();
 
   const intervalRef = useRef<number>();
+  const toastIdRef = useRef<string>();
 
   const watchTxToCompletion = useCallback(
     async () =>
@@ -233,31 +237,37 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
           }
         }, 5000);
       }),
-    [executed, isLoading, total]
+    [isLoading, total, executed]
   );
 
   useEffect(() => {
-    async function task(toastId: string) {
-      await watchTxToCompletion();
-      toast.dismiss(toastId);
-      actions.removeTransaction(props.txHash);
-    }
-
+    // Create the toast *once* and store the ID.
+    toastIdRef.current = props.txHash;
     toast.custom(
-      <ToastElement {...props} onRemoveTx={actions.removeTransaction} />,
+      <ToastElement
+        {...props}
+        onRemoveTx={actions.removeTransaction}
+        intervalId={intervalRef.current}
+      />,
       {
-        id: props.txHash,
+        id: toastIdRef.current,
         duration: Infinity,
       }
     );
 
+    async function task() {
+      await watchTxToCompletion();
+      toast.dismiss(toastIdRef.current);
+      actions.removeTransaction(props.txHash);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    task(props.txHash);
+    task();
 
     return () => {
       window.clearInterval(intervalRef.current);
     };
-  }, [actions, props, watchTxToCompletion]);
+  }, [props, actions, watchTxToCompletion]);
 
   return <></>;
 };
@@ -265,24 +275,12 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
 const Transactions = () => {
   const [state] = useTransactionsContainer();
 
-  // hack to trigger re-render of <GMPTransaction /> components
-  // this is necessary because the toast isn't re-rendered unless GMPTransaction mounts again
-  const [, setRenderCount] = useState(0);
-
   const hasPendingTransactions = state.pendingTransactions.length > 0;
-
-  const triggerRender = useCallback(
-    () => setRenderCount((renderCount) => renderCount + 1),
-    []
-  );
 
   return (
     <>
       {hasPendingTransactions && (
-        <button
-          className="indicator rounded-full bg-base-300 p-2"
-          onClick={triggerRender}
-        >
+        <button className="indicator rounded-full bg-base-300 p-2">
           <span className="badge indicator-item badge-info badge-sm">
             {state.pendingTransactions.length}
           </span>
@@ -293,10 +291,13 @@ const Transactions = () => {
         if (!tx.hash || !tx.chainId || !tx.txType) {
           return null;
         }
+
+        const normalizedTxHash = tx.hash.split("-")[0];
+
         return (
           <GMPTransaction
-            key={tx.hash}
-            txHash={tx.hash}
+            key={normalizedTxHash}
+            txHash={normalizedTxHash}
             chainId={tx.chainId}
             txType={tx.txType}
           />

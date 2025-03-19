@@ -31,7 +31,9 @@ export const IGATEWAY_CALLER_ABI = ABI_FILE.abi;
  *  address: "0x1234..."
  * });
  */
-export class IGatewayCallerClient extends PublicContractClient<any> {
+export class IGatewayCallerClient extends PublicContractClient<
+  typeof ABI_FILE.abi
+> {
   static ABI = ABI_FILE.abi;
   static contractName = ABI_FILE.contractName;
 

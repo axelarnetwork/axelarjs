@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import { filter, map } from "rambda";
 
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -18,7 +18,7 @@ const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
 function getChainNameSlug(chainId: number) {
-  const chain = WAGMI_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
+  const chain = CHAIN_CONFIGS.find((chain) => chain.id === chainId);
 
   return chain?.axelarChainName.toLowerCase() ?? "";
 }
@@ -54,7 +54,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
   );
 
   const { combinedComputed } = useAllChainConfigsQuery();
- 
+
   const maybeTokens = Maybe.of(data).map((data) => data.items);
   const totalPages = Maybe.of(data).mapOr(0, (data) => data.totalPages);
 
@@ -64,7 +64,10 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, combinedComputed.indexedById[token.axelarChainId]] as const
+              [
+                token,
+                combinedComputed.indexedById[token.axelarChainId],
+              ] as const
           )
         )
         .mapOr(

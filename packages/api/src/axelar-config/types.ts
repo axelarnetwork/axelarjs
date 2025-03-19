@@ -32,7 +32,7 @@ export interface AssetConfig {
   };
 }
 
-export type CHAIN_TYPE = "axelarnet" | "evm";
+export type CHAIN_TYPE = "axelarnet" | "evm" | "sui";
 
 export interface ChainEvmSubconfig {
   contracts?: {
@@ -49,6 +49,21 @@ export interface ChainEvmSubconfig {
     InterchainTokenFactory?: { address: string };
   };
   approxFinalityHeight: number;
+  rpc: string[];
+}
+
+export interface ChainSuiSubconfig {
+  contracts: {
+    Utils: SuiContract;
+    VersionControl: SuiContract;
+    AxelarGateway: SuiContract;
+    RelayerDiscovery: SuiContract;
+    Operators: SuiContract;
+    GasService: SuiContract;
+    Abi: SuiContract;
+    InterchainTokenService: SuiContract;
+    Example: SuiContract;
+  };
   rpc: string[];
 }
 
@@ -69,10 +84,18 @@ export interface ChainCosmosSubconfig {
   grpc: string[];
 }
 
-export interface ChainConfig {
+export interface BaseContracts {
+  [contractName: string]: { address: string };
+}
+
+export interface SuiContract {
+  address: string;
+  objects: Record<string, string>;
+}
+
+interface BaseChainConfig {
   id: string;
   displayName: string;
-  chainType: CHAIN_TYPE;
   externalChainId: string | number;
   iconUrl: string;
   nativeCurrency: {
@@ -83,9 +106,27 @@ export interface ChainConfig {
     iconUrl: string;
   } | null;
   blockExplorers: { name: string; url: string }[] | null;
-  config: ChainCosmosSubconfig | ChainEvmSubconfig;
   assets: { [assetId: string]: string };
 }
+
+// Chain configs for each chain type with associated contracts
+export interface EvmChainConfig extends BaseChainConfig {
+  chainType: "evm";
+  config: ChainEvmSubconfig;
+}
+
+interface AxelarChainConfig extends BaseChainConfig {
+  chainType: "axelarnet";
+  config: ChainCosmosSubconfig;
+}
+
+export interface SuiChainConfig extends BaseChainConfig {
+  chainType: "sui";
+  config: ChainSuiSubconfig;
+}
+
+// Union type of all possible chain configs
+export type ChainConfig = EvmChainConfig | AxelarChainConfig | SuiChainConfig;
 
 export interface AxelarConfigsResponse {
   chains: { [chainId: string]: ChainConfig };

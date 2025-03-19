@@ -29,12 +29,11 @@ import {
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
-import { useAccount } from "wagmi";
-
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
-import ConnectWalletButton from "../ConnectWalletButton";
+import ConnectWalletModal from "../ConnectWalletModal/ConnectWalletModal";
 
 type ButtonProps = ComponentProps<typeof Button>;
 
@@ -43,6 +42,7 @@ export const ModalFormInput = tw(TextInput)`bg-base-200`;
 ModalFormInput.defaultProps = {
   $bordered: true,
 };
+
 
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
   return (
@@ -212,7 +212,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
           </Dialog.Title>
         )}
         <StepsSummary currentStep={props.step} steps={steps} />
-        {isSignedIn ? props.children : <ConnectWalletButton />}
+        {isSignedIn ? props.children : <ConnectWalletModal />}
       </Dialog.Body>
     </Dialog>
   );
@@ -223,7 +223,7 @@ export const ShareHaikuButton: FC<{
   originChainName: string;
   additionalChainNames: string[];
   originAxelarChainId: string;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   haikuType: "deployment" | "send";
 }> = (props) => {
   const { mutateAsync, isPending, isSuccess } =

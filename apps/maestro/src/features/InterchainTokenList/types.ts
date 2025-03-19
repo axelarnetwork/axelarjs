@@ -1,6 +1,6 @@
 import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api/index";
 
-import type { ExtendedWagmiChainConfig } from "~/config/wagmi";
+import type { ExtendedWagmiChainConfig } from "~/config/chains";
 
 type Kind = "canonical" | "interchain";
 

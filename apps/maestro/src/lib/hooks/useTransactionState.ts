@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import type { TransactionReceipt } from "viem";
 
 export type UnsubmittedTransactionState =
@@ -8,29 +9,33 @@ export type UnsubmittedTransactionState =
   | { status: "awaiting_approval" };
 
 export type TxType = "INTERCHAIN_DEPLOYMENT" | "INTERCHAIN_TRANSFER";
+// TODO: is suiTx type needed? The object is quite large and it's being recorded to the session storage.
 export type SubmittedTransactionState<TError = Error> =
   | {
       status: "submitted";
-      hash: `0x${string}`;
+      hash: string;
       txType?: TxType;
       chainId: number;
       isGMP?: boolean;
+      suiTx?: SuiTransactionBlockResponse;
     }
   | {
       status: "confirmed";
-      receipt: TransactionReceipt;
-      hash?: `0x${string}`;
+      receipt?: TransactionReceipt;
+      hash?: string;
       txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
+      suiTx?: SuiTransactionBlockResponse;
     }
   | {
       status: "reverted";
       error: TError;
-      hash?: `0x${string}`;
+      hash?: string;
       txType?: TxType;
       chainId?: number;
       isGMP?: boolean;
+      suiTx?: SuiTransactionBlockResponse;
     };
 
 export type TransactionState<TError = Error> =

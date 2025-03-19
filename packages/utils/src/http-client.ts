@@ -79,7 +79,8 @@ export class HttpClient {
     method: HttpMethod = "GET",
     body?: T
   ): Promise<Response> {
-    const url = new URL(path, this.prefixUrl).toString();
+    const requestUrl = this.urlJoin(this.prefixUrl, path);
+    const url = new URL(requestUrl).toString();
 
     const response = await unfetch(url, {
       method,
@@ -175,5 +176,12 @@ export class HttpClient {
       text: () => fetcher().then((res) => res.text()),
       blob: () => fetcher().then((res) => res.blob()),
     };
+  }
+
+  private urlJoin(...parts: string[]): string {
+    return parts
+      .map((part) => part.trim().replace(/^\/+|\/+$/g, ""))
+      .filter(Boolean)
+      .join("/");
   }
 }

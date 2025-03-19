@@ -1,13 +1,15 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
+import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
 import { formatEther } from "viem";
-import { useChainId } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
+import { useBalance, useChainId } from "~/lib/hooks";
+import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
@@ -19,11 +21,14 @@ export type UseStep3ChainSelectionStateProps = {
 export function useStep3ChainSelectionState() {
   const { allChains } = useAllChainConfigsQuery();
   const chainId = useChainId();
+  const userBalance = useBalance();
   const [isDeploying, setIsDeploying] = useState(false);
   const [totalGasFee, $setTotalGasFee] = useState(formatEther(0n));
-  
+
   // Find source chain from both EVM and VM chains
-  const currentChain = allChains?.find((chain: EVMChainConfig | VMChainConfig) => chain.chain_id === chainId);
+  const currentChain = allChains?.find(
+    (chain: EVMChainConfig | VMChainConfig) => chain.chain_id === chainId
+  );
 
   const [sourceChainId, setSourceChainId] = useState<string>(
     currentChain?.id || ""
@@ -43,27 +48,21 @@ export function useStep3ChainSelectionState() {
     gasMultiplier: "auto",
   });
 
-  useEffect(
-    () =>
-      remoteDeploymentGasFees &&
-      setTotalGasFee(remoteDeploymentGasFees.totalGasFee),
-    [remoteDeploymentGasFees]
-  );
+  useEffect(() => {
+    Maybe.of(remoteDeploymentGasFees?.totalGasFee)
+      .map((value) => toNumericString(value, userBalance?.decimals || 18))
+      .map($setTotalGasFee);
+  }, [remoteDeploymentGasFees, $setTotalGasFee, userBalance?.decimals]);
 
   const resetState = () => {
     setIsDeploying(false);
     $setTotalGasFee(formatEther(0n));
   };
 
-  const setTotalGasFee = (total: bigint) => {
-    const num = Number(formatEther(total));
-    $setTotalGasFee(num.toFixed(4));
-  };
-
   useEffect(() => {
-    if (!currentChain || currentChain.chain_name === sourceChainId) return;
+    if (!currentChain || currentChain.id === sourceChainId) return;
 
-    setSourceChainId(currentChain.chain_name);
+    setSourceChainId(currentChain.id);
   }, [currentChain, chainId, sourceChainId]);
 
   return {
@@ -79,7 +78,7 @@ export function useStep3ChainSelectionState() {
     actions: {
       resetState,
       setIsDeploying,
-      setTotalGasFee,
+      $setTotalGasFee,
       setSourceChainId,
     },
   };

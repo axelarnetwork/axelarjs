@@ -55,7 +55,7 @@ export const getVMChainConfigs = publicProcedure
     try {
       const chainsMap = await ctx.configs.vmChains();
       const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
-      const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
+      const uniqueChainInfos = uniqBy((x) => x.id, chainInfos);
       const validChainInfos = uniqueChainInfos.filter(
         (chain) => vmChainConfigSchema.safeParse(chain).success
       );
