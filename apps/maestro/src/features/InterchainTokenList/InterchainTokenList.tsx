@@ -85,10 +85,10 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
             props.listClassName
           )}
         >
-          {tokens.map((token) =>
+          {tokens.map((token, i) =>
             token.isRegistered ? (
               <RegisteredInterchainTokenCard
-                key={token.axelarChainId}
+                key={i}
                 {...token}
                 hasRemoteTokens={tokens.length > 1}
                 originTokenAddress={originToken?.tokenAddress}
@@ -96,7 +96,7 @@ export const InterchainTokenList: FC<InterchainTokenListProps> = ({
               />
             ) : (
               <UnregisteredInterchainTokenCard
-                key={token.axelarChainId}
+                key={i}
                 onToggleSelection={onToggleSelection?.bind(null, token.chainId)}
                 {...token}
               />
