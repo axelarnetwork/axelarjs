@@ -114,6 +114,8 @@ export const NEXT_PUBLIC_ENABLED_FEATURES = Maybe.of(
   process.env.NEXT_PUBLIC_ENABLED_FEATURES
 ).mapOr([], (val) => String(val).split(","));
 
+export const FEE_MULTIPLIER = Maybe.of(process.env.FEE_MULTIPLIER).mapOr(1, Number);
+
 export const shouldDisableSend = (
   axelarChainId: string,
   tokenAddress: `0x${string}`

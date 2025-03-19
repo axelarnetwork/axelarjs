@@ -3,6 +3,7 @@ import {
   loadChains as getChainConfigs,
   type Environment,
 } from "@axelar-network/axelarjs-sdk";
+import { FEE_MULTIPLIER } from "~/config/env";
 
 import type {
   EstimateGasFeeInput,
@@ -32,7 +33,7 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
 
   const fee = await client.estimateMultihopFee(hopParams);
 
-  return BigInt(fee as string);
+  return BigInt(fee as string) * BigInt(FEE_MULTIPLIER);
 }
 
 async function estimateGasFeeMultipleChains(
