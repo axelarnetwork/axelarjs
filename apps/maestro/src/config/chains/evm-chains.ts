@@ -38,7 +38,6 @@ import {
   optimismSepolia,
   polygon,
   polygonAmoy,
-  polygonMumbai,
   polygonZkEvm,
   polygonZkEvmTestnet,
   scroll,
