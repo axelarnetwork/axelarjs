@@ -181,21 +181,10 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygonAmoy,
-    axelarChainId: "polygon-amoy",
-    axelarChainName: "polygon-amoy",
+    axelarChainId: "polygon-sepolia",
+    axelarChainName: "polygon-sepolia",
     environment: ENVIRONMENTS.testnet,
     supportWagmi: true,
-  },
-  {
-    ...polygonMumbai,
-    rpcUrls: {
-      default: { http: ["https://polygon-testnet.public.blastapi.io"] },
-      public: { http: ["https://polygon-testnet.public.blastapi.io"] },
-    },
-    axelarChainId: "polygon",
-    axelarChainName: "Polygon",
-    supportWagmi: true,
-    environment: ENVIRONMENTS.testnet,
   },
   {
     ...polygonZkEvm,
