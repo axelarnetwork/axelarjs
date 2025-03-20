@@ -405,13 +405,6 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.testnet,
   },
   {
-    ...blastSepolia,
-    axelarChainId: "blast-sepolia",
-    axelarChainName: "blast-sepolia",
-    supportWagmi: true,
-    environment: ENVIRONMENTS.testnet,
-  },
-  {
     ...avalancheFuji,
     axelarChainId: "avalanche-fuji",
     axelarChainName: "avalanche-fuji",
