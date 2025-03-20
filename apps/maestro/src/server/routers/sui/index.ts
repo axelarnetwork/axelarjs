@@ -12,10 +12,14 @@ import {
   deployRemoteInterchainToken,
   getTokenId,
   mintToken,
-  registerToken,
   setupTxBuilder,
 } from "./utils/txUtils";
-import { buildTx, getSuiChainConfig, getTreasuryCap, suiServiceBaseUrl } from "./utils/utils";
+import {
+  buildTx,
+  getSuiChainConfig,
+  getTreasuryCap,
+  suiServiceBaseUrl,
+} from "./utils/utils";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -69,9 +73,12 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         symbol: z.string(),
+        name: z.string(),
+        decimals: z.string(),
         destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
-        metadataId: z.string(),
+        tokenId: z.string(),
+        amount: z.bigint(),
         minterAddress: z.string().optional(),
         gasValues: z.array(z.bigint()),
       })
@@ -82,9 +89,12 @@ export const suiRouter = router({
           sender,
           symbol,
           tokenPackageId,
-          metadataId,
           destinationChains,
           gasValues,
+          name,
+          decimals,
+          // tokenId,
+          amount,
         } = input;
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
@@ -100,34 +110,57 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { Example, InterchainTokenService: ITS } = chainConfig.config.contracts;
+        const { InterchainTokenService: ITS } = chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
         if (!treasuryCap) {
           throw new Error("Treasury cap not found");
         }
-
-        if (input.minterAddress) {
-          await txBuilder.moveCall({
-            target: `${Example.address}::its::register_coin`,
+        const minterAddress = input.minterAddress || input.sender;
+        const coinInfo = await txBuilder.moveCall({
+          target: `${ITS.address}::coin_info::from_info`,
+          typeArguments: [tokenType],
+          arguments: [name, symbol, decimals],
+        });
+        const coinManagement = await txBuilder.moveCall({
+          target: `${ITS.address}::coin_management::new_with_cap`,
+          typeArguments: [tokenType],
+          arguments: [treasuryCap],
+        });
+        console.log("before add distributor, minterAddress", minterAddress);
+        await txBuilder
+          .moveCall({
+            target: `${ITS.address}::coin_management::add_distributor`,
             typeArguments: [tokenType],
-            arguments: [itsObjectId, metadataId],
-          });
-          txBuilder.tx.transferObjects(
-            [treasuryCap],
-            txBuilder.tx.pure.address(input.minterAddress)
-          );
-        } else {
-          await txBuilder
-            .moveCall({
-              target: `${Example.address}::its::register_coin_with_cap`,
-              typeArguments: [tokenType],
-              arguments: [itsObjectId, metadataId, treasuryCap],
-            })
-            .catch((e) => console.log("error with register coin treasury", e));
-        }
-
+            arguments: [coinManagement, minterAddress],
+          })
+          .catch((e) => console.log("error with add distributor", e));
+        await txBuilder
+          .moveCall({
+            target: `${ITS.address}::coin_management::add_operator`,
+            typeArguments: [tokenType],
+            arguments: [coinManagement, minterAddress],
+          })
+          .catch((e) => console.log("error with add operator", e));
+        await txBuilder
+          .moveCall({
+            target: `${ITS.address}::interchain_token_service::register_coin`,
+            typeArguments: [tokenType],
+            arguments: [itsObjectId, coinInfo, coinManagement],
+          })
+          .catch((e) => console.log("error with register coin", e));
+        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
+        // await txBuilder.moveCall({
+        //   target: `${ITS.address}::its::mint_as_distributor`,
+        //   typeArguments: [tokenType],
+        //   arguments: [
+        //     itsObjectId,
+        //     ITS.objects.ChannelId,
+        //     tokenId,
+        //     amount.toString(),
+        //   ],
+        // });
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
@@ -379,87 +412,12 @@ export const suiRouter = router({
         );
       }
     }),
-  getMintAndRegisterAndDeployTokenTx: publicProcedure
-    .input(
-      z.object({
-        sender: z.string(),
-        symbol: z.string(),
-        tokenPackageId: z.string(),
-        metadataId: z.string(),
-        destinationChains: z.array(z.string()),
-        amount: z.bigint(),
-        minterAddress: z.string().optional(),
-        gasValues: z.array(z.bigint()),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const chainConfig = await getSuiChainConfig(ctx);
 
-        const {
-          sender,
-          symbol,
-          tokenPackageId,
-          metadataId,
-          destinationChains,
-          amount,
-          minterAddress,
-          gasValues,
-        } = input;
-
-        const txBuilder = new TxBuilder(suiClient);
-        txBuilder.tx.setSenderIfNotSet(sender);
-
-        const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-        const coinMetadata = await suiClient.getCoinMetadata({
-          coinType: tokenType,
-        });
-
-        if (!coinMetadata) {
-          throw new Error(`Coin metadata not found for ${tokenType}`);
-        }
-
-        const treasuryCap = await getTreasuryCap(tokenPackageId);
-
-        // Mint coins
-        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
-
-        // Register coin
-        await registerToken(
-          txBuilder,
-          chainConfig,
-          tokenType,
-          metadataId,
-          treasuryCap,
-          minterAddress
-        );
-
-        for (let i = 0; i < destinationChains.length; i++) {
-          await deployRemoteInterchainToken(
-            txBuilder,
-            chainConfig,
-            destinationChains[i],
-            coinMetadata,
-            Number(gasValues[i]),
-            sender,
-            tokenType
-          );
-        }
-
-        const tx = await buildTx(sender, txBuilder);
-        const txJSON = await tx.toJSON();
-        return txJSON;
-      } catch (error) {
-        console.error(
-          "Failed to finalize combined mint and deployment:",
-          error
-        );
-        throw new Error(
-          `Combined mint, register, and deploy failed: ${
-            (error as Error).message
-          }`
-        );
-      }
+  getMintAsDistributorTx: publicProcedure
+    .input(z.object({}))
+    .mutation(({ input }) => {
+      // placeholder for now
+      console.log("input", input);
+      return {};
     }),
 });

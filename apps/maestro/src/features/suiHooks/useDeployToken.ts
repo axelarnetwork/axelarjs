@@ -87,13 +87,6 @@ export default function useTokenDeploy() {
       },
     });
 
-  const { mutateAsync: getMintAndRegisterAndDeployTokenTx } =
-    trpc.sui.getMintAndRegisterAndDeployTokenTx.useMutation({
-      onError(error) {
-        console.log("error in getSendTokenDeploymentTxBytes", error.message);
-      },
-    });
-
   const deployToken = async ({
     initialSupply,
     symbol,
@@ -156,26 +149,22 @@ export default function useTokenDeploy() {
 
       let sendTokenTxJSON;
       if (treasuryCap) {
-        sendTokenTxJSON = await getMintAndRegisterAndDeployTokenTx({
-          sender: currentAccount.address,
-          symbol,
-          tokenPackageId: tokenAddress,
-          metadataId: metadata.objectId,
-          destinationChains: destinationChainIds,
-          amount: initialSupply,
-          minterAddress: minterAddress,
-          gasValues
-        });
-      } else {
         sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
           sender: currentAccount.address,
           symbol,
           tokenPackageId: tokenAddress,
-          metadataId: metadata.objectId,
+          name,
+          tokenId: metadata.objectId,
+          amount: initialSupply,
+          decimals: decimals.toString(),
           destinationChains: destinationChainIds,
           minterAddress: minterAddress,
-          gasValues
+          gasValues,
         });
+      } else {
+        throw new Error(
+          "Failed to get register and send token deployment tx bytes, missing treasury cap"
+        );
       }
 
       if (!sendTokenTxJSON) {
