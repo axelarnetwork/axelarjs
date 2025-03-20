@@ -17,13 +17,13 @@ import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
+import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
-import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -218,23 +218,9 @@ export const Step2: FC = () => {
       }
       return { children: "Check your wallet", status: "loading" };
     }
-    if (rootState.txState.type === "idle" && !isReady) { 
-      return { children: "Initializing", status: "loading" };
-    }
-    if (rootState.txState.type === "deploying") {
-      return { children: "Deploying interchain token", status: "loading" };
-    }
-
     if (state.isEstimatingGasFees) {
       return { children: "Loading gas fees", status: "loading" };
     }
-    if (state.hasGasFeesEstimationError) {
-      return {
-        children: "Failed to load gas prices",
-        status: "error",
-      };
-    }
-
     if (hasInsufficientGasBalance) {
       return {
         children: sourceChain?.native_token.decimals
@@ -242,6 +228,18 @@ export const Step2: FC = () => {
           : `Insufficient ${nativeTokenSymbol} balance for gas fees`,
         status: "error",
       };
+    }
+    if (state.hasGasFeesEstimationError) {
+      return {
+        children: "Failed to load gas prices",
+        status: "error",
+      };
+    }
+    if (rootState.txState.type === "idle" && !isReady) {
+      return { children: "Initializing", status: "loading" };
+    }
+    if (rootState.txState.type === "deploying") {
+      return { children: "Deploying interchain token", status: "loading" };
     }
 
     return {
