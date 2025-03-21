@@ -11,7 +11,7 @@ import { publicProcedure, router } from "~/server/trpc";
 import {
   deployRemoteInterchainToken,
   getTokenId,
-  mintToken,
+  mintTokenAsDistributor,
   setupTxBuilder,
 } from "./utils/txUtils";
 import {
@@ -20,6 +20,7 @@ import {
   getTreasuryCap,
   suiServiceBaseUrl,
 } from "./utils/utils";
+import { TransactionResult } from "@mysten/sui/transactions"
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -40,19 +41,22 @@ export const suiRouter = router({
 
         const { AxelarGateway } = chainConfig.config.contracts;
 
-        const response = await fetch(`${suiServiceBaseUrl}/deploy-token-with-channel`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            sender: walletAddress,
-            name,
-            symbol,
-            decimals,
-            gatewayAddress: AxelarGateway.address,
-          }),
-        });
+        const response = await fetch(
+          `${suiServiceBaseUrl}/deploy-token-with-channel`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sender: walletAddress,
+              name,
+              symbol,
+              decimals,
+              gatewayAddress: AxelarGateway.address,
+            }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(
@@ -114,7 +118,8 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { InterchainTokenService: ITS, AxelarGateway } = chainConfig.config.contracts;
+        const { InterchainTokenService: ITS, AxelarGateway } =
+          chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
@@ -127,7 +132,6 @@ export const suiRouter = router({
           typeArguments: [tokenType],
           arguments: [name, symbol, decimals],
         });
-        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_with_cap`,
           typeArguments: [tokenType],
@@ -137,11 +141,11 @@ export const suiRouter = router({
           owner: input.sender,
           filter: {
             MoveModule: { module: "channel", package: AxelarGateway.address },
-          }
+          },
         });
 
-        const channelObjects = ownedObjects.data.map(channel => channel.data)
-        const lastChannel = channelObjects[channelObjects.length - 1]
+        const channelObjects = ownedObjects.data.map((channel) => channel.data);
+        const lastChannel = channelObjects[channelObjects.length - 1];
         const channelId = lastChannel?.objectId;
 
         if (!channelId) {
@@ -164,7 +168,7 @@ export const suiRouter = router({
           })
           .catch((e) => console.log("error with add operator", e));
 
-        await txBuilder
+        const TokenId = await txBuilder
           .moveCall({
             target: `${ITS.address}::interchain_token_service::register_coin`,
             typeArguments: [tokenType],
@@ -172,6 +176,8 @@ export const suiRouter = router({
           })
           .catch((e) => console.log("error with register coin", e));
 
+        await mintTokenAsDistributor(txBuilder, chainConfig, tokenType, TokenId as TransactionResult, channelId, amount, sender);
+       
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
@@ -180,7 +186,7 @@ export const suiRouter = router({
             coinMetadata,
             Number(gasValues[i]),
             sender,
-            tokenType,
+            tokenType
           );
         }
 

@@ -1,6 +1,7 @@
 import type { SuiChainConfig } from "@axelarjs/api";
 
 import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { TransactionResult } from "@mysten/sui/transactions";
 import { keccak256, stringToHex } from "viem";
 
 import { suiChainConfig } from "~/config/chains";
@@ -74,21 +75,27 @@ export async function mintTokenAsDistributor(
   txBuilder: TxBuilder,
   chainConfig: SuiChainConfig,
   tokenType: string,
-  tokenId: string,
+  tokenId: string | TransactionResult,
   channelId: string,
   amount: bigint,
   sender: string
 ) {
- const {
-   InterchainTokenService: ITS,
- } = chainConfig.config.contracts;
+  const { InterchainTokenService: ITS } = chainConfig.config.contracts;
 
-  const TokenId = await getTokenId(txBuilder, tokenId, ITS);
+  const TokenId =
+    typeof tokenId === "string"
+      ? await getTokenId(txBuilder, tokenId, ITS)
+      : tokenId;
 
   const [Coin] = await txBuilder.moveCall({
     target: `${ITS.address}::interchain_token_service::mint_as_distributor`,
     typeArguments: [tokenType],
-    arguments: [ITS.objects.InterchainTokenService, channelId, TokenId, amount.toString()],
+    arguments: [
+      ITS.objects.InterchainTokenService,
+      channelId,
+      TokenId,
+      amount.toString(),
+    ],
   });
 
   txBuilder.tx.transferObjects([Coin], txBuilder.tx.pure.address(sender));
