@@ -33,10 +33,7 @@ export const filterEligibleChains = (
 
   if (!currentChain) return [];
 
-  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(
-    ","
-  ).map((chain) => chain.trim());
-
+  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM
   // Normalize whitelist check
   const isAllChainsWhitelisted = whitelistedChains[0] === "all";
 
