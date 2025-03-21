@@ -32,11 +32,15 @@ export const suiRouter = router({
         walletAddress: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const { symbol, name, decimals, walletAddress } = input;
         // TODO: create a service client if we plan to keep this
-        const response = await fetch(`${suiServiceBaseUrl}/deploy-token`, {
+        const chainConfig = await getSuiChainConfig(ctx);
+
+        const { AxelarGateway } = chainConfig.config.contracts;
+
+        const response = await fetch(`${suiServiceBaseUrl}/deploy-token-with-channel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -46,6 +50,7 @@ export const suiRouter = router({
             name,
             symbol,
             decimals,
+            gatewayAddress: AxelarGateway.address,
           }),
         });
 
@@ -128,13 +133,34 @@ export const suiRouter = router({
           typeArguments: [tokenType],
           arguments: [treasuryCap],
         });
+        const ownedObjects = await suiClient.getOwnedObjects({
+          owner: input.sender,
+          filter: {
+            MoveModule: { module: "channel", package: AxelarGateway.address },
+          }
+        });
+
+        const channelObjects = ownedObjects.data.map(channel => channel.data)
+        const lastChannel = channelObjects[channelObjects.length - 1]
+        const channelId = lastChannel?.objectId;
+
+        if (!channelId) {
+          throw new Error("Channel not found");
+        }
+
+        const channelAddress = await txBuilder.moveCall({
+          target: `${AxelarGateway.address}::channel::to_address`,
+          arguments: [channelId],
+        });
+        
         await txBuilder
           .moveCall({
             target: `${ITS.address}::coin_management::add_distributor`,
             typeArguments: [tokenType],
-            arguments: [coinManagement, minterAddress],
+            arguments: [coinManagement, channelAddress],
           })
           .catch((e) => console.log("error with add distributor", e));
+
         await txBuilder
           .moveCall({
             target: `${ITS.address}::coin_management::add_operator`,
@@ -143,20 +169,13 @@ export const suiRouter = router({
           })
           .catch((e) => console.log("error with add operator", e));
 
-        await txBuilder
+        const TokenId = await txBuilder
           .moveCall({
             target: `${ITS.address}::interchain_token_service::register_coin`,
             typeArguments: [tokenType],
             arguments: [itsObjectId, coinInfo, coinManagement],
           })
           .catch((e) => console.log("error with register coin", e));
-
-        const Channel = await txBuilder.moveCall({
-          target: `${AxelarGateway.address}::channel::new`,
-          arguments: [],
-        });
-      
-        txBuilder.tx.transferObjects([Channel], txBuilder.tx.pure.address(sender));
 
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
@@ -167,6 +186,7 @@ export const suiRouter = router({
             Number(gasValues[i]),
             sender,
             tokenType,
+            TokenId
           );
         }
 
