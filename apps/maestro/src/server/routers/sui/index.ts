@@ -93,7 +93,6 @@ export const suiRouter = router({
           gasValues,
           name,
           decimals,
-          // tokenId,
           amount,
         } = input;
 
@@ -110,7 +109,7 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { InterchainTokenService: ITS } = chainConfig.config.contracts;
+        const { InterchainTokenService: ITS, AxelarGateway } = chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
@@ -123,12 +122,12 @@ export const suiRouter = router({
           typeArguments: [tokenType],
           arguments: [name, symbol, decimals],
         });
+        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_with_cap`,
           typeArguments: [tokenType],
           arguments: [treasuryCap],
         });
-        console.log("before add distributor, minterAddress", minterAddress);
         await txBuilder
           .moveCall({
             target: `${ITS.address}::coin_management::add_distributor`,
@@ -143,6 +142,7 @@ export const suiRouter = router({
             arguments: [coinManagement, minterAddress],
           })
           .catch((e) => console.log("error with add operator", e));
+
         await txBuilder
           .moveCall({
             target: `${ITS.address}::interchain_token_service::register_coin`,
@@ -150,17 +150,14 @@ export const suiRouter = router({
             arguments: [itsObjectId, coinInfo, coinManagement],
           })
           .catch((e) => console.log("error with register coin", e));
-        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
-        // await txBuilder.moveCall({
-        //   target: `${ITS.address}::its::mint_as_distributor`,
-        //   typeArguments: [tokenType],
-        //   arguments: [
-        //     itsObjectId,
-        //     ITS.objects.ChannelId,
-        //     tokenId,
-        //     amount.toString(),
-        //   ],
-        // });
+
+        const Channel = await txBuilder.moveCall({
+          target: `${AxelarGateway.address}::channel::new`,
+          arguments: [],
+        });
+      
+        txBuilder.tx.transferObjects([Channel], txBuilder.tx.pure.address(sender));
+
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
@@ -169,7 +166,7 @@ export const suiRouter = router({
             coinMetadata,
             Number(gasValues[i]),
             sender,
-            tokenType
+            tokenType,
           );
         }
 
