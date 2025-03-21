@@ -148,16 +148,11 @@ export const suiRouter = router({
           throw new Error("Channel not found");
         }
 
-        const channelAddress = await txBuilder.moveCall({
-          target: `${AxelarGateway.address}::channel::to_address`,
-          arguments: [channelId],
-        });
-        
         await txBuilder
           .moveCall({
             target: `${ITS.address}::coin_management::add_distributor`,
             typeArguments: [tokenType],
-            arguments: [coinManagement, channelAddress],
+            arguments: [coinManagement, channelId],
           })
           .catch((e) => console.log("error with add distributor", e));
 
@@ -169,7 +164,7 @@ export const suiRouter = router({
           })
           .catch((e) => console.log("error with add operator", e));
 
-        const TokenId = await txBuilder
+        await txBuilder
           .moveCall({
             target: `${ITS.address}::interchain_token_service::register_coin`,
             typeArguments: [tokenType],
@@ -186,7 +181,6 @@ export const suiRouter = router({
             Number(gasValues[i]),
             sender,
             tokenType,
-            TokenId
           );
         }
 
