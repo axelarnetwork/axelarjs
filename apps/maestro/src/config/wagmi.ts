@@ -43,7 +43,8 @@ export const WEB3_MODAL = createWeb3Modal({
     "--w3m-accent": "var(--primary)",
     "--w3m-color-mix": "var(--primary)",
   },
-  excludeWalletIds: [...NEXT_PUBLIC_DISABLED_WALLET_IDS],
+  // https://docs.reown.com/cloud/wallets/wallet-list
+  excludeWalletIds: [...NEXT_PUBLIC_DISABLED_WALLET_IDS, "6adb6082c909901b9e7189af3a4a0223102cd6f8d5c39e39f3d49acb92b578bb"],
   connectorImages: {
     coinbaseWallet:
       "https://raw.githubusercontent.com/WalletConnect/web3modal/V2/laboratory/public/images/wallet_coinbase.webp",

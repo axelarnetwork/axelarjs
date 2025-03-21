@@ -12,7 +12,7 @@ export function useChainFromRoute() {
       return CHAIN_CONFIGS.find(
         (chain) =>
           chain.axelarChainName === chainName ||
-          chain.axelarChainId === chainName
+          chain.axelarChainId.toLowerCase() === chainName.toLowerCase()
       );
     }
   }, [chainName]);

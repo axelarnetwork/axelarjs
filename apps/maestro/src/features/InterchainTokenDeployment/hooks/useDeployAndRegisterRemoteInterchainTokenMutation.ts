@@ -83,26 +83,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     });
 
-  useEffect(() => {
-    if (!tokenId || !tokenAddress) {
-      if (input) {
-        if (!input.sourceChainId.includes("sui")) {
-          setIsReady(false);
-          return;
-        }
-      }
-    }
-
-    setIsReady(true);
-  }, [
-    input,
-    tokenId,
-    deployerAddress,
-    tokenAddress,
-    input?.sourceChainId,
-    combinedComputed,
-  ]);
-
   const { destinationChainIds } = useMemo(() => {
     const index = combinedComputed.indexedById;
     const originalChain = index[input?.sourceChainId ?? chainId];
@@ -129,13 +109,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     const minter = input?.minterAddress ?? zeroAddress;
     const commonArgs = {
-      minter: minter as `0x${string}`,
       salt: input.salt,
     };
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...commonArgs,
+        minter: minter as `0x${string}`,
         initialSupply: input.initialSupply || 0n,
         name: input.tokenName,
         symbol: input.tokenSymbol,
@@ -148,8 +128,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
 
     const registerTxData = destinationChainIds.map((destinationChain, i) =>
-      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken2.data({
         ...commonArgs,
+        originalChainName: "",
+        minter: minter as `0x${string}`,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })
@@ -174,6 +156,32 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
   );
   const multicall = useWriteInterchainTokenFactoryMulticall();
+
+  useEffect(() => {
+    if (isValidEVMAddress(deployerAddress) && !prepareMulticall?.request) {
+      setIsReady(false);
+      console.warn("Failed to simulate multicall for deploying remote tokens");
+      return;
+    }
+    if (!tokenId || !tokenAddress) {
+      if (input) {
+        if (!input.sourceChainId.includes("sui")) {
+          setIsReady(false);
+          return;
+        }
+      }
+    }
+
+    setIsReady(true);
+  }, [
+    input,
+    tokenId,
+    deployerAddress,
+    tokenAddress,
+    input?.sourceChainId,
+    combinedComputed,
+    prepareMulticall?.request,
+  ]);
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: multicall?.data,

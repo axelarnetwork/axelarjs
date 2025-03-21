@@ -3,6 +3,7 @@ import { useMemo } from "react";
 
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "../axelarscan/hooks";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
@@ -29,11 +30,21 @@ export function useInterchainTokensQuery(input: {
     }
   );
 
+  const matchingTokens = data?.matchingTokens || [];
+
+  const destinationChainConfigs = matchingTokens.map((token) => {
+    return combinedComputed.indexedById[token.axelarChainId];
+  }).filter(Boolean);
+
+  const eligibleChainConfigs = input.chainId ? filterEligibleChains(destinationChainConfigs, input.chainId) : destinationChainConfigs;
+
   return {
     ...queryResult,
     data: {
       ...data,
-      matchingTokens: data?.matchingTokens.map((token) => ({
+      matchingTokens: data?.matchingTokens.filter((token) => {
+        return !!eligibleChainConfigs.find((x) => x.id === token.axelarChainId) || token.chainId === input.chainId;
+      }).map((token) => ({
         ...token,
         chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
         wagmiConfig: combinedComputed.wagmiChains?.find(
