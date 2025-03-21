@@ -70,6 +70,32 @@ export async function mintToken(
   return coin;
 }
 
+export async function mintTokenAsDistributor(
+  txBuilder: TxBuilder,
+  chainConfig: SuiChainConfig,
+  tokenType: string,
+  tokenId: string,
+  channelId: string,
+  amount: bigint,
+  sender: string
+) {
+ const {
+   InterchainTokenService: ITS,
+ } = chainConfig.config.contracts;
+
+  const TokenId = await getTokenId(txBuilder, tokenId, ITS);
+
+  const [Coin] = await txBuilder.moveCall({
+    target: `${ITS.address}::interchain_token_service::mint_as_distributor`,
+    typeArguments: [tokenType],
+    arguments: [ITS.objects.InterchainTokenService, channelId, TokenId, amount.toString()],
+  });
+
+  txBuilder.tx.transferObjects([Coin], txBuilder.tx.pure.address(sender));
+
+  return Coin;
+}
+
 export async function deployRemoteInterchainToken(
   txBuilder: TxBuilder,
   chainConfig: SuiChainConfig,
