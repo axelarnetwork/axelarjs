@@ -90,6 +90,7 @@ export function useMintInterchainTokenState() {
     erc20Details,
     isMinting,
     tokenAddress: managerState.tokenAddress,
+    tokenId: managerState.tokenId,
   };
 
   const actions = {

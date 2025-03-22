@@ -61,19 +61,25 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       // This happens when the token is deployed on sui as a remote chain
       if (!metadata) {
-        const InterchainTokenServiceV0 = chainConfig.config.contracts?.InterchainTokenService.objects.InterchainTokenServicev0;
+        const InterchainTokenServiceV0 =
+          chainConfig.config.contracts?.InterchainTokenService.objects
+            .InterchainTokenServicev0;
 
-        if(!InterchainTokenServiceV0) {
+        if (!InterchainTokenServiceV0) {
           throw new Error("Invalid chain config");
         }
 
-        const coinInfo = await getCoinInfoByCoinType(client, coinType, InterchainTokenServiceV0);
+        const coinInfo = await getCoinInfoByCoinType(
+          client,
+          coinType,
+          InterchainTokenServiceV0
+        );
         decimals = coinInfo?.decimals;
       }
 
       let tokenOwner = null;
       try {
-        tokenOwner = await getTokenOwner(input.tokenAddress);
+        tokenOwner = await getTokenOwner(input.tokenAddress, ctx);
       } catch (error) {
         console.log("getERC20TokenBalanceForOwner", error);
       }
