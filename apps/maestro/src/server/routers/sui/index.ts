@@ -4,12 +4,14 @@ import {
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
 import type { PaginatedCoins } from "@mysten/sui/client";
+import { TransactionResult } from "@mysten/sui/transactions";
 import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
   deployRemoteInterchainToken,
+  getChannelId,
   getTokenId,
   mintTokenAsDistributor,
   setupTxBuilder,
@@ -20,7 +22,6 @@ import {
   getTreasuryCap,
   suiServiceBaseUrl,
 } from "./utils/utils";
-import { TransactionResult } from "@mysten/sui/transactions"
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -118,8 +119,7 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { InterchainTokenService: ITS, AxelarGateway } =
-          chainConfig.config.contracts;
+        const { InterchainTokenService: ITS } = chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
@@ -137,16 +137,8 @@ export const suiRouter = router({
           typeArguments: [tokenType],
           arguments: [treasuryCap],
         });
-        const ownedObjects = await suiClient.getOwnedObjects({
-          owner: input.sender,
-          filter: {
-            MoveModule: { module: "channel", package: AxelarGateway.address },
-          },
-        });
 
-        const channelObjects = ownedObjects.data.map((channel) => channel.data);
-        const lastChannel = channelObjects[channelObjects.length - 1];
-        const channelId = lastChannel?.objectId;
+        const channelId = await getChannelId(sender, chainConfig);
 
         if (!channelId) {
           throw new Error("Channel not found");
@@ -176,8 +168,16 @@ export const suiRouter = router({
           })
           .catch((e) => console.log("error with register coin", e));
 
-        await mintTokenAsDistributor(txBuilder, chainConfig, tokenType, TokenId as TransactionResult, channelId, amount, sender);
-       
+        await mintTokenAsDistributor(
+          txBuilder,
+          chainConfig,
+          tokenType,
+          TokenId as TransactionResult,
+          channelId,
+          amount,
+          sender
+        );
+
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
             txBuilder,
@@ -431,10 +431,33 @@ export const suiRouter = router({
     }),
 
   getMintAsDistributorTx: publicProcedure
-    .input(z.object({}))
-    .mutation(({ input }) => {
-      // placeholder for now
-      console.log("input", input);
-      return {};
+    .input(
+      z.object({
+        sender: z.string(),
+        tokenId: z.string(),
+        tokenPackageId: z.string(),
+        amount: z.bigint(),
+        symbol: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { sender, tokenId, tokenPackageId, amount, symbol } = input;
+      const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+      const chainConfig = await getSuiChainConfig(ctx);
+      const txBuilder = new TxBuilder(suiClient);
+      const channelId = await getChannelId(sender, chainConfig);
+
+      await mintTokenAsDistributor(
+        txBuilder,
+        chainConfig,
+        tokenType,
+        tokenId,
+        channelId as string,
+        amount,
+        sender
+      );
+      const tx = await buildTx(sender, txBuilder);
+      const txJSON = await tx.toJSON();
+      return txJSON;
     }),
 });
