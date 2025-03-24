@@ -54,6 +54,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
+
       const InterchainTokenServiceV0 =
         chainConfig.config.contracts?.InterchainTokenService.objects
           .InterchainTokenServicev0;
@@ -68,22 +69,20 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         InterchainTokenServiceV0
       );
 
-      let decimals;
+      const decimals = metadata?.decimals ?? coinInfo?.decimals;
 
-      // This happens when the token is deployed on sui as a remote chain
-      if (!metadata) {
-        decimals = coinInfo?.decimals;
-      }
+      const isOperator = input.owner === coinInfo?.operator;
+      const isDistributor = input.owner === coinInfo?.distributor;
 
       const result = {
-        isTokenOwner: input.owner === coinInfo?.operator,
-        isTokenMinter: input.owner === coinInfo?.distributor,
+        isTokenOwner: isOperator,
+        isTokenMinter: isDistributor,
         tokenBalance: balance.toString(),
-        decimals: metadata?.decimals ?? decimals,
+        decimals,
         isTokenPendingOwner: false,
         hasPendingOwner: false,
-        hasMinterRole: input.owner === coinInfo?.distributor,
-        hasOperatorRole: input.owner === coinInfo?.operator,
+        hasMinterRole: isDistributor,
+        hasOperatorRole: isOperator,
         hasFlowLimiterRole: false, // TODO: check if this is correct
       };
       return result;
