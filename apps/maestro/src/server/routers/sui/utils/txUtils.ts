@@ -142,22 +142,3 @@ export async function deployRemoteInterchainToken(
     typeArguments: [tokenType],
   });
 }
-
-export const getChannelId = async (
-  sender: string,
-  chainConfig: SuiChainConfig
-) => {
-  const { AxelarGateway } = chainConfig.config.contracts;
-  const ownedObjects = await suiClient.getOwnedObjects({
-    owner: sender,
-    filter: {
-      MoveModule: { module: "channel", package: AxelarGateway.address },
-    },
-  });
-
-  const channelObjects = ownedObjects.data.map((channel) => channel.data);
-  const lastChannel = channelObjects[channelObjects.length - 1];
-  const channelId = lastChannel?.objectId;
-
-  return channelId;
-};

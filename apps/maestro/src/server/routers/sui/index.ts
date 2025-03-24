@@ -11,7 +11,6 @@ import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
 import {
   deployRemoteInterchainToken,
-  getChannelId,
   getTokenId,
   mintTokenAsDistributor,
   setupTxBuilder,
@@ -20,6 +19,7 @@ import {
   buildTx,
   getSuiChainConfig,
   getTreasuryCap,
+  getChannelId,
   suiServiceBaseUrl,
 } from "./utils/utils";
 

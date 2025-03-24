@@ -1,5 +1,6 @@
-import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import { SuiChainConfig } from "@axelarjs/api";
+
+import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import {
   SuiClient,
   SuiObjectChange,
@@ -11,13 +12,15 @@ import {
 import { Transaction } from "@mysten/sui/transactions";
 
 import { suiChainConfig } from "~/config/chains";
-import { suiClient as client } from "~/lib/clients/suiClient";
+import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
 import type { Context } from "~/server/context";
 
 export const suiServiceBaseUrl =
   "https://melted-fayth-nptytn-57e5d396.koyeb.app";
 
-export const getSuiChainConfig = async (ctx: Context): Promise<SuiChainConfig> => {
+export const getSuiChainConfig = async (
+  ctx: Context
+): Promise<SuiChainConfig> => {
   const chainConfigs = await ctx.configs.axelarConfigs();
   const chainConfig = chainConfigs.chains[suiChainConfig.axelarChainId];
 
@@ -71,22 +74,6 @@ export const getCoinType = async (tokenAddress: string) => {
   const coinSymbol = Object.keys(modules)[0];
   const coinType = `${tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
   return coinType;
-};
-
-// get token owner from token address
-// TODO: this is wrong the the destination chain is sui where the token owner is axelar relayer
-export const getTokenOwner = async (tokenAddress: string) => {
-  const treasuryCap = await getTreasuryCap(tokenAddress);
-  const object = await client.getObject({
-    id: treasuryCap as string,
-    options: {
-      showOwner: true,
-      showPreviousTransaction: true,
-    },
-  });
-
-  const owner = object?.data?.owner as { AddressOwner: string } | undefined;
-  return owner?.AddressOwner;
 };
 
 export const getCoinAddressFromType = (
@@ -221,7 +208,7 @@ export const getCoinInfoByCoinType = async (
           showContent: true,
         },
       });
-      return extractCoinInfo(coin);
+      return await extractCoinInfo(coin);
     } else {
       console.log("Token not found.");
       return null;
@@ -272,17 +259,55 @@ function extractTokenDetails(filteredResult: DynamicFieldInfo) {
   };
 }
 
-function extractCoinInfo(coin: SuiObjectResponse) {
+async function extractCoinInfo(coin: SuiObjectResponse) {
   const content = coin.data?.content as any;
   const fields = content?.fields?.value?.fields;
   const coinInfo = fields?.coin_info.fields;
   const coinManagement = fields?.coin_management.fields;
 
+  const operator = coinManagement.operator as string | undefined;
+  const distributorChannelId = coinManagement.distributor;
+
+  const channalDetails = await suiClient.getObject({
+    id: distributorChannelId,
+    options: {
+      showOwner: true,
+    },
+  });
+
+  const channelOwnerDetails = channalDetails.data?.owner as { AddressOwner: string } | undefined;
+
+  let distributor;
+  if (channelOwnerDetails) {
+    distributor = channelOwnerDetails.AddressOwner;
+  } 
+
   return {
     decimals: coinInfo.decimals,
     name: coinInfo.name,
     symbol: coinInfo.symbol,
+    operator,
+    distributor,
     totalSupply: coinManagement.treasury_cap.fields.total_supply.fields.value,
     treasuryCap: coinManagement.treasury_cap.fields.id.id,
   };
 }
+
+export const getChannelId = async (
+  sender: string,
+  chainConfig: SuiChainConfig
+) => {
+  const { AxelarGateway } = chainConfig.config.contracts;
+  const ownedObjects = await suiClient.getOwnedObjects({
+    owner: sender,
+    filter: {
+      MoveModule: { module: "channel", package: AxelarGateway.address },
+    },
+  });
+
+  const channelObjects = ownedObjects.data.map((channel) => channel.data);
+  const lastChannel = channelObjects[channelObjects.length - 1];
+  const channelId = lastChannel?.objectId;
+
+  return channelId;
+};
