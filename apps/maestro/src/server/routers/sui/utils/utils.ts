@@ -275,12 +275,7 @@ async function extractCoinInfo(coin: SuiObjectResponse) {
     },
   });
 
-  const channelOwnerDetails = channalDetails.data?.owner as { AddressOwner: string } | undefined;
-
-  let distributor;
-  if (channelOwnerDetails) {
-    distributor = channelOwnerDetails.AddressOwner;
-  } 
+  const distributor = (channalDetails.data?.owner as { AddressOwner?: string })?.AddressOwner;
 
   return {
     decimals: coinInfo.decimals,
