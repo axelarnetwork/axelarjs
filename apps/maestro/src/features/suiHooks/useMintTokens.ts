@@ -52,7 +52,7 @@ export default function useMintTokens() {
     try {
       const mintTxJSON = await getMintTx({
         sender: currentAccount.address,
-        tokenId: tokenId,
+        tokenId,
         tokenPackageId: tokenAddress,
         amount: amount,
         symbol,
