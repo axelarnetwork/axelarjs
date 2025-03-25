@@ -155,7 +155,6 @@ export const suiRouter = router({
             typeArguments: [tokenType],
             arguments: [coinManagement, input.sender],
           })
-          .catch((e) => console.log("error with add operator", e));
 
         const TokenId = await txBuilder.moveCall({
           target: `${ITS.address}::interchain_token_service::register_coin`,
