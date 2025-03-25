@@ -17,9 +17,9 @@ import {
 } from "./utils/txUtils";
 import {
   buildTx,
+  getChannelId,
   getSuiChainConfig,
   getTreasuryCap,
-  getChannelId,
   suiServiceBaseUrl,
 } from "./utils/utils";
 

@@ -113,11 +113,11 @@ export async function deployRemoteInterchainToken(
   tokenType: string
 ) {
   const {
-    Example,
     InterchainTokenService: ITS,
     AxelarGateway,
     GasService,
   } = chainConfig.config.contracts;
+  // Split coins for gas fee
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
   const TokenId = await getTokenIdByCoinMetadata(
@@ -126,19 +126,23 @@ export async function deployRemoteInterchainToken(
     coinMetadata,
     chainConfig
   );
-
-  await txBuilder.moveCall({
-    target: `${Example.address}::its::deploy_remote_interchain_token`,
-    arguments: [
-      ITS.objects.InterchainTokenService,
-      AxelarGateway.objects.Gateway,
-      GasService.objects.GasService,
-      destinationChain,
-      TokenId,
-      gas,
-      "0x",
-      sender,
-    ],
+  const messageTicket = await txBuilder.moveCall({
+    target: `${ITS.address}::interchain_token_service::deploy_remote_interchain_token`,
+    arguments: [ITS.objects.InterchainTokenService, TokenId, destinationChain],
     typeArguments: [tokenType],
+  });
+  await txBuilder.moveCall({
+    target: `${GasService.address}::gas_service::pay_gas`,
+    arguments: [
+      GasService.objects.GasService,
+      messageTicket,
+      gas,
+      sender,
+      "0x",
+    ],
+  });
+  await txBuilder.moveCall({
+    target: `${AxelarGateway.address}::gateway::send_message`,
+    arguments: [AxelarGateway.objects.Gateway, messageTicket],
   });
 }
