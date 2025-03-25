@@ -100,7 +100,7 @@ const Appbar: FC<AppbarProps> = (props) => {
             {isConnected && address ? (
               <>
                 <ChainsDropdown
-                  contentClassName="max-h-[70dvh] w-[300px] translate-x-2"
+                  contentClassName="max-h-[70dvh] w-full md:w-full translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
                 <Card className="bg-base-200" $compact>
