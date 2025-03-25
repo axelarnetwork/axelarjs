@@ -4,7 +4,6 @@ import {
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
 import type { PaginatedCoins } from "@mysten/sui/client";
-import { TransactionResult } from "@mysten/sui/transactions";
 import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
@@ -17,9 +16,9 @@ import {
 } from "./utils/txUtils";
 import {
   buildTx,
+  getChannelId,
   getSuiChainConfig,
   getTreasuryCap,
-  getChannelId,
   suiServiceBaseUrl,
 } from "./utils/utils";
 
@@ -83,8 +82,6 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         symbol: z.string(),
-        name: z.string(),
-        decimals: z.string(),
         destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
         tokenId: z.string(),
@@ -101,8 +98,6 @@ export const suiRouter = router({
           tokenPackageId,
           destinationChains,
           gasValues,
-          name,
-          decimals,
           amount,
         } = input;
 
@@ -130,7 +125,11 @@ export const suiRouter = router({
         const coinInfo = await txBuilder.moveCall({
           target: `${ITS.address}::coin_info::from_info`,
           typeArguments: [tokenType],
-          arguments: [name, symbol, decimals],
+          arguments: [
+            coinMetadata.name,
+            coinMetadata.symbol,
+            coinMetadata.decimals.toString(),
+          ],
         });
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_with_cap`,
@@ -144,35 +143,29 @@ export const suiRouter = router({
           throw new Error("Channel not found");
         }
 
-        await txBuilder
-          .moveCall({
-            target: `${ITS.address}::coin_management::add_distributor`,
-            typeArguments: [tokenType],
-            arguments: [coinManagement, channelId],
-          })
-          .catch((e) => console.log("error with add distributor", e));
+        await txBuilder.moveCall({
+          target: `${ITS.address}::coin_management::add_distributor`,
+          typeArguments: [tokenType],
+          arguments: [coinManagement, channelId],
+        });
 
-        await txBuilder
-          .moveCall({
-            target: `${ITS.address}::coin_management::add_operator`,
-            typeArguments: [tokenType],
-            arguments: [coinManagement, minterAddress],
-          })
-          .catch((e) => console.log("error with add operator", e));
+        await txBuilder.moveCall({
+          target: `${ITS.address}::coin_management::add_operator`,
+          typeArguments: [tokenType],
+          arguments: [coinManagement, minterAddress],
+        });
 
-        const TokenId = await txBuilder
-          .moveCall({
-            target: `${ITS.address}::interchain_token_service::register_coin`,
-            typeArguments: [tokenType],
-            arguments: [itsObjectId, coinInfo, coinManagement],
-          })
-          .catch((e) => console.log("error with register coin", e));
+        const TokenId = await txBuilder.moveCall({
+          target: `${ITS.address}::interchain_token_service::register_coin`,
+          typeArguments: [tokenType],
+          arguments: [itsObjectId, coinInfo, coinManagement],
+        });
 
         await mintTokenAsDistributor(
           txBuilder,
           chainConfig,
           tokenType,
-          TokenId as TransactionResult,
+          TokenId,
           channelId,
           amount,
           sender
