@@ -1,9 +1,11 @@
-import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
-import { keccak256, stringToHex } from "viem";
 import type { SuiChainConfig } from "@axelarjs/api";
 
-import { suiClient } from "~/lib/clients/suiClient";
+import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
+import { TransactionResult } from "@mysten/sui/transactions";
+import { keccak256, stringToHex } from "viem";
+
 import { suiChainConfig } from "~/config/chains";
+import { suiClient } from "~/lib/clients/suiClient";
 
 export function setupTxBuilder(sender: string) {
   const txBuilder = new TxBuilder(suiClient);
@@ -32,14 +34,14 @@ export async function getTokenIdByCoinMetadata(
   chainConfig: SuiChainConfig,
   isCanonical: boolean = false
 ) {
-  const { InterchainTokenService: ITS, AxelarGateway } = chainConfig.config.contracts;
-  const [ChainNameHash] = await txBuilder.moveCall({
+  const { InterchainTokenService: ITS, AxelarGateway } =
+    chainConfig.config.contracts;
+  const ChainNameHash = await txBuilder.moveCall({
     target: `${AxelarGateway.address}::bytes32::from_bytes`,
-    arguments: [
-      keccak256(stringToHex(suiChainConfig.axelarChainId)),
-    ],
+    arguments: [keccak256(stringToHex(suiChainConfig.axelarChainId))],
   });
-  const [TokenId] = await txBuilder.moveCall({
+
+  const TokenId = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
     typeArguments: [coinType],
     arguments: [
@@ -51,6 +53,7 @@ export async function getTokenIdByCoinMetadata(
       txBuilder.tx.pure.bool(!isCanonical), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
+
   return TokenId;
 }
 
@@ -70,6 +73,38 @@ export async function mintToken(
   return coin;
 }
 
+export async function mintTokenAsDistributor(
+  txBuilder: TxBuilder,
+  chainConfig: SuiChainConfig,
+  tokenType: string,
+  tokenId: string | TransactionResult,
+  channelId: string,
+  amount: bigint,
+  sender: string
+) {
+  const { InterchainTokenService: ITS } = chainConfig.config.contracts;
+
+  const TokenId =
+    typeof tokenId === "string"
+      ? await getTokenId(txBuilder, tokenId, ITS)
+      : tokenId;
+
+  const [Coin] = await txBuilder.moveCall({
+    target: `${ITS.address}::interchain_token_service::mint_as_distributor`,
+    typeArguments: [tokenType],
+    arguments: [
+      ITS.objects.InterchainTokenService,
+      channelId,
+      TokenId,
+      amount.toString(),
+    ],
+  });
+
+  txBuilder.tx.transferObjects([Coin], txBuilder.tx.pure.address(sender));
+
+  return Coin;
+}
+
 export async function deployRemoteInterchainToken(
   txBuilder: TxBuilder,
   chainConfig: SuiChainConfig,
@@ -79,64 +114,38 @@ export async function deployRemoteInterchainToken(
   sender: string,
   tokenType: string
 ) {
-  const { Example, InterchainTokenService: ITS, AxelarGateway, GasService } = chainConfig.config.contracts;
+  const {
+    InterchainTokenService: ITS,
+    AxelarGateway,
+    GasService,
+  } = chainConfig.config.contracts;
+  // Split coins for gas fee
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
   const TokenId = await getTokenIdByCoinMetadata(
     txBuilder,
     tokenType,
     coinMetadata,
-    chainConfig,
+    chainConfig
   );
-
-  await txBuilder.moveCall({
-    target: `${Example.address}::its::deploy_remote_interchain_token`,
-    arguments: [
-      ITS.objects.InterchainTokenService,
-      AxelarGateway.objects.Gateway,
-      GasService.objects.GasService,
-      destinationChain,
-      TokenId,
-      gas,
-      "0x",
-      sender,
-    ],
+  const messageTicket = await txBuilder.moveCall({
+    target: `${ITS.address}::interchain_token_service::deploy_remote_interchain_token`,
+    arguments: [ITS.objects.InterchainTokenService, TokenId, destinationChain],
     typeArguments: [tokenType],
   });
-}
-
-export async function registerToken(
-  txBuilder: TxBuilder,
-  chainConfig: SuiChainConfig,
-  tokenType: string,
-  metadataId: string,
-  treasuryCap: any,
-  minterAddress?: string,
-  isCanonical: boolean = false
-) {
-  const { Example, InterchainTokenService: ITS } = chainConfig.config.contracts;
-  const itsObjectId = ITS.objects.InterchainTokenService;
-
-  if (isCanonical) {
-    // Register coin and transfer cap to minter
-    await txBuilder.moveCall({
-      target: `${Example.address}::its::register_coin`,
-      typeArguments: [tokenType],
-      arguments: [itsObjectId, metadataId],
-    });
-
-    if(minterAddress) {
-      txBuilder.tx.transferObjects(
-        [treasuryCap as string],
-        txBuilder.tx.pure.address(minterAddress)
-      );
-    }
-  } else {
-    // Register with cap
-    await txBuilder.moveCall({
-      target: `${Example.address}::its::register_coin_with_cap`,
-      typeArguments: [tokenType],
-      arguments: [itsObjectId, metadataId, treasuryCap],
-    });
-  }
+  await txBuilder.moveCall({
+    target: `${GasService.address}::gas_service::pay_gas`,
+    typeArguments: [`0x2::sui::SUI`],
+    arguments: [
+      GasService.objects.GasService,
+      messageTicket,
+      gas,
+      sender,
+      "0x",
+    ],
+  });
+  await txBuilder.moveCall({
+    target: `${AxelarGateway.address}::gateway::send_message`,
+    arguments: [AxelarGateway.objects.Gateway, messageTicket],
+  });
 }

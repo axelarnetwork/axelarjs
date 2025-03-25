@@ -8,7 +8,6 @@ import {
   getCoinInfoByCoinType,
   getCoinType,
   getSuiChainConfig,
-  getTokenOwner,
 } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
@@ -46,8 +45,6 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     if (input.tokenAddress?.length === 66) {
       const chainConfig = await getSuiChainConfig(ctx);
 
-      let isTokenOwner = false;
-
       const coinType = await getCoinType(input.tokenAddress);
 
       const { totalBalance: balance } = await client.getBalance({
@@ -57,39 +54,36 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       // Get the coin metadata
       const metadata = await client.getCoinMetadata({ coinType });
-      let decimals;
 
-      // This happens when the token is deployed on sui as a remote chain
-      if (!metadata) {
-        const InterchainTokenServiceV0 = chainConfig.config.contracts?.InterchainTokenService.objects.InterchainTokenServicev0;
+      const InterchainTokenServiceV0 =
+        chainConfig.config.contracts?.InterchainTokenService.objects
+          .InterchainTokenServicev0;
 
-        if(!InterchainTokenServiceV0) {
-          throw new Error("Invalid chain config");
-        }
-
-        const coinInfo = await getCoinInfoByCoinType(client, coinType, InterchainTokenServiceV0);
-        decimals = coinInfo?.decimals;
+      if (!InterchainTokenServiceV0) {
+        throw new Error("Invalid chain config");
       }
 
-      let tokenOwner = null;
-      try {
-        tokenOwner = await getTokenOwner(input.tokenAddress);
-      } catch (error) {
-        console.log("getERC20TokenBalanceForOwner", error);
-      }
+      const coinInfo = await getCoinInfoByCoinType(
+        client,
+        coinType,
+        InterchainTokenServiceV0
+      );
 
-      isTokenOwner = tokenOwner === input.owner;
+      const decimals = metadata?.decimals ?? coinInfo?.decimals;
+
+      const isOperator = input.owner === coinInfo?.operator;
+      const isDistributor = input.owner === coinInfo?.distributor;
 
       const result = {
-        isTokenOwner,
-        isTokenMinter: isTokenOwner,
+        isTokenOwner: isOperator,
+        isTokenMinter: isDistributor,
         tokenBalance: balance.toString(),
-        decimals: metadata?.decimals ?? decimals,
+        decimals,
         isTokenPendingOwner: false,
         hasPendingOwner: false,
-        hasMinterRole: isTokenOwner,
-        hasOperatorRole: isTokenOwner,
-        hasFlowLimiterRole: isTokenOwner, // TODO: check if this is correct
+        hasMinterRole: isDistributor,
+        hasOperatorRole: isOperator,
+        hasFlowLimiterRole: false, // TODO: check if this is correct
       };
       return result;
     }
