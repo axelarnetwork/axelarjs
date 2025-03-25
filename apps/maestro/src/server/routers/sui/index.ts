@@ -82,8 +82,6 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         symbol: z.string(),
-        name: z.string(),
-        decimals: z.string(),
         destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
         tokenId: z.string(),
@@ -100,8 +98,6 @@ export const suiRouter = router({
           tokenPackageId,
           destinationChains,
           gasValues,
-          name,
-          decimals,
           amount,
         } = input;
 
