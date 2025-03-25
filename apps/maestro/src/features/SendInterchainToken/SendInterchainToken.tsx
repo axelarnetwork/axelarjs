@@ -270,27 +270,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
-  const shouldUseSameAddress = useMemo(() => {
-    return (
-      state.selectedToChain?.chain_type === "evm" &&
-      props.sourceChain.chain_type === "evm"
-    );
-  }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
-
-  useEffect(() => {
-    const defaultAddress = shouldUseSameAddress ? (address ?? "") : "";
-
-    setValue("destinationAddress", defaultAddress, {
-      shouldValidate: true,
-    });
-  }, [
-    state.selectedToChain.chain_type,
-    props.sourceChain.chain_type,
-    address,
-    setValue,
-    shouldUseSameAddress,
-  ]);
-
   return (
     <Modal
       trigger={props.trigger}
@@ -304,8 +283,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
           props.onClose?.();
           resetForm();
           actions.resetTxState();
-        } else if (shouldUseSameAddress) {
-          setValue("destinationAddress", address ?? "");
         }
         actions.setIsModalOpen(isOpen);
       }}
@@ -411,9 +388,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <FormControl>
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
-              {shouldUseSameAddress && (
-                <Label.AltText>(Using connected wallet address)</Label.AltText>
-              )}
             </Label>
             <TextInput
               id="destinationAddress"
@@ -425,7 +399,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
               data-lpignore="true"
               data-form-type="other"
               aria-autocomplete="none"
-              disabled={shouldUseSameAddress}
               {...register("destinationAddress", {
                 required: "Destination address is required",
                 validate: (value) => {
@@ -438,8 +411,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   }
 
                   if (
-                    state.selectedToChain.chain_type === "evm" &&
-                    !isValidEVMAddress(value)
+                    state.selectedToChain.chain_type === "evm" ||
+                    (state.selectedToChain.id.includes("flow") &&
+                      !isValidEVMAddress(value))
                   ) {
                     return "Invalid EVM address";
                   }
