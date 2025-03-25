@@ -36,11 +36,12 @@ export async function getTokenIdByCoinMetadata(
 ) {
   const { InterchainTokenService: ITS, AxelarGateway } =
     chainConfig.config.contracts;
-  const [ChainNameHash] = await txBuilder.moveCall({
+  const ChainNameHash = await txBuilder.moveCall({
     target: `${AxelarGateway.address}::bytes32::from_bytes`,
     arguments: [keccak256(stringToHex(suiChainConfig.axelarChainId))],
   });
-  const [TokenId] = await txBuilder.moveCall({
+
+  const TokenId = await txBuilder.moveCall({
     target: `${ITS.address}::token_id::from_info`,
     typeArguments: [coinType],
     arguments: [
@@ -52,6 +53,7 @@ export async function getTokenIdByCoinMetadata(
       txBuilder.tx.pure.bool(!isCanonical), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
+
   return TokenId;
 }
 
@@ -133,6 +135,7 @@ export async function deployRemoteInterchainToken(
   });
   await txBuilder.moveCall({
     target: `${GasService.address}::gas_service::pay_gas`,
+    typeArguments: [`0x2::sui::SUI`],
     arguments: [
       GasService.objects.GasService,
       messageTicket,

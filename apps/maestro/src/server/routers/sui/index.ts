@@ -119,7 +119,8 @@ export const suiRouter = router({
           return undefined;
         }
 
-        const { InterchainTokenService: ITS } = chainConfig.config.contracts;
+        const { InterchainTokenService: ITS } =
+          chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
         const treasuryCap = await getTreasuryCap(tokenPackageId);
 
@@ -130,7 +131,7 @@ export const suiRouter = router({
         const coinInfo = await txBuilder.moveCall({
           target: `${ITS.address}::coin_info::from_info`,
           typeArguments: [tokenType],
-          arguments: [name, symbol, decimals],
+          arguments: [name, symbol.toUpperCase(), decimals],
         });
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_with_cap`,
@@ -150,7 +151,6 @@ export const suiRouter = router({
             typeArguments: [tokenType],
             arguments: [coinManagement, channelId],
           })
-          .catch((e) => console.log("error with add distributor", e));
 
         await txBuilder
           .moveCall({
@@ -158,7 +158,6 @@ export const suiRouter = router({
             typeArguments: [tokenType],
             arguments: [coinManagement, minterAddress],
           })
-          .catch((e) => console.log("error with add operator", e));
 
         const TokenId = await txBuilder
           .moveCall({
@@ -166,13 +165,12 @@ export const suiRouter = router({
             typeArguments: [tokenType],
             arguments: [itsObjectId, coinInfo, coinManagement],
           })
-          .catch((e) => console.log("error with register coin", e));
 
         await mintTokenAsDistributor(
           txBuilder,
           chainConfig,
           tokenType,
-          TokenId as TransactionResult,
+          TokenId,
           channelId,
           amount,
           sender
