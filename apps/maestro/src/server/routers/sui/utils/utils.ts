@@ -7,6 +7,7 @@ import {
   SuiObjectResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
+  type PaginatedCoins,
   type PaginatedTransactionResponse,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
@@ -275,7 +276,8 @@ async function extractCoinInfo(coin: SuiObjectResponse) {
     },
   });
 
-  const distributor = (channalDetails.data?.owner as { AddressOwner?: string })?.AddressOwner;
+  const distributor = (channalDetails.data?.owner as { AddressOwner?: string })
+    ?.AddressOwner;
 
   return {
     decimals: coinInfo.decimals,
@@ -306,3 +308,53 @@ export const getChannelId = async (
 
   return channelId;
 };
+
+export async function mergeAllCoinsOfSameType(
+  txBuilder: TxBuilder,
+  owner: string,
+  coinType: string
+): Promise<string> {
+  const tx = txBuilder.tx;
+
+  // Get all coins of the specified type
+  let primaryCoin: string = "";
+  let coins: PaginatedCoins;
+  let otherCoins: string[] = [];
+  let cursor: string | null | undefined;
+
+  do {
+    coins = await suiClient.getCoins({
+      cursor: cursor,
+      owner: owner,
+      coinType: coinType,
+    });
+
+    if (coins.data.length === 0) {
+      throw new Error(`No coins of type ${coinType} found for ${owner}`);
+    }
+
+    // If there are multiple coins, merge them first
+    if (!primaryCoin) {
+      const [first, ...rest] = coins.data;
+      primaryCoin = first.coinObjectId;
+      otherCoins = [
+        ...otherCoins,
+        ...rest.map((coin: any) => coin.coinObjectId),
+      ];
+    } else {
+      otherCoins = [
+        ...otherCoins,
+        ...coins.data.map((coin: any) => coin.coinObjectId),
+      ];
+    }
+
+    cursor = coins.nextCursor;
+  } while (coins.hasNextPage);
+
+  // Merge coins if needed
+  if (otherCoins.length > 0) {
+    tx.mergeCoins(primaryCoin, otherCoins);
+  }
+
+  return primaryCoin;
+}
