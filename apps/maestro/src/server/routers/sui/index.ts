@@ -174,7 +174,6 @@ export const suiRouter = router({
         );
 
         if (minterAddress !== input.sender) {
-          console.log("mint to", minterAddress);
           txBuilder.tx.transferObjects([channelId], minterAddress);
         }
 
