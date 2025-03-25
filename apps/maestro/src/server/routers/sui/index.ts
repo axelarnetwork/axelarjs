@@ -149,11 +149,12 @@ export const suiRouter = router({
           arguments: [coinManagement, channelId],
         });
 
-        await txBuilder.moveCall({
-          target: `${ITS.address}::coin_management::add_operator`,
-          typeArguments: [tokenType],
-          arguments: [coinManagement, minterAddress],
-        });
+        await txBuilder
+          .moveCall({
+            target: `${ITS.address}::coin_management::add_operator`,
+            typeArguments: [tokenType],
+            arguments: [coinManagement, input.sender],
+          })
 
         const TokenId = await txBuilder.moveCall({
           target: `${ITS.address}::interchain_token_service::register_coin`,
@@ -170,6 +171,10 @@ export const suiRouter = router({
           amount,
           sender
         );
+
+        if (minterAddress !== input.sender) {
+          txBuilder.tx.transferObjects([channelId], minterAddress);
+        }
 
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
