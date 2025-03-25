@@ -3,7 +3,6 @@ import {
   SUI_PACKAGE_ID,
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
-import type { PaginatedCoins } from "@mysten/sui/client";
 import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
@@ -19,6 +18,7 @@ import {
   getChannelId,
   getSuiChainConfig,
   getTreasuryCap,
+  mergeAllCoinsOfSameType,
   suiServiceBaseUrl,
 } from "./utils/utils";
 
@@ -250,79 +250,73 @@ export const suiRouter = router({
         // Split coins for gas
         const Gas = tx.splitCoins(tx.gas, [BigInt(input.gas)]);
 
-        // Get all coins of the specified type
-        let primaryCoin: string = "";
-        let coins: PaginatedCoins;
-        let otherCoins: string[] = [];
-        let cursor: string | null | undefined;
-
-        do {
-          coins = await suiClient.getCoins({
-            cursor: cursor,
-            owner: input.sender,
-            coinType: input.coinType,
-          });
-
-          if (coins.data.length === 0) {
-            throw new Error("No coins found");
-          }
-
-          // If there are multiple coins, merge them first
-          if (!primaryCoin) {
-            const [first, ...rest] = coins.data;
-            primaryCoin = first.coinObjectId;
-            otherCoins = [
-              ...otherCoins,
-              ...rest.map((coin: any) => coin.coinObjectId),
-            ];
-          } else {
-            otherCoins = [
-              ...otherCoins,
-              ...coins.data.map((coin: any) => coin.coinObjectId),
-            ];
-          }
-
-          cursor = coins.nextCursor;
-        } while (coins.hasNextPage);
-
-        // TODO: checks if this work properly. I'll comment mergeCoins for now
-        // if (otherCoins.length > 0) {
-        //   tx.mergeCoins(primaryCoin, otherCoins);
-        // }
+        const mergedCoin = await mergeAllCoinsOfSameType(
+          txBuilder,
+          input.sender,
+          input.coinType
+        );
 
         // Split token to transfer to the destination chain
-        const Coin = tx.splitCoins(primaryCoin, [BigInt(input.amount)]);
+        const Coin = tx.splitCoins(mergedCoin, [BigInt(input.amount)]);
 
         const {
-          Example,
           AxelarGateway,
           GasService,
           InterchainTokenService: ITS,
         } = chainConfig.config.contracts;
 
         const TokenId = await getTokenId(txBuilder, input.tokenId, ITS);
+        const channelId = await txBuilder.moveCall({
+          target: `${AxelarGateway.address}::channel::new`,
+        });
 
-        await txBuilder.moveCall({
-          target: `${Example.address}::its::send_interchain_transfer_call`,
+        const interchainTransferTicket = await txBuilder.moveCall({
+          target: `${ITS.address}::interchain_token_service::prepare_interchain_transfer`,
+          typeArguments: [input.coinType],
           arguments: [
-            Example.objects.ItsSingleton,
-            ITS.objects.InterchainTokenService,
-            AxelarGateway.objects.Gateway,
-            GasService.objects.GasService,
             TokenId,
             Coin,
             input.destinationChain,
             input.destinationAddress,
             "0x",
-            input.sender,
-            Gas,
-            "0x",
+            channelId,
+          ],
+        });
+
+        const messageTicket = await txBuilder.moveCall({
+          target: `${ITS.address}::interchain_token_service::send_interchain_transfer`,
+          typeArguments: [input.coinType],
+          arguments: [
+            ITS.objects.InterchainTokenService,
+            interchainTransferTicket,
             CLOCK_PACKAGE_ID,
           ],
-          typeArguments: [input.coinType],
+        });
+
+        await txBuilder.moveCall({
+          target: `${GasService.address}::gas_service::pay_gas`,
+          typeArguments: [`0x2::sui::SUI`],
+          arguments: [
+            GasService.objects.GasService,
+            messageTicket,
+            Gas,
+            input.sender,
+            "0x",
+          ],
+        });
+
+        await txBuilder.moveCall({
+          target: `${AxelarGateway.address}::gateway::send_message`,
+          arguments: [AxelarGateway.objects.Gateway, messageTicket],
+        });
+
+        await txBuilder.moveCall({
+          target: `${AxelarGateway.address}::channel::destroy`,
+          arguments: [channelId],
         });
 
         const tx2 = await buildTx(input.sender, txBuilder);
+
         const txJSON = await tx2.toJSON();
         return txJSON;
       } catch (error) {
