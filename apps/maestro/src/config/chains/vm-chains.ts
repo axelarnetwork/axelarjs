@@ -86,7 +86,7 @@ const stellarTestnet = {
       url: "https://stellar.expert/explorer/testnet",
     },
   },
-  axelarChainId: "stellar-2024-q4",
+  axelarChainId: "stellar-2025-q1",
   environment: ENVIRONMENTS.testnet,
 };
 

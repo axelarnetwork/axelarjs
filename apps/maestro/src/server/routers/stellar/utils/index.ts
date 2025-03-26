@@ -1,6 +1,6 @@
 // TODO: get the contract id from the chain config
 export const stellarITSContractId =
-  "CCD7JXLHOJKQDPKOXQTK6PYACFYQPRC25IVKHQDOMP3ANFMBWO5FZZAN";
+  "CATNQHWMG4VOWPSWF4HXVW7ASDJNX7M7F6JLFC544T7ZMMXXAE2HUDTY";
 
 export const formatTokenId = (tokenId: string) => {
   const hex = tokenId.replace(/^0x/, "").padStart(64, "0");
