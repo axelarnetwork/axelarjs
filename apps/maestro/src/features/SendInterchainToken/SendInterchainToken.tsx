@@ -270,6 +270,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
+  const isSameChainType = useMemo(() => {
+    if (props.sourceChain.chain_type === "evm") {
+      // Handle edge case where the source chain is EVM and the destination chain is flow which is compatible with EVM but it's a VM chain
+      return (
+        state.selectedToChain?.chain_type === "evm" ||
+        state.selectedToChain?.id.includes("flow")
+      );
+    }
+
+    return state.selectedToChain?.chain_type === props.sourceChain.chain_type;
+  }, [
+    state.selectedToChain?.chain_type,
+    state.selectedToChain?.id,
+    props.sourceChain.chain_type,
+  ]);
+
   return (
     <Modal
       trigger={props.trigger}
@@ -283,7 +299,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           props.onClose?.();
           resetForm();
           actions.resetTxState();
-        }
+        }  
         actions.setIsModalOpen(isOpen);
       }}
     >
@@ -388,6 +404,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <FormControl>
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
+              {isSameChainType && (
+                <Label.AltText className="hover:cursor-pointer hover:opacity-30 transition-opacity" onClick={() => {
+                  setValue("destinationAddress", address ?? "");
+                }}>Use connected wallet address</Label.AltText>
+              )}
             </Label>
             <TextInput
               id="destinationAddress"
@@ -411,9 +432,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   }
 
                   if (
-                    state.selectedToChain.chain_type === "evm" ||
-                    (state.selectedToChain.id.includes("flow") &&
-                      !isValidEVMAddress(value))
+                    (state.selectedToChain.chain_type === "evm" ||
+                      state.selectedToChain.id.includes("flow")) &&
+                    !isValidEVMAddress(value)
                   ) {
                     return "Invalid EVM address";
                   }
