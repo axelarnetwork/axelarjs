@@ -104,14 +104,27 @@ export const suiRouter = router({
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
 
-        const coinMetadata = await suiClient.getCoinMetadata({
-          coinType: tokenType,
-        });
+        // Retry logic for getting coin metadata, sometimes it takes a while for the coin to be available
+        let coinMetadata = null;
+        let attempts = 0;
+        const maxAttempts = 5;
+
+        while (!coinMetadata && attempts < maxAttempts) {
+          attempts++;
+          coinMetadata = await suiClient.getCoinMetadata({
+            coinType: tokenType,
+          });
+
+          if (!coinMetadata && attempts < maxAttempts) {
+            // Wait a short time before retrying
+            await new Promise((resolve) => setTimeout(resolve, 300));
+          }
+        }
 
         const chainConfig = await getSuiChainConfig(ctx);
 
         if (!coinMetadata) {
-          return undefined;
+          throw new Error("Failed to get coin metadata");
         }
 
         const { InterchainTokenService: ITS } = chainConfig.config.contracts;
