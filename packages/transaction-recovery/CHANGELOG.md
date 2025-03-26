@@ -1,5 +1,16 @@
 # @axelarjs/transaction-recovery
 
+## 0.3.7
+
+### Patch Changes
+
+- [#553](https://github.com/axelarnetwork/axelarjs/pull/553) [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e) Thanks [@npty](https://github.com/npty)! - Supported devnet-amplifier
+
+- Updated dependencies [[`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e)]:
+  - @axelarjs/cosmos@0.2.14
+  - @axelarjs/core@0.2.12
+  - @axelarjs/evm@0.2.9
+
 ## 0.3.6
 
 ### Patch Changes
