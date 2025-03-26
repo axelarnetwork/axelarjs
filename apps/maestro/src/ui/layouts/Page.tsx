@@ -268,7 +268,7 @@ const Page: FC<Props> = ({
           // id needed for the hero cta smooth scroll
           id="main-content"
           className={cn(
-            "mt-20 grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
+            "mt-20 grid min-h-[80dvh] max-w-6xl flex-1 px-4 xl:px-2 2xl:px-0",
             {
               "place-items-center": isExceptionalState,
             },

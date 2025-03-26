@@ -105,7 +105,10 @@ function getDeploymentStatus(
   chainId: string | undefined,
   statusesByChain: Record<string, ChainStatus>
 ) {
-  const deploymentStatus = chainId ? statusesByChain[chainId] : undefined;
+  // axelarscan returns chainId in lowercase
+  const deploymentStatus = chainId
+    ? statusesByChain[chainId?.toLowerCase()]
+    : undefined;
 
   if (!deploymentStatus) {
     return undefined;

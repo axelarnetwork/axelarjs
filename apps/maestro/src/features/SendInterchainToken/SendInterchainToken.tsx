@@ -271,27 +271,20 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
-  const isSameAddress = useMemo(() => {
-    // EVM chains have the same address
-    // If origin chain type is "vm", always return true as they have different addresses between chains
-    if (props.sourceChain.chain_type === "vm") {
-      return false;
+  const isSameChainType = useMemo(() => {
+    if (props.sourceChain.chain_type === "evm") {
+      // Handle edge case where the source chain is EVM and the destination chain is flow which is compatible with EVM but it's a VM chain
+      return (
+        state.selectedToChain?.chain_type === "evm" ||
+        state.selectedToChain?.id.includes("flow")
+      );
     }
+
     return state.selectedToChain?.chain_type === props.sourceChain.chain_type;
-  }, [state.selectedToChain?.chain_type, props.sourceChain.chain_type]);
-
-  useEffect(() => {
-    const defaultAddress = isSameAddress ? (address ?? "") : "";
-
-    setValue("destinationAddress", defaultAddress, {
-      shouldValidate: true,
-    });
   }, [
     state.selectedToChain?.chain_type,
-    props.sourceChain?.chain_type,
-    address,
-    setValue,
-    isSameAddress,
+    state.selectedToChain?.id,
+    props.sourceChain.chain_type,
   ]);
 
   return (
@@ -412,8 +405,15 @@ export const SendInterchainToken: FC<Props> = (props) => {
           <FormControl>
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
-              {isSameAddress && (
-                <Label.AltText>(Using connected wallet address)</Label.AltText>
+              {isSameChainType && (
+                <Label.AltText
+                  className="transition-opacity hover:cursor-pointer hover:opacity-30"
+                  onClick={() => {
+                    setValue("destinationAddress", address ?? "");
+                  }}
+                >
+                  Use connected wallet address
+                </Label.AltText>
               )}
             </Label>
             <TextInput
@@ -426,26 +426,25 @@ export const SendInterchainToken: FC<Props> = (props) => {
               data-lpignore="true"
               data-form-type="other"
               aria-autocomplete="none"
-              disabled={isSameAddress}
               {...register("destinationAddress", {
                 required: "Destination address is required",
                 validate: (value) => {
+                  // TODO handle sui address length
                   if (
                     state.selectedToChain.id.includes("sui") &&
                     !isValidSuiAddress(value)
                   ) {
                     return "Invalid SUI address";
                   }
-
                   if (
                     state.selectedToChain.id.includes("stellar") &&
                     !StrKey.isValidEd25519PublicKey(value)
                   ) {
                     return "Invalid Stellar address";
                   }
-
                   if (
-                    state.selectedToChain.chain_type === "evm" &&
+                    (state.selectedToChain.chain_type === "evm" ||
+                      state.selectedToChain.id.includes("flow")) &&
                     !isValidEVMAddress(value)
                   ) {
                     return "Invalid EVM address";

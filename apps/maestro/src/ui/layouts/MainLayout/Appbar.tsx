@@ -101,7 +101,7 @@ const Appbar: FC<AppbarProps> = (props) => {
               <>
                 <ChainsDropdown
                   excludeChainIds={[STELAR_CHAIN_ID]}
-                  contentClassName="max-h-[70dvh] w-[300px] translate-x-2"
+                  contentClassName="relative left-[-8px] max-h-[70dvh] w-96 md:w-96 z-10 translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
                 <Card className="bg-base-200" $compact>

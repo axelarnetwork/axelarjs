@@ -2,6 +2,7 @@ import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
 import { trpc } from "~/lib/trpc";
+import { filterEligibleChains } from "~/lib/utils/chains";
 import { useAllChainConfigsQuery } from "../axelarscan/hooks";
 
 export function useInterchainTokensQuery(input: {
@@ -29,17 +30,36 @@ export function useInterchainTokensQuery(input: {
     }
   );
 
+  const matchingTokens = data?.matchingTokens || [];
+
+  const destinationChainConfigs = matchingTokens
+    .map((token) => {
+      return combinedComputed.indexedById[token.axelarChainId];
+    })
+    .filter(Boolean);
+
+  const eligibleChainConfigs = input.chainId
+    ? filterEligibleChains(destinationChainConfigs, input.chainId)
+    : destinationChainConfigs;
+
   return {
     ...queryResult,
     data: {
       ...data,
-      matchingTokens: data?.matchingTokens.map((token) => ({
-        ...token,
-        chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
-        wagmiConfig: combinedComputed.wagmiChains?.find(
-          (x) => x?.id === Number(token.chainId)
-        ),
-      })),
+      matchingTokens: data?.matchingTokens
+        .filter((token) => {
+          return (
+            !!eligibleChainConfigs.find((x) => x.id === token.axelarChainId) ||
+            token.chainId === input.chainId
+          );
+        })
+        .map((token) => ({
+          ...token,
+          chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
+          wagmiConfig: combinedComputed.wagmiChains?.find(
+            (x) => x?.id === Number(token.chainId)
+          ),
+        })),
       chain: Maybe.of(input.chainId).mapOrUndefined(
         (x) => combinedComputed.indexedByChainId[x]
       ),

@@ -9,29 +9,25 @@ import { invariant } from "@axelarjs/utils";
 
 import { encodeAbiParameters, keccak256 } from "viem";
 
+import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { ExtendedWagmiChainConfig, CHAIN_CONFIGS } from "~/config/chains";
 import MaestroKVClient from "~/services/db/kv";
 
 export type EvmChainsValue = {
   info: EVMChainConfig;
   wagmi: ExtendedWagmiChainConfig;
-}
+};
 
-export type EVMChainsMap = Record<
-  string | number,
-  EvmChainsValue 
->;
+export type EVMChainsMap = Record<string | number, EvmChainsValue>;
 
 export type VMChainsValue = {
-  info: VMChainConfig,
-  wagmi?: ExtendedWagmiChainConfig
-}
+  info: VMChainConfig;
+  wagmi?: ExtendedWagmiChainConfig;
+};
 
-export type VMChainsMap = Record<
-  string | number,
-  VMChainsValue 
->;
+export type VMChainsMap = Record<string | number, VMChainsValue>;
+
+export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
 
 export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
 
@@ -118,10 +114,7 @@ export async function evmChains<TCacheKey extends string>(
         wagmi: wagmiConfig,
       };
 
-      // TODO: remove this once we have ITS hub on testnet
-      if (NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier") {
-        entry.info.id = wagmiConfig.axelarChainId;
-      }
+      entry.info.id = wagmiConfig.axelarChainId;
 
       return {
         ...acc,
@@ -212,10 +205,7 @@ export async function chains<TCacheKey extends string>(
     vmChains(kvClient, axelarscanClient, `${cacheKey}-vm`),
   ]);
 
-  const combinedChainsMap: Record<
-    string,
-    EvmChainsValue | VMChainsValue
-  > = {};
+  const combinedChainsMap: Record<string, EvmChainsValue | VMChainsValue> = {};
 
   for (const chain of Object.values(evmChainsMap)) {
     combinedChainsMap[chain.info.id] = chain;

@@ -4,9 +4,7 @@ import {
   type VMChainConfig,
 } from "@axelarjs/api";
 
-import {
-  NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM,
-} from "~/config/env";
+import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env";
 
 type ChainConfig = EVMChainConfig | VMChainConfig;
 
@@ -31,26 +29,31 @@ export const filterEligibleChains = (
 
   const currentChain = destinationChains.find(
     (chain) => chain.chain_id === currentChainId
-  );
-  const isCurrentChainVM = currentChain?.chain_type === "vm";
+  ) as ChainConfig;
 
-  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM.split(
-    ","
-  ).map((chain) => chain.trim());
+  if (!currentChain) return [];
 
+  const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM;
   // Normalize whitelist check
   const isAllChainsWhitelisted = whitelistedChains[0] === "all";
 
   return destinationChains.filter((chain) => {
+    const isOriginChainSameAsDestinationChain =
+      chain.chain_id === currentChainId;
+    const areDifferentChainTypes = chain.chain_type !== currentChain.chain_type;
+    const isThisDestinationChainWhitelisted =
+      isAllChainsWhitelisted || whitelistedChains.includes(chain.id);
+    const isOriginChainWhitelisted =
+      isAllChainsWhitelisted || whitelistedChains.includes(currentChain?.id);
+
     // Always filter out current chain
-    if (chain.chain_id === currentChainId) return false;
-
-    // For EVM chains, check whitelist
-    if (isCurrentChainVM && chain.chain_type === "evm") {
-      return isAllChainsWhitelisted || whitelistedChains.includes(chain.id);
-    }
-
-    // Non-EVM chains are always included
+    if (isOriginChainSameAsDestinationChain) return false;
+    // Whitelisted chains are always included
+    if (isThisDestinationChainWhitelisted || isOriginChainWhitelisted)
+      return true;
+    // If the chain types are different and none are whitelisted, filter out the chain
+    if (areDifferentChainTypes) return false;
+    // Chains with the same chain type are always included
     return true;
   });
 };

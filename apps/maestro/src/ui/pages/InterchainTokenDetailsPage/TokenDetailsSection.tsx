@@ -59,6 +59,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     }
   );
 
+  const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
+
   const tokenDetails = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -74,7 +76,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(props.tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(props.chain.chain_id !== SUI_CHAIN_ID
+    ...(!isSuiChain
       ? [
           [
             "Add Token to Wallet",
@@ -216,6 +218,16 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     Boolean(value)
   );
 
+  function getTokenExplorerLink() {
+    if (isSuiChain) {
+      return `${props.chain.explorer.url}/object/${props.tokenAddress}`;
+    } else if (props.chain.chain_name.includes("stellar")) {
+      return `${props.chain.explorer.url}/contract/${props.tokenAddress}`;
+    } else {
+      return `${props.chain.explorer.url}/token/${props.tokenAddress}`;
+    }
+  }
+
   return (
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
@@ -236,11 +248,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         </div>
         <LinkButton
           className="flex items-center gap-2 text-lg"
-          href={
-            props.chain.chain_name.includes("stellar")
-              ? `${props.chain.explorer.url}/contract/${props.tokenAddress}`
-              : `${props.chain.explorer.url}/token/${props.tokenAddress}`
-          }
+          href={getTokenExplorerLink()}
           target="_blank"
           rel="noopener noreferrer"
           $size="sm"

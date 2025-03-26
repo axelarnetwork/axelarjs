@@ -38,7 +38,6 @@ import {
   optimismSepolia,
   polygon,
   polygonAmoy,
-  polygonMumbai,
   polygonZkEvm,
   polygonZkEvmTestnet,
   scroll,
@@ -87,9 +86,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       default: { http: ["https://rpc-sepolia.rockx.com"] },
       public: { http: ["https://rpc-sepolia.rockx.com"] },
     },
-    axelarChainId: "eth-sepolia",
+    axelarChainId: "ethereum-sepolia",
     supportWagmi: true,
-    axelarChainName: "eth-sepolia",
+    axelarChainName: "ethereum-sepolia",
     environment: ENVIRONMENTS.testnet,
   },
   {
@@ -134,7 +133,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fantomTestnet,
-    axelarChainId: "fantom",
+    axelarChainId: "Fantom",
     axelarChainName: "Fantom",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
@@ -166,7 +165,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...avalancheFuji,
-    axelarChainId: "avalanche",
+    axelarChainId: "Avalanche",
     axelarChainName: "Avalanche",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
@@ -181,21 +180,10 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygonAmoy,
-    axelarChainId: "polygon-amoy",
-    axelarChainName: "polygon-amoy",
+    axelarChainId: "polygon-sepolia",
+    axelarChainName: "polygon-sepolia",
     environment: ENVIRONMENTS.testnet,
     supportWagmi: true,
-  },
-  {
-    ...polygonMumbai,
-    rpcUrls: {
-      default: { http: ["https://polygon-testnet.public.blastapi.io"] },
-      public: { http: ["https://polygon-testnet.public.blastapi.io"] },
-    },
-    axelarChainId: "polygon",
-    axelarChainName: "Polygon",
-    supportWagmi: true,
-    environment: ENVIRONMENTS.testnet,
   },
   {
     ...polygonZkEvm,
@@ -407,13 +395,6 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "blast",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
-  },
-  {
-    ...blastSepolia,
-    axelarChainId: "blast-sepolia",
-    axelarChainName: "blast-sepolia",
-    supportWagmi: true,
-    environment: ENVIRONMENTS.testnet,
   },
   {
     ...blastSepolia,

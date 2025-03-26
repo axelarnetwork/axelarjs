@@ -29,7 +29,7 @@ export const MintInterchainToken: FC = () => {
   const chainId = useChainId();
 
   const [
-    { txState, accountAddress, erc20Details, isMinting, tokenAddress },
+    { txState, accountAddress, erc20Details, isMinting, tokenAddress, tokenId },
     { setTxState, mintTokenAsync },
   ] = useMintInterchainTokenState();
 
@@ -54,6 +54,7 @@ export const MintInterchainToken: FC = () => {
           amount: BigInt(adjustedAmount),
           symbol: erc20Details?.symbol as string,
           tokenAddress,
+          tokenId: tokenId,
         });
         if (result.digest) {
           setTxState({
