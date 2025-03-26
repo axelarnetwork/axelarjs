@@ -1,5 +1,11 @@
 # @axelarjs/core
 
+## 0.2.12
+
+### Patch Changes
+
+- [#553](https://github.com/axelarnetwork/axelarjs/pull/553) [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e) Thanks [@npty](https://github.com/npty)! - Supported devnet-amplifier
+
 ## 0.2.11
 
 ### Patch Changes
