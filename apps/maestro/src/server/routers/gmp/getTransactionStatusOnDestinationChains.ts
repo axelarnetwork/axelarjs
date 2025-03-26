@@ -130,7 +130,7 @@ export async function processGMPData(
     destinationChainFromSrcEvent ??
     callback?.returnValues.destinationChain ??
     call.returnValues.destinationChain
-  ).toLowerCase();
+  );
 
   return [
     destinationChain,
