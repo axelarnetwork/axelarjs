@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- [#553](https://github.com/axelarnetwork/axelarjs/pull/553) [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e) Thanks [@npty](https://github.com/npty)! - Modify chain config types to support sui on devnet-amplifier
+- [#553](https://github.com/axelarnetwork/axelarjs/pull/553) [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e) Thanks [@npty](https://github.com/npty)! - Modify chain config types to support sui on devnet-amplifier env
 
 - [#553](https://github.com/axelarnetwork/axelarjs/pull/553) [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e) Thanks [@npty](https://github.com/npty)! - Supported devnet-amplifier
 
