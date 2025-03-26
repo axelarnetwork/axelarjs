@@ -29,8 +29,6 @@ export type VMChainsMap = Record<string | number, VMChainsValue>;
 
 export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
 
-export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
-
 export async function vmChains<TCacheKey extends string>(
   kvClient: MaestroKVClient,
   axelarscanClient: AxelarscanClient,
