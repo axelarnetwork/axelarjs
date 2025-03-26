@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npx rimraf build contracts *.js *.d.ts
+npx rimraf build *.js *.d.ts
