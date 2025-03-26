@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src"],
+  "exclude": ["src/**/*.spec.ts"],
+  "compilerOptions": {
+    "declaration": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "skipLibCheck": true,
+    "noEmitOnError": false
+  }
+}
