@@ -1,0 +1,14 @@
+{
+  "extends": "@axelarjs/config/tsconfig.strictest",
+  "include": [
+    "src"
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "resolveJsonModule": true,
+    "types": [
+      "vitest/globals"
+    ],
+    "target": "es2020"
+  }
+}
