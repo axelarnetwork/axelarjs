@@ -9,25 +9,25 @@ import { invariant } from "@axelarjs/utils";
 
 import { encodeAbiParameters, keccak256 } from "viem";
 
+import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { ExtendedWagmiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
 import MaestroKVClient from "~/services/db/kv";
 
-export type EVMChainsMap = Record<
-  string | number,
-  {
-    info: EVMChainConfig;
-    wagmi: ExtendedWagmiChainConfig;
-  }
->;
+export type EvmChainsValue = {
+  info: EVMChainConfig;
+  wagmi: ExtendedWagmiChainConfig;
+};
 
-export type VMChainsMap = Record<
-  string | number,
-  {
-    info: VMChainConfig;
-    wagmi?: ExtendedWagmiChainConfig;
-  }
->;
+export type EVMChainsMap = Record<string | number, EvmChainsValue>;
+
+export type VMChainsValue = {
+  info: VMChainConfig;
+  wagmi?: ExtendedWagmiChainConfig;
+};
+
+export type VMChainsMap = Record<string | number, VMChainsValue>;
+
+export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
 
 export async function vmChains<TCacheKey extends string>(
   kvClient: MaestroKVClient,
@@ -44,9 +44,10 @@ export async function vmChains<TCacheKey extends string>(
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
 
-  // Add flow config to the list of eligible chains
-  const vmChainsMap = chainConfigs.vm.reduce((acc, chain) => {
-      const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
+  // Add evm-compatible chains to the list of eligible chains
+  const vmChainsMap = chainConfigs.vm.reduce(
+    (acc, chain) => {
+      const wagmiConfig = CHAIN_CONFIGS.find(
         (config) => config.id === chain.chain_id
       );
 
@@ -90,14 +91,16 @@ export async function evmChains<TCacheKey extends string>(
 
   const chainConfigs = await axelarscanClient.getChainConfigs();
 
-  const configuredIDs = WAGMI_CHAIN_CONFIGS.map((chain) => chain.id);
+  const configuredIDs = CHAIN_CONFIGS.map((chain) => chain.id);
 
-  const eligibleChains = chainConfigs.evm.filter((chain) => configuredIDs.includes(chain.chain_id));
+  const eligibleChains = chainConfigs.evm.filter((chain) =>
+    configuredIDs.includes(chain.chain_id)
+  );
 
   // Add flow config to the list of eligible chains
   const evmChainsMap = eligibleChains.reduce(
     (acc, chain) => {
-      const wagmiConfig = WAGMI_CHAIN_CONFIGS.find(
+      const wagmiConfig = CHAIN_CONFIGS.find(
         (config) => config.id === chain.chain_id
       );
 
@@ -108,6 +111,8 @@ export async function evmChains<TCacheKey extends string>(
         info: chain,
         wagmi: wagmiConfig,
       };
+
+      entry.info.id = wagmiConfig.axelarChainId;
 
       return {
         ...acc,
@@ -178,4 +183,40 @@ export function generateInterchainTokenSalt(
   const hash = keccak256(buffer);
 
   return `${hash}`;
+}
+
+export async function chains<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarscanClient: AxelarscanClient,
+  cacheKey: TCacheKey
+): Promise<ChainsMap> {
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<ChainsMap>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
+  const [evmChainsMap, vmChainsMap] = await Promise.all([
+    evmChains(kvClient, axelarscanClient, `${cacheKey}-evm`),
+    vmChains(kvClient, axelarscanClient, `${cacheKey}-vm`),
+  ]);
+
+  const combinedChainsMap: Record<string, EvmChainsValue | VMChainsValue> = {};
+
+  for (const chain of Object.values(evmChainsMap)) {
+    combinedChainsMap[chain.info.id] = chain;
+    combinedChainsMap[chain.info.chain_id] = chain;
+  }
+
+  for (const chain of Object.values(vmChainsMap)) {
+    combinedChainsMap[chain.info.id] = chain;
+    combinedChainsMap[chain.info.chain_id] = chain;
+  }
+
+  // cache for 1 hour
+  await kvClient.setCached(cacheKey, combinedChainsMap, 3600);
+
+  return combinedChainsMap;
 }

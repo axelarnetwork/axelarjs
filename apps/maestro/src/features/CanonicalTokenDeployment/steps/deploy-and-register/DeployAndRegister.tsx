@@ -11,11 +11,11 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useBalance, useChainId } from "wagmi";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { useTransactionsContainer } from "~/features/Transactions";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
@@ -34,7 +34,7 @@ export const Step3: FC = () => {
   // Support both EVM and VM chains
   const sourceChain = state.chains?.find((chain) => chain.chain_id === chainId);
 
-    const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
+  const [validDestinationChainIds, erroredDestinationChainIds] = useMemo(
     () =>
       (state.remoteDeploymentGasFees?.gasFees ?? []).reduce(
         ([succeeded, errored], x): [string[], string[]] =>
@@ -142,12 +142,10 @@ export const Step3: FC = () => {
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
-  const { address } = useAccount();
-
-  const { data: balance } = useBalance({ address });
+  const balance = useBalance();
 
   const nativeTokenSymbol = useMemo(() => {
-    if (sourceChain?.chain_type === 'vm') {
+    if (sourceChain?.chain_type === "vm") {
       return sourceChain.native_token.symbol;
     }
     return getNativeToken(state.sourceChainId);

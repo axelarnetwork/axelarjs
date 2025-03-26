@@ -24,7 +24,9 @@ describe("EVM Clients", () => {
     const configClient = createAxelarConfigClient(env);
     const configs = await configClient.getAxelarConfigs(env);
     const chains = Object.keys(configs.chains).filter(
-      (chainId) => configs.chains[chainId]?.chainType === "evm"
+      (chainId) =>
+        configs.chains[chainId]?.chainType === "evm" &&
+        configs.chains[chainId]?.id !== "sui"
     );
     const supportedChains = [];
 
@@ -47,7 +49,9 @@ describe("EVM Clients", () => {
     const configClient = createAxelarConfigClient(env);
     const configs = await configClient.getAxelarConfigs(env);
     const chains = Object.keys(configs.chains).filter(
-      (chainId) => configs.chains[chainId]?.chainType === "evm"
+      (chainId) =>
+        configs.chains[chainId]?.chainType === "evm" &&
+        configs.chains[chainId]?.id !== "sui"
     );
     const supportedChains = [];
 

@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, ilike, inArray } from "drizzle-orm";
 import { type Address } from "viem";
 import { z } from "zod";
 
@@ -228,7 +228,7 @@ export default class MaestroPostgresClient {
    */
   async getInterchainTokenByChainIdAndTokenAddress(
     axelarChainId: string,
-    tokenAddress: Address
+    tokenAddress: string
   ) {
     const query = this.db.query.interchainTokens.findFirst({
       where: (table, { ilike, and }) =>
@@ -249,7 +249,7 @@ export default class MaestroPostgresClient {
    */
   async getRemoteInterchainTokenByChainIdAndTokenAddress(
     axelarChainId: string,
-    tokenAddress: Address
+    tokenAddress: string
   ) {
     const query = this.db.query.remoteInterchainTokens.findFirst({
       where: (table, { ilike, and }) =>
@@ -318,5 +318,39 @@ export default class MaestroPostgresClient {
     });
 
     return await query;
+  }
+
+  async updateSuiRemoteTokenAddresses(inputs: {
+    tokenId: string;
+    tokenAddress: string;
+    tokenManager: string;
+  }) {
+    try {
+      const { tokenId, tokenAddress, tokenManager } = inputs;
+
+      await this.db
+        .update(remoteInterchainTokens)
+        .set({
+          tokenAddress,
+          tokenManagerAddress: tokenManager,
+          deploymentStatus: "confirmed",
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(remoteInterchainTokens.tokenId, tokenId),
+            ilike(remoteInterchainTokens.axelarChainId, "%sui%")
+          )
+        );
+    } catch (error) {
+      console.error("Failed to update Sui remote token addresses:", error);
+    }
+  }
+
+  async updateEVMRemoteTokenAddress(tokenId: string, tokenAddress: string) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({ tokenAddress, updatedAt: new Date() })
+      .where(eq(remoteInterchainTokens.tokenId, tokenId));
   }
 }

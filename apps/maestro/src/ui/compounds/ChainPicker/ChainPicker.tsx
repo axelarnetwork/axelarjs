@@ -46,7 +46,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
   }, [eligibleChains, onChainClick, selectedChains]);
 
   const getChainName = (chain: ChainConfig) => {
-    return chain.name
+    return chain.name;
   };
 
   return (
@@ -75,7 +75,7 @@ const ChainPicker: FC<ChainPickerProps> = ({
             >
               <Button
                 disabled={disabled || (chain.chain_type === "vm" && !chain.id)} // Add additional VM-specific conditions if needed
-                className={cn("w-full rounded-2xl hover:ring", {
+                className={cn("w-full rounded-2xl hover:ring flex items-center", {
                   "opacity-50": chain.chain_type === "vm" && !chain.id, // Visual indicator for unsupported VM chains
                 })}
                 $size="sm"
@@ -108,9 +108,9 @@ const ChainPicker: FC<ChainPickerProps> = ({
         })}
       </div>
       <div className="grid place-content-center">
-        <Button 
-          $size="sm" 
-          $variant="ghost" 
+        <Button
+          $size="sm"
+          $variant="ghost"
           onClick={handleToggleAll}
           disabled={disabled || eligibleChains.length === 0}
         >

@@ -1,14 +1,25 @@
-import type { GMPTxStatus } from "@axelarjs/api/gmp";
+import { GMPTxStatus } from "@axelarjs/api";
 
+import { Context } from "vm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { hex64Literal } from "~/lib/utils/validation";
+import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure } from "~/server/trpc";
+import MaestroKVClient from "~/services/db/kv";
+import { getSuiEventsByTxHash } from "../sui/utils/utils";
+
+export type ChainStatus = {
+  status: GMPTxStatus;
+  txHash: string;
+  txId: string;
+  lastHop: boolean;
+  logIndex: number;
+};
 
 export const SEARCHGMP_SOURCE = {
   includes: [
-    "call.returnValues.destinationChain",
+    "call",
     "status",
     "approved",
     "confirm",
@@ -23,25 +34,115 @@ export const SEARCHGMP_SOURCE = {
     "gas",
     "gas_price_rate",
     "gas_paid",
-    "approved.receipt",
-    "confirm.receipt",
-    "executed.receipt",
-    "approved.topics",
-    "approved.returnValues",
-    "confirm.returnValues",
-    "executed.returnValues",
-    "approved.transaction",
-    "confirm.transaction",
-    "executed.transaction",
-    "approved.created_at",
-    "confirm.created_at",
-    "executed.created_at",
+    ...["approved", "confirm", "executed"].flatMap((prefix) => [
+      `${prefix}.receipt`,
+      `${prefix}.topics`,
+      `${prefix}.returnValues`,
+      `${prefix}.transaction`,
+      `${prefix}.created_at`,
+    ]),
   ],
 };
 
 const INPUT_SCHEMA = z.object({
-  txHash: hex64Literal(),
+  txHash: z.string(),
 });
+
+async function findDestinationChainFromEvent(
+  txHash: string,
+  sourceChainId: string,
+  logIndex: number,
+  ctx: Context
+): Promise<string | undefined> {
+  const kvClient: MaestroKVClient = ctx.persistence.kv;
+
+  const cacheKey = `event_dest_chain-${txHash}:${logIndex}-${sourceChainId}`;
+
+  const cachedValue = await kvClient.getCached<string>(cacheKey);
+
+  if (cachedValue) {
+    return cachedValue;
+  }
+
+  if (sourceChainId.includes("sui")) {
+    const eventData = await getSuiEventsByTxHash(suiClient, txHash);
+    if (eventData) {
+      for (const event of eventData.data.slice(0, logIndex).reverse()) {
+        if (event.type.includes("InterchainTokenDeploymentStarted")) {
+          const eventDetails = event.parsedJson as any;
+          const destinationChainId: string = eventDetails.destination_chain;
+
+          await kvClient.setCached(cacheKey, destinationChainId, 3600);
+
+          return destinationChainId;
+        }
+      }
+    }
+  }
+
+  // For EVM, seems like the final destination chain is provided in the searchGMP response, in interchain_token_deployment_started event.
+  return undefined;
+}
+
+export async function getSecondHopStatus(
+  messageId: string,
+  ctx: Context
+): Promise<GMPTxStatus> {
+  const secondHopData = await ctx.services.gmp.searchGMP({
+    messageId,
+    _source: SEARCHGMP_SOURCE,
+  });
+
+  return secondHopData.length > 0 ? secondHopData[0].status : "pending";
+}
+
+export async function processGMPData(
+  gmpData: any,
+  ctx: Context
+): Promise<[string, ChainStatus]> {
+  const {
+    call,
+    callback,
+    status: firstHopStatus,
+    interchain_token_deployment_started,
+  } = gmpData;
+
+  let status = firstHopStatus;
+  const logIndex = call.logIndex ?? call._logIndex ?? call.messageIdIndex ?? 0;
+  let destinationChainFromSrcEvent: string | undefined;
+
+  // Handle second hop for non-EVM chains
+  if (call.chain_type !== "evm" && callback) {
+    status = await getSecondHopStatus(callback.returnValues.messageId, ctx);
+  }
+
+  if (call.chain_type !== "evm") {
+    destinationChainFromSrcEvent = await findDestinationChainFromEvent(
+      call.receipt.transactionHash,
+      call.returnValues.sourceChain,
+      call._logIndex,
+      ctx
+    );
+  }
+
+  const destinationChain = (
+    interchain_token_deployment_started?.destinationChain ??
+    destinationChainFromSrcEvent ??
+    callback?.returnValues.destinationChain ??
+    call.returnValues.destinationChain
+  );
+
+  return [
+    destinationChain,
+    {
+      status,
+      txHash: call.transactionHash,
+      logIndex,
+      txId: gmpData.message_id,
+      lastHop: call.chain_type === "evm" || !!callback,
+    },
+  ];
+}
 
 /**
  * Get the status of an GMP transaction on destination chains
@@ -55,68 +156,25 @@ export const getTransactionStatusOnDestinationChains = publicProcedure
         _source: SEARCHGMP_SOURCE,
       });
 
-      if (data.length) {
-        const pendingResult = data.reduce(
-          async (acc, gmpData) => {
-            const {
-              call,
-              status: firstHopStatus,
-              interchain_token_deployment_started: tokenDeployment,
-              interchain_transfer: tokenTransfer,
-            } = gmpData;
-
-            const chainType = gmpData.call.chain_type;
-            let secondHopStatus = "pending"
-
-            if (gmpData.callback) {
-              const secondHopMessageId = gmpData.callback.returnValues.messageId;
-              const secondHopData = await ctx.services.gmp.searchGMP({
-                txHash: secondHopMessageId,
-                _source: SEARCHGMP_SOURCE,
-              });
-
-              secondHopStatus = secondHopData[0].status;
-            }
-
-            const destinationChain =
-              tokenTransfer?.destinationChain?.toLowerCase() ||
-              tokenDeployment?.destinationChain?.toLowerCase() ||
-              call.returnValues.destinationChain.toLowerCase();
-
-            return {
-              ...acc,
-              [destinationChain]: {
-                status: chainType === "evm" ? firstHopStatus : secondHopStatus,
-                txHash: call.transactionHash,
-                logIndex: call.logIndex ?? call._logIndex ?? 0,
-                txId: gmpData.message_id,
-              },
-            };
-          },
-          {} as Promise<{
-            [chainId: string]: {
-              status: GMPTxStatus;
-              txHash: `0x${string}`;
-              txId: string;
-              logIndex: number;
-            };
-          }>
-        );
-
-        return await pendingResult;
+      if (!data.length) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Transaction not found",
+        });
       }
 
-      // If we don't find the transaction, we throw a 404 error
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Transaction not found",
-      });
+      // Process all GMP data entries in parallel
+      const processedEntries = await Promise.all(
+        data.map((gmpData) => processGMPData(gmpData, ctx))
+      );
+
+      // Convert the processed entries into a ChainStatusMap
+      const result = Object.fromEntries(processedEntries);
+
+      return result;
     } catch (error) {
-      // If we get a TRPC error, we throw it
-      if (error instanceof TRPCError) {
-        throw error;
-      }
-      // otherwise, we throw an internal server error
+      if (error instanceof TRPCError) throw error;
+
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to get transaction status",

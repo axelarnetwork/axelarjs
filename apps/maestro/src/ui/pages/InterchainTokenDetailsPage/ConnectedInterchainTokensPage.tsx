@@ -2,10 +2,9 @@ import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
-import { useCallback, useEffect, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
-import { useAccount, useBalance, useChainId, useSwitchChain } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
@@ -16,33 +15,38 @@ import { InterchainTokenList } from "~/features/InterchainTokenList";
 import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { logger } from "~/lib/logger";
+import {
+  SUI_CHAIN_ID,
+  useAccount,
+  useBalance,
+  useChainId,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import {
-  useAllChainConfigsQuery,
-} from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
 } from "~/services/gmp/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import ConnectWalletButton from "~/ui/compounds/ConnectWalletButton";
+import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 
 type ConnectedInterchainTokensPageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   tokenName: string;
   tokenSymbol: string;
   decimals: number;
-  tokenId?: `0x${string}` | null;
+  tokenId?: string | null;
   deploymentMessageId: string | undefined;
 };
 
 type InterchainTokenDetailsPageSessionStorageProps = {
   chainId: number;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
 };
 
 export const getInterchainTokenDetailsPageSessionStorageKey = (
@@ -52,14 +56,14 @@ export const getInterchainTokenDetailsPageSessionStorageKey = (
   `@maestro/interchain-tokens/${props.chainId}/${props.tokenAddress}/v${version}`;
 
 export type InterchainTokenDetailsPageState = {
-  deployTokensTxHashes: `0x${string}`[];
+  deployTokensTxHashes: string[];
   selectedChainIds: number[];
 };
 
 export function persistTokenDeploymentTxHash(
-  tokenAddress: `0x${string}`,
+  tokenAddress: string,
   chainId: number,
-  deployTokensTxHash: `0x${string}`,
+  deployTokensTxHash: string,
   selectedChainIds: number[]
 ) {
   const key = getInterchainTokenDetailsPageSessionStorageKey({
@@ -97,16 +101,34 @@ export function useInterchainTokenDetailsPageState(
   });
 }
 
+function getDeploymentStatus(
+  chainId: string | undefined,
+  statusesByChain: Record<string, ChainStatus>
+) {
+  // axelarscan returns chainId in lowercase
+  const deploymentStatus = chainId ? statusesByChain[chainId?.toLowerCase()] : undefined;
+
+  if (!deploymentStatus) {
+    return undefined;
+  }
+
+  return deploymentStatus.lastHop
+    ? deploymentStatus
+    : { ...deploymentStatus, status: "pending" };
+}
+
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
+  const [isAlreadyUpdatingRemoteSui, setAlreadyUpdatingRemoteSui] =
+    useState(false);
   const { address } = useAccount();
   const chainId = useChainId();
   const {
     data: interchainToken,
     refetch: refetchInterchainToken,
     error: interchainTokenError,
-    isLoading: isInterchainTokenLoading,
+    isFetching: isInterchainTokenFetching,
   } = useInterchainTokensQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
@@ -115,7 +137,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const {
     data: tokenDetails,
     error: tokenDetailsError,
-    refetch: refetchTokenDetails,
+    isFetching: isTokenDetailsFetching,
   } = trpc.erc20.getERC20TokenDetails.useQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
@@ -160,9 +182,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       txHashes: sessionState.deployTokensTxHashes,
     });
 
+  const { switchChain } = useSwitchChain();
   const { combinedComputed } = useAllChainConfigsQuery();
-
-  const { switchChainAsync } = useSwitchChain();
 
   const statusesByChain = useMemo(() => {
     return (
@@ -176,6 +197,18 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       )
     );
   }, [statuses, destinationChainIds]);
+  const utils = trpc.useUtils();
+  const refetchPageData = useCallback(() => {
+    if (!isInterchainTokenFetching && !isTokenDetailsFetching) {
+      void utils.interchainToken.searchInterchainToken.invalidate();
+      void utils.erc20.getERC20TokenDetails.invalidate();
+    }
+  }, [
+    isInterchainTokenFetching,
+    isTokenDetailsFetching,
+    utils.erc20.getERC20TokenDetails,
+    utils.interchainToken.searchInterchainToken,
+  ]);
 
   // reset state when all txs are executed or errored
   useEffect(() => {
@@ -188,14 +221,20 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         ({ status }) => status === "executed" || status === "error"
       )
     ) {
+      refetchPageData();
       setSessionState((draft) => {
         draft.deployTokensTxHashes = [];
         draft.selectedChainIds = [];
       });
     }
-  }, [hasFetchedStatuses, setSessionState, statuses, statusesByChain]);
-
-  const utils = trpc.useUtils();
+  }, [
+    hasFetchedStatuses,
+    setSessionState,
+    statuses,
+    refetchPageData,
+    statusesByChain,
+    sessionState,
+  ]);
 
   const { mutateAsync, isPending, isSuccess } =
     trpc.interchainToken.recoverDeploymentMessageIdByTokenId.useMutation();
@@ -211,10 +250,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     ) {
       void mutateAsync({ tokenId: props.tokenId }).then((result) => {
         if (result === "updated") {
-          void utils.erc20.invalidate().then(() => void refetchTokenDetails());
-          void utils.interchainToken
-            .invalidate()
-            .then(() => void refetchInterchainToken());
+          refetchPageData();
         }
       });
     }
@@ -224,16 +260,106 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     mutateAsync,
     props.deploymentMessageId,
     props.tokenId,
-    refetchInterchainToken,
-    refetchTokenDetails,
-    utils.erc20,
-    utils.interchainToken,
+    refetchPageData,
   ]);
 
   // Try to recover deployment message id if it's missing
   useEffect(() => {
     recoverMessageId();
   }, [recoverMessageId]);
+
+  const { mutateAsync: updateSuiAddresses } =
+    trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
+
+  const { mutateAsync: updateEVMAddresses } =
+    trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
+
+  // Update Sui remote token addresses
+  // the address is wrong on the Sui chain on deployment because it's the EVM address,
+  // we wait for the tx to be executed then we update the address on the Sui chain
+  useEffect(() => {
+    const suiChain = interchainToken?.matchingTokens?.find((x) =>
+      x.chain?.id.includes("sui")
+    );
+
+    if (
+      !isAlreadyUpdatingRemoteSui &&
+      suiChain &&
+      interchainToken?.matchingTokens?.some(
+        (x) =>
+          x.chain?.id === suiChain?.chain?.id &&
+          x.tokenAddress === props.tokenAddress &&
+          x.isRegistered
+      ) &&
+      props.tokenId
+    ) {
+      setAlreadyUpdatingRemoteSui(true);
+      updateSuiAddresses({
+        tokenId: props.tokenId
+      })
+        .then(() => {
+          setAlreadyUpdatingRemoteSui(false);
+          refetchPageData();
+        })
+        .catch(() => {
+          setTimeout(() => {
+            setAlreadyUpdatingRemoteSui(false);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on sui chain
+        });
+    }
+  }, [
+    interchainToken?.matchingTokens,
+    isAlreadyUpdatingRemoteSui,
+    props.tokenAddress,
+    props.tokenId,
+    updateSuiAddresses,
+    refetchPageData,
+  ]);
+
+  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
+
+  const setChainUpdateStatus = useCallback(
+    (chainId: string | undefined, status: boolean) => {
+      setIsUpdating((prev) => ({ ...prev, [chainId ?? ""]: status }));
+    },
+    []
+  );
+
+  useEffect(() => {
+    interchainToken?.matchingTokens?.forEach((x) => {
+      // check if the EVM token address is the same as sui, which is wrong
+      if (
+        props.chainId === SUI_CHAIN_ID &&
+        !x.chain?.id.includes("sui") &&
+        x.tokenAddress === props.tokenAddress &&
+        !isUpdating[x.chain?.id ?? ""]
+      ) {
+        setChainUpdateStatus(x.chain?.id, true);
+        updateEVMAddresses({
+          tokenId: props?.tokenId as `0x${string}`,
+          axelarChainId: x.chain?.id,
+        })
+          .then(() => {
+            setChainUpdateStatus(x.chain?.id, false);
+            refetchPageData();
+          })
+          .catch(() => {
+            setTimeout(() => {
+              setChainUpdateStatus(x.chain?.id, false);
+            }, 5000);
+          });
+      }
+    });
+  }, [
+    interchainToken?.matchingTokens,
+    props.chainId,
+    props.tokenAddress,
+    props?.tokenId,
+    updateEVMAddresses,
+    isUpdating,
+    refetchPageData,
+    setChainUpdateStatus,
+  ]);
 
   const remoteChainsExecuted = useMemo(
     () =>
@@ -247,7 +373,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     if (
       destinationChainIds.length === 0 ||
       remoteChainsExecuted.length === 0 ||
-      isInterchainTokenLoading
+      isInterchainTokenFetching
     ) {
       return;
     }
@@ -259,22 +385,21 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       });
     }
 
-    refetchInterchainToken().catch(() => {
-      logger.error("Failed to refetch interchain token");
-    });
+    refetchPageData();
   }, [
     address,
+    refetchPageData,
     remoteChainsExecuted,
     destinationChainIds,
     interchainToken.tokenId,
     props.chainId,
     props.tokenAddress,
     refetchInterchainToken,
-    isInterchainTokenLoading,
+    isInterchainTokenFetching,
     setSessionState,
   ]);
 
-  const { data: userGasBalance } = useBalance({ address });
+  const userGasBalance = useBalance();
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
@@ -293,7 +418,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const runningChainIds = useMemo(
     () =>
       Object.entries(statusesByChain).map(
-        ([axelarChainId]) => combinedComputed.indexedById[axelarChainId]?.chain_id
+        ([axelarChainId]) =>
+          combinedComputed.indexedById[axelarChainId]?.chain_id
       ),
     [combinedComputed.indexedById, statusesByChain]
   );
@@ -310,7 +436,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     isRestrictedToDeployer ||
     !address ||
     isGasPriceQueryLoading ||
-    !hasFetchedStatuses;
+    (!!sessionState.deployTokensTxHashes.length && !hasFetchedStatuses);
 
   const shouldRenderFooter =
     !isReadOnly && nonRunningSelectedChainIds.length > 0;
@@ -324,8 +450,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             x.chain && !remoteChainsExecuted.includes(x.chain.id)
         )
         .map((token) => {
-          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined(
-            (id) => statusesByChain[id]
+          const gmpInfo = Maybe.of(token.chain?.id).mapOrUndefined((id) =>
+            getDeploymentStatus(id, statusesByChain)
           );
 
           const isSelected = nonRunningSelectedChainIds.includes(token.chainId);
@@ -334,7 +460,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
             ...token,
             isSelected,
             isRegistered: false,
-            deploymentStatus: gmpInfo?.status,
+            deploymentStatus: gmpInfo?.status ?? undefined,
             deploymentTxHash: Maybe.of(gmpInfo).mapOrUndefined(
               ({ txHash, logIndex }) => `${txHash}:${logIndex}` as const
             ),
@@ -380,7 +506,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               <div className="flex items-center justify-end gap-1 text-sm md:ml-2">
                 ≈{" "}
                 <BigNumberText
-                  decimals={18}
+                  decimals={userGasBalance?.decimals || 18}
                   localeOptions={{
                     style: "decimal",
                     maximumFractionDigits: 4,
@@ -432,11 +558,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               $variant="accent"
               onClick={() => {
                 if (originToken) {
-                  switchChainAsync?.({ chainId: originToken.chainId }).catch(
-                    () => {
-                      logger.error("Failed to switch network");
-                    }
-                  );
+                  switchChain?.({ chainId: originToken.chainId });
                 }
               }}
             >
@@ -466,9 +588,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
               }}
             />
           ) : (
-            <ConnectWalletButton className="w-full" $size="md">
+            <ConnectWalletModal>
               Connect wallet to register this token
-            </ConnectWalletButton>
+            </ConnectWalletModal>
           )}
         </div>
       )}

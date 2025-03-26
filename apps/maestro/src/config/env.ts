@@ -15,7 +15,7 @@ export const NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID = Maybe.of(
 
 export const NEXT_PUBLIC_NETWORK_ENV = String(
   process.env.NEXT_PUBLIC_NETWORK_ENV ?? "testnet"
-) as "mainnet" | "testnet";
+) as "mainnet" | "testnet" | "devnet-amplifier";
 
 export const NEXT_PUBLIC_AXELAR_CONFIGS_URL = Maybe.of(
   process.env.NEXT_PUBLIC_AXELAR_CONFIGS_URL
@@ -38,7 +38,10 @@ export const NEXT_PUBLIC_EXPLORER_URL = Maybe.of(
 
 export const NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM = Maybe.of(
   process.env.NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM
-).mapOr("", String);
+)
+  .map(split(","))
+  .map(uniq)
+  .mapOr([], map(trim));
 
 export const NEXT_PUBLIC_FILE_BUG_REPORT_URL = Maybe.of(
   process.env.NEXT_PUBLIC_FILE_BUG_REPORT_URL
@@ -113,6 +116,12 @@ export const NEXT_PUBLIC_COMPETITION_END_TIMESTAMP = Maybe.of(
 export const NEXT_PUBLIC_ENABLED_FEATURES = Maybe.of(
   process.env.NEXT_PUBLIC_ENABLED_FEATURES
 ).mapOr([], (val) => String(val).split(","));
+
+// Max 3 decimals
+export const FEE_MULTIPLIER = Maybe.of(process.env.FEE_MULTIPLIER).mapOr(
+  1,
+  Number
+);
 
 export const shouldDisableSend = (
   axelarChainId: string,

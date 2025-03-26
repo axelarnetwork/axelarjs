@@ -20,7 +20,11 @@ export type GetAssetsResponse = AxelarScanAsset[];
 
 export type GetAssetsPriceResponse = AxelarAssetPrice[];
 
-export type GetChainConfigsResponse = (EVMChainConfig | CosmosChainConfig | VMChainConfig)[];
+export type GetChainConfigsResponse = (
+  | EVMChainConfig
+  | CosmosChainConfig
+  | VMChainConfig
+)[];
 
 export class AxelarscanClient extends RestService {
   static init(options: RestServiceOptions) {

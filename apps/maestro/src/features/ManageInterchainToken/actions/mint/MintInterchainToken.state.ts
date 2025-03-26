@@ -2,9 +2,10 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect } from "react";
 
 import { isAddress, type TransactionReceipt } from "viem";
-import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useWriteIerc20MintableBurnableMint } from "~/lib/contracts/IERC20MintableBurnable.hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
@@ -42,12 +43,14 @@ export function useMintInterchainTokenState() {
         return;
       }
 
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate();
-      await trpcContext.erc20.getERC20TokenBalanceForOwner.refetch({
-        chainId,
-        tokenAddress: managerState.tokenAddress,
-        owner: accountAddress as `0x${string}`,
-      });
+      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
+      await trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(
+        {
+          chainId,
+          tokenAddress: managerState.tokenAddress,
+          owner: accountAddress,
+        }
+      );
 
       setTxState({
         status: "confirmed",
@@ -58,7 +61,7 @@ export function useMintInterchainTokenState() {
     },
     [
       mintTxHash,
-      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
       chainId,
       managerState.tokenAddress,
       accountAddress,
@@ -87,6 +90,7 @@ export function useMintInterchainTokenState() {
     erc20Details,
     isMinting,
     tokenAddress: managerState.tokenAddress,
+    tokenId: managerState.tokenId,
   };
 
   const actions = {

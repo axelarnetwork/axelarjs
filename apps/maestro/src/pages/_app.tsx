@@ -1,8 +1,9 @@
 import { ThemeProvider } from "@axelarjs/ui";
 import { Toaster } from "@axelarjs/ui/toaster";
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
+import dynamic from "next/dynamic";
 import { Cabin } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -12,8 +13,12 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
+import "@mysten/dapp-kit/dist/index.css";
 import "~/lib/polyfills";
 import "~/styles/globals.css";
+
+import { SuiClientProvider } from "@mysten/dapp-kit";
+import { getFullnodeUrl } from "@mysten/sui/client";
 
 import { NEXT_PUBLIC_GA_MEASUREMENT_ID } from "~/config/env";
 import { queryClient as wagmiQueryClient } from "~/config/wagmi";
@@ -21,6 +26,33 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import MainLayout from "~/ui/layouts/MainLayout";
 import NProgressBar from "~/ui/layouts/NProgressBar";
+
+import "@tanstack/react-query";
+
+import { SUI_RPC_URLS } from "@axelarjs/core";
+
+// Dynamically import WalletProvider with ssr disabled
+const WalletProviderClient = dynamic(
+  () =>
+    import("@mysten/dapp-kit").then((mod) => ({
+      default: ({ children }: { children: React.ReactNode }) => (
+        <mod.WalletProvider
+          autoConnect
+          preferredWallets={["Suiet", "Sui Wallet"]}
+        >
+          {children}
+        </mod.WalletProvider>
+      ),
+    })),
+  { ssr: false }
+);
+
+const networks = {
+  localnet: { url: getFullnodeUrl("localnet") },
+  devnet: { url: getFullnodeUrl("devnet") },
+  testnet: { url: SUI_RPC_URLS.testnet },
+  mainnet: { url: SUI_RPC_URLS.mainnet },
+};
 
 const fontSans = Cabin({ subsets: ["latin"] });
 const clashGrotesk = localFont({
@@ -60,12 +92,7 @@ const clashGrotesk = localFont({
 });
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
-  // indicate whether the app is rendered on the server
-  const [isSSR, setIsSSR] = useState(true);
   const [queryClient] = useState(() => wagmiQueryClient);
-
-  // set isSSR to false on the first client-side render
-  useEffect(() => setIsSSR(false), []);
 
   return (
     <>
@@ -86,13 +113,22 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <SessionProvider session={pageProps.session}>
           <ThemeProvider>
             <WagmiConfigPropvider>
-              {!isSSR && (
-                <MainLayout>
-                  <Component {...pageProps} />
-                </MainLayout>
-              )}
-              <ReactQueryDevtools />
-              <Toaster />
+              <SuiClientProvider
+                networks={networks}
+                network={
+                  process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+                    ? "mainnet"
+                    : "testnet"
+                }
+              >
+                <WalletProviderClient>
+                  <MainLayout>
+                    <Component {...pageProps} />
+                  </MainLayout>
+                  <ReactQueryDevtools />
+                  <Toaster />
+                </WalletProviderClient>
+              </SuiClientProvider>
             </WagmiConfigPropvider>
           </ThemeProvider>
         </SessionProvider>

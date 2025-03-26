@@ -7,11 +7,10 @@ import {
   LinkButton,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, useEffect, useState, useMemo, type FC } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
-import { useAccount } from "wagmi";
 
-import { useChainFromRoute } from "~/lib/hooks";
+import { useAccount, useChainFromRoute } from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -46,11 +45,17 @@ const Review: FC = () => {
         chain.id,
         state.txState.txHash,
         state.selectedChains.map(
-          (axelarChainId) => combinedComputed.indexedById[axelarChainId].chain_id
+          (axelarChainId) =>
+            combinedComputed.indexedById[axelarChainId].chain_id
         )
       );
     }
-  }, [chain, combinedComputed.indexedById, state.selectedChains, state.txState]);
+  }, [
+    chain,
+    combinedComputed.indexedById,
+    state.selectedChains,
+    state.txState,
+  ]);
 
   const chainConfig = useMemo(() => {
     if (!chain) return undefined;
@@ -61,12 +66,12 @@ const Review: FC = () => {
     if (chainConfig && state.txState.type === "deployed") {
       actions.reset();
       await router.push(
-        `/${chainConfig.chain_name.toLowerCase()}/${state.txState.tokenAddress}`
+        `/${chainConfig.id.toLowerCase()}/${state.txState.tokenAddress}`
       );
     }
   }, [actions, chainConfig, router, state.txState]);
 
-  const isVMChain = chainConfig?.chain_type === 'vm';
+  const isVMChain = chainConfig?.chain_type === "vm";
 
   return (
     <>
@@ -106,7 +111,8 @@ const Review: FC = () => {
             {state.selectedChains.length > 0 ? (
               <GMPTxStatusMonitor txHash={state.txState.txHash} />
             ) : (
-              !isVMChain && chain?.blockExplorers?.default && (
+              !isVMChain &&
+              chain?.blockExplorers?.default && (
                 <LinkButton
                   $size="sm"
                   href={`${chain.blockExplorers.default.url}/tx/${state.txState.txHash}`}

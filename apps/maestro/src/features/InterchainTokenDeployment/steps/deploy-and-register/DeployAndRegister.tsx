@@ -11,17 +11,19 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
-import { useAccount, useBalance, useChainId } from "wagmi";
+import { WriteContractData } from "wagmi/query";
 
+import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
+import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
+import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
-import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -46,7 +48,7 @@ export const Step2: FC = () => {
     [state.remoteDeploymentGasFees?.gasFees]
   );
 
-  const { writeAsync: deployInterchainTokenAsync } =
+  const { writeAsync: deployInterchainTokenAsync, isReady } =
     useDeployAndRegisterRemoteInterchainTokenMutation(
       {
         onStatusUpdate(txState) {
@@ -80,8 +82,8 @@ export const Step2: FC = () => {
   const [, { addTransaction }] = useTransactionsContainer();
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-    async (e) => {
-      e.preventDefault();
+    async (ev) => {
+      ev.preventDefault();
 
       const hasGasfees =
         !rootState.selectedChains.length ||
@@ -99,11 +101,62 @@ export const Step2: FC = () => {
 
       rootActions.setTxState({
         type: "pending_approval",
+        step: 1,
+        totalSteps: 1,
       });
 
-      const txPromise = deployInterchainTokenAsync();
+      const txPromise = deployInterchainTokenAsync().catch((e) => {
+        // Handle user rejection from any wallet
+        if (e.message?.toLowerCase().includes("reject")) {
+          toast.error("Transaction rejected by user");
+          rootActions.setTxState({
+            type: "idle",
+          });
+          return;
+        }
 
-      await handleTransactionResult(txPromise, {
+        toast.error(e.message);
+        rootActions.setTxState({
+          type: "idle",
+        });
+
+        return;
+      });
+
+      // Sui will return a digest equivalent to the txHash
+      if (sourceChain.chain_id === SUI_CHAIN_ID) {
+        try {
+          const result = (await txPromise) as DeployTokenResult;
+          // if tx is successful, we will get a digest
+          if (result) {
+            rootActions.setTxState({
+              type: "deployed",
+              suiTx: result,
+              txHash: result.digest,
+              tokenAddress: result.tokenAddress,
+            });
+            if (rootState.selectedChains.length > 0) {
+              addTransaction({
+                status: "submitted",
+                suiTx: result,
+                hash: result.digest,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+            }
+            return;
+          } else {
+            rootActions.setTxState({
+              type: "idle",
+            });
+          }
+        } catch (e: any) {
+          // We're catching the error above
+          console.log("error in sui tx", e?.message);
+        }
+      }
+
+      await handleTransactionResult(txPromise as Promise<WriteContractData>, {
         onSuccess(txHash) {
           rootActions.setTxState({
             type: "deploying",
@@ -119,17 +172,10 @@ export const Step2: FC = () => {
             });
           }
         },
-        onTransactionError(txError) {
-          rootActions.setTxState({
-            type: "idle",
-          });
-
-          toast.error(txError.shortMessage);
-        },
       });
     },
     [
-      rootState.selectedChains.length,
+      rootState,
       state.totalGasFee,
       state.isEstimatingGasFees,
       state.hasGasFeesEstimationError,
@@ -140,16 +186,17 @@ export const Step2: FC = () => {
       addTransaction,
     ]
   );
-  
+
   const eligibleChains = filterEligibleChains(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
-  const { address } = useAccount();
+  const balance = useBalance();
 
-  const { data: balance } = useBalance({ address });
-
-  const nativeTokenSymbol = getNativeToken(state.sourceChainId);
+  // TODO: Fetch it from the axelarscan chains API
+  const nativeTokenSymbol = state.sourceChainId
+    ? getNativeToken(state.sourceChainId)
+    : undefined;
 
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !state.remoteDeploymentGasFees) {
@@ -163,22 +210,17 @@ export const Step2: FC = () => {
 
   const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     if (rootState.txState.type === "pending_approval") {
+      if (rootState.txState.step && rootState.txState.totalSteps) {
+        return {
+          children: `Check your wallet - Signature ${rootState.txState.step}/${rootState.txState.totalSteps}`,
+          status: "loading",
+        };
+      }
       return { children: "Check your wallet", status: "loading" };
     }
-    if (rootState.txState.type === "deploying") {
-      return { children: "Deploying interchain token", status: "loading" };
-    }
-
     if (state.isEstimatingGasFees) {
       return { children: "Loading gas fees", status: "loading" };
     }
-    if (state.hasGasFeesEstimationError) {
-      return {
-        children: "Failed to load gas prices",
-        status: "error",
-      };
-    }
-
     if (hasInsufficientGasBalance) {
       return {
         children: sourceChain?.native_token.decimals
@@ -186,6 +228,18 @@ export const Step2: FC = () => {
           : `Insufficient ${nativeTokenSymbol} balance for gas fees`,
         status: "error",
       };
+    }
+    if (state.hasGasFeesEstimationError) {
+      return {
+        children: "Failed to load gas prices",
+        status: "error",
+      };
+    }
+    if (rootState.txState.type === "idle" && !isReady) {
+      return { children: "Initializing", status: "loading" };
+    }
+    if (rootState.txState.type === "deploying") {
+      return { children: "Deploying interchain token", status: "loading" };
     }
 
     return {
@@ -200,7 +254,8 @@ export const Step2: FC = () => {
       status: "idle",
     };
   }, [
-    rootState.txState.type,
+    isReady,
+    rootState.txState,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
     state.totalGasFee,
@@ -209,6 +264,10 @@ export const Step2: FC = () => {
     sourceChain?.native_token.decimals,
     nativeTokenSymbol,
   ]);
+
+  if (!sourceChain) {
+    return;
+  }
 
   const isCTADisabled =
     state.isEstimatingGasFees ||
@@ -254,6 +313,7 @@ export const Step2: FC = () => {
           <NextButton
             $length="block"
             $loading={
+              buttonStatus === "loading" ||
               rootState.txState.type === "pending_approval" ||
               rootState.txState.type === "deploying"
             }

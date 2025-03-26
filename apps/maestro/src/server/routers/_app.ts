@@ -10,6 +10,7 @@ import { gmpRouter } from "./gmp";
 import { interchainTokenRouter } from "./interchainToken";
 import { messagesRouter } from "./messages";
 import { openaiRouter } from "./openai";
+import { suiRouter } from "./sui";
 
 export const appRouter = router({
   uptime: publicProcedure.query(() => ({
@@ -25,6 +26,7 @@ export const appRouter = router({
   openai: openaiRouter,
   messages: messagesRouter,
   accounts: accountsRouter,
+  sui: suiRouter,
 });
 
 export type AppRouter = typeof appRouter;
