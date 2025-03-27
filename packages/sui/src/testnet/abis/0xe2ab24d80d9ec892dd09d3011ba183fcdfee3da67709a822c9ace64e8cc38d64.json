@@ -1,0 +1,909 @@
+{
+  "gmp": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "gmp",
+    "friends": [],
+    "structs": {
+      "Executed": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "data",
+            "type": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
+      "Singleton": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "channel",
+            "type": {
+              "Struct": {
+                "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+                "module": "channel",
+                "name": "Channel",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "execute": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+              "module": "channel",
+              "name": "ApprovedMessage",
+              "typeArguments": []
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "gmp",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "register_transaction": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2f871726329f555bc3fa6eec129f259a8bce3cb3989b39dd75a627a1a0961bc2",
+                "module": "discovery",
+                "name": "RelayerDiscovery",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "gmp",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "send_call": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "gmp",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+                "module": "gateway",
+                "name": "Gateway",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xddf711b99aec5c72594e5cf2da4014b2d30909850a759d2e8090add1088dbbc9",
+                "module": "gas_service",
+                "name": "GasService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Vector": "U8"
+          },
+          "Address",
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "its": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "its",
+    "friends": [],
+    "structs": {
+      "ExecutedWithToken": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "source_chain",
+            "type": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "source_address",
+            "type": {
+              "Vector": "U8"
+            }
+          },
+          {
+            "name": "data",
+            "type": {
+              "Vector": "U8"
+            }
+          },
+          {
+            "name": "amount",
+            "type": "U64"
+          }
+        ]
+      },
+      "Singleton": {
+        "abilities": {
+          "abilities": [
+            "Key"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "Struct": {
+                "address": "0x2",
+                "module": "object",
+                "name": "UID",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "name": "channel",
+            "type": {
+              "Struct": {
+                "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+                "module": "channel",
+                "name": "Channel",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "deploy_remote_interchain_token": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+                "module": "gateway",
+                "name": "Gateway",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xddf711b99aec5c72594e5cf2da4014b2d30909850a759d2e8090add1088dbbc9",
+                "module": "gas_service",
+                "name": "GasService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+              "module": "token_id",
+              "name": "TokenId",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Vector": "U8"
+          },
+          "Address"
+        ],
+        "return": []
+      },
+      "get_final_transaction": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "its",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x2f871726329f555bc3fa6eec129f259a8bce3cb3989b39dd75a627a1a0961bc2",
+              "module": "transaction",
+              "name": "TxCall",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "receive_interchain_transfer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+              "module": "channel",
+              "name": "ApprovedMessage",
+              "typeArguments": []
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "its",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "register_coin": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "CoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+              "module": "token_id",
+              "name": "TokenId",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "register_coin_with_cap": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "CoinMetadata",
+                "typeArguments": [
+                  {
+                    "TypeParameter": 0
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "TreasuryCap",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+              "module": "token_id",
+              "name": "TokenId",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "register_transaction": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2f871726329f555bc3fa6eec129f259a8bce3cb3989b39dd75a627a1a0961bc2",
+                "module": "discovery",
+                "name": "RelayerDiscovery",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "its",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "send_interchain_transfer_call": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": []
+          }
+        ],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                "module": "its",
+                "name": "Singleton",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+                "module": "interchain_token_service",
+                "name": "InterchainTokenService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x6ddfcdd14a1019d13485a724db892fa0defe580f19c991eaabd690140abb21e4",
+                "module": "gateway",
+                "name": "Gateway",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xddf711b99aec5c72594e5cf2da4014b2d30909850a759d2e8090add1088dbbc9",
+                "module": "gas_service",
+                "name": "GasService",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Struct": {
+              "address": "0xe7818984af6b3e322a6d999ca291a125fc3f82e13e5e6d9affc3a712f96bc7ce",
+              "module": "token_id",
+              "name": "TokenId",
+              "typeArguments": []
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          },
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          },
+          {
+            "Vector": "U8"
+          },
+          {
+            "Vector": "U8"
+          },
+          "Address",
+          {
+            "Struct": {
+              "address": "0x2",
+              "module": "coin",
+              "name": "Coin",
+              "typeArguments": [
+                {
+                  "Struct": {
+                    "address": "0x2",
+                    "module": "sui",
+                    "name": "SUI",
+                    "typeArguments": []
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Vector": "U8"
+          },
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "clock",
+                "name": "Clock",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "token": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "token",
+    "friends": [],
+    "structs": {
+      "TOKEN": {
+        "abilities": {
+          "abilities": [
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "mint": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "coin",
+                "name": "TreasuryCap",
+                "typeArguments": [
+                  {
+                    "Struct": {
+                      "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+                      "module": "token",
+                      "name": "TOKEN",
+                      "typeArguments": []
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "U64",
+          "Address",
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x2",
+                "module": "tx_context",
+                "name": "TxContext",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  },
+  "token_a": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "token_a",
+    "friends": [],
+    "structs": {
+      "TOKEN_A": {
+        "abilities": {
+          "abilities": [
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {}
+  },
+  "token_b": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "token_b",
+    "friends": [],
+    "structs": {
+      "TOKEN_B": {
+        "abilities": {
+          "abilities": [
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {}
+  },
+  "token_c": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "token_c",
+    "friends": [],
+    "structs": {
+      "TOKEN_C": {
+        "abilities": {
+          "abilities": [
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "dummy_field",
+            "type": "Bool"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {}
+  },
+  "utils": {
+    "fileFormatVersion": 6,
+    "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+    "name": "utils",
+    "friends": [
+      {
+        "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+        "name": "gmp"
+      },
+      {
+        "address": "0xe2ab24d80d9ec892dd09d3011ba183fcdfee3da67709a822c9ace64e8cc38d64",
+        "name": "its"
+      }
+    ],
+    "structs": {},
+    "exposedFunctions": {
+      "concat": {
+        "visibility": "Friend",
+        "isEntry": false,
+        "typeParameters": [
+          {
+            "abilities": [
+              "Copy"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          },
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": {
+              "TypeParameter": 0
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,454 @@
+{
+  "abi": {
+    "fileFormatVersion": 6,
+    "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+    "name": "abi",
+    "friends": [],
+    "structs": {
+      "AbiReader": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "bytes",
+            "type": {
+              "Vector": "U8"
+            }
+          },
+          {
+            "name": "head",
+            "type": "U64"
+          },
+          {
+            "name": "pos",
+            "type": "U64"
+          }
+        ]
+      },
+      "AbiWriter": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "bytes",
+            "type": {
+              "Vector": "U8"
+            }
+          },
+          {
+            "name": "pos",
+            "type": "U64"
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "into_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Struct": {
+              "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+              "module": "abi",
+              "name": "AbiWriter",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "new_reader": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+              "module": "abi",
+              "name": "AbiReader",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "new_writer": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          "U64"
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+              "module": "abi",
+              "name": "AbiWriter",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "read_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "read_bytes_raw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U8"
+          }
+        ]
+      },
+      "read_u256": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U256"
+        ]
+      },
+      "read_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U8"
+        ]
+      },
+      "read_vector_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": {
+              "Vector": "U8"
+            }
+          }
+        ]
+      },
+      "read_vector_u256": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Vector": "U256"
+          }
+        ]
+      },
+      "skip_slot": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiReader",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      },
+      "write_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "write_bytes_raw": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U8"
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "write_u256": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          },
+          "U256"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "write_u8": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          },
+          "U8"
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "write_vector_bytes": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Vector": "U8"
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      },
+      "write_vector_u256": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": "U256"
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0xe347ab3e2c32d1bf8be1cfbc9d46b543b60ed5d2a2e6393deee2bb4cf62d6e41",
+                "module": "abi",
+                "name": "AbiWriter",
+                "typeArguments": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
