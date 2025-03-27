@@ -9,7 +9,6 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import { useWriteInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
-
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
