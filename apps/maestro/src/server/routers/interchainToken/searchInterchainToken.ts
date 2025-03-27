@@ -15,11 +15,7 @@ import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
-import {
-  formatTokenId,
-  getStellarChainConfig,
-  stellarNetworkPassphrase,
-} from "../stellar/utils";
+import { formatTokenId, getStellarChainConfig } from "../stellar/utils";
 import {
   getCoinAddressFromType,
   getSuiEventsByTxHash,
@@ -485,7 +481,7 @@ export async function getStellarTokenRegistrationDetails(
     // Create a network-configured Stellar contract client
     const stellarContractClient = (await Client.from({
       contractId: chainConfig.config.contracts.InterchainTokenService.address,
-      networkPassphrase: stellarNetworkPassphrase,
+      networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE as string,
       rpcUrl: STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV],
     })) as unknown as StellarITSContractClient;
 

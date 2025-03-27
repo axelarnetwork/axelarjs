@@ -20,8 +20,6 @@ export const getStellarChainConfig = async (
   return chainConfig;
 };
 
-export const stellarNetworkPassphrase = "Test SDF Network ; September 2015";
-
 export const stellarEncodedRecipient = (
   destinationAddress: string
 ): `0x${string}` => `0x${Buffer.from(destinationAddress).toString("hex")}`;
