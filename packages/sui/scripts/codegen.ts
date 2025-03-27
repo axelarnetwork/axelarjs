@@ -1,4 +1,5 @@
 import { createAxelarConfigClient } from "@axelarjs/api";
+import type { Environment } from "@axelarjs/core";
 
 import { SuiClient } from "@mysten/sui/client";
 
@@ -7,8 +8,6 @@ import "@typemove/sui";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-
-const env = process.argv[2] === "mainnet" ? "mainnet" : "testnet";
 
 // The script won't generate ABIs for these contracts
 const IGNORED_CONTRACTS = [];
@@ -32,16 +31,32 @@ async function downloadABI(
   );
 }
 
-function cleanup() {
-  execSync(`rm -rf ${process.cwd()}/src/abis`);
-  execSync(`rm -rf ${process.cwd()}/src/types`);
+function cleanup(dirs: string[]) {
+  for (const dir of dirs) {
+    if (fs.existsSync(dir)) {
+      fs.rmSync(dir, { recursive: true });
+    }
+  }
 }
 
 async function run() {
+  await generate("devnet-amplifier");
+  await generate("testnet");
+  await generate("mainnet");
+}
+
+async function generate(env: Environment) {
   const client = createAxelarConfigClient(env);
   const config = await client.getAxelarConfigs(env);
-  const suiConfig = config.chains["sui"];
+  const suiChainKey = Object.keys(config.chains).find(
+    (key) => config.chains[key].chainType === "sui"
+  ) as keyof typeof config.chains;
 
+  const suiConfig = config.chains[suiChainKey];
+  const abisDir = `./src/${env}/abis`;
+  const typesDir = `./src/${env}/types`;
+
+  // type guard
   if (suiConfig?.chainType !== "sui") {
     throw new Error("Chain type is not sui");
   }
@@ -54,7 +69,7 @@ async function run() {
   );
 
   // Clean up old abis and types
-  cleanup();
+  cleanup([abisDir, typesDir]);
 
   console.log(
     `Generating Sui ABIs for ${contractNames.length} contracts on ${env}`
@@ -67,22 +82,22 @@ async function run() {
     const contractAddress = contracts[key].address;
 
     // Download ABI from the rpc node
-    await downloadABI(suiClient, contractAddress);
+    await downloadABI(suiClient, contractAddress, abisDir);
 
     // This is a hack to avoid conflicts with Transaction class from @mysten/sui
     execSync(
-      `sed -i 's/"name": "Transaction"/"name": "TxCall"/g' ./src/abis/${contractAddress}.json`
+      `sed -i 's/"name": "Transaction"/"name": "TxCall"/g' ${abisDir}/${contractAddress}.json`
     );
   }
   // Replace any "transaction" and "Transaction" with "txCall" and "TxCall" in the contracts["RelayerDiscovery"].address file
   // This is a hack to avoid conflicts with Transaction class from @mysten/sui
   execSync(
-    `sed -i 's/"Transaction": {/"TxCall": {/g' ./src/abis/${contracts["RelayerDiscovery"].address}.json`
+    `sed -i 's/"Transaction": {/"TxCall": {/g' ${abisDir}/${contracts["RelayerDiscovery"].address}.json`
   );
 
   // Generate the typescript files
   execSync(
-    `pnpm typemove-sui --network ${rpc[0]} --target-dir=./src/types ./src/abis`
+    `pnpm typemove-sui --network ${rpc[0]} --target-dir=${typesDir} ${abisDir}`
   );
 
   for (const contractName of contractNames) {
@@ -91,7 +106,7 @@ async function run() {
 
     // Replace any _contractAddress with ContractName in the src/types/index.ts file
     execSync(
-      `sed -i 's/_${contracts[key].address}/${contractName}/g' ./src/types/index.ts`
+      `sed -i 's/_${contracts[key].address}/${contractName}/g' ${typesDir}/index.ts`
     );
   }
 

@@ -1,9 +1,12 @@
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { test } from "vitest";
 
-import { InterchainTokenService } from "./types";
+import Contracts from "./";
 
 describe("types", () => {
+  const testnetContracts = Contracts["testnet"];
+  const { InterchainTokenService } = testnetContracts;
+
   test("should be able to fetch basic info in a contract", async () => {
     const client = new SuiClient({ url: getFullnodeUrl("testnet") });
     const result =
