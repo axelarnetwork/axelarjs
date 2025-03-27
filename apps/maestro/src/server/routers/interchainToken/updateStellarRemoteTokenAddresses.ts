@@ -13,7 +13,7 @@ export const updateStellarRemoteTokenAddresses = protectedProcedure
     const { tokenId } = input;
 
     // Get the token registration details by querying the Stellar contract
-    const response = await getStellarTokenRegistrationDetails(tokenId);
+    const response = await getStellarTokenRegistrationDetails(tokenId, ctx);
 
     if (!response.isRegistered) {
       throw new Error("Failed to retrieve Stellar token details");

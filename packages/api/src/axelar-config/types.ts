@@ -67,6 +67,18 @@ export interface ChainSuiSubconfig {
   rpc: string[];
 }
 
+export interface ChainStellarSubconfig {
+  contracts: {
+    InterchainTokenService: StellarContract;
+    AxelarGateway: StellarContract;
+    AxelarOperators: StellarContract;
+    AxelarGasService: StellarContract;
+    AxelarExample: StellarContract;
+    Upgrader: StellarContract;
+  };
+  rpc: string[];
+}
+
 export interface ChainCosmosSubconfig {
   addressPrefix: string;
   ibc: {
@@ -89,6 +101,11 @@ export interface BaseContracts {
 }
 
 export interface SuiContract {
+  address: string;
+  objects: Record<string, string>;
+}
+
+export interface StellarContract {
   address: string;
   objects: Record<string, string>;
 }
@@ -125,8 +142,17 @@ export interface SuiChainConfig extends BaseChainConfig {
   config: ChainSuiSubconfig;
 }
 
+export interface StellarChainConfig extends BaseChainConfig {
+  chainType: "stellar";
+  config: ChainStellarSubconfig;
+}
+
 // Union type of all possible chain configs
-export type ChainConfig = EvmChainConfig | AxelarChainConfig | SuiChainConfig;
+export type ChainConfig =
+  | EvmChainConfig
+  | AxelarChainConfig
+  | SuiChainConfig
+  | StellarChainConfig;
 
 export interface AxelarConfigsResponse {
   chains: { [chainId: string]: ChainConfig };

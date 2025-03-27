@@ -17,7 +17,7 @@ import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 import {
   formatTokenId,
-  stellarITSContractId,
+  getStellarChainConfig,
   stellarNetworkPassphrase,
 } from "../stellar/utils";
 import {
@@ -262,7 +262,7 @@ async function getInterchainToken(
 
           // Check if the token is registered on Stellar by directly querying the contract
           const { isRegistered, tokenAddress, tokenManagerAddress } =
-            await getStellarTokenRegistrationDetails(tokenId);
+            await getStellarTokenRegistrationDetails(tokenId, ctx);
 
           return {
             ...remoteTokenDetails,
@@ -473,16 +473,18 @@ async function getTokenDetails(
  * Check if a token is registered on Stellar by directly querying the Stellar contract
  */
 export async function getStellarTokenRegistrationDetails(
-  tokenId: string
+  tokenId: string,
+  ctx: Context
 ): Promise<{
   isRegistered: boolean;
   tokenAddress: string | null;
   tokenManagerAddress: string | null;
 }> {
   try {
+    const chainConfig = await getStellarChainConfig(ctx);
     // Create a network-configured Stellar contract client
     const stellarContractClient = (await Client.from({
-      contractId: stellarITSContractId,
+      contractId: chainConfig.config.contracts.InterchainTokenService.address,
       networkPassphrase: stellarNetworkPassphrase,
       rpcUrl: STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV],
     })) as unknown as StellarITSContractClient;

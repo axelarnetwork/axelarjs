@@ -115,3 +115,7 @@ export const WAGMI_VM_CHAIN_CONFIGS = VM_CHAIN_CONFIGS.filter(
 export const suiChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("sui")
 ) as ExtendedWagmiChainConfig;
+
+export const stellarChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
+  chain.axelarChainId.includes("stellar")
+) as ExtendedWagmiChainConfig;
