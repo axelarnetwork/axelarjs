@@ -53,7 +53,6 @@ export async function getTokenIdByCoinMetadata(
       txBuilder.tx.pure.bool(!isCanonical), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
-
   return TokenId;
 }
 

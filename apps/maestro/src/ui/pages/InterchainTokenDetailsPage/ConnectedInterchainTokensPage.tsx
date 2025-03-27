@@ -106,7 +106,9 @@ function getDeploymentStatus(
   statusesByChain: Record<string, ChainStatus>
 ) {
   // axelarscan returns chainId in lowercase
-  const deploymentStatus = chainId ? statusesByChain[chainId?.toLowerCase()] : undefined;
+  const deploymentStatus = chainId
+    ? statusesByChain[chainId?.toLowerCase()]
+    : undefined;
 
   if (!deploymentStatus) {
     return undefined;
@@ -121,6 +123,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
   const [isAlreadyUpdatingRemoteSui, setAlreadyUpdatingRemoteSui] =
+    useState(false);
+  const [isAlreadyUpdatingRemoteStellar, setAlreadyUpdatingRemoteStellar] =
     useState(false);
   const { address } = useAccount();
   const chainId = useChainId();
@@ -271,6 +275,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { mutateAsync: updateSuiAddresses } =
     trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
 
+  const { mutateAsync: updateStellarAddresses } =
+    trpc.interchainToken.updateStellarRemoteTokenAddresses.useMutation();
+
   const { mutateAsync: updateEVMAddresses } =
     trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
 
@@ -295,7 +302,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     ) {
       setAlreadyUpdatingRemoteSui(true);
       updateSuiAddresses({
-        tokenId: props.tokenId
+        tokenId: props.tokenId,
       })
         .then(() => {
           setAlreadyUpdatingRemoteSui(false);
@@ -315,6 +322,41 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     updateSuiAddresses,
     refetchPageData,
   ]);
+
+  // Update Stellar remote token addresses
+  // the address is wrong on the Stellar chain on deployment because it's the EVM address,
+  // we wait for the tx to be executed then we update the address on the Stellar chain
+  useEffect(() => {
+    const stellarChain = interchainToken?.matchingTokens?.find((x) =>
+      x.chain?.id.includes("stellar")
+    );
+
+    if (
+      !isAlreadyUpdatingRemoteStellar &&
+      stellarChain &&
+      interchainToken?.matchingTokens?.some(
+        (x) =>
+          x.chain?.id === stellarChain?.chain?.id &&
+          x.tokenAddress === props.tokenAddress &&
+          x.isRegistered
+      ) &&
+      props.tokenId
+    ) {
+      setAlreadyUpdatingRemoteStellar(true);
+      updateStellarAddresses({
+        tokenId: props.tokenId,
+      })
+        .then(() => {
+          setAlreadyUpdatingRemoteStellar(false);
+          refetchPageData();
+        })
+        .catch(() => {
+          setTimeout(() => {
+            setAlreadyUpdatingRemoteStellar(false);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on stellar chain
+        });
+    }
+  }, [interchainToken?.matchingTokens, props.tokenId, updateStellarAddresses]);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
 

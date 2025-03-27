@@ -125,12 +125,11 @@ export async function processGMPData(
     );
   }
 
-  const destinationChain = (
+  const destinationChain =
     interchain_token_deployment_started?.destinationChain ??
     destinationChainFromSrcEvent ??
     callback?.returnValues.destinationChain ??
-    call.returnValues.destinationChain
-  );
+    call.returnValues.destinationChain;
 
   return [
     destinationChain,
