@@ -22,7 +22,7 @@ Here's a brief description of each file and directory in the project:
 
 > When designing an application, it's important to carefully consider the appropriate level of granularity for components, compounds, and features. Components should be small and focused, while compounds should be larger building blocks that are composed of smaller components. Features should be self-contained and independent from other parts of the application, with their own set of components and functionality. Following best practices for React patterns, MVVM, and feature-driven development can help ensure that your application is modular, scalable, and easy to maintain.
 
-## Why unstated-next?
+## Why Unstated Next?
 
 Unstated Next is a small library that provides a simple and intuitive way to manage state in React applications using the context API. However, for more complex state management needs, other state-management solutions such as Jotai, Zustand, or XState may be more appropriate.
 
