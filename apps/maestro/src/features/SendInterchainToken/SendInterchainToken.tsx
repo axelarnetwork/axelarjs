@@ -222,7 +222,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         status: "submitted",
         hash: suiTxDigest,
         suiTx: state.txState.suiTx,
-        chainId: 103, //todo change
+        chainId: SUI_CHAIN_ID,
         txType: "INTERCHAIN_TRANSFER",
       });
 
