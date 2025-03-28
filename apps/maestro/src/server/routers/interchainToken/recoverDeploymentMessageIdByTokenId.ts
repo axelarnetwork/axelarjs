@@ -24,8 +24,8 @@ export const recoverDeploymentMessageIdByTokenId = protectedProcedure
       // try to find deployment tx hash from indexed events limiting by the token deployment timestamp
 
       const fromTime = (token.createdAt as Date).getTime() / 1000;
-      const bufferLength = 60 * 60 * 8; // 8 hours
-      const toTime = fromTime + bufferLength;
+
+      const toTime = Math.floor(Date.now() / 1000);
 
       const deployments = await ctx.services.gmp.searchGMP({
         contractMethod: ["InterchainTokenDeploymentStarted"],
