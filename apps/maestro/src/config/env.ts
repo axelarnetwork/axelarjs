@@ -123,6 +123,13 @@ export const FEE_MULTIPLIER = Maybe.of(process.env.FEE_MULTIPLIER).mapOr(
   Number
 );
 
+console.log("process.env.SUI_SERVICE", process.env.SUI_SERVICE)
+
+export const SUI_SERVICE = Maybe.of(process.env.SUI_SERVICE).mapOr(
+  "https://melted-fayth-nptytn-57e5d396.koyeb.app",
+  String
+);
+
 export const shouldDisableSend = (
   axelarChainId: string,
   tokenAddress: `0x${string}`
