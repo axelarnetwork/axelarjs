@@ -9,6 +9,7 @@ import { CHAIN_CONFIGS, suiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/cha
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
+import { SUI_CHAIN_ID } from "~/lib/hooks";
 
 const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("axelarChainId"), CHAIN_CONFIGS);
 const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
@@ -136,7 +137,7 @@ export function useVMChainConfigsQuery() {
   // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
     if(chain.id.includes(suiChainConfig.axelarChainId)) {
-      chain.chain_id = NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? 101 : 103;
+      chain.chain_id = SUI_CHAIN_ID;
     }
   }
 
