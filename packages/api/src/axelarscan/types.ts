@@ -113,17 +113,6 @@ export type EVMChainConfig = {
   };
   id: string;
   chain_type: string;
-  provider_params: {
-    chainId: string;
-    chainName: string;
-    rpcUrls: string[];
-    nativeCurrency: {
-      name: string;
-      symbol: string;
-      decimals: number;
-    };
-    blockExplorerUrls: string[];
-  }[];
   no_inflation: boolean;
   no_tvl?: boolean;
 };

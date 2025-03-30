@@ -35,20 +35,7 @@ const evmChainConfigSchema = z.object({
     contract_0_path: z.string().optional(),
     transaction_path: z.string(),
   }),
-  provider_params: z.array(
-    z.object({
-      chainId: z.string(),
-      chainName: z.string(),
-      rpcUrls: z.array(z.string()),
-      nativeCurrency: z.object({
-        name: z.string(),
-        symbol: z.string(),
-        decimals: z.number(),
-      }),
-      blockExplorerUrls: z.array(z.string()),
-    })
-  ),
-});
+ });
 
 export const getEVMChainConfigs = publicProcedure
   .meta({

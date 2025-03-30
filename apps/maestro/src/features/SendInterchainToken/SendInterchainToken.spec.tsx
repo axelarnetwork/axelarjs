@@ -13,19 +13,6 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
   chain_name: "Ethereum",
   name: "Ethereum Mainnet",
   chain_id: 1,
-  provider_params: [
-    {
-      chainId: "0x1",
-      chainName: "Ethereum Mainnet",
-      rpcUrls: ["https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"],
-      nativeCurrency: {
-        name: "Ether",
-        symbol: "ETH",
-        decimals: 18,
-      },
-      blockExplorerUrls: ["https://etherscan.io/"],
-    },
-  ],
   explorer: {
     name: "Etherscan",
     url: "https://etherscan.io/",
