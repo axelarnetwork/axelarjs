@@ -1,3 +1,5 @@
+import { ChainConfig } from "@axelarjs/api";
+
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -10,8 +12,8 @@ export const getConfigForChain = publicProcedure
       description:
         "Get the full configs for a chain on the Axelar network, including the assets registered directly on the network",
       method: "GET",
-      path: "/axelar-chain-configs",
-      tags: ["axelar-chain-configs"],
+      path: "/axelar-chain-config",
+      tags: ["axelar-chain-config"],
     },
   })
   .input(

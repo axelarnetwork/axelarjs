@@ -87,9 +87,16 @@ export function useEVMChainConfigsQuery() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: datab } = trpc.axelarConfigs.getAxelarChainConfigs.useQuery(undefined, {
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnWindowFocus: false,
+  });
+
+  console.log("datab", datab);
+
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? []),
+    () => partition((x) => x.chainId in WAGMI_CHAIN_CONFIGS_BY_ID, data ?? []),
     [data]
   );
 

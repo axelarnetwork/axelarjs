@@ -26,7 +26,6 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
   image: "ethereum-logo.png",
   color: "#3C3C3D",
   deprecated: false,
-  no_inflation: true,
   chain_type: "evm",
   endpoints: {
     rpc: ["https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"],
@@ -36,7 +35,6 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
     symbol: "ETH",
     decimals: 18,
   },
-  // no_tvl: true,
 };
 
 const mocks = {

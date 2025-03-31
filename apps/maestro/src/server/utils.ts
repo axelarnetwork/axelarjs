@@ -2,6 +2,7 @@ import {
   AxelarConfigClient,
   AxelarConfigsResponse,
   AxelarscanClient,
+  ChainConfig,
   EVMChainConfig,
   VMChainConfig,
 } from "@axelarjs/api";
@@ -156,6 +157,31 @@ export async function axelarConfigs<TCacheKey extends string>(
   await kvClient.setCached<any>(cacheKey, chainConfigs, 3600);
 
   return chainConfigs;
+}
+
+export async function axelarChainConfigs<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarConfigClient: AxelarConfigClient,
+  cacheKey: TCacheKey
+): Promise<Record<string, ChainConfig>> {
+  type RedisType = Promise<Record<string, ChainConfig>>;
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<RedisType>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
+  const chainConfigs = await axelarConfigClient.getAxelarConfigs(
+    NEXT_PUBLIC_NETWORK_ENV
+  );
+  const chains = chainConfigs.chains;
+
+  // cache for 1 hour
+  await kvClient.setCached<Awaited<RedisType>>(cacheKey, chains, 3600);
+
+  return chains;
 }
 
 // Calculate PREFIX_INTERCHAIN_TOKEN_SALT

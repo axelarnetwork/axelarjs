@@ -4,38 +4,12 @@ import { z } from "zod";
 
 import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
 import { publicProcedure } from "~/server/trpc";
+import { baseChainConfigSchema } from "~/server/types";
 
-const evmChainConfigSchema = z.object({
-  id: z.string(),
-  deprecated: z.boolean().optional(),
+const evmChainConfigSchema = baseChainConfigSchema.extend({
   chain_id: z.number(),
-  chain_name: z.string(),
-  maintainer_id: z.string(),
-  name: z.string(),
-  image: z.string(),
-  color: z.string(),
-  chain_type: z.string(),
-  no_inflation: z.boolean(),
-  no_tvl: z.boolean().optional(),
-  endpoints: z.object({
-    rpc: z.array(z.string()),
-  }),
-  native_token: z.object({
-    name: z.string(),
-    symbol: z.string(),
-    decimals: z.number(),
-  }),
-  explorer: z.object({
-    name: z.string(),
-    url: z.string(),
-    icon: z.string(),
-    block_path: z.string(),
-    address_path: z.string(),
-    contract_path: z.string(),
-    contract_0_path: z.string().optional(),
-    transaction_path: z.string(),
-  }),
- });
+  chainType: z.literal("evm"),
+});
 
 export const getEVMChainConfigs = publicProcedure
   .meta({
@@ -59,6 +33,7 @@ export const getEVMChainConfigs = publicProcedure
   .query(async ({ ctx, input }) => {
     try {
       const chainsMap = await ctx.configs.evmChains();
+      chainsMap.axelarnetwork = chainsMap.axelarnetwork || {};
       const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
       const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
       const validChainInfos = uniqueChainInfos.filter(
