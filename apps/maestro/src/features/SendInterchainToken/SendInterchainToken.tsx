@@ -18,7 +18,7 @@ import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { isValidSuiAddress } from "@mysten/sui/utils";
 import { formatUnits, parseUnits } from "viem";
 
-import { useAccount } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
