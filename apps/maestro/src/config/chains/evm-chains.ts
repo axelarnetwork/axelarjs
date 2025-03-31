@@ -75,7 +75,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       default: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] }, // Temporarily using this url
       public: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] },
     },
-    axelarChainId: "ethereum",
+    axelarChainId: "Ethereum",
     axelarChainName: "ethereum",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
@@ -108,7 +108,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...moonbeam,
     rpcUrls: createRpcUrlConfig(moonbeam, ["https://moonbeam.drpc.org"]),
-    axelarChainId: "moonbeam",
+    axelarChainId: "Moonbeam",
     axelarChainName: "Moonbeam",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
@@ -126,7 +126,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       default: { http: ["https://fantom.drpc.org"] },
       public: { http: ["https://fantom.drpc.org"] },
     },
-    axelarChainId: "fantom",
+    axelarChainId: "Fantom",
     axelarChainName: "Fantom",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
@@ -158,7 +158,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...avalanche,
     rpcUrls: createRpcUrlConfig(avalanche, ["https://1rpc.io/avax/c"]),
-    axelarChainId: "avalanche",
+    axelarChainId: "Avalanche",
     axelarChainName: "Avalanche",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
@@ -173,7 +173,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...polygon,
     rpcUrls: createRpcUrlConfig(polygon, ["https://polygon.llamarpc.com"]),
-    axelarChainId: "polygon",
+    axelarChainId: "Polygon",
     axelarChainName: "Polygon",
     environment: ENVIRONMENTS.mainnet,
     supportWagmi: true,
