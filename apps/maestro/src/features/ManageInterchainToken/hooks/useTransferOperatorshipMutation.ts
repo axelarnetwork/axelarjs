@@ -5,15 +5,15 @@ import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 
-export function useTransferTreasuryCapMutation() {
+export function useTransferOperatorshipMutation() {
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
 
-  const { mutateAsync: getTransferTreasuryCapTx } =
-    trpc.sui.getTransferTreasuryCapTx.useMutation({
+  const { mutateAsync: getTransferOperatorshipTx } =
+    trpc.sui.getTransferOperatorshipTx.useMutation({
       onError(error: any) {
-        console.log("error in getTransferTreasuryCapTx", error.message);
+        console.log("error in getTransferOperatorshipTx", error.message);
       },
     });
 
@@ -37,9 +37,11 @@ export function useTransferTreasuryCapMutation() {
   return {
     txState,
     setTxState,
-    transferTreasuryCap: async (
+    transferOperatorship: async (
       tokenAddress: string,
-      recipientAddress: string
+      recipientAddress: string,
+      tokenId: string,
+      symbol: string
     ) => {
       if (!address) return;
 
@@ -48,14 +50,16 @@ export function useTransferTreasuryCapMutation() {
           status: "awaiting_approval",
         });
 
-        const treasuryCapTxJSON = await getTransferTreasuryCapTx({
+        const operatorshipTxJSON = await getTransferOperatorshipTx({
           tokenAddress,
           recipientAddress,
           sender: address,
+          symbol,
+          tokenId,
         });
 
         const result = await signAndExecuteTransaction({
-          transaction: treasuryCapTxJSON,
+          transaction: operatorshipTxJSON,
         });
 
         setTxState({

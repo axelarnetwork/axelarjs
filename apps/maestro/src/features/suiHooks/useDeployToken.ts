@@ -176,8 +176,7 @@ export default function useTokenDeploy() {
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
-      // TODO: this should be conditional when we support lock_unlock
-      const tokenManagerType = "mint_burn"
+      const tokenManagerType = minterAddress ? "mint_burn" : "lock_unlock";
 
       const txIndex = sendTokenResult?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
