@@ -15,9 +15,9 @@ import { Transaction } from "@mysten/sui/transactions";
 import { suiChainConfig } from "~/config/chains";
 import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
 import type { Context } from "~/server/context";
+import { SUI_SERVICE } from "~/config/env";
 
-export const suiServiceBaseUrl =
-  "https://melted-fayth-nptytn-57e5d396.koyeb.app";
+export const suiServiceBaseUrl = SUI_SERVICE
 
 export const getSuiChainConfig = async (
   ctx: Context
