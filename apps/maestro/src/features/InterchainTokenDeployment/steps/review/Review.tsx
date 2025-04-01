@@ -47,9 +47,10 @@ const Review: FC = () => {
         state.txState.tokenAddress,
         chain.id,
         state.txState.txHash,
-        state.selectedChains.map((axelarChainId) => {
-          return combinedComputed.indexedById[axelarChainId].chain_id;
-        })
+        state.selectedChains.map(
+          (axelarChainId) =>
+            combinedComputed.indexedById[axelarChainId].chain_id
+        )
       );
     }
   }, [
@@ -137,7 +138,9 @@ const Review: FC = () => {
         <Dialog.CloseAction
           $length="block"
           $variant="primary"
-          disabled={!routeChain && (!chainConfig || state.txState.type !== "deployed")}
+          disabled={
+            !routeChain && (!chainConfig || state.txState.type !== "deployed")
+          }
           onClick={async () => {
             setShouldFetch(true);
             if (routeChain) {

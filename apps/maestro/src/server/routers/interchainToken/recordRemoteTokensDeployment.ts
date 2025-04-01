@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
-import { suiChainConfig } from "~/config/chains";
 
+import { suiChainConfig } from "~/config/chains";
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
 
@@ -28,7 +28,8 @@ export const recordRemoteTokensDeployment = protectedProcedure
     ]);
 
     const configs =
-      evmChains[input.chainId] || vmChains[input?.axelarChainId || suiChainConfig.axelarChainId];
+      evmChains[input.chainId] ||
+      vmChains[input?.axelarChainId || suiChainConfig.axelarChainId];
     if (!configs) {
       throw new TRPCError({
         code: "NOT_FOUND",

@@ -1,3 +1,5 @@
+import { ITSChainConfig } from "@axelarjs/api";
+import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
@@ -13,8 +15,6 @@ import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,
 } from "./ChainsDropdown.state";
-import { ITSChainConfig } from "@axelarjs/api";
-import { HelpCircleIcon, Dropdown } from "@axelarjs/ui";
 
 const ICON_SIZES = {
   xs: 14,
