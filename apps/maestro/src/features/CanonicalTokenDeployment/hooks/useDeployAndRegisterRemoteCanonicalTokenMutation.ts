@@ -227,11 +227,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   }, [deployerAddress, input, recordDeploymentAsync, tokenId]);
 
   const writeAsync = useCallback(async () => {
-    if (!multicall.writeContractAsync || !data) {
-      throw new Error(
-        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
-      );
-    }
     await recordDeploymentDraft();
 
     if (chainId === SUI_CHAIN_ID && input) {
