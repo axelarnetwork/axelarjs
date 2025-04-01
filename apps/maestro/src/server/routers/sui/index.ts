@@ -102,8 +102,8 @@ export const suiRouter = router({
           destinationChains,
           gasValues,
           amount,
-          minterAddress,
         } = input;
+        const minterAddress = input.minterAddress || sender; // TODO: update this later
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
@@ -154,7 +154,7 @@ export const suiRouter = router({
           tokenType,
           treasuryCap,
           amount,
-          sender // minting initial supply to sender, not to minter
+          minterAddress
         );
 
         let coinManagement = null;
@@ -169,20 +169,23 @@ export const suiRouter = router({
           if (!channelId) {
             throw new Error("Channel not found");
           }
-          await txBuilder.moveCall({
-            target: `${ITS.address}::coin_management::add_distributor`,
-            typeArguments: [tokenType],
-            arguments: [coinManagement, channelId],
-          });
 
-          await txBuilder.moveCall({
-            target: `${ITS.address}::coin_management::add_operator`,
-            typeArguments: [tokenType],
-            arguments: [coinManagement, sender],
-          });
+          if (input.minterAddress) {
+            await txBuilder.moveCall({
+              target: `${ITS.address}::coin_management::add_distributor`,
+              typeArguments: [tokenType],
+              arguments: [coinManagement, channelId],
+            });
 
-          if (minterAddress !== sender) {
-            txBuilder.tx.transferObjects([channelId], minterAddress);
+            await txBuilder.moveCall({
+              target: `${ITS.address}::coin_management::add_operator`,
+              typeArguments: [tokenType],
+              arguments: [coinManagement, sender],
+            });
+
+            if (minterAddress !== sender) {
+              txBuilder.tx.transferObjects([channelId], minterAddress);
+            }
           }
         } else {
           coinManagement = await txBuilder.moveCall({
