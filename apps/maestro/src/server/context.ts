@@ -72,13 +72,13 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       evmChains: evmChains.bind(
         null,
         maestroKVClient,
-        axelarscanClient,
+        axelarConfigClient,
         "chains-evm" as const
       ),
       vmChains: vmChains.bind(
         null,
         maestroKVClient,
-        axelarscanClient,
+        axelarConfigClient,
         "chains-vm" as const
       ),
       chains: chains.bind(null, maestroKVClient, axelarscanClient, "chains" as const),
