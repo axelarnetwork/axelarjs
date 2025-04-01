@@ -19,8 +19,6 @@ import {
 import {
   buildTx,
   getChannelId,
-  getSuiChainConfig,
-  getChannelId,
   getCoinMetadataWithRetry,
   getSuiChainConfig,
   getTreasuryCap,
@@ -91,14 +89,9 @@ export const suiRouter = router({
         destinationChains: z.array(z.string()),
         tokenPackageId: z.string(),
         gasValues: z.array(z.bigint()),
-
-        tokenId: z.string(),
-        amount: z.bigint(),
-        minterAddress: z.string().optional(),
       })
     )
-    .output(z.string())
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const { sender, symbol, destinationChains, tokenPackageId, gasValues} = input;
 
@@ -132,7 +125,6 @@ export const suiRouter = router({
           typeArguments: [tokenType],
           arguments: [itsObjectId, coinInfo, coinManagement],
         });
-
 
         for (let i = 0; i < destinationChains.length; i++) {
           await deployRemoteInterchainToken(
@@ -218,6 +210,7 @@ export const suiRouter = router({
           sender // minting initial supply to sender, not to minter
         );
 
+        console.log("minterAddress", minterAddress);
 
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_with_cap`,

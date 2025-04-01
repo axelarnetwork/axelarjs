@@ -1,11 +1,12 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
-import { Maybe, throttle } from "@axelarjs/utils";
+import { invariant, Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
   useReadInterchainTokenFactoryCanonicalInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -15,7 +16,7 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { useAccount, useChainId } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -45,6 +46,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const chainId = useChainId();
 
   const { combinedComputed } = useAllChainConfigsQuery();
+  const { registerCanonicalToken } = useRegisterCanonicalToken();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -230,11 +232,43 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.writeAsync is not defined"
       );
     }
-
     await recordDeploymentDraft();
 
-    return await multicall.writeContractAsync(data.request);
-  }, [data, multicall, recordDeploymentDraft]);
+    if (chainId === SUI_CHAIN_ID && input) {
+      const gasValues = input.remoteDeploymentGasFees;
+      const result = await registerCanonicalToken({
+        symbol: input.tokenSymbol,
+        destinationChains: input.destinationChainIds,
+        tokenPackageId: input.tokenAddress,
+        gasValues,
+      });
+      if (result?.digest && result.deploymentMessageId) {
+        const token: any = result?.events?.[0]?.parsedJson;
+        setRecordDeploymentArgs({
+          kind: "interchain",
+          deploymentMessageId: result.deploymentMessageId,
+          tokenId: token.token_id?.id,
+          deployerAddress,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          tokenManagerType: result.tokenManagerType,
+          axelarChainId: input.sourceChainId,
+          destinationAxelarChainIds: input.destinationChainIds,
+          tokenManagerAddress: result.tokenManagerAddress,
+          tokenAddress: input.tokenAddress,
+        });
+        return result;
+      }
+    } else {
+      invariant(
+        data?.request !== undefined,
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: prepareMulticall?.request is not defined"
+      );
+       return await multicall.writeContractAsync(data.request);
+    }
+
+  }, [data, multicall, recordDeploymentDraft, chainId, deployerAddress, input, registerCanonicalToken]);
 
   const write = useCallback(() => {
     if (!multicall.writeContract || !data) {

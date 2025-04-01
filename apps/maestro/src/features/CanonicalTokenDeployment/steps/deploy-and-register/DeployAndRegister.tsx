@@ -15,13 +15,15 @@ import { parseUnits } from "viem";
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { useBalance, useChainId } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 import { filterEligibleChains } from "~/lib/utils/chains";
+import { WriteContractData } from "wagmi/query";
+import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -96,9 +98,59 @@ export const Step3: FC = () => {
         type: "pending_approval",
       });
 
-      const txPromise = deployCanonicalTokenAsync();
+      const txPromise = deployCanonicalTokenAsync().catch((e) => {
+        // Handle user rejection from any wallet
+        if (e.message?.toLowerCase().includes("reject")) {
+          toast.error("Transaction rejected by user");
+          rootActions.setTxState({
+            type: "idle",
+          });
+          return;
+        }
 
-      await handleTransactionResult(txPromise, {
+        toast.error(e.message);
+        rootActions.setTxState({
+          type: "idle",
+        });
+
+        return;
+      });
+
+      // Sui will return a digest equivalent to the txHash
+      if (sourceChain.chain_id === SUI_CHAIN_ID) {
+        try {
+          const result = (await txPromise) as RegisterCanonicalTokenResult;
+          // if tx is successful, we will get a digest
+          if (result) {
+            rootActions.setTxState({
+              type: "deployed",
+              suiTx: result,
+              tokenAddress: rootState.tokenDetails.tokenAddress,
+              txHash: result.digest,
+            });
+
+            if (rootState.selectedChains.length > 0) {
+              addTransaction({
+                status: "submitted",
+                suiTx: result,
+                hash: result.digest,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+            }
+            return;
+          } else {
+            rootActions.setTxState({
+              type: "idle",
+            });
+          }
+        } catch (e: any) {
+          // We're catching the error above
+          console.log("error in sui tx", e?.message);
+        }
+      }
+
+      await handleTransactionResult(txPromise as Promise<WriteContractData>, {
         onSuccess(txHash) {
           rootActions.setTxState({
             type: "deploying",
@@ -134,6 +186,7 @@ export const Step3: FC = () => {
       sourceChain,
       rootActions,
       validDestinationChainIds.length,
+      rootState.tokenDetails.tokenAddress,
       addTransaction,
     ]
   );

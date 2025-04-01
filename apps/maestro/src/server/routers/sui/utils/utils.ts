@@ -3,13 +3,14 @@ import { SuiChainConfig } from "@axelarjs/api";
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import {
   SuiClient,
-  SuiObjectChange,
+  type SuiObjectChange,
   SuiObjectResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
   type CoinMetadata,
   type PaginatedCoins,
   type PaginatedTransactionResponse,
+  SuiTransactionBlockResponse,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
@@ -31,6 +32,30 @@ export const getSuiChainConfig = async (
   }
 
   return chainConfig;
+};
+
+export type SuiObjectCreated =
+  | Extract<SuiObjectChange, { type: "created" }>
+  | undefined;
+
+export const findCoinDataObject = (
+  registerTokenResult: SuiTransactionBlockResponse
+) => {
+  return (
+    registerTokenResult?.objectChanges?.find(
+      (change) =>
+        change.type === "created" && change.objectType.includes("coin_data")
+    ) as SuiObjectCreated
+  )?.objectId;
+};
+
+export const findObjectByType = (
+  objectChanges: SuiObjectChange[],
+  type: string
+): SuiObjectCreated => {
+  return objectChanges.find(
+    (change) => change.type === "created" && change.objectType.includes(type)
+  ) as SuiObjectCreated;
 };
 
 /**

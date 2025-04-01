@@ -10,17 +10,7 @@ import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useInterchainTokenDeploymentStateContainer } from "../InterchainTokenDeployment";
-
-const findCoinDataObject = (
-  registerTokenResult: SuiTransactionBlockResponse
-) => {
-  return (
-    registerTokenResult?.objectChanges?.find(
-      (change) =>
-        change.type === "created" && change.objectType.includes("coin_data")
-    ) as SuiObjectCreated
-  )?.objectId;
-};
+import { findCoinDataObject, findObjectByType } from "~/server/routers/sui/utils/utils";
 
 export type DeployTokenParams = {
   initialSupply: bigint;
@@ -39,18 +29,6 @@ export type DeployTokenResult = SuiTransactionBlockResponse & {
   tokenManagerType: "mint_burn" | "lock_unlock";
   deploymentMessageId?: string;
   minterAddress?: string;
-};
-
-type SuiObjectCreated =
-  | Extract<SuiObjectChange, { type: "created" }>
-  | undefined;
-const findObjectByType = (
-  objectChanges: SuiObjectChange[],
-  type: string
-): SuiObjectCreated => {
-  return objectChanges.find(
-    (change) => change.type === "created" && change.objectType.includes(type)
-  ) as SuiObjectCreated;
 };
 
 export default function useTokenDeploy() {
@@ -101,6 +79,8 @@ export default function useTokenDeploy() {
       throw new Error("Wallet not connected");
     }
 
+    console.log("minterAddress", minterAddress);
+
     // First step, deploy the token
     rootActions.setTxState({
       type: "pending_approval",
@@ -140,7 +120,6 @@ export default function useTokenDeploy() {
       if (!tokenAddress) {
         throw new Error("Failed to deploy token");
       }
-
       rootActions.setTxState({
         type: "pending_approval",
         step: 2,
