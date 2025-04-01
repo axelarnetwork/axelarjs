@@ -83,7 +83,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         hasPendingOwner: false,
         hasMinterRole: isDistributor,
         hasOperatorRole: isOperator,
-        hasFlowLimiterRole: false, // TODO: check if this is correct
+        hasFlowLimiterRole: isOperator,
       };
       return result;
     }
