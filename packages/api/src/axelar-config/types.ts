@@ -96,7 +96,6 @@ export interface SuiContract {
 interface BaseChainConfig {
   id: string;
   displayName: string;
-  externalChainId: string | number;
   iconUrl: string;
   nativeCurrency: {
     name: string;
@@ -112,16 +111,19 @@ interface BaseChainConfig {
 // Chain configs for each chain type with associated contracts
 export interface EvmChainConfig extends BaseChainConfig {
   chainType: "evm";
+  externalChainId: number;
   config: ChainEvmSubconfig;
 }
 
 interface AxelarChainConfig extends BaseChainConfig {
   chainType: "axelarnet";
+  externalChainId: string;
   config: ChainCosmosSubconfig;
 }
 
 export interface SuiChainConfig extends BaseChainConfig {
   chainType: "sui";
+  externalChainId?: string;
   config: ChainSuiSubconfig;
 }
 
