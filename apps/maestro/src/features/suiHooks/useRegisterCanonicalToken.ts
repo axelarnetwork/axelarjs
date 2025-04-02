@@ -37,7 +37,7 @@ export type RegisterCanonicalTokenResult = SuiTransactionBlockResponse & {
  */
 export default function useRegisterCanonicalToken() {
   const currentAccount = useAccount();
-  const { actions } = useCanonicalTokenDeploymentStateContainer(); 
+  const { actions } = useCanonicalTokenDeploymentStateContainer();
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
@@ -48,7 +48,6 @@ export default function useRegisterCanonicalToken() {
           options: {
             showObjectChanges: true,
             showEvents: true,
-            showEffects: true,
           },
         });
         return result;
@@ -73,7 +72,6 @@ export default function useRegisterCanonicalToken() {
 
     try {
 
-      // 1. Get the transaction JSON from the backend
       const txJson = await getRegisterTxJson({
         sender: currentAccount.address,
         symbol,
@@ -82,14 +80,11 @@ export default function useRegisterCanonicalToken() {
         gasValues,
       });
 
-      // 2. Prepare the transaction object
-      // We receive JSON, not bytes, so we need Transaction.from(txJson)
-      const tx = Transaction.from(JSON.parse(txJson));
-
-      // 3. Sign and execute the transaction
       const result = await signAndExecuteTransaction({
-        transaction: await tx.toJSON(), // Convert back to JSON for the hook
+        transaction: txJson, // Convert back to JSON for the hook
       });
+
+      console.log("result", result);
 
       const coinManagementObjectId = findCoinDataObject(result);
 

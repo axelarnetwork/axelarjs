@@ -69,7 +69,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     isLoading: isSearchingInterchainTokens,
   } = useInterchainTokensQuery({
     chainId,
-    tokenAddress: search as `0x${string}`,
+    tokenAddress: search,
     strict: chainId !== -1,
   });
 
