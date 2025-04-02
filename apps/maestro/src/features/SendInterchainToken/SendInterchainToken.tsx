@@ -19,7 +19,7 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
-import { useAccount } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
@@ -223,7 +223,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
         status: "submitted",
         hash: suiTxDigest,
         suiTx: state.txState.suiTx,
-        chainId: 103, //todo change
+        chainId: SUI_CHAIN_ID,
         txType: "INTERCHAIN_TRANSFER",
       });
 

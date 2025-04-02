@@ -15,9 +15,9 @@ import { Transaction } from "@mysten/sui/transactions";
 import { suiChainConfig } from "~/config/chains";
 import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
 import type { Context } from "~/server/context";
+import { SUI_SERVICE } from "~/config/env";
 
-export const suiServiceBaseUrl =
-  "https://melted-fayth-nptytn-57e5d396.koyeb.app";
+export const suiServiceBaseUrl = SUI_SERVICE
 
 export const getSuiChainConfig = async (
   ctx: Context
@@ -268,16 +268,19 @@ async function extractCoinInfo(coin: SuiObjectResponse) {
 
   const operator = coinManagement.operator as string | undefined;
   const distributorChannelId = coinManagement.distributor;
+  let distributor = null;
 
-  const channalDetails = await suiClient.getObject({
-    id: distributorChannelId,
-    options: {
-      showOwner: true,
-    },
-  });
+  if (distributorChannelId) {
+    const channalDetails = await suiClient.getObject({
+      id: distributorChannelId,
+      options: {
+        showOwner: true,
+      },
+    });
 
-  const distributor = (channalDetails.data?.owner as { AddressOwner?: string })
-    ?.AddressOwner;
+    distributor = (channalDetails.data?.owner as { AddressOwner?: string })
+      ?.AddressOwner;
+  }
 
   return {
     decimals: coinInfo.decimals,
@@ -285,8 +288,9 @@ async function extractCoinInfo(coin: SuiObjectResponse) {
     symbol: coinInfo.symbol,
     operator,
     distributor,
-    totalSupply: coinManagement.treasury_cap.fields.total_supply.fields.value,
-    treasuryCap: coinManagement.treasury_cap.fields.id.id,
+    totalSupply:
+      coinManagement?.treasury_cap?.fields?.total_supply?.fields?.value,
+    treasuryCap: coinManagement?.treasury_cap?.fields?.id?.id,
   };
 }
 

@@ -32,7 +32,7 @@ export async function getTokenIdByCoinMetadata(
   coinType: string,
   coinMetadata: any,
   chainConfig: SuiChainConfig,
-  isCanonical: boolean = false
+  isLockUnlock: boolean = false
 ) {
   const { InterchainTokenService: ITS, AxelarGateway } =
     chainConfig.config.contracts;
@@ -50,7 +50,7 @@ export async function getTokenIdByCoinMetadata(
       coinMetadata.symbol,
       txBuilder.tx.pure.u8(coinMetadata.decimals),
       txBuilder.tx.pure.bool(false),
-      txBuilder.tx.pure.bool(!isCanonical), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
+      txBuilder.tx.pure.bool(!isLockUnlock), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
   return TokenId;
@@ -108,7 +108,7 @@ export async function deployRemoteInterchainToken(
   txBuilder: TxBuilder,
   chainConfig: SuiChainConfig,
   destinationChain: string,
-  coinMetadata: any,
+  tokenId: any,
   feeUnitAmount: number,
   sender: string,
   tokenType: string
@@ -121,15 +121,9 @@ export async function deployRemoteInterchainToken(
   // Split coins for gas fee
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
-  const TokenId = await getTokenIdByCoinMetadata(
-    txBuilder,
-    tokenType,
-    coinMetadata,
-    chainConfig
-  );
   const messageTicket = await txBuilder.moveCall({
     target: `${ITS.address}::interchain_token_service::deploy_remote_interchain_token`,
-    arguments: [ITS.objects.InterchainTokenService, TokenId, destinationChain],
+    arguments: [ITS.objects.InterchainTokenService, tokenId, destinationChain],
     typeArguments: [tokenType],
   });
   await txBuilder.moveCall({

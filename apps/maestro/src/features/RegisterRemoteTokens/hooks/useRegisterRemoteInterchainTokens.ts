@@ -96,6 +96,9 @@ export default function useRegisterRemoteInterchainTokens(
     tokenAddress: input.tokenAddress,
     symbol: tokenDeployment.tokenSymbol,
     gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
+    tokenManagerType: tokenDeployment.tokenManagerType as
+      | "lock_unlock"
+      | "mint_burn",
   };
 
   return {

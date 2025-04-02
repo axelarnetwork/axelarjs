@@ -143,15 +143,9 @@ export function useVMChainConfigsQuery() {
   });
 
   for (const chain of data ?? []) {
-    if (chain.id.includes(suiChainConfig.axelarChainId)) {
+    if (chain.id.includes("stellar")) chain.chain_id = STELAR_CHAIN_ID;
+    if (chain.id.includes(suiChainConfig.axelarChainId))
       chain.chain_id = SUI_CHAIN_ID;
-    }
-  }
-
-  for (const chain of data ?? []) {
-    if (chain.id.includes("stellar")) {
-      chain.chain_id = STELAR_CHAIN_ID;
-    }
   }
 
   // Filter out chains that are not configured in the app
