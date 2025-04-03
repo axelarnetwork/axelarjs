@@ -115,6 +115,31 @@ export const getPackageIdFromSuiTokenAddress = (tokenAddress: string) => {
   return tokenAddress;
 };
 
+/**
+ * Normalizes a Sui token address string to the format 0x<PACKAGE_ID>::<module_name>::<STRUCT_NAME>.
+ * It ensures the module name is lowercase and the struct name is uppercase.
+ * If the input string does not match the expected format, it's returned unchanged.
+ *
+ * @param tokenAddress The Sui token address string to normalize.
+ * @returns The normalized token address string or the original string if normalization is not applicable.
+ */
+export const normalizeSuiTokenAddress = (tokenAddress: string): string => {
+  if (!isValidSuiTokenAddress(tokenAddress)) {
+    // Return original if it doesn't match the basic structure
+    return tokenAddress;
+  }
+
+  const parts = tokenAddress.split("::");
+
+  if (parts.length === 3) {
+    const [packageId, moduleName, structName] = parts;
+    return `${packageId}::${moduleName.toLowerCase()}::${structName.toUpperCase()}`;
+  }
+
+  // Fallback: return original if splitting didn't yield 3 parts (unexpected)
+  return tokenAddress;
+};
+
 export const getCoinAddressFromType = (
   coinType: string,
   prefix: string = "CoinData"

@@ -9,6 +9,7 @@ import { ExtendedWagmiChainConfig } from "~/config/chains";
 import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
+import { normalizeSuiTokenAddress } from "../sui/utils/utils";
 
 //TODO: migrate to kv store?
 const overrides: Record<string, Record<string, string>> = {
@@ -50,13 +51,12 @@ export const getERC20TokenDetails = publicProcedure
   .query(async ({ input, ctx }) => {
     // Enter here if the token is a Sui token
     if (isValidSuiTokenAddress(input.tokenAddress)) {
+      const normalizedTokenAddress = normalizeSuiTokenAddress(input.tokenAddress);
       return await getSuiTokenDetails(
-        input.tokenAddress,
+        normalizedTokenAddress,
         input.chainId as number
       );
     }
-
-    console.log("YOO", input);
 
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
