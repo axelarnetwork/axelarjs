@@ -7,8 +7,7 @@ import { trpc } from "~/lib/trpc";
 
 interface MintTokensParams {
   amount: bigint;
-  symbol: string;
-  tokenAddress: string;
+  coinType: string;
   tokenId: string;
 }
 
@@ -42,8 +41,7 @@ export default function useMintTokens() {
 
   const mintTokens = async ({
     amount,
-    symbol,
-    tokenAddress,
+    coinType,
     tokenId,
   }: MintTokensParams): Promise<SuiTransactionBlockResponse> => {
     if (!currentAccount) {
@@ -53,9 +51,8 @@ export default function useMintTokens() {
       const mintTxJSON = await getMintTx({
         sender: currentAccount.address,
         tokenId,
-        tokenPackageId: tokenAddress,
+        coinType,
         amount: amount,
-        symbol,
       });
 
       const result = await signAndExecuteTransaction({

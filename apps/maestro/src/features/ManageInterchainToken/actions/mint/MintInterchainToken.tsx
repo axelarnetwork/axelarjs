@@ -52,8 +52,7 @@ export const MintInterchainToken: FC = () => {
       if (chainId === SUI_CHAIN_ID) {
         const result = await mintTokens({
           amount: BigInt(adjustedAmount),
-          symbol: erc20Details?.symbol as string,
-          tokenAddress,
+          coinType: tokenAddress,
           tokenId: tokenId,
         });
         if (result.digest) {

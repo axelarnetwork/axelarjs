@@ -508,14 +508,12 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         tokenId: z.string(),
-        tokenPackageId: z.string(),
+        coinType: z.string(),
         amount: z.bigint(),
-        symbol: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { sender, tokenId, tokenPackageId, amount, symbol } = input;
-      const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+      const { sender, tokenId, coinType, amount } = input;
       const chainConfig = await getSuiChainConfig(ctx);
       const txBuilder = new TxBuilder(suiClient);
       const channelId = await getChannelId(sender, chainConfig);
@@ -523,7 +521,7 @@ export const suiRouter = router({
       await mintTokenAsDistributor(
         txBuilder,
         chainConfig,
-        tokenType,
+        coinType,
         tokenId,
         channelId as string,
         amount,

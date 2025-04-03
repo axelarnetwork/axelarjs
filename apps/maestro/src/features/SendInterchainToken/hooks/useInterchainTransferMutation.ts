@@ -11,7 +11,6 @@ import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { getCoinType } from "~/server/routers/sui/utils/utils";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -80,7 +79,6 @@ export function useInterchainTransferMutation(
         });
         let txHash: any;
         if (config.sourceChainName.toLowerCase().includes("sui")) {
-          const coinType = await getCoinType(config.tokenAddress);
           const sendTokenTxJSON = await getSendTokenTx({
             sender: address,
             tokenId: tokenId,
@@ -88,7 +86,7 @@ export function useInterchainTransferMutation(
             destinationChain: config.destinationChainName,
             destinationAddress: destinationAddress,
             gas: config.gas.toString() ?? "0",
-            coinType: coinType,
+            coinType: config.tokenAddress,
           });
           const receipt = await signAndExecuteTransaction({
             transaction: sendTokenTxJSON,
