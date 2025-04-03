@@ -3,24 +3,25 @@ import { SuiChainConfig } from "@axelarjs/api";
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import {
   SuiClient,
-  type SuiObjectChange,
+  SuiEvent,
   SuiObjectResponse,
+  SuiTransactionBlockResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
   type PaginatedCoins,
   type PaginatedTransactionResponse,
-  SuiTransactionBlockResponse,
-  SuiEvent,
+  type SuiObjectChange,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
 import { suiChainConfig } from "~/config/chains";
-import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
-import type { Context } from "~/server/context";
 import { SUI_SERVICE } from "~/config/env";
+import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
 import { isValidSuiTokenAddress } from "~/lib/utils/validation";
+import type { Context } from "~/server/context";
+import { CoinMetadata, queryCoinMetadata } from "../graphql";
 
-export const suiServiceBaseUrl = SUI_SERVICE
+export const suiServiceBaseUrl = SUI_SERVICE;
 
 export const getSuiChainConfig = async (
   ctx: Context
@@ -64,7 +65,7 @@ export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
 };
 
 export const findGatewayEventIndex = (events: SuiEvent[]) => {
-  return events.findIndex(event => event.transactionModule === "gateway");
+  return events.findIndex((event) => event.transactionModule === "gateway");
 };
 
 export const getObjectIdsByObjectTypes = (
@@ -109,11 +110,50 @@ export const getCoinType = async (tokenAddress: string) => {
 };
 
 export const getPackageIdFromSuiTokenAddress = (tokenAddress: string) => {
-  if(isValidSuiTokenAddress(tokenAddress)) {
+  if (isValidSuiTokenAddress(tokenAddress)) {
     return tokenAddress.split("::")[0];
   }
   return tokenAddress;
 };
+
+/**
+ * Retrieves coin metadata with retry logic.
+ * @param coinType The coin type string.
+ * @param maxAttempts Maximum number of retry attempts.
+ * @param delayMs Delay between retries in milliseconds.
+ * @returns The coin metadata.
+ * @throws Error if metadata is not found after retries.
+ */
+export async function getCoinMetadataWithRetry(
+  coinType: string,
+  maxAttempts = 5,
+  delayMs = 300
+): Promise<CoinMetadata> {
+  let coinMetadata: CoinMetadata | null = null;
+  let attempts = 0;
+
+  while (!coinMetadata && attempts < maxAttempts) {
+    attempts++;
+
+    try {
+      coinMetadata = await queryCoinMetadata(coinType)
+    } catch {
+      console.debug("Failed to get coin metadata:", coinType);
+    }
+
+    if (!coinMetadata && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  if (!coinMetadata) {
+    throw new Error(
+      `Failed to get coin metadata for ${coinType} after ${maxAttempts} attempts.`
+    );
+  }
+
+  return coinMetadata;
+}
 
 /**
  * Normalizes a Sui token address string to the format 0x<PACKAGE_ID>::<module_name>::<STRUCT_NAME>.

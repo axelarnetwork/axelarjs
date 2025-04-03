@@ -19,6 +19,7 @@ import {
 import {
   buildTx,
   getChannelId,
+  getCoinMetadataWithRetry,
   getSuiChainConfig,
   getTreasuryCap,
   mergeAllCoinsOfSameType,
@@ -427,7 +428,7 @@ export const suiRouter = router({
 
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
-        const coinMetadata = await queryCoinMetadata(tokenType);
+        const coinMetadata = await getCoinMetadataWithRetry(tokenType);
 
         const tokenId = await getTokenIdByCoinMetadata(
           txBuilder,
