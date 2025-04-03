@@ -1,5 +1,6 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import {
+    Alert,
   Alert,
   Badge,
   Button,
@@ -29,14 +30,14 @@ import { z } from "zod";
 
 import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
-import { hex64Literal } from "~/lib/utils/validation";
+import { hex64Literal, isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
   chain: EVMChainConfig | VMChainConfig;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
@@ -61,6 +62,12 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
 
+  let tokenAddress = props.tokenAddress;
+
+  if (isSuiChain && isValidSuiTokenAddress(props.tokenAddress)) {
+    tokenAddress = props.tokenAddress.split("::")[0];
+  }
+
   const tokenDetails = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -71,9 +78,9 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         key="token-address"
         $size="sm"
         $variant="ghost"
-        copyText={props.tokenAddress}
+        copyText={tokenAddress}
       >
-        {maskAddress(props.tokenAddress)}
+        {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
     ...(!isSuiChain

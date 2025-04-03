@@ -130,9 +130,9 @@ export const SUI_SERVICE = Maybe.of(process.env.SUI_SERVICE).mapOr(
 
 export const shouldDisableSend = (
   axelarChainId: string,
-  tokenAddress: `0x${string}`
+  tokenAddress: string
 ) => {
-  const shouldDisable: Record<string, Record<`0x${string}`, boolean>> = {
+  const shouldDisable: Record<string, Record<string, boolean>> = {
     optimism: { "0x4200000000000000000000000000000000000042": true },
   };
   return shouldDisable[axelarChainId]?.[tokenAddress];

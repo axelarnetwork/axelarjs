@@ -6,8 +6,9 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { ExtendedWagmiChainConfig } from "~/config/chains";
+import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
-import { suiClient as client } from "~/lib/clients/suiClient";
+import { queryMetadata } from "~/server/routers/sui/graphql";
 
 //TODO: migrate to kv store?
 const overrides: Record<string, Record<string, string>> = {
@@ -17,32 +18,8 @@ const overrides: Record<string, Record<string, string>> = {
 };
 
 async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
-  const modules = await client.getNormalizedMoveModulesByPackage({
-    package: tokenAddress,
-  });
-  const coinSymbol = Object.keys(modules)[0];
-
-  const coinType = `${tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
-
-  const metadata = await client.getCoinMetadata({ coinType });
-
-  // Get the token owner
-  const object = await client.getObject({
-    id: tokenAddress,
-    options: {
-      showOwner: true,
-      showPreviousTransaction: true,
-    },
-  });
-
-  const previousTx = object?.data?.previousTransaction;
-
-  // Fetch the transaction details to find the sender
-  const transactionDetails = await client.getTransactionBlock({
-    digest: previousTx as string,
-    options: { showInput: true, showEffects: true },
-  });
-  const tokenOwner = transactionDetails.transaction?.data.sender;
+  const response = await queryMetadata(tokenAddress);
+  const metadata = response.data?.coinMetadata;
 
   if (!metadata) {
     throw new TRPCError({
@@ -54,7 +31,7 @@ async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
   return {
     name: metadata.name,
     decimals: metadata.decimals,
-    owner: tokenOwner,
+    owner: undefined,
     pendingOwner: null,
     chainId: chainId,
     chainName: "Sui",
@@ -73,12 +50,15 @@ export const getERC20TokenDetails = publicProcedure
   )
   .query(async ({ input, ctx }) => {
     // Enter here if the token is a Sui token
-    if (input.tokenAddress.length === 66) {
+    if (isValidSuiTokenAddress(input.tokenAddress)) {
       return await getSuiTokenDetails(
         input.tokenAddress,
         input.chainId as number
       );
     }
+
+    console.log("YOO", input);
+
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
       const chainConfig = chainConfigs.find(

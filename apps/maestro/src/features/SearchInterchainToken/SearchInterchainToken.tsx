@@ -9,11 +9,11 @@ import {
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
-import { isValidSuiAddress as validateSuiAddress } from "@mysten/sui/utils";
 import { isAddress } from "viem";
 
 import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
+import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -23,7 +23,7 @@ import ChainsDropdown, {
 
 export type TokenFoundResult = {
   tokenId?: `0x${string}`;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   chainName?: string;
 };
 
@@ -49,7 +49,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   );
 
   const isValidEVMAddress = isAddress(search as `0x${string}`);
-  const isValidSuiAddress = validateSuiAddress(search as `0x${string}`);
+  const isValidSuiAddress = isValidSuiTokenAddress(search);
 
   const chainId = connectedChain?.id ?? selectedChainId;
   const chainName = connectedChain?.name ?? defaultChain?.name;
@@ -60,7 +60,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     isLoading: isSearchingERC20,
   } = useERC20TokenDetailsQuery({
     chainId: chainId,
-    tokenAddress: search as `0x${string}`,
+    tokenAddress: search,
   });
 
   const {
@@ -86,7 +86,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     ) {
       props.onTokenFound({
         tokenId: searchInterchainTokenResult.tokenId as `0x${string}`,
-        tokenAddress: search as `0x${string}`,
+        tokenAddress: search,
         chainName: searchERC20Result?.axelarChainName,
       });
     }

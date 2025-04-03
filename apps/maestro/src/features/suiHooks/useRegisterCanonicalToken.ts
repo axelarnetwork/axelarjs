@@ -81,7 +81,7 @@ export default function useRegisterCanonicalToken() {
       });
 
       const result = await signAndExecuteTransaction({
-        transaction: txJson, // Convert back to JSON for the hook
+        transaction: txJson,
       });
 
       console.log("result", result);

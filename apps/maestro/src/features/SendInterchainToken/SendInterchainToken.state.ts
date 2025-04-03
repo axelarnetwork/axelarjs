@@ -24,7 +24,7 @@ import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMuta
 type ChainConfig = EVMChainConfig | VMChainConfig;
 
 export function useSendInterchainTokenState(props: {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
   tokenId: `0x${string}`;
