@@ -204,7 +204,10 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...bsc,
-    rpcUrls: createRpcUrlConfig(bsc, ["https://binance.llamarpc.com"]),
+    rpcUrls: {
+      default: { http: ["https://bsc.blockrazor.xyz"] },
+      public: { http: ["https://bsc.blockrazor.xyz"] },
+    },
     axelarChainId: "binance",
     axelarChainName: "binance",
     supportWagmi: true,
