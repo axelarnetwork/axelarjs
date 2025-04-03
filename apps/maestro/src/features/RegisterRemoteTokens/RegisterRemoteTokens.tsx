@@ -18,6 +18,7 @@ import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
+import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
 
 export type RegisterRemoteTokensProps = {
   tokenAddress: string;
@@ -95,7 +96,8 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       ...remoteToken,
       deploymentTxHash: digest,
     }));
-    const txIndex = txState.suiTx?.events?.[2]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
+
+    const txIndex = findGatewayEventIndex(txState.suiTx?.events || []);
 
     // fix hardcoded value
     await recordRemoteTokenDeployment({

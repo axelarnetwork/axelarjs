@@ -10,7 +10,7 @@ import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useInterchainTokenDeploymentStateContainer } from "../InterchainTokenDeployment";
-import { findCoinDataObject, findObjectByType } from "~/server/routers/sui/utils/utils";
+import { findCoinDataObject, findGatewayEventIndex, findObjectByType } from "~/server/routers/sui/utils/utils";
 
 export type DeployTokenParams = {
   initialSupply: bigint;
@@ -157,7 +157,7 @@ export default function useTokenDeploy() {
 
       const tokenManagerType = minterAddress ? "mint_burn" : "lock_unlock";
 
-      const txIndex = sendTokenResult?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
+      const txIndex = findGatewayEventIndex(sendTokenResult?.events || []);
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       return {
         ...sendTokenResult,

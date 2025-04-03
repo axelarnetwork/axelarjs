@@ -5,7 +5,7 @@ import { suiClient } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useCanonicalTokenDeploymentStateContainer } from "../CanonicalTokenDeployment";
-import { findCoinDataObject, getPackageIdFromSuiTokenAddress } from "~/server/routers/sui/utils/utils";
+import { findCoinDataObject, findGatewayEventIndex, getPackageIdFromSuiTokenAddress } from "~/server/routers/sui/utils/utils";
 
 /**
  * Parameters for registering a canonical token.
@@ -87,16 +87,14 @@ export default function useRegisterCanonicalToken() {
 
       const coinManagementObjectId = findCoinDataObject(result);
 
-      const tokenManagerType = "lock_unlock";
-
-      const txIndex = result?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
+      const txIndex = findGatewayEventIndex(result?.events || []);
       const deploymentMessageId = `${result?.digest}-${txIndex}`;
 
       return {
         ...result,
         deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId || "0x",
-        tokenManagerType,
+        tokenManagerType: "lock_unlock",
       };
 
     } catch (error) {

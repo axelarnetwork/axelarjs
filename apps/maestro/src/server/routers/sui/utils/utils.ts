@@ -7,10 +7,10 @@ import {
   SuiObjectResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
-  type CoinMetadata,
   type PaginatedCoins,
   type PaginatedTransactionResponse,
   SuiTransactionBlockResponse,
+  SuiEvent,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
@@ -61,6 +61,10 @@ export const findObjectByType = (
 
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
   return objectChanges.find((change) => change.type === "published");
+};
+
+export const findGatewayEventIndex = (events: SuiEvent[]) => {
+  return events.findIndex(event => event.transactionModule === "gateway");
 };
 
 export const getObjectIdsByObjectTypes = (
