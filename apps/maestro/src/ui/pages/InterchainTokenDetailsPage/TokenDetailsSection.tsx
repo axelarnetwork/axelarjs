@@ -1,6 +1,5 @@
 import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import {
-    Alert,
   Alert,
   Badge,
   Button,

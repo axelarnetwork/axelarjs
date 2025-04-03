@@ -14,7 +14,7 @@ import { trpc } from "~/lib/trpc";
 import { getCoinType } from "~/server/routers/sui/utils/utils";
 
 export type UseSendInterchainTokenConfig = {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   sourceChainName: string;
   destinationChainName: string;
   gas?: bigint;
@@ -98,7 +98,7 @@ export function useInterchainTransferMutation(
         } else {
           const recipient = (destinationAddress ?? address) as `0x${string}`;
           txHash = await transferAsync({
-            address: config.tokenAddress,
+            address: config.tokenAddress as `0x${string}`,
             value: config.gas ?? 0n,
             args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
               destinationChain: config.destinationChainName,

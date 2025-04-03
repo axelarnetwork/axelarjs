@@ -437,14 +437,6 @@ export const suiRouter = router({
           input.tokenManagerType === "lock_unlock"
         );
 
-        const tokenId = await getTokenIdByCoinMetadata(
-          txBuilder,
-          tokenType,
-          coinMetadata,
-          chainConfig,
-          input.tokenManagerType === "lock_unlock"
-        );
-
         for (let i = 0; i < destinationChainIds.length; i++) {
           const destinationChain = destinationChainIds[i];
           await deployRemoteInterchainToken(
