@@ -11,19 +11,19 @@ import React, {
 } from "react";
 
 import { parseUnits } from "viem";
+import { WriteContractData } from "wagmi/query";
 
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
+import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
+import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
-import { filterEligibleChains } from "~/lib/utils/chains";
-import { WriteContractData } from "wagmi/query";
-import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -145,8 +145,10 @@ export const Step3: FC = () => {
             });
           }
         } catch (e: any) {
-          // We're catching the error above
-          console.log("error in sui tx", e?.message);
+          toast.error(e.message);
+          rootActions.setTxState({
+            type: "idle",
+          });
         }
       }
 

@@ -232,9 +232,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     if (chainId === SUI_CHAIN_ID && input) {
       const gasValues = input.remoteDeploymentGasFees;
       const result = await registerCanonicalToken({
-        symbol: input.tokenSymbol,
         destinationChains: input.destinationChainIds,
-        tokenPackageId: input.tokenAddress,
+        coinType: input.tokenAddress,
         gasValues,
       });
       if (result?.digest && result.deploymentMessageId) {
@@ -260,10 +259,17 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         data?.request !== undefined,
         "useDeployAndRegisterRemoteCanonicalTokenMutation: prepareMulticall?.request is not defined"
       );
-       return await multicall.writeContractAsync(data.request);
+      return await multicall.writeContractAsync(data.request);
     }
-
-  }, [data, multicall, recordDeploymentDraft, chainId, deployerAddress, input, registerCanonicalToken]);
+  }, [
+    data,
+    multicall,
+    recordDeploymentDraft,
+    chainId,
+    deployerAddress,
+    input,
+    registerCanonicalToken,
+  ]);
 
   const write = useCallback(() => {
     if (!multicall.writeContract || !data) {

@@ -9,8 +9,12 @@ import { fromHex } from "@mysten/sui/utils";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+import {
+  findCoinDataObject,
+  findGatewayEventIndex,
+  findObjectByType,
+} from "~/server/routers/sui/utils/utils";
 import { useInterchainTokenDeploymentStateContainer } from "../InterchainTokenDeployment";
-import { findCoinDataObject, findGatewayEventIndex, findObjectByType } from "~/server/routers/sui/utils/utils";
 
 export type DeployTokenParams = {
   initialSupply: bigint;
@@ -78,8 +82,6 @@ export default function useTokenDeploy() {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
-
-    console.log("minterAddress", minterAddress);
 
     // First step, deploy the token
     rootActions.setTxState({

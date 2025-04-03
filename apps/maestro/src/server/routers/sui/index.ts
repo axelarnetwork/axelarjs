@@ -86,30 +86,27 @@ export const suiRouter = router({
     .input(
       z.object({
         sender: z.string(),
-        symbol: z.string(),
         destinationChains: z.array(z.string()),
-        tokenPackageId: z.string(),
+        coinType: z.string(),
         gasValues: z.array(z.bigint()),
       })
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const { sender, symbol, destinationChains, tokenPackageId, gasValues } =
-          input;
+        const { sender, destinationChains, coinType, gasValues } = input;
 
         const chainConfig = await getSuiChainConfig(ctx);
 
         const { InterchainTokenService: ITS } = chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
 
-        const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
 
-        const coinMetadata = await queryCoinMetadata(tokenType);
+        const coinMetadata = await queryCoinMetadata(coinType);
 
         const coinInfo = await txBuilder.moveCall({
           target: `${ITS.address}::coin_info::from_info`,
-          typeArguments: [tokenType],
+          typeArguments: [coinType],
           arguments: [
             coinMetadata.name,
             coinMetadata.symbol,
@@ -119,12 +116,12 @@ export const suiRouter = router({
 
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_locked`,
-          typeArguments: [tokenType],
+          typeArguments: [coinType],
         });
 
         const tokenId = await txBuilder.moveCall({
           target: `${ITS.address}::interchain_token_service::register_coin`,
-          typeArguments: [tokenType],
+          typeArguments: [coinType],
           arguments: [itsObjectId, coinInfo, coinManagement],
         });
 
@@ -136,7 +133,7 @@ export const suiRouter = router({
             tokenId,
             Number(gasValues[i]),
             sender,
-            tokenType
+            coinType
           );
         }
 

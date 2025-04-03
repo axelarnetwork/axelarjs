@@ -1,19 +1,21 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { type SuiTransactionBlockResponse } from "@mysten/sui/client";
-import { suiClient } from "~/lib/clients/suiClient";
 
+import { suiClient } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+import {
+  findCoinDataObject,
+  findGatewayEventIndex,
+} from "~/server/routers/sui/utils/utils";
 import { useCanonicalTokenDeploymentStateContainer } from "../CanonicalTokenDeployment";
-import { findCoinDataObject, findGatewayEventIndex, getPackageIdFromSuiTokenAddress } from "~/server/routers/sui/utils/utils";
 
 /**
  * Parameters for registering a canonical token.
  */
 export type RegisterCanonicalTokenParams = {
-  symbol: string;
   destinationChains: string[];
-  tokenPackageId: string;
+  coinType: string;
   gasValues: bigint[];
 };
 
@@ -47,8 +49,8 @@ export default function useRegisterCanonicalToken() {
           options: {
             showObjectChanges: true,
             showEvents: true,
-            showEffects: true,  
-            showRawEffects: true, 
+            showEffects: true,
+            showRawEffects: true,
           },
         });
         return result;
@@ -59,15 +61,13 @@ export default function useRegisterCanonicalToken() {
     trpc.sui.getRegisterAndDeployCanonicalTokenTx.useMutation();
 
   const registerCanonicalToken = async ({
-    symbol,
     destinationChains,
-    tokenPackageId,
+    coinType,
     gasValues,
   }: RegisterCanonicalTokenParams): Promise<RegisterCanonicalTokenResult> => {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
-    const suiTokenPackageId = getPackageIdFromSuiTokenAddress(tokenPackageId);
 
     // Set initial state before starting
     actions.setTxState({ type: "pending_approval" });
@@ -75,9 +75,8 @@ export default function useRegisterCanonicalToken() {
     try {
       const txJson = await getRegisterTxJson({
         sender: currentAccount.address,
-        symbol,
         destinationChains,
-        tokenPackageId: suiTokenPackageId,
+        coinType,
         gasValues,
       });
 
@@ -96,7 +95,6 @@ export default function useRegisterCanonicalToken() {
         tokenManagerAddress: coinManagementObjectId || "0x",
         tokenManagerType: "lock_unlock",
       };
-
     } catch (error) {
       actions.setTxState({
         type: "idle",
@@ -114,4 +112,3 @@ export default function useRegisterCanonicalToken() {
     account: currentAccount,
   };
 }
-

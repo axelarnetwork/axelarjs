@@ -151,8 +151,10 @@ export const Step2: FC = () => {
             });
           }
         } catch (e: any) {
-          // We're catching the error above
-          console.log("error in sui tx", e?.message);
+          toast.error(e.message);
+          rootActions.setTxState({
+            type: "idle",
+          });
         }
       }
 
