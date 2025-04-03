@@ -174,12 +174,10 @@ export const suiRouter = router({
           amount,
           minterAddress
         } = input;
-        // const minterAddress = input.minterAddress || sender; // TODO: update this later
-
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
 
-        const coinMetadata = await queryCoinMetadata(tokenType);
+        const coinMetadata = await getCoinMetadataWithRetry(tokenType);
 
         const chainConfig = await getSuiChainConfig(ctx);
 
