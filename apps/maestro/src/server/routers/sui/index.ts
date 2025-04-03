@@ -19,12 +19,12 @@ import {
 import {
   buildTx,
   getChannelId,
-  getCoinMetadataWithRetry,
   getSuiChainConfig,
   getTreasuryCap,
   mergeAllCoinsOfSameType,
   suiServiceBaseUrl,
 } from "./utils/utils";
+import { queryCoinMetadata } from "./graphql";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -103,7 +103,7 @@ export const suiRouter = router({
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
 
-        const coinMetadata = await getCoinMetadataWithRetry(tokenType);
+        const coinMetadata = await queryCoinMetadata(tokenType);
 
         const coinInfo = await txBuilder.moveCall({
           target: `${ITS.address}::coin_info::from_info`,
@@ -176,7 +176,7 @@ export const suiRouter = router({
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
 
-        const coinMetadata = await getCoinMetadataWithRetry(tokenType);
+        const coinMetadata = await queryCoinMetadata(tokenType);
 
         const chainConfig = await getSuiChainConfig(ctx);
 
@@ -419,13 +419,7 @@ export const suiRouter = router({
 
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
-        const coinMetadata = await suiClient.getCoinMetadata({
-          coinType: tokenType,
-        });
-
-        if (!coinMetadata) {
-          throw new Error(`Coin metadata not found for ${tokenType}`);
-        }
+        const coinMetadata = await queryCoinMetadata(tokenType);
 
         const tokenId = await getTokenIdByCoinMetadata(
           txBuilder,

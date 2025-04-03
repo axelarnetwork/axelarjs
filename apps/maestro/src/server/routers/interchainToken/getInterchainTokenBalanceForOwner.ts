@@ -9,6 +9,7 @@ import {
   getCoinType,
   getSuiChainConfig,
 } from "../sui/utils/utils";
+import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
 
@@ -53,7 +54,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       });
 
       // Get the coin metadata
-      const metadata = await client.getCoinMetadata({ coinType });
+      const metadata = await queryCoinMetadata(coinType);
 
       const InterchainTokenServiceV0 =
         chainConfig.config.contracts?.InterchainTokenService.objects

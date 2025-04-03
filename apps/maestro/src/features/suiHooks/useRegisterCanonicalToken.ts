@@ -1,12 +1,11 @@
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { type SuiTransactionBlockResponse } from "@mysten/sui/client";
-import { Transaction } from "@mysten/sui/transactions";
 import { suiClient } from "~/lib/clients/suiClient";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useCanonicalTokenDeploymentStateContainer } from "../CanonicalTokenDeployment";
-import { findCoinDataObject } from "~/server/routers/sui/utils/utils";
+import { findCoinDataObject, getPackageIdFromSuiTokenAddress } from "~/server/routers/sui/utils/utils";
 
 /**
  * Parameters for registering a canonical token.
@@ -48,6 +47,8 @@ export default function useRegisterCanonicalToken() {
           options: {
             showObjectChanges: true,
             showEvents: true,
+            showEffects: true,  
+            showRawEffects: true, 
           },
         });
         return result;
@@ -66,17 +67,17 @@ export default function useRegisterCanonicalToken() {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
     }
+    const suiTokenPackageId = getPackageIdFromSuiTokenAddress(tokenPackageId);
 
     // Set initial state before starting
     actions.setTxState({ type: "pending_approval" });
 
     try {
-
       const txJson = await getRegisterTxJson({
         sender: currentAccount.address,
         symbol,
         destinationChains,
-        tokenPackageId,
+        tokenPackageId: suiTokenPackageId,
         gasValues,
       });
 
@@ -84,13 +85,9 @@ export default function useRegisterCanonicalToken() {
         transaction: txJson,
       });
 
-      console.log("result", result);
-
       const coinManagementObjectId = findCoinDataObject(result);
 
       const tokenManagerType = "lock_unlock";
-
-      console.log("event", result.events);
 
       const txIndex = result?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
       const deploymentMessageId = `${result?.digest}-${txIndex}`;

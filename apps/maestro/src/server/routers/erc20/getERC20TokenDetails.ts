@@ -8,7 +8,7 @@ import { z } from "zod";
 import { ExtendedWagmiChainConfig } from "~/config/chains";
 import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
-import { queryMetadata } from "~/server/routers/sui/graphql";
+import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 
 //TODO: migrate to kv store?
 const overrides: Record<string, Record<string, string>> = {
@@ -18,8 +18,7 @@ const overrides: Record<string, Record<string, string>> = {
 };
 
 async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
-  const response = await queryMetadata(tokenAddress);
-  const metadata = response.data?.coinMetadata;
+  const metadata = await queryCoinMetadata(tokenAddress);
 
   if (!metadata) {
     throw new TRPCError({
@@ -31,13 +30,13 @@ async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
   return {
     name: metadata.name,
     decimals: metadata.decimals,
+    symbol: metadata.symbol,
     owner: undefined,
     pendingOwner: null,
     chainId: chainId,
     chainName: "Sui",
     axelarChainId: "sui",
     axelarChainName: "sui",
-    symbol: metadata.symbol,
   };
 }
 

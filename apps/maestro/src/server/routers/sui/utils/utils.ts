@@ -18,6 +18,7 @@ import { suiChainConfig } from "~/config/chains";
 import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
 import type { Context } from "~/server/context";
 import { SUI_SERVICE } from "~/config/env";
+import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 
 export const suiServiceBaseUrl = SUI_SERVICE
 
@@ -57,42 +58,6 @@ export const findObjectByType = (
     (change) => change.type === "created" && change.objectType.includes(type)
   ) as SuiObjectCreated;
 };
-
-/**
- * Retrieves coin metadata with retry logic.
- * @param coinType The coin type string.
- * @param maxAttempts Maximum number of retry attempts.
- * @param delayMs Delay between retries in milliseconds.
- * @returns The coin metadata.
- * @throws Error if metadata is not found after retries.
- */
-export async function getCoinMetadataWithRetry(
-  coinType: string,
-  maxAttempts = 5,
-  delayMs = 300
-): Promise<CoinMetadata> {
-  let coinMetadata: CoinMetadata | null = null;
-  let attempts = 0;
-
-  while (!coinMetadata && attempts < maxAttempts) {
-    attempts++;
-    coinMetadata = await suiClient
-      .getCoinMetadata({ coinType })
-      .catch(() => null); // Handle potential errors during fetch
-
-    if (!coinMetadata && attempts < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-  }
-
-  if (!coinMetadata) {
-    throw new Error(
-      `Failed to get coin metadata for ${coinType} after ${maxAttempts} attempts.`
-    );
-  }
-
-  return coinMetadata;
-}
 
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
   return objectChanges.find((change) => change.type === "published");
@@ -137,6 +102,13 @@ export const getCoinType = async (tokenAddress: string) => {
   const coinSymbol = Object.keys(modules)[0];
   const coinType = `${tokenAddress}::${coinSymbol?.toLowerCase()}::${coinSymbol?.toUpperCase()}`;
   return coinType;
+};
+
+export const getPackageIdFromSuiTokenAddress = (tokenAddress: string) => {
+  if(isValidSuiTokenAddress(tokenAddress)) {
+    return tokenAddress.split("::")[0];
+  }
+  return tokenAddress;
 };
 
 export const getCoinAddressFromType = (
