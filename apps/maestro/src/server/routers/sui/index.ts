@@ -160,6 +160,7 @@ export const suiRouter = router({
         amount: z.bigint(),
         minterAddress: z.string().optional(),
         gasValues: z.array(z.bigint()),
+        isCanonical: z.boolean(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -171,6 +172,7 @@ export const suiRouter = router({
           gasValues,
           amount,
           minterAddress,
+          isCanonical,
         } = input;
 
         const { txBuilder } = setupTxBuilder(sender);
@@ -212,7 +214,7 @@ export const suiRouter = router({
           throw new Error("Channel not found");
         }
 
-        if (minterAddress) {
+        if (minterAddress && !isCanonical) {
           await txBuilder.moveCall({
             target: `${ITS.address}::coin_management::add_distributor`,
             typeArguments: [coinType],

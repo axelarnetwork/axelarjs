@@ -60,7 +60,8 @@ export default function useRegisterRemoteInterchainTokens(
     if (
       !tokenDeployment ||
       !gasFeesData ||
-      tokenDeployment.kind !== "interchain"
+      tokenDeployment.kind !== "interchain" ||
+      chainId === SUI_CHAIN_ID
     )
       return [];
 
@@ -71,7 +72,7 @@ export default function useRegisterRemoteInterchainTokens(
         gasValue: gasFeesData.gasFees[i].fee,
       })
     );
-  }, [destinationChainIds, gasFeesData, tokenDeployment]);
+  }, [destinationChainIds, gasFeesData, tokenDeployment, chainId]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 

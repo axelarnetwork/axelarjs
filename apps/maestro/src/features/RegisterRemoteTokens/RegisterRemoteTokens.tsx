@@ -15,10 +15,10 @@ import {
 } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
-import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
 
 export type RegisterRemoteTokensProps = {
   tokenAddress: string;
@@ -223,7 +223,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         setTxState({
           status: "submitted",
           hash: result.digest,
-          suiTx: result, 
+          suiTx: result,
           chainId: props.originChainId ?? -1,
           txType: "INTERCHAIN_DEPLOYMENT",
         });

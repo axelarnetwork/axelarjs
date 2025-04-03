@@ -27,6 +27,7 @@ export type DeployAndRegisterTransactionState =
 export const INITIAL_STATE = {
   step: 0,
   tokenDetails: {
+    isCanonical: true,
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
