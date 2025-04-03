@@ -171,7 +171,9 @@ export const suiRouter = router({
           destinationChains,
           gasValues,
           amount,
+          minterAddress
         } = input;
+        // const minterAddress = input.minterAddress || sender; // TODO: update this later
 
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
@@ -198,44 +200,50 @@ export const suiRouter = router({
           ],
         });
 
-        // TODO: should we add the input.sender as a fallback?
-        const minterAddress = input.minterAddress || input.sender;
-
         // Mint initial coins supply
         await mintToken(
           txBuilder,
           tokenType,
           treasuryCap,
           amount,
-          sender // minting initial supply to sender, not to minter
+          sender
         );
 
-        console.log("minterAddress", minterAddress);
+        let coinManagement = null;
+        if (minterAddress) {
+          coinManagement = await txBuilder.moveCall({
+            target: `${ITS.address}::coin_management::new_with_cap`,
+            typeArguments: [tokenType],
+            arguments: [treasuryCap],
+          });
+          const channelId = await getChannelId(sender, chainConfig);
 
-        const coinManagement = await txBuilder.moveCall({
-          target: `${ITS.address}::coin_management::new_with_cap`,
-          typeArguments: [tokenType],
-          arguments: [treasuryCap],
-        });
-        const channelId = await getChannelId(sender, chainConfig);
+          if (!channelId) {
+            throw new Error("Channel not found");
+          }
 
-        if (!channelId) {
-          throw new Error("Channel not found");
-        }
-        await txBuilder.moveCall({
-          target: `${ITS.address}::coin_management::add_distributor`,
-          typeArguments: [tokenType],
-          arguments: [coinManagement, channelId],
-        });
+          if (input.minterAddress) {
+            await txBuilder.moveCall({
+              target: `${ITS.address}::coin_management::add_distributor`,
+              typeArguments: [tokenType],
+              arguments: [coinManagement, channelId],
+            });
 
-        await txBuilder.moveCall({
-          target: `${ITS.address}::coin_management::add_operator`,
-          typeArguments: [tokenType],
-          arguments: [coinManagement, sender],
-        });
+            await txBuilder.moveCall({
+              target: `${ITS.address}::coin_management::add_operator`,
+              typeArguments: [tokenType],
+              arguments: [coinManagement, sender],
+            });
 
-        if (minterAddress !== sender) {
-          txBuilder.tx.transferObjects([channelId], minterAddress);
+            if (minterAddress !== sender) {
+              txBuilder.tx.transferObjects([channelId], minterAddress);
+            }
+          }
+        } else {
+          coinManagement = await txBuilder.moveCall({
+            target: `${ITS.address}::coin_management::new_locked`,
+            typeArguments: [tokenType],
+          });
         }
 
         const tokenId = await txBuilder.moveCall({
@@ -420,6 +428,14 @@ export const suiRouter = router({
         const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
 
         const coinMetadata = await queryCoinMetadata(tokenType);
+
+        const tokenId = await getTokenIdByCoinMetadata(
+          txBuilder,
+          tokenType,
+          coinMetadata,
+          chainConfig,
+          input.tokenManagerType === "lock_unlock"
+        );
 
         const tokenId = await getTokenIdByCoinMetadata(
           txBuilder,
