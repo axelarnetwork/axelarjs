@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
 import { publicProcedure, router } from "~/server/trpc";
+import { queryCoinMetadata } from "./graphql";
 import {
   deployRemoteInterchainToken,
   getTokenId,
@@ -25,7 +26,6 @@ import {
   mergeAllCoinsOfSameType,
   suiServiceBaseUrl,
 } from "./utils/utils";
-import { queryCoinMetadata } from "./graphql";
 
 export const suiRouter = router({
   getDeployTokenTxBytes: publicProcedure
@@ -94,7 +94,8 @@ export const suiRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const { sender, symbol, destinationChains, tokenPackageId, gasValues} = input;
+        const { sender, symbol, destinationChains, tokenPackageId, gasValues } =
+          input;
 
         const chainConfig = await getSuiChainConfig(ctx);
 
@@ -172,7 +173,7 @@ export const suiRouter = router({
           destinationChains,
           gasValues,
           amount,
-          minterAddress
+          minterAddress,
         } = input;
         const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
         const { txBuilder } = setupTxBuilder(sender);
@@ -200,49 +201,36 @@ export const suiRouter = router({
         });
 
         // Mint initial coins supply
-        await mintToken(
-          txBuilder,
-          tokenType,
-          treasuryCap,
-          amount,
-          sender
-        );
+        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
 
-        let coinManagement = null;
+        const coinManagement = await txBuilder.moveCall({
+          target: `${ITS.address}::coin_management::new_with_cap`,
+          typeArguments: [tokenType],
+          arguments: [treasuryCap],
+        });
+
+        const channelId = await getChannelId(sender, chainConfig);
+
+        if (!channelId) {
+          throw new Error("Channel not found");
+        }
+
         if (minterAddress) {
-          coinManagement = await txBuilder.moveCall({
-            target: `${ITS.address}::coin_management::new_with_cap`,
+          await txBuilder.moveCall({
+            target: `${ITS.address}::coin_management::add_distributor`,
             typeArguments: [tokenType],
-            arguments: [treasuryCap],
+            arguments: [coinManagement, channelId],
           });
-          const channelId = await getChannelId(sender, chainConfig);
 
-          if (!channelId) {
-            throw new Error("Channel not found");
-          }
-
-          if (input.minterAddress) {
-            await txBuilder.moveCall({
-              target: `${ITS.address}::coin_management::add_distributor`,
-              typeArguments: [tokenType],
-              arguments: [coinManagement, channelId],
-            });
-
-            await txBuilder.moveCall({
-              target: `${ITS.address}::coin_management::add_operator`,
-              typeArguments: [tokenType],
-              arguments: [coinManagement, sender],
-            });
-
-            if (minterAddress !== sender) {
-              txBuilder.tx.transferObjects([channelId], minterAddress);
-            }
-          }
-        } else {
-          coinManagement = await txBuilder.moveCall({
-            target: `${ITS.address}::coin_management::new_locked`,
+          await txBuilder.moveCall({
+            target: `${ITS.address}::coin_management::add_operator`,
             typeArguments: [tokenType],
+            arguments: [coinManagement, sender],
           });
+
+          if (minterAddress !== sender) {
+            txBuilder.tx.transferObjects([channelId], minterAddress);
+          }
         }
 
         const tokenId = await txBuilder.moveCall({
