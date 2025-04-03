@@ -4,6 +4,7 @@ import {
   SUI_PACKAGE_ID,
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
+import { SUI_TYPE_ARG } from "@mysten/sui/utils";
 import { z } from "zod";
 
 import { suiClient } from "~/lib/clients/suiClient";
@@ -154,7 +155,7 @@ export const suiRouter = router({
         sender: z.string(),
         symbol: z.string(),
         destinationChains: z.array(z.string()),
-        tokenPackageId: z.string(),
+        coinType: z.string(),
         tokenId: z.string(),
         amount: z.bigint(),
         minterAddress: z.string().optional(),
@@ -165,23 +166,22 @@ export const suiRouter = router({
       try {
         const {
           sender,
-          symbol,
-          tokenPackageId,
+          coinType,
           destinationChains,
           gasValues,
           amount,
           minterAddress,
         } = input;
-        const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
+
         const { txBuilder } = setupTxBuilder(sender);
 
-        const coinMetadata = await getCoinMetadataWithRetry(tokenType);
+        const coinMetadata = await getCoinMetadataWithRetry(coinType);
 
         const chainConfig = await getSuiChainConfig(ctx);
 
         const { InterchainTokenService: ITS } = chainConfig.config.contracts;
         const itsObjectId = ITS.objects.InterchainTokenService;
-        const treasuryCap = await getTreasuryCap(tokenPackageId);
+        const treasuryCap = await getTreasuryCap(coinType); //check if this is correct
 
         if (!treasuryCap) {
           throw new Error("Treasury cap not found");
@@ -189,7 +189,7 @@ export const suiRouter = router({
 
         const coinInfo = await txBuilder.moveCall({
           target: `${ITS.address}::coin_info::from_info`,
-          typeArguments: [tokenType],
+          typeArguments: [coinType],
           arguments: [
             coinMetadata.name,
             coinMetadata.symbol,
@@ -198,11 +198,11 @@ export const suiRouter = router({
         });
 
         // Mint initial coins supply
-        await mintToken(txBuilder, tokenType, treasuryCap, amount, sender);
+        await mintToken(txBuilder, coinType, treasuryCap, amount, sender);
 
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_with_cap`,
-          typeArguments: [tokenType],
+          typeArguments: [coinType],
           arguments: [treasuryCap],
         });
 
@@ -215,13 +215,13 @@ export const suiRouter = router({
         if (minterAddress) {
           await txBuilder.moveCall({
             target: `${ITS.address}::coin_management::add_distributor`,
-            typeArguments: [tokenType],
+            typeArguments: [coinType],
             arguments: [coinManagement, channelId],
           });
 
           await txBuilder.moveCall({
             target: `${ITS.address}::coin_management::add_operator`,
-            typeArguments: [tokenType],
+            typeArguments: [coinType],
             arguments: [coinManagement, sender],
           });
 
@@ -232,7 +232,7 @@ export const suiRouter = router({
 
         const tokenId = await txBuilder.moveCall({
           target: `${ITS.address}::interchain_token_service::register_coin`,
-          typeArguments: [tokenType],
+          typeArguments: [coinType],
           arguments: [itsObjectId, coinInfo, coinManagement],
         });
 
@@ -244,7 +244,7 @@ export const suiRouter = router({
             tokenId,
             Number(gasValues[i]),
             sender,
-            tokenType
+            coinType
           );
         }
 
@@ -292,7 +292,6 @@ export const suiRouter = router({
       z.object({
         sender: z.string(),
         tokenId: z.string(),
-        tokenAddress: z.string(),
         amount: z.string(),
         destinationChain: z.string(),
         destinationAddress: z.string(),
@@ -355,7 +354,7 @@ export const suiRouter = router({
 
         await txBuilder.moveCall({
           target: `${GasService.address}::gas_service::pay_gas`,
-          typeArguments: [`0x2::sui::SUI`],
+          typeArguments: [SUI_TYPE_ARG],
           arguments: [
             GasService.objects.GasService,
             messageTicket,
@@ -390,11 +389,10 @@ export const suiRouter = router({
   getRegisterRemoteInterchainTokenTx: publicProcedure
     .input(
       z.object({
-        tokenAddress: z.string(),
+        coinType: z.string(),
         destinationChainIds: z.array(z.string()),
         originChainId: z.number(),
         sender: z.string(),
-        symbol: z.string(),
         gasValues: z.array(z.bigint()),
         tokenManagerType: z.enum(["lock_unlock", "mint_burn"]), // Only supported types for sui
       })
@@ -402,20 +400,17 @@ export const suiRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         const chainConfig = await getSuiChainConfig(ctx);
-        const { sender, symbol, tokenAddress, destinationChainIds, gasValues } =
-          input;
+        const { sender, coinType, destinationChainIds, gasValues } = input;
 
         const txBuilder = new TxBuilder(suiClient);
 
         txBuilder.tx.setSenderIfNotSet(sender);
 
-        const tokenType = `${tokenAddress}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-        const coinMetadata = await getCoinMetadataWithRetry(tokenType);
+        const coinMetadata = await getCoinMetadataWithRetry(coinType);
 
         const tokenId = await getTokenIdByCoinMetadata(
           txBuilder,
-          tokenType,
+          coinType,
           coinMetadata,
           chainConfig,
           input.tokenManagerType === "lock_unlock"
@@ -430,7 +425,7 @@ export const suiRouter = router({
             tokenId,
             Number(gasValues[i]),
             sender,
-            tokenType
+            coinType
           );
         }
 

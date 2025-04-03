@@ -136,7 +136,7 @@ export async function getCoinMetadataWithRetry(
     attempts++;
 
     try {
-      coinMetadata = await queryCoinMetadata(coinType)
+      coinMetadata = await queryCoinMetadata(coinType);
     } catch {
       console.debug("Failed to get coin metadata:", coinType);
     }
@@ -206,15 +206,15 @@ function findTreasuryCap(txData: PaginatedTransactionResponse) {
   return null;
 }
 
-export const getTreasuryCap = async (tokenAddress: string) => {
+export const getTreasuryCap = async (coinType: string) => {
   let cursor: string | null | undefined = null;
   let txs: PaginatedTransactionResponse | null;
   let treasuryCap: string | null = null;
-
+  const address = getCoinAddressFromType(coinType);
   do {
     txs = await client.queryTransactionBlocks({
       filter: {
-        ChangedObject: tokenAddress,
+        ChangedObject: address,
       },
       cursor,
       options: {

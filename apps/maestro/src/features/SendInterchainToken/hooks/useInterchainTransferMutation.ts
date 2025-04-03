@@ -84,7 +84,6 @@ export function useInterchainTransferMutation(
           const sendTokenTxJSON = await getSendTokenTx({
             sender: address,
             tokenId: tokenId,
-            tokenAddress: config.tokenAddress,
             amount: bnAmount.toString(),
             destinationChain: config.destinationChainName,
             destinationAddress: destinationAddress,

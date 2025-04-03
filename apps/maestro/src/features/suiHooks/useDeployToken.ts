@@ -117,9 +117,9 @@ export default function useTokenDeploy() {
 
       const metadata = findObjectByType(deploymentCreatedObjects, "Metadata");
 
-      const tokenAddress = metadata?.objectType.match(/<([^:>]+)/)?.[1];
+      const coinType = metadata?.objectType.match(/<([^>]+)>/)?.[1];
 
-      if (!tokenAddress) {
+      if (!coinType) {
         throw new Error("Failed to deploy token");
       }
       rootActions.setTxState({
@@ -133,7 +133,7 @@ export default function useTokenDeploy() {
         sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
           sender: currentAccount.address,
           symbol,
-          tokenPackageId: tokenAddress,
+          coinType,
           tokenId: metadata.objectId,
           amount: initialSupply,
           destinationChains: destinationChainIds,
@@ -165,7 +165,7 @@ export default function useTokenDeploy() {
         ...sendTokenResult,
         deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId || "0x",
-        tokenAddress,
+        tokenAddress: coinType,
         tokenManagerType,
         minterAddress,
       };

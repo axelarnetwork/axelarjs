@@ -7,7 +7,7 @@ import { trpc } from "~/lib/trpc";
 type RegisterRemoteInterchainTokenOnSuiInput = {
   axelarChainIds: string[];
   originChainId: number;
-  tokenAddress: string;
+  coinType: string;
   symbol: string;
   gasValues: bigint[];
   tokenManagerType: "lock_unlock" | "mint_burn";
@@ -51,11 +51,10 @@ export function useRegisterRemoteInterchainTokenOnSui() {
 
     try {
       const registerTokenTxJSON = await getRegisterRemoteInterchainTokenTx({
-        tokenAddress: input.tokenAddress,
+        coinType: input.coinType,
         destinationChainIds: input.axelarChainIds,
         originChainId: input.originChainId,
         sender: currentAccount.address,
-        symbol: input.symbol,
         gasValues: input.gasValues,
         tokenManagerType: input.tokenManagerType,
       });
