@@ -9,10 +9,11 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { useChainId } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
@@ -36,9 +37,7 @@ export default function useRegisterRemoteCanonicalTokens(
     [input.chainIds, combinedComputed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map(
-    (chain) => chain.id
-  );
+  const destinationChainIds = destinationChains.map((chain) => chain.id);
 
   const sourceChain = useMemo(
     () => combinedComputed.indexedByChainId[chainId],
@@ -58,7 +57,12 @@ export default function useRegisterRemoteCanonicalTokens(
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDetails || !gasFeesData || tokenDetails.kind !== "canonical")
+    if (
+      !tokenDetails ||
+      !gasFeesData ||
+      tokenDetails.kind !== "canonical" ||
+      chainId === SUI_CHAIN_ID
+    )
       return [];
 
     return destinationChainIds.map((axelarChainId, i) => {
@@ -72,7 +76,7 @@ export default function useRegisterRemoteCanonicalTokens(
         }
       );
     });
-  }, [destinationChainIds, gasFeesData, tokenDetails]);
+  }, [destinationChainIds, gasFeesData, tokenDetails, chainId]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
@@ -86,13 +90,32 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
+  const { registerRemoteInterchainToken } =
+    useRegisterRemoteInterchainTokenOnSui();
+
+  const suiInput = {
+    axelarChainIds: destinationChainIds,
+    originChainId: input.originChainId,
+    coinType: input.tokenAddress,
+    symbol: tokenDetails?.tokenSymbol ?? "",
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
+    tokenManagerType: tokenDetails?.tokenManagerType as
+      | "lock_unlock"
+      | "mint_burn",
+  };
   return {
     ...mutation,
     writeContract: () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
       if (!config) return;
       return mutation.writeContract(config.request);
     },
     writeContractAsync: async () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
       if (!config) return;
       return await mutation.writeContractAsync(config.request);
     },

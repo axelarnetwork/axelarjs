@@ -103,7 +103,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   ]);
 
   const multicallArgs = useMemo(() => {
-    if (!input || !tokenId) {
+    if (!input || !tokenId || chainId === SUI_CHAIN_ID) {
       return [];
     }
 
@@ -138,7 +138,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainIds]);
+  }, [input, tokenId, destinationChainIds, chainId]);
 
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
   const isMutationReady =
@@ -296,7 +296,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
         minterAddress: input.minterAddress,
-        gasValues
+        gasValues,
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;

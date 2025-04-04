@@ -81,7 +81,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   }, [combinedComputed.indexedById, input?.destinationChainIds]);
 
   const multicallArgs = useMemo(() => {
-    if (!input || !tokenId) {
+    if (!input || !tokenId || chainId === SUI_CHAIN_ID) {
       return [];
     }
 
@@ -110,7 +110,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames]);
+  }, [input, tokenId, destinationChainNames, chainId]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
