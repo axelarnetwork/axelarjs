@@ -14,8 +14,9 @@ const evmChainConfigSchema = z.object({
   name: z.string(),
   image: z.string(),
   color: z.string(),
-  chain_type: z.literal("evm"),
+  chain_type: z.string(),
   no_inflation: z.boolean(),
+  no_tvl: z.boolean().optional(),
   endpoints: z.object({
     rpc: z.array(z.string()),
   }),
@@ -73,7 +74,6 @@ export const getEVMChainConfigs = publicProcedure
       const chainsMap = await ctx.configs.evmChains();
       const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
       const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
-
       const validChainInfos = uniqueChainInfos.filter(
         (chain) => evmChainConfigSchema.safeParse(chain).success
       );

@@ -13,6 +13,67 @@ import { encodeFunctionData } from "viem";
 import type { PublicContractClient } from "../../PublicContractClient";
 import ABI_FILE from "./InterchainTokenFactory.abi";
 
+export type InterchainTokenFactoryApproveDeployRemoteInterchainTokenArgs = {
+  deployer: `0x${string}`;
+  salt: `0x${string}`;
+  destinationChain: string;
+  destinationMinter: `0x${string}`;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.approveDeployRemoteInterchainToken function args
+ */
+export const encodeInterchainTokenFactoryApproveDeployRemoteInterchainTokenArgs =
+  ({
+    deployer,
+    salt,
+    destinationChain,
+    destinationMinter,
+  }: InterchainTokenFactoryApproveDeployRemoteInterchainTokenArgs) =>
+    [deployer, salt, destinationChain, destinationMinter] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.approveDeployRemoteInterchainToken function data
+ */
+export const encodeInterchainTokenFactoryApproveDeployRemoteInterchainTokenData =
+  ({
+    deployer,
+    salt,
+    destinationChain,
+    destinationMinter,
+  }: InterchainTokenFactoryApproveDeployRemoteInterchainTokenArgs): `0x${string}` =>
+    encodeFunctionData({
+      functionName: "approveDeployRemoteInterchainToken",
+      abi: ABI_FILE.abi,
+      args: [deployer, salt, destinationChain, destinationMinter],
+    });
+
+export type InterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs = {
+  tokenAddress: `0x${string}`;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.canonicalInterchainTokenDeploySalt function args
+ */
+export const encodeInterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs =
+  ({
+    tokenAddress,
+  }: InterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs) =>
+    [tokenAddress] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.canonicalInterchainTokenDeploySalt function data
+ */
+export const encodeInterchainTokenFactoryCanonicalInterchainTokenDeploySaltData =
+  ({
+    tokenAddress,
+  }: InterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs): `0x${string}` =>
+    encodeFunctionData({
+      functionName: "canonicalInterchainTokenDeploySalt",
+      abi: ABI_FILE.abi,
+      args: [tokenAddress],
+    });
+
 export type InterchainTokenFactoryCanonicalInterchainTokenIdArgs = {
   tokenAddress: `0x${string}`;
 };
@@ -35,33 +96,6 @@ export const encodeInterchainTokenFactoryCanonicalInterchainTokenIdData = ({
     functionName: "canonicalInterchainTokenId",
     abi: ABI_FILE.abi,
     args: [tokenAddress],
-  });
-
-export type InterchainTokenFactoryCanonicalInterchainTokenSaltArgs = {
-  chainNameHash_: `0x${string}`;
-  tokenAddress: `0x${string}`;
-};
-
-/**
- * Factory function for InterchainTokenFactory.canonicalInterchainTokenSalt function args
- */
-export const encodeInterchainTokenFactoryCanonicalInterchainTokenSaltArgs = ({
-  chainNameHash_,
-  tokenAddress,
-}: InterchainTokenFactoryCanonicalInterchainTokenSaltArgs) =>
-  [chainNameHash_, tokenAddress] as const;
-
-/**
- * Encoder function for InterchainTokenFactory.canonicalInterchainTokenSalt function data
- */
-export const encodeInterchainTokenFactoryCanonicalInterchainTokenSaltData = ({
-  chainNameHash_,
-  tokenAddress,
-}: InterchainTokenFactoryCanonicalInterchainTokenSaltArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "canonicalInterchainTokenSalt",
-    abi: ABI_FILE.abi,
-    args: [chainNameHash_, tokenAddress],
   });
 
 export type InterchainTokenFactoryDeployInterchainTokenArgs = {
@@ -103,8 +137,42 @@ export const encodeInterchainTokenFactoryDeployInterchainTokenData = ({
     args: [salt, name, symbol, decimals, initialSupply, minter],
   });
 
-export type InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs = {
+export type InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs2 = {
   originalChain: string;
+  originalTokenAddress: `0x${string}`;
+  destinationChain: string;
+  gasValue: bigint;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.deployRemoteCanonicalInterchainToken function args
+ */
+export const encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainToken2Args =
+  ({
+    originalChain,
+    originalTokenAddress,
+    destinationChain,
+    gasValue,
+  }: InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs2) =>
+    [originalChain, originalTokenAddress, destinationChain, gasValue] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.deployRemoteCanonicalInterchainToken function data
+ */
+export const encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainToken2Data =
+  ({
+    originalChain,
+    originalTokenAddress,
+    destinationChain,
+    gasValue,
+  }: InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs2): `0x${string}` =>
+    encodeFunctionData({
+      functionName: "deployRemoteCanonicalInterchainToken",
+      abi: ABI_FILE.abi,
+      args: [originalChain, originalTokenAddress, destinationChain, gasValue],
+    });
+
+export type InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs = {
   originalTokenAddress: `0x${string}`;
   destinationChain: string;
   gasValue: bigint;
@@ -115,19 +183,17 @@ export type InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs = {
  */
 export const encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs =
   ({
-    originalChain,
     originalTokenAddress,
     destinationChain,
     gasValue,
   }: InterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs) =>
-    [originalChain, originalTokenAddress, destinationChain, gasValue] as const;
+    [originalTokenAddress, destinationChain, gasValue] as const;
 
 /**
  * Encoder function for InterchainTokenFactory.deployRemoteCanonicalInterchainToken function data
  */
 export const encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenData =
   ({
-    originalChain,
     originalTokenAddress,
     destinationChain,
     gasValue,
@@ -135,10 +201,40 @@ export const encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenDat
     encodeFunctionData({
       functionName: "deployRemoteCanonicalInterchainToken",
       abi: ABI_FILE.abi,
-      args: [originalChain, originalTokenAddress, destinationChain, gasValue],
+      args: [originalTokenAddress, destinationChain, gasValue],
     });
 
 export type InterchainTokenFactoryDeployRemoteInterchainTokenArgs = {
+  salt: `0x${string}`;
+  destinationChain: string;
+  gasValue: bigint;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.deployRemoteInterchainToken function args
+ */
+export const encodeInterchainTokenFactoryDeployRemoteInterchainTokenArgs = ({
+  salt,
+  destinationChain,
+  gasValue,
+}: InterchainTokenFactoryDeployRemoteInterchainTokenArgs) =>
+  [salt, destinationChain, gasValue] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.deployRemoteInterchainToken function data
+ */
+export const encodeInterchainTokenFactoryDeployRemoteInterchainTokenData = ({
+  salt,
+  destinationChain,
+  gasValue,
+}: InterchainTokenFactoryDeployRemoteInterchainTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "deployRemoteInterchainToken",
+    abi: ABI_FILE.abi,
+    args: [salt, destinationChain, gasValue],
+  });
+
+export type InterchainTokenFactoryDeployRemoteInterchainTokenArgs2 = {
   originalChainName: string;
   salt: `0x${string}`;
   minter: `0x${string}`;
@@ -149,54 +245,92 @@ export type InterchainTokenFactoryDeployRemoteInterchainTokenArgs = {
 /**
  * Factory function for InterchainTokenFactory.deployRemoteInterchainToken function args
  */
-export const encodeInterchainTokenFactoryDeployRemoteInterchainTokenArgs = ({
+export const encodeInterchainTokenFactoryDeployRemoteInterchainToken2Args = ({
   originalChainName,
   salt,
   minter,
   destinationChain,
   gasValue,
-}: InterchainTokenFactoryDeployRemoteInterchainTokenArgs) =>
+}: InterchainTokenFactoryDeployRemoteInterchainTokenArgs2) =>
   [originalChainName, salt, minter, destinationChain, gasValue] as const;
 
 /**
  * Encoder function for InterchainTokenFactory.deployRemoteInterchainToken function data
  */
-export const encodeInterchainTokenFactoryDeployRemoteInterchainTokenData = ({
+export const encodeInterchainTokenFactoryDeployRemoteInterchainToken2Data = ({
   originalChainName,
   salt,
   minter,
   destinationChain,
   gasValue,
-}: InterchainTokenFactoryDeployRemoteInterchainTokenArgs): `0x${string}` =>
+}: InterchainTokenFactoryDeployRemoteInterchainTokenArgs2): `0x${string}` =>
   encodeFunctionData({
     functionName: "deployRemoteInterchainToken",
     abi: ABI_FILE.abi,
     args: [originalChainName, salt, minter, destinationChain, gasValue],
   });
 
-export type InterchainTokenFactoryInterchainTokenAddressArgs = {
+export type InterchainTokenFactoryDeployRemoteInterchainTokenWithMinterArgs = {
+  salt: `0x${string}`;
+  minter: `0x${string}`;
+  destinationChain: string;
+  destinationMinter: `0x${string}`;
+  gasValue: bigint;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.deployRemoteInterchainTokenWithMinter function args
+ */
+export const encodeInterchainTokenFactoryDeployRemoteInterchainTokenWithMinterArgs =
+  ({
+    salt,
+    minter,
+    destinationChain,
+    destinationMinter,
+    gasValue,
+  }: InterchainTokenFactoryDeployRemoteInterchainTokenWithMinterArgs) =>
+    [salt, minter, destinationChain, destinationMinter, gasValue] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.deployRemoteInterchainTokenWithMinter function data
+ */
+export const encodeInterchainTokenFactoryDeployRemoteInterchainTokenWithMinterData =
+  ({
+    salt,
+    minter,
+    destinationChain,
+    destinationMinter,
+    gasValue,
+  }: InterchainTokenFactoryDeployRemoteInterchainTokenWithMinterArgs): `0x${string}` =>
+    encodeFunctionData({
+      functionName: "deployRemoteInterchainTokenWithMinter",
+      abi: ABI_FILE.abi,
+      args: [salt, minter, destinationChain, destinationMinter, gasValue],
+    });
+
+export type InterchainTokenFactoryInterchainTokenDeploySaltArgs = {
   deployer: `0x${string}`;
   salt: `0x${string}`;
 };
 
 /**
- * Factory function for InterchainTokenFactory.interchainTokenAddress function args
+ * Factory function for InterchainTokenFactory.interchainTokenDeploySalt function args
  */
-export const encodeInterchainTokenFactoryInterchainTokenAddressArgs = ({
+export const encodeInterchainTokenFactoryInterchainTokenDeploySaltArgs = ({
   deployer,
   salt,
-}: InterchainTokenFactoryInterchainTokenAddressArgs) =>
+}: InterchainTokenFactoryInterchainTokenDeploySaltArgs) =>
   [deployer, salt] as const;
 
 /**
- * Encoder function for InterchainTokenFactory.interchainTokenAddress function data
+ * Encoder function for InterchainTokenFactory.interchainTokenDeploySalt function data
  */
-export const encodeInterchainTokenFactoryInterchainTokenAddressData = ({
+export const encodeInterchainTokenFactoryInterchainTokenDeploySaltData = ({
   deployer,
   salt,
-}: InterchainTokenFactoryInterchainTokenAddressArgs): `0x${string}` =>
+}: InterchainTokenFactoryInterchainTokenDeploySaltArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "interchainTokenAddress",
+    functionName: "interchainTokenDeploySalt",
     abi: ABI_FILE.abi,
     args: [deployer, salt],
   });
@@ -227,34 +361,110 @@ export const encodeInterchainTokenFactoryInterchainTokenIdData = ({
     args: [deployer, salt],
   });
 
-export type InterchainTokenFactoryInterchainTokenSaltArgs = {
-  chainNameHash_: `0x${string}`;
+export type InterchainTokenFactoryLinkTokenArgs = {
+  salt: `0x${string}`;
+  destinationChain: string;
+  destinationTokenAddress: `0x${string}`;
+  tokenManagerType: number;
+  linkParams: `0x${string}`;
+  gasValue: bigint;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.linkToken function args
+ */
+export const encodeInterchainTokenFactoryLinkTokenArgs = ({
+  salt,
+  destinationChain,
+  destinationTokenAddress,
+  tokenManagerType,
+  linkParams,
+  gasValue,
+}: InterchainTokenFactoryLinkTokenArgs) =>
+  [
+    salt,
+    destinationChain,
+    destinationTokenAddress,
+    tokenManagerType,
+    linkParams,
+    gasValue,
+  ] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.linkToken function data
+ */
+export const encodeInterchainTokenFactoryLinkTokenData = ({
+  salt,
+  destinationChain,
+  destinationTokenAddress,
+  tokenManagerType,
+  linkParams,
+  gasValue,
+}: InterchainTokenFactoryLinkTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "linkToken",
+    abi: ABI_FILE.abi,
+    args: [
+      salt,
+      destinationChain,
+      destinationTokenAddress,
+      tokenManagerType,
+      linkParams,
+      gasValue,
+    ],
+  });
+
+export type InterchainTokenFactoryLinkedTokenDeploySaltArgs = {
   deployer: `0x${string}`;
   salt: `0x${string}`;
 };
 
 /**
- * Factory function for InterchainTokenFactory.interchainTokenSalt function args
+ * Factory function for InterchainTokenFactory.linkedTokenDeploySalt function args
  */
-export const encodeInterchainTokenFactoryInterchainTokenSaltArgs = ({
-  chainNameHash_,
+export const encodeInterchainTokenFactoryLinkedTokenDeploySaltArgs = ({
   deployer,
   salt,
-}: InterchainTokenFactoryInterchainTokenSaltArgs) =>
-  [chainNameHash_, deployer, salt] as const;
+}: InterchainTokenFactoryLinkedTokenDeploySaltArgs) =>
+  [deployer, salt] as const;
 
 /**
- * Encoder function for InterchainTokenFactory.interchainTokenSalt function data
+ * Encoder function for InterchainTokenFactory.linkedTokenDeploySalt function data
  */
-export const encodeInterchainTokenFactoryInterchainTokenSaltData = ({
-  chainNameHash_,
+export const encodeInterchainTokenFactoryLinkedTokenDeploySaltData = ({
   deployer,
   salt,
-}: InterchainTokenFactoryInterchainTokenSaltArgs): `0x${string}` =>
+}: InterchainTokenFactoryLinkedTokenDeploySaltArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "interchainTokenSalt",
+    functionName: "linkedTokenDeploySalt",
     abi: ABI_FILE.abi,
-    args: [chainNameHash_, deployer, salt],
+    args: [deployer, salt],
+  });
+
+export type InterchainTokenFactoryLinkedTokenIdArgs = {
+  deployer: `0x${string}`;
+  salt: `0x${string}`;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.linkedTokenId function args
+ */
+export const encodeInterchainTokenFactoryLinkedTokenIdArgs = ({
+  deployer,
+  salt,
+}: InterchainTokenFactoryLinkedTokenIdArgs) => [deployer, salt] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.linkedTokenId function data
+ */
+export const encodeInterchainTokenFactoryLinkedTokenIdData = ({
+  deployer,
+  salt,
+}: InterchainTokenFactoryLinkedTokenIdArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "linkedTokenId",
+    abi: ABI_FILE.abi,
+    args: [deployer, salt],
   });
 
 export type InterchainTokenFactoryMulticallArgs = { data: any };
@@ -325,6 +535,71 @@ export const encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenData =
       functionName: "registerCanonicalInterchainToken",
       abi: ABI_FILE.abi,
       args: [tokenAddress],
+    });
+
+export type InterchainTokenFactoryRegisterCustomTokenArgs = {
+  salt: `0x${string}`;
+  tokenAddress: `0x${string}`;
+  tokenManagerType: number;
+  operator: `0x${string}`;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.registerCustomToken function args
+ */
+export const encodeInterchainTokenFactoryRegisterCustomTokenArgs = ({
+  salt,
+  tokenAddress,
+  tokenManagerType,
+  operator,
+}: InterchainTokenFactoryRegisterCustomTokenArgs) =>
+  [salt, tokenAddress, tokenManagerType, operator] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.registerCustomToken function data
+ */
+export const encodeInterchainTokenFactoryRegisterCustomTokenData = ({
+  salt,
+  tokenAddress,
+  tokenManagerType,
+  operator,
+}: InterchainTokenFactoryRegisterCustomTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "registerCustomToken",
+    abi: ABI_FILE.abi,
+    args: [salt, tokenAddress, tokenManagerType, operator],
+  });
+
+export type InterchainTokenFactoryRevokeDeployRemoteInterchainTokenArgs = {
+  deployer: `0x${string}`;
+  salt: `0x${string}`;
+  destinationChain: string;
+};
+
+/**
+ * Factory function for InterchainTokenFactory.revokeDeployRemoteInterchainToken function args
+ */
+export const encodeInterchainTokenFactoryRevokeDeployRemoteInterchainTokenArgs =
+  ({
+    deployer,
+    salt,
+    destinationChain,
+  }: InterchainTokenFactoryRevokeDeployRemoteInterchainTokenArgs) =>
+    [deployer, salt, destinationChain] as const;
+
+/**
+ * Encoder function for InterchainTokenFactory.revokeDeployRemoteInterchainToken function data
+ */
+export const encodeInterchainTokenFactoryRevokeDeployRemoteInterchainTokenData =
+  ({
+    deployer,
+    salt,
+    destinationChain,
+  }: InterchainTokenFactoryRevokeDeployRemoteInterchainTokenArgs): `0x${string}` =>
+    encodeFunctionData({
+      functionName: "revokeDeployRemoteInterchainToken",
+      abi: ABI_FILE.abi,
+      args: [deployer, salt, destinationChain],
     });
 
 export type InterchainTokenFactorySetupArgs = { data: `0x${string}` };
@@ -402,17 +677,25 @@ export const encodeInterchainTokenFactoryUpgradeData = ({
   });
 
 export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
+  approveDeployRemoteInterchainToken: {
+    args: encodeInterchainTokenFactoryApproveDeployRemoteInterchainTokenArgs,
+    data: encodeInterchainTokenFactoryApproveDeployRemoteInterchainTokenData,
+  },
+  canonicalInterchainTokenDeploySalt: {
+    args: encodeInterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs,
+    data: encodeInterchainTokenFactoryCanonicalInterchainTokenDeploySaltData,
+  },
   canonicalInterchainTokenId: {
     args: encodeInterchainTokenFactoryCanonicalInterchainTokenIdArgs,
     data: encodeInterchainTokenFactoryCanonicalInterchainTokenIdData,
   },
-  canonicalInterchainTokenSalt: {
-    args: encodeInterchainTokenFactoryCanonicalInterchainTokenSaltArgs,
-    data: encodeInterchainTokenFactoryCanonicalInterchainTokenSaltData,
-  },
   deployInterchainToken: {
     args: encodeInterchainTokenFactoryDeployInterchainTokenArgs,
     data: encodeInterchainTokenFactoryDeployInterchainTokenData,
+  },
+  deployRemoteCanonicalInterchainToken2: {
+    args: encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainToken2Args,
+    data: encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainToken2Data,
   },
   deployRemoteCanonicalInterchainToken: {
     args: encodeInterchainTokenFactoryDeployRemoteCanonicalInterchainTokenArgs,
@@ -422,17 +705,33 @@ export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
     args: encodeInterchainTokenFactoryDeployRemoteInterchainTokenArgs,
     data: encodeInterchainTokenFactoryDeployRemoteInterchainTokenData,
   },
-  interchainTokenAddress: {
-    args: encodeInterchainTokenFactoryInterchainTokenAddressArgs,
-    data: encodeInterchainTokenFactoryInterchainTokenAddressData,
+  deployRemoteInterchainToken2: {
+    args: encodeInterchainTokenFactoryDeployRemoteInterchainToken2Args,
+    data: encodeInterchainTokenFactoryDeployRemoteInterchainToken2Data,
+  },
+  deployRemoteInterchainTokenWithMinter: {
+    args: encodeInterchainTokenFactoryDeployRemoteInterchainTokenWithMinterArgs,
+    data: encodeInterchainTokenFactoryDeployRemoteInterchainTokenWithMinterData,
+  },
+  interchainTokenDeploySalt: {
+    args: encodeInterchainTokenFactoryInterchainTokenDeploySaltArgs,
+    data: encodeInterchainTokenFactoryInterchainTokenDeploySaltData,
   },
   interchainTokenId: {
     args: encodeInterchainTokenFactoryInterchainTokenIdArgs,
     data: encodeInterchainTokenFactoryInterchainTokenIdData,
   },
-  interchainTokenSalt: {
-    args: encodeInterchainTokenFactoryInterchainTokenSaltArgs,
-    data: encodeInterchainTokenFactoryInterchainTokenSaltData,
+  linkToken: {
+    args: encodeInterchainTokenFactoryLinkTokenArgs,
+    data: encodeInterchainTokenFactoryLinkTokenData,
+  },
+  linkedTokenDeploySalt: {
+    args: encodeInterchainTokenFactoryLinkedTokenDeploySaltArgs,
+    data: encodeInterchainTokenFactoryLinkedTokenDeploySaltData,
+  },
+  linkedTokenId: {
+    args: encodeInterchainTokenFactoryLinkedTokenIdArgs,
+    data: encodeInterchainTokenFactoryLinkedTokenIdData,
   },
   multicall: {
     args: encodeInterchainTokenFactoryMulticallArgs,
@@ -445,6 +744,14 @@ export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
   registerCanonicalInterchainToken: {
     args: encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenArgs,
     data: encodeInterchainTokenFactoryRegisterCanonicalInterchainTokenData,
+  },
+  registerCustomToken: {
+    args: encodeInterchainTokenFactoryRegisterCustomTokenArgs,
+    data: encodeInterchainTokenFactoryRegisterCustomTokenData,
+  },
+  revokeDeployRemoteInterchainToken: {
+    args: encodeInterchainTokenFactoryRevokeDeployRemoteInterchainTokenArgs,
+    data: encodeInterchainTokenFactoryRevokeDeployRemoteInterchainTokenData,
   },
   setup: {
     args: encodeInterchainTokenFactorySetupArgs,
@@ -461,11 +768,22 @@ export const INTERCHAIN_TOKEN_FACTORY_ENCODERS = {
 };
 
 export function createInterchainTokenFactoryReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
+    canonicalInterchainTokenDeploySalt(
+      canonicalInterchainTokenDeploySaltArgs: InterchainTokenFactoryCanonicalInterchainTokenDeploySaltArgs,
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenDeploySalt"];
+      const encodedArgs = encoder.args(canonicalInterchainTokenDeploySaltArgs);
+
+      return publicClient.read("canonicalInterchainTokenDeploySalt", {
+        args: encodedArgs,
+      });
+    },
     canonicalInterchainTokenId(
-      canonicalInterchainTokenIdArgs: InterchainTokenFactoryCanonicalInterchainTokenIdArgs
+      canonicalInterchainTokenIdArgs: InterchainTokenFactoryCanonicalInterchainTokenIdArgs,
     ) {
       const encoder =
         INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenId"];
@@ -475,56 +793,51 @@ export function createInterchainTokenFactoryReadClient(
         args: encodedArgs,
       });
     },
-    canonicalInterchainTokenSalt(
-      canonicalInterchainTokenSaltArgs: InterchainTokenFactoryCanonicalInterchainTokenSaltArgs
-    ) {
-      const encoder =
-        INTERCHAIN_TOKEN_FACTORY_ENCODERS["canonicalInterchainTokenSalt"];
-      const encodedArgs = encoder.args(canonicalInterchainTokenSaltArgs);
-
-      return publicClient.read("canonicalInterchainTokenSalt", {
-        args: encodedArgs,
-      });
-    },
     chainNameHash() {
       return publicClient.read("chainNameHash");
     },
     contractId() {
       return publicClient.read("contractId");
     },
-    gateway() {
-      return publicClient.read("gateway");
-    },
     implementation() {
       return publicClient.read("implementation");
     },
-    interchainTokenAddress(
-      interchainTokenAddressArgs: InterchainTokenFactoryInterchainTokenAddressArgs
+    interchainTokenDeploySalt(
+      interchainTokenDeploySaltArgs: InterchainTokenFactoryInterchainTokenDeploySaltArgs,
     ) {
       const encoder =
-        INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenAddress"];
-      const encodedArgs = encoder.args(interchainTokenAddressArgs);
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenDeploySalt"];
+      const encodedArgs = encoder.args(interchainTokenDeploySaltArgs);
 
-      return publicClient.read("interchainTokenAddress", { args: encodedArgs });
+      return publicClient.read("interchainTokenDeploySalt", {
+        args: encodedArgs,
+      });
     },
     interchainTokenId(
-      interchainTokenIdArgs: InterchainTokenFactoryInterchainTokenIdArgs
+      interchainTokenIdArgs: InterchainTokenFactoryInterchainTokenIdArgs,
     ) {
       const encoder = INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenId"];
       const encodedArgs = encoder.args(interchainTokenIdArgs);
 
       return publicClient.read("interchainTokenId", { args: encodedArgs });
     },
-    interchainTokenSalt(
-      interchainTokenSaltArgs: InterchainTokenFactoryInterchainTokenSaltArgs
-    ) {
-      const encoder = INTERCHAIN_TOKEN_FACTORY_ENCODERS["interchainTokenSalt"];
-      const encodedArgs = encoder.args(interchainTokenSaltArgs);
-
-      return publicClient.read("interchainTokenSalt", { args: encodedArgs });
-    },
     interchainTokenService() {
       return publicClient.read("interchainTokenService");
+    },
+    linkedTokenDeploySalt(
+      linkedTokenDeploySaltArgs: InterchainTokenFactoryLinkedTokenDeploySaltArgs,
+    ) {
+      const encoder =
+        INTERCHAIN_TOKEN_FACTORY_ENCODERS["linkedTokenDeploySalt"];
+      const encodedArgs = encoder.args(linkedTokenDeploySaltArgs);
+
+      return publicClient.read("linkedTokenDeploySalt", { args: encodedArgs });
+    },
+    linkedTokenId(linkedTokenIdArgs: InterchainTokenFactoryLinkedTokenIdArgs) {
+      const encoder = INTERCHAIN_TOKEN_FACTORY_ENCODERS["linkedTokenId"];
+      const encodedArgs = encoder.args(linkedTokenIdArgs);
+
+      return publicClient.read("linkedTokenId", { args: encodedArgs });
     },
     owner() {
       return publicClient.read("owner");

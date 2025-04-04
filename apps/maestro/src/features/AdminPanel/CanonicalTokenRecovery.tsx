@@ -152,7 +152,7 @@ export const CanonicalTokenRecovery = () => {
           .map(([key, value]) => (
             <li key={key}>
               <span className="mr-1 font-semibold opacity-85">{key} </span>
-              <span>{value}</span>
+              <span>{value as React.ReactNode}</span>
             </li>
           ))}
       </ul>

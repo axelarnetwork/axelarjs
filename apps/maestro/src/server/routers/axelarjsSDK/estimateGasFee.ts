@@ -6,7 +6,7 @@ import { publicProcedure } from "~/server/trpc";
 const INPUT_SCHEMA = z.object({
   destinationChainId: z.string(),
   sourceChainId: z.string(),
-  sourceChainTokenSymbol: z.string(),
+  sourceChainTokenSymbol: z.string().optional(),
   gasLimit: z.number(),
   gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
   isGMPExpressTransaction: z.boolean().optional(),

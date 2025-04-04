@@ -5,11 +5,12 @@ import { useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { parseUnits, TransactionExecutionError } from "viem";
-import { useChainId } from "wagmi";
 
+import useMintTokens from "~/features/suiHooks/useMintTokens";
+import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
@@ -28,36 +29,50 @@ export const MintInterchainToken: FC = () => {
   const chainId = useChainId();
 
   const [
-    { txState, accountAddress, erc20Details, isMinting, tokenAddress },
+    { txState, accountAddress, erc20Details, isMinting, tokenAddress, tokenId },
     { setTxState, mintTokenAsync },
   ] = useMintInterchainTokenState();
 
+  const mintTokens = useMintTokens();
+
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
+    invariant(accountAddress, "Account address is required");
+
+    setTxState({
+      status: "awaiting_approval",
+    });
 
     const adjustedAmount = parseUnits(
       data.amountToMint,
       erc20Details?.decimals || 18
     );
 
-    setTxState({
-      status: "awaiting_approval",
-    });
-
-    invariant(accountAddress, "Account address is required");
-
     try {
-      const txHash = await mintTokenAsync({
-        address: tokenAddress,
-        args: [accountAddress, adjustedAmount],
-      });
-
-      if (txHash) {
-        setTxState({
-          status: "submitted",
-          hash: txHash,
-          chainId,
+      if (chainId === SUI_CHAIN_ID) {
+        const result = await mintTokens({
+          amount: BigInt(adjustedAmount),
+          coinType: tokenAddress,
+          tokenId: tokenId,
         });
+        if (result.digest) {
+          setTxState({
+            status: "confirmed",
+          });
+          toast.success("Successfully minted interchain tokens");
+        }
+      } else {
+        const txHash = await mintTokenAsync({
+          address: tokenAddress,
+          args: [accountAddress, adjustedAmount],
+        });
+        if (txHash) {
+          setTxState({
+            status: "submitted",
+            hash: txHash,
+            chainId,
+          });
+        }
       }
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
@@ -95,7 +110,7 @@ export const MintInterchainToken: FC = () => {
     <>
       <Dialog.Title className="flex">
         <span>Mint interchain tokens on</span>
-        <EVMChainsDropdown disabled compact />
+        <ChainsDropdown disabled compact />
       </Dialog.Title>
       <form
         className="flex flex-1 flex-col justify-between gap-4"

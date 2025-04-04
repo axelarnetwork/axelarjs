@@ -21,6 +21,7 @@ const chainIdToGFormChainId = {
   kava: "Kava",
   filecoin: "Filecoin",
   mantle: "Mantle",
+  flow: "Flow",
 } as any;
 
 export function getPrefilledClaimOwnershipFormLink(

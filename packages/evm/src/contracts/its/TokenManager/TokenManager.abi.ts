@@ -37,6 +37,27 @@ export default {
       inputs: [
         {
           internalType: "uint256",
+          name: "flowAmount",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "flowToAdd",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "tokenManager",
+          type: "address",
+        },
+      ],
+      name: "FlowAdditionOverflow",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
           name: "limit",
           type: "uint256",
         },
@@ -52,6 +73,27 @@ export default {
         },
       ],
       name: "FlowLimitExceeded",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "flowLimit",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "flowToCompare",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "tokenManager",
+          type: "address",
+        },
+      ],
+      name: "FlowLimitOverflow",
       type: "error",
     },
     {
@@ -137,6 +179,11 @@ export default {
         },
       ],
       name: "MissingRole",
+      type: "error",
+    },
+    {
+      inputs: [],
+      name: "MulticallFailed",
       type: "error",
     },
     {
@@ -570,6 +617,25 @@ export default {
     {
       inputs: [
         {
+          internalType: "bytes[]",
+          name: "data",
+          type: "bytes[]",
+        },
+      ],
+      name: "multicall",
+      outputs: [
+        {
+          internalType: "bytes[]",
+          name: "results",
+          type: "bytes[]",
+        },
+      ],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "bytes",
           name: "operator_",
           type: "bytes",
@@ -654,6 +720,24 @@ export default {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "from",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "to",
+          type: "address",
+        },
+      ],
+      name: "transferFlowLimiter",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {

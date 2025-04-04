@@ -6,25 +6,22 @@ import { GridLoader } from "react-spinners";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import { useAccount, useSwitchChain } from "wagmi";
-
-import { ALL_CHAINS } from "~/config/evm-chains";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useChainFromRoute } from "~/lib/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import EVMChainsDropdown, {
-  ChainIcon,
-} from "~/ui/components/EVMChainsDropdown";
+import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import ChainsDropdown, { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
-import ConnectWalletButton from "../compounds/ConnectWalletButton/ConnectWalletButton";
+import ConnectWalletModal from "../compounds/ConnectWalletModal/ConnectWalletModal";
 
 type PageState =
   | "loading"
   | "connected"
   | "disconnected"
   | "network-mismatch"
-  | "unsupported-network";
+  | "unsupported-network"
+  | "wrong-sui-network";
 
 interface Props extends ComponentProps<typeof Clamp> {
   pageTitle?: string;
@@ -48,20 +45,20 @@ const Page: FC<Props> = ({
   style,
   ...props
 }) => {
-  const { isConnected } = useAccount();
+  const { isConnected, isWrongSuiNetwork } = useAccount();
   const { chain } = useAccount();
   const chainFromRoute = useChainFromRoute();
   const { switchChain } = useSwitchChain();
-  const { data: evmChains } = useEVMChainConfigsQuery();
+  const { allChains } = useAllChainConfigsQuery();
 
-  const evmChain = useMemo(
-    () => evmChains?.find?.((x) => x.chain_id === chain?.id),
-    [chain, evmChains]
+  const currentChain = useMemo(
+    () => allChains.find((x) => x.chain_id === chain?.id),
+    [chain, allChains]
   );
 
-  const evmChainFromRoute = useMemo(
-    () => evmChains?.find?.((x) => x.chain_id === chainFromRoute?.id),
-    [chainFromRoute, evmChains]
+  const currentChainFromRoute = useMemo(
+    () => allChains.find((x) => x.chain_id === chainFromRoute?.id),
+    [chainFromRoute, allChains]
   );
 
   const pageState = useMemo<PageState>(() => {
@@ -73,15 +70,24 @@ const Page: FC<Props> = ({
       return "disconnected";
     }
 
-    if (chain && evmChains.length && !evmChain) {
-      return "unsupported-network";
+    if (isWrongSuiNetwork) {
+      return "wrong-sui-network";
     }
 
-    if (!evmChain) {
-      return "loading";
-    }
+    // TODO: uncomment this when we have a way to handle multiple chains
 
-    if (chainFromRoute && evmChain?.chain_id !== chainFromRoute.id) {
+    // if (chain && allChains?.length && !currentChain) {
+    //   return "unsupported-network";
+    // }
+
+    // if (!currentChain) {
+    //   return "loading";
+    // }
+
+    if (
+      chainFromRoute &&
+      currentChain?.chain_id !== currentChainFromRoute?.chain_id
+    ) {
       return "network-mismatch";
     }
 
@@ -89,10 +95,10 @@ const Page: FC<Props> = ({
   }, [
     mustBeConnected,
     isConnected,
-    chain,
-    evmChains.length,
-    evmChain,
     chainFromRoute,
+    currentChainFromRoute,
+    currentChain,
+    isWrongSuiNetwork,
   ]);
 
   const router = useRouter();
@@ -127,7 +133,7 @@ const Page: FC<Props> = ({
             <div className="grid w-full max-w-lg place-items-center rounded-2xl bg-base-100 p-4">
               <SearchInterchainToken onTokenFound={handleTokenFound} />
               <div className="divider w-full max-w-lg">OR</div>
-              <ConnectWalletButton className="w-full max-w-md" $size="md" />
+              <ConnectWalletModal className="w-full max-w-md" />
             </div>
             <section className="my-10 space-y-4">
               <div className="text-center text-xl font-semibold">
@@ -140,7 +146,7 @@ const Page: FC<Props> = ({
           children
         );
       case "unsupported-network": {
-        const selectedChain = ALL_CHAINS.find((t) => t.id === chain?.id);
+        const selectedChain = CHAIN_CONFIGS.find((t) => t.id === chain?.id);
         return (
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">
@@ -167,7 +173,7 @@ const Page: FC<Props> = ({
                   </div>
                 )}
               </div>
-              <EVMChainsDropdown
+              <ChainsDropdown
                 renderTrigger={() => (
                   <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}
@@ -181,31 +187,47 @@ const Page: FC<Props> = ({
         );
       }
       case "network-mismatch":
-        return !evmChain ? null : (
+        return !currentChain ? null : (
           <div className="grid w-full flex-1 place-items-center">
             <div className="grid w-full place-items-center gap-4">
               <div className="flex items-center gap-1 text-xl font-semibold">
-                {`You're currently connected to ${evmChain.name} `}
+                {`You're currently connected to ${currentChain.name} `}
                 <ChainIcon
                   size="md"
-                  src={String(evmChain.image)}
-                  alt={evmChain.name}
+                  src={String(currentChain.image)}
+                  alt={currentChain.name}
                 />
               </div>
-              {evmChainFromRoute && (
+              {currentChainFromRoute && (
                 <Button
                   $variant="primary"
                   $length="block"
                   className="max-w-md"
                   onClick={() =>
                     switchChain?.({
-                      chainId: evmChainFromRoute.chain_id,
+                      chainId: currentChainFromRoute.chain_id,
                     })
                   }
                 >
-                  Switch to {evmChainFromRoute.name}
+                  Switch to {currentChainFromRoute.name}
                 </Button>
               )}
+            </div>
+          </div>
+        );
+      case "wrong-sui-network":
+        return (
+          <div className="grid w-full flex-1 place-items-center">
+            <div className="grid w-full place-items-center gap-4">
+              <div className="flex items-center gap-1 text-center text-xl font-semibold">
+                {`You're currently connected to the wrong Sui network.`}
+                <br />
+                {`Please switch to ${
+                  process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+                    ? "mainnet"
+                    : "testnet"
+                } inside your wallet and refresh the page.`}
+              </div>
             </div>
           </div>
         );
@@ -218,8 +240,8 @@ const Page: FC<Props> = ({
     mustBeConnected,
     handleTokenFound,
     children,
-    evmChain,
-    evmChainFromRoute,
+    currentChain,
+    currentChainFromRoute,
     chain?.id,
     switchChain,
   ]);
@@ -240,7 +262,7 @@ const Page: FC<Props> = ({
           // id needed for the hero cta smooth scroll
           id="main-content"
           className={cn(
-            "mt-20 grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
+            "mt-20 max-w-6xl grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
             {
               "place-items-center": isExceptionalState,
             },

@@ -5,34 +5,69 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { ExtendedWagmiChainConfig } from "~/config/evm-chains";
-import { hex40Literal } from "~/lib/utils/validation";
+import { ExtendedWagmiChainConfig } from "~/config/chains";
+import { isValidSuiTokenAddress } from "~/lib/utils/validation";
+import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import { normalizeSuiTokenAddress } from "../sui/utils/utils";
 
 //TODO: migrate to kv store?
-const overrides: Record<`0x${string}`, Record<string, string>> = {
+const overrides: Record<string, Record<string, string>> = {
   "0x4200000000000000000000000000000000000042": {
     symbol: "axlOP",
   },
 };
 
+async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
+  const metadata = await queryCoinMetadata(tokenAddress);
+
+  if (!metadata) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Token metadata not found for ${tokenAddress} on chain ${chainId}`,
+    });
+  }
+
+  return {
+    name: metadata.name,
+    decimals: metadata.decimals,
+    symbol: metadata.symbol,
+    owner: undefined,
+    pendingOwner: null,
+    chainId: chainId,
+    chainName: "Sui",
+    axelarChainId: "sui",
+    axelarChainName: "sui",
+  };
+}
+
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
-      tokenAddress: hex40Literal(),
+      tokenAddress: z.string(),
     })
   )
   .query(async ({ input, ctx }) => {
+    // Enter here if the token is a Sui token
+    if (isValidSuiTokenAddress(input.tokenAddress)) {
+      const normalizedTokenAddress = normalizeSuiTokenAddress(
+        input.tokenAddress
+      );
+      return await getSuiTokenDetails(
+        normalizedTokenAddress,
+        input.chainId as number
+      );
+    }
+
     try {
       const { wagmiChainConfigs: chainConfigs } = ctx.configs;
-
       const chainConfig = chainConfigs.find(
         (chain) => chain.id === input.chainId
       );
 
       if (!chainConfig) {
-        const promises = chainConfigs.map((config) => {
+        const promises = chainConfigs.map(async (config) => {
           const client = ctx.contracts.createERC20Client(
             config,
             input.tokenAddress
@@ -97,7 +132,7 @@ export const getERC20TokenDetails = publicProcedure
 async function getTokenPublicDetails(
   client: IERC20BurnableMintableClient,
   chainConfig: ExtendedWagmiChainConfig,
-  tokenAddress: `0x${string}`
+  tokenAddress: string
 ) {
   invariant(client.chain, "client.chain must be defined");
 

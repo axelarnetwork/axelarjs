@@ -4,10 +4,9 @@ import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
-import { useAccount } from "wagmi";
-
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { type InterchainToken } from "~/lib/drizzle/schema";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import Pagination from "~/ui/components/Pagination";

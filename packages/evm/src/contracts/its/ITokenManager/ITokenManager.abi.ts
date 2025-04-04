@@ -26,6 +26,27 @@ export default {
       inputs: [
         {
           internalType: "uint256",
+          name: "flowAmount",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "flowToAdd",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "tokenManager",
+          type: "address",
+        },
+      ],
+      name: "FlowAdditionOverflow",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
           name: "limit",
           type: "uint256",
         },
@@ -41,6 +62,27 @@ export default {
         },
       ],
       name: "FlowLimitExceeded",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "flowLimit",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "flowToCompare",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "tokenManager",
+          type: "address",
+        },
+      ],
+      name: "FlowLimitOverflow",
       type: "error",
     },
     {

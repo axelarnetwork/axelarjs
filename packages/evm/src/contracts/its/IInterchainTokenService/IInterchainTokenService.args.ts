@@ -36,61 +36,6 @@ export const encodeIInterchainTokenServiceAcceptOperatorshipData = ({
     args: [fromOperator],
   });
 
-export type IInterchainTokenServiceCallContractWithInterchainTokenArgs = {
-  tokenId: `0x${string}`;
-  destinationChain: string;
-  destinationAddress: `0x${string}`;
-  amount: bigint;
-  data: `0x${string}`;
-  gasValue: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenService.callContractWithInterchainToken function args
- */
-export const encodeIInterchainTokenServiceCallContractWithInterchainTokenArgs =
-  ({
-    tokenId,
-    destinationChain,
-    destinationAddress,
-    amount,
-    data,
-    gasValue,
-  }: IInterchainTokenServiceCallContractWithInterchainTokenArgs) =>
-    [
-      tokenId,
-      destinationChain,
-      destinationAddress,
-      amount,
-      data,
-      gasValue,
-    ] as const;
-
-/**
- * Encoder function for IInterchainTokenService.callContractWithInterchainToken function data
- */
-export const encodeIInterchainTokenServiceCallContractWithInterchainTokenData =
-  ({
-    tokenId,
-    destinationChain,
-    destinationAddress,
-    amount,
-    data,
-    gasValue,
-  }: IInterchainTokenServiceCallContractWithInterchainTokenArgs): `0x${string}` =>
-    encodeFunctionData({
-      functionName: "callContractWithInterchainToken",
-      abi: ABI_FILE.abi,
-      args: [
-        tokenId,
-        destinationChain,
-        destinationAddress,
-        amount,
-        data,
-        gasValue,
-      ],
-    });
-
 export type IInterchainTokenServiceContractCallValueArgs = {
   sourceChain: string;
   sourceAddress: string;
@@ -119,42 +64,6 @@ export const encodeIInterchainTokenServiceContractCallValueData = ({
     functionName: "contractCallValue",
     abi: ABI_FILE.abi,
     args: [sourceChain, sourceAddress, payload],
-  });
-
-export type IInterchainTokenServiceContractCallWithTokenValueArgs = {
-  sourceChain: string;
-  sourceAddress: string;
-  payload: `0x${string}`;
-  symbol: string;
-  amount: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenService.contractCallWithTokenValue function args
- */
-export const encodeIInterchainTokenServiceContractCallWithTokenValueArgs = ({
-  sourceChain,
-  sourceAddress,
-  payload,
-  symbol,
-  amount,
-}: IInterchainTokenServiceContractCallWithTokenValueArgs) =>
-  [sourceChain, sourceAddress, payload, symbol, amount] as const;
-
-/**
- * Encoder function for IInterchainTokenService.contractCallWithTokenValue function data
- */
-export const encodeIInterchainTokenServiceContractCallWithTokenValueData = ({
-  sourceChain,
-  sourceAddress,
-  payload,
-  symbol,
-  amount,
-}: IInterchainTokenServiceContractCallWithTokenValueArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "contractCallWithTokenValue",
-    abi: ABI_FILE.abi,
-    args: [sourceChain, sourceAddress, payload, symbol, amount],
   });
 
 export type IInterchainTokenServiceDeployInterchainTokenArgs = {
@@ -199,40 +108,27 @@ export const encodeIInterchainTokenServiceDeployInterchainTokenData = ({
     args: [salt, destinationChain, name, symbol, decimals, minter, gasValue],
   });
 
-export type IInterchainTokenServiceDeployTokenManagerArgs = {
-  salt: `0x${string}`;
-  destinationChain: string;
-  tokenManagerType: number;
-  params: `0x${string}`;
-  gasValue: bigint;
+export type IInterchainTokenServiceDeployedTokenManagerArgs = {
+  tokenId: `0x${string}`;
 };
 
 /**
- * Factory function for IInterchainTokenService.deployTokenManager function args
+ * Factory function for IInterchainTokenService.deployedTokenManager function args
  */
-export const encodeIInterchainTokenServiceDeployTokenManagerArgs = ({
-  salt,
-  destinationChain,
-  tokenManagerType,
-  params,
-  gasValue,
-}: IInterchainTokenServiceDeployTokenManagerArgs) =>
-  [salt, destinationChain, tokenManagerType, params, gasValue] as const;
+export const encodeIInterchainTokenServiceDeployedTokenManagerArgs = ({
+  tokenId,
+}: IInterchainTokenServiceDeployedTokenManagerArgs) => [tokenId] as const;
 
 /**
- * Encoder function for IInterchainTokenService.deployTokenManager function data
+ * Encoder function for IInterchainTokenService.deployedTokenManager function data
  */
-export const encodeIInterchainTokenServiceDeployTokenManagerData = ({
-  salt,
-  destinationChain,
-  tokenManagerType,
-  params,
-  gasValue,
-}: IInterchainTokenServiceDeployTokenManagerArgs): `0x${string}` =>
+export const encodeIInterchainTokenServiceDeployedTokenManagerData = ({
+  tokenId,
+}: IInterchainTokenServiceDeployedTokenManagerArgs): `0x${string}` =>
   encodeFunctionData({
-    functionName: "deployTokenManager",
+    functionName: "deployedTokenManager",
     abi: ABI_FILE.abi,
-    args: [salt, destinationChain, tokenManagerType, params, gasValue],
+    args: [tokenId],
   });
 
 export type IInterchainTokenServiceExecuteArgs = {
@@ -268,52 +164,6 @@ export const encodeIInterchainTokenServiceExecuteData = ({
     args: [commandId, sourceChain, sourceAddress, payload],
   });
 
-export type IInterchainTokenServiceExecuteWithTokenArgs = {
-  commandId: `0x${string}`;
-  sourceChain: string;
-  sourceAddress: string;
-  payload: `0x${string}`;
-  tokenSymbol: string;
-  amount: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenService.executeWithToken function args
- */
-export const encodeIInterchainTokenServiceExecuteWithTokenArgs = ({
-  commandId,
-  sourceChain,
-  sourceAddress,
-  payload,
-  tokenSymbol,
-  amount,
-}: IInterchainTokenServiceExecuteWithTokenArgs) =>
-  [
-    commandId,
-    sourceChain,
-    sourceAddress,
-    payload,
-    tokenSymbol,
-    amount,
-  ] as const;
-
-/**
- * Encoder function for IInterchainTokenService.executeWithToken function data
- */
-export const encodeIInterchainTokenServiceExecuteWithTokenData = ({
-  commandId,
-  sourceChain,
-  sourceAddress,
-  payload,
-  tokenSymbol,
-  amount,
-}: IInterchainTokenServiceExecuteWithTokenArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "executeWithToken",
-    abi: ABI_FILE.abi,
-    args: [commandId, sourceChain, sourceAddress, payload, tokenSymbol, amount],
-  });
-
 export type IInterchainTokenServiceExpressExecuteArgs = {
   commandId: `0x${string}`;
   sourceChain: string;
@@ -347,112 +197,6 @@ export const encodeIInterchainTokenServiceExpressExecuteData = ({
     args: [commandId, sourceChain, sourceAddress, payload],
   });
 
-export type IInterchainTokenServiceExpressExecuteWithTokenArgs = {
-  commandId: `0x${string}`;
-  sourceChain: string;
-  sourceAddress: string;
-  payload: `0x${string}`;
-  symbol: string;
-  amount: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenService.expressExecuteWithToken function args
- */
-export const encodeIInterchainTokenServiceExpressExecuteWithTokenArgs = ({
-  commandId,
-  sourceChain,
-  sourceAddress,
-  payload,
-  symbol,
-  amount,
-}: IInterchainTokenServiceExpressExecuteWithTokenArgs) =>
-  [commandId, sourceChain, sourceAddress, payload, symbol, amount] as const;
-
-/**
- * Encoder function for IInterchainTokenService.expressExecuteWithToken function data
- */
-export const encodeIInterchainTokenServiceExpressExecuteWithTokenData = ({
-  commandId,
-  sourceChain,
-  sourceAddress,
-  payload,
-  symbol,
-  amount,
-}: IInterchainTokenServiceExpressExecuteWithTokenArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "expressExecuteWithToken",
-    abi: ABI_FILE.abi,
-    args: [commandId, sourceChain, sourceAddress, payload, symbol, amount],
-  });
-
-export type IInterchainTokenServiceFlowInAmountArgs = {
-  tokenId: `0x${string}`;
-};
-
-/**
- * Factory function for IInterchainTokenService.flowInAmount function args
- */
-export const encodeIInterchainTokenServiceFlowInAmountArgs = ({
-  tokenId,
-}: IInterchainTokenServiceFlowInAmountArgs) => [tokenId] as const;
-
-/**
- * Encoder function for IInterchainTokenService.flowInAmount function data
- */
-export const encodeIInterchainTokenServiceFlowInAmountData = ({
-  tokenId,
-}: IInterchainTokenServiceFlowInAmountArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "flowInAmount",
-    abi: ABI_FILE.abi,
-    args: [tokenId],
-  });
-
-export type IInterchainTokenServiceFlowLimitArgs = { tokenId: `0x${string}` };
-
-/**
- * Factory function for IInterchainTokenService.flowLimit function args
- */
-export const encodeIInterchainTokenServiceFlowLimitArgs = ({
-  tokenId,
-}: IInterchainTokenServiceFlowLimitArgs) => [tokenId] as const;
-
-/**
- * Encoder function for IInterchainTokenService.flowLimit function data
- */
-export const encodeIInterchainTokenServiceFlowLimitData = ({
-  tokenId,
-}: IInterchainTokenServiceFlowLimitArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "flowLimit",
-    abi: ABI_FILE.abi,
-    args: [tokenId],
-  });
-
-export type IInterchainTokenServiceFlowOutAmountArgs = {
-  tokenId: `0x${string}`;
-};
-
-/**
- * Factory function for IInterchainTokenService.flowOutAmount function args
- */
-export const encodeIInterchainTokenServiceFlowOutAmountArgs = ({
-  tokenId,
-}: IInterchainTokenServiceFlowOutAmountArgs) => [tokenId] as const;
-
-/**
- * Encoder function for IInterchainTokenService.flowOutAmount function data
- */
-export const encodeIInterchainTokenServiceFlowOutAmountData = ({
-  tokenId,
-}: IInterchainTokenServiceFlowOutAmountArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "flowOutAmount",
-    abi: ABI_FILE.abi,
-    args: [tokenId],
-  });
-
 export type IInterchainTokenServiceGetExpressExecutorArgs = {
   commandId: `0x${string}`;
   sourceChain: string;
@@ -484,45 +228,6 @@ export const encodeIInterchainTokenServiceGetExpressExecutorData = ({
     functionName: "getExpressExecutor",
     abi: ABI_FILE.abi,
     args: [commandId, sourceChain, sourceAddress, payloadHash],
-  });
-
-export type IInterchainTokenServiceGetExpressExecutorWithTokenArgs = {
-  commandId: `0x${string}`;
-  sourceChain: string;
-  sourceAddress: string;
-  payloadHash: `0x${string}`;
-  symbol: string;
-  amount: bigint;
-};
-
-/**
- * Factory function for IInterchainTokenService.getExpressExecutorWithToken function args
- */
-export const encodeIInterchainTokenServiceGetExpressExecutorWithTokenArgs = ({
-  commandId,
-  sourceChain,
-  sourceAddress,
-  payloadHash,
-  symbol,
-  amount,
-}: IInterchainTokenServiceGetExpressExecutorWithTokenArgs) =>
-  [commandId, sourceChain, sourceAddress, payloadHash, symbol, amount] as const;
-
-/**
- * Encoder function for IInterchainTokenService.getExpressExecutorWithToken function data
- */
-export const encodeIInterchainTokenServiceGetExpressExecutorWithTokenData = ({
-  commandId,
-  sourceChain,
-  sourceAddress,
-  payloadHash,
-  symbol,
-  amount,
-}: IInterchainTokenServiceGetExpressExecutorWithTokenArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "getExpressExecutorWithToken",
-    abi: ABI_FILE.abi,
-    args: [commandId, sourceChain, sourceAddress, payloadHash, symbol, amount],
   });
 
 export type IInterchainTokenServiceHasRoleArgs = {
@@ -700,6 +405,82 @@ export const encodeIInterchainTokenServiceIsTrustedAddressData = ({
     args: [chain, address_],
   });
 
+export type IInterchainTokenServiceLinkTokenArgs = {
+  salt: `0x${string}`;
+  destinationChain: string;
+  destinationTokenAddress: `0x${string}`;
+  tokenManagerType: number;
+  linkParams: `0x${string}`;
+  gasValue: bigint;
+};
+
+/**
+ * Factory function for IInterchainTokenService.linkToken function args
+ */
+export const encodeIInterchainTokenServiceLinkTokenArgs = ({
+  salt,
+  destinationChain,
+  destinationTokenAddress,
+  tokenManagerType,
+  linkParams,
+  gasValue,
+}: IInterchainTokenServiceLinkTokenArgs) =>
+  [
+    salt,
+    destinationChain,
+    destinationTokenAddress,
+    tokenManagerType,
+    linkParams,
+    gasValue,
+  ] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.linkToken function data
+ */
+export const encodeIInterchainTokenServiceLinkTokenData = ({
+  salt,
+  destinationChain,
+  destinationTokenAddress,
+  tokenManagerType,
+  linkParams,
+  gasValue,
+}: IInterchainTokenServiceLinkTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "linkToken",
+    abi: ABI_FILE.abi,
+    args: [
+      salt,
+      destinationChain,
+      destinationTokenAddress,
+      tokenManagerType,
+      linkParams,
+      gasValue,
+    ],
+  });
+
+export type IInterchainTokenServiceMigrateInterchainTokenArgs = {
+  tokenId: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.migrateInterchainToken function args
+ */
+export const encodeIInterchainTokenServiceMigrateInterchainTokenArgs = ({
+  tokenId,
+}: IInterchainTokenServiceMigrateInterchainTokenArgs) => [tokenId] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.migrateInterchainToken function data
+ */
+export const encodeIInterchainTokenServiceMigrateInterchainTokenData = ({
+  tokenId,
+}: IInterchainTokenServiceMigrateInterchainTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "migrateInterchainToken",
+    abi: ABI_FILE.abi,
+    args: [tokenId],
+  });
+
 export type IInterchainTokenServiceMulticallArgs = { data: any };
 
 /**
@@ -765,6 +546,89 @@ export const encodeIInterchainTokenServiceProposeOwnershipData = ({
     functionName: "proposeOwnership",
     abi: ABI_FILE.abi,
     args: [newOwner],
+  });
+
+export type IInterchainTokenServiceRegisterCustomTokenArgs = {
+  salt: `0x${string}`;
+  tokenAddress: `0x${string}`;
+  tokenManagerType: number;
+  linkParams: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.registerCustomToken function args
+ */
+export const encodeIInterchainTokenServiceRegisterCustomTokenArgs = ({
+  salt,
+  tokenAddress,
+  tokenManagerType,
+  linkParams,
+}: IInterchainTokenServiceRegisterCustomTokenArgs) =>
+  [salt, tokenAddress, tokenManagerType, linkParams] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.registerCustomToken function data
+ */
+export const encodeIInterchainTokenServiceRegisterCustomTokenData = ({
+  salt,
+  tokenAddress,
+  tokenManagerType,
+  linkParams,
+}: IInterchainTokenServiceRegisterCustomTokenArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "registerCustomToken",
+    abi: ABI_FILE.abi,
+    args: [salt, tokenAddress, tokenManagerType, linkParams],
+  });
+
+export type IInterchainTokenServiceRegisterTokenMetadataArgs = {
+  tokenAddress: `0x${string}`;
+  gasValue: bigint;
+};
+
+/**
+ * Factory function for IInterchainTokenService.registerTokenMetadata function args
+ */
+export const encodeIInterchainTokenServiceRegisterTokenMetadataArgs = ({
+  tokenAddress,
+  gasValue,
+}: IInterchainTokenServiceRegisterTokenMetadataArgs) =>
+  [tokenAddress, gasValue] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.registerTokenMetadata function data
+ */
+export const encodeIInterchainTokenServiceRegisterTokenMetadataData = ({
+  tokenAddress,
+  gasValue,
+}: IInterchainTokenServiceRegisterTokenMetadataArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "registerTokenMetadata",
+    abi: ABI_FILE.abi,
+    args: [tokenAddress, gasValue],
+  });
+
+export type IInterchainTokenServiceRegisteredTokenAddressArgs = {
+  tokenId: `0x${string}`;
+};
+
+/**
+ * Factory function for IInterchainTokenService.registeredTokenAddress function args
+ */
+export const encodeIInterchainTokenServiceRegisteredTokenAddressArgs = ({
+  tokenId,
+}: IInterchainTokenServiceRegisteredTokenAddressArgs) => [tokenId] as const;
+
+/**
+ * Encoder function for IInterchainTokenService.registeredTokenAddress function data
+ */
+export const encodeIInterchainTokenServiceRegisteredTokenAddressData = ({
+  tokenId,
+}: IInterchainTokenServiceRegisteredTokenAddressArgs): `0x${string}` =>
+  encodeFunctionData({
+    functionName: "registeredTokenAddress",
+    abi: ABI_FILE.abi,
+    args: [tokenId],
   });
 
 export type IInterchainTokenServiceRemoveTrustedAddressArgs = { chain: string };
@@ -1100,112 +964,34 @@ export const encodeIInterchainTokenServiceUpgradeData = ({
     args: [newImplementation, newImplementationCodeHash, params],
   });
 
-export type IInterchainTokenServiceValidTokenAddressArgs = {
-  tokenId: `0x${string}`;
-};
-
-/**
- * Factory function for IInterchainTokenService.validTokenAddress function args
- */
-export const encodeIInterchainTokenServiceValidTokenAddressArgs = ({
-  tokenId,
-}: IInterchainTokenServiceValidTokenAddressArgs) => [tokenId] as const;
-
-/**
- * Encoder function for IInterchainTokenService.validTokenAddress function data
- */
-export const encodeIInterchainTokenServiceValidTokenAddressData = ({
-  tokenId,
-}: IInterchainTokenServiceValidTokenAddressArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "validTokenAddress",
-    abi: ABI_FILE.abi,
-    args: [tokenId],
-  });
-
-export type IInterchainTokenServiceValidTokenManagerAddressArgs = {
-  tokenId: `0x${string}`;
-};
-
-/**
- * Factory function for IInterchainTokenService.validTokenManagerAddress function args
- */
-export const encodeIInterchainTokenServiceValidTokenManagerAddressArgs = ({
-  tokenId,
-}: IInterchainTokenServiceValidTokenManagerAddressArgs) => [tokenId] as const;
-
-/**
- * Encoder function for IInterchainTokenService.validTokenManagerAddress function data
- */
-export const encodeIInterchainTokenServiceValidTokenManagerAddressData = ({
-  tokenId,
-}: IInterchainTokenServiceValidTokenManagerAddressArgs): `0x${string}` =>
-  encodeFunctionData({
-    functionName: "validTokenManagerAddress",
-    abi: ABI_FILE.abi,
-    args: [tokenId],
-  });
-
 export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
   acceptOperatorship: {
     args: encodeIInterchainTokenServiceAcceptOperatorshipArgs,
     data: encodeIInterchainTokenServiceAcceptOperatorshipData,
   },
-  callContractWithInterchainToken: {
-    args: encodeIInterchainTokenServiceCallContractWithInterchainTokenArgs,
-    data: encodeIInterchainTokenServiceCallContractWithInterchainTokenData,
-  },
   contractCallValue: {
     args: encodeIInterchainTokenServiceContractCallValueArgs,
     data: encodeIInterchainTokenServiceContractCallValueData,
-  },
-  contractCallWithTokenValue: {
-    args: encodeIInterchainTokenServiceContractCallWithTokenValueArgs,
-    data: encodeIInterchainTokenServiceContractCallWithTokenValueData,
   },
   deployInterchainToken: {
     args: encodeIInterchainTokenServiceDeployInterchainTokenArgs,
     data: encodeIInterchainTokenServiceDeployInterchainTokenData,
   },
-  deployTokenManager: {
-    args: encodeIInterchainTokenServiceDeployTokenManagerArgs,
-    data: encodeIInterchainTokenServiceDeployTokenManagerData,
+  deployedTokenManager: {
+    args: encodeIInterchainTokenServiceDeployedTokenManagerArgs,
+    data: encodeIInterchainTokenServiceDeployedTokenManagerData,
   },
   execute: {
     args: encodeIInterchainTokenServiceExecuteArgs,
     data: encodeIInterchainTokenServiceExecuteData,
   },
-  executeWithToken: {
-    args: encodeIInterchainTokenServiceExecuteWithTokenArgs,
-    data: encodeIInterchainTokenServiceExecuteWithTokenData,
-  },
   expressExecute: {
     args: encodeIInterchainTokenServiceExpressExecuteArgs,
     data: encodeIInterchainTokenServiceExpressExecuteData,
   },
-  expressExecuteWithToken: {
-    args: encodeIInterchainTokenServiceExpressExecuteWithTokenArgs,
-    data: encodeIInterchainTokenServiceExpressExecuteWithTokenData,
-  },
-  flowInAmount: {
-    args: encodeIInterchainTokenServiceFlowInAmountArgs,
-    data: encodeIInterchainTokenServiceFlowInAmountData,
-  },
-  flowLimit: {
-    args: encodeIInterchainTokenServiceFlowLimitArgs,
-    data: encodeIInterchainTokenServiceFlowLimitData,
-  },
-  flowOutAmount: {
-    args: encodeIInterchainTokenServiceFlowOutAmountArgs,
-    data: encodeIInterchainTokenServiceFlowOutAmountData,
-  },
   getExpressExecutor: {
     args: encodeIInterchainTokenServiceGetExpressExecutorArgs,
     data: encodeIInterchainTokenServiceGetExpressExecutorData,
-  },
-  getExpressExecutorWithToken: {
-    args: encodeIInterchainTokenServiceGetExpressExecutorWithTokenArgs,
-    data: encodeIInterchainTokenServiceGetExpressExecutorWithTokenData,
   },
   hasRole: {
     args: encodeIInterchainTokenServiceHasRoleArgs,
@@ -1231,6 +1017,14 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     args: encodeIInterchainTokenServiceIsTrustedAddressArgs,
     data: encodeIInterchainTokenServiceIsTrustedAddressData,
   },
+  linkToken: {
+    args: encodeIInterchainTokenServiceLinkTokenArgs,
+    data: encodeIInterchainTokenServiceLinkTokenData,
+  },
+  migrateInterchainToken: {
+    args: encodeIInterchainTokenServiceMigrateInterchainTokenArgs,
+    data: encodeIInterchainTokenServiceMigrateInterchainTokenData,
+  },
   multicall: {
     args: encodeIInterchainTokenServiceMulticallArgs,
     data: encodeIInterchainTokenServiceMulticallData,
@@ -1242,6 +1036,18 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
   proposeOwnership: {
     args: encodeIInterchainTokenServiceProposeOwnershipArgs,
     data: encodeIInterchainTokenServiceProposeOwnershipData,
+  },
+  registerCustomToken: {
+    args: encodeIInterchainTokenServiceRegisterCustomTokenArgs,
+    data: encodeIInterchainTokenServiceRegisterCustomTokenData,
+  },
+  registerTokenMetadata: {
+    args: encodeIInterchainTokenServiceRegisterTokenMetadataArgs,
+    data: encodeIInterchainTokenServiceRegisterTokenMetadataData,
+  },
+  registeredTokenAddress: {
+    args: encodeIInterchainTokenServiceRegisteredTokenAddressArgs,
+    data: encodeIInterchainTokenServiceRegisteredTokenAddressData,
   },
   removeTrustedAddress: {
     args: encodeIInterchainTokenServiceRemoveTrustedAddressArgs,
@@ -1295,18 +1101,10 @@ export const IINTERCHAIN_TOKEN_SERVICE_ENCODERS = {
     args: encodeIInterchainTokenServiceUpgradeArgs,
     data: encodeIInterchainTokenServiceUpgradeData,
   },
-  validTokenAddress: {
-    args: encodeIInterchainTokenServiceValidTokenAddressArgs,
-    data: encodeIInterchainTokenServiceValidTokenAddressData,
-  },
-  validTokenManagerAddress: {
-    args: encodeIInterchainTokenServiceValidTokenManagerAddressArgs,
-    data: encodeIInterchainTokenServiceValidTokenManagerAddressData,
-  },
 };
 
 export function createIInterchainTokenServiceReadClient(
-  publicClient: PublicContractClient<typeof ABI_FILE.abi>
+  publicClient: PublicContractClient<typeof ABI_FILE.abi>,
 ) {
   return {
     chainName() {
@@ -1316,66 +1114,35 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("chainNameHash");
     },
     contractCallValue(
-      contractCallValueArgs: IInterchainTokenServiceContractCallValueArgs
+      contractCallValueArgs: IInterchainTokenServiceContractCallValueArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["contractCallValue"];
       const encodedArgs = encoder.args(contractCallValueArgs);
 
       return publicClient.read("contractCallValue", { args: encodedArgs });
     },
-    contractCallWithTokenValue(
-      contractCallWithTokenValueArgs: IInterchainTokenServiceContractCallWithTokenValueArgs
-    ) {
-      const encoder =
-        IINTERCHAIN_TOKEN_SERVICE_ENCODERS["contractCallWithTokenValue"];
-      const encodedArgs = encoder.args(contractCallWithTokenValueArgs);
-
-      return publicClient.read("contractCallWithTokenValue", {
-        args: encodedArgs,
-      });
-    },
     contractId() {
       return publicClient.read("contractId");
     },
-    flowInAmount(flowInAmountArgs: IInterchainTokenServiceFlowInAmountArgs) {
-      const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["flowInAmount"];
-      const encodedArgs = encoder.args(flowInAmountArgs);
+    deployedTokenManager(
+      deployedTokenManagerArgs: IInterchainTokenServiceDeployedTokenManagerArgs,
+    ) {
+      const encoder =
+        IINTERCHAIN_TOKEN_SERVICE_ENCODERS["deployedTokenManager"];
+      const encodedArgs = encoder.args(deployedTokenManagerArgs);
 
-      return publicClient.read("flowInAmount", { args: encodedArgs });
-    },
-    flowLimit(flowLimitArgs: IInterchainTokenServiceFlowLimitArgs) {
-      const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["flowLimit"];
-      const encodedArgs = encoder.args(flowLimitArgs);
-
-      return publicClient.read("flowLimit", { args: encodedArgs });
-    },
-    flowOutAmount(flowOutAmountArgs: IInterchainTokenServiceFlowOutAmountArgs) {
-      const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["flowOutAmount"];
-      const encodedArgs = encoder.args(flowOutAmountArgs);
-
-      return publicClient.read("flowOutAmount", { args: encodedArgs });
+      return publicClient.read("deployedTokenManager", { args: encodedArgs });
     },
     gateway() {
       return publicClient.read("gateway");
     },
     getExpressExecutor(
-      getExpressExecutorArgs: IInterchainTokenServiceGetExpressExecutorArgs
+      getExpressExecutorArgs: IInterchainTokenServiceGetExpressExecutorArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["getExpressExecutor"];
       const encodedArgs = encoder.args(getExpressExecutorArgs);
 
       return publicClient.read("getExpressExecutor", { args: encodedArgs });
-    },
-    getExpressExecutorWithToken(
-      getExpressExecutorWithTokenArgs: IInterchainTokenServiceGetExpressExecutorWithTokenArgs
-    ) {
-      const encoder =
-        IINTERCHAIN_TOKEN_SERVICE_ENCODERS["getExpressExecutorWithToken"];
-      const encodedArgs = encoder.args(getExpressExecutorWithTokenArgs);
-
-      return publicClient.read("getExpressExecutorWithToken", {
-        args: encodedArgs,
-      });
     },
     hasRole(hasRoleArgs: IInterchainTokenServiceHasRoleArgs) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["hasRole"];
@@ -1387,7 +1154,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("implementation");
     },
     interchainTokenAddress(
-      interchainTokenAddressArgs: IInterchainTokenServiceInterchainTokenAddressArgs
+      interchainTokenAddressArgs: IInterchainTokenServiceInterchainTokenAddressArgs,
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["interchainTokenAddress"];
@@ -1402,7 +1169,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("interchainTokenFactory");
     },
     interchainTokenId(
-      interchainTokenIdArgs: IInterchainTokenServiceInterchainTokenIdArgs
+      interchainTokenIdArgs: IInterchainTokenServiceInterchainTokenIdArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["interchainTokenId"];
       const encodedArgs = encoder.args(interchainTokenIdArgs);
@@ -1416,7 +1183,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("isOperator", { args: encodedArgs });
     },
     isTrustedAddress(
-      isTrustedAddressArgs: IInterchainTokenServiceIsTrustedAddressArgs
+      isTrustedAddressArgs: IInterchainTokenServiceIsTrustedAddressArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["isTrustedAddress"];
       const encodedArgs = encoder.args(isTrustedAddressArgs);
@@ -1432,6 +1199,15 @@ export function createIInterchainTokenServiceReadClient(
     pendingOwner() {
       return publicClient.read("pendingOwner");
     },
+    registeredTokenAddress(
+      registeredTokenAddressArgs: IInterchainTokenServiceRegisteredTokenAddressArgs,
+    ) {
+      const encoder =
+        IINTERCHAIN_TOKEN_SERVICE_ENCODERS["registeredTokenAddress"];
+      const encodedArgs = encoder.args(registeredTokenAddressArgs);
+
+      return publicClient.read("registeredTokenAddress", { args: encodedArgs });
+    },
     tokenHandler() {
       return publicClient.read("tokenHandler");
     },
@@ -1439,7 +1215,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("tokenManager");
     },
     tokenManagerAddress(
-      tokenManagerAddressArgs: IInterchainTokenServiceTokenManagerAddressArgs
+      tokenManagerAddressArgs: IInterchainTokenServiceTokenManagerAddressArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerAddress"];
       const encodedArgs = encoder.args(tokenManagerAddressArgs);
@@ -1450,7 +1226,7 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("tokenManagerDeployer");
     },
     tokenManagerImplementation(
-      tokenManagerImplementationArgs: IInterchainTokenServiceTokenManagerImplementationArgs
+      tokenManagerImplementationArgs: IInterchainTokenServiceTokenManagerImplementationArgs,
     ) {
       const encoder =
         IINTERCHAIN_TOKEN_SERVICE_ENCODERS["tokenManagerImplementation"];
@@ -1461,7 +1237,7 @@ export function createIInterchainTokenServiceReadClient(
       });
     },
     trustedAddress(
-      trustedAddressArgs: IInterchainTokenServiceTrustedAddressArgs
+      trustedAddressArgs: IInterchainTokenServiceTrustedAddressArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["trustedAddress"];
       const encodedArgs = encoder.args(trustedAddressArgs);
@@ -1469,31 +1245,12 @@ export function createIInterchainTokenServiceReadClient(
       return publicClient.read("trustedAddress", { args: encodedArgs });
     },
     trustedAddressHash(
-      trustedAddressHashArgs: IInterchainTokenServiceTrustedAddressHashArgs
+      trustedAddressHashArgs: IInterchainTokenServiceTrustedAddressHashArgs,
     ) {
       const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["trustedAddressHash"];
       const encodedArgs = encoder.args(trustedAddressHashArgs);
 
       return publicClient.read("trustedAddressHash", { args: encodedArgs });
-    },
-    validTokenAddress(
-      validTokenAddressArgs: IInterchainTokenServiceValidTokenAddressArgs
-    ) {
-      const encoder = IINTERCHAIN_TOKEN_SERVICE_ENCODERS["validTokenAddress"];
-      const encodedArgs = encoder.args(validTokenAddressArgs);
-
-      return publicClient.read("validTokenAddress", { args: encodedArgs });
-    },
-    validTokenManagerAddress(
-      validTokenManagerAddressArgs: IInterchainTokenServiceValidTokenManagerAddressArgs
-    ) {
-      const encoder =
-        IINTERCHAIN_TOKEN_SERVICE_ENCODERS["validTokenManagerAddress"];
-      const encodedArgs = encoder.args(validTokenManagerAddressArgs);
-
-      return publicClient.read("validTokenManagerAddress", {
-        args: encodedArgs,
-      });
     },
   };
 }

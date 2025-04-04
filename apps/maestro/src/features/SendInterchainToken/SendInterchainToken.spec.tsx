@@ -49,7 +49,7 @@ const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
     symbol: "ETH",
     decimals: 18,
   },
-  no_tvl: true,
+  // no_tvl: true,
 };
 
 const mocks = {
@@ -88,7 +88,7 @@ vi.mock("~/ui/compounds/GMPTxStatusMonitor/index.ts", () => ({
   default: () => <div>GMPTxStatusMonitor</div>,
 }));
 
-vi.mock("~/ui/components/EVMChainsDropdown/index.ts", () => ({
+vi.mock("~/ui/components/ChainsDropdown/index.ts", () => ({
   default: () => <div>EVMChainsDropdown</div>,
 }));
 

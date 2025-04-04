@@ -18,13 +18,13 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
+import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
@@ -56,11 +56,20 @@ export type Props = TokenInfo & {
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
   const chainId = useChainId();
-  const { data: balance } = useInterchainTokenBalanceForOwnerQuery({
+  const normalizedTokenAddress = props.tokenAddress?.includes(":")
+    ? props.tokenAddress.split(":")[0] // use only the first part of the address for sui
+    : props.tokenAddress;
+  // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
+  // To check sui for example, they need to connect with a sui wallet
+  const isIncompatibleChain =
+    normalizedTokenAddress?.length !== address?.length;
+  const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
+    disabled: !props.isRegistered || isIncompatibleChain,
   });
+  const balance = result?.data;
 
   const { explorerUrl, explorerName } = useMemo(() => {
     if (!props.tokenAddress || !props.chain) {
@@ -77,17 +86,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     };
   }, [props.chain, props.tokenAddress]);
 
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
-  const handleSwitchChain = useCallback(async () => {
+  const handleSwitchChain = useCallback(() => {
     try {
-      await switchChainAsync?.({ chainId: props.chainId });
+      switchChain?.({ chainId: props.chainId });
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
         toast.error(`Failed to switch chain: ${error.cause.shortMessage}`);
       }
     }
-  }, [props.chainId, switchChainAsync]);
+  }, [props.chainId, switchChain]);
 
   const isSourceChain = chainId === props.chainId;
 
@@ -155,7 +164,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               balance={BigInt(balance.tokenBalance)}
               isTokenOwner={balance.isTokenOwner}
               isTokenPendingOnwer={balance.isTokenPendingOwner}
-              isTokenMinter={balance.isTokenMinter}
+              isTokenMinter={balance.isTokenMinter as boolean}
               hasPendingOwner={balance.hasPendingOwner}
               tokenId={props.tokenId}
             />
@@ -181,8 +190,26 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
         {!balance?.tokenBalance ? (
           !address ? null : (
-            <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-              <span className="mx-auto">Loading balance...</span>
+            <div>
+              {isIncompatibleChain ? (
+                <Button
+                  $size="xs"
+                  $variant="primary"
+                  className="my-1 flex w-full"
+                  onClick={handleSwitchChain}
+                >
+                  Connect to {props.chain?.name ?? "chain"} to see your balance{" "}
+                  <ChainIcon
+                    src={props.chain?.image ?? ""}
+                    size="xs"
+                    alt={props.chain?.name ?? ""}
+                  />
+                </Button>
+              ) : (
+                <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+                  <span className="mx-auto">Loading balance...</span>
+                </div>
+              )}
             </div>
           )
         ) : (
@@ -203,7 +230,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 {balance.isTokenPendingOwner && (
                   <>
                     <AcceptInterchainTokenOwnership
-                      accountAddress={address as `0x${string}`}
+                      accountAddress={address}
                       tokenAddress={props.tokenAddress}
                       sourceChain={props.chain as EVMChainConfig}
                       tokenId={props.tokenId}
@@ -229,7 +256,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                   <>
                     {balance.isTokenPendingOwner ? (
                       <AcceptInterchainTokenOwnership
-                        accountAddress={address as `0x${string}`}
+                        accountAddress={address}
                         tokenAddress={props.tokenAddress}
                         sourceChain={props.chain as EVMChainConfig}
                         tokenId={props.tokenId}

@@ -23,9 +23,9 @@ export async function scanInterchainTokenOnChainByTokenId(
       const serviceClient =
         ctx.contracts.createInterchainTokenServiceClient(config);
 
-      const [tokenAddress, tokenManagerAddress] = await Promise.all([
+      const [tokenAddress, tokenManagerAddress] = (await Promise.all([
         serviceClient.reads
-          .interchainTokenAddress({
+          .registeredTokenAddress({
             tokenId,
           })
           .catch(() => null),
@@ -34,7 +34,7 @@ export async function scanInterchainTokenOnChainByTokenId(
             tokenId,
           })
           .catch(() => null),
-      ]);
+      ])) as [`0x${string}` | null, `0x${string}` | null];
 
       if (!tokenAddress || !tokenManagerAddress) {
         return {
@@ -53,18 +53,18 @@ export async function scanInterchainTokenOnChainByTokenId(
         tokenManagerAddress
       );
 
-      const [tokenManagerTypeCode, originTokenAddress] = await Promise.all([
+      const [tokenManagerTypeCode, originTokenAddress] = (await Promise.all([
         tokenManagerClient.reads.implementationType().catch(() => null),
         tokenManagerClient.reads.tokenAddress().catch(() => null),
-      ]);
+      ])) as [bigint | null, `0x${string}` | null];
 
-      const tokenManagerType = Maybe.of(tokenManagerTypeCode).mapOrNull(
-        getTokenManagerTypeFromBigInt
-      );
+      const tokenManagerType = Maybe.of(
+        tokenManagerTypeCode as bigint
+      ).mapOrNull(getTokenManagerTypeFromBigInt);
 
       const erc20Client = ctx.contracts.createERC20Client(
         config,
-        originTokenAddress ?? tokenAddress
+        (originTokenAddress as `0x${string}`) ?? tokenAddress
       );
 
       const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([

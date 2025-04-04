@@ -1,61 +1,75 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo } from "react";
 
-import { isAddress } from "viem";
-
 import { trpc } from "~/lib/trpc";
-import { hex64 } from "~/lib/utils/validation";
-import { useEVMChainConfigsQuery } from "../axelarscan/hooks";
+import { useAllChainConfigsQuery } from "../axelarscan/hooks";
+import { filterEligibleChains } from "~/lib/utils/chains";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;
-  tokenAddress?: `0x${string}`;
+  tokenAddress?: string;
   strict?: boolean;
 }) {
-  const { computed, ...evmChainsQuery } = useEVMChainConfigsQuery();
+  const { combinedComputed, isLoading, isError, error, isFetching } =
+    useAllChainConfigsQuery();
 
-  const { data, ...queryResult } =
-    trpc.interchainToken.searchInterchainToken.useQuery(
-      {
-        chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
-        tokenAddress: input.tokenAddress as `0x${string}`,
-        strict: input.strict,
-      },
-      {
-        enabled: Maybe.of(input.tokenAddress).mapOr(false, isAddress),
-        retry: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+  const {
+    data,
+    isFetching: isFetchingSearch,
+    ...queryResult
+  } = trpc.interchainToken.searchInterchainToken.useQuery(
+    {
+      chainId: Maybe.of(input.chainId).mapOrUndefined(Number),
+      tokenAddress: input.tokenAddress as `0x${string}`,
+      strict: input.strict,
+    },
+    {
+      enabled: Maybe.of(input.tokenAddress).mapOr(false, Boolean),
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const matchingTokens = data?.matchingTokens || [];
+
+  const destinationChainConfigs = matchingTokens.map((token) => {
+    return combinedComputed.indexedById[token.axelarChainId];
+  }).filter(Boolean);
+
+  const eligibleChainConfigs = input.chainId ? filterEligibleChains(destinationChainConfigs, input.chainId) : destinationChainConfigs;
 
   return {
     ...queryResult,
     data: {
       ...data,
-      matchingTokens: data?.matchingTokens.map((token) => ({
+      matchingTokens: data?.matchingTokens.filter((token) => {
+        return !!eligibleChainConfigs.find((x) => x.id === token.axelarChainId) || token.chainId === input.chainId;
+      }).map((token) => ({
         ...token,
-        chain: computed.indexedById[token.axelarChainId ?? ""],
-        wagmiConfig: computed.wagmiChains?.find(
+        chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
+        wagmiConfig: combinedComputed.wagmiChains?.find(
           (x) => x?.id === Number(token.chainId)
         ),
       })),
       chain: Maybe.of(input.chainId).mapOrUndefined(
-        (x) => computed.indexedByChainId[x]
+        (x) => combinedComputed.indexedByChainId[x]
       ),
-      wagmiConfig: computed.wagmiChains?.find(
-        (x) => x?.id === Number(input.chainId)
-      ),
+      wagmiConfig: Maybe.of(input.chainId)
+        .map(Number)
+        .mapOrUndefined((chainId) =>
+          combinedComputed.wagmiChains?.find((x) => x?.id === chainId)
+        ),
     },
-    isLoading: evmChainsQuery.isLoading || queryResult.isLoading,
-    isFetching: evmChainsQuery.isFetching || queryResult.isFetching,
-    isError: evmChainsQuery.isError || queryResult.isError,
-    error: evmChainsQuery.error || queryResult.error,
+    isLoading,
+    isFetching: isFetching || isFetchingSearch,
+    isError,
+    error,
   };
 }
 
 export function useGetTransactionStatusOnDestinationChainsQuery(
   input: {
-    txHash?: `0x${string}`;
+    txHash: string;
   },
   options?: {
     enabled?: boolean;
@@ -65,15 +79,11 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
   const { data, ...query } =
     trpc.gmp.getTransactionStatusOnDestinationChains.useQuery(
       {
-        txHash: input.txHash as `0x${string}`,
+        txHash: input.txHash,
       },
       {
-        refetchInterval: 1000 * 10, // 10 seconds
-        enabled:
-          input.txHash &&
-          hex64().safeParse(input.txHash).success &&
-          // apply the default value if the option is not provided
-          Maybe.of(options?.enabled).mapOr(true, Boolean),
+        refetchInterval: options?.refetchInterval ?? 1000 * 10, // 10 seconds
+        enabled: !!input.txHash && (options?.enabled || true),
       }
     );
 
@@ -93,7 +103,7 @@ export function useGetTransactionStatusOnDestinationChainsQuery(
 
 export function useGetTransactionsStatusesOnDestinationChainsQuery(
   input: {
-    txHashes?: `0x${string}`[];
+    txHashes?: string[];
   },
   options?: {
     enabled?: boolean;
@@ -106,10 +116,8 @@ export function useGetTransactionsStatusesOnDestinationChainsQuery(
         txHashes: input.txHashes as `0x${string}`[],
       },
       {
-        enabled: Boolean(
-          input.txHashes?.every((txHash) => txHash.match(/^(0x)?[0-9a-f]{64}/i))
-        ),
-        refetchInterval: 1000 * 10, // 10 seconds
+        enabled: Boolean(input.txHashes?.every((txHash) => txHash)),
+        refetchInterval: 1000 * 10,
         ...options,
       }
     );

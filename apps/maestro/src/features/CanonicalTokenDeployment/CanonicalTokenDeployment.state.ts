@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { uniq, without } from "rambda";
 
 import { logger } from "~/lib/logger";
+import { RegisterCanonicalTokenResult } from "../suiHooks/useRegisterCanonicalToken";
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -14,12 +15,13 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "deploying";
-      txHash: `0x${string}`;
+      txHash: string;
     }
   | {
       type: "deployed";
-      txHash: `0x${string}`;
-      tokenAddress: `0x${string}`;
+      suiTx?: RegisterCanonicalTokenResult;
+      txHash: string;
+      tokenAddress: string;
     };
 
 export const INITIAL_STATE = {
@@ -28,11 +30,11 @@ export const INITIAL_STATE = {
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
-    tokenAddress: "0x" as `0x${string}`,
+    tokenAddress: "0x",
   },
   txState: { type: "idle" } as DeployAndRegisterTransactionState,
   selectedChains: [] as string[],
-  onDeployTxHash: (txHash: `0x${string}`) => {
+  onDeployTxHash: (txHash: string) => {
     logger.log("onDeployTxHash", txHash);
   },
 };
@@ -92,17 +94,15 @@ function useCanonicalTokenDeploymentState(
     },
     actions: {
       reset: () => {
-        console.log("reset");
         setState((draft) => {
           Object.assign(draft, initialState);
         });
       },
-      setTokenDetails: (detatils: Partial<TokenDetails>) => {
-        console.log("setTokenDetails", detatils);
+      setTokenDetails: (details: Partial<TokenDetails>) => {
         setState((draft) => {
           draft.tokenDetails = {
             ...draft.tokenDetails,
-            ...detatils,
+            ...details,
           };
         });
       },

@@ -1,4 +1,4 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Badge,
@@ -25,23 +25,23 @@ import Image from "next/image";
 
 import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
-import { useAccount } from "wagmi";
 import { z } from "zod";
 
+import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
-  chain: EVMChainConfig;
-  tokenAddress: `0x${string}`;
+  chain: EVMChainConfig | VMChainConfig;
+  tokenAddress: string;
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
   deploymentMessageId?: string | undefined;
-  tokenManagerAddress?: `0x${string}` | null;
+  tokenManagerAddress?: string | null;
   kind?: "canonical" | "interchain" | "custom";
   claimOwnershipFormLink?: string;
 };
@@ -59,6 +59,10 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     }
   );
 
+  const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
+
+  const tokenAddress = props.tokenAddress;
+
   const tokenDetails = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -69,37 +73,41 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         key="token-address"
         $size="sm"
         $variant="ghost"
-        copyText={props.tokenAddress}
+        copyText={tokenAddress}
       >
-        {maskAddress(props.tokenAddress)}
+        {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    [
-      "Add Token to Wallet",
-      <LinkButton
-        key="add-to-wallet"
-        href="#"
-        className="ml-[-10px]"
-        $variant="link"
-        onClick={async () => {
-          try {
-            await watchAsset(wallet, {
-              type: "ERC20",
-              options: {
-                address: props.tokenAddress,
-                decimals: props.decimals,
-                symbol: props.symbol,
-                image: meta?.iconUrl,
-              },
-            });
-          } catch (_e) {
-            // noop because the error is raised when the user cancels the popup dialog
-          }
-        }}
-      >
-        Add
-      </LinkButton>,
-    ],
+    ...(!isSuiChain
+      ? [
+          [
+            "Add Token to Wallet",
+            <LinkButton
+              key="add-to-wallet"
+              href="#"
+              className="ml-[-10px]"
+              $variant="link"
+              onClick={async () => {
+                try {
+                  await watchAsset(wallet, {
+                    type: "ERC20",
+                    options: {
+                      address: props.tokenAddress,
+                      decimals: props.decimals,
+                      symbol: props.symbol,
+                      image: meta?.iconUrl,
+                    },
+                  });
+                } catch (_e) {
+                  // noop because the error is raised when the user cancels the popup dialog
+                }
+              }}
+            >
+              Add
+            </LinkButton>,
+          ],
+        ]
+      : []),
     ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) =>
       !props.deploymentMessageId
         ? [[]]
@@ -212,6 +220,14 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     Boolean(value)
   );
 
+  function getTokenExplorerLink() {
+    if (isSuiChain) {
+      return `${props.chain.explorer.url}/object/${props.tokenAddress}`;
+    } else {
+      return `${props.chain.explorer.url}/token/${props.tokenAddress}`;
+    }
+  }
+
   return (
     <section className="grid gap-6">
       <div className="flex items-center justify-between">
@@ -232,7 +248,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         </div>
         <LinkButton
           className="flex items-center gap-2 text-lg"
-          href={`${props.chain.explorer.url}/token/${props.tokenAddress}`}
+          href={getTokenExplorerLink()}
           target="_blank"
           rel="noopener noreferrer"
           $size="sm"
@@ -288,7 +304,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({
     trpc.interchainToken.getInterchainTokenRolesForAccount.useQuery(
       {
         tokenId,
-        accountAddress: address as `0x${string}`,
+        accountAddress: address,
       },
       {
         enabled: Boolean(address),

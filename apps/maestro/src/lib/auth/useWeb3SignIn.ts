@@ -1,5 +1,5 @@
 import { debounce, invariant } from "@axelarjs/utils";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   signIn,
   signOut,
@@ -7,11 +7,13 @@ import {
   type SignInResponse,
 } from "next-auth/react";
 
+import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
-import { useDisconnect, useSignMessage } from "wagmi";
+import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
 import { wagmiConfig } from "~/config/wagmi";
+import { useDisconnect } from "~/lib/hooks";
 import { trpc } from "../trpc";
 
 export type UseWeb3SignInOptions = {
@@ -41,7 +43,9 @@ export function useWeb3SignIn({
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
   const { signMessageAsync } = useSignMessage();
-  const { disconnectAsync } = useDisconnect();
+  const { disconnect } = useDisconnect();
+  const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
+  const currentSuiAccount = useCurrentAccount();
 
   const signInAddressRef = useRef<`0x${string}` | null>(null);
 
@@ -67,9 +71,24 @@ export function useWeb3SignIn({
         const { message } = await createSignInMessage({ address });
 
         onSignInStart?.(address);
-        const signature = await signMessageAsync({ message });
-        const response = await signIn("credentials", { address, signature });
+        let signature;
+        // 42 is the length of an EVM address
+        if (address.length === 42) {
+          signature = await signMessageAsync({ message });
+        }
+        // 66 is the length of a sui address
+        else if (address.length === 66) {
+          const resp = await signSuiMessageAsync({
+            message: new TextEncoder().encode(message),
+          });
+          signature = resp.signature;
+        }
 
+        const response = await signIn("credentials", {
+          address,
+          signature,
+          redirect: false,
+        });
         if (response?.error) {
           throw new Error(response.error);
         }
@@ -79,7 +98,7 @@ export function useWeb3SignIn({
         isSigningInRef.current = false;
       } catch (error) {
         if (error instanceof Error) {
-          await disconnectAsync();
+          disconnect();
           await signOut();
 
           signInAddressRef.current = null;
@@ -91,7 +110,7 @@ export function useWeb3SignIn({
     },
   });
 
-  const unwatch = watchAccount(wagmiConfig, {
+  const unwatchEVM = watchAccount(wagmiConfig, {
     onChange: debounce(async ({ address }) => {
       if (
         enabled === false ||
@@ -110,10 +129,36 @@ export function useWeb3SignIn({
         return;
       }
 
-      unwatch();
+      unwatchEVM();
       await signInWithWeb3Async(address);
     }, 150),
   });
+
+  // Same check as above, but for sui
+  useEffect(() => {
+    if (
+      enabled === false ||
+      isSigningInRef.current ||
+      sessionStatus === "loading" ||
+      !currentSuiAccount
+    ) {
+      return;
+    }
+
+    const address = currentSuiAccount.address as `0x${string}`;
+
+    if (session?.address === address || signInAddressRef.current === address) {
+      return;
+    }
+
+    void signInWithWeb3Async(address);
+  }, [
+    currentSuiAccount,
+    enabled,
+    sessionStatus,
+    session?.address,
+    signInWithWeb3Async,
+  ]);
 
   return {
     retryAsync: signInWithWeb3Async.bind(null, signInAddressRef.current),

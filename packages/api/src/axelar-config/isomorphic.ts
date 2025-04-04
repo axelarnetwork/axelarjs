@@ -1,4 +1,4 @@
-import type { Environment } from "@axelarjs/core";
+import { type Environment } from "@axelarjs/core";
 
 import { RestService, type RestServiceOptions } from "../lib/rest-service";
 import type { AxelarConfigsResponse } from "./types";

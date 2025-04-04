@@ -1,13 +1,12 @@
-import type { EVMChainConfig } from "@axelarjs/api";
+import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
-
-import { useAccount, useBalance } from "wagmi";
 
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
 } from "~/config/env";
+import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -15,24 +14,28 @@ import {
   useChainInfoQuery,
   useEstimateGasFeeQuery,
 } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
 
+type ChainConfig = EVMChainConfig | VMChainConfig;
+
 export function useSendInterchainTokenState(props: {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
   tokenId: `0x${string}`;
-  sourceChain: EVMChainConfig;
+  sourceChain: ChainConfig;
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
+  destinationAddress?: string;
 }) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
+  // Only query ERC20 details for EVM chains
   const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: props.sourceChain.chain_id,
     tokenAddress: props.tokenAddress,
@@ -50,7 +53,6 @@ export function useSendInterchainTokenState(props: {
 
   const isApprovalRequired = useMemo(
     () =>
-      // is canonical token && origin token
       props.kind === "canonical" &&
       interchainToken.chainId !== undefined &&
       interchainToken.chainId === props.originTokenChainId,
@@ -71,34 +73,30 @@ export function useSendInterchainTokenState(props: {
 
     return matchingTokens
       .filter((x) => x.isRegistered && x.chainId !== props.sourceChain.chain_id)
-      .map((x) => computed.indexedByChainId[x.chainId ?? 0])
+      .map((x) => combinedComputed.indexedByChainId[x.chainId ?? 0])
       .filter(Boolean);
   }, [
     originInterchainToken?.matchingTokens,
     props.sourceChain.chain_id,
-    computed.indexedByChainId,
+    combinedComputed.indexedByChainId,
   ]);
 
   const selectedToChain = useMemo(
     () =>
       eligibleTargetChains.find((c) => c.chain_id === toChainId) ??
       eligibleTargetChains[0],
-
     [toChainId, eligibleTargetChains]
   );
 
   const [, { addTransaction }] = useTransactionsContainer();
 
-  const { address } = useAccount();
+  const balance = useBalance();
 
-  const { data: balance } = useBalance({ address });
+  const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
-  const nativeTokenSymbol = getNativeToken(
-    props.sourceChain.chain_name.toLowerCase()
-  );
   const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: props.sourceChain.chain_name,
-    destinationChainId: selectedToChain?.chain_name,
+    sourceChainId: props.sourceChain.id,
+    destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
     gasMultiplier: "auto",
     gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
@@ -109,7 +107,6 @@ export function useSendInterchainTokenState(props: {
     if (!balance || !gas) {
       return false;
     }
-
     return gas > balance.value;
   }, [balance, gas]);
 
@@ -120,9 +117,11 @@ export function useSendInterchainTokenState(props: {
     reset: resetInterchainTransferTxState,
   } = useInterchainTransferMutation({
     tokenAddress: props.tokenAddress,
-    destinationChainName: selectedToChain?.chain_name,
-    sourceChainName: props.sourceChain.chain_name,
+    destinationChainName: selectedToChain?.id,
+    sourceChainName: props.sourceChain.id,
     gas,
+    tokenId: props.tokenId,
+    destinationAddress: props.destinationAddress,
   });
 
   const {
@@ -133,15 +132,15 @@ export function useSendInterchainTokenState(props: {
   } = useInterchainTokenServiceTransferMutation({
     tokenAddress: props.tokenAddress,
     tokenId: props.tokenId,
-    destinationChainName: selectedToChain?.chain_name,
-    sourceChainName: props.sourceChain.chain_name,
+    destinationChainName: selectedToChain?.id,
+    sourceChainName: props.sourceChain.id,
     gas,
   });
 
   const trpcContext = trpc.useUtils();
 
   const refetchBalances = () =>
-    trpcContext.erc20.getERC20TokenBalanceForOwner.refetch();
+    trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch();
 
   const resetTxState = () => {
     resetInterchainTransferTxState();
@@ -202,6 +201,5 @@ export function useSendInterchainTokenState(props: {
 export type UseSendInterchainTokenState = ReturnType<
   typeof useSendInterchainTokenState
 >;
-
 export type State = UseSendInterchainTokenState[0];
 export type Actions = UseSendInterchainTokenState[1];

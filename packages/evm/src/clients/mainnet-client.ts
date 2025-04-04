@@ -15,6 +15,7 @@ import {
   celo,
   fantom,
   filecoin,
+  flowMainnet,
   fraxtal,
   immutableZkEvm,
   kava,
@@ -54,6 +55,7 @@ export const MAINNET_CHAINS = {
   ethereum: mainnet,
   binance: bsc,
   immutable: immutableZkEvm,
+  flow: flowMainnet,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
