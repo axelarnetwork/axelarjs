@@ -1,7 +1,6 @@
 import {
   CLOCK_PACKAGE_ID,
   STD_PACKAGE_ID,
-  SUI_PACKAGE_ID,
   TxBuilder,
 } from "@axelar-network/axelar-cgp-sui";
 import { SUI_TYPE_ARG } from "@mysten/sui/utils";
