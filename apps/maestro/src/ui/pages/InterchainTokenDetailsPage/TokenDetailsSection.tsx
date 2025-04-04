@@ -36,7 +36,7 @@ export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
   chain: EVMChainConfig | VMChainConfig;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
@@ -61,6 +61,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
 
+  const tokenAddress = props.tokenAddress;
+
   const tokenDetails = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -71,9 +73,9 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         key="token-address"
         $size="sm"
         $variant="ghost"
-        copyText={props.tokenAddress}
+        copyText={tokenAddress}
       >
-        {maskAddress(props.tokenAddress)}
+        {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
     ...(!isSuiChain
@@ -220,7 +222,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   function getTokenExplorerLink() {
     if (isSuiChain) {
-      return `${props.chain.explorer.url}/object/${props.tokenAddress}`;
+      return `${props.chain.explorer.url}/coin/${props.tokenAddress}`;
     } else if (props.chain.chain_name.includes("stellar")) {
       return `${props.chain.explorer.url}/contract/${props.tokenAddress}`;
     } else {

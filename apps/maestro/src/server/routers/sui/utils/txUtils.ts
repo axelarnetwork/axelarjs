@@ -2,6 +2,7 @@ import type { SuiChainConfig } from "@axelarjs/api";
 
 import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import { TransactionResult } from "@mysten/sui/transactions";
+import { SUI_TYPE_ARG } from "@mysten/sui/utils";
 import { keccak256, stringToHex } from "viem";
 
 import { suiChainConfig } from "~/config/chains";
@@ -111,7 +112,7 @@ export async function deployRemoteInterchainToken(
   tokenId: any,
   feeUnitAmount: number,
   sender: string,
-  tokenType: string
+  coinType: string
 ) {
   const {
     InterchainTokenService: ITS,
@@ -124,11 +125,11 @@ export async function deployRemoteInterchainToken(
   const messageTicket = await txBuilder.moveCall({
     target: `${ITS.address}::interchain_token_service::deploy_remote_interchain_token`,
     arguments: [ITS.objects.InterchainTokenService, tokenId, destinationChain],
-    typeArguments: [tokenType],
+    typeArguments: [coinType],
   });
   await txBuilder.moveCall({
     target: `${GasService.address}::gas_service::pay_gas`,
-    typeArguments: [`0x2::sui::SUI`],
+    typeArguments: [SUI_TYPE_ARG],
     arguments: [
       GasService.objects.GasService,
       messageTicket,

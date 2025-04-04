@@ -94,6 +94,25 @@ export const hex64Literal = () => hex64().transform(asHexLiteral);
 
 export const numericString = () => z.string().regex(/^[0-9.]+$/);
 
+/**
+ * Zod schema to validate a Sui Token Address (Coin Type)
+ * Format: 0x<PACKAGE_ID>::<MODULE_NAME>::<STRUCT_NAME>
+ * e.g., 0x2::sui::SUI or 0x123...abc::mycoin::MYCOIN
+ */
+export const suiTokenAddress = () =>
+  z
+    .string()
+    .regex(
+      /^0x[a-fA-F0-9]{64}::\w+::\w+$/,
+      "Invalid Sui token address format (expected: 0x<packageId>::<module>::<struct>)"
+    );
+
+// Checks if a string matches the Sui Coin Type format: 0x<PACKAGE_ID>::<MODULE_NAME>::<STRUCT_NAME>
+// e.g., 0x2::sui::SUI or 0x123...abc::mycoin::MYCOIN
+export function isValidSuiTokenAddress(address: string): boolean {
+  return suiTokenAddress().safeParse(address).success;
+}
+
 const abiInputSchema = z.object({
   name: z.string().optional(),
   type: z.string().optional(),

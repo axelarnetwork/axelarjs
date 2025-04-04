@@ -9,18 +9,12 @@ import { fromHex } from "@mysten/sui/utils";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+import {
+  findCoinDataObject,
+  findGatewayEventIndex,
+  findObjectByType,
+} from "~/server/routers/sui/utils/utils";
 import { useInterchainTokenDeploymentStateContainer } from "../InterchainTokenDeployment";
-
-const findCoinDataObject = (
-  registerTokenResult: SuiTransactionBlockResponse
-) => {
-  return (
-    registerTokenResult?.objectChanges?.find(
-      (change) =>
-        change.type === "created" && change.objectType.includes("coin_data")
-    ) as SuiObjectCreated
-  )?.objectId;
-};
 
 export type DeployTokenParams = {
   initialSupply: bigint;
@@ -39,18 +33,6 @@ export type DeployTokenResult = SuiTransactionBlockResponse & {
   tokenManagerType: "mint_burn" | "lock_unlock";
   deploymentMessageId?: string;
   minterAddress?: string;
-};
-
-type SuiObjectCreated =
-  | Extract<SuiObjectChange, { type: "created" }>
-  | undefined;
-const findObjectByType = (
-  objectChanges: SuiObjectChange[],
-  type: string
-): SuiObjectCreated => {
-  return objectChanges.find(
-    (change) => change.type === "created" && change.objectType.includes(type)
-  ) as SuiObjectCreated;
 };
 
 export default function useTokenDeploy() {
@@ -135,12 +117,11 @@ export default function useTokenDeploy() {
 
       const metadata = findObjectByType(deploymentCreatedObjects, "Metadata");
 
-      const tokenAddress = metadata?.objectType.match(/<([^:>]+)/)?.[1];
+      const coinType = metadata?.objectType.match(/<([^>]+)>/)?.[1];
 
-      if (!tokenAddress) {
+      if (!coinType) {
         throw new Error("Failed to deploy token");
       }
-
       rootActions.setTxState({
         type: "pending_approval",
         step: 2,
@@ -152,7 +133,7 @@ export default function useTokenDeploy() {
         sendTokenTxJSON = await getRegisterAndSendTokenDeploymentTxBytes({
           sender: currentAccount.address,
           symbol,
-          tokenPackageId: tokenAddress,
+          coinType,
           tokenId: metadata.objectId,
           amount: initialSupply,
           destinationChains: destinationChainIds,
@@ -176,16 +157,15 @@ export default function useTokenDeploy() {
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
-      const tokenManagerType = minterAddress ? "mint_burn" : "lock_unlock";
-
-      const txIndex = sendTokenResult?.events?.[3]?.id?.eventSeq ?? 0; // TODO: find the correct txIndex, it seems to be always 3
+      minterAddress = minterAddress || currentAccount.address;
+      const txIndex = findGatewayEventIndex(sendTokenResult?.events || []);
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
       return {
         ...sendTokenResult,
         deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId || "0x",
-        tokenAddress,
-        tokenManagerType,
+        tokenAddress: coinType,
+        tokenManagerType: "mint_burn",
         minterAddress,
       };
     } catch (error) {

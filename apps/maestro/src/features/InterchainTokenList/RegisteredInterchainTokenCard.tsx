@@ -56,7 +56,13 @@ export type Props = TokenInfo & {
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
   const chainId = useChainId();
-  const isIncompatibleChain = props.tokenAddress?.length !== address?.length;
+  const normalizedTokenAddress = props.tokenAddress?.includes(":")
+    ? props.tokenAddress.split(":")[0] // use only the first part of the address for sui
+    : props.tokenAddress;
+  // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
+  // To check sui for example, they need to connect with a sui wallet
+  const isIncompatibleChain =
+    normalizedTokenAddress?.length !== address?.length;
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
