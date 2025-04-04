@@ -239,7 +239,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;
         setRecordDeploymentArgs({
-          kind: "interchain",
+          kind: "canonical",
           deploymentMessageId: result.deploymentMessageId,
           tokenId: token.token_id?.id,
           deployerAddress,

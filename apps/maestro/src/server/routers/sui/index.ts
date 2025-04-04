@@ -158,7 +158,7 @@ export const suiRouter = router({
         tokenId: z.string(),
         amount: z.bigint(),
         minterAddress: z.string().optional(),
-        gasValues: z.array(z.bigint())
+        gasValues: z.array(z.bigint()),
       })
     )
     .mutation(async ({ input, ctx }) => {
