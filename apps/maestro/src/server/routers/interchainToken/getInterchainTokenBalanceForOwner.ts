@@ -3,12 +3,9 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { suiClient as client } from "~/lib/clients/suiClient";
+import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
-import {
-  getCoinInfoByCoinType,
-  getCoinType,
-  getSuiChainConfig,
-} from "../sui/utils/utils";
+import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
 
@@ -26,9 +23,14 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    // If the token address and owner address are not the same length, the balance is 0
-    // This is because a sui address can't have evm balances and vice versa
-    if (input.tokenAddress?.length !== input.owner?.length) {
+    const normalizedTokenAddress = input.tokenAddress?.includes(":")
+      ? input.tokenAddress.split(":")[0] // use only the first part of the address for sui
+      : input.tokenAddress;
+    // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
+    // To check sui for example, they need to connect with a sui wallet
+    const isIncompatibleChain =
+      normalizedTokenAddress?.length !== input.owner?.length;
+    if (isIncompatibleChain) {
       return {
         isTokenOwner: false,
         isTokenMinter: false,
@@ -41,19 +43,17 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         hasFlowLimiterRole: false,
       };
     }
-    // Sui address length is 66
-    if (input.tokenAddress?.length === 66) {
+    // Sui coin type is in the format of packageId::module::MODULE
+    if (input.tokenAddress?.includes(":")) {
       const chainConfig = await getSuiChainConfig(ctx);
-
-      const coinType = await getCoinType(input.tokenAddress);
 
       const { totalBalance: balance } = await client.getBalance({
         owner: input.owner,
-        coinType: coinType,
+        coinType: input.tokenAddress,
       });
 
       // Get the coin metadata
-      const metadata = await client.getCoinMetadata({ coinType });
+      const metadata = await queryCoinMetadata(input.tokenAddress);
 
       const InterchainTokenServiceV0 =
         chainConfig.config.contracts?.InterchainTokenService.objects
@@ -65,7 +65,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
       const coinInfo = await getCoinInfoByCoinType(
         client,
-        coinType,
+        input.tokenAddress,
         InterchainTokenServiceV0
       );
 

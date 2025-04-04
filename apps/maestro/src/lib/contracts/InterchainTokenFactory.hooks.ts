@@ -478,7 +478,7 @@ export const interchainTokenFactoryAbi = [
 ] as const;
 
 export const interchainTokenFactoryAddress =
-  "0xdB7d6A5B8d37a4f34BC1e7ce0d0B8a9DDA124871" as const;
+  "0x83a93500d23Fbc3e82B410aD07A6a9F7A0670D66" as const;
 
 export const interchainTokenFactoryConfig = {
   address: interchainTokenFactoryAddress,

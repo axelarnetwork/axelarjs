@@ -36,7 +36,7 @@ export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
   chain: EVMChainConfig | VMChainConfig;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
@@ -61,6 +61,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
 
+  const tokenAddress = props.tokenAddress;
+
   const tokenDetails = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -71,9 +73,9 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         key="token-address"
         $size="sm"
         $variant="ghost"
-        copyText={props.tokenAddress}
+        copyText={tokenAddress}
       >
-        {maskAddress(props.tokenAddress)}
+        {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
     ...(!isSuiChain
