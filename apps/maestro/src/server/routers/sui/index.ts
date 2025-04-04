@@ -259,34 +259,6 @@ export const suiRouter = router({
       }
     }),
 
-  getMintTx: publicProcedure
-    .input(
-      z.object({
-        sender: z.string(),
-        tokenTreasuryCap: z.string(),
-        amount: z.bigint(),
-        tokenPackageId: z.string(),
-        symbol: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const { sender, tokenTreasuryCap, amount, tokenPackageId, symbol } =
-        input;
-      const tokenType = `${tokenPackageId}::${symbol.toLowerCase()}::${symbol.toUpperCase()}`;
-
-      const txBuilder = new TxBuilder(suiClient);
-      const [coin] = await txBuilder.moveCall({
-        target: `${SUI_PACKAGE_ID}::coin::mint`,
-        typeArguments: [tokenType],
-        arguments: [tokenTreasuryCap, amount.toString()],
-      });
-      txBuilder.tx.transferObjects([coin], txBuilder.tx.pure.address(sender));
-
-      const tx = await buildTx(sender, txBuilder);
-      const txJSON = await tx.toJSON();
-      return txJSON;
-    }),
-
   getSendTokenTx: publicProcedure
     .input(
       z.object({
