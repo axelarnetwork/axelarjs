@@ -222,7 +222,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   function getTokenExplorerLink() {
     if (isSuiChain) {
-      return `${props.chain.explorer.url}/object/${props.tokenAddress}`;
+      return `${props.chain.explorer.url}/coin/${props.tokenAddress}`;
     } else {
       return `${props.chain.explorer.url}/token/${props.tokenAddress}`;
     }
