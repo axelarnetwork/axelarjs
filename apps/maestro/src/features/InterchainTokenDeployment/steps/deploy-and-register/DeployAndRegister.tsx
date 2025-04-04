@@ -75,8 +75,7 @@ export const Step2: FC = () => {
         initialSupply: parseUnits(
           rootState.tokenDetails.initialSupply,
           rootState.tokenDetails.tokenDecimals || 0
-        ),
-        isCanonical: rootState.tokenDetails.isCanonical,
+        )
       }
     );
 

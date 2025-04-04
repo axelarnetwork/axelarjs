@@ -47,7 +47,6 @@ export type DeployAndRegisterTransactionState =
 export const INITIAL_STATE = {
   step: 0,
   tokenDetails: {
-    isCanonical: false,
     tokenName: "",
     tokenSymbol: "",
     tokenDecimals: 18,
@@ -132,12 +131,6 @@ function useInterchainTokenDeploymentState(
           ...draft.tokenDetails,
           ...partialInitialState.tokenDetails,
         };
-
-        // Make sure isCanonical is properly set but not part of form validation
-        if (partialInitialState.tokenDetails?.isCanonical !== undefined) {
-          draft.tokenDetails.isCanonical =
-            partialInitialState.tokenDetails.isCanonical;
-        }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

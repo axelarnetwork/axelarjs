@@ -37,7 +37,6 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   initialSupply?: bigint;
   salt: `0x${string}`;
   minterAddress?: string;
-  isCanonical: boolean;
 }
 
 export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
@@ -297,8 +296,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         decimals: input.decimals,
         destinationChainIds: input.destinationChainIds,
         minterAddress: input.minterAddress,
-        gasValues,
-        isCanonical: input.isCanonical,
+        gasValues
       });
       if (result?.digest && result.deploymentMessageId) {
         const token: any = result?.events?.[0]?.parsedJson;

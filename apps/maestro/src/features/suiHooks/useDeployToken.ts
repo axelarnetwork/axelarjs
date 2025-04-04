@@ -25,7 +25,6 @@ export type DeployTokenParams = {
   gasValues: bigint[];
   skipRegister?: boolean;
   minterAddress?: string;
-  isCanonical: boolean;
 };
 
 export type DeployTokenResult = SuiTransactionBlockResponse & {
@@ -79,7 +78,6 @@ export default function useTokenDeploy() {
     gasValues,
     skipRegister = false,
     minterAddress,
-    isCanonical,
   }: DeployTokenParams): Promise<DeployTokenResult> => {
     if (!currentAccount) {
       throw new Error("Wallet not connected");
@@ -141,7 +139,6 @@ export default function useTokenDeploy() {
           destinationChains: destinationChainIds,
           minterAddress: minterAddress,
           gasValues,
-          isCanonical,
         });
       } else {
         throw new Error(
@@ -160,7 +157,6 @@ export default function useTokenDeploy() {
       });
       const coinManagementObjectId = findCoinDataObject(sendTokenResult);
 
-      const tokenManagerType = isCanonical ? "lock_unlock" : "mint_burn";
       minterAddress = minterAddress || currentAccount.address;
       const txIndex = findGatewayEventIndex(sendTokenResult?.events || []);
       const deploymentMessageId = `${sendTokenResult?.digest}-${txIndex}`;
@@ -169,7 +165,7 @@ export default function useTokenDeploy() {
         deploymentMessageId,
         tokenManagerAddress: coinManagementObjectId || "0x",
         tokenAddress: coinType,
-        tokenManagerType,
+        tokenManagerType: "mint_burn",
         minterAddress,
       };
     } catch (error) {
