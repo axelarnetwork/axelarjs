@@ -34,7 +34,6 @@
     "release": "tsx scripts/release.ts"
   },
   "dependencies": {
-    "@0xsquid/sdk": "2.8.20",
     "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.424bc13",
     "@axelar-network/axelarjs-sdk": "0.17.3-alpha.4",
     "@axelarjs/api": "workspace:*",
