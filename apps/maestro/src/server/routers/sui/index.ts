@@ -440,6 +440,7 @@ export const suiRouter = router({
 
         const channelId = (await getChannelId(sender, chainConfig)) as string;
 
+        // TODO: just transfer the channel id
         const optionAddress = txBuilder.tx.moveCall({
           target: `${STD_PACKAGE_ID}::option::some`,
           typeArguments: ["address"],
