@@ -7,7 +7,7 @@ import { z } from "zod";
 import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
 import { publicProcedure } from "~/server/trpc";
 
-export const evmChainConfigSchema = z.array(z.custom<EvmChainConfig>());
+export const evmChainConfigSchema = z.custom<EvmChainConfig>();
 
 export const getEvmChainConfigs = publicProcedure
   .meta({
@@ -27,7 +27,7 @@ export const getEvmChainConfigs = publicProcedure
       })
       .optional()
   )
-  .output(evmChainConfigSchema)
+  .output(z.array(evmChainConfigSchema))
   .query(async ({ ctx, input }) => {
     try {
       const chains = await ctx.configs.evmChains();

@@ -46,7 +46,7 @@ export function useAllChainConfigsQuery() {
 
     // Process EVM chains first
     evmChains?.forEach((chain) => {
-      chainMap.set(parseInt(chain.externalChainId as string), {
+      chainMap.set(parseInt(chain.externalChainId), {
         ...chain,
         displayName: chain.displayName, // Store original name
       });
@@ -134,18 +134,11 @@ export function useVMChainConfigsQuery() {
       refetchOnWindowFocus: false,
     });
 
-  // TODO: Handle this in a centralized way
-  console.log("vmChains", data);
-  // for (const chain of data ?? []) {
-  //   if (chain.id.includes(suiChainConfig.axelarChainId)) {
-  //     chain.chain_id = SUI_CHAIN_ID;
-  //   }
-  // }
-
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(() => {
     return partition(
-      (x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
+      (x) =>
+        parseInt(x.externalChainId || "0") in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
       data ?? []
     );
   }, [data]);

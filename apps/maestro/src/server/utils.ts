@@ -114,7 +114,7 @@ export async function chains<TCacheKey extends string>(
 
   for (const chain of Object.values(vmChainsMap)) {
     combinedChainsMap[chain.info.id] = chain;
-    combinedChainsMap[chain.info.chain_id] = chain;
+    combinedChainsMap[chain.info.externalChainId] = chain;
   }
 
   // cache for 1 hour
