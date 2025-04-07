@@ -1,10 +1,12 @@
 import { router } from "~/server/trpc";
 import { getConfigForChain } from "./getChainConfigs";
-import { getAxelarChainConfigs } from "./getAxelarChainConfigs";
+import { getEvmChainConfigs } from "./getEvmChainConfigs";
+import { getVmChainConfigs } from "./getVmChainConfigs";
 
 export const axelarConfigsRouter = router({
   getChainConfigs: getConfigForChain,
-  getAxelarChainConfigs,
+  getVmChainConfigs,
+  getEvmChainConfigs,
 });
 
 export type AxelarConfigsRouter = typeof axelarConfigsRouter;

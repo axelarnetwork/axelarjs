@@ -13,11 +13,11 @@ import {
 import { Transaction } from "@mysten/sui/transactions";
 
 import { suiChainConfig } from "~/config/chains";
+import { SUI_SERVICE } from "~/config/env";
 import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
 import type { Context } from "~/server/context";
-import { SUI_SERVICE } from "~/config/env";
 
-export const suiServiceBaseUrl = SUI_SERVICE
+export const suiServiceBaseUrl = SUI_SERVICE;
 
 export const getSuiChainConfig = async (
   ctx: Context
@@ -29,7 +29,7 @@ export const getSuiChainConfig = async (
     throw new Error("Invalid chain config");
   }
 
-  return chainConfig;
+  return chainConfig as SuiChainConfig;
 };
 
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {

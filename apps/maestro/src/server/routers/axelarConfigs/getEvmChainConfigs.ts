@@ -1,24 +1,22 @@
+import { EvmChainConfig } from "@axelarjs/api";
+
 import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
 import { publicProcedure } from "~/server/trpc";
-import { baseChainConfigSchema } from "~/server/types";
 
-const evmChainConfigSchema = baseChainConfigSchema.extend({
-  // chain_id: z.number(),
-  chainType: z.literal("evm"),
-});
+export const evmChainConfigSchema = z.array(z.custom<EvmChainConfig>());
 
-export const getEVMChainConfigs = publicProcedure
+export const getEvmChainConfigs = publicProcedure
   .meta({
     openapi: {
       summary: "Get EVM chain configs",
       description: "Get EVM chain configs",
       method: "GET",
-      path: "/chain-configs/evm",
-      tags: ["chain-configs"],
+      path: "/evm-chain-configs",
+      tags: ["axelar-chain-configs"],
     },
   })
   .input(
@@ -29,11 +27,11 @@ export const getEVMChainConfigs = publicProcedure
       })
       .optional()
   )
-  .output(z.array(evmChainConfigSchema))
+  .output(evmChainConfigSchema)
   .query(async ({ ctx, input }) => {
     try {
-      const chainsMap = await ctx.configs.evmChains();
-      const chainInfos = Object.values(chainsMap).map((chain) => chain.info);
+      const chains = await ctx.configs.evmChains();
+      const chainInfos = Object.values(chains).map((chain) => chain.info);
       const uniqueChainInfos = uniqBy((x) => x.externalChainId, chainInfos);
       const validChainInfos = uniqueChainInfos.filter(
         (chain) => evmChainConfigSchema.safeParse(chain).success
@@ -59,7 +57,7 @@ export const getEVMChainConfigs = publicProcedure
       // otherwise, we throw an internal server error
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get chain config",
+        message: "Failed to get chain configs",
       });
     }
   });

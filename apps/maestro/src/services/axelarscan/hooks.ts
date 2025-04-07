@@ -1,17 +1,15 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { indexBy, partition, prop } from "rambda";
 
+import { CHAIN_CONFIGS, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { CHAIN_CONFIGS, suiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
-import { SUI_CHAIN_ID } from "~/lib/hooks";
 
-const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("axelarChainId"), CHAIN_CONFIGS);
+const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("id"), CHAIN_CONFIGS);
 const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
@@ -37,7 +35,7 @@ export function useAllChainConfigsQuery() {
         ...vmComputed.indexedByChainId,
         ...evmComputed.indexedByChainId,
       },
-      wagmiChains: [...vmComputed.wagmiChains, ...evmComputed.wagmiChains],
+      wagmiChains: evmComputed.wagmiChains,
     }),
     [evmComputed, vmComputed]
   );
@@ -48,19 +46,19 @@ export function useAllChainConfigsQuery() {
 
     // Process EVM chains first
     evmChains?.forEach((chain) => {
-      chainMap.set(chain.chain_id, {
+      chainMap.set(parseInt(chain.externalChainId as string), {
         ...chain,
-        displayName: chain.name, // Store original name
+        displayName: chain.displayName, // Store original name
       });
     });
 
     // Process VM chains, only add if not already present or if it's a special case
     vmChains?.forEach((chain) => {
-      const existingChain = chainMap.get(chain.chain_id);
+      const existingChain = chainMap.get(chain.externalChainId);
       if (!existingChain || existingChain.id === chain.id) {
-        chainMap.set(chain.chain_id, {
+        chainMap.set(chain.externalChainId, {
           ...chain,
-          displayName: chain.name, 
+          displayName: chain.displayName,
         });
       }
     });
@@ -80,23 +78,19 @@ export function useAllChainConfigsQuery() {
 }
 
 export function useEVMChainConfigsQuery() {
-  const { data, ...queryResult } = trpc.axelarscan.getEVMChainConfigs.useQuery<
-    EVMChainConfig[]
-  >(undefined, {
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: datab } = trpc.axelarConfigs.getAxelarChainConfigs.useQuery(undefined, {
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnWindowFocus: false,
-  });
-
-  console.log("datab", datab);
+  const { data, ...queryResult } =
+    trpc.axelarConfigs.getEvmChainConfigs.useQuery(undefined, {
+      staleTime: 1000 * 60 * 60, // 1 hour
+      refetchOnWindowFocus: false,
+    });
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.chainId in WAGMI_CHAIN_CONFIGS_BY_ID, data ?? []),
+    () =>
+      partition(
+        (x) => parseInt(x.externalChainId) in WAGMI_CHAIN_CONFIGS_BY_ID,
+        data ?? []
+      ),
     [data]
   );
 
@@ -107,8 +101,8 @@ export function useEVMChainConfigsQuery() {
         ?.map((x) =>
           JSON.stringify(
             {
-              chain_id: x.chain_id,
-              name: x.name,
+              chain_id: x.externalChainId,
+              name: x.displayName,
             },
             null,
             2
@@ -119,7 +113,7 @@ export function useEVMChainConfigsQuery() {
   }
 
   const wagmiChains = configured.map(
-    (x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id]
+    (x) => WAGMI_CHAIN_CONFIGS_BY_ID[parseInt(x.externalChainId)]
   );
 
   return {
@@ -134,27 +128,27 @@ export function useEVMChainConfigsQuery() {
 }
 
 export function useVMChainConfigsQuery() {
-  const { data, ...queryResult } = trpc.axelarscan.getVMChainConfigs.useQuery<
-    VMChainConfig[]
-  >(undefined, {
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnWindowFocus: false,
-  });
+  const { data, ...queryResult } =
+    trpc.axelarConfigs.getVmChainConfigs.useQuery(undefined, {
+      staleTime: 1000 * 60 * 60, // 1 hour
+      refetchOnWindowFocus: false,
+    });
 
   // TODO: Handle this in a centralized way
-  for (const chain of data ?? []) {
-    if(chain.id.includes(suiChainConfig.axelarChainId)) {
-      chain.chain_id = SUI_CHAIN_ID;
-    }
-  }
+  console.log("vmChains", data);
+  // for (const chain of data ?? []) {
+  //   if (chain.id.includes(suiChainConfig.axelarChainId)) {
+  //     chain.chain_id = SUI_CHAIN_ID;
+  //   }
+  // }
 
   // Filter out chains that are not configured in the app
-  const [configured, unconfigured] = useMemo(
-    () => {
-        return partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? [])
-    },
-    [data]
-  );
+  const [configured, unconfigured] = useMemo(() => {
+    return partition(
+      (x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
+      data ?? []
+    );
+  }, [data]);
 
   if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
     logger.once.info(
@@ -162,8 +156,8 @@ export function useVMChainConfigsQuery() {
         ?.map((x) =>
           JSON.stringify(
             {
-              chain_id: x.chain_id,
-              name: x.name,
+              chain_id: x.externalChainId,
+              name: x.displayName,
             },
             null,
             2
@@ -173,15 +167,12 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const wagmiChains = configured.map((x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id]).filter(chain => chain);
-
   return {
     ...queryResult,
     data: configured,
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
-      wagmiChains,
     },
   };
 }
