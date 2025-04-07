@@ -223,7 +223,8 @@ async function getInterchainToken(
             };
           }
 
-          const { isRegistered, tokenAddress } = await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
+          const { isRegistered, tokenAddress } =
+            await getSuiTokenRegistrationDetails(suiTxHash, remoteTokenDetails);
 
           return {
             ...remoteTokenDetails,
@@ -343,10 +344,7 @@ async function scanChains(
  * @param deploymentMessageId
  * @returns
  */
-async function findSuiTxHashFromGmp(
-  ctx: Context,
-  deploymentMessageId: string
-) {
+async function findSuiTxHashFromGmp(ctx: Context, deploymentMessageId: string) {
   const initialTxHash = deploymentMessageId.split("-")[0];
   const firstHopCalls = await ctx.services.gmp.searchGMP({
     txHash: initialTxHash,
@@ -355,8 +353,8 @@ async function findSuiTxHashFromGmp(
     },
   });
 
-  const suiBoundCalls = firstHopCalls.filter(
-    (call) => call.callback?.returnValues?.destinationChain?.includes("sui")
+  const suiBoundCalls = firstHopCalls.filter((call) =>
+    call.callback?.returnValues?.destinationChain?.includes("sui")
   );
 
   const axelarTxHash = suiBoundCalls[0]?.callback?.transaction?.hash;
@@ -393,12 +391,12 @@ async function getSuiTokenRegistrationDetails(
   );
 
   const tokenAddress = registeredEvent
-    ? getCoinAddressFromType(registeredEvent.type, "CoinRegistered")
+    ? registeredEvent.type.match(new RegExp(`CoinRegistered<(0x[^>]+)>`))?.[1]
     : remoteTokenDetails.tokenAddress;
 
   return {
     isRegistered: Boolean(registeredEvent),
-    tokenAddress,
+    tokenAddress: tokenAddress as string,
   };
 }
 
