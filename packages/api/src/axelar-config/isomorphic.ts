@@ -1,7 +1,11 @@
 import { type Environment } from "@axelarjs/core";
 
-import { ClientMeta, RestService, type RestServiceOptions } from "../lib/rest-service";
-import type { AxelarConfigsResponse } from "./types";
+import {
+  ClientMeta,
+  RestService,
+  type RestServiceOptions,
+} from "../lib/rest-service";
+import type { AxelarConfigsResponse, ChainConfig } from "./types";
 
 export class AxelarConfigClient extends RestService {
   env: Environment;
@@ -23,9 +27,30 @@ export class AxelarConfigClient extends RestService {
   }
 
   async getAxelarConfigs() {
-    return this.client
+    const response = await this.client
       .get(`configs/${this.env}-config-1.x.json`)
       .json<AxelarConfigsResponse>();
+
+    const keys = Object.keys(response.chains);
+
+    const chains = {} as Record<string, ChainConfig>;
+
+    for (const key of keys) {
+      const originalChain = response.chains[key] as ChainConfig;
+      const originalIconUrl = originalChain.iconUrl;
+
+      const fullIconUrl = `${response.resources.staticAssetHost}/${originalIconUrl}`;
+
+      chains[key] = {
+        ...originalChain,
+        iconUrl: fullIconUrl,
+      };
+    }
+
+    return {
+      ...response,
+      chains,
+    };
   }
 
   async getAxelarAssetConfigs() {

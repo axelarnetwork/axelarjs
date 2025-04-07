@@ -1,3 +1,5 @@
+import { EvmChainConfig, VmChainConfig } from "../axelar-config";
+
 export type AxelarScanContract = {
   chain_id: number;
   contract_address: string;
@@ -32,7 +34,7 @@ export type AxelarAssetPrice = Pick<
   updated_at: number;
 };
 
-export type ITSChainConfig = VMChainConfig | EVMChainConfig;
+export type ITSChainConfig = VmChainConfig | EvmChainConfig;
 
 export type VMChainConfig = {
   chain_id: number;

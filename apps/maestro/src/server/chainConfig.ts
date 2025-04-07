@@ -8,13 +8,38 @@ import { invariant } from "@axelarjs/utils";
 import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
 import MaestroKVClient from "~/services/db/kv";
 
+export interface ITSEvmChainConfig extends EvmChainConfig {
+  chain_id: number;
+  name: string;
+  image: string;
+  native_token: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    iconUrl?: string;
+  };
+}
+
+// Mapping with our existing used fields name
+export interface ITSVmChainConfig extends VmChainConfig {
+  chain_id?: number;
+  name: string;
+  image: string;
+  native_token: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    iconUrl?: string;
+  };
+}
+
 export type EvmChainsValue = {
-  info: EvmChainConfig;
+  info: ITSEvmChainConfig;
   wagmi: ExtendedWagmiChainConfig;
 };
 
 export type VMChainsValue = {
-  info: VmChainConfig;
+  info: ITSVmChainConfig;
 };
 
 export type EVMChainsMap = Record<string | number, EvmChainsValue>;
@@ -37,7 +62,13 @@ function getEvmChainMap(
 
     // We handle the invariant check specifically in evmChains
     const entry = {
-      info: chain,
+      info: {
+        ...chain,
+        chain_id: parseInt(chain.externalChainId),
+        name: chain.displayName,
+        image: chain.iconUrl,
+        native_token: chain.nativeCurrency,
+      },
       wagmi: wagmiConfig,
     };
 
@@ -60,6 +91,10 @@ function getVMChainMap(vmChains: VmChainConfig[]) {
       info: {
         ...chain,
         externalChainId: internalChainIdNumber,
+        chain_id: internalChainIdNumber,
+        name: chain.displayName,
+        image: chain.iconUrl,
+        native_token: chain.nativeCurrency,
       },
     };
 
@@ -71,19 +106,14 @@ function getVMChainMap(vmChains: VmChainConfig[]) {
   }, {});
 }
 
-// Internal helper function to fetch, filter, and map chains by type
-async function getChainsMapByType<
-  TCacheKey extends string,
-  TChainType extends "evm" | "vm",
-  TMap extends TChainType extends "evm" ? EVMChainsMap : VMChainsMap,
->(
+// Internal helper function to fetch, filter, and map EVM chains
+async function getEvmChainsMapInternal<TCacheKey extends string>(
   kvClient: MaestroKVClient,
   axelarConfigClient: AxelarConfigClient,
-  cacheKey: TCacheKey,
-  chainType: TChainType
-): Promise<TMap> {
+  cacheKey: TCacheKey
+): Promise<EVMChainsMap> {
   if (process.env.DISABLE_CACHE !== "true") {
-    const cached = await kvClient.getCached<TMap>(cacheKey);
+    const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
     if (cached) {
       return cached;
     }
@@ -95,29 +125,41 @@ async function getChainsMapByType<
 
   const configuredIDs = CHAIN_CONFIGS.map((chain) => chain.id);
 
-  if (chainType === "evm") {
-    const eligibleChains = allChains.filter(
-      (chain) => chain.chainType === chainType
-    );
+  const eligibleChains = allChains.filter((chain) => chain.chainType === "evm");
 
-    const chainsMap = getEvmChainMap(
-      eligibleChains as EvmChainConfig[],
-      configuredIDs
-    );
-    await kvClient.setCached<TMap>(cacheKey, chainsMap as TMap, 3600);
+  const chainsMap = getEvmChainMap(
+    eligibleChains as EvmChainConfig[],
+    configuredIDs
+  );
+  await kvClient.setCached<EVMChainsMap>(cacheKey, chainsMap, 3600);
 
-    return chainsMap as TMap;
-  } else if (chainType === "vm") {
-    const eligibleChains = allChains.filter(
-      (chain) => !["evm", "axelarnet"].includes(chain.chainType)
-    );
+  return chainsMap;
+}
 
-    const chainsMap = getVMChainMap(eligibleChains as VmChainConfig[]);
-    await kvClient.setCached<TMap>(cacheKey, chainsMap as TMap, 3600);
-    return chainsMap as TMap;
+// Internal helper function to fetch, filter, and map VM chains
+async function getVmChainsMapInternal<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarConfigClient: AxelarConfigClient,
+  cacheKey: TCacheKey
+): Promise<VMChainsMap> {
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<VMChainsMap>(cacheKey);
+    if (cached) {
+      return cached;
+    }
   }
 
-  throw new Error(`Unsupported Chain Type: ${chainType}`);
+  const axelarConfig = await axelarConfigClient.getAxelarConfigs();
+  const chainKeys = Object.keys(axelarConfig.chains);
+  const allChains = chainKeys.map((key) => axelarConfig.chains[key]);
+
+  const eligibleChains = allChains.filter(
+    (chain) => !["evm", "axelarnet"].includes(chain.chainType)
+  );
+
+  const chainsMap = getVMChainMap(eligibleChains as VmChainConfig[]);
+  await kvClient.setCached<VMChainsMap>(cacheKey, chainsMap, 3600);
+  return chainsMap;
 }
 
 export async function vmChains<TCacheKey extends string>(
@@ -125,8 +167,7 @@ export async function vmChains<TCacheKey extends string>(
   axelarConfigClient: AxelarConfigClient,
   cacheKey: TCacheKey
 ): Promise<VMChainsMap> {
-  // Directly return the result from the helper function for VM chains
-  return getChainsMapByType(kvClient, axelarConfigClient, cacheKey, "vm");
+  return getVmChainsMapInternal(kvClient, axelarConfigClient, cacheKey);
 }
 
 export async function evmChains<TCacheKey extends string>(
@@ -134,11 +175,10 @@ export async function evmChains<TCacheKey extends string>(
   axelarConfigClient: AxelarConfigClient,
   cacheKey: TCacheKey
 ): Promise<EVMChainsMap> {
-  const chainsMap = await getChainsMapByType(
+  const chainsMap = await getEvmChainsMapInternal(
     kvClient,
     axelarConfigClient,
-    cacheKey,
-    "evm"
+    cacheKey
   );
 
   // Post-process to ensure wagmi config exists for EVM chains, satisfying the EVMChainsMap type
