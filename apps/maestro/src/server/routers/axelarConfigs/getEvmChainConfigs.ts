@@ -1,13 +1,12 @@
-import { EvmChainConfig } from "@axelarjs/api";
-
 import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
+import { ITSEvmChainConfig } from "~/server/chainConfig";
 import { publicProcedure } from "~/server/trpc";
 
-export const evmChainConfigSchema = z.custom<EvmChainConfig>();
+export const evmChainConfigSchema = z.custom<ITSEvmChainConfig>();
 
 export const getEvmChainConfigs = publicProcedure
   .meta({
@@ -32,7 +31,7 @@ export const getEvmChainConfigs = publicProcedure
     try {
       const chains = await ctx.configs.evmChains();
       const chainInfos = Object.values(chains).map((chain) => chain.info);
-      const uniqueChainInfos = uniqBy((x) => x.externalChainId, chainInfos);
+      const uniqueChainInfos = uniqBy((x) => x.chain_id, chainInfos);
       const validChainInfos = uniqueChainInfos.filter(
         (chain) => evmChainConfigSchema.safeParse(chain).success
       );
@@ -43,12 +42,11 @@ export const getEvmChainConfigs = publicProcedure
             // filter also by axelarChainId if provided
             (!input?.axelarChainId || chain.id === input?.axelarChainId) &&
             // filter also by chainId if provided
-            (!input?.chainId ||
-              chain.externalChainId === input?.chainId?.toString()) &&
+            (!input?.chainId || chain.chain_id === input?.chainId) &&
             // filter out disabled chains
             !NEXT_PUBLIC_DISABLED_CHAINS.includes(chain.id)
         )
-        .sort((a, b) => a.displayName.localeCompare(b.displayName));
+        .sort((a, b) => a.name.localeCompare(b.name));
     } catch (error) {
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {

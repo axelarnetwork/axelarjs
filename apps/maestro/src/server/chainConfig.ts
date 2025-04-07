@@ -23,14 +23,14 @@ type ITSBaseChainConfig = {
 
 export type ITSEvmChainConfig = Omit<
   VmChainConfig,
-  "iconUrl" | "displayName" | "nativeCurrency"
+  "iconUrl" | "displayName" | "nativeCurrency" | "externalChainId"
 > &
   ITSBaseChainConfig;
 
 // Mapping with our existing used fields name
 export type ITSVmChainConfig = Omit<
   VmChainConfig,
-  "iconUrl" | "displayName" | "nativeCurrency"
+  "iconUrl" | "displayName" | "nativeCurrency" | "externalChainId"
 > &
   ITSBaseChainConfig;
 

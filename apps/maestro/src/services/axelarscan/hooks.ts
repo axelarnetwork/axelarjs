@@ -46,20 +46,14 @@ export function useAllChainConfigsQuery() {
 
     // Process EVM chains first
     evmChains?.forEach((chain) => {
-      chainMap.set(parseInt(chain.externalChainId), {
-        ...chain,
-        displayName: chain.displayName, // Store original name
-      });
+      chainMap.set(chain.chain_id as number, chain);
     });
 
     // Process VM chains, only add if not already present or if it's a special case
     vmChains?.forEach((chain) => {
-      const existingChain = chainMap.get(chain.externalChainId);
+      const existingChain = chainMap.get(chain.chain_id);
       if (!existingChain || existingChain.id === chain.id) {
-        chainMap.set(chain.externalChainId, {
-          ...chain,
-          displayName: chain.displayName,
-        });
+        chainMap.set(chain.chain_id, chain);
       }
     });
 
@@ -88,7 +82,7 @@ export function useEVMChainConfigsQuery() {
   const [configured, unconfigured] = useMemo(
     () =>
       partition(
-        (x) => parseInt(x.externalChainId) in WAGMI_CHAIN_CONFIGS_BY_ID,
+        (x) => (x.chain_id as number) in WAGMI_CHAIN_CONFIGS_BY_ID,
         data ?? []
       ),
     [data]
@@ -101,8 +95,8 @@ export function useEVMChainConfigsQuery() {
         ?.map((x) =>
           JSON.stringify(
             {
-              chain_id: x.externalChainId,
-              name: x.displayName,
+              chain_id: x.chain_id,
+              name: x.name,
             },
             null,
             2
@@ -113,7 +107,7 @@ export function useEVMChainConfigsQuery() {
   }
 
   const wagmiChains = configured.map(
-    (x) => WAGMI_CHAIN_CONFIGS_BY_ID[parseInt(x.externalChainId)]
+    (x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id ?? 0]
   );
 
   return {
@@ -137,8 +131,7 @@ export function useVMChainConfigsQuery() {
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(() => {
     return partition(
-      (x) =>
-        parseInt(x.externalChainId || "0") in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
+      (x) => (x.chain_id ?? 0) in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
       data ?? []
     );
   }, [data]);
@@ -149,8 +142,8 @@ export function useVMChainConfigsQuery() {
         ?.map((x) =>
           JSON.stringify(
             {
-              chain_id: x.externalChainId,
-              name: x.displayName,
+              chain_id: x.chain_id,
+              name: x.name,
             },
             null,
             2

@@ -1,13 +1,12 @@
-import { VmChainConfig } from "@axelarjs/api";
-
 import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
 import { NEXT_PUBLIC_DISABLED_CHAINS } from "~/config/env";
+import { ITSVmChainConfig } from "~/server/chainConfig";
 import { publicProcedure } from "~/server/trpc";
 
-export const vmChainConfigSchema = z.custom<VmChainConfig>();
+export const vmChainConfigSchema = z.custom<ITSVmChainConfig>();
 
 export const getVmChainConfigs = publicProcedure
   .meta({
@@ -42,7 +41,7 @@ export const getVmChainConfigs = publicProcedure
           // filter by axelarChainId if provided
           (!input?.axelarChainId || chain.id === input?.axelarChainId) &&
           // filter by chainId if provided
-          (!input?.chainId || parseInt(chain.externalChainId) === input?.chainId) &&
+          (!input?.chainId || chain.chain_id === input?.chainId) &&
           // filter out disabled chains
           !NEXT_PUBLIC_DISABLED_CHAINS.includes(chain.id)
       );
