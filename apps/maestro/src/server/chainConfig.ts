@@ -13,6 +13,8 @@ type ITSBaseChainConfig = {
   chain_id?: number;
   name: string;
   image: string;
+  chain_name: string;
+  chain_type: string;
   native_token: {
     name: string;
     symbol: string;
@@ -67,6 +69,8 @@ function createChainMapEntry(
     image: chain.iconUrl,
     native_token: chain.nativeCurrency,
     config: chain.config,
+    chain_name: chain.id,
+    chain_type: chain.chainType,
   };
 
   if (chain.chainType === "evm") {
