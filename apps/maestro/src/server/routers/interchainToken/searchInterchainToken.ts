@@ -3,7 +3,6 @@ import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
 import { partition, pluck, propEq } from "rambda";
-// import { Client } from "../../../../stellarContracts/src";
 import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
@@ -478,25 +477,34 @@ export async function getStellarTokenRegistrationDetails(
 }> {
   try {
     const chainConfig = await getStellarChainConfig(ctx);
+    const rpcUrl = STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV];
     // Create a network-configured Stellar contract client
-    const stellarContractClient = (await Client.from({
+    const ITSStellarContractClient = (await Client.from({
       contractId: chainConfig.config.contracts.InterchainTokenService.address,
       networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE as string,
-      rpcUrl: STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV],
+      rpcUrl: rpcUrl,
     })) as unknown as StellarITSContractClient;
 
     // Format the token ID properly (32 bytes)
     const tokenIdBuffer = formatTokenId(tokenId);
     const { result: tokenAddress } =
-      await stellarContractClient.interchain_token_address({
+      await ITSStellarContractClient.interchain_token_address({
         token_id: tokenIdBuffer,
       });
     const { result: tokenManagerAddress } =
-      await stellarContractClient.token_manager_address({
+      await ITSStellarContractClient.token_manager_address({
         token_id: tokenIdBuffer,
       });
+
+    // Check if the token contract exists
+    const tokenStellarContractClient = (await Client.from({
+      contractId: tokenAddress,
+      networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE as string,
+      rpcUrl: rpcUrl,
+    }).catch(() => null)) as unknown as StellarITSContractClient;
+
     return {
-      isRegistered: Boolean(tokenAddress),
+      isRegistered: Boolean(tokenStellarContractClient),
       tokenAddress: tokenAddress,
       tokenManagerAddress: tokenManagerAddress || null,
     };
