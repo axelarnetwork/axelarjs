@@ -8,20 +8,8 @@ import { invariant } from "@axelarjs/utils";
 import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
 import MaestroKVClient from "~/services/db/kv";
 
-export interface ITSEvmChainConfig extends EvmChainConfig {
-  chain_id: number;
-  name: string;
-  image: string;
-  native_token: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    iconUrl?: string;
-  };
-}
-
-// Mapping with our existing used fields name
-export interface ITSVmChainConfig extends VmChainConfig {
+type ITSBaseChainConfig = {
+  id: string;
   chain_id?: number;
   name: string;
   image: string;
@@ -31,7 +19,20 @@ export interface ITSVmChainConfig extends VmChainConfig {
     decimals: number;
     iconUrl?: string;
   };
-}
+};
+
+export type ITSEvmChainConfig = Omit<
+  VmChainConfig,
+  "iconUrl" | "displayName" | "nativeCurrency"
+> &
+  ITSBaseChainConfig;
+
+// Mapping with our existing used fields name
+export type ITSVmChainConfig = Omit<
+  VmChainConfig,
+  "iconUrl" | "displayName" | "nativeCurrency"
+> &
+  ITSBaseChainConfig;
 
 export type EvmChainsValue = {
   info: ITSEvmChainConfig;
@@ -47,6 +48,47 @@ export type VMChainsMap = Record<string | number, VMChainsValue>;
 
 export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
 
+/**
+ * Creates an entry object for the chain map based on the chain type.
+ *
+ * @param chain The chain configuration object (EVM or VM).
+ * @param wagmiConfig Optional Wagmi config (for EVM chains).
+ * @param internalChainIdNumber Optional internal chain ID (for VM chains).
+ * @returns The corresponding chain map entry (EvmChainsValue or VMChainsValue).
+ */
+function createChainMapEntry(
+  chain: EvmChainConfig | VmChainConfig,
+  wagmiConfig?: ExtendedWagmiChainConfig,
+  internalChainIdNumber?: number
+): EvmChainsValue | VMChainsValue {
+  const baseInfo = {
+    id: chain.id,
+    name: chain.displayName,
+    image: chain.iconUrl,
+    native_token: chain.nativeCurrency,
+    config: chain.config,
+  };
+
+  if (chain.chainType === "evm") {
+    const evmChain = chain as EvmChainConfig;
+    return {
+      info: {
+        ...baseInfo,
+        chain_id: parseInt(evmChain.externalChainId),
+      },
+      wagmi: wagmiConfig, // wagmiConfig should be provided for EVM
+    } as EvmChainsValue;
+  } else {
+    // Assume VM chain
+    return {
+      info: {
+        ...baseInfo,
+        chain_id: internalChainIdNumber, // internalChainIdNumber should be provided for VM
+      },
+    } as VMChainsValue;
+  }
+}
+
 function getEvmChainMap(
   evmChains: EvmChainConfig[],
   configuredIDs: number[]
@@ -61,16 +103,7 @@ function getEvmChainMap(
     );
 
     // We handle the invariant check specifically in evmChains
-    const entry = {
-      info: {
-        ...chain,
-        chain_id: parseInt(chain.externalChainId),
-        name: chain.displayName,
-        image: chain.iconUrl,
-        native_token: chain.nativeCurrency,
-      },
-      wagmi: wagmiConfig,
-    };
+    const entry = createChainMapEntry(chain, wagmiConfig);
 
     return {
       ...acc,
@@ -87,16 +120,7 @@ function getVMChainMap(vmChains: VmChainConfig[]) {
     )?.id;
 
     // We handle the invariant check specifically in evmChains
-    const entry = {
-      info: {
-        ...chain,
-        externalChainId: internalChainIdNumber,
-        chain_id: internalChainIdNumber,
-        name: chain.displayName,
-        image: chain.iconUrl,
-        native_token: chain.nativeCurrency,
-      },
-    };
+    const entry = createChainMapEntry(chain, undefined, internalChainIdNumber);
 
     return {
       ...acc,
