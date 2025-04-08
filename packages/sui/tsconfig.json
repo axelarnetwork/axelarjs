@@ -1,0 +1,16 @@
+{
+  "include": [
+    "src",
+    "scripts"
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "types": [
+      "vitest/globals"
+    ],
+    "target": "es2020"
+  }
+}

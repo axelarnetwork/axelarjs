@@ -1,0 +1,10 @@
+{
+  "utils": {
+    "fileFormatVersion": 6,
+    "address": "0x33d130d3ca43e2f82eee2d4e5cd783e4e88f4f6682d2671d259fdea5257d64d0",
+    "name": "utils",
+    "friends": [],
+    "structs": {},
+    "exposedFunctions": {}
+  }
+}

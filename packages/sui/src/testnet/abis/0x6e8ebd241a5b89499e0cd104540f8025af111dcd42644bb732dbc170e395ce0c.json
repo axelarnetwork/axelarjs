@@ -1,0 +1,244 @@
+{
+  "version_control": {
+    "fileFormatVersion": 6,
+    "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+    "name": "version_control",
+    "friends": [],
+    "structs": {
+      "VersionControl": {
+        "abilities": {
+          "abilities": [
+            "Copy",
+            "Drop",
+            "Store"
+          ]
+        },
+        "typeParameters": [],
+        "fields": [
+          {
+            "name": "allowed_functions",
+            "type": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "vec_set",
+                  "name": "VecSet",
+                  "typeArguments": [
+                    {
+                      "Struct": {
+                        "address": "0x1",
+                        "module": "ascii",
+                        "name": "String",
+                        "typeArguments": []
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "exposedFunctions": {
+      "allow_function": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+                "module": "version_control",
+                "name": "VersionControl",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "allowed_functions": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+                "module": "version_control",
+                "name": "VersionControl",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "MutableReference": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x2",
+                  "module": "vec_set",
+                  "name": "VecSet",
+                  "typeArguments": [
+                    {
+                      "Struct": {
+                        "address": "0x1",
+                        "module": "ascii",
+                        "name": "String",
+                        "typeArguments": []
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "check": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+                "module": "version_control",
+                "name": "VersionControl",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "disallow_function": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+                "module": "version_control",
+                "name": "VersionControl",
+                "typeArguments": []
+              }
+            }
+          },
+          "U64",
+          {
+            "Struct": {
+              "address": "0x1",
+              "module": "ascii",
+              "name": "String",
+              "typeArguments": []
+            }
+          }
+        ],
+        "return": []
+      },
+      "latest_version": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Reference": {
+              "Struct": {
+                "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+                "module": "version_control",
+                "name": "VersionControl",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": [
+          "U64"
+        ]
+      },
+      "new": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "Vector": {
+              "Vector": {
+                "Struct": {
+                  "address": "0x1",
+                  "module": "ascii",
+                  "name": "String",
+                  "typeArguments": []
+                }
+              }
+            }
+          }
+        ],
+        "return": [
+          {
+            "Struct": {
+              "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+              "module": "version_control",
+              "name": "VersionControl",
+              "typeArguments": []
+            }
+          }
+        ]
+      },
+      "push_back": {
+        "visibility": "Public",
+        "isEntry": false,
+        "typeParameters": [],
+        "parameters": [
+          {
+            "MutableReference": {
+              "Struct": {
+                "address": "0x6e8ebd241a5b89499e0cd104540f8025af111dcd42644bb732dbc170e395ce0c",
+                "module": "version_control",
+                "name": "VersionControl",
+                "typeArguments": []
+              }
+            }
+          },
+          {
+            "Vector": {
+              "Struct": {
+                "address": "0x1",
+                "module": "ascii",
+                "name": "String",
+                "typeArguments": []
+              }
+            }
+          }
+        ],
+        "return": []
+      }
+    }
+  }
+}
