@@ -134,6 +134,17 @@ function getVMChainMap(vmChains: VmChainConfig[]) {
   }, {});
 }
 
+async function getAllChains(axelarConfigClient: AxelarConfigClient) {
+  const axelarConfig = await axelarConfigClient.getAxelarConfigs();
+  const chainKeys = Object.keys(axelarConfig.chains);
+  return chainKeys
+    .map((key) => axelarConfig.chains[key])
+    .filter(
+      (chain) =>
+        chain.chainType !== "axelarnet" && (chain.config as any).contracts
+    );
+}
+
 // Internal helper function to fetch, filter, and map EVM chains
 async function getEvmChainsMapInternal<TCacheKey extends string>(
   kvClient: MaestroKVClient,
@@ -147,9 +158,7 @@ async function getEvmChainsMapInternal<TCacheKey extends string>(
     }
   }
 
-  const axelarConfig = await axelarConfigClient.getAxelarConfigs();
-  const chainKeys = Object.keys(axelarConfig.chains);
-  const allChains = chainKeys.map((key) => axelarConfig.chains[key]);
+  const allChains = await getAllChains(axelarConfigClient);
 
   const configuredIDs = CHAIN_CONFIGS.map((chain) => chain.id);
 
@@ -177,12 +186,10 @@ async function getVmChainsMapInternal<TCacheKey extends string>(
     }
   }
 
-  const axelarConfig = await axelarConfigClient.getAxelarConfigs();
-  const chainKeys = Object.keys(axelarConfig.chains);
-  const allChains = chainKeys.map((key) => axelarConfig.chains[key]);
+  const allChains = await getAllChains(axelarConfigClient);
 
   const eligibleChains = allChains.filter(
-    (chain) => !["evm", "axelarnet"].includes(chain.chainType)
+    (chain) => !["evm"].includes(chain.chainType)
   );
 
   const chainsMap = getVMChainMap(eligibleChains as VmChainConfig[]);
