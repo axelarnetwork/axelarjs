@@ -10,7 +10,7 @@ import { TransactionExecutionError } from "viem";
 
 import { useAccount, useSwitchChain } from "~/lib/hooks";
 import { ITSChainConfig } from "~/server/chainConfig";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,

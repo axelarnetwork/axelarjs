@@ -9,7 +9,7 @@ import { filter, map } from "rambda";
 
 import { CHAIN_CONFIGS } from "~/config/chains";
 import { trpc } from "~/lib/trpc";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import Pagination from "~/ui/components/Pagination";
 import Page from "~/ui/layouts/Page";

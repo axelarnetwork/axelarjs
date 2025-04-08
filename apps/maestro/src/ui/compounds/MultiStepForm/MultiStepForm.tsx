@@ -31,7 +31,7 @@ import { useSession } from "next-auth/react";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
 import ConnectWalletModal from "../ConnectWalletModal/ConnectWalletModal";
 

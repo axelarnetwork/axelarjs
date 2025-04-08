@@ -16,7 +16,7 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 

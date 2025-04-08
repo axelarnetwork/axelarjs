@@ -10,7 +10,7 @@ import {
 import { useBalance, useChainId } from "~/lib/hooks";
 import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
 export type UseStep2ChainSelectionStateProps = {

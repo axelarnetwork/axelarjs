@@ -14,7 +14,7 @@ import {
   useChainInfoQuery,
   useEstimateGasFeeQuery,
 } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useTransactionsContainer } from "../Transactions";

@@ -10,7 +10,7 @@ import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useChainId } from "~/lib/hooks";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";

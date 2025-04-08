@@ -14,7 +14,7 @@ import { isAddress } from "viem";
 import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { isValidSuiTokenAddress } from "~/lib/utils/validation";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import ChainsDropdown, {
