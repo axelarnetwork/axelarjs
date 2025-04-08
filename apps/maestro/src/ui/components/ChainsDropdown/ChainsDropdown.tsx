@@ -1,4 +1,3 @@
-import { ITSChainConfig } from "@axelarjs/api";
 import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
@@ -10,7 +9,8 @@ import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
 
 import { useAccount, useSwitchChain } from "~/lib/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ITSChainConfig } from "~/server/chainConfig";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,

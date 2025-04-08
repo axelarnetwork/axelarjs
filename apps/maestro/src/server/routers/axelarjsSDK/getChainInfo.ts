@@ -69,7 +69,7 @@ export const getChainInfo = publicProcedure
       // otherwise, we throw an internal server error
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get chain info",
+        message: `Failed to get chain info ${input.axelarChainId}`,
       });
     }
   });

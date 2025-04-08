@@ -33,7 +33,7 @@ export const getSuiChainConfig = async (
     throw new Error("Invalid chain config");
   }
 
-  return chainConfig;
+  return chainConfig as SuiChainConfig;
 };
 
 export type SuiObjectCreated =

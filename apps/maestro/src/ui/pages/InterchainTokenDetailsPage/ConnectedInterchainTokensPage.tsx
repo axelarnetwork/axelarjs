@@ -26,7 +26,7 @@ import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
