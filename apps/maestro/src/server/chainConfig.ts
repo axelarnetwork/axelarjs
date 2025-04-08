@@ -8,6 +8,9 @@ import { invariant } from "@axelarjs/utils";
 import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
 import MaestroKVClient from "~/services/db/kv";
 
+/**
+ * This chain config type is used for mapping the s3 chain config type into the type we've used across ITS Portal app to limit changes across the codebase.
+ */
 type ITSBaseChainConfig = {
   id: string;
   chain_id: number;
@@ -23,20 +26,14 @@ type ITSBaseChainConfig = {
   };
 };
 
-// Remove types from original response
-type OMITTED_TYPES =
-  | "iconUrl"
-  | "displayName"
-  | "nativeCurrency"
-  | "externalChainId"
-  | "assets"
-  | "chainType";
+// Picked types from original response (what we keep it as-is from the response)
+type PICKED_TYPES = "config" | "blockExplorers";
 
 // Map API response to our used fields
-export type ITSEvmChainConfig = Omit<VmChainConfig, OMITTED_TYPES> &
+export type ITSEvmChainConfig = Pick<VmChainConfig, PICKED_TYPES> &
   ITSBaseChainConfig;
 
-export type ITSVmChainConfig = Omit<VmChainConfig, OMITTED_TYPES> &
+export type ITSVmChainConfig = Pick<VmChainConfig, PICKED_TYPES> &
   ITSBaseChainConfig;
 
 export type ITSChainConfig = ITSEvmChainConfig | ITSVmChainConfig;
@@ -50,10 +47,11 @@ export type VMChainsValue = {
   info: ITSVmChainConfig;
 };
 
-export type EVMChainsMap = Record<string | number, EvmChainsValue>;
-export type VMChainsMap = Record<string | number, VMChainsValue>;
+type ChainMapKey = string | number;
 
-export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
+export type EVMChainsMap = Record<ChainMapKey, EvmChainsValue>;
+export type VMChainsMap = Record<ChainMapKey, VMChainsValue>;
+export type ChainsMap = Record<ChainMapKey, EvmChainsValue | VMChainsValue>;
 
 /**
  * Creates an entry object for the chain map based on the chain type.
