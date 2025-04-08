@@ -60,7 +60,8 @@ export default function useRegisterRemoteInterchainTokens(
     if (
       !tokenDeployment ||
       !gasFeesData ||
-      tokenDeployment.kind !== "interchain"
+      tokenDeployment.kind !== "interchain" ||
+      chainId === SUI_CHAIN_ID
     )
       return [];
 
@@ -71,7 +72,7 @@ export default function useRegisterRemoteInterchainTokens(
         gasValue: gasFeesData.gasFees[i].fee,
       })
     );
-  }, [destinationChainIds, gasFeesData, tokenDeployment]);
+  }, [destinationChainIds, gasFeesData, tokenDeployment, chainId]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
@@ -93,9 +94,12 @@ export default function useRegisterRemoteInterchainTokens(
   const suiInput = {
     axelarChainIds: destinationChainIds,
     originChainId: input.originChainId,
-    tokenAddress: input.tokenAddress,
+    coinType: input.tokenAddress,
     symbol: tokenDeployment.tokenSymbol,
-    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? []
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
+    tokenManagerType: tokenDeployment.tokenManagerType as
+      | "lock_unlock"
+      | "mint_burn",
   };
 
   return {

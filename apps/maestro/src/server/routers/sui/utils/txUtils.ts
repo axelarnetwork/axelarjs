@@ -2,6 +2,7 @@ import type { SuiChainConfig } from "@axelarjs/api";
 
 import { SUI_PACKAGE_ID, TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import { TransactionResult } from "@mysten/sui/transactions";
+import { SUI_TYPE_ARG } from "@mysten/sui/utils";
 import { keccak256, stringToHex } from "viem";
 
 import { suiChainConfig } from "~/config/chains";
@@ -32,7 +33,7 @@ export async function getTokenIdByCoinMetadata(
   coinType: string,
   coinMetadata: any,
   chainConfig: SuiChainConfig,
-  isCanonical: boolean = false
+  isLockUnlock: boolean = false
 ) {
   const { InterchainTokenService: ITS, AxelarGateway } =
     chainConfig.config.contracts;
@@ -50,7 +51,7 @@ export async function getTokenIdByCoinMetadata(
       coinMetadata.symbol,
       txBuilder.tx.pure.u8(coinMetadata.decimals),
       txBuilder.tx.pure.bool(false),
-      txBuilder.tx.pure.bool(!isCanonical), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
+      txBuilder.tx.pure.bool(!isLockUnlock), // true for mint_burn, false for lock_unlock as this checks whether an address owns the treasury cap
     ],
   });
 
@@ -109,10 +110,10 @@ export async function deployRemoteInterchainToken(
   txBuilder: TxBuilder,
   chainConfig: SuiChainConfig,
   destinationChain: string,
-  coinMetadata: any,
+  tokenId: any,
   feeUnitAmount: number,
   sender: string,
-  tokenType: string
+  coinType: string
 ) {
   const {
     InterchainTokenService: ITS,
@@ -122,20 +123,14 @@ export async function deployRemoteInterchainToken(
   // Split coins for gas fee
   const gas = txBuilder.tx.splitCoins(txBuilder.tx.gas, [feeUnitAmount]);
 
-  const TokenId = await getTokenIdByCoinMetadata(
-    txBuilder,
-    tokenType,
-    coinMetadata,
-    chainConfig
-  );
   const messageTicket = await txBuilder.moveCall({
     target: `${ITS.address}::interchain_token_service::deploy_remote_interchain_token`,
-    arguments: [ITS.objects.InterchainTokenService, TokenId, destinationChain],
-    typeArguments: [tokenType],
+    arguments: [ITS.objects.InterchainTokenService, tokenId, destinationChain],
+    typeArguments: [coinType],
   });
   await txBuilder.moveCall({
     target: `${GasService.address}::gas_service::pay_gas`,
-    typeArguments: [`0x2::sui::SUI`],
+    typeArguments: [SUI_TYPE_ARG],
     arguments: [
       GasService.objects.GasService,
       messageTicket,

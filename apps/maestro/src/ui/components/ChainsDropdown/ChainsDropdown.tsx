@@ -1,8 +1,9 @@
+import { ITSChainConfig } from "@axelarjs/api";
 import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useMemo, useState, type FC } from "react";
 import Image from "next/image";
 
 import { find, propEq } from "rambda";
@@ -29,22 +30,32 @@ export const ChainIcon: FC<{
   alt: string;
   className?: string;
 }> = (props) => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const iconSize = ICON_SIZES[props.size];
 
   return (
     <div
       className={cn(
         "rounded-full bg-base-200 p-0.5 shadow-black group-hover:ring-2",
+        isLoaded ? "opacity-100" : "opacity-0",
+        "transition-opacity duration-200",
         props.className
       )}
     >
-      <Image
-        className="overflow-hidden rounded-full bg-base-300"
-        src={props.src}
-        alt={props.alt}
-        width={iconSize}
-        height={iconSize}
-      />
+      <div
+        className={cn("overflow-hidden rounded-full bg-base-300")}
+        style={{ width: iconSize, height: iconSize }}
+      >
+        <Image
+          className={cn("overflow-hidden rounded-full bg-base-300")}
+          src={props.src}
+          alt={props.alt}
+          width={iconSize}
+          height={iconSize}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setIsLoaded(false)}
+        />
+      </div>
     </div>
   );
 };

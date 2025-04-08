@@ -22,7 +22,7 @@ import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchain
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
 
 export function useSendInterchainTokenState(props: {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
   tokenId: `0x${string}`;

@@ -21,7 +21,7 @@ import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 
 export type UseSendInterchainTokenConfig = {
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   tokenId: `0x${string}`;
   sourceChainName: string;
   destinationChainName: string;
@@ -40,13 +40,13 @@ export function useInterchainTokenServiceTransferMutation(
   const [txState, setTxState] = useTransactionState();
 
   const { data: decimals } = useReadInterchainTokenDecimals({
-    address: config.tokenAddress,
+    address: config.tokenAddress as `0x${string}`,
   });
 
   const { address } = useAccount();
 
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
-    config.tokenAddress,
+    config.tokenAddress as `0x${string}`,
     NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
   );
 
@@ -167,7 +167,7 @@ export function useInterchainTokenServiceTransferMutation(
         // only request spend approval if the allowance is not enough
         if (!tokenAllowance || tokenAllowance < approvedAmountRef.current) {
           await approveInterchainTokenAsync({
-            address: config.tokenAddress,
+            address: config.tokenAddress as `0x${string}`,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
               spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
               amount: approvedAmountRef.current,

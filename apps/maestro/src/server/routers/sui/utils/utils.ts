@@ -3,19 +3,23 @@ import { SuiChainConfig } from "@axelarjs/api";
 import { TxBuilder } from "@axelar-network/axelar-cgp-sui";
 import {
   SuiClient,
-  SuiObjectChange,
+  SuiEvent,
   SuiObjectResponse,
+  SuiTransactionBlockResponse,
   type DynamicFieldInfo,
   type DynamicFieldPage,
   type PaginatedCoins,
   type PaginatedTransactionResponse,
+  type SuiObjectChange,
 } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 
 import { suiChainConfig } from "~/config/chains";
 import { SUI_SERVICE } from "~/config/env";
 import { suiClient as client, suiClient } from "~/lib/clients/suiClient";
+import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
+import { CoinMetadata, queryCoinMetadata } from "../graphql";
 
 export const suiServiceBaseUrl = SUI_SERVICE;
 
@@ -32,8 +36,36 @@ export const getSuiChainConfig = async (
   return chainConfig as SuiChainConfig;
 };
 
+export type SuiObjectCreated =
+  | Extract<SuiObjectChange, { type: "created" }>
+  | undefined;
+
+export const findCoinDataObject = (
+  registerTokenResult: SuiTransactionBlockResponse
+) => {
+  return (
+    registerTokenResult?.objectChanges?.find(
+      (change) =>
+        change.type === "created" && change.objectType.includes("coin_data")
+    ) as SuiObjectCreated
+  )?.objectId;
+};
+
+export const findObjectByType = (
+  objectChanges: SuiObjectChange[],
+  type: string
+): SuiObjectCreated => {
+  return objectChanges.find(
+    (change) => change.type === "created" && change.objectType.includes(type)
+  ) as SuiObjectCreated;
+};
+
 export const findPublishedObject = (objectChanges: SuiObjectChange[]) => {
   return objectChanges.find((change) => change.type === "published");
+};
+
+export const findGatewayEventIndex = (events: SuiEvent[]) => {
+  return events.findIndex((event) => event.transactionModule === "gateway");
 };
 
 export const getObjectIdsByObjectTypes = (
@@ -77,6 +109,77 @@ export const getCoinType = async (tokenAddress: string) => {
   return coinType;
 };
 
+export const getPackageIdFromSuiTokenAddress = (tokenAddress: string) => {
+  if (isValidSuiTokenAddress(tokenAddress)) {
+    return tokenAddress.split("::")[0];
+  }
+  return tokenAddress;
+};
+
+/**
+ * Retrieves coin metadata with retry logic.
+ * @param coinType The coin type string.
+ * @param maxAttempts Maximum number of retry attempts.
+ * @param delayMs Delay between retries in milliseconds.
+ * @returns The coin metadata.
+ * @throws Error if metadata is not found after retries.
+ */
+export async function getCoinMetadataWithRetry(
+  coinType: string,
+  maxAttempts = 5,
+  delayMs = 300
+): Promise<CoinMetadata> {
+  let coinMetadata: CoinMetadata | null = null;
+  let attempts = 0;
+
+  while (!coinMetadata && attempts < maxAttempts) {
+    attempts++;
+
+    try {
+      coinMetadata = await queryCoinMetadata(coinType);
+    } catch {
+      console.debug("Failed to get coin metadata:", coinType);
+    }
+
+    if (!coinMetadata && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  if (!coinMetadata) {
+    throw new Error(
+      `Failed to get coin metadata for ${coinType} after ${maxAttempts} attempts.`
+    );
+  }
+
+  return coinMetadata;
+}
+
+/**
+ * Normalizes a Sui token address string to the format 0x<PACKAGE_ID>::<module_name>::<STRUCT_NAME>.
+ * It ensures the module name is lowercase and the struct name is uppercase.
+ * If the input string does not match the expected format, it's returned unchanged.
+ *
+ * @param tokenAddress The Sui token address string to normalize.
+ * @returns The normalized token address string or the original string if normalization is not applicable.
+ */
+export const normalizeSuiTokenAddress = (tokenAddress: string): string => {
+  if (!isValidSuiTokenAddress(tokenAddress)) {
+    // Return original if it doesn't match the basic structure
+    return tokenAddress;
+  }
+
+  const parts = tokenAddress.split("::");
+
+  if (parts.length === 3) {
+    const [packageId, moduleName, structName] = parts;
+    return `${packageId}::${moduleName.toLowerCase()}::${structName.toUpperCase()}`;
+  }
+
+  // Fallback: return original if splitting didn't yield 3 parts (unexpected)
+  return tokenAddress;
+};
+
 export const getCoinAddressFromType = (
   coinType: string,
   prefix: string = "CoinData"
@@ -103,15 +206,15 @@ function findTreasuryCap(txData: PaginatedTransactionResponse) {
   return null;
 }
 
-export const getTreasuryCap = async (tokenAddress: string) => {
+export const getTreasuryCap = async (coinType: string) => {
   let cursor: string | null | undefined = null;
   let txs: PaginatedTransactionResponse | null;
   let treasuryCap: string | null = null;
-
+  const address = getCoinAddressFromType(coinType);
   do {
     txs = await client.queryTransactionBlocks({
       filter: {
-        ChangedObject: tokenAddress,
+        ChangedObject: address,
       },
       cursor,
       options: {
@@ -268,16 +371,19 @@ async function extractCoinInfo(coin: SuiObjectResponse) {
 
   const operator = coinManagement.operator as string | undefined;
   const distributorChannelId = coinManagement.distributor;
+  let distributor = null;
 
-  const channalDetails = await suiClient.getObject({
-    id: distributorChannelId,
-    options: {
-      showOwner: true,
-    },
-  });
+  if (distributorChannelId) {
+    const channalDetails = await suiClient.getObject({
+      id: distributorChannelId,
+      options: {
+        showOwner: true,
+      },
+    });
 
-  const distributor = (channalDetails.data?.owner as { AddressOwner?: string })
-    ?.AddressOwner;
+    distributor = (channalDetails.data?.owner as { AddressOwner?: string })
+      ?.AddressOwner;
+  }
 
   return {
     decimals: coinInfo.decimals,
@@ -285,8 +391,9 @@ async function extractCoinInfo(coin: SuiObjectResponse) {
     symbol: coinInfo.symbol,
     operator,
     distributor,
-    totalSupply: coinManagement.treasury_cap.fields.total_supply.fields.value,
-    treasuryCap: coinManagement.treasury_cap.fields.id.id,
+    totalSupply:
+      coinManagement?.treasury_cap?.fields?.total_supply?.fields?.value,
+    treasuryCap: coinManagement?.treasury_cap?.fields?.id?.id,
   };
 }
 

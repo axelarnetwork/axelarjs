@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { uniq, without } from "rambda";
 
 import { logger } from "~/lib/logger";
+import { RegisterCanonicalTokenResult } from "../suiHooks/useRegisterCanonicalToken";
 
 export type DeployAndRegisterTransactionState =
   | {
@@ -18,6 +19,7 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "deployed";
+      suiTx?: RegisterCanonicalTokenResult;
       txHash: string;
       tokenAddress: string;
     };

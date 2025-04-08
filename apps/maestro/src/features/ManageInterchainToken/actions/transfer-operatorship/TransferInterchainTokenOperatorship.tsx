@@ -22,7 +22,7 @@ import { useWriteTokenManagerTransferOperatorship } from "~/lib/contracts/TokenM
 import { SUI_CHAIN_ID, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { useTransferTreasuryCapMutation } from "../../hooks/useTransferTreasuryCapMutation";
+import { useTransferOperatorshipMutation } from "../../hooks/useTransferOperatorshipMutation";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 
 type FormState = {
@@ -103,7 +103,7 @@ export const TransferInterchainTokenOperatorship: FC = () => {
     [onSuccess, transferTxHash]
   );
 
-  const { transferTreasuryCap } = useTransferTreasuryCapMutation();
+  const { transferOperatorship } = useTransferOperatorshipMutation();
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: transferTxHash,
@@ -126,9 +126,11 @@ export const TransferInterchainTokenOperatorship: FC = () => {
 
       try {
         if (chainId === SUI_CHAIN_ID) {
-          const result = await transferTreasuryCap(
+          const result = await transferOperatorship(
             tokenDetails?.tokenAddress as string,
-            data.recipientAddress
+            data.recipientAddress,
+            state.tokenId,
+            tokenDetails?.tokenSymbol as string
           );
 
           if (result?.digest) {
@@ -178,9 +180,11 @@ export const TransferInterchainTokenOperatorship: FC = () => {
     [
       setTxState,
       chainId,
-      transferTreasuryCap,
+      transferOperatorship,
       tokenDetails?.tokenAddress,
+      tokenDetails?.tokenSymbol,
       tokenDetails?.tokenManagerAddress,
+      state.tokenId,
       onSuccess,
       transferOperatorshipAsync,
     ]

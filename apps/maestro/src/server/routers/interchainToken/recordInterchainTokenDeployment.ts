@@ -3,6 +3,7 @@ import { invariant, Maybe } from "@axelarjs/utils";
 import { always } from "rambda";
 import { z } from "zod";
 
+import { ExtendedWagmiChainConfig } from "~/config/chains";
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { EvmChainsValue } from "~/server/chainConfig";
 import { protectedProcedure } from "~/server/trpc";
@@ -130,7 +131,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
           tokenAddress,
           axelarChainId,
           tokenManagerAddress,
-          tokenManagerType: "mint_burn" as const,
+          tokenManagerType,
           tokenId: input.tokenId,
           deployerAddress: input.deployerAddress,
           deploymentMessageId: input.deploymentMessageId,
