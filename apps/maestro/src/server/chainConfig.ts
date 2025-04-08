@@ -126,14 +126,20 @@ function getVMChainMap(vmChains: VmChainConfig[]) {
       (config) => config.axelarChainId === chain.id
     )?.id;
 
-    // We handle the invariant check specifically in evmChains
+    // We handle the invariant check specifically in evmChains function later
     const entry = createChainMapEntry(chain, undefined, internalChainIdNumber);
 
-    return {
-      ...acc,
-      [chain.id]: entry,
-      [internalChainIdNumber as number]: entry,
-    } as VMChainsMap;
+    // Only add entry if internalChainIdNumber was found
+    if (internalChainIdNumber) {
+      return {
+        ...acc,
+        [chain.id]: entry,
+        [internalChainIdNumber]: entry,
+      } as VMChainsMap;
+    }
+
+    // Skip adding the entry if internalChainIdNumber is not found
+    return acc;
   }, {});
 }
 
