@@ -1,4 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
 import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
@@ -14,8 +13,6 @@ import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hoo
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
-type ChainConfig = EVMChainConfig | VMChainConfig;
-
 export type UseStep2ChainSelectionStateProps = {
   selectedChains: Set<string>;
 };
@@ -28,9 +25,7 @@ export function useStep2ChainSelectionState() {
   const [totalGasFee, setTotalGasFee] = useState(formatEther(0n));
 
   const [sourceChainId, setSourceChainId] = useState<string>(() => {
-    const chain = allChains?.find(
-      (chain: ChainConfig) => chain.chain_id === chainId
-    );
+    const chain = allChains?.find((chain) => chain.chain_id === chainId);
     return chain?.id || "";
   });
 

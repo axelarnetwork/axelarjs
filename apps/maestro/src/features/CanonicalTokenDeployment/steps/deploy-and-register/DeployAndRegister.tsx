@@ -17,11 +17,11 @@ import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/Can
 import { useTransactionsContainer } from "~/features/Transactions";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
+import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
-import { filterEligibleChains } from "~/lib/utils/chains";
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =

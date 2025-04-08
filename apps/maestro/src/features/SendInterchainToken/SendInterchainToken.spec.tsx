@@ -1,33 +1,26 @@
-import type { EVMChainConfig } from "@axelarjs/api";
-
 import { render } from "@testing-library/react";
 import { vi } from "vitest";
 
 import { setupWithUserEvent } from "~/lib/utils/tests";
+import type { ITSChainConfig } from "~/server/chainConfig";
 import SendInterchainToken from "./SendInterchainToken";
 import type { Actions, State } from "./SendInterchainToken.state";
 
-const MOCK_EVM_CHAIN_CONFIG: EVMChainConfig = {
-  id: "1",
-  maintainer_id: "maintainer_1",
+const MOCK_EVM_CHAIN_CONFIG: ITSChainConfig = {
+  id: "ethereum",
   chain_name: "Ethereum",
   name: "Ethereum Mainnet",
   chain_id: 1,
-  explorer: {
-    name: "Etherscan",
-    url: "https://etherscan.io/",
-    icon: "etherscan-icon.png",
-    block_path: "/block/{{blockNumber}}",
-    address_path: "/address/{{address}}",
-    contract_path: "/address/{{address}}#code",
-    contract_0_path: "/address/{{address}}#readContract",
-    transaction_path: "/tx/{{transactionHash}}",
-  },
+  blockExplorers: [
+    {
+      name: "Etherscan",
+      url: "https://etherscan.io/",
+    },
+  ],
   image: "ethereum-logo.png",
-  color: "#3C3C3D",
-  deprecated: false,
   chain_type: "evm",
-  endpoints: {
+  config: {
+    contracts: {},
     rpc: ["https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"],
   },
   native_token: {

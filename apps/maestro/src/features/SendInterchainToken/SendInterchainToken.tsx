@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Button,
@@ -18,12 +17,13 @@ import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { isValidSuiAddress } from "@mysten/sui/utils";
 import { formatUnits, parseUnits } from "viem";
 
-import { useAccount } from "~/lib/hooks";
+import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
+import { ITSChainConfig } from "~/server/chainConfig";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -40,7 +40,7 @@ type Props = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   kind: "canonical" | "interchain";
-  sourceChain: EVMChainConfig;
+  sourceChain: ITSChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
   originTokenAddress?: `0x${string}`;
@@ -299,7 +299,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           props.onClose?.();
           resetForm();
           actions.resetTxState();
-        }  
+        }
         actions.setIsModalOpen(isOpen);
       }}
     >
@@ -405,9 +405,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
               {isSameChainType && (
-                <Label.AltText className="hover:cursor-pointer hover:opacity-30 transition-opacity" onClick={() => {
-                  setValue("destinationAddress", address ?? "");
-                }}>Use connected wallet address</Label.AltText>
+                <Label.AltText
+                  className="transition-opacity hover:cursor-pointer hover:opacity-30"
+                  onClick={() => {
+                    setValue("destinationAddress", address ?? "");
+                  }}
+                >
+                  Use connected wallet address
+                </Label.AltText>
               )}
             </Label>
             <TextInput

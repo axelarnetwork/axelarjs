@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api/axelarscan";
 import {
   Badge,
   Button,
@@ -22,6 +21,7 @@ import { TransactionExecutionError } from "viem";
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
+import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -72,11 +72,12 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         explorerUrl: "",
       };
     }
-    const { explorer } = props.chain;
+    const { blockExplorers } = props.chain;
+    const explorer = blockExplorers?.[0];
 
     return {
-      explorerName: explorer.name,
-      explorerUrl: `${explorer.url}/token/${props.tokenAddress}`,
+      explorerName: explorer?.name,
+      explorerUrl: `${explorer?.url}/token/${props.tokenAddress}`,
     };
   }, [props.chain, props.tokenAddress]);
 
@@ -226,7 +227,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                     <AcceptInterchainTokenOwnership
                       accountAddress={address}
                       tokenAddress={props.tokenAddress}
-                      sourceChain={props.chain as EVMChainConfig}
+                      sourceChain={props.chain as ITSChainConfig}
                       tokenId={props.tokenId}
                     />
                   </>
@@ -252,7 +253,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                       <AcceptInterchainTokenOwnership
                         accountAddress={address}
                         tokenAddress={props.tokenAddress}
-                        sourceChain={props.chain as EVMChainConfig}
+                        sourceChain={props.chain as ITSChainConfig}
                         tokenId={props.tokenId}
                       />
                     ) : (
@@ -276,7 +277,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                         tokenAddress={props.tokenAddress}
                         tokenId={props.tokenId}
                         kind={props.kind}
-                        sourceChain={props.chain as EVMChainConfig}
+                        sourceChain={props.chain as ITSChainConfig }
                         balance={balance}
                         originTokenAddress={props.originTokenAddress}
                         originTokenChainId={props.originTokenChainId}

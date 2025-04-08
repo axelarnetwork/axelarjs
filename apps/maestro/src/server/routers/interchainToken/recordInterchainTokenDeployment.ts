@@ -2,9 +2,9 @@ import { invariant, Maybe } from "@axelarjs/utils";
 
 import { always } from "rambda";
 import { z } from "zod";
-import { ExtendedWagmiChainConfig } from "~/config/chains";
 
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
+import { EvmChainsValue } from "~/server/chainConfig";
 import { protectedProcedure } from "~/server/trpc";
 import {
   newInterchainTokenSchema,
@@ -28,7 +28,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
     const chains = await ctx.configs.chains();
 
     if (!input.axelarChainId.includes("sui")) {
-      const configs = chains[input.axelarChainId];
+      const configs = chains[input.axelarChainId] as EvmChainsValue;
 
       invariant(
         configs,
@@ -42,7 +42,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
 
       // Handle different chain types
       const createServiceClient = () => {
-        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi as ExtendedWagmiChainConfig);
+        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
       };
 
       const originChainServiceClient = createServiceClient();
@@ -54,7 +54,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         .catch(() => null)) as `0x${string}`;
 
       const createTokenManagerClient = (address: string) => {
-        return ctx.contracts.createTokenManagerClient(configs.wagmi as ExtendedWagmiChainConfig, address);
+        return ctx.contracts.createTokenManagerClient(configs.wagmi, address);
       };
 
       const tokenManagerClient = !tokenManagerAddress
@@ -98,12 +98,13 @@ export const recordInterchainTokenDeployment = protectedProcedure
         let tokenManagerAddress;
 
         if (!axelarChainId.includes("sui")) {
+          const evmChainConfig = chainConfig as EvmChainsValue;
           invariant(
-            chainConfig.wagmi,
+            evmChainConfig.wagmi,
             `No wagmi configuration found for chain ${axelarChainId}`
           );
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
-            chainConfig.wagmi
+            evmChainConfig.wagmi
           );
 
           [tokenManagerAddress, tokenAddress] = await Promise.all([

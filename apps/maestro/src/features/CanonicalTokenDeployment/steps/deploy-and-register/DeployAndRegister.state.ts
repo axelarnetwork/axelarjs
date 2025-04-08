@@ -1,4 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api/axelarscan";
 import { Maybe } from "@axelarjs/utils";
 import { useEffect, useState } from "react";
 
@@ -12,6 +11,7 @@ import { useBalance, useChainId } from "~/lib/hooks";
 import { toNumericString } from "~/lib/utils/bigint";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ITSChainConfig } from '~/server/chainConfig'
 import { useCanonicalTokenDeploymentStateContainer } from "../../CanonicalTokenDeployment.state";
 
 export type UseStep3ChainSelectionStateProps = {
@@ -27,7 +27,7 @@ export function useStep3ChainSelectionState() {
 
   // Find source chain from both EVM and VM chains
   const currentChain = allChains?.find(
-    (chain: EVMChainConfig | VMChainConfig) => chain.chain_id === chainId
+    (chain: ITSChainConfig) => chain.chain_id === chainId
   );
 
   const [sourceChainId, setSourceChainId] = useState<string>(

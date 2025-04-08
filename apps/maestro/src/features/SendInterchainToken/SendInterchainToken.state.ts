@@ -1,4 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
@@ -10,6 +9,7 @@ import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { ITSChainConfig } from "~/server/chainConfig";
 import {
   useChainInfoQuery,
   useEstimateGasFeeQuery,
@@ -21,14 +21,12 @@ import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
 
-type ChainConfig = EVMChainConfig | VMChainConfig;
-
 export function useSendInterchainTokenState(props: {
   tokenAddress: `0x${string}`;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
   tokenId: `0x${string}`;
-  sourceChain: ChainConfig;
+  sourceChain: ITSChainConfig;
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
   destinationAddress?: string;

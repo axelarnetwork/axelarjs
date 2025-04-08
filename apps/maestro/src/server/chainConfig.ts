@@ -10,7 +10,7 @@ import MaestroKVClient from "~/services/db/kv";
 
 type ITSBaseChainConfig = {
   id: string;
-  chain_id?: number;
+  chain_id: number;
   name: string;
   image: string;
   chain_name: string;
@@ -23,18 +23,23 @@ type ITSBaseChainConfig = {
   };
 };
 
-export type ITSEvmChainConfig = Omit<
-  VmChainConfig,
-  "iconUrl" | "displayName" | "nativeCurrency" | "externalChainId"
-> &
+// Remove types from original response
+type OMITTED_TYPES =
+  | "iconUrl"
+  | "displayName"
+  | "nativeCurrency"
+  | "externalChainId"
+  | "assets"
+  | "chainType";
+
+// Map API response to our used fields
+export type ITSEvmChainConfig = Omit<VmChainConfig, OMITTED_TYPES> &
   ITSBaseChainConfig;
 
-// Mapping with our existing used fields name
-export type ITSVmChainConfig = Omit<
-  VmChainConfig,
-  "iconUrl" | "displayName" | "nativeCurrency" | "externalChainId"
-> &
+export type ITSVmChainConfig = Omit<VmChainConfig, OMITTED_TYPES> &
   ITSBaseChainConfig;
+
+export type ITSChainConfig = ITSEvmChainConfig | ITSVmChainConfig;
 
 export type EvmChainsValue = {
   info: ITSEvmChainConfig;
@@ -226,7 +231,7 @@ export async function evmChains<TCacheKey extends string>(
       `wagmiConfig is required for EVM chain ${entry.info.id}`
     );
     // If the invariant passes, we know entry matches EvmChainsValue structure
-    validatedMap[key] = entry as EvmChainsValue;
+    validatedMap[key] = entry;
   }
 
   return validatedMap;

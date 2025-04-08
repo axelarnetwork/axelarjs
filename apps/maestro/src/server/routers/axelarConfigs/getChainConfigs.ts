@@ -1,5 +1,3 @@
-import { ChainConfig } from "@axelarjs/api";
-
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
