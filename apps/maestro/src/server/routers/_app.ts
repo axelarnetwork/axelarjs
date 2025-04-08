@@ -4,7 +4,6 @@ import { accountsRouter } from "./accounts";
 import { authRouter } from "./auth";
 import { axelarConfigsRouter } from "./axelarConfigs";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
-import { axelarscanRouter } from "./axelarscan";
 import { erc20Router } from "./erc20";
 import { gmpRouter } from "./gmp";
 import { interchainTokenRouter } from "./interchainToken";
@@ -17,7 +16,6 @@ export const appRouter = router({
     uptime: process.uptime(),
   })),
   gmp: gmpRouter,
-  axelarscan: axelarscanRouter,
   erc20: erc20Router,
   axelarjsSDK: axelarjsSDKRouter,
   axelarConfigs: axelarConfigsRouter,

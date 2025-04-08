@@ -25,7 +25,6 @@ import {
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
-import axelarscanClient from "~/services/axelarscan";
 import MaestroKVClient from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
@@ -61,7 +60,6 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     session,
     services: {
       gmp: gmpClient,
-      axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
       axelarQuery: axelarQueryClient,
       openai: openaiClient,
