@@ -3,7 +3,6 @@ import { invariant, Maybe } from "@axelarjs/utils";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { ExtendedWagmiChainConfig } from "~/config/chains";
 import { getTokenManagerTypeFromBigInt } from "~/lib/drizzle/schema/common";
 import { EvmChainsValue } from "~/server/chainConfig";
 import { protectedProcedure } from "~/server/trpc";
