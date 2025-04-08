@@ -61,19 +61,33 @@ export type ChainsMap = Record<ChainMapKey, EvmChainsValue | VMChainsValue>;
  * @param internalChainIdNumber Optional internal chain ID (for VM chains).
  * @returns The corresponding chain map entry (EvmChainsValue or VMChainsValue).
  */
-function createChainMapEntry(
+function mapToITSChainValue(
   chain: EvmChainConfig | VmChainConfig,
   wagmiConfig?: ExtendedWagmiChainConfig,
   internalChainIdNumber?: number
 ): EvmChainsValue | VMChainsValue {
+  const {
+    id,
+    displayName,
+    config,
+    iconUrl,
+    nativeCurrency,
+    chainType,
+    blockExplorers,
+  } = chain;
   const baseInfo = {
-    id: chain.id,
-    name: chain.displayName,
-    image: chain.iconUrl,
-    native_token: chain.nativeCurrency,
-    config: chain.config,
-    chain_name: chain.id,
-    chain_type: chain.chainType,
+    id,
+    chain_id: 0, // Placeholder, will be overwritten below
+    name: displayName,
+    image: iconUrl,
+    native_token: nativeCurrency,
+    chain_name: id,
+    chain_type: chainType,
+  };
+
+  const commonData = {
+    config,
+    blockExplorers, // Add blockExplorers if needed, adjust type if VM can have it
   };
 
   if (chain.chainType === "evm") {
@@ -81,66 +95,21 @@ function createChainMapEntry(
     return {
       info: {
         ...baseInfo,
+        ...commonData,
         chain_id: parseInt(evmChain.externalChainId),
       },
-      wagmi: wagmiConfig, // wagmiConfig should be provided for EVM
+      wagmi: wagmiConfig, // wagmiConfig must be provided for EVM
     } as EvmChainsValue;
   } else {
     // Assume VM chain
     return {
       info: {
         ...baseInfo,
-        chain_id: internalChainIdNumber, // internalChainIdNumber should be provided for VM
+        ...commonData,
+        chain_id: internalChainIdNumber as number, // internalChainIdNumber must be provided for VM
       },
     } as VMChainsValue;
   }
-}
-
-function getEvmChainMap(
-  evmChains: EvmChainConfig[],
-  configuredIDs: number[]
-): EVMChainsMap {
-  const eligibleChains = evmChains.filter((chain) =>
-    configuredIDs.includes(parseInt(chain.externalChainId))
-  );
-
-  return eligibleChains.reduce((acc, chain) => {
-    const wagmiConfig = CHAIN_CONFIGS.find(
-      (config) => config.id === parseInt(chain.externalChainId)
-    );
-
-    // We handle the invariant check specifically in evmChains
-    const entry = createChainMapEntry(chain, wagmiConfig);
-
-    return {
-      ...acc,
-      [chain.id]: entry,
-      [parseInt(chain.externalChainId)]: entry,
-    } as EVMChainsMap;
-  }, {});
-}
-
-function getVMChainMap(vmChains: VmChainConfig[]) {
-  return vmChains.reduce((acc, chain) => {
-    const internalChainIdNumber = CHAIN_CONFIGS.find(
-      (config) => config.axelarChainId === chain.id
-    )?.id;
-
-    // We handle the invariant check specifically in evmChains function later
-    const entry = createChainMapEntry(chain, undefined, internalChainIdNumber);
-
-    // Only add entry if internalChainIdNumber was found
-    if (internalChainIdNumber) {
-      return {
-        ...acc,
-        [chain.id]: entry,
-        [internalChainIdNumber]: entry,
-      } as VMChainsMap;
-    }
-
-    // Skip adding the entry if internalChainIdNumber is not found
-    return acc;
-  }, {});
 }
 
 async function getAllChains(axelarConfigClient: AxelarConfigClient) {
@@ -171,12 +140,29 @@ async function getEvmChainsMapInternal<TCacheKey extends string>(
 
   const configuredIDs = CHAIN_CONFIGS.map((chain) => chain.id);
 
-  const eligibleChains = allChains.filter((chain) => chain.chainType === "evm");
-
-  const chainsMap = getEvmChainMap(
-    eligibleChains as EvmChainConfig[],
-    configuredIDs
+  const eligibleEvmChains = allChains.filter(
+    (chain): chain is EvmChainConfig =>
+      chain.chainType === "evm" &&
+      configuredIDs.includes(parseInt(chain.externalChainId))
   );
+
+  const chainsMap = eligibleEvmChains.reduce<EVMChainsMap>((acc, chain) => {
+    const wagmiConfig = CHAIN_CONFIGS.find(
+      (config) => config.id === parseInt(chain.externalChainId)
+    );
+
+    // invariant check happens in the public `evmChains` function
+    if (wagmiConfig) {
+      const entry = mapToITSChainValue(chain, wagmiConfig) as EvmChainsValue; // Cast needed because mapToITSChainValue can return VM type theoretically
+
+      acc[chain.id] = entry;
+      acc[parseInt(chain.externalChainId)] = entry;
+    }
+    // If wagmiConfig is not found, the chain is skipped, matching previous behavior implicitly
+
+    return acc;
+  }, {});
+
   await kvClient.setCached<EVMChainsMap>(cacheKey, chainsMap, 3600);
 
   return chainsMap;
@@ -197,11 +183,31 @@ async function getVmChainsMapInternal<TCacheKey extends string>(
 
   const allChains = await getAllChains(axelarConfigClient);
 
-  const eligibleChains = allChains.filter(
-    (chain) => !["evm"].includes(chain.chainType)
+  const eligibleVmChains = allChains.filter(
+    (chain): chain is VmChainConfig => chain.chainType !== "evm" // Assuming anything not EVM is VM for ITS purposes
   );
 
-  const chainsMap = getVMChainMap(eligibleChains as VmChainConfig[]);
+  const chainsMap = eligibleVmChains.reduce<VMChainsMap>((acc, chain) => {
+    const internalChainIdNumber = CHAIN_CONFIGS.find(
+      (config) => config.axelarChainId === chain.id
+    )?.id;
+
+    // Only add entry if internalChainIdNumber was found
+    if (internalChainIdNumber !== undefined) {
+      const entry = mapToITSChainValue(
+        chain,
+        undefined,
+        internalChainIdNumber
+      ) as VMChainsValue; // Cast needed because mapToITSChainValue can return EVM type theoretically
+
+      acc[chain.id] = entry;
+      acc[internalChainIdNumber] = entry;
+    }
+    // If internalChainIdNumber is not found, the chain is skipped
+
+    return acc;
+  }, {});
+
   await kvClient.setCached<VMChainsMap>(cacheKey, chainsMap, 3600);
   return chainsMap;
 }
@@ -225,18 +231,15 @@ export async function evmChains<TCacheKey extends string>(
     cacheKey
   );
 
-  // Post-process to ensure wagmi config exists for EVM chains, satisfying the EVMChainsMap type
-  const validatedMap: EVMChainsMap = {};
-  for (const key in chainsMap) {
-    const entry = chainsMap[key];
-    // Assert that wagmi config is present for EVM chains
+  // Post-process invariant check: Ensure wagmi config exists for all returned EVM chains.
+  // This check is crucial because the internal function might skip chains if wagmiConfig isn't found,
+  // but the public function guarantees that all *returned* chains have it.
+  Object.values(chainsMap).forEach((entry) => {
     invariant(
       entry.wagmi,
-      `wagmiConfig is required for EVM chain ${entry.info.id}`
+      `Invariant Violation: wagmiConfig is missing for EVM chain ${entry.info.id}. This should not happen if the chain is included in the final map.`
     );
-    // If the invariant passes, we know entry matches EvmChainsValue structure
-    validatedMap[key] = entry;
-  }
+  });
 
-  return validatedMap;
+  return chainsMap;
 }
