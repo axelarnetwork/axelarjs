@@ -46,7 +46,7 @@ export function useAllChainConfigsQuery() {
 
     // Process EVM chains first
     evmChains?.forEach((chain) => {
-      chainMap.set(chain.chain_id as number, chain);
+      chainMap.set(chain.chain_id, chain);
     });
 
     // Process VM chains, only add if not already present or if it's a special case
@@ -82,7 +82,7 @@ export function useEVMChainConfigsQuery() {
   const [configured, unconfigured] = useMemo(
     () =>
       partition(
-        (x) => (x.chain_id as number) in WAGMI_CHAIN_CONFIGS_BY_ID,
+        (x) => (x.chain_id) in WAGMI_CHAIN_CONFIGS_BY_ID,
         data ?? []
       ),
     [data]
