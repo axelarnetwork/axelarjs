@@ -7,7 +7,10 @@ import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import {
+  NEXT_PUBLIC_NETWORK_ENV,
+  NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+} from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
@@ -481,7 +484,7 @@ export async function getStellarTokenRegistrationDetails(
     // Create a network-configured Stellar contract client
     const ITSStellarContractClient = (await Client.from({
       contractId: chainConfig.config.contracts.InterchainTokenService.address,
-      networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE as string,
+      networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
       rpcUrl: rpcUrl,
     })) as unknown as StellarITSContractClient;
 
@@ -499,7 +502,7 @@ export async function getStellarTokenRegistrationDetails(
     // Check if the token contract exists
     const tokenStellarContractClient = (await Client.from({
       contractId: tokenAddress,
-      networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE as string,
+      networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
       rpcUrl: rpcUrl,
     }).catch(() => null)) as unknown as StellarITSContractClient;
 
