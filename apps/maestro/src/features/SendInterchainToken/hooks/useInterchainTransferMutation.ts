@@ -11,6 +11,7 @@ import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -78,13 +79,20 @@ export function useInterchainTransferMutation(
           status: "awaiting_approval",
         });
         let txHash: any;
+        let encodedRecipient: `0x${string}`;
+        // Encode the recipient address for Stellar since it's a base64 string
+        if (config.destinationChainName.toLowerCase().includes("stellar")) {
+          encodedRecipient = stellarEncodedRecipient(destinationAddress);
+        } else {
+          encodedRecipient = destinationAddress as `0x${string}`;
+        }
         if (config.sourceChainName.toLowerCase().includes("sui")) {
           const sendTokenTxJSON = await getSendTokenTx({
             sender: address,
             tokenId: tokenId,
             amount: bnAmount.toString(),
             destinationChain: config.destinationChainName,
-            destinationAddress: destinationAddress,
+            destinationAddress: encodedRecipient,
             gas: config.gas.toString() ?? "0",
             coinType: config.tokenAddress,
           });
@@ -93,13 +101,12 @@ export function useInterchainTransferMutation(
           });
           txHash = receipt.digest;
         } else {
-          const recipient = (destinationAddress ?? address) as `0x${string}`;
           txHash = await transferAsync({
             address: config.tokenAddress as `0x${string}`,
             value: config.gas ?? 0n,
             args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
               destinationChain: config.destinationChainName,
-              recipient,
+              recipient: encodedRecipient,
               amount: bnAmount,
               metadata: "0x",
             }),

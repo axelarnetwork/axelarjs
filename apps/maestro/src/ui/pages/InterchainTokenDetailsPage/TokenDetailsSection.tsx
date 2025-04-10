@@ -223,6 +223,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   function getTokenExplorerLink() {
     if (isSuiChain) {
       return `${props.chain.explorer.url}/coin/${props.tokenAddress}`;
+    } else if (props.chain.id.includes("stellar")) {
+      return `${props.chain.explorer.url}/contract/${props.tokenAddress}`;
     } else {
       return `${props.chain.explorer.url}/token/${props.tokenAddress}`;
     }

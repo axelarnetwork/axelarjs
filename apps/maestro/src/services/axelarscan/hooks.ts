@@ -4,14 +4,21 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { indexBy, partition, prop } from "rambda";
 
+import {
+  CHAIN_CONFIGS,
+  suiChainConfig,
+  WAGMI_CHAIN_CONFIGS,
+} from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { CHAIN_CONFIGS, suiChainConfig, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
-import { SUI_CHAIN_ID } from "~/lib/hooks";
 
-const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("axelarChainId"), CHAIN_CONFIGS);
+const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(
+  prop("axelarChainId"),
+  CHAIN_CONFIGS
+);
 const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
 
 export function useAllChainConfigsQuery() {
@@ -60,7 +67,7 @@ export function useAllChainConfigsQuery() {
       if (!existingChain || existingChain.id === chain.id) {
         chainMap.set(chain.chain_id, {
           ...chain,
-          displayName: chain.name, 
+          displayName: chain.name,
         });
       }
     });
@@ -89,7 +96,8 @@ export function useEVMChainConfigsQuery() {
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () => partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? []),
+    () =>
+      partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? []),
     [data]
   );
 
@@ -134,20 +142,19 @@ export function useVMChainConfigsQuery() {
     refetchOnWindowFocus: false,
   });
 
-  // TODO: Handle this in a centralized way
   for (const chain of data ?? []) {
-    if(chain.id.includes(suiChainConfig.axelarChainId)) {
+    if (chain.id.includes("stellar")) chain.chain_id = STELLAR_CHAIN_ID;
+    if (chain.id.includes(suiChainConfig.axelarChainId))
       chain.chain_id = SUI_CHAIN_ID;
-    }
   }
 
   // Filter out chains that are not configured in the app
-  const [configured, unconfigured] = useMemo(
-    () => {
-        return partition((x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID, data ?? [])
-    },
-    [data]
-  );
+  const [configured, unconfigured] = useMemo(() => {
+    return partition(
+      (x) => x.id in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
+      data ?? []
+    );
+  }, [data]);
 
   if (NEXT_PUBLIC_NETWORK_ENV !== "mainnet" && unconfigured?.length) {
     logger.once.info(
@@ -166,7 +173,9 @@ export function useVMChainConfigsQuery() {
     );
   }
 
-  const wagmiChains = configured.map((x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id]).filter(chain => chain);
+  const wagmiChains = configured
+    .map((x) => WAGMI_CHAIN_CONFIGS_BY_ID[x.chain_id])
+    .filter((chain) => chain);
 
   return {
     ...queryResult,

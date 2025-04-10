@@ -29,7 +29,7 @@ import {
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
-import { useAccount } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
@@ -42,7 +42,6 @@ export const ModalFormInput = tw(TextInput)`bg-base-200`;
 ModalFormInput.defaultProps = {
   $bordered: true,
 };
-
 
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
   return (
@@ -127,6 +126,7 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
   const { width } = useWindowSize();
   return (
     <ChainsDropdownComponent
+      excludeChainIds={[STELLAR_CHAIN_ID]}
       compact
       disabled={props.disabled}
       triggerClassName={cn("-translate-y-1.5", {

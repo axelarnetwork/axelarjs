@@ -435,8 +435,12 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...sepolia,
     rpcUrls: {
-      default: { http: ["https://rpc-sepolia.rockx.com"] },
-      public: { http: ["https://rpc-sepolia.rockx.com"] },
+      default: {
+        http: ["https://endpoints.omniatech.io/v1/eth/sepolia/public"],
+      },
+      public: {
+        http: ["https://endpoints.omniatech.io/v1/eth/sepolia/public"],
+      },
     },
     axelarChainId: "eth-sepolia",
     axelarChainName: "eth-sepolia",
