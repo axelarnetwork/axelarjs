@@ -193,7 +193,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         {!balance?.tokenBalance ? (
           !address ? null : (
             <div>
-              {props.chain?.chain_name?.toLowerCase().includes("stellar") ? (
+              {props.chain?.id?.toLowerCase().includes("stellar") ? (
                 <LinkButton
                   $size="xs"
                   $variant="primary"
