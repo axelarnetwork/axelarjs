@@ -29,7 +29,7 @@ import {
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
-import { STELAR_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
@@ -126,7 +126,7 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
   const { width } = useWindowSize();
   return (
     <ChainsDropdownComponent
-      excludeChainIds={[STELAR_CHAIN_ID]}
+      excludeChainIds={[STELLAR_CHAIN_ID]}
       compact
       disabled={props.disabled}
       triggerClassName={cn("-translate-y-1.5", {

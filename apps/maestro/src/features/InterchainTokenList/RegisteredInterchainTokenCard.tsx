@@ -82,7 +82,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
     return {
       explorerName: explorer.name,
-      explorerUrl: props.chain.chain_name.includes("stellar")
+      explorerUrl: props.chain.id.includes("stellar")
         ? `${explorer.url}/contract/${props.tokenAddress}`
         : `${explorer.url}/token/${props.tokenAddress}`,
     };

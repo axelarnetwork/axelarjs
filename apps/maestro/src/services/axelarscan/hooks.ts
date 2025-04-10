@@ -10,7 +10,7 @@ import {
   WAGMI_CHAIN_CONFIGS,
 } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { STELAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import axelarscanClient from ".";
@@ -143,7 +143,7 @@ export function useVMChainConfigsQuery() {
   });
 
   for (const chain of data ?? []) {
-    if (chain.id.includes("stellar")) chain.chain_id = STELAR_CHAIN_ID;
+    if (chain.id.includes("stellar")) chain.chain_id = STELLAR_CHAIN_ID;
     if (chain.id.includes(suiChainConfig.axelarChainId))
       chain.chain_id = SUI_CHAIN_ID;
   }
