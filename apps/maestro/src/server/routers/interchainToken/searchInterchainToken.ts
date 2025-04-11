@@ -480,7 +480,7 @@ export async function getStellarTokenRegistrationDetails(
 }> {
   try {
     const chainConfig = await getStellarChainConfig(ctx);
-    const rpcUrl = STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV];
+    const rpcUrl = chainConfig.config.rpc[0];
     // Create a network-configured Stellar contract client
     const ITSStellarContractClient = (await Client.from({
       contractId: chainConfig.config.contracts.InterchainTokenService.address,
