@@ -1,4 +1,3 @@
-import { STELLAR_RPC_URLS } from "@axelarjs/core";
 import { invariant } from "@axelarjs/utils";
 
 import { TRPCError } from "@trpc/server";
@@ -7,10 +6,7 @@ import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
-import {
-  NEXT_PUBLIC_NETWORK_ENV,
-  NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
-} from "~/config/env";
+import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
