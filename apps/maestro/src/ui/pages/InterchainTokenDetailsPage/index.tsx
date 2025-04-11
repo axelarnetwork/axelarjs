@@ -28,8 +28,8 @@ const InterchainTokensPage: FC = () => {
   });
 
   const { data: interchainTokenDetails } = useInterchainTokenDetailsQuery({
-    chainId: interchainToken?.chainId,
-    tokenAddress: interchainToken?.tokenAddress,
+    chainId: routeChain?.id,
+    tokenAddress,
   });
 
   const { data: tokenDetails } = useERC20TokenDetailsQuery({
