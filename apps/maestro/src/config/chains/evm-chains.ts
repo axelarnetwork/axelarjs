@@ -43,6 +43,7 @@ import {
   scroll,
   scrollSepolia,
   sepolia,
+  xrplevmTestnet,
 } from "viem/chains";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
@@ -446,6 +447,13 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "eth-sepolia",
     supportWagmi: true,
     environment: ENVIRONMENTS.devnet,
+  },
+  {
+    ...xrplevmTestnet,
+    axelarChainId: "xrpl-evm",
+    axelarChainName: "xrpl-evm",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.testnet,
   },
 ] as const;
 
