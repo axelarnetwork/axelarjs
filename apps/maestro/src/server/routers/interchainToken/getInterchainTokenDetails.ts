@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { suiChainConfig } from "~/config/chains";
 
+import { suiChainConfig } from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { SUI_CHAIN_ID } from "~/lib/hooks";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
@@ -68,7 +68,10 @@ export const getInterchainTokenDetails = publicProcedure
     const configs = evmChains[input.chainId] || vmChains[input.chainId];
 
     // TODO: remove this once we have sui in the chains object
-    const axelarChainId = input.chainId === SUI_CHAIN_ID ? suiChainConfig.axelarChainId : configs.info.id;
+    const axelarChainId =
+      input.chainId === SUI_CHAIN_ID
+        ? suiChainConfig.axelarChainId
+        : configs.info.id;
     // if (!configs) {
     //   throw new TRPCError({
     //     code: "NOT_FOUND",
