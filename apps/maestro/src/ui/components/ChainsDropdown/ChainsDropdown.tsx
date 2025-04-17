@@ -109,7 +109,7 @@ export const ChainIconComponent: FC<Props> = (props) => {
       <>
         <ChainIcon
           src={selectedChain.image}
-          alt={selectedChain.chain_name}
+          alt={selectedChain.name}
           size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
