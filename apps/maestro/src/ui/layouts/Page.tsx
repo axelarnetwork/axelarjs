@@ -15,7 +15,7 @@ import {
   useChainFromRoute,
   useSwitchChain,
 } from "~/lib/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import ChainsDropdown, { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
 import ConnectWalletModal from "../compounds/ConnectWalletModal/ConnectWalletModal";

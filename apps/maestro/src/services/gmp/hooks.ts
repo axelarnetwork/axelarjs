@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { trpc } from "~/lib/trpc";
 import { filterEligibleChains } from "~/lib/utils/chains";
-import { useAllChainConfigsQuery } from "../axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 
 export function useInterchainTokensQuery(input: {
   chainId?: number;

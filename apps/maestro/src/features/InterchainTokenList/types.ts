@@ -1,6 +1,7 @@
-import type { EVMChainConfig, GMPTxStatus } from "@axelarjs/api/index";
+import type { GMPTxStatus } from "@axelarjs/api/index";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
+import { ITSChainConfig } from "~/server/chainConfig";
 
 type Kind = "canonical" | "interchain";
 
@@ -15,7 +16,7 @@ export type TokenInfo = {
   decimals: number;
   kind: Kind;
   isSelected?: boolean;
-  chain?: EVMChainConfig;
+  chain?: ITSChainConfig;
   wagmiConfig?: ExtendedWagmiChainConfig;
   deploymentStatus?: "pending" | GMPTxStatus;
   deploymentTxHash?: `0x${string}:${number}`;

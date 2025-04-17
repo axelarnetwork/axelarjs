@@ -77,7 +77,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       public: { http: ["https://eth.llamarpc.com", "https://eth.drpc.org"] },
     },
     axelarChainId: "Ethereum",
-    axelarChainName: "ethereum",
+    axelarChainName: "Ethereum",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
   },
