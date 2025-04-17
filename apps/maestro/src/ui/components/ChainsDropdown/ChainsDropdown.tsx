@@ -72,6 +72,7 @@ type Props = {
   onSelectChain?: (chain?: ITSChainConfig) => void;
   size?: keyof typeof ICON_SIZES;
   chainType?: "evm" | "vm";
+  excludeChainIds?: number[];
 };
 
 export const ChainIconComponent: FC<Props> = (props) => {
@@ -149,7 +150,11 @@ const ChainsDropdown: FC<Props> = (props) => {
   const eligibleChains = Maybe.of(props.chains ?? allChains).mapOr(
     [],
     (chains) =>
-      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
+      chains.filter(
+        (chain) =>
+          !props.excludeChainIds?.includes(chain.chain_id) &&
+          chain.chain_id !== selectedChain?.chain_id
+      )
   );
 
   const handleChainChange = (chainId: number) => {

@@ -9,7 +9,12 @@ import { useRouter } from "next/router";
 import { CHAIN_CONFIGS } from "~/config/chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  useAccount,
+  useChainFromRoute,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import ChainsDropdown, { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";
@@ -174,6 +179,7 @@ const Page: FC<Props> = ({
                 )}
               </div>
               <ChainsDropdown
+                excludeChainIds={[STELLAR_CHAIN_ID]}
                 renderTrigger={() => (
                   <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}
@@ -262,7 +268,7 @@ const Page: FC<Props> = ({
           // id needed for the hero cta smooth scroll
           id="main-content"
           className={cn(
-            "mt-20 max-w-6xl grid min-h-[80dvh] flex-1 px-4 xl:px-2 2xl:px-0",
+            "mt-20 grid min-h-[80dvh] max-w-6xl flex-1 px-4 xl:px-2 2xl:px-0",
             {
               "place-items-center": isExceptionalState,
             },

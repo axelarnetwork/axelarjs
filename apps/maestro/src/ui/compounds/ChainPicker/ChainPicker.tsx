@@ -1,8 +1,8 @@
 import { Button, cn, Loading, Tooltip } from "@axelarjs/ui";
 import { useCallback, type FC } from "react";
-import Image from "next/image";
 
 import type { ITSEvmChainConfig, ITSVmChainConfig } from "~/server/chainConfig";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 type ChainConfig = ITSEvmChainConfig | ITSVmChainConfig;
@@ -88,17 +88,13 @@ const ChainPicker: FC<ChainPickerProps> = ({
                 $variant={buttonVariant}
                 onClick={onChainClick.bind(null, chain.id)}
               >
-                <Image
-                  className={cn(
-                    "pointer-events-none absolute left-3 -translate-x-2 rounded-full",
-                    {
-                      hidden: isSelected && loading,
-                    }
-                  )}
-                  src={`${chain.image}`}
-                  width={24}
-                  height={24}
+                <ChainIcon
+                  src={chain.image}
                   alt={`${chainName} logo`}
+                  size="md"
+                  className={cn("absolute left-3 -translate-x-2", {
+                    hidden: isSelected && loading,
+                  })}
                 />
                 <Loading
                   className={cn("absolute left-3 -translate-x-2 rounded-full", {

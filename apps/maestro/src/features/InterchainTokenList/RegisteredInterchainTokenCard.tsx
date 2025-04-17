@@ -82,8 +82,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     const explorer = blockExplorers?.[0];
 
     return {
-      explorerName: explorer?.name,
-      explorerUrl: `${explorer?.url}/token/${props.tokenAddress}`,
+      explorerName: explorer.name,
+      explorerUrl: props.chain.id.includes("stellar")
+        ? `${explorer.url}/contract/${props.tokenAddress}`
+        : `${explorer.url}/token/${props.tokenAddress}`,
     };
   }, [props.chain, props.tokenAddress]);
 
@@ -192,7 +194,22 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         {!balance?.tokenBalance ? (
           !address ? null : (
             <div>
-              {isIncompatibleChain ? (
+              {props.chain?.id?.toLowerCase().includes("stellar") ? (
+                <LinkButton
+                  $size="xs"
+                  $variant="primary"
+                  className="my-1 flex w-full items-center justify-center gap-2"
+                  href={explorerUrl}
+                  target="_blank"
+                >
+                  View on Stellar Explorer{" "}
+                  <ChainIcon
+                    src={props.chain?.image ?? ""}
+                    size="xs"
+                    alt={props.chain?.name ?? ""}
+                  />
+                </LinkButton>
+              ) : isIncompatibleChain ? (
                 <Button
                   $size="xs"
                   $variant="primary"
@@ -283,7 +300,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                         tokenAddress={props.tokenAddress}
                         tokenId={props.tokenId}
                         kind={props.kind}
-                        sourceChain={props.chain as ITSChainConfig }
+                        sourceChain={props.chain as ITSChainConfig}
                         balance={balance}
                         originTokenAddress={props.originTokenAddress}
                         originTokenChainId={props.originTokenChainId}

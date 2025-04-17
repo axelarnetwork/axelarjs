@@ -97,7 +97,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
         let tokenAddress;
         let tokenManagerAddress;
 
-        if (!axelarChainId.includes("sui")) {
+        if (chainConfig.info.chain_type === "evm") {
           const evmChainConfig = chainConfig as EvmChainsValue;
           invariant(
             evmChainConfig.wagmi,
@@ -119,7 +119,7 @@ export const recordInterchainTokenDeployment = protectedProcedure
               })
               .catch(always(input.tokenAddress)),
           ]);
-        } else if (axelarChainId.includes("sui")) {
+        } else {
           // the address should be different from the address in the origin chain
           // but this will be updated later in tokens page
           tokenAddress = input.tokenAddress;

@@ -32,6 +32,10 @@ export const NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS = Maybe.of(
   process.env.NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS
 ).mapOr("0x", String) as `0x${string}`;
 
+export const NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE = Maybe.of(
+  process.env.STELLAR_NETWORK_PASSPHRASE
+).mapOr("Test SDF Network ; September 2015", String);
+
 export const NEXT_PUBLIC_EXPLORER_URL = Maybe.of(
   process.env.NEXT_PUBLIC_EXPLORER_URL
 ).mapOr("", String);

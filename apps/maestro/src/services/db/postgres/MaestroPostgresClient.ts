@@ -208,7 +208,7 @@ export default class MaestroPostgresClient {
 
   async updateRemoteInterchainTokenDeploymentMessageId(
     tokenId: string,
-    axealrChainId: string,
+    axelarChainId: string,
     deploymentMessageId: string
   ) {
     await this.db
@@ -217,7 +217,7 @@ export default class MaestroPostgresClient {
       .where(
         and(
           eq(remoteInterchainTokens.tokenId, tokenId),
-          eq(remoteInterchainTokens.axelarChainId, axealrChainId)
+          ilike(remoteInterchainTokens.axelarChainId, axelarChainId)
         )
       );
   }
@@ -233,7 +233,7 @@ export default class MaestroPostgresClient {
     const query = this.db.query.interchainTokens.findFirst({
       where: (table, { ilike, and }) =>
         and(
-          eq(table.axelarChainId, axelarChainId),
+          ilike(table.axelarChainId, axelarChainId),
           ilike(table.tokenAddress, tokenAddress)
         ),
       with: {
@@ -254,7 +254,7 @@ export default class MaestroPostgresClient {
     const query = this.db.query.remoteInterchainTokens.findFirst({
       where: (table, { ilike, and }) =>
         and(
-          eq(table.axelarChainId, axelarChainId),
+          ilike(table.axelarChainId, axelarChainId),
           ilike(table.tokenAddress, tokenAddress)
         ),
     });
@@ -318,6 +318,27 @@ export default class MaestroPostgresClient {
     });
 
     return await query;
+  }
+
+  async updateStellarRemoteTokenAddresses(inputs: {
+    tokenId: string;
+    tokenAddress: string;
+    tokenManagerAddress: string;
+  }) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({
+        deploymentStatus: "confirmed",
+        tokenAddress: inputs.tokenAddress,
+        tokenManagerAddress: inputs.tokenManagerAddress,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(remoteInterchainTokens.tokenId, inputs.tokenId),
+          ilike(remoteInterchainTokens.axelarChainId, "%stellar%")
+        )
+      );
   }
 
   async updateSuiRemoteTokenAddresses(inputs: {

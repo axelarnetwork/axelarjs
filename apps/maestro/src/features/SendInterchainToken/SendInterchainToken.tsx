@@ -15,6 +15,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { isValidSuiAddress } from "@mysten/sui/utils";
+import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
 import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
@@ -435,7 +436,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   ) {
                     return "Invalid SUI address";
                   }
-
+                  if (
+                    state.selectedToChain.id.includes("stellar") &&
+                    !StrKey.isValidEd25519PublicKey(value)
+                  ) {
+                    return "Invalid Stellar address";
+                  }
                   if (
                     (state.selectedToChain.chain_type === "evm" ||
                       state.selectedToChain.id.includes("flow")) &&

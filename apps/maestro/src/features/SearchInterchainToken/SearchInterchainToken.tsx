@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
 import { isAddress } from "viem";
 
-import { useAccount } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -137,6 +137,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
             <SpinnerIcon className="h-6 w-6 animate-spin text-primary" />
           ) : (
             <ChainsDropdown
+              excludeChainIds={[STELLAR_CHAIN_ID]}
               triggerClassName="btn btn-sm btn-circle"
               contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
               compact
