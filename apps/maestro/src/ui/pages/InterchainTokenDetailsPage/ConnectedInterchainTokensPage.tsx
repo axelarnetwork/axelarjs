@@ -356,7 +356,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           }, 5000); // space requests while waiting for the tx to be executed and data to be available on stellar chain
         });
     }
-  }, [interchainToken?.matchingTokens, props.tokenId, updateStellarAddresses]);
+  }, [
+    refetchPageData,
+    props.tokenAddress,
+    interchainToken?.matchingTokens,
+    props.tokenId,
+    updateStellarAddresses,
+    isAlreadyUpdatingRemoteStellar,
+  ]);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
 

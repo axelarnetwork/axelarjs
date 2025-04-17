@@ -78,14 +78,15 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         explorerUrl: "",
       };
     }
+
     const { blockExplorers } = props.chain;
     const explorer = blockExplorers?.[0];
 
     return {
-      explorerName: explorer.name,
+      explorerName: explorer?.name,
       explorerUrl: props.chain.id.includes("stellar")
-        ? `${explorer.url}/contract/${props.tokenAddress}`
-        : `${explorer.url}/token/${props.tokenAddress}`,
+        ? `${explorer?.url}/contract/${props.tokenAddress}`
+        : `${explorer?.url}/token/${props.tokenAddress}`,
     };
   }, [props.chain, props.tokenAddress]);
 

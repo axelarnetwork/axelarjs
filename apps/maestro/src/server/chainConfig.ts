@@ -184,7 +184,7 @@ async function getVmChainsMapInternal<TCacheKey extends string>(
   const allChains = await getAllChains(axelarConfigClient);
 
   const eligibleVmChains = allChains.filter(
-    (chain): chain is VmChainConfig => chain.chainType !== "evm" // Assuming anything not EVM is VM for ITS purposes
+    (chain) => chain.chainType !== "evm" // Assuming anything not EVM is VM for ITS purposes
   );
 
   const chainsMap = eligibleVmChains.reduce<VMChainsMap>((acc, chain) => {
@@ -195,7 +195,7 @@ async function getVmChainsMapInternal<TCacheKey extends string>(
     // Only add entry if internalChainIdNumber was found
     if (internalChainIdNumber !== undefined) {
       const entry = mapToITSChainValue(
-        chain,
+        chain as VmChainConfig,
         undefined,
         internalChainIdNumber
       ) as VMChainsValue; // Cast needed because mapToITSChainValue can return EVM type theoretically
