@@ -86,8 +86,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     rpcUrls: {
       default: {
         http: [
-          "https://1rpc.io/sepolia",
-          "https://eth-sepolia.public.blastapi.io",
+          "https://ethereum-sepolia-rpc.publicnode.com",
           "https://endpoints.omniatech.io/v1/eth/sepolia/public",
         ],
       },
