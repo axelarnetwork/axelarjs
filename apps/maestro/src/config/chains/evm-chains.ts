@@ -66,22 +66,33 @@ function createRpcUrlConfig(
   chain: Chain,
   axelarChainId: string,
   environment: "mainnet" | "testnet" | "devnet-amplifier",
-  additionalUrls: string[] = []
+  defaultExtras: string[] = [],
+  publicExtras: string[] = []
 ) {
-  // apply private RPC overrides for testnet and devnet-amplifier
+  // private RPC overrides for non-mainnet environments
   const privates =
     environment !== ENVIRONMENTS.mainnet
       ? (PRIVATE_RPC_NODES[environment]?.[axelarChainId] ?? [])
       : [];
 
-  // To also apply private RPCs on all environments, change to this:
-  // const privates = PRIVATE_RPC_NODES[environment]?.[axelarChainId] ?? [];
+  // private RPC overrides for all environments
+  // const privates = PRIVATE_RPC_NODES[environment]?.[axelarChainId] ?? []
 
-  const defaults = [...chain.rpcUrls.default.http, ...additionalUrls];
-  const httpUrls = privates.length > 0 ? [...privates, ...defaults] : defaults;
+  // build default list
+  const baseDefaults = [...chain.rpcUrls.default.http, ...defaultExtras];
+  const defaultUrls = privates.length
+    ? [...privates, ...baseDefaults]
+    : baseDefaults;
+
+  // build public list
+  const basePublic = chain.rpcUrls.public?.http ?? chain.rpcUrls.default.http;
+  const publicUrls = privates.length
+    ? [...privates, ...basePublic, ...publicExtras]
+    : [...basePublic, ...publicExtras];
+
   return {
-    default: { http: httpUrls },
-    public: { http: httpUrls },
+    default: { http: defaultUrls },
+    public: { http: publicUrls },
   };
 }
 
@@ -106,8 +117,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       [
         "https://ethereum-sepolia-rpc.publicnode.com",
         "https://endpoints.omniatech.io/v1/eth/sepolia/public",
+      ],
+      [
         "https://1rpc.io/sepolia",
         "https://eth-sepolia.public.blastapi.io",
+        "https://endpoints.omniatech.io/v1/eth/sepolia/public",
       ]
     ),
     axelarChainId: "ethereum-sepolia",
@@ -267,9 +281,13 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...bsc,
-    rpcUrls: createRpcUrlConfig(bsc, "binance", ENVIRONMENTS.mainnet, [
-      "https://bsc.blockrazor.xyz",
-    ]),
+    rpcUrls: createRpcUrlConfig(
+      bsc,
+      "binance",
+      ENVIRONMENTS.mainnet,
+      ["https://bsc.blockrazor.xyz"],
+      ["https://bsc.blockrazor.xyz"]
+    ),
     axelarChainId: "binance",
     axelarChainName: "binance",
     supportWagmi: true,
@@ -559,9 +577,13 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...sepolia,
-    rpcUrls: createRpcUrlConfig(sepolia, "eth-sepolia", ENVIRONMENTS.devnet, [
-      "https://endpoints.omniatech.io/v1/eth/sepolia/public",
-    ]),
+    rpcUrls: createRpcUrlConfig(
+      sepolia,
+      "eth-sepolia",
+      ENVIRONMENTS.devnet,
+      ["https://endpoints.omniatech.io/v1/eth/sepolia/public"],
+      ["https://endpoints.omniatech.io/v1/eth/sepolia/public"]
+    ),
     axelarChainId: "eth-sepolia",
     axelarChainName: "eth-sepolia",
     supportWagmi: true,
