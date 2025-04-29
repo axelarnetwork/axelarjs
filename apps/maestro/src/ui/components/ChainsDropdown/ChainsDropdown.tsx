@@ -1,5 +1,5 @@
 import { ITSChainConfig } from "@axelarjs/api";
-import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
+import { Dropdown, HelpCircleIcon, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
@@ -10,6 +10,7 @@ import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
 
 import { useAccount, useSwitchChain } from "~/lib/hooks";
+import { useSingleRpcHealthStatus } from "~/services/axelarConfigs/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import {
   useChainsDropdownContainer,
@@ -75,10 +76,38 @@ type Props = {
   excludeChainIds?: number[];
 };
 
+const HealthDot: FC<{
+  status: "up" | "down" | "timeout" | "unknown" | undefined;
+  isLoading?: boolean;
+  className?: string;
+}> = ({ status, isLoading, className }) => (
+  <Tooltip
+    tip={
+      isLoading
+        ? "Checking RPC status..."
+        : status
+          ? `RPC is ${status}`
+          : "Unknown status"
+    }
+    $position="right"
+  >
+    <span
+      className={cn(
+        "ml-1 inline-block h-2 w-2 rounded-full align-middle",
+        className,
+        status === "up" && "bg-green-500",
+        status === "down" && "bg-red-500",
+        status === "timeout" && "bg-yellow-500",
+        (!status || status === "unknown") && "bg-gray-400",
+        isLoading && "animate-pulse"
+      )}
+    />
+  </Tooltip>
+);
+
 export const ChainIconComponent: FC<Props> = (props) => {
   const { allChains: chains } = useAllChainConfigsQuery();
   const { chain } = useAccount();
-
   const [state] = useChainsDropdownContainer();
 
   const selectedChain = useMemo(
@@ -88,6 +117,10 @@ export const ChainIconComponent: FC<Props> = (props) => {
       ),
     [chain?.id, chains, state.selectedChainId]
   );
+
+  const chainName =
+    props.selectedChain?.chain_name || selectedChain?.chain_name;
+  const { status, isLoading } = useSingleRpcHealthStatus(chainName);
 
   if (props.selectedChain && props.onSelectChain) {
     return (
@@ -102,6 +135,7 @@ export const ChainIconComponent: FC<Props> = (props) => {
           )}
         />
         {!props.hideLabel && <span>{props.selectedChain.name}</span>}
+        <HealthDot status={status} isLoading={isLoading} />
       </>
     );
   } else if (selectedChain) {
@@ -117,6 +151,7 @@ export const ChainIconComponent: FC<Props> = (props) => {
           )}
         />
         {!props.hideLabel && <span>{selectedChain.name}</span>}
+        <HealthDot status={status} isLoading={isLoading} />
       </>
     );
   } else {
@@ -130,6 +165,29 @@ export const ChainIconComponent: FC<Props> = (props) => {
       />
     );
   }
+};
+
+const ChainItem: FC<{
+  chain: ITSChainConfig;
+  onClick: (chainId: number) => void;
+}> = ({ chain, onClick }) => {
+  const { status, isLoading } = useSingleRpcHealthStatus(chain.chain_name);
+
+  return (
+    <Dropdown.Item key={chain.chain_id}>
+      <button
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault();
+          onClick(chain.chain_id);
+        }}
+        className="group flex w-full items-center gap-2"
+      >
+        <ChainIcon src={chain.image} alt={chain.name} size="md" />
+        <div>{chain.name}</div>
+        <HealthDot status={status} isLoading={isLoading} />
+      </button>
+    </Dropdown.Item>
+  );
 };
 
 const ChainsDropdown: FC<Props> = (props) => {
@@ -242,24 +300,11 @@ const ChainsDropdown: FC<Props> = (props) => {
             </Dropdown.Item>
           )}
           {eligibleChains.map((chain) => (
-            <Dropdown.Item
+            <ChainItem
               key={chain.chain_id}
-              className={cn({
-                "pointer-events-none":
-                  chain.chain_id === selectedChain?.chain_id,
-              })}
-            >
-              <button
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  handleChainChange(chain.chain_id);
-                }}
-                className="group flex w-full items-center gap-2"
-              >
-                <ChainIcon src={chain.image} alt={chain.name} size="md" />
-                <div>{chain.name}</div>
-              </button>
-            </Dropdown.Item>
+              chain={chain}
+              onClick={handleChainChange}
+            />
           ))}
         </Dropdown.Content>
       )}

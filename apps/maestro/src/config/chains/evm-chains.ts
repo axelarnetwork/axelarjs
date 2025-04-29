@@ -72,11 +72,11 @@ function createRpcUrlConfig(
   // private RPC overrides for non-mainnet environments
   const privates =
     environment !== ENVIRONMENTS.mainnet
-      ? (PRIVATE_RPC_NODES[environment]?.[axelarChainId] ?? [])
+      ? (PRIVATE_RPC_NODES[environment]?.[axelarChainId.toLowerCase()] ?? [])
       : [];
 
   // private RPC overrides for all environments
-  // const privates = PRIVATE_RPC_NODES[environment]?.[axelarChainId] ?? []
+  // const privates = PRIVATE_RPC_NODES[environment]?.[axelarChainId.toLowerCase()] ?? []
 
   // build default list
   const baseDefaults = [...chain.rpcUrls.default.http, ...defaultExtras];

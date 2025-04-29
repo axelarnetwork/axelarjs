@@ -2,6 +2,7 @@ import { STELLAR_RPC_URLS, SUI_RPC_URLS } from "@axelarjs/core";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
 import { ExtendedWagmiChainConfig } from "./evm-chains";
+import { PRIVATE_RPC_NODES } from "./private-rpc-nodes";
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
@@ -21,8 +22,8 @@ const sui = {
     decimals: 9,
   },
   rpcUrls: {
-    default: { http: [SUI_RPC_URLS.mainnet] },
-    public: { http: [SUI_RPC_URLS.mainnet] },
+    default: { http: [...PRIVATE_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
+    public: { http: [...PRIVATE_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
   },
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
@@ -35,8 +36,8 @@ const suiTestnet = {
   id: 103,
   environment: ENVIRONMENTS.testnet,
   rpcUrls: {
-    default: { http: [SUI_RPC_URLS.testnet] },
-    public: { http: [SUI_RPC_URLS.testnet] },
+    default: { http: [...PRIVATE_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
+    public: { http: [...PRIVATE_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
   },
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
@@ -61,8 +62,12 @@ export const stellar = {
     decimals: 7,
   },
   rpcUrls: {
-    default: { http: [STELLAR_RPC_URLS.mainnet] },
-    public: { http: [STELLAR_RPC_URLS.mainnet] },
+    default: {
+      http: [...PRIVATE_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
+    },
+    public: {
+      http: [...PRIVATE_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
+    },
   },
   blockExplorers: {
     default: {
@@ -77,8 +82,12 @@ const stellarTestnet = {
   ...stellar,
   id: 110,
   rpcUrls: {
-    default: { http: [STELLAR_RPC_URLS.testnet] },
-    public: { http: [STELLAR_RPC_URLS.testnet] },
+    default: {
+      http: [...PRIVATE_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
+    },
+    public: {
+      http: [...PRIVATE_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
+    },
   },
   blockExplorers: {
     default: {
