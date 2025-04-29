@@ -118,10 +118,6 @@ export const ChainIconComponent: FC<Props> = (props) => {
     [chain?.id, chains, state.selectedChainId]
   );
 
-  const chainName =
-    props.selectedChain?.chain_name || selectedChain?.chain_name;
-  const { status, isLoading } = useSingleRpcHealthStatus(chainName);
-
   if (props.selectedChain && props.onSelectChain) {
     return (
       <>
