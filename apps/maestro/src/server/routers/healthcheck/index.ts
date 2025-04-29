@@ -38,7 +38,6 @@ async function checkRpcNode(
         return "down";
       }
 
-      console.log({ url, chainName, json });
       // Verify if the response is valid
       if (!response.ok) return "down";
       if (!json || json.error) {

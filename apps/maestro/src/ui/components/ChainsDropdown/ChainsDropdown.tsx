@@ -135,7 +135,6 @@ export const ChainIconComponent: FC<Props> = (props) => {
           )}
         />
         {!props.hideLabel && <span>{props.selectedChain.name}</span>}
-        <HealthDot status={status} isLoading={isLoading} />
       </>
     );
   } else if (selectedChain) {
@@ -151,7 +150,6 @@ export const ChainIconComponent: FC<Props> = (props) => {
           )}
         />
         {!props.hideLabel && <span>{selectedChain.name}</span>}
-        <HealthDot status={status} isLoading={isLoading} />
       </>
     );
   } else {

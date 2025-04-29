@@ -32,7 +32,9 @@ export function useRpcHealthStatusQuery() {
 }
 
 export function useSingleRpcHealthStatus(chainName: string | undefined) {
-  const [status, setStatus] = useState<"up" | "down" | "timeout" | "unknown">("unknown");
+  const [status, setStatus] = useState<"up" | "down" | "timeout" | "unknown">(
+    "unknown"
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const query = trpc.healthcheck.getSingleRpcStatus.useQuery(
@@ -43,7 +45,8 @@ export function useSingleRpcHealthStatus(chainName: string | undefined) {
     {
       enabled: Boolean(chainName),
       staleTime: 1000 * 60 * 2, // 2 minutes
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
+      refetchInterval: 1000 * 60 * 5,
       refetchOnMount: false,
       refetchOnReconnect: true,
       trpc: {
@@ -55,17 +58,13 @@ export function useSingleRpcHealthStatus(chainName: string | undefined) {
   );
 
   useEffect(() => {
-    if (query.data) {
+    if (query.isFetching) {
+      setIsLoading(true);
+    } else if (query.data) {
       setStatus(query.data.status);
       setIsLoading(false);
     }
-  }, [query.data]);
-
-  useEffect(() => {
-    if (query.isFetching) {
-      setIsLoading(true);
-    }
-  }, [query.isFetching]);
+  }, [query.isFetching, query.data]);
 
   return {
     status,
