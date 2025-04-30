@@ -61,6 +61,9 @@ async function checkRpcNode(
   }
 }
 
+// Check if caching is disabled via environment variable
+const DISABLE_CACHE = process.env.DISABLE_CACHE === "true";
+
 export const healthcheckRouter = router({
   getSingleRpcStatus: publicProcedure
     .input(
@@ -69,7 +72,25 @@ export const healthcheckRouter = router({
         chainName: z.string(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      // Create a cache key for this specific RPC health check
+      const cacheKey = `rpc-health:${input.env}:${input.chainName}`;
+      const CACHE_TTL = 120; // 2 minutes in seconds
+      
+      // Try to get the cached result first if caching is enabled
+      if (!DISABLE_CACHE) {
+        try {
+          const cachedStatus = await ctx.persistence.kv.getCached<"up" | "down" | "timeout" | "unknown">(cacheKey);
+          if (cachedStatus) {
+            return { status: cachedStatus };
+          }
+        } catch (error) {
+          // If there's an error accessing the cache, we'll just proceed with the normal flow
+          console.error('Error accessing KV cache:', error);
+        }
+      }
+      
+      // If no cache hit, proceed with the normal flow
       const chain = CHAIN_CONFIGS.find(
         (c) =>
           c.environment === input.env &&
@@ -96,6 +117,16 @@ export const healthcheckRouter = router({
 
       // Check the first RPC URL
       const status = await checkRpcNode(urls[0], chainName);
+      
+      // Cache the result for future requests if caching is enabled
+      if (!DISABLE_CACHE) {
+        try {
+          await ctx.persistence.kv.setCached(cacheKey, status, CACHE_TTL);
+        } catch (error) {
+          console.error('Error setting KV cache:', error);
+        }
+      }
+      
       return { status };
     }),
 
@@ -105,7 +136,25 @@ export const healthcheckRouter = router({
         env: z.enum(["mainnet", "testnet", "devnet-amplifier"]),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      // Create a cache key for all RPC health checks for this environment
+      const cacheKey = `rpc-health-all:${input.env}`;
+      const CACHE_TTL = 120; // 2 minutes in seconds
+      
+      // Try to get the cached result first if caching is enabled
+      if (!DISABLE_CACHE) {
+        try {
+          const cachedResults = await ctx.persistence.kv.getCached<Record<string, "up" | "down" | "timeout" | "unknown">>(cacheKey);
+          if (cachedResults) {
+            return cachedResults;
+          }
+        } catch (error) {
+          // If there's an error accessing the cache, we'll just proceed with the normal flow
+          console.error('Error accessing KV cache for all RPC statuses:', error);
+        }
+      }
+      
+      // If no cache hit, proceed with the normal flow
       const results: Record<string, "up" | "down" | "timeout" | "unknown"> = {};
       await Promise.all(
         CHAIN_CONFIGS.filter((chain) => chain.environment === input.env).map(
@@ -116,11 +165,48 @@ export const healthcheckRouter = router({
               results[chainName] = "unknown";
               return;
             }
+            
+            // Check if we have a cached result for this specific chain if caching is enabled
+            if (!DISABLE_CACHE) {
+              const singleCacheKey = `rpc-health:${input.env}:${chainName}`;
+              try {
+                const cachedStatus = await ctx.persistence.kv.getCached<"up" | "down" | "timeout" | "unknown">(singleCacheKey);
+                if (cachedStatus) {
+                  results[chainName] = cachedStatus;
+                  return;
+                }
+              } catch (error) {
+                // If there's an error accessing the cache, we'll just proceed with checking the RPC
+                console.error(`Error accessing KV cache for ${chainName}:`, error);
+              }
+            }
+            
             // Only check the first RPC URL
-            results[chainName] = await checkRpcNode(urls[0], chainName);
+            const status = await checkRpcNode(urls[0], chainName);
+            results[chainName] = status;
+            
+            // Cache the individual result if caching is enabled
+            if (!DISABLE_CACHE) {
+              const singleCacheKey = `rpc-health:${input.env}:${chainName}`;
+              try {
+                await ctx.persistence.kv.setCached(singleCacheKey, status, CACHE_TTL);
+              } catch (error) {
+                console.error(`Error setting KV cache for ${chainName}:`, error);
+              }
+            }
           }
         )
       );
+      
+      // Cache the complete results if caching is enabled
+      if (!DISABLE_CACHE) {
+        try {
+          await ctx.persistence.kv.setCached(cacheKey, results, CACHE_TTL);
+        } catch (error) {
+          console.error('Error setting KV cache for all RPC statuses:', error);
+        }
+      }
+      
       return results;
     }),
 });
