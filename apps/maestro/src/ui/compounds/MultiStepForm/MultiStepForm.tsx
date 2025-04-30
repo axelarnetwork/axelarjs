@@ -126,7 +126,6 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
   const { width } = useWindowSize();
   return (
     <ChainsDropdownComponent
-      excludeChainIds={[STELLAR_CHAIN_ID]}
       compact
       disabled={props.disabled}
       triggerClassName={cn("-translate-y-1.5", {

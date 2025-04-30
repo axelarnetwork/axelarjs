@@ -8,7 +8,7 @@ import {
 } from "next-auth/react";
 
 import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
-import { getAddress, isAllowed, isConnected } from "@stellar/freighter-api";
+import { getAddress } from "@stellar/freighter-api";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";

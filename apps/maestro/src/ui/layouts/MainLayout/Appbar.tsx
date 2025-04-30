@@ -100,7 +100,6 @@ const Appbar: FC<AppbarProps> = (props) => {
             {isConnected && address ? (
               <>
                 <ChainsDropdown
-                  excludeChainIds={[STELLAR_CHAIN_ID]}
                   contentClassName="relative left-[-8px] max-h-[70dvh] w-96 md:w-96 z-10 translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
@@ -185,7 +184,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
-              <ChainsDropdown excludeChainIds={[STELLAR_CHAIN_ID]} />
+              <ChainsDropdown />
               <Dropdown $align="end">
                 <Dropdown.Trigger>
                   <button

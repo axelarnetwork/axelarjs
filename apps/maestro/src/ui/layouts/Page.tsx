@@ -179,7 +179,6 @@ const Page: FC<Props> = ({
                 )}
               </div>
               <ChainsDropdown
-                excludeChainIds={[STELLAR_CHAIN_ID]}
                 renderTrigger={() => (
                   <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}

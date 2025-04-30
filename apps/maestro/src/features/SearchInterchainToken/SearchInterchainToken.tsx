@@ -137,7 +137,6 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
             <SpinnerIcon className="h-6 w-6 animate-spin text-primary" />
           ) : (
             <ChainsDropdown
-              excludeChainIds={[STELLAR_CHAIN_ID]}
               triggerClassName="btn btn-sm btn-circle"
               contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
               compact
