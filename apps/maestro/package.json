@@ -35,7 +35,10 @@
   },
   "dependencies": {
     "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.424bc13",
+    "@creit.tech/stellar-wallets-kit": "^1.6.1",
     "@axelar-network/axelarjs-sdk": "0.17.3-alpha.4",
+    "@stellar/freighter-api": "^4.1.0",
+    "stellar-sdk": "^13.1.0",
     "@axelarjs/api": "workspace:*",
     "@axelarjs/core": "workspace:*",
     "@axelarjs/evm": "workspace:*",

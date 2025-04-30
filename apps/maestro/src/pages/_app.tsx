@@ -31,8 +31,16 @@ import "@tanstack/react-query";
 
 import { SUI_RPC_URLS } from "@axelarjs/core";
 
-// Dynamically import WalletProvider with ssr disabled
-const WalletProviderClient = dynamic(
+// Dynamically import wallet providers with ssr disabled
+const StellarWalletProviderClient = dynamic(
+  () =>
+    import("~/lib/providers/StellarWalletKitProvider").then(
+      (mod) => mod.StellarWalletKitProvider
+    ),
+  { ssr: false }
+);
+
+const SuiWalletProviderClient = dynamic(
   () =>
     import("@mysten/dapp-kit").then((mod) => ({
       default: ({ children }: { children: React.ReactNode }) => (
@@ -121,13 +129,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                     : "testnet"
                 }
               >
-                <WalletProviderClient>
-                  <MainLayout>
-                    <Component {...pageProps} />
-                  </MainLayout>
-                  <ReactQueryDevtools />
-                  <Toaster />
-                </WalletProviderClient>
+                <StellarWalletProviderClient>
+                  <SuiWalletProviderClient>
+                    <MainLayout>
+                      <Component {...pageProps} />
+                    </MainLayout>
+                    <ReactQueryDevtools />
+                    <Toaster />
+                  </SuiWalletProviderClient>
+                </StellarWalletProviderClient>
               </SuiClientProvider>
             </WagmiConfigPropvider>
           </ThemeProvider>

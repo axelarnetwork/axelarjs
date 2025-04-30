@@ -8,18 +8,20 @@ import {
 } from "next-auth/react";
 
 import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
+import { getAddress, isAllowed, isConnected } from "@stellar/freighter-api";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
+import { useStellarKit } from "../providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
   onSignInSuccess?: (response?: SignInResponse) => void;
-  onSignInStart?: (address: `0x${string}`) => void;
+  onSignInStart?: (address: string) => void;
 };
 
 const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
@@ -47,13 +49,14 @@ export function useWeb3SignIn({
   const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
   const currentSuiAccount = useCurrentAccount();
 
-  const signInAddressRef = useRef<`0x${string}` | null>(null);
+  const signInAddressRef = useRef<string | null>(null);
 
   const { mutateAsync: createSignInMessage } =
     trpc.auth.createSignInMessage.useMutation();
 
   // avoid signing in multiple times
   const isSigningInRef = useRef(false);
+  const { kit } = useStellarKit();
 
   const {
     mutateAsync: signInWithWeb3Async,
@@ -61,14 +64,19 @@ export function useWeb3SignIn({
     error,
     ...mutation
   } = useMutation({
-    mutationFn: async (address?: `0x${string}` | null) => {
+    mutationFn: async (address?: string | null) => {
       try {
         invariant(address, "Address is required");
 
         signInAddressRef.current = address;
         isSigningInRef.current = true;
 
-        const { message } = await createSignInMessage({ address });
+        const { message } = await createSignInMessage({ address }).catch(
+          (error) => {
+            console.error("Error creating sign in message", error);
+            throw error;
+          }
+        );
 
         onSignInStart?.(address);
         let signature;
@@ -82,6 +90,12 @@ export function useWeb3SignIn({
             message: new TextEncoder().encode(message),
           });
           signature = resp.signature;
+        } else if (address.startsWith("G")) {
+          // Stellar
+          console.log("signing in with stellar whyyyy");
+          invariant(kit, "Stellar wallet kit not initialized");
+          const result = await kit.signMessage(message);
+          signature = result.signedMessage;
         }
 
         const response = await signIn("credentials", {
@@ -151,7 +165,22 @@ export function useWeb3SignIn({
       return;
     }
 
-    void signInWithWeb3Async(address);
+    if (session?.address?.startsWith("G")) {
+      getAddress()
+        .then((x) => {
+          console.log("[Stellar] Got address from wallet:", x);
+          if (x?.address === session?.address) {
+            return;
+          } else {
+            void signInWithWeb3Async(x?.address);
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting address from wallet", error);
+        });
+    } else {
+      void signInWithWeb3Async(address);
+    }
   }, [
     currentSuiAccount,
     enabled,
