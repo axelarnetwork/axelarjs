@@ -9,12 +9,7 @@ import { useRouter } from "next/router";
 import { CHAIN_CONFIGS } from "~/config/chains";
 import RecentTransactions from "~/features/RecentTransactions/RecentTransactions";
 import SearchInterchainToken from "~/features/SearchInterchainToken";
-import {
-  STELLAR_CHAIN_ID,
-  useAccount,
-  useChainFromRoute,
-  useSwitchChain,
-} from "~/lib/hooks";
+import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdown, { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { ConditionalRenderInterchainBanner } from "../components/InterchainBanner";

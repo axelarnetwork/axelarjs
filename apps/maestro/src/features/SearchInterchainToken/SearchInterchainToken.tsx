@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FC } from "react";
 
 import { isAddress } from "viem";
 
-import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import { isValidSuiTokenAddress } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";

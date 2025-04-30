@@ -29,7 +29,7 @@ import {
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
-import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";

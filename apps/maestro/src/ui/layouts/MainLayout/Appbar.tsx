@@ -25,7 +25,7 @@ import { useRouter } from "next/router";
 import { APP_NAME } from "~/config/app";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
-import { STELLAR_CHAIN_ID, useAccount, useDisconnect } from "~/lib/hooks";
+import { useAccount, useDisconnect } from "~/lib/hooks";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 import { useLayoutStateContainer } from "./MainLayout.state";
