@@ -5,7 +5,7 @@ import { getAddress, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
 
-import { stellar, suiChainConfig } from "~/config/chains/vm-chains";
+import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import {
   getStellarConnectionState,
@@ -89,7 +89,7 @@ export function useAccount(): CombinedAccountInfo {
     chain:
       wagmiAccount.chain ||
       (isMystenConnected && suiChainConfig) ||
-      (isStellarConnected && stellar) ||
+      (isStellarConnected && stellarChainConfig) ||
       undefined,
     isEvmChain: !!evmChain,
     chainName:
