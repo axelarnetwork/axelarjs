@@ -1,14 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
-import { getAddress, isAllowed, isConnected } from "@stellar/freighter-api";
+import { getAddress, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
 
 import { stellar, suiChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import {
+  getStellarConnectionState,
+  STELLAR_CONNECTION_CHANGE,
+} from "~/lib/utils/stellar";
 import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
+
+// Custom event for stellar wallet connection changes
+export { STELLAR_CONNECTION_CHANGE };
 
 interface CombinedAccountInfo {
   address: `0x${string}`;
@@ -23,94 +29,45 @@ interface CombinedAccountInfo {
 export function useAccount(): CombinedAccountInfo {
   const wagmiAccount = useWagmiAccount();
   const mystenAccount = useMystenAccount();
+  const [stellarAccount, setStellarAccount] = useState<string | null>(null);
+
   const { data: evmChains } = useEVMChainConfigsQuery();
   const APP_SUI_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "sui:mainnet" : "sui:testnet";
-  const [stellarAccount, setStellarAccount] = useState<string | null>(null);
-  const { data: session } = useSession();
 
-  // Check if session has a Stellar address
-  useEffect(() => {
-    console.log("[Stellar] Checking session for Stellar address");
-    if (
-      session?.address &&
-      session.address.startsWith("G") &&
-      session.address.length === 56
-    ) {
-      console.log(
-        "[Stellar] Found Stellar address in session:",
-        session.address
-      );
-      getAddress()
-        .then((x) => {
-          console.log("[Stellar] Got address from wallet:", x);
-          setStellarAccount(x?.address);
-        })
-        .catch((e) => {
-          console.log("[Stellar] Error getting address:", e);
-        });
-    }
-  }, [session?.address]);
-
-  // Use Freighter SDK to check for connected account
-  useEffect(() => {
-    // Skip if we already have a Stellar address from session
-    if (stellarAccount) {
-      console.log(
-        "[Stellar] Already have Stellar address from session, skipping Freighter check"
-      );
+  const checkFreighterStatus = useCallback(async () => {
+    const isStellarConnected = getStellarConnectionState() ?? false;
+    if (stellarAccount && isStellarConnected) return;
+    if (!isStellarConnected) {
+      setStellarAccount(null);
       return;
     }
-
-    // Check if Freighter is available and connected
-    const checkFreighterStatus = async () => {
-      try {
-        // First check if Freighter is allowed to connect to this site
-        const allowed = await isAllowed();
-        console.log("[Stellar] Freighter allowed:", allowed);
-
-        // Check if connected without triggering connection
-        const connected = await isConnected();
-        console.log("[Stellar] Freighter connected:", connected);
-
-        if (connected) {
-          // Get public key without triggering connection
-          const publicKey = await getAddress();
-          console.log("[Stellar] Freighter public key:", publicKey);
-          setStellarAccount(publicKey.address);
-        } else {
-          setStellarAccount(null);
-        }
-      } catch (error) {
-        console.log("[Stellar] Error checking Freighter status:", error);
+    try {
+      const connected = await isConnected();
+      if (connected) {
+        const publicKey = await getAddress();
+        setStellarAccount(publicKey.address);
+      } else {
         setStellarAccount(null);
       }
-    };
+    } catch (error) {
+      console.error("[Stellar] Error checking Freighter status:", error);
+      setStellarAccount(null);
+    }
+  }, [stellarAccount, setStellarAccount]);
 
-    // Check once when component mounts
+  useEffect(() => {
+    // Initial check
     void checkFreighterStatus();
 
-    // Also listen for Freighter account changes
-    const handleAccountChange = () => {
-      console.log("[Stellar] Freighter account changed");
+    const handleStorageChange = () => {
+      console.log("STORAGE CHANGE", getStellarConnectionState());
       void checkFreighterStatus();
     };
 
-    // Add event listener if available
-    if (typeof window !== "undefined") {
-      window.addEventListener("freighter:accountChanged", handleAccountChange);
-    }
-
-    // Clean up
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener(
-          "freighter:accountChanged",
-          handleAccountChange
-        );
-      }
-    };
-  }, [stellarAccount]);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener(STELLAR_CONNECTION_CHANGE, handleStorageChange);
+  }, [checkFreighterStatus]);
 
   const isWagmiConnected = wagmiAccount.isConnected;
   const isMystenConnected = !!mystenAccount;

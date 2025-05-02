@@ -5,6 +5,7 @@ import { useChainId as useWagmiChainId } from "wagmi";
 
 // Sui's chain ID
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { getStellarConnectionState } from "~/lib/utils/stellar";
 
 export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
 export const STELLAR_CHAIN_ID =
@@ -16,6 +17,11 @@ export function useChainId(): number {
   const suiAccount = useCurrentAccount();
 
   const chainId = useMemo(() => {
+    // Check if Stellar wallet is connected
+    const isStellarConnected = getStellarConnectionState() ?? false;
+    if (isStellarConnected) {
+      return STELLAR_CHAIN_ID;
+    }
     if (suiAccount) {
       return SUI_CHAIN_ID;
     }

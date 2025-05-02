@@ -15,6 +15,7 @@ import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient"
 export type Web3Session = {
   address: string;
   accountStatus: AccountStatus;
+  isStellar?: boolean;
 };
 
 const kvClient = new MaestroKVClient(kv);
@@ -43,11 +44,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
         },
       },
       async authorize(credentials, req) {
-        if (
-          !credentials?.address ||
-          // !getAddress(credentials?.address) ||
-          !credentials?.signature
-        ) {
+        if (!credentials?.address || !credentials?.signature) {
           return null;
         }
         //TODO: revert
@@ -131,6 +128,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
 
         return {
           id: address,
+          isStellar: address.length === 56 && address.startsWith("G"),
         };
       },
     }),
@@ -150,13 +148,15 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
         .getAccountStatus(address)
         .then((x) => x ?? "enabled");
 
+      // Set isStellar flag if the address matches Stellar format
+      session.isStellar = address.length === 56 && address.startsWith("G");
+
       return session;
     },
     jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
       }
-
       return token;
     },
   },

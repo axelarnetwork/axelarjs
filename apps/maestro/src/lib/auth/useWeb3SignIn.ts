@@ -15,8 +15,9 @@ import { watchAccount } from "wagmi/actions";
 
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
-import { useStellarKit } from "../providers/StellarWalletKitProvider";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
+import { setStellarConnectionState } from "../utils/stellar";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
@@ -105,6 +106,11 @@ export function useWeb3SignIn({
         });
         if (response?.error) {
           throw new Error(response.error);
+        }
+
+        // If we successfully signed in with a Stellar wallet, set the connection state
+        if (address.startsWith("G")) {
+          setStellarConnectionState(true);
         }
 
         onSignInSuccess?.(response);

@@ -1,3 +1,4 @@
+import toast from "@axelarjs/ui/toaster";
 import { useLocalStorageState } from "@axelarjs/utils/react/usePersistedState";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -12,6 +13,7 @@ import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
 import { suiChainConfig } from "~/config/chains";
 import { stellarChainConfig } from "~/config/chains/vm-chains";
+import { setStellarConnectionState } from "../utils/stellar";
 import { isValidEVMAddress } from "../utils/validation";
 
 type WalletHandler = (chainId: number) => void;
@@ -20,7 +22,6 @@ export function useConnectWallet() {
   const wallets = useWallets();
   const { mutateAsync: connectAsync } = useSuiConnectWallet();
   const { open: openWeb3Modal } = useWeb3Modal();
-
   const { data: sessionData } = useSession();
   const { switchChain: switchChainWagmi } = useWagmiSwitchChain();
 
@@ -55,17 +56,19 @@ export function useConnectWallet() {
   };
 
   const tryConnectStellarWallet = async () => {
-    console.log("trying to connect to stellar wallet");
     if (!isBrowser) {
-      console.error("Stellar wallet is not available in this environment");
+      toast.error("Stellar wallet is not available in this environment");
       return false;
     }
     try {
-      const a = await setAllowed();
-      console.log("the result is", a);
+      await setAllowed();
+      // If setAllowed succeeds, it means Freighter granted permission
+      setStellarConnectionState(true);
       return true;
     } catch (error) {
-      console.error(`Failed to connect to Stellar wallet:`, error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to connect to Stellar wallet: ${errorMessage}`);
       return false;
     }
   };

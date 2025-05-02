@@ -33,13 +33,24 @@ export function StellarWalletKitProvider({
           StellarWalletsKit,
           WalletNetwork,
           FREIGHTER_ID,
-          allowAllModules,
+          FreighterModule,
         } = await import("@creit.tech/stellar-wallets-kit");
 
         const newKit = new StellarWalletsKit({
           network: WalletNetwork.TESTNET,
           selectedWalletId: FREIGHTER_ID,
-          modules: allowAllModules(),
+          modalTheme: {
+            bgColor: "#1D232A",
+            textColor: "#A6ADBA",
+            solidTextColor: "#FFFFFF",
+            headerButtonColor: "#A6ADBA",
+            dividerColor: "#2A323C",
+            helpBgColor: "#2A323C",
+            notAvailableTextColor: "#A6ADBA",
+            notAvailableBgColor: "#1D232A",
+            notAvailableBorderColor: "#2A323C",
+          },
+          modules: [new FreighterModule()],
         });
 
         setKit(newKit);
