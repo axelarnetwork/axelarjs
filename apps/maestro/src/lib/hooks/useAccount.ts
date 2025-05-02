@@ -61,7 +61,6 @@ export function useAccount(): CombinedAccountInfo {
     void checkFreighterStatus();
 
     const handleStorageChange = () => {
-      console.log("STORAGE CHANGE", getStellarConnectionState());
       void checkFreighterStatus();
     };
 

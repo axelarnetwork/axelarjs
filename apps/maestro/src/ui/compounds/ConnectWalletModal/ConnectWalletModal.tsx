@@ -30,8 +30,6 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
           onWalletSelected: async (option: ISupportedWallet) => {
             kit.setWallet(option.id);
             const { address } = await kit.getAddress();
-            console.log("the address is", address);
-            // Explicitly trigger the sign-in process
             await signInAsync(address);
             setIsModalOpen(false);
           },

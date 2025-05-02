@@ -93,7 +93,6 @@ export function useWeb3SignIn({
           signature = resp.signature;
         } else if (address.startsWith("G")) {
           // Stellar
-          console.log("signing in with stellar whyyyy");
           invariant(kit, "Stellar wallet kit not initialized");
           const result = await kit.signMessage(message);
           signature = result.signedMessage;
@@ -174,7 +173,6 @@ export function useWeb3SignIn({
     if (session?.address?.startsWith("G")) {
       getAddress()
         .then((x) => {
-          console.log("[Stellar] Got address from wallet:", x);
           if (x?.address === session?.address) {
             return;
           } else {
