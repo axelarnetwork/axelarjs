@@ -47,7 +47,7 @@ import {
 } from "viem/chains";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
-import { PRIVATE_RPC_NODES } from "./private-rpc-nodes";
+import { CUSTOM_RPC_NODES } from "./custom-rpc-nodes";
 
 export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
@@ -69,25 +69,20 @@ function createRpcUrlConfig(
   defaultExtras: string[] = [],
   publicExtras: string[] = []
 ) {
-  // private RPC overrides for non-mainnet environments
-  const privates =
-    environment !== ENVIRONMENTS.mainnet
-      ? (PRIVATE_RPC_NODES[environment]?.[axelarChainId.toLowerCase()] ?? [])
-      : [];
-
-  // private RPC overrides for all environments
-  // const privates = PRIVATE_RPC_NODES[environment]?.[axelarChainId.toLowerCase()] ?? []
+  // custom RPC overrides for all environments
+  const customNodes =
+    CUSTOM_RPC_NODES[environment]?.[axelarChainId.toLowerCase()] ?? [];
 
   // build default list
   const baseDefaults = [...chain.rpcUrls.default.http, ...defaultExtras];
-  const defaultUrls = privates.length
-    ? [...privates, ...baseDefaults]
+  const defaultUrls = customNodes.length
+    ? [...customNodes, ...baseDefaults]
     : baseDefaults;
 
   // build public list
   const basePublic = chain.rpcUrls.public?.http ?? chain.rpcUrls.default.http;
-  const publicUrls = privates.length
-    ? [...privates, ...basePublic, ...publicExtras]
+  const publicUrls = customNodes.length
+    ? [...customNodes, ...basePublic, ...publicExtras]
     : [...basePublic, ...publicExtras];
 
   return {

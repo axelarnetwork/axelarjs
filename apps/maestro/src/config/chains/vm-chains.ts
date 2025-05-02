@@ -2,7 +2,7 @@ import { STELLAR_RPC_URLS, SUI_RPC_URLS } from "@axelarjs/core";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
 import { ExtendedWagmiChainConfig } from "./evm-chains";
-import { PRIVATE_RPC_NODES } from "./private-rpc-nodes";
+import { CUSTOM_RPC_NODES } from "./custom-rpc-nodes";
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
@@ -22,8 +22,8 @@ const sui = {
     decimals: 9,
   },
   rpcUrls: {
-    default: { http: [...PRIVATE_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
-    public: { http: [...PRIVATE_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
+    default: { http: [...CUSTOM_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
+    public: { http: [...CUSTOM_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
   },
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
@@ -36,8 +36,8 @@ const suiTestnet = {
   id: 103,
   environment: ENVIRONMENTS.testnet,
   rpcUrls: {
-    default: { http: [...PRIVATE_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
-    public: { http: [...PRIVATE_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
+    default: { http: [...CUSTOM_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
+    public: { http: [...CUSTOM_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
   },
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
@@ -63,10 +63,10 @@ export const stellar = {
   },
   rpcUrls: {
     default: {
-      http: [...PRIVATE_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
+      http: [...CUSTOM_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
     },
     public: {
-      http: [...PRIVATE_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
+      http: [...CUSTOM_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
     },
   },
   blockExplorers: {
@@ -83,10 +83,10 @@ const stellarTestnet = {
   id: 110,
   rpcUrls: {
     default: {
-      http: [...PRIVATE_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
+      http: [...CUSTOM_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
     },
     public: {
-      http: [...PRIVATE_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
+      http: [...CUSTOM_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
     },
   },
   blockExplorers: {
