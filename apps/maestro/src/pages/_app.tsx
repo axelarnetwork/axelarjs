@@ -31,6 +31,8 @@ import "@tanstack/react-query";
 
 import { SUI_RPC_URLS } from "@axelarjs/core";
 
+import { AuthProvider } from "~/contexts/AuthContext";
+
 // Dynamically import wallet providers with ssr disabled
 const StellarWalletProviderClient = dynamic(
   () =>
@@ -131,11 +133,13 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
               >
                 <StellarWalletProviderClient>
                   <SuiWalletProviderClient>
-                    <MainLayout>
-                      <Component {...pageProps} />
-                    </MainLayout>
-                    <ReactQueryDevtools />
-                    <Toaster />
+                    <AuthProvider>
+                      <MainLayout>
+                        <Component {...pageProps} />
+                      </MainLayout>
+                      <ReactQueryDevtools />
+                      <Toaster />
+                    </AuthProvider>
                   </SuiWalletProviderClient>
                 </StellarWalletProviderClient>
               </SuiClientProvider>

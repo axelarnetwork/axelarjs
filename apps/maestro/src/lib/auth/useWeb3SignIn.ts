@@ -8,7 +8,6 @@ import {
 } from "next-auth/react";
 
 import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
-import { getAddress } from "@stellar/freighter-api";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
@@ -170,26 +169,12 @@ export function useWeb3SignIn({
       return;
     }
 
-    if (session?.address?.startsWith("G")) {
-      getAddress()
-        .then((x) => {
-          if (x?.address === session?.address) {
-            return;
-          } else {
-            void signInWithWeb3Async(x?.address);
-          }
-        })
-        .catch((error) => {
-          console.error("Error getting address from wallet", error);
-        });
-    } else {
-      void signInWithWeb3Async(address);
-    }
+    void signInWithWeb3Async(address);
   }, [
     currentSuiAccount,
-    enabled,
     sessionStatus,
     session?.address,
+    enabled,
     signInWithWeb3Async,
   ]);
 

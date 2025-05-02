@@ -4,7 +4,7 @@ import React, { forwardRef } from "react";
 import type { ISupportedWallet } from "@creit.tech/stellar-wallets-kit";
 import { ConnectModal } from "@mysten/dapp-kit";
 
-import { useWeb3SignIn } from "~/lib/auth";
+import { useAuth } from "~/contexts/AuthContext";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
 
@@ -20,7 +20,7 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const { kit, isLoading } = useStellarKit();
-    const { signInAsync } = useWeb3SignIn();
+    const { signInAsync } = useAuth();
 
     const handleStellarConnect = async () => {
       if (!kit || isLoading) return;

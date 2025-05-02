@@ -2,7 +2,7 @@ import { createContainer, useLocalStorageState } from "@axelarjs/utils/react";
 import { useEffect, useState, type FC } from "react";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { useWeb3SignIn } from "~/lib/auth";
+import { useAuth } from "~/contexts/AuthContext";
 
 const DEFAULT_BANNERS_STATE = {
   isTestnetBannerDismissed: false,
@@ -27,9 +27,7 @@ function useLayoutState() {
     retryAsync: retrySignInAsync,
     error: signInError,
     isSuccess: isSignedIn,
-  } = useWeb3SignIn({
-    onSignInStart: setIsSignInModalOpen.bind(null, true),
-  });
+  } = useAuth();
 
   useEffect(() => {
     let timeoutId = -1;
