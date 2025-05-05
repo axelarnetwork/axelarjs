@@ -1,14 +1,15 @@
 import { STELLAR_RPC_URLS, SUI_RPC_URLS } from "@axelarjs/core";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
-import { ExtendedWagmiChainConfig } from "./evm-chains";
-import { CUSTOM_RPC_NODES } from "./custom-rpc-nodes";
+import { ExtendedWagmiChainConfig, createRpcUrlConfig } from "./evm-chains";
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
   devnet: "devnet-amplifier",
   testnet: "testnet",
 } as const;
+
+
 
 const sui = {
   id: 101,
@@ -21,10 +22,7 @@ const sui = {
     symbol: "SUI",
     decimals: 9,
   },
-  rpcUrls: {
-    default: { http: [...CUSTOM_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
-    public: { http: [...CUSTOM_RPC_NODES.mainnet.sui, SUI_RPC_URLS.mainnet] },
-  },
+  rpcUrls: createRpcUrlConfig("sui", ENVIRONMENTS.mainnet, [SUI_RPC_URLS.mainnet], [SUI_RPC_URLS.mainnet]),
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
   },
@@ -35,10 +33,7 @@ const suiTestnet = {
   ...sui,
   id: 103,
   environment: ENVIRONMENTS.testnet,
-  rpcUrls: {
-    default: { http: [...CUSTOM_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
-    public: { http: [...CUSTOM_RPC_NODES.testnet.sui, SUI_RPC_URLS.testnet] },
-  },
+  rpcUrls: createRpcUrlConfig("sui", ENVIRONMENTS.testnet, [SUI_RPC_URLS.testnet], [SUI_RPC_URLS.testnet]),
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
   },
@@ -50,6 +45,7 @@ const suiDevnet = {
   environment: ENVIRONMENTS.devnet,
 };
 
+console.log ("STELLAR_RPC_URLS.mainnet", STELLAR_RPC_URLS.mainnet, STELLAR_RPC_URLS.testnet)
 export const stellar = {
   id: 109,
   axelarChainId: "stellar",
@@ -61,14 +57,7 @@ export const stellar = {
     symbol: "XLM",
     decimals: 7,
   },
-  rpcUrls: {
-    default: {
-      http: [...CUSTOM_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
-    },
-    public: {
-      http: [...CUSTOM_RPC_NODES.mainnet.stellar, STELLAR_RPC_URLS.mainnet],
-    },
-  },
+  rpcUrls: createRpcUrlConfig("stellar", ENVIRONMENTS.mainnet, [STELLAR_RPC_URLS.mainnet], [STELLAR_RPC_URLS.mainnet]),
   blockExplorers: {
     default: {
       name: "Stellar Explorer",
@@ -81,14 +70,7 @@ export const stellar = {
 const stellarTestnet = {
   ...stellar,
   id: 110,
-  rpcUrls: {
-    default: {
-      http: [...CUSTOM_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
-    },
-    public: {
-      http: [...CUSTOM_RPC_NODES.testnet.stellar, STELLAR_RPC_URLS.testnet],
-    },
-  },
+  rpcUrls: createRpcUrlConfig("stellar", ENVIRONMENTS.testnet, [STELLAR_RPC_URLS.testnet], [STELLAR_RPC_URLS.testnet]),
   blockExplorers: {
     default: {
       name: "Stellar Explorer",

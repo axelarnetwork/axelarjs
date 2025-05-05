@@ -109,9 +109,11 @@ export async function sendRpcNodeIssueNotification(
 
 /**
  * Minimum time between notifications for the same RPC node issue (in seconds)
- * Default: 30 minutes
+ * Default: 30 minutes if NOTIFICATION_COOLDOWN_SECONDS env var is not set
  */
-const NOTIFICATION_COOLDOWN_SECONDS = 30 * 60;
+const NOTIFICATION_COOLDOWN_SECONDS = process.env.NOTIFICATION_COOLDOWN_SECONDS
+  ? parseInt(process.env.NOTIFICATION_COOLDOWN_SECONDS, 10)
+  : 30 * 60;
 
 /**
  * Send a notification to Slack about RPC node issues, with rate limiting

@@ -14,12 +14,15 @@ async function checkRpcNode(
       controller.abort();
     }, 25000); // will timeout if RPC node dont respond in 25s
     try {
-      const method =
-        chainName.toLowerCase() === "sui"
-          ? "sui_getTotalTransactionBlocks"
-          : "net_version";
-
-      console.log({ chainName, url, method });
+      let method = "net_version";
+      const chainNameLower = chainName.toLowerCase();
+      
+      if (chainNameLower === "sui") {
+        method = "sui_getTotalTransactionBlocks";
+      } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
+        method = "getVersionInfo";
+      }
+      
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
