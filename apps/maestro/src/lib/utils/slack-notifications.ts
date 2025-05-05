@@ -1,4 +1,5 @@
 import type MaestroKVClient from "~/services/db/kv/MaestroKVClient";
+import { NOTIFICATION_COOLDOWN_SECONDS } from "~/config/env";
 
 const SLACK_WEBHOOK_URL = process.env.WEBHOOK_SLACK_INFO_ALERTS_ITS_CHANNEL;
 
@@ -107,13 +108,6 @@ export async function sendRpcNodeIssueNotification(
   }
 }
 
-/**
- * Minimum time between notifications for the same RPC node issue (in seconds)
- * Default: 30 minutes if NOTIFICATION_COOLDOWN_SECONDS env var is not set
- */
-const NOTIFICATION_COOLDOWN_SECONDS = process.env.NOTIFICATION_COOLDOWN_SECONDS
-  ? parseInt(process.env.NOTIFICATION_COOLDOWN_SECONDS, 10)
-  : 30 * 60;
 
 /**
  * Send a notification to Slack about RPC node issues, with rate limiting
