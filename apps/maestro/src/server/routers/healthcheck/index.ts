@@ -22,7 +22,7 @@ async function checkRpcNode(
       } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
         method = "getVersionInfo";
       }
-      
+
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,7 +38,6 @@ async function checkRpcNode(
       let json;
       try {
         json = await response.json();
-        console.log({ chainName, url, json });
       } catch (error) {
         return "down";
       }
