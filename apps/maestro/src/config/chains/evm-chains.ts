@@ -62,66 +62,48 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-/**
- * Create RPC URL configurations with custom nodes and extras
- */
 export function createRpcUrlConfig(
-  chainId: string,
+  chainIdOrChain: string | Chain,
   environment: "mainnet" | "testnet" | "devnet-amplifier",
-  baseDefaultUrls: string[] = [],
-  basePublicUrls: string[] = [],
-  defaultExtras: string[] = [],
-  publicExtras: string[] = []
+  extras: string[] = [],
+  axelarChainId?: string
 ) {
+  // Handle the case where a Chain object is provided
+  let chainId: string;
+  let baseUrls: string[];
+  
+  if (typeof chainIdOrChain === 'string') {
+    // VM chains configuration case
+    chainId = chainIdOrChain;
+    baseUrls = [];
+  } else {
+    // EVM chain configuration case
+    chainId = axelarChainId || '';
+    baseUrls = Array.from(chainIdOrChain.rpcUrls.default.http);
+  }
+
   // custom RPC overrides for all environments
   const customNodes =
     CUSTOM_RPC_NODES[environment]?.[chainId.toLowerCase()] ?? [];
 
-  // build default list
-  const baseDefaults = [...baseDefaultUrls, ...defaultExtras];
-  const defaultUrls = customNodes.length
-    ? [...customNodes, ...baseDefaults]
-    : baseDefaults;
-
-  // build public list
-  const basePublic = basePublicUrls.length > 0 ? basePublicUrls : baseDefaultUrls;
-  const publicUrls = customNodes.length
-    ? [...customNodes, ...basePublic, ...publicExtras]
-    : [...basePublic, ...publicExtras];
+  // build unified URL list with custom nodes and extras
+  const combinedUrls = [...extras, ...baseUrls];
+  const urls = customNodes.length
+    ? [...customNodes, ...combinedUrls]
+    : combinedUrls;
 
   return {
-    default: { http: defaultUrls },
-    public: { http: publicUrls },
+    default: { http: urls },
+    public: { http: urls },
   };
-}
-
-/**
- * Helper function to create RPC URL configuration for EVM chains
- */
-function createEvmChainRpcConfig(
-  chain: Chain,
-  axelarChainId: string,
-  environment: "mainnet" | "testnet" | "devnet-amplifier",
-  defaultExtras: string[] = [],
-  publicExtras: string[] = []
-) {
-  return createRpcUrlConfig(
-    axelarChainId,
-    environment,
-    Array.from(chain.rpcUrls.default.http),
-    chain.rpcUrls.public?.http ? Array.from(chain.rpcUrls.public.http) : Array.from(chain.rpcUrls.default.http),
-    defaultExtras,
-    publicExtras
-  );
 }
 
 export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
-    rpcUrls: createEvmChainRpcConfig(mainnet, "Ethereum", ENVIRONMENTS.mainnet, [
-      "https://eth.llamarpc.com",
-      "https://eth.drpc.org",
-    ]),
+    rpcUrls: createRpcUrlConfig(mainnet, ENVIRONMENTS.mainnet, [
+      "https://eth.llamarpc.com"
+    ], "Ethereum"),
     axelarChainId: "Ethereum",
     axelarChainName: "ethereum",
     supportWagmi: true,
@@ -129,19 +111,16 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...sepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       sepolia,
-      "ethereum-sepolia",
       ENVIRONMENTS.testnet,
       [
         "https://ethereum-sepolia-rpc.publicnode.com",
         "https://endpoints.omniatech.io/v1/eth/sepolia/public",
-      ],
-      [
         "https://1rpc.io/sepolia",
-        "https://eth-sepolia.public.blastapi.io",
-        "https://endpoints.omniatech.io/v1/eth/sepolia/public",
-      ]
+        "https://eth-sepolia.public.blastapi.io"
+      ],
+      "ethereum-sepolia"
     ),
     axelarChainId: "ethereum-sepolia",
     supportWagmi: true,
@@ -150,7 +129,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...flowMainnet,
-    rpcUrls: createEvmChainRpcConfig(flowMainnet, "flow", ENVIRONMENTS.mainnet),
+    rpcUrls: createRpcUrlConfig(flowMainnet, ENVIRONMENTS.mainnet, [], "flow"),
     axelarChainId: "flow",
     axelarChainName: "Flow",
     supportWagmi: true,
@@ -158,7 +137,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...flowTestnet,
-    rpcUrls: createEvmChainRpcConfig(flowTestnet, "flow", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(flowTestnet, ENVIRONMENTS.testnet, [], "flow"),
     axelarChainId: "flow",
     axelarChainName: "Flow",
     supportWagmi: true,
@@ -166,7 +145,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...moonbeam,
-    rpcUrls: createEvmChainRpcConfig(moonbeam, "Moonbeam", ENVIRONMENTS.mainnet),
+    rpcUrls: createRpcUrlConfig(moonbeam, ENVIRONMENTS.mainnet, [], "Moonbeam"),
     axelarChainId: "Moonbeam",
     axelarChainName: "Moonbeam",
     supportWagmi: true,
@@ -174,10 +153,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...moonbaseAlpha,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       moonbaseAlpha,
-      "moonbeam",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "moonbeam"
     ),
     axelarChainId: "moonbeam",
     axelarChainName: "Moonbeam",
@@ -186,7 +166,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fantom,
-    rpcUrls: createEvmChainRpcConfig(fantom, "Fantom", ENVIRONMENTS.mainnet),
+    rpcUrls: createRpcUrlConfig(fantom, ENVIRONMENTS.mainnet, [], "Fantom"),
     axelarChainId: "Fantom",
     axelarChainName: "Fantom",
     supportWagmi: true,
@@ -194,7 +174,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fantomTestnet,
-    rpcUrls: createEvmChainRpcConfig(fantomTestnet, "Fantom", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(fantomTestnet, ENVIRONMENTS.testnet, [], "Fantom"),
     axelarChainId: "Fantom",
     axelarChainName: "Fantom",
     supportWagmi: true,
@@ -202,10 +182,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...immutableZkEvm,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       immutableZkEvm,
-      "immutable",
-      ENVIRONMENTS.mainnet
+      ENVIRONMENTS.mainnet,
+      [],
+      "immutable"
     ),
     axelarChainId: "immutable",
     axelarChainName: "Immutable",
@@ -214,10 +195,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...immutableZkEvmTestnet,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       immutableZkEvmTestnet,
-      "immutable",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "immutable"
     ),
     axelarChainId: "immutable",
     axelarChainName: "Immutable",
@@ -226,9 +208,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...avalanche,
-    rpcUrls: createEvmChainRpcConfig(avalanche, "Avalanche", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(avalanche, ENVIRONMENTS.mainnet, [
       "https://1rpc.io/avax/c",
-    ]),
+    ], "Avalanche"),
     axelarChainId: "Avalanche",
     axelarChainName: "Avalanche",
     supportWagmi: true,
@@ -236,10 +218,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...avalancheFuji,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       avalancheFuji,
-      "Avalanche",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "Avalanche"
     ),
     axelarChainId: "Avalanche",
     axelarChainName: "Avalanche",
@@ -248,9 +231,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygon,
-    rpcUrls: createEvmChainRpcConfig(polygon, "Polygon", ENVIRONMENTS.mainnet, [
-      "https://polygon.llamarpc.com",
-    ]),
+    rpcUrls: createRpcUrlConfig(polygon, ENVIRONMENTS.mainnet, [
+      "https://polygon-rpc.com",
+    ], "Polygon"),
     axelarChainId: "Polygon",
     axelarChainName: "Polygon",
     environment: ENVIRONMENTS.mainnet,
@@ -258,10 +241,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygonAmoy,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       polygonAmoy,
-      "polygon-sepolia",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "polygon-sepolia"
     ),
     axelarChainId: "polygon-sepolia",
     axelarChainName: "polygon-sepolia",
@@ -270,10 +254,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygonZkEvm,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       polygonZkEvm,
-      "polygon-zkevm",
-      ENVIRONMENTS.mainnet
+      ENVIRONMENTS.mainnet,
+      [],
+      "polygon-zkevm"
     ),
     axelarChainId: "polygon-zkevm",
     supportWagmi: true,
@@ -282,10 +267,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...polygonZkEvmTestnet,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       polygonZkEvmTestnet,
-      "polygon-zkevm",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "polygon-zkevm"
     ),
     axelarChainId: "polygon-zkevm",
     axelarChainName: "polygon-zkevm",
@@ -294,12 +280,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...bsc,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       bsc,
-      "binance",
       ENVIRONMENTS.mainnet,
       ["https://bsc.blockrazor.xyz"],
-      ["https://bsc.blockrazor.xyz"]
+      "binance"
     ),
     axelarChainId: "binance",
     axelarChainName: "binance",
@@ -308,7 +293,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...bscTestnet,
-    rpcUrls: createEvmChainRpcConfig(bscTestnet, "binance", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(bscTestnet, ENVIRONMENTS.testnet, [], "binance"),
     axelarChainId: "binance",
     axelarChainName: "binance",
     supportWagmi: true,
@@ -316,7 +301,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...arbitrum,
-    rpcUrls: createEvmChainRpcConfig(arbitrum, "arbitrum", ENVIRONMENTS.mainnet),
+    rpcUrls: createRpcUrlConfig(arbitrum, ENVIRONMENTS.mainnet, [], "arbitrum"),
     axelarChainId: "arbitrum",
     axelarChainName: "arbitrum",
     supportWagmi: true,
@@ -324,10 +309,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...arbitrumSepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       arbitrumSepolia,
-      "arbitrum-sepolia",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "arbitrum-sepolia"
     ),
     axelarChainId: "arbitrum-sepolia",
     axelarChainName: "arbitrum-sepolia",
@@ -336,9 +322,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...celo,
-    rpcUrls: createEvmChainRpcConfig(celo, "celo", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(celo, ENVIRONMENTS.mainnet, [
       "https://1rpc.io/celo",
-    ]),
+    ], "celo"),
     axelarChainId: "celo",
     axelarChainName: "celo",
     supportWagmi: true,
@@ -346,7 +332,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...celoAlfajores,
-    rpcUrls: createEvmChainRpcConfig(celoAlfajores, "celo", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(celoAlfajores, ENVIRONMENTS.testnet, [], "celo"),
     axelarChainId: "celo",
     axelarChainName: "celo",
     supportWagmi: true,
@@ -354,9 +340,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...aurora,
-    rpcUrls: createEvmChainRpcConfig(aurora, "aurora", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(aurora, ENVIRONMENTS.mainnet, [
       "https://1rpc.io/aurora",
-    ]),
+    ], "aurora"),
     axelarChainId: "aurora",
     axelarChainName: "aurora",
     supportWagmi: true,
@@ -364,7 +350,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...auroraTestnet,
-    rpcUrls: createEvmChainRpcConfig(auroraTestnet, "aurora", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(auroraTestnet, ENVIRONMENTS.testnet, [], "aurora"),
     axelarChainId: "aurora",
     axelarChainName: "aurora",
     supportWagmi: true,
@@ -372,7 +358,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...optimism,
-    rpcUrls: createEvmChainRpcConfig(optimism, "optimism", ENVIRONMENTS.mainnet),
+    rpcUrls: createRpcUrlConfig(optimism, ENVIRONMENTS.mainnet, [], "optimism"),
     axelarChainId: "optimism",
     axelarChainName: "optimism",
     supportWagmi: true,
@@ -380,10 +366,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...optimismSepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       optimismSepolia,
-      "optimism-sepolia",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "optimism-sepolia"
     ),
     axelarChainId: "optimism-sepolia",
     axelarChainName: "optimism-sepolia",
@@ -392,7 +379,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...kava,
-    rpcUrls: createEvmChainRpcConfig(kava, "kava", ENVIRONMENTS.mainnet),
+    rpcUrls: createRpcUrlConfig(kava, ENVIRONMENTS.mainnet, [], "kava"),
     axelarChainId: "kava",
     axelarChainName: "kava",
     supportWagmi: true,
@@ -400,7 +387,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...kavaTestnet,
-    rpcUrls: createEvmChainRpcConfig(kavaTestnet, "kava", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(kavaTestnet, ENVIRONMENTS.testnet, [], "kava"),
     axelarChainId: "kava",
     axelarChainName: "kava",
     environment: ENVIRONMENTS.testnet,
@@ -408,10 +395,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...filecoinCalibration,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       filecoinCalibration,
-      "filecoin-2",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "filecoin-2"
     ),
     axelarChainId: "filecoin-2",
     axelarChainName: "filecoin-2",
@@ -420,9 +408,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...filecoin,
-    rpcUrls: createEvmChainRpcConfig(filecoin, "filecoin", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(filecoin, ENVIRONMENTS.mainnet, [
       "https://rpc.ankr.com/filecoin",
-    ]),
+    ], "filecoin"),
     axelarChainId: "filecoin",
     axelarChainName: "filecoin",
     supportWagmi: true,
@@ -430,9 +418,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...base,
-    rpcUrls: createEvmChainRpcConfig(base, "base", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(base, ENVIRONMENTS.mainnet, [
       "https://base.llamarpc.com",
-    ]),
+    ], "base"),
     axelarChainId: "base",
     axelarChainName: "base",
     supportWagmi: true,
@@ -440,10 +428,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...baseSepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       baseSepolia,
-      "base-sepolia",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "base-sepolia"
     ),
     axelarChainId: "base-sepolia",
     axelarChainName: "base-sepolia",
@@ -452,10 +441,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...lineaSepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       lineaSepolia,
-      "linea-sepolia",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "linea-sepolia"
     ),
     axelarChainId: "linea-sepolia",
     axelarChainName: "linea-sepolia",
@@ -464,7 +454,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...lineaTestnet,
-    rpcUrls: createEvmChainRpcConfig(lineaTestnet, "linea", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(lineaTestnet, ENVIRONMENTS.testnet, [], "linea"),
     axelarChainId: "linea",
     axelarChainName: "linea",
     supportWagmi: true,
@@ -472,9 +462,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...linea,
-    rpcUrls: createEvmChainRpcConfig(linea, "linea", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(linea, ENVIRONMENTS.mainnet, [
       "https://1rpc.io/linea",
-    ]),
+    ], "linea"),
     axelarChainId: "linea",
     axelarChainName: "linea",
     supportWagmi: true,
@@ -482,9 +472,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...mantle,
-    rpcUrls: createEvmChainRpcConfig(mantle, "mantle", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(mantle, ENVIRONMENTS.mainnet, [
       "https://rpc.mantle.xyz",
-    ]),
+    ], "mantle"),
     axelarChainId: "mantle",
     axelarChainName: "mantle",
     supportWagmi: true,
@@ -492,7 +482,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...mantleTestnet,
-    rpcUrls: createEvmChainRpcConfig(mantleTestnet, "mantle", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(mantleTestnet, ENVIRONMENTS.testnet, [], "mantle"),
     axelarChainId: "mantle",
     axelarChainName: "mantle",
     supportWagmi: true,
@@ -500,9 +490,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...scroll,
-    rpcUrls: createEvmChainRpcConfig(scroll, "scroll", ENVIRONMENTS.mainnet, [
-      "https://scroll.drpc.org",
-    ]),
+    rpcUrls: createRpcUrlConfig(scroll, ENVIRONMENTS.mainnet, [], "scroll"),
     axelarChainId: "scroll",
     axelarChainName: "scroll",
     supportWagmi: true,
@@ -510,7 +498,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...scrollSepolia,
-    rpcUrls: createEvmChainRpcConfig(scrollSepolia, "scroll", ENVIRONMENTS.testnet),
+    rpcUrls: createRpcUrlConfig(scrollSepolia, ENVIRONMENTS.testnet, [], "scroll"),
     axelarChainId: "scroll",
     axelarChainName: "scroll",
     supportWagmi: true,
@@ -518,9 +506,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fraxtal,
-    rpcUrls: createEvmChainRpcConfig(fraxtal, "fraxtal", ENVIRONMENTS.mainnet, [
-      "https://fraxtal.drpc.org",
-    ]),
+    rpcUrls: createRpcUrlConfig(fraxtal, ENVIRONMENTS.mainnet, [], "fraxtal"),
     axelarChainId: "fraxtal",
     axelarChainName: "fraxtal",
     supportWagmi: true,
@@ -528,10 +514,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...fraxtalTestnet,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       fraxtalTestnet,
-      "fraxtal",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "fraxtal"
     ),
     axelarChainId: "fraxtal",
     axelarChainName: "fraxtal",
@@ -540,9 +527,9 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...blast,
-    rpcUrls: createEvmChainRpcConfig(blast, "blast", ENVIRONMENTS.mainnet, [
+    rpcUrls: createRpcUrlConfig(blast, ENVIRONMENTS.mainnet, [
       "https://rpc.envelop.is/blast",
-    ]),
+    ], "blast"),
     axelarChainId: "blast",
     axelarChainName: "blast",
     supportWagmi: true,
@@ -550,10 +537,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...blastSepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       blastSepolia,
-      "blast-sepolia",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "blast-sepolia"
     ),
     axelarChainId: "blast-sepolia",
     axelarChainName: "blast-sepolia",
@@ -562,10 +550,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...avalancheFuji,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       avalancheFuji,
-      "avalanche-fuji",
-      ENVIRONMENTS.devnet
+      ENVIRONMENTS.devnet,
+      [],
+      "avalanche-fuji"
     ),
     axelarChainId: "avalanche-fuji",
     axelarChainName: "avalanche-fuji",
@@ -574,10 +563,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...optimismSepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       optimismSepolia,
-      "optimism-sepolia",
-      ENVIRONMENTS.devnet
+      ENVIRONMENTS.devnet,
+      [],
+      "optimism-sepolia"
     ),
     axelarChainId: "optimism-sepolia",
     axelarChainName: "optimism-sepolia",
@@ -586,12 +576,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...sepolia,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       sepolia,
-      "eth-sepolia",
       ENVIRONMENTS.devnet,
       ["https://endpoints.omniatech.io/v1/eth/sepolia/public"],
-      ["https://endpoints.omniatech.io/v1/eth/sepolia/public"]
+      "eth-sepolia"
     ),
     axelarChainId: "eth-sepolia",
     axelarChainName: "eth-sepolia",
@@ -600,10 +589,11 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...xrplevmTestnet,
-    rpcUrls: createEvmChainRpcConfig(
+    rpcUrls: createRpcUrlConfig(
       xrplevmTestnet,
-      "xrpl-evm",
-      ENVIRONMENTS.testnet
+      ENVIRONMENTS.testnet,
+      [],
+      "xrpl-evm"
     ),
     axelarChainId: "xrpl-evm",
     axelarChainName: "xrpl-evm",

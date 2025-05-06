@@ -22,7 +22,7 @@ const sui = {
     symbol: "SUI",
     decimals: 9,
   },
-  rpcUrls: createRpcUrlConfig("sui", ENVIRONMENTS.mainnet, [SUI_RPC_URLS.mainnet], [SUI_RPC_URLS.mainnet]),
+  rpcUrls: createRpcUrlConfig("sui", ENVIRONMENTS.mainnet, [SUI_RPC_URLS.mainnet]),
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiexplorer.com/" },
   },
@@ -33,7 +33,7 @@ const suiTestnet = {
   ...sui,
   id: 103,
   environment: ENVIRONMENTS.testnet,
-  rpcUrls: createRpcUrlConfig("sui", ENVIRONMENTS.testnet, [SUI_RPC_URLS.testnet], [SUI_RPC_URLS.testnet]),
+  rpcUrls: createRpcUrlConfig("sui", ENVIRONMENTS.testnet, [SUI_RPC_URLS.testnet]),
   blockExplorers: {
     default: { name: "Sui Explorer", url: "https://suiscan.xyz/testnet" },
   },
@@ -57,7 +57,7 @@ export const stellar = {
     symbol: "XLM",
     decimals: 7,
   },
-  rpcUrls: createRpcUrlConfig("stellar", ENVIRONMENTS.mainnet, [STELLAR_RPC_URLS.mainnet], [STELLAR_RPC_URLS.mainnet]),
+  rpcUrls: createRpcUrlConfig("stellar", ENVIRONMENTS.mainnet, [STELLAR_RPC_URLS.mainnet]),
   blockExplorers: {
     default: {
       name: "Stellar Explorer",
@@ -70,7 +70,7 @@ export const stellar = {
 const stellarTestnet = {
   ...stellar,
   id: 110,
-  rpcUrls: createRpcUrlConfig("stellar", ENVIRONMENTS.testnet, [STELLAR_RPC_URLS.testnet], [STELLAR_RPC_URLS.testnet]),
+  rpcUrls: createRpcUrlConfig("stellar", ENVIRONMENTS.testnet, [STELLAR_RPC_URLS.testnet]),
   blockExplorers: {
     default: {
       name: "Stellar Explorer",
