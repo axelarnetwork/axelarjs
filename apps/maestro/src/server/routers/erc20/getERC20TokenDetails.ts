@@ -6,9 +6,18 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { ExtendedWagmiChainConfig } from "~/config/chains";
-import { isValidSuiTokenAddress } from "~/lib/utils/validation";
+import {
+  isValidStellarTokenAddress,
+  isValidSuiTokenAddress,
+} from "~/lib/utils/validation";
+import type { Context } from "~/server/context";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import {
+  getStellarAssetMetadata,
+  getStellarChainConfig,
+  getStellarContractMetadata,
+} from "../stellar/utils";
 import { normalizeSuiTokenAddress } from "../sui/utils/utils";
 
 //TODO: migrate to kv store?
@@ -41,6 +50,37 @@ async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
   };
 }
 
+export const getStellarTokenDetails = async (
+  tokenAddress: string,
+  ctx: Context
+) => {
+  const chainConfig = await getStellarChainConfig(ctx);
+  let name: string;
+  let symbol: string;
+
+  if (tokenAddress.includes("-")) {
+    // Classic asset: ASSET_CODE-ISSUER
+    ({ name, symbol } = await getStellarAssetMetadata(tokenAddress));
+  } else if (tokenAddress.startsWith("C")) {
+    // Contract asset: C-CONTRACT_ADDRESS
+    const rpcUrl = chainConfig.config.rpc[0];
+    ({ name, symbol } = await getStellarContractMetadata(tokenAddress, rpcUrl));
+  } else {
+    throw new Error("Invalid Stellar asset address");
+  }
+
+  return {
+    name,
+    symbol,
+    decimals: 7,
+    chainId: chainConfig.id,
+    chainName: chainConfig.displayName,
+    axelarChainId: chainConfig.id,
+    axelarChainName: "stellar",
+    tokenAddress,
+  };
+};
+
 export const getERC20TokenDetails = publicProcedure
   .input(
     z.object({
@@ -58,6 +98,11 @@ export const getERC20TokenDetails = publicProcedure
         normalizedTokenAddress,
         input.chainId as number
       );
+    }
+
+    // Enter here if the token is a Stellar token
+    if (isValidStellarTokenAddress(input.tokenAddress)) {
+      return await getStellarTokenDetails(input.tokenAddress, ctx);
     }
 
     try {
