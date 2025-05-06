@@ -17,15 +17,16 @@ export function useMintInterchainTokenState() {
 
   const [managerState] = useManageInterchainTokenContainer();
 
-  const { data: erc20Details } = trpc.erc20.getERC20TokenDetails.useQuery(
-    {
-      tokenAddress: managerState.tokenAddress,
-      chainId,
-    },
-    {
-      enabled: isAddress(managerState.tokenAddress) && Boolean(chainId),
-    }
-  );
+  const { data: erc20Details } =
+    trpc.nativeTokens.getNativeTokenDetails.useQuery(
+      {
+        tokenAddress: managerState.tokenAddress,
+        chainId,
+      },
+      {
+        enabled: isAddress(managerState.tokenAddress) && Boolean(chainId),
+      }
+    );
 
   const {
     writeContractAsync: mintTokenAsync,

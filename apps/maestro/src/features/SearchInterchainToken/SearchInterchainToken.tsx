@@ -18,8 +18,8 @@ import {
   isValidSuiTokenAddress,
 } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import ChainsDropdown, {
   ChainIconComponent,
 } from "~/ui/components/ChainsDropdown";
@@ -62,7 +62,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     data: searchERC20Result,
     error: searchERC20Error,
     isLoading: isSearchingERC20,
-  } = useERC20TokenDetailsQuery({
+  } = useNativeTokenDetailsQuery({
     chainId: chainId,
     tokenAddress: search,
   });

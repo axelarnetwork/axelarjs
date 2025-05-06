@@ -142,7 +142,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     data: tokenDetails,
     error: tokenDetailsError,
     isFetching: isTokenDetailsFetching,
-  } = trpc.erc20.getERC20TokenDetails.useQuery({
+  } = trpc.nativeTokens.getNativeTokenDetails.useQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
   });
@@ -205,12 +205,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const refetchPageData = useCallback(() => {
     if (!isInterchainTokenFetching && !isTokenDetailsFetching) {
       void utils.interchainToken.searchInterchainToken.invalidate();
-      void utils.erc20.getERC20TokenDetails.invalidate();
+      void utils.nativeTokens.getNativeTokenDetails.invalidate();
     }
   }, [
     isInterchainTokenFetching,
     isTokenDetailsFetching,
-    utils.erc20.getERC20TokenDetails,
+    utils.nativeTokens.getNativeTokenDetails,
     utils.interchainToken.searchInterchainToken,
   ]);
 
@@ -356,7 +356,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           }, 5000); // space requests while waiting for the tx to be executed and data to be available on stellar chain
         });
     }
-  }, [interchainToken?.matchingTokens, props.tokenId, updateStellarAddresses]);
+  }, [
+    interchainToken?.matchingTokens,
+    isAlreadyUpdatingRemoteStellar,
+    props.tokenAddress,
+    props.tokenId,
+    refetchPageData,
+    updateStellarAddresses,
+  ]);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
 

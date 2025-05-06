@@ -15,8 +15,8 @@ import {
   useEstimateGasFeeQuery,
 } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
@@ -36,7 +36,7 @@ export function useSendInterchainTokenState(props: {
   const { combinedComputed } = useAllChainConfigsQuery();
 
   // Only query ERC20 details for EVM chains
-  const { data: tokenDetails } = useERC20TokenDetailsQuery({
+  const { data: tokenDetails } = useNativeTokenDetailsQuery({
     chainId: props.sourceChain.chain_id,
     tokenAddress: props.tokenAddress,
   });

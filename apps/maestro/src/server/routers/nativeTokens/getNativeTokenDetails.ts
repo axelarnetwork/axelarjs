@@ -81,7 +81,7 @@ export const getStellarTokenDetails = async (
   };
 };
 
-export const getERC20TokenDetails = publicProcedure
+export const getNativeTokenDetails = publicProcedure
   .input(
     z.object({
       chainId: z.number().optional(),
