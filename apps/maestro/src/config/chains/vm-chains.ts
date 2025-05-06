@@ -45,7 +45,6 @@ const suiDevnet = {
   environment: ENVIRONMENTS.devnet,
 };
 
-console.log ("STELLAR_RPC_URLS.mainnet", STELLAR_RPC_URLS.mainnet, STELLAR_RPC_URLS.testnet)
 export const stellar = {
   id: 109,
   axelarChainId: "stellar",
