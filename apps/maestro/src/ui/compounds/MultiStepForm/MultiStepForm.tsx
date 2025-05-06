@@ -147,6 +147,7 @@ export type ProtectedDialogProps = PropsWithChildren<{
   triggerLabel?: string;
   steps: string[];
   title?: ReactNode;
+  disabled?: boolean;
   onClose: DialogProps["onClose"];
   onBackClick?: () => void;
 }>;
@@ -157,6 +158,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   onClose,
   disableClose,
   disableChainsDropdown,
+  disabled,
   ...props
 }) => {
   const { status, data } = useSession();
@@ -186,7 +188,9 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     <Dialog
       onClose={handleClose}
       renderTrigger={(props) => (
-        <TriggerButton {...props}>{triggerLabel}</TriggerButton>
+        <TriggerButton {...props} disabled={disabled}>
+          {triggerLabel}
+        </TriggerButton>
       )}
     >
       <Dialog.Body $as="section">

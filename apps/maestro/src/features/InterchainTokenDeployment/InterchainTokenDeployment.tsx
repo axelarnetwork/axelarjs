@@ -2,6 +2,7 @@ import { cn, Dialog } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
+import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
 import {
   BackButton,
   ChainsDropdown,
@@ -41,6 +42,9 @@ const InterchainTokenDeployment = () => {
     () => state.step > 0 && state.step < 2,
     [state.step]
   );
+  const { chain: currentConnectedChain } = useAccount();
+
+  const isStellarChain = currentConnectedChain?.id === STELLAR_CHAIN_ID;
 
   const disableChainDropdown = useMemo(
     () =>
@@ -52,6 +56,7 @@ const InterchainTokenDeployment = () => {
   return (
     <MultiStepDialog
       triggerLabel="Deploy a new Interchain Token"
+      disabled={isStellarChain}
       title={
         <Dialog.Title className="flex items-center justify-center gap-1 sm:gap-2">
           {showBackButton && <BackButton onClick={actions.prevStep} />}
