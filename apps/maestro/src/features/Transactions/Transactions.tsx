@@ -7,7 +7,7 @@ import Link from "next/link";
 import { groupBy } from "rambda";
 
 import { useChainId, type TxType } from "~/lib/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import {

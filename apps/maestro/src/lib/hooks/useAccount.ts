@@ -6,7 +6,7 @@ import { useAccount as useWagmiAccount } from "wagmi";
 
 import { suiChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
-import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 
 interface CombinedAccountInfo {
   address: `0x${string}`;

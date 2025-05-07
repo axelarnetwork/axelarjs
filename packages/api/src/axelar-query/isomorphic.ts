@@ -330,9 +330,7 @@ export class AxelarQueryAPIClient extends RestService {
   private async getAxelarConfigs(): Promise<AxelarConfigsResponse> {
     // Cache all assets
     if (!this.cachedChainConfig) {
-      this.cachedChainConfig = await this.axelarConfigClient.getAxelarConfigs(
-        this.env
-      );
+      this.cachedChainConfig = await this.axelarConfigClient.getAxelarConfigs();
     }
 
     if (!this.cachedChainConfig) {

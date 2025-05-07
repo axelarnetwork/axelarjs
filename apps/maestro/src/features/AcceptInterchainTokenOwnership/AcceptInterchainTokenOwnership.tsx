@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import { Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
@@ -9,12 +8,13 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import { useWriteInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
+import { ITSChainConfig } from "~/server/chainConfig";
 
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  sourceChain: EVMChainConfig;
+  sourceChain: ITSChainConfig;
   isOpen?: boolean;
   accountAddress: `0x${string}`;
   onClose?: () => void;

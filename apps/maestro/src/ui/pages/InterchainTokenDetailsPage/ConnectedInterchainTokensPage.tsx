@@ -26,7 +26,7 @@ import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
@@ -356,7 +356,14 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
           }, 5000); // space requests while waiting for the tx to be executed and data to be available on stellar chain
         });
     }
-  }, [interchainToken?.matchingTokens, props.tokenId, updateStellarAddresses]);
+  }, [
+    refetchPageData,
+    props.tokenAddress,
+    interchainToken?.matchingTokens,
+    props.tokenId,
+    updateStellarAddresses,
+    isAlreadyUpdatingRemoteStellar,
+  ]);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
 
