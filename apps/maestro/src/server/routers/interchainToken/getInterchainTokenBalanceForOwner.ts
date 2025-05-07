@@ -104,24 +104,26 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         rpcUrl: rpcUrl,
       })) as unknown as StellarTokenContractClient;
 
-      const { simulation: simulationBalance } =
-        await ITSStellarContractClient.balance({
+      const [
+        { simulation: simBalance },
+        { simulation: simMinter },
+        { simulation: simOwner },
+        { simulation: simDecimals },
+      ] = await Promise.all([
+        ITSStellarContractClient.balance({
           id: input.owner,
-        });
-      const { simulation: simulationMinter } =
-        await ITSStellarContractClient.is_minter({
+        }),
+        ITSStellarContractClient.is_minter({
           minter: input.owner,
-        });
-      const { simulation: simulationOwner } =
-        await ITSStellarContractClient.owner();
-      const { simulation: simulationDecimals } =
-        await ITSStellarContractClient.decimals();
+        }),
+        ITSStellarContractClient.owner(),
+        ITSStellarContractClient.decimals(),
+      ]);
 
-      const balance = scValToNative(simulationBalance.result.retval).toString();
-      const isMinter = scValToNative(simulationMinter.result.retval);
-      const isOwner =
-        scValToNative(simulationOwner.result.retval) === input.owner;
-      const decimals = scValToNative(simulationDecimals.result.retval);
+      const balance = scValToNative(simBalance.result.retval).toString();
+      const isMinter = scValToNative(simMinter.result.retval);
+      const isOwner = scValToNative(simOwner.result.retval) === input.owner;
+      const decimals = scValToNative(simDecimals.result.retval);
 
       // check return values
       return {
