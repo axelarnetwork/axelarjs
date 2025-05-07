@@ -114,14 +114,18 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         });
       const { simulation: simulationOwner } =
         await ITSStellarContractClient.owner();
+      const { simulation: simulationDecimals } =
+        await ITSStellarContractClient.decimals();
 
       const balance = scValToNative(simulationBalance.result.retval).toString();
       const isMinter = scValToNative(simulationMinter.result.retval);
       const isOwner =
         scValToNative(simulationOwner.result.retval) === input.owner;
+      const decimals = scValToNative(simulationDecimals.result.retval);
 
       // check return values
       return {
+        decimals,
         isTokenOwner: isOwner,
         isTokenMinter: isMinter,
         tokenBalance: balance,

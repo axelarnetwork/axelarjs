@@ -17,4 +17,5 @@ export interface StellarTokenContractClient {
     minter: string;
   }) => Promise<{ simulation: { result: { retval: xdr.ScVal } } }>;
   owner: () => Promise<{ simulation: { result: { retval: xdr.ScVal } } }>;
+  decimals: () => Promise<{ simulation: { result: { retval: xdr.ScVal } } }>;
 }
