@@ -22,6 +22,7 @@
     "docgen": "turbo run docgen",
     "deploy:docs": "turbo run deploy:docs",
     "dev:maestro": "pnpm -C ./apps/maestro run dev",
+    "dev:widget": "pnpm -C ./apps/widget run dev",
     "dev:registry": "pnpm -C ./apps/registry run dev",
     "changeset": "changeset",
     "changeset:release": "pnpm build:packages && changeset publish",
