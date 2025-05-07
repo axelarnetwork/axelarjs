@@ -2,9 +2,11 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 import {
   Account,
-  Memo,
-  Operation,
-  TransactionBuilder
+  Address,
+  Contract,
+  Networks,
+  TransactionBuilder,
+  xdr
 } from "stellar-sdk";
 
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
@@ -12,10 +14,22 @@ import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { publicProcedure } from "~/server/trpc";
 import { getStellarChainConfig } from "./utils";
 
-// Mock function to generate a token ID similar to how it would be done in production
-function generateMockTokenId(): string {
-  // In production, this would be derived from salt, deployer, etc.
-  return `0x${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").padStart(64, "0")}`;
+// Function to convert a string to a bytes32 format
+function stringToBytes32(input: string): string {
+  // Create a buffer from the input string
+  const buffer = Buffer.from(input);
+  // Convert to hex and pad to 64 characters (32 bytes)
+  return buffer.toString('hex').padStart(64, '0');
+}
+
+// Function to convert a decimal string to i128 format
+function toI128(amount: string, decimals: number): { hi: string, lo: string } {
+  // Convert to BigInt with the correct number of decimals
+  const value = BigInt(amount) * BigInt(10 ** decimals);
+  // Split into hi and lo parts for i128
+  const hi = (value >> 64n).toString();
+  const lo = (value & BigInt("0xFFFFFFFFFFFFFFFF")).toString();
+  return { hi, lo };
 }
 
 export const getDeployTokenTx = publicProcedure
@@ -26,6 +40,7 @@ export const getDeployTokenTx = publicProcedure
       decimals: z.number(),
       initialSupply: z.string(),
       minterAddress: z.string(),
+      salt: z.string().optional(),
       destinationChainIds: z.array(z.string()),
       gasValues: z.array(z.string()),
     })
@@ -33,26 +48,17 @@ export const getDeployTokenTx = publicProcedure
   .mutation(async ({ input, ctx }) => {
     try {
       // Get Stellar chain config
-      await getStellarChainConfig(ctx); // We're not using this in the mock, but keeping it to simulate real behavior
+      await getStellarChainConfig(ctx);
       
-      // Generate mock data
-      const tokenId = generateMockTokenId();
+      // InterchainTokenService contract address on Stellar testnet
+      const contractAddress = "CATNQHWMG4VOWPSWF4HXVW7ASDJNX7M7F6JLFC544T7ZMMXXAE2HUDTY";
       
-      // Create a mock token address - in Stellar this would be a contract ID
-      // In a real implementation, this would be the actual deployed token contract
-      const tokenAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
+      // Create salt from input or generate a random one
+      const salt = input.salt || stringToBytes32(randomUUID());
       
-      // Create a mock token manager address
-      const tokenManagerAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
-      
-      // Create a simple mock transaction that would represent token creation
-      // In a real implementation, this would be the actual transaction to deploy a token
-      
-      // Buscar o número de sequência atual da conta do usuário
-      // Isso é necessário para criar uma transação válida
+      // Fetch the user's account sequence number
       const horizonUrl = 'https://horizon-testnet.stellar.org';
       
-      // Buscar os detalhes da conta do usuário
       console.log(`Fetching account details for ${input.minterAddress}...`);
       const accountResponse = await fetch(`${horizonUrl}/accounts/${input.minterAddress}`);
       
@@ -65,50 +71,75 @@ export const getDeployTokenTx = publicProcedure
       
       console.log(`Sequence number for account ${input.minterAddress}: ${sequenceNumber}`);
       
-      // Criar uma conta com o número de sequência correto
+      // Create a Contract instance
+      const contract = new Contract(contractAddress);
+      
+      // Prepare the token metadata map
+      const tokenMetadataMap = [
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol("decimal"),
+          val: xdr.ScVal.scvU32(input.decimals)
+        }),
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol("name"),
+          val: xdr.ScVal.scvString(input.name)
+        }),
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol("symbol"),
+          val: xdr.ScVal.scvString(input.symbol)
+        })
+      ];
+      
+      // Convert initial supply to i128
+      const initialSupplyValue = toI128(input.initialSupply, input.decimals);
+      
+      // Prepare the arguments for the deploy_interchain_token function
+      const args = [
+        // caller: address
+        new Address(input.minterAddress).toScVal(),
+        
+        // salt: bytesn<32>
+        xdr.ScVal.scvBytes(Buffer.from(salt, 'hex')),
+        
+        // token_metadata: map
+        xdr.ScVal.scvMap(tokenMetadataMap),
+        
+        // initial_supply: i128
+        xdr.ScVal.scvI128(new xdr.Int128Parts({
+          hi: xdr.Int64.fromString(initialSupplyValue.hi),
+          lo: xdr.Uint64.fromString(initialSupplyValue.lo)
+        })),
+        
+        // minter: option<address>
+        // If the minter is the same as the caller, we use the caller's address
+        new Address(input.minterAddress).toScVal()
+      ];
+      
+      // Create the source account
       const sourceAccount = new Account(input.minterAddress, sequenceNumber);
       
-      // Criar uma transação completa com as operações necessárias
+      // Create the transaction
       const transaction = new TransactionBuilder(sourceAccount, {
-        fee: "100", // 0.00001 XLM
-        networkPassphrase: "Test SDF Network ; September 2015", // Passphrase da testnet do Stellar
+        fee: "100000", // 0.01 XLM - Soroban transactions require higher fees
+        networkPassphrase: Networks.TESTNET, // Passphrase for Stellar testnet
       })
-        // Adicionar operação para armazenar os metadados do token
-        .addOperation(
-          Operation.manageData({
-            name: `token_${input.symbol.slice(0, 10)}`,
-            value: Buffer.from(`${input.symbol}:${input.decimals}`)
-          })
-        )
-        // Adicionar operação para armazenar o nome do token
-        .addOperation(
-          Operation.manageData({
-            name: `name_${input.symbol.slice(0, 10)}`,
-            value: Buffer.from(input.name.slice(0, 60))
-          })
-        )
-        // Adicionar um memo com o nome do token
-        .addMemo(Memo.text(`Deploy ${input.name} (${input.symbol})`))
-        // Definir timeout de 30 segundos
-        .setTimeout(30)
+        .addOperation(contract.call("deploy_interchain_token", ...args))
+        .setTimeout(30) // 30 seconds timeout
         .build();
       
-      // Converter a transação para formato XDR
+      // Convert the transaction to XDR format
       const transactionXDR = transaction.toXDR();
       
-      // Criar os dados do token para incluir na resposta
-      const tokenData = {
-        symbol: input.symbol,
-        name: input.name,
-        decimals: input.decimals,
-        memoText: `Deploy ${input.name} (${input.symbol})`,
-        tokenDataName: `token_${input.symbol.slice(0, 10)}`,
-        tokenDataValue: `${input.symbol}:${input.decimals}`,
-        nameDataName: `name_${input.symbol.slice(0, 10)}`,
-        nameDataValue: input.name.slice(0, 60)
-      };
+      // Generate a token ID based on the contract, salt, and caller
+      // In a real implementation, this would be returned by the contract
+      const tokenId = salt;
       
-      // Return the mock data
+      // In a real implementation, these would be returned by the contract
+      // For now, we'll generate mock addresses
+      const tokenAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
+      const tokenManagerAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
+      
+      // Return the transaction XDR and token data
       return {
         transactionXDR,
         tokenId,
@@ -116,7 +147,14 @@ export const getDeployTokenTx = publicProcedure
         tokenManagerAddress,
         tokenManagerType: TOKEN_MANAGER_TYPES[0], // "mint_burn"
         deploymentMessageId: randomUUID(),
-        tokenData, // Incluir os dados do token para uso no frontend
+        tokenData: {
+          symbol: input.symbol,
+          name: input.name,
+          decimals: input.decimals,
+          salt,
+          initialSupply: input.initialSupply,
+          minterAddress: input.minterAddress
+        }
       };
     } catch (error) {
       console.error("Error in getDeployTokenTx:", error);

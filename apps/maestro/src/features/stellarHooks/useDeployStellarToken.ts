@@ -65,11 +65,11 @@ export function useDeployStellarToken() {
         // 2. Have the user sign the transaction with their wallet
         console.log("Requesting signature from wallet...");
         
-        // Usamos o XDR da transação retornado pelo servidor
+        // We use the transaction XDR returned by the server
         console.log("Transaction XDR to be signed:", result.transactionXDR);
         
-        // Usamos o método signTransaction do StellarWalletKit
-        // A transação já foi criada com o número de sequência correto no backend
+        // We use the signTransaction method from StellarWalletKit
+        // The transaction was already created with the correct sequence number in the backend
         console.log("Requesting signature from wallet...");
         const { signedTxXdr } = await kit.signTransaction(result.transactionXDR, {
           networkPassphrase,
@@ -79,24 +79,24 @@ export function useDeployStellarToken() {
         console.log("Submitting transaction to network via Horizon API...");
         const horizonUrl = process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL || 'https://horizon-testnet.stellar.org';
         
-        // Submeter a transação usando fetch
+        // Submit the transaction using fetch
         const horizonResponse = await fetch(`${horizonUrl}/transactions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: `tx=${encodeURIComponent(signedTxXdr)}`
         });
         
-        // Processar a resposta da API Horizon
+        // Process the Horizon API response
         const responseData = await horizonResponse.json();
         console.log("Horizon API response:", responseData);
         
-        // Verificar se a submissão foi bem-sucedida
+        // Check if the submission was successful
         if (!horizonResponse.ok) {
           throw new Error(`Transaction submission failed: ${responseData.title || responseData.detail || 'Unknown error'}`);
         }
         
-        // A transação foi assinada e submetida com sucesso
-        // Extrair o hash da transação da resposta da API Horizon
+        // The transaction was successfully signed and submitted
+        // Extract the transaction hash from the Horizon API response
         const txHash = responseData.hash;
         
         console.log("Transaction successfully submitted with hash:", txHash);
