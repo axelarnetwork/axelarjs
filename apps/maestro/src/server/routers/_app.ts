@@ -10,6 +10,7 @@ import { interchainTokenRouter } from "./interchainToken";
 import { messagesRouter } from "./messages";
 import { nativeTokensRouter } from "./nativeTokens";
 import { openaiRouter } from "./openai";
+import { stellarRouter } from "./stellar";
 import { suiRouter } from "./sui";
 
 export const appRouter = router({
@@ -26,6 +27,7 @@ export const appRouter = router({
   openai: openaiRouter,
   messages: messagesRouter,
   accounts: accountsRouter,
+  stellar: stellarRouter,
   sui: suiRouter,
 });
 

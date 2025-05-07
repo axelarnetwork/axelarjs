@@ -2,7 +2,7 @@ import { cn, Dialog } from "@axelarjs/ui";
 import { useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
+// import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
 import {
   BackButton,
   ChainsDropdown,
@@ -42,7 +42,7 @@ const InterchainTokenDeployment = () => {
     () => state.step > 0 && state.step < 2,
     [state.step]
   );
-  const { chain: currentConnectedChain } = useAccount();
+  // const { chain: currentConnectedChain } = useAccount();
 
   // const isStellarChain = currentConnectedChain?.id === STELLAR_CHAIN_ID;
 

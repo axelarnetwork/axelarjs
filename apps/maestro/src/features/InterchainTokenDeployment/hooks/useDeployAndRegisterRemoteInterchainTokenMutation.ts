@@ -9,6 +9,7 @@ import { zeroAddress, type TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
 import useDeployToken from "~/features/suiHooks/useDeployToken";
+import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -19,9 +20,10 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
+import { TokenManagerType } from "~/lib/drizzle/schema/common";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
@@ -158,6 +160,23 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
   useEffect(() => {
+    // Debug log for readiness check
+    console.log("Deployment Mutation - Readiness Check:", {
+      chainId,
+      isStellar: chainId === STELLAR_CHAIN_ID,
+      isReady,
+      hasDeployerAddress: Boolean(deployerAddress),
+      hasTokenId: Boolean(tokenId),
+      hasTokenAddress: Boolean(tokenAddress)
+    });
+    
+    // Special case for Stellar - always set ready
+    if (chainId === STELLAR_CHAIN_ID) {
+      console.log("Setting isReady=true for Stellar chain");
+      setIsReady(true);
+      return;
+    }
+    
     if (isValidEVMAddress(deployerAddress) && !prepareMulticall?.request) {
       setIsReady(false);
       console.warn("Failed to simulate multicall for deploying remote tokens");
@@ -265,6 +284,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
+    // Skip recording deployment draft for Stellar chains
+    if (chainId === STELLAR_CHAIN_ID) {
+      console.log("Skipping recordDeploymentDraft for Stellar chain");
+      return;
+    }
+    
     if (input && tokenAddress && !input.sourceChainId.includes("sui")) {
       return await recordDeploymentAsync({
         kind: "interchain",
@@ -284,9 +309,51 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
+  const { deployStellarToken } = useDeployStellarToken();
+
   const writeAsync = useCallback(async () => {
+    console.log("writeAsync called with:", {
+      chainId,
+      isStellar: chainId === STELLAR_CHAIN_ID,
+      isReady,
+      hasInput: Boolean(input)
+    });
+    
     await recordDeploymentDraft();
-    if (chainId === SUI_CHAIN_ID && input) {
+    if (chainId === STELLAR_CHAIN_ID && input) {
+      // Handle Stellar deployment
+      console.log("Stellar deployment started");
+      try {
+        const gasValues =
+          input?.remoteDeploymentGasFees?.gasFees?.map((x) => BigInt(x.fee)) ?? [];
+        
+        const result = await deployStellarToken({
+          name: input.tokenName,
+          symbol: input.tokenSymbol,
+          decimals: input.decimals,
+          initialSupply: input.initialSupply,
+          minterAddress: input.minterAddress,
+          destinationChainIds: input.destinationChainIds,
+          gasValues: gasValues,
+        });
+        
+        // Update UI state to show deployment success
+        onStatusUpdate({
+          type: "deployed",
+          tokenAddress: result.tokenAddress as `0x${string}`,
+          txHash: result.digest, // Use digest as txHash
+        });
+        
+        return result;
+      } catch (error) {
+        console.error("Stellar deployment failed:", error);
+        onStatusUpdate({
+          type: "idle",
+        });
+        throw error;
+      }
+    } else if (chainId === SUI_CHAIN_ID && input) {
+      // Handle Sui deployment
       const gasValues =
         input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
       const result = await deployToken({
@@ -319,6 +386,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         return result;
       }
     } else {
+      // Handle EVM deployment
       invariant(
         prepareMulticall?.request !== undefined,
         "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
@@ -329,11 +397,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [
     chainId,
     deployToken,
+    deployStellarToken,
     deployerAddress,
     input,
     multicall,
     prepareMulticall?.request,
     recordDeploymentDraft,
+    STELLAR_CHAIN_ID,
+    SUI_CHAIN_ID,
   ]);
 
   const write = useCallback(() => {

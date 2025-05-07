@@ -6,6 +6,19 @@ import {
   LinkButton,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
+
+// Safe version of maskAddress that handles non-string values
+const safeMaskAddress = (address: any): string => {
+  if (!address || typeof address !== 'string') return '';
+  try {
+    return maskAddress(address);
+  } catch (error) {
+    // If the address can't be masked, just return a truncated version
+    return address.length > 10 
+      ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` 
+      : address;
+  }
+};
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
@@ -92,7 +105,7 @@ const Review: FC = () => {
                   $size="sm"
                   $variant="ghost"
                 >
-                  {maskAddress(state.txState.tokenAddress)}
+                  {safeMaskAddress(state.txState.tokenAddress)}
                 </CopyToClipboardButton>
               </div>
               {chainConfig && (
@@ -123,7 +136,9 @@ const Review: FC = () => {
                 >
                   View transaction{" "}
                   <span className="hidden md:inline">
-                    {maskAddress(state.txState.txHash ?? "")}
+                    {typeof state.txState.txHash === 'string' && state.txState.txHash.includes("stellar-tx-")
+                      ? "Stellar Transaction" 
+                      : safeMaskAddress(state.txState.txHash)}
                   </span>{" "}
                   on {chain?.blockExplorers?.default.name}{" "}
                   <ExternalLinkIcon className="h-4 w-4" />
