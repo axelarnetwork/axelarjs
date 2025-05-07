@@ -19,9 +19,10 @@ import {
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
-import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import {
   isValidEVMAddress,
+  isValidStellarWalletAddress,
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
@@ -47,6 +48,13 @@ const validateMinterAddress = (minter: string, chainId: number) => {
       return {
         type: "validate",
         message: "Invalid Sui minter address",
+      };
+    }
+  } else if (chainId === STELLAR_CHAIN_ID) {
+    if (!isValidStellarWalletAddress(minter)) {
+      return {
+        type: "validate",
+        message: "Invalid Stellar minter address",
       };
     }
   } else {

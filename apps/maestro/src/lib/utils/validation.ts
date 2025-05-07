@@ -132,6 +132,8 @@ export const contractABI = z.array(
 
 const STELLAR_CONTRACT_REGEX = /^C[A-Z2-7]{55}$/;
 const STELLAR_SYMBOL_ISSUER_REGEX = /^[A-Za-z0-9-]{1,12}-G[A-Z2-7]{55}$/;
+const STELLAR_WALLET_ADDRESS_REGEX = /^G[A-Z2-7]{55}$/;
+
 export const stellarTokenAddress = () =>
   z
     .string()
@@ -142,6 +144,21 @@ export const stellarTokenAddress = () =>
         .regex(STELLAR_SYMBOL_ISSUER_REGEX, "Invalid Stellar token address")
     );
 
+export const stellarWalletAddress = () =>
+  z
+    .string()
+    .regex(STELLAR_WALLET_ADDRESS_REGEX, "Invalid Stellar wallet address");
+
 export function isValidStellarTokenAddress(address: string): boolean {
   return stellarTokenAddress().safeParse(address).success;
+}
+
+/**
+ * Checks if a string is a valid Stellar wallet address (account public key)
+ * Stellar wallet addresses start with 'G' and are 56 characters long in base32 encoding
+ * @param address The address to check
+ * @returns boolean indicating if the address is a valid Stellar wallet address
+ */
+export function isValidStellarWalletAddress(address: string): boolean {
+  return stellarWalletAddress().safeParse(address).success;
 }
