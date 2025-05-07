@@ -1,16 +1,14 @@
 import { z } from "zod";
 import { randomUUID } from "crypto";
-import { 
-  Account, 
-  Asset, 
-  Keypair, 
-  Operation, 
-  TransactionBuilder 
+import {
+  Account,
+  Memo,
+  Operation,
+  TransactionBuilder
 } from "stellar-sdk";
 
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import { publicProcedure } from "~/server/trpc";
 import { getStellarChainConfig } from "./utils";
 
@@ -50,30 +48,65 @@ export const getDeployTokenTx = publicProcedure
       // Create a simple mock transaction that would represent token creation
       // In a real implementation, this would be the actual transaction to deploy a token
       
-      // Create a dummy source account (this won't be used for signing, just for creating the XDR)
-      const dummyKeypair = Keypair.random();
-      const sourceAccount = new Account(dummyKeypair.publicKey(), "0");
+      // Buscar o número de sequência atual da conta do usuário
+      // Isso é necessário para criar uma transação válida
+      const horizonUrl = 'https://horizon-testnet.stellar.org';
       
-      // Build a simple transaction
-      // In a real implementation, this would include the proper operations to deploy a token
+      // Buscar os detalhes da conta do usuário
+      console.log(`Fetching account details for ${input.minterAddress}...`);
+      const accountResponse = await fetch(`${horizonUrl}/accounts/${input.minterAddress}`);
+      
+      if (!accountResponse.ok) {
+        throw new Error(`Failed to fetch account details: ${accountResponse.statusText}`);
+      }
+      
+      const accountData = await accountResponse.json();
+      const sequenceNumber = accountData.sequence;
+      
+      console.log(`Sequence number for account ${input.minterAddress}: ${sequenceNumber}`);
+      
+      // Criar uma conta com o número de sequência correto
+      const sourceAccount = new Account(input.minterAddress, sequenceNumber);
+      
+      // Criar uma transação completa com as operações necessárias
       const transaction = new TransactionBuilder(sourceAccount, {
-        fee: "100",
-        networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+        fee: "100", // 0.00001 XLM
+        networkPassphrase: "Test SDF Network ; September 2015", // Passphrase da testnet do Stellar
       })
-        // Add a simple payment operation as a placeholder
-        // In a real implementation, this would be replaced with the proper contract invocation
+        // Adicionar operação para armazenar os metadados do token
         .addOperation(
-          Operation.payment({
-            destination: input.minterAddress,
-            asset: Asset.native(),
-            amount: "0.0000001", // Minimal amount
+          Operation.manageData({
+            name: `token_${input.symbol.slice(0, 10)}`,
+            value: Buffer.from(`${input.symbol}:${input.decimals}`)
           })
         )
+        // Adicionar operação para armazenar o nome do token
+        .addOperation(
+          Operation.manageData({
+            name: `name_${input.symbol.slice(0, 10)}`,
+            value: Buffer.from(input.name.slice(0, 60))
+          })
+        )
+        // Adicionar um memo com o nome do token
+        .addMemo(Memo.text(`Deploy ${input.name} (${input.symbol})`))
+        // Definir timeout de 30 segundos
         .setTimeout(30)
         .build();
       
-      // Convert the transaction to XDR format
+      // Converter a transação para formato XDR
       const transactionXDR = transaction.toXDR();
+      
+      // Criar os dados do token para incluir na resposta
+      const tokenData = {
+        symbol: input.symbol,
+        name: input.name,
+        decimals: input.decimals,
+        memoText: `Deploy ${input.name} (${input.symbol})`,
+        tokenDataName: `token_${input.symbol.slice(0, 10)}`,
+        tokenDataValue: `${input.symbol}:${input.decimals}`,
+        nameDataName: `name_${input.symbol.slice(0, 10)}`,
+        nameDataValue: input.name.slice(0, 60)
+      };
       
       // Return the mock data
       return {
@@ -81,8 +114,9 @@ export const getDeployTokenTx = publicProcedure
         tokenId,
         tokenAddress,
         tokenManagerAddress,
-        tokenManagerType: TOKEN_MANAGER_TYPES[0], // Use "mint_burn" from the enum
-        deploymentMessageId: `mock-deployment-${randomUUID()}`,
+        tokenManagerType: TOKEN_MANAGER_TYPES[0], // "mint_burn"
+        deploymentMessageId: randomUUID(),
+        tokenData, // Incluir os dados do token para uso no frontend
       };
     } catch (error) {
       console.error("Error in getDeployTokenTx:", error);

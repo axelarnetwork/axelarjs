@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { Transaction } from "stellar-sdk";
 
 import { TokenManagerType } from "~/lib/drizzle/schema/common";
 
 import { trpc } from "~/lib/trpc";
 import { useAccount } from "~/lib/hooks";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 
 export interface DeployStellarTokenParams {
   initialSupply: bigint;
@@ -30,6 +30,7 @@ export interface DeployStellarTokenResult {
 
 export function useDeployStellarToken() {
   const { address: currentAccount } = useAccount();
+  const { kit } = useStellarKit();
   
   // Use tRPC mutation to call server-side procedure
   const { mutateAsync: getStellarDeployTokenTx } = 
@@ -42,7 +43,11 @@ export function useDeployStellarToken() {
         throw new Error("Wallet not connected");
       }
       
-      // Call the server to get the transaction data
+      if (!kit) {
+        throw new Error("Stellar wallet kit not initialized");
+      }
+      
+      // Call the server to get the mock token data (IDs, addresses, etc)
       const result = await getStellarDeployTokenTx({
         symbol: params.symbol,
         name: params.name,
@@ -53,35 +58,78 @@ export function useDeployStellarToken() {
         gasValues: params.gasValues.map(v => v.toString()),
       });
       
-      // In a real implementation, we would:
-      // 1. Convert the XDR to a Transaction object
-      // 2. Have the user sign it with their wallet
-      // 3. Submit the signed transaction to the network
-      
-      // For now, we'll simulate a successful transaction
-      console.log("Mock Stellar transaction XDR:", result.transactionXDR);
-      
-      // Parse the XDR to show it in the console (for debugging)
       try {
-        const tx = new Transaction(result.transactionXDR, "Test SDF Network ; September 2015");
-        console.log("Parsed transaction:", tx);
-      } catch (error) {
-        console.error("Error parsing transaction XDR:", error);
+        // 1. Use the network passphrase for the testnet
+        const networkPassphrase = process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || "Test SDF Network ; September 2015";
+        
+        // 2. Have the user sign the transaction with their wallet
+        console.log("Requesting signature from wallet...");
+        
+        // Usamos o XDR da transação retornado pelo servidor
+        console.log("Transaction XDR to be signed:", result.transactionXDR);
+        
+        // Usamos o método signTransaction do StellarWalletKit
+        // A transação já foi criada com o número de sequência correto no backend
+        console.log("Requesting signature from wallet...");
+        const { signedTxXdr } = await kit.signTransaction(result.transactionXDR, {
+          networkPassphrase,
+        });
+        
+        // 3. Submit the transaction to the network using fetch API
+        console.log("Submitting transaction to network via Horizon API...");
+        const horizonUrl = process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL || 'https://horizon-testnet.stellar.org';
+        
+        // Submeter a transação usando fetch
+        const horizonResponse = await fetch(`${horizonUrl}/transactions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `tx=${encodeURIComponent(signedTxXdr)}`
+        });
+        
+        // Processar a resposta da API Horizon
+        const responseData = await horizonResponse.json();
+        console.log("Horizon API response:", responseData);
+        
+        // Verificar se a submissão foi bem-sucedida
+        if (!horizonResponse.ok) {
+          throw new Error(`Transaction submission failed: ${responseData.title || responseData.detail || 'Unknown error'}`);
+        }
+        
+        // A transação foi assinada e submetida com sucesso
+        // Extrair o hash da transação da resposta da API Horizon
+        const txHash = responseData.hash;
+        
+        console.log("Transaction successfully submitted with hash:", txHash);
+        console.log("You can verify the transaction in the Stellar Explorer:");
+        console.log(`https://stellar.expert/explorer/testnet/tx/${txHash}`);
+        
+        // Return result with the transaction hash
+        return {
+          digest: txHash,
+          deploymentMessageId: result.deploymentMessageId,
+          tokenAddress: result.tokenAddress,
+          tokenId: result.tokenId,
+          tokenManagerAddress: result.tokenManagerAddress,
+          tokenManagerType: result.tokenManagerType as TokenManagerType,
+          minterAddress: params.minterAddress || currentAccount,
+          events: [],
+        };
+      } catch (error: any) {
+        console.error("Error during Stellar transaction signing/submission:", error);
+        // Extract meaningful error message if possible
+        let errorMessage = "Failed to submit transaction to Stellar network";
+        
+        if (error.response && error.response.data && error.response.data.extras) {
+          // Horizon API error format
+          errorMessage = `Stellar error: ${error.response.data.extras.result_codes.transaction}`;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        throw new Error(errorMessage);
       }
-      
-      // Return mock result with proper typing
-      return {
-        digest: `stellar-tx-${Date.now()}`,
-        deploymentMessageId: result.deploymentMessageId,
-        tokenAddress: result.tokenAddress,
-        tokenId: result.tokenId,
-        tokenManagerAddress: result.tokenManagerAddress,
-        tokenManagerType: result.tokenManagerType as TokenManagerType, // Cast to correct type
-        minterAddress: params.minterAddress || currentAccount,
-        events: [],
-      };
     },
-    [currentAccount, getStellarDeployTokenTx]
+    [currentAccount, getStellarDeployTokenTx, kit]
   );
   
   return { deployStellarToken };
