@@ -3,21 +3,20 @@ import type { StellarChainConfig } from "@axelarjs/api";
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import {
   Address,
-  BASE_FEE,
   Contract,
   Horizon,
   nativeToScVal,
-  Operation,
-  rpc,
   scValToNative,
   TransactionBuilder,
   type Account,
 } from "@stellar/stellar-sdk";
 import { ethers } from "ethers";
+import { rpc, Transaction } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { Context } from "~/server/context";
+import { createContractTransaction, fetchStellarAccount } from "./transactions";
 
 function hexToScVal(hexString: string) {
   const result = nativeToScVal(Buffer.from(ethers.utils.arrayify(hexString)), {
@@ -65,49 +64,38 @@ export async function interchain_transfer({
   kit: StellarWalletsKit;
 }) {
   try {
-    const networkPassphrase = NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
-    // XLM contract ID
     const gasTokenAddress =
       "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
-    // Stellar ITS contract ID
     const contractId =
       "CCXT3EAQ7GPQTJWENU62SIFBQ3D4JMNQSB77KRPTGBJ7ZWBYESZQBZRK";
-    const horizonUrl = "https://horizon-testnet.stellar.org";
+    const server = new rpc.Server("https://soroban-testnet.stellar.org");
 
-    const publicKey = caller;
-
-    const horizonServer = new Horizon.Server(horizonUrl);
-    const sourceAccount = await horizonServer.loadAccount(publicKey);
-
-    // Build the contract invocation arguments
-    const args = [];
-    args.push(addressToScVal(caller));
-    args.push(hexToScVal(tokenId));
-    args.push(nativeToScVal(destinationChain, { type: "string" }));
-    args.push(hexToScVal(destinationAddress));
-    args.push(nativeToScVal(amount, { type: "u128" }));
-    args.push(nativeToScVal(null, { type: "null" }));
-    args.push(tokenToScVal(gasTokenAddress, gasValue));
-
-    const invokeOp = Operation.invokeContractFunction({
-      contract: contractId,
-      function: "interchain_transfer",
-      args,
+    const { transactionXDR } = await createContractTransaction({
+      contractAddress: contractId,
+      method: "interchain_transfer",
+      account: await fetchStellarAccount(caller),
+      args: [
+        addressToScVal(caller),
+        hexToScVal(tokenId),
+        nativeToScVal(destinationChain, { type: "string" }),
+        hexToScVal(destinationAddress),
+        nativeToScVal(amount, { type: "i128" }),
+        nativeToScVal(null, { type: "void" }),
+        tokenToScVal(gasTokenAddress, gasValue),
+      ],
     });
 
-    const tx = new TransactionBuilder(sourceAccount, {
-      fee: BASE_FEE,
-      networkPassphrase,
-    })
-      .setTimeout(30)
-      .addOperation(invokeOp)
-      .build();
-    const xdrToSign = tx.toXDR();
-    const { signedTxXdr } = await kit.signTransaction(xdrToSign, {
-      address: caller,
+    const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
       networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
     });
-    return signedTxXdr;
+
+    const tx = new Transaction(
+      signedTxXdr,
+      NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
+    );
+    const result = await server.sendTransaction(tx);
+
+    return result;
   } catch (error) {
     console.error("Interchain transfer failed:", error);
     throw error;
