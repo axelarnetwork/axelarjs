@@ -344,16 +344,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           gasValues: gasValues,
         });
         
-        // We need the tokenAddress for the final status update
-        const finalTokenAddress = "stellar_token_address_placeholder" as `0x${string}`;
-        
         // Record the deployment (needs to happen before final status update)
         try {
           await recordDeploymentAsync({
             kind: "interchain",
-            tokenId: "stellar_token_id_placeholder",
+            tokenId: result.tokenId, // Use actual tokenId from the transaction
             deployerAddress: deployerAddress,
-            tokenAddress: finalTokenAddress, // Using placeholder
+            tokenAddress: result.tokenId, // Token ID is the contract address on Stellar
             tokenName: input.tokenName,
             tokenSymbol: input.tokenSymbol,
             tokenDecimals: input.decimals,
@@ -362,9 +359,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             originalMinterAddress: input.minterAddress,
             destinationAxelarChainIds: input.destinationChainIds,
             deploymentMessageId: result.hash, // Use the tx hash
-            tokenManagerAddress: "stellar_token_manager_placeholder" as `0x${string}`, // Using placeholder
+            tokenManagerAddress: "CATNQHWMG4VOWPSWF4HXVW7ASDJNX7M7F6JLFC544T7ZMMXXAE2HUDTY", // Stellar ITS Address
           });
-          console.log("Stellar deployment recorded with placeholders.");
+          console.log("Stellar deployment recorded.");
         } catch (recordError) {
             console.error("Failed to record deployment:", recordError);
             // Do not update state here; rely on mutation's onError handling
@@ -375,7 +372,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         onStatusUpdate({ 
           type: "deployed",
           txHash: result.hash, 
-          tokenAddress: finalTokenAddress, 
+          tokenAddress: result.tokenId, // Use actual token address (tokenId)
         });
         console.log("Stellar deployment submitted, txState updated:", result);
         

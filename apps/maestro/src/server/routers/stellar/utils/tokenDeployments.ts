@@ -181,6 +181,7 @@ export async function deploy_interchain_token_stellar({
       console.warn("Could not find resultMetaXdr in SUCCESS transaction response.");
     }
 
+    console.log("tokenId", tokenId);
     if (!tokenId) {
       // Fallback or error if tokenId couldn't be parsed even after success
       console.error("Failed to obtain tokenId from successful transaction result.");
