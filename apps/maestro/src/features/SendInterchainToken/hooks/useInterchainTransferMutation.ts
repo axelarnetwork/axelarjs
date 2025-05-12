@@ -1,6 +1,7 @@
 import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
+import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
@@ -10,8 +11,12 @@ import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/Inter
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
+import {
+  interchain_transfer,
+  stellarEncodedRecipient,
+} from "~/server/routers/stellar/utils";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -34,6 +39,7 @@ export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
+  const { kit } = useStellarKit();
 
   const chainId = useChainId();
 
@@ -100,6 +106,17 @@ export function useInterchainTransferMutation(
             transaction: sendTokenTxJSON,
           });
           txHash = receipt.digest;
+        } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
+          const signedTxXdr = await interchain_transfer({
+            caller: address,
+            tokenId: tokenId,
+            destinationChain: config.destinationChainName,
+            destinationAddress: destinationAddress,
+            amount: Number(bnAmount.toString()),
+            kit: kit as StellarWalletsKit,
+            gasValue: Number(config.gas.toString()) || 0,
+          });
+          console.log("signedTxXdr", signedTxXdr);
         } else {
           txHash = await transferAsync({
             address: config.tokenAddress as `0x${string}`,
