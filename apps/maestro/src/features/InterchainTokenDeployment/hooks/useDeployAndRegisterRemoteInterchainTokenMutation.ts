@@ -3,6 +3,7 @@ import {
   INTERCHAIN_TOKEN_SERVICE_ENCODERS,
 } from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
+import { TOKEN_MANAGER_TYPES } from "../../../lib/drizzle/schema/common";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { zeroAddress, type TransactionReceipt } from "viem";
@@ -350,7 +351,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             kind: "interchain",
             tokenId: result.tokenId, // Use actual tokenId from the transaction
             deployerAddress: deployerAddress,
-            tokenAddress: result.tokenId, // Token ID is the contract address on Stellar
+            tokenAddress: result.tokenAddress, // Use actual tokenAddress from the result
             tokenName: input.tokenName,
             tokenSymbol: input.tokenSymbol,
             tokenDecimals: input.decimals,
@@ -359,7 +360,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             originalMinterAddress: input.minterAddress,
             destinationAxelarChainIds: input.destinationChainIds,
             deploymentMessageId: result.hash, // Use the tx hash
-            tokenManagerAddress: "CATNQHWMG4VOWPSWF4HXVW7ASDJNX7M7F6JLFC544T7ZMMXXAE2HUDTY", // Stellar ITS Address
+            tokenManagerAddress: result.tokenManagerAddress, // Use actual tokenManagerAddress from the result
+            tokenManagerType: result.tokenManagerType as (typeof TOKEN_MANAGER_TYPES[number] | null | undefined), // Add tokenManagerType
           });
           console.log("Stellar deployment recorded.");
         } catch (recordError) {
@@ -372,7 +374,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         onStatusUpdate({ 
           type: "deployed",
           txHash: result.hash, 
-          tokenAddress: result.tokenId, // Use actual token address (tokenId)
+          tokenAddress: result.tokenAddress, // Use actual token address (tokenId)
         });
         console.log("Stellar deployment submitted, txState updated:", result);
         

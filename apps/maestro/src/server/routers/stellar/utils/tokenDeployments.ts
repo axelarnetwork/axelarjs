@@ -3,6 +3,7 @@ import {
   Address,
   nativeToScVal,
   rpc,
+  scValToNative,
   Transaction,
   xdr,
 } from "@stellar/stellar-sdk";
@@ -16,6 +17,7 @@ import {
   tokenMetadataToScVal, 
   hexToScVal,
 } from "./transactions";
+import { TOKEN_MANAGER_TYPES, TokenManagerType } from "~/lib/drizzle/schema/common";
 
 // --- Replicated Helpers (similar to index.ts / previous versions) ---
 
@@ -47,7 +49,14 @@ export async function deploy_interchain_token_stellar({
   minterAddress?: string;
   destinationChainIds: string[];
   gasValues: bigint[];
-}) {
+}): Promise<{
+  hash: string;
+  status: string;
+  tokenId: string;
+  tokenAddress: string;
+  tokenManagerAddress: string;
+  tokenManagerType: string;
+}> {
   console.log("Starting deploy_interchain_token_stellar with params:", {
     caller,
     tokenName,
@@ -153,8 +162,11 @@ export async function deploy_interchain_token_stellar({
       throw new Error(`Transaction did not succeed after ${maxPollingAttempts} polling attempts. Last status: ${getTxResponse?.status ?? 'unknown'}`);
     }
 
-    // --- Parse tokenId from SUCCESS response --- 
+    // --- Parse tokenId, tokenAddress, and tokenManagerAddress from SUCCESS response --- 
     let tokenId: string | undefined;
+    let tokenAddress: string | undefined;
+    let tokenManagerAddress: string | undefined;
+    let tokenManagerType: number | undefined;
 
     if (getTxResponse.resultMetaXdr) {
       try {
@@ -174,25 +186,131 @@ export async function deploy_interchain_token_stellar({
         } else {
           console.warn("Could not extract Soroban returnValue from resultMetaXdr.");
         }
+
+        // --- Parse Events --- 
+        try {
+          const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
+          const events = sorobanMeta?.events();
+
+          if (events) {
+            console.log(`Found ${events.length} events to parse.`);
+            const itsContractAddressScVal = addressToScVal(INTERCHAIN_TOKEN_SERVICE_CONTRACT);
+            const itsContractId = itsContractAddressScVal.address().contractId(); // Get contract ID for comparison
+
+            for (const event of events) {
+              // Check if the event is from the correct contract
+              const eventContractId = event.contractId();
+              if (!(eventContractId && eventContractId.equals(itsContractId))) {
+                continue; // Skip events from other contracts
+              }
+
+              const eventTopics = event.body().v0().topics();
+              if (!eventTopics || eventTopics.length === 0) {
+                continue; // Skip events with no topics
+              }
+
+              // Check the first topic for the event name (Symbol)
+              const firstTopic = eventTopics[0];
+              if (firstTopic.switch() !== xdr.ScValType.scvSymbol()) {
+                continue; // Skip events where the first topic isn't a symbol
+              }
+
+              const eventName = firstTopic.sym().toString();
+              console.log("Processing event:", eventName);
+
+              if (eventName === "interchain_token_deployed" && eventTopics.length >= 3) {
+                const topic1 = eventTopics[1]; // tokenId (bytes)
+                const topic2 = eventTopics[2]; // tokenAddress (address)
+
+                // Extract tokenId (verify or assign)
+                if (topic1 && topic1.switch() === xdr.ScValType.scvBytes()) {
+                  const eventTokenId = topic1.bytes().toString("hex");
+                  console.log(`Found tokenId ${eventTokenId} in interchain_token_deployed`);
+                  if (tokenId && eventTokenId !== tokenId) {
+                    console.warn("TokenID from event differs from returnValue!");
+                  } else if (!tokenId) {
+                    tokenId = eventTokenId;
+                  }
+                }
+
+                // Extract tokenAddress
+                if (!tokenAddress && topic2 && topic2.switch() === xdr.ScValType.scvAddress()) {
+                  tokenAddress = scValToNative(topic2);
+                  console.log(`Found tokenAddress ${tokenAddress} in interchain_token_deployed`);
+                }
+              } else if (eventName === "token_manager_deployed" && eventTopics.length >= 5) { 
+                // const topic1 = eventTopics[1]; // tokenId (bytes) - can optionally verify
+                // const topic2 = eventTopics[2]; // tokenAddress (address) - can optionally verify
+                const topic3 = eventTopics[3]; // tokenManagerAddress (address)
+                const topic4 = eventTopics[4]; // tokenManagerType (u32)
+
+                // Extract tokenManagerAddress
+                if (!tokenManagerAddress && topic3 && topic3.switch() === xdr.ScValType.scvAddress()) {
+                  tokenManagerAddress = scValToNative(topic3);
+                  console.log(`Found tokenManagerAddress ${tokenManagerAddress} in token_manager_deployed`);
+                }
+
+                // Extract tokenManagerType
+                if (tokenManagerType === undefined && topic4 && topic4.switch() === xdr.ScValType.scvU32()) {
+                  tokenManagerType = scValToNative(topic4);
+                  console.log(`Found tokenManagerType ${tokenManagerType} in token_manager_deployed`);
+                }
+              }
+
+              // If we found all required data, we can stop searching
+              if (tokenAddress && tokenManagerAddress && tokenManagerType !== undefined) {
+                console.log("Found all required addresses and type, stopping event processing.");
+                break;
+              }
+            }
+          } else {
+            console.warn("No Soroban events found in transaction meta.");
+          }
+        } catch (parseEventError) { 
+          console.error("Failed to parse events from resultMetaXdr:", parseEventError);
+          // Continue without event data if parsing fails, but log it
+        }
+        
       } catch (parseError) {
         console.error("Failed to parse resultMetaXdr from SUCCESS response:", parseError);
       } 
-    } else { // Start of else block for if (getTxResponse.resultMetaXdr)
+    } else { 
       console.warn("Could not find resultMetaXdr in SUCCESS transaction response.");
     }
 
-    console.log("tokenId", tokenId);
+    // Final checks
     if (!tokenId) {
-      // Fallback or error if tokenId couldn't be parsed even after success
-      console.error("Failed to obtain tokenId from successful transaction result.");
-      throw new Error("Failed to obtain tokenId from successful Stellar transaction result.");
+      console.error("Failed to obtain tokenId from successful transaction result or events.");
+      throw new Error("Failed to obtain tokenId from successful Stellar transaction result or events.");
+    }
+    if (!tokenAddress) {
+      console.warn("Failed to obtain tokenAddress from successful transaction events.");
+      // Decide if this is critical. For now, let's throw an error.
+      throw new Error("Failed to obtain tokenAddress from successful Stellar transaction events.");
+    }
+    if (!tokenManagerAddress) {
+      console.warn("Failed to obtain tokenManagerAddress from successful transaction events.");
+      // Decide if this is critical. For now, let's throw an error.
+      throw new Error("Failed to obtain tokenManagerAddress from successful Stellar transaction events.");
+    }
+    if (tokenManagerType === undefined) {
+      console.warn("Failed to obtain tokenManagerType from successful transaction events.");
+      // Decide if this is critical. For now, let's throw an error.
+      throw new Error("Failed to obtain tokenManagerType from successful Stellar transaction events.");
     }
 
+    const tokenManagerTypeString = TOKEN_MANAGER_TYPES[tokenManagerType] as TokenManagerType;
+    if (tokenManagerTypeString !== "mint_burn") {
+      throw new Error("tokenManagerType for native ITS token is not type 0 - mint_burn");
+    } 
     // Return success details
     return {
       hash: initialResponse.hash, // Use original hash
       status: "SUCCESS", // Final status
       tokenId: `0x${tokenId}`, // Return as hex string with 0x prefix
+      tokenAddress: tokenAddress,
+      tokenManagerAddress: tokenManagerAddress,
+      tokenManagerType: tokenManagerTypeString , 
     };
   } catch (error) {
     console.error("deploy_interchain_token_stellar failed:", error);
