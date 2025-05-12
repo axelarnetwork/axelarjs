@@ -9,7 +9,6 @@ import { zeroAddress, type TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
 import useDeployToken from "~/features/suiHooks/useDeployToken";
-import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -21,13 +20,14 @@ import {
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
-import { TokenManagerType } from "~/lib/drizzle/schema/common";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
+import { deploy_interchain_token_stellar } from "~/server/routers/stellar/utils/tokenDeployments";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
   sourceChainId: string;
@@ -51,6 +51,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   input?: UseDeployAndRegisterInterchainTokenInput
 ) {
   const { address: deployerAddress } = useAccount();
+  const { address } = useAccount();
+  const { kit } = useStellarKit();
   const chainId = useChainId();
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
@@ -309,8 +311,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
-  const { deployStellarToken } = useDeployStellarToken();
-
   const writeAsync = useCallback(async () => {
     console.log("writeAsync called with:", {
       chainId,
@@ -327,22 +327,57 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         const gasValues =
           input?.remoteDeploymentGasFees?.gasFees?.map((x) => BigInt(x.fee)) ?? [];
         
-        const result = await deployStellarToken({
-          name: input.tokenName,
-          symbol: input.tokenSymbol,
+        if (!address || !kit) {
+          throw new Error("Stellar wallet not connected or public key not available.");
+        }
+        
+        const result = await deploy_interchain_token_stellar({
+          caller: address, // Use address from useAccount
+          kit: kit, // Use kit from useStellarKit
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
           decimals: input.decimals,
-          initialSupply: input.initialSupply,
+          initialSupply: input.initialSupply || 0n, // ensure it's a bigint
+          salt: input.salt,
           minterAddress: input.minterAddress,
           destinationChainIds: input.destinationChainIds,
           gasValues: gasValues,
         });
         
+        // We need the tokenAddress for the final status update
+        const finalTokenAddress = "stellar_token_address_placeholder" as `0x${string}`;
+        
+        // Record the deployment (needs to happen before final status update)
+        try {
+          await recordDeploymentAsync({
+            kind: "interchain",
+            tokenId: "stellar_token_id_placeholder",
+            deployerAddress: deployerAddress,
+            tokenAddress: finalTokenAddress, // Using placeholder
+            tokenName: input.tokenName,
+            tokenSymbol: input.tokenSymbol,
+            tokenDecimals: input.decimals,
+            axelarChainId: input.sourceChainId, // Should be Stellar's Axelar ID
+            salt: input.salt,
+            originalMinterAddress: input.minterAddress,
+            destinationAxelarChainIds: input.destinationChainIds,
+            deploymentMessageId: result.hash, // Use the tx hash
+            tokenManagerAddress: "stellar_token_manager_placeholder" as `0x${string}`, // Using placeholder
+          });
+          console.log("Stellar deployment recorded with placeholders.");
+        } catch (recordError) {
+            console.error("Failed to record deployment:", recordError);
+            // Do not update state here; rely on mutation's onError handling
+            throw recordError; 
+        }
+        
         // Update UI state to show deployment success
-        onStatusUpdate({
+        onStatusUpdate({ 
           type: "deployed",
-          tokenAddress: result.tokenAddress as `0x${string}`,
-          txHash: result.digest, // Use digest as txHash
+          txHash: result.hash, 
+          tokenAddress: finalTokenAddress, 
         });
+        console.log("Stellar deployment submitted, txState updated:", result);
         
         return result;
       } catch (error) {
@@ -397,10 +432,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [
     chainId,
     deployToken,
-    deployStellarToken,
     deployerAddress,
     input,
+    address,
+    kit,
     multicall,
+    onStatusUpdate,
     prepareMulticall?.request,
     recordDeploymentDraft,
     STELLAR_CHAIN_ID,
