@@ -43,6 +43,7 @@ import {
   scroll,
   scrollSepolia,
   sepolia,
+  xrplevmTestnet,
 } from "viem/chains";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
@@ -85,8 +86,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     rpcUrls: {
       default: {
         http: [
-          "https://1rpc.io/sepolia",
-          "https://eth-sepolia.public.blastapi.io",
+          "https://ethereum-sepolia-rpc.publicnode.com",
           "https://endpoints.omniatech.io/v1/eth/sepolia/public",
         ],
       },
@@ -446,6 +446,13 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "eth-sepolia",
     supportWagmi: true,
     environment: ENVIRONMENTS.devnet,
+  },
+  {
+    ...xrplevmTestnet,
+    axelarChainId: "xrpl-evm",
+    axelarChainName: "xrpl-evm",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.testnet,
   },
 ] as const;
 
