@@ -1,5 +1,11 @@
 import { ITSChainConfig } from "@axelarjs/api";
-import { Dropdown, HelpCircleIcon, Tooltip } from "@axelarjs/ui";
+import {
+  Badge,
+  Dropdown,
+  HelpCircleIcon,
+  Tooltip,
+  type BadgeProps,
+} from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
@@ -76,11 +82,28 @@ type Props = {
   excludeChainIds?: number[];
 };
 
+type HealthStatus = "up" | "down" | "timeout" | "unknown";
+
+const STATUS_LABELS: Partial<Record<HealthStatus, string>> = {
+  down: "Down",
+  up: "Up",
+  timeout: "Timeout",
+  unknown: "Unknown",
+};
+
+const STATUS_COLORS: Partial<
+  Record<HealthStatus, NonNullable<BadgeProps["$variant"]>>
+> = {
+  down: "error",
+  up: "success",
+  timeout: "warning",
+  unknown: "neutral",
+};
+
 const HealthDot: FC<{
-  status: "up" | "down" | "timeout" | "unknown" | undefined;
+  status: HealthStatus;
   isLoading?: boolean;
-  className?: string;
-}> = ({ status, isLoading, className }) => (
+}> = ({ status, isLoading }) => (
   <Tooltip
     tip={
       isLoading
@@ -91,17 +114,16 @@ const HealthDot: FC<{
     }
     $position="right"
   >
-    <span
-      className={cn(
-        "ml-1 inline-block h-2 w-2 rounded-full align-middle",
-        className,
-        status === "up" && "bg-green-500",
-        status === "down" && "bg-red-500",
-        status === "timeout" && "bg-yellow-500",
-        (!status || status === "unknown") && "bg-gray-400",
-        isLoading && "animate-pulse"
-      )}
-    />
+    <span className="relative ml-2 inline-block align-middle">
+      <Badge
+        $variant={STATUS_COLORS[status]}
+        $size="xs"
+        className={cn("-translate-x-1.5 text-xs", {
+          "animate-pulse": !["error", "executed"].includes(status),
+        })}
+        aria-label={`status: ${STATUS_LABELS[status]}`}
+      />
+    </span>
   </Tooltip>
 );
 
@@ -267,7 +289,7 @@ const ChainsDropdown: FC<Props> = (props) => {
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
           className={cn(
-            "z-10 mt-2 max-h-[75vh] w-full dark:bg-base-200 md:w-96",
+            "z-10 mt-2 max-h-[75vh] w-full dark:bg-base-200 md:w-[28rem]",
             {
               "broder max-h-[350px] w-80 overflow-x-scroll bg-base-200 dark:bg-base-300 md:w-96":
                 props.compact,
