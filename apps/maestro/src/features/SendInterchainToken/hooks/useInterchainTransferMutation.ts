@@ -13,10 +13,8 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import {
-  interchain_transfer,
-  stellarEncodedRecipient,
-} from "~/server/routers/stellar/utils";
+import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
+import { stellarInterchainTransfer } from "~/server/routers/stellar/utils/interchainTransfer";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -107,7 +105,7 @@ export function useInterchainTransferMutation(
           });
           txHash = receipt.digest;
         } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
-          const signedTxXdr = await interchain_transfer({
+          ({ hash: txHash } = await stellarInterchainTransfer({
             caller: address,
             tokenId: tokenId,
             destinationChain: config.destinationChainName,
@@ -115,8 +113,7 @@ export function useInterchainTransferMutation(
             amount: Number(bnAmount.toString()),
             kit: kit as StellarWalletsKit,
             gasValue: Number(config.gas.toString()) || 0,
-          });
-          console.log("signedTxXdr", signedTxXdr);
+          }));
         } else {
           txHash = await transferAsync({
             address: config.tokenAddress as `0x${string}`,
