@@ -69,7 +69,6 @@ export function tokenMetadataToScVal(
 
 // Function to fetch account details
 export async function fetchStellarAccount(accountId: string): Promise<Account> {
-  console.log(`Fetching account details for ${accountId}...`);
   const accountResponse = await fetch(
     `${STELLAR_TESTNET_HORIZON_URL}/accounts/${accountId}`
   );
@@ -112,11 +111,9 @@ export async function createContractTransaction({
   });
 
   // Create the operation using the contract.call method
-  console.log(`Creating ${method} operation...`);
   const operation = contract.call(method, ...args);
 
   // Build the transaction
-  console.log("Building transaction...");
   const builtTransaction = new TransactionBuilder(account, {
     fee: BASE_FEE,
     networkPassphrase,
@@ -126,15 +123,12 @@ export async function createContractTransaction({
     .build();
 
   // Get the XDR before preparing
-  const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
-  console.log("XDR before preparing:", xdrBeforePrepare);
+  // const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
 
   // Prepare the transaction (simulate and discover storage footprint)
-  console.log("Preparing transaction...");
   let preparedTransaction;
   try {
     preparedTransaction = await server.prepareTransaction(builtTransaction);
-    console.log("Transaction prepared successfully");
   } catch (error) {
     console.error("Error preparing transaction:", error);
     throw error;
@@ -142,7 +136,6 @@ export async function createContractTransaction({
 
   // Get the final XDR
   const transactionXDR = preparedTransaction.toEnvelope().toXDR("base64");
-  console.log("Final XDR generated successfully");
 
   return {
     transactionXDR,
