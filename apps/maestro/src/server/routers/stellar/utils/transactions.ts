@@ -122,7 +122,7 @@ export async function createContractTransaction({
     networkPassphrase,
   })
     .addOperation(operation)
-    .setTimeout(30)
+    .setTimeout(0)
     .build();
 
   // Get the XDR before preparing
