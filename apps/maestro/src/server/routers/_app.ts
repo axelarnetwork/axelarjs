@@ -11,6 +11,7 @@ import { messagesRouter } from "./messages";
 import { nativeTokensRouter } from "./nativeTokens";
 import { openaiRouter } from "./openai";
 import { suiRouter } from "./sui";
+import { healthcheckRouter } from "./healthcheck";
 
 export const appRouter = router({
   uptime: publicProcedure.query(() => ({
@@ -27,6 +28,7 @@ export const appRouter = router({
   messages: messagesRouter,
   accounts: accountsRouter,
   sui: suiRouter,
+  healthcheck: healthcheckRouter,
 });
 
 export type AppRouter = typeof appRouter;
