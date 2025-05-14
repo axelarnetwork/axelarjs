@@ -12,7 +12,7 @@ async function checkRpcNode(
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       controller.abort();
-    }, 25000); // will timeout if RPC node dont respond in 25s
+    }, 60000); // will timeout if RPC node dont respond in 60s
     try {
       let method = "net_version";
       const chainNameLower = chainName.toLowerCase();
@@ -23,6 +23,7 @@ async function checkRpcNode(
         method = "getVersionInfo";
       }
 
+      console.log({url, chainName, method})
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,6 +39,7 @@ async function checkRpcNode(
       let json;
       try {
         json = await response.json();
+        console.log({json, chainName})
       } catch (error) {
         return "down";
       }
@@ -100,14 +102,16 @@ export const healthcheckRouter = router({
       const chain = CHAIN_CONFIGS.find(
         (c) =>
           c.environment === input.env &&
-          ((c.axelarChainName &&
-            c.axelarChainName.toLowerCase() ===
-              input.chainName.toLowerCase()) ||
+            ((c.axelarChainName &&
+              c.axelarChainName.toLowerCase() ===
+                input.chainName.toLowerCase()) ||
             (c.name &&
               c.name.toLowerCase() === input.chainName.toLowerCase()) ||
             ((c as any).chain_name &&
               (c as any).chain_name.toLowerCase() ===
-                input.chainName.toLowerCase()))
+                input.chainName.toLowerCase()) ||
+            (c.axelarChainId &&
+              c.axelarChainId.toLowerCase() === input.chainName.toLowerCase()))
       );
 
       if (!chain) {
@@ -215,6 +219,7 @@ export const healthcheckRouter = router({
               }
             }
 
+            console.log({chainName})
             // Only check the first RPC URL
             const status = await checkRpcNode(urls[0], chainName);
             results[chainName] = status;
