@@ -23,7 +23,6 @@ async function checkRpcNode(
         method = "getVersionInfo";
       }
 
-      console.log({url, chainName, method})
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,7 +38,6 @@ async function checkRpcNode(
       let json;
       try {
         json = await response.json();
-        console.log({json, chainName})
       } catch (error) {
         return "down";
       }
@@ -219,7 +217,6 @@ export const healthcheckRouter = router({
               }
             }
 
-            console.log({chainName})
             // Only check the first RPC URL
             const status = await checkRpcNode(urls[0], chainName);
             results[chainName] = status;
