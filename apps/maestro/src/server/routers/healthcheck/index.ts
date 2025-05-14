@@ -12,7 +12,7 @@ async function checkRpcNode(
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       controller.abort();
-    }, 25000); // will timeout if RPC node dont respond in 25s
+    }, 60000); // will timeout if RPC node dont respond in 60s
     try {
       let method = "net_version";
       const chainNameLower = chainName.toLowerCase();
@@ -100,14 +100,16 @@ export const healthcheckRouter = router({
       const chain = CHAIN_CONFIGS.find(
         (c) =>
           c.environment === input.env &&
-          ((c.axelarChainName &&
-            c.axelarChainName.toLowerCase() ===
-              input.chainName.toLowerCase()) ||
+            ((c.axelarChainName &&
+              c.axelarChainName.toLowerCase() ===
+                input.chainName.toLowerCase()) ||
             (c.name &&
               c.name.toLowerCase() === input.chainName.toLowerCase()) ||
             ((c as any).chain_name &&
               (c as any).chain_name.toLowerCase() ===
-                input.chainName.toLowerCase()))
+                input.chainName.toLowerCase()) ||
+            (c.axelarChainId &&
+              c.axelarChainId.toLowerCase() === input.chainName.toLowerCase()))
       );
 
       if (!chain) {
