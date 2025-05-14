@@ -18,6 +18,7 @@ import {
   hexToScVal,
 } from "./transactions";
 import { TOKEN_MANAGER_TYPES, TokenManagerType } from "~/lib/drizzle/schema/common";
+import { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 
 // --- Replicated Helpers (similar to index.ts / previous versions) ---
 
@@ -38,6 +39,7 @@ export async function deploy_interchain_token_stellar({
   minterAddress,
   destinationChainIds,
   gasValues,
+  onStatusUpdate,
 }: {
   caller: string;
   kit: StellarWalletsKit;
@@ -49,6 +51,7 @@ export async function deploy_interchain_token_stellar({
   minterAddress?: string;
   destinationChainIds: string[];
   gasValues: bigint[];
+  onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
 }): Promise<{
   hash: string;
   status: string;
@@ -75,7 +78,6 @@ export async function deploy_interchain_token_stellar({
     });
 
     const account = await fetchStellarAccount(caller);
-    console.log("Fetched account sequence:", account.sequenceNumber());
 
     const actualMinterAddress = minterAddress || caller;
 
@@ -96,21 +98,31 @@ export async function deploy_interchain_token_stellar({
       networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
     });
 
-    console.log("Base Transaction XDR generated:", transactionXDR);
-
-    console.log("Requesting signature from wallet...");
     const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
       networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
     });
 
-    console.log("Transaction signed:", signedTxXdr);
+    onStatusUpdate?.({
+      type: "pending_approval",
+      step: 1,
+      totalSteps: 1,
+    });
 
-    console.log("Submitting transaction...");
     const tx = new Transaction(
       signedTxXdr,
       NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
     );
     const initialResponse = await server.sendTransaction(tx);
+
+    // Mudar para o estado 'deploying' com o hash real
+    // Isso ocorre após a submissão inicial bem-sucedida (status PENDING)
+    if (initialResponse.status === "PENDING") {
+      console.log("[STATUS_UPDATE] Deploying - Hash:", initialResponse.hash);
+      onStatusUpdate?.({
+        type: "deploying",
+        txHash: initialResponse.hash, // Usar o hash real da transação
+      });
+    }    
 
     console.log("Initial submission response:", initialResponse);
 

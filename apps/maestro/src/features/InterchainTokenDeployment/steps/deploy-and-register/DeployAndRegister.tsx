@@ -25,6 +25,15 @@ import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
 
+interface StellarDeploymentResult {
+  hash: string;
+  status: string; 
+  tokenId: string;
+  tokenAddress: string;
+  tokenManagerAddress: string;
+  tokenManagerType: string;
+}
+
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
     useInterchainTokenDeploymentStateContainer();
@@ -129,6 +138,45 @@ export const Step2: FC = () => {
 
         return;
       });
+
+      // Stellar chain handling
+      if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
+        try {
+          const result = (await txPromise) as StellarDeploymentResult;
+
+          if (result && result.hash && result.tokenAddress) {
+            rootActions.setTxState({
+              type: "deployed",
+              txHash: result.hash,
+              tokenAddress: result.tokenAddress,
+            });
+
+            // Add transaction to history (similar to other chains)
+            if (rootState.selectedChains.length >= 0) { 
+              addTransaction({
+                status: "submitted", 
+                hash: result.hash,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+            }
+            return; 
+          } else {
+            console.error("Stellar deployment result incomplete", result);
+            toast.error("Stellar deployment failed: Incomplete data from deployment function.");
+            rootActions.setTxState({
+              type: "idle",
+            });
+          }
+        } catch (e: any) {
+          console.error("Stellar deployment error in DeployAndRegister.tsx:", e);
+          toast.error(e.message || "Stellar deployment failed.");
+          rootActions.setTxState({
+            type: "idle",
+          });
+        }
+        return; 
+      }
 
       // Sui will return a digest equivalent to the txHash
       if (sourceChain.chain_id === SUI_CHAIN_ID) {

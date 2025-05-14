@@ -162,17 +162,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
-  useEffect(() => {
-    // Debug log for readiness check
-    console.log("Deployment Mutation - Readiness Check:", {
-      chainId,
-      isStellar: chainId === STELLAR_CHAIN_ID,
-      isReady,
-      hasDeployerAddress: Boolean(deployerAddress),
-      hasTokenId: Boolean(tokenId),
-      hasTokenAddress: Boolean(tokenAddress)
-    });
-    
+  useEffect(() => {    
     // Special case for Stellar - always set ready
     if (chainId === STELLAR_CHAIN_ID) {
       console.log("Setting isReady=true for Stellar chain");
@@ -343,8 +333,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           minterAddress: input.minterAddress,
           destinationChainIds: input.destinationChainIds,
           gasValues: gasValues,
-        });
-        
+          onStatusUpdate: config.onStatusUpdate,
+        });        
         // Record the deployment (needs to happen before final status update)
         try {
           await recordDeploymentAsync({
@@ -369,9 +359,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
             // Do not update state here; rely on mutation's onError handling
             throw recordError; 
         }
+
+        console.log("Stellar deployment submitted, txState updated:", {
+          txHash: result.hash,
+          tokenAddress: result.tokenAddress,
+        })
         
         // Update UI state to show deployment success
-        onStatusUpdate({ 
+        config.onStatusUpdate?.({ 
           type: "deployed",
           txHash: result.hash, 
           tokenAddress: result.tokenAddress, // Use actual token address (tokenId)
@@ -381,7 +376,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         return result;
       } catch (error) {
         console.error("Stellar deployment failed:", error);
-        onStatusUpdate({
+        config.onStatusUpdate?.({
           type: "idle",
         });
         throw error;
@@ -436,7 +431,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     address,
     kit,
     multicall,
-    onStatusUpdate,
+    config.onStatusUpdate,
     prepareMulticall?.request,
     recordDeploymentDraft,
     STELLAR_CHAIN_ID,

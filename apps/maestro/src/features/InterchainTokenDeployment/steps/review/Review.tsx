@@ -5,7 +5,6 @@ import {
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
-import { maskAddress } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
@@ -16,6 +15,7 @@ import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { persistTokenDeploymentTxHash } from "~/ui/pages/InterchainTokenDetailsPage/ConnectedInterchainTokensPage";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
+import { maskAddress } from "@axelarjs/utils";
 
 const Review: FC = () => {
   const router = useRouter();
@@ -123,7 +123,7 @@ const Review: FC = () => {
                 >
                   View transaction{" "}
                   <span className="hidden md:inline">
-                    {maskAddress(state.txState.txHash ?? "")}
+                    {maskAddress(state.txState.txHash)}
                   </span>{" "}
                   on {chain?.blockExplorers?.default.name}{" "}
                   <ExternalLinkIcon className="h-4 w-4" />
@@ -153,5 +153,4 @@ const Review: FC = () => {
     </>
   );
 };
-
 export default Review;
