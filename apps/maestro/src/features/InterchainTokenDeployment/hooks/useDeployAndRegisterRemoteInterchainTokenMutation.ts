@@ -335,44 +335,25 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           gasValues: gasValues,
           onStatusUpdate: config.onStatusUpdate,
         });        
-        // Record the deployment (needs to happen before final status update)
-        try {
-          await recordDeploymentAsync({
-            kind: "interchain",
-            tokenId: result.tokenId, // Use actual tokenId from the transaction
-            deployerAddress: deployerAddress,
-            tokenAddress: result.tokenAddress, // Use actual tokenAddress from the result
-            tokenName: input.tokenName,
-            tokenSymbol: input.tokenSymbol,
-            tokenDecimals: input.decimals,
-            axelarChainId: input.sourceChainId, // Should be Stellar's Axelar ID
-            salt: input.salt,
-            originalMinterAddress: input.minterAddress,
-            destinationAxelarChainIds: input.destinationChainIds,
-            deploymentMessageId: result.hash, // Use the tx hash
-            tokenManagerAddress: result.tokenManagerAddress, // Use actual tokenManagerAddress from the result
-            tokenManagerType: result.tokenManagerType as (typeof TOKEN_MANAGER_TYPES[number] | null | undefined), // Add tokenManagerType
-          });
-          console.log("Stellar deployment recorded.");
-        } catch (recordError) {
-            console.error("Failed to record deployment:", recordError);
-            // Do not update state here; rely on mutation's onError handling
-            throw recordError; 
-        }
-
-        console.log("Stellar deployment submitted, txState updated:", {
-          txHash: result.hash,
-          tokenAddress: result.tokenAddress,
-        })
-        
-        // Update UI state to show deployment success
-        config.onStatusUpdate?.({ 
-          type: "deployed",
-          txHash: result.hash, 
-          tokenAddress: result.tokenAddress, // Use actual token address (tokenId)
+        // Set arguments for recording the deployment
+        // The actual recording will be triggered by a useEffect watching recordDeploymentArgs
+        setRecordDeploymentArgs({
+          kind: "interchain",
+          tokenId: result.tokenId, // Use actual tokenId from the transaction
+          deployerAddress: deployerAddress,
+          tokenAddress: result.tokenAddress, // Use actual tokenAddress from the result
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          axelarChainId: input.sourceChainId, // Should be Stellar's Axelar ID
+          salt: input.salt,
+          originalMinterAddress: input.minterAddress,
+          destinationAxelarChainIds: input.destinationChainIds,
+          deploymentMessageId: result.hash, // Use the tx hash
+          tokenManagerAddress: result.tokenManagerAddress, // Use actual tokenManagerAddress from the result
+          tokenManagerType: result.tokenManagerType as (typeof TOKEN_MANAGER_TYPES[number] | null | undefined), // Add tokenManagerType
         });
-        console.log("Stellar deployment submitted, txState updated:", result);
-        
+        console.log("Stellar deployment arguments set for recording.");
         return result;
       } catch (error) {
         console.error("Stellar deployment failed:", error);
