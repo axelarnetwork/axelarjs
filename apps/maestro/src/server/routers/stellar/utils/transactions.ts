@@ -4,21 +4,16 @@ import {
   BASE_FEE,
   Contract,
   nativeToScVal,
-  Networks,
   rpc,
   TransactionBuilder,
   xdr,
 } from "stellar-sdk";
 
-// Using Networks.TESTNET as default, but can be overridden in function parameters
-
-// Constants
-export const STELLAR_TESTNET_HORIZON_URL =
-  "https://horizon-testnet.stellar.org";
-export const STELLAR_TESTNET_RPC_URL =
-  "https://soroban-testnet.stellar.org:443";
-export const INTERCHAIN_TOKEN_SERVICE_CONTRACT =
-  "CATNQHWMG4VOWPSWF4HXVW7ASDJNX7M7F6JLFC544T7ZMMXXAE2HUDTY";
+import {
+  STELLAR_HORIZON_URL,
+  STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_RPC_URL,
+} from "./config";
 
 // Function to convert a string to a bytes32 format
 export function saltToBytes32(input: string): string {
@@ -70,7 +65,7 @@ export function tokenMetadataToScVal(
 // Function to fetch account details
 export async function fetchStellarAccount(accountId: string): Promise<Account> {
   const accountResponse = await fetch(
-    `${STELLAR_TESTNET_HORIZON_URL}/accounts/${accountId}`
+    `${STELLAR_HORIZON_URL}/accounts/${accountId}`
   );
 
   if (!accountResponse.ok) {
@@ -89,8 +84,8 @@ export async function createContractTransaction({
   method,
   account,
   args,
-  rpcUrl = STELLAR_TESTNET_RPC_URL,
-  networkPassphrase = Networks.TESTNET,
+  rpcUrl = STELLAR_RPC_URL,
+  networkPassphrase = STELLAR_NETWORK_PASSPHRASE,
 }: {
   contractAddress: string;
   method: string;
