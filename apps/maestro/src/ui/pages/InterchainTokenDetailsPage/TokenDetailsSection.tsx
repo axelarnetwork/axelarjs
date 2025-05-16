@@ -361,7 +361,9 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
           layout="fill"
         />
       ) : (
-        <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+        tokenId && (
+          <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+        )
       )}
     </div>
   );
