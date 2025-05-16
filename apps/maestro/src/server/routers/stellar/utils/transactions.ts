@@ -1,11 +1,14 @@
 import { createHash, randomUUID } from "crypto";
 import {
   Account,
+  Address,
   BASE_FEE,
   Contract,
   nativeToScVal,
   Networks,
-  rpc,
+  Operation,
+  rpc, // Provides rpc.Server
+  TimeoutInfinite,
   TransactionBuilder,
   xdr,
 } from "stellar-sdk";
@@ -18,7 +21,7 @@ export const STELLAR_TESTNET_HORIZON_URL =
 export const STELLAR_TESTNET_RPC_URL =
   "https://soroban-testnet.stellar.org:443";
 export const INTERCHAIN_TOKEN_SERVICE_CONTRACT =
-  "CATNQHWMG4VOWPSWF4HXVW7ASDJNX7M7F6JLFC544T7ZMMXXAE2HUDTY";
+  "CCXT3EAQ7GPQTJWENU62SIFBQ3D4JMNQSB77KRPTGBJ7ZWBYESZQBZRK";
 
 // Function to convert a string to a bytes32 format
 export function saltToBytes32(input: string): string {
@@ -81,6 +84,66 @@ export async function fetchStellarAccount(accountId: string): Promise<Account> {
 
   const accountData = await accountResponse.json();
   return new Account(accountId, accountData.sequence);
+}
+
+// Function to create and prepare a Stellar contract transaction with multiple calls
+// Ensure STELLAR_TESTNET_RPC_URL and NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE are imported above
+
+export async function createContractTransactionMulticall({
+  contractAddress,
+  operations,
+  account,
+  rpcUrl = STELLAR_TESTNET_RPC_URL,
+  networkPassphrase = Networks.TESTNET,
+  baseFeePerOperation = 100000, // Default base fee per operation, Soroban may adjust
+}: {
+  contractAddress: string;
+  operations: Array<{
+    method: string;
+    args: xdr.ScVal[];
+    // auth?: xdr.SorobanAuthorizationEntry[]; // Optional per-operation auth if needed
+  }>;
+  account: Account;
+  rpcUrl?: string;
+  networkPassphrase?: string;
+  baseFeePerOperation?: number;
+}): Promise<{
+  transactionXDR: string;
+  preparedTransaction: any; // Matching existing function's return type
+}> {
+  const server = new rpc.Server(rpcUrl, { allowHttp: true });
+
+  const txBuilder = new TransactionBuilder(account, {
+    fee: (baseFeePerOperation * operations.length).toString(),
+    networkPassphrase,
+  });
+
+  for (const op of operations) {
+    txBuilder.addOperation(
+      Operation.invokeHostFunction({
+        func: xdr.HostFunction.hostFunctionTypeInvokeContract(
+          new xdr.InvokeContractArgs({
+            contractAddress: Address.fromString(contractAddress).toScAddress(),
+            functionName: op.method,
+            args: op.args,
+          })
+        ),
+        auth: [], // Defaulting to empty auth array, assuming source account signature is sufficient
+      })
+    );
+  }
+
+  const tx = txBuilder.setTimeout(TimeoutInfinite).build();
+  console.log("Multicall transaction before prepare:", tx.toEnvelope().toXDR("base64"))
+  // const preparedTransaction = await server.prepareTransaction(tx);
+
+  // console.log("Multicall transaction after prepare:", preparedTransaction.toEnvelope().toXDR("base64"))
+
+  return {
+    transactionXDR: tx.toEnvelope().toXDR("base64"),
+    // transactionXDR: preparedTransaction.toXDR(),
+    preparedTransaction: tx.toEnvelope().toXDR("base64"),
+  };
 }
 
 // Function to create and prepare a Stellar contract transaction

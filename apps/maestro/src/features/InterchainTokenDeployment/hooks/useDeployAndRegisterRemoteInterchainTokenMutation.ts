@@ -282,7 +282,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       console.log("Skipping recordDeploymentDraft for Stellar chain");
       return;
     }
-    
+    // any reasons why we are skipping draft deploy for sui here?
     if (input && tokenAddress && !input.sourceChainId.includes("sui")) {
       return await recordDeploymentAsync({
         kind: "interchain",
@@ -335,8 +335,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           gasValues: gasValues,
           onStatusUpdate: config.onStatusUpdate,
         });        
-        // Set arguments for recording the deployment
-        // The actual recording will be triggered by a useEffect watching recordDeploymentArgs
         setRecordDeploymentArgs({
           kind: "interchain",
           tokenId: result.tokenId, // Use actual tokenId from the transaction

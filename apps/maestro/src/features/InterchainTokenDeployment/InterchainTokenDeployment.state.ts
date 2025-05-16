@@ -38,6 +38,11 @@ export type DeployAndRegisterTransactionState =
       txHash: string;
     }
   | {
+      type: "deploying_remote";
+      txHash: string;
+      destinationChainIds: string[];
+    }
+  | {
       type: "deployed";
       suiTx?: DeployTokenResult;
       txHash: string;

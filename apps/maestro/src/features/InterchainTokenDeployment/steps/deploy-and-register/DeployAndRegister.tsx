@@ -42,13 +42,6 @@ export const Step2: FC = () => {
 
   const chainId = useChainId();
   
-  // Debug log to check chain detection
-  console.log("Deploy Step - Chain Info:", {
-    chainId,
-    isStellar: chainId === STELLAR_CHAIN_ID,
-    STELLAR_CHAIN_ID
-  });
-
   // Handle both EVM and VM chains
   const sourceChain = state.chains.find((chain) => chain.chain_id === chainId);
 

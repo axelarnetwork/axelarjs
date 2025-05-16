@@ -48,6 +48,7 @@ export function useStep2ChainSelectionState() {
     gasMultiplier: "auto",
   });
 
+  // TO-DO: FIX BALANCES CHECK FOR SU + ADD BALANCE CHECKS FOR STELLAR
   useEffect(() => {
     Maybe.of(remoteDeploymentGasFees?.totalGasFee)
       .map((value) => toNumericString(value, userBalance?.decimals || 18))
