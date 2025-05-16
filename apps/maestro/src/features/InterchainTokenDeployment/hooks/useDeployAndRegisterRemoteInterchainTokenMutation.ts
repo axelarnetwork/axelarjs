@@ -323,33 +323,34 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         }
         
         const result = await deploy_interchain_token_stellar({
-          caller: address, // Use address from useAccount
-          kit: kit, // Use kit from useStellarKit
+          caller: address,
+          kit: kit,
           tokenName: input.tokenName,
           tokenSymbol: input.tokenSymbol,
           decimals: input.decimals,
-          initialSupply: input.initialSupply || 0n, // ensure it's a bigint
+          initialSupply: input.initialSupply || 0n,
           salt: input.salt,
           minterAddress: input.minterAddress,
           destinationChainIds: input.destinationChainIds,
           gasValues: gasValues,
           onStatusUpdate: config.onStatusUpdate,
-        });        
+        });     
+        console.log("Stellar deployment result:", result)   
         setRecordDeploymentArgs({
           kind: "interchain",
-          tokenId: result.tokenId, // Use actual tokenId from the transaction
+          tokenId: result.tokenId,
           deployerAddress: deployerAddress,
-          tokenAddress: result.tokenAddress, // Use actual tokenAddress from the result
+          tokenAddress: result.tokenAddress,
           tokenName: input.tokenName,
           tokenSymbol: input.tokenSymbol,
           tokenDecimals: input.decimals,
-          axelarChainId: input.sourceChainId, // Should be Stellar's Axelar ID
+          axelarChainId: input.sourceChainId,
           salt: input.salt,
           originalMinterAddress: input.minterAddress,
           destinationAxelarChainIds: input.destinationChainIds,
-          deploymentMessageId: result.hash, // Use the tx hash
-          tokenManagerAddress: result.tokenManagerAddress, // Use actual tokenManagerAddress from the result
-          tokenManagerType: result.tokenManagerType as (typeof TOKEN_MANAGER_TYPES[number] | null | undefined), // Add tokenManagerType
+          deploymentMessageId: result.hash,
+          tokenManagerAddress: result.tokenManagerAddress,
+          tokenManagerType: result.tokenManagerType as (typeof TOKEN_MANAGER_TYPES[number] | null | undefined),
         });
         console.log("Stellar deployment arguments set for recording.");
         return result;

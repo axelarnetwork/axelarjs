@@ -146,6 +146,7 @@ export const Step2: FC = () => {
 
             // Add transaction to history (similar to other chains)
             if (rootState.selectedChains.length >= 0) { 
+              console.log("Stellar result", result)
               addTransaction({
                 status: "submitted", 
                 hash: result.hash,
@@ -184,6 +185,7 @@ export const Step2: FC = () => {
               tokenAddress: result.tokenAddress,
             });
             if (rootState.selectedChains.length > 0) {
+              console.log("sui result", result)
               addTransaction({
                 status: "submitted",
                 suiTx: result,
