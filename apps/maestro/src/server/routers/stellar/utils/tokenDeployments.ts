@@ -19,8 +19,26 @@ import {
 } from "./transactions";
 import { TOKEN_MANAGER_TYPES, TokenManagerType } from "~/lib/drizzle/schema/common";
 import { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import {
+  multicall_deploy_remote_interchain_tokens,
+  type MulticallDeployRemoteStatus, // Assuming this type is exported from remoteTokenDeployments.ts
+  type MulticallDeployRemoteResult // Assuming this type is exported for the return value
+} from "./remoteTokenDeployments";
 
 // --- Replicated Helpers (similar to index.ts / previous versions) ---
+
+// New result type combining base and optional remote deployment results
+export interface DeployAndRegisterInterchainTokenResult {
+  hash: string; // Base deployment hash
+  status: string; // Base deployment status ("SUCCESS", "ERROR")
+  tokenId: string;
+  tokenAddress: string;
+  tokenManagerAddress: string;
+  tokenManagerType: string; // e.g., "mint_burn"
+  remote?: MulticallDeployRemoteResult; // Optional: result from remote multicall deployment
+}
+
+// --- Old orchestrator types removed ---
 
 function addressToScVal(addressString: string): xdr.ScVal {
   return nativeToScVal(Address.fromString(addressString), { type: "address" });
@@ -35,11 +53,14 @@ export async function deploy_interchain_token_stellar({
   tokenSymbol,
   decimals,
   initialSupply,
-  salt, 
+  salt,
   minterAddress,
-  destinationChainIds,
-  gasValues,
-  onStatusUpdate,
+  destinationChainIds, // Used for multicall if multicallContractAddress & gasTokenAddress are provided
+  gasValues,           // Used for multicall
+  onStatusUpdate,      // For base deployment status
+  // New optional params for multicall remote deployments:
+  remoteSalt,
+  onMulticallStatusUpdate,
 }: {
   caller: string;
   kit: StellarWalletsKit;
@@ -49,17 +70,13 @@ export async function deploy_interchain_token_stellar({
   initialSupply: bigint;
   salt: string;
   minterAddress?: string;
-  destinationChainIds: string[];
+  destinationChainIds: string[]; // If empty, or multicall params not provided, no remote deploy occurs
   gasValues: bigint[];
-  onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
-}): Promise<{
-  hash: string;
-  status: string;
-  tokenId: string;
-  tokenAddress: string;
-  tokenManagerAddress: string;
-  tokenManagerType: string;
-}> {
+  onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void; // For base deployment
+  // Optional multicall parameters  gasTokenAddress?: string;
+  remoteSalt?: string;             // Salt for remote deployments, defaults to base 'salt'
+  onMulticallStatusUpdate?: (status: MulticallDeployRemoteStatus) => void;
+}): Promise<DeployAndRegisterInterchainTokenResult> {
   console.log("Starting deploy_interchain_token_stellar with params:", {
     caller,
     tokenName,
@@ -72,6 +89,8 @@ export async function deploy_interchain_token_stellar({
     gasValues: gasValues.map((g) => g.toString()),
   });
   try {
+    const multicallContractAddress = "CC6BXRCUQFAJ64NDLEZCS4FDL6GN65FL2KDOKCRHFWPMPKRWQNBA4YR2";
+    const gasTokenAddress = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
     const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
     const server = new rpc.Server(rpcUrl, {
       allowHttp: rpcUrl.startsWith("http://"), 
@@ -315,17 +334,65 @@ export async function deploy_interchain_token_stellar({
     if (tokenManagerTypeString !== "mint_burn") {
       throw new Error("tokenManagerType for native ITS token is not type 0 - mint_burn");
     } 
-    // Return success details
-    return {
-      hash: initialResponse.hash, // Use original hash
-      status: "SUCCESS", // Final status
-      tokenId: `0x${tokenId}`, // Return as hex string with 0x prefix
+    const baseDeploymentResult = {
+      hash: initialResponse.hash,
+      status: "SUCCESS" as const,
+      tokenId: `0x${tokenId}`,
       tokenAddress: tokenAddress,
       tokenManagerAddress: tokenManagerAddress,
-      tokenManagerType: tokenManagerTypeString , 
+      tokenManagerType: tokenManagerTypeString,
+    };
+
+    // --- Conditionally execute multicall for remote deployments ---
+    let remoteDeployResultData: MulticallDeployRemoteResult | undefined = undefined;
+
+    if (
+      destinationChainIds && destinationChainIds.length > 0 &&
+      multicallContractAddress && gasTokenAddress // Ensure essential multicall params are present
+    ) {
+      console.log("Base Stellar deployment successful. Proceeding to multicall remote deployments...");
+      try {
+        const saltForRemote = remoteSalt || salt; // Use specific remote salt or fallback to base salt
+        const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
+        const networkPassphrase = NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
+
+        if (!networkPassphrase) {
+          console.error("Stellar network passphrase is not configured for multicall remote deployments.");
+          onMulticallStatusUpdate?.({ type: "error", message: "Stellar network passphrase not configured for multicall."});
+        } else {
+          remoteDeployResultData = await multicall_deploy_remote_interchain_tokens({
+            caller, 
+            kit,    
+            salt: saltForRemote,
+            destinationChainIds,
+            gasValues,
+            itsContractAddress: INTERCHAIN_TOKEN_SERVICE_CONTRACT,
+            multicallContractAddress,
+            gasTokenAddress,
+            rpcUrl,
+            networkPassphrase,
+            minterAddress: minterAddress || caller, 
+            onStatusUpdate: onMulticallStatusUpdate,
+          });
+          console.log("Multicall remote deployments completed:", remoteDeployResultData);
+        }
+      } catch (multicallError) {
+        console.error("Multicall for remote deployments failed:", multicallError);
+        const errorMessage = multicallError instanceof Error ? multicallError.message : String(multicallError);
+        onMulticallStatusUpdate?.({ type: "error", message: `Multicall failed: ${errorMessage}`, error: multicallError });
+        // Do not re-throw here to allow returning the successful base deployment details.
+        // remoteDeployResultData will remain undefined or could capture error if multicall_deploy_remote_interchain_tokens itself returns error status.
+      }
+    }
+
+    return {
+      ...baseDeploymentResult,
+      remote: remoteDeployResultData,
     };
   } catch (error) {
     console.error("deploy_interchain_token_stellar failed:", error);
     throw error; // Re-throw the error for the hook to catch
   }
 }
+// --- Orchestrator function 'deployFullInterchainTokenSuite' and its example have been removed. ---
+// --- The remote deployment logic is now integrated into 'deploy_interchain_token_stellar'. ---

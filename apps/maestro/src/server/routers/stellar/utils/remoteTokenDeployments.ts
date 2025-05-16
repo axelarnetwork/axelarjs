@@ -7,7 +7,6 @@ import {
   Transaction,
   TransactionBuilder,
   xdr,
-  TimeoutInfinite,
   BASE_FEE,
 } from "@stellar/stellar-sdk";
 
@@ -61,6 +60,12 @@ export type MulticallDeployRemoteStatus =
   | { type: "success"; txHash: string; results?: xdr.ScVal[]; totalCalls: number }
   | { type: "error"; message: string; error?: any };
 
+export interface MulticallDeployRemoteResult {
+  hash: string;
+  status: string; 
+  multicallResults?: xdr.ScVal[];
+}
+
 export async function multicall_deploy_remote_interchain_tokens({
   caller,
   kit,
@@ -87,11 +92,7 @@ export async function multicall_deploy_remote_interchain_tokens({
   networkPassphrase: string;
   minterAddress?: string;
   onStatusUpdate?: (status: MulticallDeployRemoteStatus) => void;
-}): Promise<{
-  hash: string;
-  status: string; 
-  multicallResults?: xdr.ScVal[];
-}> {
+}): Promise<MulticallDeployRemoteResult> {
   if (destinationChainIds.length !== gasValues.length) {
     const errMessage = "destinationChainIds and gasValues must have the same length";
     onStatusUpdate?.({ type: "error", message: errMessage });
@@ -136,26 +137,33 @@ export async function multicall_deploy_remote_interchain_tokens({
       const callArgsVec = xdr.ScVal.scvVec(deployRemoteArgs);
 
       const callMapEntries: xdr.ScMapEntry[] = [
-        new xdr.ScMapEntry({ key: _symbolToScVal("contract"), val: _addressToScVal(itsContractAddress) }),
         new xdr.ScMapEntry({ key: _symbolToScVal("approver"), val: _addressToScVal(caller) }),
-        new xdr.ScMapEntry({ key: _symbolToScVal("function"), val: _symbolToScVal("deploy_remote_interchain_token") }),
         new xdr.ScMapEntry({ key: _symbolToScVal("args"), val: callArgsVec }),
+        new xdr.ScMapEntry({ key: _symbolToScVal("contract"), val: _addressToScVal(itsContractAddress) }),
+        new xdr.ScMapEntry({ key: _symbolToScVal("function"), val: _symbolToScVal("deploy_remote_interchain_token") }),
       ];
       return xdr.ScVal.scvMap(callMapEntries);
     });
 
     const multicallArgs = xdr.ScVal.scvVec(individualCalls);
 
-    const sourceAccount = await server.getAccount(caller); 
+    const sourceAccount = await server.getAccount(caller);
+    console.log(`[remoteTokenDeployments] Fetched source account ${caller} initial sequence: ${sourceAccount.sequenceNumber()}`);
     const multicallContract = new Contract(multicallContractAddress);
 
     const txBuilder = new TransactionBuilder(sourceAccount, {
       fee: BASE_FEE, 
       networkPassphrase,
-    }).addOperation(multicallContract.call("multicall", multicallArgs));
-    
-    const txToSign = txBuilder.setTimeout(TimeoutInfinite).build();
-    const transactionXDR = txToSign.toXDR();
+    }).addOperation(multicallContract.call("multicall", multicallArgs)).setTimeout(300); // Set timeout to 5 minutes
+
+    const builtTx = txBuilder.build();
+    console.log(`[remoteTokenDeployments] builtTx sequence: ${builtTx.sequence.toString()}`); // SDK v11+ Transaction.sequence is BigInt
+    console.log("Multicall transaction before prepare (raw build):", builtTx.toEnvelope().toXDR('base64'));
+    // Prepare the transaction to get the correct fee and footprint
+    const preparedTx = await server.prepareTransaction(builtTx);
+    console.log(`[remoteTokenDeployments] preparedTx sequence: ${preparedTx.sequence.toString()}`); // SDK v11+ Transaction.sequence is BigInt
+    console.log("Multicall transaction after prepare (prepared):", preparedTx.toEnvelope().toXDR("base64"));
+    const transactionXDR = preparedTx.toEnvelope().toXDR("base64");
 
     onStatusUpdate?.({ type: "pending_signature", totalCalls });
 
