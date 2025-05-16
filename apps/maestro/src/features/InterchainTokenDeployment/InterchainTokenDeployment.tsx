@@ -55,7 +55,7 @@ const InterchainTokenDeployment = () => {
 
   return (
     <MultiStepDialog
-      triggerLabel="Deploy a new Interchain Token"
+      triggerLabel={`${isStellarChain ? "Stellar Deployments Coming Soon" : "Deploy a new Interchain Token"}`}
       disabled={isStellarChain}
       title={
         <Dialog.Title className="flex items-center justify-center gap-1 sm:gap-2">

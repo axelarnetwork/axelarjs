@@ -1,16 +1,48 @@
 import type { StellarChainConfig } from "@axelarjs/api";
 
 import {
+  Address,
   Contract,
   Horizon,
+  nativeToScVal,
   scValToNative,
   TransactionBuilder,
+  type Account,
 } from "@stellar/stellar-sdk";
-import { rpc, type Account } from "stellar-sdk";
+import { ethers } from "ethers";
+import { rpc } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { Context } from "~/server/context";
+import { STELLAR_HORIZON_URL, STELLAR_NETWORK_PASSPHRASE } from "./config";
+
+export function hexToScVal(hexString: string) {
+  const result = nativeToScVal(Buffer.from(ethers.utils.arrayify(hexString)), {
+    type: "bytes",
+  });
+  return result;
+}
+
+export function addressToScVal(addressString: string) {
+  return nativeToScVal(Address.fromString(addressString), { type: "address" });
+}
+
+export function tokenToScVal(tokenAddress: string, tokenAmount: number) {
+  return tokenAmount === 0
+    ? nativeToScVal(null, { type: "null" })
+    : nativeToScVal(
+        {
+          address: Address.fromString(tokenAddress),
+          amount: tokenAmount,
+        },
+        {
+          type: {
+            address: ["symbol", "address"],
+            amount: ["symbol", "i128"],
+          },
+        }
+      );
+}
 
 export const formatTokenId = (tokenId: string) => {
   const hex = tokenId.replace(/^0x/, "").padStart(64, "0");
@@ -43,7 +75,7 @@ async function simulateCall(
   try {
     const tx = new TransactionBuilder(account, {
       fee: "1000000",
-      networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+      networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
     })
       .addOperation(contract.call(method))
       .setTimeout(30)
@@ -63,7 +95,7 @@ async function simulateCall(
 }
 
 export const getStellarAssetMetadata = async (tokenAddress: string) => {
-  const server = new Horizon.Server("https://horizon-testnet.stellar.org");
+  const server = new Horizon.Server(STELLAR_HORIZON_URL);
   const [asset_code, asset_issuer] = tokenAddress.split("-");
   const asset = await server
     .assets()

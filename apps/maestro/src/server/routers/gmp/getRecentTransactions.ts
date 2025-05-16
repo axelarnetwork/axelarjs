@@ -4,13 +4,12 @@ import { TRPCError } from "@trpc/server";
 import { uniqBy } from "rambda";
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
   pageSize: z.number().optional().default(20),
   page: z.number().optional().default(0),
-  senderAddress: z.union([hex40Literal(), hex64Literal()]).optional(),
+  senderAddress: z.string().optional(),
   contractMethod: z.union([
     z.literal("InterchainTransfer"),
     z.literal("InterchainTokenDeploymentStarted"),
@@ -20,8 +19,8 @@ const INPUT_SCHEMA = z.object({
 export type RecentTransactionsInput = z.infer<typeof INPUT_SCHEMA>;
 
 export type RecentTransactionsOutput = {
-  hash: `0x${string}`;
-  blockHash: `0x${string}`;
+  hash: string;
+  blockHash: string;
   status: string;
   timestamp: number;
   event?:
