@@ -47,7 +47,7 @@ export default function HomePage() {
         contentClassName="place-items-center"
         mustBeConnected
       >
-        <div className="w-full">
+        <div className="mb-20 w-full">
           <ConditionalRenderInterchainBanner />
         </div>
         <div

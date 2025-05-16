@@ -1,5 +1,4 @@
 import { and, eq, ilike, inArray } from "drizzle-orm";
-import { type Address } from "viem";
 import { z } from "zod";
 
 import type { DBClient } from "~/lib/drizzle/client";
@@ -265,7 +264,7 @@ export default class MaestroPostgresClient {
   /**
    * Returns the interchain tokens deployed by the given `deployerAddress`,
    */
-  async getInterchainTokensByDeployerAddress(deployerAddress: Address) {
+  async getInterchainTokensByDeployerAddress(deployerAddress: string) {
     const query = this.db.query.interchainTokens.findMany({
       where: (table, { ilike }) =>
         ilike(table.deployerAddress, deployerAddress),

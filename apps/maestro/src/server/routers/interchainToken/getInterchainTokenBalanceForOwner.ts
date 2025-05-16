@@ -1,8 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
+import { scValToNative } from "stellar-sdk";
+import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
+import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
+import type { StellarTokenContractClient } from "~/lib/clients/stellarClient";
 import { suiClient as client } from "~/lib/clients/suiClient";
+import { isValidStellarTokenAddress } from "~/lib/utils/validation";
+import { getStellarChainConfig } from "~/server/routers/stellar/utils";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
@@ -86,6 +92,51 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         hasFlowLimiterRole: isOperator,
       };
       return result;
+    }
+
+    // Stellar tokens
+    if (isValidStellarTokenAddress(input.tokenAddress)) {
+      const chainConfig = await getStellarChainConfig(ctx);
+      const rpcUrl = chainConfig.config.rpc[0];
+      const ITSStellarContractClient = (await Client.from({
+        contractId: input.tokenAddress,
+        networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+        rpcUrl: rpcUrl,
+      })) as unknown as StellarTokenContractClient;
+
+      const [
+        { simulation: simBalance },
+        { simulation: simMinter },
+        { simulation: simOwner },
+        { simulation: simDecimals },
+      ] = await Promise.all([
+        ITSStellarContractClient.balance({
+          id: input.owner,
+        }),
+        ITSStellarContractClient.is_minter({
+          minter: input.owner,
+        }),
+        ITSStellarContractClient.owner(),
+        ITSStellarContractClient.decimals(),
+      ]);
+
+      const balance = scValToNative(simBalance.result.retval).toString();
+      const isMinter = scValToNative(simMinter.result.retval);
+      const isOwner = scValToNative(simOwner.result.retval) === input.owner;
+      const decimals = scValToNative(simDecimals.result.retval);
+
+      // check return values
+      return {
+        decimals,
+        isTokenOwner: isOwner,
+        isTokenMinter: isMinter,
+        tokenBalance: balance,
+        isTokenPendingOwner: false,
+        hasPendingOwner: false,
+        hasMinterRole: isMinter,
+        hasOperatorRole: false,
+        hasFlowLimiterRole: false,
+      };
     }
     // This is for ERC20 tokens
     const balanceOwner = input.owner as `0x${string}`;

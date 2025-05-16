@@ -129,3 +129,19 @@ export const contractABI = z.array(
     type: z.string().optional(),
   })
 );
+
+const STELLAR_CONTRACT_REGEX = /^C[A-Z2-7]{55}$/;
+const STELLAR_SYMBOL_ISSUER_REGEX = /^[A-Za-z0-9-]{1,12}-G[A-Z2-7]{55}$/;
+export const stellarTokenAddress = () =>
+  z
+    .string()
+    .regex(STELLAR_CONTRACT_REGEX, "Invalid Stellar token address")
+    .or(
+      z
+        .string()
+        .regex(STELLAR_SYMBOL_ISSUER_REGEX, "Invalid Stellar token address")
+    );
+
+export function isValidStellarTokenAddress(address: string): boolean {
+  return stellarTokenAddress().safeParse(address).success;
+}

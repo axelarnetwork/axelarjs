@@ -6,7 +6,12 @@ import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
-import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  useAccount,
+  useChainFromRoute,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { useGetChainsConfig } from "~/services/axelarConfigs/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { MultiStepDialog, StepLoading } from "~/ui/compounds/MultiStepForm";
@@ -38,6 +43,7 @@ const CanonicalTokenDeployment: FC = () => {
     axelarChainId: routeChain?.axelarChainId,
   });
   const { switchChain } = useSwitchChain();
+  const isStellarChain = routeChain?.id === STELLAR_CHAIN_ID;
 
   const handleSwitchChain = useCallback(() => {
     try {
@@ -113,6 +119,7 @@ const CanonicalTokenDeployment: FC = () => {
   return (
     <MultiStepDialog
       triggerLabel="Register interchain token"
+      disabled={isStellarChain}
       steps={["Token details", "Register & Deploy", "Review"]}
       step={state.step}
       showBackButton={showBackButton}

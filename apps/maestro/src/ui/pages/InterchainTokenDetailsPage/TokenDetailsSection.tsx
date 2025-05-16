@@ -27,7 +27,7 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -60,7 +60,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   );
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
-
+  const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
 
   const tokenDetails = [
@@ -78,7 +78,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(!isSuiChain
+    ...(!isSuiChain && !isStellarChain
       ? [
           [
             "Add Token to Wallet",
