@@ -136,7 +136,7 @@ export const Step2: FC = () => {
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
         try {
           const result = (await txPromise) as StellarDeploymentResult;
-
+          console.log("Stellar deployment result", result)
           if (result && result.hash && result.tokenAddress) {
             rootActions.setTxState({
               type: "deployed",

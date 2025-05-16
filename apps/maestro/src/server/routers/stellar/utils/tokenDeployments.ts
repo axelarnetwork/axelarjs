@@ -23,6 +23,7 @@ import {
   multicall_deploy_remote_interchain_tokens,
   type MulticallDeployRemoteResult
 } from "./remoteTokenDeployments";
+
 export interface DeployAndRegisterInterchainTokenResult {
   hash: string; // Base deployment hash
   status: string;
@@ -78,6 +79,7 @@ export async function deploy_interchain_token_stellar({
   try {
     const multicallContractAddress = "CC6BXRCUQFAJ64NDLEZCS4FDL6GN65FL2KDOKCRHFWPMPKRWQNBA4YR2";
     const gasTokenAddress = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
+    const networkPassphrase = "Test SDF Network ; September 2015";
     const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
     const server = new rpc.Server(rpcUrl, {
       allowHttp: rpcUrl.startsWith("http://"), 
@@ -325,12 +327,7 @@ export async function deploy_interchain_token_stellar({
       try {
         const saltForRemote = salt;
         const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-        const networkPassphrase = NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
 
-        if (!networkPassphrase) {
-          console.error("Stellar network passphrase is not configured for multicall remote deployments.");
-          onStatusUpdate?.({type:"idle"})
-        } else {
           remoteDeployResultData = await multicall_deploy_remote_interchain_tokens({
             caller, 
             kit,    
@@ -346,7 +343,7 @@ export async function deploy_interchain_token_stellar({
             onStatusUpdate: onStatusUpdate,
           });
           console.log("Multicall remote deployments completed:", remoteDeployResultData);
-        }
+        
       } catch (multicallError) {
         console.error("Multicall for remote deployments failed:", multicallError);
         onStatusUpdate?.({ type: "idle"});
