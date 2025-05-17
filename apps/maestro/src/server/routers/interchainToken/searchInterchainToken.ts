@@ -424,12 +424,12 @@ async function getSuiTokenRegistrationDetails(
   );
 
   const tokenAddress = registeredEvent
-    ? getCoinAddressFromType(registeredEvent.type, "CoinRegistered")
+    ? registeredEvent.type.match(new RegExp(`CoinRegistered<(0x[^>]+)>`))?.[1]
     : remoteTokenDetails.tokenAddress;
 
   return {
     isRegistered: Boolean(registeredEvent),
-    tokenAddress,
+    tokenAddress: tokenAddress as string,
   };
 }
 
