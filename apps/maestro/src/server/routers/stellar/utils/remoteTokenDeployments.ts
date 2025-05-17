@@ -169,7 +169,6 @@ export async function multicall_deploy_remote_interchain_tokens({
       throw new Error(errorMessage);
     }
 
-    onStatusUpdate?.({ type: "idle"});
     console.log(`Transaction ${txHash} PENDING, starting polling...`);
 
     let getTxResponse: rpc.Api.GetTransactionResponse | undefined;

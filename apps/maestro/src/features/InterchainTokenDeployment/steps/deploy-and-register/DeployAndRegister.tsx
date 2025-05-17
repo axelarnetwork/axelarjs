@@ -138,12 +138,6 @@ export const Step2: FC = () => {
           const result = (await txPromise) as StellarDeploymentResult;
           console.log("Stellar deployment result", result)
           if (result && result.hash && result.tokenAddress) {
-            rootActions.setTxState({
-              type: "deployed",
-              txHash: result.hash,
-              tokenAddress: result.tokenAddress,
-            });
-
             // Add transaction to history (similar to other chains)
             if (rootState.selectedChains.length >= 0) { 
               console.log("Stellar result", result)
