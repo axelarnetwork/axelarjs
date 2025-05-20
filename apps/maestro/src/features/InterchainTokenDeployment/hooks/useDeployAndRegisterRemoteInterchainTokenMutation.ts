@@ -3,12 +3,12 @@ import {
   INTERCHAIN_TOKEN_SERVICE_ENCODERS,
 } from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
-import { TOKEN_MANAGER_TYPES } from "../../../lib/drizzle/schema/common";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { zeroAddress, type TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
@@ -20,15 +20,20 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { TOKEN_MANAGER_TYPES } from "../../../lib/drizzle/schema/common";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
-import { deploy_interchain_token_stellar } from "~/server/routers/stellar/utils/tokenDeployments";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
   sourceChainId: string;
@@ -58,6 +63,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
   const [isReady, setIsReady] = useState(false);
+  const { deployStellarTokenAsync } = useDeployStellarToken(); // isStellarDeployLoading removed as onStatusUpdate handles UI feedback
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -162,14 +168,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
-  useEffect(() => {    
+  useEffect(() => {
     // Special case for Stellar - always set ready
     if (chainId === STELLAR_CHAIN_ID) {
       console.log("Setting isReady=true for Stellar chain");
       setIsReady(true);
       return;
     }
-    
+
     if (isValidEVMAddress(deployerAddress) && !prepareMulticall?.request) {
       setIsReady(false);
       console.warn("Failed to simulate multicall for deploying remote tokens");
@@ -282,7 +288,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       console.log("Skipping recordDeploymentDraft for Stellar chain");
       return;
     }
-    // any reasons why we are skipping draft deploy for sui here?
+
     if (input && tokenAddress && !input.sourceChainId.includes("sui")) {
       return await recordDeploymentAsync({
         kind: "interchain",
@@ -307,22 +313,25 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       chainId,
       isStellar: chainId === STELLAR_CHAIN_ID,
       isReady,
-      hasInput: Boolean(input)
+      hasInput: Boolean(input),
     });
-    
+
     await recordDeploymentDraft();
     if (chainId === STELLAR_CHAIN_ID && input) {
       // Handle Stellar deployment
       console.log("Stellar deployment started");
       try {
         const gasValues =
-          input?.remoteDeploymentGasFees?.gasFees?.map((x) => BigInt(x.fee)) ?? [];
-        
+          input?.remoteDeploymentGasFees?.gasFees?.map((x) => BigInt(x.fee)) ??
+          [];
+
         if (!address || !kit) {
-          throw new Error("Stellar wallet not connected or public key not available.");
+          throw new Error(
+            "Stellar wallet not connected or public key not available."
+          );
         }
-        
-        const result = await deploy_interchain_token_stellar({
+
+        const result = await deployStellarTokenAsync({
           caller: address,
           kit: kit,
           tokenName: input.tokenName,
@@ -334,24 +343,29 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           destinationChainIds: input.destinationChainIds,
           gasValues: gasValues,
           onStatusUpdate: config.onStatusUpdate,
-        });     
-        console.log("Stellar deployment result:", result)   
-        setRecordDeploymentArgs({
-          kind: "interchain",
-          tokenId: result.tokenId,
-          deployerAddress: deployerAddress,
-          tokenAddress: result.tokenAddress,
-          tokenName: input.tokenName,
-          tokenSymbol: input.tokenSymbol,
-          tokenDecimals: input.decimals,
-          axelarChainId: input.sourceChainId,
-          salt: input.salt,
-          originalMinterAddress: input.minterAddress,
-          destinationAxelarChainIds: input.destinationChainIds,
-          deploymentMessageId: result.hash,
-          tokenManagerAddress: result.tokenManagerAddress,
-          tokenManagerType: result.tokenManagerType as (typeof TOKEN_MANAGER_TYPES[number] | null | undefined),
         });
+        console.log("Stellar deployment result:", result);
+        if (result) {
+          setRecordDeploymentArgs({
+            kind: "interchain",
+            tokenId: result.tokenId,
+            deployerAddress: deployerAddress,
+            tokenAddress: result.tokenAddress,
+            tokenName: input.tokenName,
+            tokenSymbol: input.tokenSymbol,
+            tokenDecimals: input.decimals,
+            axelarChainId: input.sourceChainId,
+            salt: input.salt,
+            originalMinterAddress: input.minterAddress,
+            destinationAxelarChainIds: input.destinationChainIds,
+            deploymentMessageId: result.hash,
+            tokenManagerAddress: result.tokenManagerAddress,
+            tokenManagerType: result.tokenManagerType as
+              | (typeof TOKEN_MANAGER_TYPES)[number]
+              | null
+              | undefined,
+          });
+        }
         console.log("Stellar deployment arguments set for recording.");
         return result;
       } catch (error) {

@@ -8,21 +8,24 @@ import {
   xdr,
 } from "@stellar/stellar-sdk";
 
-import { stellarChainConfig } from "~/config/chains"; 
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env"; 
+import { stellarChainConfig } from "~/config/chains";
+import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
+import { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import {
+  TOKEN_MANAGER_TYPES,
+  TokenManagerType,
+} from "~/lib/drizzle/schema/common";
+import { STELLAR_ITS_CONTRACT_ID } from "./config";
+import {
+  multicall_deploy_remote_interchain_tokens,
+  type MulticallDeployRemoteResult,
+} from "./remoteTokenDeployments";
 import {
   createContractTransaction,
   fetchStellarAccount,
-  INTERCHAIN_TOKEN_SERVICE_CONTRACT, 
-  tokenMetadataToScVal, 
   hexToScVal,
+  tokenMetadataToScVal,
 } from "./transactions";
-import { TOKEN_MANAGER_TYPES, TokenManagerType } from "~/lib/drizzle/schema/common";
-import { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
-import {
-  multicall_deploy_remote_interchain_tokens,
-  type MulticallDeployRemoteResult
-} from "./remoteTokenDeployments";
 
 export interface DeployAndRegisterInterchainTokenResult {
   hash: string; // Base deployment hash
@@ -34,11 +37,9 @@ export interface DeployAndRegisterInterchainTokenResult {
   remote?: MulticallDeployRemoteResult;
 }
 
-
 function addressToScVal(addressString: string): xdr.ScVal {
   return nativeToScVal(Address.fromString(addressString), { type: "address" });
 }
-
 
 export async function deploy_interchain_token_stellar({
   caller,
@@ -49,9 +50,9 @@ export async function deploy_interchain_token_stellar({
   initialSupply,
   salt,
   minterAddress,
-  destinationChainIds, 
-  gasValues,           
-  onStatusUpdate,      
+  destinationChainIds,
+  gasValues,
+  onStatusUpdate,
 }: {
   caller: string;
   kit: StellarWalletsKit;
@@ -61,9 +62,9 @@ export async function deploy_interchain_token_stellar({
   initialSupply: bigint;
   salt: string;
   minterAddress?: string;
-  destinationChainIds: string[]; 
+  destinationChainIds: string[];
   gasValues: bigint[];
-  onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void; 
+  onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
 }): Promise<DeployAndRegisterInterchainTokenResult> {
   console.log("Starting deploy_interchain_token_stellar with params:", {
     caller,
@@ -77,12 +78,14 @@ export async function deploy_interchain_token_stellar({
     gasValues: gasValues.map((g) => g.toString()),
   });
   try {
-    const multicallContractAddress = "CC6BXRCUQFAJ64NDLEZCS4FDL6GN65FL2KDOKCRHFWPMPKRWQNBA4YR2";
-    const gasTokenAddress = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
+    const multicallContractAddress =
+      "CC6BXRCUQFAJ64NDLEZCS4FDL6GN65FL2KDOKCRHFWPMPKRWQNBA4YR2";
+    const gasTokenAddress =
+      "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
     const networkPassphrase = "Test SDF Network ; September 2015";
     const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
     const server = new rpc.Server(rpcUrl, {
-      allowHttp: rpcUrl.startsWith("http://"), 
+      allowHttp: rpcUrl.startsWith("http://"),
     });
 
     const account = await fetchStellarAccount(caller);
@@ -92,13 +95,13 @@ export async function deploy_interchain_token_stellar({
     const args: xdr.ScVal[] = [
       addressToScVal(caller),
       hexToScVal(salt),
-      tokenMetadataToScVal(decimals, tokenName, tokenSymbol), 
+      tokenMetadataToScVal(decimals, tokenName, tokenSymbol),
       nativeToScVal(initialSupply.toString(), { type: "i128" }),
-      addressToScVal(actualMinterAddress), 
+      addressToScVal(actualMinterAddress),
     ];
 
     const { transactionXDR } = await createContractTransaction({
-      contractAddress: INTERCHAIN_TOKEN_SERVICE_CONTRACT,
+      contractAddress: STELLAR_ITS_CONTRACT_ID,
       method: "deploy_interchain_token",
       account,
       args,
@@ -128,46 +131,65 @@ export async function deploy_interchain_token_stellar({
         type: "deploying",
         txHash: initialResponse.hash,
       });
-    }    
+    }
 
     console.log("Initial submission response:", initialResponse);
 
-    if (initialResponse.status === "ERROR" || initialResponse.status === "DUPLICATE" || initialResponse.status === "TRY_AGAIN_LATER") {
-      const errorMessage = `Stellar transaction submission failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`; 
-      console.error(errorMessage, initialResponse); 
+    if (
+      initialResponse.status === "ERROR" ||
+      initialResponse.status === "DUPLICATE" ||
+      initialResponse.status === "TRY_AGAIN_LATER"
+    ) {
+      const errorMessage = `Stellar transaction submission failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
+      console.error(errorMessage, initialResponse);
       throw new Error(errorMessage);
     }
 
     console.log("Transaction PENDING, starting polling...");
     let getTxResponse: rpc.Api.GetTransactionResponse | undefined;
-    const maxPollingAttempts = 20; 
+    const maxPollingAttempts = 20;
     const pollingIntervalMs = 3000;
 
     for (let i = 0; i < maxPollingAttempts; i++) {
-      await new Promise(resolve => setTimeout(resolve, pollingIntervalMs));
+      await new Promise((resolve) => setTimeout(resolve, pollingIntervalMs));
 
       try {
         getTxResponse = await server.getTransaction(initialResponse.hash);
-        console.log(`Polling attempt ${i + 1}: Status = ${getTxResponse.status}`);
+        console.log(
+          `Polling attempt ${i + 1}: Status = ${getTxResponse.status}`
+        );
 
         if (getTxResponse.status === rpc.Api.GetTransactionStatus.SUCCESS) {
           console.log("Transaction SUCCESS:", getTxResponse);
           break;
-        } else if (getTxResponse.status === rpc.Api.GetTransactionStatus.FAILED) {
-          const failReason = `Transaction failed on-chain. Result XDR (base64): ${getTxResponse.resultXdr ? getTxResponse.resultXdr.toXDR("base64") : 'N/A'}`;
+        } else if (
+          getTxResponse.status === rpc.Api.GetTransactionStatus.FAILED
+        ) {
+          const failReason = `Transaction failed on-chain. Result XDR (base64): ${getTxResponse.resultXdr ? getTxResponse.resultXdr.toXDR("base64") : "N/A"}`;
           console.error("Transaction FAILED:", failReason, getTxResponse);
           throw new Error(failReason);
-        } else if (getTxResponse.status === rpc.Api.GetTransactionStatus.NOT_FOUND) {
+        } else if (
+          getTxResponse.status === rpc.Api.GetTransactionStatus.NOT_FOUND
+        ) {
           console.log("Transaction NOT_FOUND, continuing polling...");
         }
-
       } catch (pollingError) {
-        console.error(`Error during getTransactionStatus polling:`, pollingError);
-        throw new Error(`Polling with getTransaction failed: ${pollingError instanceof Error ? pollingError.message : String(pollingError)}`);
+        console.error(
+          `Error during getTransactionStatus polling:`,
+          pollingError
+        );
+        throw new Error(
+          `Polling with getTransaction failed: ${pollingError instanceof Error ? pollingError.message : String(pollingError)}`
+        );
       }
     }
-    if (!getTxResponse || getTxResponse.status !== rpc.Api.GetTransactionStatus.SUCCESS) {
-      throw new Error(`Transaction did not succeed after ${maxPollingAttempts} polling attempts. Last status: ${getTxResponse?.status ?? 'unknown'}`);
+    if (
+      !getTxResponse ||
+      getTxResponse.status !== rpc.Api.GetTransactionStatus.SUCCESS
+    ) {
+      throw new Error(
+        `Transaction did not succeed after ${maxPollingAttempts} polling attempts. Last status: ${getTxResponse?.status ?? "unknown"}`
+      );
     }
 
     let tokenId: string | undefined;
@@ -184,12 +206,17 @@ export async function deploy_interchain_token_stellar({
           console.log("Parsing returnValue from resultMetaXdr:", returnValue);
           if (returnValue.switch() === xdr.ScValType.scvBytes()) {
             tokenId = returnValue.bytes().toString("hex");
-          console.log("Parsed tokenId from SUCCESS resultMetaXdr:", tokenId);
+            console.log("Parsed tokenId from SUCCESS resultMetaXdr:", tokenId);
           } else {
-            console.warn("Success returnValue parsed, but was not ScVal.Bytes as expected for tokenId.", returnValue.switch().name);
+            console.warn(
+              "Success returnValue parsed, but was not ScVal.Bytes as expected for tokenId.",
+              returnValue.switch().name
+            );
           }
         } else {
-          console.warn("Could not extract Soroban returnValue from resultMetaXdr.");
+          console.warn(
+            "Could not extract Soroban returnValue from resultMetaXdr."
+          );
         }
 
         try {
@@ -198,8 +225,12 @@ export async function deploy_interchain_token_stellar({
 
           if (events) {
             console.log(`Found ${events.length} events to parse.`);
-            const itsContractAddressScVal = addressToScVal(INTERCHAIN_TOKEN_SERVICE_CONTRACT);
-            const itsContractId = itsContractAddressScVal.address().contractId();
+            const itsContractAddressScVal = addressToScVal(
+              STELLAR_ITS_CONTRACT_ID
+            );
+            const itsContractId = itsContractAddressScVal
+              .address()
+              .contractId();
 
             for (const event of events) {
               // Check if the event is from the correct contract
@@ -222,79 +253,133 @@ export async function deploy_interchain_token_stellar({
               const eventName = firstTopic.sym().toString();
               console.log("Processing event:", eventName);
 
-              if (eventName === "interchain_token_deployed" && eventTopics.length >= 3) {
+              if (
+                eventName === "interchain_token_deployed" &&
+                eventTopics.length >= 3
+              ) {
                 const topic1 = eventTopics[1]; // tokenId (bytes)
                 const topic2 = eventTopics[2]; // tokenAddress (address)
 
                 // Extract tokenId (verify or assign)
                 if (topic1 && topic1.switch() === xdr.ScValType.scvBytes()) {
                   const eventTokenId = topic1.bytes().toString("hex");
-                  console.log(`Found tokenId ${eventTokenId} in interchain_token_deployed`);
+                  console.log(
+                    `Found tokenId ${eventTokenId} in interchain_token_deployed`
+                  );
                   if (tokenId && eventTokenId !== tokenId) {
-                    console.warn("TokenID from event differs from returnValue!");
+                    console.warn(
+                      "TokenID from event differs from returnValue!"
+                    );
                   } else if (!tokenId) {
                     tokenId = eventTokenId;
                   }
                 }
 
                 // Extract tokenAddress
-                if (!tokenAddress && topic2 && topic2.switch() === xdr.ScValType.scvAddress()) {
+                if (
+                  !tokenAddress &&
+                  topic2 &&
+                  topic2.switch() === xdr.ScValType.scvAddress()
+                ) {
                   tokenAddress = scValToNative(topic2);
-                  console.log(`Found tokenAddress ${tokenAddress} in interchain_token_deployed`);
+                  console.log(
+                    `Found tokenAddress ${tokenAddress} in interchain_token_deployed`
+                  );
                 }
-              } else if (eventName === "token_manager_deployed" && eventTopics.length >= 5) { 
+              } else if (
+                eventName === "token_manager_deployed" &&
+                eventTopics.length >= 5
+              ) {
                 const topic3 = eventTopics[3]; // tokenManagerAddress (address)
                 const topic4 = eventTopics[4]; // tokenManagerType (u32)
 
                 // Extract tokenManagerAddress
-                if (!tokenManagerAddress && topic3 && topic3.switch() === xdr.ScValType.scvAddress()) {
+                if (
+                  !tokenManagerAddress &&
+                  topic3 &&
+                  topic3.switch() === xdr.ScValType.scvAddress()
+                ) {
                   tokenManagerAddress = scValToNative(topic3);
-                  console.log(`Found tokenManagerAddress ${tokenManagerAddress} in token_manager_deployed`);
+                  console.log(
+                    `Found tokenManagerAddress ${tokenManagerAddress} in token_manager_deployed`
+                  );
                 }
 
                 // Extract tokenManagerType
-                if (tokenManagerType === undefined && topic4 && topic4.switch() === xdr.ScValType.scvU32()) {
+                if (
+                  tokenManagerType === undefined &&
+                  topic4 &&
+                  topic4.switch() === xdr.ScValType.scvU32()
+                ) {
                   tokenManagerType = scValToNative(topic4);
-                  console.log(`Found tokenManagerType ${tokenManagerType} in token_manager_deployed`);
+                  console.log(
+                    `Found tokenManagerType ${tokenManagerType} in token_manager_deployed`
+                  );
                 }
               }
 
-              if (tokenAddress && tokenManagerAddress && tokenManagerType !== undefined) {
-                console.log("Found all required addresses and type, stopping event processing.");
+              if (
+                tokenAddress &&
+                tokenManagerAddress &&
+                tokenManagerType !== undefined
+              ) {
+                console.log(
+                  "Found all required addresses and type, stopping event processing."
+                );
                 break;
               }
             }
           } else {
             console.warn("No Soroban events found in transaction meta.");
           }
-        } catch (parseEventError) { 
-          console.error("Failed to parse events from resultMetaXdr:", parseEventError);
+        } catch (parseEventError) {
+          console.error(
+            "Failed to parse events from resultMetaXdr:",
+            parseEventError
+          );
         }
-        
       } catch (parseError) {
-        console.error("Failed to parse resultMetaXdr from SUCCESS response:", parseError);
-      } 
-    } else { 
-      console.warn("Could not find resultMetaXdr in SUCCESS transaction response.");
+        console.error(
+          "Failed to parse resultMetaXdr from SUCCESS response:",
+          parseError
+        );
+      }
+    } else {
+      console.warn(
+        "Could not find resultMetaXdr in SUCCESS transaction response."
+      );
     }
 
     // Final checks for critical deployment information
-    if (!tokenId || !tokenAddress || !tokenManagerAddress || tokenManagerType === undefined) {
+    if (
+      !tokenId ||
+      !tokenAddress ||
+      !tokenManagerAddress ||
+      tokenManagerType === undefined
+    ) {
       const missingItems: string[] = [];
       if (!tokenId) {
-        console.error("Failed to obtain tokenId from successful transaction result or events.");
+        console.error(
+          "Failed to obtain tokenId from successful transaction result or events."
+        );
         missingItems.push("tokenId");
       }
       if (!tokenAddress) {
-        console.warn("Failed to obtain tokenAddress from successful transaction events. This is critical.");
+        console.warn(
+          "Failed to obtain tokenAddress from successful transaction events. This is critical."
+        );
         missingItems.push("tokenAddress");
       }
       if (!tokenManagerAddress) {
-        console.warn("Failed to obtain tokenManagerAddress from successful transaction events. This is critical.");
+        console.warn(
+          "Failed to obtain tokenManagerAddress from successful transaction events. This is critical."
+        );
         missingItems.push("tokenManagerAddress");
       }
       if (tokenManagerType === undefined) {
-        console.warn("Failed to obtain tokenManagerType from successful transaction events. This is critical.");
+        console.warn(
+          "Failed to obtain tokenManagerType from successful transaction events. This is critical."
+        );
         missingItems.push("tokenManagerType");
       }
 
@@ -303,10 +388,14 @@ export async function deploy_interchain_token_stellar({
       );
     }
 
-    const tokenManagerTypeString = TOKEN_MANAGER_TYPES[tokenManagerType] as TokenManagerType;
+    const tokenManagerTypeString = TOKEN_MANAGER_TYPES[
+      tokenManagerType
+    ] as TokenManagerType;
     if (tokenManagerTypeString !== "mint_burn") {
-      throw new Error("tokenManagerType for native ITS token is not type 0 - mint_burn");
-    } 
+      throw new Error(
+        "tokenManagerType for native ITS token is not type 0 - mint_burn"
+      );
+    }
     const baseDeploymentResult = {
       hash: initialResponse.hash,
       status: "SUCCESS" as const,
@@ -317,20 +406,26 @@ export async function deploy_interchain_token_stellar({
     };
 
     // --- Conditionally execute multicall for remote deployments ---
-    let remoteDeployResultData: MulticallDeployRemoteResult | undefined = undefined;
+    let remoteDeployResultData: MulticallDeployRemoteResult | undefined =
+      undefined;
 
     if (
-      destinationChainIds && destinationChainIds.length > 0 &&
-      multicallContractAddress && gasTokenAddress // Ensure essential multicall params are present
+      destinationChainIds &&
+      destinationChainIds.length > 0 &&
+      multicallContractAddress &&
+      gasTokenAddress // Ensure essential multicall params are present
     ) {
-      console.log("Base Stellar deployment successful. Proceeding to multicall remote deployments...");
+      console.log(
+        "Base Stellar deployment successful. Proceeding to multicall remote deployments..."
+      );
       try {
         const saltForRemote = salt;
         const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
 
-          remoteDeployResultData = await multicall_deploy_remote_interchain_tokens({
-            caller, 
-            kit,    
+        remoteDeployResultData =
+          await multicall_deploy_remote_interchain_tokens({
+            caller,
+            kit,
             salt: saltForRemote,
             destinationChainIds,
             gasValues,
@@ -339,14 +434,19 @@ export async function deploy_interchain_token_stellar({
             gasTokenAddress,
             rpcUrl,
             networkPassphrase,
-            minterAddress: minterAddress || caller, 
+            minterAddress: minterAddress || caller,
             onStatusUpdate: onStatusUpdate,
           });
-          console.log("Multicall remote deployments completed:", remoteDeployResultData);
-        
+        console.log(
+          "Multicall remote deployments completed:",
+          remoteDeployResultData
+        );
       } catch (multicallError) {
-        console.error("Multicall for remote deployments failed:", multicallError);
-        onStatusUpdate?.({ type: "idle"});
+        console.error(
+          "Multicall for remote deployments failed:",
+          multicallError
+        );
+        onStatusUpdate?.({ type: "idle" });
         throw multicallError;
       }
     }
