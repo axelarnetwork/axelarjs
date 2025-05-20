@@ -1,24 +1,19 @@
-import { createHash, randomUUID } from "crypto";
+import { createHash } from "crypto";
 import {
   Account,
   BASE_FEE,
   Contract,
   nativeToScVal,
-  Networks,
-  rpc, // Provides rpc.Server
+  rpc,
   TransactionBuilder,
   xdr,
 } from "stellar-sdk";
 
-// Using Networks.TESTNET as default, but can be overridden in function parameters
-
-// Constants
-export const STELLAR_TESTNET_HORIZON_URL =
-  "https://horizon-testnet.stellar.org";
-export const STELLAR_TESTNET_RPC_URL =
-  "https://soroban-testnet.stellar.org:443";
-export const INTERCHAIN_TOKEN_SERVICE_CONTRACT =
-  "CCXT3EAQ7GPQTJWENU62SIFBQ3D4JMNQSB77KRPTGBJ7ZWBYESZQBZRK";
+import {
+  STELLAR_HORIZON_URL,
+  STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_RPC_URL,
+} from "./config";
 
 // Function to convert a string to a bytes32 format
 export function saltToBytes32(input: string): string {
@@ -70,7 +65,7 @@ export function tokenMetadataToScVal(
 // Function to fetch account details
 export async function fetchStellarAccount(accountId: string): Promise<Account> {
   const accountResponse = await fetch(
-    `${STELLAR_TESTNET_HORIZON_URL}/accounts/${accountId}`
+    `${STELLAR_HORIZON_URL}/accounts/${accountId}`
   );
 
   if (!accountResponse.ok) {
@@ -83,15 +78,14 @@ export async function fetchStellarAccount(accountId: string): Promise<Account> {
   return new Account(accountId, accountData.sequence);
 }
 
-
 // Function to create and prepare a Stellar contract transaction
 export async function createContractTransaction({
   contractAddress,
   method,
   account,
   args,
-  rpcUrl = STELLAR_TESTNET_RPC_URL,
-  networkPassphrase = Networks.TESTNET,
+  rpcUrl = STELLAR_RPC_URL,
+  networkPassphrase = STELLAR_NETWORK_PASSPHRASE,
 }: {
   contractAddress: string;
   method: string;
@@ -120,7 +114,7 @@ export async function createContractTransaction({
     networkPassphrase,
   })
     .addOperation(operation)
-    .setTimeout(0)
+    .setTimeout(30)
     .build();
 
   // Get the XDR before preparing
@@ -141,16 +135,5 @@ export async function createContractTransaction({
   return {
     transactionXDR,
     preparedTransaction,
-  };
-}
-
-// Generate mock addresses for testing
-export function generateMockAddresses() {
-  const tokenAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
-  const tokenManagerAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
-
-  return {
-    tokenAddress,
-    tokenManagerAddress,
   };
 }

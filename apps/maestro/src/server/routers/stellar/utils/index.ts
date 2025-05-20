@@ -13,8 +13,8 @@ import { ethers } from "ethers";
 import { rpc } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { Context } from "~/server/context";
+import { STELLAR_HORIZON_URL, STELLAR_NETWORK_PASSPHRASE } from "./config";
 
 export const gasTokenAddress =
   "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
@@ -81,7 +81,7 @@ async function simulateCall(
   try {
     const tx = new TransactionBuilder(account, {
       fee: "1000000",
-      networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+      networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
     })
       .addOperation(contract.call(method))
       .setTimeout(30)
@@ -101,7 +101,7 @@ async function simulateCall(
 }
 
 export const getStellarAssetMetadata = async (tokenAddress: string) => {
-  const server = new Horizon.Server("https://horizon-testnet.stellar.org");
+  const server = new Horizon.Server(STELLAR_HORIZON_URL);
   const [asset_code, asset_issuer] = tokenAddress.split("-");
   const asset = await server
     .assets()

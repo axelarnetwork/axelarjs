@@ -3,13 +3,12 @@ import { nativeToScVal } from "@stellar/stellar-sdk";
 import { rpc, Transaction } from "stellar-sdk";
 
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
+import { addressToScVal, tokenToScVal } from ".";
 import {
-  addressToScVal,
-  gasTokenAddress,
-  sorobanRpcUrl,
-  stellarITContractId,
-  tokenToScVal,
-} from ".";
+  STELLAR_ITS_CONTRACT_ID,
+  STELLAR_RPC_URL,
+  XLM_ASSET_ADDRESS,
+} from "./config";
 import {
   createContractTransaction,
   fetchStellarAccount,
@@ -34,10 +33,10 @@ export async function stellarInterchainTransfer({
   kit: StellarWalletsKit;
 }) {
   try {
-    const server = new rpc.Server(sorobanRpcUrl);
+    const server = new rpc.Server(STELLAR_RPC_URL);
 
     const { transactionXDR } = await createContractTransaction({
-      contractAddress: stellarITContractId,
+      contractAddress: STELLAR_ITS_CONTRACT_ID,
       method: "interchain_transfer",
       account: await fetchStellarAccount(caller),
       args: [
@@ -47,7 +46,7 @@ export async function stellarInterchainTransfer({
         hexToScVal(destinationAddress),
         nativeToScVal(amount, { type: "i128" }),
         nativeToScVal(null, { type: "void" }),
-        tokenToScVal(gasTokenAddress, gasValue),
+        tokenToScVal(XLM_ASSET_ADDRESS, gasValue),
       ],
     });
 
