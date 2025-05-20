@@ -15,7 +15,12 @@ import { WriteContractData } from "wagmi/query";
 
 import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useBalance,
+  useChainId,
+} from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -27,7 +32,7 @@ import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
 
 interface StellarDeploymentResult {
   hash: string;
-  status: string; 
+  status: string;
   tokenId: string;
   tokenAddress: string;
   tokenManagerAddress: string;
@@ -41,7 +46,7 @@ export const Step2: FC = () => {
   const { state, actions } = useStep2ChainSelectionState();
 
   const chainId = useChainId();
-  
+
   // Handle both EVM and VM chains
   const sourceChain = state.chains.find((chain) => chain.chain_id === chainId);
 
@@ -84,7 +89,7 @@ export const Step2: FC = () => {
         initialSupply: parseUnits(
           rootState.tokenDetails.initialSupply,
           rootState.tokenDetails.tokenDecimals || 0
-        )
+        ),
       }
     );
 
@@ -132,38 +137,39 @@ export const Step2: FC = () => {
         return;
       });
 
-      // Stellar chain handling
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
         try {
           const result = (await txPromise) as StellarDeploymentResult;
-          console.log("Stellar deployment result", result)
           if (result && result.hash && result.tokenAddress) {
-            // Add transaction to history (similar to other chains)
-            if (rootState.selectedChains.length >= 0) { 
-              console.log("Stellar result", result)
+            if (rootState.selectedChains.length >= 0) {
               addTransaction({
-                status: "submitted", 
+                status: "submitted",
                 hash: result.hash,
                 chainId: sourceChain.chain_id,
                 txType: "INTERCHAIN_DEPLOYMENT",
               });
             }
-            return; 
+            return;
           } else {
             console.error("Stellar deployment result incomplete", result);
-            toast.error("Stellar deployment failed: Incomplete data from deployment function.");
+            toast.error(
+              "Stellar deployment failed: Incomplete data from deployment function."
+            );
             rootActions.setTxState({
               type: "idle",
             });
           }
         } catch (e: any) {
-          console.error("Stellar deployment error in DeployAndRegister.tsx:", e);
+          console.error(
+            "Stellar deployment error in DeployAndRegister.tsx:",
+            e
+          );
           toast.error(e.message || "Stellar deployment failed.");
           rootActions.setTxState({
             type: "idle",
           });
         }
-        return; 
+        return;
       }
 
       // Sui will return a digest equivalent to the txHash
@@ -179,7 +185,7 @@ export const Step2: FC = () => {
               tokenAddress: result.tokenAddress,
             });
             if (rootState.selectedChains.length > 0) {
-              console.log("sui result", result)
+              console.log("sui result", result);
               addTransaction({
                 status: "submitted",
                 suiTx: result,
