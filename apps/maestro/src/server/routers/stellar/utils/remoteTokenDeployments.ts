@@ -1,17 +1,21 @@
 import { Buffer } from "buffer";
 import {
-  BASE_FEE,
-  TransactionBuilder,
-  xdr,
-  rpc,
   Address,
+  BASE_FEE,
   Contract,
   nativeToScVal,
+  rpc,
+  TransactionBuilder,
+  xdr,
 } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
-import { STELLAR_ITS_CONTRACT_ID } from "./config";
+import {
+  STELLAR_ITS_CONTRACT_ID,
+  STELLAR_MULTICALL_CONTRACT_ID,
+  XLM_ASSET_ADDRESS,
+} from "./config";
 import { fetchStellarAccount } from "./transactions";
 
 // Interface for the result of building a remote deployment transaction
@@ -29,8 +33,8 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   destinationChainIds,
   gasValues,
   itsContractAddress = STELLAR_ITS_CONTRACT_ID,
-  multicallContractAddress = "CC6BXRCUQFAJ64NDLEZCS4FDL6GN65FL2KDOKCRHFWPMPKRWQNBA4YR2",
-  gasTokenAddress = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+  multicallContractAddress = STELLAR_MULTICALL_CONTRACT_ID,
+  gasTokenAddress = XLM_ASSET_ADDRESS,
   rpcUrl,
   networkPassphrase,
   minterAddress,
