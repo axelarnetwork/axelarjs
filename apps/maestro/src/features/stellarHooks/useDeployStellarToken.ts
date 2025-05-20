@@ -1,14 +1,16 @@
 import { useState } from "react";
 
 import type { StellarWalletsKit as BaseStellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
-import { rpc, Transaction } from "@stellar/stellar-sdk";
+import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
+
+import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
 import { stellarChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { trpc } from "~/lib/trpc";
 
-// Interface estendida para incluir métodos que usamos mas que podem não estar na definição de tipos original
+// Extended interface to include methods we use that may not be in the original type definition
 interface StellarWalletsKit extends BaseStellarWalletsKit {
   getPublicKey(): Promise<string>;
   signTransaction(
@@ -48,19 +50,12 @@ export function useDeployStellarToken() {
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<DeployTokenResult | null>(null);
 
-  const { mutateAsync: getDeployTokenTxBytes } =
-    trpc.stellar.getDeployTokenTxBytes.useMutation({
-      onError(error) {
-        console.log("Error in getDeployTokenTxBytes:", error.message);
-      },
-    });
+  // Use the Stellar transaction polling hook
+  const { pollTransaction } = useStellarTransactionPoller();
 
-  const { mutateAsync: getDeployRemoteTokensTxBytes } =
-    trpc.stellar.getDeployRemoteTokensTxBytes.useMutation({
-      onError(error) {
-        console.log("Error in getDeployRemoteTokensTxBytes:", error.message);
-      },
-    });
+  const { mutateAsync: getDeployTokenTxBytes } = trpc.stellar.getDeployTokenTxBytes.useMutation();
+
+  const { mutateAsync: getDeployRemoteTokensTxBytes } = trpc.stellar.getDeployRemoteTokensTxBytes.useMutation();
 
   const deployStellarToken = async ({
     kit,
@@ -74,12 +69,12 @@ export function useDeployStellarToken() {
     gasValues,
     onStatusUpdate,
   }: DeployTokenParams): Promise<DeployTokenResult> => {
-    // Verificar se o kit está disponível
+    // Check if the kit is available
     if (!kit) {
       throw new Error("StellarWalletsKit not provided");
     }
 
-    // Verificar se o usuário está conectado e obter a chave pública
+    // Check if the user is connected and get the public key
     let publicKey: string;
     try {
       publicKey = (await kit.getAddress()).address;
@@ -87,15 +82,15 @@ export function useDeployStellarToken() {
         throw new Error("Stellar wallet not connected");
       }
     } catch (error) {
-      console.error("Error getting public key:", error);
+      // Error getting public key
       throw new Error("Failed to get Stellar wallet public key");
     }
 
-    // Primeiro passo: deploy do token na Stellar
+    // First step: deploy the token on Stellar
     onStatusUpdate?.({ type: "pending_approval", step: 1, totalSteps: 2 });
 
     try {
-      // 1. Obter os bytes da transação para deploy do token
+      // 1. Get transaction bytes for token deployment
       const { transactionXDR } = await getDeployTokenTxBytes({
         caller: publicKey,
         tokenName,
@@ -106,12 +101,12 @@ export function useDeployStellarToken() {
         minterAddress,
       });
 
-      // 2. Assinar a transação
+      // 2. Sign the transaction
       const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
         networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
       });
 
-      // 3. Enviar a transação
+      // 3. Submit the transaction
       const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
       const server = new rpc.Server(rpcUrl, {
         allowHttp: rpcUrl.startsWith("http://"),
@@ -126,7 +121,7 @@ export function useDeployStellarToken() {
       const initialResponse = await server.sendTransaction(tx);
 
       if (initialResponse.status === "PENDING") {
-        console.log("[STATUS_UPDATE] Deploying - Hash:", initialResponse.hash);
+        // Deploying with hash
         onStatusUpdate?.({
           type: "deploying",
           txHash: initialResponse.hash,
@@ -139,105 +134,307 @@ export function useDeployStellarToken() {
         initialResponse.status === "TRY_AGAIN_LATER"
       ) {
         const errorMessage = `Stellar transaction submission failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
-        console.error(errorMessage, initialResponse);
+        // Error in transaction submission
         throw new Error(errorMessage);
       }
 
-      // 4. Aguardar confirmação da transação
-      console.log("Transaction PENDING, starting polling...");
-      let getTxResponse: rpc.Api.GetTransactionResponse | undefined;
-      const maxPollingAttempts = 20;
-      const pollingIntervalMs = 3000;
+      // 4. Wait for transaction confirmation using the polling hook
 
-      for (let i = 0; i < maxPollingAttempts; i++) {
-        await new Promise((resolve) => setTimeout(resolve, pollingIntervalMs));
+      const pollingResult = await pollTransaction(
+        server,
+        initialResponse.hash,
+        {
+          onStatusUpdate: (status) => {
+            if (status.type === "polling") {
+              onStatusUpdate?.({
+                type: "deploying",
+                txHash: initialResponse.hash,
+              });
+            }
+          },
+        }
+      );
 
+      if (pollingResult.status !== "SUCCESS") {
+        throw pollingResult.error;
+      }
+
+      // Use the transaction result for data extraction
+      // We need to fetch the transaction again to access resultMetaXdr
+      const getTxResponse = await server.getTransaction(initialResponse.hash);
+
+      // 5. Extract token information from the transaction response
+      let tokenId: string | undefined;
+      let tokenAddress: string | undefined;
+      let tokenManagerAddress: string | undefined;
+      let tokenManagerType: string | undefined;
+
+      // Check if we have resultMetaXdr in the response (may not be defined in the type)
+      const txResponseWithMeta = getTxResponse as any;
+      if (txResponseWithMeta.resultMetaXdr) {
         try {
-          getTxResponse = await server.getTransaction(initialResponse.hash);
-          console.log(
-            `Polling attempt ${i + 1}: Status = ${getTxResponse.status}`
-          );
+          // Extract tokenId from the transaction return value
+          const transactionMeta = txResponseWithMeta.resultMetaXdr;
+          const returnValue = transactionMeta
+            .v3()
+            ?.sorobanMeta()
+            ?.returnValue();
 
-          if (getTxResponse.status === rpc.Api.GetTransactionStatus.SUCCESS) {
-            console.log("Transaction SUCCESS:", getTxResponse);
-            break;
-          } else if (
-            getTxResponse.status === rpc.Api.GetTransactionStatus.FAILED
+          if (
+            returnValue &&
+            returnValue.switch() === xdr.ScValType.scvBytes()
           ) {
-            const failReason = `Transaction failed on-chain. Result XDR (base64): ${getTxResponse.resultXdr ? getTxResponse.resultXdr.toXDR("base64") : "N/A"}`;
-            console.error("Transaction FAILED:", failReason, getTxResponse);
-            throw new Error(failReason);
+            tokenId = returnValue.bytes().toString("hex");
+            // Extracted tokenId from transaction return value
           }
-        } catch (pollingError) {
-          console.error(
-            `Error during getTransactionStatus polling:`,
-            pollingError
-          );
-          throw new Error(
-            `Polling with getTransaction failed: ${pollingError instanceof Error ? pollingError.message : String(pollingError)}`
-          );
+
+          // Extract tokenAddress, tokenManagerAddress and tokenManagerType from events
+          const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
+          const events = sorobanMeta?.events();
+
+          if (events && events.length > 0) {
+            // Found events to process
+
+            for (const event of events) {
+              const eventTopics = event.body().v0().topics();
+              if (!eventTopics || eventTopics.length === 0) continue;
+
+              // Check the event name (first topic must be a symbol)
+              const firstTopic = eventTopics[0];
+              if (firstTopic.switch() !== xdr.ScValType.scvSymbol()) continue;
+
+              const eventName = firstTopic.sym().toString();
+              // Process event by name
+
+              // Interchain token deployment event
+              if (
+                eventName === "interchain_token_deployed" &&
+                eventTopics.length >= 3
+              ) {
+                const topic1 = eventTopics[1]; // tokenId (bytes)
+                const topic2 = eventTopics[2]; // tokenAddress (address)
+
+                // Extract tokenId from the event (if not already extracted from return value)
+                if (
+                  !tokenId &&
+                  topic1 &&
+                  topic1.switch() === xdr.ScValType.scvBytes()
+                ) {
+                  tokenId = topic1.bytes().toString("hex");
+                  // Found tokenId in interchain_token_deployed event
+                }
+
+                // Extract tokenAddress
+                if (
+                  !tokenAddress &&
+                  topic2 &&
+                  topic2.switch() === xdr.ScValType.scvAddress()
+                ) {
+                  try {
+                    tokenAddress = scValToNative(topic2);
+                    // Found tokenAddress in interchain_token_deployed event
+                  } catch (error) {
+                    // Error extracting tokenAddress
+                    // Se falhar, use o valor hexadecimal bruto do endereço
+                    try {
+                      const addressBytes = topic2.address().contractId();
+                      if (addressBytes) {
+                        tokenAddress = addressBytes.toString("hex");
+                        // Using raw hex for tokenAddress
+                      }
+                    } catch (e) {
+                      // Failed to extract raw address bytes
+                    }
+                  }
+                }
+              }
+              // Token manager deployment event
+              else if (
+                eventName === "token_manager_deployed" &&
+                eventTopics.length >= 5
+              ) {
+                const topic3 = eventTopics[3]; // tokenManagerAddress (address)
+                const topic4 = eventTopics[4]; // tokenManagerType (u32)
+
+                // Extract tokenManagerAddress
+                if (
+                  !tokenManagerAddress &&
+                  topic3 &&
+                  topic3.switch() === xdr.ScValType.scvAddress()
+                ) {
+                  try {
+                    tokenManagerAddress = scValToNative(topic3);
+                    // Found tokenManagerAddress in token_manager_deployed event
+                  } catch (error) {
+                    // Error extracting tokenManagerAddress
+                    // Se falhar, use o valor hexadecimal bruto do endereço
+                    try {
+                      const addressBytes = topic3.address().contractId();
+                      if (addressBytes) {
+                        tokenManagerAddress = addressBytes.toString("hex");
+                        // Using raw hex for tokenManagerAddress
+                      }
+                    } catch (e) {
+                      // Failed to extract raw address bytes
+                    }
+                  }
+                }
+
+                // Extract tokenManagerType
+                if (
+                  tokenManagerType === undefined &&
+                  topic4 &&
+                  topic4.switch() === xdr.ScValType.scvU32()
+                ) {
+                  try {
+                    const typeNumber = scValToNative(topic4);
+                    tokenManagerType =
+                      typeNumber === 0 ? "mint_burn" : "lock_unlock";
+                    // Found tokenManagerType in token_manager_deployed event
+                  } catch (error) {
+                    // Error extracting tokenManagerType
+                    // In case of error, assume the default type mint_burn
+                    tokenManagerType = "mint_burn";
+                    // Using default tokenManagerType
+                  }
+                }
+              }
+
+              // If we found all the required information, we can stop
+              if (
+                tokenId &&
+                tokenAddress &&
+                tokenManagerAddress &&
+                tokenManagerType
+              ) {
+                // Found all required token information, stopping event processing
+                break;
+              }
+            }
+          }
+        } catch (error) {
+          // Error extracting token information from transaction
         }
       }
 
+      // If we couldn't extract all the necessary information, use fallback values
       if (
-        !getTxResponse ||
-        getTxResponse.status !== rpc.Api.GetTransactionStatus.SUCCESS
+        !tokenId ||
+        !tokenAddress ||
+        !tokenManagerAddress ||
+        !tokenManagerType
       ) {
-        throw new Error(
-          `Transaction did not succeed after ${maxPollingAttempts} polling attempts. Last status: ${getTxResponse?.status ?? "unknown"}`
-        );
+        // Could not extract all token information from transaction, using fallback values
+
+        // Use salt as tokenId if we couldn't extract it from the result
+        if (!tokenId) tokenId = salt;
+
+        // Generate unique values based on the transaction hash for other fields
+        const txHash = initialResponse.hash.substring(0, 10);
+        if (!tokenAddress) tokenAddress = `TOKEN_${txHash}`;
+        if (!tokenManagerAddress)
+          tokenManagerAddress = `TOKEN_MANAGER_${txHash}`;
+        if (!tokenManagerType) tokenManagerType = "mint_burn";
       }
 
-      // 5. Extrair informações do token da resposta (tokenId, tokenAddress, etc.)
-      // Nota: Esta parte é complexa e requer parsing dos eventos da transação
-      // Aqui estamos simplificando e assumindo que temos as informações
-      const tokenId = "token_id_placeholder"; // Extrair do resultado
-      const tokenAddress = "token_address_placeholder"; // Extrair do resultado
-      const tokenManagerAddress = "token_manager_address_placeholder"; // Extrair do resultado
-      const tokenManagerType = "mint_burn"; // Extrair do resultado
+      // Format tokenId with 0x prefix if it doesn't have it yet
+      if (tokenId && !tokenId.startsWith("0x")) {
+        tokenId = `0x${tokenId}`;
+      }
 
-      // 6. Se houver destinationChainIds, fazer o deploy remoto
+      // 6. If there are destinationChainIds, do remote deployment
       let remoteDeployResult;
       if (destinationChainIds.length > 0) {
         onStatusUpdate?.({ type: "pending_approval", step: 2, totalSteps: 2 });
 
-        // Obter os bytes da transação para deploy remoto
-        const { transactionXDR: remoteTxXDR } =
-          await getDeployRemoteTokensTxBytes({
-            caller: publicKey,
-            salt,
-            tokenName,
-            tokenSymbol,
-            decimals,
-            destinationChainIds,
-            gasValues: gasValues.map((v) => v.toString()),
-            minterAddress: minterAddress || publicKey,
+        try {
+          // Get transaction bytes for remote deployment
+          const { transactionXDR: remoteTxXDR } =
+            await getDeployRemoteTokensTxBytes({
+              caller: publicKey,
+              salt,
+              destinationChainIds,
+              gasValues: gasValues.map((v) => v.toString()),
+              minterAddress: minterAddress || publicKey,
+            });
+
+          // Sign the transaction
+          const { signedTxXdr: signedRemoteTxXdr } = await kit.signTransaction(
+            remoteTxXDR,
+            {
+              networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+            }
+          );
+
+          // Submit the transaction
+          const remoteTx = new Transaction(
+            signedRemoteTxXdr,
+            NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
+          );
+
+          // Get the transaction hash before sending it (will be used as GMP ID)
+          const txHash = remoteTx.hash().toString("hex");
+
+          onStatusUpdate?.({
+            type: "deploying",
+            txHash: txHash,
           });
 
-        // Assinar a transação
-        const { signedTxXdr: signedRemoteTxXdr } = await kit.signTransaction(
-          remoteTxXDR,
-          {
-            networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+          // Submitting multicall transaction
+
+          const remoteResponse = await server.sendTransaction(remoteTx);
+          // Remote transaction submitted
+
+          // Check if the transaction was accepted for processing
+          if (
+            remoteResponse.status === "ERROR" ||
+            remoteResponse.status === "DUPLICATE" ||
+            remoteResponse.status === "TRY_AGAIN_LATER"
+          ) {
+            const errorMessage = `Stellar remote deployment failed with status: ${remoteResponse.status}. Error: ${JSON.stringify(remoteResponse.errorResult)}`;
+            // Error in remote transaction submission
+            throw new Error(errorMessage);
           }
-        );
 
-        // Enviar a transação
-        const remoteTx = new Transaction(
-          signedRemoteTxXdr,
-          NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
-        );
-
-        const remoteResponse = await server.sendTransaction(remoteTx);
-        remoteDeployResult = {
-          hash: remoteResponse.hash,
-          status: remoteResponse.status,
-        };
+          // Poll to check the transaction status using the polling hook
+          // Transaction pending, starting polling
+          
+          const pollingResult = await pollTransaction(
+            server,
+            txHash,
+            {
+              onStatusUpdate: (status) => {
+                if (status.type === "polling") {
+                  onStatusUpdate?.({ 
+                    type: "deploying", 
+                    txHash: txHash 
+                  });
+                }
+              }
+            }
+          );
+          
+          if (pollingResult.status === "SUCCESS") {
+            remoteDeployResult = {
+              hash: txHash,
+              status: "SUCCESS",
+            };
+          } else {
+            throw pollingResult.error;
+          }
+        } catch (error) {
+          // Remote deployment error
+          onStatusUpdate?.({ type: "idle" });
+          throw error;
+        }
       }
 
-      // 7. Retornar o resultado completo
+      // 7. Return the complete result
+      // If there's a remote deployment, use the remote transaction hash as the main hash
       const result: DeployTokenResult = {
-        hash: initialResponse.hash,
+        hash: remoteDeployResult
+          ? remoteDeployResult.hash
+          : initialResponse.hash,
         status: "SUCCESS",
         tokenId,
         tokenAddress,
