@@ -432,7 +432,6 @@ export function useDeployStellarToken() {
         tokenAddress,
         tokenManagerAddress,
         tokenManagerType,
-        remote: remoteDeployResult,
       };
 
       setData(result);
