@@ -17,7 +17,7 @@ import type { Context } from "~/server/context";
 import { 
   STELLAR_HORIZON_URL, 
   STELLAR_NETWORK_PASSPHRASE, 
-  XLM_ASSET_ADDRESS as gasTokenAddress,
+  GAS_TOKEN_ADDRESS as gasTokenAddress,
   STELLAR_ITS_CONTRACT_ID as stellarITContractId,
   SOROBAN_RPC_URL as sorobanRpcUrl 
 } from "./config";

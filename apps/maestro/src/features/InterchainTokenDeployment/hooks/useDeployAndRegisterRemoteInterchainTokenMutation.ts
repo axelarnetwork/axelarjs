@@ -169,13 +169,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
   useEffect(() => {
-    // Special case for Stellar - always set ready
-    if (chainId === STELLAR_CHAIN_ID) {
-      console.log("Setting isReady=true for Stellar chain");
-      setIsReady(true);
-      return;
-    }
-
     if (isValidEVMAddress(deployerAddress) && !prepareMulticall?.request) {
       setIsReady(false);
       console.warn("Failed to simulate multicall for deploying remote tokens");
@@ -183,7 +176,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
     if (!tokenId || !tokenAddress) {
       if (input) {
-        if (!input.sourceChainId.includes("sui")) {
+        if (
+          !input.sourceChainId.includes("sui") &&
+          !input.sourceChainId.includes("stellar")
+        ) {
           setIsReady(false);
           return;
         }
@@ -308,13 +304,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
   const writeAsync = useCallback(async () => {
-    console.log("writeAsync called with:", {
-      chainId,
-      isStellar: chainId === STELLAR_CHAIN_ID,
-      isReady,
-      hasInput: Boolean(input),
-    });
-
     await recordDeploymentDraft();
     if (chainId === STELLAR_CHAIN_ID && input) {
       try {
@@ -340,7 +329,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           gasValues: gasValues,
           onStatusUpdate: config.onStatusUpdate,
         });
-        console.log("Stellar deployment result:", result);
         if (result) {
           setRecordDeploymentArgs({
             kind: "interchain",
@@ -362,7 +350,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
               | undefined,
           });
         }
-        console.log("Stellar deployment arguments set for recording.");
         return result;
       } catch (error) {
         console.error("Stellar deployment failed:", error);

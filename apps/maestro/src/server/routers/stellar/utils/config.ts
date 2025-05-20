@@ -41,12 +41,5 @@ export const XLM_ASSET_ADDRESS = XLMAssetAddresses[NEXT_PUBLIC_NETWORK_ENV];
 
 export const STELLAR_RPC_URL = STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV];
 
-// Soroban RPC URLs for different environments
-export const SOROBAN_RPC_URLS = {
-  mainnet: "XXXXX",
-  testnet: "https://soroban-testnet.stellar.org",
-  "devnet-amplifier": "https://soroban-testnet.stellar.org",
-};
-
-export const SOROBAN_RPC_URL = 
-  SOROBAN_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV as keyof typeof SOROBAN_RPC_URLS];
+// Use the Soroban RPC URLs directly from @axelarjs/core
+export const SOROBAN_RPC_URL = STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV];
