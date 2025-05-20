@@ -7,7 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
 import { z } from "zod";
 
-import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { hex64Literal, numericString } from "~/lib/utils/validation";
 import { DeployTokenResult } from "../suiHooks/useDeployToken";
@@ -106,6 +111,10 @@ function useInterchainTokenDeploymentState(
 
       if (chainId === SUI_CHAIN_ID) {
         tokenDetailsForm.setValue("tokenDecimals", 9);
+      }
+
+      if (chainId === STELLAR_CHAIN_ID) {
+        tokenDetailsForm.setValue("tokenDecimals", 7);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
