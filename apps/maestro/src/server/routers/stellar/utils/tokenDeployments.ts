@@ -41,6 +41,55 @@ function addressToScVal(addressString: string): xdr.ScVal {
   return nativeToScVal(Address.fromString(addressString), { type: "address" });
 }
 
+/**
+ * Constrói a transação para deploy de um token interchain na Stellar sem executá-la.
+ * Retorna o XDR da transação que pode ser assinada e enviada pelo cliente.
+ */
+export async function buildDeployInterchainTokenTransaction({
+  caller,
+  tokenName,
+  tokenSymbol,
+  decimals,
+  initialSupply,
+  salt,
+  minterAddress,
+  rpcUrl,
+  networkPassphrase,
+}: {
+  caller: string;
+  tokenName: string;
+  tokenSymbol: string;
+  decimals: number;
+  initialSupply: string | bigint;
+  salt: string;
+  minterAddress?: string;
+  rpcUrl?: string;
+  networkPassphrase?: string;
+}): Promise<{ transactionXDR: string }> {
+  const actualMinterAddress = minterAddress || caller;
+  const actualRpcUrl = rpcUrl || stellarChainConfig.rpcUrls.default.http[0];
+  const actualNetworkPassphrase = networkPassphrase || NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
+  
+  const account = await fetchStellarAccount(caller);
+
+  const args: xdr.ScVal[] = [
+    addressToScVal(caller),
+    hexToScVal(salt),
+    tokenMetadataToScVal(decimals, tokenName, tokenSymbol),
+    nativeToScVal(initialSupply.toString(), { type: "i128" }),
+    addressToScVal(actualMinterAddress),
+  ];
+
+  return createContractTransaction({
+    contractAddress: STELLAR_ITS_CONTRACT_ID,
+    method: "deploy_interchain_token",
+    account,
+    args,
+    rpcUrl: actualRpcUrl,
+    networkPassphrase: actualNetworkPassphrase,
+  });
+}
+
 export async function deploy_interchain_token_stellar({
   caller,
   kit,
@@ -429,7 +478,7 @@ export async function deploy_interchain_token_stellar({
             salt: saltForRemote,
             destinationChainIds,
             gasValues,
-            itsContractAddress: INTERCHAIN_TOKEN_SERVICE_CONTRACT,
+            itsContractAddress: STELLAR_ITS_CONTRACT_ID,
             multicallContractAddress,
             gasTokenAddress,
             rpcUrl,

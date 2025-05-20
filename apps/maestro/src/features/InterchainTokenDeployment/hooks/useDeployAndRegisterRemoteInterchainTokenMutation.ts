@@ -63,7 +63,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
   const [isReady, setIsReady] = useState(false);
-  const { deployStellarTokenAsync } = useDeployStellarToken(); // isStellarDeployLoading removed as onStatusUpdate handles UI feedback
+  const { deployStellarToken } = useDeployStellarToken();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -331,9 +331,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           );
         }
 
-        const result = await deployStellarTokenAsync({
-          caller: address,
-          kit: kit,
+        // Passamos o kit como any para evitar problemas de tipagem
+        const result = await deployStellarToken({
+          kit: kit as any,
           tokenName: input.tokenName,
           tokenSymbol: input.tokenSymbol,
           decimals: input.decimals,
