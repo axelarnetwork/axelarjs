@@ -13,9 +13,15 @@ import React, {
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
+import type { DeployTokenResultStellar } from "~/features/stellarHooks";
 import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useBalance,
+  useChainId,
+} from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -75,7 +81,7 @@ export const Step2: FC = () => {
         initialSupply: parseUnits(
           rootState.tokenDetails.initialSupply,
           rootState.tokenDetails.tokenDecimals || 0
-        )
+        ),
       }
     );
 
@@ -122,6 +128,41 @@ export const Step2: FC = () => {
 
         return;
       });
+
+      if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
+        try {
+          const result = (await txPromise) as DeployTokenResultStellar;
+          if (result && result.hash && result.tokenAddress) {
+            if (rootState.selectedChains.length >= 0) {
+              addTransaction({
+                status: "submitted",
+                hash: result.hash,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+            }
+            return;
+          } else {
+            console.error("Stellar deployment result incomplete", result);
+            toast.error(
+              "Stellar deployment failed: Incomplete data from deployment function."
+            );
+            rootActions.setTxState({
+              type: "idle",
+            });
+          }
+        } catch (e: any) {
+          console.error(
+            "Stellar deployment error in DeployAndRegister.tsx:",
+            e
+          );
+          toast.error(e.message || "Stellar deployment failed.");
+          rootActions.setTxState({
+            type: "idle",
+          });
+        }
+        return;
+      }
 
       // Sui will return a digest equivalent to the txHash
       if (sourceChain.chain_id === SUI_CHAIN_ID) {

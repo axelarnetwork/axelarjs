@@ -14,7 +14,15 @@ import { rpc } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import type { Context } from "~/server/context";
-import { STELLAR_HORIZON_URL, STELLAR_NETWORK_PASSPHRASE } from "./config";
+import {
+  XLM_ASSET_ADDRESS as gasTokenAddress,
+  SOROBAN_RPC_URL as sorobanRpcUrl,
+  STELLAR_HORIZON_URL,
+  STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_ITS_CONTRACT_ID as stellarITContractId,
+} from "./config";
+
+export { gasTokenAddress, stellarITContractId, sorobanRpcUrl };
 
 export function hexToScVal(hexString: string) {
   const result = nativeToScVal(Buffer.from(ethers.utils.arrayify(hexString)), {

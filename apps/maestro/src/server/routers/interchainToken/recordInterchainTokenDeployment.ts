@@ -26,8 +26,10 @@ export const recordInterchainTokenDeployment = protectedProcedure
     let tokenManagerAddress;
     let tokenManagerType;
     const chains = await ctx.configs.chains();
-
-    if (!input.axelarChainId.includes("sui")) {
+    const isSui = input.axelarChainId.includes("sui");
+    const isStellar = input.axelarChainId.includes("stellar");
+    
+    if (!isSui && !isStellar) {
       const configs = chains[input.axelarChainId];
 
       invariant(

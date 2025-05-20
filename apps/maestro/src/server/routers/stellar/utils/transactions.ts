@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "crypto";
+import { createHash } from "crypto";
 import {
   Account,
   BASE_FEE,
@@ -114,7 +114,7 @@ export async function createContractTransaction({
     networkPassphrase,
   })
     .addOperation(operation)
-    .setTimeout(30)
+    .setTimeout(0)
     .build();
 
   // Get the XDR before preparing
@@ -135,16 +135,5 @@ export async function createContractTransaction({
   return {
     transactionXDR,
     preparedTransaction,
-  };
-}
-
-// Generate mock addresses for testing
-export function generateMockAddresses() {
-  const tokenAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
-  const tokenManagerAddress = `C${Buffer.from(randomUUID().replace(/-/g, "")).toString("hex").slice(0, 55)}`;
-
-  return {
-    tokenAddress,
-    tokenManagerAddress,
   };
 }

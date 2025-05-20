@@ -229,6 +229,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       } else {
         return `${props.chain.explorer.url}/contract/${props.tokenAddress}`;
       }
+
     } else {
       return `${props.chain.explorer.url}/token/${props.tokenAddress}`;
     }
